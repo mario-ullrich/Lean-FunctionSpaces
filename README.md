@@ -279,7 +279,8 @@ domains, traces, eigenbases, manifolds) and `Wavelets/`. The blueprint gives the
 block documents state every result with its Lean name and list the files:
 
 * [Besov spaces on `ℝ^d`](docs/Rd.md): Littlewood–Paley blocks, differences, local means, atoms.
-* [Daubechies wavelets](docs/Daubechies.md): wavelet coefficients on `ℝ`.
+* [Daubechies wavelets](docs/Daubechies.md): wavelet coefficients on `ℝ`, tensor generators and
+  expansions on `ℝ^d`.
 * [Dominating mixed smoothness](docs/MixedSmoothness.md): mixed differences, hyperbolic crosses.
 * [The torus](docs/Torus.md): trigonometric approximation, moduli, traces, Sobolev spaces.
 * [Intervals, the cube, splines and wavelets](docs/IntervalCube.md): splines, Haar,

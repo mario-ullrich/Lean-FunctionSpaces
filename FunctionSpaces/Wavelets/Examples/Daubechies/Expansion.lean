@@ -42,8 +42,10 @@ The file is generic in `g`, so that it serves the scaling function `φ` (support
   (`Rd.eLpNorm_rpow_le_of_overlap`) and `‖g_{j,k}‖_p = 2^(j(1/2 - 1/p)) ‖g‖_p`
   (`Daubechies.eLpNorm_scaledFun`). The coefficient estimate
   `‖(⟨f, g_{j,k}⟩)_k‖_{ℓ_p} ≤ M^(1/p) ‖g‖_{p'} 2^(-j(1/2 - 1/p)) ‖f‖_p`
-  (`Daubechies.lqNorm_coeffFun_le`) follows from Hölder's inequality on each window and the
-  window inequality `∑_k ∫_{W_k} F ≤ M ∫ F` (`MeasureTheory.tsum_setLIntegral_le_mul_lintegral`).
+  (`Daubechies.lqNorm_coeffFun_le`) follows from Hölder's inequality on each window
+  (`MeasureTheory.eLpNorm_mul_conj_le_of_forall_notMem`) and the window inequality
+  `∑_k ∫_{W_k} F ≤ M ∫ F` (`MeasureTheory.tsum_setLIntegral_le_mul_lintegral`), here in its
+  `ℓ_p` form (`MeasureTheory.lqNorm_le_mul_eLpNorm_of_overlap`).
   Together with coefficient recovery it gives the lower estimate
   `2^(j(1/2 - 1/p)) ‖c‖_{ℓ_p} ≤ M^(1/p) ‖g‖_{p'} ‖∑_k c_k g_{j,k}‖_p` for orthonormal translates
   (`Daubechies.lqNorm_le_eLpNorm_expand`). The constants (`Daubechies.expandConst`,
@@ -90,6 +92,67 @@ theorem tsum_setLIntegral_le_mul_lintegral {α ι : Type*} [MeasurableSpace α] 
         (lintegral_tsum fun i => hF.indicator (hI i)).symm
     _ ≤ ∫⁻ x, M * F x ∂μ := lintegral_mono hpt
     _ = M * ∫⁻ x, F x ∂μ := lintegral_const_mul' _ _ (ENNReal.natCast_ne_top M)
+
+/-- **Summing local bounds over sets of bounded overlap**: let `W_i`, `i ∈ κ`, be countably many
+measurable sets such that every point lies in at most `M` of them, let `0 < p < ∞`, let `f` be
+a.e. strongly measurable, and let `w : κ → [0, ∞]` satisfy `w_i ≤ ‖1_{W_i} f‖_p B` for every `i`.
+Then `‖w‖_{ℓ_p} ≤ M^(1/p) B ‖f‖_p`: the `p`-th powers satisfy
+`∑_i w_i^p ≤ B^p ∑_i ∫_{W_i} |f|^p ≤ M B^p ‖f‖_p^p` by the window inequality
+(`MeasureTheory.tsum_setLIntegral_le_mul_lintegral`). -/
+theorem lqNorm_le_mul_eLpNorm_of_overlap {α κ E : Type*} [MeasurableSpace α]
+    [NormedAddCommGroup E] [MeasurableSpace κ] [Countable κ] [MeasurableSingletonClass κ]
+    {μ : Measure α} {W : κ → Set α} (hW : ∀ i, MeasurableSet (W i)) {M : ℕ}
+    (hM : ∀ x (S : Finset κ), (∀ i ∈ S, x ∈ W i) → S.card ≤ M) {p : ℝ≥0∞} (hp0 : p ≠ 0)
+    (hp : p ≠ ∞) {f : α → E} (hf : AEStronglyMeasurable f μ) {w : κ → ℝ≥0∞} {B : ℝ≥0∞}
+    (hw : ∀ i, w i ≤ eLpNorm ((W i).indicator f) p μ * B) :
+    ENNReal.lqNorm p w ≤ (M : ℝ≥0∞) ^ (1 / p.toReal) * B * eLpNorm f p μ := by
+  have hr : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
+  have hk : ∀ i, w i ^ p.toReal ≤ B ^ p.toReal * ∫⁻ x in W i, ‖f x‖ₑ ^ p.toReal ∂μ := fun i => by
+    calc w i ^ p.toReal
+        ≤ (eLpNorm ((W i).indicator f) p μ * B) ^ p.toReal := ENNReal.rpow_le_rpow (hw i) hr.le
+      _ = B ^ p.toReal * ∫⁻ x in W i, ‖f x‖ₑ ^ p.toReal ∂μ := by
+          rw [ENNReal.mul_rpow_of_nonneg _ _ hr.le, mul_comm,
+            eLpNorm_indicator_eq_eLpNorm_restrict (hW i).nullMeasurableSet,
+            eLpNorm_rpow_eq hf.restrict hp0 hp]
+  have hsum : ∑' i, w i ^ p.toReal ≤ B ^ p.toReal * ((M : ℝ≥0∞) * eLpNorm f p μ ^ p.toReal) := by
+    calc ∑' i, w i ^ p.toReal
+        ≤ ∑' i, B ^ p.toReal * ∫⁻ x in W i, ‖f x‖ₑ ^ p.toReal ∂μ := ENNReal.tsum_le_tsum hk
+      _ = B ^ p.toReal * ∑' i, ∫⁻ x in W i, ‖f x‖ₑ ^ p.toReal ∂μ := ENNReal.tsum_mul_left
+      _ ≤ B ^ p.toReal * ((M : ℝ≥0∞) * ∫⁻ x, ‖f x‖ₑ ^ p.toReal ∂μ) := by
+          gcongr
+          exact tsum_setLIntegral_le_mul_lintegral hW hM (hf.enorm.pow_const _)
+      _ = B ^ p.toReal * ((M : ℝ≥0∞) * eLpNorm f p μ ^ p.toReal) := by
+          rw [eLpNorm_rpow_eq hf hp0 hp]
+  rw [← ENNReal.rpow_le_rpow_iff hr, ENNReal.lqNorm_rpow hp0 hp]
+  refine hsum.trans (le_of_eq ?_)
+  simp only [ENNReal.mul_rpow_of_nonneg _ _ hr.le, ← ENNReal.rpow_mul,
+    one_div_mul_cancel hr.ne', ENNReal.rpow_one]
+  ring
+
+/-- **Hölder's inequality on a set outside which one factor vanishes**: let `W` be measurable,
+let `g` be a.e. strongly measurable with `g = 0` outside `W`, let `1 ≤ p`, and let `f` be a.e.
+strongly measurable. Then `‖f conj g‖_1 ≤ ‖1_W f‖_p ‖g‖_{p'}` with the conjugate exponent `p'`.
+Outside `W` the factor `g` vanishes, so `f` may be replaced by `1_W f`; then Hölder's inequality
+(Mathlib's `MeasureTheory.eLpNorm_le_eLpNorm_mul_eLpNorm`) applies. -/
+theorem eLpNorm_mul_conj_le_of_forall_notMem {α : Type*} [MeasurableSpace α] {μ : Measure α}
+    {W : Set α} (hW : MeasurableSet W) {g : α → ℂ} (hg : AEStronglyMeasurable g μ)
+    (hgW : ∀ y ∉ W, g y = 0) {p : ℝ≥0∞} (hp1 : 1 ≤ p) {f : α → ℂ}
+    (hf : AEStronglyMeasurable f μ) :
+    eLpNorm (fun y => f y * conj (g y)) 1 μ ≤
+      eLpNorm (W.indicator f) p μ * eLpNorm g (ENNReal.conjExponent p) μ := by
+  have := ENNReal.HolderConjugate.conjExponent hp1
+  have heq : (fun y => f y * conj (g y)) = fun y => W.indicator f y * conj (g y) := by
+    funext y
+    by_cases hy : y ∈ W
+    · rw [Set.indicator_of_mem hy]
+    · rw [hgW y hy, map_zero, mul_zero, mul_zero]
+  have h := eLpNorm_le_eLpNorm_mul_eLpNorm (μ := μ) (p := p)
+    (q := ENNReal.conjExponent p) (r := 1) (fun u v : ℂ => u * conj v) 1
+    (continuous_fst.mul (Complex.continuous_conj.comp continuous_snd))
+    (hf.indicator hW) hg (Eventually.of_forall fun y => by simp)
+  rw [ENNReal.coe_one, one_mul] at h
+  rw [heq]
+  exact h
 
 end MeasureTheory
 
@@ -203,6 +266,22 @@ theorem card_le_of_forall_mem_supportWindow {j : ℕ} (x : ℝ) (S : Finset ℤ)
   (Finset.card_le_card fun k hk => mem_Icc_ceil_floor (hS k hk)).trans
     (card_Icc_ceil_floor_le _ a b)
 
+/-- **Positions of overlapping windows are close**: if `x` lies in the support windows of level
+`j` and positions `l` and `k`, then `|l - k| ≤ ⌈b - a⌉`, since `2^j x - l` and `2^j x - k` both
+lie in `[a, b]`. -/
+theorem mem_Icc_of_mem_supportWindow {j : ℕ} {k l : ℤ} {x : ℝ} (hl : x ∈ supportWindow a b j l)
+    (hk : x ∈ supportWindow a b j k) : l ∈ Finset.Icc (k - ⌈b - a⌉₊) (k + ⌈b - a⌉₊) := by
+  have h3 := Nat.le_ceil (b - a)
+  refine Finset.mem_Icc.2 ⟨?_, ?_⟩
+  · have h4 : ((k - ⌈b - a⌉₊ : ℤ) : ℝ) ≤ l := by
+      push_cast
+      linarith [hl.2, hk.1]
+    exact_mod_cast h4
+  · have h4 : (l : ℝ) ≤ ((k + ⌈b - a⌉₊ : ℤ) : ℝ) := by
+      push_cast
+      linarith [hl.1, hk.2]
+    exact_mod_cast h4
+
 /-- **Expansions are finite sums**: if `g` vanishes outside `[a, b]`, then for every level `j`,
 coefficients `c` and point `x`,
 `∑_{k ∈ ℤ} c_k g_{j,k}(x) = ∑_{k = ⌈2^j x - b⌉}^{⌊2^j x - a⌋} c_k g_{j,k}(x)`. -/
@@ -276,7 +355,8 @@ theorem integral_scaledFun_mul_conj
 
 /-- **Generators of one level overlap only for nearby positions**: if `g` vanishes outside
 `[a, b]`, then `g_{j,l}(y) conj g_{j,k}(y) = 0` for every `y` unless `|l - k| ≤ ⌈b - a⌉`. If both
-factors are nonzero, then `2^j y - l` and `2^j y - k` lie in `[a, b]`, so `|l - k| ≤ b - a`. -/
+factors are nonzero, then `y` lies in both support windows
+(`Daubechies.mem_Icc_of_mem_supportWindow`). -/
 theorem scaledFun_mul_conj_eq_zero (hsupp : ∀ x ∉ Set.Icc a b, g x = 0) {j : ℕ} {k l : ℤ}
     (hl : l ∉ Finset.Icc (k - ⌈b - a⌉₊) (k + ⌈b - a⌉₊)) (y : ℝ) :
     scaledFun g j l y * conj (scaledFun g j k y) = 0 := by
@@ -284,16 +364,7 @@ theorem scaledFun_mul_conj_eq_zero (hsupp : ∀ x ∉ Set.Icc a b, g x = 0) {j :
   obtain ⟨hl', hk'⟩ := mul_ne_zero_iff.1 h
   have h1 := mem_supportWindow_of_scaledFun_ne_zero hsupp hl'
   have h2 := mem_supportWindow_of_scaledFun_ne_zero hsupp fun h0 => hk' (by rw [h0, map_zero])
-  have h3 := Nat.le_ceil (b - a)
-  refine hl (Finset.mem_Icc.2 ⟨?_, ?_⟩)
-  · have h4 : ((k - ⌈b - a⌉₊ : ℤ) : ℝ) ≤ l := by
-      push_cast
-      linarith [h1.2, h2.1]
-    exact_mod_cast h4
-  · have h4 : (l : ℝ) ≤ ((k + ⌈b - a⌉₊ : ℤ) : ℝ) := by
-      push_cast
-      linarith [h1.1, h2.2]
-    exact_mod_cast h4
+  exact hl (mem_Icc_of_mem_supportWindow h1 h2)
 
 /-- If `g` is continuous and vanishes outside `[a, b]`, then `y ↦ g_{j,l}(y) conj g_{j,k}(y)` is
 integrable: it is continuous with compact support. -/
@@ -499,30 +570,16 @@ theorem eLpNorm_scaledFun_conjExponent (hg : AEStronglyMeasurable g volume) {p :
 /-- **Hölder's inequality on a support window**: let `g` be a.e. strongly measurable and vanish
 outside `[a, b]`, let `1 ≤ p`, and let `f` be a.e. strongly measurable. Then
 `‖f conj g_{j,k}‖_1 ≤ ‖1_W f‖_p ‖g_{j,k}‖_{p'}` with the support window
-`W = {x : 2^j x - k ∈ [a, b]}` and the conjugate exponent `p'`. Outside `W` the factor `g_{j,k}`
-vanishes, so `f` may be replaced by `1_W f`; then Hölder's inequality (Mathlib's
-`MeasureTheory.eLpNorm_le_eLpNorm_mul_eLpNorm`) applies. -/
+`W = {x : 2^j x - k ∈ [a, b]}` and the conjugate exponent `p'`, since `g_{j,k}` vanishes outside
+`W` (`MeasureTheory.eLpNorm_mul_conj_le_of_forall_notMem`). -/
 theorem eLpNorm_mul_conj_scaledFun_le (hg : AEStronglyMeasurable g volume)
     (hsupp : ∀ x ∉ Set.Icc a b, g x = 0) {p : ℝ≥0∞} (hp1 : 1 ≤ p) {f : ℝ → ℂ}
     (hf : AEStronglyMeasurable f volume) (j : ℕ) (k : ℤ) :
     eLpNorm (fun y => f y * conj (scaledFun g j k y)) 1 volume ≤
       eLpNorm ((supportWindow a b j k).indicator f) p volume *
-        eLpNorm (scaledFun g j k) (ENNReal.conjExponent p) volume := by
-  have := ENNReal.HolderConjugate.conjExponent hp1
-  have heq : (fun y => f y * conj (scaledFun g j k y)) =
-      fun y => (supportWindow a b j k).indicator f y * conj (scaledFun g j k y) := by
-    funext y
-    by_cases hy : y ∈ supportWindow a b j k
-    · rw [Set.indicator_of_mem hy]
-    · rw [scaledFun_eq_zero hsupp hy, map_zero, mul_zero, mul_zero]
-  have h := eLpNorm_le_eLpNorm_mul_eLpNorm (μ := volume) (p := p)
-    (q := ENNReal.conjExponent p) (r := 1) (fun u v : ℂ => u * conj v) 1
-    (continuous_fst.mul (Complex.continuous_conj.comp continuous_snd))
-    (hf.indicator (measurableSet_supportWindow a b j k)) (aestronglyMeasurable_scaledFun hg j k)
-    (Eventually.of_forall fun y => by simp)
-  rw [ENNReal.coe_one, one_mul] at h
-  rw [heq]
-  exact h
+        eLpNorm (scaledFun g j k) (ENNReal.conjExponent p) volume :=
+  eLpNorm_mul_conj_le_of_forall_notMem (measurableSet_supportWindow a b j k)
+    (aestronglyMeasurable_scaledFun hg j k) (fun _ hy => scaledFun_eq_zero hsupp hy) hp1 hf
 
 /-- **A single coefficient**: under the hypotheses of `Daubechies.eLpNorm_mul_conj_scaledFun_le`,
 `|⟨f, g_{j,k}⟩| ≤ ‖1_W f‖_p ‖g_{j,k}‖_{p'}` with the support window
@@ -539,48 +596,19 @@ theorem enorm_coeffFun_le (hg : AEStronglyMeasurable g volume)
     (le_of_eq_of_le ?_ (eLpNorm_mul_conj_scaledFun_le hg hsupp hp1 hf j k))
   rw [eLpNorm_one_eq_lintegral_enorm hm]
 
-/-- **Summing local bounds over the support windows**: let `1 ≤ p < ∞`, let `f` be a.e. strongly
+/-- **Summing local bounds over the support windows**: let `0 < p < ∞`, let `f` be a.e. strongly
 measurable, and let `d : ℤ → [0, ∞]` satisfy `d_k ≤ ‖1_{W_k} f‖_p B` for every `k`, where
 `W_k = {x : 2^j x - k ∈ [a, b]}` are the support windows of level `j`. Then
-`‖d‖_{ℓ_p} ≤ M^(1/p) B ‖f‖_p` with the overlap number `M = ⌈b - a⌉ + 1`: the `p`-th powers satisfy
-`∑_k d_k^p ≤ B^p ∑_k ∫_{W_k} |f|^p ≤ M B^p ‖f‖_p^p` by the window inequality
-(`MeasureTheory.tsum_setLIntegral_le_mul_lintegral`, with the overlap bound
-`Daubechies.card_le_of_forall_mem_supportWindow`). -/
-theorem lqNorm_le_of_le_eLpNorm_indicator {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {f : ℝ → ℂ}
+`‖d‖_{ℓ_p} ≤ M^(1/p) B ‖f‖_p` with the overlap number `M = ⌈b - a⌉ + 1`: the windows overlap at
+most `M` times (`Daubechies.card_le_of_forall_mem_supportWindow`), so the window inequality in
+`ℓ_p` form (`MeasureTheory.lqNorm_le_mul_eLpNorm_of_overlap`) applies. -/
+theorem lqNorm_le_of_le_eLpNorm_indicator {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞) {f : ℝ → ℂ}
     (hf : AEStronglyMeasurable f volume) (j : ℕ) {d : ℤ → ℝ≥0∞} {B : ℝ≥0∞}
     (hd : ∀ k, d k ≤ eLpNorm ((supportWindow a b j k).indicator f) p volume * B) :
     ENNReal.lqNorm p d ≤
-      ((⌈b - a⌉₊ + 1 : ℕ) : ℝ≥0∞) ^ (1 / p.toReal) * B * eLpNorm f p volume := by
-  have hp0 : p ≠ 0 := (zero_lt_one.trans_le hp1).ne'
-  have hr : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
-  have hk : ∀ k, d k ^ p.toReal ≤
-      B ^ p.toReal * ∫⁻ x in supportWindow a b j k, ‖f x‖ₑ ^ p.toReal := fun k => by
-    calc d k ^ p.toReal
-        ≤ (eLpNorm ((supportWindow a b j k).indicator f) p volume * B) ^ p.toReal :=
-          ENNReal.rpow_le_rpow (hd k) hr.le
-      _ = B ^ p.toReal * ∫⁻ x in supportWindow a b j k, ‖f x‖ₑ ^ p.toReal := by
-          rw [ENNReal.mul_rpow_of_nonneg _ _ hr.le, mul_comm,
-            eLpNorm_indicator_eq_eLpNorm_restrict
-              (measurableSet_supportWindow a b j k).nullMeasurableSet,
-            eLpNorm_rpow_eq hf.restrict hp0 hp]
-  have hsum : ∑' k, d k ^ p.toReal ≤
-      B ^ p.toReal * (((⌈b - a⌉₊ + 1 : ℕ) : ℝ≥0∞) * eLpNorm f p volume ^ p.toReal) := by
-    calc ∑' k, d k ^ p.toReal
-        ≤ ∑' k, B ^ p.toReal * ∫⁻ x in supportWindow a b j k, ‖f x‖ₑ ^ p.toReal :=
-          ENNReal.tsum_le_tsum hk
-      _ = B ^ p.toReal * ∑' k, ∫⁻ x in supportWindow a b j k, ‖f x‖ₑ ^ p.toReal :=
-          ENNReal.tsum_mul_left
-      _ ≤ B ^ p.toReal * (((⌈b - a⌉₊ + 1 : ℕ) : ℝ≥0∞) * ∫⁻ x, ‖f x‖ₑ ^ p.toReal) := by
-          gcongr
-          exact tsum_setLIntegral_le_mul_lintegral (measurableSet_supportWindow a b j)
-            (fun x S hS => card_le_of_forall_mem_supportWindow x S hS) (hf.enorm.pow_const _)
-      _ = B ^ p.toReal * (((⌈b - a⌉₊ + 1 : ℕ) : ℝ≥0∞) * eLpNorm f p volume ^ p.toReal) := by
-          rw [eLpNorm_rpow_eq hf hp0 hp]
-  rw [← ENNReal.rpow_le_rpow_iff hr, ENNReal.lqNorm_rpow hp0 hp]
-  refine hsum.trans (le_of_eq ?_)
-  simp only [ENNReal.mul_rpow_of_nonneg _ _ hr.le, ← ENNReal.rpow_mul,
-    one_div_mul_cancel hr.ne', ENNReal.rpow_one]
-  ring
+      ((⌈b - a⌉₊ + 1 : ℕ) : ℝ≥0∞) ^ (1 / p.toReal) * B * eLpNorm f p volume :=
+  lqNorm_le_mul_eLpNorm_of_overlap (measurableSet_supportWindow a b j)
+    (fun x S hS => card_le_of_forall_mem_supportWindow x S hS) hp0 hp hf hd
 
 /-- **The coefficient estimate**: let `g` be a.e. strongly measurable and vanish outside
 `[a, b]`, and let `1 ≤ p < ∞`. Then for every a.e. strongly measurable `f` and every level `j`,
@@ -597,7 +625,8 @@ theorem lqNorm_coeffFun_le (hg : AEStronglyMeasurable g volume)
     ENNReal.lqNorm p (fun k => ‖coeffFun g j f k‖ₑ) ≤
       ((⌈b - a⌉₊ + 1 : ℕ) : ℝ≥0∞) ^ (1 / p.toReal) * eLpNorm g (ENNReal.conjExponent p) volume *
         dyadicWeight (-(1 / 2 - 1 / p.toReal)) j * eLpNorm f p volume := by
-  have h := lqNorm_le_of_le_eLpNorm_indicator (a := a) (b := b) hp1 hp hf j
+  have h := lqNorm_le_of_le_eLpNorm_indicator (a := a) (b := b) (zero_lt_one.trans_le hp1).ne' hp
+    hf j
     (d := fun k => ‖coeffFun g j f k‖ₑ)
     (B := dyadicWeight (-(1 / 2 - 1 / p.toReal)) j * eLpNorm g (ENNReal.conjExponent p) volume)
     fun k => by

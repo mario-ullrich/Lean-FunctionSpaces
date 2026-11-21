@@ -350,6 +350,14 @@ declarations.
   `TauCeti.lintegral_fintype_prod_eq_prod`),
   `(⊗K) ⋆ (⊗K') = ⊗(K_i ⋆ K'_i)` (`Rd.conv_tensorKernel`), and diagonal changes of variables
   `∫ F((a_i z_i)_i) dz = (∏_i a_i)⁻¹ ∫ F` (`Rd.integral_comp_diagMap`).
+* **`L_p` norms on `Fin (n+1) → ℝ` through slices**
+  (`FunctionSpaces/Analysis/Lp/CoordinateSlices.lean`): integrating out the coordinate `i`,
+  `∫⁻ G = ∫⁻ y, ∫⁻ t, G (i.insertNth t y)` for a.e. measurable `G ≥ 0`
+  (`Rd.lintegral_eq_lintegral_slices`), `‖f‖_p = ‖y ↦ ‖t ↦ f (i.insertNth t y)‖_p‖_p` for
+  measurable `f` and `0 < p < ∞` (`Rd.eLpNorm_eq_eLpNorm_slices`), and bounds through the slices
+  `t ↦ f (Function.update x i t)` with Minkowski's inequality (`Rd.eLpNorm_le_add_of_slice_le`);
+  Mathlib has `volume_preserving_piFinSuccAbove` and the marginals `lmarginal`, but no `L_p` form
+  (TauCeti has the product-measure form `TauCeti.eLpNorm_prod_eq_eLpNorm_eLpNorm`).
 * **The Schur test on `ℓ_q`** (`FunctionSpaces/Rd/MixedSmoothness/MixedSequences.lean`): row and
   column sums at most `A` give `‖(∑_k w(m, k) b_k)_m‖_{ℓ_q} ≤ A ‖b‖_{ℓ_q}` for `1 ≤ q ≤ ∞`
   (`Rd.lqNorm_schur_le`), for countable index sets; `∑_k ∏_i f_i(k_i) ≤ ∏_i ∑_j f_i(j)` on `ℕ^d`

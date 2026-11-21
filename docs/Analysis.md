@@ -4,18 +4,19 @@ Part of [Characterizations of Function Spaces](../README.md). Blueprint: part *T
 chapters *Convolution and the Fourier transform on `ℝ^d`*, *Maximal functions* and *Interpolation of
 operators*; the other tools are cited where they are used, in *Besov spaces and their embeddings*,
 *Polynomial approximation on intervals*, *Approximation on the cube*, *Besov spaces on `ℝ^d`*,
-*Lipschitz domains* and *Traces on Lipschitz domains*.
+*Tensor Daubechies wavelets on `ℝ^d`*, *Lipschitz domains* and *Traces on Lipschitz domains*.
 
 This block holds the folder `FunctionSpaces/Analysis/`, whose files import only Mathlib,
 `ApproximationSpaces` and each other: `L_p` norms, the inclusion `L_r ↪ L_p` and bounded
 continuous functions on finite measure spaces, Young's inequality on measurable groups, mixed
 norms `L_p(ℓ_q)` and `ℓ_q(L_p)` on every measure space, weak type, the layer cake formula,
-Marcinkiewicz interpolation and `L_p` norms by duality; differences on additive monoids, the
-translation algebra and moduli of smoothness on subsets; convolution, approximate identities,
-the Littlewood–Paley kernels and test functions on `ℝ^d`; dyadic cubes and cells, the
-Hardy–Littlewood maximal function, the Calderón–Zygmund decomposition, also for functions with
-values in a normed space, and the Fefferman–Stein inequality. The `L_p` norms are handled through
-integrals of powers (`MeasureTheory.eLpNorm_rpow_eq`).
+Marcinkiewicz interpolation, `L_p` norms by duality and `L_p` norms on `ℝ^d` through slices in
+one coordinate; differences on additive monoids, the translation algebra and moduli of
+smoothness on subsets; convolution, approximate identities, the Littlewood–Paley kernels and
+test functions on `ℝ^d`; dyadic cubes and cells, the Hardy–Littlewood maximal function, the
+Calderón–Zygmund decomposition, also for functions with values in a normed space, and the
+Fefferman–Stein inequality. The `L_p` norms are handled through integrals of powers
+(`MeasureTheory.eLpNorm_rpow_eq`).
 
 ## Main results
 
@@ -87,6 +88,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The layer cake formula `∫ F^p dν = p ∫_0^∞ ν{F > t} t^(p-1) dt` for `[0, ∞]`-valued functions on every measure space, and the integrals of powers of `t` over `(0, b)`, `(0, ∞)` and the level sets `{t < a}`, `{t ≥ a}` | ✅ | ✗ | `Analysis/Lp/LayerCake` |
 | Chebyshev's inequality with a power and at half height, the level sets of a split function, the parts of a function above and below a level, two Tonelli steps on s-finite measure spaces, integrals of powers from bounds at every level, and Marcinkiewicz interpolation between weak type `(1,1)` and strong type `(2,2)` with an explicit constant, for operators on an abstract input type and in the terms of the Carleson project | ✅ | ✗ | `Analysis/Lp/Marcinkiewicz` |
 | `L_p` and `L_p(ℓ_2)` norms by duality for `1 < p < ∞` through the norming family, Hölder's inequality for `[0, ∞]`-valued functions in `L_p` norms, and families in `L_p` vanishing outside a finite set | ✅ | ✗ | `Analysis/Lp/NormingFamily` |
+| `L_p` norms on `ℝ^d` through slices in one coordinate: integrating out a coordinate, `L_p` norms as mixed norms of slices, bounds through slices | ✅ | ✗ | `Analysis/Lp/CoordinateSlices` |
 | Differences `higherDiff` on any additive monoid, steps of either sign; the modulus of smoothness on `ℝ^d`, its homogeneity, dilation of the scale | ✅ | ✗ | `Analysis/Differences/Differences` |
 | Translation algebra of an additive monoid, differences as its powers | ✅ | ✗ | `Analysis/Differences/TranslationAlgebra` |
 | Moduli of smoothness on subsets of `ℝ^d`, restrictions by intrinsic differences, sets equal up to null sets, the intrinsic quasi-norm | ✅ | ✗ | `Analysis/Differences/DomainModuli` |

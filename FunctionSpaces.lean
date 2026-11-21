@@ -17,6 +17,7 @@ public import FunctionSpaces.Analysis.Lp.WeakType
 public import FunctionSpaces.Analysis.Lp.LayerCake
 public import FunctionSpaces.Analysis.Lp.Marcinkiewicz
 public import FunctionSpaces.Analysis.Lp.NormingFamily
+public import FunctionSpaces.Analysis.Lp.CoordinateSlices
 public import FunctionSpaces.Analysis.Differences.TranslationAlgebra
 public import FunctionSpaces.Analysis.Differences.Differences
 public import FunctionSpaces.Analysis.Differences.DomainModuli
@@ -267,6 +268,7 @@ public import FunctionSpaces.Wavelets.Examples.Daubechies.Besov
 public import FunctionSpaces.Wavelets.Examples.Daubechies.D4Besov
 public import FunctionSpaces.Wavelets.Examples.Daubechies.OrderThree
 public import FunctionSpaces.Wavelets.Examples.Daubechies.TensorWavelets
+public import FunctionSpaces.Wavelets.Examples.Daubechies.TensorExpansion
 
 /-!
 # Characterizations of function spaces

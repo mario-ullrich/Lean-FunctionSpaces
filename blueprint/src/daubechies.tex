@@ -3533,14 +3533,16 @@ $\int_\R \gamma(u - k) \overline{\gamma(u - l)} \, du$.
 
 \begin{proposition}[Coefficient recovery]
 \label{prop:daub-generators-recovery}
-\lean{Daubechies.scaledFun_mul_conj_eq_zero, Daubechies.integrable_scaledFun_mul_conj,
-  Daubechies.coeffFun_expand}
+\lean{Daubechies.mem_Icc_of_mem_supportWindow, Daubechies.scaledFun_mul_conj_eq_zero,
+  Daubechies.integrable_scaledFun_mul_conj, Daubechies.coeffFun_expand}
 \leanok
 \uses{def:daub-generators}
-Let $\gamma : \R \to \C$ vanish outside $[a, b]$, and let $j \in \N$ and $k, l \in \Z$. Then
-$\gamma_{j,l} \overline{\gamma_{j,k}} = 0$ unless $|l - k| \leq \lceil b - a \rceil$, and if
-$\gamma$ is continuous, then $\gamma_{j,l} \overline{\gamma_{j,k}}$ is integrable. If $\gamma$ is
-continuous and has orthonormal integer translates, then for every $\lambda : \Z \to \C$
+Let $j \in \N$ and $k, l \in \Z$. If $2^j x - l$ and $2^j x - k$ lie in $[a, b]$ for some
+$x \in \R$, then $|l - k| \leq \lceil b - a \rceil$. Let $\gamma : \R \to \C$ vanish outside
+$[a, b]$. Then $\gamma_{j,l} \overline{\gamma_{j,k}} = 0$ unless $|l - k| \leq \lceil b - a \rceil$,
+and if $\gamma$ is continuous, then $\gamma_{j,l} \overline{\gamma_{j,k}}$ is integrable. If
+$\gamma$ is continuous and has orthonormal integer translates, then for every
+$\lambda : \Z \to \C$
 \[
   \Bigl\langle \sum_{l \in \Z} \lambda_l \gamma_{j,l}, \gamma_{j,k} \Bigr\rangle = \lambda_k .
 \]
@@ -3549,11 +3551,11 @@ continuous and has orthonormal integer translates, then for every $\lambda : \Z 
 \begin{proof}
 \leanok
 \uses{lem:daub-support-window, lem:daub-generators-orthonormal}
-If both factors are nonzero at $y$, then $2^j y - l$ and $2^j y - k$ lie in $[a, b]$, so
-$|l - k| \leq b - a$. A continuous function with compact support is integrable
-(\Cref{lem:daub-support-window}). Hence the integrand is a finite sum over the $l$ with
-$|l - k| \leq \lceil b - a \rceil$, for every sequence $\lambda$, and orthonormality at level $j$
-(\Cref{lem:daub-generators-orthonormal}) leaves the term $l = k$.
+If $2^j x - l, 2^j x - k \in [a, b]$, then $|l - k| \leq b - a$. If both factors are nonzero at
+$y$, then $2^j y - l$ and $2^j y - k$ lie in $[a, b]$. A continuous function with compact
+support is integrable (\Cref{lem:daub-support-window}). Hence the integrand is a finite sum over
+the $l$ with $|l - k| \leq \lceil b - a \rceil$, for every sequence $\lambda$, and orthonormality
+at level $j$ (\Cref{lem:daub-generators-orthonormal}) leaves the term $l = k$.
 \end{proof}
 
 \paragraph{Stability.}
@@ -3565,20 +3567,30 @@ for $p = 1$ and $1/\infty = 0$.
 
 \begin{lemma}[The window inequality]
 \label{lem:daub-window-inequality}
-\lean{MeasureTheory.tsum_setLIntegral_le_mul_lintegral}
+\lean{MeasureTheory.tsum_setLIntegral_le_mul_lintegral,
+  MeasureTheory.lqNorm_le_mul_eLpNorm_of_overlap,
+  MeasureTheory.eLpNorm_mul_conj_le_of_forall_notMem}
 \leanok
+\uses{def:lq-norm}
 Let $(\Omega, \mu)$ be a measure space, let $I_i \subseteq \Omega$, $i$ in a countable set, be
 measurable sets such that every point of $\Omega$ lies in at most $M$ of them, and let
 $F : \Omega \to [0, \infty]$ be measurable. Then
 \[
   \sum_i \int_{I_i} F \, d\mu \leq M \int_\Omega F \, d\mu .
 \]
+Let $0 < p < \infty$, let $f$ be a measurable function on $\Omega$ with values in a normed space,
+and let $w_i, B \in [0, \infty]$ satisfy $w_i \leq \|f\|_{L_p(I_i)} B$ for every $i$. Then
+$\|w\|_{\ell_p} \leq M^{1/p} B \|f\|_p$. Finally, let $1 \leq p \leq \infty$, let
+$W \subseteq \Omega$ be measurable, and let $f, g : \Omega \to \C$ be measurable with $g = 0$
+outside $W$. Then $\|f \overline{g}\|_1 \leq \|f\|_{L_p(W)} \|g\|_{p'}$.
 \end{lemma}
 
 \begin{proof}
 \leanok
 At every point $\sum_i 1_{I_i} F \leq M F$. Integrate, and exchange the sum with the integral by
-monotone convergence.
+monotone convergence. For the second statement, $w_i^p \leq B^p \int_{I_i} |f|^p \, d\mu$, and the
+first statement with $F = |f|^p$ gives $\sum_i w_i^p \leq M B^p \|f\|_p^p$. For the third, $f$
+may be replaced by $1_W f$, since $g$ vanishes outside $W$, and H\"older's inequality applies.
 \end{proof}
 
 \begin{lemma}[Norms of the generators]
@@ -3645,13 +3657,13 @@ $\|F_k\|_p = |\lambda_k| \, 2^{j(1/2 - 1/p)} \|\gamma\|_p$ (\Cref{lem:daub-gener
   Daubechies.lqNorm_le_of_le_eLpNorm_indicator}
 \leanok
 \uses{def:daub-generators, def:lq-norm}
-Let $1 \leq p \leq \infty$, let $\gamma : \R \to \C$ be measurable and vanish outside $[a, b]$,
-and let $f : \R \to \C$ be measurable. For every $j \in \N$ and $k \in \Z$,
+Let $\gamma : \R \to \C$ be measurable and vanish outside $[a, b]$, and let $f : \R \to \C$ be
+measurable. For $1 \leq p \leq \infty$, every $j \in \N$ and every $k \in \Z$,
 \[
   |\langle f, \gamma_{j,k} \rangle| \leq \|f \overline{\gamma_{j,k}}\|_1
   \leq \|f\|_{L_p(W_{j,k})} \|\gamma_{j,k}\|_{p'} .
 \]
-If $p < \infty$, and $d : \Z \to [0, \infty]$ and $B \in [0, \infty]$ satisfy
+If $0 < p < \infty$, and $d : \Z \to [0, \infty]$ and $B \in [0, \infty]$ satisfy
 $d_k \leq \|f\|_{L_p(W_{j,k})} B$ for every $k \in \Z$, then
 $\|d\|_{\ell_p} \leq M^{1/p} B \|f\|_p$ with $M = \lceil b - a \rceil + 1$.
 \end{lemma}
@@ -3659,11 +3671,10 @@ $\|d\|_{\ell_p} \leq M^{1/p} B \|f\|_p$ with $M = \lceil b - a \rceil + 1$.
 \begin{proof}
 \leanok
 \uses{lem:daub-support-window, lem:daub-window-overlap, lem:daub-window-inequality}
-Outside $W_{j,k}$ the factor $\gamma_{j,k}$ vanishes (\Cref{lem:daub-support-window}), so $f$
-may be replaced by $1_{W_{j,k}} f$, and H\"older's inequality applies. For the second statement,
-$d_k^p \leq B^p \int_{W_{j,k}} |f|^p$, and the window inequality
-(\Cref{lem:daub-window-inequality}) with the overlap number $M$ of
-\Cref{lem:daub-window-overlap} gives $\sum_k \int_{W_{j,k}} |f|^p \leq M \|f\|_p^p$.
+Outside $W_{j,k}$ the factor $\gamma_{j,k}$ vanishes (\Cref{lem:daub-support-window}), so the
+third part of \Cref{lem:daub-window-inequality} applies. The second part of
+\Cref{lem:daub-window-inequality} with the overlap number $M$ of \Cref{lem:daub-window-overlap}
+gives the bound on $\|d\|_{\ell_p}$.
 \end{proof}
 
 \begin{proposition}[The coefficient estimate]
@@ -5938,7 +5949,10 @@ of approximation spaces (DeVore~\cite[\S 4.3, Theorem~1, and \S 7.1]{DeVore1998}
 Popov~\cite[Theorems~4.5 and~5.1]{DeVorePopovTAMS} take it for dyadic splines on the unit cube
 of $\R^d$. This chapter proves the properties of the generators that the route uses: their
 support, the orthonormality of their integer translates, and bounds for their moduli of
-smoothness (\Cref{sec:daub-rd-generators}). Tensor products of kernels and their integrals are treated in
+smoothness (\Cref{sec:daub-rd-generators}); the expansions in their dilated and translated
+copies, with their stability and Bernstein's inequality (\Cref{sec:daub-rd-expansions}); and
+the passage from one variable to $\R^d$ through slices in one coordinate
+(\Cref{sec:rd-slices}). Tensor products of kernels and their integrals are treated in
 \Cref{ch:mixed-smoothness}.
 
 \section{Tensor generators}
@@ -6205,4 +6219,463 @@ $n \leq N$ and $t \in [-1, 1]$ (\Cref{lem:daub-modulus-bound-steps}). For $n \in
 $\sum_i n_i = N$ the exponents add up to $\theta' \sum_i n_i / N = \theta'$, and
 \Cref{prop:tensor-kernel-isotropic-differences} with $\Theta = \theta'$ gives the bound with
 $K = d^N A^d$.
+\end{proof}
+
+\section{Expansions on \texorpdfstring{$\R^d$}{R\^{}d}}
+\label{sec:daub-rd-expansions}
+
+This section carries the expansions of \Cref{ch:daubechies} to $\R^d$. They are treated for a
+finite family of generators $G_\nu : \R^d \to \C$, $\nu \in I$, that vanish outside a cube
+$[a, b]^d$, that is, $G_\nu(x) = 0$ whenever some coordinate $x_i$ lies outside $[a, b]$. The
+same statements serve the tensor scaling function ($I$ with one element) and the $2^d - 1$
+tensor wavelets ($I$ the nonempty sets of coordinates). Throughout, $a \leq b$ are real
+numbers, $M = \lceil b - a \rceil + 1$, $L = |I| M^d$, $\R^d$ carries Lebesgue measure and the
+norm $\|x\| = \max_i |x_i|$, $p'$ is the conjugate exponent, and $k, l \in \Z^d$ are identified
+with points of $\R^d$.
+
+\begin{definition}[Generators, expansions and coefficients on \texorpdfstring{$\R^d$}{R\^{}d}]
+\label{def:daub-rd-expansions}
+\lean{Daubechies.tensorScaled, Daubechies.two_pow_smul_sub_apply, Daubechies.tensorScaled_zero,
+  Daubechies.tensorExpand, Daubechies.tensorCoeff}
+\leanok
+\uses{def:daub-generators}
+For $g : \R^d \to \C$, a level $j \in \N$ and a position $k \in \Z^d$ let
+\[
+  g_{j,k}(x) = 2^{jd/2} g(2^j x - k) , \qquad x \in \R^d ,
+\]
+where $(2^j x - k)_i = 2^j x_i - k_i$. For a finite set $I$, generators $G_\nu : \R^d \to \C$,
+$\nu \in I$, and coefficients $c : I \times \Z^d \to \C$, the \emph{expansion} of level $j$ is
+$x \mapsto \sum_{(\nu, k) \in I \times \Z^d} c_{\nu,k} G_{\nu,j,k}(x)$, and for $f : \R^d \to \C$
+the \emph{coefficient} of level $j$, generator $\nu$ and position $k$ is
+$\langle f, G_{\nu,j,k} \rangle = \int_{\R^d} f(y) \overline{G_{\nu,j,k}(y)} \, dy$. The generators
+of level $0$ are the integer translates, $g_{0,k} = g(\cdot - k)$.
+\end{definition}
+
+\begin{lemma}[Dilated tensor products]
+\label{lem:daub-rd-scaled-tensor}
+\lean{Daubechies.tensorScaled_tensorKernel}
+\leanok
+\uses{def:daub-rd-expansions, def:tensor-kernel}
+For $K_1, \dots, K_d : \R \to \C$, $j \in \N$ and $k \in \Z^d$,
+$(\otimes K)_{j,k} = \otimes_i (K_i)_{j,k_i}$, with the one-dimensional dilated and translated
+copies $(K_i)_{j,k_i}$ of \Cref{def:daub-generators}.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{def:daub-generators}
+$2^{jd/2} = \prod_i 2^{j/2}$, and the coordinates of $2^j x - k$ are $2^j x_i - k_i$.
+\end{proof}
+
+\begin{lemma}[Windows on \texorpdfstring{$\R^d$}{R\^{}d}]
+\label{lem:daub-rd-windows}
+\lean{Daubechies.tensorWindow, Daubechies.mem_tensorWindow, Daubechies.measurableSet_tensorWindow,
+  Daubechies.isCompact_tensorWindow, Daubechies.tensorScaled_eq_zero,
+  Daubechies.mem_tensorWindow_of_tensorScaled_ne_zero, Daubechies.hasCompactSupport_tensorScaled,
+  Daubechies.continuous_tensorScaled}
+\leanok
+\uses{def:daub-rd-expansions, lem:daub-support-window}
+For $j \in \N$ and $k \in \Z^d$ the \emph{window}
+\[
+  W_{j,k} = \{x \in \R^d : 2^j x_i - k_i \in [a, b] \text{ for every } i\}
+\]
+is the product of the one-dimensional support windows of the positions $k_i$
+(\Cref{lem:daub-support-window}); it is compact and measurable. If $g : \R^d \to \C$ vanishes
+outside $[a, b]^d$, then $g_{j,k}$ vanishes outside $W_{j,k}$ and has compact support. If $g$ is
+continuous, so is $g_{j,k}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+A product of compact intervals is compact and measurable. If $x \notin W_{j,k}$, some coordinate
+of $2^j x - k$ lies outside $[a, b]$, and $g$ vanishes there.
+\end{proof}
+
+\begin{lemma}[Bounded overlap of the windows on \texorpdfstring{$\R^d$}{R\^{}d}]
+\label{lem:daub-rd-overlap}
+\lean{Daubechies.tensorBox, Daubechies.mem_tensorBox_of_mem_tensorWindow,
+  Daubechies.card_tensorBox_le, Daubechies.tensorOverlap, Daubechies.card_le_tensorOverlap}
+\leanok
+\uses{lem:daub-rd-windows}
+Let $j \in \N$ and $x \in \R^d$. Every $k \in \Z^d$ with $x \in W_{j,k}$ lies in the box
+\[
+  B_j(x) = \prod_{i} \bigl\{\lceil 2^j x_i - b \rceil, \dots, \lfloor 2^j x_i - a \rfloor\bigr\} ,
+\]
+which has at most $M^d$ elements. Hence, for every finite set $I$, the point $x$ lies in the
+windows $W_{j,k}$ of at most $L = |I| M^d$ pairs $(\nu, k) \in I \times \Z^d$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-window-overlap}
+In each coordinate \Cref{lem:daub-window-overlap} applies with $t = 2^j x_i$: the integers
+$k_i$ with $2^j x_i - k_i \in [a, b]$ lie between the two bounds, and there are at most $M$ of
+them. The pairs lie in $I \times B_j(x)$.
+\end{proof}
+
+\begin{lemma}[Expansions on \texorpdfstring{$\R^d$}{R\^{}d} are locally finite]
+\label{lem:daub-rd-expand-finite}
+\lean{Daubechies.tensorExpand_eq_sum, Daubechies.summable_tensorExpand,
+  Daubechies.continuous_tensorExpand, Daubechies.tensorExpand_add,
+  Daubechies.tensorExpand_const_mul}
+\leanok
+\uses{def:daub-rd-expansions}
+Let the generators $G_\nu$, $\nu \in I$, vanish outside $[a, b]^d$, and let $j \in \N$ and
+$c : I \times \Z^d \to \C$. For every $x \in \R^d$ only the terms with $k \in B_j(x)$ of the
+series $\sum_{(\nu, k)} c_{\nu,k} G_{\nu,j,k}(x)$ can be nonzero. If every $G_\nu$ is
+continuous, the expansion is continuous. Expansions are linear in the coefficients.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-rd-windows, lem:daub-rd-overlap}
+If $G_{\nu,j,k}(x) \neq 0$, then $x \in W_{j,k}$ (\Cref{lem:daub-rd-windows}), so
+$k \in B_j(x)$ (\Cref{lem:daub-rd-overlap}). At all $y$ with $|2^j y_i - 2^j x_i| < 1$ for every
+$i$, the expansion is the same finite sum over $I \times B_j(x)$, the box taken for the interval
+$[a - 1, b + 1]$, a continuous function of $y$. Finite sums are linear.
+\end{proof}
+
+\begin{lemma}[Norms of the generators on \texorpdfstring{$\R^d$}{R\^{}d}]
+\label{lem:daub-rd-generator-norms}
+\lean{Daubechies.aestronglyMeasurable_comp_two_pow_smul_sub,
+  Daubechies.aestronglyMeasurable_tensorScaled, Daubechies.map_two_pow_smul_volume,
+  Daubechies.eLpNorm_comp_two_pow_smul_sub, Daubechies.eLpNorm_tensorScaled,
+  Daubechies.eLpNorm_const_mul_tensorScaled, Daubechies.eLpNorm_tensorScaled_conjExponent,
+  Daubechies.aestronglyMeasurable_tensorExpand}
+\leanok
+\uses{def:daub-rd-expansions, lem:dyadic-normalising-factor}
+Let $F, g : \R^d \to \C$ be measurable, $j \in \N$, $k \in \Z^d$, $t \in \R^d$ and
+$0 < p \leq \infty$. The image of Lebesgue measure under $x \mapsto 2^j x$ is $2^{-jd}$ times
+Lebesgue measure. The functions $x \mapsto F(2^j x - t)$, $g_{j,k}$ and every expansion in
+measurable generators are measurable, and for every $z \in \C$
+\[
+  \|F(2^j \cdot {} - t)\|_p = 2^{-jd/p} \|F\|_p , \qquad
+  \|z g_{j,k}\|_p = |z| \, 2^{jd(1/2 - 1/p)} \|g\|_p .
+\]
+For $1 \leq p \leq \infty$, $\|g_{j,k}\|_{p'} = 2^{-jd(1/2 - 1/p)} \|g\|_{p'}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-generator-norms}
+The linear map $x \mapsto 2^j x$ has determinant $2^{jd}$, translations preserve Lebesgue
+measure, and $|2^{jd/2}| = 2^{jd/2}$. An expansion is a countable sum of measurable functions.
+The last identity follows from $1/p' = 1 - 1/p$ (\Cref{lem:daub-generator-norms}).
+\end{proof}
+
+\begin{lemma}[Inner products at every level]
+\label{lem:daub-rd-orthonormal-levels}
+\lean{Daubechies.integral_tensorScaled_mul_conj}
+\leanok
+\uses{def:daub-rd-expansions, lem:dyadic-normalising-factor}
+For all $g, g' : \R^d \to \C$, $j \in \N$ and $k, l \in \Z^d$,
+\[
+  \int_{\R^d} g_{j,k}(x) \overline{g'_{j,l}(x)} \, dx
+  = \int_{\R^d} g(x - k) \overline{g'(x - l)} \, dx ,
+\]
+where the integral of a non-integrable function is $0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The factor $2^{jd/2}$ is real with square $2^{jd}$, and the substitution $u = 2^j x$ multiplies
+the integral by $2^{-jd}$.
+\end{proof}
+
+\begin{proposition}[Coefficient recovery on \texorpdfstring{$\R^d$}{R\^{}d}]
+\label{prop:daub-rd-recovery}
+\lean{Daubechies.tensorScaled_mul_conj_eq_zero, Daubechies.integrable_tensorScaled_mul_conj,
+  Daubechies.tensorCoeff_tensorExpand}
+\leanok
+\uses{def:daub-rd-expansions}
+Let $g, g' : \R^d \to \C$ vanish outside $[a, b]^d$, and let $j \in \N$ and $k, l \in \Z^d$. Then
+$g_{j,l} \overline{g'_{j,k}} = 0$ unless $|l_i - k_i| \leq \lceil b - a \rceil$ for every $i$,
+and if $g, g'$ are continuous, then $g_{j,l} \overline{g'_{j,k}}$ is integrable. Let the
+generators $G_\nu$, $\nu \in I$, be continuous, vanish outside $[a, b]^d$, and have
+\emph{orthonormal integer translates}: $\int G_\nu(x - k) \overline{G_{\nu'}(x - l)} \, dx$ is
+$1$ if $\nu = \nu'$ and $k = l$, and $0$ otherwise. Then for every $c : I \times \Z^d \to \C$
+and every $(\nu, k) \in I \times \Z^d$,
+\[
+  \Bigl\langle \sum_{(\nu', l)} c_{\nu',l} G_{\nu',j,l}, G_{\nu,j,k} \Bigr\rangle = c_{\nu,k} .
+\]
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-rd-windows, lem:daub-rd-orthonormal-levels, prop:daub-generators-recovery}
+If both factors are nonzero at $y$, then $y \in W_{j,l} \cap W_{j,k}$
+(\Cref{lem:daub-rd-windows}), so $2^j y_i - l_i$ and $2^j y_i - k_i$ lie in $[a, b]$ and
+$|l_i - k_i| \leq \lceil b - a \rceil$ for every $i$ (\Cref{prop:daub-generators-recovery}). A
+continuous function with compact support is integrable.
+Hence the integrand is a finite sum over the pairs $(\nu', l)$ with
+$|l_i - k_i| \leq \lceil b - a \rceil$, for every $c$, and by \Cref{lem:daub-rd-orthonormal-levels}
+and orthonormality only the term $(\nu', l) = (\nu, k)$ remains.
+\end{proof}
+
+\begin{lemma}[Local coefficient bounds on \texorpdfstring{$\R^d$}{R\^{}d}]
+\label{lem:daub-rd-coeff-local}
+\lean{Daubechies.eLpNorm_mul_conj_tensorScaled_le, Daubechies.enorm_tensorCoeff_le,
+  Daubechies.lqNorm_le_of_le_eLpNorm_tensorWindow}
+\leanok
+\uses{def:daub-rd-expansions, def:lq-norm}
+Let $g$ and the generators $G_\nu$, $\nu \in I$, be measurable and vanish outside $[a, b]^d$,
+and let $f : \R^d \to \C$ be measurable. For $1 \leq p \leq \infty$, every $j \in \N$ and every
+$k \in \Z^d$,
+\[
+  \|f \overline{g_{j,k}}\|_1 \leq \|f\|_{L_p(W_{j,k})} \|g_{j,k}\|_{p'} , \qquad
+  |\langle f, G_{\nu,j,k} \rangle| \leq \|f\|_{L_p(W_{j,k})} \|G_{\nu,j,k}\|_{p'} .
+\]
+If $0 < p < \infty$, and $w : I \times \Z^d \to [0, \infty]$ and $B \in [0, \infty]$ satisfy
+$w_{\nu,k} \leq \|f\|_{L_p(W_{j,k})} B$ for every $(\nu, k)$, then
+$\|w\|_{\ell_p} \leq L^{1/p} B \|f\|_p$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-rd-windows, lem:daub-rd-overlap, lem:daub-window-inequality}
+Outside $W_{j,k}$ the factor $g_{j,k}$ vanishes (\Cref{lem:daub-rd-windows}), so the third part
+of \Cref{lem:daub-window-inequality} applies. Every point lies in the windows of at most $L$
+pairs (\Cref{lem:daub-rd-overlap}), so the second part of \Cref{lem:daub-window-inequality} gives
+the bound on $\|w\|_{\ell_p}$.
+\end{proof}
+
+\begin{proposition}[The coefficient estimate on \texorpdfstring{$\R^d$}{R\^{}d}]
+\label{prop:daub-rd-coeff-estimate}
+\lean{Daubechies.lqNorm_tensorCoeff_le, Daubechies.tensorCoeffConst,
+  Daubechies.tensorCoeffConst_ne_top, Daubechies.dyadicWeight_mul_lqNorm_tensorCoeff_le}
+\leanok
+\uses{def:daub-rd-expansions, def:lq-norm}
+Let $1 \leq p < \infty$, and let the generators $G_\nu$, $\nu \in I$, be measurable and vanish
+outside $[a, b]^d$ with $\|G_\nu\|_{p'} \leq B$ for every $\nu$. For every measurable
+$f : \R^d \to \C$ and every $j \in \N$,
+\[
+  \bigl\|(\langle f, G_{\nu,j,k} \rangle)_{(\nu, k) \in I \times \Z^d}\bigr\|_{\ell_p}
+  \leq L^{1/p} B \, 2^{-jd(1/2 - 1/p)} \|f\|_p .
+\]
+In particular
+$2^{jd(1/2 - 1/p)} \|(\langle f, G_{\nu,j,k} \rangle)_{\nu,k}\|_{\ell_p} \leq C' \|f\|_p$ with
+$C' = L^{1/p} \max_\nu \|G_\nu\|_{p'}$, and $C' < \infty$ if every $G_\nu$ lies in
+$L_{p'}(\R^d)$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-rd-coeff-local, lem:daub-rd-generator-norms}
+By \Cref{lem:daub-rd-coeff-local} each coefficient is at most
+$\|f\|_{L_p(W_{j,k})} \|G_{\nu,j,k}\|_{p'}$, where
+$\|G_{\nu,j,k}\|_{p'} = 2^{-jd(1/2 - 1/p)} \|G_\nu\|_{p'} \leq 2^{-jd(1/2 - 1/p)} B$
+(\Cref{lem:daub-rd-generator-norms}). The second part of \Cref{lem:daub-rd-coeff-local} gives the
+bound.
+\end{proof}
+
+\begin{theorem}[Upper stability of expansions on \texorpdfstring{$\R^d$}{R\^{}d}]
+\label{thm:daub-rd-upper-stability}
+\lean{Daubechies.eLpNorm_tensorExpand_le, Daubechies.tensorExpandConst,
+  Daubechies.tensorExpandConst_ne_top, Daubechies.memLp_tensorExpand}
+\leanok
+\uses{def:daub-rd-expansions, def:lq-norm}
+Let $1 \leq p < \infty$, and let the generators $G_\nu$, $\nu \in I$, be measurable and vanish
+outside $[a, b]^d$ with $\|G_\nu\|_p \leq B$ for every $\nu$. For every $j \in \N$ and every
+$c : I \times \Z^d \to \C$,
+\[
+  \Bigl\|\sum_{(\nu, k)} c_{\nu,k} G_{\nu,j,k}\Bigr\|_p
+  \leq L^{1 - 1/p} B \, 2^{jd(1/2 - 1/p)} \|c\|_{\ell_p} .
+\]
+With $B = \max_\nu \|G_\nu\|_p$ the constant $C = L^{1 - 1/p} \max_\nu \|G_\nu\|_p$ is finite
+if every $G_\nu$ lies in $L_p(\R^d)$, and then every expansion with $\|c\|_{\ell_p} < \infty$
+lies in $L_p(\R^d)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-rd-overlap, lem:bounded-overlap, lem:daub-rd-generator-norms}
+At each point at most $L$ of the functions $c_{\nu,k} G_{\nu,j,k}$ are nonzero
+(\Cref{lem:daub-rd-overlap}), so the $p$-th power of the norm of their sum is at most
+$L^{p-1} \sum_{(\nu, k)} \|c_{\nu,k} G_{\nu,j,k}\|_p^p$ (\Cref{lem:bounded-overlap}), and
+$\|c_{\nu,k} G_{\nu,j,k}\|_p \leq |c_{\nu,k}| \, 2^{jd(1/2 - 1/p)} B$
+(\Cref{lem:daub-rd-generator-norms}). For $p \geq 1$ the exponent $1 - 1/p$ is nonnegative.
+\end{proof}
+
+\begin{theorem}[Lower stability of expansions on \texorpdfstring{$\R^d$}{R\^{}d}]
+\label{thm:daub-rd-lower-stability}
+\lean{Daubechies.lqNorm_le_eLpNorm_tensorExpand}
+\leanok
+\uses{def:daub-rd-expansions, def:lq-norm}
+Let $1 \leq p < \infty$, and let the generators $G_\nu$, $\nu \in I$, be continuous, vanish
+outside $[a, b]^d$ and have orthonormal integer translates. For every $j \in \N$ and every
+$c : I \times \Z^d \to \C$,
+\[
+  2^{jd(1/2 - 1/p)} \|c\|_{\ell_p}
+  \leq C' \Bigl\|\sum_{(\nu, k)} c_{\nu,k} G_{\nu,j,k}\Bigr\|_p
+\]
+with the constant $C'$ of \Cref{prop:daub-rd-coeff-estimate}.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{prop:daub-rd-recovery, prop:daub-rd-coeff-estimate, lem:daub-rd-generator-norms}
+The expansion is measurable (\Cref{lem:daub-rd-generator-norms}) and its coefficients are the
+$c_{\nu,k}$ (\Cref{prop:daub-rd-recovery}); apply \Cref{prop:daub-rd-coeff-estimate} to it.
+\end{proof}
+
+\begin{lemma}[Expansions of the coefficients on \texorpdfstring{$\R^d$}{R\^{}d}]
+\label{lem:daub-rd-expand-coeff}
+\lean{Daubechies.hasCompactSupport_of_exists_notMem,
+  Daubechies.memLp_of_continuous_of_exists_notMem, Daubechies.eLpNorm_tensorExpand_tensorCoeff_le,
+  Daubechies.memLp_tensorExpand_tensorCoeff, Daubechies.tensorCoeff_congr_ae,
+  Daubechies.integrable_mul_conj_tensorScaled, Daubechies.tensorCoeff_add,
+  Daubechies.tensorCoeff_const_mul}
+\leanok
+\uses{def:daub-rd-expansions}
+A function on $\R^d$ that vanishes outside $[a, b]^d$ has compact support, and if it is
+continuous, it lies in $L_q(\R^d)$ for every $q \in (0, \infty]$. Let $1 \leq p < \infty$, and let
+the generators $G_\nu$, $\nu \in I$, be measurable and vanish outside $[a, b]^d$. For every
+measurable $f : \R^d \to \C$ and every $j \in \N$,
+\[
+  \Bigl\|\sum_{(\nu, k)} \langle f, G_{\nu,j,k} \rangle G_{\nu,j,k}\Bigr\|_p
+  \leq C C' \|f\|_p
+\]
+with the constants of \Cref{thm:daub-rd-upper-stability} and \Cref{prop:daub-rd-coeff-estimate}.
+If every $G_\nu$ is continuous and $f \in L_p(\R^d)$, this expansion lies in $L_p(\R^d)$. The
+coefficients depend only on the class of $f$ modulo null sets, and they are linear in $f$ on
+$L_p(\R^d)$: for a continuous $g$ that vanishes outside $[a, b]^d$ and $f \in L_p(\R^d)$, the
+function $f \overline{g_{j,k}}$ is integrable.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{thm:daub-rd-upper-stability, prop:daub-rd-coeff-estimate, lem:daub-rd-windows}
+The cube $[a, b]^d$ is compact, and a continuous function with compact support lies in every
+$L_q(\R^d)$. Combine the two estimates; the factors $2^{\pm jd(1/2 - 1/p)}$ cancel. For a
+continuous $g$ that vanishes outside $[a, b]^d$, $g_{j,k}$ has compact support
+(\Cref{lem:daub-rd-windows}) and lies in $L_{p'}(\R^d)$, and H\"older's inequality gives the
+integrability.
+\end{proof}
+
+\paragraph{Bernstein's inequality for expansions.}
+Here $\Delta_h f = f(\cdot + h) - f$ for $h \in \R^d$, $\Delta_h^r$ is its $r$-fold iterate, and
+$\omega_r(f, t)_p = \sup_{\|h\| \leq t} \|\Delta_h^r f\|_p$ (\Cref{def:rd-modulus}).
+
+\begin{lemma}[Differences of expansions on \texorpdfstring{$\R^d$}{R\^{}d}]
+\label{lem:daub-rd-expansion-differences}
+\lean{Daubechies.fwdDiff_tensorScaled, Daubechies.iterate_fwdDiff_tensorScaled,
+  Daubechies.iterate_fwdDiff_eq_zero_of_exists_notMem, Daubechies.fwdDiff_tensorExpand,
+  Daubechies.iterate_fwdDiff_tensorExpand}
+\leanok
+\uses{def:daub-rd-expansions, def:rd-modulus}
+For every $g : \R^d \to \C$, all $r, j \in \N$, $k \in \Z^d$ and $h \in \R^d$,
+$\Delta_h^r (g_{j,k}) = (\Delta_{2^j h}^r g)_{j,k}$. If $g$ vanishes outside $[a, b]^d$, then
+$\Delta_h^r g$ vanishes outside $[a - r\|h\|, b + r\|h\|]^d$. If the generators $G_\nu$,
+$\nu \in I$, vanish outside $[a, b]^d$, then for every $c : I \times \Z^d \to \C$, at every
+point,
+\[
+  \Delta_h^r \Bigl(\sum_{(\nu, k)} c_{\nu,k} G_{\nu,j,k}\Bigr)
+  = \sum_{(\nu, k)} c_{\nu,k} (\Delta_{2^j h}^r G_\nu)_{j,k} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-rd-expand-finite}
+$2^j (x + h) - k = (2^j x - k) + 2^j h$, and induction on $r$. For the support, induction on
+$r$: $\Delta_h^{r+1} g(x) = \Delta_h^r g(x + h) - \Delta_h^r g(x)$, and $|h_i| \leq \|h\|$. At
+each point the expansion is a finite sum (\Cref{lem:daub-rd-expand-finite}), and each
+$\Delta_{2^j h}^i G_\nu$ vanishes outside a cube, so the differences may be taken term by term.
+\end{proof}
+
+\begin{theorem}[Bernstein's inequality for expansions on \texorpdfstring{$\R^d$}{R\^{}d}]
+\label{thm:daub-rd-expansion-moduli}
+\lean{Daubechies.tensorBernsteinConst, Daubechies.tensorBernsteinConst_ne_top,
+  Daubechies.modulus_tensorExpand_le}
+\leanok
+\uses{def:daub-rd-expansions, def:rd-modulus}
+Let $1 \leq p < \infty$ and $r \in \N$, and let the generators $G_\nu$, $\nu \in I$, be
+measurable and vanish outside $[a, b]^d$. Let $C_B = L_r^{1 - 1/p} C'$ with
+$L_r = |I| (\lceil b - a + 2r \rceil + 1)^d$ and the constant $C'$ of
+\Cref{prop:daub-rd-coeff-estimate}; $C_B < \infty$ if every $G_\nu$ lies in $L_{p'}(\R^d)$.
+Let $j \in \N$, let $f : \R^d \to \C$ be measurable with
+$f = \sum_{(\nu, k)} \langle f, G_{\nu,j,k} \rangle G_{\nu,j,k}$ almost everywhere, and let
+$t \in \R$ with $2^j t \leq 1$. Then
+\[
+  \omega_r(f, t)_p \leq C_B \Bigl(\sup_{\nu \in I, \ \|H\| \leq 2^j t}
+    \|\Delta_H^r G_\nu\|_p\Bigr) \|f\|_p .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{lem:rd-modulus, lem:daub-rd-expansion-differences, thm:daub-rd-upper-stability,
+  prop:daub-rd-coeff-estimate, lem:rd-differences}
+The modulus depends only on the class of $f$ (\Cref{lem:rd-modulus}). For $\|h\| \leq t$,
+\Cref{lem:daub-rd-expansion-differences} gives
+$\Delta_h^r f = \sum_{(\nu, k)} \langle f, G_{\nu,j,k} \rangle (\Delta_{2^j h}^r G_\nu)_{j,k}$
+almost everywhere. As $\|2^j h\| \leq 2^j t \leq 1$, the measurable functions
+$\Delta_{2^j h}^r G_\nu$ (\Cref{lem:rd-differences}) vanish outside $[a - r, b + r]^d$, whose
+overlap number is $L_r$, and their norms are at most the supremum. Upper stability
+(\Cref{thm:daub-rd-upper-stability}) and the coefficient estimate
+(\Cref{prop:daub-rd-coeff-estimate}) give the bound; the factors $2^{\pm jd(1/2 - 1/p)}$
+cancel.
+\end{proof}
+
+\section{Slices of functions on \texorpdfstring{$\R^d$}{R\^{}d}}
+\label{sec:rd-slices}
+
+For $f : \R^d \to \C$, $x \in \R^d$ and a coordinate $i$, the slice of $f$ through $x$ in
+coordinate $i$ is $f_{x,i}(t) = f(x_1, \dots, x_{i-1}, t, x_{i+1}, \dots, x_d)$, $t \in \R$. On
+the cube the slices pass bounds in one variable to $[0, 1]^d$ (\Cref{lem:cube-slices}); on $\R^d$
+with Lebesgue measure the outer integral runs over the other coordinates only. For $y \in \R^n$,
+$t \in \R$ and a coordinate $i$ of $\R^{n+1}$ let $\iota_i(t, y) \in \R^{n+1}$ be the point with
+$t$ in place $i$ and the coordinates of $y$ in the other places, in their order. For every
+$s \in \R$ the slice of $f$ through $\iota_i(s, y)$ in coordinate $i$ is
+$t \mapsto f(\iota_i(t, y))$.
+
+\begin{lemma}[Integration through slices on \texorpdfstring{$\R^d$}{R\^{}d}]
+\label{lem:rd-slices}
+\lean{Rd.lintegral_eq_lintegral_slices, Rd.measurable_insertNth, Rd.measurable_eLpNorm_slices,
+  Rd.eLpNorm_eq_eLpNorm_slices}
+\leanok
+Let $i$ be a coordinate of $\R^{n+1}$, $G : \R^{n+1} \to [0, \infty]$ and $f : \R^{n+1} \to \C$
+measurable, and $0 < p < \infty$. Then
+\[
+  \int_{\R^{n+1}} G(x) \, dx = \int_{\R^n} \int_\R G(\iota_i(t, y)) \, dt \, dy .
+\]
+The map $(y, t) \mapsto \iota_i(t, y)$ is measurable, the norm
+$\|f(\iota_i(\cdot, y))\|_{L_p(\R)}$ depends measurably on $y$, and
+\[
+  \|f\|_{L_p(\R^{n+1})}
+  = \bigl\| y \mapsto \|f(\iota_i(\cdot, y))\|_{L_p(\R)} \bigr\|_{L_p(\R^n)} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The map $x \mapsto (x_i, (x_l)_{l \neq i})$ from $\R^{n+1}$ to $\R \times \R^n$ preserves
+Lebesgue measure, its inverse is $(t, y) \mapsto \iota_i(t, y)$, and Tonelli's theorem on
+$\R \times \R^n$ integrates first over $t$; the same theorem gives the measurability of the
+partial integrals $y \mapsto \int_\R |f(\iota_i(t, y))|^p \, dt$. The identity of norms is the
+first identity for $G = |f|^p$.
+\end{proof}
+
+\begin{lemma}[Bounds through slices on \texorpdfstring{$\R^d$}{R\^{}d}]
+\label{lem:rd-slices-minkowski}
+\lean{Rd.eLpNorm_le_add_of_slice_le, Rd.eLpNorm_le_of_slice_le}
+\leanok
+Let $A, B, D : \R^d \to \C$ be measurable, $i$ a coordinate and $\alpha, \beta \in [0, \infty]$.
+If $0 < p < \infty$ and $\|A_{x,i}\|_{L_p(\R)} \leq \alpha \|B_{x,i}\|_{L_p(\R)}$ for every
+$x \in \R^d$, then $\|A\|_p \leq \alpha \|B\|_p$. If $1 \leq p < \infty$ and
+\[
+  \|A_{x,i}\|_{L_p(\R)} \leq \alpha \|B_{x,i}\|_{L_p(\R)} + \beta \|D_{x,i}\|_{L_p(\R)}
+  \qquad \text{for every } x \in \R^d ,
+\]
+then $\|A\|_p \leq \alpha \|B\|_p + \beta \|D\|_p$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:rd-slices}
+A coordinate exists, so $d = n + 1$. By \Cref{lem:rd-slices} each norm is the $L_p(\R^n)$ norm
+of $y \mapsto \|F(\iota_i(\cdot, y))\|_{L_p(\R)}$, $F \in \{A, B, D\}$, and these functions are
+the norms of the slices through $\iota_i(0, y)$. The hypothesis at $x = \iota_i(0, y)$ bounds the
+first by $\alpha$ times the second (plus $\beta$ times the third), and Minkowski's inequality in
+$L_p(\R^n)$ splits the sum.
 \end{proof}

@@ -193,7 +193,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Isotropic differences and their expansion into mixed coordinate differences | ✅ | ✗ | `Domains/Cube/IsoDifferences` |
 | Isotropic modulus on the cube, comparison with the moduli in the coordinates | ✅ | ✗ | `Domains/Cube/IsoModulus` |
 | Isotropic inverse inequalities, `A^s_q` with the isotropic modulus, coordinate and isotropic Besov conditions agree for `0 < s < r - 1 + 1/p` | ✅ | ✗ | `Domains/Cube/IsoInverse`, `Domains/Cube/IsoCoincidence` |
-| The normalising factor `2^(j/2)` of dyadic dilations: its square and its extended norm | ✅ | ✗ | `Wavelets/DyadicNormalisation` |
+| The normalising factor `2^(j/2)` of dyadic dilations: its square and its extended norm, also for its `d`-th power | ✅ | ✗ | `Wavelets/DyadicNormalisation` |
 | Haar system on `[0, 1]`: dyadic conditional expectations, density, Haar coefficient characterisation | ✅ | ✗ | `Wavelets/Examples/Haar` |
 | Haar coefficients and Besov spaces on the interval and the circle for `0 < s < 1/p` | ✅ | ✗ | `Wavelets/Examples/HaarBesov` |
 | The Haar basis of `L_2[0, 1]`, `n`-term approximation | ✅ | ✗ | `Wavelets/Examples/HaarBasis` |

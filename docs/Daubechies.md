@@ -15,8 +15,9 @@ projection scheme in the sense of [Approximation spaces](ApproximationSpaces.md)
 Bernstein's inequalities identify its approximation spaces with the Besov spaces of
 [Besov spaces on `ℝ^d`](Rd.md), as for the Haar system and the multiwavelets of
 [Intervals, the cube, splines and wavelets](IntervalCube.md). On `ℝ^d` the integer translates of
-the tensor products of the scaling function and the wavelet are orthonormal, and the Bernstein
-bounds of the scaling function bound their moduli of smoothness.
+the tensor products of the scaling function and the wavelet are orthonormal, the Bernstein bounds
+of the scaling function bound their moduli of smoothness, and the expansions in their dilated and
+translated copies are stable in `L_p` and satisfy Bernstein's inequality.
 
 ## Main results
 
@@ -87,6 +88,23 @@ bounds of the scaling function bound their moduli of smoothness.
   `0 ≤ θ' ≤ θ` with `θ' < N`, then there is `K < ∞` with `‖Δ_h^N Ψ^e‖_p ≤ K ‖h‖^{θ'}` for every
   `e` and every `h ∈ ℝ^d` with `‖h‖ ≤ 1` in the sup norm
   (`Daubechies.eLpNorm_higherDiff_tensorGen_le`).
+* **Expansions on `ℝ^d`.** Let `G_ν`, `ν ∈ I`, be finitely many measurable functions on `ℝ^d`
+  that vanish outside `[a, b]^d`, let `G_{ν,j,k}(x) = 2^(jd/2) G_ν(2^j x - k)`
+  (`Daubechies.tensorScaled`), `1 ≤ p < ∞`, `p'` the conjugate exponent and
+  `L = |I| (⌈b - a⌉ + 1)^d`. Then
+  `‖∑ c_{ν,k} G_{ν,j,k}‖_p ≤ L^(1 - 1/p) max_ν ‖G_ν‖_p 2^(jd(1/2 - 1/p)) ‖c‖_{ℓ_p}`
+  (`Daubechies.eLpNorm_tensorExpand_le`) and, for every measurable `f`,
+  `‖(⟨f, G_{ν,j,k}⟩)_{ν,k}‖_{ℓ_p} ≤ L^(1/p) max_ν ‖G_ν‖_{p'} 2^(-jd(1/2 - 1/p)) ‖f‖_p`
+  (`Daubechies.lqNorm_tensorCoeff_le`). Let `C' = L^(1/p) max_ν ‖G_ν‖_{p'}`
+  (`Daubechies.tensorCoeffConst`). If the `G_ν` are continuous with orthonormal integer
+  translates, the coefficients of an expansion are recovered
+  (`Daubechies.tensorCoeff_tensorExpand`), so
+  `2^(jd(1/2 - 1/p)) ‖c‖_{ℓ_p} ≤ C' ‖∑ c_{ν,k} G_{ν,j,k}‖_p`
+  (`Daubechies.lqNorm_le_eLpNorm_tensorExpand`). If a measurable `f` is almost everywhere the
+  expansion of its own coefficients of level `j` and `2^j t ≤ 1`, then
+  `ω_r(f, t)_p ≤ C sup_{ν, ‖H‖ ≤ 2^j t} ‖Δ_H^r G_ν‖_p ‖f‖_p` with `C = L_r^(1 - 1/p) C'` and
+  `L_r = |I| (⌈b - a + 2r⌉ + 1)^d` (`Daubechies.modulus_tensorExpand_le`,
+  `Daubechies.tensorBernsteinConst`).
 
 ## What is formalised
 
@@ -108,6 +126,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Jackson's and Bernstein's inequalities | ✅ | ✗ | `Wavelets/Examples/Daubechies/JacksonSmoothing`, `Wavelets/Examples/Daubechies/Jackson`, `Wavelets/Examples/Daubechies/Bernstein` |
 | Besov spaces by Daubechies coefficients; D4 and order three | ✅ | ✗ | `Wavelets/Examples/Daubechies/Besov`, `Wavelets/Examples/Daubechies/D4Besov`, `Wavelets/Examples/Daubechies/OrderThree` |
 | Tensor generators on `ℝ^d` and their moduli | ✅ | ✗ | `Wavelets/Examples/Daubechies/TensorWavelets` |
+| Expansions on `ℝ^d`: windows and overlap, stability, coefficient recovery, Bernstein's inequality | ✅ | ✗ | `Wavelets/Examples/Daubechies/TensorExpansion` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

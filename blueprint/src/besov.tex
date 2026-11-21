@@ -1779,16 +1779,18 @@ relevant fibres are the intervals $I_{j,n}$, $0 \leq n < 2^j$, of measure $2^{-j
 
 \begin{lemma}[The normalising factor $2^{j/2}$]
 \label{lem:dyadic-normalising-factor}
-\lean{ofReal_two_rpow_half_mul_self, enorm_two_rpow_half}
+\lean{ofReal_two_rpow_half_mul_self, enorm_two_rpow_half, ofReal_two_rpow_half_pow_mul_self,
+  enorm_two_rpow_half_pow}
 \leanok
 \uses{def:lq-norm}
 For every $j \in \N$, $2^{j/2} \cdot 2^{j/2} = 2^j$, and the modulus of $2^{j/2}$ as a complex
-number is the dyadic weight $2^{j/2}$.
+number is the dyadic weight $2^{j/2}$. For every $d \in \N$, $(2^{j/2})^d (2^{j/2})^d = 2^{jd}$,
+and the modulus of $(2^{j/2})^d$ is $2^{jd/2}$.
 \end{lemma}
 
 \begin{proof}
 \leanok
-$2^{j/2} \cdot 2^{j/2} = 2^{j/2 + j/2} = 2^j$, and $2^{j/2} > 0$.
+$2^{j/2} \cdot 2^{j/2} = 2^{j/2 + j/2} = 2^j$, and $2^{j/2} > 0$. Take $d$-th powers.
 \end{proof}
 
 The Haar functions, the multiwavelets of \Cref{sec:multiwavelets} and the Daubechies wavelets
@@ -7425,28 +7427,33 @@ rate of approximation on hyperbolic crosses.
 \begin{definition}[Tensor kernels]
 \label{def:tensor-kernel}
 \lean{Rd.tensorKernel, Rd.tensorKernel_apply, Rd.integrable_tensorKernel,
-  Rd.continuous_tensorKernel}
+  Rd.continuous_tensorKernel, Rd.aestronglyMeasurable_tensorKernel}
 \leanok
 For one-dimensional kernels $K_1, \dots, K_d$ the tensor product is
-$(\otimes K)(x) = \prod_i K_i(x_i)$. Tensor products of integrable (continuous) kernels are
-integrable (continuous).
+$(\otimes K)(x) = \prod_i K_i(x_i)$. Tensor products of integrable (continuous, measurable)
+kernels are integrable (continuous, measurable).
 \end{definition}
 
 \begin{lemma}[Integrals and convolutions of tensor kernels]
 \label{lem:tensor-kernel-fubini}
 \lean{Rd.integral_tensorKernel, Rd.lintegral_enorm_tensorKernel, Rd.eLpNorm_tensorKernel_one,
+  Rd.lintegral_fin_nat_prod_volume_eq_prod, Rd.eLpNorm_tensorKernel,
   Rd.conv_tensorKernel, Rd.dilate_tensorKernel, Rd.sum_tensorKernel_piFinset}
 \leanok
 \uses{def:tensor-kernel, thm:young}
 $\int \otimes K = \prod_i \int K_i$, $\|\otimes K\|_1 = \prod_i \|K_i\|_1$,
 $(\otimes K) * (\otimes K') = \otimes (K_i * K'_i)$, $(\otimes K)_c = \otimes (K_i)_c$, and
 $\sum_{k \in T_1 \times \dots \times T_d} \otimes (K_i(k_i)) = \otimes \bigl(\sum_{j \in T_i} K_i(j)\bigr)$
-for finite sets $T_i$.
+for finite sets $T_i$. For measurable $f_1, \dots, f_d : \R \to [0, \infty]$,
+$\int_{\R^d} \prod_i f_i(x_i) \, dx = \prod_i \int_\R f_i$, and for $0 < p < \infty$ and
+measurable $K_1, \dots, K_d$, $\|\otimes K\|_p = \prod_i \|K_i\|_p$.
 \end{lemma}
 
 \begin{proof}
 \leanok
-Fubini's theorem for product measures, and $\prod_i \sum_j = \sum \prod$ for finite sums.
+Fubini's theorem for product measures (Tonelli's theorem for nonnegative functions, by
+induction on $d$), applied to $|K_i|^p$ for the $L_p$ norms, and $\prod_i \sum_j = \sum \prod$
+for finite sums.
 \end{proof}
 
 \begin{lemma}[Diagonal changes of variables]
