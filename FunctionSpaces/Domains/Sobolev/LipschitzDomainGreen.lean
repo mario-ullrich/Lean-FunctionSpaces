@@ -34,8 +34,8 @@ hyperplanes `H_j`, the graph maps `γ_j`, the traces `Tr_j`, the normal weights
   (`Rd.LipschitzGraph.exists_contDiff_comp_graphMap_eq`).
 * **Green's formula** (`Rd.BoundedLipschitzDomain.setIntegral_green_surface`,
   `Rd.BoundedLipschitzDomain.setIntegral_green_sobolevOne`):
-  `∫_Ω (∂_v u) w + u ∂_v w = ∫_Γ γ u · γ w ⟪v, ν⟫ dσ` for `u, w ∈ H^1(Ω)`, also with weak
-  derivatives on `Ω`
+  `∫_Ω (∂_v u) w + u ∂_v w = ∫_Γ γ_{L_2} u · γ_{L_2} w ⟪v, ν⟫ dσ` for `u, w ∈ H^1(Ω)`, with the
+  trace `γ_{L_2} : H^1(Ω) → L_2(Γ)`, also with weak derivatives on `Ω`
   (`Rd.BoundedLipschitzDomain.setIntegral_green_sobolevOne_of_hasWeakLineDeriv`), and in chart
   form for every resolution of unity (`Rd.BoundedLipschitzDomain.setIntegral_green`).
 * **The zero extension** (`Rd.BoundedLipschitzDomain.memSobolev_indicatorLp_iff_mem_traceKer`): for
@@ -667,15 +667,17 @@ theorem inner_normal_neg_ae (j : Fin Ω.N) :
 
 /-! ### Green's formula with the surface measure -/
 
-/-- **The trace in `L_2(Γ)` in a chart**: for `U ∈ H^1(V)`, `(γ_{L_2} U)(γ_j x') = Tr_j U(x')` for
-almost every `x' ∈ H_j` with `γ_j(x') ∈ B_j` (`Rd.BoundedLipschitzDomain.ambientTraceL2_apply_ae`,
+/-- **The trace in `L_2(Γ)` in a chart**: for `U ∈ H^1(V)` and its trace
+`T_Γ U = Rd.BoundedLipschitzDomain.ambientTraceL2 1 U`, `(T_Γ U)(γ_j x') = Tr_j U(x')` for
+almost every `x' ∈ H_j` with `γ_j(x') ∈ B_j`
+(`Rd.BoundedLipschitzDomain.ambientTraceL2_one_apply_ae`,
 `Rd.BoundedLipschitzDomain.boundaryTrace_graphMap`). -/
 theorem ambientTraceL2_graphMap_ae (j : Fin Ω.N) (U : H^{1}(V)) :
     ∀ᵐ x' ∂(volume : Measure (Ω.graph j).hyperplane),
       (Ω.graph j).graphMap x' ∈ ball (Ω.center j) (Ω.radius j) →
-        Ω.ambientTraceL2 U ((Ω.graph j).graphMap x') = (Ω.graph j).traceH1 U x' := by
+        (Ω.ambientTraceL2 1) U ((Ω.graph j).graphMap x') = (Ω.graph j).traceH1 U x' := by
   filter_upwards [Ω.ae_graphMap_of_ae_surfaceMeasure j
-    (Ω.ambientTraceL2_apply_ae Ω.boundaryPartition U),
+    (Ω.ambientTraceL2_one_apply_ae Ω.boundaryPartition U),
     Ω.boundaryTrace_graphMap Ω.boundaryPartition two_ne_top one_le_two (s := 1 / 2) (by norm_num)
       (by norm_num) one_le_two (modNorm_toL2_lt_top U) j] with x' h1 h2 hj
   rw [h1 hj, h2 hj, (Ω.graph j).traceH1_apply]
@@ -689,10 +691,11 @@ theorem normal_graphMap_ae (j : Fin Ω.N) :
   filter_upwards [(Ω.ae_surfaceMeasure_ball_iff j).1 (Ω.normal_ae_eq_normalAt j)] with x' hx' hj
   rw [hx' hj, LipschitzGraph.proj_graphMap]
 
-/-- The boundary integrand `γ_{L_2} U · γ_{L_2} W ⟪v, ν⟫` of Green's formula is integrable with
-respect to the surface measure: a product of two `L_2(Γ)` functions and a bounded one. -/
+/-- The boundary integrand `T_Γ U · T_Γ W ⟪v, ν⟫` of Green's formula, with the trace
+`T_Γ = Rd.BoundedLipschitzDomain.ambientTraceL2 1` of `H^1(V)`, is integrable with respect to the
+surface measure: a product of two `L_2(Γ)` functions and a bounded one. -/
 theorem integrable_ambientTraceL2_mul_inner_normal (U W : H^{1}(V)) (v : V) :
-    Integrable (fun y => Ω.ambientTraceL2 U y * Ω.ambientTraceL2 W y *
+    Integrable (fun y => (Ω.ambientTraceL2 1) U y * (Ω.ambientTraceL2 1) W y *
       (inner ℝ v (Ω.normal y) : ℂ)) Ω.surfaceMeasure :=
   ((Lp.memLp _).integrable_mul (Lp.memLp _)).mul_bdd
     (Complex.measurable_ofReal.comp
@@ -704,13 +707,13 @@ theorem integrable_ambientTraceL2_mul_inner_normal (U W : H^{1}(V)) (v : V) :
 
 /-- **The boundary integral of Green's formula in the charts**: for every resolution of unity `ψ`,
 `U, W ∈ H^1(V)` and every direction `v`,
-`∫_Γ γ_{L_2} U · γ_{L_2} W ⟪v, ν⟫ dσ = ∑_j ∫_{H_j} ψ_j(γ_j x') Tr_j U Tr_j W n^j_v dx'`, by the
+`∫_Γ T_Γ U · T_Γ W ⟪v, ν⟫ dσ = ∑_j ∫_{H_j} ψ_j(γ_j x') Tr_j U Tr_j W n^j_v dx'`, by the
 surface measure in the charts (`Rd.BoundedLipschitzDomain.integral_surfaceMeasure`), the traces and
 the normal in the charts, and `⟪v, ν_j⟫ √(1 + ‖∇φ_j‖²) = n^j_v`
 (`Rd.LipschitzGraph.inner_normalAt_mul_gram`). -/
 theorem integral_ambientTraceL2_mul_inner_normal_eq (ψ : Ω.BoundaryPartition) (U W : H^{1}(V))
     (v : V) :
-    ∫ y, Ω.ambientTraceL2 U y * Ω.ambientTraceL2 W y * (inner ℝ v (Ω.normal y) : ℂ)
+    ∫ y, (Ω.ambientTraceL2 1) U y * (Ω.ambientTraceL2 1) W y * (inner ℝ v (Ω.normal y) : ℂ)
       ∂Ω.surfaceMeasure =
       ∑ j, ∫ x', ψ.toComplex j ((Ω.graph j).graphMap x') * (Ω.graph j).traceH1 U x' *
         (Ω.graph j).traceH1 W x' * ((Ω.graph j).normalWeight v x' : ℂ) := by
@@ -726,43 +729,44 @@ theorem integral_ambientTraceL2_mul_inner_normal_eq (ψ : Ω.BoundaryPartition) 
 
 /-- **Green's formula on a bounded Lipschitz domain** (Grisvard, Theorem 1.5.3.1): for all
 `U, W ∈ H^1(V)` and every direction `v`,
-`∫_Ω (∂_v U) W + U ∂_v W = ∫_Γ γ U · γ W ⟪v, ν⟫ dσ` with the traces `γ U, γ W ∈ L_2(Γ)`
-(`Rd.BoundedLipschitzDomain.ambientTraceL2`), the outward unit normal `ν` and the surface measure
-`σ`. The chart form for a resolution of unity equal to one near `Γ`
+`∫_Ω (∂_v U) W + U ∂_v W = ∫_Γ T_Γ U · T_Γ W ⟪v, ν⟫ dσ` with the traces
+`T_Γ U, T_Γ W ∈ L_2(Γ)` (`Rd.BoundedLipschitzDomain.ambientTraceL2`), the outward unit normal `ν`
+and the surface measure `σ`. The chart form for a resolution of unity equal to one near `Γ`
 (`Rd.BoundedLipschitzDomain.setIntegral_green_of_nhds`) is the boundary integral in the charts
 (`Rd.BoundedLipschitzDomain.integral_ambientTraceL2_mul_inner_normal_eq`). -/
 theorem setIntegral_green_surface (U W : H^{1}(V)) (v : V) :
     ∫ x in Ω.carrier, weakDerivL2 v U x * toL2 W x + toL2 U x * weakDerivL2 v W x =
-      ∫ y, Ω.ambientTraceL2 U y * Ω.ambientTraceL2 W y * (inner ℝ v (Ω.normal y) : ℂ)
+      ∫ y, (Ω.ambientTraceL2 1) U y * (Ω.ambientTraceL2 1) W y * (inner ℝ v (Ω.normal y) : ℂ)
         ∂Ω.surfaceMeasure := by
   obtain ⟨ψ, -, -, hψ⟩ := Ω.exists_boundaryPartition_nhds
   rw [setIntegral_green_of_nhds ψ hψ, Ω.integral_ambientTraceL2_mul_inner_normal_eq ψ]
 
 /-- **Green's formula on `H^1(Ω)`**: for all `u, w ∈ H^1(Ω)` and every direction `v`,
-`∫_Ω (∂_v u) w + u ∂_v w = ∫_Γ γ u · γ w ⟪v, ν⟫ dσ` with the trace
-`γ = Rd.BoundedLipschitzDomain.boundaryTraceL2 : H^1(Ω) → L_2(Γ)`; the left side uses the
+`∫_Ω (∂_v u) w + u ∂_v w = ∫_Γ γ_{L_2} u · γ_{L_2} w ⟪v, ν⟫ dσ` with the trace
+`γ_{L_2} = Rd.BoundedLipschitzDomain.boundaryTraceL2 1 : H^1(Ω) → L_2(Γ)`; the left side uses the
 representatives of `u, w` in `H^1(V)` (`Rd.BoundedLipschitzDomain.setIntegral_green_surface`,
 `Rd.BoundedLipschitzDomain.boundaryTraceL2_eq_ambientTraceL2`). -/
 theorem setIntegral_green_sobolevOne (u w : Ω.SobolevOne) (v : V) :
     ∫ x in Ω.carrier, weakDerivL2 v (u : H^{1}(V)) x * toL2 (w : H^{1}(V)) x +
         toL2 (u : H^{1}(V)) x * weakDerivL2 v (w : H^{1}(V)) x =
-      ∫ y, Ω.boundaryTraceL2 u y * Ω.boundaryTraceL2 w y * (inner ℝ v (Ω.normal y) : ℂ)
+      ∫ y, (Ω.boundaryTraceL2 1) u y * (Ω.boundaryTraceL2 1) w y * (inner ℝ v (Ω.normal y) : ℂ)
         ∂Ω.surfaceMeasure := by
-  rw [Ω.boundaryTraceL2_eq_ambientTraceL2, Ω.boundaryTraceL2_eq_ambientTraceL2]
+  rw [Ω.boundaryTraceL2_eq_ambientTraceL2 1 u, Ω.boundaryTraceL2_eq_ambientTraceL2 1 w]
   exact Ω.setIntegral_green_surface _ _ v
 
 /-- **Green's formula on `H^1(Ω)` with weak derivatives on `Ω`**: for all `u, w ∈ H^1(Ω)`, every
 direction `v` and weak derivatives `u_v = ∂_v u`, `w_v = ∂_v w` on `Ω`,
-`∫_Ω u_v w + u w_v = ∫_Γ γ u · γ w ⟪v, ν⟫ dσ` with the trace `γ : H^1(Ω) → L_2(Γ)`. On `Ω`, `u_v`
-and `w_v` agree almost everywhere with the weak derivatives on `V` of the representatives in
-`H^1(V)` (`Rd.HasWeakLineDeriv.mono`, `Rd.HasWeakLineDeriv.unique`), so this is
+`∫_Ω u_v w + u w_v = ∫_Γ γ_{L_2} u · γ_{L_2} w ⟪v, ν⟫ dσ` with the trace
+`γ_{L_2} : H^1(Ω) → L_2(Γ)`. On `Ω`, `u_v` and `w_v` agree almost everywhere with the weak
+derivatives on `V` of the representatives in `H^1(V)` (`Rd.HasWeakLineDeriv.mono`,
+`Rd.HasWeakLineDeriv.unique`), so this is
 `Rd.BoundedLipschitzDomain.setIntegral_green_sobolevOne`. -/
 theorem setIntegral_green_sobolevOne_of_hasWeakLineDeriv (u w : Ω.SobolevOne) (v : V)
     {uv wv : V → ℂ}
     (huv : HasWeakLineDeriv Ω.toOpens (fun _ : Fin 1 => v) (toL2 (u : H^{1}(V))) uv)
     (hwv : HasWeakLineDeriv Ω.toOpens (fun _ : Fin 1 => v) (toL2 (w : H^{1}(V))) wv) :
     ∫ x in Ω.carrier, uv x * toL2 (w : H^{1}(V)) x + toL2 (u : H^{1}(V)) x * wv x =
-      ∫ y, Ω.boundaryTraceL2 u y * Ω.boundaryTraceL2 w y * (inner ℝ v (Ω.normal y) : ℂ)
+      ∫ y, (Ω.boundaryTraceL2 1) u y * (Ω.boundaryTraceL2 1) w y * (inner ℝ v (Ω.normal y) : ℂ)
         ∂Ω.surfaceMeasure := by
   rw [← Ω.setIntegral_green_sobolevOne u w v]
   have h1 := ((hasWeakLineDeriv_weakDerivL2 v (u : H^{1}(V))).mono le_top).unique huv
@@ -809,15 +813,15 @@ theorem setIntegral_green (ψ : Ω.BoundaryPartition) (f g : Lp ℂ 2 (volume : 
 `W ∈ H^1(V)` and every direction `v`, `∫_Ω (∂_v u) W + u ∂_v W = 0`
 (`Rd.BoundedLipschitzDomain.setIntegral_green_surface`, `γ_{L_2} u = 0` by
 `Rd.BoundedLipschitzDomain.ker_boundaryTraceL2`). -/
-theorem setIntegral_green_of_mem_traceKer {u : Ω.SobolevOne} (hu : u ∈ Ω.traceKer)
+theorem setIntegral_green_of_mem_traceKer {u : Ω.SobolevOne} (hu : u ∈ Ω.traceKer 1)
     (W : H^{1}(V)) (v : V) :
     ∫ x in Ω.carrier, weakDerivL2 v (u : H^{1}(V)) x * toL2 W x +
       toL2 (u : H^{1}(V)) x * weakDerivL2 v W x = 0 := by
-  have h0 : Ω.ambientTraceL2 (u : H^{1}(V)) = 0 := by
-    have hk : u ∈ (Ω.boundaryTraceL2).ker := by
-      rw [Ω.ker_boundaryTraceL2]
+  have h0 : (Ω.ambientTraceL2 1) (u : H^{1}(V)) = 0 := by
+    have hk : u ∈ (Ω.boundaryTraceL2 1).ker := by
+      rw [Ω.ker_boundaryTraceL2 1]
       exact hu
-    rw [← Ω.boundaryTraceL2_eq_ambientTraceL2]
+    rw [← Ω.boundaryTraceL2_eq_ambientTraceL2 1 u]
     exact LinearMap.mem_ker.1 hk
   rw [Ω.setIntegral_green_surface, h0]
   refine integral_eq_zero_of_ae ?_
@@ -830,7 +834,7 @@ direction `v`, the zero extension `1_Ω ∂_v u` of the weak derivative is the w
 zero extension `1_Ω u` on `V`. Tested against `φ`, this is
 `∫_Ω (∂_v u) φ = -∫_Ω u ∂_v φ`, Green's formula without boundary term
 (`Rd.BoundedLipschitzDomain.setIntegral_green_of_mem_traceKer`). -/
-theorem hasWeakLineDeriv_indicatorLp_of_mem_traceKer {u : Ω.SobolevOne} (hu : u ∈ Ω.traceKer)
+theorem hasWeakLineDeriv_indicatorLp_of_mem_traceKer {u : Ω.SobolevOne} (hu : u ∈ Ω.traceKer 1)
     (v : V) :
     HasWeakLineDeriv ⊤ (fun _ : Fin 1 => v) (indicatorLp Ω.measurableSet (toL2 (u : H^{1}(V))))
       (indicatorLp Ω.measurableSet (weakDerivL2 v (u : H^{1}(V)))) := by
@@ -862,7 +866,7 @@ theorem hasWeakLineDeriv_indicatorLp_of_mem_traceKer {u : Ω.SobolevOne} (hu : u
 trace kernel, `1_Ω u ∈ W^1_2(V)`, with the weak derivatives `1_Ω ∂_v u`
 (`Rd.BoundedLipschitzDomain.hasWeakLineDeriv_indicatorLp_of_mem_traceKer`,
 `Rd.memSobolev_one_of_forall_hasWeakLineDeriv`). -/
-theorem memSobolev_indicatorLp_of_mem_traceKer {u : Ω.SobolevOne} (hu : u ∈ Ω.traceKer) :
+theorem memSobolev_indicatorLp_of_mem_traceKer {u : Ω.SobolevOne} (hu : u ∈ Ω.traceKer 1) :
     MemSobolev 1 (indicatorLp Ω.measurableSet (toL2 (u : H^{1}(V)))) :=
   memSobolev_one_of_forall_hasWeakLineDeriv fun v =>
     ⟨_, Ω.hasWeakLineDeriv_indicatorLp_of_mem_traceKer hu v⟩
@@ -874,12 +878,12 @@ trace of `u` is the trace of `F = 1_Ω u` (they agree on `Ω_j ∩ B_j`,
 `B_j`, which lies outside `Ω`, so its trace vanishes
 (`Rd.LipschitzGraph.traceH1_ae_eq_zero_of_lower`). -/
 theorem mem_traceKer_of_memSobolev_indicatorLp {u : Ω.SobolevOne}
-    (hu : MemSobolev 1 (indicatorLp Ω.measurableSet (toL2 (u : H^{1}(V))))) : u ∈ Ω.traceKer := by
+    (hu : MemSobolev 1 (indicatorLp Ω.measurableSet (toL2 (u : H^{1}(V))))) : u ∈ Ω.traceKer 1 := by
   obtain ⟨F, hF⟩ := exists_toL2_eq_of_memSobolev hu
   have hFe : (toL2 F : V → ℂ) =ᵐ[volume] Ω.carrier.indicator (toL2 (u : H^{1}(V))) := by
     rw [hF]
     exact indicatorLp_apply_ae _ _
-  rw [Ω.mem_traceKer_iff Ω.boundaryPartition, EventuallyEq, Ω.eventually_aeBoundary_iff]
+  rw [Ω.mem_traceKer_one_iff Ω.boundaryPartition, EventuallyEq, Ω.eventually_aeBoundary_iff]
   intro j
   have hB := Ω.inter_ball_eq j le_rfl
   have h1 := (Ω.graph j).trace_ae_eq_of_ae_eq two_ne_top 2 (s := 1 / 2) (by norm_num) one_le_two
@@ -905,7 +909,7 @@ theorem mem_traceKer_of_memSobolev_indicatorLp {u : Ω.SobolevOne}
 (`Rd.BoundedLipschitzDomain.memSobolev_indicatorLp_of_mem_traceKer`,
 `Rd.BoundedLipschitzDomain.mem_traceKer_of_memSobolev_indicatorLp`). -/
 theorem memSobolev_indicatorLp_iff_mem_traceKer (u : Ω.SobolevOne) :
-    MemSobolev 1 (indicatorLp Ω.measurableSet (toL2 (u : H^{1}(V)))) ↔ u ∈ Ω.traceKer :=
+    MemSobolev 1 (indicatorLp Ω.measurableSet (toL2 (u : H^{1}(V)))) ↔ u ∈ Ω.traceKer 1 :=
   ⟨Ω.mem_traceKer_of_memSobolev_indicatorLp, Ω.memSobolev_indicatorLp_of_mem_traceKer⟩
 
 end BoundedLipschitzDomain

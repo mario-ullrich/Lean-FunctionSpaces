@@ -5,7 +5,7 @@ Authors: Mario Ullrich
 -/
 module
 
-public import FunctionSpaces.Rd.Sobolev.RellichCompactness
+public import FunctionSpaces.Rd.Sobolev.SobolevScale
 public import Mathlib.Analysis.InnerProductSpace.ProdL2
 public import Mathlib.Analysis.InnerProductSpace.Projection.Submodule
 public import Mathlib.Topology.Algebra.Module.Basic
@@ -20,8 +20,8 @@ and McLean (Chapter 3), and are Hilbert spaces as well.
 
 * **Vanishing on `Ω`**: `Rd.vanishOn s Ω` is the closed subspace of the `U ∈ H^s(V)` with
   `U(φ) = 0` for every test function `φ` of `Ω` (evaluation `Rd.besselEvalCLM` is continuous);
-  for `s = 1` it consists of the `U` vanishing almost everywhere on `Ω`
-  (`Rd.mem_vanishOn_one_iff`).
+  for `s ≥ 0` it consists of the `U` whose `L_2` function vanishes almost everywhere on `Ω`
+  (`Rd.mem_vanishOn_iff_sobolevToL2`, and `Rd.mem_vanishOn_one_iff` for `s = 1`).
 * **`H^s(Ω)`**: `Rd.RestrictionSpace s Ω` is the orthogonal complement of `Rd.vanishOn s Ω`,
   with the restriction `Rd.restrictProj`, the orthogonal projection. It is isometric to the
   quotient `H^s(V) ⧸ vanishOn s Ω` (`Rd.quotientEquivRestrictionSpace`), so its norm is the
@@ -102,8 +102,9 @@ theorem continuous_toDistr_apply (s : ℝ) (φ : 𝓢(V, ℂ)) :
 
 /-- **The elements of `H^s(V)` vanishing on `Ω`**: the `U ∈ H^s(V)` whose tempered distribution
 vanishes on every real test function of the open set `Ω`, `U(φ) = 0` for all `φ ∈ 𝓓(Ω)`
-(`Rd.mem_vanishOn_iff`). It is a closed subspace (`Rd.isClosed_vanishOn`); for `s = 1` it
-consists of the `U` that vanish almost everywhere on `Ω` (`Rd.mem_vanishOn_one_iff`). -/
+(`Rd.mem_vanishOn_iff`). It is a closed subspace (`Rd.isClosed_vanishOn`); for `s ≥ 0` it
+consists of the `U` whose `L_2` function vanishes almost everywhere on `Ω`
+(`Rd.mem_vanishOn_iff_sobolevToL2`). -/
 noncomputable def vanishOn (s : ℝ) (Ω : Opens V) : Submodule ℂ H^{s}(V) :=
   ⨅ φ : 𝓓(Ω, ℝ), (besselEvalCLM s (testSchwartz φ)).ker
 
@@ -123,36 +124,52 @@ theorem isClosed_vanishOn (s : ℝ) (Ω : Opens V) : IsClosed (vanishOn s Ω : S
 instance completeSpace_vanishOn (s : ℝ) (Ω : Opens V) : CompleteSpace (vanishOn s Ω) :=
   (isClosed_vanishOn s Ω).completeSpace_coe
 
-/-- For `U ∈ H^1(V)` and a real test function `φ` of `Ω`, `U(φ) = ∫ φ · U`, the integral of `φ`
-against the `L_2` function of `U` (`Rd.toTemperedDistribution_toL2`). -/
-theorem toDistr_testSchwartz_eq_integral {Ω : Opens V} (U : H^{1}(V)) (φ : 𝓓(Ω, ℝ)) :
-    U.toDistr (testSchwartz φ) = ∫ x, ((φ x : ℝ) : ℂ) * toL2 U x := by
-  rw [← toTemperedDistribution_toL2, Lp.toTemperedDistribution_apply]
+/-- For `s ≥ 0`, `U ∈ H^s(V)` and a real test function `φ` of `Ω`, `U(φ) = ∫ φ · ι_s U`, the
+integral of `φ` against the `L_2` function `ι_s U` of `U`
+(`Rd.toTemperedDistribution_sobolevToL2`). -/
+theorem toDistr_testSchwartz_eq_integral_sobolevToL2 {s : ℝ} (hs : 0 ≤ s) {Ω : Opens V}
+    (U : H^{s}(V)) (φ : 𝓓(Ω, ℝ)) :
+    U.toDistr (testSchwartz φ) = ∫ x, ((φ x : ℝ) : ℂ) * sobolevToL2 hs U x := by
+  rw [← toTemperedDistribution_sobolevToL2 hs, Lp.toTemperedDistribution_apply]
   simp [smul_eq_mul]
 
-/-- **Vanishing on `Ω` for `s = 1`**: `U ∈ H^1(V)` vanishes on the open set `Ω` iff its `L_2`
-function vanishes almost everywhere on `Ω`. `⇐`: the integrand `φ · U` vanishes almost
-everywhere; `⇒`: a locally integrable function on `Ω` with vanishing integrals against all
-smooth compactly supported real functions in `Ω` vanishes almost everywhere on `Ω` (Mathlib's
-`IsOpen.ae_eq_zero_of_integral_contDiff_smul_eq_zero`). -/
-theorem mem_vanishOn_one_iff {Ω : Opens V} (U : H^{1}(V)) :
-    U ∈ vanishOn 1 Ω ↔ (toL2 U : V → ℂ) =ᵐ[volume.restrict (Ω : Set V)] 0 := by
+/-- For `U ∈ H^1(V)` and a real test function `φ` of `Ω`, `U(φ) = ∫ φ · U`, the integral of `φ`
+against the `L_2` function `Rd.toL2 U` of `U`, the case `s = 1` of
+`Rd.toDistr_testSchwartz_eq_integral_sobolevToL2` (`Rd.sobolevToL2_one`). -/
+theorem toDistr_testSchwartz_eq_integral {Ω : Opens V} (U : H^{1}(V)) (φ : 𝓓(Ω, ℝ)) :
+    U.toDistr (testSchwartz φ) = ∫ x, ((φ x : ℝ) : ℂ) * toL2 U x := by
+  rw [toDistr_testSchwartz_eq_integral_sobolevToL2 zero_le_one, sobolevToL2_one]
+
+/-- **Vanishing on `Ω` for `s ≥ 0`**: `U ∈ H^s(V)` vanishes on the open set `Ω` iff its `L_2`
+function `ι_s U` (`Rd.sobolevToL2`) vanishes almost everywhere on `Ω`. `⇐`: the integrand
+`φ · ι_s U` vanishes almost everywhere; `⇒`: a locally integrable function on `Ω` with vanishing
+integrals against all smooth compactly supported real functions in `Ω` vanishes almost everywhere
+on `Ω` (Mathlib's `IsOpen.ae_eq_zero_of_integral_contDiff_smul_eq_zero`). -/
+theorem mem_vanishOn_iff_sobolevToL2 {s : ℝ} (hs : 0 ≤ s) {Ω : Opens V} (U : H^{s}(V)) :
+    U ∈ vanishOn s Ω ↔ (sobolevToL2 hs U : V → ℂ) =ᵐ[volume.restrict (Ω : Set V)] 0 := by
   rw [mem_vanishOn_iff, Filter.EventuallyEq, ae_restrict_iff' Ω.isOpen.measurableSet]
   constructor
   · intro hU
     refine Ω.isOpen.ae_eq_zero_of_integral_contDiff_smul_eq_zero
-      (((Lp.memLp (toL2 U)).locallyIntegrable (by norm_num)).locallyIntegrableOn _)
+      (((Lp.memLp (sobolevToL2 hs U)).locallyIntegrable (by norm_num)).locallyIntegrableOn _)
       fun g hg hgc hgs => ?_
     have h := hU ⟨g, hg, hgc, hgs⟩
-    rw [toDistr_testSchwartz_eq_integral] at h
+    rw [toDistr_testSchwartz_eq_integral_sobolevToL2 hs] at h
     simpa [Complex.real_smul] using h
   · intro hU φ
-    rw [toDistr_testSchwartz_eq_integral]
+    rw [toDistr_testSchwartz_eq_integral_sobolevToL2 hs]
     refine integral_eq_zero_of_ae ?_
     filter_upwards [hU] with x hx
     by_cases hxΩ : x ∈ (Ω : Set V)
     · simp [hx hxΩ]
     · simp [image_eq_zero_of_notMem_tsupport fun h => hxΩ (φ.tsupport_subset h)]
+
+/-- **Vanishing on `Ω` for `s = 1`**: `U ∈ H^1(V)` vanishes on the open set `Ω` iff its `L_2`
+function `Rd.toL2 U` vanishes almost everywhere on `Ω` (`Rd.mem_vanishOn_iff_sobolevToL2`,
+`Rd.sobolevToL2_one`). -/
+theorem mem_vanishOn_one_iff {Ω : Opens V} (U : H^{1}(V)) :
+    U ∈ vanishOn 1 Ω ↔ (toL2 U : V → ℂ) =ᵐ[volume.restrict (Ω : Set V)] 0 := by
+  rw [mem_vanishOn_iff_sobolevToL2 zero_le_one, sobolevToL2_one]
 
 /-- For `s = 1`, `U` vanishes on `Ω` iff the restriction to `L_2(Ω)` of the `L_2` function of
 `U` is zero. -/

@@ -9,18 +9,19 @@ public import FunctionSpaces.Domains.Lipschitz.SurfaceMeasure
 public import FunctionSpaces.Domains.Traces.BoundaryBesovNorm
 
 /-!
-# The norm of the trace space of a bounded Lipschitz domain
+# The norm of the trace space of `H^1(Ω)`
 
 Let `Ω` be a bounded Lipschitz domain with boundary `Γ`, `H^1(Ω)` its Sobolev space, and
-`H^{1/2}(Γ)` the trace space, the orthogonal complement of the trace kernel in `H^1(Ω)`
-(`Rd.BoundedLipschitzDomain.TraceSpace`). For `U ∈ H^1(V)` with `L_2` function `ι U`, `Tr_Γ ι U`
-is its boundary trace.
+`Ω.TraceSpace 1` the trace space of `H^1(Ω)`, the orthogonal complement of the trace kernel in
+`H^1(Ω)` (`Rd.BoundedLipschitzDomain.TraceSpace`). For `U ∈ H^1(V)` with `L_2` function `ι U`,
+`Tr_Γ ι U` is its boundary trace.
 
 * **The least extension norm** (`Rd.BoundedLipschitzDomain.enorm_eq_iInf`): the norm of
-  `t ∈ H^{1/2}(Γ)` is the least `H^1(V)` norm of a function with the boundary trace of `t`, the
-  quotient norm of `γ(H^1(Ω))`, which McLean, Theorem 3.37, shows to be equivalent to his chart
-  norm of `H^{1/2}(Γ)`. The restriction to `Ω` keeps the boundary trace
-  (`Rd.BoundedLipschitzDomain.boundaryTrace_restrictProj`) and does not increase the norm.
+  `t ∈ Ω.TraceSpace 1` is the least `H^1(V)` norm of a function with the boundary trace of `t`,
+  the quotient norm of `γ(H^1(Ω))`, which McLean, Theorem 3.37, shows to be equivalent to his
+  chart norm of `H^{1/2}(Γ)`. By `Rd.BoundedLipschitzDomain.boundaryTrace_restrictProj_one` the
+  restriction to `Ω` keeps the boundary trace, and it does not increase the norm
+  (`Rd.BoundedLipschitzDomain.enorm_trace_restrictProj_le`).
 * **The norm equivalence** (`Rd.BoundedLipschitzDomain.exists_traceL2_norm_equiv`): for every
   resolution of unity `ψ` there is `C < ∞` with `‖t‖ ≤ C ‖τ t‖_{B^{1/2}_{2,2}(Γ)}` and
   `‖τ t‖_{B^{1/2}_{2,2}(Γ)} ≤ C ‖t‖` for the quasi-norm by chart pieces
@@ -29,11 +30,11 @@ is its boundary trace.
   with the bound of `H^1(V)` by `B^1_{2,2}(V)` (`Rd.enorm_le_modNorm_two`). Every
   `g ∈ B^{1/2}_{2,2}(Γ)` has a preimage under the trace of norm at most `C ‖g‖`
   (`Rd.BoundedLipschitzDomain.exists_traceSpace_of_memBoundaryBesov_le`).
-* **The range** of `τ : H^{1/2}(Γ) → L_2(Γ)` is `B^{1/2}_{2,2}(Γ)`
+* **The range** of `τ : Ω.TraceSpace 1 → L_2(Γ)` is `B^{1/2}_{2,2}(Γ)`
   (`Rd.BoundedLipschitzDomain.mem_range_traceL2_iff`).
 * **The Banach space `B^{1/2}_{2,2}(Γ)`** (`Rd.BoundedLipschitzDomain.BoundaryBesovHalf`): the
   functions of `L_2(Γ)` in `B^{1/2}_{2,2}(Γ)`, for the canonical resolution of unity, with the
-  quasi-norm by chart pieces, a norm here; `τ` is an isomorphism of `H^{1/2}(Γ)` onto it
+  quasi-norm by chart pieces, a norm here; `τ` is an isomorphism of `Ω.TraceSpace 1` onto it
   (`Rd.BoundedLipschitzDomain.traceSpaceEquivBoundaryBesovHalf`), so it is complete. The trace
   `H^1(Ω) → B^{1/2}_{2,2}(Γ)` has a bounded linear right inverse, as in McLean's Theorem 3.37
   (`Rd.BoundedLipschitzDomain.traceRightInverse`).
@@ -55,61 +56,45 @@ variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDim
 
 /-! ### The norm of the trace space as a least extension norm -/
 
-/-- **The restriction to `Ω` keeps the boundary trace**: for every resolution of unity `ψ` and
-`U ∈ H^1(V)`, `Tr_Γ ι(U|_Ω) = Tr_Γ ι U` almost everywhere on `Γ`, since `U - U|_Ω` vanishes on `Ω`
-(`Rd.sub_restrictProj_mem`, `Rd.mem_vanishOn_one_iff`) and the boundary trace depends only on the
-function on `Ω` (`Rd.BoundedLipschitzDomain.boundaryTrace_congr`). -/
-theorem boundaryTrace_restrictProj (ψ : Ω.BoundaryPartition) (U : H^{1}(V)) :
-    Ω.boundaryTrace ψ two_ne_top 2
-        (toL2 ((restrictProj 1 Ω.toOpens U : Ω.SobolevOne) : H^{1}(V))) =ᶠ[Ω.aeBoundary]
-      Ω.boundaryTrace ψ two_ne_top 2 (toL2 U) := by
-  have h := (mem_vanishOn_one_iff _).1 (sub_restrictProj_mem (s := 1) (Ω := Ω.toOpens) U)
-  rw [Ω.coe_toOpens] at h
-  replace h := (ae_restrict_iff' Ω.measurableSet).1 h
-  refine Ω.boundaryTrace_congr ψ two_ne_top one_le_two (s := 1 / 2) (by norm_num) (by norm_num)
-    one_le_two (modNorm_toL2_lt_top _) (modNorm_toL2_lt_top U) ?_
-  filter_upwards [h, Lp.coeFn_sub (toL2 U)
-    (toL2 ((restrictProj 1 Ω.toOpens U : Ω.SobolevOne) : H^{1}(V)))] with x hx hsub hxΩ
-  have hx' := hx hxΩ
-  rw [map_sub, hsub, Pi.sub_apply, Pi.zero_apply, sub_eq_zero] at hx'
-  exact hx'.symm
-
 /-- The trace of the restriction to `Ω` has norm at most that of `U ∈ H^1(V)`:
-`‖γ(U|_Ω)‖ ≤ ‖U|_Ω‖ ≤ ‖U‖` (`Rd.BoundedLipschitzDomain.norm_trace_apply_le`,
+`‖γ_1(U|_Ω)‖ ≤ ‖U|_Ω‖ ≤ ‖U‖` (`Rd.BoundedLipschitzDomain.norm_trace_apply_le`,
 `Rd.norm_restrictProj_apply_le`). -/
 theorem enorm_trace_restrictProj_le (U : H^{1}(V)) :
-    ‖Ω.trace (restrictProj 1 Ω.toOpens U)‖ₑ ≤ ‖U‖ₑ :=
-  enorm_le_iff_norm_le.2 ((Ω.norm_trace_apply_le _).trans (norm_restrictProj_apply_le U))
+    ‖(Ω.trace 1) (restrictProj 1 Ω.toOpens U)‖ₑ ≤ ‖U‖ₑ :=
+  enorm_le_iff_norm_le.2 ((Ω.norm_trace_apply_le 1 _).trans (norm_restrictProj_apply_le U))
 
 /-- **Functions with the boundary trace of `t` restrict to extensions of `t`**: for every
-resolution of unity `ψ`, if `Tr_Γ ι U = Tr_Γ ι(E t)` almost everywhere on `Γ`, then `γ(U|_Ω) = t`
-(`Rd.BoundedLipschitzDomain.trace_eq_iff`, `Rd.BoundedLipschitzDomain.trace_extend`). -/
-theorem trace_restrictProj_eq (ψ : Ω.BoundaryPartition) {U : H^{1}(V)} {t : Ω.TraceSpace}
+resolution of unity `ψ`, if `Tr_Γ ι U = Tr_Γ ι(E_1 t)` almost everywhere on `Γ`, then
+`γ_1(U|_Ω) = t` (`Rd.BoundedLipschitzDomain.boundaryTrace_restrictProj_one`,
+`Rd.BoundedLipschitzDomain.trace_one_eq_iff`, `Rd.BoundedLipschitzDomain.trace_extend`). -/
+theorem trace_restrictProj_eq (ψ : Ω.BoundaryPartition) {U : H^{1}(V)} {t : Ω.TraceSpace 1}
     (h : Ω.boundaryTrace ψ two_ne_top 2 (toL2 U) =ᶠ[Ω.aeBoundary]
-      Ω.boundaryTrace ψ two_ne_top 2 (toL2 ((Ω.extend t : Ω.SobolevOne) : H^{1}(V)))) :
-    Ω.trace (restrictProj 1 Ω.toOpens U) = t :=
-  ((Ω.trace_eq_iff ψ _ _).2 ((Ω.boundaryTrace_restrictProj ψ U).trans h)).trans (Ω.trace_extend t)
+      Ω.boundaryTrace ψ two_ne_top 2 (toL2 (((Ω.extend 1) t : Ω.SobolevOne) : H^{1}(V)))) :
+    (Ω.trace 1) (restrictProj 1 Ω.toOpens U) = t :=
+  ((Ω.trace_one_eq_iff ψ _ _).2 ((Ω.boundaryTrace_restrictProj_one ψ U).trans h)).trans
+    (Ω.trace_extend t)
 
-/-- `‖t‖ ≤ ‖U‖` for every `U ∈ H^1(V)` with the boundary trace of `t ∈ H^{1/2}(Γ)`, for every
+/-- `‖t‖ ≤ ‖U‖` for every `U ∈ H^1(V)` with the boundary trace of `t ∈ Ω.TraceSpace 1`, for every
 resolution of unity (`Rd.BoundedLipschitzDomain.trace_restrictProj_eq`). -/
 theorem enorm_le_of_boundaryTrace_eventuallyEq (ψ : Ω.BoundaryPartition) {U : H^{1}(V)}
-    {t : Ω.TraceSpace}
+    {t : Ω.TraceSpace 1}
     (h : Ω.boundaryTrace ψ two_ne_top 2 (toL2 U) =ᶠ[Ω.aeBoundary]
-      Ω.boundaryTrace ψ two_ne_top 2 (toL2 ((Ω.extend t : Ω.SobolevOne) : H^{1}(V)))) :
+      Ω.boundaryTrace ψ two_ne_top 2 (toL2 (((Ω.extend 1) t : Ω.SobolevOne) : H^{1}(V)))) :
     ‖t‖ₑ ≤ ‖U‖ₑ := by
   rw [← Ω.trace_restrictProj_eq ψ h]
   exact Ω.enorm_trace_restrictProj_le U
 
-/-- **The norm of `H^{1/2}(Γ)` is the least extension norm** (the quotient norm of `γ(H^1(Ω))`,
-which McLean, Theorem 3.37, shows to be equivalent to his chart norm of `H^{1/2}(Γ)`): for every
-resolution of unity `ψ` and `t ∈ H^{1/2}(Γ)`,
-`‖t‖ = inf {‖U‖ : U ∈ H^1(V), Tr_Γ ι U = Tr_Γ ι(E t) almost everywhere on Γ}`. Here `H^{1/2}(Γ)`
-is defined by orthogonality; the infimum is attained at `U = E t`. -/
-theorem enorm_eq_iInf (ψ : Ω.BoundaryPartition) (t : Ω.TraceSpace) :
+/-- **The norm of the trace space of `H^1(Ω)` is the least extension norm** (the quotient norm of
+`γ(H^1(Ω))`, which McLean, Theorem 3.37, shows to be equivalent to his chart norm of
+`H^{1/2}(Γ)`): for every resolution of unity `ψ` and `t ∈ Ω.TraceSpace 1`,
+`‖t‖ = inf {‖U‖ : U ∈ H^1(V), Tr_Γ ι U = Tr_Γ ι(E_1 t) almost everywhere on Γ}`. Here the trace
+space is defined by orthogonality; the infimum is attained at `U = E_1 t`. -/
+theorem enorm_eq_iInf (ψ : Ω.BoundaryPartition) (t : Ω.TraceSpace 1) :
     ‖t‖ₑ = ⨅ (U : H^{1}(V)) (_ : Ω.boundaryTrace ψ two_ne_top 2 (toL2 U) =ᶠ[Ω.aeBoundary]
-      Ω.boundaryTrace ψ two_ne_top 2 (toL2 ((Ω.extend t : Ω.SobolevOne) : H^{1}(V)))), ‖U‖ₑ :=
+      Ω.boundaryTrace ψ two_ne_top 2 (toL2 (((Ω.extend 1) t : Ω.SobolevOne) : H^{1}(V)))),
+        ‖U‖ₑ :=
   le_antisymm (le_iInf₂ fun _ hU => Ω.enorm_le_of_boundaryTrace_eventuallyEq ψ hU)
-    ((iInf₂_le ((Ω.extend t : Ω.SobolevOne) : H^{1}(V)) EventuallyEq.rfl).trans_eq rfl)
+    ((iInf₂_le (((Ω.extend 1) t : Ω.SobolevOne) : H^{1}(V)) EventuallyEq.rfl).trans_eq rfl)
 
 /-! ### The norm equivalence with `B^{1/2}_{2,2}(Γ)` -/
 
@@ -130,12 +115,13 @@ theorem exists_boundaryBesovNorm_toL2_le (ψ : Ω.BoundaryPartition) :
   rw [mul_assoc]
   exact h.trans (mul_le_mul' le_rfl (modNorm_two_le_norm U))
 
-/-- **The trace of `H^{1/2}(Γ)` is bounded into `B^{1/2}_{2,2}(Γ)`**: for every resolution of
-unity `ψ` there is `C < ∞` with `‖Tr_Γ ι(E t)‖_{B^{1/2}_{2,2}(Γ)} ≤ C ‖t‖` for every
-`t ∈ H^{1/2}(Γ)` (`Rd.BoundedLipschitzDomain.exists_boundaryBesovNorm_toL2_le`, `‖E t‖ = ‖t‖`). -/
+/-- **The trace of the trace space of `H^1(Ω)` is bounded into `B^{1/2}_{2,2}(Γ)`**: for every
+resolution of unity `ψ` there is `C < ∞` with `‖Tr_Γ ι(E_1 t)‖_{B^{1/2}_{2,2}(Γ)} ≤ C ‖t‖` for
+every `t ∈ Ω.TraceSpace 1` (`Rd.BoundedLipschitzDomain.exists_boundaryBesovNorm_toL2_le`,
+`‖E_1 t‖ = ‖t‖`). -/
 theorem exists_boundaryBesovNorm_extend_le (ψ : Ω.BoundaryPartition) :
-    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ t : Ω.TraceSpace, Ω.boundaryBesovNorm 2 ψ (1 / 2) 2
-      (Ω.boundaryTrace ψ two_ne_top 2 (toL2 ((Ω.extend t : Ω.SobolevOne) : H^{1}(V)))) ≤
+    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ t : Ω.TraceSpace 1, Ω.boundaryBesovNorm 2 ψ (1 / 2) 2
+      (Ω.boundaryTrace ψ two_ne_top 2 (toL2 (((Ω.extend 1) t : Ω.SobolevOne) : H^{1}(V)))) ≤
         C * ‖t‖ₑ := by
   obtain ⟨C, hC, hle⟩ := Ω.exists_boundaryBesovNorm_toL2_le ψ
   exact ⟨C, hC, fun t => hle _⟩
@@ -166,67 +152,76 @@ theorem exists_toL2_boundaryTrace_eq_le (ψ : Ω.BoundaryPartition) :
   exact (enorm_le_modNorm_two U).trans (mul_le_mul' le_rfl hFle)
 
 /-- **Bounded preimages under the trace**: for every resolution of unity `ψ` there is `C < ∞`
-such that every `g ∈ B^{1/2}_{2,2}(Γ)` is `Tr_Γ ι(E t)` almost everywhere on `Γ` for some
-`t ∈ H^{1/2}(Γ)` with `‖t‖ ≤ C ‖g‖_{B^{1/2}_{2,2}(Γ)}`; `t = γ(U|_Ω)` for the `U` of
+such that every `g ∈ B^{1/2}_{2,2}(Γ)` is `Tr_Γ ι(E_1 t)` almost everywhere on `Γ` for some
+`t ∈ Ω.TraceSpace 1` with `‖t‖ ≤ C ‖g‖_{B^{1/2}_{2,2}(Γ)}`; `t = γ_1(U|_Ω)` for the `U` of
 `Rd.BoundedLipschitzDomain.exists_toL2_boundaryTrace_eq_le`. By uniqueness
 (`Rd.BoundedLipschitzDomain.boundaryTrace_extend_eventuallyEq_iff`) `t` is determined by `g`; the
 linear right inverse is `Rd.BoundedLipschitzDomain.traceRightInverse`. -/
 theorem exists_traceSpace_of_memBoundaryBesov_le (ψ : Ω.BoundaryPartition) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ g : V → ℂ, Ω.MemBoundaryBesov 2 ψ (1 / 2) 2 g →
-      ∃ t : Ω.TraceSpace, Ω.boundaryTrace ψ two_ne_top 2
-          (toL2 ((Ω.extend t : Ω.SobolevOne) : H^{1}(V))) =ᶠ[Ω.aeBoundary] g ∧
+      ∃ t : Ω.TraceSpace 1, Ω.boundaryTrace ψ two_ne_top 2
+          (toL2 (((Ω.extend 1) t : Ω.SobolevOne) : H^{1}(V))) =ᶠ[Ω.aeBoundary] g ∧
         ‖t‖ₑ ≤ C * Ω.boundaryBesovNorm 2 ψ (1 / 2) 2 g := by
   obtain ⟨C, hC, hle⟩ := Ω.exists_toL2_boundaryTrace_eq_le ψ
   refine ⟨C, hC, fun g hg => ?_⟩
   obtain ⟨U, hU, hUg⟩ := hle g hg
-  exact ⟨Ω.trace (restrictProj 1 Ω.toOpens U), (Ω.boundaryTrace_extend_trace ψ _).trans
-    ((Ω.boundaryTrace_restrictProj ψ U).trans hUg), (Ω.enorm_trace_restrictProj_le U).trans hU⟩
+  have hE := Ω.boundaryTrace_extend_trace ψ 1 (restrictProj 1 Ω.toOpens U)
+  rw [sobolevToL2_one] at hE
+  exact ⟨(Ω.trace 1) (restrictProj 1 Ω.toOpens U),
+    (hE.trans (Ω.boundaryTrace_restrictProj_one ψ U)).trans hUg,
+    (Ω.enorm_trace_restrictProj_le U).trans hU⟩
 
-/-- **The norm of `H^{1/2}(Γ)` is bounded by the norm of the boundary trace**: for every
-resolution of unity `ψ` there is `C < ∞` with `‖t‖ ≤ C ‖Tr_Γ ι(E t)‖_{B^{1/2}_{2,2}(Γ)}` for every
-`t ∈ H^{1/2}(Γ)`: the bounded preimage
+/-- **The norm of the trace space of `H^1(Ω)` is bounded by the norm of the boundary trace**: for
+every resolution of unity `ψ` there is `C < ∞` with `‖t‖ ≤ C ‖Tr_Γ ι(E_1 t)‖_{B^{1/2}_{2,2}(Γ)}`
+for every `t ∈ Ω.TraceSpace 1`: the bounded preimage
 (`Rd.BoundedLipschitzDomain.exists_traceSpace_of_memBoundaryBesov_le`) is `t`, since elements
 of the trace space are determined by their boundary traces
 (`Rd.BoundedLipschitzDomain.boundaryTrace_extend_eventuallyEq_iff`). -/
 theorem exists_enorm_le_boundaryBesovNorm_extend (ψ : Ω.BoundaryPartition) :
-    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ t : Ω.TraceSpace, ‖t‖ₑ ≤ C * Ω.boundaryBesovNorm 2 ψ (1 / 2) 2
-      (Ω.boundaryTrace ψ two_ne_top 2 (toL2 ((Ω.extend t : Ω.SobolevOne) : H^{1}(V)))) := by
+    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ t : Ω.TraceSpace 1, ‖t‖ₑ ≤ C * Ω.boundaryBesovNorm 2 ψ (1 / 2) 2
+      (Ω.boundaryTrace ψ two_ne_top 2 (toL2 (((Ω.extend 1) t : Ω.SobolevOne) : H^{1}(V)))) := by
   obtain ⟨C, hC, hle⟩ := Ω.exists_traceSpace_of_memBoundaryBesov_le ψ
   refine ⟨C, hC, fun t => ?_⟩
-  obtain ⟨t', ht', hle'⟩ := hle _ (Ω.memBoundaryBesov_extend ψ t)
-  rwa [(Ω.boundaryTrace_extend_eventuallyEq_iff ψ t' t).1 ht'] at hle'
+  have hm := Ω.memBoundaryBesov_extend ψ t
+  rw [sobolevToL2_one, sub_half (1 : ℝ)] at hm
+  obtain ⟨t', ht', hle'⟩ := hle _ hm
+  have hiff := Ω.boundaryTrace_extend_eventuallyEq_iff ψ t' t
+  rw [sobolevToL2_one] at hiff
+  rwa [hiff.1 ht'] at hle'
 
-/-- **`H^{1/2}(Γ)` and `B^{1/2}_{2,2}(Γ)` have equivalent norms** (McLean, Theorem 3.37;
-following Schneider–Vybíral, Theorem 4.11, for `p = q = 2`): for every resolution of unity `ψ`
-there is
-`C < ∞` with `‖t‖ ≤ C ‖τ t‖_{B^{1/2}_{2,2}(Γ)}` and `‖τ t‖_{B^{1/2}_{2,2}(Γ)} ≤ C ‖t‖`
-for every `t ∈ H^{1/2}(Γ)`, with the trace `τ : H^{1/2}(Γ) → L_2(Γ)`
-(`Rd.BoundedLipschitzDomain.traceL2`). -/
+/-- **The trace space of `H^1(Ω)` and `B^{1/2}_{2,2}(Γ)` have equivalent norms** (McLean,
+Theorem 3.37; following Schneider–Vybíral, Theorem 4.11, for `p = q = 2`): for every resolution of
+unity `ψ` there is `C < ∞` with `‖t‖ ≤ C ‖τ t‖_{B^{1/2}_{2,2}(Γ)}` and
+`‖τ t‖_{B^{1/2}_{2,2}(Γ)} ≤ C ‖t‖` for every `t ∈ Ω.TraceSpace 1`, with the trace
+`τ : Ω.TraceSpace 1 → L_2(Γ)` (`Rd.BoundedLipschitzDomain.traceL2`). -/
 theorem exists_traceL2_norm_equiv (ψ : Ω.BoundaryPartition) :
-    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ t : Ω.TraceSpace,
-      ‖t‖ₑ ≤ C * Ω.boundaryBesovNorm 2 ψ (1 / 2) 2 (Ω.traceL2 t) ∧
-        Ω.boundaryBesovNorm 2 ψ (1 / 2) 2 (Ω.traceL2 t) ≤ C * ‖t‖ₑ := by
+    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ t : Ω.TraceSpace 1,
+      ‖t‖ₑ ≤ C * Ω.boundaryBesovNorm 2 ψ (1 / 2) 2 ((Ω.traceL2 1) t) ∧
+        Ω.boundaryBesovNorm 2 ψ (1 / 2) 2 ((Ω.traceL2 1) t) ≤ C * ‖t‖ₑ := by
   obtain ⟨C₁, hC₁, h₁⟩ := Ω.exists_enorm_le_boundaryBesovNorm_extend ψ
   obtain ⟨C₂, hC₂, h₂⟩ := Ω.exists_boundaryBesovNorm_extend_le ψ
   refine ⟨max C₁ C₂, (max_lt hC₁.lt_top hC₂.lt_top).ne, fun t => ?_⟩
-  rw [Ω.boundaryBesovNorm_congr ψ (Ω.ae_surfaceMeasure_iff_aeBoundary.1 (Ω.traceL2_apply_ae ψ t))]
+  rw [Ω.boundaryBesovNorm_congr ψ
+    (Ω.ae_surfaceMeasure_iff_aeBoundary.1 (Ω.traceL2_one_apply_ae ψ t))]
   exact ⟨(h₁ t).trans (mul_le_mul' (le_max_left _ _) le_rfl),
     (h₂ t).trans (mul_le_mul' (le_max_right _ _) le_rfl)⟩
 
-/-- **The range of `H^{1/2}(Γ) → L_2(Γ)` is `B^{1/2}_{2,2}(Γ)`**: for every resolution of unity
-`ψ`, `g ∈ L_2(Γ)` is `τ t` for some `t ∈ H^{1/2}(Γ)` iff `g ∈ B^{1/2}_{2,2}(Γ)`
-(`Rd.BoundedLipschitzDomain.memBoundaryBesov_extend`,
+/-- **The range of the trace `Ω.TraceSpace 1 → L_2(Γ)` is `B^{1/2}_{2,2}(Γ)`**: for every
+resolution of unity `ψ`, `g ∈ L_2(Γ)` is `τ t` for some `t ∈ Ω.TraceSpace 1` iff
+`g ∈ B^{1/2}_{2,2}(Γ)` (`Rd.BoundedLipschitzDomain.memBoundaryBesov_extend`,
 `Rd.BoundedLipschitzDomain.exists_traceL2_ae_eq`). -/
 theorem mem_range_traceL2_iff (ψ : Ω.BoundaryPartition) (g : Ω.BoundaryL2) :
-    g ∈ LinearMap.range (Ω.traceL2 : Ω.TraceSpace →ₗ[ℂ] Ω.BoundaryL2) ↔
+    g ∈ LinearMap.range (Ω.traceL2 1 : Ω.TraceSpace 1 →ₗ[ℂ] Ω.BoundaryL2) ↔
       Ω.MemBoundaryBesov 2 ψ (1 / 2) 2 g := by
   rw [LinearMap.mem_range]
   constructor
   · rintro ⟨t, rfl⟩
-    exact (Ω.memBoundaryBesov_extend ψ t).congr
+    have hm := (Ω.memBoundaryBesov_extend ψ t).congr
       (EventuallyEq.symm (Ω.ae_surfaceMeasure_iff_aeBoundary.1 (Ω.traceL2_apply_ae ψ t)))
+    rwa [sub_half] at hm
   · intro hg
-    obtain ⟨t, ht⟩ := Ω.exists_traceL2_ae_eq ψ hg
+    have hg' : Ω.MemBoundaryBesov 2 ψ (1 - 1 / 2) 2 g := by rwa [sub_half]
+    obtain ⟨t, ht⟩ := Ω.exists_traceL2_ae_eq ψ 1 hg'
     exact ⟨t, Lp.ext ht⟩
 
 /-! ### The Banach space `B^{1/2}_{2,2}(Γ)` -/
@@ -272,8 +267,8 @@ end BoundaryL2Ops
 `B^{1/2}_{2,2}(Γ)` for the canonical resolution of unity
 `Rd.BoundedLipschitzDomain.boundaryPartition`, with the norm `‖g‖_{B^{1/2}_{2,2}(Γ)}` by chart
 pieces (`Rd.BoundedLipschitzDomain.boundaryBesovNorm`). A structure around `L_2(Γ)` that
-carries the norm by chart pieces. It is a Banach space, isomorphic to `H^{1/2}(Γ)`
-(`Rd.BoundedLipschitzDomain.traceSpaceEquivBoundaryBesovHalf`). -/
+carries the norm by chart pieces. It is a Banach space, isomorphic to the trace space of
+`H^1(Ω)` (`Rd.BoundedLipschitzDomain.traceSpaceEquivBoundaryBesovHalf`). -/
 @[ext]
 structure BoundaryBesovHalf where
   /-- The function in `L_2(Γ)`. -/
@@ -413,36 +408,36 @@ noncomputable instance instNormedSpace : NormedSpace ℂ Ω.BoundaryBesovHalf :=
 
 end BoundaryBesovHalf
 
-/-- The trace `t ↦ τ t` from `H^{1/2}(Γ)` into `B^{1/2}_{2,2}(Γ)` as a linear map
+/-- The trace `t ↦ τ t` from the trace space of `H^1(Ω)` into `B^{1/2}_{2,2}(Γ)` as a linear map
 (`Rd.BoundedLipschitzDomain.mem_range_traceL2_iff`). -/
-noncomputable def traceSpaceToBoundaryBesovHalf : Ω.TraceSpace →ₗ[ℂ] Ω.BoundaryBesovHalf where
-  toFun t := ⟨Ω.traceL2 t, (Ω.mem_range_traceL2_iff Ω.boundaryPartition _).1
+noncomputable def traceSpaceToBoundaryBesovHalf : Ω.TraceSpace 1 →ₗ[ℂ] Ω.BoundaryBesovHalf where
+  toFun t := ⟨(Ω.traceL2 1) t, (Ω.mem_range_traceL2_iff Ω.boundaryPartition _).1
     (LinearMap.mem_range.2 ⟨t, rfl⟩)⟩
-  map_add' t t' := BoundaryBesovHalf.ext (map_add Ω.traceL2 t t')
-  map_smul' c t := BoundaryBesovHalf.ext (map_smul Ω.traceL2 c t)
+  map_add' t t' := BoundaryBesovHalf.ext (map_add (Ω.traceL2 1) t t')
+  map_smul' c t := BoundaryBesovHalf.ext (map_smul (Ω.traceL2 1) c t)
 
-/-- The trace `H^{1/2}(Γ) → B^{1/2}_{2,2}(Γ)` is bijective: injective by
+/-- The trace `Ω.TraceSpace 1 → B^{1/2}_{2,2}(Γ)` is bijective: injective by
 `Rd.BoundedLipschitzDomain.traceL2_injective`, surjective by
 `Rd.BoundedLipschitzDomain.mem_range_traceL2_iff`. -/
 theorem traceSpaceToBoundaryBesovHalf_bijective :
     Function.Bijective Ω.traceSpaceToBoundaryBesovHalf := by
-  refine ⟨fun t t' h => Ω.traceL2_injective (congrArg BoundaryBesovHalf.toL2 h), fun b => ?_⟩
+  refine ⟨fun t t' h => (Ω.traceL2_injective 1) (congrArg BoundaryBesovHalf.toL2 h), fun b => ?_⟩
   obtain ⟨t, ht⟩ := LinearMap.mem_range.1
     ((Ω.mem_range_traceL2_iff Ω.boundaryPartition b.toL2).2 b.mem)
   exact ⟨t, BoundaryBesovHalf.ext ht⟩
 
-/-- The trace `H^{1/2}(Γ) → B^{1/2}_{2,2}(Γ)` as a linear isomorphism. -/
+/-- The trace `Ω.TraceSpace 1 → B^{1/2}_{2,2}(Γ)` as a linear isomorphism. -/
 noncomputable def traceSpaceLinearEquiv :
-    Ω.TraceSpace ≃ₗ[ℂ] Ω.BoundaryBesovHalf :=
+    Ω.TraceSpace 1 ≃ₗ[ℂ] Ω.BoundaryBesovHalf :=
   LinearEquiv.ofBijective _ Ω.traceSpaceToBoundaryBesovHalf_bijective
 
 /-- The linear isomorphism sends `t` to `τ t`. -/
-theorem toL2_traceSpaceLinearEquiv (t : Ω.TraceSpace) :
-    (Ω.traceSpaceLinearEquiv t).toL2 = Ω.traceL2 t :=
+theorem toL2_traceSpaceLinearEquiv (t : Ω.TraceSpace 1) :
+    (Ω.traceSpaceLinearEquiv t).toL2 = (Ω.traceL2 1) t :=
   rfl
 
-/-- **The constant of the norm equivalence** `H^{1/2}(Γ) ≅ B^{1/2}_{2,2}(Γ)` for the canonical
-resolution of unity, a choice among the constants of
+/-- **The constant of the norm equivalence** of the trace space of `H^1(Ω)` with
+`B^{1/2}_{2,2}(Γ)` for the canonical resolution of unity, a choice among the constants of
 `Rd.BoundedLipschitzDomain.exists_traceL2_norm_equiv`. -/
 noncomputable def traceNormConst : ℝ≥0∞ :=
   (Ω.exists_traceL2_norm_equiv Ω.boundaryPartition).choose
@@ -452,14 +447,15 @@ theorem traceNormConst_ne_top : Ω.traceNormConst ≠ ∞ :=
   (Ω.exists_traceL2_norm_equiv Ω.boundaryPartition).choose_spec.1
 
 /-- The two bounds of the norm equivalence with the constant `Ω.traceNormConst`. -/
-theorem traceNormConst_spec (t : Ω.TraceSpace) :
-    ‖t‖ₑ ≤ Ω.traceNormConst * Ω.boundaryBesovNorm 2 Ω.boundaryPartition (1 / 2) 2 (Ω.traceL2 t) ∧
-      Ω.boundaryBesovNorm 2 Ω.boundaryPartition (1 / 2) 2 (Ω.traceL2 t) ≤
+theorem traceNormConst_spec (t : Ω.TraceSpace 1) :
+    ‖t‖ₑ ≤ Ω.traceNormConst *
+        Ω.boundaryBesovNorm 2 Ω.boundaryPartition (1 / 2) 2 ((Ω.traceL2 1) t) ∧
+      Ω.boundaryBesovNorm 2 Ω.boundaryPartition (1 / 2) 2 ((Ω.traceL2 1) t) ≤
         Ω.traceNormConst * ‖t‖ₑ :=
   (Ω.exists_traceL2_norm_equiv Ω.boundaryPartition).choose_spec.2 t
 
 /-- `‖τ t‖_{B^{1/2}_{2,2}(Γ)} ≤ C ‖t‖` with `C = Ω.traceNormConst`. -/
-theorem norm_traceSpaceLinearEquiv_le (t : Ω.TraceSpace) :
+theorem norm_traceSpaceLinearEquiv_le (t : Ω.TraceSpace 1) :
     ‖Ω.traceSpaceLinearEquiv t‖ ≤ Ω.traceNormConst.toReal * ‖t‖ := by
   rw [BoundaryBesovHalf.norm_def, toL2_traceSpaceLinearEquiv, ← toReal_enorm t,
     ← ENNReal.toReal_mul]
@@ -470,7 +466,7 @@ theorem norm_traceSpaceLinearEquiv_le (t : Ω.TraceSpace) :
 theorem norm_traceSpaceLinearEquiv_symm_le (b : Ω.BoundaryBesovHalf) :
     ‖Ω.traceSpaceLinearEquiv.symm b‖ ≤ Ω.traceNormConst.toReal * ‖b‖ := by
   have h := (Ω.traceNormConst_spec (Ω.traceSpaceLinearEquiv.symm b)).1
-  have hb : Ω.traceL2 (Ω.traceSpaceLinearEquiv.symm b) = b.toL2 :=
+  have hb : (Ω.traceL2 1) (Ω.traceSpaceLinearEquiv.symm b) = b.toL2 :=
     congrArg BoundaryBesovHalf.toL2 (Ω.traceSpaceLinearEquiv.apply_symm_apply b)
   rw [hb] at h
   rw [← toReal_enorm (Ω.traceSpaceLinearEquiv.symm b),
@@ -478,51 +474,52 @@ theorem norm_traceSpaceLinearEquiv_symm_le (b : Ω.BoundaryBesovHalf) :
   exact ENNReal.toReal_mono (ENNReal.mul_ne_top Ω.traceNormConst_ne_top
     b.boundaryBesovNorm_lt_top.ne) h
 
-/-- **`H^{1/2}(Γ) ≅ B^{1/2}_{2,2}(Γ)`** (McLean, Theorem 3.37; following Schneider–Vybíral,
-Theorem 4.11, for `p = q = 2`): the trace `t ↦ τ t` is an isomorphism of normed spaces from the
-trace space
-onto `B^{1/2}_{2,2}(Γ)` with the norm by chart pieces (Mathlib's
-`LinearEquiv.toContinuousLinearEquivOfBounds`), with the bounds of
+/-- **The trace space of `H^1(Ω)` is isomorphic to `B^{1/2}_{2,2}(Γ)`** (McLean, Theorem 3.37;
+following Schneider–Vybíral, Theorem 4.11, for `p = q = 2`): the trace `t ↦ τ t` is an
+isomorphism of normed spaces from the trace space onto `B^{1/2}_{2,2}(Γ)` with the norm by chart
+pieces (Mathlib's `LinearEquiv.toContinuousLinearEquivOfBounds`), with the bounds of
 `Rd.BoundedLipschitzDomain.exists_traceL2_norm_equiv` in both directions. -/
-noncomputable def traceSpaceEquivBoundaryBesovHalf : Ω.TraceSpace ≃L[ℂ] Ω.BoundaryBesovHalf :=
+noncomputable def traceSpaceEquivBoundaryBesovHalf : Ω.TraceSpace 1 ≃L[ℂ] Ω.BoundaryBesovHalf :=
   Ω.traceSpaceLinearEquiv.toContinuousLinearEquivOfBounds
     Ω.traceNormConst.toReal Ω.traceNormConst.toReal
     Ω.norm_traceSpaceLinearEquiv_le
     Ω.norm_traceSpaceLinearEquiv_symm_le
 
 /-- The isomorphism of normed spaces sends `t` to `τ t`. -/
-theorem toL2_traceSpaceEquivBoundaryBesovHalf (t : Ω.TraceSpace) :
-    (Ω.traceSpaceEquivBoundaryBesovHalf t).toL2 = Ω.traceL2 t :=
+theorem toL2_traceSpaceEquivBoundaryBesovHalf (t : Ω.TraceSpace 1) :
+    (Ω.traceSpaceEquivBoundaryBesovHalf t).toL2 = (Ω.traceL2 1) t :=
   rfl
 
-/-- **`B^{1/2}_{2,2}(Γ)` is a Banach space**: it is isomorphic to the Hilbert space `H^{1/2}(Γ)`
-(`Rd.BoundedLipschitzDomain.traceSpaceEquivBoundaryBesovHalf`; Mathlib's `completeSpace_congr`). -/
+/-- **`B^{1/2}_{2,2}(Γ)` is a Banach space**: it is isomorphic to the Hilbert space
+`Ω.TraceSpace 1` (`Rd.BoundedLipschitzDomain.traceSpaceEquivBoundaryBesovHalf`; Mathlib's
+`completeSpace_congr`). -/
 instance completeSpace_boundaryBesovHalf : CompleteSpace Ω.BoundaryBesovHalf :=
   (completeSpace_congr (e := Ω.traceSpaceEquivBoundaryBesovHalf.toEquiv)
     Ω.traceSpaceEquivBoundaryBesovHalf.isUniformEmbedding).1 inferInstance
 
 /-- **The bounded linear right inverse of the trace** (as in McLean, Theorem 3.37): the map
-`B^{1/2}_{2,2}(Γ) → H^1(Ω)`, `g ↦ E τ⁻¹ g`, the inverse of the isomorphism
-`Rd.BoundedLipschitzDomain.traceSpaceEquivBoundaryBesovHalf` followed by the extension `E`. -/
+`B^{1/2}_{2,2}(Γ) → H^1(Ω)`, `g ↦ E_1 τ⁻¹ g`, the inverse of the isomorphism
+`Rd.BoundedLipschitzDomain.traceSpaceEquivBoundaryBesovHalf` followed by the extension `E_1`. -/
 noncomputable def traceRightInverse : Ω.BoundaryBesovHalf →L[ℂ] Ω.SobolevOne :=
-  Ω.extend ∘L (Ω.traceSpaceEquivBoundaryBesovHalf.symm : Ω.BoundaryBesovHalf →L[ℂ] Ω.TraceSpace)
+  Ω.extend 1 ∘L
+    (Ω.traceSpaceEquivBoundaryBesovHalf.symm : Ω.BoundaryBesovHalf →L[ℂ] Ω.TraceSpace 1)
 
-/-- The trace of `E τ⁻¹ g` is `τ⁻¹ g` (`Rd.BoundedLipschitzDomain.trace_extend`). -/
+/-- The trace of `E_1 τ⁻¹ g` is `τ⁻¹ g` (`Rd.BoundedLipschitzDomain.trace_extend`). -/
 theorem trace_traceRightInverse (b : Ω.BoundaryBesovHalf) :
-    Ω.trace (Ω.traceRightInverse b) = Ω.traceSpaceEquivBoundaryBesovHalf.symm b :=
+    (Ω.trace 1) (Ω.traceRightInverse b) = Ω.traceSpaceEquivBoundaryBesovHalf.symm b :=
   Ω.trace_extend _
 
-/-- **The right inverse inverts the trace**: `γ_{L_2}(E τ⁻¹ g) = g` in `L_2(Γ)` for every
-`g ∈ B^{1/2}_{2,2}(Γ)`, with the trace `γ_{L_2} = τ ∘ γ : H^1(Ω) → L_2(Γ)`
+/-- **The right inverse inverts the trace**: `γ_{L_2}(E_1 τ⁻¹ g) = g` in `L_2(Γ)` for every
+`g ∈ B^{1/2}_{2,2}(Γ)`, with the trace `γ_{L_2} = τ ∘ γ_1 : H^1(Ω) → L_2(Γ)`
 (`Rd.BoundedLipschitzDomain.boundaryTraceL2`). -/
 theorem boundaryTraceL2_traceRightInverse (b : Ω.BoundaryBesovHalf) :
-    Ω.boundaryTraceL2 (Ω.traceRightInverse b) = b.toL2 := by
-  change Ω.traceL2 (Ω.trace (Ω.traceRightInverse b)) = b.toL2
+    (Ω.boundaryTraceL2 1) (Ω.traceRightInverse b) = b.toL2 := by
+  change (Ω.traceL2 1) ((Ω.trace 1) (Ω.traceRightInverse b)) = b.toL2
   rw [Ω.trace_traceRightInverse, ← Ω.toL2_traceSpaceEquivBoundaryBesovHalf,
     ContinuousLinearEquiv.apply_symm_apply]
 
-/-- **The right inverse is bounded**: `‖E τ⁻¹ g‖ ≤ C ‖g‖_{B^{1/2}_{2,2}(Γ)}` with
-`C = Ω.traceNormConst`, since `E` is an isometry
+/-- **The right inverse is bounded**: `‖E_1 τ⁻¹ g‖ ≤ C ‖g‖_{B^{1/2}_{2,2}(Γ)}` with
+`C = Ω.traceNormConst`, since `E_1` is an isometry
 (`Rd.BoundedLipschitzDomain.norm_extend_apply`,
 `Rd.BoundedLipschitzDomain.norm_traceSpaceLinearEquiv_symm_le`). -/
 theorem norm_traceRightInverse_le (b : Ω.BoundaryBesovHalf) :

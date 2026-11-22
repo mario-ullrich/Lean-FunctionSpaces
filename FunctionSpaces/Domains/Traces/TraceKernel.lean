@@ -32,14 +32,15 @@ closure of their restrictions in `H^1(Ω)`.
   pieces of `U` near the boundary are pushed into `Ω` by a mollifier supported in the cone of the
   chart (`Rd.LipschitzGraph.coneMollifier`,
   `Rd.BoundedLipschitzDomain.mem_tildeSpace_of_mulLp_chart`).
-* **`ker γ = H^1_0(Ω)`** (`Rd.BoundedLipschitzDomain.traceKer_eq_zeroBoundarySpace`, McLean,
-  Theorem 3.40): `u ∈ H^1(Ω)` has zero trace iff its zero extension lies in `H^1(V)`
+* **`ker γ = H^1_0(Ω)`** (`Rd.BoundedLipschitzDomain.traceKer_one_eq_zeroBoundarySpace`, McLean,
+  Theorem 3.40), for the trace kernel `ker γ = Ω.traceKer 1` of `H^1(Ω)`: `u ∈ H^1(Ω)` has zero
+  trace iff its zero extension lies in `H^1(V)`
   (`Rd.BoundedLipschitzDomain.memSobolev_indicatorLp_iff_mem_traceKer`), iff the zero extension
   lies in `H̃^1(Ω)`, iff `u ∈ H^1_0(Ω)`.
-* **The quotient and the duals**: `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)` isometrically
-  (`Rd.BoundedLipschitzDomain.quotientZeroBoundaryEquivTraceSpace`); its content is
-  `ker γ = H^1_0(Ω)`, and the isometry holds by the definition of `H^{1/2}(Γ)` as the orthogonal
-  complement of `ker γ`. Further `H̃^1(Ω) ≅ ker γ`
+* **The quotient and the duals**: `H^1(Ω) ⧸ H^1_0(Ω)` is isometrically isomorphic to the trace
+  space `Ω.TraceSpace 1` (`Rd.BoundedLipschitzDomain.quotientZeroBoundaryEquivTraceSpace`); its
+  content is `ker γ = H^1_0(Ω)`, and the isometry holds by the definition of the trace space as
+  the orthogonal complement of `ker γ`. Further `H̃^1(Ω) ≅ ker γ`
   (`Rd.BoundedLipschitzDomain.tildeEquivTraceKer`) and `(ker γ)^* ≅ H^{-1}(Ω)`
   (`Rd.BoundedLipschitzDomain.dualTraceKerEquiv`).
 -/
@@ -344,7 +345,7 @@ theorem mem_tildeSpace_iff (U : H^{1}(V)) :
 (`Rd.toL2_ae_eq_zero_of_mem_tildeSpace`), so the zero extension of `U|_Ω` is `ι U ∈ W^1_2(V)`
 (`Rd.indicatorLp_toL2_restrictProj`), and its trace vanishes
 (`Rd.BoundedLipschitzDomain.memSobolev_indicatorLp_iff_mem_traceKer`). -/
-theorem zeroBoundarySpace_le_traceKer : zeroBoundarySpace 1 Ω.toOpens ≤ Ω.traceKer := by
+theorem zeroBoundarySpace_le_traceKer : zeroBoundarySpace 1 Ω.toOpens ≤ Ω.traceKer 1 := by
   intro u hu
   rw [← range_tildeToRestriction] at hu
   obtain ⟨U, rfl⟩ := hu
@@ -360,7 +361,7 @@ function of some `U ∈ H^1(V)` (`Rd.BoundedLipschitzDomain.memSobolev_indicator
 `Rd.exists_toL2_eq_of_memSobolev`). `U` vanishes outside `Ω`, so `U ∈ H̃^1(Ω)`
 (`Rd.BoundedLipschitzDomain.mem_tildeSpace_of_ae_eq_zero`), and `u = U|_Ω`
 (`Rd.restrictProj_eq_of_ae_eq`) lies in `H^1_0(Ω)` (`Rd.range_tildeToRestriction`). -/
-theorem traceKer_le_zeroBoundarySpace : Ω.traceKer ≤ zeroBoundarySpace 1 Ω.toOpens := by
+theorem traceKer_one_le_zeroBoundarySpace : Ω.traceKer 1 ≤ zeroBoundarySpace 1 Ω.toOpens := by
   intro u hu
   obtain ⟨U, hU⟩ := exists_toL2_eq_of_memSobolev (Ω.memSobolev_indicatorLp_of_mem_traceKer hu)
   have hUae : (toL2 U : V → ℂ) =ᵐ[volume] Ω.carrier.indicator (toL2 (u : H^{1}(V))) := by
@@ -377,52 +378,54 @@ theorem traceKer_le_zeroBoundarySpace : Ω.traceKer ≤ zeroBoundarySpace 1 Ω.t
   exact ⟨⟨U, Ω.mem_tildeSpace_of_ae_eq_zero hU0⟩, rfl⟩
 
 /-- **`ker γ = H^1_0(Ω)`** on a bounded Lipschitz domain (McLean, Theorem 3.40; Hiptmair, Pauly
-and Schulz cite it for `ker γ = H^1_0(Ω)`): the elements of `H^1(Ω)` whose chart traces all vanish,
-equivalently whose boundary trace vanishes almost everywhere on `Γ`
-(`Rd.BoundedLipschitzDomain.mem_traceKer_iff`), are exactly the limits in `H^1(Ω)` of test
-functions of `Ω` (`Rd.BoundedLipschitzDomain.zeroBoundarySpace_le_traceKer`,
-`Rd.BoundedLipschitzDomain.traceKer_le_zeroBoundarySpace`). -/
-theorem traceKer_eq_zeroBoundarySpace : Ω.traceKer = zeroBoundarySpace 1 Ω.toOpens :=
-  le_antisymm Ω.traceKer_le_zeroBoundarySpace Ω.zeroBoundarySpace_le_traceKer
+and Schulz cite it for `ker γ = H^1_0(Ω)`), for the trace kernel `Ω.traceKer 1` of `H^1(Ω)`: the
+elements of `H^1(Ω)` whose chart traces all vanish, equivalently whose boundary trace vanishes
+almost everywhere on `Γ` (`Rd.BoundedLipschitzDomain.mem_traceKer_one_iff`), are exactly the
+limits in `H^1(Ω)` of test functions of `Ω`
+(`Rd.BoundedLipschitzDomain.zeroBoundarySpace_le_traceKer`,
+`Rd.BoundedLipschitzDomain.traceKer_one_le_zeroBoundarySpace`). -/
+theorem traceKer_one_eq_zeroBoundarySpace : Ω.traceKer 1 = zeroBoundarySpace 1 Ω.toOpens :=
+  le_antisymm Ω.traceKer_one_le_zeroBoundarySpace Ω.zeroBoundarySpace_le_traceKer
 
 /-! ### The quotient and the duals -/
 
-/-- **`H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)` isometrically**: the quotient of `H^1(Ω)` by `H^1_0(Ω)`,
-with the quotient norm, is isometrically isomorphic to the trace space, the orthogonal complement
-of `ker γ = H^1_0(Ω)` (Mathlib's `Submodule.quotientEquivOrthogonal`,
-`Rd.BoundedLipschitzDomain.traceKer_eq_zeroBoundarySpace`); the class of `u` corresponds to `γ u`
+/-- **`H^1(Ω) ⧸ H^1_0(Ω)` is the trace space of `H^1(Ω)`, isometrically**: the quotient of
+`H^1(Ω)` by `H^1_0(Ω)`, with the quotient norm, is isometrically isomorphic to the trace space
+`Ω.TraceSpace 1`, the orthogonal complement of `ker γ = H^1_0(Ω)` (Mathlib's
+`Submodule.quotientEquivOrthogonal`, `Rd.BoundedLipschitzDomain.traceKer_one_eq_zeroBoundarySpace`);
+the class of `u` corresponds to `γ u`
 (`Rd.BoundedLipschitzDomain.quotientZeroBoundaryEquivTraceSpace_mk`). The content is
 `ker γ = H^1_0(Ω)`; the isometry holds by the definition of the trace space as the orthogonal
 complement of `ker γ`. This is the trace space of Hiptmair, Pauly and Schulz for `k = 0`; its norm
 is equivalent to the Sobolev–Slobodeckij norm of the classical `H^{1/2}(Γ)`
 (`Rd.BoundedLipschitzDomain.exists_traceL2_norm_equiv_slobodeckij`). -/
 noncomputable def quotientZeroBoundaryEquivTraceSpace :
-    (Ω.SobolevOne ⧸ zeroBoundarySpace 1 Ω.toOpens) ≃ₗᵢ[ℂ] Ω.TraceSpace :=
+    (Ω.SobolevOne ⧸ zeroBoundarySpace 1 Ω.toOpens) ≃ₗᵢ[ℂ] Ω.TraceSpace 1 :=
   (Submodule.quotientEquivOrthogonal (zeroBoundarySpace 1 Ω.toOpens)).trans
-    (LinearIsometryEquiv.ofEq _ _ (by rw [Ω.traceKer_eq_zeroBoundarySpace]))
+    (LinearIsometryEquiv.ofEq _ _ (by rw [Ω.traceKer_one_eq_zeroBoundarySpace]))
 
 /-- The class of `u` modulo `H^1_0(Ω)` corresponds to the trace `γ u`. -/
 theorem quotientZeroBoundaryEquivTraceSpace_mk (u : Ω.SobolevOne) :
-    Ω.quotientZeroBoundaryEquivTraceSpace (Submodule.Quotient.mk u) = Ω.trace u := by
-  have hK := Ω.traceKer_eq_zeroBoundarySpace
-  have hx : (Ω.trace u : Ω.SobolevOne) ∈ (zeroBoundarySpace 1 Ω.toOpens)ᗮ := by
+    Ω.quotientZeroBoundaryEquivTraceSpace (Submodule.Quotient.mk u) = (Ω.trace 1) u := by
+  have hK := Ω.traceKer_one_eq_zeroBoundarySpace
+  have hx : ((Ω.trace 1) u : Ω.SobolevOne) ∈ (zeroBoundarySpace 1 Ω.toOpens)ᗮ := by
     rw [← hK]
-    exact (Ω.trace u).2
-  have hm : u - Ω.extend (Ω.trace u) ∈ zeroBoundarySpace 1 Ω.toOpens := by
+    exact ((Ω.trace 1) u).2
+  have hm : u - (Ω.extend 1) ((Ω.trace 1) u) ∈ zeroBoundarySpace 1 Ω.toOpens := by
     rw [← hK]
-    exact Ω.sub_extend_trace_mem u
+    exact Ω.sub_extend_trace_mem 1 u
   have h : (Submodule.Quotient.mk u : Ω.SobolevOne ⧸ zeroBoundarySpace 1 Ω.toOpens) =
-      Submodule.Quotient.mk (Ω.trace u : Ω.SobolevOne) := (Submodule.Quotient.eq _).2 hm
+      Submodule.Quotient.mk ((Ω.trace 1) u : Ω.SobolevOne) := (Submodule.Quotient.eq _).2 hm
   rw [quotientZeroBoundaryEquivTraceSpace, LinearIsometryEquiv.trans_apply, h,
     Submodule.quotientEquivOrthogonal_mk _ _ hx]
   rfl
 
 /-- **`H̃^1(Ω) ≅ ker γ` isometrically**: restriction is an isometry of `H̃^1(Ω)` onto
 `H^1_0(Ω) = ker γ` (`Rd.tildeEquivZeroBoundary`,
-`Rd.BoundedLipschitzDomain.traceKer_eq_zeroBoundarySpace`). -/
-noncomputable def tildeEquivTraceKer : tildeSpace 1 Ω.toOpens ≃ₗᵢ[ℂ] Ω.traceKer :=
+`Rd.BoundedLipschitzDomain.traceKer_one_eq_zeroBoundarySpace`). -/
+noncomputable def tildeEquivTraceKer : tildeSpace 1 Ω.toOpens ≃ₗᵢ[ℂ] Ω.traceKer 1 :=
   (tildeEquivZeroBoundary Ω.toOpens).trans
-    (LinearIsometryEquiv.ofEq _ _ Ω.traceKer_eq_zeroBoundarySpace.symm)
+    (LinearIsometryEquiv.ofEq _ _ Ω.traceKer_one_eq_zeroBoundarySpace.symm)
 
 /-- `tildeEquivTraceKer Ω U` is the restriction of `U` to `Ω`. -/
 theorem coe_tildeEquivTraceKer_apply (U : tildeSpace 1 Ω.toOpens) :
@@ -431,7 +434,7 @@ theorem coe_tildeEquivTraceKer_apply (U : tildeSpace 1 Ω.toOpens) :
 
 /-- **The element of `H̃^1(Ω)` with restriction `u ∈ ker γ` is `u` itself**, read in `H^1(V)`
 (`Rd.coe_tildeEquivZeroBoundary_symm_apply`). -/
-theorem coe_tildeEquivTraceKer_symm_apply (u : Ω.traceKer) :
+theorem coe_tildeEquivTraceKer_symm_apply (u : Ω.traceKer 1) :
     ((Ω.tildeEquivTraceKer.symm u : tildeSpace 1 Ω.toOpens) : H^{1}(V)) =
       ((u : Ω.SobolevOne) : H^{1}(V)) := by
   rw [tildeEquivTraceKer, LinearIsometryEquiv.symm_trans, LinearIsometryEquiv.trans_apply,
@@ -445,31 +448,31 @@ theorem coe_tildeEquivTraceKer_symm_apply (u : Ω.traceKer) :
 `Rd.BoundedLipschitzDomain.tildeEquivTraceKer` and the duality `H̃^1(Ω) ≅ H^{-1}(Ω)`
 (`Rd.tildeEquivRestriction`), as for `Rd.dualZeroBoundaryEquiv`. -/
 noncomputable def dualTraceKerEquiv :
-    StrongDual ℂ Ω.traceKer ≃ₗᵢ⋆[ℂ] RestrictionSpace (-1) Ω.toOpens :=
-  (InnerProductSpace.toDual ℂ Ω.traceKer).symm.trans
+    StrongDual ℂ (Ω.traceKer 1) ≃ₗᵢ⋆[ℂ] RestrictionSpace (-1) Ω.toOpens :=
+  (InnerProductSpace.toDual ℂ (Ω.traceKer 1)).symm.trans
     (Ω.tildeEquivTraceKer.symm.trans (tildeEquivRestriction 1 Ω.toOpens))
 
 /-- **`ℓ` is the pairing with `dualTraceKerEquiv Ω ℓ`**: `ℓ(u) = [W, u]` for
 `W = dualTraceKerEquiv Ω ℓ` and every `u ∈ ker γ`, read as an element of `H^1(V)`. -/
-theorem dualTraceKerEquiv_apply (ℓ : StrongDual ℂ Ω.traceKer) (u : Ω.traceKer) :
+theorem dualTraceKerEquiv_apply (ℓ : StrongDual ℂ (Ω.traceKer 1)) (u : Ω.traceKer 1) :
     ℓ u = pairing 1 (Ω.dualTraceKerEquiv ℓ : H^{-1}(V)) ((u : Ω.SobolevOne) : H^{1}(V)) := by
-  have h := InnerProductSpace.toDual_symm_apply (𝕜 := ℂ) (E := Ω.traceKer) (x := u) (y := ℓ)
+  have h := InnerProductSpace.toDual_symm_apply (𝕜 := ℂ) (E := Ω.traceKer 1) (x := u) (y := ℓ)
   rw [← h, ← LinearIsometryEquiv.inner_map_map Ω.tildeEquivTraceKer.symm,
     Submodule.coe_inner, dualTraceKerEquiv, LinearIsometryEquiv.trans_apply,
     LinearIsometryEquiv.trans_apply, coe_tildeEquivRestriction_apply, pairing_besselShift,
     Ω.coe_tildeEquivTraceKer_symm_apply u]
 
 /-- The functional of `W ∈ H^{-1}(Ω)` on `ker γ` is `u ↦ [W, u]`. -/
-theorem dualTraceKerEquiv_symm_apply (W : RestrictionSpace (-1) Ω.toOpens) (u : Ω.traceKer) :
+theorem dualTraceKerEquiv_symm_apply (W : RestrictionSpace (-1) Ω.toOpens) (u : Ω.traceKer 1) :
     Ω.dualTraceKerEquiv.symm W u =
       pairing 1 (W : H^{-1}(V)) ((u : Ω.SobolevOne) : H^{1}(V)) := by
   rw [dualTraceKerEquiv_apply, LinearIsometryEquiv.apply_symm_apply]
 
 /-- **Uniqueness of the representing element**: `dualTraceKerEquiv Ω ℓ = W` iff
 `ℓ(u) = [W, u]` for every `u ∈ ker γ`. -/
-theorem dualTraceKerEquiv_eq_iff (ℓ : StrongDual ℂ Ω.traceKer)
+theorem dualTraceKerEquiv_eq_iff (ℓ : StrongDual ℂ (Ω.traceKer 1))
     (W : RestrictionSpace (-1) Ω.toOpens) :
-    Ω.dualTraceKerEquiv ℓ = W ↔ ∀ u : Ω.traceKer,
+    Ω.dualTraceKerEquiv ℓ = W ↔ ∀ u : Ω.traceKer 1,
       ℓ u = pairing 1 (W : H^{-1}(V)) ((u : Ω.SobolevOne) : H^{1}(V)) := by
   rw [← LinearIsometryEquiv.eq_symm_apply, ContinuousLinearMap.ext_iff]
   simp only [dualTraceKerEquiv_symm_apply]

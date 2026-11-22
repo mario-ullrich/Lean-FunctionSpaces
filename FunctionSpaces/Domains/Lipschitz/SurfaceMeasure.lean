@@ -29,14 +29,24 @@ graphs `γ_j(x') = x' + φ_j(x') e_j` over the hyperplanes `H_j`.
   `Rd.BoundedLipschitzDomain.integral_surfaceMeasure`). It is finite, its null sets are those of
   the charts (`Rd.BoundedLipschitzDomain.ae_surfaceMeasure_iff_aeBoundary`), and `Γ` is a null
   set of the volume (`Rd.BoundedLipschitzDomain.volume_frontier`).
-* **The trace in `L_2(Γ)`**: the boundary trace of the trace theorem lies in `L_p(σ)`
-  (`Rd.BoundedLipschitzDomain.memLp_boundaryTrace`); for `p = 2` it gives bounded operators
-  `H^1(V) → L_2(Γ)` (`Rd.BoundedLipschitzDomain.ambientTraceL2`), the injective
-  `H^{1/2}(Γ) → L_2(Γ)` (`Rd.BoundedLipschitzDomain.traceL2`) and `γ_{L_2} : H^1(Ω) → L_2(Γ)`
-  (`Rd.BoundedLipschitzDomain.boundaryTraceL2`), the first one on `H^1(Ω)`
-  (`Rd.BoundedLipschitzDomain.boundaryTraceL2_eq_ambientTraceL2`), whose kernel is the trace
-  kernel (`Rd.BoundedLipschitzDomain.ker_boundaryTraceL2`); `B^{1/2}_{2,2}(Γ) ⊆ L_2(Γ)`
-  (`Rd.BoundedLipschitzDomain.memLp_of_memBoundaryBesov`).
+* **The traces in `L_2(Γ)`**: the boundary trace of the trace theorem lies in `L_p(σ)`
+  (`Rd.BoundedLipschitzDomain.memLp_boundaryTrace`); for `p = 2` and `1/2 < s < 3/2` it gives
+  bounded operators `T^s_Γ : H^s(V) → L_2(Γ)` (`Rd.BoundedLipschitzDomain.ambientTraceL2`), the
+  injective trace of the trace space of `H^s(Ω)` in `L_2(Γ)` (`Rd.BoundedLipschitzDomain.traceL2`)
+  and `γ^s_{L_2} : H^s(Ω) → L_2(Γ)` (`Rd.BoundedLipschitzDomain.boundaryTraceL2`), which is
+  `T^s_Γ` on `H^s(Ω)` (`Rd.BoundedLipschitzDomain.boundaryTraceL2_eq_ambientTraceL2`) and whose
+  kernel is the trace kernel (`Rd.BoundedLipschitzDomain.ker_boundaryTraceL2`);
+  `B^{s-1/2}_{2,2}(Γ) ⊆ L_2(Γ)` (`Rd.BoundedLipschitzDomain.memLp_of_memBoundaryBesov`). For
+  `s = 1` the statements with the `L_2` function `Rd.toL2` are
+  `Rd.BoundedLipschitzDomain.ambientTraceL2_one_apply_ae`,
+  `Rd.BoundedLipschitzDomain.traceL2_one_apply_ae` and
+  `Rd.BoundedLipschitzDomain.boundaryTraceL2_one_apply_ae`. The statements about `U ∈ H^s(V)`
+  alone (`Rd.BoundedLipschitzDomain.memLp_boundaryTrace_sobolevToL2`,
+  `Rd.BoundedLipschitzDomain.exists_eLpNorm_boundaryTrace_sobolevToL2_le`,
+  `Rd.BoundedLipschitzDomain.boundaryTrace_sobolevToL2_add`,
+  `Rd.BoundedLipschitzDomain.boundaryTrace_sobolevToL2_smul`, `T^s_Γ`) hold for `1/2 < s < 2`,
+  the range of `Rd.modNorm_sobolevToL2_lt_top`; they take the hypotheses `1/2 < s < 3/2` of the
+  family, for one calling convention.
 * **The outward unit normal** `ν(y) = ∑_j ψ_j(y) ν_j(P_j y)`
   (`Rd.BoundedLipschitzDomain.normal`) is pasted from the chart normals `ν_j` with the fixed
   resolution of unity `ψ = Rd.BoundedLipschitzDomain.boundaryPartition`, which is nonnegative; it is
@@ -364,46 +374,52 @@ theorem memLp_boundaryTrace (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞) {L : �
 
 end BoundaryLp
 
-/-! ### `L_2(Γ)` and the trace of `H^1` -/
+/-! ### `L_2(Γ)` and the traces of `H^s`, `1/2 < s < 3/2` -/
 
 /-- **The space `L_2(Γ)`** of square integrable functions on the boundary with respect to the
 surface measure. -/
 noncomputable abbrev BoundaryL2 := Lp ℂ 2 Ω.surfaceMeasure
 
-/-- **The boundary trace of `H^1(V)` lies in `L_2(Γ)`**: for every resolution of unity `ψ` and
-`U ∈ H^1(V)`, `Tr_Γ ι U ∈ L_2(σ)` (`Rd.BoundedLipschitzDomain.memLp_boundaryTrace` at
-`s = 1/2`, `p = q = 2`, `L = 2`). -/
-theorem memLp_boundaryTrace_toL2 (ψ : Ω.BoundaryPartition) (U : H^{1}(V)) :
-    MemLp (Ω.boundaryTrace ψ two_ne_top 2 (toL2 U)) 2 Ω.surfaceMeasure :=
-  Ω.memLp_boundaryTrace ψ two_ne_top one_le_two (s := 1 / 2) (by norm_num) (by norm_num)
-    one_le_two (modNorm_toL2_lt_top U)
+/-- **The boundary trace of `H^s(V)` lies in `L_2(Γ)`**, `1/2 < s < 3/2`: for every resolution
+of unity `ψ` and `U ∈ H^s(V)`, `Tr_Γ ι_s U ∈ L_2(σ)`
+(`Rd.BoundedLipschitzDomain.memLp_boundaryTrace` at smoothness `s - 1/2`, `p = q = 2`,
+`L = 2`). -/
+theorem memLp_boundaryTrace_sobolevToL2 (ψ : Ω.BoundaryPartition) (s : ℝ) (U : H^{s}(V))
+    (hs : 1 / 2 < s := by norm_num) (hs' : s < 3 / 2 := by norm_num) :
+    MemLp (Ω.boundaryTrace ψ two_ne_top 2 (sobolevToL2 (one_half_pos.trans hs).le U)) 2
+      Ω.surfaceMeasure :=
+  Ω.memLp_boundaryTrace ψ two_ne_top one_le_two (sub_pos.2 hs) (by norm_num; linarith)
+    one_le_two (modNorm_sobolevToL2_lt_top hs (by linarith) U)
 
-/-- **The `L_2(Γ)` bound of the trace of `H^1(V)`**: `‖Tr_Γ ι U‖_{L_2(Γ)} ≤ C ‖U‖` for every
-resolution of unity and every `U ∈ H^1(V)`, with
-`C = (∑_j √(1 + M_j²) K_j²)^(1/2)` for the constants `K_j` of the chart traces
-(`Rd.LipschitzGraph.exists_enorm_trace_toL2_le`,
+/-- **The `L_2(Γ)` bound of the trace of `H^s(V)`**, `1/2 < s < 3/2`:
+`‖Tr_Γ ι_s U‖_{L_2(Γ)} ≤ C ‖U‖` for every resolution of unity and every `U ∈ H^s(V)`, with
+`C = (∑_j √(1 + M_j²) K_j²)^(1/2)` for the constants `K_j` of the traces of the graph domains
+`Ω_j` (`Rd.LipschitzGraph.exists_enorm_trace_sobolevToL2_le`,
 `Rd.BoundedLipschitzDomain.lintegral_enorm_boundaryTrace_le`). -/
-theorem exists_eLpNorm_boundaryTrace_toL2_le :
-    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ (ψ : Ω.BoundaryPartition) (U : H^{1}(V)),
-      eLpNorm (Ω.boundaryTrace ψ two_ne_top 2 (toL2 U)) 2 Ω.surfaceMeasure ≤ C * ‖U‖ₑ := by
-  choose K hK hle using fun j => (Ω.graph j).exists_enorm_trace_toL2_le
+theorem exists_eLpNorm_boundaryTrace_sobolevToL2_le (s : ℝ) (hs : 1 / 2 < s := by norm_num)
+    (hs' : s < 3 / 2 := by norm_num) :
+    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ (ψ : Ω.BoundaryPartition) (U : H^{s}(V)),
+      eLpNorm (Ω.boundaryTrace ψ two_ne_top 2 (sobolevToL2 (one_half_pos.trans hs).le U)) 2
+        Ω.surfaceMeasure ≤ C * ‖U‖ₑ := by
+  have hs0 : 0 ≤ s := (one_half_pos.trans hs).le
+  choose K hK hle using fun j => (Ω.graph j).exists_enorm_trace_sobolevToL2_le hs (by linarith)
   refine ⟨(∑ j, ENNReal.ofReal √(1 + (Ω.graph j).M ^ 2) * K j ^ (2 : ℝ)) ^ (1 / 2 : ℝ),
     ENNReal.rpow_ne_top_of_nonneg (by norm_num) (ENNReal.sum_ne_top.2 fun j _ =>
       ENNReal.mul_ne_top ENNReal.ofReal_ne_top
         (ENNReal.rpow_ne_top_of_nonneg (by norm_num) (hK j))), fun ψ U => ?_⟩
-  have hj : ∀ j, ∫⁻ x', ‖(Ω.graph j).trace two_ne_top 2 (toL2 U) x'‖ₑ ^ (2 : ℝ≥0∞).toReal ≤
-      K j ^ (2 : ℝ) * ‖U‖ₑ ^ (2 : ℝ) := fun j => by
+  have hj : ∀ j, ∫⁻ x', ‖(Ω.graph j).trace two_ne_top 2 (sobolevToL2 hs0 U) x'‖ₑ ^
+      (2 : ℝ≥0∞).toReal ≤ K j ^ (2 : ℝ) * ‖U‖ₑ ^ (2 : ℝ) := fun j => by
     rw [ENNReal.toReal_ofNat, lintegral_rpow_enorm_eq_rpow_eLpNorm' two_pos,
       ← ENNReal.mul_rpow_of_nonneg _ _ (by norm_num)]
     refine ENNReal.rpow_le_rpow ((le_of_eq ?_).trans (hle j U)) (by norm_num)
     rw [Lp.enorm_def, eLpNorm_eq_eLpNorm' two_ne_zero two_ne_top (Lp.aestronglyMeasurable _),
       ENNReal.toReal_ofNat]
-  have hsum := (Ω.lintegral_enorm_boundaryTrace_le ψ two_ne_top one_le_two (s := 1 / 2)
-    (by norm_num) (by norm_num) one_le_two (modNorm_toL2_lt_top U)).trans
+  have hsum := (Ω.lintegral_enorm_boundaryTrace_le ψ two_ne_top one_le_two (sub_pos.2 hs)
+    (by norm_num; linarith) one_le_two (modNorm_sobolevToL2_lt_top hs (by linarith) U)).trans
     (Finset.sum_le_sum fun j _ => mul_le_mul' le_rfl (hj j))
   rw [eLpNorm_eq_lintegral_rpow_enorm_toReal two_ne_zero two_ne_top
     (Ω.stronglyMeasurable_boundaryTrace ψ two_ne_top 2 _).aestronglyMeasurable]
-  calc (∫⁻ y, ‖Ω.boundaryTrace ψ two_ne_top 2 (toL2 U) y‖ₑ ^ (2 : ℝ≥0∞).toReal
+  calc (∫⁻ y, ‖Ω.boundaryTrace ψ two_ne_top 2 (sobolevToL2 hs0 U) y‖ₑ ^ (2 : ℝ≥0∞).toReal
         ∂Ω.surfaceMeasure) ^ (1 / (2 : ℝ≥0∞).toReal)
       ≤ (∑ j, ENNReal.ofReal √(1 + (Ω.graph j).M ^ 2) * (K j ^ (2 : ℝ) * ‖U‖ₑ ^ (2 : ℝ))) ^
           (1 / 2 : ℝ) := by
@@ -415,131 +431,181 @@ theorem exists_eLpNorm_boundaryTrace_toL2_le :
           ← ENNReal.rpow_mul]
         norm_num
 
-/-- `Tr_Γ ι (U + W) = Tr_Γ ι U + Tr_Γ ι W` almost everywhere on `Γ`, for every resolution of unity
-(`Rd.BoundedLipschitzDomain.boundaryTrace_toL2_sub`). -/
-theorem boundaryTrace_toL2_add (ψ : Ω.BoundaryPartition) (U W : H^{1}(V)) :
-    Ω.boundaryTrace ψ two_ne_top 2 (toL2 (U + W)) =ᶠ[Ω.aeBoundary]
-      Ω.boundaryTrace ψ two_ne_top 2 (toL2 U) + Ω.boundaryTrace ψ two_ne_top 2 (toL2 W) := by
-  have h := Ω.boundaryTrace_toL2_sub ψ (U + W) W
+/-- `Tr_Γ ι_s (U + W) = Tr_Γ ι_s U + Tr_Γ ι_s W` almost everywhere on `Γ`, for every resolution of
+unity and `1/2 < s < 3/2` (`Rd.BoundedLipschitzDomain.boundaryTrace_sobolevToL2_sub`). -/
+theorem boundaryTrace_sobolevToL2_add (ψ : Ω.BoundaryPartition) (s : ℝ) (U W : H^{s}(V))
+    (hs : 1 / 2 < s := by norm_num) (hs' : s < 3 / 2 := by norm_num) :
+    Ω.boundaryTrace ψ two_ne_top 2 (sobolevToL2 (one_half_pos.trans hs).le (U + W))
+      =ᶠ[Ω.aeBoundary] Ω.boundaryTrace ψ two_ne_top 2 (sobolevToL2 (one_half_pos.trans hs).le U) +
+        Ω.boundaryTrace ψ two_ne_top 2 (sobolevToL2 (one_half_pos.trans hs).le W) := by
+  have h := Ω.boundaryTrace_sobolevToL2_sub ψ s (U + W) W hs hs'
   rw [add_sub_cancel_right] at h
   filter_upwards [h] with y hy
   rw [Pi.add_apply, hy, Pi.sub_apply, sub_add_cancel]
 
-/-- `Tr_Γ ι (c U) = c Tr_Γ ι U` almost everywhere on `Γ`, for every resolution of unity: in each
-chart the boundary trace is the trace of the graph domain
+/-- `Tr_Γ ι_s (c U) = c Tr_Γ ι_s U` almost everywhere on `Γ`, for every resolution of unity and
+`1/2 < s < 3/2`: in each chart the boundary trace is the trace of the graph domain
 (`Rd.BoundedLipschitzDomain.boundaryTrace_graphMap`), which is homogeneous
 (`Rd.LipschitzGraph.trace_smul`). -/
-theorem boundaryTrace_toL2_smul (ψ : Ω.BoundaryPartition) (c : ℂ) (U : H^{1}(V)) :
-    Ω.boundaryTrace ψ two_ne_top 2 (toL2 (c • U)) =ᶠ[Ω.aeBoundary]
-      c • Ω.boundaryTrace ψ two_ne_top 2 (toL2 U) := by
+theorem boundaryTrace_sobolevToL2_smul (ψ : Ω.BoundaryPartition) (s : ℝ) (c : ℂ) (U : H^{s}(V))
+    (hs : 1 / 2 < s := by norm_num) (hs' : s < 3 / 2 := by norm_num) :
+    Ω.boundaryTrace ψ two_ne_top 2 (sobolevToL2 (one_half_pos.trans hs).le (c • U))
+      =ᶠ[Ω.aeBoundary] c • Ω.boundaryTrace ψ two_ne_top 2
+        (sobolevToL2 (one_half_pos.trans hs).le U) := by
+  have hs0 : 0 ≤ s := (one_half_pos.trans hs).le
   refine Ω.eventually_aeBoundary_iff.2 fun j => ?_
-  have hG := fun G : H^{1}(V) => Ω.boundaryTrace_graphMap ψ two_ne_top one_le_two (s := 1 / 2)
-    (by norm_num) (by norm_num) one_le_two (modNorm_toL2_lt_top G) j
+  have hG := fun G : H^{s}(V) => Ω.boundaryTrace_graphMap ψ two_ne_top one_le_two
+    (sub_pos.2 hs) (by norm_num; linarith) one_le_two
+    (modNorm_sobolevToL2_lt_top hs (by linarith) G) j
   filter_upwards [hG (c • U), hG U,
-    Lp.coeFn_smul c ((Ω.graph j).trace two_ne_top 2 (toL2 U))] with x' h1 h2 h3 hj
+    Lp.coeFn_smul c ((Ω.graph j).trace two_ne_top 2 (sobolevToL2 hs0 U))] with x' h1 h2 h3 hj
   rw [Pi.smul_apply, h1 hj, h2 hj, map_smul, (Ω.graph j).trace_smul, h3, Pi.smul_apply]
 
-/-- **The trace of `H^1(V)` in `L_2(Γ)` as a linear map**: `U ↦ Tr_Γ ι U`, with the canonical
-resolution of unity. -/
-noncomputable def ambientTraceLinear : H^{1}(V) →ₗ[ℂ] Ω.BoundaryL2 where
-  toFun U := (Ω.memLp_boundaryTrace_toL2 Ω.boundaryPartition U).toLp _
+/-- **The trace of `H^s(V)` in `L_2(Γ)` as a linear map**, `1/2 < s < 3/2`: `U ↦ Tr_Γ ι_s U`,
+with the canonical resolution of unity. -/
+noncomputable def ambientTraceLinear (s : ℝ) (hs : 1 / 2 < s := by norm_num)
+    (hs' : s < 3 / 2 := by norm_num) : H^{s}(V) →ₗ[ℂ] Ω.BoundaryL2 where
+  toFun U := (Ω.memLp_boundaryTrace_sobolevToL2 Ω.boundaryPartition s U hs hs').toLp _
   map_add' U W := by
     rw [← MemLp.toLp_add, MemLp.toLp_eq_toLp_iff]
-    exact Ω.ae_surfaceMeasure_iff_aeBoundary.2 (Ω.boundaryTrace_toL2_add _ U W)
+    exact Ω.ae_surfaceMeasure_iff_aeBoundary.2 (Ω.boundaryTrace_sobolevToL2_add _ s U W hs hs')
   map_smul' c U := by
     rw [RingHom.id_apply, ← MemLp.toLp_const_smul, MemLp.toLp_eq_toLp_iff]
-    exact Ω.ae_surfaceMeasure_iff_aeBoundary.2 (Ω.boundaryTrace_toL2_smul _ c U)
+    exact Ω.ae_surfaceMeasure_iff_aeBoundary.2 (Ω.boundaryTrace_sobolevToL2_smul _ s c U hs hs')
 
-/-- **The trace of `H^1(V)` on `Γ`** as a bounded operator `H^1(V) → L_2(Γ)`, `U ↦ Tr_Γ ι U`
-(`Rd.BoundedLipschitzDomain.exists_eLpNorm_boundaryTrace_toL2_le`). -/
-noncomputable def ambientTraceL2 : H^{1}(V) →L[ℂ] Ω.BoundaryL2 :=
-  Ω.ambientTraceLinear.mkContinuousOfExistsBound (by
-    obtain ⟨C, hC, hle⟩ := Ω.exists_eLpNorm_boundaryTrace_toL2_le
+/-- **The trace `T^s_Γ` of `H^s(V)` on `Γ`**, `1/2 < s < 3/2`, as a bounded operator
+`H^s(V) → L_2(Γ)`, `U ↦ Tr_Γ ι_s U`; `T_Γ = T^1_Γ`
+(`Rd.BoundedLipschitzDomain.exists_eLpNorm_boundaryTrace_sobolevToL2_le`). -/
+noncomputable def ambientTraceL2 (s : ℝ) (hs : 1 / 2 < s := by norm_num)
+    (hs' : s < 3 / 2 := by norm_num) : H^{s}(V) →L[ℂ] Ω.BoundaryL2 :=
+  (Ω.ambientTraceLinear s hs hs').mkContinuousOfExistsBound (by
+    obtain ⟨C, hC, hle⟩ := Ω.exists_eLpNorm_boundaryTrace_sobolevToL2_le s hs hs'
     refine ⟨C.toReal, fun U => ?_⟩
-    change ‖(Ω.memLp_boundaryTrace_toL2 Ω.boundaryPartition U).toLp _‖ ≤ _
+    change ‖(Ω.memLp_boundaryTrace_sobolevToL2 Ω.boundaryPartition s U hs hs').toLp _‖ ≤ _
     rw [Lp.norm_toLp, ← toReal_enorm U, ← ENNReal.toReal_mul]
     exact ENNReal.toReal_mono (ENNReal.mul_ne_top hC enorm_ne_top) (hle _ U))
 
-/-- The trace of `U ∈ H^1(V)` in `L_2(Γ)` is the boundary trace `Tr_Γ ι U` almost everywhere on
+/-- The trace of `U ∈ H^s(V)` in `L_2(Γ)` is the boundary trace `Tr_Γ ι_s U` almost everywhere on
 `Γ`, for every resolution of unity (`Rd.BoundedLipschitzDomain.boundaryTrace_eventuallyEq`). -/
-theorem ambientTraceL2_apply_ae (ψ : Ω.BoundaryPartition) (U : H^{1}(V)) :
-    (Ω.ambientTraceL2 U : V → ℂ) =ᵐ[Ω.surfaceMeasure]
-      Ω.boundaryTrace ψ two_ne_top 2 (toL2 U) :=
-  (MemLp.coeFn_toLp (Ω.memLp_boundaryTrace_toL2 Ω.boundaryPartition U)).trans
+theorem ambientTraceL2_apply_ae (ψ : Ω.BoundaryPartition) (s : ℝ) (U : H^{s}(V))
+    (hs : 1 / 2 < s := by norm_num) (hs' : s < 3 / 2 := by norm_num) :
+    (Ω.ambientTraceL2 s hs hs' U : V → ℂ) =ᵐ[Ω.surfaceMeasure]
+      Ω.boundaryTrace ψ two_ne_top 2 (sobolevToL2 (one_half_pos.trans hs).le U) :=
+  (MemLp.coeFn_toLp (Ω.memLp_boundaryTrace_sobolevToL2 Ω.boundaryPartition s U hs hs')).trans
     (Ω.ae_surfaceMeasure_iff_aeBoundary.2
-    (Ω.boundaryTrace_eventuallyEq Ω.boundaryPartition ψ two_ne_top one_le_two (s := 1 / 2)
-      (by norm_num) (by norm_num) one_le_two (modNorm_toL2_lt_top U)))
+    (Ω.boundaryTrace_eventuallyEq Ω.boundaryPartition ψ two_ne_top one_le_two (sub_pos.2 hs)
+      (by norm_num; linarith) one_le_two (modNorm_sobolevToL2_lt_top hs (by linarith) U)))
 
-/-- **The trace `H^{1/2}(Γ) → L_2(Γ)`**: an element `t` of the trace space goes to the boundary
-trace of its extension `E t ∈ H^1(Ω)`. It is injective
+/-- The trace of `U ∈ H^1(V)` in `L_2(Γ)` is the boundary trace `Tr_Γ ι U` of its `L_2` function
+`Rd.toL2 U`, the case `s = 1` of `Rd.BoundedLipschitzDomain.ambientTraceL2_apply_ae`
+(`Rd.sobolevToL2_one`). -/
+theorem ambientTraceL2_one_apply_ae (ψ : Ω.BoundaryPartition) (U : H^{1}(V)) :
+    ((Ω.ambientTraceL2 1) U : V → ℂ) =ᵐ[Ω.surfaceMeasure]
+      Ω.boundaryTrace ψ two_ne_top 2 (toL2 U) := by
+  have h := Ω.ambientTraceL2_apply_ae ψ 1 U
+  rwa [sobolevToL2_one] at h
+
+/-- **The trace of the trace space in `L_2(Γ)`**, `1/2 < s < 3/2`: an element `t` of the trace
+space of `H^s(Ω)` goes to the boundary trace of its extension `E_s t ∈ H^s(Ω)`. It is injective
 (`Rd.BoundedLipschitzDomain.traceL2_injective`). -/
-noncomputable def traceL2 : Ω.TraceSpace →L[ℂ] Ω.BoundaryL2 :=
-  Ω.ambientTraceL2 ∘L (vanishOn 1 Ω.toOpens)ᗮ.subtypeL ∘L Ω.extend
+noncomputable def traceL2 (s : ℝ) (hs : 1 / 2 < s := by norm_num)
+    (hs' : s < 3 / 2 := by norm_num) : Ω.TraceSpace s hs hs' →L[ℂ] Ω.BoundaryL2 :=
+  Ω.ambientTraceL2 s hs hs' ∘L (vanishOn s Ω.toOpens)ᗮ.subtypeL ∘L Ω.extend s hs hs'
 
-/-- `traceL2 t = Tr_Γ ι (E t)` almost everywhere on `Γ`, for every resolution of unity. -/
-theorem traceL2_apply_ae (ψ : Ω.BoundaryPartition) (t : Ω.TraceSpace) :
-    (Ω.traceL2 t : V → ℂ) =ᵐ[Ω.surfaceMeasure]
-      Ω.boundaryTrace ψ two_ne_top 2 (toL2 ((Ω.extend t : Ω.SobolevOne) : H^{1}(V))) :=
-  Ω.ambientTraceL2_apply_ae ψ _
+/-- `traceL2 s t = Tr_Γ ι_s (E_s t)` almost everywhere on `Γ`, for every resolution of unity. -/
+theorem traceL2_apply_ae (ψ : Ω.BoundaryPartition) {s : ℝ} {hs : 1 / 2 < s} {hs' : s < 3 / 2}
+    (t : Ω.TraceSpace s hs hs') :
+    (Ω.traceL2 s hs hs' t : V → ℂ) =ᵐ[Ω.surfaceMeasure] Ω.boundaryTrace ψ two_ne_top 2
+      (sobolevToL2 (one_half_pos.trans hs).le
+        ((Ω.extend s hs hs' t : RestrictionSpace s Ω.toOpens) : H^{s}(V))) :=
+  Ω.ambientTraceL2_apply_ae ψ s _ hs hs'
 
-/-- **The trace `H^{1/2}(Γ) → L_2(Γ)` is injective**: elements of the trace space with the same
-boundary trace almost everywhere on `Γ` are equal
+/-- `traceL2 1 t = Tr_Γ ι (E_1 t)` almost everywhere on `Γ` with the `L_2` function `Rd.toL2`, the
+case `s = 1` of `Rd.BoundedLipschitzDomain.traceL2_apply_ae` (`Rd.sobolevToL2_one`). -/
+theorem traceL2_one_apply_ae (ψ : Ω.BoundaryPartition) (t : Ω.TraceSpace 1) :
+    ((Ω.traceL2 1) t : V → ℂ) =ᵐ[Ω.surfaceMeasure] Ω.boundaryTrace ψ two_ne_top 2
+      (toL2 (((Ω.extend 1) t : Ω.SobolevOne) : H^{1}(V))) := by
+  have h := Ω.traceL2_apply_ae ψ t
+  rwa [sobolevToL2_one] at h
+
+/-- **The trace of the trace space in `L_2(Γ)` is injective**: elements of the trace space with
+the same boundary trace almost everywhere on `Γ` are equal
 (`Rd.BoundedLipschitzDomain.boundaryTrace_extend_eventuallyEq_iff`), and `σ`-null sets are the
 null sets of the charts (`Rd.BoundedLipschitzDomain.ae_surfaceMeasure_iff_aeBoundary`). -/
-theorem traceL2_injective : Function.Injective Ω.traceL2 := by
+theorem traceL2_injective (s : ℝ) (hs : 1 / 2 < s := by norm_num)
+    (hs' : s < 3 / 2 := by norm_num) : Function.Injective (Ω.traceL2 s hs hs') := by
   intro t t' h
   have h1 := Ω.traceL2_apply_ae Ω.boundaryPartition t
   rw [h] at h1
   exact (Ω.boundaryTrace_extend_eventuallyEq_iff Ω.boundaryPartition t t').1
     (Ω.ae_surfaceMeasure_iff_aeBoundary.1 (h1.symm.trans (Ω.traceL2_apply_ae _ t')))
 
-/-- **The trace `γ_{L_2} : H^1(Ω) → L_2(Γ)`**: the trace `γ` onto `H^{1/2}(Γ)` followed by the
-trace `H^{1/2}(Γ) → L_2(Γ)`. Its kernel is the trace kernel
-(`Rd.BoundedLipschitzDomain.ker_boundaryTraceL2`). -/
-noncomputable def boundaryTraceL2 : Ω.SobolevOne →L[ℂ] Ω.BoundaryL2 :=
-  Ω.traceL2 ∘L Ω.trace
+/-- **The trace `γ^s_{L_2} : H^s(Ω) → L_2(Γ)`**, `1/2 < s < 3/2`: the trace `γ_s` onto the trace
+space followed by the trace of the trace space in `L_2(Γ)`; `γ_{L_2} = γ^1_{L_2}`. Its kernel is
+the trace kernel (`Rd.BoundedLipschitzDomain.ker_boundaryTraceL2`). -/
+noncomputable def boundaryTraceL2 (s : ℝ) (hs : 1 / 2 < s := by norm_num)
+    (hs' : s < 3 / 2 := by norm_num) : RestrictionSpace s Ω.toOpens →L[ℂ] Ω.BoundaryL2 :=
+  Ω.traceL2 s hs hs' ∘L Ω.trace s hs hs'
 
-/-- **`γ_{L_2} u` is the boundary trace of `u`**: `γ_{L_2} u = Tr_Γ ι u` almost everywhere on `Γ`,
-for every resolution of unity (`Rd.BoundedLipschitzDomain.boundaryTrace_extend_trace`). -/
-theorem boundaryTraceL2_apply_ae (ψ : Ω.BoundaryPartition) (u : Ω.SobolevOne) :
-    (Ω.boundaryTraceL2 u : V → ℂ) =ᵐ[Ω.surfaceMeasure]
-      Ω.boundaryTrace ψ two_ne_top 2 (toL2 (u : H^{1}(V))) :=
-  (Ω.traceL2_apply_ae ψ (Ω.trace u)).trans
-    (Ω.ae_surfaceMeasure_iff_aeBoundary.2 (Ω.boundaryTrace_extend_trace ψ u))
+/-- **`γ^s_{L_2} u` is the boundary trace of `u`**: `γ^s_{L_2} u = Tr_Γ ι_s u` almost everywhere
+on `Γ`, for every resolution of unity (`Rd.BoundedLipschitzDomain.boundaryTrace_extend_trace`). -/
+theorem boundaryTraceL2_apply_ae (ψ : Ω.BoundaryPartition) (s : ℝ)
+    (u : RestrictionSpace s Ω.toOpens) (hs : 1 / 2 < s := by norm_num)
+    (hs' : s < 3 / 2 := by norm_num) :
+    (Ω.boundaryTraceL2 s hs hs' u : V → ℂ) =ᵐ[Ω.surfaceMeasure]
+      Ω.boundaryTrace ψ two_ne_top 2 (sobolevToL2 (one_half_pos.trans hs).le (u : H^{s}(V))) :=
+  (Ω.traceL2_apply_ae ψ (Ω.trace s hs hs' u)).trans
+    (Ω.ae_surfaceMeasure_iff_aeBoundary.2 (Ω.boundaryTrace_extend_trace ψ s u hs hs'))
 
-/-- **`γ_{L_2} u` is the trace of `u` read in `H^1(V)`**: `boundaryTraceL2 u = ambientTraceL2 u`
-for every `u ∈ H^1(Ω)`; both are the boundary trace `Tr_Γ ι u` almost everywhere on `Γ`
-(`Rd.BoundedLipschitzDomain.boundaryTraceL2_apply_ae`,
+/-- **`γ_{L_2} u` is the boundary trace of `u ∈ H^1(Ω)`** with the `L_2` function `Rd.toL2`, the
+case `s = 1` of `Rd.BoundedLipschitzDomain.boundaryTraceL2_apply_ae` (`Rd.sobolevToL2_one`). -/
+theorem boundaryTraceL2_one_apply_ae (ψ : Ω.BoundaryPartition) (u : Ω.SobolevOne) :
+    ((Ω.boundaryTraceL2 1) u : V → ℂ) =ᵐ[Ω.surfaceMeasure]
+      Ω.boundaryTrace ψ two_ne_top 2 (toL2 (u : H^{1}(V))) := by
+  have h := Ω.boundaryTraceL2_apply_ae ψ 1 u
+  rwa [sobolevToL2_one] at h
+
+/-- **`γ^s_{L_2} u` is the trace of `u` read in `H^s(V)`**: `γ^s_{L_2} u = T^s_Γ u`, that is
+`boundaryTraceL2 s u = ambientTraceL2 s u`, for every `u ∈ H^s(Ω)`; both are the boundary trace
+`Tr_Γ ι_s u` almost everywhere on `Γ` (`Rd.BoundedLipschitzDomain.boundaryTraceL2_apply_ae`,
 `Rd.BoundedLipschitzDomain.ambientTraceL2_apply_ae`). -/
-theorem boundaryTraceL2_eq_ambientTraceL2 (u : Ω.SobolevOne) :
-    Ω.boundaryTraceL2 u = Ω.ambientTraceL2 (u : H^{1}(V)) :=
-  Lp.ext ((Ω.boundaryTraceL2_apply_ae Ω.boundaryPartition u).trans
-    (Ω.ambientTraceL2_apply_ae Ω.boundaryPartition _).symm)
+theorem boundaryTraceL2_eq_ambientTraceL2 (s : ℝ) (u : RestrictionSpace s Ω.toOpens)
+    (hs : 1 / 2 < s := by norm_num) (hs' : s < 3 / 2 := by norm_num) :
+    Ω.boundaryTraceL2 s hs hs' u = Ω.ambientTraceL2 s hs hs' (u : H^{s}(V)) :=
+  Lp.ext ((Ω.boundaryTraceL2_apply_ae Ω.boundaryPartition s u hs hs').trans
+    (Ω.ambientTraceL2_apply_ae Ω.boundaryPartition s _ hs hs').symm)
 
-/-- **The kernel of `γ_{L_2} : H^1(Ω) → L_2(Γ)` is the trace kernel**: `γ_{L_2} u = 0` in
+/-- **The kernel of `γ^s_{L_2} : H^s(Ω) → L_2(Γ)` is the trace kernel**: `γ^s_{L_2} u = 0` in
 `L_2(Γ)` iff the boundary trace of `u` vanishes almost everywhere on `Γ`
 (`Rd.BoundedLipschitzDomain.mem_traceKer_iff`). -/
-theorem ker_boundaryTraceL2 : (Ω.boundaryTraceL2).ker = Ω.traceKer := by
+theorem ker_boundaryTraceL2 (s : ℝ) (hs : 1 / 2 < s := by norm_num)
+    (hs' : s < 3 / 2 := by norm_num) :
+    (Ω.boundaryTraceL2 s hs hs').ker = Ω.traceKer s hs hs' := by
   ext u
-  rw [LinearMap.mem_ker, Lp.eq_zero_iff_ae_eq_zero, Ω.mem_traceKer_iff Ω.boundaryPartition]
-  have h := Ω.boundaryTraceL2_apply_ae Ω.boundaryPartition u
+  rw [LinearMap.mem_ker, Lp.eq_zero_iff_ae_eq_zero,
+    Ω.mem_traceKer_iff Ω.boundaryPartition s u hs hs']
+  have h := Ω.boundaryTraceL2_apply_ae Ω.boundaryPartition s u hs hs'
   exact ⟨fun h0 => Ω.ae_surfaceMeasure_iff_aeBoundary.1 (h.symm.trans h0),
     fun h0 => h.trans (Ω.ae_surfaceMeasure_iff_aeBoundary.2 h0)⟩
 
-/-- **The functions of `B^{1/2}_{2,2}(Γ)` are traces in `L_2(Γ)`**: for every resolution of unity
-`ψ` and `g ∈ B^{1/2}_{2,2}(Γ)` there is `t ∈ H^{1/2}(Γ)` with `traceL2 t = g` almost everywhere on
-`Γ` (`Rd.BoundedLipschitzDomain.exists_traceSpace_of_memBoundaryBesov`). -/
-theorem exists_traceL2_ae_eq (ψ : Ω.BoundaryPartition) {g : V → ℂ}
-    (hg : Ω.MemBoundaryBesov 2 ψ (1 / 2) 2 g) :
-    ∃ t : Ω.TraceSpace, (Ω.traceL2 t : V → ℂ) =ᵐ[Ω.surfaceMeasure] g := by
-  obtain ⟨t, ht⟩ := Ω.exists_traceSpace_of_memBoundaryBesov ψ hg
+/-- **The functions of `B^{s-1/2}_{2,2}(Γ)` are traces in `L_2(Γ)`**, `1/2 < s < 3/2`: for every
+resolution of unity `ψ` and `g ∈ B^{s-1/2}_{2,2}(Γ)` there is `t` in the trace space of `H^s(Ω)`
+with `traceL2 s t = g` `σ`-almost everywhere
+(`Rd.BoundedLipschitzDomain.exists_traceSpace_of_memBoundaryBesov`). -/
+theorem exists_traceL2_ae_eq (ψ : Ω.BoundaryPartition) (s : ℝ) {g : V → ℂ}
+    (hg : Ω.MemBoundaryBesov 2 ψ (s - 1 / 2) 2 g) (hs : 1 / 2 < s := by norm_num)
+    (hs' : s < 3 / 2 := by norm_num) :
+    ∃ t : Ω.TraceSpace s hs hs', (Ω.traceL2 s hs hs' t : V → ℂ) =ᵐ[Ω.surfaceMeasure] g := by
+  obtain ⟨t, ht⟩ := Ω.exists_traceSpace_of_memBoundaryBesov ψ s hg hs hs'
   exact ⟨t, (Ω.traceL2_apply_ae ψ t).trans (Ω.ae_surfaceMeasure_iff_aeBoundary.2 ht)⟩
 
-/-- **`B^{1/2}_{2,2}(Γ) ⊆ L_2(Γ)`**: every `g ∈ B^{1/2}_{2,2}(Γ)` is square integrable with respect
-to the surface measure (`Rd.BoundedLipschitzDomain.exists_traceL2_ae_eq`). -/
-theorem memLp_of_memBoundaryBesov (ψ : Ω.BoundaryPartition) {g : V → ℂ}
-    (hg : Ω.MemBoundaryBesov 2 ψ (1 / 2) 2 g) : MemLp g 2 Ω.surfaceMeasure := by
-  obtain ⟨t, ht⟩ := Ω.exists_traceL2_ae_eq ψ hg
+/-- **`B^{s-1/2}_{2,2}(Γ) ⊆ L_2(Γ)`**, `1/2 < s < 3/2`: every `g ∈ B^{s-1/2}_{2,2}(Γ)` is square
+integrable with respect to the surface measure
+(`Rd.BoundedLipschitzDomain.exists_traceL2_ae_eq`). -/
+theorem memLp_of_memBoundaryBesov (ψ : Ω.BoundaryPartition) (s : ℝ) {g : V → ℂ}
+    (hg : Ω.MemBoundaryBesov 2 ψ (s - 1 / 2) 2 g) (hs : 1 / 2 < s := by norm_num)
+    (hs' : s < 3 / 2 := by norm_num) : MemLp g 2 Ω.surfaceMeasure := by
+  obtain ⟨t, ht⟩ := Ω.exists_traceL2_ae_eq ψ s hg hs hs'
   exact (Lp.memLp _).ae_eq ht
 
 /-! ### The unit normal -/

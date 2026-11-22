@@ -8,7 +8,7 @@ space is also identified with an approximation space: the functions whose error 
 approximation by a fixed scheme (band-limited functions, trigonometric polynomials, splines,
 wavelets, eigenfunctions) decays at a given rate. This form makes the general methods of
 approximation theory available, such as interpolation, embeddings, decompositions and traces,
-and it is the form numerical analysis needs. The project has about 121 000 lines of Lean in 304
+and it is the form numerical analysis needs. The project has about 121 000 lines of Lean in 306
 files and contains no `sorry`.
 
 * **Blueprint** (a webpage explaining the mathematics):
@@ -240,10 +240,10 @@ For a general scheme the project describes `A^s_q`
 * **Traces.** Let `Ω` be as above, with boundary `Γ` and surface measure `σ`, the
   `(d-1)`-dimensional Hausdorff measure on `Γ`. In the restrictions `H^1(Ω)` of `H^1(V)`, the
   kernel `ker γ` of the boundary trace is `H^1_0(Ω)`, the closure of the restricted test
-  functions (`Rd.BoundedLipschitzDomain.traceKer_eq_zeroBoundarySpace`). Let `H^{1/2}(Γ)` be the
-  orthogonal complement of `ker γ` in `H^1(Ω)` and `τ` its trace into `L_2(Γ)`. Then `g ∈ L_2(Γ)`
-  is `τ t` for some `t` iff `∫_Γ ∫_Γ |g(x) - g(y)|² / |x - y|^d dσ(x) dσ(y) < ∞`, and `‖t‖²` is
-  equivalent to `‖τ t‖²_{L_2(Γ)}` plus this form
+  functions (`Rd.BoundedLipschitzDomain.traceKer_one_eq_zeroBoundarySpace`). Let the trace space
+  be the orthogonal complement of `ker γ` in `H^1(Ω)` and `τ` its trace into `L_2(Γ)`. Then
+  `g ∈ L_2(Γ)` is `τ t` for some `t` iff `∫_Γ ∫_Γ |g(x) - g(y)|² / |x - y|^d dσ(x) dσ(y) < ∞`, and
+  `‖t‖²` is equivalent to `‖τ t‖²_{L_2(Γ)}` plus this form
   (`Rd.BoundedLipschitzDomain.mem_range_traceL2_iff_slobodeckij`,
   `Rd.BoundedLipschitzDomain.exists_traceL2_norm_equiv_slobodeckij`).
 * **Eigenfunction expansions.** For an orthonormal basis of weak eigenfunctions `e_i` with

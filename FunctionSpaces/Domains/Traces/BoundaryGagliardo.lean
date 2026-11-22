@@ -32,10 +32,11 @@ charts `γ_j : H_j → V` and a resolution of unity `(ψ_j)` on `Γ`.
 * **Gagliardo's description of the boundary spaces**: for `g ∈ L_p(Γ)`, `g ∈ B^s_{p,p}(Γ)` iff
   the form is finite
   (`Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_boundarySlobodeckijForm_lt_top`), so
-  `W^{s,p}(Γ) = B^s_{p,p}(Γ)`. For `p = 2`, `s = 1/2`, the norm of `H^{1/2}(Γ)` is equivalent to
+  `W^{s,p}(Γ) = B^s_{p,p}(Γ)`. For `p = 2`, `s = 1/2`, the norm of the trace space
+  `Ω.TraceSpace 1` of `H^1(Ω)` is equivalent to
   `(‖τ t‖²_{L_2(Γ)} + ∫_Γ ∫_Γ |τ t(y) - τ t(x)|² / |y - x|^n dσ dσ)^(1/2)`
   (`Rd.BoundedLipschitzDomain.exists_traceL2_norm_equiv_slobodeckij`), and the range of
-  `τ : H^{1/2}(Γ) → L_2(Γ)` is the set where the form is finite
+  `τ : Ω.TraceSpace 1 → L_2(Γ)` is the set where the form is finite
   (`Rd.BoundedLipschitzDomain.mem_range_traceL2_iff_slobodeckij`).
 
 The constants depend on `Ω`, `ψ`, `p` and `s` and are fixed before the functions. The results
@@ -884,18 +885,19 @@ theorem memBoundaryBesov_iff_boundarySlobodeckijForm_lt_top (ψ : Ω.BoundaryPar
   exact (h₂ g hg.aestronglyMeasurable).trans_lt (ENNReal.mul_lt_top hC₂.lt_top
     (ENNReal.add_lt_top.2 ⟨ENNReal.rpow_lt_top_of_nonneg hP.le hg.eLpNorm_lt_top.ne, h⟩))
 
-/-- **The norm of `H^{1/2}(Γ)` by the Sobolev–Slobodeckij norm**: there is `C < ∞` with
-`‖t‖² ≤ C (‖τ t‖²_{L_2(Γ)} + ∫_Γ ∫_Γ |τ t(y) - τ t(x)|² / |y - x|^n dσ(y) dσ(x))` and the reverse
-bound `‖τ t‖²_{L_2(Γ)} + ∫_Γ ∫_Γ … ≤ C ‖t‖²` for every `t ∈ H^{1/2}(Γ)` and its trace
+/-- **The norm of the trace space of `H^1(Ω)` by the Sobolev–Slobodeckij norm**: there is `C < ∞`
+with `‖t‖² ≤ C (‖τ t‖²_{L_2(Γ)} + ∫_Γ ∫_Γ |τ t(y) - τ t(x)|² / |y - x|^n dσ(y) dσ(x))` and the
+reverse bound `‖τ t‖²_{L_2(Γ)} + ∫_Γ ∫_Γ … ≤ C ‖t‖²` for every `t ∈ Ω.TraceSpace 1` and its trace
 `τ t ∈ L_2(Γ)`, `n = dim V`: the norm of the trace space is equivalent to Gagliardo's norm of
 `W^{1/2,2}(Γ)`. It combines the equivalence with the chart-wise norm of `B^{1/2}_{2,2}(Γ)`
 (`Rd.BoundedLipschitzDomain.exists_traceL2_norm_equiv`) with
 `Rd.BoundedLipschitzDomain.exists_boundarySlobodeckijForm_le`,
 `Rd.BoundedLipschitzDomain.exists_boundaryBesovNorm_rpow_le` and the boundedness of `τ`. -/
 theorem exists_traceL2_norm_equiv_slobodeckij :
-    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ t : Ω.TraceSpace,
-      ‖t‖ₑ ^ 2 ≤ C * (‖Ω.traceL2 t‖ₑ ^ 2 + Ω.boundarySlobodeckijForm 2 (1 / 2) (Ω.traceL2 t)) ∧
-        ‖Ω.traceL2 t‖ₑ ^ 2 + Ω.boundarySlobodeckijForm 2 (1 / 2) (Ω.traceL2 t) ≤
+    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ t : Ω.TraceSpace 1,
+      ‖t‖ₑ ^ 2 ≤ C * (‖(Ω.traceL2 1) t‖ₑ ^ 2 +
+          Ω.boundarySlobodeckijForm 2 (1 / 2) ((Ω.traceL2 1) t)) ∧
+        ‖(Ω.traceL2 1) t‖ₑ ^ 2 + Ω.boundarySlobodeckijForm 2 (1 / 2) ((Ω.traceL2 1) t) ≤
           C * ‖t‖ₑ ^ 2 := by
   obtain ⟨C₁, hC₁, h₁⟩ := Ω.exists_traceL2_norm_equiv Ω.boundaryPartition
   obtain ⟨C₂, hC₂, h₂⟩ := Ω.exists_boundarySlobodeckijForm_le (p := 2) Ω.boundaryPartition
@@ -903,31 +905,33 @@ theorem exists_traceL2_norm_equiv_slobodeckij :
   obtain ⟨C₃, hC₃, h₃⟩ := Ω.exists_boundaryBesovNorm_rpow_le (p := 2) Ω.boundaryPartition
     two_ne_top (s := 1 / 2) (by norm_num) (by norm_num)
   simp only [ENNReal.toReal_ofNat, ENNReal.rpow_two] at h₂ h₃
-  refine ⟨C₁ ^ 2 * C₃ + (‖Ω.traceL2‖ₑ ^ 2 + C₂ * C₁ ^ 2), ENNReal.add_ne_top.2
+  refine ⟨C₁ ^ 2 * C₃ + (‖Ω.traceL2 1‖ₑ ^ 2 + C₂ * C₁ ^ 2), ENNReal.add_ne_top.2
     ⟨ENNReal.mul_ne_top (ENNReal.pow_ne_top hC₁) hC₃, ENNReal.add_ne_top.2
       ⟨ENNReal.pow_ne_top enorm_ne_top, ENNReal.mul_ne_top hC₂ (ENNReal.pow_ne_top hC₁)⟩⟩,
     fun t => ⟨?_, ?_⟩⟩
-  · calc ‖t‖ₑ ^ 2 ≤ (C₁ * Ω.boundaryBesovNorm 2 Ω.boundaryPartition (1 / 2) 2 (Ω.traceL2 t)) ^ 2 :=
+  · calc ‖t‖ₑ ^ 2
+        ≤ (C₁ * Ω.boundaryBesovNorm 2 Ω.boundaryPartition (1 / 2) 2 ((Ω.traceL2 1) t)) ^ 2 :=
           pow_le_pow_left₀ zero_le (h₁ t).1 2
-      _ ≤ C₁ ^ 2 * (C₃ * (‖Ω.traceL2 t‖ₑ ^ 2 +
-            Ω.boundarySlobodeckijForm 2 (1 / 2) (Ω.traceL2 t))) := by
+      _ ≤ C₁ ^ 2 * (C₃ * (‖(Ω.traceL2 1) t‖ₑ ^ 2 +
+            Ω.boundarySlobodeckijForm 2 (1 / 2) ((Ω.traceL2 1) t))) := by
           rw [mul_pow, Lp.enorm_def]
           exact mul_le_mul' le_rfl (h₃ _ (Lp.aestronglyMeasurable _))
       _ ≤ _ := by
           rw [← mul_assoc]
           exact mul_le_mul' le_self_add le_rfl
-  · calc _ ≤ (‖Ω.traceL2‖ₑ * ‖t‖ₑ) ^ 2 + C₂ * (C₁ * ‖t‖ₑ) ^ 2 :=
-          add_le_add (pow_le_pow_left₀ zero_le (Ω.traceL2.le_opENorm t) 2)
+  · calc _ ≤ (‖Ω.traceL2 1‖ₑ * ‖t‖ₑ) ^ 2 + C₂ * (C₁ * ‖t‖ₑ) ^ 2 :=
+          add_le_add (pow_le_pow_left₀ zero_le ((Ω.traceL2 1).le_opENorm t) 2)
             ((h₂ _).trans (mul_le_mul' le_rfl (pow_le_pow_left₀ zero_le (h₁ t).2 2)))
-      _ = (‖Ω.traceL2‖ₑ ^ 2 + C₂ * C₁ ^ 2) * ‖t‖ₑ ^ 2 := by ring
+      _ = (‖Ω.traceL2 1‖ₑ ^ 2 + C₂ * C₁ ^ 2) * ‖t‖ₑ ^ 2 := by ring
       _ ≤ _ := mul_le_mul' le_add_self le_rfl
 
-/-- **The range of `H^{1/2}(Γ) → L_2(Γ)` by the Gagliardo form**: `g ∈ L_2(Γ)` is the trace `τ t`
-of some `t ∈ H^{1/2}(Γ)` iff `∫_Γ ∫_Γ |g(y) - g(x)|² / |y - x|^n dσ(y) dσ(x) < ∞`
+/-- **The range of the trace `Ω.TraceSpace 1 → L_2(Γ)` by the Gagliardo form**: `g ∈ L_2(Γ)` is
+the trace `τ t` of some `t ∈ Ω.TraceSpace 1` iff
+`∫_Γ ∫_Γ |g(y) - g(x)|² / |y - x|^n dσ(y) dσ(x) < ∞`
 (`Rd.BoundedLipschitzDomain.mem_range_traceL2_iff`,
 `Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_boundarySlobodeckijForm_lt_top`). -/
 theorem mem_range_traceL2_iff_slobodeckij (g : Ω.BoundaryL2) :
-    g ∈ LinearMap.range (Ω.traceL2 : Ω.TraceSpace →ₗ[ℂ] Ω.BoundaryL2) ↔
+    g ∈ LinearMap.range (Ω.traceL2 1 : Ω.TraceSpace 1 →ₗ[ℂ] Ω.BoundaryL2) ↔
       Ω.boundarySlobodeckijForm 2 (1 / 2) g < ∞ := by
   rw [Ω.mem_range_traceL2_iff Ω.boundaryPartition]
   exact Ω.memBoundaryBesov_iff_boundarySlobodeckijForm_lt_top _ two_ne_top (by norm_num)
