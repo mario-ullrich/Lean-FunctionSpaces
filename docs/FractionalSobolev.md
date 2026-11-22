@@ -18,7 +18,11 @@ the same constant. At `s = 0` the bound holds with
 `C = 1` on every open set, since the `L_2` functions of `U` and `W` have disjoint supports; hence
 restriction is an isometry of `H̃^m(Ω)` onto `H^m_0(Ω)` for every open `Ω` and every `m ∈ ℕ`. For
 `s ≥ 0` the `L_2` functions of `H̃^s(Ω)` vanish outside `Ω`, so restriction is injective on
-`H̃^s(Ω)` for every open `Ω`.
+`H̃^s(Ω)` for every open `Ω`. On a bounded Lipschitz domain, conversely, every element of
+`H^s(ℝ^d)`, `s ≥ 0`, whose `L_2` function vanishes outside `Ω` lies in `H̃^s(Ω)`: mollification
+converges in `H^s(ℝ^d)` and smooth cut-offs keep `H^s(ℝ^d)` ([Sobolev spaces on
+`ℝ^d`](SobolevRd.md)), and the cone mollifiers of the charts push such an element into
+`H̃^s(Ω)`.
 
 ## Main results
 
@@ -46,6 +50,14 @@ span of the test functions of `Ω` in `H^s(V)` (`Rd.testSpan`), and `U ↦ U|_Ω
   vanishes almost everywhere outside `Ω` (`Rd.sobolevToL2_ae_eq_zero_of_mem_tildeSpace`), and
   `U|_Ω = 0` implies `U = 0` (`Rd.eq_zero_of_mem_tildeSpace_of_restrictProj_eq_zero`,
   `Rd.tildeToRestrictionL_injective`; Hewett–Moiola, Lemma 2.2(iii)).
+* **`H̃^s(Ω)` by supports.** Let `s ≥ 0` and `ι_s U` be the `L_2` function of `U ∈ H^s(V)`. For
+  a smooth `η` with compact support, `∫ η = 1` and dilates `η_c(x) = c^d η(c x)`: if `ι_s U`
+  vanishes almost everywhere outside a compact set `S` and `supp η_{2^n} + S ⊆ Ω` for large `n`,
+  then `U ∈ H̃^s(Ω)`
+  (`Rd.mem_tildeSpace_of_dilate_of_nonneg`). If `Ω` is a bounded Lipschitz domain, `U ∈ H̃^s(Ω)`
+  iff `ι_s U = 0` almost everywhere outside `Ω`
+  (`Rd.BoundedLipschitzDomain.mem_tildeSpace_iff_of_nonneg`; McLean, Theorem 3.29;
+  Chandler-Wilde–Hewett–Moiola, Lemma 3.15).
 * **The zero extension bound.** `Ω` has the zero extension bound with constant `C` at `s` if
   `‖U‖ ≤ C ‖U + W‖` for every `U ∈ T^s(Ω)` and every `W ∈ N^s(Ω)`
   (`Rd.HasZeroExtensionBound`; Hewett–Moiola, condition (iv) after Lemma 2.9). Then
@@ -68,8 +80,9 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 
 | Result | Lean | Human-checked | Files |
 |---|---|---|---|
-| The inclusions `H^s(ℝ^d) ⊆ H^t(ℝ^d)` on Schwartz and test functions, their dense range, the identity `ι_{s,s}`, the `L_2` functions of Schwartz functions and of `H^0`, vanishing on `Ω` and the span of the test functions under the inclusions, the injective inclusion `H^s(Ω) ⊆ H^t(Ω)` with norm at most `1`, dense range and `H^s_0(Ω) ⊆ H^t_0(Ω)`, and derivatives that keep test functions and vanishing on `Ω` | ✅ | ✗ | `Domains/Sobolev/SobolevRestrictionInclusions` |
+| The inclusions `H^s(ℝ^d) ⊆ H^t(ℝ^d)` on Schwartz and test functions, their dense range, the `L_2` functions of Schwartz functions, vanishing on `Ω` and the span of the test functions under the inclusions, the injective inclusion `H^s(Ω) ⊆ H^t(Ω)` with norm at most `1`, dense range and `H^s_0(Ω) ⊆ H^t_0(Ω)`, and derivatives that keep test functions and vanishing on `Ω` | ✅ | ✗ | `Domains/Sobolev/SobolevRestrictionInclusions` |
 | The injectivity of restriction on `H̃^s(Ω)` for `s ≥ 0`, the zero extension bound, the isomorphism `H̃^s(Ω) ≅ H^s_0(Ω)` under it, its lift from `s` to `s + 1`, and the isometry `H̃^m(Ω) ≅ H^m_0(Ω)` for every open set and `m ∈ ℕ` | ✅ | ✗ | `Domains/Sobolev/ZeroExtensionBound` |
+| Mollified functions and functions with compact support in `Ω` as elements of `H̃^s(Ω)`, localised functions, the chart pieces, and `H̃^s(Ω)`, `s ≥ 0`, on a bounded Lipschitz domain as the functions of `H^s(ℝ^d)` that vanish outside `Ω` | ✅ | ✗ | `Domains/Traces/TildeSpaceSupport` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

@@ -1735,10 +1735,12 @@ $|M|$.
 This section builds the maps between Mathlib's Sobolev spaces $H^s(V) = H^{s,2}(V, \C)$ for
 every real $s$: the inclusions $\iota_{t,s} : H^s(V) \to H^t(V)$ for $t \leq s$, the $L_2$
 functions $\iota_s U$ of the elements $U$ of $H^s(V)$ for $s \geq 0$, and the derivatives
-$\partial_v : H^{s+1}(V) \to H^s(V)$, with the exact recursion of the norms. Each map is a
+$\partial_v : H^{s+1}(V) \to H^s(V)$, with the exact recursion of the norms, and the
+convolution with an integrable kernel, under which mollification converges. Each map is a
 Fourier multiplier between the $L_2$ functions $J_s U$, so it is bounded by the bound of its
 symbol. It closes with $H^s(V) = \Besov{s}{2}{2}$ by differences, with explicit constants in
-both directions, for every $s > 0$. As in \Cref{sec:rellich-compactness}, an element $U$ of
+both directions, for every $s > 0$, and with smooth cut-offs, which keep $H^s(V)$ for
+$s \geq 0$. As in \Cref{sec:rellich-compactness}, an element $U$ of
 $H^s(V)$ is a tempered distribution $u$ together with the $L_2$ function $J_s u$, written
 $J_s U$, and $\|U\|_{H^s} = \|J_s U\|_2$.
 
@@ -1812,15 +1814,16 @@ $\iota_{t,s} : H^s(V) \to H^t(V)$ is a bounded linear operator.
 \label{lem:sobolev-inclusion}
 \lean{Rd.fourier_toLp_sobolevInclusion_ae, Rd.toDistr_sobolevInclusion,
   Rd.norm_sobolevInclusion_apply_le, Rd.sobolevInclusion_injective,
-  Rd.sobolevInclusion_sobolevInclusion}
+  Rd.sobolevInclusion_sobolevInclusion, Rd.sobolevInclusion_self}
 \leanok
 \uses{def:sobolev-inclusion, lem:fourier-multipliers-l2, lem:bessel-weight-multiplier,
   lem:plancherel-l2}
 For all $t \leq s$ and $U \in H^s(V)$, the Fourier transform of $J_t \iota_{t,s} U$ is
 $\langle \cdot \rangle^{t-s} \widehat{J_s U}$ almost everywhere, $\iota_{t,s} U = U$ as tempered
 distributions, and $\|\iota_{t,s} U\|_{H^t} \leq \|U\|_{H^s}$. For all $t \leq s$ the operator
-$\iota_{t,s}$ is injective, and for all $u \leq t \leq s$,
-$\iota_{u,t} \circ \iota_{t,s} = \iota_{u,s}$.
+$\iota_{t,s}$ is injective, for all $u \leq t \leq s$,
+$\iota_{u,t} \circ \iota_{t,s} = \iota_{u,s}$, and for every $s \in \R$, $\iota_{s,s}$ is the
+identity of $H^s(V)$.
 \end{lemma}
 
 \begin{proof}
@@ -1833,7 +1836,7 @@ apply} and \texttt{besselPotential\_\allowbreak zero}). By \Cref{lem:plancherel-
 and \Cref{lem:bessel-weight-multiplier},
 $\|\iota_{t,s} U\|_{H^t} = \|M_{t-s} \widehat{J_s U}\|_2 \leq \|\widehat{J_s U}\|_2 =
 \|U\|_{H^s}$. An element of $H^t(V)$ is determined by its tempered distribution
-(Mathlib's \texttt{BesselPotentialSpace.\allowbreak ext}), which gives the last two statements.
+(Mathlib's \texttt{BesselPotentialSpace.\allowbreak ext}), which gives the last three statements.
 \end{proof}
 
 \begin{definition}[$L_2$ functions of $H^s(V)$]
@@ -1850,7 +1853,8 @@ operator.
 \label{lem:sobolev-to-l2}
 \lean{Rd.toTemperedDistribution_sobolevToL2, Rd.besselPotential_sobolevToL2,
   Rd.sobolevToL2_eq_of_toDistr_eq, Rd.sobolevToL2_injective, Rd.norm_sobolevToL2_apply_le,
-  Rd.sobolevToL2_one, Rd.sobolevToL2_sobolevInclusion}
+  Rd.sobolevToL2_one, Rd.sobolevToL2_sobolevInclusion, Rd.norm_sobolevToL2_zero,
+  Rd.sobolevToL2_zero_surjective}
 \leanok
 \uses{def:sobolev-to-l2, lem:sobolev-inclusion, lem:lp-distribution-determined,
   def:sobolev-one-to-l2, lem:sobolev-one-to-l2}
@@ -1858,7 +1862,8 @@ Let $s \geq 0$. For every $U \in H^s(V)$, the tempered distribution of $\iota_s 
 $J_s \iota_s U = J_s U$ and $\|\iota_s U\|_2 \leq \|U\|_{H^s}$. For every $U \in H^s(V)$ and
 every $f \in L_2(V)$ whose tempered distribution is $U$, $\iota_s U = f$. The operator
 $\iota_s$ is injective, $\iota_1$ is the operator $\iota$ of \Cref{def:sobolev-one-to-l2}, and
-for every $0 \leq t \leq s$ and every $U \in H^s(V)$, $\iota_t \iota_{t,s} U = \iota_s U$.
+for every $0 \leq t \leq s$ and every $U \in H^s(V)$, $\iota_t \iota_{t,s} U = \iota_s U$. The
+operator $\iota_0$ is an isometry of $H^0(V)$ onto $L_2(V)$.
 \end{lemma}
 
 \begin{proof}
@@ -1867,7 +1872,9 @@ $J_0$ is the identity, so the tempered distribution of $\iota_s U$ is $\iota_{0,
 (\Cref{lem:sobolev-inclusion}), and $\|\iota_s U\|_2 = \|\iota_{0,s} U\|_{H^0} \leq
 \|U\|_{H^s}$. An $L_2$ function is determined by its tempered distribution
 (\Cref{lem:lp-distribution-determined}), and an element of $H^s(V)$ by its distribution; this
-gives the remaining statements, with \Cref{lem:sobolev-one-to-l2} for $\iota_1 = \iota$.
+gives the next statements, with \Cref{lem:sobolev-one-to-l2} for $\iota_1 = \iota$. Since
+$\iota_{0,0}$ is the identity (\Cref{lem:sobolev-inclusion}), $\iota_0 U = J_0 U$, and
+$U \mapsto J_0 U$ is an isometry of $H^0(V)$ onto $L_2(V)$.
 \end{proof}
 
 \begin{lemma}[The symbol of $J_{-1} \partial_v$]
@@ -1964,6 +1971,60 @@ $(2\pi)^2 (\langle \xi \rangle^{-1})^2 + \sum_i |m_{e_i}(\xi)|^2 = (2\pi)^2$ for
 At $s = 0$ the recursion is the identity of \Cref{thm:sobolev-one-two}: $\iota_{0,1} U$ is the
 $L_2$ function $\iota U$, and $\partial_{e_i} U$ the weak derivative.
 
+\begin{definition}[Convolution in $H^s(V)$]
+\label{def:sobolev-convolution}
+\lean{Rd.sobolevConv, Rd.toLp_sobolevConv}
+\leanok
+\uses{lem:conv-op}
+For an integrable $K \colon V \to \C$, $s \in \R$ and $U \in H^s(V)$, $K * U \in H^s(V)$ is the
+element with the $L_2$ function $J_s (K * U) = K * J_s U$; $U \mapsto K * U$ is a bounded linear
+operator on $H^s(V)$.
+\end{definition}
+
+It is bounded since $U \mapsto J_s U$ is an isometry of $H^s(V)$ onto $L_2(V)$ and
+$\|K * g\|_2 \leq \|K\|_1 \|g\|_2$ (\Cref{lem:conv-op}).
+
+\begin{lemma}[Convolution acts on the $L_2$ functions]
+\label{lem:sobolev-convolution-l2}
+\lean{Rd.fourier_toLp_sobolevConv_ae, Rd.sobolevToL2_sobolevConv}
+\leanok
+\uses{def:sobolev-convolution, thm:convolution-theorem-l2, lem:sobolev-inclusion,
+  def:sobolev-to-l2}
+For every integrable $K$, every $s \in \R$ and every $U \in H^s(V)$, the Fourier transform of
+$J_s (K * U)$ is $\hat K \, \widehat{J_s U}$ almost everywhere. For every $s \geq 0$, every
+integrable $K$ and every $U \in H^s(V)$, $\iota_s (K * U) = K * \iota_s U$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first statement is the convolution theorem on $L_2$ (\Cref{thm:convolution-theorem-l2}).
+For every $W \in H^s(V)$ the Fourier transform of $\iota_s W = J_0 \iota_{0,s} W$ is
+$\langle \cdot \rangle^{-s} \widehat{J_s W}$ almost everywhere (\Cref{lem:sobolev-inclusion}).
+Hence $\iota_s (K * U)$ and, by the convolution theorem, $K * \iota_s U$ both have the Fourier
+transform $\hat K \langle \cdot \rangle^{-s} \widehat{J_s U}$ almost everywhere, and the Fourier
+transform of $L_2(V)$ is injective (Mathlib's \texttt{FourierTransform.\allowbreak
+fourierInv\_\allowbreak fourier\_\allowbreak eq}).
+\end{proof}
+
+\begin{theorem}[Mollification in $H^s(V)$]
+\label{thm:sobolev-mollification}
+\lean{Rd.tendsto_sobolevConv_dilate}
+\leanok
+\uses{def:sobolev-convolution, thm:approx-identity, lem:dilate}
+For every integrable $\eta$ with $\int \eta = 1$, every filter, every family $(c_i)$ of nonzero
+reals with $c_i \to \infty$, every $s \in \R$ and every $U \in H^s(V)$, $\eta_{c_i} * U \to U$
+in $H^s(V)$, where $\eta_c(x) = c^n \eta(c x)$ and $n = \dim V$ (\Cref{lem:dilate}).
+\end{theorem}
+
+\begin{proof}
+\leanok
+$\|\eta_{c_i} * U - U\|_{H^s} = \|\eta_{c_i} * J_s U - J_s U\|_2$
+(\Cref{def:sobolev-convolution}), which tends to $0$ (\Cref{thm:approx-identity}).
+\end{proof}
+
+At $s = 1$ and for a Schwartz function $\eta$ this is \Cref{thm:sobolev-one-mollification},
+proved there through the weak derivatives.
+
 \begin{theorem}[$H^s(V)$ and $\Besov{s}{2}{2}$ by differences, with explicit constants]
 \label{thm:sobolev-besov-constants}
 \lean{Rd.sobolevBesovConst, Rd.sobolevBesovConst_ne_top, Rd.modNorm_sobolevToL2_le,
@@ -2026,6 +2087,28 @@ $F$ lies in the approximation space $A^s_2$ of the band-limited scheme (\Cref{th
 hence in $H^s(V)$ (\Cref{cor:sobolev-two-besov}); let $U$ be $F$ as an element of the bundled
 space. Its tempered distribution is that of $F$, so $\iota_s U = F$ (\Cref{lem:sobolev-to-l2}).
 \end{proof}
+
+\begin{lemma}[Smooth cut-offs in $H^s(V)$]
+\label{lem:sobolev-cutoff}
+\lean{Rd.exists_sobolevToL2_eq_mulLp}
+\leanok
+\uses{lem:sobolev-to-l2, thm:sobolev-besov-constants, lem:sobolev-from-differences,
+  thm:multipliers, lem:product-modulus, lem:resolution-of-unity}
+Let $s \geq 0$. For every smooth real $\chi$ with compact support and every $U \in H^s(V)$ there
+is $W \in H^s(V)$ with $\iota_s W = \chi \, \iota_s U$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+At $s = 0$, $\iota_0$ maps $H^0(V)$ onto $L_2(V)$ (\Cref{lem:sobolev-to-l2}). For $s > 0$ let
+$r = \lfloor s \rfloor + 1 > s$. Then $\|\iota_s U\|_2 + \|(2^{ks} \omega_r(\iota_s U,
+2^{-k})_2)_k\|_{\ell_2} < \infty$ (\Cref{thm:sobolev-besov-constants}). The derivatives of
+$\chi$ up to order $r$ are bounded (\Cref{lem:resolution-of-unity}), so the same quantity of
+$\chi \, \iota_s U$ is finite (\Cref{thm:multipliers}), and $\chi \, \iota_s U = \iota_s W$ for
+some $W \in H^s(V)$ (\Cref{lem:sobolev-from-differences}).
+\end{proof}
+
+At $s = 1$ this is part of \Cref{lem:sobolev-one-products}.
 
 \begin{lemma}[$\Besov{s}{p}{2} \subseteq \Besov{1/2}{p}{1}$ for $s > 1/2$]
 \label{lem:besov-half-one-general}

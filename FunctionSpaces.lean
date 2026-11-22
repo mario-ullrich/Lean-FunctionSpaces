@@ -141,6 +141,7 @@ public import FunctionSpaces.Domains.Traces.BoundaryTraceSpace
 public import FunctionSpaces.Domains.Traces.TraceSpaceNorm
 public import FunctionSpaces.Domains.Traces.BoundaryGagliardo
 public import FunctionSpaces.Domains.Traces.TraceKernel
+public import FunctionSpaces.Domains.Traces.TildeSpaceSupport
 public import FunctionSpaces.Domains.Sobolev.LipschitzDomainH1
 public import FunctionSpaces.Domains.Sobolev.SobolevRestrictionSpaces
 public import FunctionSpaces.Domains.Sobolev.SobolevDuality

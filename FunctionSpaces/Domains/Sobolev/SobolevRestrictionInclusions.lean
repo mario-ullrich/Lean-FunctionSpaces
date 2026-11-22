@@ -18,9 +18,9 @@ derivatives map test functions to test functions and keep vanishing on `Ω`.
 
 * **Schwartz and test functions**: `ι_{t,s}` maps a Schwartz function and a test function of `Ω`
   in `H^s(V)` to the same function in `H^t(V)` (`Rd.sobolevInclusion_ofSchwartz`,
-  `Rd.sobolevInclusion_ofTest`), so it has dense range (`Rd.denseRange_sobolevInclusion`);
-  at `t = s` it is the identity (`Rd.sobolevInclusion_self`), and the `L_2` function of a
-  Schwartz function is the function itself (`Rd.sobolevToL2_ofSchwartz`).
+  `Rd.sobolevInclusion_ofTest`), so it has dense range (`Rd.denseRange_sobolevInclusion`),
+  and the `L_2` function of a Schwartz function is the function itself
+  (`Rd.sobolevToL2_ofSchwartz`).
 * **Vanishing and test functions**: `ι_{t,s} W` vanishes on `Ω` iff `W` does
   (`Rd.sobolevInclusion_mem_vanishOn_iff`), and `ι_{t,s}` maps the span of the test functions
   into the span of the test functions (`Rd.sobolevInclusion_mem_testSpan`).
@@ -48,18 +48,6 @@ variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDim
 variable {s t : ℝ}
 
 /-! ### The inclusions on Schwartz and test functions -/
-
-/-- **The inclusion `ι_{s,s}` is the identity** of `H^s(V)`: it keeps the tempered distribution
-(`Rd.toDistr_sobolevInclusion`), which determines an element of `H^s(V)` (Mathlib's
-`BesselPotentialSpace.ext`). -/
-theorem sobolevInclusion_self (U : H^{s}(V)) : sobolevInclusion le_rfl U = U :=
-  BesselPotentialSpace.ext (toDistr_sobolevInclusion le_rfl U)
-
-/-- **The `L_2` function of `H^0(V)` has the same norm**: `‖ι_0 U‖_2 = ‖U‖_{H^0}`, since
-`ι_0 U = J_0 (ι_{0,0} U)` (`Rd.sobolevToL2_apply`), `‖J_0 U‖_2 = ‖U‖_{H^0}` (Mathlib's
-`BesselPotentialSpace.norm_toLp_eq`) and `ι_{0,0}` is the identity (`Rd.sobolevInclusion_self`). -/
-theorem norm_sobolevToL2_zero (U : H^{0}(V)) : ‖sobolevToL2 le_rfl U‖ = ‖U‖ := by
-  rw [sobolevToL2_apply, BesselPotentialSpace.norm_toLp_eq, sobolevInclusion_self]
 
 /-- **Schwartz functions under the inclusions**: for `t ≤ s` and a Schwartz function `w`,
 `ι_{t,s} w = w`, since both sides have the tempered distribution `w`

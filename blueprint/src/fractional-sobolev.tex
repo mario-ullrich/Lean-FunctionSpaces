@@ -14,7 +14,9 @@ inclusions, the $L_2$ functions and the derivatives of \Cref{sec:sobolev-scale}.
 to these spaces. \Cref{sec:zero-extension-bound} reduces the identity
 $\tilde H^s(\Omega) = H^s_0(\Omega)$ to one inequality on test functions, the zero extension
 bound, lifts the bound from $s$ to $s + 1$ with the same constant, and proves it with the
-constant $1$ for every integer $s \geq 0$ on every open set.
+constant $1$ for every integer $s \geq 0$ on every open set. \Cref{sec:tilde-space-support}
+describes $\tilde H^s(\Omega)$, $s \geq 0$, on a bounded Lipschitz domain as the space of the
+elements of $H^s(V)$ that vanish outside $\Omega$.
 
 \section{Inclusions of restriction spaces}
 \label{sec:restriction-inclusions}
@@ -25,16 +27,14 @@ objects of the same kind in $H^t(V)$.
 
 \begin{lemma}[The inclusions on Schwartz and test functions]
 \label{lem:sobolev-inclusion-tests}
-\lean{Rd.sobolevInclusion_self, Rd.norm_sobolevToL2_zero, Rd.sobolevInclusion_ofSchwartz,
-  Rd.sobolevInclusion_ofTest, Rd.denseRange_sobolevInclusion, Rd.sobolevToL2_ofSchwartz}
+\lean{Rd.sobolevInclusion_ofSchwartz, Rd.sobolevInclusion_ofTest,
+  Rd.denseRange_sobolevInclusion, Rd.sobolevToL2_ofSchwartz}
 \leanok
 \uses{lem:sobolev-inclusion, lem:sobolev-to-l2, lem:sobolev-of-schwartz,
   thm:sobolev-schwartz-dense, def:sobolev-tilde-zero-boundary}
-For every $s \in \R$, $\iota_{s,s}$ is the identity of $H^s(V)$, and
-$\|\iota_0 U\|_2 = \|U\|_{H^0}$ for every $U \in H^0(V)$. For all $t \leq s$, every Schwartz
-function $w$ and every $\varphi \in \mathcal D(\Omega)$, $\iota_{t,s} w = w$ and
-$\iota_{t,s} \varphi = \varphi$, and $\iota_{t,s}$ has dense range. For every $s \geq 0$ and
-every Schwartz function $w$, $\iota_s w = w$ in $L_2(V)$.
+For all $t \leq s$, every Schwartz function $w$ and every $\varphi \in \mathcal D(\Omega)$,
+$\iota_{t,s} w = w$ and $\iota_{t,s} \varphi = \varphi$, and $\iota_{t,s}$ has dense range. For
+every $s \geq 0$ and every Schwartz function $w$, $\iota_s w = w$ in $L_2(V)$.
 \end{lemma}
 
 \begin{proof}
@@ -42,9 +42,8 @@ every Schwartz function $w$, $\iota_s w = w$ in $L_2(V)$.
 An element of $H^t(V)$ is determined by its tempered distribution (Mathlib's
 \texttt{BesselPotentialSpace.\allowbreak ext}), $\iota_{t,s}$ keeps it
 (\Cref{lem:sobolev-inclusion}), and $\iota_s w$ is the $L_2$ function with the distribution $w$
-(\Cref{lem:sobolev-to-l2}). $\iota_0 U$ is the $L_2$ function $J_0 \iota_{0,0} U = J_0 U$, whose
-norm is $\|U\|_{H^0}$. The range of $\iota_{t,s}$ contains the Schwartz functions, which are
-dense in $H^t(V)$ (\Cref{thm:sobolev-schwartz-dense}).
+(\Cref{lem:sobolev-to-l2}). The range of $\iota_{t,s}$ contains the Schwartz functions, which
+are dense in $H^t(V)$ (\Cref{thm:sobolev-schwartz-dense}).
 \end{proof}
 
 \begin{lemma}[The inclusions keep vanishing and test functions]
@@ -282,7 +281,7 @@ squaring and summing gives $(2\pi)^2 \|U\|^2 \leq C^2 (2\pi)^2 \|U + W\|^2$.
 \leanok
 \uses{thm:zero-extension-bound-iso, thm:zero-extension-bound-lift,
   lem:tilde-space-vanishes-outside-nonneg, prop:sobolev-vanishing-one,
-  lem:norm-disjoint-supports, lem:sobolev-inclusion-tests}
+  lem:norm-disjoint-supports, lem:sobolev-to-l2}
 Every open set $\Omega \subseteq V$ has the zero extension bound with constant $1$ at every
 $m \in \N$. For every open $\Omega \subseteq V$ and every $m \in \N$, $U \mapsto r_\Omega U$ is
 an isometric isomorphism of $\tilde H^m(\Omega)$ onto $H^m_0(\Omega)$.
@@ -292,7 +291,7 @@ an isometric isomorphism of $\tilde H^m(\Omega)$ onto $H^m_0(\Omega)$.
 \leanok
 At $m = 0$, let $U \in T^0(\Omega)$ and $W \in N^0(\Omega)$. Then
 $\|U\| = \|\iota_0 U\|_2$ and $\|U + W\| = \|\iota_0 U + \iota_0 W\|_2$
-(\Cref{lem:sobolev-inclusion-tests}); $\iota_0 U$ vanishes almost everywhere outside $\Omega$
+(\Cref{lem:sobolev-to-l2}); $\iota_0 U$ vanishes almost everywhere outside $\Omega$
 (\Cref{lem:tilde-space-vanishes-outside-nonneg}) and $\iota_0 W$ almost everywhere on $\Omega$
 (\Cref{prop:sobolev-vanishing-one}), so $\|\iota_0 U\|_2 \leq \|\iota_0 U + \iota_0 W\|_2$
 (\Cref{lem:norm-disjoint-supports}). \Cref{thm:zero-extension-bound-lift} carries the bound with
@@ -305,3 +304,139 @@ Moiola \cite[Lemma 3.31(vi)]{ChandlerWildeHewettMoiola}. At $m = 1$ it is
 prove the integer case from the formula of the $H^m$ inner product as a sum of integrals of
 derivatives; here the norm recursion lifts the case $m = 0$, where the $L_2$ functions of $U$ and
 $W$ have disjoint supports.
+
+\section{\texorpdfstring{$\tilde H^s(\Omega)$}{Tilde H\^{}s(Omega)} by supports}
+\label{sec:tilde-space-support}
+
+For $s \geq 0$ the elements of $\tilde H^s(\Omega)$ vanish outside $\Omega$
+(\Cref{lem:tilde-space-vanishes-outside-nonneg}). On a bounded Lipschitz domain the converse
+holds; \Cref{sec:trace-kernel} proves it for $s = 1$ through weak derivatives, and this section
+carries the proof to every $s \geq 0$ with mollification in $H^s(V)$, which converges for every
+real $s$ (\Cref{thm:sobolev-mollification}), and smooth cut-offs, which keep $H^s(V)$ for
+$s \geq 0$ (\Cref{lem:sobolev-cutoff}). In this section $\Phi_c(x) = c^n \Phi(c x)$, $n = \dim V$
+(\Cref{lem:dilate}), $\Omega' \subseteq V$ is open, and $\Omega$ is a bounded Lipschitz domain
+with boundary $\Gamma$, boundary balls $B_j$ and graph domains $\Omega_j$ with cones $K_j$
+(\Cref{def:bounded-lipschitz}, \Cref{lem:graph-cone}).
+
+\begin{lemma}[Localised functions in $H^s(V)$]
+\label{lem:sobolev-localize}
+\lean{Rd.BoundedLipschitzDomain.BoundaryPartition.exists_sobolevToL2_eq_localize}
+\leanok
+\uses{lem:sobolev-cutoff, def:boundary-partition, def:bounded-lipschitz,
+  def:trace-space-setting}
+Let $s \geq 0$. For every resolution of unity $\psi$ on $\Gamma$, every $j$ and every
+$U \in H^s(V)$ there is $W \in H^s(V)$ with $\iota_s W = \psi_j \, \iota_s U$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The $\psi_j$ are smooth, with closed support in the bounded balls $B_j$
+(\Cref{def:boundary-partition}); apply \Cref{lem:sobolev-cutoff}.
+\end{proof}
+
+At $s = 1$ this is part of \Cref{lem:sobolev-one-products}.
+
+\begin{theorem}[Mollified functions in $\tilde H^s$]
+\label{thm:tilde-space-mollified-general}
+\lean{Rd.mem_tildeSpace_of_dilate_of_nonneg, Rd.mem_tildeSpace_of_isCompact_of_nonneg}
+\leanok
+\uses{lem:sobolev-convolution-l2, thm:sobolev-mollification, lem:smoothing-compact-support,
+  def:bump-mollifier, def:sobolev-tilde-zero-boundary, thm:sobolev-schwartz-dense,
+  lem:sobolev-inclusion-tests, lem:sobolev-to-l2, lem:dilate, lem:dual-kernel-derivatives,
+  lem:conv-op, def:conv}
+Let $s \geq 0$. For every open $\Omega' \subseteq V$, every $U \in H^s(V)$, every compact
+$S \subseteq V$ with $\iota_s U = 0$ almost everywhere outside $S$, and every smooth $\eta$ with
+compact support and $\int \eta = 1$ such that $\operatorname{supp} \eta_{2^k} + S \subseteq
+\Omega'$ for all large $k$, $U \in \tilde H^s(\Omega')$. For every open $\Omega' \subseteq V$,
+every compact $S \subseteq \Omega'$ and every $U \in H^s(V)$ with $\iota_s U = 0$ almost
+everywhere outside $S$, $U \in \tilde H^s(\Omega')$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Replace $\iota_s U$ by $\mathbf 1_S \iota_s U$, equal almost everywhere. For every $k$,
+$\eta_{2^k} * \mathbf 1_S \iota_s U$ is a Schwartz function $w_k$ with compact support in
+$\operatorname{supp} \eta_{2^k} + S$ (\Cref{lem:smoothing-compact-support}). It is the $L_2$
+function of $\eta_{2^k} * U$ (\Cref{lem:sobolev-convolution-l2}), so $\eta_{2^k} * U = w_k$ in
+$H^s(V)$ (\Cref{lem:sobolev-inclusion-tests}, \Cref{lem:sobolev-to-l2}); it converges to $U$
+(\Cref{thm:sobolev-mollification}), and for large $k$ it lies in $T^s(\Omega')$
+(\Cref{thm:sobolev-schwartz-dense}). For compact $S \subseteq \Omega'$ take $\delta > 0$ such
+that the $\delta$-neighbourhood of $S$ lies in $\Omega'$, and the bump mollifier $\eta$ of a
+bump around $0$ with outer radius $1$ (\Cref{def:bump-mollifier}): for large $k$,
+$\operatorname{supp} \eta_{2^k} + S$ lies in the $\delta$-neighbourhood of $S$
+(\Cref{lem:dilate}).
+\end{proof}
+
+At $s = 1$ this is \Cref{thm:tilde-space-mollified}.
+
+\begin{lemma}[Chart pieces in $\tilde H^s$]
+\label{lem:tilde-space-chart-pieces-general}
+\lean{Rd.BoundedLipschitzDomain.mem_tildeSpace_of_mulLp_chart_of_nonneg,
+  Rd.BoundedLipschitzDomain.eq_sum_localize_add_mulLp,
+  Rd.BoundedLipschitzDomain.eq_sum_add_of_ae_eq_zero_of_nonneg}
+\leanok
+\uses{thm:tilde-space-mollified-general, def:cone-mollifier, lem:graph-domain-closure-cone,
+  lem:dilate, def:bounded-lipschitz, lem:product-modulus, lem:sobolev-to-l2,
+  def:trace-space-setting, def:boundary-partition}
+Let $s \geq 0$. For every $j$, every $U \in H^s(V)$ with $\iota_s U = 0$ almost everywhere
+outside $\Omega$, every continuous bounded real $\zeta$ with $\operatorname{supp} \zeta \subseteq
+B_j$ and every $W \in H^s(V)$ with $\iota_s W = \zeta \, \iota_s U$, $W \in \tilde H^s(\Omega)$.
+For every resolution of unity $\psi$ on $\Gamma$ and every continuous bounded real $\chi$ with
+$\chi + \sum_j \psi_j = 1$ on $\Omega$, every $F \in L_2(V)$ with $F = 0$ almost everywhere
+outside $\Omega$ satisfies $F = \sum_j \psi_j F + \chi F$, and for every $U \in H^s(V)$ with
+$\iota_s U = 0$ almost everywhere outside $\Omega$ and all $W_j, W_0 \in H^s(V)$ with
+$\iota_s W_j = \psi_j \, \iota_s U$ and $\iota_s W_0 = \chi \, \iota_s U$,
+$U = \sum_j W_j + W_0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Since $\Omega \cap B_j = \Omega_j \cap B_j$, $\iota_s W$ vanishes almost everywhere outside the
+compact set $S = \overline{\Omega_j} \cap \operatorname{supp} \zeta$. Let $\eta$ be the cone
+mollifier of $\Omega_j$ (\Cref{def:cone-mollifier}) and $\delta > 0$ such that the
+$\delta$-neighbourhood of $\operatorname{supp} \zeta$ lies in $B_j$. For large $k$,
+$z \in \operatorname{supp} \eta_{2^k}$ and $y \in S$, $z \in K_j$
+(\Cref{lem:graph-domain-closure-cone}), so $z + y \in \Omega_j$, and $z + y$ lies in the
+$\delta$-neighbourhood of $S$ (\Cref{lem:dilate}), so $z + y \in B_j$; hence $z + y \in \Omega$,
+and \Cref{thm:tilde-space-mollified-general} applies. On $\Omega$ the factors of
+$\sum_j \psi_j F + \chi F$ add up to $1$, and outside $\Omega$ both sides vanish; with
+$F = \iota_s U$ the $L_2$ functions of $U$ and $\sum_j W_j + W_0$ agree, and $\iota_s$ is
+injective (\Cref{lem:sobolev-to-l2}).
+\end{proof}
+
+At $s = 1$ this is \Cref{lem:tilde-space-chart-pieces}.
+
+\begin{theorem}[$\tilde H^s(\Omega)$ by supports]
+\label{thm:tilde-space-supports-general}
+\lean{Rd.BoundedLipschitzDomain.mem_tildeSpace_of_ae_eq_zero_of_nonneg,
+  Rd.BoundedLipschitzDomain.mem_tildeSpace_iff_of_nonneg}
+\leanok
+\uses{lem:tilde-space-chart-pieces-general, thm:tilde-space-mollified-general,
+  lem:sobolev-cutoff, lem:sobolev-localize, lem:boundary-partition-nhds,
+  lem:tilde-space-vanishes-outside-nonneg, lem:product-modulus, def:boundary-partition}
+Let $s \geq 0$. For every $U \in H^s(V)$, $U \in \tilde H^s(\Omega)$ if and only if
+$\iota_s U = 0$ almost everywhere outside $\Omega$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+One direction is \Cref{lem:tilde-space-vanishes-outside-nonneg}. Conversely, take a resolution
+of unity $\psi$ on $\Gamma$ equal to one near $\Gamma$ and the interior cut-off $\chi$
+(\Cref{lem:boundary-partition-nhds}), and $W_j, W_0 \in H^s(V)$ with
+$\iota_s W_j = \psi_j \, \iota_s U$ and $\iota_s W_0 = \chi \, \iota_s U$
+(\Cref{lem:sobolev-localize}, \Cref{lem:sobolev-cutoff}). Then $U = \sum_j W_j + W_0$, the
+$W_j$ lie in $\tilde H^s(\Omega)$ (\Cref{lem:tilde-space-chart-pieces-general}), and $W_0$
+vanishes outside the compact set $\operatorname{supp} \chi \subseteq \Omega$
+(\Cref{thm:tilde-space-mollified-general}).
+\end{proof}
+
+Chandler-Wilde, Hewett and Moiola write $\hat H^s(\Omega)$, $s \geq 0$, for the space of the
+elements of $H^s(V)$ that vanish almost everywhere outside $\Omega$; the theorem is their
+identity $\tilde H^s(\Omega) = \hat H^s(\Omega)$ on domains with continuous boundary
+\cite[Lemma 3.15]{ChandlerWildeHewettMoiola}. Since $\Gamma$ is a null set
+(\Cref{cor:boundary-null}), $\tilde H^s(\Omega)$ is also the space of the elements of $H^s(V)$
+supported in $\overline\Omega$. This is McLean's identity
+$\tilde H^s(\Omega) = H^s_{\overline\Omega}$ \cite[Theorem 3.29]{McLean} for $s \geq 0$, which
+Chandler-Wilde, Hewett and Moiola state for every real $s$ in the same lemma; for $s > 0$ it is
+also in Grisvard \cite[Theorem 1.4.2.2]{Grisvard}. At $s = 1$ it is
+\Cref{thm:tilde-space-supports}.

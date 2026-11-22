@@ -24,6 +24,10 @@ moduli of smoothness of order `r`.
   `C' = Rd.sobolevBesovInvConst V s r`, for every `s ≥ 0` and every order `r`, informative for
   `s < r` (`Rd.enorm_le_modNorm_sobolevToL2`); for `0 < s < r`, every `F ∈ L_2(V)` with finite
   right side is `ι_s U` for some `U ∈ H^s(V)` (`Rd.exists_sobolevToL2_eq_of_modNorm_lt_top`).
+* **Smooth cut-offs**: for `s ≥ 0`, a smooth real `χ` with compact support and `U ∈ H^s(V)`,
+  the product `χ ι_s U` is `ι_s W` for some `W ∈ H^s(V)` (`Rd.exists_sobolevToL2_eq_mulLp`): at
+  `s = 0` since `ι_0` maps onto `L_2(V)`, for `s > 0` by the moduli of order `⌊s⌋ + 1` and the
+  pointwise multiplier theorem.
 * **`B^s_{p,2} ⊆ B^{1/2}_{p,1}` for `s > 1/2`**: the `ℓ_1` quantity of smoothness `1/2` is at most
   `‖(2^{-k(s-1/2)})_k‖_{ℓ_2}` times the `ℓ_2` quantity of smoothness `s`
   (`Rd.modNorm_half_one_le_of_lt`), and for `1/2 < s < 2` the `L_2` functions of `H^s(V)` satisfy
@@ -169,6 +173,33 @@ theorem exists_sobolevToL2_eq_of_modNorm_lt_top {s : ℝ} {r : ℕ} (hs : 0 < s)
   have hU := (memSobolev_two_iff_exists_memApprox hs (F : 𝓢'(V, ℂ))).2 ⟨F, rfl, hA⟩
   exact ⟨hU.toBesselPotentialSpace, sobolevToL2_eq_of_toDistr_eq hs.le _
     (TemperedDistribution.MemSobolev.toBesselPotentialSpace_toDistr hU).symm⟩
+
+/-! ### Smooth cut-offs -/
+
+/-- **Smooth multipliers keep `H^s(V)`, `s ≥ 0`**: for a smooth real `χ` with compact support and
+`U ∈ H^s(V)` there is `W ∈ H^s(V)` with `ι_s W = χ ι_s U`. At `s = 0` every `L_2` function is
+`ι_0 W` for some `W` (`Rd.sobolevToL2_zero_surjective`). For `s > 0` let `r = ⌊s⌋ + 1 > s`:
+`ι_s U` has a finite `B^s_{2,2}` quantity with the moduli of order `r`
+(`Rd.modNorm_sobolevToL2_le`), so has `χ ι_s U`, the derivatives of `χ` being bounded
+(`Rd.exists_iteratedFDeriv_bound`, `Rd.modNorm_mulLp_lt_top`), and such functions are `ι_s W`
+(`Rd.exists_sobolevToL2_eq_of_modNorm_lt_top`). At `s = 1` this is `Rd.exists_toL2_eq_mulLp`. -/
+theorem exists_sobolevToL2_eq_mulLp {s : ℝ} (hs : 0 ≤ s) {χ : V → ℝ}
+    (hχ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) χ) (hcs : HasCompactSupport χ) {C : ℝ}
+    (hc : Continuous fun x => (χ x : ℂ)) (hC : ∀ x, ‖(χ x : ℂ)‖ ≤ C) (U : H^{s}(V)) :
+    ∃ W : H^{s}(V), sobolevToL2 hs W = mulLp hc hC (sobolevToL2 hs U) := by
+  rcases hs.eq_or_lt with rfl | hpos
+  · exact sobolevToL2_zero_surjective _
+  have hχc : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) fun x => (χ x : ℂ) :=
+    Complex.ofRealCLM.contDiff.comp hχ
+  have hsr : s < ((⌊s⌋₊ + 1 : ℕ) : ℝ) := by
+    push_cast
+    exact Nat.lt_floor_add_one s
+  obtain ⟨D, hD⟩ := exists_iteratedFDeriv_bound hχc (hcs.comp_left Complex.ofReal_zero)
+    (⌊s⌋₊ + 1)
+  have hF := (modNorm_sobolevToL2_le hpos hsr U).trans_lt
+    (ENNReal.mul_lt_top (sobolevBesovConst_ne_top hpos hsr).lt_top enorm_lt_top)
+  exact exists_sobolevToL2_eq_of_modNorm_lt_top hpos hsr
+    (modNorm_mulLp_lt_top two_ne_top hχc hD hsr one_le_two hF)
 
 /-! ### The quantity of `B^{1/2}_{2,1}` and the trace hypothesis -/
 
