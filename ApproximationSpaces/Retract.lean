@@ -24,9 +24,12 @@ linear, with `R (E g) = g`, `‖E g‖ ≤ C ‖g‖` and `E^A_{2^(k+γ)}(E g) �
 (`ApproximationScheme.approxNormDyadic_extension_le`), so the two quasi-norms are equivalent
 and `B^s_q = R(A^s_q)` (`ApproximationScheme.memApprox_iff_exists_restrict`).
 
-On Lipschitz domains such an extension is built from near-best local polynomial approximations
-on Whitney cubes (DeVore–Sharpley).  The extension may be nonlinear on purpose: in parts of the
-quasi-Banach range no linear extension exists.
+For a domain `Ω ⊆ ℝ^d`, `X = L_p(ℝ^d)`, `Y = L_p(Ω)` and `R` the restriction, the quasi-norm
+of `B^s_q` uses only `g` on `Ω`: it is intrinsic.  The theorem reduces the intrinsic description
+to an approximation-preserving extension, which controls the errors of the scheme on `Y` level
+by level.  The extensions of DeVore and Sharpley control moduli of smoothness, which describes
+the Besov spaces of a domain as restrictions.  The extension may be nonlinear on purpose: in
+parts of the quasi-Banach range no linear extension exists.
 -/
 
 @[expose] public section

@@ -227,6 +227,8 @@ Descriptions & Range & Result \\
 \raggedright Piecewise polynomials and isotropic differences & $0 \leq s < 1/p$ & \Cref{thm:iso-besov} \\
 \raggedright Tensor splines and isotropic differences; coordinate and isotropic differences
   & $0 \leq s < r - 1 + 1/p$ & \Cref{thm:iso-besov} \\
+\raggedright Tensor splines and differences on $[0, 1]^n \subseteq \R^n$ for the Euclidean norm
+  & $0 \leq s < r - 1 + 1/p$ & \Cref{thm:cube-splines-euclidean} \\
 \hline
 \end{tabular}
 \end{center}
@@ -5237,6 +5239,117 @@ isotropic modulus by \Cref{lem:iso-modulus}, at the cost of a factor $d$. With
 For $0 < s < r - 1 + 1/p$ the Besov spaces $\Besov{s}{p}{q}(Q)$ defined by the moduli in the
 coordinates and by the isotropic modulus therefore coincide.
 
+\section{The cube in Euclidean space}
+\label{sec:cube-euclidean}
+
+The theory of domains in \Cref{ch:lipschitz-domains} works in the Euclidean space $\R^d$, the
+theory of the cube in $\R^d$ with the maximum norm. This section connects the two on the cube.
+
+\begin{definition}[The cube in the Euclidean space]
+\label{def:euclidean-cube}
+\lean{Cube.euclideanCube, Cube.preimage_toLp_euclideanCube, Cube.preimage_ofLp_cubeSet,
+  Cube.measurableSet_euclideanCube, Cube.measurePreserving_toLp_cubeVol,
+  Cube.measurePreserving_ofLp_euclideanCube, Cube.norm_euclideanEquiv_symm_le,
+  Cube.restrictEuclidean, Cube.extendEuclidean}
+\leanok
+\uses{def:cube, lem:modulus-on-linear-equiv, lem:zero-extension-lp}
+Let $Q_E = [0, 1]^d$ in the Euclidean space $\R^d$. The identity of $\R^d$ carries $Q_E$ onto
+the cube $Q$ of \Cref{def:cube} and Lebesgue measure on $Q_E$ to the cube measure, and
+$\|x\|_\infty \leq \|x\|_2 \leq \sqrt{d} \, \|x\|_\infty \leq 2^d \|x\|_\infty$ for
+$x \in \R^d$. For $1 \leq p \leq \infty$ the restriction $R \colon L_p(\R^d) \to L_p(Q)$,
+$R F = F|_Q$, and the extension by zero $E \colon L_p(Q) \to L_p(\R^d)$ are bounded linear
+operators.
+\end{definition}
+
+\begin{lemma}[Restriction and extension by zero]
+\label{lem:euclidean-cube-transport}
+\lean{Cube.restrictEuclidean_ae, Cube.extendEuclidean_ae, Cube.restrictEuclidean_extendEuclidean,
+  Cube.indicatorLp_extendEuclidean_restrictEuclidean, Cube.restrictEuclidean_eq_of_indicatorLp_eq,
+  Cube.enorm_restrictEuclidean, Cube.enorm_extendEuclidean}
+\leanok
+\uses{def:euclidean-cube, lem:indicator-lp}
+Let $1 \leq p \leq \infty$, $g \in L_p(Q)$ and $F, G \in L_p(\R^d)$. Then $R(E g) = g$,
+$\mathbf 1_{Q_E} E(R F) = \mathbf 1_{Q_E} F$, $\|R F\|_p = \|\mathbf 1_{Q_E} F\|_p$ and
+$\|E g\|_p = \|g\|_p$, and $\mathbf 1_{Q_E} F = \mathbf 1_{Q_E} G$ implies $R F = R G$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:indicator-lp-eq-iff}
+$R F = F$ and $E g = g$ almost everywhere on the cube, and $E g = 0$ outside of it.
+\end{proof}
+
+\begin{lemma}[The Euclidean and the isotropic modulus on the cube]
+\label{lem:euclidean-cube-moduli}
+\lean{Cube.lpModulusOn_euclideanCube_le_lpIsoModulus, Cube.lpIsoModulus_add_le_lpModulusOn}
+\leanok
+\uses{def:euclidean-cube, def:iso-modulus, def:rd-modulus-on}
+Let $1 \leq p \leq \infty$, $r, k \in \N$ and $F \in L_p(\R^d)$, and let
+$\omega_r(F, t, Q_E)_p$ be the modulus on $Q_E$ for the Euclidean norm
+(\Cref{def:rd-modulus-on}). Then
+\begin{align*}
+  \omega_r(F, 2^{-k}, Q_E)_p &\leq \omega^{\mathrm{iso}}_r(R F, 2^{-k})_p , \\
+  \omega^{\mathrm{iso}}_r(R F, 2^{-(k+d)})_p &\leq \omega_r(F, 2^{-k}, Q_E)_p .
+\end{align*}
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:modulus-on-linear-equiv, lem:iso-modulus, lem:euclidean-cube-transport}
+Both are moduli on the same set, with the norms $\|h\|_2$ and $\|h\|_\infty$ of the steps. Apply
+\Cref{lem:modulus-on-linear-equiv} to the identity of $\R^d$ in both directions, with the norms
+at most $1$ and at most $2^d$, and use that the moduli increase in $t$ and depend only on the
+class of the function on the cube.
+\end{proof}
+
+\begin{proposition}[Intrinsic and isotropic quasi-norms on the cube]
+\label{prop:euclidean-cube-norms}
+\lean{Cube.modNormOn_euclideanCube_le_isoNorm, Cube.isoNorm_restrictEuclidean_le_modNormOn}
+\leanok
+\uses{def:euclidean-cube, def:iso-modulus, lem:modnorm-on}
+Let $1 \leq p \leq \infty$, $r \in \N$, $s \geq 0$, $1 \leq q \leq \infty$ and
+$F \in L_p(\R^d)$, and let
+$N_{Q_E}(F) = \|F\|_{L_p(Q_E)} + \|(2^{ks} \omega_r(F, 2^{-k}, Q_E)_p)_k\|_{\ell_q}$. Then
+\[
+  N_{Q_E}(F) \leq \|R F\|_p
+    + \bigl\|\bigl(2^{ks} \omega^{\mathrm{iso}}_r(R F, 2^{-k})_p\bigr)_k\bigr\|_{\ell_q}
+  \leq \bigl(1 + 2^{ds} (d \, 2^r + 1)\bigr) N_{Q_E}(F) .
+\]
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{lem:euclidean-cube-moduli, lem:lq-basic, lem:euclidean-cube-transport, lem:iso-modulus}
+By \Cref{lem:euclidean-cube-transport}, $\|R F\|_p = \|F\|_{L_p(Q_E)}$. The first bound is the
+first comparison of \Cref{lem:euclidean-cube-moduli}. For the second, the isotropic modulus at
+level $k + d$ is at most the Euclidean one at level $k$, the first $d$ levels are at most
+$2^r \|R F\|_p$ (\Cref{lem:iso-modulus}), and a shift by $d$ levels costs the factor $2^{ds}$
+(\Cref{lem:lq-basic}).
+\end{proof}
+
+\begin{theorem}[Tensor splines and the Euclidean modulus on the cube]
+\label{thm:cube-splines-euclidean}
+\lean{Cube.memApprox_cubeSplineScheme_restrictEuclidean_iff,
+  Cube.exists_approxNormDyadic_restrictEuclidean_le}
+\leanok
+\uses{thm:iso-besov, prop:euclidean-cube-norms, thm:modulus-coincidence}
+Let $1 \leq p < \infty$, $1 \leq q \leq \infty$, $r \geq 1$ and $F \in L_p(\R^d)$.
+\begin{enumerate}
+  \item For $0 \leq s < r - 1 + 1/p$, $R F$ lies in the approximation space $A^s_q$ of the
+    tensor splines of order $r$ if and only if $N_{Q_E}(F) < \infty$.
+  \item For $s \geq 0$ there is $C < \infty$, independent of $F$, with
+    $\|R F\|^{\mathrm{dy}}_{A^s_q} \leq C \, N_{Q_E}(F)$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{prop:euclidean-cube-norms} the quasi-norm $N_{Q_E}(F)$ and the isotropic quasi-norm of
+$R F$ are equivalent. Part (1) is then part (2) of \Cref{thm:iso-besov}; part (2) is Jackson's
+direction of \Cref{thm:modulus-coincidence} for the isotropic modulus, which holds for every
+$s \geq 0$.
+\end{proof}
+
 \chapter{Besov spaces on \texorpdfstring{$\R^d$}{R\^{}d}}
 \label{ch:rd}
 
@@ -5629,6 +5742,77 @@ $N_U(f) = N_{U'}(f)$.
 \begin{proof}
 \leanok
 The step sets are intersections of translates, and translations preserve the Lebesgue measure.
+\end{proof}
+
+\begin{lemma}[Moduli on subsets under linear changes of variables]
+\label{lem:modulus-on-linear-equiv}
+\lean{Rd.stepSet_preimage, Rd.modulusOn_comp_le, PiLp.norm_continuousLinearEquiv_le,
+  PiLp.norm_continuousLinearEquiv_symm_le}
+\leanok
+\uses{def:rd-modulus-on, lem:modulus-linear-equiv}
+Let $V$, $W$, $\mu$, $\nu$ and $e$ be as in \Cref{lem:modulus-linear-equiv}, and let
+$U \subseteq W$ be measurable. Then $(e^{-1}U)_{rh} = e^{-1}(U_{r\,eh})$ for every $h \in V$ and
+$r \in \N$, and for every measurable $f : W \to \C$, every exponent $p$ and every $t$,
+\[
+  \omega_r(f \circ e, t, e^{-1}U)_{L_p(\mu)} \leq \omega_r(f, \|e\| t, U)_{L_p(\nu)} .
+\]
+For $1 \leq p \leq \infty$ and normed spaces $\beta_i$, $i$ in a finite set $I$, the identity map
+from $\ell_p^I(\beta)$ to the product $\prod_i \beta_i$ with the maximum norm has norm at most
+$1$, and its inverse has norm at most $(\# I)^{1/p}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:rd-modulus-on}
+Since $e(x + lh) = e x + l \, e h$, the points $x, x + h, \dots, x + rh$ lie in $e^{-1}U$ if and
+only if $e x, e x + e h, \dots, e x + r \, e h$ lie in $U$. Hence the restricted difference of
+$f \circ e$ with step $h$ is the restricted difference of $f$ with step $e h$, composed with $e$,
+and $e$ preserves the measures; moreover $\|e h\| \leq \|e\| t$ for $\|h\| \leq t$. The norm
+bounds are $\max_i \|x_i\| \leq \|x\|_p \leq (\# I)^{1/p} \max_i \|x_i\|$.
+\end{proof}
+
+\begin{lemma}[Moduli on subsets under affine maps]
+\label{lem:modulus-on-affine}
+\lean{Rd.measurePreserving_affine, Rd.eLpNorm_comp_affine, Rd.ae_eq_comp_affine,
+  Rd.memLp_comp_affine, Rd.stepSet_preimage_affine, Rd.higherDiff_comp_affine,
+  Rd.modulusOn_comp_affine_le, Rd.compAffineLp, Rd.compAffineLp_ae, Rd.enorm_compAffineLp,
+  Rd.compAffineLp_inv_compAffineLp, Rd.compAffineLp_compAffineLp_inv,
+  Rd.lpModulusOn_compAffineLp_le, Rd.enorm_indicatorLp_compAffineLp,
+  Rd.exists_modNormOn_compAffineLp_le}
+\leanok
+\uses{def:rd-modulus-on, lem:modnorm-on}
+Let $V$ be a finite-dimensional real normed space of dimension $n$ with an additive Haar
+measure $\mu$, let $a \in V$, $L > 0$ and $A x = a + L x$. Then $\mu(A^{-1} B) = L^{-n} \mu(B)$
+for every Borel set $B$. For $1 \leq p \leq \infty$ and every measurable $G$,
+$\|G \circ A\|_p = L^{-n/p} \|G\|_p$, with $L^{-n/p} = 1$ for $p = \infty$, and
+$G \mapsto G \circ A$ is a bounded operator on $L_p(\mu)$, inverted on both sides by the
+composition with $A^{-1} y = -L^{-1} a + L^{-1} y$. For every
+$U \subseteq V$, $r \in \N$ and $h \in V$, $(A^{-1}U)_{rh} = A^{-1}(U_{r\,Lh})$ and
+$\Delta_h^r (f \circ A) = (\Delta_{Lh}^r f) \circ A$; for measurable $U$ and $f$ and every $t$,
+\[
+  \omega_r(f \circ A, t, A^{-1}U)_p \leq L^{-n/p} \, \omega_r(f, L t, U)_p .
+\]
+For measurable $U$, $r \in \N$, $s \geq 0$ and $1 \leq q \leq \infty$ there is $C < \infty$ with
+$N_{A^{-1}U}(G \circ A) \leq C \, N_U(G)$ for every $G \in L_p(\mu)$, with the intrinsic
+quasi-norms of \Cref{lem:modnorm-on}.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:modulus-on-linear-equiv, lem:rd-modulus-on, lem:lq-basic}
+The dilation $x \mapsto L x$ carries $\mu$ to $L^{-n} \mu$, and translations preserve
+$L^{-n} \mu$; hence $\int |G \circ A|^p \, d\mu = L^{-n} \int |G|^p \, d\mu$ for $p < \infty$,
+and for $p = \infty$ the measures $\mu$ and $L^{-n} \mu$ have the same null sets. As in
+\Cref{lem:modulus-on-linear-equiv}, since $A(x + lh) = A x + l \, L h$, the points
+$x, \dots, x + rh$ lie in $A^{-1}U$ if and only if $A x, \dots, A x + r \, L h$ lie in $U$, and
+$\Delta_h^r (f \circ A) = (\Delta_{Lh}^r f) \circ A$; with $\|L h\| \leq L t$ for
+$\|h\| \leq t$ this gives the bound of the moduli. For the
+quasi-norms choose $m \in \N$ with $L < 2^m$. Then $L \, 2^{-(k+m)} \leq 2^{-k}$, so
+$\omega_r(G \circ A, 2^{-(k+m)}, A^{-1}U)_p \leq L^{-n/p} \omega_r(G, 2^{-k}, U)_p$, while the
+first $m$ levels are at most $2^r L^{-n/p} \|G\|_{L_p(U)}$ by \Cref{lem:rd-modulus-on}. The shift of
+$m$ levels costs $2^{ms}$ (\Cref{lem:lq-basic}), and $C = L^{-n/p} (1 + 2^{ms} (m 2^r + 1))$.
+The compositions with $A$ and with $A^{-1}$ undo each other, since $A(A^{-1} y) = y$ and
+$A^{-1}(A x) = x$.
 \end{proof}
 
 \section{Moment kernels}

@@ -12,7 +12,7 @@ continuous functions on finite measure spaces, Young's inequality on measurable 
 norms `L_p(ℓ_q)` and `ℓ_q(L_p)` on every measure space, weak type, the layer cake formula,
 Marcinkiewicz interpolation, `L_p` norms by duality and `L_p` norms on `ℝ^d` through slices in
 one coordinate; differences on additive monoids, the translation algebra, moduli of
-smoothness on subsets and under linear changes of variables; convolution, approximate
+smoothness on subsets and under linear and affine changes of variables; convolution, approximate
 identities, the Littlewood–Paley kernels and test functions on `ℝ^d`; dyadic cubes and cells,
 the Hardy–Littlewood maximal function, the Calderón–Zygmund decomposition, also for functions
 with values in a normed space, and the Fefferman–Stein inequality. The `L_p` norms are handled
@@ -92,7 +92,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Differences `higherDiff` on any additive monoid, steps of either sign, under additive maps; the modulus of smoothness on `ℝ^d`, its homogeneity, dilation of the scale | ✅ | ✗ | `Analysis/Differences/Differences` |
 | Translation algebra of an additive monoid, differences as its powers | ✅ | ✗ | `Analysis/Differences/TranslationAlgebra` |
 | Moduli of smoothness on subsets of `ℝ^d`, restrictions by intrinsic differences, sets equal up to null sets, the intrinsic quasi-norm, its lower semicontinuity along `L_p` limits, and the convergence of its Cauchy sequences | ✅ | ✗ | `Analysis/Differences/DomainModuli` |
-| Moduli of smoothness and Besov quasi-norms under measure preserving linear changes of variables | ✅ | ✗ | `Analysis/Differences/LinearEquivModuli` |
+| Moduli of smoothness and Besov quasi-norms under measure preserving linear changes of variables; moduli on subsets under linear and affine maps, `L_p` norms and intrinsic quasi-norms under affine maps, composition with an affine map on `L_p`, the norms of the identification of `ℓ_p^n` with the product | ✅ | ✗ | `Analysis/Differences/LinearEquivModuli` |
 | Convolution with integrable kernels on `ℝ^d`: Young's inequality, pointwise bounds, associativity, operators on `L_p` | ✅ | ✗ | `Analysis/Fourier/Convolution` |
 | Changes of scale `x ↦ r x` in integrals, dilations, their supports, `L_1` norms and first moments, continuity of translation, approximate identities in `L_p(ℝ^d)` | ✅ | ✗ | `Analysis/Fourier/ApproxIdentity` |
 | The Fourier transform of integrable functions (continuity, `L_1` bounds, convolutions, multiplication formula, conjugation, Lipschitz bound for band-limited inverse transforms); Littlewood–Paley kernels: smooth cut-offs, dilation formula for `𝓕`, the kernels on the frequency side with `|𝓕ψ_j| ≤ 1`, telescoping sums and at most two blocks at every frequency, kernel identities by Fourier inversion | ✅ | ✗ | `Analysis/Fourier/LittlewoodPaleyKernels` |

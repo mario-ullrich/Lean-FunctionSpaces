@@ -6,7 +6,8 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Domains.Cube.IsoDifferences
-public import FunctionSpaces.Analysis.Differences.DomainModuli
+public import FunctionSpaces.Analysis.Differences.LinearEquivModuli
+public import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
 
 /-!
 # The isotropic modulus of smoothness on the cube
@@ -28,6 +29,22 @@ the isotropic modulus (`Cube.coordModulus_le_isoModulus`) and `ω_cube ≤ d ω_
 (`Cube.cubeModulus_le_isoModulus`). Jackson's inequalities with the coordinate moduli therefore
 hold with the isotropic modulus as well. The converse comparison, for the approximants, is the
 inverse inequality of `FunctionSpaces.Domains.Cube.IsoInverse`.
+
+**The cube in the Euclidean space.** The closed unit cube `Q_E = [0, 1]^d` in the Euclidean space
+`ℝ^d = EuclideanSpace ℝ (Fin d)` (`Cube.euclideanCube`) corresponds to `Q` under Mathlib's
+coordinates `ofLp` and `toLp`, which preserve Lebesgue measure (`Cube.preimage_ofLp_cubeSet`,
+`Cube.measurePreserving_toLp_cubeVol`). Restriction to the cube followed by the change of
+coordinates maps `L_p(ℝ^d)` to `L_p(Q)` (`Cube.restrictEuclidean`), and extension by zero maps
+back (`Cube.extendEuclidean`); the restriction of an extension is the identity
+(`Cube.restrictEuclidean_extendEuclidean`), and the restriction sees only `1_{Q_E} F`
+(`Cube.restrictEuclidean_eq_of_indicatorLp_eq`, `Cube.enorm_restrictEuclidean`). Since
+`‖h‖_∞ ≤ ‖h‖_2 ≤ √d ‖h‖_∞ ≤ 2^d ‖h‖_∞` (`Cube.norm_euclideanEquiv_symm_le`), the modulus on
+`Q_E` for the Euclidean norm (`Rd.modulusOn`) and the isotropic modulus compare with a shift of `d`
+levels (`Cube.lpModulusOn_euclideanCube_le_lpIsoModulus`,
+`Cube.lpIsoModulus_add_le_lpModulusOn`), so the intrinsic quasi-norm `N_{Q_E}(F)` of
+`Rd.modNormOn` and the isotropic quasi-norm of `F|_Q` are equivalent for `s ≥ 0` and
+`1 ≤ q ≤ ∞` (`Cube.modNormOn_euclideanCube_le_isoNorm`,
+`Cube.isoNorm_restrictEuclidean_le_modNormOn`).
 -/
 
 @[expose] public section
@@ -287,5 +304,260 @@ omit [Fact (1 ≤ p)] in
 theorem lpCubeModulus_le_lpIsoModulus (r : ℕ) (f : Lp ℂ p (cubeVol d)) (k : ℕ) :
     lpCubeModulus p r f k ≤ d * lpIsoModulus p r f k :=
   cubeModulus_le_isoModulus r p _ _
+
+/-! ### The cube in the Euclidean space -/
+
+section Euclidean
+
+open ENNReal (lqNorm dyadicWeight)
+
+/-- The **closed unit cube** `[0, 1]^d` as a subset of the Euclidean space `ℝ^d`, the set of
+`Rd.BesovDomain.closedUnitCube`. -/
+abbrev euclideanCube (d : ℕ) : Set (EuclideanSpace ℝ (Fin d)) := {x | ∀ i, x i ∈ Icc (0 : ℝ) 1}
+
+/-- The points of `Fin d → ℝ` whose Euclidean copy lies in `[0, 1]^d` form the cube `Q`. -/
+theorem preimage_toLp_euclideanCube (d : ℕ) :
+    (WithLp.toLp 2 : (Fin d → ℝ) → EuclideanSpace ℝ (Fin d)) ⁻¹' euclideanCube d =
+      cubeSet d := by
+  ext x
+  simp [cubeSet, euclideanCube, -Set.pi_univ_Icc]
+
+/-- The points of `ℝ^d` whose coordinates lie in the cube `Q` form `[0, 1]^d`. -/
+theorem preimage_ofLp_cubeSet (d : ℕ) :
+    (WithLp.ofLp : EuclideanSpace ℝ (Fin d) → Fin d → ℝ) ⁻¹' cubeSet d = euclideanCube d := by
+  ext x
+  simp [cubeSet, euclideanCube, -Set.pi_univ_Icc]
+
+/-- The cube `[0, 1]^d` in the Euclidean space is measurable: it is the preimage of `Q` under the
+coordinates (`Cube.preimage_ofLp_cubeSet`). -/
+theorem measurableSet_euclideanCube (d : ℕ) : MeasurableSet (euclideanCube d) := by
+  rw [← preimage_ofLp_cubeSet]
+  exact (PiLp.volume_preserving_ofLp (Fin d)).measurable (measurableSet_cubeSet d)
+
+/-- **The Euclidean copy preserves the cube measure**: `toLp` carries the cube measure on `Q` to
+Lebesgue measure on `[0, 1]^d ⊆ ℝ^d` (Mathlib's `PiLp.volume_preserving_toLp`, restricted with
+`MeasureTheory.MeasurePreserving.restrict_preimage`). -/
+theorem measurePreserving_toLp_cubeVol (d : ℕ) :
+    MeasurePreserving (WithLp.toLp 2 : (Fin d → ℝ) → EuclideanSpace ℝ (Fin d)) (cubeVol d)
+      (volume.restrict (euclideanCube d)) := by
+  have h := (PiLp.volume_preserving_toLp (Fin d)).restrict_preimage
+    (measurableSet_euclideanCube d)
+  rwa [preimage_toLp_euclideanCube, ← cubeVol_eq_restrict] at h
+
+/-- **The coordinates preserve the cube measure**: `ofLp` carries Lebesgue measure on
+`[0, 1]^d ⊆ ℝ^d` to the cube measure on `Q` (Mathlib's `PiLp.volume_preserving_ofLp`). -/
+theorem measurePreserving_ofLp_euclideanCube (d : ℕ) :
+    MeasurePreserving (WithLp.ofLp : EuclideanSpace ℝ (Fin d) → Fin d → ℝ)
+      (volume.restrict (euclideanCube d)) (cubeVol d) := by
+  have h := (PiLp.volume_preserving_ofLp (Fin d)).restrict_preimage (measurableSet_cubeSet d)
+  rwa [preimage_ofLp_cubeSet, ← cubeVol_eq_restrict] at h
+
+/-- **The Euclidean norm against the maximum norm**: `‖x‖_2 ≤ √d ‖x‖_∞ ≤ 2^d ‖x‖_∞` on `ℝ^d`,
+the norm bound of the map from `Fin d → ℝ` to the Euclidean space
+(`PiLp.norm_continuousLinearEquiv_symm_le`), with `√d ≤ d < 2^d`. -/
+theorem norm_euclideanEquiv_symm_le (d : ℕ) :
+    ‖((EuclideanSpace.equiv (Fin d) ℝ).symm : (Fin d → ℝ) →L[ℝ] EuclideanSpace ℝ (Fin d))‖ ≤
+      2 ^ d := by
+  refine (PiLp.norm_continuousLinearEquiv_symm_le 2 ℝ (fun _ : Fin d => ℝ)).trans ?_
+  rw [Fintype.card_fin]
+  rcases Nat.eq_zero_or_pos d with rfl | hd
+  · simp
+  · calc (d : ℝ) ^ (1 / (2 : ℝ≥0∞)).toReal ≤ (d : ℝ) ^ (1 : ℝ) := by
+          refine Real.rpow_le_rpow_of_exponent_le (Nat.one_le_cast.2 hd) ?_
+          simpa using ENNReal.toReal_mono ENNReal.one_ne_top
+            (show (1 / 2 : ℝ≥0∞) ≤ 1 by norm_num)
+      _ ≤ 2 ^ d := by
+          rw [Real.rpow_one]
+          exact_mod_cast Nat.lt_two_pow_self.le
+
+variable (p) in
+/-- **Restriction to the unit cube in coordinates**: `F ↦ F|_{Q_E} ∘ toLp`, from `L_p(ℝ^d)` on
+the Euclidean space to `L_p(Q)`, `Q = [0, 1]^d` in `Fin d → ℝ`: the restriction to
+`Q_E = [0, 1]^d ⊆ ℝ^d` (Mathlib's `MeasureTheory.LpToLpRestrictCLM`) followed by the measure
+preserving change of coordinates (`Cube.measurePreserving_toLp_cubeVol`). -/
+noncomputable def restrictEuclidean (d : ℕ) :
+    Lp ℂ p (volume : Measure (EuclideanSpace ℝ (Fin d))) →L[ℂ] Lp ℂ p (cubeVol d) :=
+  (Lp.compMeasurePreservingₗᵢ ℂ (WithLp.toLp 2 : (Fin d → ℝ) → EuclideanSpace ℝ (Fin d))
+      (measurePreserving_toLp_cubeVol d)).toContinuousLinearMap ∘L
+    LpToLpRestrictCLM (EuclideanSpace ℝ (Fin d)) ℂ ℂ volume p (euclideanCube d)
+
+variable (p) in
+/-- **Extension by zero from the unit cube**: `g ↦ 1_{Q_E} (g ∘ ofLp)`, from `L_p(Q)` to
+`L_p(ℝ^d)` on the Euclidean space (`Rd.indicatorExtendLp` after the measure preserving change of
+coordinates `Cube.measurePreserving_ofLp_euclideanCube`). -/
+noncomputable def extendEuclidean (d : ℕ) :
+    Lp ℂ p (cubeVol d) →L[ℂ] Lp ℂ p (volume : Measure (EuclideanSpace ℝ (Fin d))) :=
+  Rd.indicatorExtendLp (measurableSet_euclideanCube d) subset_rfl ∘L
+    (Lp.compMeasurePreservingₗᵢ ℂ (WithLp.ofLp : EuclideanSpace ℝ (Fin d) → Fin d → ℝ)
+      (measurePreserving_ofLp_euclideanCube d)).toContinuousLinearMap
+
+/-- The restriction to the cube is `F ∘ toLp` almost everywhere on `Q`. -/
+theorem restrictEuclidean_ae (F : Lp ℂ p (volume : Measure (EuclideanSpace ℝ (Fin d)))) :
+    (restrictEuclidean p d F : (Fin d → ℝ) → ℂ) =ᵐ[cubeVol d] F ∘ WithLp.toLp 2 :=
+  (Lp.coeFn_compMeasurePreserving _ (measurePreserving_toLp_cubeVol d)).trans
+    ((measurePreserving_toLp_cubeVol d).quasiMeasurePreserving.ae_eq_comp
+      (LpToLpRestrictCLM_coeFn ℂ (euclideanCube d) F))
+
+/-- The extension by zero is `1_{Q_E} (g ∘ ofLp)` almost everywhere on `ℝ^d`. -/
+theorem extendEuclidean_ae (g : Lp ℂ p (cubeVol d)) :
+    (extendEuclidean p d g : EuclideanSpace ℝ (Fin d) → ℂ) =ᵐ[volume]
+      (euclideanCube d).indicator (g ∘ WithLp.ofLp) :=
+  (Rd.indicatorExtendLp_apply_ae (measurableSet_euclideanCube d) subset_rfl _).trans
+    ((ae_eq_restrict_iff_indicator_ae_eq (measurableSet_euclideanCube d)).1
+      (Lp.coeFn_compMeasurePreserving g (measurePreserving_ofLp_euclideanCube d)))
+
+/-- **The restriction of the extension by zero is the identity** on `L_p(Q)`, since
+`ofLp (toLp x) = x` and `toLp x ∈ Q_E` for `x ∈ Q`. -/
+theorem restrictEuclidean_extendEuclidean (g : Lp ℂ p (cubeVol d)) :
+    restrictEuclidean p d (extendEuclidean p d g) = g := by
+  refine Lp.ext ?_
+  have hmem : ∀ᵐ x ∂(cubeVol d), x ∈ cubeSet d := by
+    rw [cubeVol_eq_restrict]
+    exact ae_restrict_mem (measurableSet_cubeSet d)
+  filter_upwards [restrictEuclidean_ae (extendEuclidean p d g),
+    (measurePreserving_toLp_cubeVol d).quasiMeasurePreserving.ae_eq_comp
+      (ae_restrict_of_ae (extendEuclidean_ae g)), hmem] with x h1 h2 h3
+  rw [h1, h2, Function.comp_apply, Set.indicator_of_mem
+    (show WithLp.toLp 2 x ∈ euclideanCube d by rwa [← Set.mem_preimage,
+      preimage_toLp_euclideanCube])]
+  rfl
+
+/-- **The extension of the restriction agrees with `F` on the cube**:
+`1_{Q_E} E(F|_Q) = 1_{Q_E} F` in `L_p(ℝ^d)` (`Rd.indicatorLp_eq_iff_ae_eq_restrict`). -/
+theorem indicatorLp_extendEuclidean_restrictEuclidean
+    (F : Lp ℂ p (volume : Measure (EuclideanSpace ℝ (Fin d)))) :
+    Rd.indicatorLp (measurableSet_euclideanCube d)
+        (extendEuclidean p d (restrictEuclidean p d F)) =
+      Rd.indicatorLp (measurableSet_euclideanCube d) F := by
+  refine (Rd.indicatorLp_eq_iff_ae_eq_restrict (measurableSet_euclideanCube d)).2 ?_
+  filter_upwards [ae_restrict_of_ae (extendEuclidean_ae (restrictEuclidean p d F)),
+    (measurePreserving_ofLp_euclideanCube d).quasiMeasurePreserving.ae_eq_comp
+      (restrictEuclidean_ae F), ae_restrict_mem (measurableSet_euclideanCube d)] with y h1 h2 h3
+  rw [h1, Set.indicator_of_mem (show y ∈ euclideanCube d from h3)]
+  exact h2
+
+/-- **The restriction sees only the cube**: if `1_{Q_E} F = 1_{Q_E} G` in `L_p(ℝ^d)`, then
+`F|_Q = G|_Q` in `L_p(Q)`. -/
+theorem restrictEuclidean_eq_of_indicatorLp_eq
+    {F G : Lp ℂ p (volume : Measure (EuclideanSpace ℝ (Fin d)))}
+    (h : Rd.indicatorLp (measurableSet_euclideanCube d) F =
+      Rd.indicatorLp (measurableSet_euclideanCube d) G) :
+    restrictEuclidean p d F = restrictEuclidean p d G := by
+  refine Lp.ext ?_
+  filter_upwards [restrictEuclidean_ae F, restrictEuclidean_ae G,
+    (measurePreserving_toLp_cubeVol d).quasiMeasurePreserving.ae_eq_comp
+      ((Rd.indicatorLp_eq_iff_ae_eq_restrict (measurableSet_euclideanCube d)).1 h)]
+    with x h1 h2 h3
+  rw [h1, h2]
+  exact h3
+
+/-- **The norm of the restriction**: `‖F|_Q‖_{L_p(Q)} = ‖1_{Q_E} F‖_{L_p(ℝ^d)}`
+(`Rd.enorm_indicatorLp_eq`, `MeasureTheory.Lp.enorm_compMeasurePreserving`). -/
+theorem enorm_restrictEuclidean (F : Lp ℂ p (volume : Measure (EuclideanSpace ℝ (Fin d)))) :
+    ‖restrictEuclidean p d F‖ₑ = ‖Rd.indicatorLp (measurableSet_euclideanCube d) F‖ₑ := by
+  rw [Rd.enorm_indicatorLp_eq]
+  exact Lp.enorm_compMeasurePreserving _ (measurePreserving_toLp_cubeVol d)
+
+/-- **Extension by zero keeps the norm**: `‖E g‖_{L_p(ℝ^d)} = ‖g‖_{L_p(Q)}`. -/
+theorem enorm_extendEuclidean (g : Lp ℂ p (cubeVol d)) : ‖extendEuclidean p d g‖ₑ = ‖g‖ₑ := by
+  rw [Lp.enorm_def, Lp.enorm_def, eLpNorm_congr_ae (extendEuclidean_ae g),
+    eLpNorm_indicator_eq_eLpNorm_restrict (measurableSet_euclideanCube d).nullMeasurableSet,
+    eLpNorm_comp_measurePreserving (Lp.aestronglyMeasurable g)
+      (measurePreserving_ofLp_euclideanCube d)]
+
+/-- **The Euclidean modulus on the cube is at most the isotropic one**: for `F ∈ L_p(ℝ^d)`,
+`ω_r(F, 2^(-k), Q_E)_p ≤ ω^iso_r(F|_Q, 2^(-k))_p`, with the modulus on `Q_E` for the Euclidean
+norm (`Rd.lpModulusOn`), since `‖ofLp h‖_∞ ≤ ‖h‖_2` (`Rd.modulusOn_comp_le`,
+`PiLp.norm_continuousLinearEquiv_le`). -/
+theorem lpModulusOn_euclideanCube_le_lpIsoModulus (r : ℕ)
+    (F : Lp ℂ p (volume : Measure (EuclideanSpace ℝ (Fin d)))) (k : ℕ) :
+    Rd.lpModulusOn p (euclideanCube d) r F k ≤ lpIsoModulus p r (restrictEuclidean p d F) k := by
+  have hcongr : (euclideanCube d).indicator (F : EuclideanSpace ℝ (Fin d) → ℂ) =ᵐ[volume]
+      (euclideanCube d).indicator
+        ((restrictEuclidean p d F : (Fin d → ℝ) → ℂ) ∘ WithLp.ofLp) :=
+    (ae_eq_restrict_iff_indicator_ae_eq (measurableSet_euclideanCube d)).1
+      ((measurePreserving_ofLp_euclideanCube d).quasiMeasurePreserving.ae_eq_comp
+        (restrictEuclidean_ae F)).symm
+  have hcoe : ⇑(EuclideanSpace.equiv (Fin d) ℝ : EuclideanSpace ℝ (Fin d) →L[ℝ] (Fin d → ℝ)) =
+      WithLp.ofLp := rfl
+  have he : MeasurePreserving
+      (EuclideanSpace.equiv (Fin d) ℝ : EuclideanSpace ℝ (Fin d) →L[ℝ] (Fin d → ℝ)) := by
+    rw [hcoe]
+    exact PiLp.volume_preserving_ofLp (Fin d)
+  have h := Rd.modulusOn_comp_le _ he (measurableSet_cubeSet d)
+    (Lp.stronglyMeasurable (restrictEuclidean p d F)).aestronglyMeasurable r p (1 / 2 ^ k)
+  rw [hcoe, preimage_ofLp_cubeSet] at h
+  rw [Rd.lpModulusOn, Rd.modulusOn_congr_ae hcongr]
+  exact h.trans (isoModulus_mono r p _ (mul_le_of_le_one_left (by positivity)
+    (PiLp.norm_continuousLinearEquiv_le 2 ℝ _)))
+
+/-- **The isotropic modulus is at most the Euclidean one `d` levels coarser**: for
+`F ∈ L_p(ℝ^d)`, `ω^iso_r(F|_Q, 2^(-(k+d)))_p ≤ ω_r(F, 2^(-k), Q_E)_p`, since
+`‖toLp h‖_2 ≤ 2^d ‖h‖_∞` (`Rd.modulusOn_comp_le`, `Cube.norm_euclideanEquiv_symm_le`). -/
+theorem lpIsoModulus_add_le_lpModulusOn (r : ℕ)
+    (F : Lp ℂ p (volume : Measure (EuclideanSpace ℝ (Fin d)))) (k : ℕ) :
+    lpIsoModulus p r (restrictEuclidean p d F) (k + d) ≤
+      Rd.lpModulusOn p (euclideanCube d) r F k := by
+  have hscale : ‖((EuclideanSpace.equiv (Fin d) ℝ).symm :
+      (Fin d → ℝ) →L[ℝ] EuclideanSpace ℝ (Fin d))‖ * (1 / 2 ^ (k + d)) ≤ 1 / 2 ^ k :=
+    calc _ ≤ 2 ^ d * (1 / 2 ^ (k + d)) :=
+          mul_le_mul_of_nonneg_right (norm_euclideanEquiv_symm_le d) (by positivity)
+      _ = 1 / 2 ^ k := by
+          rw [pow_add]
+          field_simp
+  have hcoe : ⇑((EuclideanSpace.equiv (Fin d) ℝ).symm :
+      (Fin d → ℝ) →L[ℝ] EuclideanSpace ℝ (Fin d)) = WithLp.toLp 2 := rfl
+  have he : MeasurePreserving ((EuclideanSpace.equiv (Fin d) ℝ).symm :
+      (Fin d → ℝ) →L[ℝ] EuclideanSpace ℝ (Fin d)) := by
+    rw [hcoe]
+    exact PiLp.volume_preserving_toLp (Fin d)
+  have h := Rd.modulusOn_comp_le _ he (measurableSet_euclideanCube d)
+    (Lp.aestronglyMeasurable F) r p (1 / 2 ^ (k + d))
+  rw [hcoe, preimage_toLp_euclideanCube] at h
+  rw [lpIsoModulus, isoModulus_congr_ae (restrictEuclidean_ae F)]
+  exact h.trans (Rd.modulusOn_mono _ r p _ hscale)
+
+/-- **The Euclidean intrinsic quasi-norm on the cube is at most the isotropic one**:
+`N_{Q_E}(F) ≤ ‖F|_Q‖_p + ‖(2^(ks) ω^iso_r(F|_Q, 2^(-k))_p)_k‖_{ℓ_q}` for `F ∈ L_p(ℝ^d)`, with
+the intrinsic quasi-norm `N_{Q_E}` of `Rd.modNormOn` (`Cube.enorm_restrictEuclidean`,
+`Cube.lpModulusOn_euclideanCube_le_lpIsoModulus`). -/
+theorem modNormOn_euclideanCube_le_isoNorm (r : ℕ) (s : ℝ) (q : ℝ≥0∞)
+    (F : Lp ℂ p (volume : Measure (EuclideanSpace ℝ (Fin d)))) :
+    Rd.modNormOn (measurableSet_euclideanCube d) r s q F ≤ ‖restrictEuclidean p d F‖ₑ +
+      lqNorm q (fun k => dyadicWeight s k * lpIsoModulus p r (restrictEuclidean p d F) k) := by
+  rw [Rd.modNormOn, enorm_restrictEuclidean]
+  exact add_le_add le_rfl (ENNReal.lqNorm_mono fun k =>
+    mul_le_mul' le_rfl (lpModulusOn_euclideanCube_le_lpIsoModulus r F k))
+
+/-- **The isotropic quasi-norm of the restriction is at most a multiple of the Euclidean one**:
+for `s ≥ 0`, `1 ≤ q ≤ ∞` and `F ∈ L_p(ℝ^d)`,
+`‖F|_Q‖_p + ‖(2^(ks) ω^iso_r(F|_Q, 2^(-k))_p)_k‖_{ℓ_q} ≤ (1 + 2^(ds) (d 2^r + 1)) N_{Q_E}(F)`.
+The comparison of the moduli `d` levels apart (`Cube.lpIsoModulus_add_le_lpModulusOn`) passes to
+the quasi-norms at the cost `2^(ds)` (`ENNReal.lqNorm_dyadicWeight_le_of_shift`), and the first `d`
+levels are at most `2^r ‖F|_Q‖_p` (`Cube.lpIsoModulus_le`). -/
+theorem isoNorm_restrictEuclidean_le_modNormOn (r : ℕ) {s : ℝ} (hs : 0 ≤ s) {q : ℝ≥0∞}
+    (hq : 1 ≤ q) (F : Lp ℂ p (volume : Measure (EuclideanSpace ℝ (Fin d)))) :
+    ‖restrictEuclidean p d F‖ₑ +
+        lqNorm q (fun k => dyadicWeight s k * lpIsoModulus p r (restrictEuclidean p d F) k) ≤
+      (1 + dyadicWeight s d * (d * 2 ^ r + 1)) *
+        Rd.modNormOn (measurableSet_euclideanCube d) r s q F := by
+  set N := Rd.modNormOn (measurableSet_euclideanCube d) r s q F
+  have hI : ‖restrictEuclidean p d F‖ₑ ≤ N := by
+    rw [enorm_restrictEuclidean]
+    exact le_self_add
+  have hΛ : lqNorm q (fun k => dyadicWeight s k * Rd.lpModulusOn p (euclideanCube d) r F k) ≤
+      N := le_add_self
+  have hshift := ENNReal.lqNorm_dyadicWeight_le_of_shift hq hs d
+    (B := 2 ^ r * ‖restrictEuclidean p d F‖ₑ) (fun k _ => lpIsoModulus_le r _ k)
+    (fun k => lpIsoModulus_add_le_lpModulusOn r F k)
+  calc ‖restrictEuclidean p d F‖ₑ +
+        lqNorm q (fun k => dyadicWeight s k * lpIsoModulus p r (restrictEuclidean p d F) k)
+      ≤ ‖restrictEuclidean p d F‖ₑ + dyadicWeight s d * (d * (2 ^ r *
+          ‖restrictEuclidean p d F‖ₑ) + lqNorm q (fun k => dyadicWeight s k *
+            Rd.lpModulusOn p (euclideanCube d) r F k)) := add_le_add le_rfl hshift
+    _ ≤ N + dyadicWeight s d * (d * (2 ^ r * N) + N) := by gcongr
+    _ = (1 + dyadicWeight s d * (d * 2 ^ r + 1)) * N := by ring
+
+end Euclidean
 
 end Cube

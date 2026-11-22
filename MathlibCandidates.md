@@ -268,11 +268,23 @@ declarations.
   `FunctionSpaces/Rd/Differences/DilatedDifferences.lean`); `Δ_h^r (f ∘ e) = (Δ_{e h}^r f) ∘ e`
   for every additive map `e` (`Rd.higherDiff_comp_addHom`, `Differences.lean`) and
   `ω_r(f ∘ e, t)_p ≤ ω_r(f, ‖e‖ t)_p` for a measure preserving continuous linear map `e`
-  (`Rd.modulus_comp_le`, `FunctionSpaces/Analysis/Differences/LinearEquivModuli.lean`).
+  (`Rd.modulus_comp_le`, `FunctionSpaces/Analysis/Differences/LinearEquivModuli.lean`), also for
+  the modulus on a set, `ω_r(f ∘ e, t, e⁻¹(U))_p ≤ ω_r(f, ‖e‖ t, U)_p` (`Rd.modulusOn_comp_le`),
+  and for affine maps `A x = a + L x`,
+  `ω_r(f ∘ A, t, A⁻¹(U))_p ≤ L^(-n/p) ω_r(f, L t, U)_p` (`Rd.modulusOn_comp_affine_le`).
 * **Composition with measure preserving maps in `L_p`**
   (`FunctionSpaces/Analysis/Differences/LinearEquivModuli.lean`): `‖g ∘ f‖_p = ‖g‖_p` in
   `[0, ∞]` for a measure preserving `f` (`MeasureTheory.Lp.enorm_compMeasurePreserving`). Mathlib
-  has only the real-valued form `MeasureTheory.Lp.norm_compMeasurePreserving`.
+  has only the real-valued form `MeasureTheory.Lp.norm_compMeasurePreserving`. For affine maps
+  `x ↦ a + L x`, `L > 0`, on a space of dimension `n` with an additive Haar measure:
+  `x ↦ a + L x` carries `μ` to `L^(-n) μ` and `‖G(a + L ·)‖_p = L^(-n/p) ‖G‖_p` for every `p`
+  (`Rd.measurePreserving_affine`, `Rd.eLpNorm_comp_affine`); Mathlib has
+  `MeasureTheory.Measure.map_addHaar_smul` but no `L_p` form.
+* **Operator norms of `PiLp.continuousLinearEquiv`**
+  (`FunctionSpaces/Analysis/Differences/LinearEquivModuli.lean`): `‖ofLp‖ ≤ 1` and
+  `‖toLp‖ ≤ (#ι)^(1/p)` (`PiLp.norm_continuousLinearEquiv_le`,
+  `PiLp.norm_continuousLinearEquiv_symm_le`); Mathlib has the Lipschitz constants
+  (`PiLp.lipschitzWith_ofLp`, `PiLp.lipschitzWith_toLp`) but no operator-norm form.
 * **Sobolev–Slobodeckij norms** (`FunctionSpaces/Rd/Differences/SobolevSlobodeckij.lean`):
   Mathlib has no fractional Sobolev spaces. The Gagliardo form
   `∫∫ |f(y) - f(x)|^p / |y - x|^(n+sp) dy dx` on a finite-dimensional inner product space
