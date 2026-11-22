@@ -279,12 +279,14 @@ declarations.
   (`Rd.slobodeckijForm`), its form `∫ ‖Δ_h f‖_p^p / |h|^(n+sp) dh` by Tonelli's theorem
   (`Rd.slobodeckijForm_eq_lintegral_eLpNorm`), its two-sided bounds by the first-difference
   Besov norm (`Rd.lqNorm_modulus_rpow_le_slobodeckijForm`, `Rd.slobodeckijForm_le`) and
-  `W^{s,p} = B^s_{p,p}` for `0 < s < 1` (`Rd.slobodeckijForm_lt_top_iff_memApprox`); the radial
-  integrals `∫_{|z| ≥ R} |z|^(-a)` for `a > n` and `∫_{|z| < R} |z|^(-a)` for `a < n` with
-  explicit constants (`Rd.lintegral_compl_ball_norm_rpow_neg_le`,
-  `Rd.lintegral_ball_norm_rpow_neg_le`) belong next to Mathlib's
-  `integrableOn_ball_of_norm_le_rpow`. The Lean project *quadratic-forms-sobolev-lean* has the
-  form for `p = 2` (`formHs`); *grunweg/SobolevSlobodeckij* has integer orders only.
+  `W^{s,p} = B^s_{p,p}` for `0 < s < 1` (`Rd.slobodeckijForm_lt_top_iff_memApprox`); for `p = 2`
+  the form is the square of the `L_2` norm of `(x, y) ↦ f(y) - f(x)` for the measure
+  `|y - x|^(-(n+2s)) dx dy` (`Rd.gagliardoMeasure`, `Rd.eLpNorm_sub_sq_gagliardoMeasure`), which
+  gives `W^{s,2}` an inner product; the radial integrals `∫_{|z| ≥ R} |z|^(-a)` for `a > n` and
+  `∫_{|z| < R} |z|^(-a)` for `a < n` with explicit constants
+  (`Rd.lintegral_compl_ball_norm_rpow_neg_le`, `Rd.lintegral_ball_norm_rpow_neg_le`) belong next
+  to Mathlib's `integrableOn_ball_of_norm_le_rpow`. The Lean project *quadratic-forms-sobolev-lean*
+  has the form for `p = 2` (`formHs`); *grunweg/SobolevSlobodeckij* has integer orders only.
 * **Leibniz's rule for iterated forward differences**
   (`FunctionSpaces/Rd/Differences/PointwiseMultipliers.lean`):
   `Δ_h^r(u v)(x) = ∑_{l ≤ r} C(r, l) Δ_h^l u(x) Δ_h^(r-l) v(x + l h)` (`Rd.higherDiff_mul`); Mathlib

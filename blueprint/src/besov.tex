@@ -6017,6 +6017,35 @@ $\int |f(x + h) - f(x)|^p \, dx = \|\Delta_h f\|_p^p$. The same Tonelli argument
 measurability of $h \mapsto \|\Delta_h f\|_p^p$.
 \end{proof}
 
+\begin{lemma}[The Gagliardo measure]
+\label{lem:gagliardo-measure}
+\lean{Rd.gagliardoMeasure, Rd.lintegral_gagliardoMeasure, Rd.ae_gagliardoMeasure,
+  Rd.eLpNorm_sub_sq_gagliardoMeasure}
+\leanok
+\uses{def:slobodeckij-form}
+Let $s \in \R$ and let $\mu_s$ be the measure $|y - x|^{-(n + 2s)} \, dx \, dy$ on $V \times V$.
+For every measurable $F \colon V \times V \to [0, \infty]$,
+$\int F \, d\mu_s = \int_V \int_V F(x, y) \, |y - x|^{-(n + 2s)} \, dy \, dx$. A property that
+holds almost everywhere on $V$ holds for both coordinates of $\mu_s$-almost every pair. For every
+measurable $f \colon V \to \C$,
+\[
+  \bigl\|(x, y) \mapsto f(y) - f(x)\bigr\|_{L_2(\mu_s)}^2 = \mathcal{E}_{s,2}(f) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\mu_s$ has a measurable density with respect to the product of the Lebesgue measures, and
+Tonelli's theorem gives the double integral. Null sets of the product measure are null for
+$\mu_s$, and the preimages of null sets of $V$ under the coordinate maps are null for the product
+measure. For $F(x, y) = |f(y) - f(x)|^2$ the double integral is the Gagliardo form, since
+$a / b^c = a b^{-c}$.
+\end{proof}
+
+So $f \mapsto (f, (x, y) \mapsto f(y) - f(x))$ maps $W^{s,2}(V)$ with the norm
+$(\|f\|_2^2 + \mathcal{E}_{s,2}(f))^{1/2}$ isometrically into $L_2(V) \times L_2(\mu_s)$ with the
+$L_2$ norm on the product, which gives $W^{s,2}(V)$ an inner product.
+
 \paragraph{Dyadic annuli and radial integrals.}
 
 \begin{lemma}[Dyadic annuli]
