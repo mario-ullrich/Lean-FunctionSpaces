@@ -444,22 +444,16 @@ theorem boundaryTrace_sobolevToL2_add (ψ : Ω.BoundaryPartition) (s : ℝ) (U W
   rw [Pi.add_apply, hy, Pi.sub_apply, sub_add_cancel]
 
 /-- `Tr_Γ ι_s (c U) = c Tr_Γ ι_s U` almost everywhere on `Γ`, for every resolution of unity and
-`1/2 < s < 3/2`: in each chart the boundary trace is the trace of the graph domain
-(`Rd.BoundedLipschitzDomain.boundaryTrace_graphMap`), which is homogeneous
-(`Rd.LipschitzGraph.trace_smul`). -/
+`1/2 < s < 3/2`, since `ι_s (c U) = c ι_s U` and the boundary trace is homogeneous
+(`Rd.BoundedLipschitzDomain.boundaryTrace_smul`, `Rd.modNorm_sobolevToL2_lt_top`). -/
 theorem boundaryTrace_sobolevToL2_smul (ψ : Ω.BoundaryPartition) (s : ℝ) (c : ℂ) (U : H^{s}(V))
     (hs : 1 / 2 < s := by norm_num) (hs' : s < 3 / 2 := by norm_num) :
     Ω.boundaryTrace ψ two_ne_top 2 (sobolevToL2 (one_half_pos.trans hs).le (c • U))
       =ᶠ[Ω.aeBoundary] c • Ω.boundaryTrace ψ two_ne_top 2
         (sobolevToL2 (one_half_pos.trans hs).le U) := by
-  have hs0 : 0 ≤ s := (one_half_pos.trans hs).le
-  refine Ω.eventually_aeBoundary_iff.2 fun j => ?_
-  have hG := fun G : H^{s}(V) => Ω.boundaryTrace_graphMap ψ two_ne_top one_le_two
-    (sub_pos.2 hs) (by norm_num; linarith) one_le_two
-    (modNorm_sobolevToL2_lt_top hs (by linarith) G) j
-  filter_upwards [hG (c • U), hG U,
-    Lp.coeFn_smul c ((Ω.graph j).trace two_ne_top 2 (sobolevToL2 hs0 U))] with x' h1 h2 h3 hj
-  rw [Pi.smul_apply, h1 hj, h2 hj, map_smul, (Ω.graph j).trace_smul, h3, Pi.smul_apply]
+  rw [map_smul]
+  exact Ω.boundaryTrace_smul ψ two_ne_top (sub_pos.2 hs) (by norm_num; linarith) one_le_two c
+    (modNorm_sobolevToL2_lt_top hs (by linarith) U)
 
 /-- **The trace of `H^s(V)` in `L_2(Γ)` as a linear map**, `1/2 < s < 3/2`: `U ↦ Tr_Γ ι_s U`,
 with the canonical resolution of unity. -/

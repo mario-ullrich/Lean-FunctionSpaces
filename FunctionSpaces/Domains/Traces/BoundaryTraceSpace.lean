@@ -631,26 +631,22 @@ theorem mem_traceKer_one_iff (ψ : Ω.BoundaryPartition) (u : Ω.SobolevOne) :
 
 /-- **The boundary trace of `H^s(V)` functions is linear**, `1/2 < s < 3/2`: for every resolution
 of unity `ψ` and `U, W ∈ H^s(V)`, `Tr_Γ ι_s(U - W) = Tr_Γ ι_s U - Tr_Γ ι_s W` almost everywhere on
-`Γ`: in each chart the boundary traces are traces of the graph domain
-(`Rd.BoundedLipschitzDomain.boundaryTrace_graphMap`), which are linear
-(`Rd.LipschitzGraph.trace_sub`). -/
+`Γ`, since `ι_s(U - W) + ι_s W = ι_s U` and the boundary trace is additive
+(`Rd.BoundedLipschitzDomain.boundaryTrace_add`, `Rd.modNorm_sobolevToL2_lt_top`). -/
 theorem boundaryTrace_sobolevToL2_sub (ψ : Ω.BoundaryPartition) (s : ℝ) (U W : H^{s}(V))
     (hs : 1 / 2 < s := by norm_num) (hs' : s < 3 / 2 := by norm_num) :
     Ω.boundaryTrace ψ two_ne_top 2 (sobolevToL2 (one_half_pos.trans hs).le (U - W))
       =ᶠ[Ω.aeBoundary] Ω.boundaryTrace ψ two_ne_top 2 (sobolevToL2 (one_half_pos.trans hs).le U) -
         Ω.boundaryTrace ψ two_ne_top 2 (sobolevToL2 (one_half_pos.trans hs).le W) := by
   have hs0 : 0 ≤ s := (one_half_pos.trans hs).le
-  refine Ω.eventually_aeBoundary_iff.2 fun j => ?_
-  have hF := fun G : H^{s}(V) => modNorm_sobolevToL2_lt_top hs (by linarith) G
-  have hG := fun G : H^{s}(V) => Ω.boundaryTrace_graphMap ψ two_ne_top one_le_two
-    (sub_pos.2 hs) (by norm_num; linarith) one_le_two (hF G) j
-  have hI := fun G : H^{s}(V) => ((Ω.graph j).intrinsicNorm_lt_top_of_modNorm two_ne_top 2
-    one_le_two (hF G)).2
-  have hsub := (Ω.graph j).trace_sub two_ne_top 2 (sub_pos.2 hs) one_le_two (hI U) (hI W)
-  filter_upwards [hG (U - W), hG U, hG W,
-    Lp.coeFn_sub ((Ω.graph j).trace two_ne_top 2 (sobolevToL2 hs0 U))
-      ((Ω.graph j).trace two_ne_top 2 (sobolevToL2 hs0 W))] with x' h1 h2 h3 h4 hj
-  rw [Pi.sub_apply, h1 hj, h2 hj, h3 hj, map_sub, hsub, h4, Pi.sub_apply]
+  have h := Ω.boundaryTrace_add ψ two_ne_top (sub_pos.2 hs) (by norm_num; linarith) one_le_two
+    (modNorm_sobolevToL2_lt_top hs (by linarith) (U - W))
+    (modNorm_sobolevToL2_lt_top hs (by linarith) W)
+  have hUW : sobolevToL2 hs0 (U - W) + sobolevToL2 hs0 W = sobolevToL2 hs0 U := by
+    rw [← map_add, sub_add_cancel]
+  rw [hUW] at h
+  filter_upwards [h] with y hy
+  rw [Pi.sub_apply, hy, Pi.add_apply, add_sub_cancel_right]
 
 /-- **The restriction to `Ω` keeps the boundary trace**, `1/2 < s < 3/2`: for every resolution of
 unity `ψ` and `U ∈ H^s(V)`, `Tr_Γ ι_s(U|_Ω) = Tr_Γ ι_s U` almost everywhere on `Γ`, since

@@ -14,7 +14,8 @@ declarations.
   on `ℕ`, splitting off the first terms (`ENNReal.lqNorm_le_head_add_shift`,
   `ENNReal.lqNorm_le_head_add_shift'`, `ENNReal.lqNorm_le_sum_range_add_shift`); reindexing along
   bijections and injections (`ENNReal.lqNorm_comp_equiv`, `ENNReal.lqNorm_extend_zero`,
-  `ENNReal.lqNorm_comp_le_of_injective`).
+  `ENNReal.lqNorm_comp_le_of_injective`); Fatou's lemma for termwise limits, `a_m → b` termwise
+  and `‖a_m‖_q ≤ d_m → D` give `‖b‖_q ≤ D` (`ENNReal.lqNorm_le_of_tendsto`).
 * **Subadditivity of `x ↦ x^p` for series** (`ApproximationSpaces/Sequences/Lq.lean`): for
   `0 < p ≤ 1` and every family `f` in `[0, ∞]`, `(∑_i f_i)^p ≤ ∑_i f_i^p`
   (`ENNReal.rpow_tsum_le_tsum_rpow`), from the finite form of Mathlib PR #44783 by the supremum

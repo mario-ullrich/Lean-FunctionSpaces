@@ -15,7 +15,8 @@ For a measurable set `s` of a measure space, multiplication by the indicator `1_
 linear operator on `L_p(μ)` of norm at most `1` (`Rd.indicatorLp`); it is multiplication by
 `1_s` almost everywhere (`Rd.indicatorLp_apply_ae`) and `‖1_s g‖_p ≤ ‖g‖_p`
 (`Rd.enorm_indicatorLp_le`). Two classes have the same image iff they agree almost everywhere
-on `s` (`Rd.indicatorLp_eq_iff_ae_eq_restrict`), and `∫_s a b = ⟨1_s a, b⟩` for `a, b ∈ L_2`
+on `s` (`Rd.indicatorLp_eq_iff_ae_eq_restrict`), cutting off twice is cutting off once
+(`Rd.indicatorLp_indicatorLp`), and `∫_s a b = ⟨1_s a, b⟩` for `a, b ∈ L_2`
 with Mathlib's pairing of `L_2` with `L_2` (`Rd.setIntegral_mul_eq_lpPairing`). For a measurable
 `T ⊆ O`, the extension by zero `g ↦ 1_T g` from `L_p(μ|_O)` to `L_p(μ)` is a bounded linear
 operator of norm at most `1` (`Rd.indicatorExtendLp`). The cut-off norm `‖1_s f‖_{L_p(μ)}` is the
@@ -124,6 +125,14 @@ theorem indicatorLp_eq_iff_ae_eq_restrict {s : Set α} (hs : MeasurableSet s) {F
   rw [ae_eq_restrict_iff_indicator_ae_eq hs, Lp.ext_iff]
   exact ⟨fun h => (indicatorLp_apply_ae hs F).symm.trans (h.trans (indicatorLp_apply_ae hs f)),
     fun h => (indicatorLp_apply_ae hs F).trans (h.trans (indicatorLp_apply_ae hs f).symm)⟩
+
+/-- **Cutting off twice is cutting off once**: `1_s (1_s f) = 1_s f` in `L_p(μ)` for a measurable
+set `s` (`Rd.indicatorLp_eq_iff_ae_eq_restrict`). -/
+theorem indicatorLp_indicatorLp {s : Set α} (hs : MeasurableSet s) (f : Lp ℂ p μ) :
+    indicatorLp hs (indicatorLp hs f) = indicatorLp hs f := by
+  refine (indicatorLp_eq_iff_ae_eq_restrict hs).2 ?_
+  filter_upwards [ae_restrict_of_ae (indicatorLp_apply_ae hs f), ae_restrict_mem hs] with x h1 h2
+  rw [h1, Set.indicator_of_mem h2]
 
 /-! ### Extension by zero -/
 

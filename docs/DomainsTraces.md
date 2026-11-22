@@ -9,8 +9,11 @@ described by intrinsic differences on `Ω` and as restrictions of `B^s_{p,q}(V)`
 domains (Rychkov's extension) and for bounded Lipschitz domains (pasting with a resolution of unity
 and pointwise multipliers). Traces on Lipschitz boundaries are built from the atoms and hold for
 `0 < s < 1`; on the half-space, where smooth atoms restrict to smooth atoms, the trace theorem holds
-for every `s > 0`. In finite dimension the bounded Lipschitz domains are the sets of the usual
-definition by local Lipschitz graphs, the open balls and the bounded open convex sets among them.
+for every `s > 0`. On a bounded Lipschitz domain, `B^s_{p,q}(Ω)` and `B^t_{p,q}(Γ)` are Banach
+spaces, and the trace is a bounded linear operator from `B^s_{p,q}(Ω)` onto `B^{s-1/p}_{p,q}(Γ)`,
+`1/p < s < 1 + 1/p`, with a bounded linear right inverse. In finite dimension the bounded
+Lipschitz domains are the sets of the usual definition by local Lipschitz graphs, the open balls
+and the bounded open convex sets among them.
 The Besov spaces on compact manifolds, the smooth bounded domains and the eigenbases of the
 Laplacian are in [Manifolds and eigenbases](Manifolds.md).
 
@@ -221,6 +224,27 @@ isometric to the trace space of `H^1(Ω)`, by its definition as the orthogonal c
   (`Rd.BoundedLipschitzDomain.exists_boundaryTrace_eq_le`). Two resolutions of
   unity give equivalent quasi-norms
   (`Rd.BoundedLipschitzDomain.exists_boundaryBesovNorm_le_of_partition`).
+* **Besov spaces on `Γ` and the trace operator.** With `Ω` and `Γ` as above and the surface
+  measure `σ` of `Γ`, let `1 ≤ p ≤ ∞` and `1 ≤ q ≤ ∞`. `B^s_{p,q}(Ω)` is the space of the
+  `f ∈ L_p(V)` vanishing outside `Ω` with
+  `N_Ω(f) = ‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`, normed by `N_Ω`
+  (`Rd.BoundedLipschitzDomain.DomainBesov`), and `B^t_{p,q}(Γ)` is the space of the
+  `g ∈ L_p(Γ)` with a finite quasi-norm by chart pieces for a fixed resolution of unity, normed by
+  it (`Rd.BoundedLipschitzDomain.BoundaryBesov`); both are Banach spaces
+  (`Rd.BoundedLipschitzDomain.completeSpace_domainBesov`,
+  `Rd.BoundedLipschitzDomain.completeSpace_boundaryBesov`), since the quasi-norms pass to `L_p`
+  limits by Fatou's lemma for `ℓ_q` norms (`Rd.tendsto_modNormOn_sub_of_cauchy`), and
+  `‖g‖_{L_p(Γ)} ≤ C ‖g‖_{B^t_{p,q}(Γ)}`
+  (`Rd.BoundedLipschitzDomain.exists_eLpNorm_le_boundaryBesovNorm`). For `1 ≤ p < ∞`,
+  `1/p < s < 1 + 1/p` and differences of order `2` on `Ω`, the trace
+  `Tr : B^s_{p,q}(Ω) → B^{s-1/p}_{p,q}(Γ)` is a bounded linear operator, with `Tr f = Tr_Γ F` for
+  every extension `F` of `f` with a finite norm on `V` (`Rd.BoundedLipschitzDomain.besovTrace`,
+  `Rd.BoundedLipschitzDomain.besovTrace_ae`; Schneider–Vybíral, Theorem 4.11; Mayboroda,
+  Theorem 1.1.3(i)), and it is onto (`Rd.BoundedLipschitzDomain.besovTrace_surjective`). For
+  `0 < t < 1`, `g ↦ 1_Ω ∑_j ζ_j E_j G_j` is a bounded linear right inverse
+  `B^t_{p,q}(Γ) → B^{t+1/p}_{p,q}(Ω)` (`Rd.BoundedLipschitzDomain.besovExtend`,
+  `Rd.BoundedLipschitzDomain.toLp_besovTrace_besovExtend`); it is linear because the extensions
+  `E_j` of the graph domains are (`Rd.LipschitzGraph.graphExtension_add`).
 * **`H^1` on bounded Lipschitz domains.** Let `Ω` be a bounded Lipschitz domain with boundary `Γ`.
   `f ∈ L_2(V)` lies in `H^1(Ω)` if `f = F` almost everywhere on `Ω` for some `F ∈ W^1_2(V)`
   (`Rd.BoundedLipschitzDomain.MemSobolevOn`, a definition by extension); `H^1(Ω)` contains `0`, is
@@ -557,16 +581,16 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The local extension of a bump on a set: absolute convergence from bounds of the weighted local means, the Besov bound, agreement on the set it sees; Rychkov's extension as its case `W = Ω`, restrictions to Lipschitz graph domains by intrinsic local means | ✅ | ✗ | `Domains/Extension/RychkovExtension` |
 | Restrictions to Lipschitz graph domains by intrinsic differences | ✅ | ✗ | `Domains/Extension/LipschitzGraphBesov` |
 | Local versions of Rychkov's extension: boundary and inner patches, cone bumps of small radius, short steps into the closed cone, local means on a set bounded by the moduli on a larger set, the local extension with a bound | ✅ | ✗ | `Domains/Extension/LocalExtension` |
-| Bounded Lipschitz domains: the patches covering the closure, pasting over the patches, pasting of local extensions, subadditivity and homogeneity of the quasi-norms by differences, the extension with a bound | ✅ | ✗ | `Domains/Lipschitz/BoundedLipschitz` |
+| Bounded Lipschitz domains: the patches covering the closure, pasting over the patches, pasting of local extensions, subadditivity and homogeneity of the quasi-norms by differences, the extension with a bound, the Banach space `B^s_{p,q}(Ω)` by intrinsic differences and extensions of its elements | ✅ | ✗ | `Domains/Lipschitz/BoundedLipschitz` |
 | Null hyperplanes, Lipschitz graph domains with the extension property, the half-space, the first axis `e₀` of `ℝ^n`, and the models of manifolds as Besov domains | ✅ | ✗ | `Domains/Lipschitz/HalfSpace` |
 | Traces of every order on the half-space: trace theorem, extension, trace space | ✅ | ✗ | `Domains/Traces/HalfSpaceTrace` |
 | Graph map of a Lipschitz graph domain, the boundary as the graph, restrictions of atoms to the graph | ✅ | ✗ | `Domains/Lipschitz/GraphParametrization` |
 | Traces on Lipschitz graph domains: boundedness, linearity, trace of continuous functions | ✅ | ✗ | `Domains/Traces/GraphTrace` |
 | Mollified graph and vertical cut-off with bounds of their differences | ✅ | ✗ | `Domains/Traces/MollifiedGraph` |
-| Extension from the boundary of a Lipschitz graph domain, its trace space | ✅ | ✗ | `Domains/Traces/GraphTraceExtension` |
+| Extension from the boundary of a Lipschitz graph domain, its linearity, its trace space | ✅ | ✗ | `Domains/Traces/GraphTraceExtension` |
 | Traces in charts: locality, approximation, change of chart, products and their bound, finite sums | ✅ | ✗ | `Domains/Traces/GraphTraceCharts` |
-| Traces on bounded Lipschitz domains: Besov spaces on the boundary, the trace space | ✅ | ✗ | `Domains/Traces/LipschitzBoundaryTrace` |
-| Besov quasi-norms on the boundary: chart pieces, bounded trace and extension for `1 ≤ p < ∞`, independence of the resolution of unity | ✅ | ✗ | `Domains/Traces/BoundaryBesovNorm` |
+| Traces on bounded Lipschitz domains: Besov spaces on the boundary, linearity of the boundary trace, the trace space | ✅ | ✗ | `Domains/Traces/LipschitzBoundaryTrace` |
+| Besov quasi-norms on the boundary: chart pieces, bounded trace and extension for `1 ≤ p < ∞`, independence of the resolution of unity, chart pieces as bounded operators `L_p(Γ) → L_p(H_j)`, the bound of the `L_p(Γ)` norm, the Banach space `B^t_{p,q}(Γ)`, the trace operator from `B^s_{p,q}(Ω)` onto `B^{s-1/p}_{p,q}(Γ)` and its bounded linear right inverse | ✅ | ✗ | `Domains/Traces/BoundaryBesovNorm` |
 | Flattening of graph domains, the Lipschitz bounds of the flattening and its inverse, the graph in the image of the hyperplane, product and graph coordinates, preservation of the Lebesgue measure for every Lipschitz graph | ✅ | ✗ | `Domains/Lipschitz/GraphStraightening` |
 | `H^1` on bounded Lipschitz domains defined as restrictions of `H^1(ℝ^d)`, by intrinsic differences, the identification with the restriction space, the weak gradient, and the boundary traces, which form `B^{1/2}_{2,2}(Γ)` | ✅ | ✗ | `Domains/Sobolev/LipschitzDomainH1` |
 | The Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)` and `H^s_0(Ω)` on open sets inside Mathlib's `H^s(ℝ^d)`, `H^s(Ω)` as a quotient, Rellich's theorem for `H^1(Ω)`, the restriction of an element agreeing with `u ∈ H^1(Ω)` on `Ω`, the bound of the `H^1` norm by the `W^1_2` norm, the weak derivatives as bounded operators on `H^1(ℝ^d)`, differences and moduli of `H^1(ℝ^d)` functions by the gradient, the density of compactly supported Schwartz functions in `H^s(ℝ^d)`, Schwartz functions with compact support in `Ω` in the span of the test functions, vanishing on `Ω` by the `L_2` function for every `s ≥ 0`, `H̃^s(ℝ^d) = H^s(ℝ^d)`, the isometry `H̃^1(Ω) ≅ H^1_0(Ω)`, and the vanishing of `H̃^1(Ω)` outside `Ω` | ✅ | ✗ | `Domains/Sobolev/SobolevRestrictionSpaces` |

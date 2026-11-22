@@ -5,7 +5,6 @@ Authors: Mario Ullrich
 -/
 module
 
-public import FunctionSpaces.Domains.Lipschitz.SurfaceMeasure
 public import FunctionSpaces.Domains.Traces.BoundaryBesovNorm
 
 /-!
@@ -225,43 +224,6 @@ theorem mem_range_traceL2_iff (ψ : Ω.BoundaryPartition) (g : Ω.BoundaryL2) :
     exact ⟨t, Lp.ext ht⟩
 
 /-! ### The Banach space `B^{1/2}_{2,2}(Γ)` -/
-
-section BoundaryL2Ops
-
-variable {Ω} {p : ℝ≥0∞} [Fact (1 ≤ p)]
-
-/-- `B^s_{p,q}(Γ)` contains the class `0` of `L_2(Γ)`. -/
-theorem memBoundaryBesov_coe_zero (ψ : Ω.BoundaryPartition) (s : ℝ) (q : ℝ≥0∞) :
-    Ω.MemBoundaryBesov p ψ s q ((0 : Ω.BoundaryL2) : V → ℂ) :=
-  ((Ω.memBoundaryBesov_iff_boundaryBesovNorm_lt_top ψ 0).2
-    ((Ω.boundaryBesovNorm_zero ψ s q).trans_lt ENNReal.zero_lt_top)).congr
-    (EventuallyEq.symm (Ω.ae_surfaceMeasure_iff_aeBoundary.1 (Lp.coeFn_zero ℂ 2 Ω.surfaceMeasure)))
-
-/-- `B^s_{p,q}(Γ)` is closed under the addition of `L_2(Γ)`, for `q ≥ 1`
-(`Rd.BoundedLipschitzDomain.MemBoundaryBesov.add`). -/
-theorem MemBoundaryBesov.coe_add {ψ : Ω.BoundaryPartition} {s : ℝ} {q : ℝ≥0∞} (hq : 1 ≤ q)
-    {f g : Ω.BoundaryL2} (hf : Ω.MemBoundaryBesov p ψ s q f)
-    (hg : Ω.MemBoundaryBesov p ψ s q g) :
-    Ω.MemBoundaryBesov p ψ s q ((f + g : Ω.BoundaryL2) : V → ℂ) :=
-  (hf.add hq hg).congr
-    (EventuallyEq.symm (Ω.ae_surfaceMeasure_iff_aeBoundary.1 (Lp.coeFn_add f g)))
-
-/-- `B^s_{p,q}(Γ)` is closed under the scalar multiplication of `L_2(Γ)`
-(`Rd.BoundedLipschitzDomain.MemBoundaryBesov.const_smul`). -/
-theorem MemBoundaryBesov.coe_smul {ψ : Ω.BoundaryPartition} {s : ℝ} {q : ℝ≥0∞} (c : ℂ)
-    {f : Ω.BoundaryL2} (hf : Ω.MemBoundaryBesov p ψ s q f) :
-    Ω.MemBoundaryBesov p ψ s q ((c • f : Ω.BoundaryL2) : V → ℂ) :=
-  (hf.const_smul c).congr
-    (EventuallyEq.symm (Ω.ae_surfaceMeasure_iff_aeBoundary.1 (Lp.coeFn_smul c f)))
-
-/-- `B^s_{p,q}(Γ)` is closed under the negation of `L_2(Γ)`, the multiplication by `-1`. -/
-theorem MemBoundaryBesov.coe_neg {ψ : Ω.BoundaryPartition} {s : ℝ} {q : ℝ≥0∞}
-    {f : Ω.BoundaryL2} (hf : Ω.MemBoundaryBesov p ψ s q f) :
-    Ω.MemBoundaryBesov p ψ s q ((-f : Ω.BoundaryL2) : V → ℂ) := by
-  rw [← neg_one_smul ℂ f]
-  exact hf.coe_smul (-1)
-
-end BoundaryL2Ops
 
 /-- **The space `B^{1/2}_{2,2}(Γ)`** as a normed space: the elements `g ∈ L_2(Γ)` of
 `B^{1/2}_{2,2}(Γ)` for the canonical resolution of unity

@@ -5,9 +5,11 @@
 
 This part carries the function spaces from $\R^d$ to domains and manifolds.
 \Cref{ch:lipschitz-domains} describes the Besov spaces of Lipschitz graph domains and of bounded
-Lipschitz domains by intrinsic differences and as restrictions, and builds the surface measure
-from the area formula; \Cref{ch:traces-lipschitz} proves the trace theorems on Lipschitz
-boundaries for $0 < s < 1$ and on the half-space for every $s > 0$; \Cref{ch:sobolev-domains}
+Lipschitz domains by intrinsic differences and as restrictions, makes $B^s_{p,q}(\Omega)$ a
+Banach space, and builds the surface measure from the area formula; \Cref{ch:traces-lipschitz}
+proves the trace theorems on Lipschitz boundaries for $0 < s < 1$ and on the half-space for every
+$s > 0$, and makes the trace a bounded linear operator from $B^s_{p,q}(\Omega)$ onto the Banach
+space $B^{s - 1/p}_{p,q}(\Gamma)$ with a bounded linear right inverse; \Cref{ch:sobolev-domains}
 builds the Sobolev spaces on open sets as Hilbert spaces, with their duality, the trace space
 of $H^s(\Omega)$ for $1/2 < s < 3/2$, the extension theorems for $\Sob{1}{p}$ and $\Sob{m}{p}$,
 Green's formula and the kernel of the trace; \Cref{ch:laplacian-eigenbases} builds the Dirichlet
@@ -23,7 +25,8 @@ in the eigenbasis of a chart form.
 \label{ch:lipschitz-domains}
 
 This chapter works on a finite-dimensional real inner product space $V$ of dimension $n$ with
-Lebesgue measure, and with $L_p = L_p(V)$ for $1 \leq p < \infty$; the moduli of smoothness on
+Lebesgue measure, and with $L_p = L_p(V)$ for $1 \leq p < \infty$ unless a statement allows
+$p = \infty$; the moduli of smoothness on
 subsets, the local means and the pointwise multipliers are those of \Cref{ch:rd}. A Lipschitz
 graph domain lies above the graph of a Lipschitz function, and a bounded Lipschitz domain agrees
 near each boundary point with a Lipschitz graph domain. On Lipschitz graph domains the
@@ -32,7 +35,9 @@ differences, with Rychkov's universal extension (\Cref{thm:graph-extension},
 \Cref{thm:restriction-local-means} and \Cref{thm:graph-besov}); on bounded Lipschitz domains
 they are described by intrinsic differences, with an extension bounded by a constant times the
 intrinsic quasi-norm that pastes local extensions (\Cref{thm:local-extension} and
-\Cref{thm:bounded-lipschitz-besov}). The area formula for Lipschitz graphs
+\Cref{thm:bounded-lipschitz-besov}), and with the intrinsic quasi-norm as norm they form the
+Banach space $B^s_{p,q}(\Omega)$, $1 \leq p \leq \infty$ (\Cref{def:domain-besov-space} and
+\Cref{thm:domain-besov-complete}). The area formula for Lipschitz graphs
 (\Cref{thm:lipschitz-graph-area}) expresses the Euclidean Hausdorff measure of the boundary in a
 chart, and \Cref{sec:surface-measure} builds from it the surface measure, $L_2(\Gamma)$ and the
 traces into it. \Cref{sec:local-lipschitz-graphs} shows that the bounded Lipschitz domains are
@@ -755,6 +760,106 @@ linear operator, as in Rychkov's construction \cite{Rychkov}; \Cref{thm:bounded-
 records its bound for each $f$. For Sobolev spaces the bounded
 extension operator on Lipschitz domains is Stein's
 \cite[Chapter VI, \S 3, Theorem 5]{SteinSingular}.
+
+\begin{lemma}[Limits of intrinsic quasi-norms]
+\label{lem:besov-norm-complete}
+\lean{ENNReal.lqNorm_le_of_tendsto, Rd.tendsto_lpModulusOn, Rd.modNormOn_le_of_tendsto,
+  Rd.tendsto_modNormOn_sub_of_cauchy, Rd.indicatorLp_indicatorLp}
+\leanok
+\uses{lem:rd-modulus-on, lem:modnorm-on}
+Let $V$ carry an additive Haar measure, $U \subseteq V$ be measurable, $1 \leq p \leq \infty$,
+$r \in \N$, $s \in \R$ and $q \in [0, \infty]$, and write
+$N_U(F) = \|\mathbf 1_U F\|_p + \|(2^{ks} \omega_r(F, 2^{-k}, U)_p)_k\|_{\ell_q}$.
+\begin{enumerate}
+  \item For every countable set $I$, all $a_m, b \colon I \to [0, \infty]$ with $a_m(i) \to b(i)$
+    for every $i$, and all $d_m \to D$ in $[0, \infty]$ with $\|a_m\|_{\ell_q} \leq d_m$ for all
+    large $m$, $\|b\|_{\ell_q} \leq D$.
+  \item If $F_m \to G$ in $L_p$, then $\omega_r(F_m, 2^{-k}, U)_p \to \omega_r(G, 2^{-k}, U)_p$
+    for every $k$, and $N_U(F_m) \leq C$ for all large $m$ gives $N_U(G) \leq C$.
+  \item If $f_n \to g$ in $L_p$ and for every $\varepsilon > 0$ there is $N$ with
+    $N_U(f_m - f_n) \leq \varepsilon$ for all $m, n \geq N$, then $N_U(g - f_n) \to 0$.
+  \item $\mathbf 1_U (\mathbf 1_U f) = \mathbf 1_U f$ for every $f \in L_p$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) For $q = \infty$ every $b(i)$ is at most $D$; for $0 < q < \infty$ every finite sum
+$\sum_{i \in S} b(i)^q$ is the limit of the finite sums of the $a_m(i)^q$, which are at most
+$d_m^q$, and $\sum_i b(i)^q$ is the supremum of the finite sums. (2) By
+\Cref{lem:rd-modulus-on}, $|\omega_r(F, t, U)_p - \omega_r(G, t, U)_p| \leq 2^r \|F - G\|_p$; the
+cut-off norms converge, and (1) bounds the $\ell_q$ part of $N_U(G)$ by
+$C - \|\mathbf 1_U G\|_p$. (3) For $m, n \geq N$, $f_m - f_n \to g - f_n$ in $L_p$ as
+$m \to \infty$, and (2) gives $N_U(g - f_n) \leq \varepsilon$. (4) Both sides agree almost
+everywhere.
+\end{proof}
+
+\begin{definition}[The space $B^s_{p,q}(\Omega)$]
+\label{def:domain-besov-space}
+\lean{Rd.BoundedLipschitzDomain.DomainBesov,
+  Rd.BoundedLipschitzDomain.DomainBesov.toLp_injective,
+  Rd.BoundedLipschitzDomain.DomainBesov.instZero,
+  Rd.BoundedLipschitzDomain.DomainBesov.instSMul,
+  Rd.BoundedLipschitzDomain.DomainBesov.instNeg,
+  Rd.BoundedLipschitzDomain.DomainBesov.instAdd,
+  Rd.BoundedLipschitzDomain.DomainBesov.instSub,
+  Rd.BoundedLipschitzDomain.DomainBesov.instSMulNat,
+  Rd.BoundedLipschitzDomain.DomainBesov.instSMulInt,
+  Rd.BoundedLipschitzDomain.DomainBesov.instAddCommGroup,
+  Rd.BoundedLipschitzDomain.DomainBesov.toLpAddMonoidHom,
+  Rd.BoundedLipschitzDomain.DomainBesov.instModule,
+  Rd.BoundedLipschitzDomain.DomainBesov.instNorm,
+  Rd.BoundedLipschitzDomain.DomainBesov.norm_def,
+  Rd.BoundedLipschitzDomain.DomainBesov.norm_smul,
+  Rd.BoundedLipschitzDomain.DomainBesov.norm_add_le,
+  Rd.BoundedLipschitzDomain.DomainBesov.norm_eq_zero_iff,
+  Rd.BoundedLipschitzDomain.DomainBesov.normedSpaceCore,
+  Rd.BoundedLipschitzDomain.DomainBesov.instNormedAddCommGroup,
+  Rd.BoundedLipschitzDomain.DomainBesov.instNormedSpace,
+  Rd.BoundedLipschitzDomain.DomainBesov.enorm_eq,
+  Rd.BoundedLipschitzDomain.DomainBesov.toLpL,
+  Rd.BoundedLipschitzDomain.DomainBesov.toLpL_apply}
+\leanok
+\uses{def:bounded-lipschitz, def:rd-modulus-on, lem:modnorm-on}
+Let $\Omega$ be a bounded Lipschitz domain, $1 \leq p \leq \infty$, $r \in \N$, $s \in \R$ and
+$1 \leq q \leq \infty$. The space $B^s_{p,q}(\Omega)$ consists of the $f \in L_p(V)$ with
+$\mathbf 1_\Omega f = f$ and
+\[
+  N_\Omega(f) = \|f\|_{L_p(\Omega)} + \|(2^{ks} \omega_r(f, 2^{-k}, \Omega)_p)_k\|_{\ell_q}
+  < \infty ,
+\]
+with the norm $N_\Omega$. It is a complex normed space, and $\|f\|_p \leq N_\Omega(f)$.
+\end{definition}
+
+This is the space of \cite[(2.2)]{DeVoreSharpley} in dyadic form, with differences of a fixed
+order $r$. Its elements are stored as functions on $V$ that vanish outside $\Omega$, so the space
+lies inside $L_p(V)$. For $1 \leq p < \infty$ and $0 < s < r$ its elements are the restrictions to
+$\Omega$ of the functions of $B^s_{p,q}(V)$ (\Cref{thm:bounded-lipschitz-besov}). The norm axioms
+are those of $N_\Omega$ (\Cref{lem:modnorm-on}); $N_\Omega(f) = 0$ gives $f = \mathbf 1_\Omega f
+= 0$.
+
+\begin{theorem}[$B^s_{p,q}(\Omega)$ is a Banach space]
+\label{thm:domain-besov-complete}
+\lean{Rd.BoundedLipschitzDomain.completeSpace_domainBesov,
+  Rd.BoundedLipschitzDomain.domainBesovExtension,
+  Rd.BoundedLipschitzDomain.indicatorLp_domainBesovExtension,
+  Rd.BoundedLipschitzDomain.modNorm_domainBesovExtension_lt_top}
+\leanok
+\uses{def:domain-besov-space, lem:besov-norm-complete, thm:bounded-lipschitz-besov}
+For $1 \leq p \leq \infty$, $r \in \N$, $s \in \R$ and $1 \leq q \leq \infty$, the space
+$B^s_{p,q}(\Omega)$ is complete. For $1 \leq p < \infty$ and $0 < s < r$ every
+$f \in B^s_{p,q}(\Omega)$ agrees almost everywhere on $\Omega$ with some $F \in L_p(V)$ with
+$\|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q} < \infty$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+A Cauchy sequence $(f_n)$ for $N_\Omega$ is a Cauchy sequence in $L_p(V)$, since
+$\|f\|_p \leq N_\Omega(f)$. Its limit $g$ has $\mathbf 1_\Omega g = g$, as the cut-off is
+continuous, and $N_\Omega(g - f_n) \to 0$ by \Cref{lem:besov-norm-complete}; so
+$N_\Omega(g) < \infty$ and $f_n \to g$ in $B^s_{p,q}(\Omega)$. The extension is
+\Cref{thm:bounded-lipschitz-besov}.
+\end{proof}
 
 \section{The area formula for Lipschitz graphs}
 \label{sec:lipschitz-graph-area}
@@ -1499,7 +1604,7 @@ the surface measure, modulo $\sigma$-null sets.
   Rd.BoundedLipschitzDomain.ambientTraceL2_one_apply_ae}
 \leanok
 \uses{thm:boundary-trace-lp, lem:graph-trace-sobolev, lem:besov-half-one-general,
-  thm:trace-kernel-boundary, thm:boundary-trace-charts, lem:trace-linear,
+  thm:trace-kernel-boundary, thm:boundary-trace-charts, lem:boundary-trace-linear,
   thm:surface-measure-null-sets, def:boundary-l2, lem:sobolev-to-l2}
 Let $1/2 < s < 3/2$. For every resolution of unity $\psi$ on $\Gamma$ and every
 $U \in H^s(V)$, $\operatorname{Tr}_\Gamma \iota_s U \in L_2(\Gamma)$. There is $C < \infty$ with
@@ -1526,9 +1631,9 @@ $U \in H^1(V)$.
   \leq \sum_j \sqrt{1 + M_j^2} \, C_j^2 \|U\|^2 ,
 \]
 so $C = (\sum_j \sqrt{1 + M_j^2} \, C_j^2)^{1/2}$. Additivity is \Cref{thm:trace-kernel-boundary}
-for $U + W$ and $W$. For homogeneity, in the chart $j$ the boundary trace is
-$\operatorname{Tr}_j$ (\Cref{thm:boundary-trace-charts}), which commutes with complex scalars
-(\Cref{lem:trace-linear}). Almost everywhere on $\Gamma$ is $\sigma$-almost everywhere
+for $U + W$ and $W$. Homogeneity is \Cref{lem:boundary-trace-linear}, since $\iota_s (c U) =
+c \iota_s U$ has a finite norm (\Cref{lem:besov-half-one-general}). Almost everywhere on $\Gamma$
+is $\sigma$-almost everywhere
 (\Cref{thm:surface-measure-null-sets}), and the boundary traces of two resolutions of unity agree
 almost everywhere on $\Gamma$ (\Cref{thm:boundary-trace-charts}). For $s = 1$, $\iota_1 = \iota$
 (\Cref{lem:sobolev-to-l2}).
@@ -2269,14 +2374,18 @@ the open unit cube (\Cref{lem:unit-cube}), a bounded Lipschitz domain
 \label{ch:traces-lipschitz}
 
 In this chapter $V$ is a finite-dimensional real inner product space of dimension $n$ with
-Lebesgue measure, and $1 \leq p < \infty$. The trace on the boundary of a Lipschitz graph domain
-is built from the atomic decomposition of \Cref{ch:rd}: the cell atoms, composed with the graph
-map $\gamma$ over the hyperplane $H = e^\perp$, are atoms on $H$ (\Cref{lem:atom-traces}). This
-gives the trace theorem on Lipschitz graph domains for $0 < s < 1$
-(\Cref{thm:trace-graph} and \Cref{thm:graph-trace-space}), on the half-space for every $s > 0$
-(\Cref{thm:half-space-trace-space}), and, through the change of chart
+Lebesgue measure, and $1 \leq p < \infty$ unless a statement allows $p = \infty$. The trace on the
+boundary of a Lipschitz graph domain is built from the atomic decomposition of \Cref{ch:rd}: the
+cell atoms, composed with the graph map $\gamma$ over the hyperplane $H = e^\perp$, are atoms on
+$H$ (\Cref{lem:atom-traces}). This gives the trace theorem on Lipschitz graph domains for
+$0 < s < 1$ (\Cref{thm:trace-graph} and \Cref{thm:graph-trace-space}), on the half-space for
+every $s > 0$ (\Cref{thm:half-space-trace-space}), and, through the change of chart
 (\Cref{thm:change-of-chart}), on bounded Lipschitz domains, whose boundary Besov spaces are
 defined in charts by first differences (\Cref{thm:boundary-trace-space}).
+\Cref{sec:boundary-besov-space} makes $B^t_{p,q}(\Gamma)$ a Banach space and the trace a bounded
+linear operator $B^s_{p,q}(\Omega) \to B^{s - 1/p}_{p,q}(\Gamma)$, $1/p < s < 1 + 1/p$, with a
+bounded linear right inverse (\Cref{thm:besov-trace-operator} and
+\Cref{thm:besov-trace-right-inverse}).
 
 \section{Traces on Lipschitz graph domains}
 
@@ -3400,6 +3509,28 @@ In the chart $j$ both are the traces on $\Omega_j$ (\Cref{thm:boundary-trace-cha
 $F_1 = F_2$ on $\Omega_j \cap B_j = \Omega \cap B_j$, so \Cref{lem:trace-locality} with $U = B_j$.
 \end{proof}
 
+\begin{lemma}[Linearity of the boundary trace]
+\label{lem:boundary-trace-linear}
+\lean{Rd.BoundedLipschitzDomain.boundaryTrace_add, Rd.BoundedLipschitzDomain.boundaryTrace_smul}
+\leanok
+\uses{def:boundary-trace, thm:boundary-trace-charts, lem:trace-linear, lem:moduli-orders,
+  lem:pasting}
+Let $\psi$ be a resolution of unity on $\Gamma$, $1 \leq p < \infty$, $L \in \N$, $s > 0$ with
+$s + 1/p < L$ (so $L \geq 1$) and $1 \leq q \leq \infty$. For all $F_1, F_2 \in L_p(V)$ with
+$\|F_i\|_p + \|(2^{k(s + 1/p)} \omega_L(F_i, 2^{-k})_p)_k\|_{\ell_q} < \infty$ and every
+$c \in \C$, $\operatorname{Tr}_\Gamma (F_1 + F_2) = \operatorname{Tr}_\Gamma F_1 +
+\operatorname{Tr}_\Gamma F_2$ and $\operatorname{Tr}_\Gamma (c F_1) = c \operatorname{Tr}_\Gamma
+F_1$ almost everywhere on $\Gamma$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$F_1 + F_2$ and $c F_1$ have finite norms (\Cref{lem:pasting}), hence finite intrinsic norms on
+each $\Omega_j$ (\Cref{lem:moduli-orders}). In the chart $j$ the boundary traces are the traces of
+$\Omega_j$ (\Cref{thm:boundary-trace-charts}), which are linear on these functions
+(\Cref{lem:trace-linear}).
+\end{proof}
+
 \begin{theorem}[The boundary trace is bounded]
 \label{thm:boundary-trace-bounded}
 \lean{Rd.BoundedLipschitzDomain.trace_mulLp_ae_boundaryTrace,
@@ -3703,6 +3834,337 @@ $\|g\|_{B^s_{p,q}(\Gamma), \psi'}$. With the constant $C'$ of
 $C > 0$, so that $C \cdot \infty = \infty$ when $g \notin B^s_{p,q}(\Gamma)$, where the right side
 is $\infty$ (\Cref{lem:boundary-besov-norm-properties}).
 \end{proof}
+
+\section{Besov spaces on the boundary and the trace operator}
+\label{sec:boundary-besov-space}
+
+In this section $\Omega$ is a bounded Lipschitz domain with boundary $\Gamma$, surface measure
+$\sigma$ (\Cref{def:surface-measure}), boundary balls $B_j$ and graph domains $\Omega_j$ over the
+hyperplanes $H_j$, with graph maps $\gamma_j$ and Lipschitz constants $M_j$, and $\psi^0$ is the
+fixed resolution of unity of \Cref{def:trace-space-setting}; for a resolution of unity $\psi$,
+$D_j$ is the bound of $|\psi_j|$ fixed there. These, the chart integrals
+(\Cref{lem:boundary-double-integral-charts}), the vanishing in the charts
+(\Cref{lem:boundary-vanishing-charts}) and the decomposition $g = \sum_j \psi_j g$
+(\Cref{lem:boundary-besov-measurable}) come from \Cref{ch:sobolev-domains}, which follows. The
+quasi-norm of
+\Cref{def:boundary-besov-norm} for $\psi^0$ is a norm on a subspace of
+$L_p(\Gamma) = L_p(\sigma)$, which is complete, and the trace and the extension of
+\Cref{sec:boundary-besov-norm} become a bounded linear operator
+$B^s_{p,q}(\Omega) \to B^{s - 1/p}_{p,q}(\Gamma)$ with a bounded linear right inverse.
+\cite[Theorem 4.11]{SchneiderVybiral} gives the trace and its range, and
+\cite[Theorem 1.1.3(i)]{Mayboroda2005} also gives a linear right inverse.
+
+\begin{lemma}[Linearity of the extension of a graph domain]
+\label{lem:graph-extension-linear}
+\lean{Rd.LipschitzGraph.extLevelH_add, Rd.LipschitzGraph.extLevelH_smul,
+  Rd.LipschitzGraph.traceExtTerm_add, Rd.LipschitzGraph.traceExtTerm_smul,
+  Rd.LipschitzGraph.graphExtension_add, Rd.LipschitzGraph.graphExtension_smul}
+\leanok
+\uses{thm:graph-trace-extension, def:conv}
+Let $\Omega_0$ be a Lipschitz graph domain with hyperplane $H$, $1 \leq p < \infty$ and $L_H \in
+\N$, and let $E$ be the extension with moment order $L_H$ (\Cref{thm:graph-trace-extension}). The
+terms $g_j$ and the levels $F_j$ of $E g$ are linear in $g \in L_p(H)$, and $E(c g) = c E g$ for
+every $c \in \C$ and every $g \in L_p(H)$. For $s > 0$, $1 \leq q \leq \infty$ and
+$g, g' \in L_p(H)$ with finite local means quasi-norms
+$\|(2^{js} \|k_j * g\|_p)_j\|_{\ell_q}$ and $\|(2^{js} \|k_j * g'\|_p)_j\|_{\ell_q}$,
+$E(g + g') = E g + E g'$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$g_j = \eta_j * (k_j * g)$ is linear in $g$, since convolution is (\Cref{def:conv}); $\eta_j$ is
+continuous with compact support and $k_j * g$ is locally integrable, so the convolutions exist at
+every point. Hence $F_j(x) = g_j(P x) v_j(x)$ is linear in $g$. A series commutes with complex
+scalars (Mathlib's \texttt{tsum\_\allowbreak const\_\allowbreak smul''}); the series of $E g$ and
+$E g'$ converge absolutely (\Cref{thm:graph-trace-extension}), so the series of the sums is the
+sum of the series.
+\end{proof}
+
+\begin{lemma}[Chart pieces in $L_p$]
+\label{lem:boundary-chart-pieces-lp}
+\lean{Rd.BoundedLipschitzDomain.lintegral_chartPiece_le,
+  Rd.BoundedLipschitzDomain.stronglyMeasurable_chartPiece,
+  Rd.BoundedLipschitzDomain.eLpNorm_chartPiece_le,
+  Rd.BoundedLipschitzDomain.memLp_chartPiece,
+  Rd.BoundedLipschitzDomain.chartPieceLinear,
+  Rd.BoundedLipschitzDomain.chartPieceLp,
+  Rd.BoundedLipschitzDomain.chartPieceLp_ae,
+  Rd.BoundedLipschitzDomain.boundaryBesovNorm_eq_sum_chartPieceLp,
+  Rd.BoundedLipschitzDomain.modNorm_chartPieceLp_le,
+  Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_chartPieceLp}
+\leanok
+\uses{lem:boundary-double-integral-charts, thm:surface-measure-null-sets, def:trace-space-setting,
+  def:boundary-besov-norm, def:boundary-besov, def:boundary-partition}
+Let $\psi$ be a resolution of unity on $\Gamma$ and $G_j = (\psi_j g) \circ \gamma_j$ the chart
+pieces of $g \colon V \to \C$.
+\begin{enumerate}
+  \item For every $P > 0$ and every $g$,
+    $\int_{H_j} |G_j|^P \leq D_j^P \int_\Gamma |g|^P \, d\sigma$.
+  \item For every $1 \leq p \leq \infty$ and every measurable $g$, $G_j$ is measurable and
+    $\|G_j\|_{L_p(H_j)} \leq D_j \|g\|_{L_p(\Gamma)}$; so $g \mapsto G_j$ is a bounded linear
+    operator $L_p(\Gamma) \to L_p(H_j)$.
+  \item For $g \in L_p(\Gamma)$, $s \in \R$ and $q \in [0, \infty]$,
+    \[
+      \|g\|_{B^s_{p,q}(\Gamma)} = \sum_j \bigl(\|G_j\|_{L_p(H_j)}
+        + \|(2^{ks} \omega_1(G_j, 2^{-k})_p)_k\|_{\ell_q}\bigr) ,
+    \]
+    every summand is at most $\|g\|_{B^s_{p,q}(\Gamma)}$, and $g \in B^s_{p,q}(\Gamma)$ if and
+    only if every summand is finite.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) $|\psi_j| \leq D_j$ and $|\psi_j g|^P$ vanishes outside $B_j$, so the chart integral is at
+most $\int_\Gamma |\psi_j g|^P \, d\sigma$ (\Cref{lem:boundary-double-integral-charts}).
+(2) $\psi_j$ and $\gamma_j$ are continuous. For $p < \infty$ take $P = p$ in (1). For $p = \infty$,
+$|g| \leq \|g\|_{L_\infty(\Gamma)}$ $\sigma$-almost everywhere, hence at $\gamma_j(x')$ for
+almost every $x'$ with $\gamma_j(x') \in B_j$ (\Cref{thm:surface-measure-null-sets}), and
+$\psi_j = 0$ outside $B_j$. Linearity: $\sigma$-almost everywhere identities hold at
+$\gamma_j(x')$ for almost every $x'$ where $\psi_j(\gamma_j x') \neq 0$. (3)
+\Cref{def:boundary-besov-norm} with the chart pieces of (2).
+\end{proof}
+
+\begin{lemma}[$L_p(\Gamma)$ norms by the quasi-norm on the boundary]
+\label{lem:boundary-besov-lp}
+\lean{Rd.BoundedLipschitzDomain.eLpNorm_mul_le_chart,
+  Rd.BoundedLipschitzDomain.exists_eLpNorm_le_boundaryBesovNorm}
+\leanok
+\uses{lem:boundary-double-integral-charts, thm:surface-measure-null-sets,
+  lem:boundary-besov-measurable, def:boundary-besov-norm, lem:boundary-besov-norm-properties}
+Let $\psi$ be a resolution of unity on $\Gamma$ and $1 \leq p \leq \infty$. For every $j$, every
+$\sigma$-measurable $g$ and every $G \in L_p(H_j)$ with $G = (\psi_j g) \circ \gamma_j$ almost
+everywhere on $H_j$,
+$\|\psi_j g\|_{L_p(\Gamma)} \leq (1 + M_j^2)^{1/(2p)} \|G\|_{L_p(H_j)}$, with the factor $1$ for
+$p = \infty$. For all $s \in \R$ and $q \in [0, \infty]$ there is $C < \infty$ with
+$\|g\|_{L_p(\Gamma)} \leq C \|g\|_{B^s_{p,q}(\Gamma)}$ for every $\sigma$-measurable $g$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\psi_j g = 0$ outside $B_j$, and $\int_\Gamma F \, d\sigma \leq \sqrt{1 + M_j^2} \int_{H_j}
+F(\gamma_j x') \, dx'$ for such $F \geq 0$ (\Cref{lem:boundary-double-integral-charts}); for
+$p = \infty$ the bound $|G| \leq \|G\|_\infty$ almost everywhere on $H_j$ holds
+$\sigma$-almost everywhere on $B_j$ (\Cref{thm:surface-measure-null-sets}). Then
+$g = \sum_j \psi_j g$ $\sigma$-almost everywhere (\Cref{lem:boundary-besov-measurable}), the
+triangle inequality and the first statement give
+$\|g\|_{L_p(\Gamma)} \leq \sum_j (1 + M_j^2)^{1/(2p)} \|G_j\|_p$ for $g \in B^s_{p,q}(\Gamma)$, so
+$C = 1 + \sum_j (1 + M_j^2)^{1/(2p)}$ works; outside $B^s_{p,q}(\Gamma)$ the right side is
+$\infty$ (\Cref{lem:boundary-besov-norm-properties}) and $C > 0$.
+\end{proof}
+
+\begin{definition}[The space $B^t_{p,q}(\Gamma)$]
+\label{def:boundary-besov-space}
+\lean{Rd.BoundedLipschitzDomain.memBoundaryBesov_coe_zero,
+  Rd.BoundedLipschitzDomain.MemBoundaryBesov.coe_add,
+  Rd.BoundedLipschitzDomain.MemBoundaryBesov.coe_smul,
+  Rd.BoundedLipschitzDomain.MemBoundaryBesov.coe_neg,
+  Rd.BoundedLipschitzDomain.BoundaryBesov,
+  Rd.BoundedLipschitzDomain.BoundaryBesov.toLp_injective,
+  Rd.BoundedLipschitzDomain.BoundaryBesov.instZero,
+  Rd.BoundedLipschitzDomain.BoundaryBesov.instSMul,
+  Rd.BoundedLipschitzDomain.BoundaryBesov.instNeg,
+  Rd.BoundedLipschitzDomain.BoundaryBesov.instAdd,
+  Rd.BoundedLipschitzDomain.BoundaryBesov.instSub,
+  Rd.BoundedLipschitzDomain.BoundaryBesov.instSMulNat,
+  Rd.BoundedLipschitzDomain.BoundaryBesov.instSMulInt,
+  Rd.BoundedLipschitzDomain.BoundaryBesov.instAddCommGroup,
+  Rd.BoundedLipschitzDomain.BoundaryBesov.toLpAddMonoidHom,
+  Rd.BoundedLipschitzDomain.BoundaryBesov.instModule,
+  Rd.BoundedLipschitzDomain.BoundaryBesov.instNorm,
+  Rd.BoundedLipschitzDomain.BoundaryBesov.norm_def,
+  Rd.BoundedLipschitzDomain.BoundaryBesov.boundaryBesovNorm_lt_top,
+  Rd.BoundedLipschitzDomain.BoundaryBesov.norm_smul,
+  Rd.BoundedLipschitzDomain.BoundaryBesov.norm_add_le,
+  Rd.BoundedLipschitzDomain.BoundaryBesov.norm_eq_zero_iff,
+  Rd.BoundedLipschitzDomain.BoundaryBesov.normedSpaceCore,
+  Rd.BoundedLipschitzDomain.BoundaryBesov.instNormedAddCommGroup,
+  Rd.BoundedLipschitzDomain.BoundaryBesov.instNormedSpace,
+  Rd.BoundedLipschitzDomain.BoundaryBesov.enorm_eq,
+  Rd.BoundedLipschitzDomain.BoundaryBesov.toLpL,
+  Rd.BoundedLipschitzDomain.BoundaryBesov.toLpL_apply}
+\leanok
+\uses{def:surface-measure, def:boundary-besov, def:boundary-besov-norm,
+  lem:boundary-besov-norm-properties, lem:boundary-vanishing-charts,
+  thm:surface-measure-null-sets, def:trace-space-setting, lem:boundary-besov-lp}
+Let $1 \leq p \leq \infty$, $t \in \R$ and $1 \leq q \leq \infty$. The space
+$B^t_{p,q}(\Gamma)$ consists of the $g \in L_p(\Gamma)$ that lie in the space of
+\Cref{def:boundary-besov} for $\psi^0$, with the norm $\|g\|_{B^t_{p,q}(\Gamma)}$ of
+\Cref{def:boundary-besov-norm} for $\psi^0$. It is a complex normed space, and the inclusion
+$B^t_{p,q}(\Gamma) \to L_p(\Gamma)$ is bounded.
+\end{definition}
+
+The space of \Cref{def:boundary-besov} is closed under the operations of $L_p(\Gamma)$, and the
+quasi-norm is homogeneous and subadditive (\Cref{lem:boundary-besov-norm-properties}). It is
+definite: a vanishing norm makes all chart pieces vanish, so $g = 0$ almost everywhere on
+$\Gamma$ (\Cref{lem:boundary-vanishing-charts}), that is, $\sigma$-almost everywhere
+(\Cref{thm:surface-measure-null-sets}). The inclusion is bounded by \Cref{lem:boundary-besov-lp}.
+In Lean it is a structure around $L_p(\Gamma)$ that carries the norm by chart pieces. It is
+defined for every $t$; for $0 < t < 1$, where first differences suffice, it is the space of
+\cite[Definition 3.3]{SchneiderVybiral}.
+
+\begin{theorem}[$B^t_{p,q}(\Gamma)$ is a Banach space]
+\label{thm:boundary-besov-complete}
+\lean{Rd.BoundedLipschitzDomain.tendsto_boundaryBesovNorm_sub_of_cauchy,
+  Rd.BoundedLipschitzDomain.completeSpace_boundaryBesov}
+\leanok
+\uses{def:boundary-besov-space, lem:boundary-chart-pieces-lp, lem:besov-norm-complete}
+Let $\psi$ be a resolution of unity on $\Gamma$, $1 \leq p \leq \infty$, $s \in \R$ and
+$q \in [0, \infty]$. If $g_n \to g$ in $L_p(\Gamma)$ and for every $\varepsilon > 0$ there is $N$
+with $\|g_m - g_n\|_{B^s_{p,q}(\Gamma)} \leq \varepsilon$ for all $m, n \geq N$, then
+$\|g - g_n\|_{B^s_{p,q}(\Gamma)} \to 0$. In particular $B^t_{p,q}(\Gamma)$ is complete for
+$1 \leq p \leq \infty$, $t \in \R$ and $1 \leq q \leq \infty$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+In each chart the pieces $G_j(g_n) \to G_j(g)$ in $L_p(H_j)$, since $g \mapsto G_j(g)$ is bounded
+(\Cref{lem:boundary-chart-pieces-lp}), and $(G_j(g_n))$ is a Cauchy sequence for the quasi-norm of
+$H_j$, which the quasi-norm of $g_m - g_n$ bounds; \Cref{lem:besov-norm-complete} on $U = H_j$ gives
+convergence of each summand of \Cref{lem:boundary-chart-pieces-lp}(3). A Cauchy sequence of
+$B^t_{p,q}(\Gamma)$ converges in $L_p(\Gamma)$ (\Cref{def:boundary-besov-space}); its limit $g$
+has $\|g - g_n\|_{B^t_{p,q}(\Gamma)} \to 0$, so $g \in B^t_{p,q}(\Gamma)$ and $g$ is the limit.
+\end{proof}
+
+\begin{theorem}[The trace operator]
+\label{thm:besov-trace-operator}
+\lean{Rd.besovTrace_index_bounds,
+  Rd.BoundedLipschitzDomain.besovTraceExtension,
+  Rd.BoundedLipschitzDomain.indicatorLp_besovTraceExtension,
+  Rd.BoundedLipschitzDomain.modNorm_besovTraceExtension_lt_top,
+  Rd.BoundedLipschitzDomain.besovTraceLp,
+  Rd.BoundedLipschitzDomain.besovTraceLp_ae,
+  Rd.BoundedLipschitzDomain.memBoundaryBesov_besovTraceLp,
+  Rd.BoundedLipschitzDomain.besovTraceLp_add,
+  Rd.BoundedLipschitzDomain.besovTraceLp_smul,
+  Rd.BoundedLipschitzDomain.exists_boundaryBesovNorm_besovTraceLp_le,
+  Rd.BoundedLipschitzDomain.besovTrace,
+  Rd.BoundedLipschitzDomain.toLp_besovTrace,
+  Rd.BoundedLipschitzDomain.besovTrace_ae}
+\leanok
+\uses{thm:boundary-besov-norm-trace, thm:domain-besov-complete, def:boundary-besov-space,
+  lem:boundary-trace-linear, thm:boundary-trace-bounded, thm:boundary-trace-lp,
+  lem:boundary-trace-locality, thm:bounded-lipschitz-besov, lem:pasting}
+Let $1 \leq p < \infty$, $1/p < s < 1 + 1/p$ and $1 \leq q \leq \infty$, and let
+$B^s_{p,q}(\Omega)$ be the space of \Cref{def:domain-besov-space} with differences of order $2$.
+There is a bounded linear operator
+\[
+  \operatorname{Tr} \colon B^s_{p,q}(\Omega) \to B^{s - 1/p}_{p,q}(\Gamma)
+\]
+such that for every $f \in B^s_{p,q}(\Omega)$ and every $F \in L_p(V)$ with $F = f$ almost
+everywhere on $\Omega$ and $\|F\|_p + \|(2^{ks} \omega_2(F, 2^{-k})_p)_k\|_{\ell_q} < \infty$,
+$\operatorname{Tr} f = \operatorname{Tr}_\Gamma F$ $\sigma$-almost everywhere.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Write $t = s - 1/p$; then $0 < t < 1$ and $t + 1/p = s < 2$. Some $F$ as in the statement exists
+(\Cref{thm:domain-besov-complete}); $\operatorname{Tr}_\Gamma F$ lies in $L_p(\sigma)$
+(\Cref{thm:boundary-trace-lp}) and in $B^t_{p,q}(\Gamma)$ (\Cref{thm:boundary-trace-bounded}),
+and it does not depend on $F$ (\Cref{lem:boundary-trace-locality}). For $f$, $f'$ with such
+extensions $F$, $F'$, the function $F + F'$ is such an extension of $f + f'$, and $c F$ of $c f$
+(\Cref{lem:pasting}), so the operator is linear by \Cref{lem:boundary-trace-linear}. For the
+bound, take the extension of \Cref{thm:bounded-lipschitz-besov} with
+$\|F\|_p + \|(2^{ks} \omega_2(F, 2^{-k})_p)_k\|_{\ell_q} \leq C_1 N_\Omega(f)$; by
+\Cref{thm:boundary-besov-norm-trace} with $L = 2$,
+$\|\operatorname{Tr} f\|_{B^t_{p,q}(\Gamma)} \leq C_2 C_1 N_\Omega(f)$.
+\end{proof}
+
+This is \cite[Theorem 4.11]{SchneiderVybiral} for $p \geq 1$ and
+\cite[Theorem 1.1.3(i)]{Mayboroda2005} in its range of indices. By the last statement the
+operator is the boundary trace of \Cref{sec:boundary-besov-norm}, read on $B^s_{p,q}(\Omega)$.
+
+\begin{definition}[The extension from the boundary]
+\label{def:boundary-extension-operator}
+\lean{Rd.BoundedLipschitzDomain.boundaryCutoff,
+  Rd.BoundedLipschitzDomain.contDiff_boundaryCutoff,
+  Rd.BoundedLipschitzDomain.hasCompactSupport_boundaryCutoff,
+  Rd.BoundedLipschitzDomain.mem_ball_of_boundaryCutoff_ne_zero,
+  Rd.BoundedLipschitzDomain.boundaryCutoff_eq_one,
+  Rd.BoundedLipschitzDomain.boundaryCutoffBound,
+  Rd.BoundedLipschitzDomain.boundaryCutoffBound_spec,
+  Rd.BoundedLipschitzDomain.besovExtendLp}
+\leanok
+\uses{lem:boundary-cutoffs, lem:resolution-of-unity, def:trace-space-setting,
+  lem:boundary-chart-pieces-lp, thm:graph-trace-extension, lem:product-modulus}
+Let $1 \leq p < \infty$. Fix cut-offs $\zeta_j$ for $\psi^0$ as in \Cref{lem:boundary-cutoffs}
+and bounds of their derivatives up to order $2$. For $g \in L_p(\Gamma)$ let
+\[
+  E_\Gamma g = \sum_j \zeta_j E_j G_j ,
+\]
+with the chart pieces $G_j = (\psi^0_j g) \circ \gamma_j \in L_p(H_j)$
+(\Cref{lem:boundary-chart-pieces-lp}) and the extensions $E_j$ of the graph domains $\Omega_j$ with
+moment order $1$ (\Cref{thm:graph-trace-extension}).
+\end{definition}
+
+The same operator serves every $B^t_{p,q}(\Gamma)$, $0 < t < 1$.
+
+\begin{theorem}[The bounded linear right inverse of the trace]
+\label{thm:besov-trace-right-inverse}
+\lean{Rd.BoundedLipschitzDomain.modNorm_besovExtendLp_lt_top,
+  Rd.BoundedLipschitzDomain.exists_modNorm_besovExtendLp_le,
+  Rd.BoundedLipschitzDomain.boundaryTrace_besovExtendLp,
+  Rd.BoundedLipschitzDomain.besovExtendLp_add,
+  Rd.BoundedLipschitzDomain.besovExtendLp_smul,
+  Rd.BoundedLipschitzDomain.modNormOn_indicatorLp_besovExtendLp_le,
+  Rd.BoundedLipschitzDomain.besovExtend,
+  Rd.BoundedLipschitzDomain.toLp_besovExtend,
+  Rd.BoundedLipschitzDomain.toLp_besovTrace_besovExtend,
+  Rd.BoundedLipschitzDomain.besovTrace_surjective}
+\leanok
+\uses{def:boundary-extension-operator, thm:boundary-besov-norm-extension,
+  lem:chart-extension-bound, thm:boundary-trace-extension, lem:graph-extension-linear,
+  lem:local-means-upper, lem:product-modulus, lem:pasting, lem:restriction-moduli,
+  lem:besov-norm-complete, lem:boundary-chart-pieces-lp, thm:besov-trace-operator}
+Let $1 \leq p < \infty$, $0 < t < 1$ and $1 \leq q \leq \infty$. There is $C < \infty$ such that
+for every $g \in B^t_{p,q}(\Gamma)$,
+\[
+  \|E_\Gamma g\|_p + \|(2^{k(t + 1/p)} \omega_2(E_\Gamma g, 2^{-k})_p)_k\|_{\ell_q}
+  \leq C \|g\|_{B^t_{p,q}(\Gamma)}
+\]
+and $\operatorname{Tr}_\Gamma E_\Gamma g = g$ almost everywhere on $\Gamma$; $E_\Gamma$ is linear
+on $B^t_{p,q}(\Gamma)$. Hence
+$\operatorname{Ext} g = \mathbf 1_\Omega E_\Gamma g$ is a bounded linear operator
+$B^t_{p,q}(\Gamma) \to B^{t + 1/p}_{p,q}(\Omega)$, and $\operatorname{Tr} \operatorname{Ext} g = g$
+for every $g \in B^t_{p,q}(\Gamma)$, with the trace of \Cref{thm:besov-trace-operator}. In
+particular, for $1/p < s < 1 + 1/p$ the trace
+$\operatorname{Tr} \colon B^s_{p,q}(\Omega) \to B^{s - 1/p}_{p,q}(\Gamma)$ is onto.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The bound and the trace identity are the proof of \Cref{thm:boundary-besov-norm-extension} with
+the chart pieces of \Cref{lem:boundary-chart-pieces-lp}: $N(\zeta_j E_j G_j) \leq K_j N(G_j)$
+(\Cref{lem:chart-extension-bound}), the triangle inequality (\Cref{lem:pasting}), and
+$\operatorname{Tr}_\Gamma E_\Gamma g = g$ (\Cref{thm:boundary-trace-extension}). Linearity: the
+chart pieces are linear, the chart pieces of $g \in B^t_{p,q}(\Gamma)$ have finite local means
+quasi-norms (\Cref{lem:local-means-upper}), so $E_j$ is additive on them
+(\Cref{lem:graph-extension-linear}), and multiplication by $\zeta_j$ is linear
+(\Cref{lem:product-modulus}). The cut-off $\mathbf 1_\Omega E_\Gamma g$ vanishes outside $\Omega$
+(\Cref{lem:besov-norm-complete}) and has
+$N_\Omega(\mathbf 1_\Omega E_\Gamma g) \leq \|E_\Gamma g\|_p + \|(2^{k(t + 1/p)}
+\omega_2(E_\Gamma g, 2^{-k})_p)_k\|_{\ell_q}$ (\Cref{lem:restriction-moduli}). Finally $E_\Gamma g$
+is an extension of $\operatorname{Ext} g$ with a finite norm, so
+$\operatorname{Tr} \operatorname{Ext} g = \operatorname{Tr}_\Gamma E_\Gamma g = g$
+(\Cref{thm:besov-trace-operator}). For $1/p < s < 1 + 1/p$ take $t = s - 1/p$: every
+$g \in B^{s - 1/p}_{p,q}(\Gamma)$ is the trace of $\mathbf 1_\Omega E_\Gamma g \in
+B^s_{p,q}(\Omega)$.
+\end{proof}
+
+The extension of \cite[Theorem 4.10]{SchneiderVybiral} is a bounded non-linear operator built
+from atomic decompositions. A linear right inverse is the operator $\operatorname{Ex}$ in the
+proof of \cite[Theorem 1.1.3(i)]{Mayboroda2005}, see its (4.2.19). The extension here is linear
+because the extensions $E_j$ of the graph domains are built from the local means of the chart
+pieces.
+
+For Triebel--Lizorkin spaces the trace maps $F^s_{p,q}(\Omega)$ onto
+$B^{s - 1/p}_{p,p}(\Gamma)$ for every $q$, with a linear right inverse
+\cite[Theorem 1.1.3(ii)]{Mayboroda2005}. Once Triebel--Lizorkin spaces on
+$\Omega$ are defined, for $q \leq p$ the boundedness of the trace would follow from
+$F^s_{p,q} \subseteq B^s_{p,p}$, and for $q \geq p$ the right inverse from
+$B^s_{p,p} \subseteq F^s_{p,q}$ together with \Cref{thm:besov-trace-right-inverse}; the remaining
+half needs a sharper argument in each case, and both halves hold at $q = p$. This is a later
+goal.
 
 \chapter{Sobolev spaces on domains}
 \label{ch:sobolev-domains}
@@ -5123,8 +5585,8 @@ closed subspace of a Hilbert space.
   Rd.BoundedLipschitzDomain.boundaryTrace_sobolevToL2_sub}
 \leanok
 \uses{def:trace-kernel, lem:boundary-vanishing-charts, thm:boundary-trace-charts,
-  lem:trace-linear, lem:besov-half-one-general, lem:trace-partial-sums,
-  thm:chart-traces-bounded, lem:sobolev-to-l2}
+  lem:boundary-trace-linear, lem:besov-half-one-general, thm:chart-traces-bounded,
+  lem:sobolev-to-l2}
 Let $1/2 < s < 3/2$. For every resolution of unity $\psi$ on $\Gamma$ and every
 $u \in H^s(\Omega)$, $u \in N^s_\Gamma$ if and only if $\operatorname{Tr}_\Gamma \iota_s u = 0$
 almost everywhere on $\Gamma$, with the boundary trace of $\psi$; for $s = 1$ with
@@ -5139,11 +5601,10 @@ By \Cref{thm:chart-traces-bounded}, $T^s_j u = 0$ if and only if
 $(\psi^0_j \operatorname{Tr}_\Gamma \iota_s u) \circ \gamma_j = 0$ almost everywhere on $H_j$, so
 $u \in N^s_\Gamma$ if and only if the boundary trace of $\psi^0$ vanishes almost everywhere on
 $\Gamma$ (\Cref{lem:boundary-vanishing-charts}), and the boundary traces of $\psi^0$ and $\psi$
-agree almost everywhere on $\Gamma$ (\Cref{thm:boundary-trace-charts}). For the difference, in
-the chart $j$ the boundary traces are the traces $\operatorname{Tr}_j$
-(\Cref{thm:boundary-trace-charts}), which are linear on $H^s(V)$ (\Cref{lem:trace-linear}),
-since the functions of $H^s(V)$ have finite intrinsic norms (\Cref{lem:besov-half-one-general},
-\Cref{lem:trace-partial-sums}). For $s = 1$, $\iota_1 = \iota$ (\Cref{lem:sobolev-to-l2}).
+agree almost everywhere on $\Gamma$ (\Cref{thm:boundary-trace-charts}). For the difference,
+$\iota_s(U - W) + \iota_s W = \iota_s U$, the functions of $H^s(V)$ have finite norms
+(\Cref{lem:besov-half-one-general}), and the boundary trace is additive on them
+(\Cref{lem:boundary-trace-linear}). For $s = 1$, $\iota_1 = \iota$ (\Cref{lem:sobolev-to-l2}).
 \end{proof}
 
 So the trace kernel does not depend on the resolution of unity in its definition.
@@ -5455,11 +5916,7 @@ and $\tau$ identifies it with $N_\Gamma^\perp$.
 
 \begin{definition}[The space $B^{1/2}_{2,2}(\Gamma)$ as a normed space]
 \label{def:boundary-besov-half}
-\lean{Rd.BoundedLipschitzDomain.memBoundaryBesov_coe_zero,
-  Rd.BoundedLipschitzDomain.MemBoundaryBesov.coe_add,
-  Rd.BoundedLipschitzDomain.MemBoundaryBesov.coe_smul,
-  Rd.BoundedLipschitzDomain.MemBoundaryBesov.coe_neg,
-  Rd.BoundedLipschitzDomain.BoundaryBesovHalf,
+\lean{Rd.BoundedLipschitzDomain.BoundaryBesovHalf,
   Rd.BoundedLipschitzDomain.BoundaryBesovHalf.toL2_injective,
   Rd.BoundedLipschitzDomain.BoundaryBesovHalf.instZero,
   Rd.BoundedLipschitzDomain.BoundaryBesovHalf.instAdd,
@@ -5483,7 +5940,7 @@ and $\tau$ identifies it with $N_\Gamma^\perp$.
 \leanok
 \uses{def:boundary-l2, def:boundary-besov, def:boundary-besov-norm,
   lem:boundary-besov-norm-properties, lem:boundary-vanishing-charts, thm:surface-measure-null-sets,
-  def:trace-space-setting}
+  def:trace-space-setting, def:boundary-besov-space}
 The normed space $B^{1/2}_{2,2}(\Gamma)$ consists of the $g \in L_2(\Gamma)$ that lie in the
 space of \Cref{def:boundary-besov} for $p = q = 2$, $s = 1/2$ and $\psi^0$, with the norm
 $\|g\|_{B^{1/2}_{2,2}(\Gamma)}$ of \Cref{def:boundary-besov-norm} for $\psi^0$. It is a complex
@@ -5882,8 +6339,7 @@ $\gamma_j y' \notin B_j$ is symmetric.
 
 \begin{lemma}[The parts of a chart piece]
 \label{lem:chart-piece-parts}
-\lean{Rd.BoundedLipschitzDomain.lintegral_chartPiece_le,
-  Rd.BoundedLipschitzDomain.lintegral_lintegral_inside_le,
+\lean{Rd.BoundedLipschitzDomain.lintegral_lintegral_inside_le,
   Rd.BoundedLipschitzDomain.chartLipschitzConst,
   Rd.BoundedLipschitzDomain.chartLipschitzConst_ne_top,
   Rd.BoundedLipschitzDomain.lintegral_lintegral_lipschitz_le,
@@ -5892,7 +6348,7 @@ $\gamma_j y' \notin B_j$ is symmetric.
 \uses{lem:chart-piece-integrand, lem:boundary-double-integral-charts,
   lem:radial-lipschitz-integral, lem:boundary-partition-lipschitz, lem:graph-map-bilipschitz,
   lem:double-integral-splitting, def:slobodeckij-form, def:boundary-slobodeckij-form,
-  def:graph-map}
+  def:graph-map, lem:boundary-chart-pieces-lp}
 Let $1 \leq p < \infty$, $0 < s < 1$, $b = n - 1 + sp$, and keep the notation of
 \Cref{lem:chart-piece-integrand} with $P = p$ and $a = b$. For every $g \colon V \to \C$:
 \begin{enumerate}
@@ -5913,7 +6369,8 @@ Let $1 \leq p < \infty$, $0 < s < 1$, $b = n - 1 + sp$, and keep the notation of
 
 \begin{proof}
 \leanok
-(1) and (2) are \Cref{lem:boundary-double-integral-charts}, with $|\psi_j| \leq D_j$. (3) After
+(1) is \Cref{lem:boundary-chart-pieces-lp}(1) and (2) is
+\Cref{lem:boundary-double-integral-charts}. (3) After
 the substitution $y' = x' + z$ the inner integral is at most $K_j$ by
 \Cref{lem:radial-lipschitz-integral} with
 $|\psi_j(\gamma_j(x' + z)) - \psi_j(\gamma_j x')| \leq \min(D_j (1 + M_j) |z|, 2 D_j)$

@@ -53,6 +53,14 @@ The proof follows Schneider–Vybíral §3: a covering `Ω̄ ⊆ K_0 ∪ ⋃_j K
 
 For a compact set, the smooth resolutions of unity can be chosen equal to `1` on a neighbourhood
 of it (`Rd.exists_smooth_partition_nhds`).
+
+**The Banach space `B^s_{p,q}(Ω)`** (`Rd.BoundedLipschitzDomain.DomainBesov`): the functions
+`f ∈ L_p(V)` vanishing outside `Ω` with a finite intrinsic quasi-norm, normed by it for
+`1 ≤ q ≤ ∞`. It is complete (`Rd.BoundedLipschitzDomain.completeSpace_domainBesov`), since a
+Cauchy sequence for the intrinsic quasi-norm converges in `L_p(V)` and the quasi-norm passes to the
+limit (`Rd.tendsto_modNormOn_sub_of_cauchy`). For `1 ≤ p < ∞`, `0 < s < r` and `1 ≤ q ≤ ∞` every
+element has an extension to `V` with a finite quasi-norm
+(`Rd.BoundedLipschitzDomain.domainBesovExtension`).
 -/
 
 @[expose] public section
@@ -704,6 +712,224 @@ theorem exists_memApprox_extension_iff (hp : p ≠ ∞) {r : ℕ} {s : ℝ} (hs 
   rw [← Ω.exists_besov_extension_iff_modulusOn hp hs hsr hq f]
   exact exists_congr fun F =>
     and_congr_right fun _ => memApprox_bandScheme_iff_modulus hp hs.le hsr hq F
+
+/-! ### The Banach space `B^s_{p,q}(Ω)` -/
+
+variable (p) in
+/-- **The Besov space `B^s_{p,q}(Ω)` by intrinsic differences** (DeVore–Sharpley, (2.2), in dyadic
+form): the functions `f ∈ L_p(V)` that vanish outside `Ω`, `1_Ω f = f`, with a finite intrinsic
+quasi-norm `N_Ω(f) = ‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q}` (`Rd.modNormOn`),
+differences of order `r`. For `1 ≤ q ≤ ∞` it is a Banach space with the norm `N_Ω`
+(`Rd.BoundedLipschitzDomain.completeSpace_domainBesov`); for `1 ≤ p < ∞`, `0 < s < r` and
+`1 ≤ q ≤ ∞` its elements are the restrictions to `Ω` of the functions of `B^s_{p,q}(V)`
+(`Rd.BoundedLipschitzDomain.exists_besov_extension_iff_modulusOn`). Storing `1_Ω f` instead of
+the class of `f` on `Ω` keeps the space inside `L_p(V)`. -/
+@[ext]
+structure DomainBesov (r : ℕ) (s : ℝ) (q : ℝ≥0∞) where
+  /-- The function in `L_p(V)`, zero outside `Ω`. -/
+  toLp : Lp ℂ p (volume : Measure V)
+  /-- It vanishes outside `Ω`. -/
+  indicator_eq : indicatorLp Ω.measurableSet toLp = toLp
+  /-- Its intrinsic quasi-norm on `Ω` is finite. -/
+  mem : modNormOn Ω.measurableSet r s q toLp < ∞
+
+namespace DomainBesov
+
+variable {Ω} {r : ℕ} {s : ℝ} {q : ℝ≥0∞}
+
+/-- An element of `B^s_{p,q}(Ω)` is determined by its function in `L_p(V)`. -/
+theorem toLp_injective :
+    Function.Injective (toLp : Ω.DomainBesov p r s q → Lp ℂ p (volume : Measure V)) :=
+  fun _ _ h => DomainBesov.ext h
+
+/-- The zero function. -/
+noncomputable instance instZero : Zero (Ω.DomainBesov p r s q) :=
+  ⟨⟨0, map_zero _, (modNormOn_zero Ω.measurableSet r s q).trans_lt ENNReal.zero_lt_top⟩⟩
+
+/-- Complex multiples of a function of `B^s_{p,q}(Ω)` (`Rd.modNormOn_const_smul`). -/
+noncomputable instance instSMul : SMul ℂ (Ω.DomainBesov p r s q) :=
+  ⟨fun c a => ⟨c • a.toLp, by rw [map_smul, a.indicator_eq], by
+    rw [modNormOn_const_smul]
+    exact ENNReal.mul_lt_top enorm_lt_top a.mem⟩⟩
+
+/-- The negative of a function of `B^s_{p,q}(Ω)`, the multiple by `-1`. -/
+noncomputable instance instNeg : Neg (Ω.DomainBesov p r s q) :=
+  ⟨fun a => ⟨-a.toLp, by rw [map_neg, a.indicator_eq], by
+    rw [← neg_one_smul ℂ a.toLp, modNormOn_const_smul]
+    exact ENNReal.mul_lt_top enorm_lt_top a.mem⟩⟩
+
+/-- The sum of two functions of `B^s_{p,q}(Ω)`, for `q ≥ 1` (`Rd.modNormOn_add_le`). -/
+noncomputable instance instAdd [Fact (1 ≤ q)] : Add (Ω.DomainBesov p r s q) :=
+  ⟨fun a b => ⟨a.toLp + b.toLp, by rw [map_add, a.indicator_eq, b.indicator_eq],
+    (modNormOn_add_le _ r s Fact.out _ _).trans_lt (ENNReal.add_lt_top.2 ⟨a.mem, b.mem⟩)⟩⟩
+
+/-- The difference of two functions of `B^s_{p,q}(Ω)`, for `q ≥ 1`. -/
+noncomputable instance instSub [Fact (1 ≤ q)] : Sub (Ω.DomainBesov p r s q) :=
+  ⟨fun a b => ⟨a.toLp - b.toLp, by rw [sub_eq_add_neg]; exact (a + -b).indicator_eq, by
+    rw [sub_eq_add_neg]; exact (a + -b).mem⟩⟩
+
+/-- Natural multiples of a function of `B^s_{p,q}(Ω)`. -/
+noncomputable instance instSMulNat : SMul ℕ (Ω.DomainBesov p r s q) :=
+  ⟨fun n a => ⟨n • a.toLp, by rw [← Nat.cast_smul_eq_nsmul ℂ]; exact ((n : ℂ) • a).indicator_eq,
+    by rw [← Nat.cast_smul_eq_nsmul ℂ]; exact ((n : ℂ) • a).mem⟩⟩
+
+/-- Integer multiples of a function of `B^s_{p,q}(Ω)`. -/
+noncomputable instance instSMulInt : SMul ℤ (Ω.DomainBesov p r s q) :=
+  ⟨fun n a => ⟨n • a.toLp, by rw [← Int.cast_smul_eq_zsmul ℂ]; exact ((n : ℂ) • a).indicator_eq,
+    by rw [← Int.cast_smul_eq_zsmul ℂ]; exact ((n : ℂ) • a).mem⟩⟩
+
+/-- `B^s_{p,q}(Ω)` is an additive group, a subgroup of `L_p(V)`, for `q ≥ 1`. -/
+noncomputable instance instAddCommGroup [Fact (1 ≤ q)] : AddCommGroup (Ω.DomainBesov p r s q) :=
+  toLp_injective.addCommGroup _ rfl (fun _ _ => rfl) (fun _ => rfl) (fun _ _ => rfl)
+    (fun _ _ => rfl) (fun _ _ => rfl)
+
+/-- The inclusion `B^s_{p,q}(Ω) → L_p(V)` as an additive map. -/
+noncomputable def toLpAddMonoidHom [Fact (1 ≤ q)] :
+    Ω.DomainBesov p r s q →+ Lp ℂ p (volume : Measure V) where
+  toFun := toLp
+  map_zero' := rfl
+  map_add' _ _ := rfl
+
+/-- `B^s_{p,q}(Ω)` is a complex vector space, a subspace of `L_p(V)`, for `q ≥ 1`. -/
+noncomputable instance instModule [Fact (1 ≤ q)] : Module ℂ (Ω.DomainBesov p r s q) :=
+  Function.Injective.module (R := ℂ) toLpAddMonoidHom toLp_injective fun _ _ => rfl
+
+/-- **The norm of `B^s_{p,q}(Ω)`**: the intrinsic quasi-norm `N_Ω(f)`. -/
+noncomputable instance instNorm : Norm (Ω.DomainBesov p r s q) :=
+  ⟨fun a => (modNormOn Ω.measurableSet r s q a.toLp).toReal⟩
+
+/-- The norm of `B^s_{p,q}(Ω)` is the intrinsic quasi-norm `N_Ω(f)`. -/
+protected theorem norm_def (a : Ω.DomainBesov p r s q) :
+    ‖a‖ = (modNormOn Ω.measurableSet r s q a.toLp).toReal :=
+  rfl
+
+/-- The norm is homogeneous (`Rd.modNormOn_const_smul`). -/
+protected theorem norm_smul (c : ℂ) (a : Ω.DomainBesov p r s q) : ‖c • a‖ = ‖c‖ * ‖a‖ := by
+  rw [DomainBesov.norm_def, DomainBesov.norm_def]
+  change (modNormOn Ω.measurableSet r s q (c • a.toLp)).toReal = _
+  rw [modNormOn_const_smul, ENNReal.toReal_mul, toReal_enorm]
+
+/-- The triangle inequality, for `q ≥ 1` (`Rd.modNormOn_add_le`). -/
+protected theorem norm_add_le [Fact (1 ≤ q)] (a b : Ω.DomainBesov p r s q) :
+    ‖a + b‖ ≤ ‖a‖ + ‖b‖ := by
+  rw [DomainBesov.norm_def, DomainBesov.norm_def, DomainBesov.norm_def,
+    ← ENNReal.toReal_add a.mem.ne b.mem.ne]
+  exact ENNReal.toReal_mono (ENNReal.add_ne_top.2 ⟨a.mem.ne, b.mem.ne⟩)
+    (modNormOn_add_le _ r s Fact.out _ _)
+
+/-- **The norm is definite**: `N_Ω(f) = 0` gives `1_Ω f = 0`, and `f = 1_Ω f`. -/
+protected theorem norm_eq_zero_iff [Fact (1 ≤ q)] (a : Ω.DomainBesov p r s q) :
+    ‖a‖ = 0 ↔ a = 0 := by
+  constructor
+  · intro h
+    rw [DomainBesov.norm_def, ENNReal.toReal_eq_zero_iff] at h
+    have h0 := (add_eq_zero.1 (h.resolve_right a.mem.ne)).1
+    ext1
+    change a.toLp = 0
+    rw [← a.indicator_eq]
+    exact enorm_eq_zero.1 h0
+  · rintro rfl
+    rw [DomainBesov.norm_def]
+    change (modNormOn Ω.measurableSet r s q (0 : Lp ℂ p (volume : Measure V))).toReal = 0
+    rw [modNormOn_zero, ENNReal.toReal_zero]
+
+/-- The axioms of a normed space for `B^s_{p,q}(Ω)`, `q ≥ 1`. -/
+theorem normedSpaceCore [Fact (1 ≤ q)] : NormedSpace.Core ℂ (Ω.DomainBesov p r s q) where
+  norm_nonneg _ := ENNReal.toReal_nonneg
+  norm_smul := DomainBesov.norm_smul
+  norm_triangle := DomainBesov.norm_add_le
+  norm_eq_zero_iff := DomainBesov.norm_eq_zero_iff
+
+/-- `B^s_{p,q}(Ω)` is a normed group, `q ≥ 1` (Mathlib's `NormedAddCommGroup.ofCore`). -/
+noncomputable instance instNormedAddCommGroup [Fact (1 ≤ q)] :
+    NormedAddCommGroup (Ω.DomainBesov p r s q) :=
+  NormedAddCommGroup.ofCore normedSpaceCore
+
+/-- `B^s_{p,q}(Ω)` is a complex normed space, `q ≥ 1` (Mathlib's `NormedSpace.ofCore`). -/
+noncomputable instance instNormedSpace [Fact (1 ≤ q)] : NormedSpace ℂ (Ω.DomainBesov p r s q) :=
+  NormedSpace.ofCore normedSpaceCore
+
+/-- The extended norm of `f ∈ B^s_{p,q}(Ω)` is the intrinsic quasi-norm `N_Ω(f)`. -/
+theorem enorm_eq [Fact (1 ≤ q)] (a : Ω.DomainBesov p r s q) :
+    ‖a‖ₑ = modNormOn Ω.measurableSet r s q a.toLp := by
+  rw [← ofReal_norm, DomainBesov.norm_def, ENNReal.ofReal_toReal a.mem.ne]
+
+/-- **The inclusion `B^s_{p,q}(Ω) → L_p(V)`** as a bounded operator of norm at most `1`:
+`‖f‖_p = ‖1_Ω f‖_p ≤ N_Ω(f)`. -/
+noncomputable def toLpL [Fact (1 ≤ q)] :
+    Ω.DomainBesov p r s q →L[ℂ] Lp ℂ p (volume : Measure V) :=
+  LinearMap.mkContinuous
+    { toFun := toLp
+      map_add' _ _ := rfl
+      map_smul' _ _ := rfl }
+    1 fun a => by
+      change ‖a.toLp‖ ≤ 1 * ‖a‖
+      rw [one_mul, ← toReal_enorm a.toLp, ← toReal_enorm a]
+      refine ENNReal.toReal_mono enorm_ne_top ?_
+      calc ‖a.toLp‖ₑ = ‖indicatorLp Ω.measurableSet a.toLp‖ₑ := by rw [a.indicator_eq]
+        _ ≤ modNormOn Ω.measurableSet r s q a.toLp := le_self_add
+        _ = ‖a‖ₑ := a.enorm_eq.symm
+
+/-- The inclusion `B^s_{p,q}(Ω) → L_p(V)` sends `f` to its function. -/
+theorem toLpL_apply [Fact (1 ≤ q)] (a : Ω.DomainBesov p r s q) : toLpL a = a.toLp :=
+  rfl
+
+end DomainBesov
+
+/-- **`B^s_{p,q}(Ω)` is a Banach space**, `1 ≤ q ≤ ∞`. A Cauchy sequence `(f_n)` for `N_Ω` is a
+Cauchy sequence in `L_p(V)` (`Rd.BoundedLipschitzDomain.DomainBesov.toLpL`); its limit `g`
+vanishes outside `Ω`, and `N_Ω(g - f_n) → 0` (`Rd.tendsto_modNormOn_sub_of_cauchy`), so `g` has
+a finite intrinsic quasi-norm and is the limit for `N_Ω`. -/
+instance completeSpace_domainBesov {r : ℕ} {s : ℝ} {q : ℝ≥0∞} [Fact (1 ≤ q)] :
+    CompleteSpace (Ω.DomainBesov p r s q) := by
+  refine EMetric.complete_of_cauchySeq_tendsto fun u hu => ?_
+  obtain ⟨G, hG⟩ := cauchySeq_tendsto_of_complete
+    ((DomainBesov.toLpL : Ω.DomainBesov p r s q →L[ℂ] Lp ℂ p (volume : Measure V)
+      ).uniformContinuous.comp_cauchySeq hu)
+  have hG' : Tendsto (fun n => (u n).toLp) atTop (𝓝 G) := hG
+  have hGi : indicatorLp Ω.measurableSet G = G := tendsto_nhds_unique
+    (((indicatorLp Ω.measurableSet).continuous.tendsto G).comp hG')
+    (hG'.congr fun n => (u n).indicator_eq.symm)
+  have hC : ∀ ε > 0, ∃ N, ∀ m ≥ N, ∀ n ≥ N,
+      modNormOn Ω.measurableSet r s q ((u m).toLp - (u n).toLp) ≤ ε := fun ε hε => by
+    obtain ⟨N, hN⟩ := EMetric.cauchySeq_iff.1 hu ε hε
+    refine ⟨N, fun m hm n hn => ?_⟩
+    have h := hN m hm n hn
+    rw [edist_eq_enorm_sub, DomainBesov.enorm_eq] at h
+    exact h.le
+  have hlim := tendsto_modNormOn_sub_of_cauchy Ω.measurableSet r s q hG' hC
+  obtain ⟨n, hn⟩ := (ENNReal.tendsto_nhds_zero.1 hlim 1 one_pos).exists
+  have hmem : modNormOn Ω.measurableSet r s q G < ∞ := by
+    calc modNormOn Ω.measurableSet r s q G
+        = modNormOn Ω.measurableSet r s q ((G - (u n).toLp) + (u n).toLp) := by
+          rw [sub_add_cancel]
+      _ ≤ _ := modNormOn_add_le _ r s Fact.out _ _
+      _ < ∞ := ENNReal.add_lt_top.2 ⟨hn.trans_lt ENNReal.one_lt_top, (u n).mem⟩
+  refine ⟨⟨G, hGi, hmem⟩, tendsto_iff_edist_tendsto_0.2 (hlim.congr fun n => ?_)⟩
+  rw [edist_comm, edist_eq_enorm_sub, DomainBesov.enorm_eq]
+  rfl
+
+/-- **An extension of `f ∈ B^s_{p,q}(Ω)` to `V`**, `1 ≤ p < ∞`, `0 < s < r`, `1 ≤ q ≤ ∞`: some
+`F ∈ L_p(V)` with `F = f` on `Ω` and `‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} < ∞`, a choice
+among the extensions of `Rd.BoundedLipschitzDomain.exists_besov_extension_of_modulusOn`. Every
+statement about it below holds for every such extension. -/
+noncomputable def domainBesovExtension (hp : p ≠ ∞) {r : ℕ} {s : ℝ} (hs : 0 < s) (hsr : s < r)
+    {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Ω.DomainBesov p r s q) : Lp ℂ p (volume : Measure V) :=
+  (Ω.exists_besov_extension_of_modulusOn hp hs hsr hq f.mem).choose
+
+/-- The extension agrees with `f` on `Ω`: `1_Ω F = f`. -/
+theorem indicatorLp_domainBesovExtension (hp : p ≠ ∞) {r : ℕ} {s : ℝ} (hs : 0 < s)
+    (hsr : s < r) {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Ω.DomainBesov p r s q) :
+    indicatorLp Ω.measurableSet (Ω.domainBesovExtension hp hs hsr hq f) = f.toLp :=
+  (Ω.exists_besov_extension_of_modulusOn hp hs hsr hq f.mem).choose_spec.1.trans f.indicator_eq
+
+/-- The extension has a finite quasi-norm by differences on `V`:
+`‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} < ∞`. -/
+theorem modNorm_domainBesovExtension_lt_top (hp : p ≠ ∞) {r : ℕ} {s : ℝ} (hs : 0 < s)
+    (hsr : s < r) {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Ω.DomainBesov p r s q) :
+    ‖Ω.domainBesovExtension hp hs hsr hq f‖ₑ + lqNorm q (fun k =>
+      dyadicWeight s k * lpModulus p r (Ω.domainBesovExtension hp hs hsr hq f) k) < ∞ :=
+  (Ω.exists_besov_extension_of_modulusOn hp hs hsr hq f.mem).choose_spec.2
 
 end BoundedLipschitzDomain
 

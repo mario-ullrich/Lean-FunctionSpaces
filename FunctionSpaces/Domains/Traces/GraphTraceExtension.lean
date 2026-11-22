@@ -22,7 +22,10 @@ with the vertical cut-off `v_j` of the mollified graph (`Rd.LipschitzGraph.vertC
 (`Rd.LipschitzGraph.enorm_higherDiff_two_extendAtom_le`), so the extended atoms are regular atoms of
 order and exponent `2` on `V` (`Rd.LipschitzGraph.isRegularAtom_extendAtom`). With the terms
 `g_j` of moment order `Lh`, the levels of the extension are `F_j(x) = g_j(Px) v_j(x)`
-(`Rd.LipschitzGraph.extLevel`) and `E g = ∑_j F_j` (`Rd.LipschitzGraph.graphExtension`).
+(`Rd.LipschitzGraph.extLevel`) and `E g = ∑_j F_j` (`Rd.LipschitzGraph.graphExtension`). The
+levels are linear in `g` (`Rd.LipschitzGraph.traceExtTerm_add`,
+`Rd.LipschitzGraph.traceExtTerm_smul`), hence so is `E` on the functions for which the series
+converges (`Rd.LipschitzGraph.graphExtension_add`, `Rd.LipschitzGraph.graphExtension_smul`).
 
 The order-dependent bounds are stated once for a **package of extended atoms** of order `r`
 (`Rd.LipschitzGraph.HasExtensionAtoms`). For `s > 0`, `s + 1/p < r`, `C < ∞` and `g` with a finite
@@ -89,6 +92,16 @@ theorem one_div_toReal_pos {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞) : 
 theorem one_le_of_add_one_div_toReal_lt {p : ℝ≥0∞} {s : ℝ} (hs : 0 < s) {r : ℕ}
     (hsr : s + 1 / p.toReal < r) : 1 ≤ r :=
   Nat.cast_pos.1 ((by positivity : (0 : ℝ) < s + 1 / p.toReal).trans hsr)
+
+/-- **The indices of the Besov trace**: for `1 ≤ p < ∞` and `1/p < s < 1 + 1/p`, the smoothness
+`t = s - 1/p` on the boundary has `0 < t < 1`, and `0 < s < 2`, so differences of order `2` on the
+domain suffice (`Rd.add_one_div_toReal_lt`). -/
+theorem besovTrace_index_bounds {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞) {s : ℝ}
+    (hs : 1 / p.toReal < s) (hs' : s < 1 + 1 / p.toReal) :
+    0 < s - 1 / p.toReal ∧ s - 1 / p.toReal < 1 ∧ 0 < s ∧ s < ((2 : ℕ) : ℝ) := by
+  have h := add_one_div_toReal_lt hp (show s - 1 / p.toReal < 1 by linarith) (le_refl 2)
+  rw [sub_add_cancel] at h
+  exact ⟨sub_pos.2 hs, by linarith, (one_div_nonneg.2 ENNReal.toReal_nonneg).trans_lt hs, h⟩
 
 namespace LipschitzGraph
 
@@ -455,6 +468,73 @@ theorem summable_traceExtTerm (hp : p ≠ ∞) (Lh : ℕ) {s : ℝ} (hs : 0 < s)
   rw [ENNReal.tsum_mul_left, ENNReal.tsum_dyadicWeight_neg]
   exact ENNReal.mul_ne_top (ENNReal.mul_ne_top hK hX.ne)
     (ENNReal.one_sub_two_rpow_neg_inv_ne_top hs)
+
+/-! ### Linearity of the extension -/
+
+/-- **The terms on `H` are additive**: `η_j ⋆ (k_j ⋆ (g + g')) = η_j ⋆ (k_j ⋆ g) + η_j ⋆ (k_j ⋆ g')`
+at every point, since `η_j` is continuous with compact support and `k_j ⋆ g ∈ L_p` is locally
+integrable (Mathlib's `HasCompactSupport.convolutionExists_left`,
+`ConvolutionExistsAt.distrib_add`). -/
+theorem extLevelH_add (hp : p ≠ ∞) (Lh j : ℕ) (g g' : Lp ℂ p (volume : Measure Ω.hyperplane))
+    (x' : Ω.hyperplane) :
+    Ω.extLevelH hp Lh j (g + g') x' = Ω.extLevelH hp Lh j g x' + Ω.extLevelH hp Lh j g' x' := by
+  have hex := fun h : Lp ℂ p (volume : Measure Ω.hyperplane) =>
+    (Ω.graphBump.hasCompactSupport_dual Lh j).convolutionExists_left
+      (ContinuousLinearMap.mul ℂ ℂ) (Ω.graphBump.continuous_dual Lh j)
+      ((Lp.memLp (Ω.graphBump.localMean hp Lh j h)).locallyIntegrable Fact.out)
+  simp only [extLevelH, map_add]
+  rw [conv_congr_ae (Lp.coeFn_add _ _)]
+  exact (hex g x').distrib_add (hex g' x')
+
+/-- **The terms on `H` are homogeneous**: `η_j ⋆ (k_j ⋆ (c g)) = c (η_j ⋆ (k_j ⋆ g))` at every point
+(`Rd.conv_smul`). -/
+theorem extLevelH_smul (hp : p ≠ ∞) (Lh j : ℕ) (c : ℂ)
+    (g : Lp ℂ p (volume : Measure Ω.hyperplane)) (x' : Ω.hyperplane) :
+    Ω.extLevelH hp Lh j (c • g) x' = c * Ω.extLevelH hp Lh j g x' := by
+  simp only [extLevelH, map_smul]
+  rw [conv_congr_ae (Lp.coeFn_smul _ _), conv_smul, Pi.smul_apply, smul_eq_mul]
+
+/-- **The levels of the extension are additive**: `F_j(g + g') = F_j(g) + F_j(g')` in `L_p(V)`,
+since `F_j(g)(x) = g_j(Px) v_j(x)` (`Rd.LipschitzGraph.extLevelH_add`). -/
+theorem traceExtTerm_add (hp : p ≠ ∞) (Lh j : ℕ) (g g' : Lp ℂ p (volume : Measure Ω.hyperplane)) :
+    Ω.traceExtTerm hp Lh j (g + g') = Ω.traceExtTerm hp Lh j g + Ω.traceExtTerm hp Lh j g' := by
+  refine Lp.ext ?_
+  filter_upwards [Ω.traceExtTerm_ae hp Lh j (g + g'), Ω.traceExtTerm_ae hp Lh j g,
+    Ω.traceExtTerm_ae hp Lh j g', Lp.coeFn_add (Ω.traceExtTerm hp Lh j g)
+      (Ω.traceExtTerm hp Lh j g')] with x h1 h2 h3 h4
+  rw [h1, h4, Pi.add_apply, h2, h3]
+  simp only [extLevel, extendAtom, Ω.extLevelH_add, add_mul]
+
+/-- **The levels of the extension are homogeneous**: `F_j(c g) = c F_j(g)` in `L_p(V)`
+(`Rd.LipschitzGraph.extLevelH_smul`). -/
+theorem traceExtTerm_smul (hp : p ≠ ∞) (Lh j : ℕ) (c : ℂ)
+    (g : Lp ℂ p (volume : Measure Ω.hyperplane)) :
+    Ω.traceExtTerm hp Lh j (c • g) = c • Ω.traceExtTerm hp Lh j g := by
+  refine Lp.ext ?_
+  filter_upwards [Ω.traceExtTerm_ae hp Lh j (c • g), Ω.traceExtTerm_ae hp Lh j g,
+    Lp.coeFn_smul c (Ω.traceExtTerm hp Lh j g)] with x h1 h2 h3
+  rw [h1, h3, Pi.smul_apply, h2, smul_eq_mul]
+  simp only [extLevel, extendAtom, Ω.extLevelH_smul, mul_assoc]
+
+/-- **The extension is additive** on functions with a finite local means quasi-norm,
+`s > 0`, `q ≥ 1`: `E(g + g') = E g + E g'`, since both series converge
+(`Rd.LipschitzGraph.summable_traceExtTerm`) and the levels are additive
+(`Rd.LipschitzGraph.traceExtTerm_add`). -/
+theorem graphExtension_add (hp : p ≠ ∞) (Lh : ℕ) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞} (hq : 1 ≤ q)
+    {g g' : Lp ℂ p (volume : Measure Ω.hyperplane)}
+    (hg : Ω.graphBump.localMeansNorm hp Lh s q g < ∞)
+    (hg' : Ω.graphBump.localMeansNorm hp Lh s q g' < ∞) :
+    Ω.graphExtension hp Lh (g + g') = Ω.graphExtension hp Lh g + Ω.graphExtension hp Lh g' := by
+  simp only [graphExtension, Ω.traceExtTerm_add]
+  exact (Ω.summable_traceExtTerm hp Lh hs hq hg).tsum_add (Ω.summable_traceExtTerm hp Lh hs hq hg')
+
+/-- **The extension is homogeneous**: `E(c g) = c E g` for every `g ∈ L_p(H)`
+(`Rd.LipschitzGraph.traceExtTerm_smul`, Mathlib's `tsum_const_smul''`). -/
+theorem graphExtension_smul (hp : p ≠ ∞) (Lh : ℕ) (c : ℂ)
+    (g : Lp ℂ p (volume : Measure Ω.hyperplane)) :
+    Ω.graphExtension hp Lh (c • g) = c • Ω.graphExtension hp Lh g := by
+  simp only [graphExtension, Ω.traceExtTerm_smul]
+  exact tsum_const_smul'' c
 
 /-- The coefficient quasi-norm of the cell coefficients on `H` with smoothness `s + 1/p` in
 dimension `n` is the local means quasi-norm of `g` with smoothness `s`, since

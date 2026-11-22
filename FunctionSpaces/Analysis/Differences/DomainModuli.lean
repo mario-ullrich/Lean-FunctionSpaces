@@ -35,6 +35,13 @@ the set (`Rd.modNormOn_mono_set`). If
 `1_O F = 1_O f`, the intrinsic quasi-norm of `f` on `O` is at most that of `F` on `V`
 (`Rd.modNormOn_le_modNorm_of_indicatorLp`), and on `O = V` the two agree (`Rd.modNormOn_univ`).
 
+**Completeness.** The dyadic moduli on a set are continuous on `L_p` (`Rd.tendsto_lpModulusOn`),
+and `ℓ_q` norms admit Fatou's lemma (`ENNReal.lqNorm_le_of_tendsto`), so a bound on `N_Ω(F_m)`
+passes to the `L_p` limit of the `F_m` (`Rd.modNormOn_le_of_tendsto`). Hence a sequence that is
+Cauchy for `N_Ω` and converges in `L_p` converges for `N_Ω`
+(`Rd.tendsto_modNormOn_sub_of_cauchy`); this gives the completeness of the Besov spaces on
+domains and on boundaries.
+
 On `V` with Lebesgue measure, sets that agree up to a null set have almost equal step sets
 (`Rd.stepSet_ae_eq`), the same moduli (`Rd.modulusOn_congr_set`, `Rd.lpModulusOn_congr_set`), the
 same cut-offs (`Rd.indicatorLp_congr_set`) and the same intrinsic quasi-norms
@@ -44,7 +51,7 @@ same cut-offs (`Rd.indicatorLp_congr_set`) and the same intrinsic quasi-norms
 @[expose] public section
 
 open MeasureTheory Filter
-open scoped ENNReal
+open scoped ENNReal Topology
 
 open ENNReal (lqNorm dyadicWeight)
 
@@ -418,6 +425,81 @@ theorem modNormOn_univ [Fact (1 ≤ p)] (r : ℕ) (s : ℝ) (q : ℝ≥0∞) (f 
   have h2 : ∀ k, lpModulusOn p (Set.univ : Set V) r f k = lpModulus p r f k := fun k => by
     rw [lpModulusOn, modulusOn_univ, lpModulus]
   simp_rw [modNormOn, h1, h2]
+
+/-! ### Limits in `L_p` and completeness -/
+
+/-- **The dyadic moduli on a set are continuous on `L_p`**: if `F_m → G` in `L_p`, `p ≥ 1`, then
+`ω_r(F_m, 2^(-k), U)_p → ω_r(G, 2^(-k), U)_p` for every `k`, since
+`|ω_r(F, 2^(-k), U)_p - ω_r(G, 2^(-k), U)_p| ≤ 2^r ‖F - G‖_p` (`Rd.lpModulusOn_add_le`,
+`Rd.lpModulusOn_le`). -/
+theorem tendsto_lpModulusOn [Fact (1 ≤ p)] {U : Set V} (hU : MeasurableSet U) (r : ℕ)
+    {F : ℕ → Lp ℂ p μ} {G : Lp ℂ p μ} (hFG : Tendsto F atTop (𝓝 G)) (k : ℕ) :
+    Tendsto (fun m => lpModulusOn p U r (F m) k) atTop (𝓝 (lpModulusOn p U r G k)) := by
+  have h0 : Tendsto (fun m => (2 : ℝ≥0∞) ^ r * ‖F m - G‖ₑ) atTop (𝓝 0) := by
+    have h := ENNReal.Tendsto.const_mul (a := (2 : ℝ≥0∞) ^ r)
+      (by simpa only [edist_eq_enorm_sub] using tendsto_iff_edist_tendsto_0.1 hFG)
+      (Or.inr (by simp))
+    rwa [mul_zero] at h
+  have hup : ∀ m, lpModulusOn p U r (F m) k ≤
+      lpModulusOn p U r G k + 2 ^ r * ‖F m - G‖ₑ := fun m => by
+    calc lpModulusOn p U r (F m) k = lpModulusOn p U r (G + (F m - G)) k := by
+          rw [add_sub_cancel]
+      _ ≤ _ := (lpModulusOn_add_le U r _ _ k).trans (add_le_add le_rfl (lpModulusOn_le hU r _ k))
+  have hlow : ∀ m, lpModulusOn p U r G k - 2 ^ r * ‖F m - G‖ₑ ≤
+      lpModulusOn p U r (F m) k := fun m => by
+    rw [tsub_le_iff_right, enorm_sub_rev]
+    calc lpModulusOn p U r G k = lpModulusOn p U r (F m + (G - F m)) k := by
+          rw [add_sub_cancel]
+      _ ≤ _ := (lpModulusOn_add_le U r _ _ k).trans (add_le_add le_rfl (lpModulusOn_le hU r _ k))
+  have hu : Tendsto (fun m => lpModulusOn p U r G k + 2 ^ r * ‖F m - G‖ₑ) atTop
+      (𝓝 (lpModulusOn p U r G k + 0)) := tendsto_const_nhds.add h0
+  have hl : Tendsto (fun m => lpModulusOn p U r G k - 2 ^ r * ‖F m - G‖ₑ) atTop
+      (𝓝 (lpModulusOn p U r G k - 0)) :=
+    ENNReal.Tendsto.sub tendsto_const_nhds h0 (Or.inr ENNReal.zero_ne_top)
+  rw [add_zero] at hu
+  rw [tsub_zero] at hl
+  exact tendsto_of_tendsto_of_tendsto_of_le_of_le hl hu hlow hup
+
+/-- **The intrinsic quasi-norm is lower semicontinuous on `L_p`**: if `F_m → G` in `L_p`, `p ≥ 1`,
+and `N_U(F_m) ≤ C` for all large `m`, then `N_U(G) ≤ C`. The cut-off norms converge, the dyadic
+moduli converge (`Rd.tendsto_lpModulusOn`), and Fatou's lemma for `ℓ_q`
+(`ENNReal.lqNorm_le_of_tendsto`) bounds the `ℓ_q` part by `C - ‖1_U G‖_p`. -/
+theorem modNormOn_le_of_tendsto [Fact (1 ≤ p)] {U : Set V} (hU : MeasurableSet U) (r : ℕ)
+    (s : ℝ) (q : ℝ≥0∞) {F : ℕ → Lp ℂ p μ} {G : Lp ℂ p μ} (hFG : Tendsto F atTop (𝓝 G))
+    {C : ℝ≥0∞} (hC : ∀ᶠ m in atTop, modNormOn hU r s q (F m) ≤ C) :
+    modNormOn hU r s q G ≤ C := by
+  rcases eq_or_ne C ∞ with rfl | hCt
+  · exact le_top
+  have hx : Tendsto (fun m => ‖indicatorLp hU (F m)‖ₑ) atTop (𝓝 ‖indicatorLp hU G‖ₑ) :=
+    (continuous_enorm.tendsto _).comp (((indicatorLp hU).continuous.tendsto G).comp hFG)
+  have hxC : ‖indicatorLp hU G‖ₑ ≤ C :=
+    le_of_tendsto hx (hC.mono fun m hm => le_self_add.trans hm)
+  have hlq : lqNorm q (fun k => dyadicWeight s k * lpModulusOn p U r G k) ≤
+      C - ‖indicatorLp hU G‖ₑ :=
+    ENNReal.lqNorm_le_of_tendsto (fun k => ENNReal.Tendsto.const_mul
+        (tendsto_lpModulusOn hU r hFG k) (Or.inr (ENNReal.dyadicWeight_ne_top s k)))
+      (ENNReal.Tendsto.sub tendsto_const_nhds hx (Or.inl hCt))
+      (hC.mono fun m hm => ENNReal.le_sub_of_add_le_left enorm_ne_top hm)
+  calc modNormOn hU r s q G
+      = ‖indicatorLp hU G‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulusOn p U r G k) := rfl
+    _ ≤ ‖indicatorLp hU G‖ₑ + (C - ‖indicatorLp hU G‖ₑ) := add_le_add le_rfl hlq
+    _ = C := add_tsub_cancel_of_le hxC
+
+/-- **Cauchy sequences for the intrinsic quasi-norm converge in it**: if `f_n → g` in `L_p`,
+`p ≥ 1`, and `(f_n)` is a Cauchy sequence for `N_U`, then `N_U(g - f_n) → 0`. For `m, n ≥ N`,
+`N_U(f_m - f_n) ≤ ε`, and `f_m - f_n → g - f_n` in `L_p` as `m → ∞`
+(`Rd.modNormOn_le_of_tendsto`). The set `U` is any measurable set and `μ` any additive Haar
+measure, so this holds on `V` and on the hyperplanes of the charts of a Lipschitz boundary. -/
+theorem tendsto_modNormOn_sub_of_cauchy [Fact (1 ≤ p)] {U : Set V} (hU : MeasurableSet U)
+    (r : ℕ) (s : ℝ) (q : ℝ≥0∞) {f : ℕ → Lp ℂ p μ} {g : Lp ℂ p μ}
+    (hfg : Tendsto f atTop (𝓝 g))
+    (hC : ∀ ε > 0, ∃ N, ∀ m ≥ N, ∀ n ≥ N, modNormOn hU r s q (f m - f n) ≤ ε) :
+    Tendsto (fun n => modNormOn hU r s q (g - f n)) atTop (𝓝 0) := by
+  refine ENNReal.tendsto_nhds_zero.2 fun ε hε => ?_
+  obtain ⟨N, hN⟩ := hC ε hε
+  filter_upwards [eventually_ge_atTop N] with n hn
+  exact modNormOn_le_of_tendsto hU r s q (hfg.sub tendsto_const_nhds)
+    ((eventually_ge_atTop N).mono fun m hm => hN m hm n hn)
 
 end Rd
 

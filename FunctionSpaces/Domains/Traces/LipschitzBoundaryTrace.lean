@@ -36,8 +36,10 @@ Let `Ω` be a bounded Lipschitz domain with boundary `Γ`: finitely many balls `
   traces of `ψ_j F` on the graph domains; conversely `F = ∑_j ζ_j E_j G_j` with the extensions `E_j`
   of the graph domains and cut-offs `ζ_j` with `ζ_j ≠ 0` only in `B_j` and `ζ_j = 1` where
   `ψ_j ≠ 0` (`Rd.BoundedLipschitzDomain.boundaryTrace_extensionSum_eventuallyEq`).
-* The boundary trace depends only on `F` on `Ω` (`Rd.BoundedLipschitzDomain.boundaryTrace_congr`),
-  and the functions with a finite intrinsic norm on `Ω` are the restrictions of such `F`
+* The boundary trace is linear on such `F` (`Rd.BoundedLipschitzDomain.boundaryTrace_add`,
+  `Rd.BoundedLipschitzDomain.boundaryTrace_smul`) and depends only on `F` on `Ω`
+  (`Rd.BoundedLipschitzDomain.boundaryTrace_congr`), and the functions with a finite intrinsic
+  norm on `Ω` are the restrictions of such `F`
   (`Rd.BoundedLipschitzDomain.exists_besov_extension_of_modulusOn`): `B^s_{p,q}(Γ)` is the trace
   space of `B^{s+1/p}_{p,q}(Ω)`
   (`Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_exists_isBoundaryTrace`); every such function
@@ -364,6 +366,54 @@ theorem boundaryTrace_congr (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞) {L : �
   filter_upwards [Ω.boundaryTrace_graphMap ψ hp hL hs hsL hq hF₁ j,
     Ω.boundaryTrace_graphMap ψ hp hL hs hsL hq hF₂ j, hloc] with x' h1 h2 h3 hj
   rw [h1 hj, h2 hj, h3 hj]
+
+/-- **The boundary trace is additive**: for `1 ≤ p < ∞`, `s > 0`, `s + 1/p < L`, `1 ≤ q ≤ ∞` and
+`F₁, F₂` with finite `‖F_i‖_p + ‖(2^(k(s+1/p)) ω_L(F_i, 2^(-k))_p)_k‖_{ℓ_q}`,
+`Tr_Γ(F₁ + F₂) = Tr_Γ F₁ + Tr_Γ F₂` almost everywhere on `Γ`: in each chart the boundary traces
+are traces of the graph domain (`Rd.BoundedLipschitzDomain.boundaryTrace_graphMap`), which are
+linear (`Rd.LipschitzGraph.trace_sub`). The order is `L ≥ 1`, since `0 < s + 1/p < L`. -/
+theorem boundaryTrace_add (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞) {L : ℕ} {s : ℝ} (hs : 0 < s)
+    (hsL : s + 1 / p.toReal < L) {q : ℝ≥0∞} (hq : 1 ≤ q) {F₁ F₂ : Lp ℂ p (volume : Measure V)}
+    (hF₁ : ‖F₁‖ₑ + lqNorm q (fun k =>
+      dyadicWeight (s + 1 / p.toReal) k * lpModulus p L F₁ k) < ∞)
+    (hF₂ : ‖F₂‖ₑ + lqNorm q (fun k =>
+      dyadicWeight (s + 1 / p.toReal) k * lpModulus p L F₂ k) < ∞) :
+    Ω.boundaryTrace ψ hp L (F₁ + F₂) =ᶠ[Ω.aeBoundary]
+      Ω.boundaryTrace ψ hp L F₁ + Ω.boundaryTrace ψ hp L F₂ := by
+  have hL := one_le_of_add_one_div_toReal_lt hs hsL
+  have hF := (modNorm_add_le F₁ F₂ L (s + 1 / p.toReal) hq).trans_lt
+    (ENNReal.add_lt_top.2 ⟨hF₁, hF₂⟩)
+  refine Ω.eventually_aeBoundary_iff.2 fun j => ?_
+  have hsub := (Ω.graph j).trace_sub hp L hs hq
+    ((Ω.graph j).intrinsicNorm_lt_top_of_modNorm hp L hq hF).2
+    ((Ω.graph j).intrinsicNorm_lt_top_of_modNorm hp L hq hF₂).2
+  rw [add_sub_cancel_right] at hsub
+  filter_upwards [Ω.boundaryTrace_graphMap ψ hp hL hs hsL hq hF j,
+    Ω.boundaryTrace_graphMap ψ hp hL hs hsL hq hF₁ j,
+    Ω.boundaryTrace_graphMap ψ hp hL hs hsL hq hF₂ j,
+    Lp.coeFn_sub ((Ω.graph j).trace hp L (F₁ + F₂)) ((Ω.graph j).trace hp L F₂)] with
+    x' h1 h2 h3 h4 hj
+  rw [Pi.add_apply, h1 hj, h2 hj, h3 hj, hsub, h4, Pi.sub_apply, sub_add_cancel]
+
+/-- **The boundary trace is homogeneous**: under the hypotheses of
+`Rd.BoundedLipschitzDomain.boundaryTrace_add`, `Tr_Γ(c F) = c Tr_Γ F` almost everywhere on `Γ`
+for every `c ∈ ℂ` (`Rd.LipschitzGraph.trace_smul`, `Rd.modNorm_const_smul`). -/
+theorem boundaryTrace_smul (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞) {L : ℕ} {s : ℝ} (hs : 0 < s)
+    (hsL : s + 1 / p.toReal < L) {q : ℝ≥0∞} (hq : 1 ≤ q) (c : ℂ)
+    {F : Lp ℂ p (volume : Measure V)}
+    (hF : ‖F‖ₑ + lqNorm q (fun k =>
+      dyadicWeight (s + 1 / p.toReal) k * lpModulus p L F k) < ∞) :
+    Ω.boundaryTrace ψ hp L (c • F) =ᶠ[Ω.aeBoundary] c • Ω.boundaryTrace ψ hp L F := by
+  have hL := one_le_of_add_one_div_toReal_lt hs hsL
+  have hcF : ‖c • F‖ₑ + lqNorm q (fun k =>
+      dyadicWeight (s + 1 / p.toReal) k * lpModulus p L (c • F) k) < ∞ := by
+    rw [modNorm_const_smul]
+    exact ENNReal.mul_lt_top enorm_lt_top hF
+  refine Ω.eventually_aeBoundary_iff.2 fun j => ?_
+  filter_upwards [Ω.boundaryTrace_graphMap ψ hp hL hs hsL hq hcF j,
+    Ω.boundaryTrace_graphMap ψ hp hL hs hsL hq hF j,
+    Lp.coeFn_smul c ((Ω.graph j).trace hp L F)] with x' h1 h2 h3 hj
+  rw [Pi.smul_apply, h1 hj, h2 hj, (Ω.graph j).trace_smul, h3, Pi.smul_apply]
 
 /-! ### The trace space -/
 

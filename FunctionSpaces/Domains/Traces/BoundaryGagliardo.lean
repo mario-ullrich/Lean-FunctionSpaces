@@ -422,21 +422,6 @@ theorem exists_boundarySlobodeckijForm_le (ψ : Ω.BoundaryPartition) (hp : p �
 
 /-! ### The lower bound by the Gagliardo form -/
 
-/-- **The `L_p` norm of a chart piece**: for `P > 0`,
-`∫_{H_j} |ψ_j(γ_j x') g(γ_j x')|^P dx' ≤ D_j^P ∫_Γ |g|^P dσ` with `D_j = ψ.derivBound j`
-(`Rd.BoundedLipschitzDomain.lintegral_chart_le`). -/
-theorem lintegral_chartPiece_le (ψ : Ω.BoundaryPartition) (j : Fin Ω.N) {P : ℝ} (hP : 0 < P)
-    (g : V → ℂ) :
-    ∫⁻ x', ‖ψ.toComplex j ((Ω.graph j).graphMap x') * g ((Ω.graph j).graphMap x')‖ₑ ^ P ≤
-      ENNReal.ofReal (ψ.derivBound j) ^ P * ∫⁻ y, ‖g y‖ₑ ^ P ∂Ω.surfaceMeasure := by
-  refine (Ω.lintegral_chart_le j (fun y => ‖ψ.toComplex j y * g y‖ₑ ^ P) fun y hy =>
-    ψ.mem_ball_of_ne_zero fun h => hy ?_).trans ?_
-  · rw [ψ.toComplex_of_eq_zero h, zero_mul, enorm_zero, ENNReal.zero_rpow_of_pos hP]
-  · rw [← lintegral_const_mul' _ _ (ENNReal.rpow_ne_top_of_nonneg hP.le ENNReal.ofReal_ne_top)]
-    refine lintegral_mono fun y => ?_
-    rw [enorm_mul, ENNReal.mul_rpow_of_nonneg _ _ hP.le]
-    exact mul_le_mul' (ENNReal.rpow_le_rpow (ψ.enorm_toComplex_le j y) hP.le) le_rfl
-
 omit [MeasurableSpace V] [BorelSpace V] in
 /-- **The integrand of a chart piece, by the product rule for differences**: for `P ≥ 1`,
 `a ≥ 0`, the chart piece `G = (ψ_j g) ∘ γ_j` and all `x', y' ∈ H_j`,

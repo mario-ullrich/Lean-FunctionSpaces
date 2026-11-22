@@ -52,8 +52,9 @@ many terms are estimated in the `p`-th power with constant `1`, telescoping sums
 
 The file adds what Mathlib lacks: the explicit formulas, homogeneity for `ℝ≥0∞` scalars,
 **monotonicity in `q`** (`lqNorm r a ≤ lqNorm q a` for `0 < q ≤ r`; Mathlib has only the
-inclusion `lp.monotone`, without the norm bound), the Cauchy–Schwarz inequality
-`∑_k a_k b_k ≤ ‖a‖_{ℓ_2} ‖b‖_{ℓ_2}` for series and for finite sums
+inclusion `lp.monotone`, without the norm bound), **Fatou's lemma** for termwise limits,
+`a_m → b` termwise and `‖a_m‖_q ≤ d_m → D` give `‖b‖_q ≤ D` (`ENNReal.lqNorm_le_of_tendsto`), the
+Cauchy–Schwarz inequality `∑_k a_k b_k ≤ ‖a‖_{ℓ_2} ‖b‖_{ℓ_2}` for series and for finite sums
 (`ENNReal.lqNorm_one_mul_le`, `ENNReal.sum_mul_le_lqNorm_two_mul`), the splitting off of the
 first term, also with dyadic weights (`ENNReal.lqNorm_dyadicWeight_le_of_head_of_succ_le`), tails
 of sequences (`ENNReal.lqNorm_ite_le_eq`), which tend to `0` for `q < ∞`
@@ -98,7 +99,7 @@ For a function bounded between step values `a_n` on disjoint pieces of equal mea
 @[expose] public section
 
 open MeasureTheory Filter
-open scoped ENNReal
+open scoped ENNReal Topology
 
 namespace ENNReal
 
@@ -287,6 +288,35 @@ theorem le_lqNorm (hq : q ≠ 0) (a : ι → ℝ≥0∞) (n : ι) : a n ≤ lqNo
 /-- The `ℓ_q` norm is monotone in the sequence. -/
 theorem lqNorm_mono (h : ∀ n, a n ≤ b n) : lqNorm q a ≤ lqNorm q b :=
   eLpNorm_mono_enorm (aestronglyMeasurable_count a) h
+
+/-- **Fatou's lemma for `ℓ_q` norms**, `q ∈ [0, ∞]`: if `a_m → b` termwise and
+`‖a_m‖_{ℓ_q} ≤ d_m` eventually with `d_m → D`, then `‖b‖_{ℓ_q} ≤ D`. For `q = ∞` every term is
+bounded; for `0 < q < ∞` every finite sum `∑_{i ∈ S} b_i^q` is the limit of the finite sums of the
+`a_m`, which are at most `d_m^q`, and `∑_i b_i^q` is their supremum
+(Mathlib's `ENNReal.tsum_eq_iSup_sum`). -/
+theorem lqNorm_le_of_tendsto {a : ℕ → ι → ℝ≥0∞}
+    (hab : ∀ i, Tendsto (fun m => a m i) atTop (𝓝 (b i))) {d : ℕ → ℝ≥0∞} {D : ℝ≥0∞}
+    (hd : Tendsto d atTop (𝓝 D)) (hle : ∀ᶠ m in atTop, lqNorm q (a m) ≤ d m) :
+    lqNorm q b ≤ D := by
+  rcases eq_or_ne q 0 with rfl | hq0
+  · simp
+  rcases eq_or_ne q ∞ with rfl | hq
+  · rw [lqNorm_top]
+    refine iSup_le fun i => le_of_tendsto_of_tendsto (hab i) hd ?_
+    filter_upwards [hle] with m hm
+    exact (le_lqNorm top_ne_zero (a m) i).trans hm
+  have hpos : 0 < q.toReal := ENNReal.toReal_pos hq0 hq
+  have hsum : ∑' i, b i ^ q.toReal ≤ D ^ q.toReal := by
+    rw [ENNReal.tsum_eq_iSup_sum]
+    refine iSup_le fun S => le_of_tendsto_of_tendsto
+      (tendsto_finsetSum S fun i _ => (ENNReal.continuous_rpow_const.tendsto _).comp (hab i))
+      ((ENNReal.continuous_rpow_const.tendsto D).comp hd) ?_
+    filter_upwards [hle] with m hm
+    exact (ENNReal.sum_le_tsum S).trans ((lqNorm_rpow hq0 hq (a m)).symm.le.trans
+      (ENNReal.rpow_le_rpow hm hpos.le))
+  calc lqNorm q b = (∑' i, b i ^ q.toReal) ^ (1 / q.toReal) := lqNorm_eq_tsum hq0 hq b
+    _ ≤ (D ^ q.toReal) ^ (1 / q.toReal) := ENNReal.rpow_le_rpow hsum (by positivity)
+    _ = D := by rw [← ENNReal.rpow_mul, mul_one_div_cancel hpos.ne', ENNReal.rpow_one]
 
 omit [Countable ι] [MeasurableSingletonClass ι] in
 /-- **Minkowski's inequality** for `ℓ_q`, `1 ≤ q ≤ ∞`. -/

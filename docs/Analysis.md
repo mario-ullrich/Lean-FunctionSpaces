@@ -79,7 +79,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Result | Lean | Human-checked | Files |
 |---|---|---|---|
 | `L_p` norms through integrals of powers | ✅ | ✗ | `Analysis/Lp/LintegralForm` |
-| Multiplication by an indicator as an operator on `L_p`, integrals over a set as `L_2` pairings, zero extension from `L_p(μ|_s)`, restriction to a smaller set | ✅ | ✗ | `Analysis/Lp/IndicatorOperator` |
+| Multiplication by an indicator as an operator on `L_p`, its idempotence, integrals over a set as `L_2` pairings, zero extension from `L_p(μ|_s)`, restriction to a smaller set | ✅ | ✗ | `Analysis/Lp/IndicatorOperator` |
 | Inclusion `L_r ↪ L_p`, bounded continuous functions in `L_p` | ✅ | ✗ | `Analysis/Lp/Inclusion`, `Analysis/Lp/BoundedContinuous` |
 | Interpolation `L_p`–`L_∞` | ✅ | ✗ | `Analysis/Lp/Interpolation` |
 | Young's inequality on measurable groups, weighted Jensen inequality, weighted averages in `L_p` | ✅ | ✗ | `Analysis/Lp/Young` |
@@ -91,7 +91,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | `L_p` norms on `ℝ^d` through slices in one coordinate: integrating out a coordinate, `L_p` norms as mixed norms of slices, bounds through slices | ✅ | ✗ | `Analysis/Lp/CoordinateSlices` |
 | Differences `higherDiff` on any additive monoid, steps of either sign, under additive maps; the modulus of smoothness on `ℝ^d`, its homogeneity, dilation of the scale | ✅ | ✗ | `Analysis/Differences/Differences` |
 | Translation algebra of an additive monoid, differences as its powers | ✅ | ✗ | `Analysis/Differences/TranslationAlgebra` |
-| Moduli of smoothness on subsets of `ℝ^d`, restrictions by intrinsic differences, sets equal up to null sets, the intrinsic quasi-norm | ✅ | ✗ | `Analysis/Differences/DomainModuli` |
+| Moduli of smoothness on subsets of `ℝ^d`, restrictions by intrinsic differences, sets equal up to null sets, the intrinsic quasi-norm, its lower semicontinuity along `L_p` limits, and the convergence of its Cauchy sequences | ✅ | ✗ | `Analysis/Differences/DomainModuli` |
 | Moduli of smoothness and Besov quasi-norms under measure preserving linear changes of variables | ✅ | ✗ | `Analysis/Differences/LinearEquivModuli` |
 | Convolution with integrable kernels on `ℝ^d`: Young's inequality, pointwise bounds, associativity, operators on `L_p` | ✅ | ✗ | `Analysis/Fourier/Convolution` |
 | Changes of scale `x ↦ r x` in integrals, dilations, their supports, `L_1` norms and first moments, continuity of translation, approximate identities in `L_p(ℝ^d)` | ✅ | ✗ | `Analysis/Fourier/ApproxIdentity` |
