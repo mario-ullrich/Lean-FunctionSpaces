@@ -86,6 +86,8 @@ public import FunctionSpaces.Rd.SingularIntegrals.VectorValuedSingularIntegrals
 public import FunctionSpaces.Rd.Sobolev.WeakDerivatives
 public import FunctionSpaces.Rd.Sobolev.SobolevTwoLittlewoodPaley
 public import FunctionSpaces.Rd.Sobolev.RellichCompactness
+public import FunctionSpaces.Rd.Sobolev.SobolevScale
+public import FunctionSpaces.Rd.Sobolev.SobolevTwoDifferences
 public import FunctionSpaces.Rd.Sobolev.WeakDerivativeChangeOfVariables
 public import FunctionSpaces.Rd.Sobolev.WeakDerivativeLeibniz
 public import FunctionSpaces.Rd.Sobolev.DerivativeKernels

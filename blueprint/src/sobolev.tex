@@ -34,7 +34,11 @@ maps that preserve Lebesgue measure. For $p = 2$,
 $s \geq 0$, with the Triebel--Lizorkin spaces $\TL{s}{2}{2}$ (and, for $s > 0$, with the Besov
 spaces $\Besov{s}{2}{2}$) and proves $\Sob{1}{2}(V) = H^1(V) = \Besov{1}{2}{2}$.
 \Cref{sec:rellich-compactness} proves Rellich's theorem: the restriction from $H^1(V)$ to
-$L_2(\Omega)$ is compact for every bounded $\Omega \subseteq V$. \Cref{sec:leibniz-rule}
+$L_2(\Omega)$ is compact for every bounded $\Omega \subseteq V$. \Cref{sec:sobolev-scale}
+builds, for every real $s$, the inclusions $H^s(V) \subseteq H^t(V)$, $t \leq s$, the $L_2$
+functions of $H^s(V)$, $s \geq 0$, and the derivatives $H^{s+1}(V) \to H^s(V)$ with the exact
+recursion of the norms, and gives, for $s > 0$, $H^s(V) = \Besov{s}{2}{2}$ by differences with
+explicit constants. \Cref{sec:leibniz-rule}
 proves the Leibniz rule for the weak derivatives of every order of a product with a smooth
 compactly supported function. \Cref{sec:derivative-kernels}
 writes the Littlewood--Paley blocks as sums of derivatives of Schwartz kernels,
@@ -1724,6 +1728,340 @@ Weak derivatives on $V$ are derivatives of tempered distributions
 (\Cref{cor:weak-gradient-sobolev-norm}). Apply \Cref{thm:rellich-compactness} with the bound
 $|M|$.
 \end{proof}
+
+\section{The scale of Sobolev spaces}
+\label{sec:sobolev-scale}
+
+This section builds the maps between Mathlib's Sobolev spaces $H^s(V) = H^{s,2}(V, \C)$ for
+every real $s$: the inclusions $\iota_{t,s} : H^s(V) \to H^t(V)$ for $t \leq s$, the $L_2$
+functions $\iota_s U$ of the elements $U$ of $H^s(V)$ for $s \geq 0$, and the derivatives
+$\partial_v : H^{s+1}(V) \to H^s(V)$, with the exact recursion of the norms. Each map is a
+Fourier multiplier between the $L_2$ functions $J_s U$, so it is bounded by the bound of its
+symbol. It closes with $H^s(V) = \Besov{s}{2}{2}$ by differences, with explicit constants in
+both directions, for every $s > 0$. As in \Cref{sec:rellich-compactness}, an element $U$ of
+$H^s(V)$ is a tempered distribution $u$ together with the $L_2$ function $J_s u$, written
+$J_s U$, and $\|U\|_{H^s} = \|J_s U\|_2$.
+
+\begin{lemma}[Fourier multipliers of $L_2$ functions]
+\label{lem:fourier-multipliers-l2}
+\lean{Rd.fourierMultiplierCLM_toTemperedDistribution_eq,
+  Rd.enorm_sq_eq_lintegral_of_fourier_ae_eq, Rd.lineDerivOp_besselPotential}
+\leanok
+\uses{lem:temperate-weight-lp, lem:plancherel-l2, def:bessel-weight}
+For all $g, h \in L_2(V)$ and every function $w : V \to \C$ with $\widehat h = w \widehat g$
+almost everywhere,
+\[
+  \|h\|_2^2 = \int_V |w(\xi)|^2 |\widehat g(\xi)|^2 \, d\xi .
+\]
+If moreover $w$ is smooth with polynomially bounded derivatives, then the Fourier multiplier
+$w(D) = \mathcal F^{-1} w \mathcal F$ of tempered distributions maps $g$ to $h$. For every
+$t \in \R$, every $v \in V$ and every tempered distribution $u$,
+$\partial_v J_t u = J_t \partial_v u$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The identity is \Cref{lem:plancherel-l2} for $\widehat h$. The Fourier transform of the
+tempered distribution $g$ is the $L_2$ function $\widehat g$, the product of $w$ with it is the
+tempered distribution of the $L_2$ function $w \widehat g = \widehat h$
+(\Cref{lem:temperate-weight-lp}), and its inverse Fourier transform is $h$. Both
+$\partial_v = 2 \pi i \langle \cdot, v \rangle(D)$ and $J_t = \langle \cdot \rangle^t(D)$ are
+Fourier multipliers (Mathlib's \texttt{TemperedDistribution.\allowbreak lineDeriv\_\allowbreak
+eq\_\allowbreak fourierMultiplierCLM}), and the multipliers with two symbols compose to the
+multiplier with their product (\texttt{TemperedDistribution.\allowbreak
+fourierMultiplierCLM\_\allowbreak fourierMultiplierCLM\_\allowbreak apply}), which does not
+depend on the order.
+\end{proof}
+
+\begin{lemma}[Bessel weights of nonpositive order as multipliers]
+\label{lem:bessel-weight-multiplier}
+\lean{Rd.besselWeight_le_one, Rd.norm_besselWeight_le_one, Rd.continuous_ofReal_besselWeight,
+  Rd.besselWeightMul, Rd.besselWeightMul_apply_ae, Rd.norm_besselWeightMul_le_one,
+  Rd.besselWeightMul_neg_one}
+\leanok
+\uses{def:bessel-weight, lem:bessel-weight-basic, lem:product-modulus, lem:bessel-weight-inverse}
+For every $t \leq 0$ and every $\xi \in V$, $\langle \xi \rangle^t \leq 1$. For every $t \leq 0$
+the multiplication $M_t g = \langle \cdot \rangle^t g$ is a bounded linear operator on $L_2(V)$
+of norm at most $1$, and $M_{-1}$ is the multiplication by $\langle \cdot \rangle^{-1}$ of
+\Cref{lem:bessel-weight-inverse}.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$1 + |\xi|^2 \geq 1$ and $t/2 \leq 0$. The weight is smooth (\Cref{lem:bessel-weight-basic}),
+and multiplication by a smooth bounded function is a bounded linear operator on $L_2$
+(\Cref{lem:product-modulus} with $r = 0$), of norm at most the bound $1$ of the function. Both
+operators in the last statement multiply by $\langle \cdot \rangle^{-1}$ almost everywhere.
+\end{proof}
+
+\begin{definition}[The inclusions]
+\label{def:sobolev-inclusion}
+\lean{Rd.sobolevInclusion, Rd.toLp_sobolevInclusion}
+\leanok
+\uses{lem:bessel-weight-multiplier, lem:plancherel-l2}
+For $t \leq s$ and $U \in H^s(V)$, $\iota_{t,s} U \in H^t(V)$ is the element with the $L_2$
+function
+\[
+  J_t \iota_{t,s} U = \mathcal F^{-1} \bigl(M_{t-s} \widehat{J_s U}\bigr) ,
+\]
+that is, $\iota_{t,s} U = J_{-t} \mathcal F^{-1}(\langle \cdot \rangle^{t-s} \widehat{J_s U})$;
+$\iota_{t,s} : H^s(V) \to H^t(V)$ is a bounded linear operator.
+\end{definition}
+
+\begin{lemma}[The inclusions keep the distribution]
+\label{lem:sobolev-inclusion}
+\lean{Rd.fourier_toLp_sobolevInclusion_ae, Rd.toDistr_sobolevInclusion,
+  Rd.norm_sobolevInclusion_apply_le, Rd.sobolevInclusion_injective,
+  Rd.sobolevInclusion_sobolevInclusion}
+\leanok
+\uses{def:sobolev-inclusion, lem:fourier-multipliers-l2, lem:bessel-weight-multiplier,
+  lem:plancherel-l2}
+For all $t \leq s$ and $U \in H^s(V)$, the Fourier transform of $J_t \iota_{t,s} U$ is
+$\langle \cdot \rangle^{t-s} \widehat{J_s U}$ almost everywhere, $\iota_{t,s} U = U$ as tempered
+distributions, and $\|\iota_{t,s} U\|_{H^t} \leq \|U\|_{H^s}$. For all $t \leq s$ the operator
+$\iota_{t,s}$ is injective, and for all $u \leq t \leq s$,
+$\iota_{u,t} \circ \iota_{t,s} = \iota_{u,s}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first statement is \Cref{def:sobolev-inclusion} and $\mathcal F \mathcal F^{-1} = 1$. By
+\Cref{lem:fourier-multipliers-l2}, $J_t \iota_{t,s} U = J_{t-s} J_s U$ as tempered
+distributions, so $\iota_{t,s} U = J_{-t} J_{t-s} J_s U = J_0 U = U$ (Mathlib's
+\texttt{TemperedDistribution.\allowbreak besselPotential\_\allowbreak besselPotential\_\allowbreak
+apply} and \texttt{besselPotential\_\allowbreak zero}). By \Cref{lem:plancherel-l2}
+and \Cref{lem:bessel-weight-multiplier},
+$\|\iota_{t,s} U\|_{H^t} = \|M_{t-s} \widehat{J_s U}\|_2 \leq \|\widehat{J_s U}\|_2 =
+\|U\|_{H^s}$. An element of $H^t(V)$ is determined by its tempered distribution
+(Mathlib's \texttt{BesselPotentialSpace.\allowbreak ext}), which gives the last two statements.
+\end{proof}
+
+\begin{definition}[$L_2$ functions of $H^s(V)$]
+\label{def:sobolev-to-l2}
+\lean{Rd.sobolevToL2, Rd.sobolevToL2_apply}
+\leanok
+\uses{def:sobolev-inclusion}
+For $s \geq 0$ and $U \in H^s(V)$, $\iota_s U = J_0 \iota_{0,s} U \in L_2(V)$ is the $L_2$
+function of $\iota_{0,s} U \in H^0(V)$; $\iota_s : H^s(V) \to L_2(V)$ is a bounded linear
+operator.
+\end{definition}
+
+\begin{lemma}[$\iota_s U$ represents $U$]
+\label{lem:sobolev-to-l2}
+\lean{Rd.toTemperedDistribution_sobolevToL2, Rd.besselPotential_sobolevToL2,
+  Rd.sobolevToL2_eq_of_toDistr_eq, Rd.sobolevToL2_injective, Rd.norm_sobolevToL2_apply_le,
+  Rd.sobolevToL2_one, Rd.sobolevToL2_sobolevInclusion}
+\leanok
+\uses{def:sobolev-to-l2, lem:sobolev-inclusion, lem:lp-distribution-determined,
+  def:sobolev-one-to-l2, lem:sobolev-one-to-l2}
+Let $s \geq 0$. For every $U \in H^s(V)$, the tempered distribution of $\iota_s U$ is $U$,
+$J_s \iota_s U = J_s U$ and $\|\iota_s U\|_2 \leq \|U\|_{H^s}$. For every $U \in H^s(V)$ and
+every $f \in L_2(V)$ whose tempered distribution is $U$, $\iota_s U = f$. The operator
+$\iota_s$ is injective, $\iota_1$ is the operator $\iota$ of \Cref{def:sobolev-one-to-l2}, and
+for every $0 \leq t \leq s$ and every $U \in H^s(V)$, $\iota_t \iota_{t,s} U = \iota_s U$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$J_0$ is the identity, so the tempered distribution of $\iota_s U$ is $\iota_{0,s} U = U$
+(\Cref{lem:sobolev-inclusion}), and $\|\iota_s U\|_2 = \|\iota_{0,s} U\|_{H^0} \leq
+\|U\|_{H^s}$. An $L_2$ function is determined by its tempered distribution
+(\Cref{lem:lp-distribution-determined}), and an element of $H^s(V)$ by its distribution; this
+gives the remaining statements, with \Cref{lem:sobolev-one-to-l2} for $\iota_1 = \iota$.
+\end{proof}
+
+\begin{lemma}[The symbol of $J_{-1} \partial_v$]
+\label{lem:line-derivative-symbol}
+\lean{Rd.besselLineDerivSymbol, Rd.hasTemperateGrowth_besselLineDerivSymbol,
+  Rd.continuous_besselLineDerivSymbol, Rd.norm_besselLineDerivSymbol,
+  Rd.norm_besselLineDerivSymbol_le, Rd.besselPotential_neg_one_lineDerivOp}
+\leanok
+\uses{def:bessel-weight, lem:bessel-weight-basic, lem:bessel-weight-inverse}
+For $v \in V$ let $m_v(\xi) = 2 \pi i \langle \xi, v \rangle \langle \xi \rangle^{-1}$. Then
+$m_v$ is smooth with polynomially bounded derivatives, and for every $\xi \in V$,
+\[
+  |m_v(\xi)| = 2 \pi |\langle \xi, v \rangle| \langle \xi \rangle^{-1} \leq 2 \pi |v| .
+\]
+For every tempered distribution $u$, $J_{-1} \partial_v u = m_v(D) u$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$|\langle \xi, v \rangle| \leq |\xi| |v|$ by the Cauchy--Schwarz inequality, and
+$|\xi| \leq \langle \xi \rangle^1 = (\langle \xi \rangle^{-1})^{-1}$
+(\Cref{lem:bessel-weight-basic}, \Cref{lem:bessel-weight-inverse}). The last statement is
+Mathlib's \texttt{TemperedDistribution.\allowbreak besselPotential\_\allowbreak neg\_\allowbreak
+one\_\allowbreak lineDerivOp\_\allowbreak eq} with the factor $2 \pi i$ moved into the symbol.
+\end{proof}
+
+\begin{definition}[Derivatives in the scale]
+\label{def:sobolev-line-derivative}
+\lean{Rd.sobolevLineDeriv, Rd.toLp_sobolevLineDeriv}
+\leanok
+\uses{lem:line-derivative-symbol, lem:product-modulus, lem:plancherel-l2}
+For $s \in \R$, $v \in V$ and $U \in H^{s+1}(V)$, $\partial_v U \in H^s(V)$ is the element with
+the $L_2$ function
+\[
+  J_s \partial_v U = \mathcal F^{-1} \bigl(m_v \widehat{J_{s+1} U}\bigr) ;
+\]
+$\partial_v : H^{s+1}(V) \to H^s(V)$ is a bounded linear operator.
+\end{definition}
+
+\begin{lemma}[Derivatives of tempered distributions]
+\label{lem:sobolev-line-derivative}
+\lean{Rd.fourier_toLp_sobolevLineDeriv_ae, Rd.toDistr_sobolevLineDeriv,
+  Rd.norm_sobolevLineDeriv_apply_le}
+\leanok
+\uses{def:sobolev-line-derivative, lem:fourier-multipliers-l2, lem:line-derivative-symbol,
+  lem:product-modulus, lem:plancherel-l2}
+For all $s \in \R$, $v \in V$ and $U \in H^{s+1}(V)$, the Fourier transform of $J_s \partial_v U$
+is $m_v \widehat{J_{s+1} U}$ almost everywhere, $\partial_v U$ is the derivative of the tempered
+distribution $U$ in the direction $v$, and
+$\|\partial_v U\|_{H^s} \leq 2 \pi |v| \, \|U\|_{H^{s+1}}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{lem:fourier-multipliers-l2} and \Cref{lem:line-derivative-symbol},
+$J_s \partial_v U = m_v(D) J_{s+1} U = J_{-1} \partial_v J_{s+1} U$ as tempered distributions,
+so $\partial_v U = J_{-s} J_{-1} \partial_v J_{s+1} U = J_{-s} J_{-1} J_{s+1} \partial_v U$, since
+$\partial_v$ commutes with $J_{s+1}$ (\Cref{lem:fourier-multipliers-l2}), and
+$J_{-s} J_{-1} J_{s+1} = J_0 = 1$. The bound is \Cref{lem:plancherel-l2} with
+$\|m_v F\|_2 \leq 2 \pi |v| \, \|F\|_2$ for $F \in L_2(V)$ (\Cref{lem:line-derivative-symbol},
+\Cref{lem:product-modulus}).
+\end{proof}
+
+\begin{theorem}[The norm recursion]
+\label{thm:sobolev-norm-recursion}
+\lean{Rd.besselWeight_neg_one_sq_mul, Rd.sq_besselWeight_add_sum_sq_norm_besselLineDerivSymbol,
+  Rd.enorm_sq_sobolevInclusion_add_one, Rd.enorm_sq_sobolevLineDeriv,
+  Rd.enorm_sq_eq_add_sum_sobolevLineDeriv, Rd.sq_norm_eq_add_sum_sobolevLineDeriv}
+\leanok
+\uses{lem:sobolev-inclusion, lem:sobolev-line-derivative, lem:fourier-multipliers-l2,
+  lem:line-derivative-symbol, lem:plancherel-l2}
+For every orthonormal basis $(e_i)_{i \in I}$ of $V$, every $s \in \R$ and every
+$U \in H^{s+1}(V)$,
+\[
+  (2\pi)^2 \|U\|_{H^{s+1}}^2 = (2\pi)^2 \|\iota_{s,s+1} U\|_{H^s}^2
+  + \sum_{i \in I} \|\partial_{e_i} U\|_{H^s}^2 .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $G = \widehat{J_{s+1} U}$. By \Cref{lem:plancherel-l2}, $\|U\|_{H^{s+1}}^2 = \int |G|^2$; by
+\Cref{lem:sobolev-inclusion}, \Cref{lem:sobolev-line-derivative} and
+\Cref{lem:fourier-multipliers-l2},
+$\|\iota_{s,s+1} U\|_{H^s}^2 = \int (\langle \xi \rangle^{-1})^2 |G(\xi)|^2 \, d\xi$ and
+$\|\partial_{e_i} U\|_{H^s}^2 = \int |m_{e_i}(\xi)|^2 |G(\xi)|^2 \, d\xi$. Parseval's identity
+$\sum_i \langle \xi, e_i \rangle^2 = |\xi|^2$ (Mathlib's \texttt{OrthonormalBasis.\allowbreak
+sum\_\allowbreak sq\_\allowbreak inner\_\allowbreak left}) and
+$(\langle \xi \rangle^{-1})^2 (1 + |\xi|^2) = 1$ give
+$(2\pi)^2 (\langle \xi \rangle^{-1})^2 + \sum_i |m_{e_i}(\xi)|^2 = (2\pi)^2$ for every $\xi$
+(\Cref{lem:line-derivative-symbol}); multiply by $|G(\xi)|^2$ and integrate.
+\end{proof}
+
+At $s = 0$ the recursion is the identity of \Cref{thm:sobolev-one-two}: $\iota_{0,1} U$ is the
+$L_2$ function $\iota U$, and $\partial_{e_i} U$ the weak derivative.
+
+\begin{theorem}[$H^s(V)$ and $\Besov{s}{2}{2}$ by differences, with explicit constants]
+\label{thm:sobolev-besov-constants}
+\lean{Rd.sobolevBesovConst, Rd.sobolevBesovConst_ne_top, Rd.modNorm_sobolevToL2_le,
+  Rd.sobolevBesovInvConst, Rd.sobolevBesovInvConst_ne_top, Rd.enorm_le_modNorm_sobolevToL2}
+\leanok
+\uses{thm:modulus-coincidence, thm:rd-besov, thm:tl-besov-sandwich, lem:tl-sandwich-constants,
+  thm:sobolev-two-triebel-lizorkin, lem:sobolev-to-l2, lem:bessel-space-enorm}
+Let $s > 0$ and let $r$ be an integer with $s < r$. Let $K_{s,r}$ be the constant of the inverse
+direction of \Cref{thm:modulus-coincidence} for the band-limited scheme with the moduli of order
+$r$ (\Cref{thm:rd-besov}) at smoothness $s$, and
+$C_{s,r} = K_{s,r} \cdot 2 (1 - 2^{-s})^{-1} \cdot (2 \cdot 4^s)^{1/2}$. Then
+$C_{s,r} < \infty$, and for every $U \in H^s(V)$,
+\[
+  \|\iota_s U\|_2 + \|(2^{ks} \omega_r(\iota_s U, 2^{-k})_2)_k\|_{\ell_2} \leq C_{s,r} \|U\| .
+\]
+Let $s \geq 0$ and $r \in \N$, let $D_{s,r}$ be the constant of the direct direction of
+\Cref{thm:modulus-coincidence} for the band-limited scheme with the moduli of order $r$ at
+smoothness $s$, $\Phi$ the kernel of \Cref{thm:tl-besov-sandwich}, and
+$C'_{s,r} = (2 \cdot 5^s)^{1/2} \cdot 8 \cdot 8^s \, \|\Phi\|_1 D_{s,r}$. Then
+$C'_{s,r} < \infty$, and for every $U \in H^s(V)$,
+\[
+  \|U\| \leq C'_{s,r} \bigl(\|\iota_s U\|_2 +
+  \|(2^{ks} \omega_r(\iota_s U, 2^{-k})_2)_k\|_{\ell_2}\bigr) .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+$J_s \iota_s U$ is the $L_2$ function of $U$ (\Cref{lem:sobolev-to-l2}), of norm $\|U\|$
+(\Cref{lem:bessel-space-enorm}). For the first bound, the left side is at most $K_{s,r}$ times
+the approximation norm of $\iota_s U$ in $A^s_2$ of the band-limited scheme
+(\Cref{thm:modulus-coincidence}), which is at most
+$2 (1 - 2^{-s})^{-1} \|\iota_s U\|_{F^s_{2,2}}$ (\Cref{thm:tl-besov-sandwich}), and
+$\|\iota_s U\|_{F^s_{2,2}} \leq (2 \cdot 4^s)^{1/2} \|J_s \iota_s U\|_2$
+(\Cref{thm:sobolev-two-triebel-lizorkin}). For the second, $\|J_s \iota_s U\|_2 \leq
+(2 \cdot 5^s)^{1/2} \|\iota_s U\|_{F^s_{2,2}}$ (\Cref{thm:sobolev-two-triebel-lizorkin}), which
+is at most $8 \cdot 8^s \, \|\Phi\|_1$ times the approximation norm of $\iota_s U$ in $A^s_2$
+(\Cref{thm:tl-besov-sandwich}), which is at most $D_{s,r}$ times the right side without
+$C'_{s,r}$ (\Cref{thm:modulus-coincidence}).
+\end{proof}
+
+The second bound is informative for $s < r$: for $r \leq s$ its right side is infinite unless
+$U = 0$. At $s = 1$ and $r = 2$ the constants $C_{1,2}$ and $C'_{1,2}$ are the constants $C_1$
+and $C_2$ of \Cref{thm:sobolev-one-besov-constant} and \Cref{thm:besov-sobolev-one-constant},
+which state the two bounds for the operator $\iota = \iota_1$.
+
+\begin{lemma}[$\Besov{s}{2}{2}$ functions in $H^s(V)$]
+\label{lem:sobolev-from-differences}
+\lean{Rd.exists_sobolevToL2_eq_of_modNorm_lt_top}
+\leanok
+\uses{thm:rd-besov, cor:sobolev-two-besov, lem:sobolev-to-l2}
+Let $s > 0$ and let $r$ be an integer with $s < r$. For every $F \in L_2(V)$ with
+$\|F\|_2 + \|(2^{ks} \omega_r(F, 2^{-k})_2)_k\|_{\ell_2} < \infty$ there is $U \in H^s(V)$ with
+$\iota_s U = F$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$F$ lies in the approximation space $A^s_2$ of the band-limited scheme (\Cref{thm:rd-besov}),
+hence in $H^s(V)$ (\Cref{cor:sobolev-two-besov}); let $U$ be $F$ as an element of the bundled
+space. Its tempered distribution is that of $F$, so $\iota_s U = F$ (\Cref{lem:sobolev-to-l2}).
+\end{proof}
+
+\begin{lemma}[$\Besov{s}{p}{2} \subseteq \Besov{1/2}{p}{1}$ for $s > 1/2$]
+\label{lem:besov-half-one-general}
+\lean{Rd.modNorm_half_one_le_of_lt, Rd.modNorm_sobolevToL2_lt_top}
+\leanok
+\uses{lem:lq-cauchy-schwarz-sequences, lem:lq-reindex, thm:sobolev-besov-constants}
+Let $1 \leq p \leq \infty$, $s > 1/2$, $r \in \N$ and
+$c_s = \|(2^{-k(s - 1/2)})_k\|_{\ell_2} = (1 - 2^{-2(s - 1/2)})^{-1/2}$. For every
+$F \in L_p(V)$,
+\[
+  \|F\|_p + \sum_k 2^{k/2} \omega_r(F, 2^{-k})_p
+  \leq c_s \bigl(\|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_2}\bigr) .
+\]
+For every $1/2 < s < 2$ and every $U \in H^s(V)$,
+\[
+  \|\iota_s U\|_2 + \|(2^{k((s - 1/2) + 1/2)} \omega_2(\iota_s U, 2^{-k})_2)_k\|_{\ell_2}
+  < \infty .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$2^{k/2} \omega_k = 2^{-k(s - 1/2)} (2^{ks} \omega_k)$, so
+\Cref{lem:lq-cauchy-schwarz-sequences} bounds the sum by
+$c_s \|(2^{ks} \omega_k)_k\|_{\ell_2}$, with the value of $c_s$ from \Cref{lem:lq-reindex};
+and $c_s \geq 1$. The second statement is the first bound of \Cref{thm:sobolev-besov-constants}
+with $r = 2 > s$, since $(s - 1/2) + 1/2 = s$.
+\end{proof}
+
+The finiteness in \Cref{lem:besov-half-one-general} is the hypothesis of the boundary trace
+theorems (\Cref{thm:boundary-trace-lp}, \Cref{thm:boundary-trace-bounded}) with smoothness
+$s - 1/2$, $p = q = 2$ and order $2$, whose condition $(s - 1/2) + 1/2 < 2$ is $s < 2$. The
+finiteness holds for every $0 < s < 2$, and $s > 1/2$ is the range of the trace theorems. At
+$s = 1$ it is that of
+\Cref{thm:sobolev-one-besov-constant}, and the first bound is \Cref{lem:besov-half-one} with
+$c_1 = \sqrt 2$.
 
 \section{The Leibniz rule}
 \label{sec:leibniz-rule}

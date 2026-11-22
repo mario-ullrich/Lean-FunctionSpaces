@@ -12,11 +12,14 @@ differentiable, and weak derivatives satisfy the product rule with cutoffs and t
 under Lipschitz maps that preserve Lebesgue measure. For `p = 2` it identifies Mathlib's
 Bessel potential spaces `H^s`, `s ≥ 0`, with the Triebel–Lizorkin spaces `F^s_{2,2}` (and, for
 `s > 0`, with the Besov spaces `B^s_{2,2}`) and shows `W^1_2 = H^1 = B^1_{2,2}`. On every bounded
-set the restriction from `H^1(ℝ^d)` to `L_2` is compact (Rellich's theorem). For `W^m_p`, the block
-`ψ_1` is a sum of derivatives of order `m` of Schwartz kernels, whose dilates form Calderón–Zygmund
-families, and so do the rescaled derivatives `2^{-jk} ∂^w ψ̃_j` of the synthesis kernels.
-With them, `W^m_p = F^m_{p,2}` for `1 < p < ∞`, with named constants in both directions, and,
-for `m ≥ 1`, `W^m_p` lies between the Besov spaces `B^m_{p,min(p,2)}` and `B^m_{p,max(p,2)}`.
+set the restriction from `H^1(ℝ^d)` to `L_2` is compact (Rellich's theorem). For every real `s`,
+the inclusions `H^s ⊆ H^t`, `t ≤ s`, and the derivatives `H^{s+1} → H^s` are bounded Fourier
+multipliers with an exact recursion of the norms, and `H^s = B^s_{2,2}` by the moduli of
+smoothness of every order `r > s`, with explicit constants in both directions. For `W^m_p`, the
+block `ψ_1` is a sum of derivatives of order `m` of Schwartz kernels, whose dilates form
+Calderón–Zygmund families, and so do the rescaled derivatives `2^{-jk} ∂^w ψ̃_j` of the synthesis
+kernels. With them, `W^m_p = F^m_{p,2}` for `1 < p < ∞`, with named constants in both directions,
+and, for `m ≥ 1`, `W^m_p` lies between the Besov spaces `B^m_{p,min(p,2)}` and `B^m_{p,max(p,2)}`.
 The difference of two dilates of a smooth function is a divergence of smooth kernels, with mean
 zero when its first moments vanish; these kernels give the extension theorems on Lipschitz
 domains ([Lipschitz domains and traces](DomainsTraces.md)). The
@@ -141,6 +144,22 @@ theorem are in [Triebel–Lizorkin spaces](TriebelLizorkin.md).
   makes the truncated operators compact (`Rd.isCompactOperator_restr_truncL2`). On the way, the
   `L_2` inverse Fourier transform of an integrable `h ∈ L_2(V)` is the pointwise inverse
   Fourier integral (`Rd.fourierInv_Lp_ae_eq_of_integrable`).
+* **The scale of Sobolev spaces.** For every real `s`, Mathlib's `H^s(V)` lies in `H^t(V)` for
+  `t ≤ s`, by an inclusion of norm at most `1` that keeps the distribution
+  (`Rd.sobolevInclusion`, `Rd.toDistr_sobolevInclusion`, `Rd.norm_sobolevInclusion_apply_le`); for
+  `s ≥ 0` every `U ∈ H^s(V)` is an `L_2(V)` function `ι_s U` with `‖ι_s U‖_2 ≤ ‖U‖`
+  (`Rd.sobolevToL2`, `Rd.toTemperedDistribution_sobolevToL2`), and `∂_v` is a bounded operator
+  `H^{s+1}(V) → H^s(V)` of norm at most `2π ‖v‖` (`Rd.sobolevLineDeriv`,
+  `Rd.toDistr_sobolevLineDeriv`). For every orthonormal basis `(e_i)` of `V`,
+  `(2π)² ‖U‖²_{H^{s+1}} = (2π)² ‖U‖²_{H^s} + ∑_i ‖∂_{e_i} U‖²_{H^s}`
+  (`Rd.sq_norm_eq_add_sum_sobolevLineDeriv`). Each map is a Fourier multiplier between the `L_2`
+  functions `J_s U`, with the symbols `⟨ξ⟩^{t-s}` and `2πi ⟪ξ, v⟫ ⟨ξ⟩^{-1}`. For `0 < s < r`,
+  `H^s(V) = B^s_{2,2}(V)` by the moduli of order `r`, with explicit constants in both directions:
+  `‖ι_s U‖_2 + ‖(2^{ks} ω_r(ι_s U, 2^{-k})_2)_k‖_{ℓ_2} ≤ C ‖U‖` and conversely
+  (`Rd.modNorm_sobolevToL2_le`, `Rd.enorm_le_modNorm_sobolevToL2`,
+  `Rd.exists_sobolevToL2_eq_of_modNorm_lt_top`), and for `s > 1/2` the `ℓ_1` quantity of
+  smoothness `1/2`, the one that bounds traces, is at most `‖(2^{-k(s-1/2)})_k‖_{ℓ_2}` times the
+  `ℓ_2` quantity of smoothness `s` (`Rd.modNorm_half_one_le_of_lt`).
 * **Derivative kernels.** Let `e_0, …, e_{n-1}` be an orthonormal basis of `V` (`Rd.gridBasis`)
   and `m ∈ ℕ`. For every multi-index `α = (α_0, …, α_{m-1})` with entries below `n`, the
   derivative kernel `η_α` is the Schwartz function with Fourier transform
@@ -388,6 +407,8 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Composition of weak derivatives, the derivatives along all directions from those along words in the basis, sums and choices over words, the Leibniz rule for `χ f` with a smooth compactly supported `χ` and the Leibniz constant `2^k sup_x ∑_{j ≤ k} ‖D^j χ(x)‖`, smooth compactly supported multipliers on `W^m_p(ℝ^d)`, the product rule in `L_p(ℝ^d)` | ✅ | ✗ | `Rd/Sobolev/WeakDerivativeLeibniz` |
 | The convolution theorem and Plancherel for a convolution on `L_2`, the Bessel potential on Schwartz functions, Fourier multipliers multiplying the Fourier transform and even ones acting by the transpose, the comparison of the Bessel weight with the Littlewood–Paley weights, Mathlib's `H^s` as `F^s_{2,2}` (`s ≥ 0`) and `B^s_{2,2}` (`s > 0`) with explicit constants, `W^1_2 = H^1 = B^1_{2,2}` | ✅ | ✗ | `Rd/Sobolev/SobolevTwoLittlewoodPaley` |
 | The inverse Fourier transform of integrable `L_2` functions, band-limited functions as bounded Lipschitz functions, truncation in frequency, the injectivity of `H^1(ℝ^d) → L_2(ℝ^d)`, and Rellich's theorem: the restriction from `H^1(ℝ^d)` to `L_2(Ω)` is compact for bounded `Ω` | ✅ | ✗ | `Rd/Sobolev/RellichCompactness` |
+| Fourier multipliers of `L_2` functions, Bessel weights of nonpositive order as multipliers, the inclusions `H^s ⊆ H^t` for `t ≤ s` of norm at most `1`, the `L_2` functions of `H^s` for `s ≥ 0`, the derivatives `H^{s+1} → H^s` of norm at most `2π ‖v‖`, and the norm recursion `(2π)² ‖U‖²_{s+1} = (2π)² ‖U‖²_s + ∑_i ‖∂_{e_i} U‖²_s`, for every real `s` | ✅ | ✗ | `Rd/Sobolev/SobolevScale` |
+| `H^s = B^s_{2,2}` by the moduli of order `r`, `0 < s < r`, with explicit constants in both directions, `L_2` functions of finite Besov quantity as elements of `H^s`, the quantity of `B^{1/2}_{p,1}` below that of `B^s_{p,2}` for `s > 1/2`, `1 ≤ p ≤ ∞`, and the trace hypothesis for `H^s`, `1/2 < s < 2` | ✅ | ✗ | `Rd/Sobolev/SobolevTwoDifferences` |
 | Fourier transforms of iterated derivatives, the derivative symbols and kernels, the block `ψ_1` as a sum of derivatives of order `m`, and the Calderón–Zygmund families of the dilated derivative kernels and of the rescaled derivatives `2^{-jk} ∂^w ψ̃_j` of the synthesis kernels | ✅ | ✗ | `Rd/Sobolev/DerivativeKernels` |
 | Smoothness of parametric integrals, the dilation identity `m_2 - m = ∑_i ∂_{e_i} K_i` with the divergence kernels `K_i(x) = ⟪e_i, x⟫ ∫_1^2 t⁻¹ m_t(x) dt`, their supports and those of dyadic dilates, mean zero, the local means kernels as dilation differences `k_{j+1} = (m_2 - m)_{2^j}`, and the Calderón–Zygmund families of the dilates of mean-zero Schwartz functions | ✅ | ✗ | `Rd/Sobolev/DivergenceKernels` |
 | `W^m_p = F^m_{p,2}` for `1 < p < ∞` with named constants in both directions: the blocks as convolutions with the weak derivatives, convergent synthesis sums, the derivatives of the reproducing sums and their limit, the Besov sandwich `B^m_{p,min(p,2)} ⊆ W^m_p ⊆ B^m_{p,max(p,2)}` and `W^m_2 = B^m_{2,2}` for `m ≥ 1` | ✅ | ✗ | `Rd/Sobolev/SobolevTriebelLizorkin` |

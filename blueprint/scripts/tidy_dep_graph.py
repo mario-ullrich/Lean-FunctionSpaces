@@ -117,7 +117,7 @@ BLOCKS: list[tuple[str, list]] = [
     ("Sobolev spaces: the bridge for p = 2", [
         (SOB, ["Weak derivatives on open sets", "Changes of variables and cutoffs",
                r"Mathlib's Sobolev spaces \texorpdfstring{$H^s$}{H\^{}s} by Littlewood--Paley blocks",
-               "Rellich compactness"])]),
+               "Rellich compactness", "The scale of Sobolev spaces"])]),
     ("Sobolev spaces W^m_p", [
         (SOB, ["The Leibniz rule", "Derivative kernels", "Divergence kernels",
                "Sobolev spaces as Triebel--Lizorkin spaces",

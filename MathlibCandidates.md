@@ -570,6 +570,20 @@ declarations.
   `L_1 ∩ L_2`. For every bounded `Ω ⊆ V`, the restriction
   from Mathlib's `H^{1,2}(V, ℂ)` to `L_2(Ω)` is a compact operator
   (`Rd.isCompactOperator_restr_toL2`).
+* **Inclusions and derivatives of Mathlib's Sobolev spaces `H^s`**
+  (`FunctionSpaces/Rd/Sobolev/SobolevScale.lean`): for every real `s`, the inclusion
+  `H^{s,2}(V, ℂ) → H^{t,2}(V, ℂ)`, `t ≤ s`, as a continuous linear map of norm at most `1` that
+  keeps the distribution (`Rd.sobolevInclusion`), the `L_2` function of an element of
+  `H^{s,2}(V, ℂ)` for `s ≥ 0` (`Rd.sobolevToL2`), the derivative
+  `∂_v : H^{s+1,2}(V, ℂ) → H^{s,2}(V, ℂ)` as a continuous linear map of norm at most `2π ‖v‖`
+  (`Rd.sobolevLineDeriv`), and the identity
+  `(2π)² ‖U‖²_{s+1} = (2π)² ‖U‖²_s + ∑_i ‖∂_{e_i} U‖²_s` for an orthonormal basis `(e_i)`
+  (`Rd.sq_norm_eq_add_sum_sobolevLineDeriv`). Mathlib has `BesselPotentialSpace` and the
+  unbundled `TemperedDistribution.MemSobolev.mono` and `MemSobolev.lineDerivOp`, but no maps between
+  the bundled spaces; each map here is an explicit Fourier multiplier on the `L_2` functions, with
+  the identification of `𝓕⁻(w 𝓕g)` with Mathlib's `w(D) g`
+  (`Rd.fourierMultiplierCLM_toTemperedDistribution_eq`). These belong in
+  `Mathlib/Analysis/FunctionalSpaces/BesselPotentialSpace.lean`.
 * **Evaluation on `H^s` and Sobolev spaces on open sets**
   (`FunctionSpaces/Domains/Sobolev/SobolevRestrictionSpaces.lean`): for every Schwartz function `φ`,
   `U ↦ U(φ)` is a continuous linear functional on Mathlib's `H^{s,2}(V, ℂ)` (`Rd.besselEvalCLM`,
