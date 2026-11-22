@@ -1,0 +1,307 @@
+% !TEX root = print.tex
+
+\chapter{Fractional Sobolev spaces on Lipschitz domains}
+\label{ch:fractional-sobolev-domains}
+
+This chapter compares the two Sobolev spaces of an open set that vanish at its boundary,
+$\tilde H^s(\Omega)$ and $H^s_0(\Omega)$, for real $s$, following Hewett and Moiola
+\cite{HewettMoiola}. Throughout, $V$ is a finite-dimensional real inner product space with
+Lebesgue measure and $\Omega \subseteq V$ is open. $N^s(\Omega)$, $H^s(\Omega)$, the restriction
+$r_\Omega$, $T^s(\Omega)$, $\tilde H^s(\Omega)$ and $H^s_0(\Omega)$ are those of
+\Cref{sec:sobolev-restriction-spaces}; $\iota_{t,s}$, $\iota_s$ and $\partial_v$ are the
+inclusions, the $L_2$ functions and the derivatives of \Cref{sec:sobolev-scale}.
+\Cref{sec:restriction-inclusions} carries the inclusions $H^s(V) \subseteq H^t(V)$, $t \leq s$,
+to these spaces. \Cref{sec:zero-extension-bound} reduces the identity
+$\tilde H^s(\Omega) = H^s_0(\Omega)$ to one inequality on test functions, the zero extension
+bound, lifts the bound from $s$ to $s + 1$ with the same constant, and proves it with the
+constant $1$ for every integer $s \geq 0$ on every open set.
+
+\section{Inclusions of restriction spaces}
+\label{sec:restriction-inclusions}
+
+The inclusions $\iota_{t,s}$ keep the tempered distribution (\Cref{lem:sobolev-inclusion}), so
+they map Schwartz functions, test functions and elements vanishing on $\Omega$ in $H^s(V)$ to
+objects of the same kind in $H^t(V)$.
+
+\begin{lemma}[The inclusions on Schwartz and test functions]
+\label{lem:sobolev-inclusion-tests}
+\lean{Rd.sobolevInclusion_self, Rd.norm_sobolevToL2_zero, Rd.sobolevInclusion_ofSchwartz,
+  Rd.sobolevInclusion_ofTest, Rd.denseRange_sobolevInclusion, Rd.sobolevToL2_ofSchwartz}
+\leanok
+\uses{lem:sobolev-inclusion, lem:sobolev-to-l2, lem:sobolev-of-schwartz,
+  thm:sobolev-schwartz-dense, def:sobolev-tilde-zero-boundary}
+For every $s \in \R$, $\iota_{s,s}$ is the identity of $H^s(V)$, and
+$\|\iota_0 U\|_2 = \|U\|_{H^0}$ for every $U \in H^0(V)$. For all $t \leq s$, every Schwartz
+function $w$ and every $\varphi \in \mathcal D(\Omega)$, $\iota_{t,s} w = w$ and
+$\iota_{t,s} \varphi = \varphi$, and $\iota_{t,s}$ has dense range. For every $s \geq 0$ and
+every Schwartz function $w$, $\iota_s w = w$ in $L_2(V)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+An element of $H^t(V)$ is determined by its tempered distribution (Mathlib's
+\texttt{BesselPotentialSpace.\allowbreak ext}), $\iota_{t,s}$ keeps it
+(\Cref{lem:sobolev-inclusion}), and $\iota_s w$ is the $L_2$ function with the distribution $w$
+(\Cref{lem:sobolev-to-l2}). $\iota_0 U$ is the $L_2$ function $J_0 \iota_{0,0} U = J_0 U$, whose
+norm is $\|U\|_{H^0}$. The range of $\iota_{t,s}$ contains the Schwartz functions, which are
+dense in $H^t(V)$ (\Cref{thm:sobolev-schwartz-dense}).
+\end{proof}
+
+\begin{lemma}[The inclusions keep vanishing and test functions]
+\label{lem:sobolev-inclusion-vanishing}
+\lean{Rd.sobolevInclusion_mem_vanishOn_iff, Rd.sobolevInclusion_mem_vanishOn,
+  Rd.apply_mem_testSpan_of_forall, Rd.sobolevInclusion_mem_testSpan}
+\leanok
+\uses{lem:sobolev-inclusion, def:sobolev-vanishing, lem:sobolev-inclusion-tests,
+  def:sobolev-tilde-zero-boundary}
+For all $s, t \in \R$, every linear map $f : H^s(V) \to H^t(V)$ with $f \varphi \in T^t(\Omega)$
+for every $\varphi \in \mathcal D(\Omega)$ maps $T^s(\Omega)$ into $T^t(\Omega)$. Let $t \leq s$.
+For every $W \in H^s(V)$, $\iota_{t,s} W \in N^t(\Omega)$ if and only if $W \in N^s(\Omega)$,
+and $\iota_{t,s}(T^s(\Omega)) \subseteq T^t(\Omega)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+A linear map that sends the spanning set of $T^s(\Omega)$ into the subspace $T^t(\Omega)$ sends
+the span into it (Mathlib's \texttt{Submodule.\allowbreak map\_\allowbreak span\_\allowbreak
+le}). $\iota_{t,s} W$ and $W$ have the same tempered distribution, so one vanishes on every test
+function of $\Omega$ if and only if the other does; and $\iota_{t,s} \varphi = \varphi$
+(\Cref{lem:sobolev-inclusion-tests}).
+\end{proof}
+
+\begin{definition}[The inclusion $H^s(\Omega) \subseteq H^t(\Omega)$]
+\label{def:restriction-inclusion}
+\lean{Rd.restrictionInclusion, Rd.restrictionInclusion_apply}
+\leanok
+\uses{def:sobolev-restriction-space, def:sobolev-inclusion}
+For $t \leq s$ and $u \in H^s(\Omega) \subseteq H^s(V)$, $\iota^\Omega_{t,s} u =
+r_\Omega(\iota_{t,s} u) \in H^t(\Omega)$; $\iota^\Omega_{t,s} : H^s(\Omega) \to H^t(\Omega)$ is a
+bounded linear operator.
+\end{definition}
+
+\begin{lemma}[Properties of $\iota^\Omega_{t,s}$]
+\label{lem:restriction-inclusion}
+\lean{Rd.norm_restrictionInclusion_apply_le, Rd.restrictionInclusion_injective,
+  Rd.restrictionInclusion_restrictProj, Rd.denseRange_restrictionInclusion,
+  Rd.restrictionInclusion_mem_zeroBoundarySpace}
+\leanok
+\uses{def:restriction-inclusion, lem:sobolev-restriction-basic, lem:sobolev-inclusion,
+  lem:sobolev-inclusion-tests, lem:sobolev-inclusion-vanishing,
+  lem:sobolev-tilde-zero-boundary-closed}
+Let $t \leq s$. For every $u \in H^s(\Omega)$, $\|\iota^\Omega_{t,s} u\| \leq \|u\|$. For every
+$U \in H^s(V)$, $\iota^\Omega_{t,s}(r_\Omega U) = r_\Omega(\iota_{t,s} U)$. The operator
+$\iota^\Omega_{t,s}$ is injective, has dense range and maps $H^s_0(\Omega)$ into
+$H^t_0(\Omega)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The bound holds since $r_\Omega$ and $\iota_{t,s}$ have norm at most $1$
+(\Cref{lem:sobolev-restriction-basic}, \Cref{lem:sobolev-inclusion}). If
+$\iota^\Omega_{t,s} u = 0$, then $\iota_{t,s} u \in N^t(\Omega)$
+(\Cref{lem:sobolev-restriction-basic}), so $u \in N^s(\Omega)$
+(\Cref{lem:sobolev-inclusion-vanishing}); as $u \in N^s(\Omega)^\perp$ as well, $u = 0$ (Mathlib's
+\texttt{Submodule.\allowbreak inf\_\allowbreak orthogonal\_\allowbreak eq\_\allowbreak bot}).
+$r_\Omega U - U$ lies in $N^s(\Omega)$ (\Cref{lem:sobolev-restriction-basic}), so its image
+under $\iota_{t,s}$ lies in $N^t(\Omega)$ (\Cref{lem:sobolev-inclusion-vanishing}), the kernel
+of $r_\Omega$; this gives the identity. By the identity the range of $\iota^\Omega_{t,s}$ contains
+$r_\Omega(\iota_{t,s}(H^s(V)))$, the image of a dense set (\Cref{lem:sobolev-inclusion-tests})
+under a continuous surjection, which is dense. For $U \in T^s(\Omega)$,
+$\iota^\Omega_{t,s}(r_\Omega U) = r_\Omega(\iota_{t,s} U)$ with
+$\iota_{t,s} U \in T^t(\Omega)$ (\Cref{lem:sobolev-inclusion-vanishing}), an element of
+$H^t_0(\Omega)$. The preimage of the closed subspace $H^t_0(\Omega)$
+(\Cref{lem:sobolev-tilde-zero-boundary-closed}) under $\iota^\Omega_{t,s}$ is a closed subspace
+that contains $r_\Omega(T^s(\Omega))$, hence its closure $H^s_0(\Omega)$.
+\end{proof}
+
+\section{The zero extension bound}
+\label{sec:zero-extension-bound}
+
+Restriction maps $\tilde H^s(\Omega)$ into $H^s_0(\Omega)$
+(\Cref{lem:sobolev-tilde-restriction-range}). For $s \geq 0$, Hewett and Moiola list four
+equivalent conditions for this map to be an isomorphism \cite[list after Lemma 2.9]{HewettMoiola},
+among them the bound $\|\varphi\|_{H^s(V)} \leq C \|\Phi\|_{H^s(V)}$ for every test function
+$\varphi$ of $\Omega$ and every $\Phi \in H^s(V)$ that agrees with $\varphi$ on $\Omega$. This
+section takes that bound as the hypothesis, derives the isomorphism from it, and lifts it from
+$s$ to $s + 1$ through derivatives.
+
+\begin{lemma}[Derivatives keep test functions and vanishing]
+\label{lem:derivative-tests}
+\lean{Rd.sobolevLineDeriv_ofTest, Rd.sobolevLineDeriv_mem_testSpan,
+  Rd.sobolevLineDeriv_mem_vanishOn}
+\leanok
+\uses{lem:sobolev-line-derivative, lem:directional-derivatives-commute,
+  def:sobolev-tilde-zero-boundary, def:sobolev-vanishing, lem:sobolev-inclusion-vanishing}
+For every $s \in \R$, every $v \in V$ and every $\varphi \in \mathcal D(\Omega)$, the derivative
+$\partial_v : H^{s+1}(V) \to H^s(V)$ maps $\varphi$ to the test function
+$\partial_v \varphi \in \mathcal D(\Omega)$. For every $s \in \R$ and every $v \in V$,
+$\partial_v(T^{s+1}(\Omega)) \subseteq T^s(\Omega)$ and
+$\partial_v(N^{s+1}(\Omega)) \subseteq N^s(\Omega)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\partial_v U$ is the derivative of the tempered distribution $U$
+(\Cref{lem:sobolev-line-derivative}), the derivative of the distribution of a Schwartz function is
+the distribution of its derivative (Mathlib's \texttt{TemperedDistribution.\allowbreak
+lineDerivOp\_\allowbreak toTemperedDistributionCLM\_\allowbreak eq}), and $\partial_v \varphi$ as a
+Schwartz function is the test function $\partial_v \varphi$
+(\Cref{lem:directional-derivatives-commute}); \Cref{lem:sobolev-inclusion-vanishing} gives the
+spans. For $W \in N^{s+1}(\Omega)$ and $\varphi \in \mathcal D(\Omega)$,
+$(\partial_v W)(\varphi) = -W(\partial_v \varphi) = 0$.
+\end{proof}
+
+\begin{lemma}[$\tilde H^s(\Omega)$ vanishes outside $\Omega$ for $s \geq 0$]
+\label{lem:tilde-space-vanishes-outside-nonneg}
+\lean{Rd.exists_opens_sobolevToL2_ae_eq_zero, Rd.sobolevToL2_ae_eq_zero_of_mem_tildeSpace}
+\leanok
+\uses{lem:sobolev-test-span-schwartz, lem:sobolev-to-l2, def:sobolev-tilde-zero-boundary}
+Let $s \geq 0$. For every $U \in T^s(\Omega)$ there is an open set $O \supseteq V \setminus
+\Omega$ with $\iota_s U = 0$ almost everywhere on $O$. For every $U \in \tilde H^s(\Omega)$,
+$\iota_s U = 0$ almost everywhere outside $\Omega$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $U \in T^s(\Omega)$, $\iota_s U = w$ almost everywhere for a Schwartz function $w$ with
+closed support in $\Omega$ (\Cref{lem:sobolev-test-span-schwartz}, \Cref{lem:sobolev-to-l2}), and
+$O$ is the complement of the closed support of $w$. The $U$ with $\iota_s U = 0$ almost
+everywhere outside $\Omega$ form the kernel of a bounded operator into $L_2(V \setminus \Omega)$,
+a closed subspace that contains $T^s(\Omega)$, hence $\tilde H^s(\Omega)$. At $s = 1$ this is
+\Cref{lem:tilde-space-vanishes-outside}.
+\end{proof}
+
+\begin{lemma}[Restriction is injective on $\tilde H^s(\Omega)$ for $s \geq 0$]
+\label{lem:tilde-restriction-injective}
+\lean{Rd.eq_zero_of_mem_tildeSpace_of_restrictProj_eq_zero, Rd.tildeToRestrictionL_injective}
+\leanok
+\uses{lem:tilde-space-vanishes-outside-nonneg, prop:sobolev-vanishing-one,
+  lem:sobolev-restriction-basic, lem:sobolev-to-l2}
+For every $s \geq 0$, every open $\Omega \subseteq V$ and every $U \in \tilde H^s(\Omega)$ with
+$r_\Omega U = 0$, $U = 0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$r_\Omega U = 0$ means $U \in N^s(\Omega)$ (\Cref{lem:sobolev-restriction-basic}), so
+$\iota_s U = 0$ almost everywhere on $\Omega$ (\Cref{prop:sobolev-vanishing-one}), and
+$\iota_s U = 0$ almost everywhere outside $\Omega$
+(\Cref{lem:tilde-space-vanishes-outside-nonneg}). $\iota_s$ is injective
+(\Cref{lem:sobolev-to-l2}).
+\end{proof}
+
+This is part of \cite[Lemma 2.2(iii)]{HewettMoiola}.
+
+\begin{definition}[The zero extension bound]
+\label{def:zero-extension-bound}
+\lean{Rd.HasZeroExtensionBound}
+\leanok
+\uses{def:sobolev-tilde-zero-boundary, def:sobolev-vanishing}
+For $s \in \R$, an open set $\Omega \subseteq V$ and $C \in \R$, $\Omega$ has the zero extension
+bound with constant $C$ at $s$ if
+\[
+  \|U\| \leq C \|U + W\| \quad \text{for every } U \in T^s(\Omega)
+  \text{ and every } W \in N^s(\Omega) .
+\]
+\end{definition}
+
+Since $U + W$ runs through all extensions of $r_\Omega U$, the bound says
+$\|U\| \leq C \|r_\Omega U\|$ on $T^s(\Omega)$: extending $r_\Omega U$ by zero outside $\Omega$
+costs at most the factor $C$. It is condition (iv) of Hewett and Moiola
+\cite[list after Lemma 2.9]{HewettMoiola}.
+
+\begin{theorem}[The zero extension bound gives $\tilde H^s(\Omega) \cong H^s_0(\Omega)$]
+\label{thm:zero-extension-bound-iso}
+\lean{Rd.HasZeroExtensionBound.norm_le_of_mem_testSpan,
+  Rd.HasZeroExtensionBound.norm_le_norm_restrictProj,
+  Rd.HasZeroExtensionBound.tildeToRestrictionL_injective,
+  Rd.HasZeroExtensionBound.range_tildeToRestrictionL,
+  Rd.HasZeroExtensionBound.tildeLinearEquivZeroBoundary,
+  Rd.HasZeroExtensionBound.coe_tildeLinearEquivZeroBoundary_apply,
+  Rd.HasZeroExtensionBound.tildeEquivZeroBoundary,
+  Rd.HasZeroExtensionBound.coe_tildeEquivZeroBoundary_apply,
+  Rd.HasZeroExtensionBound.norm_restrictProj_eq}
+\leanok
+\uses{def:zero-extension-bound, thm:sobolev-restriction-quotient, lem:sobolev-restriction-basic,
+  lem:sobolev-tilde-zero-boundary-closed, lem:sobolev-tilde-restriction-range}
+Let $s \in \R$, $\Omega \subseteq V$ open and $C \in \R$, and let $\Omega$ have the zero
+extension bound with constant $C$ at $s$. Then $\|U\| \leq C \|r_\Omega U\|$ for every
+$U \in \tilde H^s(\Omega)$, and $U \mapsto r_\Omega U$ is an isomorphism of $\tilde H^s(\Omega)$
+onto $H^s_0(\Omega)$ with $\|r_\Omega U\| \leq \|U\| \leq C \|r_\Omega U\|$. If $C = 1$, it is an
+isometry.
+\end{theorem}
+
+\begin{proof}
+\leanok
+For $U \in T^s(\Omega)$, $\|r_\Omega U\| = \|U + W\|$ for some $W \in N^s(\Omega)$
+(\Cref{thm:sobolev-restriction-quotient}), so $\|U\| \leq C \|r_\Omega U\|$; both sides are
+continuous in $U$, so the bound extends to the closure $\tilde H^s(\Omega)$. It makes the
+restriction injective on $\tilde H^s(\Omega)$ and gives a uniform bound of the inverse on the
+range; since $\tilde H^s(\Omega)$ is complete (\Cref{lem:sobolev-tilde-zero-boundary-closed}),
+the range is closed (Mathlib's \texttt{AntilipschitzWith.\allowbreak isClosed\_\allowbreak
+range}), and its closure is $H^s_0(\Omega)$ (\Cref{lem:sobolev-tilde-restriction-range}). The
+bound $\|r_\Omega U\| \leq \|U\|$ is \Cref{lem:sobolev-restriction-basic}; with the two bounds
+the bijection is an isomorphism (Mathlib's \texttt{LinearEquiv.\allowbreak
+toContinuousLinearEquivOfBounds}).
+\end{proof}
+
+This is the implication (iv) $\Rightarrow$ (i) of Hewett and Moiola
+\cite[list after Lemma 2.9]{HewettMoiola}.
+
+\begin{theorem}[Lifting the zero extension bound]
+\label{thm:zero-extension-bound-lift}
+\lean{Rd.HasZeroExtensionBound.add_one}
+\leanok
+\uses{def:zero-extension-bound, thm:sobolev-norm-recursion, lem:derivative-tests,
+  lem:sobolev-inclusion-vanishing, lem:sobolev-inclusion}
+Let $s \in \R$, $\Omega \subseteq V$ open and $C \in \R$. If $\Omega$ has the zero extension
+bound with constant $C$ at $s$, then it has the zero extension bound with constant $C$ at $s + 1$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $U \in T^{s+1}(\Omega)$, $W \in N^{s+1}(\Omega)$ and $(e_i)$ an orthonormal basis of $V$. By
+\Cref{thm:sobolev-norm-recursion},
+\[
+  (2\pi)^2 \|U\|_{H^{s+1}}^2 = (2\pi)^2 \|\iota_{s,s+1} U\|_{H^s}^2
+  + \sum_i \|\partial_{e_i} U\|_{H^s}^2 ,
+\]
+and the same for $U + W$. The inclusion and the derivatives map $U$ into $T^s(\Omega)$ and $W$
+into $N^s(\Omega)$ (\Cref{lem:sobolev-inclusion-vanishing}, \Cref{lem:derivative-tests}), so the
+bound at $s$ gives $\|\iota_{s,s+1} U\| \leq C \|\iota_{s,s+1}(U + W)\|$ and
+$\|\partial_{e_i} U\| \leq C \|\partial_{e_i}(U + W)\|$. If $C < 0$, the first bound forces
+$\iota_{s,s+1} U = 0$ and $\iota_{s,s+1}(U + W) = 0$, so $U = 0$ and $U + W = 0$, since
+$\iota_{s,s+1}$ is injective (\Cref{lem:sobolev-inclusion}), and the claim holds. If $C \geq 0$,
+squaring and summing gives $(2\pi)^2 \|U\|^2 \leq C^2 (2\pi)^2 \|U + W\|^2$.
+\end{proof}
+
+\begin{theorem}[$\tilde H^m(\Omega) = H^m_0(\Omega)$ isometrically for integer $m$]
+\label{thm:tilde-zero-boundary-integer}
+\lean{Rd.hasZeroExtensionBound_zero, Rd.hasZeroExtensionBound_natCast,
+  Rd.tildeEquivZeroBoundaryNat, Rd.coe_tildeEquivZeroBoundaryNat_apply}
+\leanok
+\uses{thm:zero-extension-bound-iso, thm:zero-extension-bound-lift,
+  lem:tilde-space-vanishes-outside-nonneg, prop:sobolev-vanishing-one,
+  lem:norm-disjoint-supports, lem:sobolev-inclusion-tests}
+Every open set $\Omega \subseteq V$ has the zero extension bound with constant $1$ at every
+$m \in \N$. For every open $\Omega \subseteq V$ and every $m \in \N$, $U \mapsto r_\Omega U$ is
+an isometric isomorphism of $\tilde H^m(\Omega)$ onto $H^m_0(\Omega)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+At $m = 0$, let $U \in T^0(\Omega)$ and $W \in N^0(\Omega)$. Then
+$\|U\| = \|\iota_0 U\|_2$ and $\|U + W\| = \|\iota_0 U + \iota_0 W\|_2$
+(\Cref{lem:sobolev-inclusion-tests}); $\iota_0 U$ vanishes almost everywhere outside $\Omega$
+(\Cref{lem:tilde-space-vanishes-outside-nonneg}) and $\iota_0 W$ almost everywhere on $\Omega$
+(\Cref{prop:sobolev-vanishing-one}), so $\|\iota_0 U\|_2 \leq \|\iota_0 U + \iota_0 W\|_2$
+(\Cref{lem:norm-disjoint-supports}). \Cref{thm:zero-extension-bound-lift} carries the bound with
+constant $1$ to every $m$, and \Cref{thm:zero-extension-bound-iso} gives the isometry.
+\end{proof}
+
+This is Hewett and Moiola \cite[Lemma 2.2(iii)]{HewettMoiola} and Chandler-Wilde, Hewett and
+Moiola \cite[Lemma 3.31(vi)]{ChandlerWildeHewettMoiola}. At $m = 1$ it is
+\Cref{thm:sobolev-tilde-zero-boundary}, proved there through weak derivatives. Hewett and Moiola
+prove the integer case from the formula of the $H^m$ inner product as a sum of integrals of
+derivatives; here the norm recursion lifts the case $m = 0$, where the $L_2$ functions of $U$ and
+$W$ have disjoint supports.

@@ -53,8 +53,9 @@ and McLean (Chapter 3), and are Hilbert spaces as well.
   `Rd.zeroBoundarySpace s Ω` the closure of their restrictions in `H^s(Ω)`. For `s = 1` and every
   open `Ω`, restriction is an isometry of `H̃^1(Ω)` onto `H^1_0(Ω)` (`Rd.tildeEquivZeroBoundary`),
   and inside `H^1(V)` the two are the same subspace (`Rd.tildeSpace_one_le_orthogonal`,
-  `Rd.coe_tildeEquivZeroBoundary_symm_apply`); the elements of `H̃^1(Ω)` vanish outside `Ω`
-  (`Rd.toL2_ae_eq_zero_of_mem_tildeSpace`). On the whole space, `H̃^s(V) = H^s(V)`
+  `Rd.coe_tildeEquivZeroBoundary_symm_apply`). For `s ≥ 0` the `L_2` functions of the elements
+  of `H̃^s(Ω)` vanish outside `Ω` (`Rd.sobolevToL2_ae_eq_zero_of_mem_tildeSpace`, and
+  `Rd.toL2_ae_eq_zero_of_mem_tildeSpace` for `s = 1`). On the whole space, `H̃^s(V) = H^s(V)`
   (`Rd.tildeSpace_top`).
 -/
 
@@ -761,13 +762,16 @@ theorem exists_schwartz_of_mem_testSpan {U : H^{s}(V)} (hU : U ∈ testSpan s Ω
     exact ⟨c • w, hs.trans hw, by rw [BesselPotentialSpace.toDistr_smul, hxw, map_smul]⟩
 
 /-- **Elements of the span of the test functions vanish near the complement of `Ω`**: for
-`U ∈ testSpan 1 Ω`, the `L_2` function of `U` vanishes almost everywhere on an open set
-containing `V \ Ω`, the complement of the closed support of its Schwartz function. -/
-theorem exists_opens_toL2_ae_eq_zero {U : H^{1}(V)} (hU : U ∈ testSpan 1 Ω) :
-    ∃ O : Opens V, (Ω : Set V)ᶜ ⊆ O ∧ (toL2 U : V → ℂ) =ᵐ[volume.restrict (O : Set V)] 0 := by
+`s ≥ 0` and `U ∈ T^s(Ω)`, the `L_2` function `ι_s U` vanishes almost everywhere on an open set
+containing `V \ Ω`, the complement of the closed support of the Schwartz function of `U`
+(`Rd.exists_schwartz_of_mem_testSpan`, `Rd.sobolevToL2_eq_of_toDistr_eq`). -/
+theorem exists_opens_sobolevToL2_ae_eq_zero (hs : 0 ≤ s) {U : H^{s}(V)}
+    (hU : U ∈ testSpan s Ω) :
+    ∃ O : Opens V, (Ω : Set V)ᶜ ⊆ O ∧
+      (sobolevToL2 hs U : V → ℂ) =ᵐ[volume.restrict (O : Set V)] 0 := by
   obtain ⟨w, hw, hUw⟩ := exists_schwartz_of_mem_testSpan hU
-  have h : toL2 U = w.toLp 2 (volume : Measure V) :=
-    toL2_eq_of_toDistr_eq U (by rw [Lp.toTemperedDistribution_toLp_eq]; exact hUw.symm)
+  have h : sobolevToL2 hs U = w.toLp 2 (volume : Measure V) :=
+    sobolevToL2_eq_of_toDistr_eq hs U (by rw [Lp.toTemperedDistribution_toLp_eq]; exact hUw.symm)
   refine ⟨⟨(tsupport w)ᶜ, (isClosed_tsupport w).isOpen_compl⟩, Set.compl_subset_compl.2 hw, ?_⟩
   rw [h]
   filter_upwards [ae_restrict_of_ae (w.coeFn_toLp 2 volume),
@@ -775,28 +779,45 @@ theorem exists_opens_toL2_ae_eq_zero {U : H^{1}(V)} (hU : U ∈ testSpan 1 Ω) :
   rw [hx]
   exact image_eq_zero_of_notMem_tsupport hxO
 
-/-- **The elements of `H̃^1(Ω)` vanish outside `Ω`**: for every open `Ω` and `U ∈ H̃^1(Ω)`, the
-`L_2` function of `U` vanishes almost everywhere outside `Ω`. The `U` with this property form the
-kernel of `U ↦ (ι U)|_{V \ Ω}`, a closed subspace containing the test functions of `Ω`
-(`Rd.exists_opens_toL2_ae_eq_zero`). -/
-theorem toL2_ae_eq_zero_of_mem_tildeSpace {Ω : Opens V} {U : H^{1}(V)}
-    (hU : U ∈ tildeSpace 1 Ω) : ∀ᵐ x ∂volume, x ∉ (Ω : Set V) → toL2 U x = 0 := by
-  have hker : tildeSpace 1 Ω ≤
-      (LpToLpRestrictCLM V ℂ ℂ volume 2 (Ω : Set V)ᶜ ∘L toL2).ker := by
+/-- **The elements of `H̃^s(Ω)` vanish outside `Ω`**: for `s ≥ 0`, every open `Ω` and
+`U ∈ H̃^s(Ω)`, the `L_2` function `ι_s U` vanishes almost everywhere outside `Ω`. The `U` with
+this property form the kernel of `U ↦ (ι_s U)|_{V \ Ω}`, a closed subspace containing `T^s(Ω)`
+(`Rd.exists_opens_sobolevToL2_ae_eq_zero`). -/
+theorem sobolevToL2_ae_eq_zero_of_mem_tildeSpace (hs : 0 ≤ s) {U : H^{s}(V)}
+    (hU : U ∈ tildeSpace s Ω) : ∀ᵐ x ∂volume, x ∉ (Ω : Set V) → sobolevToL2 hs U x = 0 := by
+  have hker : tildeSpace s Ω ≤
+      (LpToLpRestrictCLM V ℂ ℂ volume 2 (Ω : Set V)ᶜ ∘L sobolevToL2 hs).ker := by
     refine Submodule.topologicalClosure_minimal _ (fun W hW => ?_)
       (ContinuousLinearMap.isClosed_ker _)
-    obtain ⟨O, hO, hWO⟩ := exists_opens_toL2_ae_eq_zero hW
+    obtain ⟨O, hO, hWO⟩ := exists_opens_sobolevToL2_ae_eq_zero hs hW
     rw [LinearMap.mem_ker]
-    change LpToLpRestrictCLM V ℂ ℂ volume 2 (Ω : Set V)ᶜ (toL2 W) = 0
+    change LpToLpRestrictCLM V ℂ ℂ volume 2 (Ω : Set V)ᶜ (sobolevToL2 hs W) = 0
     rw [Lp.eq_zero_iff_ae_eq_zero]
     exact (LpToLpRestrictCLM_coeFn ℂ _ _).trans (ae_restrict_of_ae_restrict_of_subset hO hWO)
   have h := hker hU
   rw [LinearMap.mem_ker] at h
-  change LpToLpRestrictCLM V ℂ ℂ volume 2 (Ω : Set V)ᶜ (toL2 U) = 0 at h
+  change LpToLpRestrictCLM V ℂ ℂ volume 2 (Ω : Set V)ᶜ (sobolevToL2 hs U) = 0 at h
   rw [Lp.eq_zero_iff_ae_eq_zero] at h
   have h' := (LpToLpRestrictCLM_coeFn ℂ _ _).symm.trans h
   rw [EventuallyEq, ae_restrict_iff' Ω.isOpen.measurableSet.compl] at h'
   exact h'
+
+/-- **Elements of the span of the test functions vanish near the complement of `Ω`**: for
+`U ∈ testSpan 1 Ω`, the `L_2` function of `U` vanishes almost everywhere on an open set
+containing `V \ Ω`, the case `s = 1` of `Rd.exists_opens_sobolevToL2_ae_eq_zero`
+(`Rd.sobolevToL2_one`). -/
+theorem exists_opens_toL2_ae_eq_zero {U : H^{1}(V)} (hU : U ∈ testSpan 1 Ω) :
+    ∃ O : Opens V, (Ω : Set V)ᶜ ⊆ O ∧ (toL2 U : V → ℂ) =ᵐ[volume.restrict (O : Set V)] 0 := by
+  rw [← sobolevToL2_one]
+  exact exists_opens_sobolevToL2_ae_eq_zero zero_le_one hU
+
+/-- **The elements of `H̃^1(Ω)` vanish outside `Ω`**: for every open `Ω` and `U ∈ H̃^1(Ω)`, the
+`L_2` function of `U` vanishes almost everywhere outside `Ω`, the case `s = 1` of
+`Rd.sobolevToL2_ae_eq_zero_of_mem_tildeSpace` (`Rd.sobolevToL2_one`). -/
+theorem toL2_ae_eq_zero_of_mem_tildeSpace {Ω : Opens V} {U : H^{1}(V)}
+    (hU : U ∈ tildeSpace 1 Ω) : ∀ᵐ x ∂volume, x ∉ (Ω : Set V) → toL2 U x = 0 := by
+  rw [← sobolevToL2_one]
+  exact sobolevToL2_ae_eq_zero_of_mem_tildeSpace zero_le_one hU
 
 /-- **Functions with disjoint supports**: in every `L_p(μ)` with values in a normed group, if
 `a` vanishes almost everywhere outside a measurable set `S` and `b` vanishes almost everywhere on

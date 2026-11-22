@@ -310,6 +310,8 @@ block documents state every result with its Lean name and list the files:
   embeddings.
 * [Lipschitz domains and traces](docs/DomainsTraces.md): extension, traces, `H^1(Ω)`, Green's
   formula.
+* [Fractional Sobolev spaces on Lipschitz domains](docs/FractionalSobolev.md): `H̃^s(Ω)` and
+  `H^s_0(Ω)`, the zero extension bound.
 * [Manifolds and eigenbases](docs/Manifolds.md): compact manifolds, Dirichlet and Neumann
   eigenfunctions.
 * [Besov and Sobolev spaces on measure spaces](docs/MeasureSpaces.md): spaces of a scheme,

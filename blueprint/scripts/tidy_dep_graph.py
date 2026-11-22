@@ -129,7 +129,8 @@ BLOCKS: list[tuple[str, list]] = [
     ("Fourier multipliers", ["Fourier multipliers"]),
     ("Lipschitz domains", ["Lipschitz domains"]),
     ("Traces", ["Traces on Lipschitz domains"]),
-    ("Sobolev spaces on domains and boundaries", ["Sobolev spaces on domains"]),
+    ("Sobolev spaces on domains and boundaries", [
+        "Sobolev spaces on domains", "Fractional Sobolev spaces on Lipschitz domains"]),
     ("Eigenbases of the Laplacian", ["Eigenbases of the Laplacian"]),
     ("Compact manifolds", ["Besov spaces on compact manifolds",
                            "Eigenfunction expansions on compact manifolds"]),

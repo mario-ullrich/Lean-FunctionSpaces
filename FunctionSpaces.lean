@@ -144,6 +144,8 @@ public import FunctionSpaces.Domains.Traces.TraceKernel
 public import FunctionSpaces.Domains.Sobolev.LipschitzDomainH1
 public import FunctionSpaces.Domains.Sobolev.SobolevRestrictionSpaces
 public import FunctionSpaces.Domains.Sobolev.SobolevDuality
+public import FunctionSpaces.Domains.Sobolev.SobolevRestrictionInclusions
+public import FunctionSpaces.Domains.Sobolev.ZeroExtensionBound
 public import FunctionSpaces.Domains.Sobolev.LipschitzDomainW1p
 public import FunctionSpaces.Domains.Sobolev.LipschitzGraphGreen
 public import FunctionSpaces.Domains.Sobolev.LipschitzDomainGreen
