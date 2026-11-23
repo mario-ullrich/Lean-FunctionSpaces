@@ -8,7 +8,7 @@ space is also identified with an approximation space: the functions whose error 
 approximation by a fixed scheme (band-limited functions, trigonometric polynomials, splines,
 wavelets, eigenfunctions) decays at a given rate. This form makes the general methods of
 approximation theory available, such as interpolation, embeddings, decompositions and traces,
-and it is the form numerical analysis needs. The project has about 121 000 lines of Lean in 306
+and it is the form numerical analysis needs. The project has about 129 000 lines of Lean in 318
 files and contains no `sorry`.
 
 * **Blueprint** (a webpage explaining the mathematics):
@@ -123,19 +123,25 @@ unless an entry says otherwise.
 | Characterization by | Settings |
 |---|---|
 | Littlewood–Paley blocks: `H^{s,p} = F^s_{p,2}` | [`ℝ^d`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-bessel-potential-distributions.html#thm:bessel-triebel-lizorkin-distr) (`s ∈ ℝ`), [`ℝ^d`, `p = 2`, and `H^s = B^s_{2,2}` for `s > 0`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-sobolev-two-littlewood-paley.html#cor:sobolev-two-besov) (`s ≥ 0`) |
-| derivatives: `u ∈ H^{s+1,p}` iff `u` and every `∂_v u` lie in `H^{s,p}` | [`ℝ^d`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-bessel-potential-multipliers.html#thm:bessel-potential-derivatives) (`s ∈ ℝ`) |
+| derivatives: `u ∈ H^{s+1,p}` iff `u` and every `∂_v u` lie in `H^{s,p}` | [`ℝ^d`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-bessel-potential-multipliers.html#thm:bessel-potential-derivatives) (`s ∈ ℝ`), [`ℝ^d`, `p = 2`, with the identity `(2π)² ‖U‖²_{s+1} = (2π)² ‖U‖²_s + ∑_i ‖∂_i U‖²_s`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-sobolev-scale.html#thm:sobolev-norm-recursion) |
+| differences: `‖U‖_{H^s} ≈ ‖U‖_2 + ‖(2^(ks) ω_r(U, 2^(-k))_2)_k‖_{ℓ_2}` | [`ℝ^d`, explicit constants](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-sobolev-scale.html#thm:sobolev-besov-constants) (`p = 2`, `0 < s < r`) |
 | real interpolation: `(H^{s₀,p}, H^{s₁,p})_{η,q} = B^{(1-η)s₀+ηs₁}_{p,q}` | [`ℝ^d`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-bessel-potential-interpolation.html#thm:bessel-potential-interpolate) (`0 < s₀ < s₁`) |
 | tensor Daubechies wavelet coefficients | [`ℝ^d`, `p = 2`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-daub-rd-besov.html#cor:daub-rd-sobolev) (`0 < s < 3 - log₂ 3` for masks of order three) |
+| supports: `H̃^s(Ω)` is the set of `U ∈ H^s(ℝ^d)` vanishing outside `Ω` | [bounded Lipschitz domains](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-tilde-space-support.html#thm:tilde-space-supports-general) (`p = 2`, `s ≥ 0`) |
+| restriction: `H̃^s(Ω) ≅ H^s_0(Ω)` | [open sets, isometric](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-zero-extension-bound.html#thm:tilde-zero-boundary-integer) (`p = 2`, `s ∈ ℕ`), [bounded Lipschitz domains](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-tilde-zero-boundary.html#thm:tilde-zero-boundary) (`p = 2`, `s ≥ 0`, `s - 1/2 ∉ ℕ_0`) |
+| the kernel of the trace: `H^s_0(Ω) = ker γ_s` | [bounded Lipschitz domains](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-sobolev-trace-kernel.html#thm:sobolev-trace-kernel) (`p = 2`, `1/2 < s < 3/2`) |
+| `H^s_0(Ω) = H^s(Ω)` | [bounded Lipschitz domains](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-zero-extension-small.html#thm:zero-boundary-small) (`p = 2`, `0 ≤ s < 1/2`) |
 
 **Traces.** The trace maps `B^{s+1/p}_{p,q}` of the domain onto `B^s_{p,q}` of the boundary, and
-`H^s(Ω)`, `1/2 < s < 3/2`, onto a space on the boundary `Γ`. The rows describe the space on the
-boundary.
+`H^s(Ω)`, `1/2 < s < 3/2`, onto `H^{s-1/2}(Γ)` of the boundary `Γ`. The rows describe the space
+on the boundary.
 
 | Boundary space described by | Settings |
 |---|---|
 | the Besov space of the boundary | [`𝕋^{n+1}` to a face `𝕋^n`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-torus-traces.html#thm:trace-torus), [the half-space to its hyperplane](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-half-space-traces.html#thm:half-space-trace-space) (`s > 0`) |
 | chart pieces | [bounded Lipschitz domains](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-bounded-lipschitz-traces.html#thm:boundary-trace-space) (first differences, `0 < s < 1`), [`B^{s+1/p}_{p,q}(Ω)` of a bounded Lipschitz domain, a bounded operator onto `B^s_{p,q}(Γ)`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-boundary-besov-space.html#thm:besov-trace-operator) (`1 ≤ p < ∞`, `1 ≤ q ≤ ∞`, `0 < s < 1`), [compact manifolds with boundary](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-manifold-trace.html#thm:manifold-trace) (`s > 0`), [`H^1(Ω)` of a bounded Lipschitz domain, `B^{1/2}_{2,2}(Γ)`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-lipschitz-domain-h1.html#thm:sobolev-lipschitz-domain-trace), [`H^s(Ω)` of a bounded Lipschitz domain, `H^{s-1/2}(Γ) = B^{s-1/2}_{2,2}(Γ)`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-boundary-slobodeckij.html#thm:trace-space-boundary-sobolev) (`1/2 < s < 3/2`) |
-| the Gagliardo form `∫_Γ ∫_Γ \|g(x) - g(y)\|² / \|x - y\|^(d+2s-2) dσ dσ` | [`H^s(Ω)` of a bounded Lipschitz domain](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-boundary-slobodeckij.html#thm:trace-space-slobodeckij) (`1/2 < s < 3/2`, equivalent norms) |
+| the Gagliardo form `∫_Γ ∫_Γ \|g(x) - g(y)\|² / \|x - y\|^(d+2s-2) dσ dσ` | [`H^s(Ω)` of a bounded Lipschitz domain](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-boundary-slobodeckij.html#thm:trace-space-slobodeckij) (`1/2 < s < 3/2`, equivalent norms), [the Hilbert norm of `H^t(Γ)` by the Gagliardo forms of the chart pieces](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-boundary-slobodeckij.html#thm:boundary-sobolev-norm) (`0 < t < 1`) |
+| the quotient `H^s(Ω) ⧸ H^s_0(Ω)` | [bounded Lipschitz domains](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-sobolev-trace-kernel.html#cor:sobolev-trace-kernel-quotient) (`1/2 < s < 3/2`) |
 
 **Approximation spaces `A^s_q`.** Each row names a space and the scheme whose approximation
 spaces it is.
@@ -215,7 +221,13 @@ For a general scheme the project describes `A^s_q`
   in `F^m_{p,2}(V)` iff in `H^{m,p}(V)`, the last being Calderón's theorem
   (`Rd.memSobolev_iff_memTriebelLizorkin`, `Rd.memSobolev_iff_memSobolev_bessel`). For real `s`,
   a tempered distribution lies in `H^{s,p}(V)` iff it lies in `F^s_{p,2}(V)`
-  (`Rd.memSobolev_bessel_iff_memTriebelLizorkinDistr`).
+  (`Rd.memSobolev_bessel_iff_memTriebelLizorkinDistr`). For real `t ≤ s` the inclusion
+  `H^s(V) ⊆ H^t(V)` has norm at most `1`, every derivative `∂_v : H^{s+1}(V) → H^s(V)` is
+  bounded, and for an orthonormal basis `(e_i)` of `V`,
+  `(2π)² ‖U‖²_{H^{s+1}} = (2π)² ‖U‖²_{H^s} + ∑_i ‖∂_{e_i} U‖²_{H^s}` (`Rd.sobolevInclusion`,
+  `Rd.sobolevLineDeriv`, `Rd.sq_norm_eq_add_sum_sobolevLineDeriv`). For `0 < s < r`,
+  `‖U‖_{H^s}` is equivalent to `‖U‖_2 + ‖(2^(ks) ω_r(U, 2^(-k))_2)_k‖_{ℓ_2}`, with explicit
+  constants (`Rd.modNorm_sobolevToL2_le`, `Rd.enorm_le_modNorm_sobolevToL2`).
 * **Sobolev embeddings.** Let `d ≥ 1`, `1 < p < ∞`, `m ∈ ℕ` and `f ∈ W^m_p(V)`. If `r < ∞` and
   `1/r = 1/p - m/d`, then `f` agrees almost everywhere with a function in `L_r(V)`
   (`Rd.exists_memLp_ae_eq_of_memSobolev_of_eq`); if `m > d/p`, with a bounded continuous function
@@ -253,39 +265,59 @@ For a general scheme the project describes `A^s_q`
   `s > 0` and `1 ≤ q ≤ ∞`, `B^s_{p,q}(M)`, defined by the chart pieces of a Besov atlas, is the
   same for every atlas (`Manifold.memBesov_iff`).
 * **Traces.** Let `Ω` be as above, with boundary `Γ` and surface measure `σ`, the
-  `(d-1)`-dimensional Hausdorff measure on `Γ`. In the restrictions `H^1(Ω)` of `H^1(V)`, the
-  kernel `ker γ` of the boundary trace is `H^1_0(Ω)`, the closure of the restricted test
-  functions (`Rd.BoundedLipschitzDomain.traceKer_one_eq_zeroBoundarySpace`). Let the trace space
-  be the orthogonal complement of `ker γ` in `H^1(Ω)` and `τ` its trace into `L_2(Γ)`. Then
-  `g ∈ L_2(Γ)` is `τ t` for some `t` iff `∫_Γ ∫_Γ |g(x) - g(y)|² / |x - y|^d dσ(x) dσ(y) < ∞`, and
-  `‖t‖²` is equivalent to `‖τ t‖²_{L_2(Γ)}` plus this form
-  (`Rd.BoundedLipschitzDomain.mem_range_traceL2_iff_slobodeckij`,
+  `(d-1)`-dimensional Hausdorff measure on `Γ`. For `1 ≤ p < ∞`, `1 ≤ q ≤ ∞` and
+  `1/p < s < 1 + 1/p`, let `B^s_{p,q}(Ω)` carry the intrinsic quasi-norm with differences of
+  order `2` and `B^{s-1/p}_{p,q}(Γ)` the quasi-norm by the chart pieces of a resolution of unity.
+  Both are Banach spaces, and the trace is a bounded linear operator from `B^s_{p,q}(Ω)` onto
+  `B^{s-1/p}_{p,q}(Γ)` with a bounded linear right inverse
+  (`Rd.BoundedLipschitzDomain.besovTrace`, `Rd.BoundedLipschitzDomain.besovTrace_surjective`,
+  `Rd.BoundedLipschitzDomain.besovExtend`,
+  `Rd.BoundedLipschitzDomain.toLp_besovTrace_besovExtend`; Schneider–Vybíral, Mayboroda). For
+  `0 < t < 1` let `H^t(Γ)` be `B^t_{2,2}(Γ)` with the Hilbert norm
+  `(‖g‖²_{L_2(Γ)} + ∑_j E_j(g))^(1/2)`, where `E_j(g)` is the Gagliardo form of the `j`-th chart
+  piece of `g` (`Rd.BoundedLipschitzDomain.BoundarySobolev`). This norm is equivalent to the
+  norm by chart pieces and to the square root of
+  `‖g‖²_{L_2(Γ)} + ∫_Γ ∫_Γ |g(x) - g(y)|² / |x - y|^(d-1+2t) dσ dσ`
+  (`Rd.BoundedLipschitzDomain.boundarySobolevEquivBoundaryBesov`,
+  `Rd.BoundedLipschitzDomain.exists_boundarySobolev_norm_equiv_slobodeckij`), and Riesz
+  identifies the dual `H^{-t}(Γ)` with `H^t(Γ)`
+  (`Rd.BoundedLipschitzDomain.dualBoundarySobolevEquiv`). Let `1/2 < s < 3/2`, `H^s(Ω)` the
+  restrictions of `H^s(V)`, `H^s_0(Ω)` the closure of the restricted test functions, and the
+  trace space the orthogonal complement of the kernel of the trace in `H^s(Ω)`. The trace maps
+  `H^s(Ω)` onto `H^{s-1/2}(Γ)` with a bounded linear right inverse
+  (`Rd.BoundedLipschitzDomain.sobolevTrace`,
+  `Rd.BoundedLipschitzDomain.sobolevTrace_sobolevExtend`; McLean, Theorem 3.38), its kernel is
+  `H^s_0(Ω)` (`Rd.BoundedLipschitzDomain.traceKer_eq_zeroBoundarySpace`; McLean, Theorem 3.40),
+  and the trace space and `H^s(Ω) ⧸ H^s_0(Ω)` are isomorphic to `H^{s-1/2}(Γ)`
+  (`Rd.BoundedLipschitzDomain.traceSpaceEquivBoundarySobolev`,
+  `Rd.BoundedLipschitzDomain.quotientZeroBoundaryEquivBoundarySobolev`). Let `τ` be the trace of
+  the trace space into `L_2(Γ)`. Then `g ∈ L_2(Γ)` is `τ u` for some `u` iff
+  `∫_Γ ∫_Γ |g(x) - g(y)|² / |x - y|^(d+2s-2) dσ(x) dσ(y) < ∞`, and `‖u‖²` is equivalent to
+  `‖τ u‖²_{L_2(Γ)}` plus this form (`Rd.BoundedLipschitzDomain.mem_range_traceL2_iff_slobodeckij`,
   `Rd.BoundedLipschitzDomain.exists_traceL2_norm_equiv_slobodeckij`).
-* **Traces of `B^s_{p,q}(Ω)` and `H^s(Ω)`.** Let `Ω`, `Γ` and `σ` be as above. For `1 ≤ p < ∞`,
-  `1 ≤ q ≤ ∞` and `1/p < s < 1 + 1/p`, the trace is a bounded linear operator from
-  `B^s_{p,q}(Ω)` onto `B^{s-1/p}_{p,q}(Γ)` with a bounded linear right inverse
-  (`Rd.BoundedLipschitzDomain.besovTrace`, `Rd.BoundedLipschitzDomain.besovExtend`,
-  `Rd.BoundedLipschitzDomain.besovTrace_surjective`,
-  `Rd.BoundedLipschitzDomain.toLp_besovTrace_besovExtend`). For `1/2 < s < 3/2` the trace maps
-  `H^s(Ω)` onto `H^{s-1/2}(Γ) = B^{s-1/2}_{2,2}(Γ)` with a bounded linear right inverse
-  (`Rd.BoundedLipschitzDomain.sobolevTrace`, `Rd.BoundedLipschitzDomain.sobolevExtend`,
-  `Rd.BoundedLipschitzDomain.sobolevTrace_sobolevExtend`), the trace space of `H^s(Ω)` is
-  isomorphic to `H^{s-1/2}(Γ)` (`Rd.BoundedLipschitzDomain.traceSpaceEquivBoundarySobolev`), and
-  `g ∈ L_2(Γ)` is a trace iff `∫_Γ ∫_Γ |g(x) - g(y)|² / |x - y|^(d+2s-2) dσ(x) dσ(y) < ∞`
-  (`Rd.BoundedLipschitzDomain.mem_range_traceL2_iff_slobodeckij`). The kernel of the trace is
-  `H^s_0(Ω)`, the closure of the restricted test functions in `H^s(Ω)`
-  (`Rd.BoundedLipschitzDomain.traceKer_eq_zeroBoundarySpace`,
-  `Rd.BoundedLipschitzDomain.ker_sobolevTrace_eq_zeroBoundarySpace`; McLean, Theorem 3.40), and
-  `H^s(Ω) ⧸ H^s_0(Ω)` is isomorphic to `H^{s-1/2}(Γ)`
-  (`Rd.BoundedLipschitzDomain.quotientZeroBoundaryEquivBoundarySobolev`).
-* **`H̃^s(Ω) = H^s_0(Ω)`.** Let `Ω ⊆ V` be open, `H̃^s(Ω)` the closure of the test functions of
-  `Ω` in `H^s(V)` and `H^s_0(Ω)` the closure of their restrictions in `H^s(Ω)`. For every
-  `m ∈ ℕ_0`, restriction is an isometric isomorphism of `H̃^m(Ω)` onto `H^m_0(Ω)`
-  (`Rd.tildeEquivZeroBoundaryNat`; Hewett–Moiola, Lemma 2.2(iii)). If `Ω` is a bounded Lipschitz
-  domain and `s ≥ 0` with `s - 1/2 ∉ ℕ_0`, restriction is an isomorphism of `H̃^s(Ω)` onto
-  `H^s_0(Ω)` (`Rd.BoundedLipschitzDomain.tildeEquivZeroBoundaryOfNeHalf`; McLean, Theorem 3.33),
-  and `H^s_0(Ω) = H^s(Ω)` for `0 ≤ s < 1/2`
-  (`Rd.BoundedLipschitzDomain.zeroBoundarySpace_eq_top_of_lt_half`).
+* **`H̃^s(Ω)` and `H^s_0(Ω)`.** Let `Ω ⊆ V` be open, `H̃^s(Ω)` the closure of the test
+  functions of `Ω` in `H^s(V)` and `H^s_0(Ω)` the closure of their restrictions in `H^s(Ω)`.
+  For every `l ∈ ℕ_0`, restriction is an isometric isomorphism of `H̃^l(Ω)` onto `H^l_0(Ω)`
+  (`Rd.tildeEquivZeroBoundaryNat`; Hewett–Moiola, Lemma 2.2(iii)). Let `Ω` be a bounded
+  Lipschitz domain and `s ≥ 0`. Then `H̃^s(Ω)` consists of the `U ∈ H^s(V)` that vanish almost
+  everywhere outside `Ω` (`Rd.BoundedLipschitzDomain.mem_tildeSpace_iff_of_nonneg`); if
+  `s - 1/2 ∉ ℕ_0`, restriction is an isomorphism of `H̃^s(Ω)` onto `H^s_0(Ω)`
+  (`Rd.BoundedLipschitzDomain.tildeEquivZeroBoundaryOfNeHalf`; McLean, Theorem 3.33); and
+  `H^s_0(Ω) = H^s(Ω)` for `s < 1/2`
+  (`Rd.BoundedLipschitzDomain.zeroBoundarySpace_eq_top_of_lt_half`). Two inequalities carry the
+  proofs. For `1 ≤ p < ∞`, `1 ≤ q ≤ ∞` and `0 < s < 1/p`, multiplication by the indicator of
+  `Ω` is bounded on `B^s_{p,q}(V)` (`Rd.BoundedLipschitzDomain.exists_modNorm_indicatorLp_le`).
+  On a Lipschitz graph domain `Ω'` with height `h(x)` above the graph and `1/2 < s < 1`, every
+  `G ∈ L_2(V)` that vanishes near the graph has
+  `∫_{Ω'} |G|² / min(h, 1)^(2s) ≤ C (‖G‖_{L_2(Ω')} + ‖(2^(ks) ω_1(G, 2^(-k), Ω')_2)_k‖_{ℓ_2})²`
+  (`Rd.LipschitzGraph.exists_lintegral_div_height_le`), a fractional Hardy inequality. On a
+  bounded Lipschitz domain the traces, the isomorphisms and the duals hold componentwise for
+  `ℂ^m`-valued functions, in the Hilbert direct sums `X^m`: the trace maps `H^s(Ω)^m` onto
+  `H^{s-1/2}(Γ)^m` with kernel `H^s_0(Ω)^m` for `1/2 < s < 3/2`, restriction maps `H̃^s(Ω)^m`
+  isomorphically onto `H^s_0(Ω)^m` for `s ≥ 0` with `s - 1/2 ∉ ℕ_0`, and the dual of
+  `H̃^s(Ω)^m` is `H^{-s}(Ω)^m` for every real `s`
+  (`Rd.BoundedLipschitzDomain.vecSobolevTrace`, `Rd.BoundedLipschitzDomain.ker_vecSobolevTrace`,
+  `Rd.BoundedLipschitzDomain.vecTildeEquivZeroBoundaryOfNeHalf`, `Rd.vecDualEquiv`).
 * **Gelfand triples.** `L_2` is the pivot space between `H^s` and `H^{-s}` on `ℝ^d`, on open
   sets `Ω` and on `Γ`. For `s ≥ 0` the embeddings `H^s(V) → L_2(V)` and `H̃^s(Ω) → L_2(Ω)`, and
   for `0 < t < 1` the embedding `H^t(Γ) → L_2(Γ)`, are injective with dense range
@@ -362,9 +394,11 @@ block documents state every result with its Lean name and list the files:
 * [Sobolev spaces on `ℝ^d`](docs/SobolevRd.md): weak derivatives, `W^m_p = F^m_{p,2} = H^{m,p}`,
   embeddings.
 * [Lipschitz domains and traces](docs/DomainsTraces.md): extension, splines on domains,
-  `B^s_{p,q}(Ω)`, `H^s(Ω)` and their traces, Green's formula.
+  `B^s_{p,q}(Ω)`, `H^s(Ω)` and their traces, `H^t(Γ)`, Green's formula.
 * [Fractional Sobolev spaces on Lipschitz domains](docs/FractionalSobolev.md): `H̃^s(Ω)` and
-  `H^s_0(Ω)`, the zero extension bound, the kernel of the trace of `H^s(Ω)`.
+  `H^s_0(Ω)`, the zero extension bound, the indicator as a multiplier of `B^s_{p,q}` for
+  `0 < s < 1/p`, `H̃^s = H^s_0 = H^s` for `0 ≤ s < 1/2`, a fractional Hardy inequality, the
+  kernel of the trace, vector-valued spaces.
 * [Manifolds and eigenbases](docs/Manifolds.md): compact manifolds, Dirichlet and Neumann
   eigenfunctions.
 * [Besov and Sobolev spaces on measure spaces](docs/MeasureSpaces.md): spaces of a scheme,
@@ -440,6 +474,8 @@ sources. The essential ones:
   J. Appl. Anal. **23** (2017), 1–8.
 * J. Johnsen, W. Sickel, *A direct proof of Sobolev embeddings for quasi-homogeneous
   Lizorkin–Triebel spaces with mixed norms*, J. Funct. Spaces Appl. **5** (2007), 183–198.
+* S. Mayboroda, *The Poisson Problem on Lipschitz Domains*, PhD thesis, University of
+  Missouri-Columbia, 2005.
 * W. McLean, *Strongly Elliptic Systems and Boundary Integral Equations*, Cambridge University
   Press, 2000.
 * S. M. Nikol'skii, *Approximation of Functions of Several Variables and Imbedding Theorems*,
@@ -447,6 +483,8 @@ sources. The essential ones:
 * A. Pietsch, *Approximation spaces*, J. Approx. Theory **32** (1981), 115–134.
 * V. S. Rychkov, *On restrictions and extensions of the Besov and Triebel–Lizorkin spaces with
   respect to Lipschitz domains*, J. London Math. Soc. (2) **60** (1999), 237–257.
+* C. Schneider, J. Vybíral, *Non-smooth atomic decompositions, traces on Lipschitz domains, and
+  pointwise multipliers in function spaces*, J. Funct. Anal. **264** (2013), 1197–1237.
 * S. B. Stechkin, *On absolute convergence of orthogonal series* (in Russian), Dokl. Akad. Nauk
   SSSR (N.S.) **102** (1955), 37–40.
 * E. M. Stein, *Singular Integrals and Differentiability Properties of Functions*, Princeton
