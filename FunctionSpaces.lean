@@ -120,6 +120,8 @@ public import FunctionSpaces.Domains.Lipschitz.LocalLipschitzGraphs
 public import FunctionSpaces.Domains.Lipschitz.ConvexDomains
 public import FunctionSpaces.Domains.Lipschitz.BesovDomains
 public import FunctionSpaces.Domains.Lipschitz.BesovDomainLocalisation
+public import FunctionSpaces.Domains.Lipschitz.BoundaryLayers
+public import FunctionSpaces.Domains.Lipschitz.IndicatorMultiplier
 public import FunctionSpaces.Domains.Extension.RychkovExtension
 public import FunctionSpaces.Domains.Extension.LipschitzGraphBesov
 public import FunctionSpaces.Domains.Extension.LocalExtension
@@ -147,6 +149,7 @@ public import FunctionSpaces.Domains.Sobolev.SobolevRestrictionSpaces
 public import FunctionSpaces.Domains.Sobolev.SobolevDuality
 public import FunctionSpaces.Domains.Sobolev.SobolevRestrictionInclusions
 public import FunctionSpaces.Domains.Sobolev.ZeroExtensionBound
+public import FunctionSpaces.Domains.Sobolev.SobolevZeroExtension
 public import FunctionSpaces.Domains.Sobolev.LipschitzDomainW1p
 public import FunctionSpaces.Domains.Sobolev.LipschitzGraphGreen
 public import FunctionSpaces.Domains.Sobolev.LipschitzDomainGreen

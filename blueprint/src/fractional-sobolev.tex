@@ -16,7 +16,11 @@ $\tilde H^s(\Omega) = H^s_0(\Omega)$ to one inequality on test functions, the ze
 bound, lifts the bound from $s$ to $s + 1$ with the same constant, and proves it with the
 constant $1$ for every integer $s \geq 0$ on every open set. \Cref{sec:tilde-space-support}
 describes $\tilde H^s(\Omega)$, $s \geq 0$, on a bounded Lipschitz domain as the space of the
-elements of $H^s(V)$ that vanish outside $\Omega$.
+elements of $H^s(V)$ that vanish outside $\Omega$. \Cref{sec:indicator-multiplier} proves that
+the indicator of a bounded Lipschitz domain is a pointwise multiplier of $B^s_{p,q}(V)$ for
+$1 \leq p < \infty$, $1 \leq q \leq \infty$ and $0 < s < 1/p$, and
+\Cref{sec:zero-extension-small} derives from it the zero extension bound and
+$\tilde H^s(\Omega) = H^s_0(\Omega) = H^s(\Omega)$ for $0 \leq s < 1/2$.
 
 \section{Inclusions of restriction spaces}
 \label{sec:restriction-inclusions}
@@ -440,3 +444,417 @@ $\tilde H^s(\Omega) = H^s_{\overline\Omega}$ \cite[Theorem 3.29]{McLean} for $s 
 Chandler-Wilde, Hewett and Moiola state for every real $s$ in the same lemma; for $s > 0$ it is
 also in Grisvard \cite[Theorem 1.4.2.2]{Grisvard}. At $s = 1$ it is
 \Cref{thm:tilde-space-supports}.
+
+\section{The indicator of a domain as a multiplier}
+\label{sec:indicator-multiplier}
+
+For $1 \leq p < \infty$, $1 \leq q \leq \infty$ and $0 < s < 1/p$, multiplication by the
+indicator $\mathbf 1_\Omega$ of a bounded Lipschitz domain is bounded on $B^s_{p,q}(V)$
+(\Cref{thm:indicator-multiplier}). The proof follows the mechanism of Schneider and Vybíral
+\cite[Theorem 5.4(i)]{SchneiderVybiral}: the product of a smooth atom with $\mathbf 1_\Omega$ is
+a non-smooth atom (\Cref{lem:indicator-atoms}), and the atomic synthesis sums these atoms. The
+exponent $1/p$ of the new atoms comes from the volume of the boundary layer that a step $h$ sees
+(\Cref{lem:boundary-layer-volume}). In this section $n = \dim V$, $|S|$ is the Lebesgue measure
+of $S \subseteq V$, $\beta = |B(0, 1)|$, $\overline B(c, \rho)$ is the closed ball, and $\Omega$
+is a bounded Lipschitz domain with boundary $\Gamma$, boundary balls $B_i = B(c_i, \rho_i)$ and
+graph domains $\Omega_i$ with Lipschitz constants $M_i$ and hyperplanes $H_i$
+(\Cref{def:bounded-lipschitz}, \Cref{def:graph-map}).
+
+\begin{definition}[Switch sets]
+\label{def:switch-set}
+\lean{Rd.switchSet, Rd.switchSet_zero}
+\leanok
+For $U \subseteq V$ and $h \in V$, the switch set $S_h(U)$ is the set of the $x \in V$ for which
+exactly one of $x$ and $x + h$ lies in $U$. In particular $S_0(U) = \emptyset$.
+\end{definition}
+
+Thus $\mathbf 1_U(x + h) - \mathbf 1_U(x) \neq 0$ if and only if $x \in S_h(U)$.
+
+\begin{lemma}[Crossing the boundary]
+\label{lem:switch-set-crossing}
+\lean{Rd.inter_frontier_nonempty_of_isPreconnected, Rd.switchSet_eq_symmDiff,
+  Rd.exists_mem_frontier_of_mem_switchSet, Rd.measurableSet_switchSet, Rd.volume_switchSet_le}
+\leanok
+\uses{def:switch-set}
+Let $X$ be a topological space and $S, U \subseteq X$ with $S$ preconnected. If $S$ meets both $U$
+and $X \setminus U$, then $S$ meets $\partial U$. For all $U \subseteq V$ and $h \in V$,
+$S_h(U) = U \mathbin{\triangle} (U - h)$, and for every $x \in S_h(U)$ the segment
+$[x, x + h]$ contains a point of $\partial U$. For all $U \subseteq V$ and $h \in V$,
+$|S_h(U)| \leq 2 |U|$, and $S_h(U)$ is measurable if $U$ is.
+\end{lemma}
+
+\begin{proof}
+\leanok
+If $S$ did not meet $\partial U$, it would lie in the union of the disjoint open sets
+$\operatorname{int} U$ and $X \setminus \overline U$, hence in one of them, since it is
+preconnected (Mathlib's \texttt{IsPreconnected.\allowbreak subset\_\allowbreak or\_\allowbreak
+subset}); either case contradicts the assumption. The segment $[x, x + h]$ is convex, hence
+preconnected, and of its end points one lies in $U$ and one outside. Finally
+$S_h(U) = U \mathbin{\triangle} (U - h) \subseteq U \cup (U - h)$ (Mathlib's
+\texttt{Set.\allowbreak symmDiff\_\allowbreak subset\_\allowbreak union}), symmetric differences
+of measurable sets are measurable (\texttt{MeasurableSet.\allowbreak symmDiff}), and translations
+preserve the Lebesgue measure.
+\end{proof}
+
+\begin{definition}[The height above a graph]
+\label{def:graph-height}
+\lean{Rd.LipschitzGraph.height}
+\leanok
+\uses{def:lipschitz-graph}
+For a Lipschitz graph domain $\Omega' = \{x : \varphi(x) < \langle x, e \rangle\}$, the height of
+$x \in V$ above its graph is $\eta(x) = \langle x, e \rangle - \varphi(x)$.
+\end{definition}
+
+\begin{lemma}[Properties of the height]
+\label{lem:graph-height}
+\lean{Rd.LipschitzGraph.mem_domain_iff_height_pos, Rd.LipschitzGraph.height_add_smul,
+  Rd.LipschitzGraph.height_graphMap, Rd.LipschitzGraph.height_graphEquiv,
+  Rd.LipschitzGraph.proj_graphEquiv, Rd.LipschitzGraph.abs_height_add_sub_le,
+  Rd.LipschitzGraph.abs_height_le_of_mem_switchSet}
+\leanok
+\uses{def:graph-height, def:graph-map, lem:flattening, def:switch-set}
+Let $\eta$ be the height of a Lipschitz graph domain $\Omega'$ with Lipschitz constant $M$, $P$
+the orthogonal projection onto its hyperplane $H = e^\perp$ and $\gamma$ its graph map
+(\Cref{def:graph-map}). For all $x, h \in V$, $r, t \in \R$ and $x' \in H$:
+$x \in \Omega'$ if and only if $\eta(x) > 0$; $\eta(x + r e) = \eta(x) + r$;
+$\eta(\gamma(x')) = 0$, $\eta(\gamma(x') + t e) = t$ and $P(\gamma(x') + t e) = x'$;
+$|\eta(x + h) - \eta(x)| \leq (1 + M) \|h\|$; and if $x \in S_h(\Omega')$, then
+$|\eta(x)| \leq (1 + M) \|h\|$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first statement is the definition of $\Omega'$. Since $\langle e, e \rangle = 1$ and
+$\varphi$ is constant along $e$, $\eta(x + r e) = \eta(x) + r$; since
+$\langle \gamma(x'), e \rangle = \varphi(x') = \varphi(\gamma(x'))$, $\eta(\gamma(x')) = 0$; and
+$P e = 0$, $P \gamma(x') = x'$ (\Cref{def:graph-map}). The Lipschitz bound follows from
+$|\langle h, e \rangle| \leq \|h\|$ and $|\varphi(x + h) - \varphi(x)| \leq M \|h\|$. For
+$x \in S_h(\Omega')$, $\eta$ changes sign between $x$ and $x + h$, so either
+$0 < \eta(x) \leq \eta(x) - \eta(x + h)$ or $0 \leq -\eta(x) < \eta(x + h) - \eta(x)$.
+\end{proof}
+
+\begin{lemma}[Slabs along a graph]
+\label{lem:graph-slab}
+\lean{Rd.LipschitzGraph.volume_abs_height_le_inter_closedBall}
+\leanok
+\uses{lem:graph-height, lem:flattening, def:graph-map}
+Let $\eta$ be the height of a Lipschitz graph domain with hyperplane $H$, and $\beta_H$ the volume
+of the unit ball of $H$. For all $c \in V$, $\rho \geq 0$ and $\delta \in \R$,
+\[
+  \bigl|\{x : |\eta(x)| \leq \delta\} \cap \overline B(c, \rho)\bigr|
+  \leq 2 \delta_+ \rho^{n-1} \beta_H ,
+\]
+where $\delta_+ = \max(\delta, 0)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+If $\gamma(x') + t e$ lies in the set, then $|t| \leq \delta$ and
+$\|x' - Pc\| = \|P(\gamma(x') + t e - c)\| \leq \rho$ (\Cref{lem:graph-height}), so the preimage
+of the set under the graph coordinates lies in $\overline B^H(Pc, \rho) \times [-\delta, \delta]$.
+The graph coordinates carry the product of the Lebesgue measures of $H$ and $\R$ to the Lebesgue
+measure of $V$ (\Cref{lem:flattening}), and the preimage of every set, measurable or not, has the
+same measure (Mathlib's \texttt{MeasurePreserving.\allowbreak measure\_\allowbreak
+preimage\_\allowbreak equiv}). The product set has measure $\rho^{n-1} \beta_H \cdot 2\delta_+$,
+since $\dim H = n - 1$; for $\delta < 0$ it is empty.
+\end{proof}
+
+\begin{lemma}[The boundary layer]
+\label{lem:boundary-layer-volume}
+\lean{Rd.BoundedLipschitzDomain.mem_carrier_iff_of_mem_ball,
+  Rd.BoundedLipschitzDomain.switchSet_subset_iUnion,
+  Rd.BoundedLipschitzDomain.volume_switchSet_inter_closedBall_le_of_le,
+  Rd.BoundedLipschitzDomain.exists_volume_switchSet_inter_closedBall_le}
+\leanok
+\uses{lem:switch-set-crossing, lem:graph-height, lem:graph-slab, lem:flattening,
+  lem:bounded-lipschitz-geometry, def:bounded-lipschitz}
+There is $C_\Gamma < \infty$ with
+\[
+  |S_h(\Omega) \cap \overline B(c, \rho)| \leq C_\Gamma \|h\| \rho^{n-1}
+  \qquad (c, h \in V,\ \rho \geq \|h\|) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Take $\varepsilon > 0$ with $\Gamma \subseteq \bigcup_i B(c_i, \rho_i - 2\varepsilon)$
+(\Cref{lem:bounded-lipschitz-geometry}).
+
+\emph{Short steps, $\|h\| \leq \varepsilon$.} Let $x \in S_h(\Omega)$. The segment $[x, x + h]$
+contains a point $z \in \Gamma$ (\Cref{lem:switch-set-crossing}), and
+$z \in B(c_i, \rho_i - 2\varepsilon)$ for some $i$, which may depend on $x$. Then $x$ and $x + h$
+lie in $B(c_i, \rho_i - \varepsilon) \subseteq B_i$, where $\Omega$ and $\Omega_i$ agree, so
+$x \in S_h(\Omega_i)$ and $|\eta_i(x)| \leq (1 + M_i) \|h\|$ for the height $\eta_i$ of
+$\Omega_i$ (\Cref{lem:graph-height}). Hence $S_h(\Omega) \cap \overline B(c, \rho)$ lies in the
+union over $i$ of the slabs $\{|\eta_i| \leq (1 + M_i) \|h\|\} \cap \overline B(c, \rho)$, and
+\Cref{lem:graph-slab} bounds its measure by $\sum_i 2 (1 + M_i) \beta_{H_i} \|h\| \rho^{n-1}$.
+
+\emph{Long steps, $\|h\| > \varepsilon$.} Then $|S_h(\Omega)| \leq 2 |\Omega|$
+(\Cref{lem:switch-set-crossing}), and $\|h\| \rho^{n-1} \geq \varepsilon^n$ since
+$\rho \geq \|h\| > \varepsilon$. So
+$C_\Gamma = \sum_i 2 (1 + M_i) \beta_{H_i} + 2 |\Omega| \varepsilon^{-n}$ will do.
+\end{proof}
+
+The chart is chosen for each switch point separately, so the ball $\overline B(c, \rho)$ may meet
+several chart balls.
+
+\begin{corollary}[The boundary layer at the scale of an atom]
+\label{cor:boundary-layer-atoms}
+\lean{Rd.mul_div_two_pow_pow_sub_one_le,
+  Rd.BoundedLipschitzDomain.exists_volume_switchSet_inter_closedBall_div_two_pow_le}
+\leanok
+\uses{lem:boundary-layer-volume, lem:dyadic-ball-volume}
+For all $t \geq 0$, $d \geq 1$, $j \in \N$ and $n' \geq 1$ with $t \leq d 2^{-j}$,
+$t (d 2^{-j})^{n'-1} \leq d^{n'} 2^{-jn'} \min(1, 2^j t)$. There is $C < \infty$ with
+\[
+  |S_h(\Omega) \cap \overline B(c, d 2^{-j})| \leq C d^n 2^{-jn} \min(1, 2^j \|h\|)
+  \qquad (c, h \in V,\ d \geq 1,\ j \in \N) .
+\]
+\end{corollary}
+
+\begin{proof}
+\leanok
+With $\rho = d 2^{-j}$, $\rho^{n'} \min(1, 2^j t) = \rho^{n'-1} \min(\rho, d t)$, and $t \leq \rho$,
+$t \leq d t$. For $h = 0$ the switch set is empty; for $h \neq 0$, $n \geq 1$. If
+$\|h\| \leq d 2^{-j}$, \Cref{lem:boundary-layer-volume} and the first statement give the bound
+with $C_\Gamma$. If $\|h\| > d 2^{-j}$, then $2^j \|h\| > d \geq 1$, so the minimum is $1$, and
+the set has at most the measure $d^n \beta 2^{-jn}$ of the ball (\Cref{lem:dyadic-ball-volume}).
+So $C = C_\Gamma + \beta$ will do.
+\end{proof}
+
+\begin{lemma}[Cut-off functions and bounds by indicators]
+\label{lem:cut-off-differences}
+\lean{Rd.enorm_indicator_add_sub_le, Rd.eLpNorm_le_of_enorm_le_indicator_add}
+\leanok
+\uses{def:switch-set}
+Let $X$ be a set with an addition, $E$ a normed abelian group, and $S_h(U)$ as in
+\Cref{def:switch-set} for $U \subseteq X$. For all $U \subseteq X$, $a : X \to E$
+and $h, x \in X$,
+\[
+  |\mathbf 1_U a(x + h) - \mathbf 1_U a(x)| \leq |a(x + h) - a(x)| + \mathbf 1_{S_h(U)}(x) |a(x)| .
+\]
+Let $\mu$ be a measure, $1 \leq p \leq \infty$, $S_1, S_2$ measurable sets and
+$B_1, B_2 \in [0, \infty]$. For every measurable $f$ with values in $E$ and
+$|f| \leq B_1 \mathbf 1_{S_1} + B_2 \mathbf 1_{S_2}$,
+$\|f\|_p \leq B_1 \mu(S_1)^{1/p} + B_2 \mu(S_2)^{1/p}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+If $x \notin S_h(U)$, both points lie on the same side of $U$, and the difference is
+$a(x + h) - a(x)$ or $0$. If $x \in S_h(U)$, it is $-a(x)$ or
+$a(x + h) = (a(x + h) - a(x)) + a(x)$. The second statement is Minkowski's inequality with
+$\|\mathbf 1_S\|_p = \mu(S)^{1/p}$.
+\end{proof}
+
+\begin{lemma}[Indicators of smooth atoms]
+\label{lem:indicator-atoms}
+\lean{ENNReal.rpow_le_self_of_one_le, Rd.IsSmoothAtom.enorm_sub_le_indicator,
+  Rd.IsSmoothAtom.indicator_switchSet_le, Rd.IsSmoothAtom.eLpNorm_indicator_le,
+  Rd.IsSmoothAtom.eLpNorm_fwdDiff_indicator_le,
+  Rd.BoundedLipschitzDomain.exists_isRegularAtom_indicator}
+\leanok
+\uses{cor:boundary-layer-atoms, lem:cut-off-differences, lem:smooth-atoms-regular,
+  def:smooth-atoms, lem:smooth-atoms-basic, def:regular-atoms, lem:dyadic-ball-volume,
+  lem:pointwise-atoms, lem:switch-set-crossing}
+For all $x \in [1, \infty]$ and $z \leq 1$, $x^z \leq x$. Let $1 \leq p \leq \infty$, with
+$1/\infty = 0$. There is $K < \infty$ such that for all $d \geq 1$, $j \in \N$, $c \in V$ and
+every smooth atom $a$ on $V$ of level $j$ and order $1$ with centre $c$, radius factor $d$ and
+constant $A$, the function $\mathbf 1_\Omega a$ is a regular atom of level $j$, exponent $1/p$
+and order $1$ with centre $c$, radius factor $d$ and constant $K A d^n$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first statement follows from $x^z \leq x^1$ for $x \geq 1$. A smooth atom on $V$ satisfies
+$|a| \leq A$, so $A \geq 0$ (\Cref{lem:smooth-atoms-basic}). Let $\rho = d 2^{-j}$, so
+$|\overline B(c, \rho)| = d^n \beta 2^{-jn}$ (\Cref{lem:dyadic-ball-volume}); note
+$d^{n/p} \leq d^n$ by the first statement. The function $\mathbf 1_\Omega a$ vanishes where $a$
+does, and $|\mathbf 1_\Omega a| \leq A$ on $\overline B(c, \rho)$, so
+$\|\mathbf 1_\Omega a\|_p \leq \beta^{1/p} A d^n 2^{-jn/p}$ (\Cref{lem:pointwise-atoms}). For the
+differences, \Cref{lem:cut-off-differences} gives
+$|\Delta_h (\mathbf 1_\Omega a)| \leq |\Delta_h a| + \mathbf 1_{S_h(\Omega)} |a|$. The first term
+is at most $2A \min(1, 2^j \|h\|)$ (\Cref{lem:smooth-atoms-regular}) and vanishes outside
+$\overline B(c, \rho) \cup \overline B(c - h, \rho)$, of measure at most $2 d^n \beta 2^{-jn}$.
+The second term is at most $A$ and vanishes outside $S_h(\Omega) \cap \overline B(c, \rho)$, of
+measure at most $C d^n 2^{-jn} \min(1, 2^j \|h\|)$ (\Cref{cor:boundary-layer-atoms}). With
+$m = \min(1, 2^j \|h\|)$, \Cref{lem:cut-off-differences} gives
+\[
+  \|\Delta_h (\mathbf 1_\Omega a)\|_p \leq 2A m (2 d^n \beta 2^{-jn})^{1/p}
+  + A (C d^n 2^{-jn} m)^{1/p} .
+\]
+Since $1/p \leq 1$, $m \leq m^{1/p} \leq \min(1, (2^j \|h\|)^{1/p})$ and $2^{1/p} \leq 2$, so
+$K = 4 \beta^{1/p} + C^{1/p}$ will do.
+\end{proof}
+
+Only the size $|a| \leq A$ enters the switch term, so the atoms must be smooth atoms: the regular
+atoms of \Cref{thm:atomic-decomposition} carry only $L_p$ bounds. The difference bound holds in
+$L_p$: near $\Gamma$ the differences of $\mathbf 1_\Omega a$ are of size $A$ for short steps, and
+the layer where they live has small measure.
+
+\begin{theorem}[The indicator of a Lipschitz domain as a multiplier]
+\label{thm:indicator-multiplier}
+\lean{Rd.BoundedLipschitzDomain.exists_modNorm_indicatorLp_le}
+\leanok
+\uses{lem:indicator-atoms, thm:smooth-atomic-decomposition, lem:reproducing-formula,
+  thm:rd-atomic-synthesis, lem:local-means-upper, lem:cells-partition, lem:indicator-lp}
+Let $1 \leq p < \infty$ and $0 < s < 1/p$. There is $C < \infty$ such that for every
+$1 \leq q \leq \infty$ and every $F \in L_p(V)$
+\[
+  \|\mathbf 1_\Omega F\|_p
+  + \bigl\|\bigl(2^{ks} \omega_1(\mathbf 1_\Omega F, 2^{-k})_p\bigr)_k\bigr\|_{\ell_q}
+  \leq C \Bigl(\|F\|_p + \bigl\|\bigl(2^{ks} \omega_1(F, 2^{-k})_p\bigr)_k\bigr\|_{\ell_q}\Bigr) .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Take the normalised smooth bump of radius $1$ and the smooth atomic decomposition of order $1$
+(\Cref{thm:smooth-atomic-decomposition}): there is $A$ such that for every $F$ the terms of the
+reproducing formula are $f_j = \eta_j * (k_j * F) = \sum_m \lambda_{j,m} a_{j,m}$ with smooth
+atoms $a_{j,m}$ of order $1$, radius factor $d = 2 + n$ and constant $A$, centred at the cell
+centres, and $\|\lambda\|_{b^s_{p,q}}$ is the local means quasi-norm of $F$. The partial sums of
+$\sum_j f_j$ converge to $F$ in $L_p$ (\Cref{lem:reproducing-formula}), and multiplication by
+$\mathbf 1_\Omega$ is a bounded operator on $L_p$ (\Cref{lem:indicator-lp}), so
+$\sum_j \mathbf 1_\Omega f_j = \mathbf 1_\Omega F$ in $L_p$, with
+$\mathbf 1_\Omega f_j = \sum_m \lambda_{j,m} \mathbf 1_\Omega a_{j,m}$ almost everywhere. By
+\Cref{lem:indicator-atoms} the $\mathbf 1_\Omega a_{j,m}$ are regular atoms of exponent
+$\sigma = 1/p$ and order $1$ with constant $K A d^n$, with the same centres, whose overlap is
+bounded (\Cref{lem:cells-partition}). The atomic synthesis (\Cref{thm:rd-atomic-synthesis}) with
+$0 < s < \sigma$ bounds the left side by a constant times $\|\lambda\|_{b^s_{p,q}}$, and the local
+means quasi-norm is bounded by the right side (\Cref{lem:local-means-upper}). All constants are
+independent of $q$.
+\end{proof}
+
+This is the case of $B$-spaces with $1 \leq p < \infty$ of Triebel's multiplier theorem for
+characteristic functions \cite[Proposition 5.3 and Remark 5.4]{Triebel2002}, stated there for
+$0 < q \leq \infty$ and based on the half-space case of Runst and Sickel
+\cite[Proposition 5.1]{Triebel2002}. Schneider and Vybíral obtain it for every $q$ from the same
+atomic mechanism \cite[Theorem 5.4(i) and Remark 5.10]{SchneiderVybiral}, where the self-similar
+quasi-norm of $\mathbf 1_\Omega$ plays the part of \Cref{lem:boundary-layer-volume}. They also
+show that $\mathbf 1_\Omega \notin B^{1/p}_{p,q}(V)$ for the cube when $q < \infty$, so the
+multiplier property fails at $s = 1/p$; the endpoint with $q = \infty$ is left open there
+\cite[p.~31]{SchneiderVybiral}. For $s < 1/p$ the case $q = \infty$ is in both sources, and the
+proof here treats all $q$ alike.
+
+\section{Small smoothness}
+\label{sec:zero-extension-small}
+
+For $0 \leq s < 1/2$ the multiplier theorem at $p = q = 2$ and the description of $H^s(V)$ by
+differences with constants (\Cref{thm:sobolev-besov-constants}) show that multiplication by
+$\mathbf 1_\Omega$ keeps $H^s(V)$. This gives the zero extension bound and
+$\tilde H^s(\Omega) = H^s_0(\Omega) = H^s(\Omega)$. In this section $\Omega' \subseteq V$ is open,
+$\Omega$ is a bounded Lipschitz domain, and
+$N_s(F) = \|F\|_2 + \|(2^{ks} \omega_1(F, 2^{-k})_2)_k\|_{\ell_2}$ for $F \in L_2(V)$.
+
+\begin{lemma}[Restrictions through the $L_2$ functions]
+\label{lem:restriction-l2-functions}
+\lean{Rd.restrictProj_eq_restrictProj_of_ae_eq, Rd.restrictProj_eq_of_sobolevToL2_ae_eq,
+  Rd.sobolevToL2_eq_indicatorLp_add}
+\leanok
+\uses{lem:sobolev-restriction-basic, prop:sobolev-vanishing-one,
+  lem:tilde-space-vanishes-outside-nonneg, lem:sobolev-to-l2, lem:indicator-lp}
+Let $s \geq 0$. For all $U, U' \in H^s(V)$ with $\iota_s U = \iota_s U'$ almost everywhere on
+$\Omega'$, $r_{\Omega'} U = r_{\Omega'} U'$; for every $U \in H^s(V)$ and every
+$u \in H^s(\Omega')$ with $\iota_s U = \iota_s u$ almost everywhere on $\Omega'$,
+$r_{\Omega'} U = u$. For every $U \in \tilde H^s(\Omega')$ and every $W \in N^s(\Omega')$,
+$\iota_s U = \mathbf 1_{\Omega'} \iota_s(U + W)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\iota_s(U - U') = 0$ almost everywhere on $\Omega'$, so $U - U' \in N^s(\Omega')$
+(\Cref{prop:sobolev-vanishing-one}), the kernel of $r_{\Omega'}$, and $r_{\Omega'} u = u$
+(\Cref{lem:sobolev-restriction-basic}). For the last statement, $\iota_s U = 0$ almost everywhere
+outside $\Omega'$ (\Cref{lem:tilde-space-vanishes-outside-nonneg}) and $\iota_s W = 0$ almost
+everywhere on $\Omega'$ (\Cref{prop:sobolev-vanishing-one}).
+\end{proof}
+
+At $s = 1$ the second statement is part of \Cref{prop:sobolev-restriction-l2}.
+
+\begin{theorem}[The zero extension bound for small smoothness]
+\label{thm:zero-extension-small}
+\lean{Rd.BoundedLipschitzDomain.exists_hasZeroExtensionBound_of_lt_half}
+\leanok
+\uses{thm:indicator-multiplier, thm:sobolev-besov-constants, lem:restriction-l2-functions,
+  def:zero-extension-bound, thm:tilde-zero-boundary-integer}
+For every $0 \leq s < 1/2$ there is $C \in \R$ such that $\Omega$ has the zero extension bound
+with constant $C$ at $s$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+At $s = 0$ this holds with $C = 1$ (\Cref{thm:tilde-zero-boundary-integer}). Let $0 < s < 1/2$,
+$U \in T^s(\Omega)$ and $W \in N^s(\Omega)$. Then $\iota_s U = \mathbf 1_\Omega \iota_s(U + W)$
+(\Cref{lem:restriction-l2-functions}). With the constants $c_I$ and $c_B$ of
+\Cref{thm:sobolev-besov-constants} for the first modulus, $1 > s$, and $C_\Omega$ of
+\Cref{thm:indicator-multiplier} for $p = q = 2$, $s < 1/2$,
+\begin{align*}
+  \|U\| &\leq c_I N_s(\iota_s U) = c_I N_s(\mathbf 1_\Omega \iota_s(U + W)) \\
+  &\leq c_I C_\Omega N_s(\iota_s(U + W)) \leq c_I C_\Omega c_B \|U + W\| .
+\end{align*}
+\end{proof}
+
+By \Cref{thm:zero-extension-bound-iso}, restriction is then an isomorphism of
+$\tilde H^s(\Omega)$ onto $H^s_0(\Omega)$ for $0 \leq s < 1/2$.
+
+\begin{theorem}[$H^s_0(\Omega) = H^s(\Omega)$ for small smoothness]
+\label{thm:zero-boundary-small}
+\lean{Rd.BoundedLipschitzDomain.exists_sobolevToL2_eq_indicatorLp,
+  Rd.BoundedLipschitzDomain.mem_tildeSpace_of_sobolevToL2_eq_indicatorLp,
+  Rd.BoundedLipschitzDomain.restrictProj_eq_of_sobolevToL2_eq_indicatorLp,
+  Rd.BoundedLipschitzDomain.zeroBoundarySpace_eq_top_of_lt_half}
+\leanok
+\uses{thm:indicator-multiplier, thm:sobolev-besov-constants, lem:sobolev-from-differences,
+  lem:sobolev-to-l2, thm:tilde-space-supports-general, lem:restriction-l2-functions,
+  lem:sobolev-tilde-restriction-range}
+Let $s \geq 0$ and $U, U' \in H^s(V)$ with $\iota_s U' = \mathbf 1_\Omega \iota_s U$. Then
+$U' \in \tilde H^s(\Omega)$ and $r_\Omega U' = r_\Omega U$. If $s < 1/2$, then for every
+$U \in H^s(V)$ there is such a $U' \in H^s(V)$, and $H^s_0(\Omega) = H^s(\Omega)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+$\iota_s U'$ vanishes outside $\Omega$, so $U' \in \tilde H^s(\Omega)$
+(\Cref{thm:tilde-space-supports-general}), and agrees with $\iota_s U$ on $\Omega$
+(\Cref{lem:restriction-l2-functions}). Let $s < 1/2$. At $s = 0$, $\iota_0$ maps onto $L_2(V)$
+(\Cref{lem:sobolev-to-l2}). For $0 < s < 1/2$,
+$N_s(\mathbf 1_\Omega \iota_s U) \leq C_\Omega c_B \|U\| < \infty$
+(\Cref{thm:indicator-multiplier}, \Cref{thm:sobolev-besov-constants}), so
+$\mathbf 1_\Omega \iota_s U = \iota_s U'$ for some $U' \in H^s(V)$
+(\Cref{lem:sobolev-from-differences}). For $u \in H^s(\Omega)$ take $U = u$: then
+$u = r_\Omega u = r_\Omega U'$ with $U' \in \tilde H^s(\Omega)$, so $u \in H^s_0(\Omega)$
+(\Cref{lem:sobolev-tilde-restriction-range}).
+\end{proof}
+
+For a bounded Lipschitz domain, $H^s_0(\Omega) = H^s(\Omega)$ holds for $0 \leq s \leq 1/2$
+\cite[Theorem 1.4.2.4]{Grisvard}, \cite[Theorem 3.40]{McLean}, as quoted by Chandler-Wilde,
+Hewett and Moiola, who show that for Lipschitz $\Omega$ equality holds if and only if
+$s \leq 1/2$ \cite[Corollary 3.29(ix)]{ChandlerWildeHewettMoiola}. With the same multiplier they
+prove $\tilde H^s(\Omega) = H^s_{\overline\Omega}$ for $0 \leq s < 1/2$ on disjoint unions of
+finitely many bounded Lipschitz open sets, whose closures may meet
+\cite[Lemma 3.21]{ChandlerWildeHewettMoiola}. For Besov spaces with $q < \infty$ the zero
+extension is Triebel's \cite[Proposition 3.1(ii)]{Triebel2002} and Mayboroda's
+\cite[Proposition 3.6.6]{Mayboroda2005}.
+
+\begin{corollary}[$\tilde H^s(\Omega) \cong H^s(\Omega)$ for small smoothness]
+\label{cor:tilde-restriction-small}
+\lean{Rd.BoundedLipschitzDomain.tildeEquivRestrictionSpaceOfLtHalf,
+  Rd.BoundedLipschitzDomain.tildeEquivRestrictionSpaceOfLtHalf_apply}
+\leanok
+\uses{thm:zero-extension-small, thm:zero-boundary-small, thm:zero-extension-bound-iso}
+For every $0 \leq s < 1/2$, $U \mapsto r_\Omega U$ is an isomorphism of $\tilde H^s(\Omega)$ onto
+$H^s(\Omega)$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+By \Cref{thm:zero-extension-small} and \Cref{thm:zero-extension-bound-iso} restriction is an
+isomorphism of $\tilde H^s(\Omega)$ onto $H^s_0(\Omega)$, which is $H^s(\Omega)$
+(\Cref{thm:zero-boundary-small}).
+\end{proof}
+
+This is the case $0 \leq s < 1/2$ of Hewett and Moiola
+\cite[Lemma 2.1 and Remark 2.6]{HewettMoiola}; the isomorphism
+$\tilde H^s(\Omega) \cong H^s_0(\Omega)$ for $s \geq 0$, $s \notin 1/2 + \N_0$, is classical
+\cite[Theorem 3.33]{McLean}.

@@ -22,7 +22,11 @@ restriction is an isometry of `H̃^m(Ω)` onto `H^m_0(Ω)` for every open `Ω` a
 `H^s(ℝ^d)`, `s ≥ 0`, whose `L_2` function vanishes outside `Ω` lies in `H̃^s(Ω)`: mollification
 converges in `H^s(ℝ^d)` and smooth cut-offs keep `H^s(ℝ^d)` ([Sobolev spaces on
 `ℝ^d`](SobolevRd.md)), and the cone mollifiers of the charts push such an element into
-`H̃^s(Ω)`.
+`H̃^s(Ω)`. The indicator `1_Ω` of a bounded Lipschitz domain is a pointwise multiplier of
+`B^s_{p,q}(ℝ^d)` for `0 < s < 1/p`: the steps `h` that cross the boundary start in a layer of
+width `≲ ‖h‖` along it, so `1_Ω` turns smooth atoms into atoms of smoothness `1/p`. At
+`p = q = 2` this gives the zero extension bound and `H̃^s(Ω) = H^s_0(Ω) = H^s(Ω)` for
+`0 ≤ s < 1/2`.
 
 ## Main results
 
@@ -73,6 +77,28 @@ span of the test functions of `Ω` in `H^s(V)` (`Rd.testSpan`), and `U ↦ U|_Ω
   `Rd.hasZeroExtensionBound_natCast`), and restriction is an isometric isomorphism of `H̃^m(Ω)`
   onto `H^m_0(Ω)` (`Rd.tildeEquivZeroBoundaryNat`; Hewett–Moiola, Lemma 2.2(iii);
   Chandler-Wilde–Hewett–Moiola, Lemma 3.31(vi)).
+* **The indicator of a Lipschitz domain as a multiplier.** Let `Ω` be a bounded Lipschitz domain,
+  `1 ≤ p < ∞` and `0 < s < 1/p`. There is `C < ∞` with
+  `‖1_Ω F‖_p + ‖(2^(ks) ω_1(1_Ω F, 2^(-k))_p)_k‖_{ℓ_q}`
+  `≤ C (‖F‖_p + ‖(2^(ks) ω_1(F, 2^(-k))_p)_k‖_{ℓ_q})` for every `1 ≤ q ≤ ∞` and every
+  `F ∈ L_p(V)`
+  (`Rd.BoundedLipschitzDomain.exists_modNorm_indicatorLp_le`; Triebel 2002, Proposition 5.3 and
+  Remark 5.4; Schneider–Vybíral, Theorem 5.4(i) and Remark 5.10). The ingredients: the steps that
+  cross the boundary form a layer, `|S_h(Ω) ∩ B̄(c, ρ)| ≤ C ‖h‖ ρ^(d-1)` for `ρ ≥ ‖h‖`
+  (`Rd.BoundedLipschitzDomain.exists_volume_switchSet_inter_closedBall_le`), and `1_Ω a` is a
+  regular atom of exponent `1/p` for every smooth atom `a` of order `1`
+  (`Rd.BoundedLipschitzDomain.exists_isRegularAtom_indicator`).
+* **`H̃^s(Ω) = H^s_0(Ω) = H^s(Ω)` for `0 ≤ s < 1/2`.** On a bounded Lipschitz domain the zero
+  extension bound holds at every `0 ≤ s < 1/2`
+  (`Rd.BoundedLipschitzDomain.exists_hasZeroExtensionBound_of_lt_half`), every `U ∈ H^s(V)` has a
+  zero extension `U' ∈ H̃^s(Ω)` with `ι_s U' = 1_Ω ι_s U` and `U'|_Ω = U|_Ω`
+  (`Rd.BoundedLipschitzDomain.exists_sobolevToL2_eq_indicatorLp`,
+  `Rd.BoundedLipschitzDomain.mem_tildeSpace_of_sobolevToL2_eq_indicatorLp`,
+  `Rd.BoundedLipschitzDomain.restrictProj_eq_of_sobolevToL2_eq_indicatorLp`),
+  `H^s_0(Ω) = H^s(Ω)` (`Rd.BoundedLipschitzDomain.zeroBoundarySpace_eq_top_of_lt_half`; Grisvard,
+  Theorem 1.4.2.4; McLean, Theorem 3.40), and restriction is an isomorphism of `H̃^s(Ω)` onto
+  `H^s(Ω)` (`Rd.BoundedLipschitzDomain.tildeEquivRestrictionSpaceOfLtHalf`; Hewett–Moiola,
+  Lemma 2.1; Chandler-Wilde–Hewett–Moiola, Corollary 3.29(ix)).
 
 ## What is formalised
 
@@ -83,6 +109,9 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The inclusions `H^s(ℝ^d) ⊆ H^t(ℝ^d)` on Schwartz and test functions, their dense range, the `L_2` functions of Schwartz functions, vanishing on `Ω` and the span of the test functions under the inclusions, the injective inclusion `H^s(Ω) ⊆ H^t(Ω)` with norm at most `1`, dense range and `H^s_0(Ω) ⊆ H^t_0(Ω)`, and derivatives that keep test functions and vanishing on `Ω` | ✅ | ✗ | `Domains/Sobolev/SobolevRestrictionInclusions` |
 | The injectivity of restriction on `H̃^s(Ω)` for `s ≥ 0`, the zero extension bound, the isomorphism `H̃^s(Ω) ≅ H^s_0(Ω)` under it, its lift from `s` to `s + 1`, and the isometry `H̃^m(Ω) ≅ H^m_0(Ω)` for every open set and `m ∈ ℕ` | ✅ | ✗ | `Domains/Sobolev/ZeroExtensionBound` |
 | Mollified functions and functions with compact support in `Ω` as elements of `H̃^s(Ω)`, localised functions, the chart pieces, and `H̃^s(Ω)`, `s ≥ 0`, on a bounded Lipschitz domain as the functions of `H^s(ℝ^d)` that vanish outside `Ω` | ✅ | ✗ | `Domains/Traces/TildeSpaceSupport` |
+| Switch sets of a step and crossing points on the boundary, the height above a Lipschitz graph, slabs along a graph, and the boundary layer `\|S_h(Ω) ∩ B̄(c, ρ)\| ≤ C ‖h‖ ρ^(d-1)` of a bounded Lipschitz domain, also at the scales of atoms | ✅ | ✗ | `Domains/Lipschitz/BoundaryLayers` |
+| Differences of cut-off functions, indicators of smooth atoms as regular atoms of exponent `1/p`, and the indicator of a bounded Lipschitz domain as a pointwise multiplier of `B^s_{p,q}(ℝ^d)` for `0 < s < 1/p`, `1 ≤ p < ∞`, `1 ≤ q ≤ ∞` | ✅ | ✗ | `Domains/Lipschitz/IndicatorMultiplier` |
+| Restrictions determined by the `L_2` functions on `Ω`, the zero extension bound for `0 ≤ s < 1/2`, zero extensions in `H^s(ℝ^d)`, `H^s_0(Ω) = H^s(Ω)` and the isomorphism `H̃^s(Ω) ≅ H^s(Ω)` for `0 ≤ s < 1/2` | ✅ | ✗ | `Domains/Sobolev/SobolevZeroExtension` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

@@ -113,6 +113,10 @@ declarations.
   `∑_k 2^k b_{2^k} ≤ 2 ∑_n b_n` (`ENNReal.tsum_two_pow_mul_le_two_mul`), where Mathlib's
   `ENNReal.tsum_condensed_le` has `b_1 + 2 ∑_n b_n`; and
   `ENNReal.rpow_le_rpow_of_nonpos`, which exists for `ℝ` and `ℝ≥0` but not for `ℝ≥0∞`.
+* **`x^z ≤ x` in `[0, ∞]`** (`FunctionSpaces/Domains/Lipschitz/IndicatorMultiplier.lean`):
+  `x^z ≤ x` for `x ≥ 1` and `z ≤ 1` (`ENNReal.rpow_le_self_of_one_le`), the companion of
+  Mathlib's `ENNReal.rpow_le_self_of_le_one`; Mathlib has it for `ℝ`
+  (`Real.rpow_le_self_of_one_le`).
 * **Products and sums in canonically ordered semirings**
   (`ApproximationSpaces/Sequences/Lq.lean`): `a x + b y ≤ (a + b)(x + y)`
   (`ENNReal.mul_add_mul_le_add_mul_add`) and `∑_{i ∈ s} a_i b_i ≤ (∑_{i ∈ s} a_i)(∑_{i ∈ s} b_i)`
@@ -703,6 +707,13 @@ declarations.
   In Mathlib it would follow from the finiteness of `μHE[n-1]` on the graph of a Lipschitz
   function over a bounded subset of a hyperplane, a consequence of
   `LipschitzOnWith.euclideanHausdorffMeasure_image_le`.
+* **Preconnected sets cross the frontier** (`FunctionSpaces/Domains/Lipschitz/BoundaryLayers.lean`):
+  a preconnected set that meets `U` and its complement meets `frontier U`
+  (`Rd.inter_frontier_nonempty_of_isPreconnected`), from Mathlib's
+  `IsPreconnected.subset_or_subset`; the segment form for a step `x ↦ x + h` that leaves or enters
+  `U` is `Rd.exists_mem_frontier_of_mem_switchSet`. Mathlib states the case of a preconnected
+  whole space (`nonempty_frontier_iff`). In Mathlib the statement would read
+  `IsPreconnected.inter_frontier_nonempty (hS : IsPreconnected S) …`.
 * **Bounded Lipschitz domains from local graphs**
   (`FunctionSpaces/Domains/Lipschitz/LocalLipschitzGraphs.lean`): the set-level definition
   (`Rd.IsLipschitzDomainAt`, `Rd.IsBoundedLipschitzDomain`), the ball

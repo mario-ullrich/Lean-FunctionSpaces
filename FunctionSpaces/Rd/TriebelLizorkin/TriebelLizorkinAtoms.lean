@@ -225,17 +225,6 @@ theorem dyadicWeight_mul_tsum_ite_le_maximal {i j : ℕ} (hij : i ≤ j)
 
 /-! ### Smooth atoms -/
 
-/-- A smooth atom on `Ω` is bounded by its constant on `Ω`: `|a(y)| ≤ A`. -/
-theorem IsSmoothAtom.norm_le {Ω : Set V} {K : ℕ} {d A : ℝ} {j : ℕ} {c : V} {a : V → ℂ}
-    (ha : IsSmoothAtom Ω K d A j c a) {y : V} (hy : y ∈ Ω) : ‖a y‖ ≤ A := by
-  simpa [norm_iteratedFDerivWithin_zero] using
-    ha.norm_iteratedFDerivWithin_le 0 (Nat.zero_le K) y hy
-
-/-- The constant of a smooth atom on `V` is nonnegative: `0 ≤ |a(0)| ≤ A`. -/
-theorem IsSmoothAtom.const_nonneg {K : ℕ} {d A : ℝ} {j : ℕ} {c : V} {a : V → ℂ}
-    (ha : IsSmoothAtom univ K d A j c a) : 0 ≤ A :=
-  (norm_nonneg _).trans (ha.norm_le (mem_univ 0))
-
 /-- A smooth atom on `V` is continuous. -/
 theorem IsSmoothAtom.continuous {K : ℕ} {d A : ℝ} {j : ℕ} {c : V} {a : V → ℂ}
     (ha : IsSmoothAtom univ K d A j c a) : Continuous a :=
