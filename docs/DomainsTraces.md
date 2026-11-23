@@ -51,12 +51,14 @@ formula `∫_Ω (∂_v u) w + u ∂_v w = ∫_Γ γ_{L_2} u · γ_{L_2} w ⟪v, 
 with the trace `γ_{L_2} : H^1(Ω) → L_2(Γ)`, pasted from the graph domains with a resolution of unity
 equal to one near the boundary; the outward unit normal is the chart normal almost everywhere on the
 boundary, and the zero extension of `u ∈ H^1(Ω)` lies in `W^1_2(ℝ^d)` iff the trace of `u` vanishes.
-The kernel of the trace is `H^1_0(Ω)`: mollification converges in `H^1(ℝ^d)`, and mollifiers
-supported in the cone of a chart push the pieces of a function that vanishes outside `Ω` into `Ω`,
-so `H̃^1(Ω)` consists of the functions of `H^1(ℝ^d)` that vanish outside `Ω`; with the zero
-extension this gives `ker γ = H^1_0(Ω)` for the trace of `H^1(Ω)`; hence `H^1(Ω) ⧸ H^1_0(Ω)` is
-isometric to the trace space of `H^1(Ω)`, by its definition as the orthogonal complement of
-`ker γ`, and `(ker γ)^* ≅ H^{-1}(Ω)`.
+The kernel of the trace is `H^1_0(Ω)`: `H̃^1(Ω)` consists of the functions of `H^1(ℝ^d)` that
+vanish outside `Ω` ([Fractional Sobolev spaces on Lipschitz domains](FractionalSobolev.md)), and
+with the zero extension this gives `ker γ = H^1_0(Ω)` for the trace of `H^1(Ω)`; hence
+`H^1(Ω) ⧸ H^1_0(Ω)` is isometric to the trace space of `H^1(Ω)`, by its definition as the
+orthogonal complement of `ker γ`, and `(ker γ)^* ≅ H^{-1}(Ω)`. For `1/2 < s ≤ 1` the kernel of
+the trace of `H^s(Ω)` is `H^s_0(Ω)`: an approximation from `H^1(ℝ^d)` is corrected by the
+extension from the boundary, one operator for every smoothness, so that the correction lies in
+`H^1_0(Ω) ⊆ H^s_0(Ω)`.
 
 ## Main results
 
@@ -585,13 +587,30 @@ isometric to the trace space of `H^1(Ω)`, by its definition as the orthogonal c
   bounded functional `ℓ` on `ker γ` is `u ↦ [W, u]` for exactly one `W ∈ H^{-1}(Ω)` with
   `‖W‖ = ‖ℓ‖` (`Rd.BoundedLipschitzDomain.dualTraceKerEquiv`,
   `Rd.BoundedLipschitzDomain.dualTraceKerEquiv_apply`,
-  `Rd.BoundedLipschitzDomain.dualTraceKerEquiv_eq_iff`). The proof mollifies: for a Schwartz
-  function `η` with `∫ η = 1` and `c_i → ∞`, `η_{c_i} ⋆ U → U` in `H^1(V)`
-  (`Rd.tendsto_of_toL2_eq_convLp`), since weak derivatives commute with convolution
-  (`Rd.hasWeakLineDeriv_convLp`); the pieces of `U` near the boundary vanish outside the closure
-  of a graph domain, which convolution with a mollifier supported in the cone of the graph moves
-  into the domain (`Rd.LipschitzGraph.coneMollifier`,
-  `Rd.BoundedLipschitzDomain.mem_tildeSpace_of_mulLp_chart`).
+  `Rd.BoundedLipschitzDomain.dualTraceKerEquiv_eq_iff`). For a Schwartz function `η` with
+  `∫ η = 1` and `c_i → ∞`, `η_{c_i} ⋆ U → U` in `H^1(V)` (`Rd.tendsto_of_toL2_eq_convLp`), since
+  weak derivatives commute with convolution (`Rd.hasWeakLineDeriv_convLp`); the description of
+  `H̃^1(Ω)` is the case `s = 1` of `Rd.BoundedLipschitzDomain.mem_tildeSpace_iff_of_nonneg`.
+* **The kernel of the trace of `H^s(Ω)`, `1/2 < s ≤ 1`.** With `Ω` and `Γ` as above,
+  `1/2 < s < 3/2` and `ker γ_s` the `u ∈ H^s(Ω)` whose boundary trace vanishes almost everywhere
+  on `Γ`, `H^s_0(Ω) ⊆ ker γ_s` (`Rd.BoundedLipschitzDomain.zeroBoundarySpace_le_traceKer`), and
+  for `1/2 < s ≤ 1`, `ker γ_s = H^s_0(Ω)`
+  (`Rd.BoundedLipschitzDomain.traceKer_eq_zeroBoundarySpace_of_le_one`; McLean, Theorem 3.40,
+  applied in this range by Hewett–Moiola, Remark 2.6). Quantitatively, there is `K < ∞` such that
+  for every `u ∈ ker γ_s` and every `W' ∈ H^1(V)` some `y ∈ H^s_0(Ω)` has
+  `‖y - u‖ ≤ K ‖W' - u‖_{H^s(V)}`, with `W'` and `u` read in `H^s(V)`
+  (`Rd.BoundedLipschitzDomain.exists_mem_zeroBoundarySpace_enorm_sub_le`). The trace
+  `T^s_Γ : H^s(V) → L_2(Γ)` commutes with the inclusions `H^s(V) ⊆ H^t(V)`, and the inclusions
+  `H^s(Ω) ⊆ H^t(Ω)` map `ker γ_s` into `ker γ_t`, for `1/2 < t ≤ s`
+  (`Rd.BoundedLipschitzDomain.ambientTraceL2_sobolevInclusion`,
+  `Rd.BoundedLipschitzDomain.restrictionInclusion_mem_traceKer`); the extension `E_Γ` from the
+  boundary maps `B^{s-1/2}_{2,2}(Γ)` into `H^s(V)` with a bound
+  (`Rd.BoundedLipschitzDomain.exists_sobolevToL2_eq_besovExtendLp`,
+  `Rd.BoundedLipschitzDomain.exists_enorm_le_of_sobolevToL2_eq_besovExtendLp`), and for
+  `ι_s W = E_Γ T^s_Γ U` the difference `(U - W)|_Ω` lies in `ker γ_s`
+  (`Rd.BoundedLipschitzDomain.restrictProj_sub_mem_traceKer`). The proof corrects `W'` by
+  `E_Γ T^1_Γ W'` inside `H^1(Ω)`, where `ker γ_1 = H^1_0(Ω) ⊆ H^s_0(Ω)`, and bounds the
+  correction in `H^s(V)` through the same function `E_Γ T^1_Γ W'`.
 
 ## What is formalised
 
@@ -632,7 +651,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | `W^1_p(Ω)` as the space of restrictions of `W^1_p(ℝ^d)` for `1 ≤ p ≤ ∞` (the extension theorem), and for `p = 2` `H^1(Ω) = W^1_2(Ω)`, Rellich's theorem in `W^1_2(Ω)`, the quotient norm of `H^1(Ω)` and the boundary traces of `W^1_2(Ω)` | ✅ | ✗ | `Domains/Sobolev/LipschitzDomainW1p` |
 | Gauss–Green on Lipschitz graph domains: Fubini in product coordinates, ray integrals, the normal weight, `∫_Ω ∂_v g = ∫_Γ g ⟪v, ν⟫ dσ` for compactly supported `C^1` functions in chart and surface form, the product rule for line derivatives, and Green's formula `∫_Ω (∂_v f) g + f ∂_v g = ∫_Γ Tr f · Tr g ⟪v, ν⟫ dσ` for `f, g ∈ W^1_2(ℝ^d)` | ✅ | ✗ | `Domains/Sobolev/LipschitzGraphGreen` |
 | Green's formula on bounded Lipschitz domains: integration by parts in `H^1(ℝ^d)`, resolutions of unity equal to one near the boundary, the chart form for every resolution of unity, the outward unit normal as the chart normal and a unit vector almost everywhere on the boundary, `∫_Ω (∂_v u) w + u ∂_v w = ∫_Γ γ_{L_2} u · γ_{L_2} w ⟪v, ν⟫ dσ` for `u, w ∈ H^1(Ω)`, the traces from both sides of a graph, and the zero extension: `1_Ω u ∈ W^1_2(ℝ^d)` iff the trace of `u` vanishes | ✅ | ✗ | `Domains/Sobolev/LipschitzDomainGreen` |
-| The kernel of the trace: convergence and mollification in `H^1(ℝ^d)`, smoothing with compact support, cone mollifiers, `H̃^1(Ω)` as the functions of `H^1(ℝ^d)` vanishing outside `Ω`, `ker γ = H^1_0(Ω)` for the trace of `H^1(Ω)`, `H^1(Ω) ⧸ H^1_0(Ω)` isometric to the trace space of `H^1(Ω)`, `H̃^1(Ω) ≅ ker γ` and `(ker γ)^* ≅ H^{-1}(Ω)` | ✅ | ✗ | `Domains/Traces/TraceKernel` |
+| The kernel of the trace: convergence and mollification in `H^1(ℝ^d)`, `H̃^1(Ω)` as the functions of `H^1(ℝ^d)` vanishing outside `Ω`, `H^s_0(Ω) ⊆ ker γ_s` for `1/2 < s < 3/2`, `ker γ = H^1_0(Ω)` for the trace of `H^1(Ω)`, `H^1(Ω) ⧸ H^1_0(Ω)` isometric to the trace space of `H^1(Ω)`, `H̃^1(Ω) ≅ ker γ` and `(ker γ)^* ≅ H^{-1}(Ω)`; the trace of `H^s(ℝ^d)` under the inclusions, the extension from the boundary into `H^s(ℝ^d)` with a bound, and `ker γ_s = H^s_0(Ω)` for `1/2 < s ≤ 1` | ✅ | ✗ | `Domains/Traces/TraceKernel` |
 | Bounded Lipschitz domains from the set-level definition: sets Lipschitz near a point, local graphs as Lipschitz graph domains, McShane's extension of local graphs, the structure from a family of charts and the converse, the ball | ✅ | ✗ | `Domains/Lipschitz/LocalLipschitzGraphs` |
 | Bounded open convex sets as bounded Lipschitz domains: the ray length, its cone estimate, open convex sets, bounded or not, near a frontier point as regions above a Lipschitz graph, and the open unit cube with its closure | ✅ | ✗ | `Domains/Lipschitz/ConvexDomains` |
 | Lipschitz graph domains with null graphs and boundaries, closures of convex Lipschitz graph domains as Besov domains, the quadrant as a Lipschitz graph domain and the quadrant model of manifolds with corners as a Besov domain, bounded Lipschitz domains with the extension property, closures of nonempty convex bounded Lipschitz domains and of nonempty bounded open convex sets, closed balls of positive radius and the closed unit cube as Besov domains | ✅ | ✗ | `Domains/Lipschitz/BesovDomains` |

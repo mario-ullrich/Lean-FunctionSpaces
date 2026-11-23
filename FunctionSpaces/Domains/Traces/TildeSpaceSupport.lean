@@ -5,8 +5,10 @@ Authors: Mario Ullrich
 -/
 module
 
-public import FunctionSpaces.Domains.Traces.TraceKernel
+public import FunctionSpaces.Domains.Sobolev.LipschitzDomainGreen
 public import FunctionSpaces.Domains.Sobolev.ZeroExtensionBound
+public import FunctionSpaces.Rd.SingularIntegrals.ConvolutionAdjoint
+public import FunctionSpaces.Rd.Atoms.SmoothAtoms
 public import FunctionSpaces.Rd.Sobolev.SobolevTwoDifferences
 
 /-!
@@ -25,12 +27,18 @@ mollification in `H^s(V)` (`Rd.tendsto_sobolevConv_dilate`) and smooth cut-offs
 * **Localised functions**: for a resolution of unity `ψ` of a bounded Lipschitz domain, every
   `ψ_j ι_s U` is `ι_s W` for some `W ∈ H^s(V)`
   (`Rd.BoundedLipschitzDomain.BoundaryPartition.exists_sobolevToL2_eq_localize`).
-* **Mollified functions**: let `η` be smooth with compact support and `∫ η = 1`, and
+* **Mollified functions**: smoothing a function that vanishes outside a compact set `S` with a
+  smooth kernel of compact support gives a Schwartz function supported in `supp K + S`
+  (`Rd.exists_schwartz_eq_conv`). Let `η` be smooth with compact support and `∫ η = 1`, and
   `η_c(x) = c^d η(c x)` its dilates (`Rd.dilate`, `d = dim V`). If `ι_s U` vanishes almost
   everywhere outside a compact set `S` and `supp η_{2^n} + S ⊆ Ω` for large `n`, then
   `U ∈ H̃^s(Ω)` (`Rd.mem_tildeSpace_of_dilate_of_nonneg`); in particular, every `U` with
   `ι_s U = 0` almost everywhere outside a compact subset of `Ω` lies in `H̃^s(Ω)`
   (`Rd.mem_tildeSpace_of_isCompact_of_nonneg`).
+* **Cone mollifiers**: for a Lipschitz graph domain, a normalised bump function supported in the
+  open cone of the graph and in `B̄(0, 1/2)` (`Rd.LipschitzGraph.coneMollifier`,
+  `Rd.LipschitzGraph.tsupport_coneMollifier_subset`); convolution with its dilates moves the
+  closure of the graph domain into the domain.
 * **`H̃^s(Ω)` by supports**: on a bounded Lipschitz domain, every `U` with `ι_s U = 0` almost
   everywhere outside `Ω` is `U = ∑_j ψ_j U + χ U`, for a resolution of unity `ψ` equal to one
   near `Γ` and an interior cut-off `χ` with `χ + ∑_j ψ_j = 1` on `Ω`
@@ -67,6 +75,24 @@ theorem BoundedLipschitzDomain.BoundaryPartition.exists_sobolevToL2_eq_localize
   exists_sobolevToL2_eq_mulLp hs (ψ.contDiff j) (ψ.hasCompactSupport j) _ _ U
 
 /-! ### Smooth functions supported in `Ω` -/
+
+/-- **Smoothing a function that vanishes outside a compact set**: for a smooth kernel `K` with
+compact support and a locally integrable `f` vanishing outside a compact set `S`, `K ⋆ f` is a
+Schwartz function with compact support in `supp K + S` (Mathlib's
+`HasCompactSupport.contDiff_convolution_left`, `HasCompactSupport.convolution`,
+`support_convolution_subset`). -/
+theorem exists_schwartz_eq_conv {K f : V → ℂ} (hK : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) K)
+    (hKc : HasCompactSupport K)
+    (hf : LocallyIntegrable f volume) {S : Set V} (hS : IsCompact S) (hfS : ∀ x ∉ S, f x = 0) :
+    ∃ w : 𝓢(V, ℂ), (w : V → ℂ) = conv K f volume ∧ HasCompactSupport w ∧
+      tsupport w ⊆ tsupport K + S := by
+  have hfc : HasCompactSupport f := HasCompactSupport.intro hS hfS
+  have hsm : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (conv K f volume) := contDiff_conv hK hKc hf
+  have hcs : HasCompactSupport (conv K f volume) :=
+    hKc.convolution (ContinuousLinearMap.mul ℂ ℂ) hfc
+  exact ⟨hcs.toSchwartzMap hsm, rfl, hcs, closure_minimal ((support_convolution_subset _).trans
+    (add_subset_add (subset_tsupport K) (Function.support_subset_iff'.2 hfS)))
+    (hKc.isCompact.add hS).isClosed⟩
 
 /-- **Mollified functions in `H̃^s(Ω)`, `s ≥ 0`**: let `Ω` be open, `U ∈ H^s(V)` with `ι_s U = 0`
 almost everywhere outside a compact set `S`, and `η` a smooth function with compact support and
@@ -123,6 +149,47 @@ theorem mem_tildeSpace_of_isCompact_of_nonneg (hs : 0 ≤ s) {Ω : Opens V} {U :
     (integral_bumpMollifier _) ?_
   exact (eventually_tsupport_dilate_add_subset_thickening (tsupport_bumpMollifier_subset _) hδ
     S).mono fun n hn => hn.trans hδΩ
+
+/-! ### Mollifiers supported in the cone of a Lipschitz graph -/
+
+namespace LipschitzGraph
+
+variable (Ω : LipschitzGraph V)
+
+/-- The bump function of the cone mollifier: centre `e/4`, radii `ρ/4` and `ρ/2` for the cone
+radius `ρ = 1/(8(M + 1))`. -/
+noncomputable def coneMollifierBase : ContDiffBump ((1 / 4 : ℝ) • Ω.e) :=
+  ⟨Ω.coneRadius / 4, Ω.coneRadius / 2, by have := Ω.coneRadius_pos; positivity,
+    by have := Ω.coneRadius_pos; linarith⟩
+
+/-- **The cone mollifier**: a smooth function with integral `1` and compact support in the open
+cone `K` of the graph and in `B̄(0, 1/2)` (`Rd.LipschitzGraph.tsupport_coneMollifier_subset`), the
+mollifier of the bump `Rd.LipschitzGraph.coneMollifierBase`. Convolution with its dilates moves
+the closure of the graph domain into the domain (`Rd.LipschitzGraph.add_mem_of_mem_closure`). -/
+noncomputable def coneMollifier : V → ℂ := bumpMollifier Ω.coneMollifierBase
+
+/-- The cone mollifier is supported in the open cone and in `B̄(0, 1/2)`: its closed support is
+`B̄(e/4, ρ/2) ⊆ B(e/4, ρ) ⊆ K` (`Rd.LipschitzGraph.ball_subset_cone`), and
+`‖e/4‖ + ρ/2 ≤ 1/2`. -/
+theorem tsupport_coneMollifier_subset :
+    tsupport Ω.coneMollifier ⊆ Ω.cone ∩ closedBall 0 (1 / 2) := by
+  intro z hz
+  have h := tsupport_bumpMollifier_subset Ω.coneMollifierBase hz
+  have hρ := Ω.coneRadius_pos
+  have hρ8 := Ω.coneRadius_le
+  have hr : Ω.coneMollifierBase.rOut = Ω.coneRadius / 2 := rfl
+  rw [hr] at h
+  refine ⟨Ω.ball_subset_cone (closedBall_subset_ball (by linarith) h), ?_⟩
+  rw [mem_closedBall, dist_eq_norm] at h
+  have he : ‖(1 / 4 : ℝ) • Ω.e‖ = 1 / 4 := by
+    rw [norm_smul, Ω.norm_e, mul_one, Real.norm_of_nonneg (by norm_num)]
+  have hz' : ‖z‖ ≤ ‖z - (1 / 4 : ℝ) • Ω.e‖ + ‖(1 / 4 : ℝ) • Ω.e‖ := by
+    have := norm_add_le (z - (1 / 4 : ℝ) • Ω.e) ((1 / 4 : ℝ) • Ω.e)
+    rwa [sub_add_cancel] at this
+  rw [mem_closedBall_zero_iff]
+  linarith
+
+end LipschitzGraph
 
 /-! ### `H̃^s(Ω)` by supports -/
 

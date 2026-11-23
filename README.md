@@ -127,13 +127,14 @@ unless an entry says otherwise.
 | tensor Daubechies wavelet coefficients | [`ℝ^d`, `p = 2`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-daub-rd-besov.html#cor:daub-rd-sobolev) (`0 < s < 3 - log₂ 3` for masks of order three) |
 
 **Traces.** The trace maps `B^{s+1/p}_{p,q}` of the domain onto `B^s_{p,q}` of the boundary, and
-`H^1(Ω)` onto a space on the boundary `Γ`. The rows describe the space on the boundary.
+`H^s(Ω)`, `1/2 < s < 3/2`, onto a space on the boundary `Γ`. The rows describe the space on the
+boundary.
 
 | Boundary space described by | Settings |
 |---|---|
 | the Besov space of the boundary | [`𝕋^{n+1}` to a face `𝕋^n`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-torus-traces.html#thm:trace-torus), [the half-space to its hyperplane](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-half-space-traces.html#thm:half-space-trace-space) (`s > 0`) |
-| chart pieces | [bounded Lipschitz domains](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-bounded-lipschitz-traces.html#thm:boundary-trace-space) (first differences, `0 < s < 1`), [compact manifolds with boundary](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-manifold-trace.html#thm:manifold-trace) (`s > 0`), [`H^1(Ω)` of a bounded Lipschitz domain, `B^{1/2}_{2,2}(Γ)`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-lipschitz-domain-h1.html#thm:sobolev-lipschitz-domain-trace) |
-| the Gagliardo form `∫_Γ ∫_Γ \|g(x) - g(y)\|² / \|x - y\|^d dσ dσ` | [`H^1(Ω)` of a bounded Lipschitz domain](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-boundary-slobodeckij.html#thm:trace-space-slobodeckij) (equivalent norms) |
+| chart pieces | [bounded Lipschitz domains](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-bounded-lipschitz-traces.html#thm:boundary-trace-space) (first differences, `0 < s < 1`), [`B^{s+1/p}_{p,q}(Ω)` of a bounded Lipschitz domain, a bounded operator onto `B^s_{p,q}(Γ)`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-boundary-besov-space.html#thm:besov-trace-operator) (`1 ≤ p < ∞`, `1 ≤ q ≤ ∞`, `0 < s < 1`), [compact manifolds with boundary](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-manifold-trace.html#thm:manifold-trace) (`s > 0`), [`H^1(Ω)` of a bounded Lipschitz domain, `B^{1/2}_{2,2}(Γ)`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-lipschitz-domain-h1.html#thm:sobolev-lipschitz-domain-trace), [`H^s(Ω)` of a bounded Lipschitz domain, `H^{s-1/2}(Γ) = B^{s-1/2}_{2,2}(Γ)`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-boundary-slobodeckij.html#thm:trace-space-boundary-sobolev) (`1/2 < s < 3/2`) |
+| the Gagliardo form `∫_Γ ∫_Γ \|g(x) - g(y)\|² / \|x - y\|^(d+2s-2) dσ dσ` | [`H^s(Ω)` of a bounded Lipschitz domain](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-boundary-slobodeckij.html#thm:trace-space-slobodeckij) (`1/2 < s < 3/2`, equivalent norms) |
 
 **Approximation spaces `A^s_q`.** Each row names a space and the scheme whose approximation
 spaces it is.
@@ -246,6 +247,19 @@ For a general scheme the project describes `A^s_q`
   `‖t‖²` is equivalent to `‖τ t‖²_{L_2(Γ)}` plus this form
   (`Rd.BoundedLipschitzDomain.mem_range_traceL2_iff_slobodeckij`,
   `Rd.BoundedLipschitzDomain.exists_traceL2_norm_equiv_slobodeckij`).
+* **Traces of `B^s_{p,q}(Ω)` and `H^s(Ω)`.** Let `Ω`, `Γ` and `σ` be as above. For `1 ≤ p < ∞`,
+  `1 ≤ q ≤ ∞` and `1/p < s < 1 + 1/p`, the trace is a bounded linear operator from
+  `B^s_{p,q}(Ω)` onto `B^{s-1/p}_{p,q}(Γ)` with a bounded linear right inverse
+  (`Rd.BoundedLipschitzDomain.besovTrace`, `Rd.BoundedLipschitzDomain.besovExtend`,
+  `Rd.BoundedLipschitzDomain.besovTrace_surjective`,
+  `Rd.BoundedLipschitzDomain.toLp_besovTrace_besovExtend`). For `1/2 < s < 3/2` the trace maps
+  `H^s(Ω)` onto `H^{s-1/2}(Γ) = B^{s-1/2}_{2,2}(Γ)` with a bounded linear right inverse
+  (`Rd.BoundedLipschitzDomain.sobolevTrace`, `Rd.BoundedLipschitzDomain.sobolevExtend`,
+  `Rd.BoundedLipschitzDomain.sobolevTrace_sobolevExtend`), the trace space of `H^s(Ω)` is
+  isomorphic to `H^{s-1/2}(Γ)` (`Rd.BoundedLipschitzDomain.traceSpaceEquivBoundarySobolev`), and
+  `g ∈ L_2(Γ)` is a trace iff `∫_Γ ∫_Γ |g(x) - g(y)|² / |x - y|^(d+2s-2) dσ(x) dσ(y) < ∞`
+  (`Rd.BoundedLipschitzDomain.mem_range_traceL2_iff_slobodeckij`); the kernel of the trace is
+  `H^s_0(Ω)` for `s ≤ 1` (`Rd.BoundedLipschitzDomain.traceKer_eq_zeroBoundarySpace_of_le_one`).
 * **Eigenfunction expansions.** For an orthonormal basis of weak eigenfunctions `e_i` with
   eigenvalues `λ_i`, let `A_k` be the span of the `e_i` with `⌊√(1 + λ_i)⌋ < k`, and let
   `0 < θ < 1`, `1 ≤ q ≤ ∞`. On a bounded Lipschitz domain `Ω`, `d ≥ 1`, with the Neumann
@@ -308,8 +322,8 @@ block documents state every result with its Lean name and list the files:
   singular integrals.
 * [Sobolev spaces on `ℝ^d`](docs/SobolevRd.md): weak derivatives, `W^m_p = F^m_{p,2} = H^{m,p}`,
   embeddings.
-* [Lipschitz domains and traces](docs/DomainsTraces.md): extension, traces, `H^1(Ω)`, Green's
-  formula.
+* [Lipschitz domains and traces](docs/DomainsTraces.md): extension, `B^s_{p,q}(Ω)`, `H^s(Ω)` and
+  their traces, Green's formula.
 * [Fractional Sobolev spaces on Lipschitz domains](docs/FractionalSobolev.md): `H̃^s(Ω)` and
   `H^s_0(Ω)`, the zero extension bound.
 * [Manifolds and eigenbases](docs/Manifolds.md): compact manifolds, Dirichlet and Neumann

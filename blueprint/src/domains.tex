@@ -4200,7 +4200,8 @@ $\Sob{m}{p}$ for every $m$ and $1 < p < \infty$.
 \Cref{sec:lipschitz-graph-green} and
 \Cref{sec:lipschitz-domain-green} prove Gauss--Green on Lipschitz graph domains and Green's
 formula on bounded Lipschitz domains, and \Cref{sec:trace-kernel} proves that the kernel of the
-trace of $H^1(\Omega)$ is $H^1_0(\Omega)$. \Cref{sec:besov-domain-localisation} decides
+trace of $H^s(\Omega)$ is $H^s_0(\Omega)$ for $1/2 < s \leq 1$.
+\Cref{sec:besov-domain-localisation} decides
 finiteness of the intrinsic quasi-norm on a Besov domain, for functions that vanish outside a
 ball, on bounded convex pieces, and with \Cref{sec:lipschitz-domain-h1} identifies $\Sob{1}{2}$ and
 $B^1_{2,2}$ for such functions.
@@ -4219,8 +4220,10 @@ on $V$ are explicit or named (\Cref{ch:sobolev-rd}); on bounded Lipschitz domain
 and trace theorems carry existential constants, and the statements are equivalences of
 membership. On bounded Lipschitz domains the functions of
 $H^1(\Omega)$ with boundary trace zero form the closure of the test functions in $H^1(\Omega)$
-\cite[Theorem 3.40]{McLean} (\Cref{thm:trace-kernel-zero-boundary}); the spaces $H^1(\Omega)$ and
-$H^1_0(\Omega)$ of that theorem are the Hilbert spaces of \Cref{sec:sobolev-restriction-spaces}.
+\cite[Theorem 3.40]{McLean} (\Cref{thm:trace-kernel-zero-boundary}), and so do those of
+$H^s(\Omega)$ for $1/2 < s \leq 1$ (\Cref{thm:sobolev-trace-kernel-small}); the spaces
+$H^s(\Omega)$ and $H^s_0(\Omega)$ of these theorems are the Hilbert spaces of
+\Cref{sec:sobolev-restriction-spaces}.
 
 \section{\texorpdfstring{$H^1$}{H\^{}1} on bounded Lipschitz domains}
 \label{sec:lipschitz-domain-h1}
@@ -9854,20 +9857,27 @@ $u \in N_\Gamma$ (\Cref{thm:trace-kernel-boundary}).
 
 Throughout this section $\Omega$ is a bounded Lipschitz domain in $V$, $\dim V = n$, with boundary
 $\Gamma$, boundary balls $B_j$ and graph domains $\Omega_j$ with cones $K_j$
-(\Cref{def:bounded-lipschitz}, \Cref{lem:graph-cone}); $\tilde H^1(\Omega)$ and $H^1_0(\Omega)$ are
+(\Cref{def:bounded-lipschitz}, \Cref{lem:graph-cone}); $\tilde H^s(\Omega)$ and $H^s_0(\Omega)$ are
 the spaces of \Cref{def:sobolev-tilde-zero-boundary}, $r_\Omega$ is the restriction to
-$H^1(\Omega)$,
-$N_\Gamma$ is the trace kernel of $H^1(\Omega)$ (\Cref{def:trace-kernel}), $N_\Gamma^\perp$ the
-trace space (\Cref{def:trace-space}) and $\Phi_c(x) = c^n \Phi(c x)$ (\Cref{lem:dilate}). The
+$H^s(\Omega)$, $N^s_\Gamma$ is the trace kernel of $H^s(\Omega)$, $1/2 < s < 3/2$, and
+$N_\Gamma = N^1_\Gamma$ (\Cref{def:trace-kernel}), $N_\Gamma^\perp$ the
+trace space (\Cref{def:trace-space}), $T^s_\Gamma$ the trace of $H^s(V)$ in $L_2(\Gamma)$
+(\Cref{thm:ambient-trace-l2}), $E_\Gamma$ the extension from the boundary
+(\Cref{def:boundary-extension-operator}) and $\Phi_c(x) = c^n \Phi(c x)$ (\Cref{lem:dilate}). The
 kernel of the trace is $H^1_0(\Omega)$ (McLean \cite[Theorem 3.40]{McLean}; Hiptmair, Pauly and
 Schulz \cite{HiptmairPaulySchulz} cite it in this form). By \Cref{thm:zero-extension-trace-kernel},
 $u \in N_\Gamma$ if and only if the zero extension $\mathbf 1_\Omega \iota u$ lies in
 $\Sob{1}{2}(V)$, so
 the theorem says that the elements of $H^1(V)$ vanishing outside $\Omega$ are the elements of
-$\tilde H^1(\Omega)$. Such a function is cut into pieces near the boundary and an interior piece;
+$\tilde H^1(\Omega)$, the case $s = 1$ of \Cref{thm:tilde-space-supports-general}. Such a function
+is cut into pieces near the boundary and an interior piece;
 each boundary piece vanishes outside the closure of a graph domain, and convolution with the dilates
 of a smooth function supported in the cone of the graph moves this closure into the graph domain.
-The mollified pieces are test functions of $\Omega$ and converge in $H^1(V)$.
+The mollified pieces are test functions of $\Omega$ and converge in $H^1(V)$. For
+$1/2 < s \leq 1$ the kernel of the trace of $H^s(\Omega)$ is $H^s_0(\Omega)$ as well: an
+approximation of $u \in N^s_\Gamma$ from $H^1(V)$ is corrected by the extension of its trace, the
+correction lies in $N_\Gamma = H^1_0(\Omega) \subseteq H^s_0(\Omega)$, and its distance to $u$ is
+bounded by the error of the approximation.
 
 \paragraph{Mollification in $H^1(V)$.}
 
@@ -9929,9 +9939,7 @@ $\operatorname{supp} K + S$, which is compact, hence closed.
 \label{thm:tilde-space-mollified}
 \lean{Rd.mem_tildeSpace_of_dilate, Rd.mem_tildeSpace_of_isCompact}
 \leanok
-\uses{thm:sobolev-one-mollification, lem:smoothing-compact-support, def:bump-mollifier,
-  def:sobolev-tilde-zero-boundary, thm:sobolev-schwartz-dense, lem:dilate,
-  lem:dual-kernel-derivatives, lem:conv-op, def:conv, lem:sobolev-of-schwartz}
+\uses{thm:tilde-space-mollified-general, lem:sobolev-to-l2}
 For every open $\Omega' \subseteq V$, every $U \in H^1(V)$, every compact $S \subseteq V$ with
 $\iota U = 0$ almost everywhere outside $S$, and every smooth $\eta$ with compact support and
 $\int \eta = 1$ such that $\operatorname{supp} \eta_{2^k} + S \subseteq \Omega'$ for all large
@@ -9942,15 +9950,8 @@ $U \in \tilde H^1(\Omega')$.
 
 \begin{proof}
 \leanok
-Replace $\iota U$ by $\mathbf 1_S \iota U$, equal almost everywhere. For every $k$,
-$\eta_{2^k} * \mathbf 1_S \iota U$ is a Schwartz function $w_k$ with compact support in
-$\operatorname{supp} \eta_{2^k} + S$ (\Cref{lem:smoothing-compact-support}); as an element of
-$H^1(V)$ it converges to $U$ (\Cref{thm:sobolev-one-mollification}), and for large $k$ it lies in
-$T^1(\Omega')$ (\Cref{thm:sobolev-schwartz-dense}). For compact $S \subseteq \Omega'$ take
-$\delta > 0$ such that the $\delta$-neighbourhood of $S$ lies in $\Omega'$, and the bump
-mollifier $\eta$ of a bump around $0$ with outer radius $1$ (\Cref{def:bump-mollifier}): for
-large $k$, $\operatorname{supp} \eta_{2^k} + S$ lies in the $\delta$-neighbourhood of $S$
-(\Cref{lem:dilate}).
+The case $s = 1$ of \Cref{thm:tilde-space-mollified-general}, with $\iota_1 = \iota$
+(\Cref{lem:sobolev-to-l2}).
 \end{proof}
 
 \paragraph{Cone mollifiers.}
@@ -9992,9 +9993,7 @@ $\iota (r_{\Omega'} U) = \iota U$ almost everywhere on $\Omega'$
 \lean{Rd.BoundedLipschitzDomain.mem_tildeSpace_of_mulLp_chart,
   Rd.BoundedLipschitzDomain.eq_sum_add_of_ae_eq_zero}
 \leanok
-\uses{thm:tilde-space-mollified, def:cone-mollifier, lem:graph-domain-closure-cone,
-  lem:dilate, def:bounded-lipschitz, lem:green-pieces, lem:sobolev-one-to-l2,
-  lem:product-modulus, def:trace-space-setting, def:boundary-partition}
+\uses{lem:tilde-space-chart-pieces-general, lem:sobolev-to-l2}
 For every $j$, every $U \in H^1(V)$ with $\iota U = 0$ almost everywhere outside $\Omega$, every
 continuous bounded real $\zeta$ with $\operatorname{supp} \zeta \subseteq B_j$ and every
 $W \in H^1(V)$ with $\iota W = \zeta \, \iota U$, $W \in \tilde H^1(\Omega)$. For every resolution
@@ -10006,16 +10005,8 @@ $U = \sum_j W_j + W_0$.
 
 \begin{proof}
 \leanok
-Since $\Omega \cap B_j = \Omega_j \cap B_j$, $\iota W$ vanishes almost everywhere outside the
-compact set $S = \overline{\Omega_j} \cap \operatorname{supp} \zeta$. Let $\eta$ be the cone
-mollifier of $\Omega_j$ (\Cref{def:cone-mollifier}) and $\delta > 0$ such that
-the $\delta$-neighbourhood of $\operatorname{supp} \zeta$ lies in $B_j$. For large $k$,
-$z \in \operatorname{supp} \eta_{2^k}$ and $y \in S$, $z \in K_j$
-(\Cref{lem:graph-domain-closure-cone}), so $z + y \in \Omega_j$, and $z + y$ lies in the
-$\delta$-neighbourhood of $S$ (\Cref{lem:dilate}), so $z + y \in B_j$; hence
-$z + y \in \Omega$, and \Cref{thm:tilde-space-mollified} applies. The decomposition holds almost
-everywhere on $\Omega$ (\Cref{lem:green-pieces}), both sides vanish almost everywhere outside
-$\Omega$, and $\iota$ is injective (\Cref{lem:sobolev-one-to-l2}).
+The case $s = 1$ of \Cref{lem:tilde-space-chart-pieces-general}, with $\iota_1 = \iota$
+(\Cref{lem:sobolev-to-l2}).
 \end{proof}
 
 \begin{theorem}[$\tilde H^1(\Omega)$ by supports]
@@ -10023,22 +10014,15 @@ $\Omega$, and $\iota$ is injective (\Cref{lem:sobolev-one-to-l2}).
 \lean{Rd.BoundedLipschitzDomain.mem_tildeSpace_of_ae_eq_zero,
   Rd.BoundedLipschitzDomain.mem_tildeSpace_iff}
 \leanok
-\uses{lem:tilde-space-chart-pieces, thm:tilde-space-mollified, lem:boundary-partition-nhds,
-  lem:sobolev-one-products, lem:tilde-space-vanishes-outside, lem:product-modulus,
-  def:boundary-partition}
+\uses{thm:tilde-space-supports-general, lem:sobolev-to-l2}
 For every $U \in H^1(V)$, $U \in \tilde H^1(\Omega)$ if and only if $\iota U = 0$ almost everywhere
 outside $\Omega$.
 \end{theorem}
 
 \begin{proof}
 \leanok
-One direction is \Cref{lem:tilde-space-vanishes-outside}. Conversely, take a resolution of unity
-$\psi$ on $\Gamma$ equal to one near $\Gamma$ and the interior cut-off $\chi$
-(\Cref{lem:boundary-partition-nhds}), and $W_j, W_0 \in H^1(V)$ with $\iota W_j = \psi_j \iota U$
-and $\iota W_0 = \chi \iota U$ (\Cref{lem:sobolev-one-products}). Then $U = \sum_j W_j + W_0$,
-the $W_j$ lie in $\tilde H^1(\Omega)$ (\Cref{lem:tilde-space-chart-pieces}), and $W_0$ vanishes
-outside the compact set $\operatorname{supp} \chi \subseteq \Omega$
-(\Cref{thm:tilde-space-mollified}).
+The case $s = 1$ of \Cref{thm:tilde-space-supports-general}, with $\iota_1 = \iota$
+(\Cref{lem:sobolev-to-l2}).
 \end{proof}
 
 In the language of McLean \cite[Theorem 3.29]{McLean}, $\tilde H^1(\Omega)$ is the space of
@@ -10047,26 +10031,49 @@ the elements of $H^1(V)$ supported in $\overline\Omega$, since $\Gamma$ is a nul
 
 \paragraph{The kernel of the trace.}
 
+\begin{lemma}[$H^s_0(\Omega)$ lies in the trace kernel]
+\label{lem:zero-boundary-trace-kernel}
+\lean{Rd.BoundedLipschitzDomain.boundaryTrace_sobolevToL2_ofTest,
+  Rd.BoundedLipschitzDomain.zeroBoundarySpace_le_traceKer}
+\leanok
+\uses{def:trace-kernel, thm:trace-kernel-boundary, lem:boundary-trace-restriction-sobolev,
+  lem:sobolev-of-schwartz, lem:sobolev-inclusion-tests, def:test-schwartz,
+  def:sobolev-tilde-zero-boundary, thm:boundary-trace-charts, lem:besov-half-one-general,
+  def:surface-measure, thm:surface-measure-null-sets}
+Let $s \geq 0$. For every resolution of unity $\psi$ on $\Gamma$ and every
+$\varphi \in \mathcal D(\Omega)$, $\operatorname{Tr}_\Gamma \iota_s \varphi = 0$ almost everywhere
+on $\Gamma$. For $1/2 < s < 3/2$, $H^s_0(\Omega) \subseteq N^s_\Gamma$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\iota_s \varphi$ is the continuous function $\varphi$ (\Cref{lem:sobolev-of-schwartz},
+\Cref{lem:sobolev-inclusion-tests}), the same function as $\iota_1 \varphi$, so its boundary
+trace is its restriction to $\Gamma$ (\Cref{thm:boundary-trace-charts}, whose hypothesis
+$\iota_1 \varphi$ satisfies by \Cref{lem:besov-half-one-general}). The restriction vanishes
+almost everywhere on $\Gamma$: $\sigma$-almost every point lies on $\Gamma$
+(\Cref{def:surface-measure}, \Cref{thm:surface-measure-null-sets}), $\Omega$ is open, so $\Gamma$
+does not meet $\Omega$, and $\operatorname{supp} \varphi \subseteq \Omega$. For $1/2 < s < 3/2$
+the restriction to $\Omega$ keeps the boundary trace
+(\Cref{lem:boundary-trace-restriction-sobolev}), so $r_\Omega \varphi \in N^s_\Gamma$
+(\Cref{thm:trace-kernel-boundary}). $N^s_\Gamma$ is closed (\Cref{def:trace-kernel}), and
+$H^s_0(\Omega)$ is the closure of these restrictions (\Cref{def:sobolev-tilde-zero-boundary}).
+\end{proof}
+
 \begin{theorem}[The kernel of the trace is $H^1_0(\Omega)$]
 \label{thm:trace-kernel-zero-boundary}
-\lean{Rd.BoundedLipschitzDomain.zeroBoundarySpace_le_traceKer,
-  Rd.BoundedLipschitzDomain.traceKer_one_le_zeroBoundarySpace,
+\lean{Rd.BoundedLipschitzDomain.traceKer_one_le_zeroBoundarySpace,
   Rd.BoundedLipschitzDomain.traceKer_one_eq_zeroBoundarySpace}
 \leanok
-\uses{thm:tilde-space-supports, lem:tilde-space-vanishes-outside,
-  lem:zero-extension-restriction, thm:zero-extension-trace-kernel, thm:sobolev-tilde-zero-boundary,
-  lem:sobolev-one-weak-gradient-norm, def:trace-kernel, lem:indicator-lp,
-  prop:sobolev-restriction-l2}
+\uses{lem:zero-boundary-trace-kernel, thm:tilde-space-supports, thm:zero-extension-trace-kernel,
+  thm:sobolev-tilde-zero-boundary, lem:sobolev-one-weak-gradient-norm, def:trace-kernel,
+  lem:indicator-lp, prop:sobolev-restriction-l2}
 $N_\Gamma = H^1_0(\Omega)$.
 \end{theorem}
 
 \begin{proof}
 \leanok
-Every element of $H^1_0(\Omega)$ is $r_\Omega U$ for some $U \in \tilde H^1(\Omega)$
-(\Cref{thm:sobolev-tilde-zero-boundary}); $U$ vanishes outside $\Omega$, so
-$\mathbf 1_\Omega \iota (r_\Omega U) = \iota U \in \Sob{1}{2}(V)$
-(\Cref{lem:tilde-space-vanishes-outside}, \Cref{lem:zero-extension-restriction}) and
-$r_\Omega U \in N_\Gamma$ (\Cref{thm:zero-extension-trace-kernel}). Conversely, for
+$H^1_0(\Omega) \subseteq N_\Gamma$ is \Cref{lem:zero-boundary-trace-kernel}. Conversely, for
 $u \in N_\Gamma$, $\mathbf 1_\Omega \iota u = \iota U$ for some $U \in H^1(V)$
 (\Cref{thm:zero-extension-trace-kernel}, \Cref{lem:sobolev-one-weak-gradient-norm}); $U$ vanishes
 outside $\Omega$, so $U \in \tilde H^1(\Omega)$ (\Cref{thm:tilde-space-supports}), and
@@ -10114,6 +10121,125 @@ the trace space as $N_\Gamma^\perp$. For the trace
 spaces of Hiptmair, Pauly and Schulz \cite{HiptmairPaulySchulz} at $k = 0$ the quotient
 $H^1(\Omega) / H^1_0(\Omega)$ is the trace space; its norm is equivalent to the
 Sobolev--Slobodeckij norm of the classical $H^{1/2}(\Gamma)$ (\Cref{sec:boundary-slobodeckij}).
+
+\paragraph{The kernel of the trace of $H^s(\Omega)$, $1/2 < s \leq 1$.}
+
+\begin{lemma}[The trace of $H^s(V)$ and the inclusions]
+\label{lem:ambient-trace-inclusion}
+\lean{Rd.BoundedLipschitzDomain.ambientTraceL2_sobolevInclusion,
+  Rd.BoundedLipschitzDomain.restrictionInclusion_mem_traceKer,
+  Rd.BoundedLipschitzDomain.memBoundaryBesov_ambientTraceL2,
+  Rd.BoundedLipschitzDomain.ambientTraceL2_eq_zero_of_mem_traceKer}
+\leanok
+\uses{thm:ambient-trace-l2, lem:sobolev-to-l2, thm:trace-kernel-boundary,
+  lem:boundary-trace-restriction-sobolev, def:restriction-inclusion, thm:trace-space-functions,
+  def:boundary-besov, thm:surface-measure-null-sets, thm:trace-l2}
+Let $1/2 < t \leq s < 3/2$. For every $U \in H^s(V)$, $T^t_\Gamma \iota_{t,s} U = T^s_\Gamma U$.
+For every $u \in N^s_\Gamma$, $\iota^\Omega_{t,s} u \in N^t_\Gamma$, and $T^s_\Gamma u = 0$ with
+$u$ read as an element of $H^s(V)$. For every resolution of unity $\psi$ on $\Gamma$ and every
+$U \in H^s(V)$, $T^s_\Gamma U \in B^{s-1/2}_{2,2}(\Gamma)$, taken with respect to $\psi$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\iota_t \iota_{t,s} U = \iota_s U$ (\Cref{lem:sobolev-to-l2}), and both traces are the boundary
+trace of this function $\sigma$-almost everywhere (\Cref{thm:ambient-trace-l2}). For
+$u \in N^s_\Gamma$, $\iota^\Omega_{t,s} u = r_\Omega(\iota_{t,s} u)$
+(\Cref{def:restriction-inclusion}), the restriction keeps the boundary trace
+(\Cref{lem:boundary-trace-restriction-sobolev}), and $\iota_t \iota_{t,s} u = \iota_s u$; both
+membership statements are \Cref{thm:trace-kernel-boundary}, and $T^s_\Gamma u = 0$ is
+$\gamma^s_{L_2} u = 0$ (\Cref{thm:trace-l2}). $T^s_\Gamma U$ is the boundary trace of $\iota_s U$
+almost everywhere on $\Gamma$ (\Cref{thm:ambient-trace-l2}, \Cref{thm:surface-measure-null-sets}),
+which lies in $B^{s-1/2}_{2,2}(\Gamma)$ (\Cref{thm:trace-space-functions}), and
+$B^{s-1/2}_{2,2}(\Gamma)$ sees functions only almost everywhere on $\Gamma$
+(\Cref{def:boundary-besov}).
+\end{proof}
+
+\begin{lemma}[The extension from the boundary into $H^s(V)$]
+\label{lem:boundary-extension-sobolev}
+\lean{Rd.BoundedLipschitzDomain.exists_sobolevToL2_eq_besovExtendLp,
+  Rd.BoundedLipschitzDomain.exists_enorm_le_of_sobolevToL2_eq_besovExtendLp,
+  Rd.BoundedLipschitzDomain.restrictProj_sub_mem_traceKer}
+\leanok
+\uses{def:boundary-extension-operator, thm:besov-trace-right-inverse,
+  lem:sobolev-from-differences, thm:sobolev-besov-constants, lem:ambient-trace-inclusion,
+  thm:ambient-trace-l2, thm:trace-kernel-boundary, lem:boundary-trace-restriction-sobolev,
+  thm:surface-measure-null-sets}
+Let $1/2 < s < 3/2$, with $B^{s-1/2}_{2,2}(\Gamma)$ taken with respect to $\psi^0$. For every
+$g \in L_2(\Gamma)$ in $B^{s-1/2}_{2,2}(\Gamma)$ there is $W \in H^s(V)$ with
+$\iota_s W = E_\Gamma g$. There is $C < \infty$ with $\|W\| \leq C
+\|g\|_{B^{s-1/2}_{2,2}(\Gamma)}$ for every such $g$ and every $W \in H^s(V)$ with
+$\iota_s W = E_\Gamma g$. For all $U, W \in H^s(V)$ with $\iota_s W = E_\Gamma T^s_\Gamma U$,
+$r_\Omega(U - W) \in N^s_\Gamma$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{thm:besov-trace-right-inverse} with $p = q = 2$ and $t = s - 1/2 \in (0, 1)$,
+\[
+  \|E_\Gamma g\|_2 + \|(2^{ks} \omega_2(E_\Gamma g, 2^{-k})_2)_k\|_{\ell_2}
+  \leq C' \|g\|_{B^{s-1/2}_{2,2}(\Gamma)} < \infty ,
+\]
+since $t + 1/2 = s$. So $E_\Gamma g = \iota_s W$ for some $W \in H^s(V)$
+(\Cref{lem:sobolev-from-differences}, $2 > s$), and for every such $W$,
+$\|W\| \leq C'_{s,2} C' \|g\|_{B^{s-1/2}_{2,2}(\Gamma)}$ (\Cref{thm:sobolev-besov-constants}).
+For the last statement let $g = T^s_\Gamma U \in B^{s-1/2}_{2,2}(\Gamma)$
+(\Cref{lem:ambient-trace-inclusion}). Almost everywhere on $\Gamma$,
+$\operatorname{Tr}_\Gamma \iota_s (U - W) = \operatorname{Tr}_\Gamma \iota_s U -
+\operatorname{Tr}_\Gamma E_\Gamma g = g - g = 0$ (\Cref{thm:trace-kernel-boundary},
+\Cref{thm:ambient-trace-l2}, \Cref{thm:surface-measure-null-sets},
+\Cref{thm:besov-trace-right-inverse}), and the restriction keeps the boundary trace
+(\Cref{lem:boundary-trace-restriction-sobolev}).
+\end{proof}
+
+\begin{theorem}[The kernel of the trace of $H^s(\Omega)$, $1/2 < s \leq 1$]
+\label{thm:sobolev-trace-kernel-small}
+\lean{Rd.BoundedLipschitzDomain.exists_mem_zeroBoundarySpace_enorm_sub_le,
+  Rd.BoundedLipschitzDomain.traceKer_le_zeroBoundarySpace_of_le_one,
+  Rd.BoundedLipschitzDomain.traceKer_eq_zeroBoundarySpace_of_le_one}
+\leanok
+\uses{lem:zero-boundary-trace-kernel, thm:trace-kernel-zero-boundary,
+  lem:boundary-extension-sobolev, lem:ambient-trace-inclusion, thm:besov-trace-right-inverse,
+  thm:sobolev-besov-constants, lem:sobolev-from-differences, lem:restriction-inclusion,
+  lem:trace-space-norm-bounds, lem:sobolev-inclusion-tests, lem:sobolev-restriction-basic,
+  lem:sobolev-to-l2, lem:boundary-besov-norm-properties, thm:surface-measure-null-sets,
+  def:sobolev-inclusion}
+Let $1/2 < s \leq 1$. There is $K < \infty$ such that for every $u \in N^s_\Gamma$ and every
+$W' \in H^1(V)$ some $y \in H^s_0(\Omega)$ has $\|y - u\| \leq K \|\iota_{s,1} W' - u\|$, with
+$u$ read as an element of $H^s(V)$. Hence $N^s_\Gamma = H^s_0(\Omega)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $C_{\mathrm{tr}}$ be the constant of \Cref{lem:trace-space-norm-bounds}~(1) for $\psi^0$,
+$C_E$ that of \Cref{lem:boundary-extension-sobolev}, and $K = 1 + C_E C_{\mathrm{tr}}$. Let
+$g = T^1_\Gamma W' \in B^{1/2}_{2,2}(\Gamma)$ (\Cref{lem:ambient-trace-inclusion}) and
+$W \in H^1(V)$ with $\iota_1 W = E_\Gamma g$; then $r_\Omega(W' - W) \in N_\Gamma = H^1_0(\Omega)$
+(\Cref{lem:boundary-extension-sobolev}, \Cref{thm:trace-kernel-zero-boundary}). So
+$y = \iota^\Omega_{s,1} r_\Omega(W' - W) \in H^s_0(\Omega)$ and
+$y - u = r_\Omega(\iota_{s,1} W' - u - \iota_{s,1} W)$ (\Cref{lem:restriction-inclusion},
+\Cref{lem:sobolev-restriction-basic}). Since $T^s_\Gamma u = 0$,
+$g = T^s_\Gamma(\iota_{s,1} W' - u)$ (\Cref{lem:ambient-trace-inclusion}), so
+$\|g\|_{B^{s-1/2}_{2,2}(\Gamma)} \leq C_{\mathrm{tr}} \|\iota_{s,1} W' - u\|$
+(\Cref{lem:boundary-besov-norm-properties}, \Cref{thm:surface-measure-null-sets}). Further
+$\iota_s \iota_{s,1} W = \iota_1 W = E_\Gamma g$ (\Cref{lem:sobolev-to-l2}), so
+$\|\iota_{s,1} W\| \leq C_E \|g\|_{B^{s-1/2}_{2,2}(\Gamma)}$. The one function $E_\Gamma g$
+serves the two levels $1$ and $s$, since $E_\Gamma$ is one operator for every smoothness; of
+$E_\Gamma$ the proof uses only the bound and the trace identity for single functions. As
+$r_\Omega$ has norm at most $1$,
+\[
+  \|y - u\| \leq \|\iota_{s,1} W' - u\| + \|\iota_{s,1} W\| \leq K \|\iota_{s,1} W' - u\| .
+\]
+The inclusion $\iota_{s,1}$ has dense range (\Cref{lem:sobolev-inclusion-tests}), so every
+$u \in N^s_\Gamma$ lies in the closure of $H^s_0(\Omega)$, which is closed; the converse inclusion
+is \Cref{lem:zero-boundary-trace-kernel}.
+\end{proof}
+
+This is McLean \cite[Theorem 3.40]{McLean} for $1/2 < s \leq 1$, which Hewett and Moiola
+\cite[Remark 2.6]{HewettMoiola} cite in this range. The proof here reduces the case $s < 1$ to
+$s = 1$ (\Cref{thm:trace-kernel-zero-boundary}) through the extension from the boundary and
+density; the reduction needs $s \leq 1$, where $\iota^\Omega_{s,1}$ maps $H^1_0(\Omega)$ into
+$H^s_0(\Omega)$ (\Cref{lem:restriction-inclusion}).
 
 \section{Compactly supported functions on Besov domains}
 \label{sec:besov-domain-localisation}
