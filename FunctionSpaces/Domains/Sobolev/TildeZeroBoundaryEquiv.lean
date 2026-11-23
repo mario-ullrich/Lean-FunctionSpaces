@@ -9,13 +9,14 @@ public import FunctionSpaces.Domains.Lipschitz.GraphHardy
 public import FunctionSpaces.Domains.Sobolev.SobolevZeroExtension
 
 /-!
-# The zero extension bound for `1/2 < s < 1`
+# `H̃^s(Ω) = H^s_0(Ω)` for `s ≥ 0`, `s ∉ 1/2 + ℕ_0`
 
 Let `V` be a finite-dimensional real inner product space, such as `ℝ^d`, with Lebesgue measure,
-`Ω ⊆ V` a bounded Lipschitz domain and `1/2 < s < 1`. Write `ι_s U` for the `L_2` function of
-`U ∈ H^s(V)` (`Rd.sobolevToL2`) and `N_s(F) = ‖F‖_2 + ‖(2^(ks) ω_1(F, 2^(-k))_2)_k‖_{ℓ_2}` for the
-`B^s_{2,2}` quantity of first differences, equivalent to the norm of `H^s(V)` on the `L_2`
-functions (`Rd.modNorm_sobolevToL2_le`, `Rd.enorm_le_modNorm_sobolevToL2`).
+and `Ω ⊆ V` a bounded Lipschitz domain. The first part treats `1/2 < s < 1`. Write `ι_s U` for
+the `L_2` function of `U ∈ H^s(V)` (`Rd.sobolevToL2`) and
+`N_s(F) = ‖F‖_2 + ‖(2^(ks) ω_1(F, 2^(-k))_2)_k‖_{ℓ_2}` for the `B^s_{2,2}` quantity of first
+differences, equivalent to the norm of `H^s(V)` on the `L_2` functions
+(`Rd.modNorm_sobolevToL2_le`, `Rd.enorm_le_modNorm_sobolevToL2`).
 
 * **The zero extension bound**
   (`Rd.BoundedLipschitzDomain.exists_hasZeroExtensionBound_of_half_lt`): there is `C` with
@@ -37,6 +38,15 @@ The extension by zero from each graph domain
 (`Rd.LipschitzGraph.exists_modNorm_indicatorLp_le_of_vanish`, which rests on the Hardy inequality
 and needs `s > 1/2`) and the smooth multipliers `ψ_j` and `χ` (`Rd.exists_mul_modNorm_le`, which
 needs `s < 1` for first differences) bound `N_s(ι_s U)` by a multiple of `N_s(Φ)`.
+
+**All admissible `s`.** Let `s ≥ 0` with `s - 1/2 ∉ ℕ_0`. The zero extension bound at
+`s - ⌊s⌋ ∈ [0, 1/2) ∪ (1/2, 1)` (`Rd.BoundedLipschitzDomain.exists_hasZeroExtensionBound_of_lt_one`,
+from `Rd.BoundedLipschitzDomain.exists_hasZeroExtensionBound_of_lt_half` and the bound above),
+lifted `⌊s⌋` times with the same constant (`Rd.HasZeroExtensionBound.add_natCast`), gives the bound
+at `s` (`Rd.BoundedLipschitzDomain.exists_hasZeroExtensionBound`), so restriction is an
+isomorphism of `H̃^s(Ω)` onto `H^s_0(Ω)`
+(`Rd.BoundedLipschitzDomain.tildeEquivZeroBoundaryOfNeHalf`; McLean, Theorem 3.33; the case of
+bounded `Ω` and `s ≥ 0` of Hewett–Moiola, Lemma 2.1).
 -/
 
 @[expose] public section
@@ -52,6 +62,17 @@ variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDim
   [MeasurableSpace V] [BorelSpace V]
 
 variable {s : ℝ}
+
+/-- **Lifting the zero extension bound by `m ∈ ℕ`, with the same constant**: for every open `Ω`
+and every real `C`, the zero extension bound at `s` gives the bound at `s + m`
+(`Rd.HasZeroExtensionBound.add_one`, applied `m` times). -/
+theorem HasZeroExtensionBound.add_natCast {Ω : Opens V} {C : ℝ}
+    (h : HasZeroExtensionBound s Ω C) (m : ℕ) : HasZeroExtensionBound (s + m) Ω C := by
+  induction m with
+  | zero => rwa [Nat.cast_zero, add_zero]
+  | succ m ih =>
+    rw [Nat.cast_succ, ← add_assoc]
+    exact ih.add_one
 
 namespace BoundedLipschitzDomain
 
@@ -236,6 +257,55 @@ theorem exists_hasZeroExtensionBound_of_half_lt (hs : 1 / 2 < s) (hs1 : s < 1) :
       _ = K * ‖U + W‖ₑ := by ring
   have h' := ENNReal.toReal_mono (ENNReal.mul_ne_top hK enorm_ne_top) h
   rwa [toReal_enorm, ENNReal.toReal_mul, toReal_enorm] at h'
+
+/-! ### `H̃^s(Ω) = H^s_0(Ω)` for `s ≥ 0`, `s ∉ 1/2 + ℕ_0` -/
+
+/-- **The zero extension bound for `0 ≤ s < 1`, `s ≠ 1/2`**: a bounded Lipschitz domain has the
+zero extension bound at `s` with some constant, for `s < 1/2` by the indicator of `Ω` as a
+multiplier (`Rd.BoundedLipschitzDomain.exists_hasZeroExtensionBound_of_lt_half`) and for
+`1/2 < s < 1` by the Hardy inequality
+(`Rd.BoundedLipschitzDomain.exists_hasZeroExtensionBound_of_half_lt`). -/
+theorem exists_hasZeroExtensionBound_of_lt_one (hs0 : 0 ≤ s) (hs1 : s < 1) (hs : s ≠ 1 / 2) :
+    ∃ C : ℝ, HasZeroExtensionBound s Ω.toOpens C := by
+  rcases lt_or_gt_of_ne hs with h | h
+  · exact Ω.exists_hasZeroExtensionBound_of_lt_half hs0 h
+  · exact Ω.exists_hasZeroExtensionBound_of_half_lt h hs1
+
+/-- **The zero extension bound for every `s ≥ 0` with `s - 1/2 ∉ ℕ_0`** (McLean, Theorem 3.33;
+the case of bounded `Ω` and `s ≥ 0` of Hewett–Moiola, Lemma 2.1): a bounded Lipschitz domain has
+the zero extension bound at `s` with some constant `C`. With `m = ⌊s⌋`, the fractional part
+`s - m ∈ [0, 1)` differs from `1/2`, so the bound holds at `s - m`
+(`Rd.BoundedLipschitzDomain.exists_hasZeroExtensionBound_of_lt_one`), and lifting it `m` times
+keeps the constant (`Rd.HasZeroExtensionBound.add_natCast`). On a smooth bounded domain,
+restriction does not map `H̃^s(Ω)` onto `H^s_0(Ω)` for the excluded `s ∈ 1/2 + ℕ_0`
+(Hewett–Moiola, Remark 2.5). -/
+theorem exists_hasZeroExtensionBound (hs0 : 0 ≤ s) (hs : ∀ k : ℕ, s ≠ k + 1 / 2) :
+    ∃ C : ℝ, HasZeroExtensionBound s Ω.toOpens C := by
+  have hm : (⌊s⌋₊ : ℝ) ≤ s := Nat.floor_le hs0
+  have hm1 : s < ⌊s⌋₊ + 1 := Nat.lt_floor_add_one s
+  obtain ⟨C, hC⟩ := Ω.exists_hasZeroExtensionBound_of_lt_one (sub_nonneg.2 hm) (by linarith)
+    (fun h => hs ⌊s⌋₊ (by linarith))
+  refine ⟨C, ?_⟩
+  have h := hC.add_natCast ⌊s⌋₊
+  rwa [sub_add_cancel] at h
+
+/-- **`H̃^s(Ω) ≅ H^s_0(Ω)` for `s ≥ 0`, `s - 1/2 ∉ ℕ_0`** (McLean, Theorem 3.33; the case of
+bounded `Ω` and `s ≥ 0` of Hewett–Moiola, Lemma 2.1): on a bounded Lipschitz domain, restriction
+is an isomorphism of `H̃^s(Ω)` onto `H^s_0(Ω)`, the isomorphism of the zero extension bound
+(`Rd.BoundedLipschitzDomain.exists_hasZeroExtensionBound`,
+`Rd.HasZeroExtensionBound.tildeEquivZeroBoundary`), with `‖U|_Ω‖ ≤ ‖U‖ ≤ C ‖U|_Ω‖`. With the
+Gelfand triple `H̃^s(Ω) ⊂ L_2(Ω) ⊂ H^{-s}(Ω)` of `Rd.tildePivotDual` it gives the triple
+`H^s_0(Ω) ⊂ L_2(Ω) ⊂ H^{-s}(Ω)` up to equivalent norms. -/
+noncomputable def tildeEquivZeroBoundaryOfNeHalf (hs0 : 0 ≤ s) (hs : ∀ k : ℕ, s ≠ k + 1 / 2) :
+    tildeSpace s Ω.toOpens ≃L[ℂ] zeroBoundarySpace s Ω.toOpens :=
+  (Ω.exists_hasZeroExtensionBound hs0 hs).choose_spec.tildeEquivZeroBoundary
+
+/-- `Ω.tildeEquivZeroBoundaryOfNeHalf hs0 hs U` is the restriction of `U` to `Ω`. -/
+theorem coe_tildeEquivZeroBoundaryOfNeHalf_apply (hs0 : 0 ≤ s) (hs : ∀ k : ℕ, s ≠ k + 1 / 2)
+    (U : tildeSpace s Ω.toOpens) :
+    (Ω.tildeEquivZeroBoundaryOfNeHalf hs0 hs U : RestrictionSpace s Ω.toOpens) =
+      restrictProj s Ω.toOpens U :=
+  rfl
 
 end BoundedLipschitzDomain
 

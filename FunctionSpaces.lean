@@ -156,6 +156,7 @@ public import FunctionSpaces.Domains.Sobolev.ZeroExtensionBound
 public import FunctionSpaces.Domains.Sobolev.TildeSpaceSupport
 public import FunctionSpaces.Domains.Sobolev.SobolevZeroExtension
 public import FunctionSpaces.Domains.Sobolev.TildeZeroBoundaryEquiv
+public import FunctionSpaces.Domains.Traces.TraceKernelGeneral
 public import FunctionSpaces.Domains.Sobolev.LipschitzDomainW1p
 public import FunctionSpaces.Domains.Sobolev.LipschitzGraphGreen
 public import FunctionSpaces.Domains.Sobolev.LipschitzDomainGreen

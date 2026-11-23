@@ -4512,7 +4512,8 @@ and trace theorems carry existential constants, and the statements are equivalen
 membership. On bounded Lipschitz domains the functions of
 $H^1(\Omega)$ with boundary trace zero form the closure of the test functions in $H^1(\Omega)$
 \cite[Theorem 3.40]{McLean} (\Cref{thm:trace-kernel-zero-boundary}), and so do those of
-$H^s(\Omega)$ for $1/2 < s \leq 1$ (\Cref{thm:sobolev-trace-kernel-small}); the spaces
+$H^s(\Omega)$ for $1/2 < s \leq 1$ (\Cref{thm:sobolev-trace-kernel-small}) and, by zero
+extension, for every $1/2 < s < 3/2$ (\Cref{thm:sobolev-trace-kernel}); the spaces
 $H^s(\Omega)$ and $H^s_0(\Omega)$ of these theorems are the Hilbert spaces of
 \Cref{sec:sobolev-restriction-spaces}.
 
@@ -5648,10 +5649,11 @@ range, and \Cref{thm:pivot-dual} the formula for $J_\Omega$ and its injectivity.
 
 For $s = 1$, restriction maps $\tilde H^1(\Omega)$ isometrically onto $H^1_0(\Omega)$
 (\Cref{thm:sobolev-tilde-zero-boundary}), and the triple is
-$H^1_0(\Omega) \subseteq L_2(\Omega) \subseteq H^{-1}(\Omega)$. On a Lipschitz domain, for
-$s \geq 0$ with $s - \frac12 \notin \Z$, restriction is an isomorphism of $\tilde H^s(\Omega)$
-onto $H^s_0(\Omega)$ with equivalent norms \cite[Theorem 3.33]{McLean}, and up to equivalent
-norms the triple is $H^s_0(\Omega) \subseteq L_2(\Omega) \subseteq H^{-s}(\Omega)$.
+$H^1_0(\Omega) \subseteq L_2(\Omega) \subseteq H^{-1}(\Omega)$. On a bounded Lipschitz domain,
+for $s \geq 0$ with $s - \frac12 \notin \Z$, restriction is an isomorphism of $\tilde H^s(\Omega)$
+onto $H^s_0(\Omega)$ with equivalent norms \cite[Theorem 3.33]{McLean}
+(\Cref{thm:tilde-zero-boundary}), and up to equivalent norms the triple is
+$H^s_0(\Omega) \subseteq L_2(\Omega) \subseteq H^{-s}(\Omega)$.
 
 \section{The trace spaces of a bounded Lipschitz domain}
 \label{sec:boundary-trace-space}
@@ -10477,24 +10479,21 @@ $u = r_\Omega U \in H^1_0(\Omega)$ (\Cref{prop:sobolev-restriction-l2},
 \Cref{thm:sobolev-tilde-zero-boundary}).
 \end{proof}
 
-\begin{corollary}[The quotient by $H^1_0(\Omega)$ and the dual of the trace kernel]
+\begin{corollary}[The trace kernel as $\tilde H^1(\Omega)$ and its dual]
 \label{cor:trace-kernel-quotient-duals}
-\lean{Rd.BoundedLipschitzDomain.quotientZeroBoundaryEquivTraceSpace,
-  Rd.BoundedLipschitzDomain.quotientZeroBoundaryEquivTraceSpace_mk,
-  Rd.BoundedLipschitzDomain.tildeEquivTraceKer,
+\lean{Rd.BoundedLipschitzDomain.tildeEquivTraceKer,
   Rd.BoundedLipschitzDomain.coe_tildeEquivTraceKer_apply,
   Rd.BoundedLipschitzDomain.coe_tildeEquivTraceKer_symm_apply,
   Rd.BoundedLipschitzDomain.dualTraceKerEquiv, Rd.BoundedLipschitzDomain.dualTraceKerEquiv_apply,
   Rd.BoundedLipschitzDomain.dualTraceKerEquiv_symm_apply,
   Rd.BoundedLipschitzDomain.dualTraceKerEquiv_eq_iff}
 \leanok
-\uses{thm:trace-kernel-zero-boundary, thm:trace-space-operators, thm:sobolev-tilde-zero-boundary,
+\uses{thm:trace-kernel-zero-boundary, thm:sobolev-tilde-zero-boundary,
   lem:sobolev-tilde-in-restriction, thm:tilde-restriction-shift, prop:sobolev-pairing,
   cor:sobolev-duality-zero-boundary}
-The map $[u] \mapsto \gamma u$ is an isometric isomorphism of $H^1(\Omega) / H^1_0(\Omega)$ onto
-the trace space $N_\Gamma^\perp$. The restriction $U \mapsto r_\Omega U$ is an isometric
-isomorphism of $\tilde H^1(\Omega)$ onto $N_\Gamma$, and the element of $\tilde H^1(\Omega)$ with
-restriction $u \in N_\Gamma$ is $u$ itself, read in $H^1(V)$. For every bounded linear functional
+The restriction $U \mapsto r_\Omega U$ is an isometric isomorphism of $\tilde H^1(\Omega)$ onto
+$N_\Gamma$, and the element of $\tilde H^1(\Omega)$ with restriction $u \in N_\Gamma$ is $u$
+itself, read in $H^1(V)$. For every bounded linear functional
 $\ell$ on $N_\Gamma$ there is exactly one $W \in H^{-1}(\Omega)$ with $\ell(u) = [W, u]$ for every
 $u \in N_\Gamma$, and $\|W\| = \|\ell\|$; the map $\ell \mapsto W$ is a conjugate-linear isometric
 isomorphism of the dual of $N_\Gamma$ onto $H^{-1}(\Omega)$.
@@ -10502,21 +10501,17 @@ isomorphism of the dual of $N_\Gamma$ onto $H^{-1}(\Omega)$.
 
 \begin{proof}
 \leanok
-$H^1(\Omega) / K \cong K^\perp$ for the closed subspace $K = H^1_0(\Omega) = N_\Gamma$, whose
-orthogonal complement is the trace space $N_\Gamma^\perp$, and $u - E \gamma u \in N_\Gamma$
-(\Cref{thm:trace-space-operators}). The isometry is that of
-\Cref{thm:sobolev-tilde-zero-boundary} followed by $H^1_0(\Omega) = N_\Gamma$, with
-\Cref{lem:sobolev-tilde-in-restriction} for the inverse. The dual is Riesz's representation
-theorem on $N_\Gamma$, this isometry and $\Theta_1 \colon \tilde H^1(\Omega) \to H^{-1}(\Omega)$
-(\Cref{thm:tilde-restriction-shift}), as in \Cref{cor:sobolev-duality-zero-boundary}.
+The isometry is that of \Cref{thm:sobolev-tilde-zero-boundary} followed by
+$H^1_0(\Omega) = N_\Gamma$, with \Cref{lem:sobolev-tilde-in-restriction} for the inverse. The
+dual is Riesz's representation theorem on $N_\Gamma$, this isometry and
+$\Theta_1 \colon \tilde H^1(\Omega) \to H^{-1}(\Omega)$ (\Cref{thm:tilde-restriction-shift}), as
+in \Cref{cor:sobolev-duality-zero-boundary}.
 \end{proof}
 
-The content of the first isometry is $H^1_0(\Omega) = N_\Gamma$
-(\Cref{thm:trace-kernel-zero-boundary}); given that, it holds by the definition of
-the trace space as $N_\Gamma^\perp$. For the trace
-spaces of Hiptmair, Pauly and Schulz \cite{HiptmairPaulySchulz} at $k = 0$ the quotient
-$H^1(\Omega) / H^1_0(\Omega)$ is the trace space; its norm is equivalent to the
-Sobolev--Slobodeckij norm of the classical $H^{1/2}(\Gamma)$ (\Cref{sec:boundary-slobodeckij}).
+The map $[u] \mapsto \gamma u$ is an isometric isomorphism of $H^1(\Omega) / H^1_0(\Omega)$
+onto the trace space $N_\Gamma^\perp$, the case $s = 1$ of
+\Cref{cor:sobolev-trace-kernel-quotient}; for the trace spaces of Hiptmair, Pauly and Schulz
+\cite{HiptmairPaulySchulz} at $k = 0$ this quotient is the trace space.
 
 \paragraph{The kernel of the trace of $H^s(\Omega)$, $1/2 < s \leq 1$.}
 

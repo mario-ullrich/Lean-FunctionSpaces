@@ -23,7 +23,10 @@ $1 \leq p < \infty$, $1 \leq q \leq \infty$ and $0 < s < 1/p$, and
 $\tilde H^s(\Omega) = H^s_0(\Omega) = H^s(\Omega)$ for $0 \leq s < 1/2$.
 \Cref{sec:fractional-hardy} proves a Hardy inequality on Lipschitz graph domains, from a
 fractional Hardy inequality on $(0, 1]$, and derives from it the zero extension bound for
-$1/2 < s < 1$.
+$1/2 < s < 1$. \Cref{sec:tilde-zero-boundary} lifts the two cases to
+$\tilde H^s(\Omega) \cong H^s_0(\Omega)$ for every $s \geq 0$ with $s - 1/2 \notin \N_0$, and
+\Cref{sec:sobolev-trace-kernel} shows that the kernel of the trace of $H^s(\Omega)$ is
+$H^s_0(\Omega)$ for $1/2 < s < 3/2$, through the zero extension for $1 \leq s < 3/2$.
 
 \section{Inclusions of restriction spaces}
 \label{sec:restriction-inclusions}
@@ -1372,3 +1375,235 @@ $\|U\| \leq c_I N_s(\iota_s U) \leq c_I (\sum_j C_j P_j + P_\chi) c_B \|U + W\|$
 By \Cref{thm:zero-extension-bound-iso}, restriction is then an isomorphism of
 $\tilde H^s(\Omega)$ onto $H^s_0(\Omega)$ for $1/2 < s < 1$, the case $1/2 < s < 1$ of McLean's
 \cite[Theorem 3.33]{McLean} and Hewett and Moiola's \cite[Lemma 2.1]{HewettMoiola}.
+
+\section{\texorpdfstring{$\tilde H^s(\Omega) = H^s_0(\Omega)$}{H̃\^{}s = H\^{}s\_0}}
+\label{sec:tilde-zero-boundary}
+
+On a bounded Lipschitz domain the zero extension bound holds for $0 \leq s < 1/2$
+(\Cref{thm:zero-extension-small}) and for $1/2 < s < 1$ (\Cref{thm:zero-extension-hardy}).
+Lifting it through derivatives with the same constant (\Cref{thm:zero-extension-bound-lift})
+covers every $s \geq 0$ whose fractional part is not $1/2$. In this section $\Omega$ is a bounded
+Lipschitz domain and $\Omega' \subseteq V$ is open.
+
+\begin{theorem}[The zero extension bound off $1/2 + \N_0$]
+\label{thm:zero-extension-bound-all}
+\lean{Rd.HasZeroExtensionBound.add_natCast,
+  Rd.BoundedLipschitzDomain.exists_hasZeroExtensionBound_of_lt_one,
+  Rd.BoundedLipschitzDomain.exists_hasZeroExtensionBound}
+\leanok
+\uses{def:zero-extension-bound, thm:zero-extension-bound-lift, thm:zero-extension-small,
+  thm:zero-extension-hardy}
+Let $s, C \in \R$ and $m \in \N_0$. If $\Omega'$ has the zero extension bound with constant $C$ at
+$s$, then it has the zero extension bound with constant $C$ at $s + m$. For every $s \geq 0$ with
+$s \neq k + 1/2$ for all $k \in \N_0$ there is $C \in \R$ such that $\Omega$ has the zero
+extension bound with constant $C$ at $s$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The first statement is \Cref{thm:zero-extension-bound-lift}, applied $m$ times. Let
+$m = \lfloor s \rfloor$. Then $0 \leq s - m < 1$ and $s - m \neq 1/2$, so $\Omega$ has the zero
+extension bound at $s - m$ with some constant $C$, by \Cref{thm:zero-extension-small} if
+$s - m < 1/2$ and by \Cref{thm:zero-extension-hardy} if $s - m > 1/2$; the first statement
+carries it to $s$.
+\end{proof}
+
+\begin{theorem}[$\tilde H^s(\Omega) \cong H^s_0(\Omega)$]
+\label{thm:tilde-zero-boundary}
+\lean{Rd.BoundedLipschitzDomain.tildeEquivZeroBoundaryOfNeHalf,
+  Rd.BoundedLipschitzDomain.coe_tildeEquivZeroBoundaryOfNeHalf_apply}
+\leanok
+\uses{thm:zero-extension-bound-all, thm:zero-extension-bound-iso}
+Let $s \geq 0$ with $s \neq k + 1/2$ for all $k \in \N_0$. Then $U \mapsto r_\Omega U$ is an
+isomorphism of $\tilde H^s(\Omega)$ onto $H^s_0(\Omega)$, and there is $C \in \R$ with
+$\|r_\Omega U\| \leq \|U\| \leq C \|r_\Omega U\|$ for every $U \in \tilde H^s(\Omega)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\Cref{thm:zero-extension-bound-all} and \Cref{thm:zero-extension-bound-iso}.
+\end{proof}
+
+This is McLean's \cite[Theorem 3.33]{McLean} and the case of bounded $\Omega$ and $s \geq 0$ of
+Hewett and Moiola's \cite[Lemma 2.1]{HewettMoiola}. On a smooth bounded domain restriction does
+not map $\tilde H^s(\Omega)$ onto $H^s_0(\Omega)$ for $s \in 1/2 + \N_0$
+\cite[Remark 2.5]{HewettMoiola}.
+On every open set the isomorphism is isometric for integer $s$
+(\Cref{thm:tilde-zero-boundary-integer}), and $H^s_0(\Omega) = H^s(\Omega)$ for
+$0 \leq s < 1/2$ (\Cref{thm:zero-boundary-small}). With the Gelfand triple
+$\tilde H^s(\Omega) \subseteq L_2(\Omega) \subseteq H^{-s}(\Omega)$
+(\Cref{thm:domain-gelfand-triple}) the isomorphism gives the triple
+$H^s_0(\Omega) \subseteq L_2(\Omega) \subseteq H^{-s}(\Omega)$ up to equivalent norms.
+
+\section{The kernel of the trace of \texorpdfstring{$H^s(\Omega)$}{H\^{}s(Ω)}}
+\label{sec:sobolev-trace-kernel}
+
+In this section $\Omega$ is a bounded Lipschitz domain with boundary $\Gamma$, $\Omega' \subseteq V$
+is open, $N^s_\Gamma$ is the trace kernel of $H^s(\Omega)$ and $(N^s_\Gamma)^\perp$ the trace
+space with the trace $\gamma_s$ and the extension $E_s$, $1/2 < s < 3/2$
+(\Cref{def:trace-kernel}, \Cref{def:trace-space}),
+$\gamma^H_s \colon H^s(\Omega) \to H^{s-1/2}(\Gamma)$ is the trace of
+\Cref{thm:trace-space-boundary-sobolev}, and $\partial_v \colon H^1(V) \to L_2(V)$ is the weak
+derivative of \Cref{lem:sobolev-one-weak-derivative-operator}. For $1/2 < s \leq 1$ the kernel is
+$H^s_0(\Omega)$ by approximation from the level $1$ (\Cref{thm:sobolev-trace-kernel-small}). For
+$1 \leq s < 3/2$ the zero extension of $u \in N^s_\Gamma$ lies in $H^s(V)$: its derivatives are the
+zero extensions of the derivatives of $u$, by Green's formula at the level $1$, and they lie in
+$H^{s-1}(V)$, since $s - 1 < 1/2$ and the indicator of $\Omega$ keeps $H^{s-1}(V)$.
+
+\begin{lemma}[$L_2$ functions, weak derivatives and restrictions]
+\label{lem:sobolev-l2-weak-derivatives}
+\lean{Rd.memSobolev_bessel_iff_exists_sobolevToL2_eq, Rd.toTemperedDistribution_weakDerivL2,
+  Rd.memSobolev_bessel_weakDerivL2_sobolevInclusion, Rd.sobolevToL2_restrictProj_ae_eq,
+  Rd.weakDerivL2_restrictProj_ae_eq}
+\leanok
+\uses{lem:sobolev-to-l2, lem:sobolev-one-to-l2, lem:sobolev-one-weak-derivative-operator,
+  thm:weak-derivative-tempered, lem:sobolev-inclusion, lem:sobolev-restriction-basic,
+  prop:sobolev-vanishing-one, lem:sobolev-one-weak-derivative-local}
+Let $s \geq 0$. A function $f \in L_2(V)$ lies in $H^s(V)$ as a tempered distribution if and only
+if $f = \iota_s U$ for some $U \in H^s(V)$. For every $U \in H^1(V)$ and every $v \in V$, the
+tempered distribution of $\partial_v U \in L_2(V)$ is the derivative $\partial_v U$ of the
+distribution $U$. For $s \geq 1$, every $U \in H^s(V)$ and every $v \in V$,
+$\partial_v \iota_{1,s} U \in L_2(V)$ lies in $H^{s-1}(V)$ as a tempered distribution. For every
+$U \in H^s(V)$, $\iota_s r_{\Omega'} U = \iota_s U$ almost everywhere on $\Omega'$, and for every
+$U \in H^1(V)$ and every $v \in V$, $\partial_v r_{\Omega'} U = \partial_v U$ almost everywhere on
+$\Omega'$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+A tempered distribution in $H^s(V)$ is an element $U$ of $H^s(V)$ (Mathlib's
+\texttt{TemperedDistribution.\allowbreak MemSobolev.\allowbreak toBesselPotentialSpace}), and the
+$L_2$ function with the distribution $U$ is $\iota_s U$ (\Cref{lem:sobolev-to-l2}). The weak
+derivative of $\iota U$ on $V$ is the derivative of the tempered distribution of $\iota U$, which
+is $U$ (\Cref{thm:weak-derivative-tempered}, \Cref{lem:sobolev-one-to-l2}). The distribution of
+$\iota_{1,s} U$ is $U$ (\Cref{lem:sobolev-inclusion}), and $\partial_v U \in H^{s-1}(V)$ (Mathlib's
+\texttt{TemperedDistribution.\allowbreak MemSobolev.\allowbreak lineDerivOp}). Finally
+$U - r_{\Omega'} U \in N^s(\Omega')$ (\Cref{lem:sobolev-restriction-basic}), so its $L_2$
+function vanishes almost everywhere on $\Omega'$ (\Cref{prop:sobolev-vanishing-one}). For $s = 1$
+the weak derivatives of $r_{\Omega'} U$ and $U$ then agree almost everywhere on $\Omega'$
+(\Cref{lem:sobolev-one-weak-derivative-local}).
+\end{proof}
+
+\begin{lemma}[The zero extension of the trace kernel]
+\label{lem:zero-extension-trace-kernel}
+\lean{Rd.BoundedLipschitzDomain.mem_zeroBoundarySpace_of_sobolevToL2_eq_indicatorLp,
+  Rd.BoundedLipschitzDomain.lineDerivOp_indicatorLp_of_mem_traceKer,
+  Rd.BoundedLipschitzDomain.exists_sobolevToL2_eq_indicatorLp_of_mem_traceKer}
+\leanok
+\uses{lem:sobolev-l2-weak-derivatives, lem:ambient-trace-inclusion, lem:green-trace-kernel,
+  lem:indicator-lp-eq-iff, lem:sobolev-to-l2, thm:zero-boundary-small,
+  thm:bessel-potential-derivatives, def:restriction-inclusion,
+  lem:sobolev-tilde-restriction-range}
+Let $s \geq 0$, $u \in H^s(\Omega)$ and $U' \in H^s(V)$ with
+$\iota_s U' = \mathbf 1_\Omega \iota_s u$. Then $u \in H^s_0(\Omega)$. Let $1 \leq s < 3/2$ and
+$u \in N^s_\Gamma$. For every $v \in V$,
+$\partial_v(\mathbf 1_\Omega \iota_s u) = \mathbf 1_\Omega \partial_v \iota_{1,s} u$ as tempered
+distributions, and there is $U' \in H^s(V)$ with $\iota_s U' = \mathbf 1_\Omega \iota_s u$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For the first statement, $U' \in \tilde H^s(\Omega)$ and $r_\Omega U' = r_\Omega u = u$
+(\Cref{thm:zero-boundary-small}), and $r_\Omega(\tilde H^s(\Omega)) \subseteq H^s_0(\Omega)$
+(\Cref{lem:sobolev-tilde-restriction-range}). Let $1 \leq s < 3/2$ and $u \in N^s_\Gamma$. Then
+$u_1 = \iota^\Omega_{1,s} u = r_\Omega(\iota_{1,s} u)$ (\Cref{def:restriction-inclusion}) lies in
+$N^1_\Gamma$ (\Cref{lem:ambient-trace-inclusion}), so $\mathbf 1_\Omega \partial_v u_1$ is the
+weak derivative of $\mathbf 1_\Omega \iota u_1$ on $V$ (\Cref{lem:green-trace-kernel}). On
+$\Omega$, $\iota u_1 = \iota_1 \iota_{1,s} u = \iota_s u$ and
+$\partial_v u_1 = \partial_v \iota_{1,s} u$ almost everywhere
+(\Cref{lem:sobolev-l2-weak-derivatives}, \Cref{lem:sobolev-to-l2}), so the zero extensions agree
+(\Cref{lem:indicator-lp-eq-iff}), and the weak derivative is the derivative of tempered
+distributions (\Cref{thm:weak-derivative-tempered}). Since $0 \leq s - 1 < 1/2$, multiplication
+by $\mathbf 1_\Omega$ keeps $H^{s-1}(V)$ (\Cref{thm:zero-boundary-small}). So
+$\mathbf 1_\Omega \iota_s u = \mathbf 1_\Omega \iota_{s-1} \iota_{s-1,s} u$ lies in $H^{s-1}(V)$,
+and so does $\partial_v(\mathbf 1_\Omega \iota_s u) = \mathbf 1_\Omega \partial_v \iota_{1,s} u$
+for every $v$, as $\partial_v \iota_{1,s} u \in H^{s-1}(V)$
+(\Cref{lem:sobolev-l2-weak-derivatives}). By the derivative characterisation
+(\Cref{thm:bessel-potential-derivatives} for $p = 2$),
+$\mathbf 1_\Omega \iota_s u \in H^{(s-1)+1}(V) = H^s(V)$, and it is $\iota_s U'$ for some
+$U' \in H^s(V)$ (\Cref{lem:sobolev-l2-weak-derivatives}).
+\end{proof}
+
+\begin{theorem}[The kernel of the trace of $H^s(\Omega)$]
+\label{thm:sobolev-trace-kernel}
+\lean{Rd.BoundedLipschitzDomain.traceKer_le_zeroBoundarySpace_of_one_le,
+  Rd.BoundedLipschitzDomain.traceKer_eq_zeroBoundarySpace,
+  Rd.BoundedLipschitzDomain.ker_sobolevTrace_eq_zeroBoundarySpace}
+\leanok
+\uses{lem:zero-extension-trace-kernel, thm:sobolev-trace-kernel-small,
+  lem:zero-boundary-trace-kernel, thm:trace-space-boundary-sobolev}
+Let $1/2 < s < 3/2$. Then $N^s_\Gamma = H^s_0(\Omega)$, and the kernel of
+$\gamma^H_s \colon H^s(\Omega) \to H^{s-1/2}(\Gamma)$ is $H^s_0(\Omega)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+$H^s_0(\Omega) \subseteq N^s_\Gamma$ is \Cref{lem:zero-boundary-trace-kernel}. For $s \leq 1$ the
+converse is \Cref{thm:sobolev-trace-kernel-small}. For $s \geq 1$ and $u \in N^s_\Gamma$, the zero
+extension $\mathbf 1_\Omega \iota_s u$ is $\iota_s U'$ for some $U' \in H^s(V)$, so
+$u \in H^s_0(\Omega)$ (\Cref{lem:zero-extension-trace-kernel}). The kernel of $\gamma^H_s$ is
+$N^s_\Gamma$ (\Cref{thm:trace-space-boundary-sobolev}).
+\end{proof}
+
+This is McLean's \cite[Theorem 3.40]{McLean} for $1/2 < s < 3/2$. For $s > 1$ the proof follows
+the case $s = 1$ (\Cref{thm:trace-kernel-zero-boundary}): Green's formula gives the derivatives of
+the zero extension, and the multiplier $\mathbf 1_\Omega$ on $H^{s-1}(V)$, together with the
+derivative characterisation of $H^s(V)$ (\Cref{thm:bessel-potential-derivatives}), replaces the
+description of $\Sob{1}{2}(V)$ by weak derivatives.
+
+\begin{corollary}[Vanishing trace by zero extension]
+\label{cor:sobolev-trace-kernel-zero-extension}
+\lean{Rd.BoundedLipschitzDomain.mem_traceKer_iff_exists_sobolevToL2_eq_indicatorLp}
+\leanok
+\uses{thm:sobolev-trace-kernel, lem:zero-extension-trace-kernel, lem:zero-boundary-trace-kernel,
+  thm:tilde-zero-boundary, lem:sobolev-restriction-basic, lem:restriction-l2-functions}
+Let $1/2 < s < 3/2$ and $u \in H^s(\Omega)$. Then $u \in N^s_\Gamma$ if and only if
+$\mathbf 1_\Omega \iota_s u = \iota_s U'$ for some $U' \in H^s(V)$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+If $\mathbf 1_\Omega \iota_s u = \iota_s U'$, then $u \in H^s_0(\Omega)$
+(\Cref{lem:zero-extension-trace-kernel}), and $H^s_0(\Omega) \subseteq N^s_\Gamma$
+(\Cref{lem:zero-boundary-trace-kernel}). Conversely, let $u \in N^s_\Gamma = H^s_0(\Omega)$
+(\Cref{thm:sobolev-trace-kernel}). Since $s \neq 1/2$ and $s < 3/2$, $s \neq k + 1/2$ for all
+$k \in \N_0$, so $u = r_\Omega U$ for some $U \in \tilde H^s(\Omega)$
+(\Cref{thm:tilde-zero-boundary}). Then $W = r_\Omega U - U \in N^s(\Omega)$
+(\Cref{lem:sobolev-restriction-basic}), and
+$\iota_s U = \mathbf 1_\Omega \iota_s(U + W) = \mathbf 1_\Omega \iota_s u$
+(\Cref{lem:restriction-l2-functions}).
+\end{proof}
+
+At $s = 1$ the corollary is \Cref{thm:zero-extension-trace-kernel} with $H^1(V)$ in place of
+$\Sob{1}{2}(V)$.
+
+\begin{corollary}[The quotient by $H^s_0(\Omega)$]
+\label{cor:sobolev-trace-kernel-quotient}
+\lean{Rd.BoundedLipschitzDomain.quotientZeroBoundaryEquivTraceSpace,
+  Rd.BoundedLipschitzDomain.quotientZeroBoundaryEquivTraceSpace_mk,
+  Rd.BoundedLipschitzDomain.quotientZeroBoundaryEquivBoundarySobolev,
+  Rd.BoundedLipschitzDomain.quotientZeroBoundaryEquivBoundarySobolev_mk}
+\leanok
+\uses{thm:sobolev-trace-kernel, thm:trace-space-operators, thm:trace-space-boundary-sobolev}
+Let $1/2 < s < 3/2$. The map $[u] \mapsto \gamma_s u$ is an isometric isomorphism of
+$H^s(\Omega) / H^s_0(\Omega)$ onto the trace space $(N^s_\Gamma)^\perp$, and
+$[u] \mapsto \gamma^H_s u$ is an isomorphism of normed spaces of $H^s(\Omega) / H^s_0(\Omega)$
+onto $H^{s-1/2}(\Gamma)$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+Since $H^s_0(\Omega) = N^s_\Gamma$ (\Cref{thm:sobolev-trace-kernel}), the quotients
+$H^s(\Omega) / H^s_0(\Omega)$ and $H^s(\Omega) / N^s_\Gamma$ are the same normed space, with the
+same classes (Mathlib's \texttt{Submodule.\allowbreak quotLIEOfEq}), and $[u] \mapsto \gamma_s u$
+is an isometric isomorphism of $H^s(\Omega) / N^s_\Gamma$ onto $(N^s_\Gamma)^\perp$
+(\Cref{thm:trace-space-operators}). The second map is the first followed by the isomorphism of the
+trace space onto $H^{s-1/2}(\Gamma)$ (\Cref{thm:trace-space-boundary-sobolev}).
+\end{proof}
+
+The content of the isometry is $H^s_0(\Omega) = N^s_\Gamma$; given that, it holds by the
+definition of the trace space as $(N^s_\Gamma)^\perp$. The norm of the trace space, and so the
+quotient norm, is equivalent to the Sobolev--Slobodeckij norm of $H^{s-1/2}(\Gamma)$
+(\Cref{thm:trace-space-slobodeckij}). For $s = 1$ the quotient $H^1(\Omega) / H^1_0(\Omega)$ is
+the trace space of Hiptmair, Pauly and Schulz \cite{HiptmairPaulySchulz} at $k = 0$, and
+$H^{s-1/2}(\Gamma)$ is the classical $H^{1/2}(\Gamma)$.

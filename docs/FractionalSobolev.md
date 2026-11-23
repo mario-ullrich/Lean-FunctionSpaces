@@ -31,7 +31,12 @@ near the boundary of a Lipschitz graph domain, divided by the `s`-th power of it
 the graph, is controlled by its first differences in the domain, through a dyadic Hardy
 inequality on the vertical lines. Extension by zero from a graph domain is then bounded on such
 functions, with a constant independent of how close to the boundary they vanish, and the charts
-of a bounded Lipschitz domain give the zero extension bound.
+of a bounded Lipschitz domain give the zero extension bound. Lifted through derivatives, the two
+cases give `H̃^s(Ω) ≅ H^s_0(Ω)` for every `s ≥ 0` with `s - 1/2 ∉ ℕ_0`. For `1 ≤ s < 3/2` the
+zero extension of a function of `H^s(Ω)` with vanishing trace lies in `H^s(ℝ^d)`: Green's formula
+gives its derivatives, the zero extensions of the derivatives, and these lie in `H^{s-1}(ℝ^d)`,
+since `s - 1 < 1/2` and `1_Ω` keeps `H^{s-1}(ℝ^d)`. So the kernel of the trace of `H^s(Ω)` is
+`H^s_0(Ω)` for every `1/2 < s < 3/2`, and `H^s(Ω) ⧸ H^s_0(Ω) ≅ H^{s-1/2}(Γ)`.
 
 ## Main results
 
@@ -119,6 +124,32 @@ span of the test functions of `Ω` in `H^s(V)` (`Rd.testSpan`), and `U ↦ U|_Ω
   the zero extension bound holds at every `1/2 < s < 1`
   (`Rd.BoundedLipschitzDomain.exists_hasZeroExtensionBound_of_half_lt`; McLean, Theorem 3.33;
   Hewett–Moiola, Lemma 2.1), so restriction is an isomorphism of `H̃^s(Ω)` onto `H^s_0(Ω)`.
+* **`H̃^s(Ω) ≅ H^s_0(Ω)` for `s ≥ 0`, `s - 1/2 ∉ ℕ_0`.** The zero extension bound at `s` gives
+  the bound with the same constant at `s + m` for every `m ∈ ℕ_0`
+  (`Rd.HasZeroExtensionBound.add_natCast`). On a bounded Lipschitz domain the zero extension
+  bound holds at every `s ≥ 0` with `s - 1/2 ∉ ℕ_0`
+  (`Rd.BoundedLipschitzDomain.exists_hasZeroExtensionBound`), and restriction is an isomorphism
+  of `H̃^s(Ω)` onto `H^s_0(Ω)` with `‖U|_Ω‖ ≤ ‖U‖ ≤ C ‖U|_Ω‖`
+  (`Rd.BoundedLipschitzDomain.tildeEquivZeroBoundaryOfNeHalf`; McLean, Theorem 3.33; the case
+  of bounded `Ω` and `s ≥ 0` of Hewett–Moiola, Lemma 2.1).
+* **The kernel of the trace of `H^s(Ω)`.** Let `Ω` be a bounded Lipschitz domain with boundary
+  `Γ` and `1/2 < s < 3/2`. The `u ∈ H^s(Ω)` whose boundary trace vanishes almost everywhere on
+  `Γ` form `H^s_0(Ω)`, the kernel of the trace `H^s(Ω) → H^{s-1/2}(Γ)`
+  (`Rd.BoundedLipschitzDomain.traceKer_eq_zeroBoundarySpace`,
+  `Rd.BoundedLipschitzDomain.ker_sobolevTrace_eq_zeroBoundarySpace`; McLean, Theorem 3.40), and
+  `u ∈ H^s(Ω)` has vanishing trace iff `1_Ω ι_s u = ι_s U'` for some `U' ∈ H^s(V)`
+  (`Rd.BoundedLipschitzDomain.mem_traceKer_iff_exists_sobolevToL2_eq_indicatorLp`).
+  `H^s(Ω) ⧸ H^s_0(Ω)` is isometrically isomorphic to the trace space of `H^s(Ω)`, the class of
+  `u` going to its trace, and isomorphic to `H^{s-1/2}(Γ)`
+  (`Rd.BoundedLipschitzDomain.quotientZeroBoundaryEquivTraceSpace`,
+  `Rd.BoundedLipschitzDomain.quotientZeroBoundaryEquivBoundarySobolev`). For `1 ≤ s < 3/2` and
+  `u` with vanishing trace, `∂_v(1_Ω ι_s u) = 1_Ω ∂_v u` as tempered distributions and
+  `1_Ω ι_s u = ι_s U'` for some `U' ∈ H^s(V)`
+  (`Rd.BoundedLipschitzDomain.lineDerivOp_indicatorLp_of_mem_traceKer`,
+  `Rd.BoundedLipschitzDomain.exists_sobolevToL2_eq_indicatorLp_of_mem_traceKer`). The tools: for
+  `s ≥ 0`, `f ∈ L_2(V)` lies in Mathlib's `H^s(V)` iff `f = ι_s U` for some `U ∈ H^s(V)`
+  (`Rd.memSobolev_bessel_iff_exists_sobolevToL2_eq`), and the weak derivatives of `H^1(V)` are
+  derivatives of tempered distributions (`Rd.toTemperedDistribution_weakDerivL2`).
 
 ## What is formalised
 
@@ -133,7 +164,8 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Differences of cut-off functions, indicators of smooth atoms as regular atoms of exponent `1/p`, and the indicator of a bounded Lipschitz domain as a pointwise multiplier of `B^s_{p,q}(ℝ^d)` for `0 < s < 1/p`, `1 ≤ p < ∞`, `1 ≤ q ≤ ∞` | ✅ | ✗ | `Domains/Lipschitz/IndicatorMultiplier` |
 | Restrictions determined by the `L_2` functions on `Ω`, the zero extension bound for `0 ≤ s < 1/2`, zero extensions in `H^s(ℝ^d)`, `H^s_0(Ω) = H^s(Ω)` and the isomorphism `H̃^s(Ω) ≅ H^s(Ω)` for `0 ≤ s < 1/2` | ✅ | ✗ | `Domains/Sobolev/SobolevZeroExtension` |
 | Integrals over the line by dyadic shells, integrals in graph coordinates, vertical forms and vertical difference quotients, the Hardy inequality `∫_{Ω'} \|G\|² / min(η, 1)^(2s) ≤ (1 + K_s 2^(2s+2)) N_{s,Ω'}(G)²` on a Lipschitz graph domain for `s > 1/2` and `G` vanishing near the graph, differences of the extension by zero, and the extension by zero from a graph domain | ✅ | ✗ | `Domains/Lipschitz/GraphHardy` |
-| The cut-off by the charts, extensions of test functions that vanish on `Ω` outside a compact set, localised functions that vanish near the graphs, and the zero extension bound for `1/2 < s < 1` on a bounded Lipschitz domain | ✅ | ✗ | `Domains/Sobolev/TildeZeroBoundaryEquiv` |
+| The cut-off by the charts, extensions of test functions that vanish on `Ω` outside a compact set, localised functions that vanish near the graphs, the zero extension bound for `1/2 < s < 1` on a bounded Lipschitz domain, the lift of the bound by `m ∈ ℕ_0`, the bound for every `s ≥ 0` with `s - 1/2 ∉ ℕ_0`, and the isomorphism `H̃^s(Ω) ≅ H^s_0(Ω)` for these `s` | ✅ | ✗ | `Domains/Sobolev/TildeZeroBoundaryEquiv` |
+| `L_2` functions in `H^s(ℝ^d)`, weak derivatives of `H^1(ℝ^d)` as distributional derivatives, `L_2` functions and weak derivatives of restrictions, zero extensions of the trace kernel of `H^s(Ω)` for `1 ≤ s < 3/2`, `ker γ_s = H^s_0(Ω)` for `1/2 < s < 3/2`, vanishing trace as a zero extension in `H^s(ℝ^d)`, and `H^s(Ω) ⧸ H^s_0(Ω)` isometric to the trace space of `H^s(Ω)` and isomorphic to `H^{s-1/2}(Γ)` | ✅ | ✗ | `Domains/Traces/TraceKernelGeneral` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

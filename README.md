@@ -272,8 +272,20 @@ For a general scheme the project describes `A^s_q`
   `Rd.BoundedLipschitzDomain.sobolevTrace_sobolevExtend`), the trace space of `H^s(Ω)` is
   isomorphic to `H^{s-1/2}(Γ)` (`Rd.BoundedLipschitzDomain.traceSpaceEquivBoundarySobolev`), and
   `g ∈ L_2(Γ)` is a trace iff `∫_Γ ∫_Γ |g(x) - g(y)|² / |x - y|^(d+2s-2) dσ(x) dσ(y) < ∞`
-  (`Rd.BoundedLipschitzDomain.mem_range_traceL2_iff_slobodeckij`); the kernel of the trace is
-  `H^s_0(Ω)` for `s ≤ 1` (`Rd.BoundedLipschitzDomain.traceKer_eq_zeroBoundarySpace_of_le_one`).
+  (`Rd.BoundedLipschitzDomain.mem_range_traceL2_iff_slobodeckij`). The kernel of the trace is
+  `H^s_0(Ω)`, the closure of the restricted test functions in `H^s(Ω)`
+  (`Rd.BoundedLipschitzDomain.traceKer_eq_zeroBoundarySpace`,
+  `Rd.BoundedLipschitzDomain.ker_sobolevTrace_eq_zeroBoundarySpace`; McLean, Theorem 3.40), and
+  `H^s(Ω) ⧸ H^s_0(Ω)` is isomorphic to `H^{s-1/2}(Γ)`
+  (`Rd.BoundedLipschitzDomain.quotientZeroBoundaryEquivBoundarySobolev`).
+* **`H̃^s(Ω) = H^s_0(Ω)`.** Let `Ω ⊆ V` be open, `H̃^s(Ω)` the closure of the test functions of
+  `Ω` in `H^s(V)` and `H^s_0(Ω)` the closure of their restrictions in `H^s(Ω)`. For every
+  `m ∈ ℕ_0`, restriction is an isometric isomorphism of `H̃^m(Ω)` onto `H^m_0(Ω)`
+  (`Rd.tildeEquivZeroBoundaryNat`; Hewett–Moiola, Lemma 2.2(iii)). If `Ω` is a bounded Lipschitz
+  domain and `s ≥ 0` with `s - 1/2 ∉ ℕ_0`, restriction is an isomorphism of `H̃^s(Ω)` onto
+  `H^s_0(Ω)` (`Rd.BoundedLipschitzDomain.tildeEquivZeroBoundaryOfNeHalf`; McLean, Theorem 3.33),
+  and `H^s_0(Ω) = H^s(Ω)` for `0 ≤ s < 1/2`
+  (`Rd.BoundedLipschitzDomain.zeroBoundarySpace_eq_top_of_lt_half`).
 * **Gelfand triples.** `L_2` is the pivot space between `H^s` and `H^{-s}` on `ℝ^d`, on open
   sets `Ω` and on `Γ`. For `s ≥ 0` the embeddings `H^s(V) → L_2(V)` and `H̃^s(Ω) → L_2(Ω)`, and
   for `0 < t < 1` the embedding `H^t(Γ) → L_2(Γ)`, are injective with dense range
@@ -352,7 +364,7 @@ block documents state every result with its Lean name and list the files:
 * [Lipschitz domains and traces](docs/DomainsTraces.md): extension, splines on domains,
   `B^s_{p,q}(Ω)`, `H^s(Ω)` and their traces, Green's formula.
 * [Fractional Sobolev spaces on Lipschitz domains](docs/FractionalSobolev.md): `H̃^s(Ω)` and
-  `H^s_0(Ω)`, the zero extension bound.
+  `H^s_0(Ω)`, the zero extension bound, the kernel of the trace of `H^s(Ω)`.
 * [Manifolds and eigenbases](docs/Manifolds.md): compact manifolds, Dirichlet and Neumann
   eigenfunctions.
 * [Besov and Sobolev spaces on measure spaces](docs/MeasureSpaces.md): spaces of a scheme,
@@ -424,6 +436,8 @@ sources. The essential ones:
   (1988), 397–414.
 * C. Fefferman, E. M. Stein, *Some maximal inequalities*, Amer. J. Math. **93** (1971), 107–115.
 * L. Grafakos, *Classical Fourier Analysis*, 3rd ed., Springer, 2014.
+* D. P. Hewett, A. Moiola, *A note on properties of the restriction operator on Sobolev spaces*,
+  J. Appl. Anal. **23** (2017), 1–8.
 * J. Johnsen, W. Sickel, *A direct proof of Sobolev embeddings for quasi-homogeneous
   Lizorkin–Triebel spaces with mixed norms*, J. Funct. Spaces Appl. **5** (2007), 183–198.
 * W. McLean, *Strongly Elliptic Systems and Boundary Integral Equations*, Cambridge University

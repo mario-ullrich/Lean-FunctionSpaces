@@ -634,8 +634,11 @@ declarations.
   `L_2(V)` (`Rd.sobolevToL2_zero_surjective`), convolution with an integrable kernel acts on
   every `H^{s,2}(V, ℂ)` (`Rd.sobolevConv`), and convolution with the dilates of a kernel of
   integral `1` converges to the identity in `H^{s,2}(V, ℂ)` (`Rd.tendsto_sobolevConv_dilate`).
-  Mathlib has `BesselPotentialSpace` and the unbundled `TemperedDistribution.MemSobolev.mono` and
-  `MemSobolev.lineDerivOp`, but no maps between the bundled spaces; each map here is an explicit
+  For `s ≥ 0` an `L_2` function lies in `H^{s,2}(V, ℂ)` as a tempered distribution iff it is the
+  `L_2` function of an element (`Rd.memSobolev_bessel_iff_exists_sobolevToL2_eq`, in
+  `FunctionSpaces/Domains/Traces/TraceKernelGeneral.lean`). Mathlib has `BesselPotentialSpace`
+  and the unbundled `TemperedDistribution.MemSobolev.mono` and `MemSobolev.lineDerivOp`, but no
+  maps between the bundled spaces; each map here is an explicit
   Fourier multiplier on the `L_2` functions, with the identification of `𝓕⁻(w 𝓕g)` with
   Mathlib's `w(D) g` (`Rd.fourierMultiplierCLM_toTemperedDistribution_eq`). These belong in
   `Mathlib/Analysis/FunctionalSpaces/BesselPotentialSpace.lean`.
