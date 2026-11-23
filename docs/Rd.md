@@ -47,9 +47,9 @@ the approximate identities and the Littlewood–Paley kernels in [Tools from ana
   `0 < η < 1`, `1 ≤ q₀, q₁, q ≤ ∞` and `s = (1-η)s₀ + ηs₁`. Then `f ∈ L_p(V)` lies in the real
   interpolation space `(N_{s₀,q₀}, N_{s₁,q₁})_{η,q}` of the continuous K-method iff
   `N_{s,q}(f) < ∞` iff `‖(2^(js) ‖ψ_j ⋆ f‖_p)_j‖_{ℓ_q} < ∞` (Bergh–Löfström, Theorem 6.4.5(1);
-  `Rd.memKMethod_modCouple_iff`, `Rd.memKMethod_modCouple_iff_littlewoodPaley`), and
+  `Rd.memKMethod_bandModCouple_iff`, `Rd.memKMethod_modCouple_iff_littlewoodPaley`), and
   `(‖·‖_p, N_{s₁,q₁})_{η,q}` consists of the `f` with `N_{ηs₁,q}(f) < ∞`
-  (`Rd.memKMethod_leftModCouple_iff`). The same holds for the band-limited approximation spaces
+  (`Rd.memKMethod_bandLeftModCouple_iff`). The same holds for the band-limited approximation spaces
   themselves (`Rd.memKMethod_bandApproxCouple_iff`, `Rd.memKMethod_bandLeftApproxCouple_iff`).
 * **Sobolev–Slobodeckij spaces on `ℝ^d`.** With `V` and `p` as above, `n = dim V` and `s > 0`,
   let `E_{s,p}(f) = ∫∫ |f(y) - f(x)|^p / |y - x|^(n+sp) dy dx` be the Gagliardo form
@@ -115,7 +115,7 @@ the approximate identities and the Littlewood–Paley kernels in [Tools from ana
   nonempty bounded open convex sets, among them closed balls of positive radius),
   `N_Ω(T f) ≤ C N_Ω(f)`
   (`Rd.CutoffDiffeo.modNormOn_applyLp_le_modNormOn`), and the order `r > s` of the differences
-  does not matter (`Rd.BesovDomain.modNormOn_order_le`).
+  does not matter (`Rd.BesovDomain.modNormOn_order_le_of_besovDomain`).
 
 ## What is formalised
 

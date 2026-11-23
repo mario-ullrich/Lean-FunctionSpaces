@@ -80,7 +80,8 @@ theorem summable_norm_restrict_comp_addRight {E : Type*} [NormedAddCommGroup E] 
 every integer `n ≠ 0`. Then the periodisation of `f` is the constant `∫ f`:
 `∑_{n ∈ ℤ} f(x + n) = ∫ f(y) dy` for every `x ∈ ℝ`. Poisson summation (Mathlib's
 `Real.tsum_eq_tsum_fourier`) writes the periodisation as the Fourier series
-`∑_n 𝓕 f(n) e^(2πinx)`, whose only nonzero term is `𝓕 f(0) = ∫ f` (`Real.fourier_apply_zero`). -/
+`∑_n 𝓕 f(n) e^(2πinx)`, whose only nonzero term is `𝓕 f(0) = ∫ f`
+(`Real.real_fourier_apply_zero`). -/
 theorem tsum_comp_add_int_eq_integral {f : ℝ → ℂ} (hf : Continuous f) {a b : ℝ}
     (hab : ∀ x ∉ Set.Icc a b, f x = 0) (hF : ∀ n : ℤ, n ≠ 0 → 𝓕 f n = 0) (x : ℝ) :
     ∑' n : ℤ, f (x + n) = ∫ y, f y := by
@@ -89,7 +90,7 @@ theorem tsum_comp_add_int_eq_integral {f : ℝ → ℂ} (hf : Continuous f) {a b
   have h := tsum_eq_tsum_fourier (f := ⟨f, hf⟩)
     (summable_norm_restrict_comp_addRight (f := ⟨f, hf⟩) hab) hsum x
   have h0 : ∑' n : ℤ, 𝓕 f n * fourier n (x : UnitAddCircle) = ∫ y, f y := by
-    rw [tsum_eq_single 0, Int.cast_zero, _root_.fourier_zero, mul_one, fourier_apply_zero]
+    rw [tsum_eq_single 0, Int.cast_zero, _root_.fourier_zero, mul_one, real_fourier_apply_zero]
     intro n hn
     rw [hF n hn, zero_mul]
   simp only [ContinuousMap.coe_mk] at h

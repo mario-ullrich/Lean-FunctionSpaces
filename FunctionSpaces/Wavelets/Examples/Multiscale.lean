@@ -46,12 +46,12 @@ theorem ppScheme_mono_degree {r r' : ℕ} (hrr' : r ≤ r') (n : ℕ) :
     exact (mem_ppScheme hn).2 ⟨Q, fun m => degreeLT_mono hrr' (hQ m), hae⟩
 
 /-- **The piecewise polynomials are dense** in `L_p[0, 1]` for `1 ≤ p < ∞` and `r ≥ 1`: they
-contain the step functions of the Haar system (`Haar.scheme_eq_ppScheme`,
-`Haar.closure_iUnion_scheme`). -/
+contain the step functions of the Haar system (`Haar.haarScheme_eq_ppScheme`,
+`Haar.closure_iUnion_haarScheme`). -/
 theorem closure_iUnion_ppScheme (hp : p ≠ ∞) {r : ℕ} (hr : 1 ≤ r) :
     closure (⋃ n, ppScheme p r n) = univ := by
-  refine eq_univ_of_univ_subset ((Haar.closure_iUnion_scheme hp).symm.trans_subset ?_)
-  rw [Haar.scheme_eq_ppScheme]
+  refine eq_univ_of_univ_subset ((Haar.closure_iUnion_haarScheme hp).symm.trans_subset ?_)
+  rw [Haar.haarScheme_eq_ppScheme]
   exact closure_mono (iUnion_mono fun n => ppScheme_mono_degree hr n)
 
 /-- **Approximation by piecewise polynomials through multiscale details**: for `1 ≤ p < ∞`,

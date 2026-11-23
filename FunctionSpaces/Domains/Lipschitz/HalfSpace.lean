@@ -64,13 +64,13 @@ theorem volume_orthogonal_singleton_eq_zero {e : V} (he : e ≠ 0) :
 /-- **Lipschitz graph domains have the extension property**: Rychkov's extension agrees with `f`
 on the domain (`Rd.LipschitzGraph.cutoff_extension_of_modNormOn`) and is bounded by a constant
 times the intrinsic quasi-norm (`Rd.LipschitzGraph.modNorm_extension_le_modNormOn`); the proof
-takes `C = G.coneBump.synthConst r s * G.intrinsicConst r`. -/
+takes `C = G.coneBump.bumpSynthConst r s * G.intrinsicConst r`. -/
 theorem LipschitzGraph.hasBesovExtension (G : LipschitzGraph V) :
     HasBesovExtension G.measurableSet_domain := by
   intro p _ hp r s hs hsr q hq
   have hr : 1 ≤ r := Nat.one_le_iff_ne_zero.2 (Nat.cast_pos.1 (hs.trans hsr)).ne'
-  exact ⟨G.coneBump.synthConst r s * G.intrinsicConst r, ENNReal.mul_ne_top
-    (G.coneBump.synthConst_ne_top hs hsr) (G.intrinsicConst_ne_top r), fun f hf =>
+  exact ⟨G.coneBump.bumpSynthConst r s * G.intrinsicConst r, ENNReal.mul_ne_top
+    (G.coneBump.bumpSynthConst_ne_top hs hsr) (G.intrinsicConst_ne_top r), fun f hf =>
     ⟨G.extension hp r f, G.cutoff_extension_of_modNormOn hp hr hs hq hf,
       G.modNorm_extension_le_modNormOn hp r hs hq hf⟩⟩
 

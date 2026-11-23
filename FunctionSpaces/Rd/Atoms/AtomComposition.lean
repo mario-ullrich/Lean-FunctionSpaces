@@ -121,19 +121,20 @@ noncomputable def apply (f : V → ℂ) : V → ℂ :=
   (Ω ∩ T.U).indicator fun x => T.chi (T.Phi x) * f (T.Phi x)
 
 /-- The compact set `Ψ(K₀)` that carries the images. -/
-def carrier : Set V := T.Psi '' T.K0
+def imageCompact : Set V := T.Psi '' T.K0
 
 /-- `Ψ(K₀)` is compact. -/
-theorem isCompact_carrier : IsCompact T.carrier :=
+theorem isCompact_imageCompact : IsCompact T.imageCompact :=
   T.isCompact_K0.image_of_continuousOn (T.contDiffOn_Psi.continuousOn.mono T.K0_subset)
 
 /-- `Ψ(K₀) ⊆ Ω ∩ U`. -/
-theorem carrier_subset : T.carrier ⊆ Ω ∩ T.U := by
+theorem imageCompact_subset : T.imageCompact ⊆ Ω ∩ T.U := by
   rintro _ ⟨y, hy, rfl⟩
   exact T.mapsTo_Psi (T.K0_subset hy)
 
 /-- **`T f` vanishes on `Ω` outside `Ψ(K₀)`**: if `Φ x ∉ K₀`, the cut-off vanishes. -/
-theorem apply_eq_zero_of_notMem (f : V → ℂ) {x : V} (hx : x ∉ T.carrier) : T.apply f x = 0 := by
+theorem apply_eq_zero_of_notMem (f : V → ℂ) {x : V} (hx : x ∉ T.imageCompact) :
+    T.apply f x = 0 := by
   by_cases hxs : x ∈ Ω ∩ T.U
   · rw [apply, Set.indicator_of_mem hxs]
     have hΦ : T.Phi x ∉ T.K0 := fun h => hx ⟨T.Phi x, h, T.left_inv x hxs⟩
@@ -144,8 +145,8 @@ theorem apply_eq_zero_of_notMem (f : V → ℂ) {x : V} (hx : x ∉ T.carrier) :
 of `Ψ(K₀)` it is `(χ f) ∘ Φ`, and off the compact set `Ψ(K₀)` it vanishes. -/
 theorem continuousOn_apply {f : V → ℂ} (hf : Continuous f) : ContinuousOn (T.apply f) Ω := by
   intro x hx
-  by_cases hxK : x ∈ T.carrier
-  · have hxU : x ∈ T.U := (T.carrier_subset hxK).2
+  by_cases hxK : x ∈ T.imageCompact
+  · have hxU : x ∈ T.U := (T.imageCompact_subset hxK).2
     have hcont : ContinuousOn (fun y => T.chi (T.Phi y) * f (T.Phi y)) (Ω ∩ T.U) :=
       (T.contDiffOn_chi.continuousOn.comp T.contDiffOn_Phi.continuousOn T.mapsTo_Phi).mul
         (hf.comp_continuousOn T.contDiffOn_Phi.continuousOn)
@@ -156,7 +157,7 @@ theorem continuousOn_apply {f : V → ℂ} (hf : Continuous f) : ContinuousOn (T
       rw [apply, Set.indicator_of_mem (Set.mem_inter hyΩ hyU)]
     · rw [apply, Set.indicator_of_mem (Set.mem_inter hx hxU)]
   · have hev : T.apply f =ᶠ[𝓝 x] fun _ => 0 := by
-      filter_upwards [T.isCompact_carrier.isClosed.isOpen_compl.mem_nhds hxK] with y hy
+      filter_upwards [T.isCompact_imageCompact.isClosed.isOpen_compl.mem_nhds hxK] with y hy
       exact T.apply_eq_zero_of_notMem f hy
     exact (continuousAt_const.congr hev.symm).continuousWithinAt
 
@@ -191,9 +192,9 @@ theorem exists_lipschitzOnWith_Psi : ∃ L : ℝ≥0, LipschitzOnWith L T.Psi T.
 
 omit hint in
 /-- `Φ` is Lipschitz on `Ψ(K₀)`. -/
-theorem exists_lipschitzOnWith_Phi : ∃ L : ℝ≥0, LipschitzOnWith L T.Phi T.carrier :=
+theorem exists_lipschitzOnWith_Phi : ∃ L : ℝ≥0, LipschitzOnWith L T.Phi T.imageCompact :=
   exists_lipschitzOnWith_of_contDiffOn_inter hΩ T.isOpen_U (by exact_mod_cast le_top)
-    T.contDiffOn_Phi T.isCompact_carrier T.carrier_subset
+    T.contDiffOn_Phi T.isCompact_imageCompact T.imageCompact_subset
 
 /-- **The derivatives of the cut-off are bounded**: `‖D^l χ‖ ≤ M` within `Ω ∩ U'` for `l ≤ K`;
 on the compact `K₀` by continuity (`ContDiffOn.exists_norm_iteratedFDerivWithin_le`), elsewhere
@@ -214,10 +215,10 @@ theorem exists_iteratedFDerivWithin_chi_bound (K : ℕ) :
 /-- **The derivatives of `Φ` are bounded on `Ψ(K₀)`**: `‖D^i Φ‖ ≤ D` within `Ω ∩ U` for
 `i ≤ K`, with `D ≥ 1` (`ContDiffOn.exists_norm_iteratedFDerivWithin_le`). -/
 theorem exists_iteratedFDerivWithin_Phi_bound (K : ℕ) :
-    ∃ D : ℝ, 1 ≤ D ∧ ∀ i ≤ K, ∀ x ∈ T.carrier,
+    ∃ D : ℝ, 1 ≤ D ∧ ∀ i ≤ K, ∀ x ∈ T.imageCompact,
       ‖iteratedFDerivWithin ℝ i T.Phi (Ω ∩ T.U) x‖ ≤ D := by
   obtain ⟨C, hC⟩ := T.contDiffOn_Phi.exists_norm_iteratedFDerivWithin_le
-    (T.uniqueDiffOn_source hΩ hint) T.isCompact_carrier T.carrier_subset K
+    (T.uniqueDiffOn_source hΩ hint) T.isCompact_imageCompact T.imageCompact_subset K
   exact ⟨max 1 C, le_max_left _ _, fun i hi x hx => (hC i hi x hx).trans (le_max_right _ _)⟩
 
 end CutoffDiffeo
@@ -363,26 +364,26 @@ theorem isSmoothAtom_apply (hΩ : Convex ℝ Ω) (hΩm : MeasurableSet Ω)
   have hEq : ∀ x ∈ S, T.apply a x = (g ∘ T.Phi) x := fun x hx => by
     rw [apply, Set.indicator_of_mem hx]
     rfl
-  have hzero : ∀ x ∈ Ω ∩ T.carrierᶜ, T.apply a x = 0 := fun x hx =>
+  have hzero : ∀ x ∈ Ω ∩ T.imageCompactᶜ, T.apply a x = 0 := fun x hx =>
     T.apply_eq_zero_of_notMem a hx.2
-  have hopen : IsOpen T.carrierᶜ := T.isCompact_carrier.isClosed.isOpen_compl
+  have hopen : IsOpen T.imageCompactᶜ := T.isCompact_imageCompact.isClosed.isOpen_compl
   refine ⟨?_, fun x hx => T.apply_eq_zero_of_far hL ha.eq_zero hy₀ hy₀c hx, ?_, ?_⟩
   · -- measurability
     refine (aestronglyMeasurable_indicator_iff hSm).2 ?_
     exact (hgΦ.continuousOn).aestronglyMeasurable hSm
   · -- smoothness within `Ω`
     intro x hx
-    by_cases hxc : x ∈ T.carrier
-    · have hxS : x ∈ S := T.carrier_subset hxc
+    by_cases hxc : x ∈ T.imageCompact
+    · have hxS : x ∈ S := T.imageCompact_subset hxc
       refine (contDiffWithinAt_inter (T.isOpen_U.mem_nhds hxS.2)).1 ?_
       exact (hgΦ x hxS).congr hEq (hEq x hxS)
     · have hev : T.apply a =ᶠ[𝓝[Ω] x] fun _ => 0 :=
-        mem_nhdsWithin.2 ⟨T.carrierᶜ, hopen, hxc, fun y hy => hzero y ⟨hy.2, hy.1⟩⟩
+        mem_nhdsWithin.2 ⟨T.imageCompactᶜ, hopen, hxc, fun y hy => hzero y ⟨hy.2, hy.1⟩⟩
       exact contDiffWithinAt_const.congr_of_eventuallyEq hev (hzero x ⟨hx, hxc⟩)
   · -- the derivatives
     intro l hl x hx
-    by_cases hxc : x ∈ T.carrier
-    · have hxS : x ∈ S := T.carrier_subset hxc
+    by_cases hxc : x ∈ T.imageCompact
+    · have hxS : x ∈ S := T.imageCompact_subset hxc
       rw [← iteratedFDerivWithin_inter_open T.isOpen_U hxS.2,
         iteratedFDerivWithin_congr hEq hxS]
       have hC : ∀ i ≤ l, ‖iteratedFDerivWithin ℝ i g (Ω ∩ T.U') (T.Phi x)‖ ≤

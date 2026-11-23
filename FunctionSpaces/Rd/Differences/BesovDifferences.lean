@@ -56,8 +56,8 @@ noncomputable def bandModulusData (hp : p ≠ ∞) (r : ℕ) :
   C0_ne_top := by simp
   le_enorm f k := lpModulus_le r f k
   jacksonStart := 0
-  CJ := jacksonConst V r p
-  CJ_ne_top := jacksonConst_ne_top Fact.out hp r
+  CJ := bandJacksonConst V r p
+  CJ_ne_top := bandJacksonConst_ne_top Fact.out hp r
   jackson f k _ := approxError_bandScheme_le hp r k f
   CB := bandInverseConst V r
   CB_ne_top := bandInverseConst_ne_top r

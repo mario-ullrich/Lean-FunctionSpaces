@@ -22,35 +22,36 @@ dilates and translates `ψ_{j,k}(x) = 2^(j/2) ψ(2^j x - k)` (`Daubechies.wavele
 the multiresolution analysis of `FunctionSpaces.Wavelets.Examples.Daubechies.Projections`, with the
 projections `P_j f = ∑_k ⟨f, φ_{j,k}⟩ φ_{j,k}`.
 
-* **Refinement.** `ψ_{j,k} = ∑_n (g_{n-2k}/√2) φ_{j+1,n}` (`Daubechies.waveletScaled_eq_expand`),
-  as `φ_{j,k} = ∑_n (c_{n-2k}/√2) φ_{j+1,n}`.
+* **Refinement.** `ψ_{j,k} = ∑_n (g_{n-2k}/√2) φ_{j+1,n}`
+  (`Daubechies.waveletScaled_eq_daubechiesExpand`), as `φ_{j,k} = ∑_n (c_{n-2k}/√2) φ_{j+1,n}`.
 * **Orthonormality.** `⟨ψ_{j,k}, ψ_{j,l}⟩ = δ_{kl}` and `⟨ψ_{j,k}, φ_{j,l}⟩ = 0` at every level
   (`Daubechies.integral_waveletScaled_mul_conj`,
-  `Daubechies.integral_waveletScaled_mul_conj_scaled`), in particular for the integer translates.
-  Both functions are expansions of level `j + 1`, so Parseval's identity for finite expansions
-  (`Daubechies.integral_expand_mul_conj_expand`) reduces the integrals to the filter identities
-  `∑_k g_k g_{k+2i} = 2 δ_{i0}` and `∑_k c_k g_{k+2i} = 0`.
+  `Daubechies.integral_waveletScaled_mul_conj_daubechiesScaled`), in particular for the integer
+  translates. Both functions are expansions of level `j + 1`, so Parseval's identity for finite
+  expansions (`Daubechies.integral_daubechiesExpand_mul_conj_daubechiesExpand`) reduces the
+  integrals to the filter identities `∑_k g_k g_{k+2i} = 2 δ_{i0}` and `∑_k c_k g_{k+2i} = 0`.
 * **The block identity.** `P_{j+1} f - P_j f = ∑_k ⟨f, ψ_{j,k}⟩ ψ_{j,k}` for locally integrable
-  `f` (`Daubechies.projFun_succ_eq_add`, with the wavelet part `Daubechies.detailFun`) and on
-  `L_p` (`Daubechies.proj_succ_sub_proj`). The coefficients of level `j` are
+  `f` (`Daubechies.projFun_succ_eq_add`, with the wavelet part `Daubechies.daubechiesDetailFun`) and
+  on `L_p` (`Daubechies.daubechiesProj_succ_sub_daubechiesProj`). The coefficients of level `j` are
   `⟨f, φ_{j,k}⟩ = ∑_n (c_{n-2k}/√2) ⟨f, φ_{j+1,n}⟩` and
   `⟨f, ψ_{j,k}⟩ = ∑_n (g_{n-2k}/√2) ⟨f, φ_{j+1,n}⟩`, both expansions of level `j` are expansions
-  of level `j + 1` (`Daubechies.expand_eq_expand_succ`,
-  `Daubechies.expand_wavelet_eq_expand_succ`, `Daubechies.coeffFun_eq_tsum_of_filter`), and the
-  filter identity
+  of level `j + 1` (`Daubechies.daubechiesExpand_eq_daubechiesExpand_succ`,
+  `Daubechies.daubechiesExpand_wavelet_eq_daubechiesExpand_succ`,
+  `Daubechies.coeffFun_eq_tsum_of_filter`), and the filter identity
   `∑_k (c_{a-2k} c_{b-2k} + g_{a-2k} g_{b-2k}) = 2 δ_{ab}` gives perfect reconstruction
   (`Daubechies.refineCoeff_add_waveletRefineCoeff`).
 * **The kernel identity.**
   `∑_n φ_{j+1,n}(x) φ_{j+1,n}(y) = ∑_k φ_{j,k}(x) φ_{j,k}(y) + ∑_k ψ_{j,k}(x) ψ_{j,k}(y)`
-  (`Daubechies.tsum_scaled_mul_scaled_succ`), by perfect reconstruction with
+  (`Daubechies.tsum_daubechiesScaled_mul_daubechiesScaled_succ`), by perfect reconstruction with
   `a_n = φ_{j+1,n}(y)`; at level `0` it reads `2 K(2x, 2y) = K(x, y) + ∑_k ψ(x - k) ψ(y - k)` for
   the kernel `K(x, y) = ∑_k φ(x - k) φ(y - k)` of `P_0` (`Daubechies.kernel_succ`).
 * **Norms of the blocks.** For `1 ≤ p < ∞` there are constants `K, M < ∞` with
   `2^(j(1/2 - 1/p)) ‖(⟨f, ψ_{j,k}⟩)_k‖_{ℓ_p} ≤ K ‖P_{j+1} f - P_j f‖_p` and
   `‖P_{j+1} f - P_j f‖_p ≤ M 2^(j(1/2 - 1/p)) ‖(⟨f, ψ_{j,k}⟩)_k‖_{ℓ_p}` for all `f` and `j`
   (`Daubechies.enorm_block_equiv`), and the same for `‖P_j f‖_p` and the coefficients
-  `⟨f, φ_{j,k}⟩` (`Daubechies.enorm_proj_equiv`, `Daubechies.enorm_proj_zero_equiv`): the
-  stability of the expansions (`FunctionSpaces.Wavelets.Examples.Daubechies.Expansion`).
+  `⟨f, φ_{j,k}⟩` (`Daubechies.enorm_daubechiesProj_equiv`,
+  `Daubechies.enorm_daubechiesProj_zero_equiv`): the stability of the expansions
+  (`FunctionSpaces.Wavelets.Examples.Daubechies.Expansion`).
 * **Vanishing moments.** `∫ x^l ψ(x) dx = 0` for `l < N` (`Daubechies.vanishing_moments`): the
   substitution `y = 2x - k` and the binomial theorem reduce it to `∑_k g_k k^i = 0` for `i < N`.
 -/
@@ -120,8 +121,8 @@ definition `ψ(y) = ∑_i g_i φ(2y - i)` at `y = 2^j x - k`, with
 (`Daubechies.two_rpow_succ_div_two`). -/
 theorem waveletScaled_refine (j : ℕ) (k : ℤ) (x : ℝ) :
     waveletScaled m j k x = ∑ i ∈ Finset.Icc (2 - 2 * (N : ℤ)) 1,
-      ((dualCoeff m i / √2 : ℝ) : ℂ) * scaled m (j + 1) (2 * k + i) x := by
-  simp only [waveletScaled, scaled, scaledFun, wavelet]
+      ((dualCoeff m i / √2 : ℝ) : ℂ) * daubechiesScaled m (j + 1) (2 * k + i) x := by
+  simp only [waveletScaled, daubechiesScaled, scaledFun, wavelet]
   rw [Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   have h2 : (2 : ℝ) * ((2 : ℝ) ^ j * x - k) - i = 2 ^ (j + 1) * x - ((2 * k + i : ℤ) : ℝ) := by
@@ -138,10 +139,11 @@ theorem waveletScaled_refine (j : ℕ) (k : ℤ) (x : ℝ) :
 `x`, `ψ_{j,k}(x) = ∑_{n ∈ ℤ} (g_{n-2k}/√2) φ_{j+1,n}(x)`. This is
 `Daubechies.waveletScaled_refine` after the substitution `n = 2k + i`; the dual filter vanishes
 outside `2 - 2N ≤ i ≤ 1` (`Daubechies.dualCoeff_eq_zero`). -/
-theorem waveletScaled_eq_expand (j : ℕ) (k : ℤ) (x : ℝ) :
+theorem waveletScaled_eq_daubechiesExpand (j : ℕ) (k : ℤ) (x : ℝ) :
     waveletScaled m j k x =
-      expand (scalingFun m) (j + 1) (fun n => ((dualCoeff m (n - 2 * k) / √2 : ℝ) : ℂ)) x := by
-  rw [waveletScaled_refine m, expand, ← (Equiv.addLeft (2 * k)).tsum_eq]
+      daubechiesExpand (scalingFun m) (j + 1)
+        (fun n => ((dualCoeff m (n - 2 * k) / √2 : ℝ) : ℂ)) x := by
+  rw [waveletScaled_refine m, daubechiesExpand, ← (Equiv.addLeft (2 * k)).tsum_eq]
   simp only [Equiv.coe_addLeft, add_sub_cancel_left]
   rw [tsum_eq_sum (s := Finset.Icc (2 - 2 * (N : ℤ)) 1) ?_]
   intro i hi
@@ -153,35 +155,38 @@ theorem waveletScaled_eq_expand (j : ℕ) (k : ℤ) (x : ℝ) :
 /-- **Coefficients against a finite expansion**: let `N ≥ 2`, let `f` be locally integrable and
 let the coefficients `v : ℤ → ℂ` vanish outside a finite set `T`. Then for every level `j`,
 `∫ f conj(∑_n v_n φ_{j,n}) = ∑_{n ∈ T} conj(v_n) ⟨f, φ_{j,n}⟩`: the expansion is a finite sum, and
-the integral is linear on the integrable terms (`Daubechies.integrable_mul_conj_scaled`). -/
-theorem integral_mul_conj_expand (hN : 2 ≤ N) {f : ℝ → ℂ} (hf : LocallyIntegrable f volume)
-    (j : ℕ) {v : ℤ → ℂ} {T : Finset ℤ} (hv : ∀ n ∉ T, v n = 0) :
-    ∫ y, f y * conj (expand (scalingFun m) j v y) =
+the integral is linear on the integrable terms
+(`Daubechies.integrable_mul_conj_daubechiesScaled`). -/
+theorem integral_mul_conj_daubechiesExpand (hN : 2 ≤ N) {f : ℝ → ℂ}
+    (hf : LocallyIntegrable f volume) (j : ℕ) {v : ℤ → ℂ} {T : Finset ℤ} (hv : ∀ n ∉ T, v n = 0) :
+    ∫ y, f y * conj (daubechiesExpand (scalingFun m) j v y) =
       ∑ n ∈ T, conj (v n) * coeffFun (scalingFun m) j f n := by
-  have h : ∀ y, f y * conj (expand (scalingFun m) j v y) =
-      ∑ n ∈ T, conj (v n) * (f y * conj (scaled m j n y)) := fun y => by
-    rw [expand, tsum_eq_sum (s := T) fun n hn => by rw [hv n hn, zero_mul], map_sum,
+  have h : ∀ y, f y * conj (daubechiesExpand (scalingFun m) j v y) =
+      ∑ n ∈ T, conj (v n) * (f y * conj (daubechiesScaled m j n y)) := fun y => by
+    rw [daubechiesExpand, tsum_eq_sum (s := T) fun n hn => by rw [hv n hn, zero_mul], map_sum,
       Finset.mul_sum]
     refine Finset.sum_congr rfl fun n _ => ?_
     rw [map_mul]
     ring
   simp_rw [h]
-  rw [integral_finsetSum _ fun n _ => (integrable_mul_conj_scaled m hN hf j n).const_mul _]
+  rw [integral_finsetSum _ fun n _ =>
+    (integrable_mul_conj_daubechiesScaled m hN hf j n).const_mul _]
   simp_rw [integral_const_mul]
   rfl
 
 /-- **Parseval's identity for a finite expansion**: for `N ≥ 2`, every level `j`, all coefficients
 `u : ℤ → ℂ` and all coefficients `v` vanishing outside a finite set `T`,
 `∫ (∑_n u_n φ_{j,n}) conj(∑_n v_n φ_{j,n}) = ∑_{n ∈ T} u_n conj(v_n)`, by
-`Daubechies.integral_mul_conj_expand` and coefficient recovery
-(`Daubechies.coeffFun_expand_scalingFun`). -/
-theorem integral_expand_mul_conj_expand (hN : 2 ≤ N) (j : ℕ) (u : ℤ → ℂ) {v : ℤ → ℂ}
-    {T : Finset ℤ} (hv : ∀ n ∉ T, v n = 0) :
-    ∫ y, expand (scalingFun m) j u y * conj (expand (scalingFun m) j v y) =
+`Daubechies.integral_mul_conj_daubechiesExpand` and coefficient recovery
+(`Daubechies.coeffFun_daubechiesExpand_scalingFun`). -/
+theorem integral_daubechiesExpand_mul_conj_daubechiesExpand (hN : 2 ≤ N) (j : ℕ) (u : ℤ → ℂ)
+    {v : ℤ → ℂ} {T : Finset ℤ} (hv : ∀ n ∉ T, v n = 0) :
+    ∫ y, daubechiesExpand (scalingFun m) j u y * conj (daubechiesExpand (scalingFun m) j v y) =
       ∑ n ∈ T, u n * conj (v n) := by
-  rw [integral_mul_conj_expand m hN (continuous_expand (continuous_scalingFun m hN)
-    (fun _ hx => scalingFun_eq_zero m hN hx) j u).locallyIntegrable j hv]
-  exact Finset.sum_congr rfl fun n _ => by rw [coeffFun_expand_scalingFun m hN, mul_comm]
+  rw [integral_mul_conj_daubechiesExpand m hN
+    (continuous_daubechiesExpand (continuous_scalingFun m hN)
+      (fun _ hx => scalingFun_eq_zero m hN hx) j u).locallyIntegrable j hv]
+  exact Finset.sum_congr rfl fun n _ => by rw [coeffFun_daubechiesExpand_scalingFun m hN, mul_comm]
 
 /-! ### Sums of products of filters -/
 
@@ -237,14 +242,14 @@ theorem finsum_mul_sub_two_mul (h h' : ℤ → ℝ) (k l : ℤ) :
 /-- **Orthonormality of the wavelets at every level**: for `N ≥ 2`, every level `j` and all
 positions `k, l`, `∫ ψ_{j,k}(x) conj ψ_{j,l}(x) dx` is `1` for `k = l` and `0` otherwise. Both
 wavelets are expansions of level `j + 1` with the coefficients `g_{n-2k}/√2` and `g_{n-2l}/√2`
-(`Daubechies.waveletScaled_eq_expand`), so by Parseval's identity
-(`Daubechies.integral_expand_mul_conj_expand`) the integral is
+(`Daubechies.waveletScaled_eq_daubechiesExpand`), so by Parseval's identity
+(`Daubechies.integral_daubechiesExpand_mul_conj_daubechiesExpand`) the integral is
 `(1/2) ∑_n g_{n-2k} g_{n-2l} = (1/2) ∑_a g_a g_{a+2(k-l)} = δ_{kl}`
 (`Daubechies.sum_dualCoeff_mul_dualCoeff_add`). -/
 theorem integral_waveletScaled_mul_conj (hN : 2 ≤ N) (j : ℕ) (k l : ℤ) :
     ∫ x, waveletScaled m j k x * conj (waveletScaled m j l x) = if k = l then 1 else 0 := by
-  simp_rw [waveletScaled_eq_expand m j]
-  rw [integral_expand_mul_conj_expand m hN (j + 1) _
+  simp_rw [waveletScaled_eq_daubechiesExpand m j]
+  rw [integral_daubechiesExpand_mul_conj_daubechiesExpand m hN (j + 1) _
       (T := Finset.Icc (2 * l + (2 - 2 * N)) (2 * l + 1)) fun n hn => by
         simp only [dualCoeff_sub_eq_zero m hn, zero_div, Complex.ofReal_zero],
     sum_mul_conj_filter fun n hn => dualCoeff_sub_eq_zero m hn, finsum_mul_sub_two_mul,
@@ -254,13 +259,14 @@ theorem integral_waveletScaled_mul_conj (hN : 2 ≤ N) (j : ℕ) (k l : ℤ) :
 
 /-- **The wavelets are orthogonal to the scaling functions of the same level**: for `N ≥ 2`,
 every level `j` and all positions `k, l`, `∫ ψ_{j,k}(x) conj φ_{j,l}(x) dx = 0`. As expansions of
-level `j + 1` (`Daubechies.waveletScaled_eq_expand`, `Daubechies.scaled_eq_expand`), Parseval's
-identity gives `(1/2) ∑_n g_{n-2k} c_{n-2l} = (1/2) ∑_a c_a g_{a+2(l-k)} = 0`
+level `j + 1` (`Daubechies.waveletScaled_eq_daubechiesExpand`,
+`Daubechies.daubechiesScaled_eq_daubechiesExpand`), Parseval's identity gives
+`(1/2) ∑_n g_{n-2k} c_{n-2l} = (1/2) ∑_a c_a g_{a+2(l-k)} = 0`
 (`Daubechies.sum_daubechiesCoeff_mul_dualCoeff_add`). -/
-theorem integral_waveletScaled_mul_conj_scaled (hN : 2 ≤ N) (j : ℕ) (k l : ℤ) :
-    ∫ x, waveletScaled m j k x * conj (scaled m j l x) = 0 := by
-  simp_rw [waveletScaled_eq_expand m j, scaled_eq_expand m hN j]
-  rw [integral_expand_mul_conj_expand m hN (j + 1) _
+theorem integral_waveletScaled_mul_conj_daubechiesScaled (hN : 2 ≤ N) (j : ℕ) (k l : ℤ) :
+    ∫ x, waveletScaled m j k x * conj (daubechiesScaled m j l x) = 0 := by
+  simp_rw [waveletScaled_eq_daubechiesExpand m j, daubechiesScaled_eq_daubechiesExpand m hN j]
+  rw [integral_daubechiesExpand_mul_conj_daubechiesExpand m hN (j + 1) _
       (T := Finset.Icc (2 * l) (2 * l + (2 * N - 1))) fun n hn => by
         simp only [daubechiesCoeff_sub_eq_zero m hn, zero_div, Complex.ofReal_zero],
     sum_mul_conj_filter fun n hn => daubechiesCoeff_sub_eq_zero m hn,
@@ -276,23 +282,23 @@ theorem integral_wavelet_translate_mul_conj_translate (hN : 2 ≤ N) (k l : ℤ)
 
 /-- **The integer translates of the wavelet and of the scaling function are orthogonal**: for
 `N ≥ 2` and all `k, l ∈ ℤ`, `∫ ψ(x - k) conj φ(x - l) dx = 0`: the level `j = 0` of
-`Daubechies.integral_waveletScaled_mul_conj_scaled` (`Daubechies.scaledFun_zero`). -/
+`Daubechies.integral_waveletScaled_mul_conj_daubechiesScaled` (`Daubechies.scaledFun_zero`). -/
 theorem integral_wavelet_translate_mul_conj_scalingFun_translate (hN : 2 ≤ N) (k l : ℤ) :
     ∫ x, wavelet m (x - k) * conj (scalingFun m (x - l)) = 0 := by
-  simpa only [waveletScaled, scaled, scaledFun_zero] using
-    integral_waveletScaled_mul_conj_scaled m hN 0 k l
+  simpa only [waveletScaled, daubechiesScaled, scaledFun_zero] using
+    integral_waveletScaled_mul_conj_daubechiesScaled m hN 0 k l
 
 /-! ### The coefficients of two consecutive levels -/
 
 /-- **The coefficients of a refinable generator through those of the next level**: if `N ≥ 2`,
 the real filter `h` vanishes outside `[a, b]`, `f` is locally integrable and
 `g_{j,k} = ∑_n (h_{n-2k}/√2) φ_{j+1,n}`, then `⟨f, g_{j,k}⟩ = ∑_n (h_{n-2k}/√2) ⟨f, φ_{j+1,n}⟩`
-(`Daubechies.integral_mul_conj_expand` for the finite expansion; the filter is real). -/
+(`Daubechies.integral_mul_conj_daubechiesExpand` for the finite expansion; the filter is real). -/
 theorem coeffFun_eq_tsum_of_filter (hN : 2 ≤ N) {g : ℝ → ℂ} {h : ℤ → ℝ} {a b : ℤ}
     (hh : ∀ i, h i ≠ 0 → a ≤ i ∧ i ≤ b) {f : ℝ → ℂ} (hf : LocallyIntegrable f volume)
     (j : ℕ) (k : ℤ)
     (hg : ∀ x, scaledFun g j k x =
-      expand (scalingFun m) (j + 1) (fun n => ((h (n - 2 * k) / √2 : ℝ) : ℂ)) x) :
+      daubechiesExpand (scalingFun m) (j + 1) (fun n => ((h (n - 2 * k) / √2 : ℝ) : ℂ)) x) :
     coeffFun g j f k =
       ∑' n : ℤ, ((h (n - 2 * k) / √2 : ℝ) : ℂ) * coeffFun (scalingFun m) (j + 1) f n := by
   have hT : ∀ n ∉ Finset.Icc (2 * k + a) (2 * k + b), ((h (n - 2 * k) / √2 : ℝ) : ℂ) = 0 :=
@@ -302,38 +308,40 @@ theorem coeffFun_eq_tsum_of_filter (hN : 2 ≤ N) {g : ℝ → ℂ} {h : ℤ →
         obtain ⟨h1, h2⟩ := hh _ hne
         exact hn (Finset.mem_Icc.2 ⟨by omega, by omega⟩)
       rw [h0, zero_div, Complex.ofReal_zero]
-  rw [coeffFun, show scaledFun g j k = expand (scalingFun m) (j + 1)
+  rw [coeffFun, show scaledFun g j k = daubechiesExpand (scalingFun m) (j + 1)
       (fun n => ((h (n - 2 * k) / √2 : ℝ) : ℂ)) from funext hg,
-    integral_mul_conj_expand m hN hf (j + 1) hT,
+    integral_mul_conj_daubechiesExpand m hN hf (j + 1) hT,
     tsum_eq_sum (s := Finset.Icc (2 * k + a) (2 * k + b)) fun n hn => by rw [hT n hn, zero_mul]]
   simp only [Complex.conj_ofReal]
 
 /-- **The scaling coefficients of level `j` through those of level `j + 1`**: for `N ≥ 2` and
 locally integrable `f`, `⟨f, φ_{j,k}⟩ = ∑_n (c_{n-2k}/√2) ⟨f, φ_{j+1,n}⟩`
-(`Daubechies.coeffFun_eq_tsum_of_filter`, `Daubechies.scaled_eq_expand`). -/
+(`Daubechies.coeffFun_eq_tsum_of_filter`, `Daubechies.daubechiesScaled_eq_daubechiesExpand`). -/
 theorem coeffFun_scalingFun_eq_tsum (hN : 2 ≤ N) {f : ℝ → ℂ} (hf : LocallyIntegrable f volume)
     (j : ℕ) (k : ℤ) :
     coeffFun (scalingFun m) j f k =
       ∑' n : ℤ, ((daubechiesCoeff m (n - 2 * k) / √2 : ℝ) : ℂ) *
         coeffFun (scalingFun m) (j + 1) f n :=
   coeffFun_eq_tsum_of_filter m hN (h := daubechiesCoeff m)
-    (fun _ hi => mem_Icc_of_daubechiesCoeff_ne_zero m hi) hf j k (scaled_eq_expand m hN j k)
+    (fun _ hi => mem_Icc_of_daubechiesCoeff_ne_zero m hi) hf j k
+      (daubechiesScaled_eq_daubechiesExpand m hN j k)
 
 /-- **The wavelet coefficients of level `j` through the scaling coefficients of level `j + 1`**:
 for `N ≥ 2` and locally integrable `f`, `⟨f, ψ_{j,k}⟩ = ∑_n (g_{n-2k}/√2) ⟨f, φ_{j+1,n}⟩`
-(`Daubechies.coeffFun_eq_tsum_of_filter`, `Daubechies.waveletScaled_eq_expand`). -/
+(`Daubechies.coeffFun_eq_tsum_of_filter`, `Daubechies.waveletScaled_eq_daubechiesExpand`). -/
 theorem coeffFun_wavelet_eq_tsum (hN : 2 ≤ N) {f : ℝ → ℂ} (hf : LocallyIntegrable f volume)
     (j : ℕ) (k : ℤ) :
     coeffFun (wavelet m) j f k =
       ∑' n : ℤ, ((dualCoeff m (n - 2 * k) / √2 : ℝ) : ℂ) * coeffFun (scalingFun m) (j + 1) f n :=
   coeffFun_eq_tsum_of_filter m hN (h := dualCoeff m)
-    (fun _ hi => mem_Icc_of_dualCoeff_ne_zero m hi) hf j k (waveletScaled_eq_expand m j k)
+    (fun _ hi => mem_Icc_of_dualCoeff_ne_zero m hi) hf j k (waveletScaled_eq_daubechiesExpand m j k)
 
 /-- **The refined wavelet coefficients**: for coefficients `b : ℤ → ℂ` of level `j`, the
 coefficients `b'_n = ∑_{k ∈ ℤ} b_k g_{n-2k}/√2` of level `j + 1`, with the dual filter `g`
 (`Daubechies.dualCoeff`); only the `k` with `2 - 2N ≤ n - 2k ≤ 1` contribute. They express a
 wavelet expansion of level `j` as an expansion in the scaling functions of level `j + 1`,
-`∑_k b_k ψ_{j,k} = ∑_n b'_n φ_{j+1,n}` (`Daubechies.expand_wavelet_eq_expand_succ`). -/
+`∑_k b_k ψ_{j,k} = ∑_n b'_n φ_{j+1,n}`
+(`Daubechies.daubechiesExpand_wavelet_eq_daubechiesExpand_succ`). -/
 noncomputable def waveletRefineCoeff (b : ℤ → ℂ) (n : ℤ) : ℂ :=
   ∑' k : ℤ, b k * ((dualCoeff m (n - 2 * k) / √2 : ℝ) : ℂ)
 
@@ -342,18 +350,20 @@ noncomputable def waveletRefineCoeff (b : ℤ → ℂ) (n : ℤ) : ℂ :=
 (`Daubechies.summable_refine_of_filter`, `Daubechies.mem_Icc_of_dualCoeff_ne_zero`). -/
 theorem summable_waveletRefine (hN : 2 ≤ N) (j : ℕ) (b : ℤ → ℂ) (x : ℝ) :
     Summable (Function.uncurry fun k n : ℤ =>
-      b k * (((dualCoeff m (n - 2 * k) / √2 : ℝ) : ℂ) * scaled m (j + 1) n x)) :=
+      b k * (((dualCoeff m (n - 2 * k) / √2 : ℝ) : ℂ) * daubechiesScaled m (j + 1) n x)) :=
   summable_refine_of_filter m hN (h := dualCoeff m)
     (fun _ hi => mem_Icc_of_dualCoeff_ne_zero m hi) j b x
 
 /-- **Wavelet expansions of level `j` are expansions of level `j + 1`**: for `N ≥ 2`, every level
 `j`, coefficients `b : ℤ → ℂ` and point `x`, `∑_k b_k ψ_{j,k}(x) = ∑_n b'_n φ_{j+1,n}(x)` with the
 refined coefficients `b'_n = ∑_k b_k g_{n-2k}/√2` (`Daubechies.waveletRefineCoeff`), by
-`Daubechies.expand_eq_tsum_refine_of_filter` and `Daubechies.waveletScaled_eq_expand`. -/
-theorem expand_wavelet_eq_expand_succ (hN : 2 ≤ N) (j : ℕ) (b : ℤ → ℂ) (x : ℝ) :
-    expand (wavelet m) j b x = expand (scalingFun m) (j + 1) (waveletRefineCoeff m b) x :=
-  expand_eq_tsum_refine_of_filter m hN (h := dualCoeff m)
-    (fun _ hi => mem_Icc_of_dualCoeff_ne_zero m hi) j (waveletScaled_eq_expand m j) b x
+`Daubechies.daubechiesExpand_eq_tsum_refine_of_filter` and
+`Daubechies.waveletScaled_eq_daubechiesExpand`. -/
+theorem daubechiesExpand_wavelet_eq_daubechiesExpand_succ (hN : 2 ≤ N) (j : ℕ) (b : ℤ → ℂ) (x : ℝ) :
+    daubechiesExpand (wavelet m) j b x =
+      daubechiesExpand (scalingFun m) (j + 1) (waveletRefineCoeff m b) x :=
+  daubechiesExpand_eq_tsum_refine_of_filter m hN (h := dualCoeff m)
+    (fun _ hi => mem_Icc_of_dualCoeff_ne_zero m hi) j (waveletScaled_eq_daubechiesExpand m j) b x
 
 /-! ### Perfect reconstruction -/
 
@@ -482,33 +492,35 @@ theorem refineCoeff_add_waveletRefineCoeff (a : ℤ → ℂ) (n' : ℤ) :
 for every `f : ℝ → ℂ`, the expansion of level `j` in the wavelets with the coefficients
 `⟨f, ψ_{j,k}⟩ = ∫ f(y) conj ψ_{j,k}(y) dy` (`Daubechies.coeffFun`). It is the difference
 `P_{j+1} f - P_j f` of two consecutive projections (`Daubechies.projFun_succ_eq_add`). -/
-noncomputable def detailFun (j : ℕ) (f : ℝ → ℂ) : ℝ → ℂ :=
-  expand (wavelet m) j (coeffFun (wavelet m) j f)
+noncomputable def daubechiesDetailFun (j : ℕ) (f : ℝ → ℂ) : ℝ → ℂ :=
+  daubechiesExpand (wavelet m) j (coeffFun (wavelet m) j f)
 
 /-- **The block identity, pointwise**: for `N ≥ 2`, locally integrable `f`, every level `j` and
 point `x`, `P_{j+1} f(x) = P_j f(x) + ∑_k ⟨f, ψ_{j,k}⟩ ψ_{j,k}(x)`. Both terms on the right are
-expansions of level `j + 1` (`Daubechies.expand_eq_expand_succ`,
-`Daubechies.expand_wavelet_eq_expand_succ`) whose coefficients, written through
+expansions of level `j + 1` (`Daubechies.daubechiesExpand_eq_daubechiesExpand_succ`,
+`Daubechies.daubechiesExpand_wavelet_eq_daubechiesExpand_succ`) whose coefficients, written through
 `a_n = ⟨f, φ_{j+1,n}⟩` (`Daubechies.coeffFun_scalingFun_eq_tsum`,
 `Daubechies.coeffFun_wavelet_eq_tsum`), add up to `a` (perfect reconstruction,
 `Daubechies.refineCoeff_add_waveletRefineCoeff`). -/
 theorem projFun_succ_eq_add (hN : 2 ≤ N) {f : ℝ → ℂ} (hf : LocallyIntegrable f volume) (j : ℕ)
-    (x : ℝ) : projFun m (j + 1) f x = projFun m j f x + detailFun m j f x := by
+    (x : ℝ) : projFun m (j + 1) f x = projFun m j f x + daubechiesDetailFun m j f x := by
   have hc : coeffFun (scalingFun m) (j + 1) f = fun n =>
       refineCoeff m (coeffFun (scalingFun m) j f) n +
         waveletRefineCoeff m (coeffFun (wavelet m) j f) n := by
     funext n
     rw [funext (coeffFun_scalingFun_eq_tsum m hN hf j), funext (coeffFun_wavelet_eq_tsum m hN hf j),
       refineCoeff_add_waveletRefineCoeff m (coeffFun (scalingFun m) (j + 1) f) n]
-  rw [projFun, projFun, detailFun, expand_eq_expand_succ m hN j (coeffFun (scalingFun m) j f) x,
-    expand_wavelet_eq_expand_succ m hN j (coeffFun (wavelet m) j f) x,
-    ← expand_add (fun _ hy => scalingFun_eq_zero m hN hy), ← hc]
+  rw [projFun, projFun, daubechiesDetailFun,
+    daubechiesExpand_eq_daubechiesExpand_succ m hN j (coeffFun (scalingFun m) j f) x,
+    daubechiesExpand_wavelet_eq_daubechiesExpand_succ m hN j (coeffFun (wavelet m) j f) x,
+    ← daubechiesExpand_add (fun _ hy => scalingFun_eq_zero m hN hy), ← hc]
 
 /-- **The wavelet part of an `L_p` function lies in `L_p`**: for `N ≥ 2`, `1 ≤ p < ∞`, `f ∈ L_p`
-and every level `j` (`Daubechies.memLp_expand_coeffFun` for `g = ψ`). -/
-theorem memLp_detailFun (hN : 2 ≤ N) {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {f : ℝ → ℂ}
-    (hf : MemLp f p volume) (j : ℕ) : MemLp (detailFun m j f) p volume :=
-  memLp_expand_coeffFun (continuous_wavelet m hN) (fun _ hx => wavelet_eq_zero m hN hx) hp1 hp hf j
+and every level `j` (`Daubechies.memLp_daubechiesExpand_coeffFun` for `g = ψ`). -/
+theorem memLp_daubechiesDetailFun (hN : 2 ≤ N) {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {f : ℝ → ℂ}
+    (hf : MemLp f p volume) (j : ℕ) : MemLp (daubechiesDetailFun m j f) p volume :=
+  memLp_daubechiesExpand_coeffFun (continuous_wavelet m hN) (fun _ hx => wavelet_eq_zero m hN hx)
+    hp1 hp hf j
 
 /-! ### The kernel identity -/
 
@@ -517,33 +529,35 @@ theorem memLp_detailFun (hN : 2 ≤ N) {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p 
 of `P_{j+1}` is the kernel of `P_j` plus the kernel of the wavelets of level `j`. As functions of
 `x`, the two sums on the right are expansions of level `j` with the coefficients
 `φ_{j,k}(y) = ∑_n (c_{n-2k}/√2) φ_{j+1,n}(y)` and `ψ_{j,k}(y) = ∑_n (g_{n-2k}/√2) φ_{j+1,n}(y)`
-(`Daubechies.scaled_eq_expand`, `Daubechies.waveletScaled_eq_expand`), hence expansions of level
-`j + 1`, and perfect reconstruction (`Daubechies.refineCoeff_add_waveletRefineCoeff`) with
-`a_n = φ_{j+1,n}(y)` adds their coefficients up to `a`. -/
-theorem tsum_scaled_mul_scaled_succ (hN : 2 ≤ N) (j : ℕ) (x y : ℝ) :
-    ∑' n : ℤ, scaled m (j + 1) n x * scaled m (j + 1) n y =
-      ∑' k : ℤ, scaled m j k x * scaled m j k y +
+(`Daubechies.daubechiesScaled_eq_daubechiesExpand`, `Daubechies.waveletScaled_eq_daubechiesExpand`),
+hence expansions of level `j + 1`, and perfect reconstruction
+(`Daubechies.refineCoeff_add_waveletRefineCoeff`) with `a_n = φ_{j+1,n}(y)` adds their coefficients
+up to `a`. -/
+theorem tsum_daubechiesScaled_mul_daubechiesScaled_succ (hN : 2 ≤ N) (j : ℕ) (x y : ℝ) :
+    ∑' n : ℤ, daubechiesScaled m (j + 1) n x * daubechiesScaled m (j + 1) n y =
+      ∑' k : ℤ, daubechiesScaled m j k x * daubechiesScaled m j k y +
         ∑' k : ℤ, waveletScaled m j k x * waveletScaled m j k y := by
-  have hc : (fun n => scaled m (j + 1) n y) = fun n =>
-      refineCoeff m (fun k => scaled m j k y) n +
+  have hc : (fun n => daubechiesScaled m (j + 1) n y) = fun n =>
+      refineCoeff m (fun k => daubechiesScaled m j k y) n +
         waveletRefineCoeff m (fun k => waveletScaled m j k y) n := by
     funext n
-    have hb : (fun k => scaled m j k y) = fun k =>
-        ∑' i, ((daubechiesCoeff m (i - 2 * k) / √2 : ℝ) : ℂ) * scaled m (j + 1) i y :=
-      funext fun k => scaled_eq_expand m hN j k y
+    have hb : (fun k => daubechiesScaled m j k y) = fun k =>
+        ∑' i, ((daubechiesCoeff m (i - 2 * k) / √2 : ℝ) : ℂ) * daubechiesScaled m (j + 1) i y :=
+      funext fun k => daubechiesScaled_eq_daubechiesExpand m hN j k y
     have hb' : (fun k => waveletScaled m j k y) = fun k =>
-        ∑' i, ((dualCoeff m (i - 2 * k) / √2 : ℝ) : ℂ) * scaled m (j + 1) i y :=
-      funext fun k => waveletScaled_eq_expand m j k y
+        ∑' i, ((dualCoeff m (i - 2 * k) / √2 : ℝ) : ℂ) * daubechiesScaled m (j + 1) i y :=
+      funext fun k => waveletScaled_eq_daubechiesExpand m j k y
     rw [hb, hb']
-    exact (refineCoeff_add_waveletRefineCoeff m (fun i => scaled m (j + 1) i y) n).symm
-  have h1 : ∑' k : ℤ, scaled m j k x * scaled m j k y =
-      expand (scalingFun m) j (fun k => scaled m j k y) x :=
+    exact (refineCoeff_add_waveletRefineCoeff m (fun i => daubechiesScaled m (j + 1) i y) n).symm
+  have h1 : ∑' k : ℤ, daubechiesScaled m j k x * daubechiesScaled m j k y =
+      daubechiesExpand (scalingFun m) j (fun k => daubechiesScaled m j k y) x :=
     tsum_congr fun k => mul_comm _ _
   have h2 : ∑' k : ℤ, waveletScaled m j k x * waveletScaled m j k y =
-      expand (wavelet m) j (fun k => waveletScaled m j k y) x :=
+      daubechiesExpand (wavelet m) j (fun k => waveletScaled m j k y) x :=
     tsum_congr fun k => mul_comm _ _
-  rw [h1, h2, expand_eq_expand_succ m hN j _ x, expand_wavelet_eq_expand_succ m hN j _ x,
-    ← expand_add (fun _ hz => scalingFun_eq_zero m hN hz), ← hc]
+  rw [h1, h2, daubechiesExpand_eq_daubechiesExpand_succ m hN j _ x,
+    daubechiesExpand_wavelet_eq_daubechiesExpand_succ m hN j _ x,
+    ← daubechiesExpand_add (fun _ hz => scalingFun_eq_zero m hN hz), ← hc]
   exact tsum_congr fun n => mul_comm _ _
 
 /-- **Products of generators of level `1`**: `g_{1,n}(x) g_{1,n}(y) = 2 g(2x - n) g(2y - n)` for
@@ -563,16 +577,16 @@ theorem scaledFun_one_mul_scaledFun_one (g : ℝ → ℂ) (n : ℤ) (x y : ℝ) 
 /-- **The kernel identity**: for `N ≥ 2` and all `x, y ∈ ℝ`, the kernel
 `K(x, y) = ∑_k φ(x - k) φ(y - k)` of the projection `P_0` satisfies
 `2 K(2x, 2y) = K(x, y) + ∑_k ψ(x - k) ψ(y - k)`. This is the level `j = 0` of
-`Daubechies.tsum_scaled_mul_scaled_succ`, with `φ_{0,k} = φ(· - k)` (`Daubechies.scaledFun_zero`)
-and `φ_{1,n}(x) φ_{1,n}(y) = 2 φ(2x - n) φ(2y - n)`
+`Daubechies.tsum_daubechiesScaled_mul_daubechiesScaled_succ`, with `φ_{0,k} = φ(· - k)`
+(`Daubechies.scaledFun_zero`) and `φ_{1,n}(x) φ_{1,n}(y) = 2 φ(2x - n) φ(2y - n)`
 (`Daubechies.scaledFun_one_mul_scaledFun_one`). -/
 theorem kernel_succ (hN : 2 ≤ N) (x y : ℝ) :
     2 * ∑' n : ℤ, scalingFun m (2 * x - n) * scalingFun m (2 * y - n) =
       ∑' k : ℤ, scalingFun m (x - k) * scalingFun m (y - k) +
         ∑' k : ℤ, wavelet m (x - k) * wavelet m (y - k) := by
-  have h := tsum_scaled_mul_scaled_succ m hN 0 x y
-  simp only [scaled, waveletScaled, zero_add, scaledFun_zero, scaledFun_one_mul_scaledFun_one,
-    tsum_mul_left] at h
+  have h := tsum_daubechiesScaled_mul_daubechiesScaled_succ m hN 0 x y
+  simp only [daubechiesScaled, waveletScaled, zero_add, scaledFun_zero,
+    scaledFun_one_mul_scaledFun_one, tsum_mul_left] at h
   exact h
 
 section Lp
@@ -581,91 +595,97 @@ variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 
 /-- **The block identity on `L_p`**: for `N ≥ 2`, `1 ≤ p < ∞`, every level `j` and every
 `f ∈ L_p`, `P_{j+1} f - P_j f` is the class of the wavelet part
-`∑_k ⟨f, ψ_{j,k}⟩ ψ_{j,k}` (`Daubechies.detailFun`, `Daubechies.projFun_succ_eq_add`). -/
-theorem proj_succ_sub_proj (hN : 2 ≤ N) (hp : p ≠ ∞) (j : ℕ) (f : Lp ℂ p (volume : Measure ℝ)) :
-    proj m p hN hp (j + 1) f - proj m p hN hp j f =
-      (memLp_detailFun m hN Fact.out hp (Lp.memLp f) j).toLp _ := by
+`∑_k ⟨f, ψ_{j,k}⟩ ψ_{j,k}` (`Daubechies.daubechiesDetailFun`, `Daubechies.projFun_succ_eq_add`). -/
+theorem daubechiesProj_succ_sub_daubechiesProj (hN : 2 ≤ N) (hp : p ≠ ∞) (j : ℕ)
+    (f : Lp ℂ p (volume : Measure ℝ)) :
+    daubechiesProj m p hN hp (j + 1) f - daubechiesProj m p hN hp j f =
+      (memLp_daubechiesDetailFun m hN Fact.out hp (Lp.memLp f) j).toLp _ := by
   refine Lp.ext ?_
-  filter_upwards [Lp.coeFn_sub (proj m p hN hp (j + 1) f) (proj m p hN hp j f),
-    proj_apply_ae m hN hp (j + 1) f, proj_apply_ae m hN hp j f,
-    MemLp.coeFn_toLp (memLp_detailFun m hN Fact.out hp (Lp.memLp f) j)] with x h1 h2 h3 h4
+  filter_upwards [Lp.coeFn_sub (daubechiesProj m p hN hp (j + 1) f) (daubechiesProj m p hN hp j f),
+    daubechiesProj_apply_ae m hN hp (j + 1) f, daubechiesProj_apply_ae m hN hp j f,
+    MemLp.coeFn_toLp (memLp_daubechiesDetailFun m hN Fact.out hp (Lp.memLp f) j)] with x h1 h2 h3 h4
   rw [h1, Pi.sub_apply, h2, h3, h4,
     projFun_succ_eq_add m hN ((Lp.memLp f).locallyIntegrable Fact.out) j x, add_sub_cancel_left]
 
 /-- **The norm of a block**: `‖P_{j+1} f - P_j f‖_p = ‖∑_k ⟨f, ψ_{j,k}⟩ ψ_{j,k}‖_p` for every
-`f ∈ L_p` and every level `j` (`Daubechies.proj_succ_sub_proj`). -/
-theorem enorm_proj_succ_sub_proj (hN : 2 ≤ N) (hp : p ≠ ∞) (j : ℕ)
+`f ∈ L_p` and every level `j` (`Daubechies.daubechiesProj_succ_sub_daubechiesProj`). -/
+theorem enorm_daubechiesProj_succ_sub_daubechiesProj (hN : 2 ≤ N) (hp : p ≠ ∞) (j : ℕ)
     (f : Lp ℂ p (volume : Measure ℝ)) :
-    ‖proj m p hN hp (j + 1) f - proj m p hN hp j f‖ₑ = eLpNorm (detailFun m j f) p volume := by
-  rw [proj_succ_sub_proj, Lp.enorm_def, eLpNorm_congr_ae (MemLp.coeFn_toLp _)]
+    ‖daubechiesProj m p hN hp (j + 1) f - daubechiesProj m p hN hp j f‖ₑ =
+      eLpNorm (daubechiesDetailFun m j f) p volume := by
+  rw [daubechiesProj_succ_sub_daubechiesProj, Lp.enorm_def, eLpNorm_congr_ae (MemLp.coeFn_toLp _)]
 
 /-- **The norm of a projection**: `‖P_j f‖_p = ‖∑_k ⟨f, φ_{j,k}⟩ φ_{j,k}‖_p` for every
-`f ∈ L_p` and every level `j` (`Daubechies.proj_apply_ae`). -/
-theorem enorm_proj_eq (hN : 2 ≤ N) (hp : p ≠ ∞) (j : ℕ) (f : Lp ℂ p (volume : Measure ℝ)) :
-    ‖proj m p hN hp j f‖ₑ = eLpNorm (projFun m j f) p volume := by
-  rw [Lp.enorm_def, eLpNorm_congr_ae (proj_apply_ae m hN hp j f)]
+`f ∈ L_p` and every level `j` (`Daubechies.daubechiesProj_apply_ae`). -/
+theorem enorm_daubechiesProj_eq (hN : 2 ≤ N) (hp : p ≠ ∞) (j : ℕ)
+    (f : Lp ℂ p (volume : Measure ℝ)) :
+    ‖daubechiesProj m p hN hp j f‖ₑ = eLpNorm (projFun m j f) p volume := by
+  rw [Lp.enorm_def, eLpNorm_congr_ae (daubechiesProj_apply_ae m hN hp j f)]
 
 /-- **The norms of the blocks through the wavelet coefficients**: for `N ≥ 2` and `1 ≤ p < ∞`
 there are constants `K, M < ∞` such that for every `f ∈ L_p` and every level `j`
 `2^(j(1/2 - 1/p)) ‖(⟨f, ψ_{j,k}⟩)_k‖_{ℓ_p} ≤ K ‖P_{j+1} f - P_j f‖_p` and
 `‖P_{j+1} f - P_j f‖_p ≤ M 2^(j(1/2 - 1/p)) ‖(⟨f, ψ_{j,k}⟩)_k‖_{ℓ_p}`. The block is the wavelet
-expansion with the coefficients `⟨f, ψ_{j,k}⟩` (`Daubechies.enorm_proj_succ_sub_proj`), so the
-lower and the upper stability of the expansions (`Daubechies.lqNorm_le_eLpNorm_expand`, which
-uses the orthonormality of the translates of `ψ`, and `Daubechies.eLpNorm_expand_le`) give the
-constants `K = Daubechies.coeffConst` and `M = Daubechies.expandConst` for `g = ψ`. -/
+expansion with the coefficients `⟨f, ψ_{j,k}⟩`
+(`Daubechies.enorm_daubechiesProj_succ_sub_daubechiesProj`), so the lower and the upper stability of
+the expansions (`Daubechies.lqNorm_le_eLpNorm_daubechiesExpand`, which uses the orthonormality of
+the translates of `ψ`, and `Daubechies.eLpNorm_daubechiesExpand_le`) give the constants
+`K = Daubechies.coeffConst` and `M = Daubechies.expandConst` for `g = ψ`. -/
 theorem enorm_block_equiv (hN : 2 ≤ N) (hp : p ≠ ∞) :
     ∃ K M : ℝ≥0∞, K ≠ ∞ ∧ M ≠ ∞ ∧ ∀ (f : Lp ℂ p (volume : Measure ℝ)) (j : ℕ),
       dyadicWeight (1 / 2 - 1 / p.toReal) j *
           ENNReal.lqNorm p (fun k : ℤ => ‖coeffFun (wavelet m) j f k‖ₑ) ≤
-        K * ‖proj m p hN hp (j + 1) f - proj m p hN hp j f‖ₑ ∧
-      ‖proj m p hN hp (j + 1) f - proj m p hN hp j f‖ₑ ≤
+        K * ‖daubechiesProj m p hN hp (j + 1) f - daubechiesProj m p hN hp j f‖ₑ ∧
+      ‖daubechiesProj m p hN hp (j + 1) f - daubechiesProj m p hN hp j f‖ₑ ≤
         M * (dyadicWeight (1 / 2 - 1 / p.toReal) j *
           ENNReal.lqNorm p (fun k : ℤ => ‖coeffFun (wavelet m) j f k‖ₑ)) := by
   refine ⟨coeffConst (wavelet m) (1 - N) N p, expandConst (wavelet m) (1 - N) N p,
     coeffConst_ne_top _ _ (memLp_wavelet m hN _), expandConst_ne_top _ _ (memLp_wavelet m hN p),
     fun f j => ⟨?_, ?_⟩⟩
-  · rw [enorm_proj_succ_sub_proj]
-    exact lqNorm_le_eLpNorm_expand (continuous_wavelet m hN) (fun _ hx => wavelet_eq_zero m hN hx)
+  · rw [enorm_daubechiesProj_succ_sub_daubechiesProj]
+    exact lqNorm_le_eLpNorm_daubechiesExpand (continuous_wavelet m hN)
+      (fun _ hx => wavelet_eq_zero m hN hx)
       (integral_wavelet_translate_mul_conj_translate m hN) Fact.out hp j _
-  · rw [enorm_proj_succ_sub_proj, expandConst, ← mul_assoc]
-    exact eLpNorm_expand_le (continuous_wavelet m hN).aestronglyMeasurable
+  · rw [enorm_daubechiesProj_succ_sub_daubechiesProj, expandConst, ← mul_assoc]
+    exact eLpNorm_daubechiesExpand_le (continuous_wavelet m hN).aestronglyMeasurable
       (fun _ hx => wavelet_eq_zero m hN hx) Fact.out hp j _
 
 /-- **The norms of the projections through the scaling coefficients**: for `N ≥ 2` and
 `1 ≤ p < ∞` there are constants `K, M < ∞` such that for every `f ∈ L_p` and every level `j`
 `2^(j(1/2 - 1/p)) ‖(⟨f, φ_{j,k}⟩)_k‖_{ℓ_p} ≤ K ‖P_j f‖_p` and
 `‖P_j f‖_p ≤ M 2^(j(1/2 - 1/p)) ‖(⟨f, φ_{j,k}⟩)_k‖_{ℓ_p}`, by the stability of the expansions
-(`Daubechies.lqNorm_le_eLpNorm_expand`, `Daubechies.eLpNorm_expand_le`) for `g = φ`. -/
-theorem enorm_proj_equiv (hN : 2 ≤ N) (hp : p ≠ ∞) :
+(`Daubechies.lqNorm_le_eLpNorm_daubechiesExpand`, `Daubechies.eLpNorm_daubechiesExpand_le`) for
+`g = φ`. -/
+theorem enorm_daubechiesProj_equiv (hN : 2 ≤ N) (hp : p ≠ ∞) :
     ∃ K M : ℝ≥0∞, K ≠ ∞ ∧ M ≠ ∞ ∧ ∀ (f : Lp ℂ p (volume : Measure ℝ)) (j : ℕ),
       dyadicWeight (1 / 2 - 1 / p.toReal) j *
           ENNReal.lqNorm p (fun k : ℤ => ‖coeffFun (scalingFun m) j f k‖ₑ) ≤
-        K * ‖proj m p hN hp j f‖ₑ ∧
-      ‖proj m p hN hp j f‖ₑ ≤
+        K * ‖daubechiesProj m p hN hp j f‖ₑ ∧
+      ‖daubechiesProj m p hN hp j f‖ₑ ≤
         M * (dyadicWeight (1 / 2 - 1 / p.toReal) j *
           ENNReal.lqNorm p (fun k : ℤ => ‖coeffFun (scalingFun m) j f k‖ₑ)) := by
   refine ⟨coeffConst (scalingFun m) 0 (2 * N - 1) p, expandConst (scalingFun m) 0 (2 * N - 1) p,
     coeffConst_ne_top _ _ (memLp_scalingFun m hN _),
     expandConst_ne_top _ _ (memLp_scalingFun m hN p), fun f j => ⟨?_, ?_⟩⟩
-  · rw [enorm_proj_eq]
-    exact lqNorm_le_eLpNorm_expand (continuous_scalingFun m hN)
+  · rw [enorm_daubechiesProj_eq]
+    exact lqNorm_le_eLpNorm_daubechiesExpand (continuous_scalingFun m hN)
       (fun _ hx => scalingFun_eq_zero m hN hx)
       (integral_scalingFun_translate_mul_conj_translate m hN) Fact.out hp j _
-  · rw [enorm_proj_eq, expandConst, ← mul_assoc]
-    exact eLpNorm_expand_le (continuous_scalingFun m hN).aestronglyMeasurable
+  · rw [enorm_daubechiesProj_eq, expandConst, ← mul_assoc]
+    exact eLpNorm_daubechiesExpand_le (continuous_scalingFun m hN).aestronglyMeasurable
       (fun _ hx => scalingFun_eq_zero m hN hx) Fact.out hp j _
 
 /-- **The norm of the projection of level `0` through the scaling coefficients**: for `N ≥ 2` and
 `1 ≤ p < ∞` there are constants `K, M < ∞` with `‖(⟨f, φ_{0,k}⟩)_k‖_{ℓ_p} ≤ K ‖P_0 f‖_p` and
 `‖P_0 f‖_p ≤ M ‖(⟨f, φ_{0,k}⟩)_k‖_{ℓ_p}` for every `f ∈ L_p`, where `φ_{0,k} = φ(· - k)`: the level
-`j = 0` of `Daubechies.enorm_proj_equiv`. -/
-theorem enorm_proj_zero_equiv (hN : 2 ≤ N) (hp : p ≠ ∞) :
+`j = 0` of `Daubechies.enorm_daubechiesProj_equiv`. -/
+theorem enorm_daubechiesProj_zero_equiv (hN : 2 ≤ N) (hp : p ≠ ∞) :
     ∃ K M : ℝ≥0∞, K ≠ ∞ ∧ M ≠ ∞ ∧ ∀ f : Lp ℂ p (volume : Measure ℝ),
       ENNReal.lqNorm p (fun k : ℤ => ‖coeffFun (scalingFun m) 0 f k‖ₑ) ≤
-        K * ‖proj m p hN hp 0 f‖ₑ ∧
-      ‖proj m p hN hp 0 f‖ₑ ≤
+        K * ‖daubechiesProj m p hN hp 0 f‖ₑ ∧
+      ‖daubechiesProj m p hN hp 0 f‖ₑ ≤
         M * ENNReal.lqNorm p (fun k : ℤ => ‖coeffFun (scalingFun m) 0 f k‖ₑ) := by
-  obtain ⟨K, M, hK, hM, hKM⟩ := enorm_proj_equiv m hN hp
+  obtain ⟨K, M, hK, hM, hKM⟩ := enorm_daubechiesProj_equiv m hN hp
   refine ⟨K, M, hK, hM, fun f => ?_⟩
   simpa only [ENNReal.dyadicWeight_zero_right, one_mul] using hKM f 0
 

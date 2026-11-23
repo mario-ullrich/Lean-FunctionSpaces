@@ -38,7 +38,7 @@ hyperplanes `H_j`, the graph maps `γ_j`, the traces `Tr_j`, the normal weights
   trace `γ_{L_2} : H^1(Ω) → L_2(Γ)`, also with weak derivatives on `Ω`
   (`Rd.BoundedLipschitzDomain.setIntegral_green_sobolevOne_of_hasWeakLineDeriv`), and in chart
   form for every resolution of unity (`Rd.BoundedLipschitzDomain.setIntegral_green`).
-* **The zero extension** (`Rd.BoundedLipschitzDomain.memSobolev_indicatorLp_iff_mem_traceKer`): for
+* **The zero extension** (`Rd.BoundedLipschitzDomain.memWSobolev_indicatorLp_iff_mem_traceKer`): for
   `u ∈ H^1(Ω)`, `1_Ω u ∈ W^1_2(V)` iff the trace of `u` vanishes, and then
   `∂_v (1_Ω u) = 1_Ω ∂_v u`. One direction is Green's formula without boundary term, the other
   compares the traces from both sides of each graph, with the lower graph domain
@@ -124,14 +124,14 @@ theorem integral_weakDeriv_mul_add_eq_zero (v : V) (U W : H^{1}(V)) :
 /-- **Integration by parts for `W^1_2(V)` functions**: for `f, g ∈ L_2(V)` with
 `f, g ∈ W^1_2(V)`, every direction `v` and the weak derivatives `f_v = ∂_v f`, `g_v = ∂_v g` in
 `L_2(V)`, `∫ f_v g + f g_v = 0`. Here `f = ι U`, `g = ι W` for `U, W ∈ H^1(V)`
-(`Rd.exists_toL2_eq_of_memSobolev`), so this is `Rd.integral_weakDeriv_mul_add_eq_zero`. -/
+(`Rd.exists_toL2_eq_of_memWSobolev`), so this is `Rd.integral_weakDeriv_mul_add_eq_zero`. -/
 theorem integral_mul_add_eq_zero_of_hasWeakLineDeriv (f g : Lp ℂ 2 (volume : Measure V))
-    (hf : MemSobolev 1 f) (hg : MemSobolev 1 g) (v : V) {fv gv : Lp ℂ 2 (volume : Measure V)}
+    (hf : MemWSobolev 1 f) (hg : MemWSobolev 1 g) (v : V) {fv gv : Lp ℂ 2 (volume : Measure V)}
     (hfv : HasWeakLineDeriv ⊤ (fun _ : Fin 1 => v) f fv)
     (hgv : HasWeakLineDeriv ⊤ (fun _ : Fin 1 => v) g gv) :
     ∫ x, fv x * g x + f x * gv x = 0 := by
-  obtain ⟨U, rfl⟩ := exists_toL2_eq_of_memSobolev hf
-  obtain ⟨W, rfl⟩ := exists_toL2_eq_of_memSobolev hg
+  obtain ⟨U, rfl⟩ := exists_toL2_eq_of_memWSobolev hf
+  obtain ⟨W, rfl⟩ := exists_toL2_eq_of_memWSobolev hg
   rw [← weakDerivL2_eq hfv, ← weakDerivL2_eq hgv]
   exact integral_weakDeriv_mul_add_eq_zero v U W
 
@@ -170,12 +170,12 @@ theorem integral_smul_indicatorLp_eq_setIntegral_mul {p : ℝ≥0∞} [Fact (1 �
   · rw [indicator_of_notMem hx, indicator_of_notMem hx, smul_zero]
 
 /-- **Smooth multipliers keep `H^1(V)`**: for a smooth real `χ` with compact support and
-`W ∈ H^1(V)` there is `W' ∈ H^1(V)` whose `L_2` function is `χ ι W` (`Rd.MemSobolev.mulLp`). -/
+`W ∈ H^1(V)` there is `W' ∈ H^1(V)` whose `L_2` function is `χ ι W` (`Rd.MemWSobolev.mulLp`). -/
 theorem exists_toL2_eq_mulLp {χ : V → ℝ} (hχ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) χ)
     (hcs : HasCompactSupport χ) {C : ℝ} (hc : Continuous fun x => (χ x : ℂ))
     (hC : ∀ x, ‖(χ x : ℂ)‖ ≤ C) (W : H^{1}(V)) :
     ∃ W' : H^{1}(V), toL2 W' = mulLp hc hC (toL2 W) :=
-  exists_toL2_eq_of_memSobolev ((memSobolev_toL2 W).mulLp hχ hcs hc hC)
+  exists_toL2_eq_of_memWSobolev ((memWSobolev_toL2 W).mulLp hχ hcs hc hC)
 
 /-- **Green's integrand of a product vanishes outside the multiplier**: if the `L_2` function of
 `W' ∈ H^1(V)` is `χ ι W` for a continuous bounded `χ`, then `(∂_v U) W' + U ∂_v W' = 0` almost
@@ -773,15 +773,15 @@ weak derivatives `f_v = ∂_v f`, `g_v = ∂_v g` in `L_2(V)`,
 `∫_Ω f_v g + f g_v = ∑_j ∫_{H_j} ψ_j(γ_j x') Tr_j f Tr_j g n^j_v dx'`
 (`Rd.BoundedLipschitzDomain.setIntegral_green_besselPotentialSpace`). -/
 theorem setIntegral_green (ψ : Ω.BoundaryPartition) (f g : Lp ℂ 2 (volume : Measure V))
-    (hf : MemSobolev 1 f) (hg : MemSobolev 1 g) (v : V) {fv gv : Lp ℂ 2 (volume : Measure V)}
+    (hf : MemWSobolev 1 f) (hg : MemWSobolev 1 g) (v : V) {fv gv : Lp ℂ 2 (volume : Measure V)}
     (hfv : HasWeakLineDeriv ⊤ (fun _ : Fin 1 => v) f fv)
     (hgv : HasWeakLineDeriv ⊤ (fun _ : Fin 1 => v) g gv) :
     ∫ x in Ω.carrier, fv x * g x + f x * gv x =
       ∑ j, ∫ x', ψ.toComplex j ((Ω.graph j).graphMap x') *
         (Ω.graph j).trace two_ne_top 2 f x' * (Ω.graph j).trace two_ne_top 2 g x' *
           ((Ω.graph j).normalWeight v x' : ℂ) := by
-  obtain ⟨U, rfl⟩ := exists_toL2_eq_of_memSobolev hf
-  obtain ⟨W, rfl⟩ := exists_toL2_eq_of_memSobolev hg
+  obtain ⟨U, rfl⟩ := exists_toL2_eq_of_memWSobolev hf
+  obtain ⟨W, rfl⟩ := exists_toL2_eq_of_memWSobolev hg
   rw [← weakDerivL2_eq hfv, ← weakDerivL2_eq hgv]
   exact Ω.setIntegral_green_besselPotentialSpace ψ U W v
 
@@ -843,10 +843,10 @@ theorem hasWeakLineDeriv_indicatorLp_of_mem_traceKer {u : Ω.SobolevOne} (hu : u
 /-- **The zero extension of a function with vanishing trace lies in `W^1_2(V)`**: for `u` in the
 trace kernel, `1_Ω u ∈ W^1_2(V)`, with the weak derivatives `1_Ω ∂_v u`
 (`Rd.BoundedLipschitzDomain.hasWeakLineDeriv_indicatorLp_of_mem_traceKer`,
-`Rd.memSobolev_one_of_forall_hasWeakLineDeriv`). -/
-theorem memSobolev_indicatorLp_of_mem_traceKer {u : Ω.SobolevOne} (hu : u ∈ Ω.traceKer 1) :
-    MemSobolev 1 (indicatorLp Ω.measurableSet (toL2 (u : H^{1}(V)))) :=
-  memSobolev_one_of_forall_hasWeakLineDeriv fun v =>
+`Rd.memWSobolev_one_of_forall_hasWeakLineDeriv`). -/
+theorem memWSobolev_indicatorLp_of_mem_traceKer {u : Ω.SobolevOne} (hu : u ∈ Ω.traceKer 1) :
+    MemWSobolev 1 (indicatorLp Ω.measurableSet (toL2 (u : H^{1}(V)))) :=
+  memWSobolev_one_of_forall_hasWeakLineDeriv fun v =>
     ⟨_, Ω.hasWeakLineDeriv_indicatorLp_of_mem_traceKer hu v⟩
 
 /-- **A function whose zero extension lies in `W^1_2(V)` has vanishing trace**: if
@@ -855,9 +855,10 @@ trace of `u` is the trace of `F = 1_Ω u` (they agree on `Ω_j ∩ B_j`,
 `Rd.LipschitzGraph.trace_ae_eq_of_ae_eq`), and `F` vanishes on the part of the lower domain in
 `B_j`, which lies outside `Ω`, so its trace vanishes
 (`Rd.LipschitzGraph.traceH1_ae_eq_zero_of_lower`). -/
-theorem mem_traceKer_of_memSobolev_indicatorLp {u : Ω.SobolevOne}
-    (hu : MemSobolev 1 (indicatorLp Ω.measurableSet (toL2 (u : H^{1}(V))))) : u ∈ Ω.traceKer 1 := by
-  obtain ⟨F, hF⟩ := exists_toL2_eq_of_memSobolev hu
+theorem mem_traceKer_of_memWSobolev_indicatorLp {u : Ω.SobolevOne}
+    (hu : MemWSobolev 1 (indicatorLp Ω.measurableSet (toL2 (u : H^{1}(V))))) :
+    u ∈ Ω.traceKer 1 := by
+  obtain ⟨F, hF⟩ := exists_toL2_eq_of_memWSobolev hu
   have hFe : (toL2 F : V → ℂ) =ᵐ[volume] Ω.carrier.indicator (toL2 (u : H^{1}(V))) := by
     rw [hF]
     exact indicatorLp_apply_ae _ _
@@ -884,11 +885,11 @@ theorem mem_traceKer_of_memSobolev_indicatorLp {u : Ω.SobolevOne}
 /-- **Zero extension and vanishing trace**: for `u ∈ H^1(Ω)`, the zero extension `1_Ω u` lies in
 `W^1_2(V)` iff `u` lies in the trace kernel, that is, iff its trace vanishes almost everywhere on
 `Γ`
-(`Rd.BoundedLipschitzDomain.memSobolev_indicatorLp_of_mem_traceKer`,
-`Rd.BoundedLipschitzDomain.mem_traceKer_of_memSobolev_indicatorLp`). -/
-theorem memSobolev_indicatorLp_iff_mem_traceKer (u : Ω.SobolevOne) :
-    MemSobolev 1 (indicatorLp Ω.measurableSet (toL2 (u : H^{1}(V)))) ↔ u ∈ Ω.traceKer 1 :=
-  ⟨Ω.mem_traceKer_of_memSobolev_indicatorLp, Ω.memSobolev_indicatorLp_of_mem_traceKer⟩
+(`Rd.BoundedLipschitzDomain.memWSobolev_indicatorLp_of_mem_traceKer`,
+`Rd.BoundedLipschitzDomain.mem_traceKer_of_memWSobolev_indicatorLp`). -/
+theorem memWSobolev_indicatorLp_iff_mem_traceKer (u : Ω.SobolevOne) :
+    MemWSobolev 1 (indicatorLp Ω.measurableSet (toL2 (u : H^{1}(V)))) ↔ u ∈ Ω.traceKer 1 :=
+  ⟨Ω.mem_traceKer_of_memWSobolev_indicatorLp, Ω.memWSobolev_indicatorLp_of_mem_traceKer⟩
 
 end BoundedLipschitzDomain
 

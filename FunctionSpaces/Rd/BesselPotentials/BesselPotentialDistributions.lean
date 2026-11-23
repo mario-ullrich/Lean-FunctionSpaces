@@ -139,7 +139,7 @@ theorem exists_besselPotential_eq_of_memTriebelLizorkinDistr [Nontrivial V] (hp1
         ‖h‖ₑ ≤ C * triebelLizorkinNormDistr p s 2 u := by
   obtain ⟨B, H, hB, hH, hθ⟩ := exists_isCZFamily_besselBase_psiDualBase (V := V) s
   refine ⟨czConst V p B H, czConst_ne_top hp1 hp hB hH, fun u hu => ?_⟩
-  obtain ⟨g, hg⟩ := hu.exists_blocks
+  obtain ⟨g, hg⟩ := hu.exists_lp_blocks
   have hnorm := triebelLizorkinNormDistr_eq (s := s) (q := 2) hg
   obtain ⟨h, hlim, hh⟩ := exists_tendsto_sum_convLp hp (K := fun j => besselSchwartz s (psiDualS j))
     (czConst_ne_top hp1 hp hB hH) (hnorm ▸ hu.ne)

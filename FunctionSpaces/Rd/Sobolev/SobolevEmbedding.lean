@@ -35,16 +35,16 @@ Let `V` have dimension `n`, `1 ≤ p < ∞` and `α(n, p, r) = n (1/p - 1/r)` fo
   for `1 ≤ q ≤ ∞` and `s > n/p` the series of the blocks converges uniformly to a bounded
   continuous representative `a` of `f` with `sup |a| ≤ K ‖(2^(js) ‖ψ_j ⋆ f‖_p)_j‖_{ℓ_q}`.
 * **Sobolev embeddings** (`Rd.exists_memLp_ae_eq_of_hasWeakLineDeriv`,
-  `Rd.exists_boundedContinuous_ae_eq_of_hasWeakLineDeriv`, `Rd.exists_memLp_ae_eq_of_memSobolev`,
-  `Rd.exists_boundedContinuous_ae_eq_of_memSobolev`): for `n ≥ 1` and `1 < p < ∞`, the bound
+  `Rd.exists_boundedContinuous_ae_eq_of_hasWeakLineDeriv`, `Rd.exists_memLp_ae_eq_of_memWSobolev`,
+  `Rd.exists_boundedContinuous_ae_eq_of_memWSobolev`): for `n ≥ 1` and `1 < p < ∞`, the bound
   `‖f‖_{F^m_{p,2}} ≤ ‖Φ‖_1 ‖f‖_p + 2^m ∑_α K_α ‖∂^α f‖_p` bounds the Littlewood–Paley quasi-norm
   of `B^m_{p,max(p,2)}`, which gives `W^m_p ↪ L_r` for `m > n(1/p - 1/r)` and `W^m_p ↪ C_b` for
   `m > n/p`, with named constants, formulas in norms and Schwartz seminorms of fixed kernels
   that are proved finite. The critical case `1/r = 1/p - m/n` with `r < ∞` (Sobolev's
   inequality) is in `FunctionSpaces.Rd.Sobolev.CriticalSobolevEmbedding`
-  (`Rd.exists_memLp_ae_eq_of_memSobolev_of_eq`), and for `p = 1` in
+  (`Rd.exists_memLp_ae_eq_of_memWSobolev_of_eq`), and for `p = 1` in
   `FunctionSpaces.Rd.Sobolev.GagliardoNirenbergSobolev`
-  (`Rd.exists_memLp_ae_eq_of_memSobolev_one_of_eq`).
+  (`Rd.exists_memLp_ae_eq_of_memWSobolev_one_of_eq`).
 -/
 
 @[expose] public section
@@ -468,33 +468,33 @@ theorem exists_boundedContinuous_ae_eq_of_hasWeakLineDeriv [Nontrivial V] (hp1 :
 /-- **The Sobolev embedding into `L_r`**: let `n ≥ 1`, `1 < p ≤ r ≤ ∞`, `p < ∞` and
 `m > n(1/p - 1/r)`. Every `f ∈ W^m_p(V)` has a representative in `L_r(V)`: there is
 `g ∈ L_r(V)` with `g = f` almost everywhere. This is `W^m_p ⊆ B^m_{p,max(p,2)}`
-(`Rd.memApprox_of_memSobolev`) and the Besov embedding (`Rd.exists_memLp_ae_eq_of_memApprox`);
+(`Rd.memApprox_of_memWSobolev`) and the Besov embedding (`Rd.exists_memLp_ae_eq_of_memApprox`);
 `Rd.exists_memLp_ae_eq_of_hasWeakLineDeriv` adds the norm bound. The critical case
 `1/r = 1/p - m/n` with `r < ∞` (Sobolev's inequality) is
-`Rd.exists_memLp_ae_eq_of_memSobolev_of_eq`, and for `p = 1`
-`Rd.exists_memLp_ae_eq_of_memSobolev_one_of_eq`. -/
-theorem exists_memLp_ae_eq_of_memSobolev [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞)
+`Rd.exists_memLp_ae_eq_of_memWSobolev_of_eq`, and for `p = 1`
+`Rd.exists_memLp_ae_eq_of_memWSobolev_one_of_eq`. -/
+theorem exists_memLp_ae_eq_of_memWSobolev [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞)
     {r : ℝ≥0∞} (hpr : p ≤ r) {m : ℕ}
     (hs : nikolskiiExponent (finrank ℝ V) p r < m) {f : Lp ℂ p (volume : Measure V)}
-    (hf : MemSobolev m f) : ∃ g : Lp ℂ r (volume : Measure V), (g : V → ℂ) =ᵐ[volume] f := by
+    (hf : MemWSobolev m f) : ∃ g : Lp ℂ r (volume : Measure V), (g : V → ℂ) =ᵐ[volume] f := by
   have hm : 1 ≤ m := one_le_of_nikolskiiExponent_lt (Nat.cast_nonneg _) Fact.out hpr hs
   obtain ⟨g, hg, -⟩ := exists_memLp_ae_eq_of_memApprox hp hpr hs
-    (one_le_two.trans (le_max_right _ _)) (memApprox_of_memSobolev hp1 hp hm hf)
+    (one_le_two.trans (le_max_right _ _)) (memApprox_of_memWSobolev hp1 hp hm hf)
   exact ⟨g, hg⟩
 
 /-- **The Sobolev embedding into bounded continuous functions**: let `n ≥ 1`, `1 < p < ∞` and
 `m > n/p`. Every `f ∈ W^m_p(V)` has a bounded continuous representative. This is
-`W^m_p ⊆ B^m_{p,max(p,2)}` (`Rd.memApprox_of_memSobolev`) and the Besov embedding into bounded
+`W^m_p ⊆ B^m_{p,max(p,2)}` (`Rd.memApprox_of_memWSobolev`) and the Besov embedding into bounded
 continuous functions (`Rd.exists_boundedContinuous_ae_eq_of_memApprox`);
 `Rd.exists_boundedContinuous_ae_eq_of_hasWeakLineDeriv` adds the norm bound. -/
-theorem exists_boundedContinuous_ae_eq_of_memSobolev [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞)
+theorem exists_boundedContinuous_ae_eq_of_memWSobolev [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞)
     {m : ℕ} (hs : (finrank ℝ V : ℝ) / p.toReal < m) {f : Lp ℂ p (volume : Measure V)}
-    (hf : MemSobolev m f) : ∃ a : V →ᵇ ℂ, (a : V → ℂ) =ᵐ[volume] f := by
+    (hf : MemWSobolev m f) : ∃ a : V →ᵇ ℂ, (a : V → ℂ) =ᵐ[volume] f := by
   have hα : nikolskiiExponent (finrank ℝ V) p ∞ < m := by
     rwa [nikolskiiExponent_top, ← div_eq_mul_inv]
   have hm : 1 ≤ m := one_le_of_nikolskiiExponent_lt (Nat.cast_nonneg _) Fact.out le_top hα
   obtain ⟨a, ha, -⟩ := exists_boundedContinuous_ae_eq_of_memApprox hp hs
-    (one_le_two.trans (le_max_right _ _)) (memApprox_of_memSobolev hp1 hp hm hf)
+    (one_le_two.trans (le_max_right _ _)) (memApprox_of_memWSobolev hp1 hp hm hf)
   exact ⟨a, ha⟩
 
 end Rd

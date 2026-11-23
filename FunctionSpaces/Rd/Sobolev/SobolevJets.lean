@@ -16,8 +16,8 @@ its orthonormal basis, `O ⊆ V` open and `1 ≤ p ≤ ∞`. A **jet** of `W^1_p
 `(f, (g_i)_i)` of elements of `L_p(O)` with `g_i = ∂_{e_i} f` weakly on `O`
 (`Rd.weakSobolevJet p O`); the jets of `W^1_p(V)` are the same over `L_p(V)` (`Rd.sobolevJet p`).
 Both are complex linear subspaces of `L_p × L_p^n` with the norm `max(‖f‖_p, max_i ‖g_i‖_p)`, which
-is equivalent to `‖f‖_p + ∑_i ‖g_i‖_p` (`Rd.norm_le_norm_fst_add_sum`,
-`Rd.norm_fst_add_sum_le`; in `ℝ≥0∞`, `Rd.toReal_enorm_add_sum`, and the squared form
+is equivalent to `‖f‖_p + ∑_i ‖g_i‖_p` (`Rd.prod_pi_norm_le_norm_fst_add_sum`,
+`Rd.prod_pi_norm_fst_add_sum_le`; in `ℝ≥0∞`, `Rd.toReal_enorm_add_sum`, and the squared form
 `Rd.sq_norm_add_sum_sq_le`).
 
 * The derivatives of a jet are determined by its value (`Rd.weakSobolevJet.snd_eq_of_fst_eq`,
@@ -26,7 +26,7 @@ is equivalent to `‖f‖_p + ∑_i ‖g_i‖_p` (`Rd.norm_le_norm_fst_add_sum`,
 * The restriction `Rd.sobolevJet.restrictL O` from the jets of `W^1_p(V)` to those of `W^1_p(O)`
   is a bounded linear operator.
 * A linear map into `L_p(V)` whose values have weak derivatives along the `e_i` in `L_p(V)` is a
-  linear map into the jets (`Rd.sobolevJet.lift`).
+  linear map into the jets (`Rd.sobolevJet.liftJet`).
 -/
 
 @[expose] public section
@@ -39,7 +39,7 @@ namespace Rd
 /-! ### Norms on products -/
 
 /-- The sup norm of `(x, (y_i)_i) ∈ E × F^ι` is at most `‖x‖ + ∑_i ‖y_i‖`. -/
-theorem norm_le_norm_fst_add_sum {E F ι : Type*} [SeminormedAddCommGroup E]
+theorem prod_pi_norm_le_norm_fst_add_sum {E F ι : Type*} [SeminormedAddCommGroup E]
     [SeminormedAddCommGroup F] [Fintype ι] (u : E × (ι → F)) :
     ‖u‖ ≤ ‖u.1‖ + ∑ i, ‖u.2 i‖ := by
   have hs : 0 ≤ ∑ i, ‖u.2 i‖ := Finset.sum_nonneg fun i _ => norm_nonneg _
@@ -50,7 +50,7 @@ theorem norm_le_norm_fst_add_sum {E F ι : Type*} [SeminormedAddCommGroup E]
 
 /-- `‖x‖ + ∑_i ‖y_i‖` is at most `(#ι + 1)` times the sup norm of `(x, (y_i)_i) ∈ E × F^ι`
 (Mathlib's `Pi.sum_norm_apply_le_norm`, `∑_i ‖y_i‖ ≤ #ι ‖y‖`). -/
-theorem norm_fst_add_sum_le {E F ι : Type*} [SeminormedAddCommGroup E]
+theorem prod_pi_norm_fst_add_sum_le {E F ι : Type*} [SeminormedAddCommGroup E]
     [SeminormedAddCommGroup F] [Fintype ι] (u : E × (ι → F)) :
     ‖u.1‖ + ∑ i, ‖u.2 i‖ ≤ (Fintype.card ι + 1) * ‖u‖ := by
   have h2 : ∑ i, ‖u.2 i‖ ≤ Fintype.card ι * ‖u‖ := by
@@ -174,7 +174,7 @@ theorem sobolevJet.ext_of_fst_eq {u v : sobolevJet (V := V) p}
 weak derivatives `∂_{e_i} (L u) ∈ L_p(V)` is the linear map `u ↦ (L u, (∂_{e_i} (L u))_i)` into
 the jets; it is additive and homogeneous since the derivatives are determined by the value
 (`Rd.sobolevJet.ext_of_fst_eq`). -/
-noncomputable def sobolevJet.lift {M : Type*} [AddCommGroup M] [Module ℂ M]
+noncomputable def sobolevJet.liftJet {M : Type*} [AddCommGroup M] [Module ℂ M]
     (L : M →ₗ[ℂ] Lp ℂ p (volume : Measure V))
     (h : ∀ u i, ∃ G : Lp ℂ p (volume : Measure V),
       HasWeakLineDeriv ⊤ (fun _ : Fin 1 => gridBasis V i) (L u) G) :
@@ -183,23 +183,23 @@ noncomputable def sobolevJet.lift {M : Type*} [AddCommGroup M] [Module ℂ M]
   map_add' u v := sobolevJet.ext_of_fst_eq (map_add L u v)
   map_smul' c u := sobolevJet.ext_of_fst_eq (map_smul L c u)
 
-/-- The value of `Rd.sobolevJet.lift L h u` is `L u`. -/
-theorem sobolevJet.lift_apply_fst {M : Type*} [AddCommGroup M] [Module ℂ M]
+/-- The value of `Rd.sobolevJet.liftJet L h u` is `L u`. -/
+theorem sobolevJet.liftJet_apply_fst {M : Type*} [AddCommGroup M] [Module ℂ M]
     (L : M →ₗ[ℂ] Lp ℂ p (volume : Measure V))
     (h : ∀ u i, ∃ G : Lp ℂ p (volume : Measure V),
       HasWeakLineDeriv ⊤ (fun _ : Fin 1 => gridBasis V i) (L u) G) (u : M) :
-    (sobolevJet.lift L h u).1.1 = L u :=
+    (sobolevJet.liftJet L h u).1.1 = L u :=
   rfl
 
-/-- The derivatives of `Rd.sobolevJet.lift L h u` are the weak derivatives of `L u`: every weak
+/-- The derivatives of `Rd.sobolevJet.liftJet L h u` are the weak derivatives of `L u`: every weak
 derivative `G = ∂_{e_i} (L u)` in `L_p(V)` is the `i`-th one (`Rd.HasWeakLineDeriv.eq_of_top`). -/
-theorem sobolevJet.lift_apply_snd {M : Type*} [AddCommGroup M] [Module ℂ M]
+theorem sobolevJet.liftJet_apply_snd {M : Type*} [AddCommGroup M] [Module ℂ M]
     (L : M →ₗ[ℂ] Lp ℂ p (volume : Measure V))
     (h : ∀ u i, ∃ G : Lp ℂ p (volume : Measure V),
       HasWeakLineDeriv ⊤ (fun _ : Fin 1 => gridBasis V i) (L u) G) (u : M) (i : Fin (finrank ℝ V))
     {G : Lp ℂ p (volume : Measure V)}
     (hG : HasWeakLineDeriv ⊤ (fun _ : Fin 1 => gridBasis V i) (L u) G) :
-    (sobolevJet.lift L h u).1.2 i = G :=
+    (sobolevJet.liftJet L h u).1.2 i = G :=
   (h u i).choose_spec.eq_of_top hG
 
 /-! ### The restriction -/

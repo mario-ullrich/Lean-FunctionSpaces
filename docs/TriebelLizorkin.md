@@ -57,31 +57,32 @@ and of `L_p` and one of them, are Besov spaces.
   blocks `ψ_j ⋆ f`. The quasi-norm is defined once, for the blocks `Δ'_j` of an admissible
   kernel `K` (below): for every real `s`, `1 ≤ p ≤ ∞` and `1 ≤ q ≤ ∞`,
   `‖u‖_{F^s_{p,q}, K} = ‖ x ↦ ‖(2^{js} |g_j(x)|)_j‖_{ℓ_q} ‖_p` when every block `Δ'_j u` is an
-  `L_p` function `g_j`, and `∞` otherwise (`Rd.LPKernel.triebelLizorkinNormDistr`); it decreases
-  in `q` and increases in `s`. The standard kernel gives `‖u‖_{F^s_{p,q}}`
+  `L_p` function `g_j`, and `∞` otherwise (`Rd.LPKernel.kernelTriebelLizorkinNormDistr`); it
+  decreases in `q` and increases in `s`. The standard kernel gives `‖u‖_{F^s_{p,q}}`
   (`Rd.triebelLizorkinNormDistr`, `Rd.MemTriebelLizorkinDistr`, with the blocks `Δ_j`); for
   `p < ∞` it is the quasi-norm above on `L_p`
   (`Rd.triebelLizorkinNormDistr_toTemperedDistribution`) and describes `F^s_{p,q}` for every
   real `s`. For every kernel and `f ∈ L_p`, `p < ∞`, the quasi-norm is
-  `‖ x ↦ ‖(2^{js} |(ψ'_j ⋆ f)(x)|)_j‖_{ℓ_q} ‖_p` (`Rd.LPKernel.triebelLizorkinNorm`,
-  `Rd.LPKernel.triebelLizorkinNormDistr_toTemperedDistribution`). Symbols of order `σ` map
+  `‖ x ↦ ‖(2^{js} |(ψ'_j ⋆ f)(x)|)_j‖_{ℓ_q} ‖_p` (`Rd.LPKernel.kernelTriebelLizorkinNorm`,
+  `Rd.LPKernel.kernelTriebelLizorkinNormDistr_toTemperedDistribution`). Symbols of order `σ` map
   these spaces into each other, see [Sobolev spaces on `ℝ^d`](SobolevRd.md).
 * **Independence of the Littlewood–Paley family.** An admissible kernel is a Schwartz function
   `Φ'` with `𝓕Φ' = 1` on `{‖ξ‖ ≤ a}` and `𝓕Φ' = 0` outside the ball of radius `b`, `0 < a < b`
   (`Rd.LPKernel`), with the blocks `ψ'_0 = Φ'`, `ψ'_j = (Φ' - δ_{1/2} Φ')_{2^j}`. For two
   admissible kernels and `2^c ≥ max(b/a', b'/a)`, `Δ_j u = ∑_{|k - j| ≤ c} (𝓕ψ_j)(D) Δ'_k u` for
-  every tempered distribution `u` (`Rd.LPKernel.distribBlock_eq_sum`). Hence, for `1 < p < ∞`,
+  every tempered distribution `u` (`Rd.LPKernel.kernelDistribBlock_eq_sum`). Hence, for `1 < p < ∞`,
   `1 < q ≤ ∞` and every real `s`, the quasi-norms of any two admissible kernels are equivalent,
   on tempered distributions and on `L_p`, with the explicit constant
   `Rd.LPKernel.comparisonConst N c s` times the Fefferman–Stein constant
-  (`Rd.LPKernel.triebelLizorkinNormDistr_le_of_blocks`,
-  `Rd.LPKernel.triebelLizorkinNormDistr_le_mul`) for every window `c` with
+  (`Rd.LPKernel.kernelTriebelLizorkinNormDistr_le_of_blocks`,
+  `Rd.LPKernel.kernelTriebelLizorkinNormDistr_le_mul`) for every window `c` with
   `2^c ≥ max(b/a', b'/a)`; such a window exists (`Rd.LPKernel.exists_window`,
-  `Rd.LPKernel.exists_triebelLizorkinNormDistr_le`, `Rd.LPKernel.exists_triebelLizorkinNorm_le`).
-  Every admissible kernel gives the spaces `F^s_{p,q}` of the project
-  (`Rd.LPKernel.memTriebelLizorkinDistr_iff`, `Rd.LPKernel.memTriebelLizorkin_iff`). The bound
-  is pointwise: the window sums lie below `2^{c|s|}` times sums of maximal functions, cost `2c + 1`
-  in `ℓ_q` (`ENNReal.lqNorm_sum_Icc_le`), and the Fefferman–Stein inequality finishes.
+  `Rd.LPKernel.exists_kernelTriebelLizorkinNormDistr_le`,
+  `Rd.LPKernel.exists_kernelTriebelLizorkinNorm_le`). Every admissible kernel gives the spaces
+  `F^s_{p,q}` of the project (`Rd.LPKernel.memTriebelLizorkinDistr_iff`,
+  `Rd.LPKernel.memTriebelLizorkin_iff`). The bound is pointwise: the window sums lie below
+  `2^{c|s|}` times sums of maximal functions, cost `2c + 1` in `ℓ_q` (`ENNReal.lqNorm_sum_Icc_le`),
+  and the Fefferman–Stein inequality finishes.
 * **Triebel–Lizorkin spaces and the Besov sandwich on the torus.** For `f ∈ L_p(𝕋^d)`,
   `1 ≤ p < ∞`, the same quasi-norm with the blocks `ψ_j ⋆ f(t) = ∫ ψ_j(y) f(t - π y) dy` of the
   kernels on `ℝ^d`, with the quotient map `π : ℝ^d → 𝕋^d`, defines `F^s_{p,q}(𝕋^d)`
@@ -174,7 +175,7 @@ and of `L_p` and one of them, are Besov spaces.
   overlap `4` (`Rd.psiDual`, `Rd.isCZFamily_psiDual`), which reproduce the blocks:
   `ψ̃_j ⋆ ψ_j = ψ_j` (`Rd.conv_psiDual_lpBlockKernel`).
 * **The adjoint of a convolution.** For `K ∈ L_1(V)`, `f ∈ L_p(V)` and `g ∈ L_q(V)` with
-  `1/p + 1/q = 1`, `p < ∞`, and the reflection `K^∨(x) = K(-x)` (`Rd.reflect`),
+  `1/p + 1/q = 1`, `p < ∞`, and the reflection `K^∨(x) = K(-x)` (`Rd.reflectNeg`),
   `∫ (K ⋆ f) g = ∫ f (K^∨ ⋆ g)` (`Rd.integral_conv_mul`). For Schwartz functions `η`, `u`,
   `f ∈ L_p(V)`, `1 ≤ p < ∞`, and `w ∈ V^k`, `∫ ((∂^w η) ⋆ f) u = (-1)^k ∫ (η ⋆ f) ∂^w u`
   (`Rd.integral_conv_iteratedLineDerivOp_mul`). Weak derivatives commute with convolution by a
@@ -184,11 +185,12 @@ and of `L_p` and one of them, are Besov spaces.
   `∂^v (η ⋆ f)` for `f ∈ L_p(V)`, `1 ≤ p < ∞` (`Rd.hasWeakLineDeriv_conv`).
 * **Plancherel bounds.** For integrable kernels `θ_j` on `V` with `∑_j |𝓕θ_j(ξ)|² ≤ B` for
   almost every `ξ`, the analysis operator satisfies `∑_j ‖θ_j ⋆ f‖_2² ≤ B ‖f‖_2²` for every
-  `f ∈ L_2(V)` (`Rd.tsum_enorm_convLp_sq_le`, `Rd.lintegral_lqNorm_conv_sq_le`), and the
-  synthesis operator satisfies `‖∑_{j ∈ s} θ_j ⋆ g_j‖_2² ≤ B ∑_{j ∈ s} ‖g_j‖_2²` for all
-  `g_j ∈ L_2(V)` and every finite set `s` (`Rd.enorm_sum_convLp_sq_le`,
-  `Rd.lintegral_enorm_sum_conv_sq_le`); in particular for every Calderón–Zygmund family with
-  overlap `B` (`Rd.IsCZFamily.lintegral_lqNorm_conv_sq_le`,
+  `f ∈ L_2(V)` (`Rd.tsum_enorm_convLp_sq_le_of_fourier_bound`,
+  `Rd.lintegral_lqNorm_conv_sq_le_of_fourier_bound`), and the synthesis operator satisfies
+  `‖∑_{j ∈ s} θ_j ⋆ g_j‖_2² ≤ B ∑_{j ∈ s} ‖g_j‖_2²` for all `g_j ∈ L_2(V)` and every finite set `s`
+  (`Rd.enorm_sum_convLp_sq_le_of_fourier_bound`,
+  `Rd.lintegral_enorm_sum_conv_sq_le_of_fourier_bound`); in particular for every Calderón–Zygmund
+  family with overlap `B` (`Rd.IsCZFamily.lintegral_lqNorm_conv_sq_le`,
   `Rd.IsCZFamily.lintegral_enorm_sum_conv_sq_le`).
 * **The weak type `(1,1)` of vector-valued singular integrals.** Let `n = dim V ≥ 1` and let
   `(θ_j)_j` be a Calderón–Zygmund family with overlap `B` and Hörmander constant `H`, and put

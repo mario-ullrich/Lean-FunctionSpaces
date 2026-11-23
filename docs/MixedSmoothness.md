@@ -19,10 +19,10 @@ rate `2^(-sN) (N + 1)^((d-1)(1-1/q))`.
   `Ω^e_L(f, t)_p = sup_{|h_i| ≤ t_i, i ∈ e} ‖Δ^{L,e}_h f‖_p` the mixed moduli (`Rd.mixedModulus`),
   used for `k ∈ ℕ^d` in the coordinates `e(k) = {i : k_i ≠ 0}` at the scale `2^(-k)`. Let
   `k_k = ⊗_i k_{k_i}` be the tensor products of the one-dimensional local means kernels of a bump
-  vanishing outside `[-1, 1]` (`Rd.LocalMeansBump.mixedKernel`) and `δ_k = ⊗_i ψ_{k_i}` those of the
-  one-dimensional Littlewood–Paley blocks (`Rd.mixedPsi`), so that `δ_k ⋆ f = 𝓕⁻¹(φ_k 𝓕 f)` for the
-  tensor decomposition of unity. For `1 ≤ p < ∞`, `0 < s < L`, `1 ≤ q ≤ ∞` and `f ∈ L_p(ℝ^d)`,
-  `‖(2^(s|k|_1) Ω^{e(k)}_L(f, 2^(-k))_p)_{k ∈ ℕ^d}‖_{ℓ_q} < ∞` iff
+  vanishing outside `[-1, 1]` (`Rd.LocalMeansBump.mixedMeansKernel`) and `δ_k = ⊗_i ψ_{k_i}` those
+  of the one-dimensional Littlewood–Paley blocks (`Rd.mixedPsi`), so that `δ_k ⋆ f = 𝓕⁻¹(φ_k 𝓕 f)`
+  for the tensor decomposition of unity. For `1 ≤ p < ∞`, `0 < s < L`, `1 ≤ q ≤ ∞` and
+  `f ∈ L_p(ℝ^d)`, `‖(2^(s|k|_1) Ω^{e(k)}_L(f, 2^(-k))_p)_{k ∈ ℕ^d}‖_{ℓ_q} < ∞` iff
   `‖(2^(s|k|_1) ‖k_k ⋆ f‖_p)_k‖_{ℓ_q} < ∞` (`Rd.LocalMeansBump.mixedBesov_iff_mixedLocalMeans`) iff
   `‖(2^(s|k|_1) ‖δ_k ⋆ f‖_p)_k‖_{ℓ_q} < ∞` (`Rd.mixedBesov_iff_mixedLP`), the last being Vybíral's
   quasi-norm. The local means average mixed differences
@@ -34,7 +34,7 @@ rate `2^(-sN) (N + 1)^((d-1)(1-1/q))`.
   `‖f - S_N f‖_p ≤ C 2^(-sN) (N + 1)^((d-1)(1-1/q)) ‖(2^(s|k|_1) ‖δ_k ⋆ f‖_p)_k‖_{ℓ_q}` with the
   finite constant `C = ∑_l 2^(-sl) (l + 1)^((d-1)(1-1/q))` (`Rd.hyperbolicCrossConst`,
   `Rd.hyperbolicCrossConst_ne_top`, `Rd.enorm_sub_hyperbolicSum_le_of_pos`); the counting step is
-  `#{k : |k|_1 = n} ≤ (n + 1)^(d-1)` (`Rd.card_levelSet_le`).
+  `#{k : |k|_1 = n} ≤ (n + 1)^(d-1)` (`Rd.card_gridLevelSet_le`).
 
 ## What is formalised
 

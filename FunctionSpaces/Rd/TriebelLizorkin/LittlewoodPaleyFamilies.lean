@@ -15,25 +15,25 @@ public import FunctionSpaces.Rd.TriebelLizorkin.TriebelLizorkinLocalMeans
 The blocks of an admissible Littlewood–Paley kernel (`Rd.LPKernel`, with `𝓕Φ' = 1` on the ball
 `{‖ξ‖ ≤ a}` and `𝓕Φ' = 0` outside the ball of radius `b`) are `ψ'_0 = Φ'` and
 `ψ'_j = (Φ' - δ_{1/2} Φ')_{2^j}`, with the dilation `G_c(x) = c^n G(c x)`, so that
-`𝓕ψ'_j(ξ) = 𝓕Φ'(2^{-j} ξ) - 𝓕Φ'(2^{1-j} ξ)` for `j ≥ 1` (`Rd.LPKernel.fourier_psiS_succ`), as in
-Triebel's example of a Littlewood–Paley system (Triebel 1983, §2.3.1). The bases `Φ'` and
+`𝓕ψ'_j(ξ) = 𝓕Φ'(2^{-j} ξ) - 𝓕Φ'(2^{1-j} ξ)` for `j ≥ 1` (`Rd.LPKernel.fourier_kernelLpBlockS_succ`),
+as in Triebel's example of a Littlewood–Paley system (Triebel 1983, §2.3.1). The bases `Φ'` and
 `Φ' - δ_{1/2} Φ'` are uniformly Schwartz with the seminorm bounds `Rd.LPKernel.baseBound`
-(`Rd.LPKernel.isUniformSchwartz_base`).
+(`Rd.LPKernel.isUniformSchwartz_kernelBase`).
 
 Any two admissible kernels give equivalent Triebel–Lizorkin quasi-norms on tempered distributions,
 for every real `s`, `1 < p < ∞` and `1 < q ≤ ∞`, with the explicit constant
 `Rd.LPKernel.comparisonConst N c s` times the Fefferman–Stein constant
-(`Rd.LPKernel.triebelLizorkinNormDistr_le_of_blocks`,
-`Rd.LPKernel.triebelLizorkinNormDistr_le_mul`), for every window `c ∈ ℕ` with `b ≤ 2^c a'` and
+(`Rd.LPKernel.kernelTriebelLizorkinNormDistr_le_of_blocks`,
+`Rd.LPKernel.kernelTriebelLizorkinNormDistr_le_mul`), for every window `c ∈ ℕ` with `b ≤ 2^c a'` and
 `b' ≤ 2^c a`, that is `2^c ≥ max(b/a', b'/a)`; such a window exists (`Rd.LPKernel.exists_window`).
 Hence they give the same spaces, also on `L_p` (`Rd.LPKernel.memTriebelLizorkinDistr_iff`,
 `Rd.LPKernel.memTriebelLizorkin_iff`).
 
 The proof is a finite identity on the Fourier side. With `2^c ≥ max(b/a', b'/a)`,
-`∑_{|k - j| ≤ c} 𝓕ψ'_k = 1` wherever `𝓕ψ_j ≠ 0` (`Rd.LPKernel.fourier_psiS_mul_sum_Icc`), so
-`Δ_j u = ∑_{|k - j| ≤ c} ψ_j ⋆ Δ'_k u` (`Rd.LPKernel.distribBlock_eq_sum`). The convolutions with
-`ψ_j` lie below the maximal function, uniformly in `j`, the weights change by at most `2^{c|s|}`
-inside the window, the window sums cost the factor `2c + 1` in `ℓ_q`
+`∑_{|k - j| ≤ c} 𝓕ψ'_k = 1` wherever `𝓕ψ_j ≠ 0` (`Rd.LPKernel.fourier_kernelLpBlockS_mul_sum_Icc`),
+so `Δ_j u = ∑_{|k - j| ≤ c} ψ_j ⋆ Δ'_k u` (`Rd.LPKernel.kernelDistribBlock_eq_sum`). The
+convolutions with `ψ_j` lie below the maximal function, uniformly in `j`, the weights change by at
+most `2^{c|s|}` inside the window, the window sums cost the factor `2c + 1` in `ℓ_q`
 (`ENNReal.lqNorm_sum_Icc_le`), and the Fefferman–Stein inequality finishes.
 -/
 
@@ -62,26 +62,26 @@ noncomputable def baseBound (k l : ℕ) : ℝ :=
 
 /-- The bases form a uniformly Schwartz family with bounds `K.baseBound`, since they take only two
 values (`Rd.IsUniformSchwartz.of_forall_eq_or_eq`). -/
-theorem isUniformSchwartz_base : IsUniformSchwartz K.base K.baseBound :=
+theorem isUniformSchwartz_kernelBase : IsUniformSchwartz K.kernelBase K.baseBound :=
   IsUniformSchwartz.of_forall_eq_or_eq fun j => by
     cases j with
     | zero => exact Or.inl rfl
     | succ j => exact Or.inr rfl
 
 /-- `𝓕ψ'_0 = 𝓕Φ'`. -/
-theorem fourier_psiS_zero (ξ : V) :
-    (𝓕 (K.psiS 0) : 𝓢(V, ℂ)) ξ = (𝓕 K.kernel : 𝓢(V, ℂ)) ξ := by
-  rw [psiS, fourier_schwartzDilate_apply (by norm_num : (0 : ℝ) < 2 ^ 0), pow_zero, inv_one,
-    one_smul]
+theorem fourier_kernelLpBlockS_zero (ξ : V) :
+    (𝓕 (K.kernelLpBlockS 0) : 𝓢(V, ℂ)) ξ = (𝓕 K.kernel : 𝓢(V, ℂ)) ξ := by
+  rw [kernelLpBlockS, fourier_schwartzDilate_apply (by norm_num : (0 : ℝ) < 2 ^ 0), pow_zero,
+    inv_one, one_smul]
   rfl
 
 /-- `𝓕ψ'_{j+1}(ξ) = 𝓕Φ'(2^{-(j+1)} ξ) - 𝓕Φ'(2^{-j} ξ)` (`Rd.fourier_schwartzDilate_apply`). -/
-theorem fourier_psiS_succ (j : ℕ) (ξ : V) :
-    (𝓕 (K.psiS (j + 1)) : 𝓢(V, ℂ)) ξ =
+theorem fourier_kernelLpBlockS_succ (j : ℕ) (ξ : V) :
+    (𝓕 (K.kernelLpBlockS (j + 1)) : 𝓢(V, ℂ)) ξ =
       (𝓕 K.kernel : 𝓢(V, ℂ)) (((2 : ℝ) ^ (j + 1))⁻¹ • ξ) -
         (𝓕 K.kernel : 𝓢(V, ℂ)) (((2 : ℝ) ^ j)⁻¹ • ξ) := by
-  rw [psiS, fourier_schwartzDilate_apply (by positivity : (0 : ℝ) < 2 ^ (j + 1)), base,
-    sub_eq_add_neg, FourierAdd.fourier_add, FourierTransform.fourier_neg, add_apply,
+  rw [kernelLpBlockS, fourier_schwartzDilate_apply (by positivity : (0 : ℝ) < 2 ^ (j + 1)),
+    kernelBase, sub_eq_add_neg, FourierAdd.fourier_add, FourierTransform.fourier_neg, add_apply,
     neg_apply, ← sub_eq_add_neg,
     fourier_schwartzDilate_apply (by norm_num : (0 : ℝ) < 1 / 2), smul_smul]
   congr 2
@@ -89,12 +89,13 @@ theorem fourier_psiS_succ (j : ℕ) (ξ : V) :
   field_simp
 
 /-- **The blocks telescope**: `∑_{j ≤ J} 𝓕ψ'_j(ξ) = 𝓕Φ'(2^{-J} ξ)`. -/
-theorem sum_range_fourier_psiS (J : ℕ) (ξ : V) :
-    ∑ j ∈ Finset.range (J + 1), (𝓕 (K.psiS j) : 𝓢(V, ℂ)) ξ =
+theorem sum_range_fourier_kernelLpBlockS (J : ℕ) (ξ : V) :
+    ∑ j ∈ Finset.range (J + 1), (𝓕 (K.kernelLpBlockS j) : 𝓢(V, ℂ)) ξ =
       (𝓕 K.kernel : 𝓢(V, ℂ)) (((2 : ℝ) ^ J)⁻¹ • ξ) := by
   induction J with
-  | zero => rw [zero_add, Finset.sum_range_one, fourier_psiS_zero, pow_zero, inv_one, one_smul]
-  | succ J ih => rw [Finset.sum_range_succ, ih, fourier_psiS_succ]; ring
+  | zero =>
+    rw [zero_add, Finset.sum_range_one, fourier_kernelLpBlockS_zero, pow_zero, inv_one, one_smul]
+  | succ J ih => rw [Finset.sum_range_succ, ih, fourier_kernelLpBlockS_succ]; ring
 
 /-- `𝓕Φ'(c⁻¹ ξ) = 1` for `‖ξ‖ ≤ c a`, `c > 0`. -/
 theorem fourier_kernel_inv_smul_eq_one {c : ℝ} (hc : 0 < c) {ξ : V} (h : ‖ξ‖ ≤ c * K.a) :
@@ -111,16 +112,16 @@ theorem fourier_kernel_inv_smul_eq_zero {c : ℝ} (hc : 0 < c) {ξ : V} (h : c *
   exact h
 
 /-- **The Fourier support of the blocks, outer radius**: where `𝓕ψ'_j(ξ) ≠ 0`, `‖ξ‖ < 2^j b`. -/
-theorem norm_lt_of_fourier_psiS_ne_zero {j : ℕ} {ξ : V}
-    (h : (𝓕 (K.psiS j) : 𝓢(V, ℂ)) ξ ≠ 0) : ‖ξ‖ < 2 ^ j * K.b := by
+theorem norm_lt_of_fourier_kernelLpBlockS_ne_zero {j : ℕ} {ξ : V}
+    (h : (𝓕 (K.kernelLpBlockS j) : 𝓢(V, ℂ)) ξ ≠ 0) : ‖ξ‖ < 2 ^ j * K.b := by
   by_contra hξ
   rw [not_lt] at hξ
   cases j with
   | zero =>
-    rw [fourier_psiS_zero] at h
+    rw [fourier_kernelLpBlockS_zero] at h
     exact h (by simpa using K.fourier_kernel_inv_smul_eq_zero one_pos (by simpa using hξ))
   | succ j =>
-    rw [fourier_psiS_succ, K.fourier_kernel_inv_smul_eq_zero (by positivity) hξ,
+    rw [fourier_kernelLpBlockS_succ, K.fourier_kernel_inv_smul_eq_zero (by positivity) hξ,
       K.fourier_kernel_inv_smul_eq_zero (by positivity) (le_trans (by
         rw [pow_succ]; nlinarith [K.a_pos, K.a_lt_b, pow_pos (two_pos (α := ℝ)) j]) hξ),
       sub_zero] at h
@@ -128,11 +129,11 @@ theorem norm_lt_of_fourier_psiS_ne_zero {j : ℕ} {ξ : V}
 
 /-- **The Fourier support of the blocks, inner radius**: where `𝓕ψ'_{j+1}(ξ) ≠ 0`,
 `2^j a < ‖ξ‖`. -/
-theorem lt_norm_of_fourier_psiS_succ_ne_zero {j : ℕ} {ξ : V}
-    (h : (𝓕 (K.psiS (j + 1)) : 𝓢(V, ℂ)) ξ ≠ 0) : 2 ^ j * K.a < ‖ξ‖ := by
+theorem lt_norm_of_fourier_kernelLpBlockS_succ_ne_zero {j : ℕ} {ξ : V}
+    (h : (𝓕 (K.kernelLpBlockS (j + 1)) : 𝓢(V, ℂ)) ξ ≠ 0) : 2 ^ j * K.a < ‖ξ‖ := by
   by_contra hξ
   rw [not_lt] at hξ
-  rw [fourier_psiS_succ, K.fourier_kernel_inv_smul_eq_one (by positivity) hξ,
+  rw [fourier_kernelLpBlockS_succ, K.fourier_kernel_inv_smul_eq_one (by positivity) hξ,
     K.fourier_kernel_inv_smul_eq_one (by positivity) (hξ.trans (by
       rw [pow_succ]; nlinarith [K.a_pos, pow_pos (two_pos (α := ℝ)) j])), sub_self] at h
   exact h rfl
@@ -149,76 +150,79 @@ theorem exists_window : ∃ c : ℕ, K.b ≤ 2 ^ c * K'.a ∧ K'.b ≤ 2 ^ c * K
 
 /-- **The window sums are `1` on the Fourier support of a block**: if `b ≤ 2^c a'` and
 `b' ≤ 2^c a`, then `∑_{k = j - c}^{j + c} 𝓕ψ'_k(ξ) = 1` wherever `𝓕ψ_j(ξ) ≠ 0`. The sum is
-`𝓕Φ'(2^{-(j+c)} ξ) - 𝓕Φ'(2^{-(j-c-1)} ξ)` (`Rd.LPKernel.sum_range_fourier_psiS`, the second term
-absent for `j ≤ c`), and `2^{j-1} a < ‖ξ‖ < 2^j b` (`Rd.LPKernel.norm_lt_of_fourier_psiS_ne_zero`,
-`Rd.LPKernel.lt_norm_of_fourier_psiS_succ_ne_zero`). -/
-theorem sum_Icc_fourier_psiS_eq_one {c : ℕ} (hb : K.b ≤ 2 ^ c * K'.a) (hb' : K'.b ≤ 2 ^ c * K.a)
-    {j : ℕ} {ξ : V} (h : (𝓕 (K.psiS j) : 𝓢(V, ℂ)) ξ ≠ 0) :
-    ∑ k ∈ Finset.Icc (j - c) (j + c), (𝓕 (K'.psiS k) : 𝓢(V, ℂ)) ξ = 1 := by
-  have hup : ∑ k ∈ Finset.range (j + c + 1), (𝓕 (K'.psiS k) : 𝓢(V, ℂ)) ξ = 1 := by
-    rw [K'.sum_range_fourier_psiS]
+`𝓕Φ'(2^{-(j+c)} ξ) - 𝓕Φ'(2^{-(j-c-1)} ξ)` (`Rd.LPKernel.sum_range_fourier_kernelLpBlockS`, the
+second term absent for `j ≤ c`), and `2^{j-1} a < ‖ξ‖ < 2^j b`
+(`Rd.LPKernel.norm_lt_of_fourier_kernelLpBlockS_ne_zero`,
+`Rd.LPKernel.lt_norm_of_fourier_kernelLpBlockS_succ_ne_zero`). -/
+theorem sum_Icc_fourier_kernelLpBlockS_eq_one {c : ℕ} (hb : K.b ≤ 2 ^ c * K'.a)
+    (hb' : K'.b ≤ 2 ^ c * K.a) {j : ℕ} {ξ : V} (h : (𝓕 (K.kernelLpBlockS j) : 𝓢(V, ℂ)) ξ ≠ 0) :
+    ∑ k ∈ Finset.Icc (j - c) (j + c), (𝓕 (K'.kernelLpBlockS k) : 𝓢(V, ℂ)) ξ = 1 := by
+  have hup : ∑ k ∈ Finset.range (j + c + 1), (𝓕 (K'.kernelLpBlockS k) : 𝓢(V, ℂ)) ξ = 1 := by
+    rw [K'.sum_range_fourier_kernelLpBlockS]
     refine K'.fourier_kernel_inv_smul_eq_one (by positivity) ?_
-    have h1 := K.norm_lt_of_fourier_psiS_ne_zero h
+    have h1 := K.norm_lt_of_fourier_kernelLpBlockS_ne_zero h
     calc ‖ξ‖ ≤ 2 ^ j * K.b := h1.le
       _ ≤ 2 ^ j * (2 ^ c * K'.a) := by gcongr
       _ = 2 ^ (j + c) * K'.a := by rw [pow_add, mul_assoc]
   rw [← Finset.Ico_add_one_right_eq_Icc, Finset.sum_Ico_eq_sub _ (by omega), hup]
   rcases Nat.lt_or_ge c j with hcj | hcj
   · obtain ⟨i, rfl⟩ : ∃ i, j = c + i + 1 := ⟨j - c - 1, by omega⟩
-    rw [show c + i + 1 - c = i + 1 by omega, K'.sum_range_fourier_psiS,
+    rw [show c + i + 1 - c = i + 1 by omega, K'.sum_range_fourier_kernelLpBlockS,
       K'.fourier_kernel_inv_smul_eq_zero (by positivity), sub_zero]
-    have h1 := K.lt_norm_of_fourier_psiS_succ_ne_zero h
+    have h1 := K.lt_norm_of_fourier_kernelLpBlockS_succ_ne_zero h
     calc 2 ^ i * K'.b ≤ 2 ^ i * (2 ^ c * K.a) := by gcongr
       _ = 2 ^ (c + i) * K.a := by rw [pow_add]; ring
       _ ≤ ‖ξ‖ := h1.le
   · rw [Nat.sub_eq_zero_of_le hcj, Finset.sum_range_zero, sub_zero]
 
 /-- **The finite identity on the Fourier side**: `𝓕ψ_j · ∑_{k = j - c}^{j + c} 𝓕ψ'_k = 𝓕ψ_j`
-under the hypotheses of `Rd.LPKernel.sum_Icc_fourier_psiS_eq_one`. -/
-theorem fourier_psiS_mul_sum_Icc {c : ℕ} (hb : K.b ≤ 2 ^ c * K'.a) (hb' : K'.b ≤ 2 ^ c * K.a)
-    (j : ℕ) (ξ : V) :
-    (𝓕 (K.psiS j) : 𝓢(V, ℂ)) ξ *
-        ∑ k ∈ Finset.Icc (j - c) (j + c), (𝓕 (K'.psiS k) : 𝓢(V, ℂ)) ξ =
-      (𝓕 (K.psiS j) : 𝓢(V, ℂ)) ξ := by
-  by_cases h : (𝓕 (K.psiS j) : 𝓢(V, ℂ)) ξ = 0
+under the hypotheses of `Rd.LPKernel.sum_Icc_fourier_kernelLpBlockS_eq_one`. -/
+theorem fourier_kernelLpBlockS_mul_sum_Icc {c : ℕ} (hb : K.b ≤ 2 ^ c * K'.a)
+    (hb' : K'.b ≤ 2 ^ c * K.a) (j : ℕ) (ξ : V) :
+    (𝓕 (K.kernelLpBlockS j) : 𝓢(V, ℂ)) ξ *
+        ∑ k ∈ Finset.Icc (j - c) (j + c), (𝓕 (K'.kernelLpBlockS k) : 𝓢(V, ℂ)) ξ =
+      (𝓕 (K.kernelLpBlockS j) : 𝓢(V, ℂ)) ξ := by
+  by_cases h : (𝓕 (K.kernelLpBlockS j) : 𝓢(V, ℂ)) ξ = 0
   · rw [h, zero_mul]
-  · rw [K.sum_Icc_fourier_psiS_eq_one K' hb hb' h, mul_one]
+  · rw [K.sum_Icc_fourier_kernelLpBlockS_eq_one K' hb hb' h, mul_one]
 
 /-! ### The finite identity for tempered distributions -/
 
 /-- **The finite identity for tempered distributions**: under the hypotheses of
-`Rd.LPKernel.sum_Icc_fourier_psiS_eq_one`, for every tempered distribution `u` and every `j`,
-`Δ_j u = ∑_{k = j - c}^{j + c} (𝓕ψ_j)(D) Δ'_k u`, with the blocks `Δ_j` of `K` and `Δ'_k` of
+`Rd.LPKernel.sum_Icc_fourier_kernelLpBlockS_eq_one`, for every tempered distribution `u` and every
+`j`, `Δ_j u = ∑_{k = j - c}^{j + c} (𝓕ψ_j)(D) Δ'_k u`, with the blocks `Δ_j` of `K` and `Δ'_k` of
 `K'`. Both sides are Fourier multipliers of `u` (Mathlib's
 `TemperedDistribution.fourierMultiplierCLM_fourierMultiplierCLM_apply`,
 `TemperedDistribution.fourierMultiplierCLM_sum`), with the same symbol by
-`Rd.LPKernel.fourier_psiS_mul_sum_Icc`. -/
-theorem distribBlock_eq_sum {c : ℕ} (hb : K.b ≤ 2 ^ c * K'.a) (hb' : K'.b ≤ 2 ^ c * K.a)
+`Rd.LPKernel.fourier_kernelLpBlockS_mul_sum_Icc`. -/
+theorem kernelDistribBlock_eq_sum {c : ℕ} (hb : K.b ≤ 2 ^ c * K'.a) (hb' : K'.b ≤ 2 ^ c * K.a)
     (u : 𝓢'(V, ℂ)) (j : ℕ) :
-    K.distribBlock j u = ∑ k ∈ Finset.Icc (j - c) (j + c),
-      TemperedDistribution.fourierMultiplierCLM ℂ (𝓕 (K.psiS j) : 𝓢(V, ℂ))
-        (K'.distribBlock k u) := by
-  simp only [distribBlock]
+    K.kernelDistribBlock j u = ∑ k ∈ Finset.Icc (j - c) (j + c),
+      TemperedDistribution.fourierMultiplierCLM ℂ (𝓕 (K.kernelLpBlockS j) : 𝓢(V, ℂ))
+        (K'.kernelDistribBlock k u) := by
+  simp only [kernelDistribBlock]
   simp_rw [TemperedDistribution.fourierMultiplierCLM_fourierMultiplierCLM_apply
-    (𝓕 (K'.psiS _)).hasTemperateGrowth (𝓕 (K.psiS j)).hasTemperateGrowth]
+    (𝓕 (K'.kernelLpBlockS _)).hasTemperateGrowth (𝓕 (K.kernelLpBlockS j)).hasTemperateGrowth]
   rw [← sum_apply, ← TemperedDistribution.fourierMultiplierCLM_sum ℂ
-    fun k _ => (𝓕 (K'.psiS k)).hasTemperateGrowth.mul (𝓕 (K.psiS j)).hasTemperateGrowth]
+    fun k _ =>
+      (𝓕 (K'.kernelLpBlockS k)).hasTemperateGrowth.mul (𝓕 (K.kernelLpBlockS j)).hasTemperateGrowth]
   refine congrArg (fun f => TemperedDistribution.fourierMultiplierCLM ℂ f u) (funext fun ξ => ?_)
   simp only [Pi.mul_apply]
-  rw [← Finset.sum_mul, mul_comm, K.fourier_psiS_mul_sum_Icc K' hb hb' j ξ]
+  rw [← Finset.sum_mul, mul_comm, K.fourier_kernelLpBlockS_mul_sum_Icc K' hb hb' j ξ]
 
 variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 
 /-- **The blocks of `K` from those of `K'`**: under the hypotheses of
-`Rd.LPKernel.distribBlock_eq_sum`, `1 ≤ p < ∞`, if the blocks `Δ'_k u` are `L_p` functions `g_k`,
-then `Δ_j u` is the `L_p` function `∑_{k = j - c}^{j + c} ψ_j ⋆ g_k`
+`Rd.LPKernel.kernelDistribBlock_eq_sum`, `1 ≤ p < ∞`, if the blocks `Δ'_k u` are `L_p` functions
+`g_k`, then `Δ_j u` is the `L_p` function `∑_{k = j - c}^{j + c} ψ_j ⋆ g_k`
 (`Rd.fourierMultiplierCLM_fourier_toLp_eq_conv`). -/
-theorem distribBlock_eq_sum_convLp (hp : p ≠ ∞) {c : ℕ} (hb : K.b ≤ 2 ^ c * K'.a)
+theorem kernelDistribBlock_eq_sum_convLp (hp : p ≠ ∞) {c : ℕ} (hb : K.b ≤ 2 ^ c * K'.a)
     (hb' : K'.b ≤ 2 ^ c * K.a) {u : 𝓢'(V, ℂ)} {g : ℕ → Lp ℂ p (volume : Measure V)}
-    (hg : ∀ k, K'.distribBlock k u = (g k : 𝓢'(V, ℂ))) (j : ℕ) :
-    K.distribBlock j u = ((∑ k ∈ Finset.Icc (j - c) (j + c),
-      convLp hp (K.psiS j).integrable (g k) : Lp ℂ p (volume : Measure V)) : 𝓢'(V, ℂ)) := by
-  rw [K.distribBlock_eq_sum K' hb hb', ← Lp.toTemperedDistributionCLM_apply, map_sum]
+    (hg : ∀ k, K'.kernelDistribBlock k u = (g k : 𝓢'(V, ℂ))) (j : ℕ) :
+    K.kernelDistribBlock j u = ((∑ k ∈ Finset.Icc (j - c) (j + c),
+      convLp hp (K.kernelLpBlockS j).integrable (g k) : Lp ℂ p (volume : Measure V)) :
+        𝓢'(V, ℂ)) := by
+  rw [K.kernelDistribBlock_eq_sum K' hb hb', ← Lp.toTemperedDistributionCLM_apply, map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [hg, fourierMultiplierCLM_fourier_toLp_eq_conv hp, Lp.toTemperedDistributionCLM_apply]
 
@@ -232,19 +236,21 @@ function (`Rd.IsUniformSchwartz.enorm_conv_dilate_le_maximalFunction`), and ever
 has `|j - k| ≤ c`, so `2^{js} ≤ 2^{c|s|} 2^{ks}` (`ENNReal.dyadicWeight_le_of_mem_Icc`). -/
 theorem dyadicWeight_mul_enorm_sum_conv_le {N : ℕ} (hN : finrank ℝ V < N) (c : ℕ) (s : ℝ)
     (j : ℕ) (g : ℕ → V → ℂ) (x : V) :
-    dyadicWeight s j * ‖∑ k ∈ Finset.Icc (j - c) (j + c), conv (K.psiS j) (g k) volume x‖ₑ ≤
+    dyadicWeight s j * ‖∑ k ∈ Finset.Icc (j - c) (j + c),
+        conv (K.kernelLpBlockS j) (g k) volume x‖ₑ ≤
       dyadicWeight |s| c * (decayMaximalConst V N * familyDecayConst K.baseBound 0 N) *
         ∑ k ∈ Finset.Icc (j - c) (j + c),
           maximalFunction (fun y => dyadicWeight s k * ‖g k y‖ₑ) x := by
   set D := decayMaximalConst V N * familyDecayConst K.baseBound 0 N
-  calc dyadicWeight s j * ‖∑ k ∈ Finset.Icc (j - c) (j + c), conv (K.psiS j) (g k) volume x‖ₑ
+  calc dyadicWeight s j * ‖∑ k ∈ Finset.Icc (j - c) (j + c),
+          conv (K.kernelLpBlockS j) (g k) volume x‖ₑ
       ≤ ∑ k ∈ Finset.Icc (j - c) (j + c),
           dyadicWeight s j * (D * maximalFunction (fun y => ‖g k y‖ₑ) x) := by
         rw [← Finset.mul_sum]
         refine mul_le_mul_of_nonneg_left ((enorm_sum_le _ _).trans
           (Finset.sum_le_sum fun k _ => ?_)) (zero_le (a := dyadicWeight s j))
-        rw [K.coe_psiS]
-        exact K.isUniformSchwartz_base.enorm_conv_dilate_le_maximalFunction hN j _ x
+        rw [K.coe_kernelLpBlockS]
+        exact K.isUniformSchwartz_kernelBase.enorm_conv_dilate_le_maximalFunction hN j _ x
     _ ≤ ∑ k ∈ Finset.Icc (j - c) (j + c),
           dyadicWeight |s| c * dyadicWeight s k * (D * maximalFunction (fun y => ‖g k y‖ₑ) x) :=
         Finset.sum_le_sum fun k hk => mul_le_mul_of_nonneg_right
@@ -270,30 +276,30 @@ theorem comparisonConst_ne_top {N : ℕ} (hN : finrank ℝ V < N) (c : ℕ) (s :
 `b ≤ 2^c a'`, `b' ≤ 2^c a`. If the blocks of `u` for `K'` are `L_p` functions `g_k`, then
 `‖u‖_{F^s_{p,q}, K} ≤ C C_{FS} ‖ x ↦ ‖(2^{ks} |g_k(x)|)_k‖_{ℓ_q} ‖_p` with the comparison constant
 `C = K.comparisonConst N c s` and the Fefferman–Stein constant `C_{FS}`. The blocks of `u` for `K`
-are window sums of convolutions of the `g_k` (`Rd.LPKernel.distribBlock_eq_sum_convLp`), bounded
-pointwise by maximal functions (`Rd.LPKernel.dyadicWeight_mul_enorm_sum_conv_le`); the window
-sums cost `2c + 1` in `ℓ_q` (`ENNReal.lqNorm_sum_Icc_le`), and
+are window sums of convolutions of the `g_k` (`Rd.LPKernel.kernelDistribBlock_eq_sum_convLp`),
+bounded pointwise by maximal functions (`Rd.LPKernel.dyadicWeight_mul_enorm_sum_conv_le`); the
+window sums cost `2c + 1` in `ℓ_q` (`ENNReal.lqNorm_sum_Icc_le`), and
 `Rd.eLpNorm_le_of_le_lqNorm_maximalFunction` finishes. -/
-theorem triebelLizorkinNormDistr_le_of_blocks (hp1 : 1 < p) (hp : p ≠ ∞) {q : ℝ≥0∞}
+theorem kernelTriebelLizorkinNormDistr_le_of_blocks (hp1 : 1 < p) (hp : p ≠ ∞) {q : ℝ≥0∞}
     (hq1 : 1 < q) {N : ℕ} (hN : finrank ℝ V < N) {c : ℕ} (hb : K.b ≤ 2 ^ c * K'.a)
     (hb' : K'.b ≤ 2 ^ c * K.a) (s : ℝ) {u : 𝓢'(V, ℂ)} {g : ℕ → Lp ℂ p (volume : Measure V)}
-    (hg : ∀ k, K'.distribBlock k u = (g k : 𝓢'(V, ℂ))) :
-    K.triebelLizorkinNormDistr p s q u ≤ K.comparisonConst N c s * feffermanSteinConst V p q *
+    (hg : ∀ k, K'.kernelDistribBlock k u = (g k : 𝓢'(V, ℂ))) :
+    K.kernelTriebelLizorkinNormDistr p s q u ≤ K.comparisonConst N c s * feffermanSteinConst V p q *
       eLpNorm (fun x => lqNorm q fun k => dyadicWeight s k * ‖g k x‖ₑ) p volume := by
   set h : ℕ → Lp ℂ p (volume : Measure V) := fun j =>
-    ∑ k ∈ Finset.Icc (j - c) (j + c), convLp hp (K.psiS j).integrable (g k) with hh
+    ∑ k ∈ Finset.Icc (j - c) (j + c), convLp hp (K.kernelLpBlockS j).integrable (g k) with hh
   have hae : ∀ j, ⇑(h j) =ᵐ[volume]
-      fun x => ∑ k ∈ Finset.Icc (j - c) (j + c), conv (K.psiS j) (g k) volume x := fun j =>
-    coeFn_sum_convLp_ae hp (fun _ => K.psiS j) g _
-  refine (K.triebelLizorkinNormDistr_le (g := h)
-    (K.distribBlock_eq_sum_convLp K' hp hb hb' hg)).trans ?_
+      fun x => ∑ k ∈ Finset.Icc (j - c) (j + c), conv (K.kernelLpBlockS j) (g k) volume x :=
+    fun j => coeFn_sum_convLp_ae hp (fun _ => K.kernelLpBlockS j) g _
+  refine (K.kernelTriebelLizorkinNormDistr_le (g := h)
+    (K.kernelDistribBlock_eq_sum_convLp K' hp hb hb' hg)).trans ?_
   refine eLpNorm_le_of_le_lqNorm_maximalFunction hp1 hp hq1
     (aemeasurable_lqNorm_dyadicWeight_Lp _ q _)
     (fun k => ((Lp.aestronglyMeasurable (g k)).enorm.const_mul _)) ?_
   filter_upwards [ae_all_iff.2 hae] with x hx
   simp_rw [hx]
   calc lqNorm q (fun j => dyadicWeight s j *
-        ‖∑ k ∈ Finset.Icc (j - c) (j + c), conv (K.psiS j) (g k) volume x‖ₑ)
+        ‖∑ k ∈ Finset.Icc (j - c) (j + c), conv (K.kernelLpBlockS j) (g k) volume x‖ₑ)
       ≤ lqNorm q (fun j => dyadicWeight |s| c *
           (decayMaximalConst V N * familyDecayConst K.baseBound 0 N) *
           ∑ k ∈ Finset.Icc (j - c) (j + c),
@@ -310,45 +316,46 @@ theorem triebelLizorkinNormDistr_le_of_blocks (hp1 : 1 < p) (hp : p ≠ ∞) {q 
 `1 < p < ∞`, `1 < q ≤ ∞`, `N > n` and `b ≤ 2^c a'`, `b' ≤ 2^c a`. For every tempered distribution
 `u`, `‖u‖_{F^s_{p,q}, K} ≤ max(1, C C_{FS}) ‖u‖_{F^s_{p,q}, K'}` with the comparison constant
 `C = K.comparisonConst N c s` and the Fefferman–Stein constant `C_{FS}`
-(`Rd.LPKernel.triebelLizorkinNormDistr_le_of_blocks` for every family of `L_p` functions
-representing the blocks of `u` for `K'`, and `Rd.LPKernel.le_mul_triebelLizorkinNormDistr`). -/
-theorem triebelLizorkinNormDistr_le_mul (hp1 : 1 < p) (hp : p ≠ ∞) {q : ℝ≥0∞} (hq1 : 1 < q)
+(`Rd.LPKernel.kernelTriebelLizorkinNormDistr_le_of_blocks` for every family of `L_p` functions
+representing the blocks of `u` for `K'`, and
+`Rd.LPKernel.le_mul_kernelTriebelLizorkinNormDistr`). -/
+theorem kernelTriebelLizorkinNormDistr_le_mul (hp1 : 1 < p) (hp : p ≠ ∞) {q : ℝ≥0∞} (hq1 : 1 < q)
     {N : ℕ} (hN : finrank ℝ V < N) {c : ℕ} (hb : K.b ≤ 2 ^ c * K'.a) (hb' : K'.b ≤ 2 ^ c * K.a)
     (s : ℝ) (u : 𝓢'(V, ℂ)) :
-    K.triebelLizorkinNormDistr p s q u ≤
+    K.kernelTriebelLizorkinNormDistr p s q u ≤
       max 1 (K.comparisonConst N c s * feffermanSteinConst V p q) *
-        K'.triebelLizorkinNormDistr p s q u := by
-  refine K'.le_mul_triebelLizorkinNormDistr (zero_lt_one.trans_le (le_max_left _ _)).ne'
+        K'.kernelTriebelLizorkinNormDistr p s q u := by
+  refine K'.le_mul_kernelTriebelLizorkinNormDistr (zero_lt_one.trans_le (le_max_left _ _)).ne'
     fun g hg => ?_
-  refine (K.triebelLizorkinNormDistr_le_of_blocks K' hp1 hp hq1 hN hb hb' s hg).trans ?_
+  refine (K.kernelTriebelLizorkinNormDistr_le_of_blocks K' hp1 hp hq1 hN hb hb' s hg).trans ?_
   exact mul_le_mul_of_nonneg_right (le_max_right _ _) (zero_le (a := _))
 
 /-- **Any two admissible kernels give equivalent quasi-norms**: for admissible kernels `K`, `K'`,
 `1 < p < ∞`, `1 < q ≤ ∞` and every real `s` there is a finite constant `C` with
 `‖u‖_{F^s_{p,q}, K} ≤ C ‖u‖_{F^s_{p,q}, K'}` for every tempered distribution `u`
-(`Rd.LPKernel.triebelLizorkinNormDistr_le_mul` with a window from `Rd.LPKernel.exists_window` and
-`N = n + 1`). Exchanging `K` and `K'` gives the converse. -/
-theorem exists_triebelLizorkinNormDistr_le (hp1 : 1 < p) (hp : p ≠ ∞) {q : ℝ≥0∞} (hq1 : 1 < q)
+(`Rd.LPKernel.kernelTriebelLizorkinNormDistr_le_mul` with a window from `Rd.LPKernel.exists_window`
+and `N = n + 1`). Exchanging `K` and `K'` gives the converse. -/
+theorem exists_kernelTriebelLizorkinNormDistr_le (hp1 : 1 < p) (hp : p ≠ ∞) {q : ℝ≥0∞} (hq1 : 1 < q)
     (s : ℝ) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ u : 𝓢'(V, ℂ),
-      K.triebelLizorkinNormDistr p s q u ≤ C * K'.triebelLizorkinNormDistr p s q u := by
+      K.kernelTriebelLizorkinNormDistr p s q u ≤ C * K'.kernelTriebelLizorkinNormDistr p s q u := by
   obtain ⟨c, hb, hb'⟩ := K.exists_window K'
   have hN : finrank ℝ V < finrank ℝ V + 1 := Nat.lt_succ_self _
   exact ⟨max 1 (K.comparisonConst (finrank ℝ V + 1) c s * feffermanSteinConst V p q),
     max_ne_top ENNReal.one_ne_top (ENNReal.mul_ne_top (K.comparisonConst_ne_top hN c s)
       (feffermanSteinConst_ne_top hp1 hp hq1)),
-    K.triebelLizorkinNormDistr_le_mul K' hp1 hp hq1 hN hb hb' s⟩
+    K.kernelTriebelLizorkinNormDistr_le_mul K' hp1 hp hq1 hN hb hb' s⟩
 
 /-- **Every admissible kernel gives the same spaces of tempered distributions**: for `1 < p < ∞`,
 `1 < q ≤ ∞` and every real `s`, a tempered distribution has finite quasi-norm for the kernel `K`
-iff it lies in `F^s_{p,q}` of the project (`Rd.LPKernel.exists_triebelLizorkinNormDistr_le` for
-`K` and `Rd.LPKernel.standard` in both orders). -/
+iff it lies in `F^s_{p,q}` of the project (`Rd.LPKernel.exists_kernelTriebelLizorkinNormDistr_le`
+for `K` and `Rd.LPKernel.standardKernel` in both orders). -/
 theorem memTriebelLizorkinDistr_iff (hp1 : 1 < p) (hp : p ≠ ∞) {q : ℝ≥0∞} (hq1 : 1 < q)
     (s : ℝ) (u : 𝓢'(V, ℂ)) :
-    K.triebelLizorkinNormDistr p s q u < ∞ ↔ MemTriebelLizorkinDistr p s q u := by
-  rw [MemTriebelLizorkinDistr, ← standard_triebelLizorkinNormDistr]
-  obtain ⟨C, hC, h⟩ := K.exists_triebelLizorkinNormDistr_le (standard V) hp1 hp hq1 s
-  obtain ⟨C', hC', h'⟩ := (standard V).exists_triebelLizorkinNormDistr_le K hp1 hp hq1 s
+    K.kernelTriebelLizorkinNormDistr p s q u < ∞ ↔ MemTriebelLizorkinDistr p s q u := by
+  rw [MemTriebelLizorkinDistr, ← standardKernel_kernelTriebelLizorkinNormDistr]
+  obtain ⟨C, hC, h⟩ := K.exists_kernelTriebelLizorkinNormDistr_le (standardKernel V) hp1 hp hq1 s
+  obtain ⟨C', hC', h'⟩ := (standardKernel V).exists_kernelTriebelLizorkinNormDistr_le K hp1 hp hq1 s
   exact ⟨fun hu => (h' u).trans_lt (ENNReal.mul_lt_top hC'.lt_top hu),
     fun hu => (h u).trans_lt (ENNReal.mul_lt_top hC.lt_top hu)⟩
 
@@ -356,29 +363,29 @@ theorem memTriebelLizorkinDistr_iff (hp1 : 1 < p) (hp : p ≠ ∞) {q : ℝ≥0�
 `1 < q ≤ ∞`, every real `s` and `f ∈ L_p(V)`,
 `‖ x ↦ ‖(2^{js} |(ψ'_j ⋆ f)(x)|)_j‖_{ℓ_q} ‖_p < ∞` iff `f ∈ F^s_{p,q}`
 (`Rd.LPKernel.memTriebelLizorkinDistr_iff`,
-`Rd.LPKernel.triebelLizorkinNormDistr_toTemperedDistribution`,
+`Rd.LPKernel.kernelTriebelLizorkinNormDistr_toTemperedDistribution`,
 `Rd.memTriebelLizorkinDistr_toTemperedDistribution_iff`). -/
 theorem memTriebelLizorkin_iff (hp1 : 1 < p) (hp : p ≠ ∞) {q : ℝ≥0∞} (hq1 : 1 < q) (s : ℝ)
     (f : Lp ℂ p (volume : Measure V)) :
-    K.triebelLizorkinNorm s q f < ∞ ↔ MemTriebelLizorkin s q f := by
-  rw [← K.triebelLizorkinNormDistr_toTemperedDistribution hp, K.memTriebelLizorkinDistr_iff hp1 hp
-    hq1, memTriebelLizorkinDistr_toTemperedDistribution_iff hp]
+    K.kernelTriebelLizorkinNorm s q f < ∞ ↔ MemTriebelLizorkin s q f := by
+  rw [← K.kernelTriebelLizorkinNormDistr_toTemperedDistribution hp,
+    K.memTriebelLizorkinDistr_iff hp1 hp hq1, memTriebelLizorkinDistr_toTemperedDistribution_iff hp]
 
 /-- **Equivalent quasi-norms on `L_p`**: for admissible kernels `K`, `K'`, `1 < p < ∞`,
 `1 < q ≤ ∞` and every real `s` there is a finite constant `C` with
 `‖f‖_{F^s_{p,q}, K} ≤ C ‖f‖_{F^s_{p,q}, K'}` for every `f ∈ L_p(V)`
-(`Rd.LPKernel.exists_triebelLizorkinNormDistr_le`). For `K' = Rd.LPKernel.standard` the right side
-is the quasi-norm `Rd.triebelLizorkinNorm` of the project
-(`Rd.LPKernel.standard_triebelLizorkinNorm`). -/
-theorem exists_triebelLizorkinNorm_le (hp1 : 1 < p) (hp : p ≠ ∞) {q : ℝ≥0∞} (hq1 : 1 < q)
+(`Rd.LPKernel.exists_kernelTriebelLizorkinNormDistr_le`). For `K' = Rd.LPKernel.standardKernel` the
+right side is the quasi-norm `Rd.triebelLizorkinNorm` of the project
+(`Rd.LPKernel.standardKernel_kernelTriebelLizorkinNorm`). -/
+theorem exists_kernelTriebelLizorkinNorm_le (hp1 : 1 < p) (hp : p ≠ ∞) {q : ℝ≥0∞} (hq1 : 1 < q)
     (s : ℝ) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ f : Lp ℂ p (volume : Measure V),
-      K.triebelLizorkinNorm s q f ≤ C * K'.triebelLizorkinNorm s q f := by
-  obtain ⟨C, hC, h⟩ := K.exists_triebelLizorkinNormDistr_le K' hp1 hp hq1 s
+      K.kernelTriebelLizorkinNorm s q f ≤ C * K'.kernelTriebelLizorkinNorm s q f := by
+  obtain ⟨C, hC, h⟩ := K.exists_kernelTriebelLizorkinNormDistr_le K' hp1 hp hq1 s
   refine ⟨C, hC, fun f => ?_⟩
   have hf := h f
-  rwa [K.triebelLizorkinNormDistr_toTemperedDistribution hp,
-    K'.triebelLizorkinNormDistr_toTemperedDistribution hp] at hf
+  rwa [K.kernelTriebelLizorkinNormDistr_toTemperedDistribution hp,
+    K'.kernelTriebelLizorkinNormDistr_toTemperedDistribution hp] at hf
 
 end LPKernel
 

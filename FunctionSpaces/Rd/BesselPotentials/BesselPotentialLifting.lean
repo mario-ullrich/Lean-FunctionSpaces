@@ -39,7 +39,7 @@ distribution by `⟨ξ⟩^s = (1 + ‖ξ‖²)^{s/2}`, and `f` lies in Mathlib's
   `J_s f ∈ L_p` is an `L_p` function (`Rd.exists_memTriebelLizorkin_of_besselPotential_eq`), also
   for Mathlib's bundled space (`Rd.exists_memTriebelLizorkin_toDistr`).
 * **The identities**: `Rd.memTriebelLizorkin_iff_memSobolev_bessel` (`f ∈ L_p`, every real `s`)
-  and `Rd.memSobolev_iff_memSobolev_bessel` (`W^m_p = H^{m,p}`).
+  and `Rd.memWSobolev_iff_memSobolev_bessel` (`W^m_p = H^{m,p}`).
 -/
 
 @[expose] public section
@@ -99,7 +99,7 @@ theorem besselSchwartz_compSubConstCLM (t : ℝ) (φ : 𝓢(V, ℂ)) (y : V) :
 
 /-- **Even Fourier multipliers commute with the reflection** `φ ↦ φ(-·)`: for an even symbol `m`
 of temperate growth, the Fourier transforms of both sides are `m(ξ) 𝓕φ(-ξ)`
-(`Rd.fourier_reflect`). -/
+(`Rd.fourier_reflectNeg`). -/
 theorem fourierMultiplierCLM_schwartzReflect {m : V → ℂ} (hm : m.HasTemperateGrowth)
     (heven : ∀ ξ, m (-ξ) = m ξ) (φ : 𝓢(V, ℂ)) :
     SchwartzMap.fourierMultiplierCLM ℂ m (schwartzReflect φ) =
@@ -109,7 +109,7 @@ theorem fourierMultiplierCLM_schwartzReflect {m : V → ℂ} (hm : m.HasTemperat
   ext ξ
   have hr : ∀ G : 𝓢(V, ℂ), 𝓕 (schwartzReflect G) ξ = 𝓕 G (-ξ) := fun G => by
     rw [SchwartzMap.fourier_coe, SchwartzMap.fourier_coe, coe_schwartzReflect]
-    exact fourier_reflect (G : V → ℂ) ξ
+    exact fourier_reflectNeg (G : V → ℂ) ξ
   rw [fourier_fourierMultiplierCLM_apply hm, hr, hr, fourier_fourierMultiplierCLM_apply hm,
     heven]
 
@@ -195,7 +195,7 @@ theorem integral_besselSchwartz_mul_conv {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : 
   congr 1
   funext y
   congr 1
-  rw [conv_reflect_apply, conv_reflect_apply]
+  rw [conv_reflectNeg_apply, conv_reflectNeg_apply]
   have h := integral_besselSchwartz_mul t (η.compSubConstCLM ℂ y) u
   rw [besselSchwartz_compSubConstCLM] at h
   simp only [SchwartzMap.compSubConstCLM_apply] at h
@@ -520,11 +520,11 @@ theorem memTriebelLizorkin_iff_memSobolev_bessel [Nontrivial V] (hp1 : 1 < p) (h
 /-- **`W^m_p = H^{m,p}` (Calderón)**: in dimension `n ≥ 1`, for `1 < p < ∞`, `m ∈ ℕ` and
 `f ∈ L_p(V)`, `f` lies in the Sobolev space `W^m_p(V)` of weak derivatives iff it lies in
 Mathlib's Bessel potential space `H^{m,p}(V)`: both are `F^m_{p,2}(V)`
-(`Rd.memSobolev_iff_memTriebelLizorkin`, `Rd.memTriebelLizorkin_iff_memSobolev_bessel`). -/
-theorem memSobolev_iff_memSobolev_bessel [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {m : ℕ}
+(`Rd.memWSobolev_iff_memTriebelLizorkin`, `Rd.memTriebelLizorkin_iff_memSobolev_bessel`). -/
+theorem memWSobolev_iff_memSobolev_bessel [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {m : ℕ}
     (f : Lp ℂ p (volume : Measure V)) :
-    MemSobolev m f ↔ TemperedDistribution.MemSobolev (m : ℝ) p (f : 𝓢'(V, ℂ)) := by
-  rw [memSobolev_iff_memTriebelLizorkin hp1 hp,
+    MemWSobolev m f ↔ TemperedDistribution.MemSobolev (m : ℝ) p (f : 𝓢'(V, ℂ)) := by
+  rw [memWSobolev_iff_memTriebelLizorkin hp1 hp,
     memTriebelLizorkin_iff_memSobolev_bessel hp1 hp]
 
 end Rd

@@ -82,29 +82,32 @@ noncomputable def rescale {c : ℝ} (hc : 0 < c) : LocalMeansBump V where
 theorem rescale_radius {c : ℝ} (hc : 0 < c) : (b.rescale hc).radius = b.radius / c := rfl
 
 /-- The dilated moment kernels vanish outside the ball of radius `L R`. -/
-theorem scaled_eq_zero (L j : ℕ) {y : V} (hy : L * b.radius < ‖y‖) : b.scaled L j y = 0 := by
+theorem scaledMoment_eq_zero (L j : ℕ) {y : V} (hy : L * b.radius < ‖y‖) :
+    b.scaledMoment L j y = 0 := by
   have h1 : (1 : ℝ) ≤ 2 ^ j := one_le_pow₀ one_le_two
   have hy' : L * b.radius < ‖(2 : ℝ) ^ j • y‖ := by
     rw [norm_smul, Real.norm_of_nonneg (by positivity)]
     calc (L : ℝ) * b.radius < ‖y‖ := hy
       _ ≤ 2 ^ j * ‖y‖ := le_mul_of_one_le_left (norm_nonneg y) h1
-  simp only [scaled, Rd.dilate, b.momentKernel_eq_zero L hy', mul_zero]
+  simp only [scaledMoment, Rd.dilate, b.momentKernel_eq_zero L hy', mul_zero]
 
 /-- The dual kernels vanish outside the ball of radius `L R`. -/
-theorem dual_eq_zero (L j : ℕ) {y : V} (hy : L * b.radius < ‖y‖) : b.dual L j y = 0 := by
+theorem dualKernel_eq_zero (L j : ℕ) {y : V} (hy : L * b.radius < ‖y‖) :
+    b.dualKernel L j y = 0 := by
   cases j with
-  | zero => exact b.scaled_eq_zero L 0 hy
+  | zero => exact b.scaledMoment_eq_zero L 0 hy
   | succ j =>
-    show b.scaled L (j + 1) y + b.scaled L j y = 0
-    rw [b.scaled_eq_zero L _ hy, b.scaled_eq_zero L _ hy, add_zero]
+    show b.scaledMoment L (j + 1) y + b.scaledMoment L j y = 0
+    rw [b.scaledMoment_eq_zero L _ hy, b.scaledMoment_eq_zero L _ hy, add_zero]
 
 /-- The local means kernels vanish outside the ball of radius `L R`. -/
-theorem kernel_eq_zero (L j : ℕ) {y : V} (hy : L * b.radius < ‖y‖) : b.kernel L j y = 0 := by
+theorem meansKernel_eq_zero (L j : ℕ) {y : V} (hy : L * b.radius < ‖y‖) :
+    b.meansKernel L j y = 0 := by
   cases j with
-  | zero => exact b.scaled_eq_zero L 0 hy
+  | zero => exact b.scaledMoment_eq_zero L 0 hy
   | succ j =>
-    show b.scaled L (j + 1) y - b.scaled L j y = 0
-    rw [b.scaled_eq_zero L _ hy, b.scaled_eq_zero L _ hy, sub_zero]
+    show b.scaledMoment L (j + 1) y - b.scaledMoment L j y = 0
+    rw [b.scaledMoment_eq_zero L _ hy, b.scaledMoment_eq_zero L _ hy, sub_zero]
 
 end LocalMeansBump
 
@@ -152,13 +155,13 @@ dual kernels at points of `Ω ∩ B(c, ρ - 2ε)` only see `Ω ∩ B(c, ρ - ε)
 (`Rd.LipschitzGraph.sub_mem_patch_of_mem_closedCone`). -/
 theorem patch_support {b : LocalMeansBump V} (hb : Ω.ConeSupported b.toFun) {L : ℕ} {ε ρ : ℝ}
     {c : V} (hLR : L * b.radius ≤ ε) :
-    ∀ x ∈ Ω.domain ∩ ball c (ρ - 2 * ε), ∀ j y, b.dual L j y ≠ 0 →
+    ∀ x ∈ Ω.domain ∩ ball c (ρ - 2 * ε), ∀ j y, b.dualKernel L j y ≠ 0 →
       x - y ∈ Ω.domain ∩ ball c (ρ - ε) := by
   intro x hx j y hy
-  have hyR : ‖y‖ ≤ L * b.radius := not_lt.1 fun h => hy (b.dual_eq_zero L j h)
+  have hyR : ‖y‖ ≤ L * b.radius := not_lt.1 fun h => hy (b.dualKernel_eq_zero L j h)
   rw [show ρ - 2 * ε = ρ - ε - ε by ring] at hx
   exact Ω.sub_mem_patch_of_mem_closedCone hx
-    (Ω.cone_subset_closedCone (Ω.coneSupported_dual_of hb L j y hy)) (hyR.trans hLR)
+    (Ω.cone_subset_closedCone (Ω.coneSupported_dualKernel_of hb L j y hy)) (hyR.trans hLR)
 
 /-- **Boundary patches, the step condition**: for a bump supported in `-K` with `L R ≤ ε`, the steps
 `-c'^(-1) z`, `c' ≥ 1`, `b(z) ≠ 0`, take `Ω ∩ B(c, ρ - ε)` into `Ω ∩ B(c, ρ)`. -/
@@ -275,15 +278,15 @@ theorem localNormOn_le (hp : p ≠ ∞) {W T : Set V} (hW : MeasurableSet W) (L 
     fun j => b.enorm_indicatorLp_localMean_succ_le hp hW L j hstep hR f
 
 /-- The **constant of the local extension** `C_b(L, s) (‖m‖_1 + 2 ‖g‖_1)`, for the moment kernel
-`m` of the bump `g`: the constant of the synthesis estimate (`Rd.LocalMeansBump.synthConst`) times
-that of `Rd.LocalMeansBump.localNormOn_le`. -/
+`m` of the bump `g`: the constant of the synthesis estimate (`Rd.LocalMeansBump.bumpSynthConst`)
+times that of `Rd.LocalMeansBump.localNormOn_le`. -/
 noncomputable def localExtConst (L : ℕ) (s : ℝ) : ℝ≥0∞ :=
-  b.synthConst L s * (eLpNorm (momentKernel b.toFun L) 1 volume + 2 * ∫⁻ z, ‖b.toFun z‖ₑ)
+  b.bumpSynthConst L s * (eLpNorm (momentKernel b.toFun L) 1 volume + 2 * ∫⁻ z, ‖b.toFun z‖ₑ)
 
 /-- The constant of the local extension is finite for `0 < s < L`. -/
 theorem localExtConst_ne_top {L : ℕ} {s : ℝ} (hs : 0 < s) (hsL : s < L) :
     b.localExtConst L s ≠ ∞ :=
-  ENNReal.mul_ne_top (b.synthConst_ne_top hs hsL) (b.momentConst_ne_top L)
+  ENNReal.mul_ne_top (b.bumpSynthConst_ne_top hs hsL) (b.momentConst_ne_top L)
 
 /-- **The local extension theorem with a bound**: let `U ⊆ W`, `U ⊆ T` be measurable sets such
 that the dual kernels at points of `U` only see `W` and the steps take `W` into `T`, and let the
@@ -294,11 +297,11 @@ bump have radius `R ≤ 1/2`. For `1 ≤ p < ∞`, `0 < s`, `1 ≤ q ≤ ∞` an
 (`Rd.LocalMeansBump.localExtConst`): the local extension of `1_T f`
 (`Rd.LocalMeansBump.modNorm_localExtension_le`, `Rd.LocalMeansBump.localNormOn_le`). The constant
 is finite for `s < L` (`Rd.LocalMeansBump.localExtConst_ne_top`); for `s ≥ L` the factor
-`(1 - 2^(-(L - s)))⁻¹` of `Rd.LocalMeansBump.synthConst` is `∞`. -/
+`(1 - 2^(-(L - s)))⁻¹` of `Rd.LocalMeansBump.bumpSynthConst` is `∞`. -/
 theorem exists_local_extension_le (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s : ℝ} (hs : 0 < s)
     {q : ℝ≥0∞} (hq : 1 ≤ q) {U W T : Set V} (hU : MeasurableSet U)
     (hW : MeasurableSet W) (hT : MeasurableSet T) (hUT : U ⊆ T)
-    (hUW : ∀ x ∈ U, ∀ j y, b.dual L j y ≠ 0 → x - y ∈ W)
+    (hUW : ∀ x ∈ U, ∀ j y, b.dualKernel L j y ≠ 0 → x - y ∈ W)
     (hstep : ∀ c : ℝ, 1 ≤ c → ∀ z, b.toFun z ≠ 0 → W ⊆ diffStepSet T L (-c⁻¹ • z))
     (hR : b.radius ≤ 1 / 2) (f : Lp ℂ p (volume : Measure V))
     (hf : modNormOn hT L s q f < ∞) :
@@ -344,7 +347,7 @@ quasi-norm by differences on `V` and `F = f` almost everywhere on `U`
 theorem exists_local_extension (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s : ℝ} (hs : 0 < s)
     (hsL : s < L) {q : ℝ≥0∞} (hq : 1 ≤ q) {U W T : Set V} (hU : MeasurableSet U)
     (hW : MeasurableSet W) (hT : MeasurableSet T) (hUT : U ⊆ T)
-    (hUW : ∀ x ∈ U, ∀ j y, b.dual L j y ≠ 0 → x - y ∈ W)
+    (hUW : ∀ x ∈ U, ∀ j y, b.dualKernel L j y ≠ 0 → x - y ∈ W)
     (hstep : ∀ c : ℝ, 1 ≤ c → ∀ z, b.toFun z ≠ 0 → W ⊆ diffStepSet T L (-c⁻¹ • z))
     (hR : b.radius ≤ 1 / 2) (f : Lp ℂ p (volume : Measure V))
     (hf : modNormOn hT L s q f < ∞) :

@@ -33,9 +33,9 @@ orthonormal basis `e_0, …, e_{n-1}` of `Rd.gridBasis`. A **word** of length `k
   family of choices along all words of length at most `m`
   (`Rd.exists_forall_words_of_forall_le`).
 * **Smooth compactly supported multipliers on `W^m_p(V)`**
-  (`Rd.MemSobolev.mulLp_of_hasCompactSupport`): `χ F ∈ W^m_p(V)` for `F ∈ W^m_p(V)`, since
+  (`Rd.MemWSobolev.mulLp_of_hasCompactSupport`): `χ F ∈ W^m_p(V)` for `F ∈ W^m_p(V)`, since
   derivatives in `L_p(V)` along all words of length `k ≤ m` give `W^m_p(V)`
-  (`Rd.memSobolev_of_forall_gridBasis_words`); the case `m = 1` is `Rd.MemSobolev.mulLp`.
+  (`Rd.memWSobolev_of_forall_gridBasis_words`); the case `m = 1` is `Rd.MemWSobolev.mulLp`.
 * **The product rule in `L_p(V)`** (`Rd.hasWeakLineDeriv_mulLp`): `∂_w (χ F) = χ ∂_w F + (∂_w χ) F`
   for every smooth bounded `χ` with bounded `∂_w χ`.
 -/
@@ -422,8 +422,8 @@ variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 has a weak derivative `G ∈ L_p(V)` along every word of length `k ≤ m`
 (`Rd.exists_hasWeakLineDeriv_mul_of_tsupport_subset` with `O = B = V`; the bound is finite since the
 derivatives of `F` lie in `L_p(V)`). -/
-theorem MemSobolev.exists_hasWeakLineDeriv_mul {m : ℕ} {F : Lp ℂ p (volume : Measure V)}
-    (hF : MemSobolev m F) {χ : V → ℝ} (hχ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) χ)
+theorem MemWSobolev.exists_hasWeakLineDeriv_mul {m : ℕ} {F : Lp ℂ p (volume : Measure V)}
+    (hF : MemWSobolev m F) {χ : V → ℝ} (hχ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) χ)
     (hcs : HasCompactSupport χ) {k : ℕ} (hk : k ≤ m) (w : Fin k → Fin (finrank ℝ V)) :
     ∃ G : V → ℂ, MemLp G p volume ∧
       HasWeakLineDeriv ⊤ (fun l => gridBasis V (w l)) (fun x => (χ x : ℂ) * F x) G := by
@@ -446,10 +446,10 @@ theorem MemSobolev.exists_hasWeakLineDeriv_mul {m : ℕ} {F : Lp ℂ p (volume :
 derivative `G_w ∈ L_p(V)` on `V` along every word `w` of length `k ≤ m` lies in `W^m_p(V)`; the
 derivative along `v ∈ V^k` is `∑_w ∏_l ⟪v_l, e_{w_l}⟫ G_w`
 (`Rd.hasWeakLineDeriv_of_gridBasis_words`). For `m = 1` this is
-`Rd.memSobolev_one_of_forall_gridBasis`. -/
-theorem memSobolev_of_forall_gridBasis_words {m : ℕ} {F : Lp ℂ p (volume : Measure V)}
+`Rd.memWSobolev_one_of_forall_gridBasis`. -/
+theorem memWSobolev_of_forall_gridBasis_words {m : ℕ} {F : Lp ℂ p (volume : Measure V)}
     (h : ∀ k ≤ m, ∀ w : Fin k → Fin (finrank ℝ V), ∃ G : V → ℂ, MemLp G p volume ∧
-      HasWeakLineDeriv ⊤ (fun l => gridBasis V (w l)) F G) : MemSobolev m F := by
+      HasWeakLineDeriv ⊤ (fun l => gridBasis V (w l)) F G) : MemWSobolev m F := by
   refine ⟨by simpa using Lp.memLp F, fun k hk v => ?_⟩
   choose G hG hGd using h k hk
   have hD : MemLp (fun x => ∑ w, (∏ l, (inner ℝ (v l) (gridBasis V (w l)) : ℂ)) * G w x) p
@@ -466,17 +466,17 @@ theorem memSobolev_of_forall_gridBasis_words {m : ℕ} {F : Lp ℂ p (volume : M
 smooth real function with compact support, then `χ F ∈ W^m_p(V)`. Here `hc` and `hC` are the
 continuity and the bound `|χ| ≤ C` with which the product `Rd.mulLp` in `L_p` is formed; both
 follow from smoothness and compact support. The derivatives along words come from the Leibniz rule
-(`Rd.MemSobolev.exists_hasWeakLineDeriv_mul`), those along all directions from the words
-(`Rd.memSobolev_of_forall_gridBasis_words`). -/
-theorem MemSobolev.mulLp_of_hasCompactSupport {m : ℕ} {F : Lp ℂ p (volume : Measure V)}
-    (hF : MemSobolev m F) {χ : V → ℝ} (hχ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) χ)
+(`Rd.MemWSobolev.exists_hasWeakLineDeriv_mul`), those along all directions from the words
+(`Rd.memWSobolev_of_forall_gridBasis_words`). -/
+theorem MemWSobolev.mulLp_of_hasCompactSupport {m : ℕ} {F : Lp ℂ p (volume : Measure V)}
+    (hF : MemWSobolev m F) {χ : V → ℝ} (hχ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) χ)
     (hcs : HasCompactSupport χ) {C : ℝ} (hc : Continuous fun x => (χ x : ℂ))
-    (hC : ∀ x, ‖(χ x : ℂ)‖ ≤ C) : MemSobolev m (mulLp hc hC F) := by
+    (hC : ∀ x, ‖(χ x : ℂ)‖ ≤ C) : MemWSobolev m (mulLp hc hC F) := by
   have hae : (fun x => (χ x : ℂ) * F x) =ᵐ[volume.restrict ((⊤ : Opens V) : Set V)]
       (mulLp hc hC F : V → ℂ) := by
     rw [volume_restrict_top]
     exact (mulLp_apply_ae hc hC F).symm
-  refine memSobolev_of_forall_gridBasis_words fun k hk w => ?_
+  refine memWSobolev_of_forall_gridBasis_words fun k hk w => ?_
   obtain ⟨G, hG, hGd⟩ := hF.exists_hasWeakLineDeriv_mul hχ hcs hk w
   exact ⟨G, hG, hGd.congr_ae hae EventuallyEq.rfl⟩
 
@@ -500,11 +500,11 @@ theorem hasWeakLineDeriv_mulLp {w : V} {F G : Lp ℂ p (volume : Measure V)}
 
 /-- **Smooth compactly supported multipliers keep `W^1_p(V)`**: if `F ∈ W^1_p(V)` and `χ` is a
 smooth real function with compact support, then `χ F ∈ W^1_p(V)`, the case `m = 1` of
-`Rd.MemSobolev.mulLp_of_hasCompactSupport`. -/
-theorem MemSobolev.mulLp {F : Lp ℂ p (volume : Measure V)} (hF : MemSobolev 1 F)
+`Rd.MemWSobolev.mulLp_of_hasCompactSupport`. -/
+theorem MemWSobolev.mulLp {F : Lp ℂ p (volume : Measure V)} (hF : MemWSobolev 1 F)
     {χ : V → ℝ} (hχ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) χ) (hcs : HasCompactSupport χ) {C : ℝ}
     (hc : Continuous fun x => (χ x : ℂ)) (hC : ∀ x, ‖(χ x : ℂ)‖ ≤ C) :
-    MemSobolev 1 (mulLp hc hC F) :=
+    MemWSobolev 1 (mulLp hc hC F) :=
   hF.mulLp_of_hasCompactSupport hχ hcs hc hC
 
 end Multipliers

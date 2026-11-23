@@ -17,12 +17,14 @@ operator `f ↦ (θ_j ⋆ f)_j` and of the synthesis operators `(g_j)_j ↦ ∑_
 finite sets `s`, by Plancherel's theorem for one convolution, `‖K ⋆ f‖_2² = ∫ |𝓕K|² |𝓕f|²`
 (`Rd.enorm_convLp_sq`), and the convolution theorem on `L_2` (`Rd.fourier_convLp`).
 
-* **The analysis bound** (`Rd.tsum_enorm_convLp_sq_le`, `Rd.lintegral_lqNorm_conv_sq_le`):
-  `∑_j ‖θ_j ⋆ f‖_2² ≤ B ‖f‖_2²`, that is, `∫ ‖((θ_j ⋆ f)(x))_j‖_{ℓ_2}² dx ≤ B ∫ |f|²`.
-* **The synthesis bound** (`Rd.enorm_sum_convLp_sq_le`, `Rd.lintegral_enorm_sum_conv_sq_le`):
-  for every finite set `s` of indices, `‖∑_{j ∈ s} θ_j ⋆ g_j‖_2² ≤ B ∑_{j ∈ s} ‖g_j‖_2²`,
-  hence `∫ |∑_{j ∈ s} θ_j ⋆ g_j|² ≤ B ∫ ‖(g_j(x))_j‖_{ℓ_2}² dx`, by the Cauchy–Schwarz
-  inequality at each frequency (`enorm_sum_mul_sq_le`).
+* **The analysis bound** (`Rd.tsum_enorm_convLp_sq_le_of_fourier_bound`,
+  `Rd.lintegral_lqNorm_conv_sq_le_of_fourier_bound`): `∑_j ‖θ_j ⋆ f‖_2² ≤ B ‖f‖_2²`, that is,
+  `∫ ‖((θ_j ⋆ f)(x))_j‖_{ℓ_2}² dx ≤ B ∫ |f|²`.
+* **The synthesis bound** (`Rd.enorm_sum_convLp_sq_le_of_fourier_bound`,
+  `Rd.lintegral_enorm_sum_conv_sq_le_of_fourier_bound`): for every finite set `s` of indices,
+  `‖∑_{j ∈ s} θ_j ⋆ g_j‖_2² ≤ B ∑_{j ∈ s} ‖g_j‖_2²`, hence
+  `∫ |∑_{j ∈ s} θ_j ⋆ g_j|² ≤ B ∫ ‖(g_j(x))_j‖_{ℓ_2}² dx`, by the Cauchy–Schwarz inequality at each
+  frequency (`enorm_sum_mul_sq_le`).
 * **Calderón–Zygmund families** satisfy both bounds with their overlap `B`
   (`Rd.IsCZFamily.lintegral_lqNorm_conv_sq_le`, `Rd.IsCZFamily.lintegral_enorm_sum_conv_sq_le`).
 -/
@@ -71,8 +73,8 @@ theorem lintegral_enorm_conv_sq_eq {K f : V → ℂ} (hK : Integrable K) (hf : M
 `∑_j ‖θ_j ⋆ f‖_2² ≤ B ‖f‖_2²`. By `Rd.enorm_convLp_sq` the left side is
 `∫ (∑_j |𝓕θ_j|²) |𝓕f|²` (Mathlib's `lintegral_tsum`), and Plancherel's theorem gives
 `∫ |𝓕f|² = ‖f‖_2²`. -/
-theorem tsum_enorm_convLp_sq_le {θ : ℕ → V → ℂ} (hθ : ∀ j, Integrable (θ j)) {B : ℝ≥0∞}
-    (hB : ∀ᵐ ξ ∂volume, ∑' j, ‖𝓕 (θ j) ξ‖ₑ ^ 2 ≤ B) (f : Lp ℂ 2 (volume : Measure V)) :
+theorem tsum_enorm_convLp_sq_le_of_fourier_bound {θ : ℕ → V → ℂ} (hθ : ∀ j, Integrable (θ j))
+    {B : ℝ≥0∞} (hB : ∀ᵐ ξ ∂volume, ∑' j, ‖𝓕 (θ j) ξ‖ₑ ^ 2 ≤ B) (f : Lp ℂ 2 (volume : Measure V)) :
     ∑' j, ‖convLp two_ne_top (hθ j) f‖ₑ ^ 2 ≤ B * ‖f‖ₑ ^ 2 := by
   have hF : AEMeasurable (fun ξ => ‖(𝓕 f : Lp ℂ 2 (volume : Measure V)) ξ‖ₑ ^ 2) volume :=
     (Lp.aestronglyMeasurable _).enorm.pow_const 2
@@ -92,10 +94,10 @@ theorem tsum_enorm_convLp_sq_le {θ : ℕ → V → ℂ} (hθ : ∀ j, Integrabl
 
 /-- **The analysis bound on `L_2`, for functions**: for integrable kernels `θ_j` with Fourier
 overlap `B` (almost everywhere) and every `f ∈ L_2(V)`,
-`∫ ‖((θ_j ⋆ f)(x))_j‖_{ℓ_2}² dx ≤ B ∫ |f|²` (`Rd.tsum_enorm_convLp_sq_le` for the class of `f`,
-and Mathlib's `lintegral_tsum`). -/
-theorem lintegral_lqNorm_conv_sq_le {θ : ℕ → V → ℂ} (hθ : ∀ j, Integrable (θ j)) {B : ℝ≥0∞}
-    (hB : ∀ᵐ ξ ∂volume, ∑' j, ‖𝓕 (θ j) ξ‖ₑ ^ 2 ≤ B) {f : V → ℂ} (hf : MemLp f 2) :
+`∫ ‖((θ_j ⋆ f)(x))_j‖_{ℓ_2}² dx ≤ B ∫ |f|²` (`Rd.tsum_enorm_convLp_sq_le_of_fourier_bound`
+for the class of `f`, and Mathlib's `lintegral_tsum`). -/
+theorem lintegral_lqNorm_conv_sq_le_of_fourier_bound {θ : ℕ → V → ℂ} (hθ : ∀ j, Integrable (θ j))
+    {B : ℝ≥0∞} (hB : ∀ᵐ ξ ∂volume, ∑' j, ‖𝓕 (θ j) ξ‖ₑ ^ 2 ≤ B) {f : V → ℂ} (hf : MemLp f 2) :
     ∫⁻ x, lqNorm 2 (fun j => ‖conv (θ j) f volume x‖ₑ) ^ 2 ≤ B * ∫⁻ x, ‖f x‖ₑ ^ 2 := by
   simp_rw [ENNReal.lqNorm_two_sq]
   rw [lintegral_tsum fun j => (aestronglyMeasurable_conv (hθ j).aestronglyMeasurable
@@ -103,7 +105,7 @@ theorem lintegral_lqNorm_conv_sq_le {θ : ℕ → V → ℂ} (hθ : ∀ j, Integ
   calc ∑' j, ∫⁻ x, ‖conv (θ j) f volume x‖ₑ ^ 2
       = ∑' j, ‖convLp two_ne_top (hθ j) (hf.toLp f)‖ₑ ^ 2 :=
         tsum_congr fun j => lintegral_enorm_conv_sq_eq (hθ j) hf
-    _ ≤ B * ‖hf.toLp f‖ₑ ^ 2 := tsum_enorm_convLp_sq_le hθ hB _
+    _ ≤ B * ‖hf.toLp f‖ₑ ^ 2 := tsum_enorm_convLp_sq_le_of_fourier_bound hθ hB _
 
 /-! ### The synthesis bound -/
 
@@ -127,8 +129,8 @@ theorem fourier_sum_convLp {θ : ℕ → V → ℂ} (hθ : ∀ j, Integrable (θ
 of the sum is `∑_{j ∈ s} 𝓕θ_j(ξ) 𝓕g_j(ξ)` (`Rd.fourier_sum_convLp`), whose square is at most
 `(∑_j |𝓕θ_j(ξ)|²) ∑_{j ∈ s} |𝓕g_j(ξ)|² ≤ B ∑_{j ∈ s} |𝓕g_j(ξ)|²` by the Cauchy–Schwarz
 inequality (`enorm_sum_mul_sq_le`); Plancherel's theorem finishes. -/
-theorem enorm_sum_convLp_sq_le {θ : ℕ → V → ℂ} (hθ : ∀ j, Integrable (θ j)) {B : ℝ≥0∞}
-    (hB : ∀ᵐ ξ ∂volume, ∑' j, ‖𝓕 (θ j) ξ‖ₑ ^ 2 ≤ B) (s : Finset ℕ)
+theorem enorm_sum_convLp_sq_le_of_fourier_bound {θ : ℕ → V → ℂ} (hθ : ∀ j, Integrable (θ j))
+    {B : ℝ≥0∞} (hB : ∀ᵐ ξ ∂volume, ∑' j, ‖𝓕 (θ j) ξ‖ₑ ^ 2 ≤ B) (s : Finset ℕ)
     (g : ℕ → Lp ℂ 2 (volume : Measure V)) :
     ‖∑ j ∈ s, convLp two_ne_top (hθ j) (g j)‖ₑ ^ 2 ≤ B * ∑ j ∈ s, ‖g j‖ₑ ^ 2 := by
   have hG : ∀ j ∈ s, AEMeasurable
@@ -151,9 +153,9 @@ theorem enorm_sum_convLp_sq_le {θ : ℕ → V → ℂ} (hθ : ∀ j, Integrable
 
 /-- **The synthesis bound on `L_2`, for functions**: for integrable kernels `θ_j` with Fourier
 overlap `B` (almost everywhere), functions `g_j ∈ L_2(V)` and every finite set `s` of indices,
-`∫ |∑_{j ∈ s} θ_j ⋆ g_j|² ≤ B ∫ ‖(g_j(x))_j‖_{ℓ_2}² dx` (`Rd.enorm_sum_convLp_sq_le` for the
-classes of the `g_j`). -/
-theorem lintegral_enorm_sum_conv_sq_le {θ : ℕ → V → ℂ} (hθ : ∀ j, Integrable (θ j))
+`∫ |∑_{j ∈ s} θ_j ⋆ g_j|² ≤ B ∫ ‖(g_j(x))_j‖_{ℓ_2}² dx`
+(`Rd.enorm_sum_convLp_sq_le_of_fourier_bound` for the classes of the `g_j`). -/
+theorem lintegral_enorm_sum_conv_sq_le_of_fourier_bound {θ : ℕ → V → ℂ} (hθ : ∀ j, Integrable (θ j))
     {B : ℝ≥0∞} (hB : ∀ᵐ ξ ∂volume, ∑' j, ‖𝓕 (θ j) ξ‖ₑ ^ 2 ≤ B) (s : Finset ℕ)
     {g : ℕ → V → ℂ} (hg : ∀ j, MemLp (g j) 2) :
     ∫⁻ x, ‖∑ j ∈ s, conv (θ j) (g j) volume x‖ₑ ^ 2 ≤
@@ -171,7 +173,7 @@ theorem lintegral_enorm_sum_conv_sq_le {θ : ℕ → V → ℂ} (hθ : ∀ j, In
       = ‖∑ j ∈ s, convLp two_ne_top (hθ j) ((hg j).toLp (g j))‖ₑ ^ 2 := by
         rw [enorm_sq_eq_lintegral]
         exact lintegral_congr_ae (hv.mono fun x hx => by dsimp only at hx ⊢; rw [hx])
-    _ ≤ B * ∑ j ∈ s, ‖(hg j).toLp (g j)‖ₑ ^ 2 := enorm_sum_convLp_sq_le hθ hB s _
+    _ ≤ B * ∑ j ∈ s, ‖(hg j).toLp (g j)‖ₑ ^ 2 := enorm_sum_convLp_sq_le_of_fourier_bound hθ hB s _
     _ = B * ∫⁻ x, ∑ j ∈ s, ‖g j x‖ₑ ^ 2 := by
         rw [lintegral_finsetSum' s hG]
         congr 1
@@ -184,35 +186,36 @@ theorem lintegral_enorm_sum_conv_sq_le {θ : ℕ → V → ℂ} (hθ : ∀ j, In
 /-! ### Calderón–Zygmund families -/
 
 /-- **The analysis bound for a Calderón–Zygmund family** with overlap `B`:
-`∑_j ‖θ_j ⋆ f‖_2² ≤ B ‖f‖_2²` for every `f ∈ L_2(V)` (`Rd.tsum_enorm_convLp_sq_le`). -/
+`∑_j ‖θ_j ⋆ f‖_2² ≤ B ‖f‖_2²` for every `f ∈ L_2(V)`
+(`Rd.tsum_enorm_convLp_sq_le_of_fourier_bound`). -/
 theorem IsCZFamily.tsum_enorm_convLp_sq_le {θ : ℕ → V → ℂ} {B H : ℝ≥0∞}
     (h : IsCZFamily θ B H) (f : Lp ℂ 2 (volume : Measure V)) :
     ∑' j, ‖convLp two_ne_top (h.integrable j) f‖ₑ ^ 2 ≤ B * ‖f‖ₑ ^ 2 :=
-  Rd.tsum_enorm_convLp_sq_le h.integrable (ae_of_all _ h.overlap) f
+  Rd.tsum_enorm_convLp_sq_le_of_fourier_bound h.integrable (ae_of_all _ h.overlap) f
 
 /-- **The analysis bound for a Calderón–Zygmund family, for functions**: with overlap `B`,
 `∫ ‖((θ_j ⋆ f)(x))_j‖_{ℓ_2}² dx ≤ B ∫ |f|²` for every `f ∈ L_2(V)`
-(`Rd.lintegral_lqNorm_conv_sq_le`). -/
+(`Rd.lintegral_lqNorm_conv_sq_le_of_fourier_bound`). -/
 theorem IsCZFamily.lintegral_lqNorm_conv_sq_le {θ : ℕ → V → ℂ} {B H : ℝ≥0∞}
     (h : IsCZFamily θ B H) {f : V → ℂ} (hf : MemLp f 2) :
     ∫⁻ x, lqNorm 2 (fun j => ‖conv (θ j) f volume x‖ₑ) ^ 2 ≤ B * ∫⁻ x, ‖f x‖ₑ ^ 2 :=
-  Rd.lintegral_lqNorm_conv_sq_le h.integrable (ae_of_all _ h.overlap) hf
+  Rd.lintegral_lqNorm_conv_sq_le_of_fourier_bound h.integrable (ae_of_all _ h.overlap) hf
 
 /-- **The synthesis bound for a Calderón–Zygmund family** with overlap `B`:
 `‖∑_{j ∈ s} θ_j ⋆ g_j‖_2² ≤ B ∑_{j ∈ s} ‖g_j‖_2²` for all `g_j ∈ L_2(V)` and every finite set
-`s` (`Rd.enorm_sum_convLp_sq_le`). -/
+`s` (`Rd.enorm_sum_convLp_sq_le_of_fourier_bound`). -/
 theorem IsCZFamily.enorm_sum_convLp_sq_le {θ : ℕ → V → ℂ} {B H : ℝ≥0∞}
     (h : IsCZFamily θ B H) (s : Finset ℕ) (g : ℕ → Lp ℂ 2 (volume : Measure V)) :
     ‖∑ j ∈ s, convLp two_ne_top (h.integrable j) (g j)‖ₑ ^ 2 ≤ B * ∑ j ∈ s, ‖g j‖ₑ ^ 2 :=
-  Rd.enorm_sum_convLp_sq_le h.integrable (ae_of_all _ h.overlap) s g
+  Rd.enorm_sum_convLp_sq_le_of_fourier_bound h.integrable (ae_of_all _ h.overlap) s g
 
 /-- **The synthesis bound for a Calderón–Zygmund family, for functions**: with overlap `B`,
 `∫ |∑_{j ∈ s} θ_j ⋆ g_j|² ≤ B ∫ ‖(g_j(x))_j‖_{ℓ_2}² dx` for all `g_j ∈ L_2(V)` and every finite
-set `s` (`Rd.lintegral_enorm_sum_conv_sq_le`). -/
+set `s` (`Rd.lintegral_enorm_sum_conv_sq_le_of_fourier_bound`). -/
 theorem IsCZFamily.lintegral_enorm_sum_conv_sq_le {θ : ℕ → V → ℂ} {B H : ℝ≥0∞}
     (h : IsCZFamily θ B H) (s : Finset ℕ) {g : ℕ → V → ℂ} (hg : ∀ j, MemLp (g j) 2) :
     ∫⁻ x, ‖∑ j ∈ s, conv (θ j) (g j) volume x‖ₑ ^ 2 ≤
       B * ∫⁻ x, lqNorm 2 (fun j => ‖g j x‖ₑ) ^ 2 :=
-  Rd.lintegral_enorm_sum_conv_sq_le h.integrable (ae_of_all _ h.overlap) s hg
+  Rd.lintegral_enorm_sum_conv_sq_le_of_fourier_bound h.integrable (ae_of_all _ h.overlap) s hg
 
 end Rd

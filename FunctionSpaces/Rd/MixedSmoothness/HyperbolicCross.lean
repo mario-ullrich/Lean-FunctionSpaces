@@ -12,15 +12,15 @@ public import Mathlib.Analysis.SpecificLimits.Normed
 /-!
 # Approximation on hyperbolic crosses
 
-The **level** of `k ∈ ℕ^d` is `|k|_1 = ∑_i k_i` (`Rd.level`), and the **hyperbolic cross** of level
-`N` is `{k : |k|_1 ≤ N}` (`Rd.hyperbolicCross`). The partial sum
+The **level** of `k ∈ ℕ^d` is `|k|_1 = ∑_i k_i` (`Rd.gridLevel`), and the **hyperbolic cross** of
+level `N` is `{k : |k|_1 ≤ N}` (`Rd.hyperbolicCross`). The partial sum
 `S_N f = ∑_{|k|_1 ≤ N} δ_k ⋆ f` of the tensor Littlewood–Paley decomposition
 (`Rd.hyperbolicSum`) is band-limited to the union of the dyadic rectangles of these blocks.
 
 * **The tail** (`Rd.enorm_sub_hyperbolicSum_le`): `‖f - S_N f‖_p ≤ ∑_{|k|_1 > N} ‖δ_k ⋆ f‖_p`, by
   the tensor Littlewood–Paley decomposition.
-* **Counting** (`Rd.card_levelSet_le`): `#{k ∈ ℕ^d : |k|_1 = n} ≤ (n + 1)^(d-1)`, since an index of
-  level `n` is determined by its first `d - 1` coordinates.
+* **Counting** (`Rd.card_gridLevelSet_le`): `#{k ∈ ℕ^d : |k|_1 = n} ≤ (n + 1)^(d-1)`, since an index
+  of level `n` is determined by its first `d - 1` coordinates.
 * **The rate** (`Rd.enorm_sub_hyperbolicSum_le_mixedLPNorm`): for real `s` and `1 ≤ q ≤ ∞`,
   `‖f - S_N f‖_p ≤ C 2^(-sN) (N + 1)^((d-1)(1-1/q)) ‖(2^(s|k|_1) ‖δ_k ⋆ f‖_p)_k‖_{ℓ_q}` with
   `C = ∑_l 2^(-sl) (l + 1)^((d-1)(1-1/q))` (`Rd.hyperbolicCrossConst`): on each level Hölder's
@@ -43,26 +43,26 @@ variable {d : ℕ}
 /-! ### Levels -/
 
 /-- The **level** `|k|_1 = ∑_i k_i` of `k ∈ ℕ^d`. -/
-def level (k : Fin d → ℕ) : ℕ := ∑ i, k i
+def gridLevel (k : Fin d → ℕ) : ℕ := ∑ i, k i
 
 /-- A coordinate is at most the level. -/
-theorem le_level (k : Fin d → ℕ) (i : Fin d) : k i ≤ level k :=
+theorem le_gridLevel (k : Fin d → ℕ) (i : Fin d) : k i ≤ gridLevel k :=
   Finset.single_le_sum (fun j _ => Nat.zero_le (k j)) (Finset.mem_univ i)
 
 /-- The indices of level `n`, `{k ∈ ℕ^d : |k|_1 = n}`: Mathlib's
 `Finset.Nat.antidiagonalTuple d n`. -/
-def levelSet (n : ℕ) : Finset (Fin d → ℕ) := Finset.Nat.antidiagonalTuple d n
+def gridLevelSet (n : ℕ) : Finset (Fin d → ℕ) := Finset.Nat.antidiagonalTuple d n
 
 /-- `k` lies in the level set of `n` iff `|k|_1 = n`. -/
-theorem mem_levelSet {n : ℕ} {k : Fin d → ℕ} : k ∈ levelSet n ↔ level k = n :=
+theorem mem_gridLevelSet {n : ℕ} {k : Fin d → ℕ} : k ∈ gridLevelSet n ↔ gridLevel k = n :=
   Finset.Nat.mem_antidiagonalTuple
 
 /-- **Counting**: `#{k ∈ ℕ^d : |k|_1 = n} ≤ (n + 1)^(d-1)`, since an index of level `n` is
 determined by its first `d - 1` coordinates. -/
-theorem card_levelSet_le (n : ℕ) : (levelSet (d := d) n).card ≤ (n + 1) ^ (d - 1) := by
+theorem card_gridLevelSet_le (n : ℕ) : (gridLevelSet (d := d) n).card ≤ (n + 1) ^ (d - 1) := by
   cases d with
   | zero =>
-    calc (levelSet (d := 0) n).card
+    calc (gridLevelSet (d := 0) n).card
         ≤ (Fintype.piFinset fun _ : Fin 0 => Finset.range (n + 1)).card :=
           Finset.card_le_card fun k _ => Fintype.mem_piFinset.2 fun i => i.elim0
       _ = (n + 1) ^ (0 - 1) := by simp
@@ -70,13 +70,13 @@ theorem card_levelSet_le (n : ℕ) : (levelSet (d := d) n).card ≤ (n + 1) ^ (d
     refine (Finset.card_le_card_of_injOn (fun k : Fin (e + 1) → ℕ => fun i : Fin e => k i.castSucc)
       (t := Fintype.piFinset fun _ : Fin e => Finset.range (n + 1)) (fun k hk => ?_)
       (fun k hk k' hk' hkk' => ?_)).trans ?_
-    · have hk' := mem_levelSet.1 hk
+    · have hk' := mem_gridLevelSet.1 hk
       simp only [Finset.mem_coe, Fintype.mem_piFinset, Finset.mem_range]
-      exact fun i => Nat.lt_succ_of_le (hk' ▸ le_level k _)
-    · have h1 := mem_levelSet.1 hk
-      have h2 := mem_levelSet.1 hk'
+      exact fun i => Nat.lt_succ_of_le (hk' ▸ le_gridLevel k _)
+    · have h1 := mem_gridLevelSet.1 hk
+      have h2 := mem_gridLevelSet.1 hk'
       have hcast : ∀ i : Fin e, k i.castSucc = k' i.castSucc := fun i => congr_fun hkk' i
-      simp only [level, Fin.sum_univ_castSucc] at h1 h2
+      simp only [gridLevel, Fin.sum_univ_castSucc] at h1 h2
       have hsum : ∑ i : Fin e, k i.castSucc = ∑ i : Fin e, k' i.castSucc :=
         Finset.sum_congr rfl fun i _ => hcast i
       funext i
@@ -86,25 +86,25 @@ theorem card_levelSet_le (n : ℕ) : (levelSet (d := d) n).card ≤ (n + 1) ^ (d
     · simp [Fintype.card_piFinset]
 
 /-- `2^(s|k|_1) = ∏_i 2^(s k_i)`. -/
-theorem mixedWeight_eq_dyadicWeight_level (s : ℝ) (k : Fin d → ℕ) :
-    mixedWeight s k = dyadicWeight s (level k) := by
-  rw [mixedWeight, level]
+theorem mixedWeight_eq_dyadicWeight_gridLevel (s : ℝ) (k : Fin d → ℕ) :
+    mixedWeight s k = dyadicWeight s (gridLevel k) := by
+  rw [mixedWeight, gridLevel]
   induction (Finset.univ : Finset (Fin d)) using Finset.induction_on with
   | empty => simp [ENNReal.dyadicWeight_zero_right]
   | insert i t hi ih =>
     rw [Finset.prod_insert hi, Finset.sum_insert hi, ih, ENNReal.dyadicWeight_add_nat]
 
 /-- **Regrouping by levels**: `∑_k F_k ≤ ∑_n ∑_{|k|_1 = n} F_k`. -/
-theorem tsum_le_tsum_levelSet (F : (Fin d → ℕ) → ℝ≥0∞) :
-    ∑' k, F k ≤ ∑' n, ∑ k ∈ levelSet n, F k := by
+theorem tsum_le_tsum_gridLevelSet (F : (Fin d → ℕ) → ℝ≥0∞) :
+    ∑' k, F k ≤ ∑' n, ∑ k ∈ gridLevelSet n, F k := by
   rw [ENNReal.tsum_eq_iSup_sum]
   refine iSup_le fun T => ?_
-  calc ∑ k ∈ T, F k = ∑ n ∈ T.image level, ∑ k ∈ T.filter (fun k => level k = n), F k :=
-        (Finset.sum_fiberwise_of_maps_to (fun k hk => Finset.mem_image_of_mem level hk) F).symm
-    _ ≤ ∑ n ∈ T.image level, ∑ k ∈ levelSet n, F k :=
+  calc ∑ k ∈ T, F k = ∑ n ∈ T.image gridLevel, ∑ k ∈ T.filter (fun k => gridLevel k = n), F k :=
+        (Finset.sum_fiberwise_of_maps_to (fun k hk => Finset.mem_image_of_mem gridLevel hk) F).symm
+    _ ≤ ∑ n ∈ T.image gridLevel, ∑ k ∈ gridLevelSet n, F k :=
         Finset.sum_le_sum fun n _ => Finset.sum_le_sum_of_subset fun k hk =>
-          mem_levelSet.2 (Finset.mem_filter.1 hk).2
-    _ ≤ ∑' n, ∑ k ∈ levelSet n, F k := ENNReal.sum_le_tsum _
+          mem_gridLevelSet.2 (Finset.mem_filter.1 hk).2
+    _ ≤ ∑' n, ∑ k ∈ gridLevelSet n, F k := ENNReal.sum_le_tsum _
 
 /-- **Hölder's inequality on a finite set**: `∑_{k ∈ S} x_k ≤ #S^(1-1/q) ‖x‖_{ℓ_q}` for
 `1 ≤ q ≤ ∞`. -/
@@ -203,15 +203,15 @@ theorem tsum_tail_le (s : ℝ) {a : ℝ} (ha : 0 ≤ a) (N : ℕ) :
 
 /-- The **hyperbolic cross** `{k ∈ ℕ^d : |k|_1 ≤ N}`. -/
 def hyperbolicCross (N : ℕ) : Finset (Fin d → ℕ) :=
-  (Fintype.piFinset fun _ => Finset.range (N + 1)).filter fun k => level k ≤ N
+  (Fintype.piFinset fun _ => Finset.range (N + 1)).filter fun k => gridLevel k ≤ N
 
 /-- `k` lies in the hyperbolic cross of level `N` iff `|k|_1 ≤ N`. -/
-theorem mem_hyperbolicCross {N : ℕ} {k : Fin d → ℕ} : k ∈ hyperbolicCross N ↔ level k ≤ N := by
+theorem mem_hyperbolicCross {N : ℕ} {k : Fin d → ℕ} : k ∈ hyperbolicCross N ↔ gridLevel k ≤ N := by
   simp only [hyperbolicCross, Finset.mem_filter, Fintype.mem_piFinset, Finset.mem_range]
   constructor
   · exact fun h => h.2
   · intro h
-    exact ⟨fun i => Nat.lt_succ_of_le ((le_level k i).trans h), h⟩
+    exact ⟨fun i => Nat.lt_succ_of_le ((le_gridLevel k i).trans h), h⟩
 
 variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 
@@ -226,21 +226,21 @@ Littlewood–Paley decomposition. -/
 theorem enorm_sub_hyperbolicSum_le (hp : p ≠ ∞) (N : ℕ)
     (f : Lp ℂ p (volume : Measure (Fin d → ℝ))) :
     ‖f - hyperbolicSum hp N f‖ₑ ≤
-      ∑' k, if level k ≤ N then 0 else ‖mixedBlock hp k f‖ₑ := by
+      ∑' k, if gridLevel k ≤ N then 0 else ‖mixedBlock hp k f‖ₑ := by
   set u : (Fin d → ℕ) → Lp ℂ p (volume : Measure (Fin d → ℝ)) := fun k =>
-    if level k ≤ N then 0 else mixedBlock hp k f
+    if gridLevel k ≤ N then 0 else mixedBlock hp k f
   have hrep : Tendsto (fun J => ∑ k ∈ Fintype.piFinset (fun _ : Fin d => Finset.range (J + 1)),
       u k) atTop (𝓝 (f - hyperbolicSum hp N f)) := by
     refine ((tendsto_sum_mixedBlock hp f).sub_const (hyperbolicSum hp N f)).congr' ?_
     filter_upwards [eventually_ge_atTop N] with J hJ
     have hcross : (Fintype.piFinset fun _ : Fin d => Finset.range (J + 1)).filter
-        (fun k => level k ≤ N) = hyperbolicCross N := by
+        (fun k => gridLevel k ≤ N) = hyperbolicCross N := by
       ext k
       simp only [Finset.mem_filter, Fintype.mem_piFinset, Finset.mem_range, mem_hyperbolicCross]
       constructor
       · exact fun h => h.2
       · intro h
-        exact ⟨fun i => Nat.lt_succ_of_le (((le_level k i).trans h).trans hJ), h⟩
+        exact ⟨fun i => Nat.lt_succ_of_le (((le_gridLevel k i).trans h).trans hJ), h⟩
     simp only [u, hyperbolicSum]
     rw [Finset.sum_ite, Finset.sum_const_zero, zero_add, ← hcross, eq_comm, eq_sub_iff_add_eq,
       add_comm, Finset.sum_filter_add_sum_filter_not]
@@ -248,7 +248,7 @@ theorem enorm_sub_hyperbolicSum_le (hp : p ≠ ∞) (N : ℕ)
     ‖x‖ₑ) (C := 1) ENNReal.one_ne_top (fun x y => enorm_add_le x y) (fun x => (one_mul _).ge)
     hrep).trans (le_of_eq ?_)
   refine tsum_congr fun k => ?_
-  by_cases h : level k ≤ N <;> simp [u, h]
+  by_cases h : gridLevel k ≤ N <;> simp [u, h]
 
 /-- The **constant of hyperbolic cross approximation**,
 `C(d, s, q) = ∑_l 2^(-sl) (l + 1)^((d-1)(1-1/q)) ∈ [0, ∞]`. -/
@@ -279,30 +279,30 @@ theorem enorm_sub_hyperbolicSum_le_mixedLPNorm (hp : p ≠ ∞) (s : ℝ) {q : �
   have ha : 0 ≤ a := mul_nonneg (Nat.cast_nonneg _) hq1
   set X := mixedLPNorm hp s q f
   -- each level costs `2^(-sn) (n + 1)^a X`
-  have hlevel : ∀ n, ∑ k ∈ levelSet n, ‖mixedBlock hp k f‖ₑ ≤
+  have hlevel : ∀ n, ∑ k ∈ gridLevelSet n, ‖mixedBlock hp k f‖ₑ ≤
       dyadicWeight (-s) n * ((n + 1 : ℕ) : ℝ≥0∞) ^ a * X := fun n => by
-    have hw : ∀ k ∈ levelSet n, ‖mixedBlock hp k f‖ₑ =
+    have hw : ∀ k ∈ gridLevelSet n, ‖mixedBlock hp k f‖ₑ =
         dyadicWeight (-s) n * (mixedWeight s k * ‖mixedBlock hp k f‖ₑ) := fun k hk => by
-      rw [mixedWeight_eq_dyadicWeight_level, mem_levelSet.1 hk, ← mul_assoc,
+      rw [mixedWeight_eq_dyadicWeight_gridLevel, mem_gridLevelSet.1 hk, ← mul_assoc,
         ENNReal.dyadicWeight_neg_mul_self, one_mul]
     rw [Finset.sum_congr rfl hw, ← Finset.mul_sum, mul_assoc]
-    refine mul_le_mul' le_rfl ((sum_le_card_rpow_mul_lqNorm hq (levelSet n)
+    refine mul_le_mul' le_rfl ((sum_le_card_rpow_mul_lqNorm hq (gridLevelSet n)
       fun k => mixedWeight s k * ‖mixedBlock hp k f‖ₑ).trans (mul_le_mul' ?_ le_rfl))
-    calc ((levelSet (d := d) n).card : ℝ≥0∞) ^ (1 - 1 / q.toReal)
+    calc ((gridLevelSet (d := d) n).card : ℝ≥0∞) ^ (1 - 1 / q.toReal)
         ≤ (((n + 1) ^ (d - 1) : ℕ) : ℝ≥0∞) ^ (1 - 1 / q.toReal) :=
-          ENNReal.rpow_le_rpow (by exact_mod_cast card_levelSet_le n) hq1
+          ENNReal.rpow_le_rpow (by exact_mod_cast card_gridLevelSet_le n) hq1
       _ = ((n + 1 : ℕ) : ℝ≥0∞) ^ a := by
           rw [Nat.cast_pow, ← ENNReal.rpow_natCast, ← ENNReal.rpow_mul]
   calc ‖f - hyperbolicSum hp N f‖ₑ
-      ≤ ∑' k, (if level k ≤ N then 0 else ‖mixedBlock hp k f‖ₑ) :=
+      ≤ ∑' k, (if gridLevel k ≤ N then 0 else ‖mixedBlock hp k f‖ₑ) :=
         enorm_sub_hyperbolicSum_le hp N f
-    _ ≤ ∑' n, ∑ k ∈ levelSet n, (if level k ≤ N then 0 else ‖mixedBlock hp k f‖ₑ) :=
-        tsum_le_tsum_levelSet _
+    _ ≤ ∑' n, ∑ k ∈ gridLevelSet n, (if gridLevel k ≤ N then 0 else ‖mixedBlock hp k f‖ₑ) :=
+        tsum_le_tsum_gridLevelSet _
     _ ≤ ∑' n : ℕ, (if N < n then dyadicWeight (-s) n * ((n + 1 : ℕ) : ℝ≥0∞) ^ a else 0) * X := by
         refine ENNReal.tsum_le_tsum fun n => ?_
-        have hk : ∀ k ∈ levelSet n, (if level k ≤ N then 0 else ‖mixedBlock hp k f‖ₑ) =
+        have hk : ∀ k ∈ gridLevelSet n, (if gridLevel k ≤ N then 0 else ‖mixedBlock hp k f‖ₑ) =
             if N < n then ‖mixedBlock hp k f‖ₑ else 0 := fun k hk => by
-          rw [mem_levelSet.1 hk]
+          rw [mem_gridLevelSet.1 hk]
           split_ifs <;> first | rfl | omega
         rw [Finset.sum_congr rfl hk]
         split_ifs with h

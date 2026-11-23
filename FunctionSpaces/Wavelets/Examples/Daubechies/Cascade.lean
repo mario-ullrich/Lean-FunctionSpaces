@@ -29,8 +29,8 @@ the **cascade algorithm**
   `𝓕 η_n(ξ) → Φ(ξ)` for every `ξ` (`Daubechies.tendsto_fourier_cascade`).
 * **Convergence against Schwartz functions.** For `N ≥ 2` and every Schwartz function `ψ`,
   `∫ η_n ψ = ∫ 𝓕 η_n · 𝓕⁻ ψ → ∫ Φ · 𝓕⁻ ψ = ∫ φ ψ` (`Daubechies.tendsto_integral_cascade_mul`),
-  by the multiplication formula (`Real.integral_mul_schwartz_eq`, `Real.integral_fourierInv_mul`)
-  and dominated convergence with the integrable bound `|𝓕⁻ ψ|`.
+  by the multiplication formula (`Real.integral_mul_schwartz_eq`,
+  `Real.real_integral_fourierInv_mul`) and dominated convergence with the integrable bound `|𝓕⁻ ψ|`.
 * **Compact support of `φ`.** For `ψ` supported in the open set `ℝ \ [0, 2N - 1]` every integral
   `∫ η_n ψ` vanishes, so `∫ φ ψ = 0`, and the fundamental lemma
   (`Real.eqOn_zero_of_integral_mul_schwartz_eq_zero`) gives `φ = 0` outside `[0, 2N - 1]`
@@ -41,7 +41,7 @@ the **cascade algorithm**
   `Daubechies.memLp_scalingFun`).
 * **Fourier inversion.** `𝓕 Φ(ξ) = φ(-ξ)` is integrable, so the inversion theorem gives
   `𝓕 φ = Φ` (`Daubechies.fourier_scalingFun`), and `∫ φ = 𝓕 φ(0) = Φ(0) = 1`
-  (`Daubechies.integral_scalingFun`, with `𝓕 f(0) = ∫ f` from `Real.fourier_apply_zero`).
+  (`Daubechies.integral_scalingFun`, with `𝓕 f(0) = ∫ f` from `Real.real_fourier_apply_zero`).
 -/
 
 @[expose] public section
@@ -157,9 +157,9 @@ theorem fourier_cascade (n : ℕ) (ξ : ℝ) :
     rw [fourier_cascade_succ, ih, prod_range_succ_symbol, h, mul_assoc]
 
 /-- The Fourier transform of every cascade function is continuous, since `η_n` is integrable
-(`Real.continuous_fourier_of_integrable`). -/
+(`Real.real_continuous_fourier_of_integrable`). -/
 theorem continuous_fourier_cascade (n : ℕ) : Continuous (𝓕 (cascade m n)) :=
-  Real.continuous_fourier_of_integrable (integrable_cascade m n)
+  Real.real_continuous_fourier_of_integrable (integrable_cascade m n)
 
 /-- `∫ η_0 = ∫_0^1 1 dx = 1`. -/
 theorem integral_cascade_zero : ∫ x, cascade m 0 x = 1 := by
@@ -171,9 +171,9 @@ theorem integral_norm_cascade_zero : ∫ x, ‖cascade m 0 x‖ = 1 := by
   rw [cascade_zero]
   simp [norm_indicator_eq_indicator_norm, integral_indicator measurableSet_Ico]
 
-/-- `𝓕 η_0(0) = ∫ η_0 = 1` (`Real.fourier_apply_zero`). -/
+/-- `𝓕 η_0(0) = ∫ η_0 = 1` (`Real.real_fourier_apply_zero`). -/
 theorem fourier_cascade_zero_apply_zero : 𝓕 (cascade m 0) 0 = 1 := by
-  rw [Real.fourier_apply_zero, integral_cascade_zero]
+  rw [Real.real_fourier_apply_zero, integral_cascade_zero]
 
 /-- `|𝓕 η_0(ξ)| ≤ ∫ |η_0| = 1` for every `ξ ∈ ℝ` (`Real.norm_fourier_le_integral_norm`). -/
 theorem norm_fourier_cascade_zero_le_one (ξ : ℝ) : ‖𝓕 (cascade m 0) ξ‖ ≤ 1 :=
@@ -210,14 +210,14 @@ multiplication formula gives `∫ η_n ψ = ∫ 𝓕 η_n · 𝓕⁻ ψ` (`Real.
 integrands converge pointwise to `Φ · 𝓕⁻ ψ` (`Daubechies.tendsto_fourier_cascade`) and are
 bounded by the integrable function `|𝓕⁻ ψ|` (`Daubechies.norm_fourier_cascade_le_one`), so
 dominated convergence (Mathlib's `MeasureTheory.tendsto_integral_of_dominated_convergence`) gives
-the limit `∫ Φ · 𝓕⁻ ψ = ∫ 𝓕⁻ Φ · ψ = ∫ φ ψ` (`Real.integral_fourierInv_mul`, which needs
+the limit `∫ Φ · 𝓕⁻ ψ = ∫ 𝓕⁻ Φ · ψ = ∫ φ ψ` (`Real.real_integral_fourierInv_mul`, which needs
 `Φ ∈ L¹`, `Daubechies.integrable_symbolProduct`). -/
 theorem tendsto_integral_cascade_mul (hN : 2 ≤ N) (ψ : 𝓢(ℝ, ℂ)) :
     Tendsto (fun n => ∫ x, cascade m n x * ψ x) atTop (𝓝 (∫ x, scalingFun m x * ψ x)) := by
   have h1 : ∀ n, ∫ x, cascade m n x * ψ x = ∫ ξ, 𝓕 (cascade m n) ξ * 𝓕⁻ ψ ξ := fun n =>
     Real.integral_mul_schwartz_eq (integrable_cascade m n) ψ
   have h2 : ∫ x, scalingFun m x * ψ x = ∫ ξ, symbolProduct m ξ * 𝓕⁻ ψ ξ := by
-    rw [scalingFun, Real.integral_fourierInv_mul (integrable_symbolProduct m hN) ψ.integrable,
+    rw [scalingFun, Real.real_integral_fourierInv_mul (integrable_symbolProduct m hN) ψ.integrable,
       SchwartzMap.fourierInv_coe]
   simp_rw [h1, h2]
   refine tendsto_integral_of_dominated_convergence (fun ξ => ‖𝓕⁻ ψ ξ‖)
@@ -315,8 +315,9 @@ theorem fourier_scalingFun (hN : 2 ≤ N) : 𝓕 (scalingFun m) = symbolProduct 
     (integrable_fourier_symbolProduct m hN)
 
 /-- **The scaling function has integral `1`**: `∫ φ = 𝓕 φ(0) = Φ(0) = 1` for `N ≥ 2`
-(`Real.fourier_apply_zero`, `Daubechies.fourier_scalingFun`, `Daubechies.symbolProduct_zero`). -/
+(`Real.real_fourier_apply_zero`, `Daubechies.fourier_scalingFun`,
+`Daubechies.symbolProduct_zero`). -/
 theorem integral_scalingFun (hN : 2 ≤ N) : ∫ x, scalingFun m x = 1 := by
-  rw [← Real.fourier_apply_zero, fourier_scalingFun m hN, symbolProduct_zero]
+  rw [← Real.real_fourier_apply_zero, fourier_scalingFun m hN, symbolProduct_zero]
 
 end Daubechies

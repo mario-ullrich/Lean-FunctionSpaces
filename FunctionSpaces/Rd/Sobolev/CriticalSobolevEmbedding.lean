@@ -32,8 +32,8 @@ following Johnsen–Sickel (2007, Proposition 1):
   `1 ≤ q ≤ ∞` (`Rd.exists_triebelLizorkinNorm_le_of_nikolskiiExponent`);
 * **the critical Sobolev embedding** `W^m_p ↪ L_r` for `1 < p < ∞`, `r < ∞` and
   `m = n(1/p - 1/r)` with named constants (`Rd.exists_memLp_ae_eq_of_hasWeakLineDeriv_of_eq`,
-  `Rd.exists_memLp_ae_eq_of_memSobolev_of_eq`), and `W^m_p ↪ L_r` for every `p ≤ r < ∞` with
-  `n(1/p - 1/r) ≤ m` (`Rd.exists_memLp_ae_eq_of_memSobolev_of_le`).
+  `Rd.exists_memLp_ae_eq_of_memWSobolev_of_eq`), and `W^m_p ↪ L_r` for every `p ≤ r < ∞` with
+  `n(1/p - 1/r) ≤ m` (`Rd.exists_memLp_ae_eq_of_memWSobolev_of_le`).
 -/
 
 @[expose] public section
@@ -313,29 +313,29 @@ theorem exists_memLp_ae_eq_of_hasWeakLineDeriv_of_eq [Nontrivial V] (hp1 : 1 < p
 
 /-- **The Sobolev embedding `W^m_p ↪ L_r` for `p ≤ r < ∞`**: let `n ≥ 1`, `1 < p < ∞`,
 `p ≤ r < ∞` and `n(1/p - 1/r) ≤ m`. Every `f ∈ W^m_p(V)` has a representative in `L_r(V)`. For
-`r = p` this is `f` itself; for `p < r`, `f ∈ F^m_{p,2}` (`Rd.memTriebelLizorkin_of_memSobolev`)
+`r = p` this is `f` itself; for `p < r`, `f ∈ F^m_{p,2}` (`Rd.memTriebelLizorkin_of_memWSobolev`)
 and `F^m_{p,2} ↪ L_r` (`Rd.exists_memLp_ae_eq_of_memTriebelLizorkin_of_le`). -/
-theorem exists_memLp_ae_eq_of_memSobolev_of_le [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞)
+theorem exists_memLp_ae_eq_of_memWSobolev_of_le [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞)
     (hpr : p ≤ r) (hr : r ≠ ∞) {m : ℕ} (hs : nikolskiiExponent (finrank ℝ V) p r ≤ m)
-    {f : Lp ℂ p (volume : Measure V)} (hf : MemSobolev m f) :
+    {f : Lp ℂ p (volume : Measure V)} (hf : MemWSobolev m f) :
     ∃ g : Lp ℂ r (volume : Measure V), (g : V → ℂ) =ᵐ[volume] f :=
   exists_memLp_ae_eq_of_memTriebelLizorkin_of_le hpr hr hs one_le_two
-    (memTriebelLizorkin_of_memSobolev hp1 hp hf)
+    (memTriebelLizorkin_of_memWSobolev hp1 hp hf)
 
 /-- **The critical Sobolev embedding** (Sobolev's inequality for `1 < p < n/m`): let `n ≥ 1`,
 `1 < p < ∞`, `r < ∞` and `m = n(1/p - 1/r)`, that is `1/r = 1/p - m/n`. Every `f ∈ W^m_p(V)` has
 a representative in `L_r(V)`. Here `p ≤ r` (`le_of_nikolskiiExponent_nonneg`), so
-`Rd.exists_memLp_ae_eq_of_memSobolev_of_le` applies;
+`Rd.exists_memLp_ae_eq_of_memWSobolev_of_le` applies;
 `Rd.exists_memLp_ae_eq_of_hasWeakLineDeriv_of_eq` adds the norm bound. -/
-theorem exists_memLp_ae_eq_of_memSobolev_of_eq [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞)
+theorem exists_memLp_ae_eq_of_memWSobolev_of_eq [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞)
     (hr : r ≠ ∞) {m : ℕ} (hs : nikolskiiExponent (finrank ℝ V) p r = m)
-    {f : Lp ℂ p (volume : Measure V)} (hf : MemSobolev m f) :
+    {f : Lp ℂ p (volume : Measure V)} (hf : MemWSobolev m f) :
     ∃ g : Lp ℂ r (volume : Measure V), (g : V → ℂ) =ᵐ[volume] f := by
   rcases eq_or_ne r 0 with rfl | hr0
   · obtain ⟨u, hu, -⟩ := exists_lp_zero_ae_eq f
     exact ⟨u, hu⟩
   have hpr : p ≤ r := le_of_nikolskiiExponent_nonneg (Nat.cast_pos.2 finrank_pos) hp
     (pos_iff_ne_zero.2 hr0) (by rw [hs]; exact Nat.cast_nonneg m)
-  exact exists_memLp_ae_eq_of_memSobolev_of_le hp1 hp hpr hr hs.le hf
+  exact exists_memLp_ae_eq_of_memWSobolev_of_le hp1 hp hpr hr hs.le hf
 
 end Rd

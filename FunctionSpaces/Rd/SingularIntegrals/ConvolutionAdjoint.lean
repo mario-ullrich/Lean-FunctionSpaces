@@ -14,7 +14,7 @@ public import FunctionSpaces.Analysis.Lp.Young
 
 On a finite-dimensional real inner product space `V` with Lebesgue measure, `K ⋆ f` is the
 convolution `(K ⋆ f)(x) = ∫ K(y) f(x - y) dy` (`Rd.conv`) and `K^∨(x) = K(-x)` the reflection
-(`Rd.reflect`).
+(`Rd.reflectNeg`).
 
 * **The adjoint identity** (`Rd.integral_conv_mul`): for integrable `K`, `f ∈ L_p`, `g ∈ L_q`
   with `1/p + 1/q = 1`, `p < ∞`, `∫ (K ⋆ f) g = ∫ f (K^∨ ⋆ g)`, by Fubini's theorem; the double
@@ -78,35 +78,35 @@ variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDim
 /-! ### Reflection -/
 
 /-- The **reflection** `K^∨(x) = K(-x)` of a function `K : V → ℂ`. -/
-def reflect (K : V → ℂ) (x : V) : ℂ := K (-x)
+def reflectNeg (K : V → ℂ) (x : V) : ℂ := K (-x)
 
 omit [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- The values of the reflection: `K^∨(x) = K(-x)`. -/
 @[simp]
-theorem reflect_apply (K : V → ℂ) (x : V) : reflect K x = K (-x) :=
+theorem reflectNeg_apply (K : V → ℂ) (x : V) : reflectNeg K x = K (-x) :=
   rfl
 
 omit [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- The reflection is an involution. -/
 @[simp]
-theorem reflect_reflect (K : V → ℂ) : reflect (reflect K) = K := by
+theorem reflectNeg_reflectNeg (K : V → ℂ) : reflectNeg (reflectNeg K) = K := by
   funext x
   simp
 
 /-- The reflection of an integrable function is integrable (Lebesgue measure is invariant under
 `x ↦ -x`, Mathlib's `Integrable.comp_neg`). -/
-theorem integrable_reflect {K : V → ℂ} (hK : Integrable K) : Integrable (reflect K) :=
+theorem integrable_reflectNeg {K : V → ℂ} (hK : Integrable K) : Integrable (reflectNeg K) :=
   hK.comp_neg
 
 omit [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- The reflection of a continuous function is continuous. -/
-theorem continuous_reflect {K : V → ℂ} (hK : Continuous K) : Continuous (reflect K) :=
+theorem continuous_reflectNeg {K : V → ℂ} (hK : Continuous K) : Continuous (reflectNeg K) :=
   hK.comp continuous_neg
 
 /-- **Fourier transform of the reflection**: `𝓕(K^∨)(ξ) = 𝓕K(-ξ)` for every function `K`, from
 Mathlib's `Real.fourierInv_eq_fourier_comp_neg` and `Real.fourierInv_eq_fourier_neg`. -/
-theorem fourier_reflect (K : V → ℂ) (ξ : V) : 𝓕 (reflect K) ξ = 𝓕 K (-ξ) := by
-  rw [show reflect K = fun x => K (-x) from rfl, ← Real.fourierInv_eq_fourier_comp_neg,
+theorem fourier_reflectNeg (K : V → ℂ) (ξ : V) : 𝓕 (reflectNeg K) ξ = 𝓕 K (-ξ) := by
+  rw [show reflectNeg K = fun x => K (-x) from rfl, ← Real.fourierInv_eq_fourier_comp_neg,
     Real.fourierInv_eq_fourier_neg]
 
 /-! ### Convolution as an integral against translates -/
@@ -119,9 +119,9 @@ theorem conv_apply_eq_integral_sub (K f : V → ℂ) (x : V) :
   exact convolution_mul_swap
 
 /-- **Convolution with a reflected kernel**: `(K^∨ ⋆ u)(y) = ∫ K(z - y) u(z) dz`. -/
-theorem conv_reflect_apply (K u : V → ℂ) (y : V) :
-    conv (reflect K) u volume y = ∫ z, K (z - y) * u z := by
-  simp [conv_apply_eq_integral_sub, reflect_apply, neg_sub]
+theorem conv_reflectNeg_apply (K u : V → ℂ) (y : V) :
+    conv (reflectNeg K) u volume y = ∫ z, K (z - y) * u z := by
+  simp [conv_apply_eq_integral_sub, reflectNeg_apply, neg_sub]
 
 /-! ### The adjoint identity -/
 
@@ -165,17 +165,17 @@ theorem integrable_kernel_mul_mul {p q : ℝ≥0∞} [p.HolderConjugate q] (hp :
 of Mathlib's `integral_integral_swap`). -/
 theorem integral_conv_mul {p q : ℝ≥0∞} [p.HolderConjugate q] (hp : p ≠ ∞) {K f g : V → ℂ}
     (hK : Integrable K) (hf : MemLp f p) (hg : MemLp g q) :
-    ∫ x, conv K f volume x * g x = ∫ y, f y * conv (reflect K) g volume y := by
+    ∫ x, conv K f volume x * g x = ∫ y, f y * conv (reflectNeg K) g volume y := by
   calc ∫ x, conv K f volume x * g x = ∫ x, ∫ y, K (x - y) * f y * g x := by
         congr 1
         funext x
         rw [conv_apply_eq_integral_sub, ← integral_mul_const]
     _ = ∫ y, ∫ x, K (x - y) * f y * g x :=
         integral_integral_swap (integrable_kernel_mul_mul hp hK hf hg)
-    _ = ∫ y, f y * conv (reflect K) g volume y := by
+    _ = ∫ y, f y * conv (reflectNeg K) g volume y := by
         congr 1
         funext y
-        rw [conv_reflect_apply, ← integral_const_mul]
+        rw [conv_reflectNeg_apply, ← integral_const_mul]
         congr 1
         funext x
         ring
@@ -183,17 +183,17 @@ theorem integral_conv_mul {p q : ℝ≥0∞} [p.HolderConjugate q] (hp : p ≠ �
 /-- **Reflection and conjugation**: `(K^∨ ⋆ conj u)(x) = conj((K^* ⋆ u)(x))` at every point, for
 the adjoint kernel `K^*(z) = conj K(-z)` and the reflection `K^∨(z) = K(-z)`; both sides are
 `∫ K(y - x) conj u(y) dy`. -/
-theorem conv_reflect_conj (K u : V → ℂ) (x : V) :
-    conv (reflect K) (fun y => conj (u y)) volume x =
+theorem conv_reflectNeg_conj (K u : V → ℂ) (x : V) :
+    conv (reflectNeg K) (fun y => conj (u y)) volume x =
       conj (conv (fun z => conj (K (-z))) u volume x) := by
   rw [conv_apply_eq_integral_sub, conv_apply_eq_integral_sub, ← integral_conj]
   congr 1
   funext y
-  rw [map_mul, Complex.conj_conj, reflect_apply]
+  rw [map_mul, Complex.conj_conj, reflectNeg_apply]
 
 /-- **The adjoint identity with conjugation**: for integrable `K`, `f ∈ L_p` and `g ∈ L_q` with
 `1/p + 1/q = 1`, `p < ∞`, `∫ (K ⋆ f) conj g = ∫ f conj(K^* ⋆ g)` with the adjoint kernel
-`K^*(z) = conj K(-z)` (`Rd.integral_conv_mul` for `conj g` and `Rd.conv_reflect_conj`). -/
+`K^*(z) = conj K(-z)` (`Rd.integral_conv_mul` for `conj g` and `Rd.conv_reflectNeg_conj`). -/
 theorem integral_conv_mul_conj {p q : ℝ≥0∞} [p.HolderConjugate q] (hp : p ≠ ∞) {K f g : V → ℂ}
     (hK : Integrable K) (hf : MemLp f p) (hg : MemLp g q) :
     ∫ x, conv K f volume x * conj (g x) =
@@ -201,7 +201,7 @@ theorem integral_conv_mul_conj {p q : ℝ≥0∞} [p.HolderConjugate q] (hp : p 
   rw [integral_conv_mul (g := fun x => conj (g x)) hp hK hf hg.star]
   congr 1
   funext y
-  rw [conv_reflect_conj]
+  rw [conv_reflectNeg_conj]
 
 /-! ### Translates and reflections of Schwartz functions -/
 
@@ -259,20 +259,20 @@ theorem iteratedLineDerivOp_shiftReflect {k : ℕ} (η : 𝓢(V, ℂ)) (x : V) (
 `(∂_v η)^∨ ⋆ u = -(η^∨ ⋆ ∂_v u)` pointwise, by integration by parts on the Schwartz space
 (Mathlib's `SchwartzMap.integral_mul_lineDerivOp_right_eq_neg_left`) applied to `η(· - y)` and
 `u`. -/
-theorem conv_reflect_lineDerivOp (η u : 𝓢(V, ℂ)) (v y : V) :
-    conv (reflect (∂_{v} η : 𝓢(V, ℂ))) u volume y =
-      -conv (reflect η) (∂_{v} u : 𝓢(V, ℂ)) volume y := by
+theorem conv_reflectNeg_lineDerivOp (η u : 𝓢(V, ℂ)) (v y : V) :
+    conv (reflectNeg (∂_{v} η : 𝓢(V, ℂ))) u volume y =
+      -conv (reflectNeg η) (∂_{v} u : 𝓢(V, ℂ)) volume y := by
   have h := SchwartzMap.integral_mul_lineDerivOp_right_eq_neg_left (μ := volume)
     (η.compSubConstCLM ℂ y) u v
   rw [SchwartzMap.lineDerivOp_compSubConstCLM] at h
   simp only [SchwartzMap.compSubConstCLM_apply] at h
-  rw [conv_reflect_apply, conv_reflect_apply, h, neg_neg]
+  rw [conv_reflectNeg_apply, conv_reflectNeg_apply, h, neg_neg]
 
 /-- **A derivative moves from the kernel `η` to the Schwartz function `u`**: for Schwartz
 functions `η`, `u`, `f ∈ L_p` with `1 ≤ p < ∞` and `v ∈ V`,
 `∫ ((∂_v η) ⋆ f) u = -∫ (η ⋆ f) ∂_v u`. Both sides are pairings of `f` with reflected
 convolutions (`Rd.integral_conv_mul`, with the conjugate exponent of `p` and Schwartz functions
-in every `L_q`), and these agree up to the sign (`Rd.conv_reflect_lineDerivOp`). -/
+in every `L_q`), and these agree up to the sign (`Rd.conv_reflectNeg_lineDerivOp`). -/
 theorem integral_conv_lineDerivOp_mul {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {f : V → ℂ}
     (hf : MemLp f p) (η u : 𝓢(V, ℂ)) (v : V) :
     ∫ x, conv (∂_{v} η : 𝓢(V, ℂ)) f volume x * u x =
@@ -283,7 +283,7 @@ theorem integral_conv_lineDerivOp_mul {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p �
     ← integral_neg]
   congr 1
   funext y
-  rw [conv_reflect_lineDerivOp, mul_neg]
+  rw [conv_reflectNeg_lineDerivOp, mul_neg]
 
 /-- **Iterated derivatives move from the kernel `η` to the Schwartz function `u`**: for Schwartz
 functions `η`, `u`, `f ∈ L_p` with `1 ≤ p < ∞` and `w ∈ V^k`,

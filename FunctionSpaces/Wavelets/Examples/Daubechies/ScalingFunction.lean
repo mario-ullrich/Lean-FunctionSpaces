@@ -100,16 +100,16 @@ theorem scalingFun_eq_integral (x : ℝ) :
 
 /-- **The scaling function is continuous** for `N ≥ 2`: the inverse Fourier transform of the
 integrable function `Φ` (`Daubechies.integrable_symbolProduct`) is continuous
-(`Real.continuous_fourierInv_of_integrable`). -/
+(`Real.real_continuous_fourierInv_of_integrable`). -/
 theorem continuous_scalingFun (hN : 2 ≤ N) : Continuous (scalingFun m) :=
-  Real.continuous_fourierInv_of_integrable (integrable_symbolProduct m hN)
+  Real.real_continuous_fourierInv_of_integrable (integrable_symbolProduct m hN)
 
 /-- **The uniform bound** `|φ(x)| ≤ ∫ |Φ(ξ)| dξ` for every `x ∈ ℝ`
-(`Real.norm_fourierInv_le_integral_norm`). For `N ≥ 2` the right side is finite
+(`Real.real_norm_fourierInv_le_integral_norm`). For `N ≥ 2` the right side is finite
 (`Daubechies.integrable_symbolProduct`); the bound holds for every order, since Lean assigns
 the value `0` to the integral of a non-integrable function. -/
 theorem norm_scalingFun_le (x : ℝ) : ‖scalingFun m x‖ ≤ ∫ ξ, ‖symbolProduct m ξ‖ :=
-  Real.norm_fourierInv_le_integral_norm _ x
+  Real.real_norm_fourierInv_le_integral_norm _ x
 
 /-! ### The refinement equation -/
 

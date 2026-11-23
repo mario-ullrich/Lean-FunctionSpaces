@@ -37,7 +37,7 @@ set `Ω` has finite measure (`Rd.BoundedLipschitzDomain.isFiniteMeasure_volume_r
   functions of `H^1(Ω)` are the functions of `B^{1/2}_{2,2}(Γ)`
   (`Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_exists_memSobolevOn`). The extensions in the
   definition of the boundary trace are the `F ∈ W^1_2(V)` with `F = f` on `Ω`
-  (`Rd.BoundedLipschitzDomain.isBoundaryTrace_iff_forall_memSobolev`), and `f` has the boundary
+  (`Rd.BoundedLipschitzDomain.isBoundaryTrace_iff_forall_memWSobolev`), and `f` has the boundary
   trace `g` with a finite intrinsic norm iff `f ∈ H^1(Ω)` and `g` is its boundary trace
   (`Rd.BoundedLipschitzDomain.hasBoundaryTrace_iff_memSobolevOn`).
 -/
@@ -80,26 +80,26 @@ variable (Ω : BoundedLipschitzDomain V)
 
 /-- **The Sobolev space `H^1(Ω)`** of a bounded Lipschitz domain, as the space of restrictions:
 `f ∈ L_2(V)` lies in `H^1(Ω)` if `f = F` almost everywhere on `Ω` for some `F ∈ W^1_2(V)`, which is
-Mathlib's `H^1(V)` (`Rd.memSobolev_one_iff`). Only the values of `f` on `Ω` matter
+Mathlib's `H^1(V)` (`Rd.memWSobolev_one_iff`). Only the values of `f` on `Ω` matter
 (`Rd.BoundedLipschitzDomain.MemSobolevOn.congr_ae`). By this definition every such `f` lies in
 the Sobolev space `W^1_2(Ω)` of weak derivatives on `Ω`
 (`Rd.BoundedLipschitzDomain.MemSobolevOn.memWeakSobolev`); the converse is the extension theorem
 of Calderón and Stein (Stein 1970, Chapter VI;
 `Rd.BoundedLipschitzDomain.memSobolevOn_iff_memWeakSobolev`). -/
 def MemSobolevOn (f : Lp ℂ 2 (volume : Measure V)) : Prop :=
-  ∃ F : Lp ℂ 2 (volume : Measure V), MemSobolev 1 F ∧
+  ∃ F : Lp ℂ 2 (volume : Measure V), MemWSobolev 1 F ∧
     (F : V → ℂ) =ᵐ[volume.restrict Ω.carrier] f
 
 variable {Ω}
 
 /-- Every `f ∈ W^1_2(V)` lies in `H^1(Ω)`. -/
-theorem memSobolevOn_of_memSobolev {f : Lp ℂ 2 (volume : Measure V)} (hf : MemSobolev 1 f) :
+theorem memSobolevOn_of_memWSobolev {f : Lp ℂ 2 (volume : Measure V)} (hf : MemWSobolev 1 f) :
     Ω.MemSobolevOn f :=
   ⟨f, hf, Filter.EventuallyEq.rfl⟩
 
 /-- The zero class lies in `H^1(Ω)`. -/
 theorem zero_memSobolevOn : Ω.MemSobolevOn 0 :=
-  memSobolevOn_of_memSobolev zero_memSobolev
+  memSobolevOn_of_memWSobolev zero_memWSobolev
 
 /-- `H^1(Ω)` only sees `f` almost everywhere on `Ω`. -/
 theorem MemSobolevOn.congr_ae {f f' : Lp ℂ 2 (volume : Measure V)} (hf : Ω.MemSobolevOn f)
@@ -132,13 +132,13 @@ variable (Ω)
 
 /-- **`H^1(Ω)` by restrictions of `B^1_{2,2}(V)`**: `f ∈ H^1(Ω)` iff `f` agrees on `Ω` with some
 `F` in the approximation space `A^1_2` of the band-limited functions on `V`
-(`Rd.memSobolev_one_iff_memApprox`). -/
+(`Rd.memWSobolev_one_iff_memApprox`). -/
 theorem memSobolevOn_iff_exists_memApprox (f : Lp ℂ 2 (volume : Measure V)) :
     Ω.MemSobolevOn f ↔ ∃ F : Lp ℂ 2 (volume : Measure V),
       indicatorLp Ω.measurableSet F = indicatorLp Ω.measurableSet f ∧
         (bandScheme two_ne_top).MemApprox 1 2 F := by
   refine exists_congr fun F => ?_
-  rw [memSobolev_one_iff_memApprox, indicatorLp_eq_iff_ae_eq_restrict, and_comm]
+  rw [memWSobolev_one_iff_memApprox, indicatorLp_eq_iff_ae_eq_restrict, and_comm]
 
 /-- **`H^1(Ω)` by intrinsic differences**: for every order `r ≥ 2`, `f ∈ L_2(V)` lies in `H^1(Ω)`
 iff `‖f‖_{L_2(Ω)} + ‖(2^k ω_r(f, 2^(-k), Ω)_2)_k‖_{ℓ_2} < ∞`, with the moduli of smoothness of `f`
@@ -172,7 +172,7 @@ theorem MemSobolevOn.exists_modNorm_lt_top {r : ℕ} (hr : 2 ≤ r)
       indicatorLp Ω.measurableSet F = indicatorLp Ω.measurableSet f ∧
         ‖F‖ₑ + lqNorm 2 (fun k => dyadicWeight 1 k * lpModulus 2 r F k) < ∞ := by
   obtain ⟨F, hF, hFf⟩ := hf
-  exact ⟨F, (indicatorLp_eq_iff_ae_eq_restrict _).2 hFf, (memSobolev_one_iff_modulus hr F).1 hF⟩
+  exact ⟨F, (indicatorLp_eq_iff_ae_eq_restrict _).2 hFf, (memWSobolev_one_iff_modulus hr F).1 hF⟩
 
 /-! ### The weak gradient -/
 
@@ -191,17 +191,17 @@ variable (Ω)
 
 /-- **Boundary traces of `H^1` functions**: for `L = 2`, `σ = 1` and `q = 2`, the functions `F` in
 the definition of a boundary trace (`Rd.BoundedLipschitzDomain.IsBoundaryTrace`) are the
-`F ∈ W^1_2(V)` with `F = f` almost everywhere on `Ω` (`Rd.memSobolev_one_iff_modulus` with
+`F ∈ W^1_2(V)` with `F = f` almost everywhere on `Ω` (`Rd.memWSobolev_one_iff_modulus` with
 `r = 2`): `g` is the boundary trace of `f` iff `Tr_Γ F = g` almost everywhere on `Γ` for every such
 `F`. -/
-theorem isBoundaryTrace_iff_forall_memSobolev (ψ : Ω.BoundaryPartition)
+theorem isBoundaryTrace_iff_forall_memWSobolev (ψ : Ω.BoundaryPartition)
     (f : Lp ℂ 2 (volume : Measure V)) (g : V → ℂ) :
-    Ω.IsBoundaryTrace ψ two_ne_top 2 1 2 f g ↔ ∀ F : Lp ℂ 2 (volume : Measure V), MemSobolev 1 F →
+    Ω.IsBoundaryTrace ψ two_ne_top 2 1 2 f g ↔ ∀ F : Lp ℂ 2 (volume : Measure V), MemWSobolev 1 F →
       (F : V → ℂ) =ᵐ[volume.restrict Ω.carrier] f →
         Ω.boundaryTrace ψ two_ne_top 2 F =ᶠ[Ω.aeBoundary] g := by
   unfold IsBoundaryTrace
   refine forall_congr' fun F => ?_
-  rw [memSobolev_one_iff_modulus le_rfl F, indicatorLp_eq_iff_ae_eq_restrict]
+  rw [memWSobolev_one_iff_modulus le_rfl F, indicatorLp_eq_iff_ae_eq_restrict]
   exact ⟨fun h hF hFf => h hFf hF, fun h hFf hF => h hF hFf⟩
 
 /-- **Boundary traces of `H^1` functions with a finite intrinsic norm**: for `L = 2`, `σ = 1` and
@@ -273,7 +273,7 @@ theorem memSobolevOn_iff_exists_restrictL2 (Ω : BoundedLipschitzDomain V)
       restrictL2 Ω.toOpens u = LpToLpRestrictCLM V ℂ ℂ volume 2 Ω.carrier f := by
   constructor
   · rintro ⟨F, hF, hFf⟩
-    have hS := (memSobolev_one_iff F).1 hF
+    have hS := (memWSobolev_one_iff F).1 hF
     have hU : toL2 hS.toBesselPotentialSpace = F :=
       toL2_eq_of_toDistr_eq _ hS.toBesselPotentialSpace_toDistr.symm
     refine ⟨restrictProj 1 Ω.toOpens hS.toBesselPotentialSpace, ?_⟩
@@ -281,7 +281,7 @@ theorem memSobolevOn_iff_exists_restrictL2 (Ω : BoundedLipschitzDomain V)
     exact Lp.ext ((LpToLpRestrictCLM_coeFn ℂ _ _).trans
       (hFf.trans (LpToLpRestrictCLM_coeFn ℂ _ _).symm))
   · rintro ⟨u, hu⟩
-    refine ⟨toL2 (u : H^{1}(V)), memSobolev_toL2 _, ?_⟩
+    refine ⟨toL2 (u : H^{1}(V)), memWSobolev_toL2 _, ?_⟩
     exact (restrictL2_eq_iff_ae_eq u f).1 hu
 
 end BoundedLipschitzDomain

@@ -64,7 +64,7 @@ theorem enorm_indicatorLp_sub_convLp_scaled_le (hp : p ≠ ∞) {W T : Set V}
     (hW : MeasurableSet W) (L j : ℕ)
     (hstep : ∀ c : ℝ, 1 ≤ c → ∀ z, b.toFun z ≠ 0 → W ⊆ diffStepSet T L (-c⁻¹ • z))
     (f : Lp ℂ p (volume : Measure V)) :
-    ‖indicatorLp hW (f - convLp hp (b.integrable_scaled L j) f)‖ₑ ≤
+    ‖indicatorLp hW (f - convLp hp (b.integrable_scaledMoment L j) f)‖ₑ ≤
       (∫⁻ z, ‖b.toFun z‖ₑ) * modulusOn volume T L p (f : V → ℂ) (b.radius / 2 ^ j) := by
   rw [Lp.enorm_def, eLpNorm_congr_ae (indicatorLp_apply_ae hW _)]
   exact eLpNorm_indicator_sub_convLp_momentKernel_le hp b.integrable b.integral_eq_one b.eq_zero L
@@ -78,11 +78,11 @@ theorem enorm_indicatorLp_localMean_succ_le (hp : p ≠ ∞) {W T : Set V} (hW :
     ‖indicatorLp hW (b.localMean hp L (j + 1) f)‖ₑ ≤
       2 * (∫⁻ z, ‖b.toFun z‖ₑ) * lpModulusOn p T L f (j + 1) := by
   set A := ∫⁻ z, ‖b.toFun z‖ₑ
-  have hk : b.localMean hp L (j + 1) f = (f - convLp hp (b.integrable_scaled L j) f) -
-      (f - convLp hp (b.integrable_scaled L (j + 1)) f) := by
-    rw [show b.localMean hp L (j + 1) f = convLp hp (b.integrable_scaled L (j + 1)) f -
-        convLp hp (b.integrable_scaled L j) f from
-      convLp_sub_kernel hp (b.integrable_scaled L (j + 1)) (b.integrable_scaled L j) f]
+  have hk : b.localMean hp L (j + 1) f = (f - convLp hp (b.integrable_scaledMoment L j) f) -
+      (f - convLp hp (b.integrable_scaledMoment L (j + 1)) f) := by
+    rw [show b.localMean hp L (j + 1) f = convLp hp (b.integrable_scaledMoment L (j + 1)) f -
+        convLp hp (b.integrable_scaledMoment L j) f from
+      convLp_sub_kernel hp (b.integrable_scaledMoment L (j + 1)) (b.integrable_scaledMoment L j) f]
     abel
   have hmono : ∀ i, j ≤ i →
       modulusOn volume T L p (f : V → ℂ) (b.radius / 2 ^ i) ≤ lpModulusOn p T L f (j + 1) :=
@@ -96,8 +96,8 @@ theorem enorm_indicatorLp_localMean_succ_le (hp : p ≠ ∞) {W T : Set V} (hW :
             rw [pow_succ]
             ring)
   calc ‖indicatorLp hW (b.localMean hp L (j + 1) f)‖ₑ
-      ≤ ‖indicatorLp hW (f - convLp hp (b.integrable_scaled L j) f)‖ₑ +
-          ‖indicatorLp hW (f - convLp hp (b.integrable_scaled L (j + 1)) f)‖ₑ := by
+      ≤ ‖indicatorLp hW (f - convLp hp (b.integrable_scaledMoment L j) f)‖ₑ +
+          ‖indicatorLp hW (f - convLp hp (b.integrable_scaledMoment L (j + 1)) f)‖ₑ := by
         rw [hk, map_sub]
         exact enorm_sub_le
     _ ≤ A * lpModulusOn p T L f (j + 1) + A * lpModulusOn p T L f (j + 1) :=
@@ -144,7 +144,7 @@ variable [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] {p : ℝ�
 `‖1_Ω (f - m_{2^j} ⋆ f)‖_p ≤ ‖g‖_1 ω_L(f, 2^(-(j+1)), Ω)_p` for the cone bump `g`. -/
 theorem enorm_cutoff_sub_convLp_scaled_le (hp : p ≠ ∞) (L j : ℕ)
     (f : Lp ℂ p (volume : Measure V)) :
-    ‖Ω.cutoff (f - convLp hp (Ω.coneBump.integrable_scaled L j) f)‖ₑ ≤
+    ‖Ω.cutoff (f - convLp hp (Ω.coneBump.integrable_scaledMoment L j) f)‖ₑ ≤
       (∫⁻ z, ‖Ω.coneBump.toFun z‖ₑ) * lpModulusOn p Ω.domain L f (j + 1) := by
   have hR : Ω.coneBump.radius / 2 ^ j = 1 / 2 ^ (j + 1) := by
     rw [Ω.coneBump_radius, pow_succ]
@@ -158,8 +158,8 @@ theorem enorm_cutoff_sub_convLp_scaled_le (hp : p ≠ ∞) (L j : ℕ)
 theorem enorm_cutoff_localMean_zero_le (hp : p ≠ ∞) (L : ℕ) (f : Lp ℂ p (volume : Measure V)) :
     ‖Ω.cutoff (Ω.coneBump.localMean hp L 0 f)‖ₑ ≤
       eLpNorm (momentKernel Ω.coneBump.toFun L) 1 volume * ‖Ω.cutoff f‖ₑ := by
-  have h := Ω.cutoff_convLp_cutoff hp (Ω.coneBump.integrable_kernel L 0)
-    (Ω.coneSupported_kernel L 0) f
+  have h := Ω.cutoff_convLp_cutoff hp (Ω.coneBump.integrable_meansKernel L 0)
+    (Ω.coneSupported_meansKernel L 0) f
   calc ‖Ω.cutoff (Ω.coneBump.localMean hp L 0 f)‖ₑ
       = ‖Ω.cutoff (Ω.coneBump.localMean hp L 0 (Ω.cutoff f))‖ₑ := congrArg (‖·‖ₑ) h.symm
     _ ≤ ‖Ω.coneBump.localMean hp L 0 (Ω.cutoff f)‖ₑ := Ω.enorm_cutoff_le _
@@ -233,7 +233,7 @@ theorem modNorm_extension_le_modNormOn (hp : p ≠ ∞) (r : ℕ) {s : ℝ} (hs 
     (hf : modNormOn Ω.measurableSet_domain r s q f < ∞) :
     ‖Ω.extension hp r f‖ₑ +
         lqNorm q (fun k => dyadicWeight s k * lpModulus p r (Ω.extension hp r f) k) ≤
-      Ω.coneBump.synthConst r s * Ω.intrinsicConst r *
+      Ω.coneBump.bumpSynthConst r s * Ω.intrinsicConst r *
         modNormOn Ω.measurableSet_domain r s q f := by
   rw [mul_assoc]
   exact (Ω.modNorm_extension_le hp r hs hq (Ω.intrinsicNorm_lt_top hp r s hq hf)).trans

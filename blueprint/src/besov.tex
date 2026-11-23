@@ -1776,12 +1776,12 @@ The fibres of measure $0$ are countably many, so their union is a null set.
 
 \begin{definition}[Dyadic intervals and the dyadic filtration]
 \label{def:dyadic-filtration}
-\lean{Haar.vol, Haar.dyadicIndex, Haar.dyadicInterval, Haar.dyadicInterval_eq_Ico,
-  Haar.dyadicInterval_eq_union, Haar.vol_dyadicInterval, Haar.dyadicSigma, Haar.dyadicFiltration,
-  Haar.scheme, Haar.mem_dyadicInterval, Haar.measurable_dyadicIndex,
-  Haar.measurableSet_dyadicInterval, Haar.disjoint_dyadicInterval, Haar.dyadicIndex_nonneg,
-  Haar.dyadicIndex_lt, Haar.dyadicInterval_natCast, Haar.dyadicInterval_subset,
-  Haar.vol_real_dyadicInterval,
+\lean{Haar.vol, Haar.dyadicIndex, Haar.haarDyadicInterval, Haar.haarDyadicInterval_eq_Ico,
+  Haar.haarDyadicInterval_eq_union, Haar.vol_haarDyadicInterval, Haar.dyadicSigma,
+  Haar.dyadicFiltration, Haar.haarScheme, Haar.mem_haarDyadicInterval, Haar.measurable_dyadicIndex,
+  Haar.measurableSet_haarDyadicInterval, Haar.disjoint_haarDyadicInterval, Haar.dyadicIndex_nonneg,
+  Haar.dyadicIndex_lt, Haar.haarDyadicInterval_natCast, Haar.haarDyadicInterval_subset,
+  Haar.vol_real_haarDyadicInterval,
   Haar.dyadicIndex_succ_div, Haar.dyadicSigma_mono}
 \leanok
 \uses{def:filtration-scheme, def:pp-scheme}
@@ -1853,7 +1853,7 @@ and functions that agree almost everywhere on $[0, 1]$ have the same Haar coeffi
 
 \begin{lemma}[Martingale differences are Haar sums]
 \label{lem:haar-martingale}
-\lean{Haar.sum_fin_eq_of_ne, Haar.setIntegral_dyadicInterval, Haar.condExp_succ_sub_ae_eq,
+\lean{Haar.sum_fin_eq_of_ne, Haar.setIntegral_haarDyadicInterval, Haar.condExp_succ_sub_ae_eq,
   Haar.condExpLp_succ_sub_ae_eq}
 \leanok
 \uses{lem:dyadic-condexp, def:haar, lem:dyadic-normalising-factor}
@@ -1894,7 +1894,7 @@ $p$-th power of the norm is $\sum_m |c_m|^p 2^{jp/2} 2^{-j}$.
 \begin{lemma}[Density of step functions]
 \label{lem:haar-density}
 \lean{Haar.stepFun, Haar.stronglyMeasurable_stepFun, Haar.exists_norm_sub_stepFun_le,
-  Haar.toLp_mem_closure, Haar.closure_iUnion_scheme}
+  Haar.toLp_mem_closure, Haar.closure_iUnion_haarScheme}
 \leanok
 \uses{def:dyadic-filtration}
 For $1 \leq p < \infty$ the Haar approximants are dense in $L_p[0, 1]$.
@@ -1951,7 +1951,7 @@ $L_p[0, 1]$, $1 \leq p < \infty$, in the same way.
   Haar.integral_haarFunction_mul_self, Haar.haarFunction_mul_haarFunction_of_ne,
   Haar.integral_haarFunction_mul_of_lt, Haar.integral_haarFunction_mul,
   Haar.integral_haarSystem_mul, Haar.orthonormal_haarVec, Haar.condExpLp_mem_span_haarVec,
-  Haar.iUnion_scheme_subset_span, Haar.span_haarVec_closure_eq_top, Haar.haarBasis,
+  Haar.iUnion_haarScheme_subset_span, Haar.span_haarVec_closure_eq_top, Haar.haarBasis,
   Haar.coe_haarBasis, Haar.haarBasis_repr_apply, Haar.haarBasis_repr_zero,
   Haar.haarBasis_repr_two_pow_add}
 \leanok
@@ -2010,7 +2010,7 @@ the weight $2^{k(s + 1/2 - 1/p)}$ is $1$.
 
 \begin{theorem}[Nonlinear approximation in $L_2$ and linear approximation in $L_\tau$]
 \label{thm:haar-nterm-linear}
-\lean{Haar.memApprox_nTerm_iff_memApprox_scheme}
+\lean{Haar.memApprox_nTerm_iff_memApprox_haarScheme}
 \leanok
 \uses{thm:haar-nterm, thm:haar, lem:lq-basic}
 Let $1 \leq \tau < 2$ and $\theta = 1/\tau - 1/2$. Then $f \in L_2[0, 1]$ lies in the
@@ -2677,8 +2677,8 @@ between the ends of the interval costs nothing.
 \label{cor:haar-besov}
 \lean{Haar.polyFun_of_mem_degreeLT_one, Haar.dyadicIndex_eq_floor, Haar.dyadicIndex_intCast_div,
   Haar.dyadicIndex_natCast_div, Haar.ppFun_ae_eq_stepFun, Haar.ae_eq_ppFun_of_stronglyMeasurable,
-  Haar.mem_scheme_of_mem_ppScheme, Haar.mem_ppScheme_of_mem_scheme, Haar.scheme_eq_ppScheme,
-  Haar.memApprox_ppScheme_one_iff,
+  Haar.mem_haarScheme_of_mem_ppScheme, Haar.mem_ppScheme_of_mem_haarScheme,
+  Haar.haarScheme_eq_ppScheme, Haar.memApprox_ppScheme_one_iff,
   Haar.lqNorm_modulus_lt_top_iff_haarCoeff, Haar.lqNorm_perModulus_lt_top_iff_haarCoeff}
 \leanok
 \uses{thm:haar, thm:pp-besov, thm:pp-besov-per}
@@ -3029,7 +3029,7 @@ $\ell_{q/\rho}$ applies, since $\|(z_k^\rho)_k\|_{\ell_{q/\rho}} = \|z\|_{\ell_q
 \begin{lemma}[Steps in $L_1$]
 \label{lem:steps-into-l1}
 \lean{Haar.eq_of_dyadicIndex_eq, Haar.memLp_of_stronglyMeasurable_dyadicFiltration,
-  Haar.memLp_of_mem_lpMeas, Haar.mem_lpMeas_of_le, Haar.sum_setLIntegral_dyadicInterval,
+  Haar.memLp_of_mem_lpMeas, Haar.mem_lpMeas_of_le, Haar.sum_setLIntegral_haarDyadicInterval,
   Haar.setLIntegral_enorm_le_of_dyadicIndex, Haar.eLpNorm_one_le_of_mem_lpMeas}
 \leanok
 \uses{def:dyadic-filtration, lem:condexp-partition, cor:haar-besov, def:pp-scheme,
@@ -3519,8 +3519,9 @@ the local projections $P_j$ are those of discontinuous Galerkin methods.
   Alpert.twoPieces_smul, Alpert.levelOne, Alpert.coeFn_levelOne, Alpert.eq_zero_of_ae_dyadicIco,
   Alpert.levelOne_injective, Alpert.polyL2, Alpert.range_polyL2_le, Alpert.finrank_range_polyL2,
   Alpert.finrank_range_levelOne, Alpert.detail, Alpert.finiteDimensional_detail,
-  Alpert.finrank_detail, Alpert.detailBasis, Alpert.detailBasis_mem_range, Alpert.psiPieces,
-  Alpert.levelOne_psiPieces, Alpert.psi, Alpert.coeFn_detailBasis, Alpert.inner_eq_integral}
+  Alpert.finrank_detail, Alpert.detailBasis, Alpert.detailBasis_mem_range,
+  Alpert.multiwaveletPieces, Alpert.levelOne_multiwaveletPieces, Alpert.multiwavelet,
+  Alpert.coeFn_detailBasis, Alpert.inner_eq_integral}
 \leanok
 \uses{def:pp-scheme, lem:poly-dual-basis}
 Let $r \geq 1$. The \emph{detail space} $W \subseteq L_2[0,1]$ consists of the piecewise
@@ -3535,10 +3536,11 @@ $W$ serves. For $r = 1$, $\psi_1$ is the Haar function.
 
 \begin{lemma}[Properties of the multiwavelets]
 \label{lem:multiwavelets}
-\lean{Alpert.integral_conj_psi_mul_psi, Alpert.integral_conj_polyFun_mul_psi,
-  Alpert.integral_polyFun_mul_psi, Alpert.ppFun_ae_eq_sum_psi, Interval.conj_ppFun,
-  Alpert.integrable_conj_psi_mul, Alpert.integral_conj_psi_mul_sum, Alpert.memLp_sum_psi,
-  Alpert.sumPsi, Alpert.coeFn_sumPsi, Alpert.sumPsi_injective, Alpert.exists_stable}
+\lean{Alpert.integral_conj_multiwavelet_mul_multiwavelet,
+  Alpert.integral_conj_polyFun_mul_multiwavelet, Alpert.integral_polyFun_mul_multiwavelet,
+  Alpert.ppFun_ae_eq_sum_multiwavelet, Interval.conj_ppFun, Alpert.integrable_conj_multiwavelet_mul,
+  Alpert.integral_conj_multiwavelet_mul_sum, Alpert.memLp_sum_multiwavelet, Alpert.sumMultiwavelet,
+  Alpert.coeFn_sumMultiwavelet, Alpert.sumMultiwavelet_injective, Alpert.exists_stable}
 \leanok
 \uses{def:multiwavelets}
 The multiwavelets are orthonormal in $L_2[0,1]$, have $r$ vanishing moments,
@@ -3561,11 +3563,12 @@ triangle inequality.
 \begin{lemma}[Details in the multiwavelets]
 \label{lem:multiwavelet-details}
 \lean{Interval.integrableOn_mul_polyFun, Interval.dyadicIco_eq_union,
-  Interval.disjoint_dyadicIco_halves, Alpert.integral_sub_ppFun_succ_mul, Alpert.detailFun,
-  Alpert.integral_detailFun_mul, Alpert.exists_conj_psi_eq_polyFun,
-  Alpert.integral_ppFun_mul_conj_psi, Alpert.integral_detailFun_mul_conj_psi, Alpert.coeff,
-  Alpert.detailPieces, Alpert.ppFun_detailPieces, Alpert.levelOne_detailPieces_mem,
-  Alpert.integral_conj_psi_mul_detailPieces, Alpert.ppFun_detailPieces_ae_eq}
+  Interval.disjoint_dyadicIco_halves, Alpert.integral_sub_ppFun_succ_mul, Alpert.alpertDetailFun,
+  Alpert.integral_alpertDetailFun_mul, Alpert.exists_conj_multiwavelet_eq_polyFun,
+  Alpert.integral_ppFun_mul_conj_multiwavelet,
+  Alpert.integral_alpertDetailFun_mul_conj_multiwavelet, Alpert.alpertCoeff, Alpert.detailPieces,
+  Alpert.ppFun_detailPieces, Alpert.levelOne_detailPieces_mem,
+  Alpert.integral_conj_multiwavelet_mul_detailPieces, Alpert.ppFun_detailPieces_ae_eq}
 \leanok
 \uses{lem:multiwavelets, lem:loc-proj, thm:pp-proj, lem:dyadic-normalising-factor}
 Let $g \in L_1[0,1]$, $k \in \N$ and $m < 2^k$. On $I_{k,m}$,
@@ -3590,8 +3593,8 @@ moved multiwavelet is a polynomial on each half, so $\int_{I_{k,m}} (P_{k+1} g -
 
 \begin{lemma}[Norms of the details]
 \label{lem:multiwavelet-norms}
-\lean{ENNReal.ofReal_two_pow_eq, Alpert.eLpNorm_detailFun_dyadicIco,
-  Alpert.exists_eLpNorm_detailFun_equiv, Alpert.enorm_ppProj_sub}
+\lean{ENNReal.ofReal_two_pow_eq, Alpert.eLpNorm_alpertDetailFun_dyadicIco,
+  Alpert.exists_eLpNorm_alpertDetailFun_equiv, Alpert.enorm_ppProj_sub}
 \leanok
 \uses{lem:multiwavelet-details, lem:multiwavelets, lem:dyadic-normalising-factor,
   lem:pp-bookkeeping}
@@ -3618,8 +3621,8 @@ over $m < 2^k$.
 
 \begin{theorem}[Multiwavelet characterisation]
 \label{thm:multiwavelet-besov}
-\lean{Alpert.memApprox_ppScheme_iff_coeff, Alpert.lqNorm_modulus_lt_top_iff_coeff,
-  Alpert.lqNorm_perModulus_lt_top_iff_coeff}
+\lean{Alpert.memApprox_ppScheme_iff_alpertCoeff, Alpert.lqNorm_modulus_lt_top_iff_alpertCoeff,
+  Alpert.lqNorm_perModulus_lt_top_iff_alpertCoeff}
 \leanok
 \uses{thm:pp-multiscale, lem:multiwavelet-norms, thm:pp-besov, thm:pp-besov-per}
 Let $1 \leq p < \infty$, $r \geq 1$, $s > 0$ and $1 \leq q \leq \infty$. A function
@@ -4500,11 +4503,12 @@ $k < j$.
 \begin{lemma}[Steklov smoothing in one coordinate]
 \label{lem:cube-smoothing}
 \lean{Cube.continuous_slice, Cube.continuous_cubeDiff_uncurry, Cube.continuous_cubeDiff,
-  Cube.cubeSmooth, Cube.cubeSmoothDeriv, Cube.slice_cubeSmooth, Cube.slice_cubeSmoothDeriv,
-  Cube.sub_cubeSmooth_eq, Cube.cubeSmoothDeriv_eq, Cube.continuous_cubeSmooth,
-  Cube.cubeSmoothDeriv_eq_sum_smul, Cube.continuous_cubeSmoothDeriv,
-  Cube.eLpNorm_sub_cubeSmooth_le_of_cubeDiff_le, Cube.eLpNorm_cubeDiff_regionVol_le,
-  Cube.eLpNorm_sub_cubeSmooth_le, Cube.eLpNorm_cubeSmoothDeriv_le}
+  Cube.cubeSteklovSmooth, Cube.cubeSteklovSmoothDeriv, Cube.slice_cubeSteklovSmooth,
+  Cube.slice_cubeSteklovSmoothDeriv, Cube.sub_cubeSteklovSmooth_eq, Cube.cubeSteklovSmoothDeriv_eq,
+  Cube.continuous_cubeSteklovSmooth, Cube.cubeSteklovSmoothDeriv_eq_sum_smul,
+  Cube.continuous_cubeSteklovSmoothDeriv, Cube.eLpNorm_sub_cubeSteklovSmooth_le_of_cubeDiff_le,
+  Cube.eLpNorm_cubeDiff_regionVol_le, Cube.eLpNorm_sub_cubeSteklovSmooth_le,
+  Cube.eLpNorm_cubeSteklovSmoothDeriv_le}
 \leanok
 \uses{thm:steklov-smoothing, lem:minkowski-avg, def:cube-modulus}
 Let $f$ be continuous on $\R^d$, $r \in \N$, $\delta > 0$, and let
@@ -5974,7 +5978,7 @@ lemma of its own, since it serves the torus as well (\Cref{thm:torus-lp-jackson}
 
 \begin{lemma}[Weighted averages with the Jackson weight]
 \label{lem:jackson-weighted-average}
-\lean{one_add_pow_le_two_pow_mul, Rd.jacksonConst, Rd.jacksonConst_ne_top,
+\lean{one_add_pow_le_two_pow_mul, Rd.bandJacksonConst, Rd.bandJacksonConst_ne_top,
   Rd.eLpNorm_integral_lpKernel_mul_le}
 \leanok
 \uses{lem:weighted-jensen, lem:lp-kernels-basic}
@@ -6438,9 +6442,9 @@ $\max(1, C_1)$, respectively $1 + C_2$, times the other.
 \lean{Rd.LocalMeansBump, Rd.LocalMeansBump.hasCompactSupport, Rd.LocalMeansBump.integrable,
   Rd.LocalMeansBump.contDiff_momentKernel, Rd.LocalMeansBump.momentKernel_eq_zero,
   Rd.LocalMeansBump.hasCompactSupport_momentKernel, Rd.LocalMeansBump.momentSchwartz,
-  Rd.LocalMeansBump.derivNorm, Rd.LocalMeansBump.scaled, Rd.LocalMeansBump.kernel,
-  Rd.LocalMeansBump.dual, Rd.LocalMeansBump.integrable_scaled,
-  Rd.LocalMeansBump.integrable_kernel, Rd.LocalMeansBump.integrable_dual,
+  Rd.LocalMeansBump.derivNorm, Rd.LocalMeansBump.scaledMoment, Rd.LocalMeansBump.meansKernel,
+  Rd.LocalMeansBump.dualKernel, Rd.LocalMeansBump.integrable_scaledMoment,
+  Rd.LocalMeansBump.integrable_meansKernel, Rd.LocalMeansBump.integrable_dualKernel,
   Rd.LocalMeansBump.localMean, Rd.LocalMeansBump.localMeansNorm}
 \leanok
 \uses{def:moment-kernel, lem:conv-op}
@@ -6507,12 +6511,12 @@ both terms by $\|g\|_1 \omega_L(f, R 2^{-j})_p \leq \|g\|_1 (1 + R)^L \omega_L(f
 
 \begin{lemma}[Moduli of the reproducing terms]
 \label{lem:dual-kernel-moduli}
-\lean{Rd.LocalMeansBump.eLpNorm_scaled_one, Rd.LocalMeansBump.eLpNorm_dual_one_le,
-  Rd.LocalMeansBump.eLpNorm_kernel_one_le,
-  Rd.LocalMeansBump.eLpNorm_higherDiff_scaled_le, Rd.LocalMeansBump.eLpNorm_higherDiff_scaled_le',
-  Rd.LocalMeansBump.dualConst, Rd.LocalMeansBump.dualConst_ne_top,
-  Rd.LocalMeansBump.eLpNorm_higherDiff_scaled_le_dyadic,
-  Rd.LocalMeansBump.eLpNorm_higherDiff_dual_le, Rd.LocalMeansBump.lpModulus_dual_le}
+\lean{Rd.LocalMeansBump.eLpNorm_scaledMoment_one, Rd.LocalMeansBump.eLpNorm_dualKernel_one_le,
+  Rd.LocalMeansBump.eLpNorm_meansKernel_one_le,
+  Rd.LocalMeansBump.eLpNorm_higherDiff_scaledMoment_le,
+  Rd.LocalMeansBump.eLpNorm_higherDiff_scaledMoment_le', Rd.LocalMeansBump.dualConst,
+  Rd.LocalMeansBump.dualConst_ne_top, Rd.LocalMeansBump.eLpNorm_higherDiff_scaledMoment_le_dyadic,
+  Rd.LocalMeansBump.eLpNorm_higherDiff_dualKernel_le, Rd.LocalMeansBump.lpModulus_dual_le}
 \leanok
 \uses{def:local-means, lem:schwartz-differences, lem:rd-differences, lem:rd-modulus-conv}
 With the notation of \Cref{def:local-means}, $\|\eta_j\|_1 \leq 2 \|m\|_1$ and
@@ -6566,7 +6570,7 @@ by $2^{js}$, take the $\ell_q$ norm and apply the displayed bound to $(m_i)_i$.
 \begin{lemma}[The synthesis estimate]
 \label{lem:local-means-synthesis}
 \lean{ENNReal.le_tsum_of_tendsto_sum, ENNReal.enorm_le_of_tendsto_sum,
-  Rd.LocalMeansBump.synthConst, Rd.LocalMeansBump.synthConst_ne_top,
+  Rd.LocalMeansBump.bumpSynthConst, Rd.LocalMeansBump.bumpSynthConst_ne_top,
   Rd.LocalMeansBump.modNorm_le_of_tendsto, Rd.LocalMeansBump.modNorm_le_localMeansNorm}
 \leanok
 \uses{lem:dual-kernel-moduli, lem:almost-diagonal, lem:reproducing-formula, lem:rd-modulus}
@@ -7116,9 +7120,9 @@ have $\|\lambda\|_{b^s_{p,q}} = \|(2^{js} \|g_j\|_p)_j\|_{\ell_q}$.
 
 \begin{lemma}[Bounds of the dual kernels]
 \label{lem:dual-kernel-bounds}
-\lean{ENNReal.ofReal_two_pow_pow, Rd.LocalMeansBump.scaled_eq_zero_of_lt,
-  Rd.LocalMeansBump.dual_eq_zero_of_lt, Rd.LocalMeansBump.hasCompactSupport_dual,
-  Rd.LocalMeansBump.continuous_dual, Rd.LocalMeansBump.exists_higherDiff_dual_bound}
+\lean{ENNReal.ofReal_two_pow_pow, Rd.LocalMeansBump.scaledMoment_eq_zero_of_lt,
+  Rd.LocalMeansBump.dualKernel_eq_zero_of_lt, Rd.LocalMeansBump.hasCompactSupport_dualKernel,
+  Rd.LocalMeansBump.continuous_dualKernel, Rd.LocalMeansBump.exists_higherDiff_dualKernel_bound}
 \leanok
 \uses{def:local-means, lem:smooth-differences, lem:resolution-of-unity, lem:rd-differences}
 For a bump $g$ of radius $R$ and $L, r \in \N$, the kernels $m_{2^j}$ and $\eta_j$ are continuous
@@ -7283,11 +7287,11 @@ integral; induction on $l$ applies it to the directional derivatives of $K$.
 \begin{lemma}[Derivatives of the dual kernels]
 \label{lem:dual-kernel-derivatives}
 \lean{Rd.contDiff_dilate, Rd.ofReal_two_pow_mul, Rd.norm_iteratedFDeriv_dilate_le,
-  Rd.LocalMeansBump.contDiff_scaled, Rd.LocalMeansBump.contDiff_dual,
+  Rd.LocalMeansBump.contDiff_scaledMoment, Rd.LocalMeansBump.contDiff_dualKernel,
   Rd.LocalMeansBump.dualDerivConst, Rd.LocalMeansBump.dualDerivConst_nonneg,
   Rd.LocalMeansBump.norm_iteratedFDeriv_momentKernel_le,
-  Rd.LocalMeansBump.norm_iteratedFDeriv_dual_le,
-  Rd.LocalMeansBump.exists_iteratedFDeriv_dual_bound}
+  Rd.LocalMeansBump.norm_iteratedFDeriv_dualKernel_le,
+  Rd.LocalMeansBump.exists_iteratedFDeriv_dualKernel_bound}
 \leanok
 \uses{def:local-means, lem:dual-kernel-bounds}
 Dilations of smooth functions are smooth, with
@@ -7348,8 +7352,8 @@ $1$, so its $L_1$ norm is $1$.
 
 \begin{definition}[Smooth changes of variables with a cut-off]
 \label{def:cutoff-diffeo}
-\lean{Rd.CutoffDiffeo, Rd.CutoffDiffeo.apply, Rd.CutoffDiffeo.carrier,
-  Rd.CutoffDiffeo.isCompact_carrier, Rd.CutoffDiffeo.carrier_subset,
+\lean{Rd.CutoffDiffeo, Rd.CutoffDiffeo.apply, Rd.CutoffDiffeo.imageCompact,
+  Rd.CutoffDiffeo.isCompact_imageCompact, Rd.CutoffDiffeo.imageCompact_subset,
   Rd.CutoffDiffeo.apply_eq_zero_of_notMem, Rd.CutoffDiffeo.apply_eq_zero_of_forall_far,
   Rd.CutoffDiffeo.uniqueDiffOn_source, Rd.CutoffDiffeo.uniqueDiffOn_target,
   Rd.CutoffDiffeo.continuousOn_apply}
@@ -7551,7 +7555,7 @@ Lipschitz domain, convex or not, satisfies the extension condition of
 \begin{theorem}[Invariance on Besov domains]
 \label{thm:besov-domain-invariance}
 \lean{Rd.CutoffDiffeo.applyLp_eq_of_indicatorLp_eq, Rd.CutoffDiffeo.modNormOn_applyLp_le_modNormOn,
-  Rd.BesovDomain.modNormOn_order_le}
+  Rd.BesovDomain.modNormOn_order_le_of_besovDomain}
 \leanok
 \uses{def:besov-domain, thm:diffeo-invariance, thm:rd-besov}
 Let $\Omega$ be a Besov domain, $T$ a smooth change of variables with a cut-off on $\Omega$,
@@ -7617,7 +7621,7 @@ interior (Mathlib's
 
 \begin{corollary}[The order of the differences]
 \label{cor:besov-extension-order}
-\lean{Rd.HasBesovExtension.modNormOn_order_le}
+\lean{Rd.HasBesovExtension.modNormOn_order_le_of_hasBesovExtension}
 \leanok
 \uses{def:besov-extension-property, thm:rd-besov, lem:rd-modulus-on}
 For every measurable set $\Omega \subseteq V$ with the extension property, every
@@ -7693,8 +7697,8 @@ This is \Cref{thm:approximation-spaces-reiteration} for the band-limited scheme.
 
 \begin{theorem}[Besov spaces by differences interpolate]
 \label{thm:rd-besov-interpolate}
-\lean{Rd.memKMethod_modCouple_iff, Rd.memKMethod_modCouple_iff_littlewoodPaley,
-  Rd.memKMethod_leftModCouple_iff}
+\lean{Rd.memKMethod_bandModCouple_iff, Rd.memKMethod_modCouple_iff_littlewoodPaley,
+  Rd.memKMethod_bandLeftModCouple_iff}
 \leanok
 \uses{thm:rd-besov, def:modulus-couples, cor:modulus-spaces-interpolate, def:lp-blocks}
 Let $1 \leq p < \infty$, let $r \geq 1$ be an integer, let $0 < \eta < 1$,
@@ -7958,8 +7962,8 @@ of $\otimes g$ (\Cref{lem:diagonal-substitution}).
 
 \begin{definition}[Mixed local means]
 \label{def:mixed-local-means}
-\lean{Rd.LocalMeansBump.mixedKernel, Rd.LocalMeansBump.mixedDual,
-  Rd.LocalMeansBump.integrable_mixedKernel, Rd.LocalMeansBump.integrable_mixedDual,
+\lean{Rd.LocalMeansBump.mixedMeansKernel, Rd.LocalMeansBump.mixedDualKernel,
+  Rd.LocalMeansBump.integrable_mixedMeansKernel, Rd.LocalMeansBump.integrable_mixedDualKernel,
   Rd.LocalMeansBump.mixedLocalMean, Rd.LocalMeansBump.mixedLocalMeansNorm}
 \leanok
 \uses{def:local-means, def:tensor-kernel}
@@ -7972,7 +7976,7 @@ $\|(2^{s|k|_1} \|k_k * f\|_p)_k\|_{\ell_q}$.
 \begin{lemma}[Local means kernels as sums of dilated bumps]
 \label{lem:kernel-dilation-sum}
 \lean{Rd.LocalMeansBump.lmExp, Rd.LocalMeansBump.lmCoeff, Rd.LocalMeansBump.one_le_lmExp,
-  Rd.LocalMeansBump.kernel_eq_sum_dilate, Rd.LocalMeansBump.sum_lmCoeff_smul_pow}
+  Rd.LocalMeansBump.meansKernel_eq_sum_dilate, Rd.LocalMeansBump.sum_lmCoeff_smul_pow}
 \leanok
 \uses{def:moment-kernel, lem:moment-polynomial}
 With $a_l = (-1)^l \binom{L}{l+1}$, $k_0 = \sum_{l < L} a_l g_{1/(l+1)}$ and
@@ -8014,9 +8018,10 @@ polynomials $B(z)$ in the translations that act with constant $(2^L + 1)^d$
 \begin{lemma}[The mixed reproducing formula]
 \label{lem:mixed-reproducing}
 \lean{Rd.conv_dilate_dilate, Rd.convLp_congr, Rd.convLp_finsetSum_kernel, Rd.conv_add_conv_sub,
-  Rd.LocalMeansBump.sum_conv_dual_kernel, Rd.LocalMeansBump.sum_conv_mixedDual_mixedKernel,
+  Rd.LocalMeansBump.sum_conv_dualKernel_meansKernel,
+  Rd.LocalMeansBump.sum_conv_mixedDualKernel_mixedMeansKernel,
   Rd.LocalMeansBump.integral_conv_momentKernel,
-  Rd.LocalMeansBump.tendsto_sum_mixedDual_mixedLocalMean}
+  Rd.LocalMeansBump.tendsto_sum_mixedDualKernel_mixedLocalMean}
 \leanok
 \uses{lem:reproducing-formula, lem:reproducing-pointwise, lem:tensor-kernel-fubini,
   thm:approx-identity}
@@ -8034,7 +8039,7 @@ $\otimes (m * m)$ has integral $1$, so \Cref{thm:approx-identity} applies.
 
 \begin{lemma}[Mixed moduli of the reproducing terms]
 \label{lem:mixed-dual-moduli}
-\lean{Rd.LocalMeansBump.lpMixedModulus_convLp_mixedDual_le}
+\lean{Rd.LocalMeansBump.lpMixedModulus_convLp_mixedDualKernel_le}
 \leanok
 \uses{lem:dual-kernel-moduli, lem:mixed-differences, lem:tensor-kernel-fubini}
 $\Omega^{e(m)}_L(\eta_k * h, 2^{-m})_p \leq C_\eta^d \prod_i c(m_i, k_i) \, \|h\|_p$ with the
@@ -8092,7 +8097,7 @@ $(\otimes \Phi)_{2^J}$, and $\sum_k \delta_k * f = f$ in $L_p$.
 \label{lem:mixed-lp-kernels}
 \lean{Rd.eLpNorm_conv_eq_enorm_convLp, Rd.one_le_dyadicWeight_mul_almostDiagCoeff,
   Rd.LocalMeansBump.exists_eLpNorm_conv_lpBlockKernel_dualKernel_le,
-  Rd.LocalMeansBump.exists_eLpNorm_conv_kernel_Theta_le}
+  Rd.LocalMeansBump.exists_eLpNorm_conv_meansKernel_dilatedBandKernel_le}
 \leanok
 \uses{thm:band-jackson, thm:kernel-identities, lem:local-means-upper, thm:band-inverse,
   lem:dual-kernel-moduli}
@@ -8114,7 +8119,7 @@ inequality suffices.
 
 \begin{theorem}[Littlewood--Paley blocks, local means and differences]
 \label{thm:mixed-lp}
-\lean{Rd.LocalMeansBump.enorm_mixedBlock_convLp_mixedDual_le,
+\lean{Rd.LocalMeansBump.enorm_mixedBlock_convLp_mixedDualKernel_le,
   Rd.LocalMeansBump.enorm_mixedLocalMean_mixedBlock_le, Rd.LocalMeansBump.exists_mixedLPNorm_le,
   Rd.LocalMeansBump.exists_mixedLocalMeansNorm_le, Rd.mixedBesov_iff_mixedLP}
 \leanok
@@ -8139,8 +8144,9 @@ concludes.
 
 \begin{definition}[Levels and hyperbolic crosses]
 \label{def:hyperbolic-cross}
-\lean{Rd.level, Rd.le_level, Rd.levelSet, Rd.mem_levelSet, Rd.mixedWeight_eq_dyadicWeight_level,
-  Rd.hyperbolicCross, Rd.mem_hyperbolicCross, Rd.hyperbolicSum}
+\lean{Rd.gridLevel, Rd.le_gridLevel, Rd.gridLevelSet, Rd.mem_gridLevelSet,
+  Rd.mixedWeight_eq_dyadicWeight_gridLevel, Rd.hyperbolicCross, Rd.mem_hyperbolicCross,
+  Rd.hyperbolicSum}
 \leanok
 \uses{def:mixed-lp}
 The level of $k \in \N^d$ is $|k|_1 = \sum_i k_i$, the hyperbolic cross of level $N$ is
@@ -8150,7 +8156,7 @@ of the dyadic rectangles of these blocks.
 
 \begin{lemma}[Counting and Hölder's inequality on levels]
 \label{lem:level-count}
-\lean{Rd.card_levelSet_le, Rd.tsum_le_tsum_levelSet, Rd.sum_le_card_rpow_mul_lqNorm}
+\lean{Rd.card_gridLevelSet_le, Rd.tsum_le_tsum_gridLevelSet, Rd.sum_le_card_rpow_mul_lqNorm}
 \leanok
 \uses{def:hyperbolic-cross, def:mixed-lq}
 $\#\{k \in \N^d : |k|_1 = n\} \leq (n + 1)^{d-1}$; sums over $\N^d$ are at most the sums over the

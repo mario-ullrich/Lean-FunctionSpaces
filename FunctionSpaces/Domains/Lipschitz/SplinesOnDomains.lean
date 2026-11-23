@@ -474,7 +474,7 @@ theorem exists_memApprox_cubeSplineSchemeAt_iff (h : HasBesovExtension hΩ) (hp 
 element of the approximation space `A^s_q` of the tensor splines of order `r` on `Q` iff
 `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_{r'}(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`, since on a set with the
 extension property the order of the differences does not matter
-(`Rd.HasBesovExtension.modNormOn_order_le`). -/
+(`Rd.HasBesovExtension.modNormOn_order_le_of_hasBesovExtension`). -/
 theorem exists_memApprox_cubeSplineSchemeAt_iff_of_order (h : HasBesovExtension hΩ)
     (hp : p ≠ ∞) {a : EuclideanSpace ℝ (Fin d)} {L : ℝ} (hL : 0 < L)
     (hΩQ : Ω ⊆ euclideanCubeAt a L) {r r' : ℕ} (hr : 1 ≤ r) {s : ℝ} {q : ℝ≥0∞} (hq : 1 ≤ q)
@@ -486,8 +486,8 @@ theorem exists_memApprox_cubeSplineSchemeAt_iff_of_order (h : HasBesovExtension 
       modNormOn hΩ r' s q f < ∞ := by
   rw [h.exists_memApprox_cubeSplineSchemeAt_iff hp hL hΩQ hr hq hs hsr f]
   have hsr₀ := lt_of_lt_splineRange hsr
-  obtain ⟨C, hC, hle⟩ := h.modNormOn_order_le hp hs hsr₀ hsr' hq
-  obtain ⟨C', hC', hle'⟩ := h.modNormOn_order_le hp hs hsr' hsr₀ hq
+  obtain ⟨C, hC, hle⟩ := h.modNormOn_order_le_of_hasBesovExtension hp hs hsr₀ hsr' hq
+  obtain ⟨C', hC', hle'⟩ := h.modNormOn_order_le_of_hasBesovExtension hp hs hsr' hsr₀ hq
   exact ⟨fun hf => (hle f hf).trans_lt (ENNReal.mul_lt_top hC.lt_top hf),
     fun hf => (hle' f hf).trans_lt (ENNReal.mul_lt_top hC'.lt_top hf)⟩
 

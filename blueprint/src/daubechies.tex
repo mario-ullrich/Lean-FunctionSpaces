@@ -1570,8 +1570,8 @@ statements below without integrability hypotheses hold for every $f$.
 
 \begin{lemma}[Continuity and the uniform bound]
 \label{lem:daub-fourier-continuous}
-\lean{Real.continuous_fourier_of_integrable, Real.continuous_fourierInv_of_integrable,
-  Real.norm_fourierInv_le_integral_norm}
+\lean{Real.real_continuous_fourier_of_integrable, Real.real_continuous_fourierInv_of_integrable,
+  Real.real_norm_fourierInv_le_integral_norm}
 \leanok
 For every integrable $f : \R \to \C$ the functions $\widehat f$ and $\mathcal F^{-1} f$ are
 continuous. For every $f : \R \to \C$ and all $\xi, x \in \R$,
@@ -1591,7 +1591,7 @@ inverse transform is $\mathcal F^{-1} f(x) = \widehat f(-x)$.
 
 \begin{lemma}[The Fourier transform at the origin]
 \label{lem:daub-fourier-zero}
-\lean{Real.fourier_apply_zero}
+\lean{Real.real_fourier_apply_zero}
 \leanok
 For every $f : \R \to \C$, $\widehat f(0) = \int_\R f$.
 \end{lemma}
@@ -1692,7 +1692,7 @@ this gives Parseval's identity for integrable functions with integrable transfor
 
 \begin{proposition}[The multiplication formula]
 \label{prop:daub-multiplication-formula}
-\lean{Real.integral_fourier_mul, Real.integral_fourierInv_mul}
+\lean{Real.real_integral_fourier_mul, Real.real_integral_fourierInv_mul}
 \leanok
 For all integrable $f, g : \R \to \C$,
 \[
@@ -1715,7 +1715,7 @@ with $e^{2\pi i x \xi}$.
 
 \begin{proposition}[Parseval's identity]
 \label{prop:daub-parseval}
-\lean{Real.integral_mul_conj_eq_integral_fourier, Real.integral_norm_sq_fourier}
+\lean{Real.integral_mul_conj_eq_integral_fourier, Real.real_integral_norm_sq_fourier}
 \leanok
 Let $f : \R \to \C$ be integrable, and let $g : \R \to \C$ be continuous and integrable with
 integrable $\widehat g$. Then
@@ -2729,7 +2729,7 @@ for every $0 \leq a \leq r$ with $a < N - \log_4 \lambda - \frac12$.
 
 \begin{lemma}[The differences of $\varphi$ as inverse transforms]
 \label{lem:daub-scaling-difference-inverse}
-\lean{Real.fourierInv_sub_apply, Real.integrable_exp_mul, Real.fwdDiff_fourierInv_apply,
+\lean{Real.fourierInv_sub_apply, Real.integrable_cexp_mul, Real.fwdDiff_fourierInv_apply,
   Real.iterate_fwdDiff_fourierInv_apply, Real.norm_iterate_fwdDiff_fourierInv_le,
   Daubechies.higherDiff_scalingFun_eq_fourierInv, Daubechies.norm_higherDiff_scalingFun_le_integral}
 \leanok
@@ -3404,7 +3404,8 @@ boundedly many dilated and translated copies of $\gamma$ of one level are nonzer
 
 \begin{definition}[Generators, expansions and coefficients]
 \label{def:daub-generators}
-\lean{Daubechies.scaledFun, Daubechies.expand, Daubechies.coeffFun, Daubechies.scaledFun_zero}
+\lean{Daubechies.scaledFun, Daubechies.daubechiesExpand, Daubechies.coeffFun,
+  Daubechies.scaledFun_zero}
 \leanok
 For $\gamma : \R \to \C$, a level $j \in \N$ and a position $k \in \Z$ let
 \[
@@ -3464,8 +3465,9 @@ $W_{j,k}$ contains $x$ exactly when $2^j x - k \in [a, b]$ (\Cref{lem:daub-suppo
 
 \begin{lemma}[Expansions are locally finite]
 \label{lem:daub-expand-finite}
-\lean{Daubechies.expand_eq_sum, Daubechies.summable_expand, Daubechies.continuous_expand,
-  Daubechies.expand_add, Daubechies.expand_const_mul}
+\lean{Daubechies.daubechiesExpand_eq_sum, Daubechies.summable_expand,
+  Daubechies.continuous_daubechiesExpand, Daubechies.daubechiesExpand_add,
+  Daubechies.daubechiesExpand_const_mul}
 \leanok
 \uses{def:daub-generators}
 Let $\gamma : \R \to \C$ vanish outside $[a, b]$, let $j \in \N$ and $\lambda : \Z \to \C$. For
@@ -3538,7 +3540,7 @@ $\int_\R \gamma(u - k) \overline{\gamma(u - l)} \, du$.
 \begin{proposition}[Coefficient recovery]
 \label{prop:daub-generators-recovery}
 \lean{Daubechies.mem_Icc_of_mem_supportWindow, Daubechies.scaledFun_mul_conj_eq_zero,
-  Daubechies.integrable_scaledFun_mul_conj, Daubechies.coeffFun_expand}
+  Daubechies.integrable_scaledFun_mul_conj, Daubechies.coeffFun_daubechiesExpand}
 \leanok
 \uses{def:daub-generators}
 Let $j \in \N$ and $k, l \in \Z$. If $2^j x - l$ and $2^j x - k$ lie in $[a, b]$ for some
@@ -3601,7 +3603,7 @@ may be replaced by $1_W f$, since $g$ vanishes outside $W$, and H\"older's inequ
 \label{lem:daub-generator-norms}
 \lean{Daubechies.aestronglyMeasurable_comp_sub_map,
   Daubechies.aestronglyMeasurable_comp_two_pow_mul_sub, Daubechies.aestronglyMeasurable_scaledFun,
-  Daubechies.aestronglyMeasurable_expand, Daubechies.eLpNorm_comp_two_pow_mul_sub,
+  Daubechies.aestronglyMeasurable_daubechiesExpand, Daubechies.eLpNorm_comp_two_pow_mul_sub,
   Daubechies.eLpNorm_scaledFun,
   Daubechies.eLpNorm_const_mul_scaledFun, Daubechies.memLp_of_continuous_of_eq_zero,
   Daubechies.one_div_toReal_conjExponent, Daubechies.eLpNorm_scaledFun_conjExponent}
@@ -3630,8 +3632,8 @@ lies in every $L_p$.
 
 \begin{theorem}[Upper stability of expansions]
 \label{thm:daub-upper-stability}
-\lean{Daubechies.eLpNorm_expand_le, Daubechies.expandConst, Daubechies.expandConst_ne_top,
-  Daubechies.memLp_expand}
+\lean{Daubechies.eLpNorm_daubechiesExpand_le, Daubechies.expandConst, Daubechies.expandConst_ne_top,
+  Daubechies.memLp_daubechiesExpand}
 \leanok
 \uses{def:daub-generators, def:lq-norm}
 Let $1 \leq p < \infty$, let $\gamma : \R \to \C$ be measurable and vanish outside $[a, b]$, and
@@ -3709,7 +3711,7 @@ bound. A continuous $\gamma$ that vanishes outside $[a, b]$ lies in $L_{p'}(\R)$
 
 \begin{theorem}[Lower stability of expansions]
 \label{thm:daub-lower-stability}
-\lean{Daubechies.lqNorm_le_eLpNorm_expand}
+\lean{Daubechies.lqNorm_le_eLpNorm_daubechiesExpand}
 \leanok
 \uses{def:daub-generators, def:lq-norm}
 Let $1 \leq p < \infty$, and let $\gamma : \R \to \C$ be continuous, vanish outside $[a, b]$ and
@@ -3730,7 +3732,7 @@ $\lambda_k$ (\Cref{prop:daub-generators-recovery}); apply \Cref{prop:daub-coeff-
 
 \begin{lemma}[Expansions of the coefficients]
 \label{lem:daub-expand-coeff}
-\lean{Daubechies.eLpNorm_expand_coeffFun_le, Daubechies.memLp_expand_coeffFun}
+\lean{Daubechies.eLpNorm_daubechiesExpand_coeffFun_le, Daubechies.memLp_daubechiesExpand_coeffFun}
 \leanok
 \uses{def:daub-generators}
 Let $1 \leq p < \infty$, and let $\gamma : \R \to \C$ be measurable and vanish outside
@@ -3758,7 +3760,7 @@ everything above applies to $\gamma = \varphi$ with $a = 0$, $b = 2N - 1$ and $M
 
 \begin{definition}[The functions $\varphi_{j,k}$]
 \label{def:daub-scaled}
-\lean{Daubechies.scaled, Daubechies.scaled_eq_zero}
+\lean{Daubechies.daubechiesScaled, Daubechies.daubechiesScaled_eq_zero}
 \leanok
 \uses{def:daub-scaling-function, def:daub-generators}
 For a Daubechies mask with scaling function $\varphi$, a level $j \in \N$ and a position
@@ -3768,7 +3770,8 @@ $\varphi_{j,k}$ vanishes outside $[k/2^j, (k + 2N - 1)/2^j]$.
 
 \begin{proposition}[Orthonormality and coefficient recovery for $\varphi$]
 \label{prop:daub-scaled-orthonormal}
-\lean{Daubechies.integral_scaled_mul_conj, Daubechies.coeffFun_expand_scalingFun}
+\lean{Daubechies.integral_daubechiesScaled_mul_conj,
+  Daubechies.coeffFun_daubechiesExpand_scalingFun}
 \leanok
 \uses{def:daub-scaled}
 For every Daubechies mask of order $N \geq 2$, every $j \in \N$ and all $k, l \in \Z$,
@@ -3788,7 +3791,8 @@ $b = 2N - 1$.
 
 \begin{proposition}[The refinement relation between levels]
 \label{prop:daub-scaled-refine}
-\lean{Daubechies.two_rpow_succ_div_two, Daubechies.scaled_refine, Daubechies.scaled_eq_expand}
+\lean{Daubechies.two_rpow_succ_div_two, Daubechies.daubechiesScaled_refine,
+  Daubechies.daubechiesScaled_eq_daubechiesExpand}
 \leanok
 \uses{def:daub-scaled, def:daub-symbol}
 For every Daubechies mask of order $N \geq 2$, every $j \in \N$, $k \in \Z$ and $x \in \R$,
@@ -3962,8 +3966,8 @@ For a Daubechies mask, a level $j \in \N$ and $f : \R \to \C$ let
 \lean{Daubechies.coeffFun_congr_ae, Daubechies.integrable_mul_conj_scaledFun,
   Daubechies.coeffFun_add, Daubechies.coeffFun_const_mul, Daubechies.coeffFun_sum_mul,
   Daubechies.continuous_projFun, Daubechies.projFun_congr_ae,
-  Daubechies.integrable_mul_conj_scaled, Daubechies.projFun_add, Daubechies.projFun_const_mul,
-  Daubechies.projFun_sub}
+  Daubechies.integrable_mul_conj_daubechiesScaled, Daubechies.projFun_add,
+  Daubechies.projFun_const_mul, Daubechies.projFun_sub}
 \leanok
 \uses{def:daub-proj-fun}
 Let $N \geq 2$ and $j \in \N$. For every $f : \R \to \C$ the function $P_j f$ is continuous and
@@ -4019,10 +4023,10 @@ finite since $\varphi$ lies in every $L_p(\R)$ (\Cref{prop:daub-scaling-integrab
 
 \begin{proposition}[The local bound]
 \label{prop:daub-proj-cell-bound}
-\lean{Daubechies.scaled_eq_zero_of_mem_cell, Daubechies.projFun_eq_sum_of_mem_cell,
+\lean{Daubechies.daubechiesScaled_eq_zero_of_mem_cell, Daubechies.projFun_eq_sum_of_mem_cell,
   Daubechies.supportWindow_subset_of_mem_Icc, Daubechies.card_Icc_sub_two_mul_sub_two,
-  Daubechies.cellConst, Daubechies.cellConst_ne_top, Daubechies.eLpNorm_coeffFun_mul_scaled_le,
-  Daubechies.eLpNorm_projFun_cell_le}
+  Daubechies.cellConst, Daubechies.cellConst_ne_top,
+  Daubechies.eLpNorm_coeffFun_mul_daubechiesScaled_le, Daubechies.eLpNorm_projFun_cell_le}
 \leanok
 \uses{def:daub-proj-fun}
 Let $N \geq 2$ and $1 \leq p \leq \infty$, and let $C_I = (2N - 1) \|\varphi\|_p \|\varphi\|_{p'}$.
@@ -4062,7 +4066,7 @@ inequality. The norms of $\varphi$ are finite (\Cref{prop:daub-scaling-integrabl
 
 \begin{proposition}[Reproduction]
 \label{prop:daub-proj-reproduction}
-\lean{Daubechies.projFun_expand, Daubechies.projFun_projFun, Daubechies.projFun_poly}
+\lean{Daubechies.projFun_daubechiesExpand, Daubechies.projFun_projFun, Daubechies.projFun_poly}
 \leanok
 \uses{def:daub-proj-fun, lem:dyadic-normalising-factor}
 For every Daubechies mask of order $N \geq 2$ and every $j \in \N$:
@@ -4104,8 +4108,8 @@ support in place of $c$.
 
 \begin{proposition}[Nested expansions]
 \label{prop:daub-expand-succ}
-\lean{Daubechies.expand_eq_expand_succ, Daubechies.projFun_succ_projFun,
-  Daubechies.expand_eq_tsum_refine_of_filter}
+\lean{Daubechies.daubechiesExpand_eq_daubechiesExpand_succ, Daubechies.projFun_succ_projFun,
+  Daubechies.daubechiesExpand_eq_tsum_refine_of_filter}
 \leanok
 \uses{def:daub-refine-coeff, def:daub-proj-fun}
 For every Daubechies mask of order $N \geq 2$, every $j \in \N$, every $\lambda : \Z \to \C$ and
@@ -4140,10 +4144,12 @@ continuous functions with compact support.
 
 \begin{lemma}[The kernel form of $P_j f - f$]
 \label{lem:daub-kernel-form}
-\lean{Daubechies.integrable_conj_scaled, Daubechies.scaled_mul_integral_conj,
-  Daubechies.tsum_scaled_mul_integral_conj, Daubechies.scaled_eq_zero_of_notMem_Icc,
-  Daubechies.tsum_eq_sum_of_scaled_eq_zero, Daubechies.summable_of_scaled_eq_zero,
-  Daubechies.card_Icc_ceil_floor_le_two_mul, Daubechies.projFun_sub_eq_tsum}
+\lean{Daubechies.integrable_conj_daubechiesScaled, Daubechies.daubechiesScaled_mul_integral_conj,
+  Daubechies.tsum_daubechiesScaled_mul_integral_conj,
+  Daubechies.daubechiesScaled_eq_zero_of_notMem_Icc,
+  Daubechies.tsum_eq_sum_of_daubechiesScaled_eq_zero,
+  Daubechies.summable_of_daubechiesScaled_eq_zero, Daubechies.card_Icc_ceil_floor_le_two_mul,
+  Daubechies.projFun_sub_eq_tsum}
 \leanok
 \uses{def:daub-proj-fun, lem:dyadic-normalising-factor}
 Let $N \geq 2$, $j \in \N$ and $x \in \R$. Then $\varphi_{j,k}(x) = 0$ for every integer $k$
@@ -4180,8 +4186,8 @@ functions $f \overline{\varphi_{j,k}}$ are integrable (\Cref{lem:daub-proj-fun-b
 
 \begin{proposition}[The error for uniformly continuous functions]
 \label{prop:daub-proj-error}
-\lean{Daubechies.abs_sub_le_of_mem_supportWindow, Daubechies.enorm_scaled_le,
-  Daubechies.enorm_scaled_mul_integral_sub_le, Daubechies.enorm_projFun_sub_le,
+\lean{Daubechies.abs_sub_le_of_mem_supportWindow, Daubechies.enorm_daubechiesScaled_le,
+  Daubechies.enorm_daubechiesScaled_mul_integral_sub_le, Daubechies.enorm_projFun_sub_le,
   Daubechies.eLpNorm_sub_projFun_le}
 \leanok
 \uses{def:daub-proj-fun, lem:dyadic-normalising-factor}
@@ -4220,8 +4226,8 @@ Their ranges form the approximation scheme of the Daubechies wavelets.
 
 \begin{definition}[The projections on $L_p$]
 \label{def:daub-proj}
-\lean{Daubechies.projLinear, Daubechies.proj, Daubechies.proj_apply_ae, Daubechies.norm_proj_le,
-  Daubechies.enorm_proj_le}
+\lean{Daubechies.projLinear, Daubechies.daubechiesProj, Daubechies.daubechiesProj_apply_ae,
+  Daubechies.norm_daubechiesProj_le, Daubechies.enorm_daubechiesProj_le}
 \leanok
 \uses{def:daub-proj-fun, thm:daub-proj-bound, lem:daub-proj-fun-basic}
 Let $N \geq 2$ and $1 \leq p < \infty$. For $j \in \N$ the \emph{projection}
@@ -4232,7 +4238,8 @@ every $j$, with the constant $C_P$ of \Cref{thm:daub-proj-bound}.
 
 \begin{definition}[Scaling spaces]
 \label{def:daub-scaling-space}
-\lean{Daubechies.scalingSpace, Daubechies.mem_scalingSpace, Daubechies.proj_mem_scalingSpace}
+\lean{Daubechies.scalingSpace, Daubechies.mem_scalingSpace,
+  Daubechies.daubechiesProj_mem_scalingSpace}
 \leanok
 \uses{def:daub-proj}
 Let $N \geq 2$ and $1 \leq p < \infty$. The \emph{scaling space} $V_j \subseteq L_p(\R)$ of level
@@ -4241,8 +4248,9 @@ $j \in \N$ is the range of the projection $P_j$, a real subspace.
 
 \begin{proposition}[The scaling spaces are nested]
 \label{prop:daub-scaling-spaces}
-\lean{Daubechies.proj_proj, Daubechies.proj_eq_self_of_mem, Daubechies.proj_succ_proj,
-  Daubechies.scalingSpace_le_succ, Daubechies.scalingSpace_mono}
+\lean{Daubechies.daubechiesProj_daubechiesProj, Daubechies.daubechiesProj_eq_self_of_mem,
+  Daubechies.daubechiesProj_succ_daubechiesProj, Daubechies.scalingSpace_le_succ,
+  Daubechies.scalingSpace_mono}
 \leanok
 \uses{def:daub-scaling-space}
 Let $N \geq 2$ and $1 \leq p < \infty$. For every $j \in \N$, $P_j P_j = P_j$ and
@@ -4260,8 +4268,9 @@ the class of $f$ (\Cref{lem:daub-proj-fun-basic}).
 
 \begin{definition}[The Daubechies scheme]
 \label{def:daub-scheme}
-\lean{Daubechies.scheme, Daubechies.mem_scheme_zero, Daubechies.mem_scheme,
-  Daubechies.mem_scheme_two_pow, Daubechies.projectionScheme, Daubechies.projectionScheme_two_pow}
+\lean{Daubechies.daubechiesScheme, Daubechies.mem_daubechiesScheme_zero,
+  Daubechies.mem_daubechiesScheme, Daubechies.mem_daubechiesScheme_two_pow,
+  Daubechies.daubechiesProjectionScheme, Daubechies.daubechiesProjectionScheme_two_pow}
 \leanok
 \uses{def:daub-scaling-space, prop:daub-scaling-spaces, def:comap, def:projection-scheme}
 Let $N \geq 2$ and $1 \leq p < \infty$. The \emph{Daubechies scheme} in $L_p(\R)$ is the dyadic
@@ -4274,8 +4283,8 @@ bound $C_P$ (\Cref{def:projection-scheme}), whose projection of complexity $2^j$
 \begin{theorem}[Density and convergence]
 \label{thm:daub-density}
 \lean{Daubechies.exists_div_two_pow_lt, Daubechies.tendsto_eLpNorm_sub_projFun,
-  Daubechies.closure_iUnion_scalingSpace, Daubechies.closure_iUnion_scheme,
-  Daubechies.tendsto_proj}
+  Daubechies.closure_iUnion_scalingSpace, Daubechies.closure_iUnion_daubechiesScheme,
+  Daubechies.tendsto_daubechiesProj}
 \leanok
 \uses{def:daub-scheme}
 Let $N \geq 2$ and $1 \leq p < \infty$. The union $\bigcup_j V_j$ of the scaling spaces is dense
@@ -4339,7 +4348,7 @@ $1 - N \leq x \leq N$.
 
 \begin{lemma}[The wavelets through the next level]
 \label{lem:daub-wavelet-refine}
-\lean{Daubechies.waveletScaled_refine, Daubechies.waveletScaled_eq_expand}
+\lean{Daubechies.waveletScaled_refine, Daubechies.waveletScaled_eq_daubechiesExpand}
 \leanok
 \uses{def:daub-wavelet, def:daub-scaled}
 For every Daubechies mask of order $N$, every $j \in \N$, $k \in \Z$ and $x \in \R$,
@@ -4359,7 +4368,8 @@ $2 - 2N \leq i \leq 1$ (\Cref{def:daub-dual-filter}).
 
 \begin{lemma}[Inner products of finite expansions]
 \label{lem:daub-finite-expansions}
-\lean{Daubechies.integral_mul_conj_expand, Daubechies.integral_expand_mul_conj_expand}
+\lean{Daubechies.integral_mul_conj_daubechiesExpand,
+  Daubechies.integral_daubechiesExpand_mul_conj_daubechiesExpand}
 \leanok
 \uses{def:daub-scaled}
 Let $N \geq 2$ and $j \in \N$, and let $\mu : \Z \to \C$ vanish outside a finite set
@@ -4414,7 +4424,8 @@ $\sqrt 2 \sqrt 2 = 2$ for real sequences the second.
 
 \begin{theorem}[Orthonormality of the wavelets]
 \label{thm:daub-wavelet-orthonormal}
-\lean{Daubechies.integral_waveletScaled_mul_conj, Daubechies.integral_waveletScaled_mul_conj_scaled,
+\lean{Daubechies.integral_waveletScaled_mul_conj,
+  Daubechies.integral_waveletScaled_mul_conj_daubechiesScaled,
   Daubechies.integral_wavelet_translate_mul_conj_translate,
   Daubechies.integral_wavelet_translate_mul_conj_scalingFun_translate}
 \leanok
@@ -4461,7 +4472,7 @@ since only finitely many of its terms are nonzero.
 
 \begin{lemma}[Wavelet expansions through the next level]
 \label{lem:daub-expand-wavelet-succ}
-\lean{Daubechies.expand_wavelet_eq_expand_succ}
+\lean{Daubechies.daubechiesExpand_wavelet_eq_daubechiesExpand_succ}
 \leanok
 \uses{def:daub-wavelet-refine-coeff}
 For every Daubechies mask of order $N \geq 2$, every $j \in \N$, every $\mu : \Z \to \C$ and
@@ -4513,8 +4524,8 @@ $\sum_n \lambda_n \delta_{nn'} = \lambda_{n'}$.
 \label{thm:daub-block-identity}
 \lean{Daubechies.coeffFun_eq_tsum_of_filter, Daubechies.coeffFun_scalingFun_eq_tsum,
   Daubechies.coeffFun_wavelet_eq_tsum,
-  Daubechies.detailFun, Daubechies.projFun_succ_eq_add, Daubechies.memLp_detailFun,
-  Daubechies.proj_succ_sub_proj}
+  Daubechies.daubechiesDetailFun, Daubechies.projFun_succ_eq_add,
+  Daubechies.memLp_daubechiesDetailFun, Daubechies.daubechiesProj_succ_sub_daubechiesProj}
 \leanok
 \uses{def:daub-proj-fun, def:daub-proj, def:daub-wavelet}
 Let $N \geq 2$ and $j \in \N$, and for $f : \R \to \C$ let
@@ -4563,8 +4574,8 @@ $Q_j f \in L_p(\R)$ by \Cref{lem:daub-expand-coeff}.
 
 \begin{proposition}[The kernel identity]
 \label{prop:daub-kernel-identity}
-\lean{Daubechies.tsum_scaled_mul_scaled_succ, Daubechies.scaledFun_one_mul_scaledFun_one,
-  Daubechies.kernel_succ}
+\lean{Daubechies.tsum_daubechiesScaled_mul_daubechiesScaled_succ,
+  Daubechies.scaledFun_one_mul_scaledFun_one, Daubechies.kernel_succ}
 \leanok
 \uses{def:daub-scaled, def:daub-wavelet, lem:dyadic-normalising-factor}
 For a Daubechies mask of order $N \geq 2$ and $j \in \N$ let
@@ -4596,8 +4607,9 @@ translates, so the stability of expansions holds for $\gamma = \psi$ as for $\ga
 
 \begin{proposition}[Norms of the blocks]
 \label{prop:daub-block-norms}
-\lean{Daubechies.enorm_proj_succ_sub_proj, Daubechies.enorm_proj_eq, Daubechies.enorm_block_equiv,
-  Daubechies.enorm_proj_equiv, Daubechies.enorm_proj_zero_equiv}
+\lean{Daubechies.enorm_daubechiesProj_succ_sub_daubechiesProj, Daubechies.enorm_daubechiesProj_eq,
+  Daubechies.enorm_block_equiv, Daubechies.enorm_daubechiesProj_equiv,
+  Daubechies.enorm_daubechiesProj_zero_equiv}
 \leanok
 \uses{def:daub-proj, def:daub-wavelet, def:lq-norm}
 Let $N \geq 2$ and $1 \leq p < \infty$. There are constants $K_1, K_2 < \infty$ such that for
@@ -4826,7 +4838,7 @@ constant $C_I$ is finite (\Cref{prop:daub-proj-cell-bound}).
   Daubechies.eLpNorm_iteratedDeriv_steklovSmooth_le_dyadic, Daubechies.eLpNorm_sub_projFun_le_add,
   Daubechies.daubechiesJacksonConst, Daubechies.daubechiesJacksonConst_ne_top,
   Daubechies.add_le_daubechiesJacksonConst_mul, Daubechies.eLpNorm_sub_projFun_le_smoothnessModulus,
-  Daubechies.enorm_sub_proj_le_of_continuous}
+  Daubechies.enorm_sub_daubechiesProj_le_of_continuous}
 \leanok
 \uses{def:daub-proj-fun, def:daub-proj, def:rd-modulus}
 Let $N \geq 2$ and $1 \leq p < \infty$, and let $C_J = 1 + C_P + 2^N N^N C_S$. Then
@@ -4863,8 +4875,8 @@ Both sides depend only on the class of $f$ (\Cref{lem:daub-proj-fun-basic} and
 
 \begin{theorem}[Jackson's inequality]
 \label{thm:daub-jackson}
-\lean{Daubechies.approxError_scheme_le_jacksonConst_mul, Daubechies.approxError_scheme_le,
-  Daubechies.enorm_sub_proj_le}
+\lean{Daubechies.approxError_daubechiesScheme_le_daubechiesJacksonConst_mul,
+  Daubechies.approxError_daubechiesScheme_le, Daubechies.enorm_sub_daubechiesProj_le}
 \leanok
 \uses{def:daub-scheme, def:rd-modulus, def:error}
 Let $N \geq 2$ and $1 \leq p < \infty$. For every $f \in L_p(\R)$ and every $j \in \N$ the error
@@ -4899,7 +4911,7 @@ $r$-fold iterate.
 \begin{lemma}[Differences of expansions]
 \label{lem:daub-expansion-differences}
 \lean{Daubechies.fwdDiff_scaledFun, Daubechies.iterate_fwdDiff_scaledFun,
-  Daubechies.fwdDiff_expand, Daubechies.iterate_fwdDiff_expand}
+  Daubechies.fwdDiff_daubechiesExpand, Daubechies.iterate_fwdDiff_daubechiesExpand}
 \leanok
 \uses{def:daub-generators, def:rd-modulus}
 For every $\gamma : \R \to \C$, all $r, j \in \N$, $k \in \Z$ and $h \in \R$,
@@ -5017,7 +5029,7 @@ The rules for powers.
 
 \begin{corollary}[The inverse inequality]
 \label{cor:daub-inverse}
-\lean{Daubechies.lpModulus_le_of_mem_scalingSpace, Daubechies.inverse_scheme}
+\lean{Daubechies.lpModulus_le_of_mem_scalingSpace, Daubechies.inverse_daubechiesScheme}
 \leanok
 \uses{def:daub-scheme, def:daub-bernstein-bound, def:modulus-data}
 Let $N \geq 2$, $1 \leq p < \infty$, $r \in \N$ and $\theta \in \R$, and let $K \in [0, \infty]$
@@ -5089,7 +5101,7 @@ classical quasi-norm is
 
 \begin{theorem}[Approximation and moduli of smoothness]
 \label{thm:daub-approx-modulus}
-\lean{Daubechies.memApprox_scheme_iff_modulus}
+\lean{Daubechies.memApprox_daubechiesScheme_iff_modulus}
 \leanok
 \uses{def:daub-modulus-data, def:approx-space}
 Let $N \geq 2$, $1 \leq p < \infty$ and $1 \leq q \leq \infty$, let the scaling function of a
@@ -5110,8 +5122,8 @@ The coincidence theorem (\Cref{thm:modulus-coincidence}) for the modulus of
 
 \begin{theorem}[Approximation and coefficients]
 \label{thm:daub-approx-coeff}
-\lean{Daubechies.projectionScheme_one, Daubechies.projectionScheme_block,
-  Daubechies.memApprox_scheme_iff_coeff}
+\lean{Daubechies.daubechiesProjectionScheme_one, Daubechies.daubechiesProjectionScheme_block,
+  Daubechies.memApprox_daubechiesScheme_iff_coeff}
 \leanok
 \uses{def:daub-coeff-norm, def:daub-scheme, def:approx-space}
 Let $N \geq 2$, $1 \leq p < \infty$, $s > 0$ and $1 \leq q \leq \infty$. An $f \in L_p(\R)$ lies
@@ -7182,8 +7194,9 @@ norm $\|x\| = \max_i |x_i|$, and $f_{x,i}$ is the slice of $f$ through $x$ in co
 
 \begin{lemma}[Smoothing in one coordinate on \texorpdfstring{$\R^d$}{R\^{}d}]
 \label{lem:rd-coordinate-smoothing}
-\lean{Cube.eLpNorm_cubeDiff_le_smoothnessModulus, Cube.eLpNorm_sub_cubeSmooth_le_smoothnessModulus,
-  Cube.eLpNorm_cubeSmoothDeriv_le_smoothnessModulus}
+\lean{Cube.eLpNorm_cubeDiff_le_smoothnessModulus,
+  Cube.eLpNorm_sub_cubeSteklovSmooth_le_smoothnessModulus,
+  Cube.eLpNorm_cubeSteklovSmoothDeriv_le_smoothnessModulus}
 \leanok
 \uses{lem:cube-smoothing, def:rd-modulus}
 Let $f : \R^d \to \C$, $r \in \N$ and $i$ a coordinate. For every $p$ and all $h, t \in \R$ with
@@ -7213,7 +7226,7 @@ $\sum_{k=1}^r \binom{r}{k} \leq 2^r$ (\Cref{thm:steklov-smoothing}).
 
 \begin{lemma}[Expansions with varying coefficients]
 \label{lem:daub-expand-joint}
-\lean{Daubechies.continuous_expand_uncurry, Daubechies.continuous_coeffFun_slice,
+\lean{Daubechies.continuous_daubechiesExpand_uncurry, Daubechies.continuous_coeffFun_slice,
   Daubechies.measurable_coeffFun_slice}
 \leanok
 \uses{def:daub-generators}

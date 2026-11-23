@@ -414,7 +414,7 @@ variable (p) in
 functions on the dyadic intervals of level `j`, with `V_j` at complexity `2^j`
 (`InterpCouple.ofMonotoneSubgroups`). It uses the group structure and the quasi-norm `‖·‖ₑ` of
 `Lp`, which exist for every `p`; for `1 ≤ p` it is the complexity couple of the Haar scheme
-`Haar.scheme` (`Haar.stepCouple_eq_complexityCouple`). -/
+`Haar.haarScheme` (`Haar.stepCouple_eq_complexityCouple`). -/
 noncomputable def stepCouple : InterpCouple (Lp ℂ p vol) :=
   InterpCouple.ofMonotoneSubgroups (fun f => ‖f‖ₑ)
     (fun j => lpMeasSubgroup ℂ (dyadicFiltration j) p vol)
@@ -441,13 +441,13 @@ theorem mem_lpMeas_of_stepCouple_norm1_le {j : ℕ} {a : Lp ℂ p vol}
 complexity couple of the norm of `L_p[0, 1]` and of the sets `{0}` at complexity `0` and the
 `ℱ_⌊log₂ n⌋`-measurable elements at complexity `n ≥ 1`. -/
 theorem stepCouple_eq_complexityCouple [Fact (1 ≤ p)] :
-    stepCouple p = (scheme p).complexityCouple := by
+    stepCouple p = (haarScheme p).complexityCouple := by
   have hS : InterpCouple.dyadicLevels (fun j => lpMeasSubgroup ℂ (dyadicFiltration j) p vol) =
-      (scheme p).sets := by
+      (haarScheme p).sets := by
     funext n
     ext f
     rcases eq_or_ne n 0 with rfl | hn
-    · rw [InterpCouple.dyadicLevels_zero, (scheme p).sets_zero]
+    · rw [InterpCouple.dyadicLevels_zero, (haarScheme p).sets_zero]
     · simp only [InterpCouple.dyadicLevels, hn, ↓reduceIte, SetLike.mem_coe]
       rw [mem_lpMeasSubgroup_iff_aestronglyMeasurable]
       exact mem_lpMeas_iff_aestronglyMeasurable.symm.trans
@@ -460,7 +460,7 @@ scheme**: for `s ≥ 0` and `q ≠ 0` with `s > 0` or `q = ∞`, `f ∈ E_{s,q}`
 `f ∈ A^s_q(L_p, Haar)` (`ApproximationScheme.memEMethod_complexityCouple_iff`). -/
 theorem memEMethod_stepCouple_iff_memApprox [Fact (1 ≤ p)] {s : ℝ} {q : ℝ≥0∞} (hs : 0 ≤ s)
     (hsq : 0 < s ∨ q = ∞) (hq0 : q ≠ 0) {f : Lp ℂ p vol} :
-    (stepCouple p).MemEMethod s q f ↔ (scheme p).MemApprox s q f := by
+    (stepCouple p).MemEMethod s q f ↔ (haarScheme p).MemApprox s q f := by
   rw [stepCouple_eq_complexityCouple]
   exact ApproximationScheme.memEMethod_complexityCouple_iff hs hsq hq0
 

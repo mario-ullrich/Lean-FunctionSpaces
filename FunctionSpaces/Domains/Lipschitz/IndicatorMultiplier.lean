@@ -325,18 +325,19 @@ theorem exists_modNorm_indicatorLp_le {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p 
   obtain ⟨hatom, hsum, hcoef⟩ := hdec F
   set G : ℕ → Lp ℂ p (volume : Measure V) := fun j => b.localMean hp 1 j F
   have hF : Tendsto (fun J => ∑ j ∈ Finset.range (J + 1),
-      indicatorLp Ω.measurableSet (convLp hp (b.integrable_dual 1 j) (G j))) atTop
+      indicatorLp Ω.measurableSet (convLp hp (b.integrable_dualKernel 1 j) (G j))) atTop
       (𝓝 (indicatorLp Ω.measurableSet F)) :=
     (((indicatorLp Ω.measurableSet).continuous.tendsto F).comp
       (b.tendsto_sum_dual_localMean hp le_rfl F)).congr fun J => by
         simp only [Function.comp_apply, map_sum]
         rfl
   have hf : ∀ j, ∀ᵐ x ∂volume,
-      indicatorLp Ω.measurableSet (convLp hp (b.integrable_dual 1 j) (G j)) x =
-        ∑' m, cellCoef p j (G j) m * Ω.carrier.indicator (cellAtom p (b.dual 1 j) j (G j) m) x :=
+      indicatorLp Ω.measurableSet (convLp hp (b.integrable_dualKernel 1 j) (G j)) x =
+        ∑' m, cellCoef p j (G j) m *
+          Ω.carrier.indicator (cellAtom p (b.dualKernel 1 j) j (G j) m) x :=
     fun j => by
       filter_upwards [indicatorLp_apply_ae Ω.measurableSet
-        (convLp hp (b.integrable_dual 1 j) (G j)), hsum j] with x hx hxs
+        (convLp hp (b.integrable_dualKernel 1 j) (G j)), hsum j] with x hx hxs
       rw [hx]
       by_cases hxΩ : x ∈ Ω.carrier
       · simp only [indicator_of_mem hxΩ]
@@ -347,7 +348,7 @@ theorem exists_modNorm_indicatorLp_le {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p 
         S.card ≤ N := fun j x S hS =>
     card_le_of_norm_sub_cellCenter_le j (by linarith) x S fun m hm => (hS m hm).2
   have hsyn := modNorm_le_coeffNorm hp (fun j m => cellCenter j m)
-    (fun j m => Ω.carrier.indicator (cellAtom p (b.dual 1 j) j (G j) m))
+    (fun j m => Ω.carrier.indicator (cellAtom p (b.dualKernel 1 j) j (G j) m))
     (fun j => cellCoef p j (G j)) hN (fun j m => hind hd (hatom j m)) hf hF hs hsp hq
   rw [hcoef s q] at hsyn
   refine hsyn.trans ?_

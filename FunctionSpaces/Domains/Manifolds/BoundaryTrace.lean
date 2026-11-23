@@ -116,7 +116,7 @@ theorem trace_chartChange_applyLp_of_continuous {L : ℕ} (hL : 1 ≤ L) {s : �
       _ → ℂ) =ᵐ[volume] T.apply g :=
     (T.applyLp_ae _ _ hΩm hp G).trans (T.apply_ae_eq (hGg.mono fun y hy _ => hy))
   have htr1 := Rd.trace_ae_eq_of_continuousOn Rd.norm_e0 hp hL hs hq hfin
-    (by rw [← range_eq_closedHalfSpace]; exact T.continuousOn_apply hgc) T.isCompact_carrier
+    (by rw [← range_eq_closedHalfSpace]; exact T.continuousOn_apply hgc) T.isCompact_imageCompact
     (fun x _ hx => T.apply_eq_zero_of_notMem _ hx) (h1.mono fun x hx _ => hx)
   have htr2 : Ω.trace hp L G =ᵐ[volume] fun x' => g x' := by
     filter_upwards [Ω.trace_ae_eq_comp_graphMap hp hL hs hq

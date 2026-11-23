@@ -32,7 +32,7 @@ differences** `E[f | ℱ_{k+1}] - E[f | ℱ_k]`, and for `s > 0` (`memApprox_iff
 `f ∈ A^s_q(L_p, ℱ)`  iff  `‖E[f | ℱ_0]‖_p + ‖(2^(ks) ‖E[f | ℱ_{k+1}] - E[f | ℱ_k]‖_p)_k‖_{ℓ_q} < ∞`,
 
 provided the approximants are dense in `L_p` (for the dyadic filtration of `[0, 1]` with
-Lebesgue measure and `p < ∞`, `Haar.closure_iUnion_scheme`).  For the Haar system,
+Lebesgue measure and `p < ∞`, `Haar.closure_iUnion_haarScheme`).  For the Haar system,
 `E[f | ℱ_{k+1}] - E[f | ℱ_k]` is the part of the Haar expansion of `f` at level `k`
 (`Haar.condExpLp_succ_sub_ae_eq`), and the characterisation becomes one by Haar coefficients
 (`Haar.memApprox_iff_haarCoeff`).

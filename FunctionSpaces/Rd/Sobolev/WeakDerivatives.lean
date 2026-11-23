@@ -35,11 +35,11 @@ the distribution `φ ↦ ∫ φ f` on `Ω` (Mathlib's `Distribution.ofFun`, test
   (`Rd.hasWeakLineDeriv_schwartz`), and pass to limits in `L_p(Ω)`
   (`Rd.HasWeakLineDeriv.of_tendsto`).
 * **Sobolev spaces**: `Rd.MemWeakSobolev Ω m p f` says that `f` and all its weak derivatives of
-  order at most `m` lie in `L_p(Ω)`; `Rd.MemSobolev m f` is the case `Ω = V` for `f ∈ L_p(V)`,
-  with the weak derivatives as classes in `L_p(V)` (`Rd.memSobolev_iff_exists_hasWeakLineDeriv`;
+  order at most `m` lie in `L_p(Ω)`; `Rd.MemWSobolev m f` is the case `Ω = V` for `f ∈ L_p(V)`,
+  with the weak derivatives as classes in `L_p(V)` (`Rd.memWSobolev_iff_exists_hasWeakLineDeriv`;
   for `m = 1`, weak derivatives in every direction suffice,
-  `Rd.memSobolev_one_of_forall_hasWeakLineDeriv`), closed under finite sums
-  (`Rd.MemSobolev.sum`).
+  `Rd.memWSobolev_one_of_forall_hasWeakLineDeriv`), closed under finite sums
+  (`Rd.MemWSobolev.sum`).
 * **The bridge to tempered distributions** (`Rd.hasWeakLineDeriv_top_iff`): for `f ∈ L_p(V)`,
   `g ∈ L_r(V)`, the weak derivative on `V` is the derivative of tempered distributions,
   `∂^v f = g` in `𝓢'(V, ℂ)`, since a tempered distribution that vanishes on all test functions
@@ -79,7 +79,7 @@ def MemWeakSobolev (Ω : Opens V) (m : ℕ) (p : ℝ≥0∞) (f : V → ℂ) : P
 
 /-- The **Sobolev space** `W^m_p(V)` as a predicate on `f ∈ L_p(V)`: the case `Ω = V` of
 `Rd.MemWeakSobolev`. -/
-def MemSobolev {p : ℝ≥0∞} (m : ℕ) (f : Lp ℂ p (volume : Measure V)) : Prop :=
+def MemWSobolev {p : ℝ≥0∞} (m : ℕ) (f : Lp ℂ p (volume : Measure V)) : Prop :=
   MemWeakSobolev ⊤ m p f
 
 /-- Lebesgue measure restricted to the whole space `Ω = V` is Lebesgue measure, so that
@@ -446,26 +446,26 @@ theorem MemWeakSobolev.congr_ae {p : ℝ≥0∞} {m : ℕ} (hf : MemWeakSobolev 
   exact ⟨g, hg, hfg.congr_ae hff' Filter.EventuallyEq.rfl⟩
 
 /-- The zero class lies in `W^m_p(V)`. -/
-theorem zero_memSobolev {p : ℝ≥0∞} {m : ℕ} : MemSobolev m (0 : Lp ℂ p (volume : Measure V)) :=
+theorem zero_memWSobolev {p : ℝ≥0∞} {m : ℕ} : MemWSobolev m (0 : Lp ℂ p (volume : Measure V)) :=
   zero_memWeakSobolev.congr_ae (ae_restrict_of_ae (Lp.coeFn_zero ..).symm)
 
 /-- `W^m_p(V)` is closed under addition in `L_p(V)`. -/
-theorem MemSobolev.add {p : ℝ≥0∞} {m : ℕ} {F G : Lp ℂ p (volume : Measure V)}
-    (hF : MemSobolev m F) (hG : MemSobolev m G) : MemSobolev m (F + G) :=
+theorem MemWSobolev.add {p : ℝ≥0∞} {m : ℕ} {F G : Lp ℂ p (volume : Measure V)}
+    (hF : MemWSobolev m F) (hG : MemWSobolev m G) : MemWSobolev m (F + G) :=
   (MemWeakSobolev.add hF hG).congr_ae (ae_restrict_of_ae (Lp.coeFn_add F G).symm)
 
 /-- `W^m_p(V)` is closed under multiplication by complex scalars in `L_p(V)`. -/
-theorem MemSobolev.smul {p : ℝ≥0∞} {m : ℕ} {F : Lp ℂ p (volume : Measure V)}
-    (hF : MemSobolev m F) (c : ℂ) : MemSobolev m (c • F) :=
+theorem MemWSobolev.smul {p : ℝ≥0∞} {m : ℕ} {F : Lp ℂ p (volume : Measure V)}
+    (hF : MemWSobolev m F) (c : ℂ) : MemWSobolev m (c • F) :=
   (MemWeakSobolev.smul hF c).congr_ae (ae_restrict_of_ae (Lp.coeFn_smul c F).symm)
 
-/-- `W^m_p(V)` is closed under finite sums in `L_p(V)` (`Rd.MemSobolev.add`). -/
-theorem MemSobolev.sum {p : ℝ≥0∞} {m : ℕ} {ι : Type*} (s : Finset ι)
-    {F : ι → Lp ℂ p (volume : Measure V)} (hF : ∀ i ∈ s, MemSobolev m (F i)) :
-    MemSobolev m (∑ i ∈ s, F i) := by
+/-- `W^m_p(V)` is closed under finite sums in `L_p(V)` (`Rd.MemWSobolev.add`). -/
+theorem MemWSobolev.sum {p : ℝ≥0∞} {m : ℕ} {ι : Type*} (s : Finset ι)
+    {F : ι → Lp ℂ p (volume : Measure V)} (hF : ∀ i ∈ s, MemWSobolev m (F i)) :
+    MemWSobolev m (∑ i ∈ s, F i) := by
   classical
   induction s using Finset.induction_on with
-  | empty => simpa using (zero_memSobolev : MemSobolev m (0 : Lp ℂ p (volume : Measure V)))
+  | empty => simpa using (zero_memWSobolev : MemWSobolev m (0 : Lp ℂ p (volume : Measure V)))
   | insert i s hi ih =>
     rw [Finset.sum_insert hi]
     exact (hF i (Finset.mem_insert_self i s)).add
@@ -474,9 +474,9 @@ theorem MemSobolev.sum {p : ℝ≥0∞} {m : ℕ} {ι : Type*} (s : Finset ι)
 /-- **`W^m_p(V)` with derivatives in `L_p(V)`**: `f ∈ L_p(V)` lies in `W^m_p(V)` iff for every
 order `k ≤ m` and all directions `v ∈ V^k` some class `g ∈ L_p(V)` is the weak derivative
 `∂^v f` on `V`. -/
-theorem memSobolev_iff_exists_hasWeakLineDeriv {p : ℝ≥0∞} {m : ℕ}
+theorem memWSobolev_iff_exists_hasWeakLineDeriv {p : ℝ≥0∞} {m : ℕ}
     (f : Lp ℂ p (volume : Measure V)) :
-    MemSobolev m f ↔ ∀ k ≤ m, ∀ v : Fin k → V,
+    MemWSobolev m f ↔ ∀ k ≤ m, ∀ v : Fin k → V,
       ∃ g : Lp ℂ p (volume : Measure V), HasWeakLineDeriv ⊤ v f g := by
   constructor
   · rintro ⟨-, h⟩ k hk v
@@ -596,11 +596,11 @@ theorem locallyIntegrableOn_top_Lp (f : Lp ℂ p (volume : Measure V)) :
 
 /-- **`W^1_p(V)` from first-order weak derivatives**: a function `f ∈ L_p(V)`, `1 ≤ p`, with a
 weak derivative `∂_v f ∈ L_p(V)` in every direction `v` lies in `W^1_p(V)`
-(`Rd.memSobolev_iff_exists_hasWeakLineDeriv`; the derivative of order zero is `f` itself). -/
-theorem memSobolev_one_of_forall_hasWeakLineDeriv {f : Lp ℂ p (volume : Measure V)}
+(`Rd.memWSobolev_iff_exists_hasWeakLineDeriv`; the derivative of order zero is `f` itself). -/
+theorem memWSobolev_one_of_forall_hasWeakLineDeriv {f : Lp ℂ p (volume : Measure V)}
     (h : ∀ v : V, ∃ g : Lp ℂ p (volume : Measure V), HasWeakLineDeriv ⊤ (fun _ : Fin 1 => v) f g) :
-    MemSobolev 1 f := by
-  refine (memSobolev_iff_exists_hasWeakLineDeriv _).2 fun k hk v => ?_
+    MemWSobolev 1 f := by
+  refine (memWSobolev_iff_exists_hasWeakLineDeriv _).2 fun k hk v => ?_
   rcases Nat.le_one_iff_eq_zero_or_eq_one.1 hk with rfl | rfl
   · exact ⟨_, hasWeakLineDeriv_fin_zero v (locallyIntegrableOn_top_Lp _)⟩
   have hv : v = fun _ => v 0 := funext fun i => congrArg v (Subsingleton.elim i 0)
@@ -669,17 +669,17 @@ theorem hasWeakLineDeriv_schwartz (Ω : Opens V) (η : 𝓢(V, ℂ)) (v : Fin k 
 
 /-- **Sobolev spaces by tempered distributions**: `f ∈ L_p(V)` lies in `W^m_p(V)` iff for every
 order `k ≤ m` and all directions `v`, the tempered derivative `∂^v f` is an `L_p(V)` function
-(`Rd.memSobolev_iff_exists_hasWeakLineDeriv` and `Rd.hasWeakLineDeriv_top_iff`). -/
-theorem memSobolev_iff_tempered {m : ℕ} (f : Lp ℂ p (volume : Measure V)) :
-    MemSobolev m f ↔ ∀ k ≤ m, ∀ v : Fin k → V,
+(`Rd.memWSobolev_iff_exists_hasWeakLineDeriv` and `Rd.hasWeakLineDeriv_top_iff`). -/
+theorem memWSobolev_iff_tempered {m : ℕ} (f : Lp ℂ p (volume : Measure V)) :
+    MemWSobolev m f ↔ ∀ k ≤ m, ∀ v : Fin k → V,
       ∃ g : Lp ℂ p (volume : Measure V), ∂^{v} (f : 𝓢'(V, ℂ)) = (g : 𝓢'(V, ℂ)) :=
-  (memSobolev_iff_exists_hasWeakLineDeriv f).trans <| forall₂_congr fun _ _ =>
+  (memWSobolev_iff_exists_hasWeakLineDeriv f).trans <| forall₂_congr fun _ _ =>
     forall_congr' fun _ => exists_congr fun _ => hasWeakLineDeriv_top_iff
 
 /-- Schwartz functions lie in every Sobolev space `W^m_p(V)`. -/
-theorem memSobolev_toLp (η : 𝓢(V, ℂ)) (m : ℕ) :
-    MemSobolev m (η.toLp p (volume : Measure V)) :=
-  (memSobolev_iff_tempered _).2 fun _ _ v => ⟨_, iteratedLineDerivOp_toLp_eq (r := p) η v⟩
+theorem memWSobolev_toLp (η : 𝓢(V, ℂ)) (m : ℕ) :
+    MemWSobolev m (η.toLp p (volume : Measure V)) :=
+  (memWSobolev_iff_tempered _).2 fun _ _ v => ⟨_, iteratedLineDerivOp_toLp_eq (r := p) η v⟩
 
 end Bridge
 

@@ -410,17 +410,19 @@ theorem ModulusBound.exists_eLpNorm_le_orders {p : ℝ≥0∞} [Fact (1 ≤ p)] 
 
 /-- **The wavelet lies in the scaling space of level one**: for `N ≥ 2` and `1 ≤ p < ∞`, the class
 of `ψ` in `L_p(ℝ)` lies in `V_1` (`Daubechies.scalingSpace`), since
-`ψ = ∑_n (g_n/√2) φ_{1,n}` is an expansion of level one (`Daubechies.waveletScaled_eq_expand` at
-level and position `0`) and the projection `P_1` reproduces it (`Daubechies.projFun_expand`). -/
+`ψ = ∑_n (g_n/√2) φ_{1,n}` is an expansion of level one
+(`Daubechies.waveletScaled_eq_daubechiesExpand` at level and position `0`) and the projection `P_1`
+reproduces it (`Daubechies.projFun_daubechiesExpand`). -/
 theorem toLp_wavelet_mem_scalingSpace (hN : 2 ≤ N) {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞) :
     (memLp_wavelet m hN p).toLp _ ∈ scalingSpace m p hN hp 1 := by
-  have hψ : wavelet m = expand (scalingFun m) 1 (fun n => ((dualCoeff m n / √2 : ℝ) : ℂ)) := by
+  have hψ : wavelet m =
+      daubechiesExpand (scalingFun m) 1 (fun n => ((dualCoeff m n / √2 : ℝ) : ℂ)) := by
     funext x
-    simpa [waveletScaled, scaledFun_zero] using waveletScaled_eq_expand m 0 0 x
+    simpa [waveletScaled, scaledFun_zero] using waveletScaled_eq_daubechiesExpand m 0 0 x
   have h1 : projFun m 1 (wavelet m) = wavelet m := by
-    rw [hψ, projFun_expand m hN]
+    rw [hψ, projFun_daubechiesExpand m hN]
   refine (mem_scalingSpace m).2 ⟨(memLp_wavelet m hN p).toLp _, Lp.ext ?_⟩
-  refine (proj_apply_ae m hN hp 1 _).trans ?_
+  refine (daubechiesProj_apply_ae m hN hp 1 _).trans ?_
   rw [projFun_congr_ae m (MemLp.coeFn_toLp _) 1, h1]
   exact (MemLp.coeFn_toLp _).symm
 

@@ -38,12 +38,12 @@ the orthonormal basis `(e_i)` of `Rd.gridBasis` and the dilations `G_c(x) = c^n 
   `u(s) = ∑_{l<L} a_l ρ(s + log(l + 1))` (`Rd.momentWeight`,
   `Rd.LocalMeansBump.momentKernel_dilationSmoothed`), and its local means kernels are
   `k_{j+1} = (A_v b)_{2^j}` with `v(s) = u(s - log 2) - u(s)` (`Rd.kernelWeight`,
-  `Rd.LocalMeansBump.kernel_succ_dilationSmoothed`). The moments of `v` of the orders `r < L`
+  `Rd.LocalMeansBump.meansKernel_succ_dilationSmoothed`). The moments of `v` of the orders `r < L`
   vanish (`Rd.integral_kernelWeight_mul_exp`), since `∑_{l<L} a_l (l + 1)^r = 0` for
   `1 ≤ r < L` (`Rd.sum_jacksonCoeff_mul_pow`).
 * **The bump statement**: for `m ≤ L`, `k_{j+1} = 2^{-jm} ∑_i ∂^{e_i} (K_i)_{2^j}` with the higher
   divergence kernels of the bump (`Rd.LocalMeansBump.higherKernel`,
-  `Rd.LocalMeansBump.kernel_succ_eq_sum_higherKernel`). For `m < L` their dyadic dilates form
+  `Rd.LocalMeansBump.meansKernel_succ_eq_sum_higherKernel`). For `m < L` their dyadic dilates form
   Calderón–Zygmund families (`Rd.LocalMeansBump.isCZFamily_higherKernel`); they have compact
   support (`Rd.LocalMeansBump.hasCompactSupport_higherKernel`), for `L ≥ 1` in `B̄(0, L R)`, and
   in the reflected closed cone for bumps supported in `-K`
@@ -683,7 +683,7 @@ noncomputable def momentWeight (L : ℕ) (s : ℝ) : ℂ :=
 
 /-- The **kernel weight** `u(s - log 2) - u(s)`: the local means kernels of order `L` of the
 smoothed bump are dilates of the weighted dilation average of `b` with this weight
-(`Rd.LocalMeansBump.kernel_succ_dilationSmoothed`). -/
+(`Rd.LocalMeansBump.meansKernel_succ_dilationSmoothed`). -/
 noncomputable def kernelWeight (L : ℕ) (s : ℝ) : ℂ :=
   momentWeight L (s - Real.log 2) - momentWeight L s
 
@@ -760,12 +760,12 @@ theorem LocalMeansBump.momentKernel_dilationSmoothed (b : LocalMeansBump V) (L :
 
 /-- **The local means kernels of the smoothed bump**: `k_{j+1} = (m_2 - m)_{2^j}` with
 `m_2 - m = ∫_{-log L}^{2 log 2} (u(s - log 2) - u(s)) b_{e^s} ds`, the weighted dilation average
-with the kernel weight (`Rd.LocalMeansBump.kernel_succ_eq_dilate`,
+with the kernel weight (`Rd.LocalMeansBump.meansKernel_succ_eq_dilate`,
 `Rd.LocalMeansBump.momentKernel_dilationSmoothed`, `Rd.dilate_exp_neg_weightedDilation`). -/
-theorem LocalMeansBump.kernel_succ_dilationSmoothed (b : LocalMeansBump V) (L j : ℕ) :
-    b.dilationSmoothed.kernel L (j + 1) = dilate (2 ^ j)
+theorem LocalMeansBump.meansKernel_succ_dilationSmoothed (b : LocalMeansBump V) (L j : ℕ) :
+    b.dilationSmoothed.meansKernel L (j + 1) = dilate (2 ^ j)
       (weightedDilation (-Real.log L) (2 * Real.log 2) (kernelWeight L) b.toFun) := by
-  rw [b.dilationSmoothed.kernel_succ_eq_dilate L j]
+  rw [b.dilationSmoothed.meansKernel_succ_eq_dilate L j]
   congr 1
   funext y
   have hlog := Real.log_nonneg (one_le_two : (1 : ℝ) ≤ 2)
@@ -891,7 +891,7 @@ variable (b : LocalMeansBump V)
 `L`: the higher divergence kernels (`Rd.higherDivSchwartz`) of `b` with the kernel weight
 `u(s - log 2) - u(s)` on `[-log L, 2 log 2]`. The local means kernels of order `L` of the smoothed
 bump are sums of their derivatives of order `m ≤ L`
-(`Rd.LocalMeansBump.kernel_succ_eq_sum_higherKernel`). -/
+(`Rd.LocalMeansBump.meansKernel_succ_eq_sum_higherKernel`). -/
 noncomputable def higherKernel (L m : ℕ) (i : Fin m → Fin (finrank ℝ V)) : 𝓢(V, ℂ) :=
   higherDivSchwartz (neg_log_le_two_mul_log_two L) (contDiff_kernelWeight L) b.contDiff b.eq_zero i
 
@@ -904,15 +904,15 @@ theorem higherKernel_apply (L m : ℕ) (i : Fin m → Fin (finrank ℝ V)) (x : 
 /-- **The local means kernels of the smoothed bump at dyadic scales as derivatives of order `m`**:
 for `m ≤ L`,
 `k_{j+1} = 2^{-jm} ∑_i ∂_{e_{i_0}} ⋯ ∂_{e_{i_{m-1}}} (K_i)_{2^j}` with the higher divergence kernels
-`K_i` (`Rd.LocalMeansBump.kernel_succ_dilationSmoothed`,
+`K_i` (`Rd.LocalMeansBump.meansKernel_succ_dilationSmoothed`,
 `Rd.weightedDilation_eq_sum_iteratedLineDeriv` with the moments
 `Rd.integral_kernelWeight_mul_exp`, and the chain rule for dilations
 `Rd.iteratedLineDerivOp_schwartzDilate`). -/
-theorem kernel_succ_eq_sum_higherKernel {L m : ℕ} (hmL : m ≤ L) (j : ℕ) (y : V) :
-    b.dilationSmoothed.kernel L (j + 1) y = ((2 : ℂ) ^ (j * m))⁻¹ *
+theorem meansKernel_succ_eq_sum_higherKernel {L m : ℕ} (hmL : m ≤ L) (j : ℕ) (y : V) :
+    b.dilationSmoothed.meansKernel L (j + 1) y = ((2 : ℂ) ^ (j * m))⁻¹ *
       ∑ i, (∂^{fun l => gridBasis V (i l)}
         (schwartzDilate (2 ^ j) (by positivity) (b.higherKernel L m i)) : 𝓢(V, ℂ)) y := by
-  rw [b.kernel_succ_dilationSmoothed, dilate,
+  rw [b.meansKernel_succ_dilationSmoothed, dilate,
     weightedDilation_eq_sum_iteratedLineDeriv (neg_log_le_two_mul_log_two L)
       (contDiff_kernelWeight L) b.contDiff b.eq_zero (m := m)
       (fun r hr => integral_kernelWeight_mul_exp (by omega))]

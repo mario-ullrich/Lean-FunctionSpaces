@@ -76,12 +76,12 @@ the quasi-Banach space `L_τ`.
   `Interval.lqNorm_perModulus_lt_top_iff_block`).
 * **Multiwavelets.** Let `ψ_1, …, ψ_r` be an orthonormal basis of the piecewise polynomials of
   degree `< r` on `[0, 1/2)` and `[1/2, 1)` that are `L_2`-orthogonal to the polynomials of
-  degree `< r` (`Alpert.psi`), and `ψ_{k,m,i}(x) = 2^(k/2) ψ_i(2^k x - m)`. For `1 ≤ p < ∞`,
-  `s > 0` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q` of the dyadic piecewise polynomials of degree `< r` iff
-  `‖P_0 f‖_p + ‖(2^(k(s+1/2-1/p)) ‖(⟨f, ψ_{k,m,i}⟩)_{m,i}‖_{ℓ_p})_k‖_{ℓ_q} < ∞`
-  (`Alpert.memApprox_ppScheme_iff_coeff`); for `0 < s < 1/p` this characterises
-  `B^s_{p,q}[0, 1]` and `B^s_{p,q}(𝕋)` (`Alpert.lqNorm_modulus_lt_top_iff_coeff`,
-  `Alpert.lqNorm_perModulus_lt_top_iff_coeff`).
+  degree `< r` (`Alpert.multiwavelet`), and `ψ_{k,m,i}(x) = 2^(k/2) ψ_i(2^k x - m)`. For
+  `1 ≤ p < ∞`, `s > 0` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q` of the dyadic piecewise polynomials of degree
+  `< r` iff `‖P_0 f‖_p + ‖(2^(k(s+1/2-1/p)) ‖(⟨f, ψ_{k,m,i}⟩)_{m,i}‖_{ℓ_p})_k‖_{ℓ_q} < ∞`
+  (`Alpert.memApprox_ppScheme_iff_alpertCoeff`); for `0 < s < 1/p` this characterises
+  `B^s_{p,q}[0, 1]` and `B^s_{p,q}(𝕋)` (`Alpert.lqNorm_modulus_lt_top_iff_alpertCoeff`,
+  `Alpert.lqNorm_perModulus_lt_top_iff_alpertCoeff`).
 * **Piecewise polynomials on the cube.** On `Q = [0, 1]^d` let
   `ω_r^(i)(f, t)_p = sup_{0 ≤ h ≤ t} ‖Δ^r_{h e_i} f‖_{L_p({x ∈ Q : x_i ≤ 1 - rh})}` be the modulus
   in coordinate `i` and `ω_r = ∑_i ω_r^(i)`. Let `V_k^d ⊆ L_p(Q)` consist of the bounded
@@ -160,7 +160,7 @@ the quasi-Banach space `L_τ`.
   the approximation space `A^θ_τ` of `n`-term approximation from the multiples `c φ_n` iff
   `|∫_0^1 f|^τ + ∑_k ∑_{i<2^k} |⟨f, h_{k,i}⟩|^τ < ∞` (`Haar.memApprox_nTerm_iff_haarCoeff`). For
   `1 ≤ τ < 2` this is the space `A^θ_τ(L_τ[0, 1])` of the Haar scheme
-  (`Haar.memApprox_nTerm_iff_memApprox_scheme`), so it is the Besov condition
+  (`Haar.memApprox_nTerm_iff_memApprox_haarScheme`), so it is the Besov condition
   `‖f‖_τ + ‖(2^(kθ) ω_1(f, 2^(-k), [0, 1])_τ)_k‖_{ℓ_τ} < ∞` and its periodic version
   (`Haar.memApprox_nTerm_iff_modulus`, `Haar.memApprox_nTerm_iff_perModulus`): the Haar case of
   the theorem of DeVore, Jawerth and Popov. For `0 < τ ≤ 1` the space `A^θ_τ` is, as a set, the

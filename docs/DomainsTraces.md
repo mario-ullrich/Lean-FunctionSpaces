@@ -159,9 +159,9 @@ extension from the boundary, one operator for every smoothness, so that the corr
   agrees on `Ω` with some `F` with `‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} ≤ C N_Ω(f)`; a
   closed convex set with nonempty interior has it iff it is a Besov domain. The property passes to
   sets that agree up to a null set (`Rd.HasBesovExtension.congr_set`), and with it every order
-  `r > s` gives the same space (`Rd.HasBesovExtension.modNormOn_order_le`). Every Lipschitz graph
-  domain `{x : φ(x) < ⟪x, e⟫}` has it (`Rd.LipschitzGraph.hasBesovExtension`), its graph and its
-  frontier are null sets (`Rd.LipschitzGraph.volume_graph`,
+  `r > s` gives the same space (`Rd.HasBesovExtension.modNormOn_order_le_of_hasBesovExtension`).
+  Every Lipschitz graph domain `{x : φ(x) < ⟪x, e⟫}` has it (`Rd.LipschitzGraph.hasBesovExtension`),
+  its graph and its frontier are null sets (`Rd.LipschitzGraph.volume_graph`,
   `Rd.LipschitzGraph.volume_frontier_domain`), and for convex `φ` its closure is a Besov domain
   (`Rd.BesovDomain.closure_lipschitzGraph`). The open quadrant `{y ∈ ℝ^n : y_i > 0 for all i}` is
   the Lipschitz graph domain of `φ(y) = ⟪y, e⟫ - √n min_i y_i` with the diagonal
@@ -291,7 +291,7 @@ extension from the boundary, one operator for every smoothness, so that the corr
   `B^{1/2}_{2,2}(Γ)` iff it is the boundary trace of some `f ∈ H^1(Ω)`
   (`Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_exists_memSobolevOn`). The extensions in the
   definition of the boundary trace are the `F ∈ W^1_2(V)` with `F = f` on `Ω`
-  (`Rd.BoundedLipschitzDomain.isBoundaryTrace_iff_forall_memSobolev`), and `f` has the boundary
+  (`Rd.BoundedLipschitzDomain.isBoundaryTrace_iff_forall_memWSobolev`), and `f` has the boundary
   trace `g` with a finite intrinsic norm iff `f ∈ H^1(Ω)` and `g` is its boundary trace
   (`Rd.BoundedLipschitzDomain.hasBoundaryTrace_iff_memSobolevOn`). The extension and trace theorems
   for bounded Lipschitz domains hold with bounds
@@ -499,7 +499,7 @@ extension from the boundary, one operator for every smoothness, so that the corr
   everywhere on `Ω` with some `F ∈ W^1_p(V)` whose weak derivatives `G_i = ∂_{e_i} F` satisfy
   `‖F‖_p + ∑_i ‖G_i‖_p ≤ C (‖f‖_{L_p(Ω)} + ∑_i ‖g_i‖_{L_p(Ω)})`
   (`Rd.BoundedLipschitzDomain.exists_extendsSobolev`); hence `f ∈ W^1_p(Ω)` iff `f` agrees on `Ω`
-  with some `F ∈ W^1_p(V)` (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev`).
+  with some `F ∈ W^1_p(V)` (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memWSobolev`).
   For `p = 2`, `f ∈ L_2(V)` lies in `H^1(Ω)` iff `f ∈ W^1_2(Ω)`
   (`Rd.BoundedLipschitzDomain.memSobolevOn_iff_memWeakSobolev`,
   `Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_restrictL2`), every sequence bounded in
@@ -511,14 +511,14 @@ extension from the boundary, one operator for every smoothness, so that the corr
   (`Rd.BoundedLipschitzDomain.exists_isBoundaryTrace_of_memWeakSobolev`,
   `Rd.BoundedLipschitzDomain.isBoundaryTrace_unique_of_memWeakSobolev`). The membership
   statements hold in every dimension; for `n = 0`, `F = f` or `F = 0` serves
-  (`Rd.exists_memSobolev_of_memWeakSobolev_of_subsingleton`). The membership statements hold for
+  (`Rd.exists_memWSobolev_of_memWeakSobolev_of_subsingleton`). The membership statements hold for
   every `1 ≤ p ≤ ∞` by the theorem by reflection below; the bound with
   the constant `C`, and with it Rellich's theorem and the quotient norm, is Rychkov's local
   extension with the local means of the gradient: for a bump with the moment kernel `m` of order
   two, `k_{j+1} = 2^{-j} ∑_i ∂_{e_i} (K_i)_{2^j}`
-  (`Rd.LocalMeansBump.kernel_two_succ_apply`), so on a patch
+  (`Rd.LocalMeansBump.meansKernel_two_succ_apply`), so on a patch
   `k_{j+1} ⋆ 1_T f = 2^{-j} ∑_i (K_i)_{2^j} ⋆ 1_T g_i`
-  (`Rd.LocalMeansBump.conv_kernel_two_succ_eq`),
+  (`Rd.LocalMeansBump.conv_meansKernel_two_succ_eq`),
   the strong type of the Calderón–Zygmund families `((K_i)_{2^j})_j` bounds the local means of
   Triebel–Lizorkin type of `f` on the patch (`Rd.LocalMeansBump.tlLocalNormOn_le_patchConst`), the
   local extension lies in `F^1_{p,2} = W^1_p` and is linear in `f`
@@ -534,7 +534,7 @@ extension from the boundary, one operator for every smoothness, so that the corr
   `‖F‖_p + ∑_i ‖G_i‖_p ≤ C (‖f‖_{L_p(Ω)} + ∑_i ‖g_i‖_{L_p(Ω)})`
   (`Rd.BoundedLipschitzDomain.exists_extendsSobolev_reflection`); hence `f ∈ W^1_p(Ω)` iff `f`
   agrees on `Ω` with some `F ∈ W^1_p(V)`, in every dimension
-  (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev`). On a Lipschitz
+  (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memWSobolev`). On a Lipschitz
   graph domain `Ω = {x : φ(x) < ⟪x, e⟫}` with `M`-Lipschitz `φ`, the flattening
   `F(x) = x - φ(x) e` and its inverse are `(1 + M)`-Lipschitz and preserve Lebesgue measure
   (`Rd.LipschitzGraph.measurePreserving_flatten`,
@@ -559,12 +559,12 @@ extension from the boundary, one operator for every smoothness, so that the corr
   satisfy `∑_{k ≤ m} ∑_w ‖G_{k,w}‖_p ≤ C ∑_{k ≤ m} ∑_w ‖g_{k,w}‖_{L_p(Ω)}`
   (`Rd.BoundedLipschitzDomain.exists_extendsSobolevOrder`); hence `f ∈ W^m_p(Ω)` iff `f` agrees
   on `Ω` with some `F ∈ W^m_p(V)`, in every dimension
-  (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev_order`). For the smoothed bump
+  (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memWSobolev_order`). For the smoothed bump
   `b'` of a bump `b` and `m ≤ L`, the local means kernels of order `L` are
   `k_{j+1} = 2^{-jm} ∑_i ∂^{e_i} (K_i)_{2^j}` with the higher divergence kernels `K_i` of `b`, so
   on a patch `k_{j+1} ⋆ 1_T f = 2^{-jm} ∑_i (K_i)_{2^j} ⋆ 1_T ∂^{e_i} f`
-  (`Rd.LocalMeansBump.conv_kernel_succ_eq_sum_higherKernel`); for `L = m + 1` the strong type of
-  the Calderón–Zygmund families `((K_i)_{2^j})_j` bounds the local means of Triebel–Lizorkin type
+  (`Rd.LocalMeansBump.conv_meansKernel_succ_eq_sum_higherKernel`); for `L = m + 1` the strong type
+  of the Calderón–Zygmund families `((K_i)_{2^j})_j` bounds the local means of Triebel–Lizorkin type
   with smoothness `m` (`Rd.LocalMeansBump.tlLocalNormOn_le_higherPatchConst`), the local extension
   lies in `F^m_{p,2} ⊆ W^m_p` (`Rd.LocalMeansBump.extendsSobolevOrder`), and a smooth resolution of
   unity pastes the local extensions by the Leibniz rule (`Rd.extendsSobolevOrder_of_cover`). The
@@ -611,7 +611,7 @@ extension from the boundary, one operator for every smoothness, so that the corr
   `σ`-almost everywhere, so `‖ν‖ = 1` `σ`-almost everywhere
   (`Rd.BoundedLipschitzDomain.normal_ae_eq_normalAt`, `Rd.BoundedLipschitzDomain.norm_normal_ae`).
   For every `u ∈ H^1(Ω)`, the zero extension `1_Ω u` lies in `W^1_2(V)` iff the trace of `u`
-  vanishes (`Rd.BoundedLipschitzDomain.memSobolev_indicatorLp_iff_mem_traceKer`), and then
+  vanishes (`Rd.BoundedLipschitzDomain.memWSobolev_indicatorLp_iff_mem_traceKer`), and then
   `∂_v (1_Ω u) = 1_Ω ∂_v u`
   (`Rd.BoundedLipschitzDomain.hasWeakLineDeriv_indicatorLp_of_mem_traceKer`). The proof pastes
   Green's formula on the graph domains with a resolution of unity equal to one near `Γ`

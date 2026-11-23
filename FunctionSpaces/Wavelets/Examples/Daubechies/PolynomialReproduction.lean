@@ -37,7 +37,7 @@ each of these sums has only finitely many nonzero terms.
   expansions in `φ`, so coefficient recovery
   `∫ (∑_j a(j) φ(y - j)) conj φ(y - k) dy = a(k)` for every sequence `a : ℤ → ℂ`
   (`Daubechies.integral_tsum_mul_scalingFun_sub_mul_conj`) is the level `0` case of
-  `Daubechies.coeffFun_expand_scalingFun`. For `Q = ∑_j a(j) φ(· - j)` this is
+  `Daubechies.coeffFun_daubechiesExpand_scalingFun`. For `Q = ∑_j a(j) φ(· - j)` this is
   `⟨Q, φ(· - k)⟩ = a(k)`, and the projection identity follows. Its dyadic form is the identity
   for the polynomial `Q(2^(-j) ·)` after the substitution `u = 2^j y`
   (`Daubechies.integral_eq_two_pow_mul_integral_comp`).
@@ -197,12 +197,13 @@ theorem integrable_scalingFun_sub_mul_conj (hN : 2 ≤ N) (j k : ℤ) :
 
 /-- **Coefficient recovery**: for `N ≥ 2`, every sequence `a : ℤ → ℂ` and every `k ∈ ℤ`,
 `∫ (∑_{j ∈ ℤ} a(j) φ(y - j)) conj φ(y - k) dy = a(k)`. This is coefficient recovery for the
-scaling function at level `0` (`Daubechies.coeffFun_expand_scalingFun`,
+scaling function at level `0` (`Daubechies.coeffFun_daubechiesExpand_scalingFun`,
 `Daubechies.scaledFun_zero`). The sequence `a` is arbitrary: at each point the sum over `j` is
 finite. -/
 theorem integral_tsum_mul_scalingFun_sub_mul_conj (hN : 2 ≤ N) (a : ℤ → ℂ) (k : ℤ) :
     ∫ y, (∑' j : ℤ, a j * scalingFun m (y - j)) * conj (scalingFun m (y - k)) = a k := by
-  simpa only [coeffFun, expand, scaledFun_zero] using coeffFun_expand_scalingFun m hN 0 a k
+  simpa only [coeffFun, daubechiesExpand, scaledFun_zero] using
+    coeffFun_daubechiesExpand_scalingFun m hN 0 a k
 
 /-! ### The projection identity -/
 

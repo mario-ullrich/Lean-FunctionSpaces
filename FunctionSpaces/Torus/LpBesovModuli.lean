@@ -52,8 +52,8 @@ noncomputable def lpModulusData (hp : p ≠ ∞) (r : ℕ) :
   C0_ne_top := by simp
   le_enorm f k := Rd.lpModulus_le r f k
   jacksonStart := 1
-  CJ := Rd.jacksonConst (EuclideanSpace ℝ d) r p * 2 ^ r
-  CJ_ne_top := ENNReal.mul_ne_top (Rd.jacksonConst_ne_top Fact.out hp r) (by simp)
+  CJ := Rd.bandJacksonConst (EuclideanSpace ℝ d) r p * 2 ^ r
+  CJ_ne_top := ENNReal.mul_ne_top (Rd.bandJacksonConst_ne_top Fact.out hp r) (by simp)
   jackson f k hk := by
     obtain ⟨k', rfl⟩ : ∃ k', k = k' + 1 := ⟨k - 1, by omega⟩
     refine (approxError_trigScheme_le hp r k' f).trans ?_

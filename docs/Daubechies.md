@@ -75,8 +75,8 @@ wavelets of all levels form a Hilbert basis of `L_2(ℝ^d)`, in which `H^s` is a
   `p ≥ 2` (`Daubechies.besov_iff_coeff_of_two_le`,
   `Daubechies.besov_iff_coeff_of_two_le_of_holder`).
   The theorem rests on Jackson's inequality `E_{2^j}(f)_p ≤ C ω_N(f, 2^(-j))_p` for the spaces
-  `V_j = span{φ_{j,k}}` (`Daubechies.approxError_scheme_le`) and on Bernstein's inequality for them
-  (`Daubechies.inverse_scheme`).
+  `V_j = span{φ_{j,k}}` (`Daubechies.approxError_daubechiesScheme_le`) and on Bernstein's inequality
+  for them (`Daubechies.inverse_daubechiesScheme`).
 * **D4.** Let `α = 2 - log₂(1 + √3) ≈ 0.55`. With differences of order `2`, the Besov condition
   and the coefficient condition are equivalent for `1 ≤ p ≤ 2` and `0 < s < 1`
   (`Daubechies.besov_iff_coeff_d4_le_two`), for `2 ≤ p < ∞` and `0 < s < 2/p + (1 - 2/p) α`

@@ -25,7 +25,7 @@ of order `L` centred at the cells and `‖λ‖_{f^s_{p,q}} < ∞`. No moment co
   atoms of level `j ≥ i` is bounded by the coefficients of the nearby cells; for `j < i` the
   moments of `k_i` and the smoothness of the atoms give the factor `2^(-(i-j)L)`. Both bounds
   are maximal functions of the step functions of the coefficients
-  (`Rd.LocalMeansBump.ae_enorm_conv_kernel_level_le`), and the almost diagonal estimate and the
+  (`Rd.LocalMeansBump.ae_enorm_conv_meansKernel_level_le`), and the almost diagonal estimate and the
   Fefferman–Stein inequality finish. The **coarse local means** are those of levels `i ≤ j`, at
   most the level `j` of the atoms, and the **fine local means** those of levels `i > j`.
 * **Analysis** (`Rd.LocalMeansBump.tl_atomic_decomposition`,
@@ -335,22 +335,22 @@ variable (b : LocalMeansBump V)
 `∫ |k_i(y)| |a(x - y)| dy ≤ C A d^n |B_1| 2^(in) 2^(-jn)` with
 `C = Rd.LocalMeansBump.kernelSupConst L`, and the integral vanishes unless
 `|x - c| ≤ (2LR + d) 2^(-i)`. -/
-theorem lintegral_enorm_kernel_mul_atom_le (L : ℕ) {i j : ℕ} (hij : i ≤ j) {K : ℕ} {d A : ℝ}
+theorem lintegral_enorm_meansKernel_mul_atom_le (L : ℕ) {i j : ℕ} (hij : i ≤ j) {K : ℕ} {d A : ℝ}
     (hd : 0 ≤ d) {c : V} {a : V → ℂ} (ha : IsSmoothAtom univ K d A j c a) (x : V) :
-    ∫⁻ y, ‖b.kernel L i y‖ₑ * ‖a (x - y)‖ₑ ≤
+    ∫⁻ y, ‖b.meansKernel L i y‖ₑ * ‖a (x - y)‖ₑ ≤
       ENNReal.ofReal (b.kernelSupConst L) * (ENNReal.ofReal A *
         (ENNReal.ofReal (d ^ finrank ℝ V) * volume (ball (0 : V) 1))) *
           dyadicWeight (finrank ℝ V : ℝ) i * dyadicWeight (-(finrank ℝ V : ℝ)) j *
             (if ‖x - c‖ ≤ (2 * L * b.radius + d) / 2 ^ i then 1 else 0) := by
   split_ifs with hx
   · rw [mul_one]
-    calc ∫⁻ y, ‖b.kernel L i y‖ₑ * ‖a (x - y)‖ₑ
+    calc ∫⁻ y, ‖b.meansKernel L i y‖ₑ * ‖a (x - y)‖ₑ
         ≤ ∫⁻ y, ENNReal.ofReal (b.kernelSupConst L) * dyadicWeight (finrank ℝ V : ℝ) i *
             ‖a (x - y)‖ₑ :=
           lintegral_mono fun y => by
             gcongr
             rw [ENNReal.dyadicWeight_natCast]
-            exact b.enorm_kernel_le L i y
+            exact b.enorm_meansKernel_le L i y
       _ = ENNReal.ofReal (b.kernelSupConst L) * dyadicWeight (finrank ℝ V : ℝ) i *
             ∫⁻ y, ‖a y‖ₑ := by
           rw [lintegral_const_mul' _ _ (ENNReal.mul_ne_top ENNReal.ofReal_ne_top
@@ -361,9 +361,9 @@ theorem lintegral_enorm_kernel_mul_atom_le (L : ℕ) {i j : ℕ} (hij : i ≤ j)
           gcongr
           exact ha.lintegral_enorm_le hd
       _ = _ := by ring
-  · have h0 : ∀ y, ‖b.kernel L i y‖ₑ * ‖a (x - y)‖ₑ = 0 := fun y => by
+  · have h0 : ∀ y, ‖b.meansKernel L i y‖ₑ * ‖a (x - y)‖ₑ = 0 := fun y => by
       by_cases hy : 2 * L * b.radius / 2 ^ i < ‖y‖
-      · rw [b.kernel_eq_zero_of_lt L i hy, enorm_zero, zero_mul]
+      · rw [b.meansKernel_eq_zero_of_lt L i hy, enorm_zero, zero_mul]
       · push Not at hy hx
         have h1 : d / 2 ^ j ≤ d / 2 ^ i :=
           div_le_div_of_nonneg_left hd (by positivity) (pow_le_pow_right₀ one_le_two hij)
@@ -395,19 +395,19 @@ theorem tlAtomCoarseConst_ne_top (L : ℕ) (d A : ℝ) : b.tlAtomCoarseConst L d
 and `f = ∑_m λ_{j,m} a_{j,m}` almost everywhere, `|k_i ⋆ f(x)| ≤ C M(x)` at every point, with
 `M` the maximal function of the step function of the coefficients of level `j` and
 `C = Rd.LocalMeansBump.tlAtomCoarseConst L d A`. -/
-theorem enorm_conv_kernel_level_le_of_le (L : ℕ) {i j : ℕ} (hij : i ≤ j) {K : ℕ} {d A : ℝ}
+theorem enorm_conv_meansKernel_level_le_of_le (L : ℕ) {i j : ℕ} (hij : i ≤ j) {K : ℕ} {d A : ℝ}
     (hd : 0 ≤ d) {coef : ℕ → (Fin (finrank ℝ V) → ℤ) → ℂ}
     {a : ℕ → (Fin (finrank ℝ V) → ℤ) → V → ℂ}
     (hatom : ∀ m, IsSmoothAtom univ K d A j (cellCenter j m) (a j m)) {f : V → ℂ}
     (hf : ∀ᵐ x ∂volume, f x = ∑' m, coef j m * a j m x) (x : V) :
-    ‖conv (b.kernel L i) f volume x‖ₑ ≤
+    ‖conv (b.meansKernel L i) f volume x‖ₑ ≤
       b.tlAtomCoarseConst L d A * maximalFunction (cellCoefFun j coef) x := by
   have hR := b.radius_nonneg
   have hρ : 0 ≤ 2 * L * b.radius + d := by positivity
-  refine (enorm_conv_le_tsum_atom (b.continuous_kernel L i) (by positivity)
-    (fun y hy => b.kernel_eq_zero_of_lt L i hy) hd hatom hf x).trans
+  refine (enorm_conv_le_tsum_atom (b.continuous_meansKernel L i) (by positivity)
+    (fun y hy => b.meansKernel_eq_zero_of_lt L i hy) hd hatom hf x).trans
     ((ENNReal.tsum_mul_le_of_le fun m => (enorm_conv_le_lintegral _ _ x).trans
-      (b.lintegral_enorm_kernel_mul_atom_le L hij hd (hatom m) x)).trans ?_)
+      (b.lintegral_enorm_meansKernel_mul_atom_le L hij hd (hatom m) x)).trans ?_)
   calc ENNReal.ofReal (b.kernelSupConst L) * (ENNReal.ofReal A *
         (ENNReal.ofReal (d ^ finrank ℝ V) * volume (ball (0 : V) 1))) *
           dyadicWeight (finrank ℝ V : ℝ) i * dyadicWeight (-(finrank ℝ V : ℝ)) j *
@@ -480,9 +480,9 @@ and order `L ≥ 1` with centre `c`, radius factor `d` and constant `A`, and `k 
 everywhere
 `|a(x) - (m_{2^k} ⋆ a)(x)| ≤ ‖g‖_1 2^L L^(L+1) A R^L 2^(-(k-j)L) 1_{|x - c| ≤ (d + LR) 2^(-j)}`,
 by the averaged differences of the moment kernel `m` of the bump `g`. -/
-theorem ae_enorm_atom_sub_conv_scaled_le {L : ℕ} (hL : 1 ≤ L) {d A : ℝ} {j : ℕ}
+theorem ae_enorm_atom_sub_conv_scaledMoment_le {L : ℕ} (hL : 1 ≤ L) {d A : ℝ} {j : ℕ}
     {c : V} {a : V → ℂ} (ha : IsSmoothAtom univ L d A j c a) {k : ℕ} (hjk : j ≤ k) :
-    ∀ᵐ x ∂volume, ‖a x - conv (b.scaled L k) a volume x‖ₑ ≤
+    ∀ᵐ x ∂volume, ‖a x - conv (b.scaledMoment L k) a volume x‖ₑ ≤
       (∫⁻ z, ‖b.toFun z‖ₑ) * (ENNReal.ofReal (2 ^ L * (L : ℝ) ^ (L + 1) * A) *
         ENNReal.ofReal (b.radius ^ L) * dyadicWeight (-(L : ℝ)) (k - j) *
           (if ‖x - c‖ ≤ (d + L * b.radius) / 2 ^ j then 1 else 0)) := by
@@ -508,23 +508,24 @@ theorem momentAtomConst_ne_top (L : ℕ) (A : ℝ) : b.momentAtomConst L A ≠ �
 `L ≥ 1` with centre `c`, radius factor `d` and constant `A`, almost everywhere
 `|k_i ⋆ a(x)| ≤ C 2^(-(i-j)L) 1_{|x - c| ≤ (d + LR) 2^(-j)}` with
 `C = Rd.LocalMeansBump.momentAtomConst L A`. The kernel `k_i = m_{2^i} - m_{2^(i-1)}` is a
-difference of two moment kernels (`Rd.LocalMeansBump.ae_enorm_conv_kernel_le_of_scaled`), each of
-which reproduces `a` up to averaged differences of order `L` with steps of length at most
+difference of two moment kernels (`Rd.LocalMeansBump.ae_enorm_conv_meansKernel_le_of_scaledMoment`),
+each of which reproduces `a` up to averaged differences of order `L` with steps of length at most
 `2^(1-i) R`. -/
-theorem ae_enorm_conv_kernel_atom_le_of_lt {L : ℕ} (hL : 1 ≤ L) {d A : ℝ} {j : ℕ}
+theorem ae_enorm_conv_meansKernel_atom_le_of_lt {L : ℕ} (hL : 1 ≤ L) {d A : ℝ} {j : ℕ}
     {c : V} {a : V → ℂ} (ha : IsSmoothAtom univ L d A j c a) {i : ℕ} (hji : j < i) :
-    ∀ᵐ x ∂volume, ‖conv (b.kernel L i) a volume x‖ₑ ≤
+    ∀ᵐ x ∂volume, ‖conv (b.meansKernel L i) a volume x‖ₑ ≤
       b.momentAtomConst L A * dyadicWeight (-(L : ℝ)) (i - j) *
         (if ‖x - c‖ ≤ (d + L * b.radius) / 2 ^ j then 1 else 0) := by
   have hR := b.radius_nonneg
   have h2R : ENNReal.ofReal ((2 * b.radius) ^ L) = 2 ^ L * ENNReal.ofReal (b.radius ^ L) := by
     rw [mul_pow, ENNReal.ofReal_mul (by positivity), ENNReal.ofReal_pow zero_le_two,
       ENNReal.ofReal_ofNat]
-  filter_upwards [b.ae_enorm_conv_kernel_le_of_scaled L (memLp_one_iff_integrable.2 ha.integrable)
+  filter_upwards [b.ae_enorm_conv_meansKernel_le_of_scaledMoment L
+    (memLp_one_iff_integrable.2 ha.integrable)
     (C := (∫⁻ z, ‖b.toFun z‖ₑ) * (ENNReal.ofReal (2 ^ L * (L : ℝ) ^ (L + 1) * A) *
       ENNReal.ofReal (b.radius ^ L)))
     (u := fun x => if ‖x - c‖ ≤ (d + L * b.radius) / 2 ^ j then 1 else 0)
-    (fun k hjk => (b.ae_enorm_atom_sub_conv_scaled_le hL ha hjk).mono fun x hx =>
+    (fun k hjk => (b.ae_enorm_atom_sub_conv_scaledMoment_le hL ha hjk).mono fun x hx =>
       hx.trans_eq (by ring)) hji] with x hx
   refine hx.trans_eq ?_
   rw [momentAtomConst, h2R]
@@ -547,20 +548,20 @@ on `V` of level `j` and order `L ≥ 1` centred at the cells, with radius factor
 constant `A`, and `f = ∑_m λ_{j,m} a_{j,m}` almost everywhere, almost everywhere
 `|k_i ⋆ f(x)| ≤ C 2^(-(i-j)L) M(x)`, with `M` the maximal function of the step function of the
 coefficients of level `j` and `C = Rd.LocalMeansBump.tlAtomFineConst L d A`. -/
-theorem ae_enorm_conv_kernel_level_le_of_lt {L : ℕ} (hL : 1 ≤ L) {d A : ℝ} (hd : 0 ≤ d)
+theorem ae_enorm_conv_meansKernel_level_le_of_lt {L : ℕ} (hL : 1 ≤ L) {d A : ℝ} (hd : 0 ≤ d)
     {j : ℕ} {coef : ℕ → (Fin (finrank ℝ V) → ℤ) → ℂ}
     {a : ℕ → (Fin (finrank ℝ V) → ℤ) → V → ℂ}
     (hatom : ∀ m, IsSmoothAtom univ L d A j (cellCenter j m) (a j m)) {f : V → ℂ}
     (hf : ∀ᵐ x ∂volume, f x = ∑' m, coef j m * a j m x) {i : ℕ} (hji : j < i) :
-    ∀ᵐ x ∂volume, ‖conv (b.kernel L i) f volume x‖ₑ ≤
+    ∀ᵐ x ∂volume, ‖conv (b.meansKernel L i) f volume x‖ₑ ≤
       b.tlAtomFineConst L d A * dyadicWeight (-(L : ℝ)) (i - j) *
         maximalFunction (cellCoefFun j coef) x := by
   have hR := b.radius_nonneg
   have hρ : 0 ≤ d + L * b.radius := by positivity
-  filter_upwards [ae_all_iff.2 fun m => b.ae_enorm_conv_kernel_atom_le_of_lt hL (hatom m) hji]
+  filter_upwards [ae_all_iff.2 fun m => b.ae_enorm_conv_meansKernel_atom_le_of_lt hL (hatom m) hji]
     with x hx
-  refine (enorm_conv_le_tsum_atom (b.continuous_kernel L i) (by positivity)
-    (fun y hy => b.kernel_eq_zero_of_lt L i hy) hd hatom hf x).trans
+  refine (enorm_conv_le_tsum_atom (b.continuous_meansKernel L i) (by positivity)
+    (fun y hy => b.meansKernel_eq_zero_of_lt L i hy) hd hatom hf x).trans
     ((ENNReal.tsum_mul_le_of_le hx).trans ?_)
   have hS : ∑' m, (if ‖x - cellCenter j m‖ ≤ (d + L * b.radius) / 2 ^ j then ‖coef j m‖ₑ
       else 0) ≤ ENNReal.ofReal ((d + L * b.radius + finrank ℝ V + 1) ^ finrank ℝ V) *
@@ -594,22 +595,23 @@ and order `L ≥ 1` centred at the cells, with radius factor `d ≥ 0` and const
 `|k_i ⋆ f(x)| ≤ C c_{ij} M(x)` with `c_{ij} = 2^(-(i-j)L)` for `j ≤ i`, `c_{ij} = 1` for `j > i`,
 `M` the maximal function of the step function of the coefficients of level `j` and
 `C = Rd.LocalMeansBump.tlAtomSynthesisConst L d A`. -/
-theorem ae_enorm_conv_kernel_level_le {L : ℕ} (hL : 1 ≤ L) {d A : ℝ} (hd : 0 ≤ d)
+theorem ae_enorm_conv_meansKernel_level_le {L : ℕ} (hL : 1 ≤ L) {d A : ℝ} (hd : 0 ≤ d)
     {j : ℕ} {coef : ℕ → (Fin (finrank ℝ V) → ℤ) → ℂ}
     {a : ℕ → (Fin (finrank ℝ V) → ℤ) → V → ℂ}
     (hatom : ∀ m, IsSmoothAtom univ L d A j (cellCenter j m) (a j m)) {f : V → ℂ}
     (hf : ∀ᵐ x ∂volume, f x = ∑' m, coef j m * a j m x) (i : ℕ) :
-    ∀ᵐ x ∂volume, ‖conv (b.kernel L i) f volume x‖ₑ ≤ b.tlAtomSynthesisConst L d A *
+    ∀ᵐ x ∂volume, ‖conv (b.meansKernel L i) f volume x‖ₑ ≤ b.tlAtomSynthesisConst L d A *
       ((if j ≤ i then dyadicWeight (-(L : ℝ)) (i - j) else 1) *
         maximalFunction (cellCoefFun j coef) x) := by
   rcases lt_or_ge j i with hji | hij
-  · filter_upwards [b.ae_enorm_conv_kernel_level_le_of_lt hL hd hatom hf hji] with x hx
+  · filter_upwards [b.ae_enorm_conv_meansKernel_level_le_of_lt hL hd hatom hf hji] with x hx
     simp only [hji.le, ↓reduceIte]
     refine hx.trans ?_
     rw [← mul_assoc, tlAtomSynthesisConst]
     gcongr
     exact le_max_right _ _
-  · refine ae_of_all _ fun x => (b.enorm_conv_kernel_level_le_of_le L hij hd hatom hf x).trans ?_
+  · refine ae_of_all _ fun x =>
+      (b.enorm_conv_meansKernel_level_le_of_le L hij hd hatom hf x).trans ?_
     have h1 : 1 ≤ (if j ≤ i then dyadicWeight (-(L : ℝ)) (i - j) else 1) := by
       split_ifs with hji
       · rw [le_antisymm hji hij, Nat.sub_self, ENNReal.dyadicWeight_zero_right]
@@ -627,13 +629,13 @@ variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 almost everywhere `|k_i ⋆ F(x)| ≤ ∑_j |k_i ⋆ f_j(x)|`: the local mean `k_i ⋆` is continuous on
 `L_p`, and the bound holds for the partial sums
 (`MeasureTheory.ae_enorm_le_of_tendsto_Lp`). -/
-theorem enorm_conv_kernel_le_tsum_level (hp : p ≠ ∞) (L : ℕ)
+theorem enorm_conv_meansKernel_le_tsum_level (hp : p ≠ ∞) (L : ℕ)
     (f : ℕ → Lp ℂ p (volume : Measure V)) {F : Lp ℂ p (volume : Measure V)}
     (hF : Tendsto (fun J => ∑ j ∈ Finset.range (J + 1), f j) atTop (𝓝 F)) (i : ℕ) :
-    ∀ᵐ x ∂volume, ‖conv (b.kernel L i) F volume x‖ₑ ≤
-      ∑' j, ‖conv (b.kernel L i) (f j) volume x‖ₑ := by
+    ∀ᵐ x ∂volume, ‖conv (b.meansKernel L i) F volume x‖ₑ ≤
+      ∑' j, ‖conv (b.meansKernel L i) (f j) volume x‖ₑ := by
   have h := ae_enorm_le_of_tendsto_Lp (((b.localMean hp L i).continuous.tendsto F).comp hF)
-    (v := fun x => ∑' j, ‖conv (b.kernel L i) (f j) volume x‖ₑ) fun J => by
+    (v := fun x => ∑' j, ‖conv (b.meansKernel L i) (f j) volume x‖ₑ) fun J => by
       have hall := ae_all_iff.2 fun j => b.localMean_ae_eq hp L i (f j)
       filter_upwards [Lp.coeFn_fun_finsetSum (Finset.range (J + 1))
         (fun j => b.localMean hp L i (f j)), hall] with x hx hj
@@ -659,12 +661,12 @@ theorem enorm_localMean_le_tsum_maximalFunction_cellCoefFun {L : ℕ} (hL : 1 �
     {f : ℕ → Lp ℂ p (volume : Measure V)}
     (hf : ∀ j, ∀ᵐ x ∂volume, f j x = ∑' m, coef j m * a j m x) {F : Lp ℂ p (volume : Measure V)}
     (hF : Tendsto (fun J => ∑ j ∈ Finset.range (J + 1), f j) atTop (𝓝 F)) :
-    ∀ᵐ x ∂volume, ∀ i, ‖conv (b.kernel L i) F volume x‖ₑ ≤ b.tlAtomSynthesisConst L d A *
+    ∀ᵐ x ∂volume, ∀ i, ‖conv (b.meansKernel L i) F volume x‖ₑ ≤ b.tlAtomSynthesisConst L d A *
       ∑' j, (if j ≤ i then dyadicWeight (-(L : ℝ)) (i - j) else 1) *
         maximalFunction (cellCoefFun j coef) x := by
-  have h1 := ae_all_iff.2 fun i => b.enorm_conv_kernel_le_tsum_level hp L f hF i
+  have h1 := ae_all_iff.2 fun i => b.enorm_conv_meansKernel_le_tsum_level hp L f hF i
   have h2 := ae_all_iff.2 fun i => ae_all_iff.2 fun j =>
-    b.ae_enorm_conv_kernel_level_le hL hd (hatom j) (hf j) i
+    b.ae_enorm_conv_meansKernel_level_le hL hd (hatom j) (hf j) i
   filter_upwards [h1, h2] with x hx1 hx2 i
   refine (hx1 i).trans ?_
   rw [← ENNReal.tsum_mul_left]
@@ -687,7 +689,8 @@ theorem tlLocalMeansNorm_le_tlCoeffNorm {L : ℕ} (hL : 1 ≤ L) (hp1 : 1 < p) (
     (hF : Tendsto (fun J => ∑ j ∈ Finset.range (J + 1), f j) atTop (𝓝 F)) :
     b.tlLocalMeansNorm L s q F ≤ b.tlAtomSynthesisConst L d A * ENNReal.almostDiagonalConst s L *
       feffermanSteinConst V p q * tlCoeffNorm p s q coef :=
-  eLpNorm_le_of_le_lqNorm_maximalFunction hp1 hp hq1 (b.aemeasurable_lqNorm_conv_kernel L s q F)
+  eLpNorm_le_of_le_lqNorm_maximalFunction hp1 hp hq1
+    (b.aemeasurable_lqNorm_conv_meansKernel L s q F)
     (fun j => ((measurable_cellCoefFun j coef).const_mul _).aemeasurable)
     ((b.enorm_localMean_le_tsum_maximalFunction_cellCoefFun hL hp hd hatom hf hF).mono fun x hx =>
       (ENNReal.lqNorm_le_almostDiagonalConst_mul_of_le hq1.le s L hx).trans_eq
@@ -705,23 +708,24 @@ at every point; and `∑_{j ≤ J} η_j ⋆ g_j → F` in `L_p`. -/
 theorem tl_atomic_decomposition {L : ℕ} (hL : 1 ≤ L) (K : ℕ) (hp : p ≠ ∞)
     (F : Lp ℂ p (volume : Measure V)) :
     (∀ j m, IsSmoothAtom univ K (2 * L * b.radius + finrank ℝ V) (b.dualDerivConst L K) j
-      (cellCenter j m) (cellAtom 1 (b.dual L j) j (conv (b.kernel L j) F volume) m)) ∧
-    (∀ j x, conv (b.dual L j) (conv (b.kernel L j) F volume) volume x =
-      ∑' m, cellCoef 1 j (conv (b.kernel L j) F volume) m *
-        cellAtom 1 (b.dual L j) j (conv (b.kernel L j) F volume) m x) ∧
+      (cellCenter j m) (cellAtom 1 (b.dualKernel L j) j (conv (b.meansKernel L j) F volume) m)) ∧
+    (∀ j x, conv (b.dualKernel L j) (conv (b.meansKernel L j) F volume) volume x =
+      ∑' m, cellCoef 1 j (conv (b.meansKernel L j) F volume) m *
+        cellAtom 1 (b.dualKernel L j) j (conv (b.meansKernel L j) F volume) m x) ∧
     Tendsto (fun J => ∑ j ∈ Finset.range (J + 1),
-      convLp hp (b.integrable_dual L j) (b.localMean hp L j F)) atTop (𝓝 F) := by
-  have hcell : ∀ j m, MemLp ((dyadicCell j m).indicator (conv (b.kernel L j) F volume)) 1 volume :=
+      convLp hp (b.integrable_dualKernel L j) (b.localMean hp L j F)) atTop (𝓝 F) := by
+  have hcell : ∀ j m,
+      MemLp ((dyadicCell j m).indicator (conv (b.meansKernel L j) F volume)) 1 volume :=
     fun j m => memLp_one_indicator_dyadicCell Fact.out
-      (memLp_conv Fact.out hp (b.integrable_kernel L j) (Lp.memLp F)) j m
+      (memLp_conv Fact.out hp (b.integrable_meansKernel L j) (Lp.memLp F)) j m
   refine ⟨fun j m => ?_, fun j x => ?_, b.tendsto_sum_dual_localMean hp hL F⟩
   · have h := b.isSmoothAtom_cellAtom le_rfl L K j (hcell j m) m
     rw [cellAtom_indicator] at h
     convert h using 1
     simp
   · have hR := b.radius_nonneg
-    exact conv_eq_tsum_cellAtom_of_indicator le_rfl (b.continuous_dual L j) (by positivity)
-      (fun y hy => b.dual_eq_zero_of_lt L j hy) (hcell j) x
+    exact conv_eq_tsum_cellAtom_of_indicator le_rfl (b.continuous_dualKernel L j) (by positivity)
+      (fun y hy => b.dualKernel_eq_zero_of_lt L j hy) (hcell j) x
 
 /-- **The coefficients of the atomic decomposition in `f^s_{p,q}`**: for every order `L`,
 `1 < p < ∞`, `1 < q ≤ ∞`, `s ∈ ℝ` and `F ∈ L_p`, the coefficients with exponent one
@@ -730,13 +734,13 @@ theorem tl_atomic_decomposition {L : ℕ} (hL : 1 ≤ L) (K : ℕ) (hp : p ≠ �
 constant `C_{FS} = Rd.feffermanSteinConst V p q`. -/
 theorem tlCoeffNorm_cellCoef_le (L : ℕ) (hp1 : 1 < p) (hp : p ≠ ∞) {q : ℝ≥0∞} (hq1 : 1 < q)
     (s : ℝ) (F : Lp ℂ p (volume : Measure V)) :
-    tlCoeffNorm p s q (fun j => cellCoef 1 j (conv (b.kernel L j) F volume)) ≤
+    tlCoeffNorm p s q (fun j => cellCoef 1 j (conv (b.meansKernel L j) F volume)) ≤
       ENNReal.ofReal ((2 * finrank ℝ V + 1) ^ finrank ℝ V) * volume (ball (0 : V) 1) *
         feffermanSteinConst V p q * b.tlLocalMeansNorm L s q F :=
   eLpNorm_le_of_le_lqNorm_maximalFunction hp1 hp hq1 (aemeasurable_lqNorm_cellCoefFun s q _)
-    (fun j => (b.measurable_dyadicWeight_mul_conv_kernel L s j F).aemeasurable)
+    (fun j => (b.measurable_dyadicWeight_mul_conv_meansKernel L s j F).aemeasurable)
     (ae_of_all _ (lqNorm_cellCoefFun_le_lqNorm_maximalFunction q s fun j =>
-      (b.continuous_conv_kernel L j F).aestronglyMeasurable))
+      (b.continuous_conv_meansKernel L j F).aestronglyMeasurable))
 
 end LocalMeansBump
 
@@ -772,11 +776,11 @@ theorem memTriebelLizorkin_iff_atomic {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp1 : 1
     obtain ⟨hatom, hsum, hlim⟩ := b.tl_atomic_decomposition hL L hp F
     have hR := b.radius_nonneg
     refine ⟨2 * L * b.radius + finrank ℝ V, b.dualDerivConst L L,
-      fun j => cellCoef 1 j (conv (b.kernel L j) F volume),
-      fun j => cellAtom 1 (b.dual L j) j (conv (b.kernel L j) F volume),
-      fun j => convLp hp (b.integrable_dual L j) (b.localMean hp L j F), by positivity, hatom,
+      fun j => cellCoef 1 j (conv (b.meansKernel L j) F volume),
+      fun j => cellAtom 1 (b.dualKernel L j) j (conv (b.meansKernel L j) F volume),
+      fun j => convLp hp (b.integrable_dualKernel L j) (b.localMean hp L j F), by positivity, hatom,
       fun j => ?_, hlim, ?_⟩
-    · filter_upwards [convLp_apply_ae hp (b.integrable_dual L j) (b.localMean hp L j F)]
+    · filter_upwards [convLp_apply_ae hp (b.integrable_dualKernel L j) (b.localMean hp L j F)]
         with x hx
       rw [hx, conv_congr_ae (b.localMean_ae_eq hp L j F)]
       exact hsum j x

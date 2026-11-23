@@ -35,14 +35,14 @@ a cut-off on `Ω` (`Rd.CutoffDiffeo`), acting by `T f = 1_{Ω ∩ U} (χ f) ∘ 
 * **The extension property** (`Rd.HasBesovExtension`): every function of finite intrinsic Besov
   quasi-norm on a measurable set (`Rd.modNormOn`) extends to `V` with a bound. It is the same for
   sets that agree up to a null set (`Rd.HasBesovExtension.congr_set`), and with it the order of
-  the differences does not matter (`Rd.HasBesovExtension.modNormOn_order_le`).
+  the differences does not matter (`Rd.HasBesovExtension.modNormOn_order_le_of_hasBesovExtension`).
 * **Besov domains** (`Rd.BesovDomain`): convex closed sets with nonempty interior with the
   extension property (`Rd.BesovDomain.of_hasBesovExtension`, up to null sets
   `Rd.BesovDomain.of_ae_eq`). On a Besov domain the intrinsic quasi-norm is invariant
   (`Rd.CutoffDiffeo.modNormOn_applyLp_le_modNormOn`), and the order of the differences does not
-  matter (`Rd.BesovDomain.modNormOn_order_le`); `V` itself is a Besov domain, and so are the
-  closed half-space, the quadrant, closed balls of positive radius, the closed unit cube and the
-  closures of nonempty bounded open convex sets (`FunctionSpaces.Domains.Lipschitz.HalfSpace`,
+  matter (`Rd.BesovDomain.modNormOn_order_le_of_besovDomain`); `V` itself is a Besov domain, and so
+  are the closed half-space, the quadrant, closed balls of positive radius, the closed unit cube and
+  the closures of nonempty bounded open convex sets (`FunctionSpaces.Domains.Lipschitz.HalfSpace`,
   `FunctionSpaces.Domains.Lipschitz.BesovDomains`).
 -/
 
@@ -164,8 +164,8 @@ theorem lintegral_apply_eq (g : V → ℂ) {e : ℝ} (he : 0 < e) :
       (T.K0_subset hy)).hasFDerivWithinAt).mono T.K0_subset
   have hinj : InjOn T.Psi T.K0 := fun y₁ h₁ y₂ h₂ h => by
     rw [← T.right_inv y₁ (T.K0_subset h₁), h, T.right_inv y₂ (T.K0_subset h₂)]
-  rw [← setLIntegral_eq_of_support_subset (s := T.carrier) fun x hx => ?_]
-  · rw [carrier, lintegral_image_eq_lintegral_abs_det_fderiv_mul volume
+  rw [← setLIntegral_eq_of_support_subset (s := T.imageCompact) fun x hx => ?_]
+  · rw [imageCompact, lintegral_image_eq_lintegral_abs_det_fderiv_mul volume
       T.isCompact_K0.measurableSet hderiv hinj]
     refine setLIntegral_congr_fun T.isCompact_K0.measurableSet fun y hy => ?_
     rw [apply, Set.indicator_of_mem (T.mapsTo_Psi (T.K0_subset hy)), T.right_inv y (T.K0_subset hy),
@@ -357,15 +357,15 @@ theorem modNormOn_applyLp_le {r : ℕ} (hr : 1 ≤ r) {s : ℝ} (hs : 0 < s) (hs
     htr _ (fun j => cellCoef p j (b.localMean hp r j F)) ha
   -- the transported level sums
   have hf : ∀ j, ∀ᵐ x ∂volume, T.applyLp hΩ hint hΩm hp
-      (convLp hp (b.integrable_dual r j) (b.localMean hp r j F)) x =
-        ∑' m, coef' j m * T.apply (cellAtom p (b.dual r j) j (b.localMean hp r j F) m) x :=
+      (convLp hp (b.integrable_dualKernel r j) (b.localMean hp r j F)) x =
+        ∑' m, coef' j m * T.apply (cellAtom p (b.dualKernel r j) j (b.localMean hp r j F) m) x :=
     fun j => by
       filter_upwards [T.applyLp_ae hΩ hint hΩm hp _,
         T.apply_ae_eq ((hsum j).mono fun y hy _ => hy)] with x h1 h2
       rw [h1, h2]
       exact T.apply_tsum _ _ _ (hor j) x
   have hF : Tendsto (fun J => ∑ j ∈ Finset.range (J + 1), T.applyLp hΩ hint hΩm hp
-      (convLp hp (b.integrable_dual r j) (b.localMean hp r j F))) atTop
+      (convLp hp (b.integrable_dualKernel r j) (b.localMean hp r j F))) atTop
       (𝓝 (T.applyLp hΩ hint hΩm hp F)) := by
     have h := ((T.applyLp hΩ hint hΩm hp).continuous.tendsto F).comp
       (b.tendsto_sum_dual_localMean hp hr F)
@@ -463,7 +463,7 @@ theorem HasBesovExtension.congr_set {U U' : Set V} {hU : MeasurableSet U} (hU' :
 `0 < s < r` and `s < r'` there is `C < ∞` with `N_Ω(f; r') ≤ C N_Ω(f; r)` whenever
 `N_Ω(f; r) < ∞`, where `N_Ω(f; r) = ‖1_Ω f‖_p + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q}`. Extend
 `f` to `V`, change the order there (`Rd.modNorm_le_modNorm_of_lt`), and restrict. -/
-theorem HasBesovExtension.modNormOn_order_le {Ω : Set V} {hΩ : MeasurableSet Ω}
+theorem HasBesovExtension.modNormOn_order_le_of_hasBesovExtension {Ω : Set V} {hΩ : MeasurableSet Ω}
     (h : HasBesovExtension hΩ) {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞) {r r' : ℕ} {s : ℝ}
     (hs : 0 < s) (hsr : s < r) (hsr' : s < r') {q : ℝ≥0∞} (hq : 1 ≤ q) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ f : Lp ℂ p (volume : Measure V),
@@ -539,13 +539,13 @@ variable {Ω} in
 /-- **The order of the differences on a Besov domain does not matter**: for `0 < s < r` and
 `s < r'` there is `C < ∞` with `N_Ω(f; r') ≤ C N_Ω(f; r)` whenever `N_Ω(f; r) < ∞`, where
 `N_Ω(f; r) = ‖1_Ω f‖_p + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q}`
-(`Rd.HasBesovExtension.modNormOn_order_le`). -/
-theorem modNormOn_order_le {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞)
+(`Rd.HasBesovExtension.modNormOn_order_le_of_hasBesovExtension`). -/
+theorem modNormOn_order_le_of_besovDomain {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞)
     {r r' : ℕ} {s : ℝ} (hs : 0 < s) (hsr : s < r) (hsr' : s < r') {q : ℝ≥0∞} (hq : 1 ≤ q) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ f : Lp ℂ p (volume : Measure V),
       modNormOn (measurableSet Ω) r s q f < ∞ →
       modNormOn (measurableSet Ω) r' s q f ≤ C * modNormOn (measurableSet Ω) r s q f :=
-  (hasBesovExtension Ω).modNormOn_order_le hp hs hsr hsr' hq
+  (hasBesovExtension Ω).modNormOn_order_le_of_hasBesovExtension hp hs hsr hsr' hq
 
 end BesovDomain
 

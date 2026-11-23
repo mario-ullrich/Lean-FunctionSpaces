@@ -32,7 +32,7 @@ for almost every `x` (`Rd.ae_sub_jacksonApprox_eq`). The weighted Jensen inequal
 `E(f, E_k)_p ≤ ‖f - J_k f‖_p ≤ C ω_r(f, 2^(-k))_p`,
 `C^p = ‖Φ‖_1^(p-1) ∫ |Φ(z)| (1 + |z|)^(rp) dz`,
 
-with `C` finite because `Φ` is a Schwartz function (`Rd.jacksonConst_ne_top`).
+with `C` finite because `Φ` is a Schwartz function (`Rd.bandJacksonConst_ne_top`).
 -/
 
 @[expose] public section
@@ -121,7 +121,7 @@ theorem ae_sub_jacksonApprox_eq (hp : p ≠ ∞) (r k : ℕ) (f : Lp ℂ p (volu
 variable (V) in
 /-- The **constant of Jackson's inequality**,
 `C = (‖Φ‖_1^(p-1) ∫ |Φ(z)| (1 + |z|)^(rp) dz)^(1/p)`. -/
-noncomputable def jacksonConst (r : ℕ) (p : ℝ≥0∞) : ℝ≥0∞ :=
+noncomputable def bandJacksonConst (r : ℕ) (p : ℝ≥0∞) : ℝ≥0∞ :=
   ((∫⁻ z, ‖lpKernel (V := V) z‖ₑ) ^ (p.toReal - 1) *
     ∫⁻ z, ‖lpKernel (V := V) z‖ₑ * ENNReal.ofReal (1 + ‖z‖) ^ ((r : ℝ) * p.toReal)) ^
       (1 / p.toReal)
@@ -129,7 +129,8 @@ noncomputable def jacksonConst (r : ℕ) (p : ℝ≥0∞) : ℝ≥0∞ :=
 omit [Fact (1 ≤ p)] in
 /-- **The constant of Jackson's inequality is finite**: `Φ` decays faster than every power,
 `|Φ(z)| (1 + |z|)^(rp) ≤ 2^N (|Φ(z)| + |z|^N |Φ(z)|)` with `N = ⌈rp⌉`. -/
-theorem jacksonConst_ne_top (hp1 : 1 ≤ p) (hp : p ≠ ∞) (r : ℕ) : jacksonConst V r p ≠ ∞ := by
+theorem bandJacksonConst_ne_top (hp1 : 1 ≤ p) (hp : p ≠ ∞) (r : ℕ) :
+    bandJacksonConst V r p ≠ ∞ := by
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one hp1).ne'
   have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
   have hq1 : 1 ≤ p.toReal := ENNReal.one_le_toReal_of_one_le hp1 hp
@@ -160,14 +161,14 @@ omit [Fact (1 ≤ p)] in
 /-- **Weighted averages with the Jackson weight**: for `1 ≤ p < ∞`, `r ∈ ℕ`, an s-finite measure
 space `(α, μ)`, `M < ∞` and a jointly measurable `G : α × V → ℂ` with
 `‖G(·, z)‖_p ≤ (1 + |z|)^r M` for every `z`, `‖∫ Φ(z) G(·, z) dz‖_p ≤ C M` with the constant
-`C = Rd.jacksonConst V r p` of Jackson's inequality, by the weighted averages of
+`C = Rd.bandJacksonConst V r p` of Jackson's inequality, by the weighted averages of
 `MeasureTheory.eLpNorm_integral_kernel_le`. It gives Jackson's inequality on `V` and on the
 torus. -/
 theorem eLpNorm_integral_lpKernel_mul_le {α : Type*} [MeasurableSpace α] {μ : Measure α}
     [SFinite μ] (hp1 : 1 ≤ p) (hp : p ≠ ∞) (r : ℕ) {G : α → V → ℂ}
     (hG : Measurable (Function.uncurry G)) {M : ℝ≥0∞} (hM : M ≠ ∞)
     (hbound : ∀ z, eLpNorm (fun x => G x z) p μ ≤ ENNReal.ofReal (1 + ‖z‖) ^ r * M) :
-    eLpNorm (fun x => ∫ z, lpKernel z * G x z) p μ ≤ jacksonConst V r p * M := by
+    eLpNorm (fun x => ∫ z, lpKernel z * G x z) p μ ≤ bandJacksonConst V r p * M := by
   have hq : 0 < p.toReal := ENNReal.toReal_pos (lt_of_lt_of_le zero_lt_one hp1).ne' hp
   rw [← ENNReal.rpow_le_rpow_iff hq]
   refine (eLpNorm_integral_kernel_le hp1 hp integrable_lpKernel.aestronglyMeasurable hG).trans ?_
@@ -183,8 +184,8 @@ theorem eLpNorm_integral_lpKernel_mul_le {α : Type*} [MeasurableSpace α] {μ :
           _ = ENNReal.ofReal (1 + ‖z‖) ^ ((r : ℝ) * p.toReal) * M ^ p.toReal := by
               rw [ENNReal.mul_rpow_of_nonneg _ _ hq.le, ← ENNReal.rpow_natCast,
                 ← ENNReal.rpow_mul]
-    _ = (jacksonConst V r p * M) ^ p.toReal := by
-        rw [ENNReal.mul_rpow_of_nonneg _ _ hq.le, jacksonConst, ← ENNReal.rpow_mul,
+    _ = (bandJacksonConst V r p * M) ^ p.toReal := by
+        rw [ENNReal.mul_rpow_of_nonneg _ _ hq.le, bandJacksonConst, ← ENNReal.rpow_mul,
           one_div_mul_cancel hq.ne', ENNReal.rpow_one, mul_assoc]
         congr 1
         rw [← lintegral_mul_const' _ _ (ENNReal.rpow_ne_top_of_nonneg hq.le hM)]
@@ -194,7 +195,7 @@ theorem eLpNorm_integral_lpKernel_mul_le {α : Type*} [MeasurableSpace α] {μ :
 `‖f - J_k f‖_p ≤ C ω_r(f, 2^(-k))_p`, from `‖Δ^r_{-2^(-k) z} f‖_p ≤ (1 + |z|)^r ω_r(f, 2^(-k))_p`
 (`Rd.eLpNorm_integral_lpKernel_mul_le`). -/
 theorem enorm_sub_jacksonApprox_le (hp : p ≠ ∞) (r k : ℕ) (f : Lp ℂ p (volume : Measure V)) :
-    ‖f - jacksonApprox hp r k f‖ₑ ≤ jacksonConst V r p * lpModulus p r f k := by
+    ‖f - jacksonApprox hp r k f‖ₑ ≤ bandJacksonConst V r p * lpModulus p r f k := by
   have hp1 : 1 ≤ p := Fact.out
   have hfm : Measurable (f : V → ℂ) := (Lp.stronglyMeasurable f).measurable
   set w : V → V := fun z => -((2 : ℝ) ^ k)⁻¹ • z with hw
@@ -236,7 +237,7 @@ theorem enorm_sub_jacksonApprox_le (hp : p ≠ ∞) (r k : ℕ) (f : Lp ℂ p (v
 /-- **Jackson's inequality for the band-limited scheme**:
 `E(f, E_k)_p ≤ C ω_r(f, 2^(-k))_p`. -/
 theorem approxError_bandScheme_le (hp : p ≠ ∞) (r k : ℕ) (f : Lp ℂ p (volume : Measure V)) :
-    (bandScheme hp).approxError f (2 ^ k) ≤ jacksonConst V r p * lpModulus p r f k :=
+    (bandScheme hp).approxError f (2 ^ k) ≤ bandJacksonConst V r p * lpModulus p r f k :=
   (ApproximationScheme.approxError_le_of_mem
     (mem_bandScheme_two_pow.2 (jacksonApprox_mem_bandSpace hp r k f)) f).trans
     (enorm_sub_jacksonApprox_le hp r k f)

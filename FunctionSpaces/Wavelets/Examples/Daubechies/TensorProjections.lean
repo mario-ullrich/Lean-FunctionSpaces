@@ -31,10 +31,11 @@ and the **wavelet part of level `j`** is `Q_j f = ∑_{e ≠ ∅} ∑_k ⟨f, Ψ
   since a sum over `ℤ^d` of products of finitely supported factors is the product of the sums
   (`Rd.tsum_prod_eq_prod_tsum`).
 * **The kernel identity.** In one variable the kernel of level `j + 1` of `φ` is the sum of the
-  kernels of level `j` of `φ` and of `ψ` (`Daubechies.tsum_scaled_mul_scaled_succ`). Multiplying
-  out the product over the coordinates gives the sum over all sets `e` of coordinates of the
-  kernels of `Ψ^e` (`Daubechies.tsum_tensorGen_empty_mul_conj_succ`), so the kernel of `Φ` of
-  level `j + 1` is the kernel of `Φ` of level `j` plus the kernel of the wavelets of level `j`
+  kernels of level `j` of `φ` and of `ψ`
+  (`Daubechies.tsum_daubechiesScaled_mul_daubechiesScaled_succ`). Multiplying out the product over
+  the coordinates gives the sum over all sets `e` of coordinates of the kernels of `Ψ^e`
+  (`Daubechies.tsum_tensorGen_empty_mul_conj_succ`), so the kernel of `Φ` of level `j + 1` is the
+  kernel of `Φ` of level `j` plus the kernel of the wavelets of level `j`
   (`Daubechies.expansionKernel_tensorScalingFamily_succ`).
 * **The block identity.** Hence `P_{j+1} f = P_j f + Q_j f` for locally integrable `f`
   (`Daubechies.tensorProjFun_succ_eq_add`) and on `L_p`
@@ -206,7 +207,7 @@ theorem tsum_tensorGen_mul_conj (hN : 2 ≤ N) (e : Finset (Fin d)) (j : ℕ) (x
     ∑' k : Fin d → ℤ, tensorScaled (tensorGen m e) j k x *
         conj (tensorScaled (tensorGen m e) j k y) =
       ∏ i, if i ∈ e then ∑' n : ℤ, waveletScaled m j n (x i) * waveletScaled m j n (y i)
-        else ∑' n : ℤ, scaled m j n (x i) * scaled m j n (y i) := by
+        else ∑' n : ℤ, daubechiesScaled m j n (x i) * daubechiesScaled m j n (y i) := by
   rw [tensorGen, tsum_tensorScaled_tensorKernel_mul_conj (a := 1 - N) (b := 2 * N - 1)
     (fun i t ht => ite_wavelet_scalingFun_eq_zero m hN (i ∈ e) ht)]
   refine Finset.prod_congr rfl fun i _ => ?_
@@ -220,16 +221,17 @@ of the kernels of `Ψ^e` of level `j`:
 `∑_k Φ_{j+1,k}(x) conj Φ_{j+1,k}(y) = ∑_e ∑_k Ψ^e_{j,k}(x) conj Ψ^e_{j,k}(y)`. Both sides are
 products of one-dimensional kernels (`Daubechies.tsum_tensorGen_mul_conj`); in each coordinate
 the kernel of `φ` of level `j + 1` is the sum of the kernels of `φ` and `ψ` of level `j`
-(`Daubechies.tsum_scaled_mul_scaled_succ`), and the product of the sums is the sum over `e` of
-the products with `ψ` in the coordinates of `e` (Mathlib's `Finset.prod_add`). -/
+(`Daubechies.tsum_daubechiesScaled_mul_daubechiesScaled_succ`), and the product of the sums is the
+sum over `e` of the products with `ψ` in the coordinates of `e` (Mathlib's `Finset.prod_add`). -/
 theorem tsum_tensorGen_empty_mul_conj_succ (hN : 2 ≤ N) (j : ℕ) (x y : Fin d → ℝ) :
     ∑' k : Fin d → ℤ, tensorScaled (tensorGen m ∅) (j + 1) k x *
         conj (tensorScaled (tensorGen m ∅) (j + 1) k y) =
       ∑ e : Finset (Fin d), ∑' k : Fin d → ℤ, tensorScaled (tensorGen m e) j k x *
         conj (tensorScaled (tensorGen m e) j k y) := by
   simp_rw [tsum_tensorGen_mul_conj m hN]
-  simp only [Finset.notMem_empty, ↓reduceIte, tsum_scaled_mul_scaled_succ m hN j]
-  simp_rw [add_comm (∑' k : ℤ, scaled m j k _ * scaled m j k _)]
+  simp only [Finset.notMem_empty, ↓reduceIte,
+    tsum_daubechiesScaled_mul_daubechiesScaled_succ m hN j]
+  simp_rw [add_comm (∑' k : ℤ, daubechiesScaled m j k _ * daubechiesScaled m j k _)]
   rw [Finset.prod_add, Finset.powerset_univ]
   refine Finset.sum_congr rfl fun e _ => ?_
   rw [Finset.prod_ite, Finset.filter_mem_eq_inter, Finset.univ_inter, ← Finset.sdiff_eq_filter]

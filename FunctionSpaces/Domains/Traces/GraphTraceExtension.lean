@@ -286,7 +286,7 @@ stated once for such a package. -/
 def HasExtensionAtoms (p : ℝ≥0∞) (Lh r : ℕ) (d : ℝ) (C : ℝ≥0∞) (N : ℕ) : Prop :=
   ∀ (j : ℕ) {h : Ω.hyperplane → ℂ}, MemLp h p volume →
     (∀ m, IsRegularAtom p r r d C j (Ω.extendCenter j (cellCenter j m))
-      (Ω.extendAtom j (cellAtom p (Ω.graphBump.dual Lh j) j h m))) ∧
+      (Ω.extendAtom j (cellAtom p (Ω.graphBump.dualKernel Lh j) j h m))) ∧
     ∀ x (S : Finset (Fin (finrank ℝ Ω.hyperplane) → ℤ)),
       (∀ m ∈ S, cellCoef p j h m ≠ 0 ∧ ‖x - Ω.extendCenter j (cellCenter j m)‖ ≤ (d + r) / 2 ^ j) →
         S.card ≤ N
@@ -301,13 +301,13 @@ variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 `H` and moment order `Lh`. -/
 noncomputable def extLevelH (hp : p ≠ ∞) (Lh j : ℕ) (g : Lp ℂ p (volume : Measure Ω.hyperplane))
     (x' : Ω.hyperplane) : ℂ :=
-  conv (Ω.graphBump.dual Lh j) (Ω.graphBump.localMean hp Lh j g) volume x'
+  conv (Ω.graphBump.dualKernel Lh j) (Ω.graphBump.localMean hp Lh j g) volume x'
 
 /-- The terms on `H` are continuous. -/
 theorem continuous_extLevelH (hp : p ≠ ∞) (Lh j : ℕ)
     (g : Lp ℂ p (volume : Measure Ω.hyperplane)) : Continuous (Ω.extLevelH hp Lh j g) :=
-  (Ω.graphBump.hasCompactSupport_dual Lh j).continuous_convolution_left
-    (ContinuousLinearMap.mul ℂ ℂ) (Ω.graphBump.continuous_dual Lh j)
+  (Ω.graphBump.hasCompactSupport_dualKernel Lh j).continuous_convolution_left
+    (ContinuousLinearMap.mul ℂ ℂ) (Ω.graphBump.continuous_dualKernel Lh j)
     ((Lp.memLp _).locallyIntegrable Fact.out)
 
 /-- The radius factor `2 Lh + (n - 1)` of the cell atoms on `H` of moment order `Lh` (the
@@ -341,9 +341,10 @@ theorem exists_extension_atoms (Lh : ℕ) :
           (ENNReal.natCast_ne_top _) (ENNReal.mul_ne_top ENNReal.ofReal_ne_top
             measure_ball_lt_top.ne)))
   · simpa only [Nat.cast_ofNat] using Ω.isRegularAtom_extendAtom j (continuous_cellAtom hp1
-      (Ω.graphBump.continuous_dual Lh j) (Ω.graphBump.hasCompactSupport_dual Lh j) hh j m)
+      (Ω.graphBump.continuous_dualKernel Lh j) (Ω.graphBump.hasCompactSupport_dualKernel Lh j)
+      hh j m)
       (Ω.extRadiusH_nonneg Lh)
-      (fun y hy => cellAtom_eq_zero (fun z hz => Ω.graphBump.dual_eq_zero_of_lt Lh j hz) m hy)
+      (fun y hy => cellAtom_eq_zero (fun z hz => Ω.graphBump.dualKernel_eq_zero_of_lt Lh j hz) m hy)
       (fun l hl h' y => hb j hh m l hl h' y)
   · refine card_le_of_norm_sub_cellCenter_le j (by linarith) (Ω.proj x) S fun m hm => ?_
     calc ‖Ω.proj x - cellCenter j m‖ = ‖Ω.proj (x - Ω.extendCenter j (cellCenter j m))‖ := by
@@ -361,13 +362,14 @@ noncomputable def extLevel (hp : p ≠ ∞) (Lh j : ℕ) (g : Lp ℂ p (volume :
 theorem extLevel_eq_tsum (hp : p ≠ ∞) (Lh j : ℕ) (g : Lp ℂ p (volume : Measure Ω.hyperplane))
     (x : V) :
     Ω.extLevel hp Lh j g x = ∑' m, cellCoef p j (Ω.graphBump.localMean hp Lh j g) m *
-      Ω.extendAtom j (cellAtom p (Ω.graphBump.dual Lh j) j (Ω.graphBump.localMean hp Lh j g) m)
-        x := by
+      Ω.extendAtom j
+        (cellAtom p (Ω.graphBump.dualKernel Lh j) j (Ω.graphBump.localMean hp Lh j g) m) x := by
   have hρ : 0 ≤ 2 * (Lh : ℝ) * Ω.graphBump.radius / 2 ^ j :=
     div_nonneg (mul_nonneg (mul_nonneg zero_le_two (Nat.cast_nonneg _))
       Ω.graphBump.radius_nonneg) (by positivity)
   rw [extLevel, extendAtom, extLevelH, conv_eq_tsum_cellAtom Fact.out
-    (Ω.graphBump.continuous_dual Lh j) hρ (fun y hy => Ω.graphBump.dual_eq_zero_of_lt Lh j hy)
+    (Ω.graphBump.continuous_dualKernel Lh j) hρ
+      (fun y hy => Ω.graphBump.dualKernel_eq_zero_of_lt Lh j hy)
     (Lp.memLp _) j, ← tsum_mul_right]
   refine tsum_congr fun m => ?_
   rw [extendAtom, mul_assoc]
@@ -391,7 +393,7 @@ theorem eLpNorm_extLevel_le (hp : p ≠ ∞) (Lh : ℕ) :
     (ENNReal.rpow_ne_top_of_nonneg hexp (ENNReal.natCast_ne_top N)) hC, fun j g => ?_⟩
   obtain ⟨hat, hN⟩ := hatoms j (Lp.memLp (Ω.graphBump.localMean hp Lh j g))
   have hlev := eLpNorm_levelSum_le hp1 hp (fun m => Ω.extendCenter j (cellCenter j m))
-    (fun m => Ω.extendAtom j (cellAtom p (Ω.graphBump.dual Lh j) j
+    (fun m => Ω.extendAtom j (cellAtom p (Ω.graphBump.dualKernel Lh j) j
       (Ω.graphBump.localMean hp Lh j g) m))
     (cellCoef p j (Ω.graphBump.localMean hp Lh j g)) hN hat
     (Ω.continuous_extLevel hp Lh j g).aestronglyMeasurable
@@ -479,8 +481,8 @@ theorem extLevelH_add (hp : p ≠ ∞) (Lh j : ℕ) (g g' : Lp ℂ p (volume : M
     (x' : Ω.hyperplane) :
     Ω.extLevelH hp Lh j (g + g') x' = Ω.extLevelH hp Lh j g x' + Ω.extLevelH hp Lh j g' x' := by
   have hex := fun h : Lp ℂ p (volume : Measure Ω.hyperplane) =>
-    (Ω.graphBump.hasCompactSupport_dual Lh j).convolutionExists_left
-      (ContinuousLinearMap.mul ℂ ℂ) (Ω.graphBump.continuous_dual Lh j)
+    (Ω.graphBump.hasCompactSupport_dualKernel Lh j).convolutionExists_left
+      (ContinuousLinearMap.mul ℂ ℂ) (Ω.graphBump.continuous_dualKernel Lh j)
       ((Lp.memLp (Ω.graphBump.localMean hp Lh j h)).locallyIntegrable Fact.out)
   simp only [extLevelH, map_add]
   rw [conv_congr_ae (Lp.coeFn_add _ _)]
@@ -569,7 +571,7 @@ theorem modNorm_graphExtension_le_localMeansNorm (hp : p ≠ ∞) (Lh : ℕ) {r 
       atomSynthConst p N C r (s + 1 / p.toReal) r * Ω.graphBump.localMeansNorm hp Lh s q g := by
   have hσ0 : 0 < s + 1 / p.toReal := by positivity
   have hsyn := modNorm_le_coeffNorm hp (fun j m => Ω.extendCenter j (cellCenter j m))
-    (fun j m => Ω.extendAtom j (cellAtom p (Ω.graphBump.dual Lh j) j
+    (fun j m => Ω.extendAtom j (cellAtom p (Ω.graphBump.dualKernel Lh j) j
       (Ω.graphBump.localMean hp Lh j g) m))
     (fun j => cellCoef p j (Ω.graphBump.localMean hp Lh j g))
     (fun j x S hS => (hat j (Lp.memLp _)).2 x S hS)
@@ -665,7 +667,7 @@ theorem modNorm_traceExtTerm_le (hp : p ≠ ∞) (Lh : ℕ) {r : ℕ} {d : ℝ} 
   have hp0 : p ≠ 0 := (zero_lt_one.trans_le (Fact.out : 1 ≤ p)).ne'
   obtain ⟨hat, hN⟩ := hat j (Lp.memLp (Ω.graphBump.localMean hp Lh j g))
   refine (modNorm_level_le hp j (fun m => Ω.extendCenter j (cellCenter j m))
-    (fun m => Ω.extendAtom j (cellAtom p (Ω.graphBump.dual Lh j) j
+    (fun m => Ω.extendAtom j (cellAtom p (Ω.graphBump.dualKernel Lh j) j
       (Ω.graphBump.localMean hp Lh j g) m)) (cellCoef p j (Ω.graphBump.localMean hp Lh j g))
     hN hat ((Ω.traceExtTerm_ae hp Lh j g).mono fun x hx =>
       hx.trans (Ω.extLevel_eq_tsum hp Lh j g x)) hσ hσr hq).trans_eq ?_
@@ -687,7 +689,7 @@ theorem trace_sum_traceExtTerm (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) (Lh : �
         lpModulus p L (∑ j ∈ Finset.range (J + 1), Ω.traceExtTerm hp Lh j g) k) < ∞) :
     Ω.trace hp L (∑ j ∈ Finset.range (J + 1), Ω.traceExtTerm hp Lh j g) =
       ∑ j ∈ Finset.range (J + 1),
-        convLp hp (Ω.graphBump.integrable_dual Lh j) (Ω.graphBump.localMean hp Lh j g) := by
+        convLp hp (Ω.graphBump.integrable_dualKernel Lh j) (Ω.graphBump.localMean hp Lh j g) := by
   have hcont : Continuous fun x => ∑ j ∈ Finset.range (J + 1), Ω.extLevel hp Lh j g x :=
     continuous_finsetSum _ fun j _ => Ω.continuous_extLevel hp Lh j g
   have hae : ((∑ j ∈ Finset.range (J + 1), Ω.traceExtTerm hp Lh j g :
@@ -702,8 +704,8 @@ theorem trace_sum_traceExtTerm (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) (Lh : �
     (Ω.intrinsicNorm_lt_top_of_modNorm hp L hq hFJ).1 hcont hae
   refine Lp.ext ?_
   filter_upwards [htr, Lp.coeFn_fun_finsetSum (Finset.range (J + 1))
-    (fun j => convLp hp (Ω.graphBump.integrable_dual Lh j) (Ω.graphBump.localMean hp Lh j g)),
-    ae_all_iff.2 fun j => convLp_apply_ae hp (Ω.graphBump.integrable_dual Lh j)
+    (fun j => convLp hp (Ω.graphBump.integrable_dualKernel Lh j) (Ω.graphBump.localMean hp Lh j g)),
+    ae_all_iff.2 fun j => convLp_apply_ae hp (Ω.graphBump.integrable_dualKernel Lh j)
       (Ω.graphBump.localMean hp Lh j g)] with x' h1 h2 h3
   rw [h1, h2, Function.comp_apply]
   refine Finset.sum_congr rfl fun j _ => ?_
@@ -803,8 +805,8 @@ theorem trace_graphExtension_of_atoms (hp : p ≠ ∞) {Lh : ℕ} (hLh : 1 ≤ L
   -- the traces of the partial sums are the partial sums of the reproducing formula on `H`
   have hpart : ∀ J, Ω.trace hp L (∑ j ∈ Finset.range (J + 1), T j) =
       ∑ j ∈ Finset.range (J + 1),
-        convLp hp (Ω.graphBump.integrable_dual Lh j) (Ω.graphBump.localMean hp Lh j g) := fun J =>
-    Ω.trace_sum_traceExtTerm hp hL Lh hs hq g J (hFJ J)
+        convLp hp (Ω.graphBump.integrable_dualKernel Lh j) (Ω.graphBump.localMean hp Lh j g) :=
+    fun J => Ω.trace_sum_traceExtTerm hp hL Lh hs hq g J (hFJ J)
   have hlim := Ω.graphBump.tendsto_sum_dual_localMean hp hLh g
   simp_rw [← hpart] at hlim
   exact tendsto_nhds_unique hconv hlim

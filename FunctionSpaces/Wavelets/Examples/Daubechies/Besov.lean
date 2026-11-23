@@ -29,20 +29,21 @@ has a Bernstein bound `ω_N(φ, t)_p ≤ K t^θ` for `0 < t ≤ 1` (`Daubechies.
 `‖f‖_p + ‖(2^(ks) ω_N(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞  ⟺  ‖f‖_coef < ∞`.
 
 * **Approximation and moduli.** Jackson's inequality `E_{2^k}(f)_p ≤ C_J ω_N(f, 2^(-k))_p`
-  (`Daubechies.approxError_scheme_le`) and the inverse inequality
-  `ω_N(a, 2^(-k))_p ≤ C_B 2^(-(k-j)θ) ‖a‖_p` for `a ∈ V_j` (`Daubechies.inverse_scheme`) make
-  the modulus of smoothness compatible with the Daubechies scheme (`Daubechies.modulusData`), so
-  the coincidence theorem `ApproximationScheme.ModulusData.memApprox_iff_modNorm_lt_top` gives
+  (`Daubechies.approxError_daubechiesScheme_le`) and the inverse inequality
+  `ω_N(a, 2^(-k))_p ≤ C_B 2^(-(k-j)θ) ‖a‖_p` for `a ∈ V_j` (`Daubechies.inverse_daubechiesScheme`)
+  make the modulus of smoothness compatible with the Daubechies scheme (`Daubechies.modulusData`),
+  so the coincidence theorem `ApproximationScheme.ModulusData.memApprox_iff_modNorm_lt_top` gives
   `f ∈ A^s_q ⟺ ‖f‖_p + ‖(2^(ks) ω_N(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞` for `0 ≤ s < θ`
-  (`Daubechies.memApprox_scheme_iff_modulus`).
+  (`Daubechies.memApprox_daubechiesScheme_iff_modulus`).
 * **Approximation and coefficients.** The projections `P_j` form a projection scheme with dense
-  union (`Daubechies.projectionScheme`, `Daubechies.closure_iUnion_scheme`), so `f ∈ A^s_q` iff
-  `‖P_0 f‖_p + ‖(2^(js) ‖P_{j+1} f - P_j f‖_p)_j‖_{ℓ_q} < ∞` for `s > 0`
+  union (`Daubechies.daubechiesProjectionScheme`, `Daubechies.closure_iUnion_daubechiesScheme`), so
+  `f ∈ A^s_q` iff `‖P_0 f‖_p + ‖(2^(js) ‖P_{j+1} f - P_j f‖_p)_j‖_{ℓ_q} < ∞` for `s > 0`
   (`ApproximationScheme.ProjectionScheme.memApprox_iff_blockNorm_lt_top_of_dense`). The blocks
-  are the wavelet expansions of level `j` (`Daubechies.proj_succ_sub_proj`), and their norms are
-  comparable with `2^(j(1/2 - 1/p)) ‖(⟨f, ψ_{j,k}⟩)_k‖_{ℓ_p}` (`Daubechies.enorm_block_equiv`);
-  likewise `‖P_0 f‖_p` with `‖(⟨f, φ(· - k)⟩)_k‖_{ℓ_p}` (`Daubechies.enorm_proj_zero_equiv`).
-  Hence `f ∈ A^s_q ⟺ ‖f‖_coef < ∞` for `s > 0` (`Daubechies.memApprox_scheme_iff_coeff`).
+  are the wavelet expansions of level `j` (`Daubechies.daubechiesProj_succ_sub_daubechiesProj`), and
+  their norms are comparable with `2^(j(1/2 - 1/p)) ‖(⟨f, ψ_{j,k}⟩)_k‖_{ℓ_p}`
+  (`Daubechies.enorm_block_equiv`); likewise `‖P_0 f‖_p` with `‖(⟨f, φ(· - k)⟩)_k‖_{ℓ_p}`
+  (`Daubechies.enorm_daubechiesProj_zero_equiv`). Hence `f ∈ A^s_q ⟺ ‖f‖_coef < ∞` for `s > 0`
+  (`Daubechies.memApprox_daubechiesScheme_iff_coeff`).
 * **Littlewood–Paley.** For `0 < s < min(θ, N)` the coefficient condition is also equivalent
   to the finiteness of the Littlewood–Paley quasi-norm `‖(2^(js) ‖Δ_j f‖_p)_j‖_{ℓ_q}`
   (`Daubechies.littlewoodPaleyNorm_lt_top_iff_coeff`, through
@@ -130,11 +131,11 @@ variable (p) in
 `ω_N(f, 2^(-k))_p` (`Rd.lpModulus p N`) is compatible with the Daubechies scheme with inverse
 order `θ` (`ApproximationScheme.ModulusData`). Jackson's inequality
 `E_{2^k}(f)_p ≤ C_J ω_N(f, 2^(-k))_p` holds from level `0` on
-(`Daubechies.approxError_scheme_le_jacksonConst_mul`), and the inverse inequality
-`ω_N(a, 2^(-k))_p ≤ C_B 2^(-(k-j)θ) ‖a‖_p` for the approximants `a` of complexity `2^j` is
-`Daubechies.inverse_scheme`. -/
+(`Daubechies.approxError_daubechiesScheme_le_daubechiesJacksonConst_mul`), and the inverse
+inequality `ω_N(a, 2^(-k))_p ≤ C_B 2^(-(k-j)θ) ‖a‖_p` for the approximants `a` of complexity `2^j`
+is `Daubechies.inverse_daubechiesScheme`. -/
 noncomputable def modulusData (hN : 2 ≤ N) (hp : p ≠ ∞) {θ : ℝ} (hB : BernsteinBound m p θ N) :
-    ApproximationScheme.ModulusData (scheme m p hN hp) θ where
+    ApproximationScheme.ModulusData (daubechiesScheme m p hN hp) θ where
   modulus := Rd.lpModulus p N
   add_le := Rd.lpModulus_add_le N
   C0 := 2 ^ N
@@ -143,10 +144,10 @@ noncomputable def modulusData (hN : 2 ≤ N) (hp : p ≠ ∞) {θ : ℝ} (hB : B
   jacksonStart := 0
   CJ := daubechiesJacksonConst m p
   CJ_ne_top := daubechiesJacksonConst_ne_top m hN p
-  jackson f k _ := approxError_scheme_le_jacksonConst_mul m hN hp f k
-  CB := (inverse_scheme m hN hp hB).choose
-  CB_ne_top := (inverse_scheme m hN hp hB).choose_spec.1
-  inverse := (inverse_scheme m hN hp hB).choose_spec.2
+  jackson f k _ := approxError_daubechiesScheme_le_daubechiesJacksonConst_mul m hN hp f k
+  CB := (inverse_daubechiesScheme m hN hp hB).choose
+  CB_ne_top := (inverse_daubechiesScheme m hN hp hB).choose_spec.1
+  inverse := (inverse_daubechiesScheme m hN hp hB).choose_spec.2
 
 /-- **Approximation by the Daubechies scaling spaces and moduli of smoothness**: for `N ≥ 2`,
 `1 ≤ p < ∞`, a Bernstein bound of order `θ` for `φ` with differences of order `N`,
@@ -154,29 +155,30 @@ noncomputable def modulusData (hN : 2 ≤ N) (hp : p ≠ ∞) {θ : ℝ} (hB : B
 Daubechies scheme iff `‖f‖_p + ‖(2^(ks) ω_N(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞`. This is the coincidence
 theorem `ApproximationScheme.ModulusData.memApprox_iff_modNorm_lt_top` for
 `Daubechies.modulusData`. -/
-theorem memApprox_scheme_iff_modulus (hN : 2 ≤ N) (hp : p ≠ ∞) {θ : ℝ}
+theorem memApprox_daubechiesScheme_iff_modulus (hN : 2 ≤ N) (hp : p ≠ ∞) {θ : ℝ}
     (hB : BernsteinBound m p θ N) {s : ℝ} {q : ℝ≥0∞} (hq : 1 ≤ q) (hs : 0 ≤ s) (hsθ : s < θ)
     (f : Lp ℂ p (volume : Measure ℝ)) :
-    (scheme m p hN hp).MemApprox s q f ↔
+    (daubechiesScheme m p hN hp).MemApprox s q f ↔
       ‖f‖ₑ + ENNReal.lqNorm q (fun k => dyadicWeight s k * Rd.lpModulus p N f k) < ∞ :=
   (modulusData m p hN hp hB).memApprox_iff_modNorm_lt_top hq hs hsθ f
 
 /-! ### Approximation and coefficients -/
 
 /-- **The projection of complexity `1` of the Daubechies projection scheme is `P_0`**: the
-case `k = 0` of `Daubechies.projectionScheme_two_pow`. -/
-theorem projectionScheme_one (hN : 2 ≤ N) (hp : p ≠ ∞) :
-    (projectionScheme m p hN hp).P 1 = proj m p hN hp 0 := by
-  simpa using projectionScheme_two_pow m hN hp 0
+case `k = 0` of `Daubechies.daubechiesProjectionScheme_two_pow`. -/
+theorem daubechiesProjectionScheme_one (hN : 2 ≤ N) (hp : p ≠ ∞) :
+    (daubechiesProjectionScheme m p hN hp).P 1 = daubechiesProj m p hN hp 0 := by
+  simpa using daubechiesProjectionScheme_two_pow m hN hp 0
 
 /-- **The dyadic blocks of the Daubechies projection scheme**: for every `f ∈ L_p` and level `j`,
 the block `P(2^(j+1)) f - P(2^j) f` of the projection scheme is `P_{j+1} f - P_j f`, since the
-projection of complexity `2^j` is `P_j` (`Daubechies.projectionScheme_two_pow`). -/
-theorem projectionScheme_block (hN : 2 ≤ N) (hp : p ≠ ∞) (j : ℕ)
+projection of complexity `2^j` is `P_j` (`Daubechies.daubechiesProjectionScheme_two_pow`). -/
+theorem daubechiesProjectionScheme_block (hN : 2 ≤ N) (hp : p ≠ ∞) (j : ℕ)
     (f : Lp ℂ p (volume : Measure ℝ)) :
-    (projectionScheme m p hN hp).block j f = proj m p hN hp (j + 1) f - proj m p hN hp j f := by
-  rw [ApproximationScheme.ProjectionScheme.block, projectionScheme_two_pow,
-    projectionScheme_two_pow]
+    (daubechiesProjectionScheme m p hN hp).block j f =
+      daubechiesProj m p hN hp (j + 1) f - daubechiesProj m p hN hp j f := by
+  rw [ApproximationScheme.ProjectionScheme.block, daubechiesProjectionScheme_two_pow,
+    daubechiesProjectionScheme_two_pow]
 
 /-- **Approximation by the Daubechies scaling spaces through coefficients**: for `N ≥ 2`,
 `1 ≤ p < ∞`, `s > 0` and `1 ≤ q ≤ ∞`, an `f ∈ L_p(ℝ)` lies in the approximation space `A^s_q`
@@ -187,20 +189,20 @@ of the Daubechies scheme iff its coefficient quasi-norm
 The projections form a projection scheme with dense union, so `f ∈ A^s_q` iff
 `‖P_0 f‖_p + ‖(2^(js) ‖P_{j+1} f - P_j f‖_p)_j‖_{ℓ_q} < ∞`
 (`ApproximationScheme.ProjectionScheme.memApprox_iff_blockNorm_lt_top_of_dense`). The first summand
-`‖P_0 f‖_p` and `‖(⟨f, φ(· - k)⟩)_k‖_{ℓ_p}` are both finite (`Daubechies.enorm_proj_zero_equiv`),
-and
+`‖P_0 f‖_p` and `‖(⟨f, φ(· - k)⟩)_k‖_{ℓ_p}` are both finite
+(`Daubechies.enorm_daubechiesProj_zero_equiv`), and
 `2^(js) ‖P_{j+1} f - P_j f‖_p` is comparable with
 `2^(j(s + 1/2 - 1/p)) ‖(⟨f, ψ_{j,k}⟩)_k‖_{ℓ_p}` uniformly in `j` (`Daubechies.enorm_block_equiv`),
 so the two `ℓ_q` norms are finite together (`ENNReal.lqNorm_lt_top_iff_of_le_mul`). -/
-theorem memApprox_scheme_iff_coeff (hN : 2 ≤ N) (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞}
-    (hq : 1 ≤ q) (f : Lp ℂ p (volume : Measure ℝ)) :
-    (scheme m p hN hp).MemApprox s q f ↔ daubechiesCoeffNorm m p s q f < ∞ := by
-  obtain ⟨K₀, _, hK₀, _, hKM₀⟩ := enorm_proj_zero_equiv m hN hp
+theorem memApprox_daubechiesScheme_iff_coeff (hN : 2 ≤ N) (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s)
+    {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Lp ℂ p (volume : Measure ℝ)) :
+    (daubechiesScheme m p hN hp).MemApprox s q f ↔ daubechiesCoeffNorm m p s q f < ∞ := by
+  obtain ⟨K₀, _, hK₀, _, hKM₀⟩ := enorm_daubechiesProj_zero_equiv m hN hp
   obtain ⟨K, M, hK, hM, hKM⟩ := enorm_block_equiv m hN hp
-  rw [(projectionScheme m p hN hp).memApprox_iff_blockNorm_lt_top_of_dense
-    (closure_iUnion_scheme m hN hp) hs hq, ApproximationScheme.ProjectionScheme.blockNorm,
-    projectionScheme_one, daubechiesCoeffNorm]
-  simp only [projectionScheme_block, ENNReal.add_lt_top]
+  rw [(daubechiesProjectionScheme m p hN hp).memApprox_iff_blockNorm_lt_top_of_dense
+    (closure_iUnion_daubechiesScheme m hN hp) hs hq, ApproximationScheme.ProjectionScheme.blockNorm,
+    daubechiesProjectionScheme_one, daubechiesCoeffNorm]
+  simp only [daubechiesProjectionScheme_block, ENNReal.add_lt_top]
   refine and_congr ⟨fun _ => (hKM₀ f).1.trans_lt (ENNReal.mul_lt_top hK₀.lt_top enorm_lt_top),
     fun _ => enorm_lt_top⟩
     (ENNReal.lqNorm_lt_top_iff_of_le_mul hK hM (fun j => ?_) fun j => ?_)
@@ -217,15 +219,15 @@ Then for `0 < s < θ` and every `f ∈ L_p(ℝ)`,
 `‖f‖_p + ‖(2^(ks) ω_N(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff
 `‖(⟨f, φ(· - k)⟩)_k‖_{ℓ_p} + ‖(2^(j(s + 1/2 - 1/p)) ‖(⟨f, ψ_{j,k}⟩)_k‖_{ℓ_p})_j‖_{ℓ_q} < ∞`
 (`Daubechies.daubechiesCoeffNorm`). Both conditions describe the approximation space `A^s_q` of the
-Daubechies scheme (`Daubechies.memApprox_scheme_iff_modulus`,
-`Daubechies.memApprox_scheme_iff_coeff`). -/
+Daubechies scheme (`Daubechies.memApprox_daubechiesScheme_iff_modulus`,
+`Daubechies.memApprox_daubechiesScheme_iff_coeff`). -/
 theorem besov_iff_coeff (hN : 2 ≤ N) (hp : p ≠ ∞) {θ : ℝ} (hB : BernsteinBound m p θ N)
     {s : ℝ} (hs : 0 < s) (hsθ : s < θ) {q : ℝ≥0∞} (hq : 1 ≤ q)
     (f : Lp ℂ p (volume : Measure ℝ)) :
     ‖f‖ₑ + ENNReal.lqNorm q (fun k => dyadicWeight s k * Rd.lpModulus p N f k) < ∞ ↔
       daubechiesCoeffNorm m p s q f < ∞ :=
-  (memApprox_scheme_iff_modulus m hN hp hB hq hs.le hsθ f).symm.trans
-    (memApprox_scheme_iff_coeff m hN hp hs hq f)
+  (memApprox_daubechiesScheme_iff_modulus m hN hp hB hq hs.le hsθ f).symm.trans
+    (memApprox_daubechiesScheme_iff_coeff m hN hp hs hq f)
 
 /-- **Littlewood–Paley blocks and Daubechies coefficients**: let `N ≥ 2`, `1 ≤ p < ∞`,
 `1 ≤ q ≤ ∞`, and let `φ` have a Bernstein bound of order `θ` with differences of order `N`

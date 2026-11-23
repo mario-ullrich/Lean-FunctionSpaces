@@ -264,7 +264,7 @@ def MemBesov (s : ℝ) (q : ℝ≥0∞) (f : Lp ℂ p μ) : Prop :=
   A.besovNorm hp (⌊s⌋₊ + 1) s q f < ⊤
 
 /-- **The order does not matter**: for `0 < s < r`, `f ∈ B^s_{p,q}` iff its Besov quasi-norm of
-order `r` is finite (`Rd.BesovDomain.modNormOn_order_le` piece by piece). -/
+order `r` is finite (`Rd.BesovDomain.modNormOn_order_le_of_besovDomain` piece by piece). -/
 theorem memBesov_iff_besovNorm_lt_top {r : ℕ} {s : ℝ} (hs : 0 < s) (hsr : s < r) {q : ℝ≥0∞}
     (hq : 1 ≤ q) (f : Lp ℂ p μ) :
     A.MemBesov hp s q f ↔ A.besovNorm hp r s q f < ⊤ := by
@@ -277,7 +277,7 @@ theorem memBesov_iff_besovNorm_lt_top {r : ℕ} {s : ℝ} (hs : 0 < s) (hsr : s 
   have hcmp : ∀ {r₁ r₂ : ℕ}, s < r₁ → s < r₂ → A.besovNorm hp r₁ s q f < ⊤ →
       A.besovNorm hp r₂ s q f < ⊤ := fun {r₁ r₂} h1 h2 hfin => by
     refine ENNReal.sum_lt_top.2 fun i _ => ?_
-    obtain ⟨C, hC, hle⟩ := Rd.BesovDomain.modNormOn_order_le (Ω := Ω) hp hs h1 h2 hq
+    obtain ⟨C, hC, hle⟩ := Rd.BesovDomain.modNormOn_order_le_of_besovDomain (Ω := Ω) hp hs h1 h2 hq
     have hi : Rd.modNormOn hΩ r₁ s q (A.pieceLp μ hp i f) < ⊤ :=
       (A.modNormOn_pieceLp_le_besovNorm hp r₁ s q f i).trans_lt hfin
     exact (hle _ hi).trans_lt (ENNReal.mul_lt_top hC.lt_top hi)

@@ -13,24 +13,24 @@ public import FunctionSpaces.Domains.Interval.Taylor
 # Smoothing in one coordinate
 
 The **Steklov smoothing in coordinate `i`** smooths every slice in coordinate `i`,
-`S^{(i)}_δ f(x) = S_δ (slice f x i)(x_i)` (`Cube.cubeSmooth`), with the smoothing `S_δ` of one
-variable (`Interval.steklovSmooth`). For continuous `f` its two identities hold pointwise on the
+`S^{(i)}_δ f(x) = S_δ (slice f x i)(x_i)` (`Cube.cubeSteklovSmooth`), with the smoothing `S_δ` of
+one variable (`Interval.steklovSmooth`). For continuous `f` its two identities hold pointwise on the
 cube:
 
 * `f - S^{(i)}_δ f = (-1)^r avg_v Δ^r_{(v_1 + ⋯ + v_r) e_i} f`, the average being over the steps
-  only (`Cube.sub_cubeSmooth_eq`, from `Interval.sub_steklovSmooth_eq` and
+  only (`Cube.sub_cubeSteklovSmooth_eq`, from `Interval.sub_steklovSmooth_eq` and
   `Interval.avgStepIter_congr_point`);
-* the derivative of order `r` in `x_i` (`Cube.cubeSmoothDeriv`) is the finite combination
-  `∑_k (-1)^(k+1) C(r,k) (kδ)^(-r) Δ^r_{kδ e_i} f` (`Cube.cubeSmoothDeriv_eq`).
+* the derivative of order `r` in `x_i` (`Cube.cubeSteklovSmoothDeriv`) is the finite combination
+  `∑_k (-1)^(k+1) C(r,k) (kδ)^(-r) Δ^r_{kδ e_i} f` (`Cube.cubeSteklovSmoothDeriv_eq`).
 
 Minkowski's inequality for averages on the cube (`Interval.eLpNorm_avgStepIter_le`, for any point
 space) and the derivative bound for any measure (`Interval.eLpNorm_sum_smoothCoeff_smul_le`) then
 bound both by the coordinate differences with steps `0 ≤ h ≤ rδ`, for every measure
-(`Cube.eLpNorm_sub_cubeSmooth_le_of_cubeDiff_le`). On the cube this is the coordinate modulus,
-with the supremum over the steps outside the integral over the cube
-(`Cube.eLpNorm_sub_cubeSmooth_le`, `Cube.eLpNorm_cubeSmoothDeriv_le`); on `ℝ^d` it is the
-isotropic modulus of smoothness (`Cube.eLpNorm_sub_cubeSmooth_le_smoothnessModulus`,
-`Cube.eLpNorm_cubeSmoothDeriv_le_smoothnessModulus`). With `δ = L / r²`
+(`Cube.eLpNorm_sub_cubeSteklovSmooth_le_of_cubeDiff_le`). On the cube this is the coordinate
+modulus, with the supremum over the steps outside the integral over the cube
+(`Cube.eLpNorm_sub_cubeSteklovSmooth_le`, `Cube.eLpNorm_cubeSteklovSmoothDeriv_le`); on `ℝ^d` it is
+the isotropic modulus of smoothness (`Cube.eLpNorm_sub_cubeSteklovSmooth_le_smoothnessModulus`,
+`Cube.eLpNorm_cubeSteklovSmoothDeriv_le_smoothnessModulus`). With `δ = L / r²`
 this gives smoothings on the regions `{x_i ≤ w}` and, by the reflection `x_i ↦ 1 - x_i`
 (`Cube.coordModulus_reflectCoord`), `{x_i ≥ 1 - w}`, `w + L ≤ 1`, whose slices have Taylor
 polynomials on all intervals (`Cube.exists_left_cubeSmoothing`, `Cube.exists_right_cubeSmoothing`),
@@ -73,88 +73,89 @@ theorem continuous_cubeDiff {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) (r
 /-! ### The smoothing and its identities -/
 
 /-- The **Steklov smoothing in coordinate `i`**: `S^{(i)}_δ f(x) = S_δ (slice f x i)(x_i)`. -/
-noncomputable def cubeSmooth (r : ℕ) (δ : ℝ) (i : Fin d) (f : (Fin d → ℝ) → ℂ)
+noncomputable def cubeSteklovSmooth (r : ℕ) (δ : ℝ) (i : Fin d) (f : (Fin d → ℝ) → ℂ)
     (x : Fin d → ℝ) : ℂ :=
   steklovSmooth r δ (slice f x i) (x i)
 
 /-- The **derivative of order `r` in coordinate `i`** of the smoothing,
 `∂_i^r S^{(i)}_δ f(x) = (S_δ (slice f x i))^(r)(x_i)`. -/
-noncomputable def cubeSmoothDeriv (r : ℕ) (δ : ℝ) (i : Fin d) (f : (Fin d → ℝ) → ℂ)
+noncomputable def cubeSteklovSmoothDeriv (r : ℕ) (δ : ℝ) (i : Fin d) (f : (Fin d → ℝ) → ℂ)
     (x : Fin d → ℝ) : ℂ :=
   iteratedDeriv r (steklovSmooth r δ (slice f x i)) (x i)
 
 /-- The slices of the smoothing are the smoothings of the slices. -/
-theorem slice_cubeSmooth (r : ℕ) (δ : ℝ) (i : Fin d) (f : (Fin d → ℝ) → ℂ) (x : Fin d → ℝ) :
-    slice (cubeSmooth r δ i f) x i = steklovSmooth r δ (slice f x i) := by
+theorem slice_cubeSteklovSmooth (r : ℕ) (δ : ℝ) (i : Fin d) (f : (Fin d → ℝ) → ℂ) (x : Fin d → ℝ) :
+    slice (cubeSteklovSmooth r δ i f) x i = steklovSmooth r δ (slice f x i) := by
   funext t
-  simp only [slice, cubeSmooth]
+  simp only [slice, cubeSteklovSmooth]
   rw [slice_update, Function.update_self]
 
 /-- The slices of the derivative are the derivatives of the smoothed slices. -/
-theorem slice_cubeSmoothDeriv (r : ℕ) (δ : ℝ) (i : Fin d) (f : (Fin d → ℝ) → ℂ)
+theorem slice_cubeSteklovSmoothDeriv (r : ℕ) (δ : ℝ) (i : Fin d) (f : (Fin d → ℝ) → ℂ)
     (x : Fin d → ℝ) :
-    slice (cubeSmoothDeriv r δ i f) x i = iteratedDeriv r (steklovSmooth r δ (slice f x i)) := by
+    slice (cubeSteklovSmoothDeriv r δ i f) x i =
+      iteratedDeriv r (steklovSmooth r δ (slice f x i)) := by
   funext t
-  simp only [slice, cubeSmoothDeriv]
+  simp only [slice, cubeSteklovSmoothDeriv]
   rw [slice_update, Function.update_self]
 
 /-- **`f - S^{(i)}_δ f` is an averaged coordinate difference**:
 `f(x) - S^{(i)}_δ f(x) = (-1)^r avg_h Δ^r_{h e_i} f(x)`, the average over the steps only. -/
-theorem sub_cubeSmooth_eq {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) (r : ℕ) {δ : ℝ}
+theorem sub_cubeSteklovSmooth_eq {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) (r : ℕ) {δ : ℝ}
     (hδ : δ ≠ 0) (i : Fin d) (x : Fin d → ℝ) :
-    f x - cubeSmooth r δ i f x =
+    f x - cubeSteklovSmooth r δ i f x =
       (-1 : ℂ) ^ r * avgStepIter r δ (fun h y => cubeDiff r h i f y) 0 x := by
   have h := sub_steklovSmooth_eq (continuous_slice hf x i) r hδ (x i)
   rw [show slice f x i (x i) = f x by simp [slice] ] at h
-  rw [cubeSmooth, h]
+  rw [cubeSteklovSmooth, h]
   congr 1
   exact avgStepIter_congr_point (G := fun h y => higherDiff r h (slice f x i) y)
     (G' := fun h y => cubeDiff r h i f y) (x := x i) (x' := x) (fun s => rfl) r δ 0
 
 /-- **The derivative of the smoothing is a combination of coordinate differences**:
 `∂_i^r S^{(i)}_δ f = ∑_{k=1}^r (-1)^(k+1) C(r,k) (kδ)^(-r) Δ^r_{kδ e_i} f`. -/
-theorem cubeSmoothDeriv_eq {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) (r : ℕ) (δ : ℝ)
+theorem cubeSteklovSmoothDeriv_eq {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) (r : ℕ) (δ : ℝ)
     (i : Fin d) (x : Fin d → ℝ) :
-    cubeSmoothDeriv r δ i f x = ∑ k ∈ Finset.range r,
+    cubeSteklovSmoothDeriv r δ i f x = ∑ k ∈ Finset.range r,
       ((-1 : ℂ) ^ (k + 2) * (r.choose (k + 1) : ℂ)) *
         ((((k + 1 : ℕ) * δ : ℝ) : ℂ)⁻¹ ^ r * cubeDiff r ((k + 1 : ℕ) * δ) i f x) := by
-  rw [cubeSmoothDeriv, iteratedDeriv_steklovSmooth (continuous_slice hf x i) r δ]
+  rw [cubeSteklovSmoothDeriv, iteratedDeriv_steklovSmooth (continuous_slice hf x i) r δ]
   rfl
 
 /-- **The derivative of the smoothing as a sum of functions**:
 `∂_i^r S^{(i)}_δ f = ∑_{k=1}^r (-1)^(k+1) C(r,k) (kδ)^(-r) Δ^r_{kδ e_i} f` as an identity of
-functions on `ℝ^d` (`Cube.cubeSmoothDeriv_eq` at every point), written as a sum `∑_k c_k • g_k`,
-the form to which the triangle inequality in `L_p` applies. -/
-theorem cubeSmoothDeriv_eq_sum_smul {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) (r : ℕ) (δ : ℝ)
+functions on `ℝ^d` (`Cube.cubeSteklovSmoothDeriv_eq` at every point), written as a sum
+`∑_k c_k • g_k`, the form to which the triangle inequality in `L_p` applies. -/
+theorem cubeSteklovSmoothDeriv_eq_sum_smul {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) (r : ℕ) (δ : ℝ)
     (i : Fin d) :
-    cubeSmoothDeriv r δ i f = ∑ k ∈ Finset.range r,
+    cubeSteklovSmoothDeriv r δ i f = ∑ k ∈ Finset.range r,
       (((-1 : ℂ) ^ (k + 2) * (r.choose (k + 1) : ℂ)) *
         (((k + 1 : ℕ) * δ : ℝ) : ℂ)⁻¹ ^ r) • cubeDiff r ((k + 1 : ℕ) * δ) i f := by
   funext x
-  rw [cubeSmoothDeriv_eq hf r δ i x, Finset.sum_apply]
+  rw [cubeSteklovSmoothDeriv_eq hf r δ i x, Finset.sum_apply]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [Pi.smul_apply, smul_eq_mul]
   ring
 
 /-- The smoothing of a continuous function is continuous. -/
-theorem continuous_cubeSmooth {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) (r : ℕ) {δ : ℝ}
-    (hδ : δ ≠ 0) (i : Fin d) : Continuous (cubeSmooth r δ i f) := by
-  have : cubeSmooth r δ i f = fun x =>
+theorem continuous_cubeSteklovSmooth {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) (r : ℕ) {δ : ℝ}
+    (hδ : δ ≠ 0) (i : Fin d) : Continuous (cubeSteklovSmooth r δ i f) := by
+  have : cubeSteklovSmooth r δ i f = fun x =>
       f x - (-1 : ℂ) ^ r * avgStepIter r δ (fun h y => cubeDiff r h i f y) 0 x := by
     funext x
-    rw [← sub_cubeSmooth_eq hf r hδ i x]
+    rw [← sub_cubeSteklovSmooth_eq hf r hδ i x]
     ring
   rw [this]
   exact hf.sub (continuous_const.mul ((continuous_avgStepIter
     (continuous_cubeDiff_uncurry hf r i) r δ).comp (continuous_const.prodMk continuous_id)))
 
 /-- The derivative of the smoothing of a continuous function is continuous. -/
-theorem continuous_cubeSmoothDeriv {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) (r : ℕ) (δ : ℝ)
-    (i : Fin d) : Continuous (cubeSmoothDeriv r δ i f) := by
-  rw [show cubeSmoothDeriv r δ i f = fun x => ∑ k ∈ Finset.range r,
+theorem continuous_cubeSteklovSmoothDeriv {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) (r : ℕ) (δ : ℝ)
+    (i : Fin d) : Continuous (cubeSteklovSmoothDeriv r δ i f) := by
+  rw [show cubeSteklovSmoothDeriv r δ i f = fun x => ∑ k ∈ Finset.range r,
       ((-1 : ℂ) ^ (k + 2) * (r.choose (k + 1) : ℂ)) *
         ((((k + 1 : ℕ) * δ : ℝ) : ℂ)⁻¹ ^ r * cubeDiff r ((k + 1 : ℕ) * δ) i f x) from
-    funext (cubeSmoothDeriv_eq hf r δ i)]
+    funext (cubeSteklovSmoothDeriv_eq hf r δ i)]
   exact continuous_finsetSum _ fun k _ =>
     continuous_const.mul (continuous_const.mul (continuous_cubeDiff hf r _ i))
 
@@ -176,17 +177,17 @@ theorem eLpNorm_cubeDiff_regionVol_le {f : (Fin d → ℝ) → ℂ} {r : ℕ} {�
 `δ > 0`, `1 ≤ p < ∞`, `μ` an s-finite measure on `ℝ^d`, and let
 `‖Δ^r_{h e_i} f‖_{L_p(μ)} ≤ B` for every step `0 ≤ h ≤ rδ`. Then
 `‖f - S^{(i)}_δ f‖_{L_p(μ)} ≤ B`: the difference is `(-1)^r` times an average of these
-coordinate differences (`Cube.sub_cubeSmooth_eq`), and Minkowski's inequality for averages
+coordinate differences (`Cube.sub_cubeSteklovSmooth_eq`), and Minkowski's inequality for averages
 (`Interval.eLpNorm_avgStepIter_le`) bounds it by the largest of their norms. -/
-theorem eLpNorm_sub_cubeSmooth_le_of_cubeDiff_le {f : (Fin d → ℝ) → ℂ} (hf : Continuous f)
+theorem eLpNorm_sub_cubeSteklovSmooth_le_of_cubeDiff_le {f : (Fin d → ℝ) → ℂ} (hf : Continuous f)
     (r : ℕ) {δ : ℝ} (hδ : 0 < δ) {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p ≠ ∞) (i : Fin d)
     (μ : Measure (Fin d → ℝ)) [SFinite μ] {B : ℝ≥0∞}
     (hB : ∀ h, 0 ≤ h → h ≤ r * δ → eLpNorm (cubeDiff r h i f) p μ ≤ B) :
-    eLpNorm (fun x => f x - cubeSmooth r δ i f x) p μ ≤ B := by
-  have heq : (fun x => f x - cubeSmooth r δ i f x) =
+    eLpNorm (fun x => f x - cubeSteklovSmooth r δ i f x) p μ ≤ B := by
+  have heq : (fun x => f x - cubeSteklovSmooth r δ i f x) =
       ((-1 : ℂ) ^ r) • avgStepIter r δ (fun h y => cubeDiff r h i f y) 0 := by
     funext x
-    rw [sub_cubeSmooth_eq hf r hδ.ne' i x]
+    rw [sub_cubeSteklovSmooth_eq hf r hδ.ne' i x]
     rfl
   rw [heq, eLpNorm_const_smul, enorm_pow, enorm_neg, enorm_one, one_pow, one_mul]
   refine (eLpNorm_avgStepIter_le (continuous_cubeDiff_uncurry hf r i) hδ hp hp' μ r 0).trans ?_
@@ -195,23 +196,23 @@ theorem eLpNorm_sub_cubeSmooth_le_of_cubeDiff_le {f : (Fin d → ℝ) → ℂ} (
   exact hB h hh.1 hh.2
 
 /-- **The smoothing is close to `f`**: on `{x_i ≤ w}` with `w + r² δ ≤ 1`,
-`‖f - S^{(i)}_δ f‖_p ≤ ω_r^{(i)}(f, rδ)_p` (`Cube.eLpNorm_sub_cubeSmooth_le_of_cubeDiff_le` with
-`Cube.eLpNorm_cubeDiff_regionVol_le`). -/
-theorem eLpNorm_sub_cubeSmooth_le {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) (r : ℕ) {δ : ℝ}
+`‖f - S^{(i)}_δ f‖_p ≤ ω_r^{(i)}(f, rδ)_p` (`Cube.eLpNorm_sub_cubeSteklovSmooth_le_of_cubeDiff_le`
+with `Cube.eLpNorm_cubeDiff_regionVol_le`). -/
+theorem eLpNorm_sub_cubeSteklovSmooth_le {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) (r : ℕ) {δ : ℝ}
     (hδ : 0 < δ) {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p ≠ ∞) (i : Fin d) {w : ℝ}
     (hwb : w + r * (r * δ) ≤ 1) :
-    eLpNorm (fun x => f x - cubeSmooth r δ i f x) p (regionVol d i 0 w) ≤
+    eLpNorm (fun x => f x - cubeSteklovSmooth r δ i f x) p (regionVol d i 0 w) ≤
       coordModulus r p i f (r * δ) :=
-  eLpNorm_sub_cubeSmooth_le_of_cubeDiff_le hf r hδ hp hp' i (regionVol d i 0 w) fun _ h0 hh =>
-    eLpNorm_cubeDiff_regionVol_le hwb h0 hh
+  eLpNorm_sub_cubeSteklovSmooth_le_of_cubeDiff_le hf r hδ hp hp' i (regionVol d i 0 w)
+    fun _ h0 hh => eLpNorm_cubeDiff_regionVol_le hwb h0 hh
 
 /-- **The derivative of the smoothing**: on `{x_i ≤ w}` with `w + r² δ ≤ 1`,
 `‖∂_i^r S^{(i)}_δ f‖_p ≤ 2^r δ^(-r) ω_r^{(i)}(f, rδ)_p`. -/
-theorem eLpNorm_cubeSmoothDeriv_le {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) (r : ℕ) {δ : ℝ}
+theorem eLpNorm_cubeSteklovSmoothDeriv_le {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) (r : ℕ) {δ : ℝ}
     (hδ : 0 < δ) {p : ℝ≥0∞} (hp : 1 ≤ p) (i : Fin d) {w : ℝ} (hwb : w + r * (r * δ) ≤ 1) :
-    eLpNorm (cubeSmoothDeriv r δ i f) p (regionVol d i 0 w) ≤
+    eLpNorm (cubeSteklovSmoothDeriv r δ i f) p (regionVol d i 0 w) ≤
       2 ^ r * (ENNReal.ofReal δ)⁻¹ ^ r * coordModulus r p i f (r * δ) := by
-  rw [cubeSmoothDeriv_eq_sum_smul hf r δ i]
+  rw [cubeSteklovSmoothDeriv_eq_sum_smul hf r δ i]
   exact eLpNorm_sum_smoothCoeff_smul_le (D := fun h => cubeDiff r h i f) hδ hp
     fun h h0 hh => eLpNorm_cubeDiff_regionVol_le hwb h0 hh
 
@@ -220,26 +221,26 @@ theorem eLpNorm_cubeSmoothDeriv_le {f : (Fin d → ℝ) → ℂ} (hf : Continuou
 /-- **The smoothing in one coordinate is close to `f` on `ℝ^d`**: for continuous
 `f : ℝ^d → ℂ`, `r ∈ ℕ`, `δ > 0`, `1 ≤ p < ∞` and every coordinate `i`,
 `‖f - S^{(i)}_δ f‖_{L_p(ℝ^d)} ≤ ω_r(f, rδ)_p` with the isotropic modulus of smoothness of `ℝ^d`
-(sup norm): `Cube.eLpNorm_sub_cubeSmooth_le_of_cubeDiff_le` for Lebesgue measure, with
+(sup norm): `Cube.eLpNorm_sub_cubeSteklovSmooth_le_of_cubeDiff_le` for Lebesgue measure, with
 `Cube.eLpNorm_cubeDiff_le_smoothnessModulus` for the coordinate differences. -/
-theorem eLpNorm_sub_cubeSmooth_le_smoothnessModulus {f : (Fin d → ℝ) → ℂ} (hf : Continuous f)
+theorem eLpNorm_sub_cubeSteklovSmooth_le_smoothnessModulus {f : (Fin d → ℝ) → ℂ} (hf : Continuous f)
     (r : ℕ) {δ : ℝ} (hδ : 0 < δ) {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p ≠ ∞) (i : Fin d) :
-    eLpNorm (fun x => f x - cubeSmooth r δ i f x) p volume ≤
+    eLpNorm (fun x => f x - cubeSteklovSmooth r δ i f x) p volume ≤
       Rd.smoothnessModulus volume r p f (r * δ) :=
-  eLpNorm_sub_cubeSmooth_le_of_cubeDiff_le hf r hδ hp hp' i volume fun _ h0 hh =>
+  eLpNorm_sub_cubeSteklovSmooth_le_of_cubeDiff_le hf r hδ hp hp' i volume fun _ h0 hh =>
     eLpNorm_cubeDiff_le_smoothnessModulus (by rw [abs_of_nonneg h0]; exact hh)
 
 /-- **The derivative of the smoothing in one coordinate on `ℝ^d`**: for continuous
 `f : ℝ^d → ℂ`, `r ∈ ℕ`, `δ > 0`, `1 ≤ p ≤ ∞` and every coordinate `i`,
 `‖∂_i^r S^{(i)}_δ f‖_{L_p(ℝ^d)} ≤ 2^r δ^(-r) ω_r(f, rδ)_p`: the derivative is the combination
-`∑_{k=1}^r (-1)^(k+1) C(r,k) (kδ)^(-r) Δ^r_{kδ e_i} f` (`Cube.cubeSmoothDeriv_eq_sum_smul`),
+`∑_{k=1}^r (-1)^(k+1) C(r,k) (kδ)^(-r) Δ^r_{kδ e_i} f` (`Cube.cubeSteklovSmoothDeriv_eq_sum_smul`),
 and `Interval.eLpNorm_sum_smoothCoeff_smul_le` with `Cube.eLpNorm_cubeDiff_le_smoothnessModulus`
 bounds it. -/
-theorem eLpNorm_cubeSmoothDeriv_le_smoothnessModulus {f : (Fin d → ℝ) → ℂ} (hf : Continuous f)
-    (r : ℕ) {δ : ℝ} (hδ : 0 < δ) {p : ℝ≥0∞} (hp : 1 ≤ p) (i : Fin d) :
-    eLpNorm (cubeSmoothDeriv r δ i f) p volume ≤
+theorem eLpNorm_cubeSteklovSmoothDeriv_le_smoothnessModulus {f : (Fin d → ℝ) → ℂ}
+    (hf : Continuous f) (r : ℕ) {δ : ℝ} (hδ : 0 < δ) {p : ℝ≥0∞} (hp : 1 ≤ p) (i : Fin d) :
+    eLpNorm (cubeSteklovSmoothDeriv r δ i f) p volume ≤
       2 ^ r * (ENNReal.ofReal δ)⁻¹ ^ r * Rd.smoothnessModulus volume r p f (r * δ) := by
-  rw [cubeSmoothDeriv_eq_sum_smul hf r δ i]
+  rw [cubeSteklovSmoothDeriv_eq_sum_smul hf r δ i]
   exact eLpNorm_sum_smoothCoeff_smul_le (D := fun h => cubeDiff r h i f) hδ hp
     fun h h0 hh => eLpNorm_cubeDiff_le_smoothnessModulus (by rw [abs_of_nonneg h0]; exact hh)
 
@@ -262,13 +263,14 @@ theorem exists_left_cubeSmoothing {f : (Fin d → ℝ) → ℂ} (hf : Continuous
           ENNReal.ofReal (v - u) ^ r * eLpNorm (slice D x i) p (volume.restrict (Icc u v)) := by
   obtain ⟨hδ, hrδ, hrrδ⟩ := step_div_sq_bounds hr hL
   have hwb : w + r * (r * (L / r ^ 2)) ≤ 1 := by rw [hrrδ]; exact hwL
-  refine ⟨cubeSmooth r (L / r ^ 2) i f, cubeSmoothDeriv r (L / r ^ 2) i f,
-    (continuous_cubeSmooth hf r hδ.ne' i).measurable,
-    (continuous_cubeSmoothDeriv hf r (L / r ^ 2) i).measurable, ?_, ?_, fun x u v huv => ?_⟩
-  · exact (eLpNorm_sub_cubeSmooth_le hf r hδ hp hp' i hwb).trans (coordModulus_mono r p i f hrδ)
-  · exact (eLpNorm_cubeSmoothDeriv_le hf r hδ hp i hwb).trans
+  refine ⟨cubeSteklovSmooth r (L / r ^ 2) i f, cubeSteklovSmoothDeriv r (L / r ^ 2) i f,
+    (continuous_cubeSteklovSmooth hf r hδ.ne' i).measurable,
+    (continuous_cubeSteklovSmoothDeriv hf r (L / r ^ 2) i).measurable, ?_, ?_, fun x u v huv => ?_⟩
+  · exact (eLpNorm_sub_cubeSteklovSmooth_le hf r hδ hp hp' i hwb).trans
+      (coordModulus_mono r p i f hrδ)
+  · exact (eLpNorm_cubeSteklovSmoothDeriv_le hf r hδ hp i hwb).trans
       (two_pow_mul_inv_div_sq_pow_mul_le hr hL (coordModulus_mono r p i f hrδ))
-  · rw [slice_cubeSmooth, slice_cubeSmoothDeriv]
+  · rw [slice_cubeSteklovSmooth, slice_cubeSteklovSmoothDeriv]
     exact exists_eLpNorm_sub_polyFun_le hp r
       (contDiff_steklovSmooth (continuous_slice hf x i) r (L / r ^ 2)) huv
 

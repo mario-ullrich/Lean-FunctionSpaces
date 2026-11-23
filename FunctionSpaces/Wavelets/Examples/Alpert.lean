@@ -18,7 +18,7 @@ two halves `[0, 1/2)`, `[1/2, 1)` that are `L_2`-orthogonal to the polynomials o
 (`Alpert.detail`). It has dimension `2r - r = r` (`Alpert.finrank_detail`, Mathlib's
 `Submodule.finrank_add_inf_finrank_orthogonal'`), and an orthonormal basis of it
 (`Alpert.detailBasis`, from Mathlib's `stdOrthonormalBasis`) gives the **multiwavelets**
-`ψ_1, …, ψ_r` (`Alpert.psi`): piecewise polynomials on the two halves with `r` vanishing
+`ψ_1, …, ψ_r` (`Alpert.multiwavelet`): piecewise polynomials on the two halves with `r` vanishing
 moments, `∫_0^1 ψ_i x^l dx = 0` for `l < r`. B. Alpert (1993) chose one such basis explicitly
 through Legendre polynomials; every orthonormal basis serves the same purpose, and the
 characterisation below does not depend on the choice.
@@ -30,22 +30,22 @@ polynomials by `Interval.coeffToLp`.
 **The details in the multiwavelets.** Let `P_k` be the local `L_2`-orthogonal projections onto
 the piecewise polynomials of level `k` (`Interval.ppProj`; their orthogonality is
 `Interval.integral_sub_locProj_mul`). On each dyadic interval `I_{k,m}` the detail
-`Δ_k f = P_{k+1} f - P_k f` (`Alpert.detailFun`) is a piecewise polynomial on the two halves,
-orthogonal to the polynomials (`Alpert.integral_detailFun_mul`); moved to `[0, 1]` it lies in
+`Δ_k f = P_{k+1} f - P_k f` (`Alpert.alpertDetailFun`) is a piecewise polynomial on the two halves,
+orthogonal to the polynomials (`Alpert.integral_alpertDetailFun_mul`); moved to `[0, 1]` it lies in
 the detail space, so
 `Δ_k f = ∑_i ⟨f, ψ_{k,m,i}⟩ ψ_{k,m,i}` on `I_{k,m}`, `ψ_{k,m,i}(x) = 2^(k/2) ψ_i(2^k x - m)`
 (`Alpert.ppFun_detailPieces_ae_eq`), with the coefficients `⟨f, ψ_{k,m,i}⟩` of `f` itself
-(`Alpert.coeff`, `Alpert.integral_detailFun_mul_conj_psi`).
+(`Alpert.alpertCoeff`, `Alpert.integral_alpertDetailFun_mul_conj_multiwavelet`).
 
 **Norms.** The multiwavelets are stable: `‖∑_i β_i ψ_i‖_{L_p[0,1]}` is comparable with
 `‖β‖_{ℓ_p}` (`Alpert.exists_stable`, finite dimension). Hence
 `‖Δ_k f‖_p ≍ 2^(k(1/2-1/p)) ‖(⟨f, ψ_{k,m,i}⟩)_{m,i}‖_{ℓ_p}` with constants independent of `f`
-and `k` (`Alpert.exists_eLpNorm_detailFun_equiv`), and the multiscale characterisation of
+and `k` (`Alpert.exists_eLpNorm_alpertDetailFun_equiv`), and the multiscale characterisation of
 `FunctionSpaces.Wavelets.Examples.Multiscale` becomes, for `1 ≤ p < ∞`, `1 ≤ q ≤ ∞` and `s > 0`,
 `f ∈ A^s_q ↔ ‖P_0 f‖_p + ‖(2^(k(s+1/2-1/p)) ‖(⟨f, ψ_{k,m,i}⟩)_{m,i}‖_{ℓ_p})_k‖_{ℓ_q} < ∞`
-(`Alpert.memApprox_ppScheme_iff_coeff`). For `0 < s < 1/p` this describes `B^s_{p,q}[0, 1]` and
-`B^s_{p,q}(𝕋)` (`Alpert.lqNorm_modulus_lt_top_iff_coeff`,
-`Alpert.lqNorm_perModulus_lt_top_iff_coeff`). For `r = 1` the multiwavelet is a multiple of
+(`Alpert.memApprox_ppScheme_iff_alpertCoeff`). For `0 < s < 1/p` this describes `B^s_{p,q}[0, 1]`
+and `B^s_{p,q}(𝕋)` (`Alpert.lqNorm_modulus_lt_top_iff_alpertCoeff`,
+`Alpert.lqNorm_perModulus_lt_top_iff_alpertCoeff`). For `r = 1` the multiwavelet is a multiple of
 modulus `1` of the Haar function, since the basis of the detail space comes from Mathlib's
 `stdOrthonormalBasis`.
 -/
@@ -204,22 +204,22 @@ theorem detailBasis_mem_range (i : Fin r) :
   (detailBasis r i).2.2
 
 /-- The coefficients of the pieces of the multiwavelet `ψ_i`. -/
-noncomputable def psiPieces (i : Fin r) : Fin 2 → Fin r → ℂ :=
+noncomputable def multiwaveletPieces (i : Fin r) : Fin 2 → Fin r → ℂ :=
   (detailBasis_mem_range r i).choose
 
 /-- `ψ_i` is the basis vector `i` of the detail space. -/
-theorem levelOne_psiPieces (i : Fin r) :
-    levelOne r (psiPieces r i) = (detailBasis r i : Lp ℂ 2 unitVol) :=
+theorem levelOne_multiwaveletPieces (i : Fin r) :
+    levelOne r (multiwaveletPieces r i) = (detailBasis r i : Lp ℂ 2 unitVol) :=
   (detailBasis_mem_range r i).choose_spec
 
 /-- The **multiwavelets** `ψ_i`, `i < r`: the orthonormal basis `Alpert.detailBasis` of the
 detail space as piecewise polynomials on `[0, 1/2)` and `[1/2, 1)`. -/
-noncomputable def psi (i : Fin r) : ℝ → ℂ := ppFun 1 (twoPieces r (psiPieces r i))
+noncomputable def multiwavelet (i : Fin r) : ℝ → ℂ := ppFun 1 (twoPieces r (multiwaveletPieces r i))
 
 /-- The function of the basis vector `i` is `ψ_i`. -/
 theorem coeFn_detailBasis (i : Fin r) :
-    ((detailBasis r i : detail r) : Lp ℂ 2 unitVol) =ᵐ[unitVol] psi r i := by
-  rw [← levelOne_psiPieces]
+    ((detailBasis r i : detail r) : Lp ℂ 2 unitVol) =ᵐ[unitVol] multiwavelet r i := by
+  rw [← levelOne_multiwaveletPieces]
   exact coeFn_levelOne r _
 
 /-- The `L_2[0, 1]` inner product as an integral, `⟨f, g⟩ = ∫_0^1 conj f · g`. -/
@@ -231,8 +231,9 @@ theorem inner_eq_integral (f g : Lp ℂ 2 unitVol) :
 /-! ### The multiwavelets as functions -/
 
 /-- **The multiwavelets are orthonormal**: `∫_0^1 conj ψ_i ψ_j = δ_{ij}`. -/
-theorem integral_conj_psi_mul_psi (i j : Fin r) :
-    ∫ x in Icc (0 : ℝ) 1, conj (psi r i x) * psi r j x = if i = j then 1 else 0 := by
+theorem integral_conj_multiwavelet_mul_multiwavelet (i j : Fin r) :
+    ∫ x in Icc (0 : ℝ) 1, conj (multiwavelet r i x) * multiwavelet r j x =
+      if i = j then 1 else 0 := by
   rw [← orthonormal_iff_ite.1 (detailBasis r).orthonormal i j, Submodule.coe_inner,
     inner_eq_integral]
   refine integral_congr_ae ?_
@@ -241,8 +242,8 @@ theorem integral_conj_psi_mul_psi (i j : Fin r) :
 
 /-- **The multiwavelets have `r` vanishing moments**: `∫_0^1 conj P · ψ_i = 0` for every
 polynomial `P` of degree `< r`. -/
-theorem integral_conj_polyFun_mul_psi {P : ℂ[X]} (hP : P ∈ degreeLT ℂ r) (i : Fin r) :
-    ∫ x in Icc (0 : ℝ) 1, conj (polyFun P x) * psi r i x = 0 := by
+theorem integral_conj_polyFun_mul_multiwavelet {P : ℂ[X]} (hP : P ∈ degreeLT ℂ r) (i : Fin r) :
+    ∫ x in Icc (0 : ℝ) 1, conj (polyFun P x) * multiwavelet r i x = 0 := by
   have hmem : polyL2 r (degreeLTEquiv ℂ r ⟨P, hP⟩) ∈ LinearMap.range (polyL2 r) := ⟨_, rfl⟩
   have horth := Submodule.inner_right_of_mem_orthogonal hmem (detailBasis r i).2.1
   rw [inner_eq_integral] at horth
@@ -255,34 +256,34 @@ theorem integral_conj_polyFun_mul_psi {P : ℂ[X]} (hP : P ∈ degreeLT ℂ r) (
     LinearEquiv.symm_apply_apply]
 
 /-- **Vanishing moments**, in the form `∫_0^1 Q ψ_i = 0` for every polynomial `Q` of degree
-`< r`: apply `Alpert.integral_conj_polyFun_mul_psi` to the conjugate polynomial `Q̄`. -/
-theorem integral_polyFun_mul_psi {Q : ℂ[X]} (hQ : Q ∈ degreeLT ℂ r) (i : Fin r) :
-    ∫ x in Icc (0 : ℝ) 1, polyFun Q x * psi r i x = 0 := by
+`< r`: apply `Alpert.integral_conj_polyFun_mul_multiwavelet` to the conjugate polynomial `Q̄`. -/
+theorem integral_polyFun_mul_multiwavelet {Q : ℂ[X]} (hQ : Q ∈ degreeLT ℂ r) (i : Fin r) :
+    ∫ x in Icc (0 : ℝ) 1, polyFun Q x * multiwavelet r i x = 0 := by
   have hmem : Q.map (starRingEnd ℂ) ∈ degreeLT ℂ r :=
     mem_degreeLT.2 (degree_map_le.trans_lt (mem_degreeLT.1 hQ))
-  have h := integral_conj_polyFun_mul_psi r hmem i
+  have h := integral_conj_polyFun_mul_multiwavelet r hmem i
   simpa only [polyFun_map_conj, Complex.conj_conj] using h
 
 /-- **Expansion in the multiwavelets**: a piecewise polynomial `u` of level `1` orthogonal to the
 polynomials of degree `< r` is `u = ∑_i ⟨ψ_i, u⟩ ψ_i` almost everywhere on `[0, 1]`. -/
-theorem ppFun_ae_eq_sum_psi {u : Fin 2 → Fin r → ℂ}
+theorem ppFun_ae_eq_sum_multiwavelet {u : Fin 2 → Fin r → ℂ}
     (hu : levelOne r u ∈ (LinearMap.range (polyL2 r))ᗮ) :
     ppFun 1 (twoPieces r u) =ᵐ[unitVol] fun x => ∑ i, (∫ t in Icc (0 : ℝ) 1,
-      conj (psi r i t) * ppFun 1 (twoPieces r u) t) * psi r i x := by
+      conj (multiwavelet r i t) * ppFun 1 (twoPieces r u) t) * multiwavelet r i x := by
   set w : detail r := ⟨levelOne r u, hu, ⟨u, rfl⟩⟩
   have hsum : ∑ i, ⟪(detailBasis r i : Lp ℂ 2 unitVol), levelOne r u⟫_ℂ •
       (detailBasis r i : Lp ℂ 2 unitVol) = levelOne r u := by
     have h := congrArg (fun v : detail r => (v : Lp ℂ 2 unitVol)) ((detailBasis r).sum_repr' w)
     simpa only [Submodule.coe_sum, Submodule.coe_smul, Submodule.coe_inner] using h
   have hcoef : ∀ i, ⟪(detailBasis r i : Lp ℂ 2 unitVol), levelOne r u⟫_ℂ =
-      ∫ t in Icc (0 : ℝ) 1, conj (psi r i t) * ppFun 1 (twoPieces r u) t := fun i => by
+      ∫ t in Icc (0 : ℝ) 1, conj (multiwavelet r i t) * ppFun 1 (twoPieces r u) t := fun i => by
     rw [inner_eq_integral]
     refine integral_congr_ae ?_
     filter_upwards [coeFn_detailBasis r i, coeFn_levelOne r u] with x h1 h2
     rw [h1, h2]
   have hterms : ∀ᵐ x ∂unitVol, ∀ i, ((⟪(detailBasis r i : Lp ℂ 2 unitVol), levelOne r u⟫_ℂ •
       (detailBasis r i : Lp ℂ 2 unitVol) : Lp ℂ 2 unitVol) x) =
-        ⟪(detailBasis r i : Lp ℂ 2 unitVol), levelOne r u⟫_ℂ * psi r i x := by
+        ⟪(detailBasis r i : Lp ℂ 2 unitVol), levelOne r u⟫_ℂ * multiwavelet r i x := by
     rw [Filter.eventually_all]
     intro i
     filter_upwards [Lp.coeFn_smul (⟪(detailBasis r i : Lp ℂ 2 unitVol), levelOne r u⟫_ℂ)
@@ -330,14 +331,14 @@ variable {r}
 
 /-- The **detail** `Δ_k g = P_{k+1} g - P_k g` of `g` at level `k`, as a function: the
 difference of the local projections of levels `k + 1` and `k`. -/
-noncomputable def detailFun (r : ℕ) (g : ℝ → ℂ) (k : ℕ) (x : ℝ) : ℂ :=
+noncomputable def alpertDetailFun (r : ℕ) (g : ℝ → ℂ) (k : ℕ) (x : ℝ) : ℂ :=
   ppFun (k + 1) (locProj r (k + 1) g) x - ppFun k (locProj r k g) x
 
 /-- **The details are orthogonal to the polynomials** on every interval `I_{k,m}`:
 `∫_{I_{k,m}} Δ_k g · Q = 0` for every polynomial `Q` of degree `< r`. -/
-theorem integral_detailFun_mul {g : ℝ → ℂ} (hg : IntegrableOn g (Icc 0 1)) {k m : ℕ}
+theorem integral_alpertDetailFun_mul {g : ℝ → ℂ} (hg : IntegrableOn g (Icc 0 1)) {k m : ℕ}
     (hm : m < 2 ^ k) {Q : ℂ[X]} (hQ : Q ∈ degreeLT ℂ r) :
-    ∫ x in dyadicIco k m, detailFun r g k x * polyFun Q x = 0 := by
+    ∫ x in dyadicIco k m, alpertDetailFun r g k x * polyFun Q x = 0 := by
   have hsub : dyadicIco k m ⊆ Icc 0 1 := (dyadicIco_subset hm).trans Ico_subset_Icc_self
   have hgI : IntegrableOn g (dyadicIco k m) := hg.mono_set hsub
   have hfine : IntegrableOn (fun x => (g x - ppFun (k + 1) (locProj r (k + 1) g) x) *
@@ -350,8 +351,8 @@ theorem integral_detailFun_mul {g : ℝ → ℂ} (hg : IntegrableOn g (Icc 0 1))
       (continuous_polyFun _) _ _)) (measurableSet_dyadicIco _ _) hsub Q
   have heq : EqOn (fun x => (g x - polyFun (locProj r k g m) x) * polyFun Q x -
       (g x - ppFun (k + 1) (locProj r (k + 1) g) x) * polyFun Q x)
-      (fun x => detailFun r g k x * polyFun Q x) (dyadicIco k m) := fun x hx => by
-    simp only [detailFun, ppFun_eq_of_mem _ hm hx]
+      (fun x => alpertDetailFun r g k x * polyFun Q x) (dyadicIco k m) := fun x hx => by
+    simp only [alpertDetailFun, ppFun_eq_of_mem _ hm hx]
     ring
   rw [← setIntegral_congr_fun (measurableSet_dyadicIco _ _) heq, integral_sub hcoarse hfine,
     integral_sub_locProj_mul hgI hQ,
@@ -359,10 +360,10 @@ theorem integral_detailFun_mul {g : ℝ → ℂ} (hg : IntegrableOn g (Icc 0 1))
 
 /-- On the half `I_{k+1,2m+e}` of `I_{k,m}` the rescaled conjugate wavelet
 `conj ψ_i(2^k x - m)` is a polynomial of degree `< r`. -/
-theorem exists_conj_psi_eq_polyFun (i : Fin r) {k m e : ℕ} (he : e < 2) :
+theorem exists_conj_multiwavelet_eq_polyFun (i : Fin r) {k m e : ℕ} (he : e < 2) :
     ∃ Q ∈ degreeLT ℂ r, ∀ x ∈ dyadicIco (k + 1) (2 * m + e),
-      conj (psi r i (2 ^ k * x - m)) = polyFun Q x := by
-  set P := twoPieces r (psiPieces r i) e
+      conj (multiwavelet r i (2 ^ k * x - m)) = polyFun Q x := by
+  set P := twoPieces r (multiwaveletPieces r i) e
   have hP : P ∈ degreeLT ℂ r := twoPieces_mem r _ e
   have hPc : P.map (starRingEnd ℂ) ∈ degreeLT ℂ r :=
     mem_degreeLT.2 (degree_map_le.trans_lt (mem_degreeLT.1 hP))
@@ -374,82 +375,88 @@ theorem exists_conj_psi_eq_polyFun (i : Fin r) {k m e : ℕ} (he : e < 2) :
     push_cast at hx
     rw [pow_succ] at hx
     constructor <;> nlinarith [hx.1, hx.2]
-  rw [psi, ppFun_eq_of_mem _ (by norm_num; omega) ht, polyFun_comp_affine, polyFun_map_conj]
+  rw [multiwavelet, ppFun_eq_of_mem _ (by norm_num; omega) ht, polyFun_comp_affine,
+    polyFun_map_conj]
   congr 2
   ring
 
 /-- **The coarse projection is orthogonal to the wavelets** of its level:
 `∫_{I_{k,m}} P_k g · conj ψ_i(2^k x - m) = 0`, by the vanishing moments of `ψ_i`. -/
-theorem integral_ppFun_mul_conj_psi (g : ℝ → ℂ) {k m : ℕ} (hm : m < 2 ^ k) (i : Fin r) :
-    ∫ x in dyadicIco k m, ppFun k (locProj r k g) x * conj (psi r i (2 ^ k * x - m)) = 0 := by
+theorem integral_ppFun_mul_conj_multiwavelet (g : ℝ → ℂ) {k m : ℕ} (hm : m < 2 ^ k) (i : Fin r) :
+    ∫ x in dyadicIco k m,
+      ppFun k (locProj r k g) x * conj (multiwavelet r i (2 ^ k * x - m)) = 0 := by
   have h2 : (((2 : ℝ) ^ k : ℝ) : ℂ) ≠ 0 := by rw [Complex.ofReal_ne_zero]; positivity
   have hpos : (0 : ℝ) < 2 ^ k := by positivity
   set R := (locProj r k g m).comp (C ((((m : ℝ) / 2 ^ k : ℝ)) : ℂ) + C (((1 / 2 ^ k : ℝ)) : ℂ) * X)
   have hR : R ∈ degreeLT ℂ r := comp_affine_mem_degreeLT (locProj_mem r k g m) _ _
-  have hcongr : ∫ x in dyadicIco k m, ppFun k (locProj r k g) x * conj (psi r i (2 ^ k * x - m)) =
-      ∫ x in dyadicIco k m, polyFun (locProj r k g m) x * conj (psi r i (2 ^ k * x - m)) :=
+  have hcongr :
+      ∫ x in dyadicIco k m, ppFun k (locProj r k g) x * conj (multiwavelet r i (2 ^ k * x - m)) =
+      ∫ x in dyadicIco k m, polyFun (locProj r k g m) x * conj (multiwavelet r i (2 ^ k * x - m)) :=
     setIntegral_congr_fun (measurableSet_dyadicIco _ _) fun x hx => by
       rw [ppFun_eq_of_mem _ hm hx]
   rw [hcongr]
   refine (mul_eq_zero.1 ?_).resolve_left h2
   rw [integral_dyadicIco_eq]
   have hval : ∀ t : ℝ, polyFun (locProj r k g m) (t / 2 ^ k + m / 2 ^ k) *
-      conj (psi r i (2 ^ k * (t / 2 ^ k + m / 2 ^ k) - m)) =
-        conj (conj (polyFun R t) * psi r i t) := fun t => by
+      conj (multiwavelet r i (2 ^ k * (t / 2 ^ k + m / 2 ^ k) - m)) =
+        conj (conj (polyFun R t) * multiwavelet r i t) := fun t => by
     have e1 : (2 : ℝ) ^ k * (t / 2 ^ k + m / 2 ^ k) - m = t := by field_simp; ring
     rw [e1, map_mul, Complex.conj_conj, polyFun_comp_affine]
     congr 2
     ring
   simp only [hval]
-  rw [integral_conj, integral_conj_polyFun_mul_psi r hR i, map_zero]
+  rw [integral_conj, integral_conj_polyFun_mul_multiwavelet r hR i, map_zero]
 
 /-- **The wavelet coefficients of the detail are those of the function**:
 `∫_{I_{k,m}} Δ_k g · conj ψ_i(2^k x - m) = ∫_{I_{k,m}} g · conj ψ_i(2^k x - m)`. -/
-theorem integral_detailFun_mul_conj_psi {g : ℝ → ℂ} (hg : IntegrableOn g (Icc 0 1)) {k m : ℕ}
-    (hm : m < 2 ^ k) (i : Fin r) :
-    ∫ x in dyadicIco k m, detailFun r g k x * conj (psi r i (2 ^ k * x - m)) =
-      ∫ x in dyadicIco k m, g x * conj (psi r i (2 ^ k * x - m)) := by
+theorem integral_alpertDetailFun_mul_conj_multiwavelet {g : ℝ → ℂ} (hg : IntegrableOn g (Icc 0 1))
+    {k m : ℕ} (hm : m < 2 ^ k) (i : Fin r) :
+    ∫ x in dyadicIco k m, alpertDetailFun r g k x * conj (multiwavelet r i (2 ^ k * x - m)) =
+      ∫ x in dyadicIco k m, g x * conj (multiwavelet r i (2 ^ k * x - m)) := by
   have hsub : dyadicIco k m ⊆ Icc 0 1 := (dyadicIco_subset hm).trans Ico_subset_Icc_self
   have hgI : IntegrableOn g (dyadicIco k m) := hg.mono_set hsub
   -- the rescaled wavelet is bounded, since `ψ_i` is a piecewise polynomial
-  obtain ⟨M, hM⟩ := exists_norm_ppFun_le 1 (twoPieces r (psiPieces r i))
-  have hmeas : AEStronglyMeasurable (fun x => conj (psi r i (2 ^ k * x - m)))
+  obtain ⟨M, hM⟩ := exists_norm_ppFun_le 1 (twoPieces r (multiwaveletPieces r i))
+  have hmeas : AEStronglyMeasurable (fun x => conj (multiwavelet r i (2 ^ k * x - m)))
       (volume.restrict (dyadicIco k m)) :=
     (Complex.continuous_conj.measurable.comp ((measurable_ppFun 1 _).comp
       (by fun_prop))).aestronglyMeasurable
   have hint : ∀ {F : ℝ → ℂ}, IntegrableOn F (dyadicIco k m) →
-      IntegrableOn (fun x => F x * conj (psi r i (2 ^ k * x - m))) (dyadicIco k m) :=
+      IntegrableOn (fun x => F x * conj (multiwavelet r i (2 ^ k * x - m))) (dyadicIco k m) :=
     fun hF => hF.mul_bdd (c := M) hmeas (Filter.Eventually.of_forall fun x => by
       rw [Complex.norm_conj]
       exact hM _)
   have hPfine := (integrableOn_ppFun (k + 1) (locProj r (k + 1) g)).mono_set hsub
   have hPcoarse := (integrableOn_ppFun k (locProj r k g)).mono_set hsub
-  have heq : EqOn (fun x => g x * conj (psi r i (2 ^ k * x - m)) -
-      (g x - ppFun (k + 1) (locProj r (k + 1) g) x) * conj (psi r i (2 ^ k * x - m)) -
-      ppFun k (locProj r k g) x * conj (psi r i (2 ^ k * x - m)))
-      (fun x => detailFun r g k x * conj (psi r i (2 ^ k * x - m))) (dyadicIco k m) :=
-    fun x _ => by simp only [detailFun]; ring
-  have hA : IntegrableOn (fun x => g x * conj (psi r i (2 ^ k * x - m))) (dyadicIco k m) :=
+  have heq : EqOn (fun x => g x * conj (multiwavelet r i (2 ^ k * x - m)) -
+      (g x - ppFun (k + 1) (locProj r (k + 1) g) x) * conj (multiwavelet r i (2 ^ k * x - m)) -
+      ppFun k (locProj r k g) x * conj (multiwavelet r i (2 ^ k * x - m)))
+      (fun x => alpertDetailFun r g k x * conj (multiwavelet r i (2 ^ k * x - m)))
+      (dyadicIco k m) :=
+    fun x _ => by simp only [alpertDetailFun]; ring
+  have hA : IntegrableOn (fun x => g x * conj (multiwavelet r i (2 ^ k * x - m))) (dyadicIco k m) :=
     hint hgI
   have hB : IntegrableOn (fun x => (g x - ppFun (k + 1) (locProj r (k + 1) g) x) *
-      conj (psi r i (2 ^ k * x - m))) (dyadicIco k m) := hint (hgI.sub hPfine)
-  have hC : IntegrableOn (fun x => ppFun k (locProj r k g) x * conj (psi r i (2 ^ k * x - m)))
+      conj (multiwavelet r i (2 ^ k * x - m))) (dyadicIco k m) := hint (hgI.sub hPfine)
+  have hC :
+      IntegrableOn (fun x => ppFun k (locProj r k g) x * conj (multiwavelet r i (2 ^ k * x - m)))
       (dyadicIco k m) := hint hPcoarse
-  have hAB : IntegrableOn (fun x => g x * conj (psi r i (2 ^ k * x - m)) -
-      (g x - ppFun (k + 1) (locProj r (k + 1) g) x) * conj (psi r i (2 ^ k * x - m)))
+  have hAB : IntegrableOn (fun x => g x * conj (multiwavelet r i (2 ^ k * x - m)) -
+      (g x - ppFun (k + 1) (locProj r (k + 1) g) x) * conj (multiwavelet r i (2 ^ k * x - m)))
       (dyadicIco k m) := hA.sub hB
   rw [← setIntegral_congr_fun (measurableSet_dyadicIco _ _) heq, integral_sub hAB hC,
     integral_sub hA hB,
-    integral_sub_ppFun_succ_mul r hg hm fun _ he => exists_conj_psi_eq_polyFun i he,
-    integral_ppFun_mul_conj_psi g hm i, sub_zero, sub_zero]
+    integral_sub_ppFun_succ_mul r hg hm fun _ he => exists_conj_multiwavelet_eq_polyFun i he,
+    integral_ppFun_mul_conj_multiwavelet g hm i, sub_zero, sub_zero]
 
 /-! ### Multiwavelet coefficients -/
 
 variable (r) in
 /-- The **multiwavelet coefficient** `⟨g, ψ_{k,m,i}⟩ = 2^(k/2) ∫_{I_{k,m}} g · conj ψ_i(2^k x - m)`
 of `g`, for the wavelet `ψ_{k,m,i}(x) = 2^(k/2) ψ_i(2^k x - m)` supported in `I_{k,m}`. -/
-noncomputable def coeff (g : ℝ → ℂ) (k m : ℕ) (i : Fin r) : ℂ :=
-  (((2 : ℝ) ^ ((k : ℝ) / 2) : ℝ) : ℂ) * ∫ x in dyadicIco k m, g x * conj (psi r i (2 ^ k * x - m))
+noncomputable def alpertCoeff (g : ℝ → ℂ) (k m : ℕ) (i : Fin r) : ℂ :=
+  (((2 : ℝ) ^ ((k : ℝ) / 2) : ℝ) : ℂ) * ∫ x in dyadicIco k m,
+    g x * conj (multiwavelet r i (2 ^ k * x - m))
 
 variable (r) in
 /-- The coefficients of the pieces of the detail `Δ_k g` on `I_{k,m}` moved to `[0, 1]`: on the
@@ -465,7 +472,7 @@ piecewise polynomial of level `1` with the pieces `Alpert.detailPieces`. -/
 theorem ppFun_detailPieces (g : ℝ → ℂ) {k m : ℕ} (hm : m < 2 ^ k) {t : ℝ}
     (ht : t ∈ Ico (0 : ℝ) 1) :
     ppFun 1 (twoPieces r (detailPieces r g k m)) t =
-      detailFun r g k ((m : ℝ) / 2 ^ k + 1 / 2 ^ k * t) := by
+      alpertDetailFun r g k ((m : ℝ) / 2 ^ k + 1 / 2 ^ k * t) := by
   obtain ⟨htI, hn⟩ := mem_dyadicIco_floor (k := 1) ht
   set e := ⌊2 ^ 1 * t⌋₊ with he
   have he2 : e < 2 := by simpa using hn
@@ -483,7 +490,8 @@ theorem ppFun_detailPieces (g : ℝ → ℂ) {k m : ℕ} (hm : m < 2 ^ k) {t : �
     push_cast
     constructor <;> linarith [htI.1, htI.2]
   have hidx : 2 * m + e < 2 ^ (k + 1) := by rw [pow_succ]; omega
-  rw [ppFun_eq_of_mem _ hn htI, detailFun, ppFun_eq_of_mem _ hidx hxk1, ppFun_eq_of_mem _ hm hxk]
+  rw [ppFun_eq_of_mem _ hn htI, alpertDetailFun, ppFun_eq_of_mem _ hidx hxk1,
+    ppFun_eq_of_mem _ hm hxk]
   have hpiece : twoPieces r (detailPieces r g k m) e =
       (locProj r (k + 1) g (2 * m + e) - locProj r k g m).comp
         (C ((((m : ℝ) / 2 ^ k : ℝ)) : ℂ) + C (((1 / 2 ^ k : ℝ)) : ℂ) * X) := by
@@ -511,7 +519,7 @@ theorem levelOne_detailPieces_mem {g : ℝ → ℂ} (hg : IntegrableOn g (Icc 0 
   have h2 : (((2 : ℝ) ^ k : ℝ) : ℂ) ≠ 0 := by rw [Complex.ofReal_ne_zero]; positivity
   have hcongr : ∫ t in Icc (0 : ℝ) 1, conj ((polyL2 r c : Lp ℂ 2 unitVol) t) *
       (levelOne r (detailPieces r g k m) : Lp ℂ 2 unitVol) t =
-      ∫ t in Icc (0 : ℝ) 1, detailFun r g k (t / 2 ^ k + m / 2 ^ k) *
+      ∫ t in Icc (0 : ℝ) 1, alpertDetailFun r g k (t / 2 ^ k + m / 2 ^ k) *
         polyFun Q (t / 2 ^ k + m / 2 ^ k) := by
     refine integral_congr_ae ?_
     filter_upwards [MemLp.coeFn_toLp (memLp_polyFun P 2 0 1),
@@ -523,22 +531,23 @@ theorem levelOne_detailPieces_mem {g : ℝ → ℂ} (hg : IntegrableOn g (Icc 0 
     rw [e1, e2, mul_comm]
   calc ∫ t in Icc (0 : ℝ) 1, conj ((polyL2 r c : Lp ℂ 2 unitVol) t) *
         (levelOne r (detailPieces r g k m) : Lp ℂ 2 unitVol) t
-      = ∫ t in Icc (0 : ℝ) 1, detailFun r g k (t / 2 ^ k + m / 2 ^ k) *
+      = ∫ t in Icc (0 : ℝ) 1, alpertDetailFun r g k (t / 2 ^ k + m / 2 ^ k) *
           polyFun Q (t / 2 ^ k + m / 2 ^ k) := hcongr
-    _ = (((2 : ℝ) ^ k : ℝ) : ℂ) * ∫ x in dyadicIco k m, detailFun r g k x * polyFun Q x :=
-        (integral_dyadicIco_eq k m (fun x => detailFun r g k x * polyFun Q x)).symm
-    _ = 0 := by rw [integral_detailFun_mul hg hm hQ, mul_zero]
+    _ = (((2 : ℝ) ^ k : ℝ) : ℂ) * ∫ x in dyadicIco k m, alpertDetailFun r g k x * polyFun Q x :=
+        (integral_dyadicIco_eq k m (fun x => alpertDetailFun r g k x * polyFun Q x)).symm
+    _ = 0 := by rw [integral_alpertDetailFun_mul hg hm hQ, mul_zero]
 
 /-- The coefficient of `ψ_i` in the moved detail is `2^(k/2)` times the multiwavelet coefficient
 `⟨g, ψ_{k,m,i}⟩`. -/
-theorem integral_conj_psi_mul_detailPieces {g : ℝ → ℂ} (hg : IntegrableOn g (Icc 0 1))
+theorem integral_conj_multiwavelet_mul_detailPieces {g : ℝ → ℂ} (hg : IntegrableOn g (Icc 0 1))
     {k m : ℕ} (hm : m < 2 ^ k) (i : Fin r) :
-    ∫ t in Icc (0 : ℝ) 1, conj (psi r i t) * ppFun 1 (twoPieces r (detailPieces r g k m)) t =
-      (((2 : ℝ) ^ ((k : ℝ) / 2) : ℝ) : ℂ) * coeff r g k m i := by
-  have hcongr : ∫ t in Icc (0 : ℝ) 1, conj (psi r i t) *
+    ∫ t in Icc (0 : ℝ) 1,
+      conj (multiwavelet r i t) * ppFun 1 (twoPieces r (detailPieces r g k m)) t =
+      (((2 : ℝ) ^ ((k : ℝ) / 2) : ℝ) : ℂ) * alpertCoeff r g k m i := by
+  have hcongr : ∫ t in Icc (0 : ℝ) 1, conj (multiwavelet r i t) *
       ppFun 1 (twoPieces r (detailPieces r g k m)) t =
-      ∫ t in Icc (0 : ℝ) 1, detailFun r g k (t / 2 ^ k + m / 2 ^ k) *
-        conj (psi r i (2 ^ k * (t / 2 ^ k + m / 2 ^ k) - m)) := by
+      ∫ t in Icc (0 : ℝ) 1, alpertDetailFun r g k (t / 2 ^ k + m / 2 ^ k) *
+        conj (multiwavelet r i (2 ^ k * (t / 2 ^ k + m / 2 ^ k) - m)) := by
     refine integral_congr_ae ?_
     filter_upwards [ae_mem_Ico_unitVol] with t ht
     have e1 : (2 : ℝ) ^ k * (t / 2 ^ k + m / 2 ^ k) - m = t := by field_simp; ring
@@ -549,60 +558,65 @@ theorem integral_conj_psi_mul_detailPieces {g : ℝ → ℂ} (hg : IntegrableOn 
     rw [ofReal_two_rpow_half_mul_self]
     push_cast
     rfl
-  calc ∫ t in Icc (0 : ℝ) 1, conj (psi r i t) * ppFun 1 (twoPieces r (detailPieces r g k m)) t
-      = ∫ t in Icc (0 : ℝ) 1, detailFun r g k (t / 2 ^ k + m / 2 ^ k) *
-          conj (psi r i (2 ^ k * (t / 2 ^ k + m / 2 ^ k) - m)) := hcongr
+  calc ∫ t in Icc (0 : ℝ) 1,
+          conj (multiwavelet r i t) * ppFun 1 (twoPieces r (detailPieces r g k m)) t
+      = ∫ t in Icc (0 : ℝ) 1, alpertDetailFun r g k (t / 2 ^ k + m / 2 ^ k) *
+          conj (multiwavelet r i (2 ^ k * (t / 2 ^ k + m / 2 ^ k) - m)) := hcongr
     _ = (((2 : ℝ) ^ k : ℝ) : ℂ) * ∫ x in dyadicIco k m,
-          detailFun r g k x * conj (psi r i (2 ^ k * x - m)) :=
+          alpertDetailFun r g k x * conj (multiwavelet r i (2 ^ k * x - m)) :=
         (integral_dyadicIco_eq k m
-          (fun x => detailFun r g k x * conj (psi r i (2 ^ k * x - m)))).symm
+          (fun x => alpertDetailFun r g k x * conj (multiwavelet r i (2 ^ k * x - m)))).symm
     _ = _ := by
-        rw [integral_detailFun_mul_conj_psi hg hm i, coeff, ← mul_assoc, hc]
+        rw [integral_alpertDetailFun_mul_conj_multiwavelet hg hm i, alpertCoeff, ← mul_assoc, hc]
 
 /-- **The moved detail in the multiwavelets**: almost everywhere on `[0, 1]`,
 `Δ_k g(m 2^(-k) + 2^(-k) t) = ∑_i 2^(k/2) ⟨g, ψ_{k,m,i}⟩ ψ_i(t)`. -/
 theorem ppFun_detailPieces_ae_eq {g : ℝ → ℂ} (hg : IntegrableOn g (Icc 0 1)) {k m : ℕ}
     (hm : m < 2 ^ k) :
     ppFun 1 (twoPieces r (detailPieces r g k m)) =ᵐ[unitVol] fun t =>
-      ∑ i, ((((2 : ℝ) ^ ((k : ℝ) / 2) : ℝ) : ℂ) * coeff r g k m i) * psi r i t := by
-  filter_upwards [ppFun_ae_eq_sum_psi r (levelOne_detailPieces_mem hg hm)] with t ht
+      ∑ i, ((((2 : ℝ) ^ ((k : ℝ) / 2) : ℝ) : ℂ) * alpertCoeff r g k m i) * multiwavelet r i t := by
+  filter_upwards [ppFun_ae_eq_sum_multiwavelet r (levelOne_detailPieces_mem hg hm)] with t ht
   rw [ht]
-  simp only [integral_conj_psi_mul_detailPieces hg hm]
+  simp only [integral_conj_multiwavelet_mul_detailPieces hg hm]
 
 /-! ### Stability and the norms of the details -/
 
 variable (r) in
 /-- `conj ψ_j · F` is integrable on `[0, 1]` for bounded `F`. -/
-theorem integrable_conj_psi_mul (j : Fin r) {F : ℝ → ℂ} (hF : MemLp F ∞ unitVol) :
-    Integrable (fun t => conj (psi r j t) * F t) unitVol := by
-  have h1 : Integrable (fun t => conj (psi r j t)) unitVol := by
-    simp only [psi, conj_ppFun]
+theorem integrable_conj_multiwavelet_mul (j : Fin r) {F : ℝ → ℂ} (hF : MemLp F ∞ unitVol) :
+    Integrable (fun t => conj (multiwavelet r j t) * F t) unitVol := by
+  have h1 : Integrable (fun t => conj (multiwavelet r j t)) unitVol := by
+    simp only [multiwavelet, conj_ppFun]
     exact (memLp_ppFun 1 _ 1).integrable le_rfl
   exact h1.mul_of_top_left hF
 
 variable (r) in
 /-- `∫_0^1 conj ψ_j ∑_i β_i ψ_i = β_j`, by orthonormality. -/
-theorem integral_conj_psi_mul_sum (β : Fin r → ℂ) (j : Fin r) :
-    ∫ t in Icc (0 : ℝ) 1, conj (psi r j t) * ∑ i, β i * psi r i t = β j := by
-  have hint : ∀ i, Integrable (fun t => conj (psi r j t) * (β i * psi r i t)) unitVol := fun i =>
-    integrable_conj_psi_mul r j ((memLp_ppFun 1 (twoPieces r (psiPieces r i)) ∞).const_mul (β i))
+theorem integral_conj_multiwavelet_mul_sum (β : Fin r → ℂ) (j : Fin r) :
+    ∫ t in Icc (0 : ℝ) 1, conj (multiwavelet r j t) * ∑ i, β i * multiwavelet r i t = β j := by
+  have hint : ∀ i,
+      Integrable (fun t => conj (multiwavelet r j t) * (β i * multiwavelet r i t)) unitVol :=
+    fun i => integrable_conj_multiwavelet_mul r j
+      ((memLp_ppFun 1 (twoPieces r (multiwaveletPieces r i)) ∞).const_mul (β i))
   simp only [Finset.mul_sum]
   rw [integral_finsetSum _ fun i _ => hint i]
-  simp only [mul_left_comm _ (β _), integral_const_mul, integral_conj_psi_mul_psi, mul_ite,
-    mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_univ, ↓reduceIte]
+  simp only [mul_left_comm _ (β _), integral_const_mul, integral_conj_multiwavelet_mul_multiwavelet,
+    mul_ite, mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_univ, ↓reduceIte]
 
 variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 
 omit [Fact (1 ≤ p)] in
 variable (r p) in
 /-- Combinations of the multiwavelets lie in `L_p[0, 1]`. -/
-theorem memLp_sum_psi (β : Fin r → ℂ) : MemLp (fun t => ∑ i, β i * psi r i t) p unitVol :=
-  memLp_finsetSum _ fun i _ => (memLp_ppFun 1 (twoPieces r (psiPieces r i)) p).const_mul (β i)
+theorem memLp_sum_multiwavelet (β : Fin r → ℂ) :
+    MemLp (fun t => ∑ i, β i * multiwavelet r i t) p unitVol :=
+  memLp_finsetSum _ fun i _ =>
+    (memLp_ppFun 1 (twoPieces r (multiwaveletPieces r i)) p).const_mul (β i)
 
 variable (r p) in
 /-- The combinations `∑_i β_i ψ_i` in `L_p[0, 1]`, as a linear map of the coefficients. -/
-noncomputable def sumPsi : (Fin r → ℂ) →ₗ[ℂ] Lp ℂ p unitVol where
-  toFun β := (memLp_sum_psi r p β).toLp _
+noncomputable def sumMultiwavelet : (Fin r → ℂ) →ₗ[ℂ] Lp ℂ p unitVol where
+  toFun β := (memLp_sum_multiwavelet r p β).toLp _
   map_add' β γ := by
     rw [← MemLp.toLp_add]
     refine MemLp.toLp_congr _ _ (Filter.Eventually.of_forall fun t => ?_)
@@ -613,22 +627,22 @@ noncomputable def sumPsi : (Fin r → ℂ) →ₗ[ℂ] Lp ℂ p unitVol where
     simp only [Pi.smul_apply, smul_eq_mul, Finset.mul_sum, mul_assoc]
 
 omit [Fact (1 ≤ p)] in
-/-- The function of `Alpert.sumPsi β` is `∑_i β_i ψ_i`. -/
-theorem coeFn_sumPsi (β : Fin r → ℂ) :
-    sumPsi r p β =ᵐ[unitVol] fun t => ∑ i, β i * psi r i t :=
-  MemLp.coeFn_toLp (memLp_sum_psi r p β)
+/-- The function of `Alpert.sumMultiwavelet β` is `∑_i β_i ψ_i`. -/
+theorem coeFn_sumMultiwavelet (β : Fin r → ℂ) :
+    sumMultiwavelet r p β =ᵐ[unitVol] fun t => ∑ i, β i * multiwavelet r i t :=
+  MemLp.coeFn_toLp (memLp_sum_multiwavelet r p β)
 
 omit [Fact (1 ≤ p)] in
 variable (r p) in
 /-- The multiwavelets are linearly independent in `L_p[0, 1]`: `β_j` is the coefficient of `ψ_j`
-in `∑_i β_i ψ_i` (`Alpert.integral_conj_psi_mul_sum`). -/
-theorem sumPsi_injective : Function.Injective (sumPsi r p) := by
+in `∑_i β_i ψ_i` (`Alpert.integral_conj_multiwavelet_mul_sum`). -/
+theorem sumMultiwavelet_injective : Function.Injective (sumMultiwavelet r p) := by
   rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
   intro β hβ
-  have h0 : (fun t => ∑ i, β i * psi r i t) =ᵐ[unitVol] 0 :=
-    (coeFn_sumPsi β).symm.trans ((Lp.ext_iff.1 hβ).trans (Lp.coeFn_zero ℂ p unitVol))
+  have h0 : (fun t => ∑ i, β i * multiwavelet r i t) =ᵐ[unitVol] 0 :=
+    (coeFn_sumMultiwavelet β).symm.trans ((Lp.ext_iff.1 hβ).trans (Lp.coeFn_zero ℂ p unitVol))
   funext j
-  rw [← integral_conj_psi_mul_sum r β j, Pi.zero_apply]
+  rw [← integral_conj_multiwavelet_mul_sum r β j, Pi.zero_apply]
   refine (integral_congr_ae (h0.mono fun t ht => ?_)).trans (integral_zero _ _)
   simp only [ht, Pi.zero_apply, mul_zero]
 
@@ -640,39 +654,44 @@ coefficients (`LinearMap.injective_iff_antilipschitz`, applied to `β` and `0`),
 triangle inequality. -/
 theorem exists_stable : ∃ K M : ℝ≥0∞, K ≠ ∞ ∧ M ≠ ∞ ∧ ∀ β : Fin r → ℂ,
     ENNReal.lqNorm p (fun i => ‖β i‖ₑ) ≤
-      K * eLpNorm (fun t => ∑ i, β i * psi r i t) p unitVol ∧
-    eLpNorm (fun t => ∑ i, β i * psi r i t) p unitVol ≤
+      K * eLpNorm (fun t => ∑ i, β i * multiwavelet r i t) p unitVol ∧
+    eLpNorm (fun t => ∑ i, β i * multiwavelet r i t) p unitVol ≤
       M * ENNReal.lqNorm p (fun i => ‖β i‖ₑ) := by
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one (Fact.out : 1 ≤ p)).ne'
-  obtain ⟨K, -, hK⟩ := (sumPsi r p).injective_iff_antilipschitz.1 (sumPsi_injective r p)
-  refine ⟨(Fintype.card (Fin r) : ℝ≥0∞) ^ (1 / p.toReal) * K, ∑ i, eLpNorm (psi r i) p unitVol,
+  obtain ⟨K, -, hK⟩ :=
+    (sumMultiwavelet r p).injective_iff_antilipschitz.1 (sumMultiwavelet_injective r p)
+  refine ⟨(Fintype.card (Fin r) : ℝ≥0∞) ^ (1 / p.toReal) * K,
+    ∑ i, eLpNorm (multiwavelet r i) p unitVol,
     ENNReal.mul_ne_top (ENNReal.rpow_ne_top_of_nonneg (by positivity) (ENNReal.natCast_ne_top _))
       ENNReal.coe_ne_top,
-    ENNReal.sum_ne_top.2 fun i _ => (memLp_ppFun 1 (twoPieces r (psiPieces r i)) p).eLpNorm_ne_top,
+    ENNReal.sum_ne_top.2 fun i _ =>
+      (memLp_ppFun 1 (twoPieces r (multiwaveletPieces r i)) p).eLpNorm_ne_top,
     fun β => ⟨?_, ?_⟩⟩
-  · have hnorm : ‖sumPsi r p β‖ₑ = eLpNorm (fun t => ∑ i, β i * psi r i t) p unitVol := by
+  · have hnorm : ‖sumMultiwavelet r p β‖ₑ =
+        eLpNorm (fun t => ∑ i, β i * multiwavelet r i t) p unitVol := by
       rw [Lp.enorm_def]
-      exact eLpNorm_congr_ae (coeFn_sumPsi β)
-    have hbe : ‖β‖ₑ ≤ K * ‖sumPsi r p β‖ₑ := by
+      exact eLpNorm_congr_ae (coeFn_sumMultiwavelet β)
+    have hbe : ‖β‖ₑ ≤ K * ‖sumMultiwavelet r p β‖ₑ := by
       simpa only [edist_zero_right, map_zero] using hK β 0
     calc ENNReal.lqNorm p (fun i => ‖β i‖ₑ)
         ≤ (Fintype.card (Fin r) : ℝ≥0∞) ^ (1 / p.toReal) * ‖β‖ₑ :=
           ENNReal.lqNorm_le_card_rpow_mul fun i => by
             rw [← ofReal_norm, ← ofReal_norm]
             exact ENNReal.ofReal_le_ofReal (norm_le_pi_norm β i)
-      _ ≤ (Fintype.card (Fin r) : ℝ≥0∞) ^ (1 / p.toReal) * (K * ‖sumPsi r p β‖ₑ) := by gcongr
+      _ ≤ (Fintype.card (Fin r) : ℝ≥0∞) ^ (1 / p.toReal) *
+          (K * ‖sumMultiwavelet r p β‖ₑ) := by gcongr
       _ = _ := by rw [hnorm, mul_assoc]
-  · have hsmul : ∀ i, (fun t => β i * psi r i t) = β i • psi r i := fun i => rfl
-    calc eLpNorm (fun t => ∑ i, β i * psi r i t) p unitVol
-        ≤ ∑ i, eLpNorm (fun t => β i * psi r i t) p unitVol := by
-          have h := eLpNorm_sum_le (f := fun i t => β i * psi r i t) (s := Finset.univ)
+  · have hsmul : ∀ i, (fun t => β i * multiwavelet r i t) = β i • multiwavelet r i := fun i => rfl
+    calc eLpNorm (fun t => ∑ i, β i * multiwavelet r i t) p unitVol
+        ≤ ∑ i, eLpNorm (fun t => β i * multiwavelet r i t) p unitVol := by
+          have h := eLpNorm_sum_le (f := fun i t => β i * multiwavelet r i t) (s := Finset.univ)
             (μ := unitVol) (Fact.out : 1 ≤ p)
           convert h using 2
           funext t
           simp only [Finset.sum_apply]
-      _ = ∑ i, ‖β i‖ₑ * eLpNorm (psi r i) p unitVol := by
+      _ = ∑ i, ‖β i‖ₑ * eLpNorm (multiwavelet r i) p unitVol := by
           simp only [hsmul, eLpNorm_const_smul]
-      _ ≤ ∑ i, ENNReal.lqNorm p (fun i => ‖β i‖ₑ) * eLpNorm (psi r i) p unitVol := by
+      _ ≤ ∑ i, ENNReal.lqNorm p (fun i => ‖β i‖ₑ) * eLpNorm (multiwavelet r i) p unitVol := by
           gcongr with i
           exact ENNReal.le_lqNorm hp0 (fun i => ‖β i‖ₑ) i
       _ = _ := by rw [← Finset.mul_sum, mul_comm]
@@ -680,18 +699,20 @@ theorem exists_stable : ∃ K M : ℝ≥0∞, K ≠ ∞ ∧ M ≠ ∞ ∧ ∀ β
 omit [Fact (1 ≤ p)] in
 /-- **The detail on one interval through the multiwavelets**:
 `2^(k/p) ‖Δ_k g‖_{L_p(I_{k,m})} = ‖∑_i 2^(k/2) ⟨g, ψ_{k,m,i}⟩ ψ_i‖_{L_p[0, 1]}`. -/
-theorem eLpNorm_detailFun_dyadicIco (hp : p ≠ ∞) {g : ℝ → ℂ} (hg : IntegrableOn g (Icc 0 1))
+theorem eLpNorm_alpertDetailFun_dyadicIco (hp : p ≠ ∞) {g : ℝ → ℂ} (hg : IntegrableOn g (Icc 0 1))
     {k m : ℕ} (hm : m < 2 ^ k) :
-    dyadicWeight (1 / p.toReal) k * eLpNorm (detailFun r g k) p (volume.restrict (dyadicIco k m)) =
-      eLpNorm (fun t => ∑ i, ((((2 : ℝ) ^ ((k : ℝ) / 2) : ℝ) : ℂ) * coeff r g k m i) *
-        psi r i t) p unitVol := by
-  have hmeas : Measurable (detailFun r g k) := (measurable_ppFun _ _).sub (measurable_ppFun _ _)
+    dyadicWeight (1 / p.toReal) k *
+      eLpNorm (alpertDetailFun r g k) p (volume.restrict (dyadicIco k m)) =
+      eLpNorm (fun t => ∑ i, ((((2 : ℝ) ^ ((k : ℝ) / 2) : ℝ) : ℂ) * alpertCoeff r g k m i) *
+        multiwavelet r i t) p unitVol := by
+  have hmeas : Measurable (alpertDetailFun r g k) :=
+    (measurable_ppFun _ _).sub (measurable_ppFun _ _)
   have h :=
     interval_eLpNorm_comp_affine hmeas hp ((m : ℝ) / 2 ^ k) (L := 1 / 2 ^ k) (by positivity) 0 1
   rw [mul_zero, add_zero, mul_one] at h
-  have hL : eLpNorm (fun y => detailFun r g k ((m : ℝ) / 2 ^ k + 1 / 2 ^ k * y)) p unitVol =
-      eLpNorm (fun t => ∑ i, ((((2 : ℝ) ^ ((k : ℝ) / 2) : ℝ) : ℂ) * coeff r g k m i) *
-        psi r i t) p unitVol := by
+  have hL : eLpNorm (fun y => alpertDetailFun r g k ((m : ℝ) / 2 ^ k + 1 / 2 ^ k * y)) p unitVol =
+      eLpNorm (fun t => ∑ i, ((((2 : ℝ) ^ ((k : ℝ) / 2) : ℝ) : ℂ) * alpertCoeff r g k m i) *
+        multiwavelet r i t) p unitVol := by
     refine eLpNorm_congr_ae ?_
     filter_upwards [ae_mem_Ico_unitVol, ppFun_detailPieces_ae_eq hg hm] with t ht h2
     rw [← ppFun_detailPieces g hm ht, h2]
@@ -708,36 +729,38 @@ theorem eLpNorm_detailFun_dyadicIco (hp : p ≠ ∞) {g : ℝ → ℂ} (hg : Int
 `2^(k(1/2-1/p)) ‖(⟨g, ψ_{k,m,i}⟩)_{m,i}‖_{ℓ_p} ≤ K ‖Δ_k g‖_p` and
 `‖Δ_k g‖_p ≤ M 2^(k(1/2-1/p)) ‖(⟨g, ψ_{k,m,i}⟩)_{m,i}‖_{ℓ_p}`
 for every `g` integrable on `[0, 1]` and every `k`: on each of the `2^k` intervals the detail is
-a moved multiwavelet combination (`Alpert.eLpNorm_detailFun_dyadicIco`), whose norm is that of
+a moved multiwavelet combination (`Alpert.eLpNorm_alpertDetailFun_dyadicIco`), whose norm is that of
 its coefficients up to the constants of `Alpert.exists_stable`. -/
-theorem exists_eLpNorm_detailFun_equiv (hp : p ≠ ∞) : ∃ K M : ℝ≥0∞, K ≠ ∞ ∧ M ≠ ∞ ∧
+theorem exists_eLpNorm_alpertDetailFun_equiv (hp : p ≠ ∞) : ∃ K M : ℝ≥0∞, K ≠ ∞ ∧ M ≠ ∞ ∧
     ∀ g : ℝ → ℂ, IntegrableOn g (Icc 0 1) → ∀ k : ℕ,
       dyadicWeight (1 / 2 - 1 / p.toReal) k * ENNReal.lqNorm p
-        (fun mi : Fin (2 ^ k) × Fin r => ‖coeff r g k mi.1 mi.2‖ₑ) ≤
-          K * eLpNorm (detailFun r g k) p unitVol ∧
-      eLpNorm (detailFun r g k) p unitVol ≤ M * (dyadicWeight (1 / 2 - 1 / p.toReal) k *
-        ENNReal.lqNorm p (fun mi : Fin (2 ^ k) × Fin r => ‖coeff r g k mi.1 mi.2‖ₑ)) := by
+        (fun mi : Fin (2 ^ k) × Fin r => ‖alpertCoeff r g k mi.1 mi.2‖ₑ) ≤
+          K * eLpNorm (alpertDetailFun r g k) p unitVol ∧
+      eLpNorm (alpertDetailFun r g k) p unitVol ≤ M * (dyadicWeight (1 / 2 - 1 / p.toReal) k *
+        ENNReal.lqNorm p (fun mi : Fin (2 ^ k) × Fin r => ‖alpertCoeff r g k mi.1 mi.2‖ₑ)) := by
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one (Fact.out : 1 ≤ p)).ne'
   have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
   obtain ⟨K, M, hK, hM, hKM⟩ := exists_stable (p := p) r
   refine ⟨K, M, hK, hM, fun g hg k => ?_⟩
-  set A := eLpNorm (detailFun r g k) p unitVol
+  set A := eLpNorm (alpertDetailFun r g k) p unitVol
   set β : Fin (2 ^ k) → Fin r → ℂ := fun m i =>
-    (((2 : ℝ) ^ ((k : ℝ) / 2) : ℝ) : ℂ) * coeff r g k m i
-  set S : Fin (2 ^ k) → ℝ≥0∞ := fun m => eLpNorm (fun t => ∑ i, β m i * psi r i t) p unitVol
-  set F := ENNReal.lqNorm p (fun mi : Fin (2 ^ k) × Fin r => ‖coeff r g k mi.1 mi.2‖ₑ)
-  have hmeas : Measurable (detailFun r g k) := (measurable_ppFun _ _).sub (measurable_ppFun _ _)
+    (((2 : ℝ) ^ ((k : ℝ) / 2) : ℝ) : ℂ) * alpertCoeff r g k m i
+  set S : Fin (2 ^ k) → ℝ≥0∞ :=
+    fun m => eLpNorm (fun t => ∑ i, β m i * multiwavelet r i t) p unitVol
+  set F := ENNReal.lqNorm p (fun mi : Fin (2 ^ k) × Fin r => ‖alpertCoeff r g k mi.1 mi.2‖ₑ)
+  have hmeas : Measurable (alpertDetailFun r g k) :=
+    (measurable_ppFun _ _).sub (measurable_ppFun _ _)
   -- the level norm in pieces
   have hA : dyadicWeight 1 k * A ^ p.toReal = ∑ m, S m ^ p.toReal := by
     rw [eLpNorm_rpow_eq hmeas.aestronglyMeasurable hp0 hp,
-      show (∫⁻ x, ‖detailFun r g k x‖ₑ ^ p.toReal ∂unitVol) =
-        ∫⁻ x in Icc (0 : ℝ) 1, ‖detailFun r g k x‖ₑ ^ p.toReal from rfl,
+      show (∫⁻ x, ‖alpertDetailFun r g k x‖ₑ ^ p.toReal ∂unitVol) =
+        ∫⁻ x in Icc (0 : ℝ) 1, ‖alpertDetailFun r g k x‖ₑ ^ p.toReal from rfl,
       lintegral_unit_eq_sum_dyadicIco _ k, Finset.mul_sum, Finset.sum_range]
     refine Finset.sum_congr rfl fun m _ => ?_
     rw [← eLpNorm_rpow_eq hmeas.aestronglyMeasurable hp0 hp,
       show dyadicWeight 1 k = dyadicWeight (1 / p.toReal) k ^ p.toReal by
         rw [ENNReal.dyadicWeight_rpow, one_div_mul_cancel hq.ne'],
-      ← ENNReal.mul_rpow_of_nonneg _ _ hq.le, eLpNorm_detailFun_dyadicIco hp hg m.isLt]
+      ← ENNReal.mul_rpow_of_nonneg _ _ hq.le, eLpNorm_alpertDetailFun_dyadicIco hp hg m.isLt]
   -- the coefficients in pieces
   have hβ : ENNReal.lqNorm p (fun mi : Fin (2 ^ k) × Fin r => ‖β mi.1 mi.2‖ₑ) =
       dyadicWeight (1 / 2) k * F := by
@@ -779,9 +802,9 @@ theorem exists_eLpNorm_detailFun_equiv (hp : p ≠ ∞) : ∃ K M : ℝ≥0∞, 
 
 /-! ### The coefficient characterisation -/
 
-/-- The detail `P_{k+1} f - P_k f` in `L_p[0, 1]` is the function `Alpert.detailFun`. -/
+/-- The detail `P_{k+1} f - P_k f` in `L_p[0, 1]` is the function `Alpert.alpertDetailFun`. -/
 theorem enorm_ppProj_sub (hp : p ≠ ∞) (f : Lp ℂ p unitVol) (k : ℕ) :
-    ‖ppProj p hp r (k + 1) f - ppProj p hp r k f‖ₑ = eLpNorm (detailFun r f k) p unitVol := by
+    ‖ppProj p hp r (k + 1) f - ppProj p hp r k f‖ₑ = eLpNorm (alpertDetailFun r f k) p unitVol := by
   rw [Lp.enorm_def]
   exact eLpNorm_congr_ae ((Lp.coeFn_sub _ _).trans
     ((coeFn_ppProj hp r (k + 1) f).sub (coeFn_ppProj hp r k f)))
@@ -790,12 +813,12 @@ theorem enorm_ppProj_sub (hp : p ≠ ∞) (f : Lp ℂ p unitVol) (k : ℕ) :
 `1 ≤ p < ∞`, `r ≥ 1`, `s > 0` and `1 ≤ q ≤ ∞`, an `f ∈ L_p[0, 1]` lies in the approximation space
 `A^s_q` of the dyadic piecewise polynomials of degree `< r` iff
 `‖P_0 f‖_p + ‖(2^(k(s + 1/2 - 1/p)) ‖(⟨f, ψ_{k,m,i}⟩)_{m < 2^k, i < r}‖_{ℓ_p})_k‖_{ℓ_q} < ∞`. -/
-theorem memApprox_ppScheme_iff_coeff (hp : p ≠ ∞) (hr : 1 ≤ r) {s : ℝ} (hs : 0 < s)
+theorem memApprox_ppScheme_iff_alpertCoeff (hp : p ≠ ∞) (hr : 1 ≤ r) {s : ℝ} (hs : 0 < s)
     {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Lp ℂ p unitVol) :
     (ppScheme p r).MemApprox s q f ↔ ‖ppProj p hp r 0 f‖ₑ + ENNReal.lqNorm q (fun k =>
       dyadicWeight (s + (1 / 2 - 1 / p.toReal)) k * ENNReal.lqNorm p
-        (fun mi : Fin (2 ^ k) × Fin r => ‖coeff r f k mi.1 mi.2‖ₑ)) < ∞ := by
-  obtain ⟨K, M, hK, hM, hKM⟩ := exists_eLpNorm_detailFun_equiv (r := r) hp
+        (fun mi : Fin (2 ^ k) × Fin r => ‖alpertCoeff r f k mi.1 mi.2‖ₑ)) < ∞ := by
+  obtain ⟨K, M, hK, hM, hKM⟩ := exists_eLpNorm_alpertDetailFun_equiv (r := r) hp
   have hf : IntegrableOn (f : ℝ → ℂ) (Icc 0 1) := (Lp.memLp f).integrable Fact.out
   rw [memApprox_ppScheme_iff_block hp hr hs hq f]
   simp only [enorm_ppProj_sub hp f, ENNReal.add_lt_top]
@@ -809,26 +832,26 @@ theorem memApprox_ppScheme_iff_coeff (hp : p ≠ ∞) (hr : 1 ≤ r) {s : ℝ} (
 `1 ≤ q ≤ ∞`, `r ≥ 1` and `0 < s < 1/p`, the Besov quasi-norm
 `‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k), [0, 1])_p)_k‖_{ℓ_q}` is finite iff
 `‖P_0 f‖_p + ‖(2^(k(s + 1/2 - 1/p)) ‖(⟨f, ψ_{k,m,i}⟩)_{m,i}‖_{ℓ_p})_k‖_{ℓ_q}` is. -/
-theorem lqNorm_modulus_lt_top_iff_coeff (hp : p ≠ ∞) (hr : 1 ≤ r) {s : ℝ} (hs : 0 < s)
+theorem lqNorm_modulus_lt_top_iff_alpertCoeff (hp : p ≠ ∞) (hr : 1 ≤ r) {s : ℝ} (hs : 0 < s)
     (hsp : s < 1 / p.toReal) {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Lp ℂ p unitVol) :
     ‖f‖ₑ + ENNReal.lqNorm q (fun k => dyadicWeight s k * intervalLpModulus p r f k) < ∞ ↔
       ‖ppProj p hp r 0 f‖ₑ + ENNReal.lqNorm q (fun k =>
         dyadicWeight (s + (1 / 2 - 1 / p.toReal)) k * ENNReal.lqNorm p
-          (fun mi : Fin (2 ^ k) × Fin r => ‖coeff r f k mi.1 mi.2‖ₑ)) < ∞ :=
+          (fun mi : Fin (2 ^ k) × Fin r => ‖alpertCoeff r f k mi.1 mi.2‖ₑ)) < ∞ :=
   (memApprox_ppScheme_iff hr hp hq hs.le hsp f).symm.trans
-    (memApprox_ppScheme_iff_coeff hp hr hs hq f)
+    (memApprox_ppScheme_iff_alpertCoeff hp hr hs hq f)
 
 /-- **Besov spaces on the circle through multiwavelet coefficients**: for `1 ≤ p < ∞`,
 `1 ≤ q ≤ ∞`, `r ≥ 1` and `0 < s < 1/p`, the periodic Besov quasi-norm
 `‖f‖_p + ‖(2^(ks) ω_r^per(f, 2^(-k))_p)_k‖_{ℓ_q}` is finite iff
 `‖P_0 f‖_p + ‖(2^(k(s + 1/2 - 1/p)) ‖(⟨f, ψ_{k,m,i}⟩)_{m,i}‖_{ℓ_p})_k‖_{ℓ_q}` is. -/
-theorem lqNorm_perModulus_lt_top_iff_coeff (hp : p ≠ ∞) (hr : 1 ≤ r) {s : ℝ} (hs : 0 < s)
+theorem lqNorm_perModulus_lt_top_iff_alpertCoeff (hp : p ≠ ∞) (hr : 1 ≤ r) {s : ℝ} (hs : 0 < s)
     (hsp : s < 1 / p.toReal) {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Lp ℂ p unitVol) :
     ‖f‖ₑ + ENNReal.lqNorm q (fun k => dyadicWeight s k * lpPerModulus p r f k) < ∞ ↔
       ‖ppProj p hp r 0 f‖ₑ + ENNReal.lqNorm q (fun k =>
         dyadicWeight (s + (1 / 2 - 1 / p.toReal)) k * ENNReal.lqNorm p
-          (fun mi : Fin (2 ^ k) × Fin r => ‖coeff r f k mi.1 mi.2‖ₑ)) < ∞ :=
+          (fun mi : Fin (2 ^ k) × Fin r => ‖alpertCoeff r f k mi.1 mi.2‖ₑ)) < ∞ :=
   (memApprox_ppScheme_iff_per hr hp hq hs.le hsp f).symm.trans
-    (memApprox_ppScheme_iff_coeff hp hr hs hq f)
+    (memApprox_ppScheme_iff_alpertCoeff hp hr hs hq f)
 
 end Alpert

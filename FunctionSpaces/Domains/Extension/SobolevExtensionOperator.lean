@@ -63,7 +63,7 @@ structure SobolevExtensionOp (O : Opens V) (U : Set V) (C : ℝ≥0∞) where
   /-- The linear map on jets. -/
   toLinearMap : weakSobolevJet p O →ₗ[ℂ] sobolevJet (V := V) p
   /-- The values lie in `W^1_p(V)`. -/
-  memSobolev : ∀ u, MemSobolev 1 (toLinearMap u).1.1
+  memSobolev : ∀ u, MemWSobolev 1 (toLinearMap u).1.1
   /-- The value of `E u` agrees with the value of `u` almost everywhere on `U`. -/
   ae_eq : ∀ u, ∀ᵐ x ∂volume, x ∈ U → (toLinearMap u).1.1 x = u.1.1 x
   /-- The bound with the constant `C`. -/
@@ -92,17 +92,17 @@ theorem extendsSobolev (E : SobolevExtensionOp p O U C) (hUO : U ⊆ O) :
     simp only [u, Lp.enorm_toLp]
 
 /-- The norm bound of an extension operator in the product norm of the jets:
-`‖E u‖ ≤ (n + 1) C ‖u‖` for finite `C` (`Rd.norm_le_norm_fst_add_sum`,
-`Rd.norm_fst_add_sum_le`). -/
+`‖E u‖ ≤ (n + 1) C ‖u‖` for finite `C` (`Rd.prod_pi_norm_le_norm_fst_add_sum`,
+`Rd.prod_pi_norm_fst_add_sum_le`). -/
 theorem norm_apply_le (E : SobolevExtensionOp p O U C) (hC : C ≠ ∞) (u : weakSobolevJet p O) :
     ‖E.toLinearMap u‖ ≤ (finrank ℝ V + 1) * C.toReal * ‖u‖ := by
   have h1 := ENNReal.toReal_mono (ENNReal.mul_ne_top hC (ENNReal.add_ne_top.2
     ⟨enorm_ne_top, ENNReal.sum_ne_top.2 fun _ _ => enorm_ne_top⟩)) (E.bound u)
   rw [ENNReal.toReal_mul, toReal_enorm_add_sum, toReal_enorm_add_sum] at h1
-  have h2 := norm_fst_add_sum_le u.1
+  have h2 := prod_pi_norm_fst_add_sum_le u.1
   rw [Fintype.card_fin] at h2
   calc ‖E.toLinearMap u‖ = ‖(E.toLinearMap u).1‖ := rfl
-    _ ≤ _ := norm_le_norm_fst_add_sum _
+    _ ≤ _ := prod_pi_norm_le_norm_fst_add_sum _
     _ ≤ C.toReal * (‖u.1.1‖ + ∑ i, ‖u.1.2 i‖) := h1
     _ ≤ C.toReal * ((finrank ℝ V + 1) * ‖u‖) := by gcongr; exact h2
     _ = _ := by ring
@@ -211,7 +211,7 @@ theorem memTriebelLizorkin_localExtensionJet [Nontrivial V] (hp1 : 1 < p) (hp : 
 at points of `U` only see `W` (`Rd.LocalMeansBump.ae_localExtension_eq_of_ae_eq_indicator`). -/
 theorem ae_localExtensionJet_eq [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {U W : Set V}
     (hU : MeasurableSet U) (hW : MeasurableSet W) {T O : Opens V} (hTO : T ≤ O) (hUT : U ⊆ T)
-    (hUW : ∀ x ∈ U, ∀ j y, b.dual 2 j y ≠ 0 → x - y ∈ W)
+    (hUW : ∀ x ∈ U, ∀ j y, b.dualKernel 2 j y ≠ 0 → x - y ∈ W)
     (hsupp : ∀ x ∈ W, ∀ j i, ∀ y ∈ tsupport (dilate (2 ^ j) (b.divKernel i : V → ℂ)), x - y ∈ T)
     (u : weakSobolevJet p O) :
     ∀ᵐ x ∂volume, x ∈ U → b.localExtensionJet hp1 hp hW hTO hsupp u x = u.1.1 x :=
@@ -240,18 +240,18 @@ theorem enorm_localExtensionJet_add_le [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ 
 the gradient): let `U ⊆ T ⊆ O` with `T` and `O` open, let the dual kernels at points of `U` only
 see `W`, and let `x - y ∈ T` for every `x ∈ W`, every level `j` and every `y` in the support of
 `(K_i)_{2^j}`. Then for `1 < p < ∞` the local extension of jets
-(`Rd.LocalMeansBump.localExtensionJet`) with its weak derivatives (`Rd.sobolevJet.lift`) is an
+(`Rd.LocalMeansBump.localExtensionJet`) with its weak derivatives (`Rd.sobolevJet.liftJet`) is an
 extension operator from `U` with the constant `Rd.LocalMeansBump.extensionConst b p`. -/
 noncomputable def sobolevExtensionOp [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {U W : Set V}
     (hU : MeasurableSet U) (hW : MeasurableSet W) {T O : Opens V} (hTO : T ≤ O) (hUT : U ⊆ T)
-    (hUW : ∀ x ∈ U, ∀ j y, b.dual 2 j y ≠ 0 → x - y ∈ W)
+    (hUW : ∀ x ∈ U, ∀ j y, b.dualKernel 2 j y ≠ 0 → x - y ∈ W)
     (hsupp : ∀ x ∈ W, ∀ j i, ∀ y ∈ tsupport (dilate (2 ^ j) (b.divKernel i : V → ℂ)), x - y ∈ T) :
     SobolevExtensionOp p O U (b.extensionConst p) :=
-  let L := sobolevJet.lift (b.localExtensionJet hp1 hp hW hTO hsupp) fun u i =>
+  let L := sobolevJet.liftJet (b.localExtensionJet hp1 hp hW hTO hsupp) fun u i =>
     (exists_hasWeakLineDeriv_of_memTriebelLizorkin hp1 hp (fun _ : Fin 1 => gridBasis V i)
       (b.memTriebelLizorkin_localExtensionJet hp1 hp hW hTO hsupp u)).imp fun _ h => h.1
   { toLinearMap := L
-    memSobolev := fun u => memSobolev_of_memTriebelLizorkin hp1 hp
+    memSobolev := fun u => memWSobolev_of_memTriebelLizorkin hp1 hp
       (b.memTriebelLizorkin_localExtensionJet hp1 hp hW hTO hsupp u)
     ae_eq := fun u => b.ae_localExtensionJet_eq hp1 hp hU hW hTO hUT hUW hsupp u
     bound := fun u => b.enorm_localExtensionJet_add_le hp1 hp hW hTO hsupp u fun i => (L u).2 i }
@@ -267,7 +267,7 @@ for `1 < p < ∞` the local extension `F = ∑_j η_j ⋆ 1_W (k_j ⋆ 1_T f)` o
 (`Rd.SobolevExtensionOp.extendsSobolev`). -/
 theorem extendsSobolev [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {U W : Set V}
     (hU : MeasurableSet U) (hW : MeasurableSet W) {T : Opens V} (hUT : U ⊆ T)
-    (hUW : ∀ x ∈ U, ∀ j y, b.dual 2 j y ≠ 0 → x - y ∈ W)
+    (hUW : ∀ x ∈ U, ∀ j y, b.dualKernel 2 j y ≠ 0 → x - y ∈ W)
     (hsupp : ∀ x ∈ W, ∀ j i, ∀ y ∈ tsupport (dilate (2 ^ j) (b.divKernel i : V → ℂ)), x - y ∈ T) :
     ExtendsSobolev p T U (b.extensionConst p) :=
   have : Fact (1 ≤ p) := ⟨hp1.le⟩
@@ -341,14 +341,14 @@ noncomputable def paste (E : ∀ k, SobolevExtensionOp p O ((O : Set V) ∩ U k)
     (hd : ∀ k i x, ‖((fderiv ℝ (ψ k) x (gridBasis V i) : ℝ) : ℂ)‖ ≤ d k i) :
     SobolevExtensionOp p O O (∑ k, (ENNReal.ofReal (a k) + ∑ i, ENNReal.ofReal (d k i)) * C k)
     where
-  toLinearMap := sobolevJet.lift (pasteValue E hc ha) fun u i =>
+  toLinearMap := sobolevJet.liftJet (pasteValue E hc ha) fun u i =>
     ⟨_, hasWeakLineDeriv_pasteValue E hψ hc ha hc' hd u i⟩
-  memSobolev u := MemSobolev.sum _ fun k _ =>
+  memSobolev u := MemWSobolev.sum _ fun k _ =>
     ((E k).memSobolev u).mulLp (hψ k) (hcs k) (hc k) (ha k)
   ae_eq u := ae_pasteValue_eq E hψU hψ1 hc ha u
   bound u := by
-    simp only [sobolevJet.lift_apply_fst,
-      sobolevJet.lift_apply_snd _ _ u _ (hasWeakLineDeriv_pasteValue E hψ hc ha hc' hd u _)]
+    simp only [sobolevJet.liftJet_apply_fst,
+      sobolevJet.liftJet_apply_snd _ _ u _ (hasWeakLineDeriv_pasteValue E hψ hc ha hc' hd u _)]
     exact pasting_bound (x := fun k => ‖((E k).toLinearMap u).1.1‖ₑ)
       (y := fun k i => ‖((E k).toLinearMap u).1.2 i‖ₑ)
       ((enorm_sum_le _ _).trans (Finset.sum_le_sum fun k _ => enorm_mulLp_le _ _ _))
@@ -444,7 +444,8 @@ theorem exists_sobolevExtensionOp_interior [Nontrivial V] (hp1 : 1 < p) (hp : p 
   refine ⟨b.sobolevExtensionOp hp1 hp (measurableSet_infDist_gt Ω.carrier (2 * δ))
     (measurableSet_infDist_gt Ω.carrier δ) (T := Ω.toOpens) le_rfl hUΩ
     (fun x hx j y hy => interior_patch_support Ω.carrier (fun y hy =>
-      (not_lt.1 fun h => hy (b.dual_eq_zero 2 j h)).trans (by rw [← hR]; push_cast; rfl)) x hx y hy)
+      (not_lt.1 fun h => hy (b.dualKernel_eq_zero 2 j h)).trans (by rw [← hR]; push_cast; rfl))
+      x hx y hy)
     fun x hx j i y hy => sub_mem_of_lt_infDist_of_norm_le Ω.carrier hx (by
       rw [← hR]
       exact mem_closedBall_zero_iff.1 (b.tsupport_dilate_divKernel_subset_closedBall i j hy))⟩

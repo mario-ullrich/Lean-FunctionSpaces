@@ -75,15 +75,16 @@ variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDim
 /-- The partial sums of the reproducing formula, `G_J = ∑_{j ≤ J} η_j ⋆ (k_j ⋆ f)`. -/
 noncomputable def partialSum (hp : p ≠ ∞) (L J : ℕ) (f : Lp ℂ p (volume : Measure V)) :
     Lp ℂ p (volume : Measure V) :=
-  ∑ j ∈ Finset.range (J + 1), convLp hp (b.integrable_dual L j) (b.localMean hp L j f)
+  ∑ j ∈ Finset.range (J + 1), convLp hp (b.integrable_dualKernel L j) (b.localMean hp L j f)
 
 /-- The partial sums have the continuous representatives `∑_{j ≤ J} η_j ⋆ (k_j ⋆ f)`. -/
 theorem partialSum_ae (hp : p ≠ ∞) (L J : ℕ) (f : Lp ℂ p (volume : Measure V)) :
     b.partialSum hp L J f =ᵐ[volume]
-      fun x => ∑ j ∈ Finset.range (J + 1), conv (b.dual L j) (b.localMean hp L j f) volume x := by
+      fun x => ∑ j ∈ Finset.range (J + 1),
+        conv (b.dualKernel L j) (b.localMean hp L j f) volume x := by
   filter_upwards [Lp.coeFn_fun_finsetSum (Finset.range (J + 1))
-    (fun j => convLp hp (b.integrable_dual L j) (b.localMean hp L j f)),
-    ae_all_iff.2 fun j => convLp_apply_ae hp (b.integrable_dual L j) (b.localMean hp L j f)]
+    (fun j => convLp hp (b.integrable_dualKernel L j) (b.localMean hp L j f)),
+    ae_all_iff.2 fun j => convLp_apply_ae hp (b.integrable_dualKernel L j) (b.localMean hp L j f)]
     with x h1 h2
   rw [partialSum, h1]
   exact Finset.sum_congr rfl fun j _ => h2 j
@@ -91,9 +92,10 @@ theorem partialSum_ae (hp : p ≠ ∞) (L J : ℕ) (f : Lp ℂ p (volume : Measu
 /-- The representatives of the partial sums are continuous. -/
 theorem continuous_partialSum_rep (hp : p ≠ ∞) (L J : ℕ) (f : Lp ℂ p (volume : Measure V)) :
     Continuous fun x => ∑ j ∈ Finset.range (J + 1),
-      conv (b.dual L j) (b.localMean hp L j f) volume x :=
-  continuous_finsetSum _ fun j _ => (b.hasCompactSupport_dual L j).continuous_convolution_left
-    (ContinuousLinearMap.mul ℂ ℂ) (b.continuous_dual L j) ((Lp.memLp _).locallyIntegrable Fact.out)
+      conv (b.dualKernel L j) (b.localMean hp L j f) volume x :=
+  continuous_finsetSum _ fun j _ => (b.hasCompactSupport_dualKernel L j).continuous_convolution_left
+    (ContinuousLinearMap.mul ℂ ℂ) (b.continuous_dualKernel L j)
+      ((Lp.memLp _).locallyIntegrable Fact.out)
 
 omit [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- `∑_{j ≤ I} [J < j] u_j = ∑_{j ≤ I} u_j - ∑_{j ≤ J} u_j` for `J ≤ I`. -/
@@ -141,15 +143,15 @@ theorem tendsto_modNorm_sub_partialSum (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L)
     exact ENNReal.mul_ne_top hY.ne (ENNReal.one_sub_two_rpow_neg_inv_ne_top (by linarith))
   have hbound : ∀ J, ‖f - b.partialSum hp L J f‖ₑ + lqNorm 1 (fun k =>
       dyadicWeight σ' k * lpModulus p L (f - b.partialSum hp L J f) k) ≤
-        b.synthConst L σ' * ∑' i, a (i + (J + 1)) := fun J => by
+        b.bumpSynthConst L σ' * ∑' i, a (i + (J + 1)) := fun J => by
     set h' : ℕ → Lp ℂ p (volume : Measure V) := fun j => if J < j then b.localMean hp L j f else 0
     have hrep : Tendsto (fun I => ∑ j ∈ Finset.range (I + 1),
-        convLp hp (b.integrable_dual L j) (h' j)) atTop (𝓝 (f - b.partialSum hp L J f)) := by
+        convLp hp (b.integrable_dualKernel L j) (h' j)) atTop (𝓝 (f - b.partialSum hp L J f)) := by
       have h0 := (b.tendsto_sum_dual_localMean hp hL f).sub_const (b.partialSum hp L J f)
       refine h0.congr' ?_
       filter_upwards [eventually_ge_atTop J] with I hI
-      have hite : ∀ j, convLp hp (b.integrable_dual L j) (h' j) =
-          if J < j then convLp hp (b.integrable_dual L j) (b.localMean hp L j f) else 0 :=
+      have hite : ∀ j, convLp hp (b.integrable_dualKernel L j) (h' j) =
+          if J < j then convLp hp (b.integrable_dualKernel L j) (b.localMean hp L j f) else 0 :=
         fun j => by
           simp only [h']
           split_ifs <;> simp
@@ -169,9 +171,9 @@ theorem tendsto_modNorm_sub_partialSum (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L)
       refine tsum_congr fun i => ?_
       simp [h', a, show J < i + (J + 1) by omega]
     exact hsplit.le
-  have htail : Tendsto (fun J => b.synthConst L σ' * ∑' i, a (i + (J + 1))) atTop (𝓝 0) := by
+  have htail : Tendsto (fun J => b.bumpSynthConst L σ' * ∑' i, a (i + (J + 1))) atTop (𝓝 0) := by
     have h := ((ENNReal.tendsto_sum_nat_add a hasum).comp (tendsto_add_atTop_nat 1))
-    simpa using ENNReal.Tendsto.const_mul h (Or.inr (b.synthConst_ne_top hσ' hσ'L))
+    simpa using ENNReal.Tendsto.const_mul h (Or.inr (b.bumpSynthConst_ne_top hσ' hσ'L))
   exact tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds htail
     (fun J => zero_le) hbound
 
@@ -183,10 +185,10 @@ theorem modNorm_partialSum_lt_top (hp : p ≠ ∞) (L J : ℕ) {σ : ℝ} (hσ :
       dyadicWeight σ k * lpModulus p L (b.partialSum hp L J f) k) < ∞ := by
   set h' : ℕ → Lp ℂ p (volume : Measure V) := fun j => if j ≤ J then b.localMean hp L j f else 0
   have hrep : Tendsto (fun I => ∑ j ∈ Finset.range (I + 1),
-      convLp hp (b.integrable_dual L j) (h' j)) atTop (𝓝 (b.partialSum hp L J f)) := by
+      convLp hp (b.integrable_dualKernel L j) (h' j)) atTop (𝓝 (b.partialSum hp L J f)) := by
     refine tendsto_atTop_of_eventually_const (i₀ := J) fun I hI => ?_
-    have hite : ∀ j, convLp hp (b.integrable_dual L j) (h' j) =
-        if j ≤ J then convLp hp (b.integrable_dual L j) (b.localMean hp L j f) else 0 :=
+    have hite : ∀ j, convLp hp (b.integrable_dualKernel L j) (h' j) =
+        if j ≤ J then convLp hp (b.integrable_dualKernel L j) (b.localMean hp L j f) else 0 :=
       fun j => by
         simp only [h']
         split_ifs <;> simp
@@ -197,7 +199,7 @@ theorem modNorm_partialSum_lt_top (hp : p ≠ ∞) (L J : ℕ) {σ : ℝ} (hσ :
     simp only [Finset.mem_filter, Finset.mem_range]
     omega
   refine (b.modNorm_le_of_tendsto hp L σ hq hrep).trans_lt (ENNReal.mul_lt_top
-    (b.synthConst_ne_top hσ hσL).lt_top ?_)
+    (b.bumpSynthConst_ne_top hσ hσL).lt_top ?_)
   refine (ENNReal.lqNorm_le_lqNorm_one hq _).trans_lt ?_
   rw [tsum_eq_sum (s := Finset.range (J + 1)) fun j hj => by
     have : ¬ j ≤ J := fun h => hj (Finset.mem_range.2 (Nat.lt_succ_of_le h))
@@ -217,32 +219,32 @@ variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDim
 /-- **The mollified restrictions vanish where `f` does**: if `f = 0` almost everywhere on
 `Ω ∩ B(γ x', δ)` and `2 L R 2^(-J) < δ`, then `(m_{2^J} ⋆ (m_{2^J} ⋆ f))(γ x') = 0`, since the cone
 kernels only see `f` on `Ω ∩ B(γ x', 2 L R 2^(-J))`. -/
-theorem conv_scaled_convLp_eq_zero (hp : p ≠ ∞) (L J : ℕ) {f : Lp ℂ p (volume : Measure V)}
+theorem conv_scaledMoment_convLp_eq_zero (hp : p ≠ ∞) (L J : ℕ) {f : Lp ℂ p (volume : Measure V)}
     (x' : Ω.hyperplane) {δ : ℝ} (hJ : 2 * L * Ω.coneBump.radius / 2 ^ J < δ)
     (hf : ∀ᵐ x ∂volume, x ∈ Ω.domain → x ∈ ball (Ω.graphMap x') δ → f x = 0) :
-    conv (Ω.coneBump.scaled L J) (convLp hp (Ω.coneBump.integrable_scaled L J) f) volume
+    conv (Ω.coneBump.scaledMoment L J) (convLp hp (Ω.coneBump.integrable_scaledMoment L J) f) volume
       (Ω.graphMap x') = 0 := by
   set y := Ω.graphMap x'
   have hLR : 0 ≤ (L : ℝ) * Ω.coneBump.radius :=
     mul_nonneg (Nat.cast_nonneg L) Ω.coneBump.radius_nonneg
-  have hsmall : ∀ z, Ω.coneBump.scaled L J z ≠ 0 → ‖z‖ ≤ L * Ω.coneBump.radius / 2 ^ J :=
-    fun z hz => not_lt.1 fun h => hz (Ω.coneBump.scaled_eq_zero_of_lt L J h)
+  have hsmall : ∀ z, Ω.coneBump.scaledMoment L J z ≠ 0 → ‖z‖ ≤ L * Ω.coneBump.radius / 2 ^ J :=
+    fun z hz => not_lt.1 fun h => hz (Ω.coneBump.scaledMoment_eq_zero_of_lt L J h)
   rw [conv_congr_ae (convLp_apply_ae hp _ f), conv_apply]
   refine integral_eq_zero_of_ae (Eventually.of_forall fun z => ?_)
-  by_cases hz : Ω.coneBump.scaled L J z = 0
+  by_cases hz : Ω.coneBump.scaledMoment L J z = 0
   · simp [hz]
   have hw : y - z ∈ Ω.domain := by
     rw [sub_eq_add_neg]
-    exact Ω.graphMap_add_mem x' (Ω.coneSupported_scaled L J z hz)
-  have hinner : conv (Ω.coneBump.scaled L J) f volume (y - z) = 0 := by
+    exact Ω.graphMap_add_mem x' (Ω.coneSupported_scaledMoment L J z hz)
+  have hinner : conv (Ω.coneBump.scaledMoment L J) f volume (y - z) = 0 := by
     rw [conv_apply]
     have hf' := (Measure.measurePreserving_sub_left volume (y - z)).quasiMeasurePreserving.ae hf
     refine integral_eq_zero_of_ae (hf'.mono fun z' hz' => ?_)
-    by_cases hz'0 : Ω.coneBump.scaled L J z' = 0
+    by_cases hz'0 : Ω.coneBump.scaledMoment L J z' = 0
     · simp [hz'0]
     have hdom : y - z - z' ∈ Ω.domain := by
       rw [sub_eq_add_neg]
-      exact Ω.add_mem hw (Ω.coneSupported_scaled L J z' hz'0)
+      exact Ω.add_mem hw (Ω.coneSupported_scaledMoment L J z' hz'0)
     have hball : y - z - z' ∈ ball y δ := by
       rw [mem_ball, dist_eq_norm]
       calc ‖y - z - z' - y‖ = ‖z + z'‖ := by rw [show y - z - z' - y = -(z + z') by abel, norm_neg]
@@ -266,10 +268,10 @@ theorem trace_ae_eq_zero_of_ae_eq_zero (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs 
   obtain ⟨δ, hδ, hball⟩ := Metric.isOpen_iff.1 hU _ hxU
   obtain ⟨J₀, hJ₀⟩ := pow_unbounded_of_one_lt (2 * L * Ω.coneBump.radius / δ)
     (one_lt_two : (1 : ℝ) < 2)
-  have hev : ∀ᶠ k in atTop, conv (Ω.coneBump.scaled L (ns k))
-      (convLp hp (Ω.coneBump.integrable_scaled L (ns k)) f) volume (Ω.graphMap x') = 0 := by
+  have hev : ∀ᶠ k in atTop, conv (Ω.coneBump.scaledMoment L (ns k))
+      (convLp hp (Ω.coneBump.integrable_scaledMoment L (ns k)) f) volume (Ω.graphMap x') = 0 := by
     filter_upwards [hns.tendsto_atTop.eventually_ge_atTop J₀] with k hk
-    refine Ω.conv_scaled_convLp_eq_zero hp L (ns k) x' ?_ (hfU.mono fun x hx hxd hxb =>
+    refine Ω.conv_scaledMoment_convLp_eq_zero hp L (ns k) x' ?_ (hfU.mono fun x hx hxd hxb =>
       hx hxd (hball hxb))
     have h2 : (2 : ℝ) ^ J₀ ≤ 2 ^ ns k := pow_le_pow_right₀ one_le_two hk
     rw [div_lt_iff₀ (by positivity)]
@@ -314,7 +316,8 @@ theorem trace_congr (hp : p ≠ ∞) (L : ℕ) {F f : Lp ℂ p (volume : Measure
   unfold trace
   congr 1
   funext j
-  exact Ω.cutoff_convLp_eq hp (Ω.coneBump.integrable_kernel L j) (Ω.coneSupported_kernel L j) hFf
+  exact Ω.cutoff_convLp_eq hp (Ω.coneBump.integrable_meansKernel L j)
+    (Ω.coneSupported_meansKernel L j) hFf
 
 /-! ### Change of chart -/
 
@@ -389,7 +392,7 @@ theorem trace_ae_eq_trace_comp (Ω₁ Ω₂ : LipschitzGraph V) (hp : p ≠ ∞)
   have hp0 : p ≠ 0 := (zero_lt_one.trans_le (Fact.out : 1 ≤ p)).ne'
   set b := Ω₁.coneBump
   set g : ℕ → V → ℂ := fun J x => ∑ j ∈ Finset.range (J + 1),
-    conv (b.dual L j) (b.localMean hp L j F) volume x
+    conv (b.dualKernel L j) (b.localMean hp L j F) volume x
   have hGfin : ∀ J, ‖b.partialSum hp L J F‖ₑ + lqNorm q (fun k =>
       dyadicWeight (s + 1 / p.toReal) k * lpModulus p L (b.partialSum hp L J F) k) < ∞ :=
     fun J => b.modNorm_partialSum_lt_top hp L J (by positivity) hsL hq F
@@ -444,7 +447,7 @@ theorem trace_mulLp_ae (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s : ℝ} (hs :
   set b := Ω.coneBump
   set G : ℕ → Lp ℂ p (volume : Measure V) := fun J => b.partialSum hp L J F
   set g : ℕ → V → ℂ := fun J x => ∑ j ∈ Finset.range (J + 1),
-    conv (b.dual L j) (b.localMean hp L j F) volume x
+    conv (b.dualKernel L j) (b.localMean hp L j F) volume x
   set M := ENNReal.ofReal C + ∑ l ∈ Finset.range (L + 1),
     (L.choose l : ℝ≥0∞) * ENNReal.ofReal C * multiplierConst (V := V) hp L (1 / p.toReal) l
   have hM : M ≠ ∞ := multiplierTotal_ne_top hp hpL C

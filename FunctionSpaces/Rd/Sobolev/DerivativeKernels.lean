@@ -28,7 +28,7 @@ Fourier transform `𝓕η_i(ξ) = ∏_k ⟪ξ, e_{i_k}⟫ / ((2πi)^m ‖ξ‖^{
   (`Rd.two_pow_smul_lpBlockKernel_succ_eq_sum`), with the factor `‖2^n‖ = 2^n`
   (`Rd.enorm_two_pow_complex`).
 * **The derivative families** `((η_i)_{2^j})_j` are Calderón–Zygmund families with overlap `2`
-  (`Rd.isCZFamily_derivFamily`).
+  (`Rd.isCZFamily_derivKernelFamily`).
 * **The dual derivative families**: for every `w ∈ V^k` the synthesis kernels satisfy
   `∂^w psiDual_j = 2^{jk} (∂^w psiDualBase_j)_{2^j}` (`Rd.iteratedLineDerivOp_psiDualS`), and the
   dilates on the right form a Calderón–Zygmund family with overlap `4 ((8π)^k ∏_l ‖w_l‖)²`
@@ -278,21 +278,21 @@ theorem enorm_two_pow_complex (n : ℕ) : ‖(2 : ℂ) ^ n‖ₑ = 2 ^ n := by
 /-! ### The derivative families -/
 
 /-- The **derivative family** of the multi-index `i`: `j ↦ (η_i)_{2^j}`. -/
-noncomputable def derivFamily {m : ℕ} (i : Fin m → Fin (finrank ℝ V)) (j : ℕ) : V → ℂ :=
+noncomputable def derivKernelFamily {m : ℕ} (i : Fin m → Fin (finrank ℝ V)) (j : ℕ) : V → ℂ :=
   dilate (2 ^ j) (derivKernel i : V → ℂ)
 
 /-- `𝓕(η_i)_{2^j}(ξ) = σ_i(2^{-j} ξ) 𝓕ψ_{j+1}(ξ)`. -/
-theorem fourier_derivFamily {m : ℕ} (i : Fin m → Fin (finrank ℝ V)) (j : ℕ) (ξ : V) :
-    𝓕 (derivFamily i j) ξ =
+theorem fourier_derivKernelFamily {m : ℕ} (i : Fin m → Fin (finrank ℝ V)) (j : ℕ) (ξ : V) :
+    𝓕 (derivKernelFamily i j) ξ =
       derivSymbol i (((2 : ℝ) ^ j)⁻¹ • ξ) * 𝓕 (lpBlockKernel (V := V) (j + 1)) ξ := by
-  rw [derivFamily, fourier_dilate _ (by positivity), fourier_derivKernel,
+  rw [derivKernelFamily, fourier_dilate _ (by positivity), fourier_derivKernel,
     fourier_lpBlockKernel_succ_eq_fourier_lpBlockKernel_one j ξ]
 
 /-- `|𝓕(η_i)_{2^j}(ξ)| ≤ |𝓕ψ_{j+1}(ξ)|`: where `𝓕ψ_{j+1}(ξ) ≠ 0`, `‖2^{-j} ξ‖ > 1` and
 `|σ_i| ≤ 1` there (`Rd.norm_derivSymbol_le`). -/
-theorem enorm_fourier_derivFamily_le {m : ℕ} (i : Fin m → Fin (finrank ℝ V)) (j : ℕ) (ξ : V) :
-    ‖𝓕 (derivFamily i j) ξ‖ₑ ≤ ‖𝓕 (lpBlockKernel (V := V) (j + 1)) ξ‖ₑ := by
-  rw [fourier_derivFamily, enorm_mul]
+theorem enorm_fourier_derivKernelFamily_le {m : ℕ} (i : Fin m → Fin (finrank ℝ V)) (j : ℕ) (ξ : V) :
+    ‖𝓕 (derivKernelFamily i j) ξ‖ₑ ≤ ‖𝓕 (lpBlockKernel (V := V) (j + 1)) ξ‖ₑ := by
+  rw [fourier_derivKernelFamily, enorm_mul]
   by_cases h : 𝓕 (lpBlockKernel (V := V) (j + 1)) ξ = 0
   · rw [h, enorm_zero, mul_zero]
   · rw [fourier_lpBlockKernel_succ_eq_fourier_lpBlockKernel_one j ξ] at h
@@ -305,12 +305,12 @@ theorem enorm_fourier_derivFamily_le {m : ℕ} (i : Fin m → Fin (finrank ℝ V
       _ = ‖𝓕 (lpBlockKernel (V := V) (j + 1)) ξ‖ₑ := one_mul _
 
 /-- **Overlap of a derivative family**: `∑_j |𝓕(η_i)_{2^j}(ξ)|² ≤ 2` for every `ξ`, by comparison
-with the blocks (`Rd.enorm_fourier_derivFamily_le`, `Rd.tsum_fourier_lpBlockKernel_sq_le`). -/
-theorem tsum_fourier_derivFamily_sq_le {m : ℕ} (i : Fin m → Fin (finrank ℝ V)) (ξ : V) :
-    ∑' j, ‖𝓕 (derivFamily i j) ξ‖ₑ ^ 2 ≤ 2 :=
-  calc ∑' j, ‖𝓕 (derivFamily i j) ξ‖ₑ ^ 2
+with the blocks (`Rd.enorm_fourier_derivKernelFamily_le`, `Rd.tsum_fourier_lpBlockKernel_sq_le`). -/
+theorem tsum_fourier_derivKernelFamily_sq_le {m : ℕ} (i : Fin m → Fin (finrank ℝ V)) (ξ : V) :
+    ∑' j, ‖𝓕 (derivKernelFamily i j) ξ‖ₑ ^ 2 ≤ 2 :=
+  calc ∑' j, ‖𝓕 (derivKernelFamily i j) ξ‖ₑ ^ 2
       ≤ ∑' j, ‖𝓕 (lpBlockKernel (V := V) (j + 1)) ξ‖ₑ ^ 2 :=
-        ENNReal.tsum_le_tsum fun j => by gcongr; exact enorm_fourier_derivFamily_le i j ξ
+        ENNReal.tsum_le_tsum fun j => by gcongr; exact enorm_fourier_derivKernelFamily_le i j ξ
     _ ≤ ∑' j, ‖𝓕 (lpBlockKernel (V := V) j) ξ‖ₑ ^ 2 :=
         ENNReal.tsum_comp_le_tsum_of_injective (add_left_injective 1)
           fun j => ‖𝓕 (lpBlockKernel (V := V) j) ξ‖ₑ ^ 2
@@ -328,9 +328,9 @@ theorem isUniformSchwartz_derivKernel {m : ℕ} (i : Fin m → Fin (finrank ℝ 
 
 /-- **The derivative families are Calderón–Zygmund families** with overlap `2` and Hörmander
 constant `4 H_{A^{η_i}}`, `H_{A^{η_i}} = Rd.familyHormanderConst V (Rd.derivKernelBound i)`. -/
-theorem isCZFamily_derivFamily {m : ℕ} (i : Fin m → Fin (finrank ℝ V)) :
-    IsCZFamily (derivFamily i) 2 (4 * familyHormanderConst V (derivKernelBound i)) :=
-  IsCZFamily.of_dilation (isUniformSchwartz_derivKernel i) (tsum_fourier_derivFamily_sq_le i)
+theorem isCZFamily_derivKernelFamily {m : ℕ} (i : Fin m → Fin (finrank ℝ V)) :
+    IsCZFamily (derivKernelFamily i) 2 (4 * familyHormanderConst V (derivKernelBound i)) :=
+  IsCZFamily.of_dilation (isUniformSchwartz_derivKernel i) (tsum_fourier_derivKernelFamily_sq_le i)
 
 /-! ### The dual derivative families -/
 

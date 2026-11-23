@@ -14,7 +14,7 @@ public import ApproximationSpaces.Transfer
 
 The Haar scheme of `FunctionSpaces.Wavelets.Examples.Haar` (step functions on the dyadic
 intervals) and the scheme of dyadic piecewise polynomials of degree `< 1` (`Interval.ppScheme p 1`)
-are the same scheme in `L_p[0, 1]` (`Haar.scheme_eq_ppScheme`): a function measurable for the
+are the same scheme in `L_p[0, 1]` (`Haar.haarScheme_eq_ppScheme`): a function measurable for the
 dyadic `σ`-algebra of level `j` is a step function on the dyadic intervals of level `j`, and
 conversely. Hence the two schemes have the same approximation spaces
 (`Haar.memApprox_ppScheme_one_iff`).
@@ -88,11 +88,11 @@ theorem ae_eq_ppFun_of_stronglyMeasurable {j : ℕ} {g : ℝ → ℂ}
 
 /-- The piecewise constant approximants are Haar approximants: a piecewise constant function
 of level `j` agrees almost everywhere with its step function. -/
-theorem mem_scheme_of_mem_ppScheme {n : ℕ} {a : Lp ℂ p unitVol} (ha : a ∈ ppScheme p 1 n) :
-    a ∈ scheme p n := by
+theorem mem_haarScheme_of_mem_ppScheme {n : ℕ} {a : Lp ℂ p unitVol} (ha : a ∈ ppScheme p 1 n) :
+    a ∈ haarScheme p n := by
   rcases eq_or_ne n 0 with rfl | hn
   · rw [mem_ppScheme_zero.1 ha]
-    exact (scheme p).zero_mem 0
+    exact (haarScheme p).zero_mem 0
   · obtain ⟨Q, hQ, hae⟩ := (mem_ppScheme hn).1 ha
     rw [dyadicFiltration.mem_filtrationScheme hn, mem_lpMeas_iff_aestronglyMeasurable]
     exact ⟨stepFun (ppFun (Nat.log 2 n) Q) (Nat.log 2 n), stronglyMeasurable_stepFun _ _,
@@ -100,7 +100,7 @@ theorem mem_scheme_of_mem_ppScheme {n : ℕ} {a : Lp ℂ p unitVol} (ha : a ∈ 
 
 /-- The Haar approximants are piecewise constant approximants: a function measurable for the
 dyadic `σ`-algebra of level `j` is a piecewise constant function of level `j`. -/
-theorem mem_ppScheme_of_mem_scheme {n : ℕ} {a : Lp ℂ p unitVol} (ha : a ∈ scheme p n) :
+theorem mem_ppScheme_of_mem_haarScheme {n : ℕ} {a : Lp ℂ p unitVol} (ha : a ∈ haarScheme p n) :
     a ∈ ppScheme p 1 n := by
   rcases eq_or_ne n 0 with rfl | hn
   · rw [mem_ppScheme_zero, ApproximationScheme.mem_ofMonotoneSubmodules_zero.1 ha]
@@ -113,16 +113,16 @@ theorem mem_ppScheme_of_mem_scheme {n : ℕ} {a : Lp ℂ p unitVol} (ha : a ∈ 
 
 /-- **The Haar scheme is the piecewise constant scheme** in `L_p[0, 1]`: both have the same
 approximants of every complexity. -/
-theorem scheme_eq_ppScheme : scheme p = ppScheme p 1 :=
-  ApproximationScheme.ext fun _ => Subset.antisymm (fun _ => mem_ppScheme_of_mem_scheme)
-    (fun _ => mem_scheme_of_mem_ppScheme)
+theorem haarScheme_eq_ppScheme : haarScheme p = ppScheme p 1 :=
+  ApproximationScheme.ext fun _ => Subset.antisymm (fun _ => mem_ppScheme_of_mem_haarScheme)
+    (fun _ => mem_haarScheme_of_mem_ppScheme)
 
 /-- **The Haar scheme and the piecewise constant scheme have the same approximation spaces**:
 `f ∈ A^s_q` for the piecewise constants in `L_p[0, 1]` iff `f ∈ A^s_q` for the Haar scheme
-(`Haar.scheme_eq_ppScheme`). -/
+(`Haar.haarScheme_eq_ppScheme`). -/
 theorem memApprox_ppScheme_one_iff {s : ℝ} {q : ℝ≥0∞} (f : Lp ℂ p unitVol) :
-    (ppScheme p 1).MemApprox s q f ↔ (scheme p).MemApprox s q f := by
-  rw [scheme_eq_ppScheme]
+    (ppScheme p 1).MemApprox s q f ↔ (haarScheme p).MemApprox s q f := by
+  rw [haarScheme_eq_ppScheme]
 
 /-- **Besov spaces on the interval through Haar coefficients.** For `1 ≤ p < ∞`, `1 ≤ q ≤ ∞` and
 `0 < s < 1/p`, the Besov quasi-norm `‖f‖_p + ‖(2^(ks) ω_1(f, 2^(-k), [0, 1])_p)_k‖_{ℓ_q}` of

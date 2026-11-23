@@ -19,9 +19,9 @@ the value at `0`, conjugation and the multiplication formula are the cases `V = 
 lemmas of `FunctionSpaces.Analysis.Fourier.LittlewoodPaleyKernels`.
 
 * **Continuity and the uniform bound.** For integrable `f`, `𝓕 f` and `𝓕⁻ f` are continuous
-  (`Real.continuous_fourier_of_integrable`), and `‖𝓕 f(ξ)‖ ≤ ∫ ‖f‖`
+  (`Real.real_continuous_fourier_of_integrable`), and `‖𝓕 f(ξ)‖ ≤ ∫ ‖f‖`
   (Mathlib's `Real.norm_fourier_le_integral_norm`).
-* **The value at `0`**: `𝓕 f(0) = ∫ f` for every `f` (`Real.fourier_apply_zero`).
+* **The value at `0`**: `𝓕 f(0) = ∫ f` for every `f` (`Real.real_fourier_apply_zero`).
 * **Linearity**: `𝓕[c f] = c 𝓕 f` for every `f` (`Real.fourier_const_mul_apply`) and finite sums
   of integrable functions (`Real.fourier_sum_apply`), each with its `𝓕⁻` version.
 * **Translation, modulation, dilation, conjugation**:
@@ -30,13 +30,13 @@ lemmas of `FunctionSpaces.Analysis.Fourier.LittlewoodPaleyKernels`.
   `𝓕[f(a ·)](ξ) = a⁻¹ 𝓕 f(ξ / a)` for `a > 0` (`Real.fourier_comp_mul_left_apply`) and
   `conj (𝓕 f(ξ)) = 𝓕⁻[conj ∘ f](ξ)` (`Real.conj_fourier`), each with its `𝓕⁻` version.
 * **The multiplication formula** `∫ 𝓕 f · g = ∫ f · 𝓕 g` for integrable `f, g`
-  (`Real.integral_fourier_mul`), by Fubini (`Rd.integral_fourier_mul`).
+  (`Real.real_integral_fourier_mul`), by Fubini (`Rd.integral_fourier_mul`).
 * **Parseval's identity** `∫ f · conj g = ∫ 𝓕 f · conj (𝓕 g)` for integrable `f` and continuous
   integrable `g` with integrable `𝓕 g` (`Real.integral_mul_conj_eq_integral_fourier`): the
   sesquilinear multiplication formula for `f` and `𝓕 g`
   (`VectorFourier.integral_sesq_fourierIntegral_eq_neg_flip`) and the inversion theorem
   `𝓕⁻ (𝓕 g) = g` (`Continuous.fourierInv_fourier_eq`). For `f = g` it is Plancherel's identity
-  `∫ ‖𝓕 f‖² = ∫ ‖f‖²` (`Real.integral_norm_sq_fourier`).
+  `∫ ‖𝓕 f‖² = ∫ ‖f‖²` (`Real.real_integral_norm_sq_fourier`).
 * **Schwartz test functions.** `∫ f · ψ = ∫ 𝓕 f · 𝓕⁻ ψ` for integrable `f` and a Schwartz
   function `ψ` (`Real.integral_mul_schwartz_eq`), and the **fundamental lemma**
   `Real.eqOn_zero_of_integral_mul_schwartz_eq_zero`: a continuous `f` with `∫ ψ f = 0` for every
@@ -60,24 +60,24 @@ variable {f g : ℝ → ℂ}
 
 /-- The Fourier transform `𝓕 f(ξ) = ∫ e^(-2πixξ) f(x) dx` of an integrable function is
 continuous (`Rd.continuous_fourier_of_integrable` on `ℝ`). -/
-theorem continuous_fourier_of_integrable (hf : Integrable f) : Continuous (𝓕 f) :=
+theorem real_continuous_fourier_of_integrable (hf : Integrable f) : Continuous (𝓕 f) :=
   Rd.continuous_fourier_of_integrable hf
 
 /-- The inverse Fourier transform `𝓕⁻ f(x) = ∫ e^(2πixξ) f(ξ) dξ` of an integrable function is
 continuous (`Rd.continuous_fourierInv_of_integrable` on `ℝ`). -/
-theorem continuous_fourierInv_of_integrable (hf : Integrable f) : Continuous (𝓕⁻ f) :=
+theorem real_continuous_fourierInv_of_integrable (hf : Integrable f) : Continuous (𝓕⁻ f) :=
   Rd.continuous_fourierInv_of_integrable hf
 
 /-- The uniform bound `‖𝓕⁻ f(x)‖ ≤ ∫ ‖f‖` for the inverse transform
 (`Rd.norm_fourierInv_le_integral_norm` on `ℝ`). -/
-theorem norm_fourierInv_le_integral_norm (f : ℝ → ℂ) (x : ℝ) : ‖𝓕⁻ f x‖ ≤ ∫ ξ, ‖f ξ‖ :=
+theorem real_norm_fourierInv_le_integral_norm (f : ℝ → ℂ) (x : ℝ) : ‖𝓕⁻ f x‖ ≤ ∫ ξ, ‖f ξ‖ :=
   Rd.norm_fourierInv_le_integral_norm f x
 
 /-! ### The Fourier transform at `0` -/
 
 /-- **The Fourier transform at `0` is the integral**: `𝓕 f(0) = ∫ f(x) dx` for every
 `f : ℝ → ℂ` (`Rd.fourier_apply_zero` on `ℝ`). -/
-theorem fourier_apply_zero (f : ℝ → ℂ) : 𝓕 f 0 = ∫ x, f x :=
+theorem real_fourier_apply_zero (f : ℝ → ℂ) : 𝓕 f 0 = ∫ x, f x :=
   Rd.fourier_apply_zero f
 
 /-! ### Linearity -/
@@ -207,13 +207,13 @@ theorem conj_fourierInv (f : ℝ → ℂ) (x : ℝ) : conj (𝓕⁻ f x) = 𝓕 
 
 /-- **The multiplication formula** `∫ 𝓕 f · g = ∫ f · 𝓕 g` for integrable `f, g`
 (`Rd.integral_fourier_mul` on `ℝ`). -/
-theorem integral_fourier_mul (hf : Integrable f) (hg : Integrable g) :
+theorem real_integral_fourier_mul (hf : Integrable f) (hg : Integrable g) :
     ∫ ξ, 𝓕 f ξ * g ξ = ∫ x, f x * 𝓕 g x :=
   Rd.integral_fourier_mul hf hg
 
 /-- The multiplication formula for the inverse transform: `∫ 𝓕⁻ f · g = ∫ f · 𝓕⁻ g` for
 integrable `f, g` (`Rd.integral_fourierInv_mul` on `ℝ`). -/
-theorem integral_fourierInv_mul (hf : Integrable f) (hg : Integrable g) :
+theorem real_integral_fourierInv_mul (hf : Integrable f) (hg : Integrable g) :
     ∫ ξ, 𝓕⁻ f ξ * g ξ = ∫ x, f x * 𝓕⁻ g x :=
   Rd.integral_fourierInv_mul hf hg
 
@@ -236,7 +236,7 @@ theorem integral_mul_conj_eq_integral_fourier (hf : Integrable f) (hg : Continuo
 
 /-- **Plancherel's identity** `∫ ‖𝓕 f‖² = ∫ ‖f‖²` for a continuous integrable `f` with integrable
 transform: Parseval's identity for `g = f`, with `z · conj z = ‖z‖²`. -/
-theorem integral_norm_sq_fourier (hf : Continuous f) (hfi : Integrable f)
+theorem real_integral_norm_sq_fourier (hf : Continuous f) (hfi : Integrable f)
     (hFf : Integrable (𝓕 f)) : ∫ ξ, ‖𝓕 f ξ‖ ^ 2 = ∫ x, ‖f x‖ ^ 2 := by
   have h := integral_mul_conj_eq_integral_fourier hfi hf hfi hFf
   have e : ∀ z : ℂ, z * conj z = ((‖z‖ ^ 2 : ℝ) : ℂ) := fun z => by
@@ -250,7 +250,7 @@ the multiplication formula for `f` and `𝓕⁻ ψ` together with `𝓕 (𝓕⁻
 the Schwartz space). Here `𝓕⁻ ψ` is the inverse transform of `ψ` as a Schwartz function. -/
 theorem integral_mul_schwartz_eq (hf : Integrable f) (ψ : 𝓢(ℝ, ℂ)) :
     ∫ x, f x * ψ x = ∫ ξ, 𝓕 f ξ * 𝓕⁻ ψ ξ := by
-  rw [integral_fourier_mul hf (𝓕⁻ ψ).integrable]
+  rw [real_integral_fourier_mul hf (𝓕⁻ ψ).integrable]
   congr 1 with x
   rw [← SchwartzMap.fourier_coe, FourierTransform.fourier_fourierInv_eq]
 

@@ -67,19 +67,19 @@ variable (b : LocalMeansBump V)
 
 /-- The **trace of a term**: `x' ↦ (η_j ⋆ h)(γ x')`. -/
 noncomputable def traceFun (L j : ℕ) (h : V → ℂ) (x' : Ω.hyperplane) : ℂ :=
-  conv (b.dual L j) h volume (Ω.graphMap x')
+  conv (b.dualKernel L j) h volume (Ω.graphMap x')
 
 open Classical in
 /-- The **coefficients of the trace atoms**: `λ_{j,m}` for the cells whose atoms meet the graph,
 `0` for the others. -/
 noncomputable def traceCoef (p : ℝ≥0∞) (L j : ℕ) (h : V → ℂ) (m : Fin (finrank ℝ V) → ℤ) : ℂ :=
-  if ∃ y', cellAtom p (b.dual L j) j h m (Ω.graphMap y') ≠ 0 then cellCoef p j h m else 0
+  if ∃ y', cellAtom p (b.dualKernel L j) j h m (Ω.graphMap y') ≠ 0 then cellCoef p j h m else 0
 
 /-- The trace of a term is continuous. -/
 theorem continuous_traceFun {p : ℝ≥0∞} (hp1 : 1 ≤ p) (L j : ℕ) {h : V → ℂ}
     (hh : MemLp h p volume) : Continuous (Ω.traceFun b L j h) :=
-  ((b.hasCompactSupport_dual L j).continuous_convolution_left (ContinuousLinearMap.mul ℂ ℂ)
-    (b.continuous_dual L j) (hh.locallyIntegrable hp1)).comp Ω.continuous_graphMap
+  ((b.hasCompactSupport_dualKernel L j).continuous_convolution_left (ContinuousLinearMap.mul ℂ ℂ)
+    (b.continuous_dualKernel L j) (hh.locallyIntegrable hp1)).comp Ω.continuous_graphMap
 
 /-- **The trace of a term is the sum of the traces of its cell atoms**:
 `(η_j ⋆ h)(γ x') = ∑_m λ'_{j,m} a_{j,m}(γ x')` with the coefficients of the cells meeting the
@@ -87,12 +87,12 @@ graph. -/
 theorem traceFun_eq_tsum {p : ℝ≥0∞} (hp1 : 1 ≤ p) (L j : ℕ) {h : V → ℂ}
     (hh : MemLp h p volume) (x' : Ω.hyperplane) :
     Ω.traceFun b L j h x' =
-      ∑' m, Ω.traceCoef b p L j h m * (cellAtom p (b.dual L j) j h m ∘ Ω.graphMap) x' := by
+      ∑' m, Ω.traceCoef b p L j h m * (cellAtom p (b.dualKernel L j) j h m ∘ Ω.graphMap) x' := by
   have hρ : 0 ≤ 2 * (L : ℝ) * b.radius / 2 ^ j :=
     div_nonneg (mul_nonneg (mul_nonneg zero_le_two (Nat.cast_nonneg L)) b.radius_nonneg)
       (by positivity)
-  rw [traceFun, conv_eq_tsum_cellAtom hp1 (b.continuous_dual L j) hρ
-    (fun y hy => b.dual_eq_zero_of_lt L j hy) hh j]
+  rw [traceFun, conv_eq_tsum_cellAtom hp1 (b.continuous_dualKernel L j) hρ
+    (fun y hy => b.dualKernel_eq_zero_of_lt L j hy) hh j]
   refine tsum_congr fun m => ?_
   rw [Function.comp_apply, traceCoef]
   split_ifs with hm
@@ -157,11 +157,11 @@ centres of the cells meeting the graph have overlap at most `N`: such a centre l
 theorem exists_trace_atoms {p : ℝ≥0∞} (hp1 : 1 ≤ p) (L : ℕ) :
     ∃ (d : ℝ) (C : ℝ≥0∞) (N : ℕ), 0 ≤ d ∧ C ≠ ∞ ∧ ∀ (j : ℕ) {h : V → ℂ}, MemLp h p volume →
       (∀ m, IsRegularAtom p 1 1 d C j (Ω.proj (cellCenter j m))
-        (cellAtom p (b.dual L j) j h m ∘ Ω.graphMap)) ∧
+        (cellAtom p (b.dualKernel L j) j h m ∘ Ω.graphMap)) ∧
       ∀ x' (S : Finset (Fin (finrank ℝ V) → ℤ)),
         (∀ m ∈ S, Ω.traceCoef b p L j h m ≠ 0 ∧ ‖x' - Ω.proj (cellCenter j m)‖ ≤ (d + 1) / 2 ^ j) →
           S.card ≤ N := by
-  obtain ⟨A, hA, hb⟩ := b.exists_higherDiff_dual_bound L 1
+  obtain ⟨A, hA, hb⟩ := b.exists_higherDiff_dualKernel_bound L 1
   have ht : 0 ≤ 1 - 1 / p.toReal := one_sub_one_div_toReal_nonneg hp1
   set ρ := 2 * (L : ℝ) * b.radius
   have hρ : 0 ≤ ρ := mul_nonneg (mul_nonneg zero_le_two (Nat.cast_nonneg L)) b.radius_nonneg
@@ -174,7 +174,8 @@ theorem exists_trace_atoms {p : ℝ≥0∞} (hp1 : 1 ≤ p) (L : ℕ) :
       measure_ball_lt_top.ne))
   set ρ' := d + (1 + Ω.M) * (2 * d + 1)
   have hρ' : 0 ≤ ρ' := add_nonneg hd (mul_nonneg (by linarith [Ω.M_nonneg]) (by linarith))
-  have hKρ : ∀ j y, ρ / 2 ^ j < ‖y‖ → b.dual L j y = 0 := fun j y hy => b.dual_eq_zero_of_lt L j hy
+  have hKρ : ∀ j y, ρ / 2 ^ j < ‖y‖ → b.dualKernel L j y = 0 :=
+    fun j y hy => b.dualKernel_eq_zero_of_lt L j hy
   refine ⟨d, ENNReal.ofReal (1 + Ω.M) * A1 * (((1 + 1 : ℕ) : ℝ≥0∞) *
       (ENNReal.ofReal (d ^ finrank ℝ Ω.hyperplane) * volume (ball (0 : Ω.hyperplane) 1))) ^
         (1 / p.toReal), ⌈(2 * ρ' + 2) ^ finrank ℝ V⌉₊, hd, ?_, fun j h hh => ⟨fun m => ?_,
@@ -183,10 +184,10 @@ theorem exists_trace_atoms {p : ℝ≥0∞} (hp1 : 1 ≤ p) (L : ℕ) :
       (ENNReal.rpow_ne_top_of_nonneg (div_nonneg zero_le_one ENNReal.toReal_nonneg)
         (ENNReal.mul_ne_top (ENNReal.natCast_ne_top _)
           (ENNReal.mul_ne_top ENNReal.ofReal_ne_top measure_ball_lt_top.ne)))
-  · have hK : ∀ y, ‖b.dual L j y‖ₑ ≤ A * dyadicWeight (finrank ℝ V) j := fun y => by
+  · have hK : ∀ y, ‖b.dualKernel L j y‖ₑ ≤ A * dyadicWeight (finrank ℝ V) j := fun y => by
       simpa using hb 0 (Nat.zero_le 1) j 0 y
-    refine Ω.isRegularAtom_comp_graphMap hd (continuous_cellAtom hp1 (b.continuous_dual L j)
-      (b.hasCompactSupport_dual L j) hh j m) (fun x hx => cellAtom_eq_zero (hKρ j) m hx)
+    refine Ω.isRegularAtom_comp_graphMap hd (continuous_cellAtom hp1 (b.continuous_dualKernel L j)
+      (b.hasCompactSupport_dualKernel L j) hh j m) (fun x hx => cellAtom_eq_zero (hKρ j) m hx)
       (fun x => ?_) (fun v x => ?_)
     · refine (enorm_cellAtom_le hp1 hh m hK hρ (hKρ j) x).trans ?_
       have hXY : (ENNReal.ofReal (ρ ^ finrank ℝ V) * volume (ball (0 : V) 1)) ^
@@ -203,13 +204,13 @@ theorem exists_trace_atoms {p : ℝ≥0∞} (hp1 : 1 ≤ p) (L : ℕ) :
             simp only [A1]
             rw [mul_assoc]
             exact mul_le_mul' (by norm_num) le_rfl
-    · have h1 := enorm_higherDiff_cellAtom_le hp1 (b.continuous_dual L j) hh m hK
+    · have h1 := enorm_higherDiff_cellAtom_le hp1 (b.continuous_dualKernel L j) hh m hK
         (hb 1 le_rfl j) hρ (hKρ j) v x
       rw [Nat.cast_one, ENNReal.rpow_one] at h1
       simpa only [Function.iterate_one, fwdDiff] using h1
   · refine card_le_of_norm_sub_cellCenter_le j hρ' (Ω.graphMap x') S fun m hm => ?_
     obtain ⟨hcoef, hdist⟩ := hS m hm
-    have hex : ∃ y', cellAtom p (b.dual L j) j h m (Ω.graphMap y') ≠ 0 := by
+    have hex : ∃ y', cellAtom p (b.dualKernel L j) j h m (Ω.graphMap y') ≠ 0 := by
       by_contra hcon
       exact hcoef (by simp [traceCoef, hcon])
     exact Ω.norm_graphMap_sub_cellCenter_le (hKρ j) hex hdist
@@ -235,7 +236,7 @@ theorem eLpNorm_traceFun_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) (L
     (ENNReal.rpow_ne_top_of_nonneg hexp (ENNReal.natCast_ne_top N)) hC, fun j h hh => ?_⟩
   obtain ⟨hat, hN⟩ := hatoms j hh
   have hlev := eLpNorm_levelSum_le hp1 hp (fun m => Ω.proj (cellCenter j m))
-    (fun m => cellAtom p (b.dual L j) j h m ∘ Ω.graphMap) (Ω.traceCoef b p L j h)
+    (fun m => cellAtom p (b.dualKernel L j) j h m ∘ Ω.graphMap) (Ω.traceCoef b p L j h)
     (fun x' S hS => hN x' S fun m hm => ⟨(hS m hm).1, by simpa only [Nat.cast_one] using (hS m hm).2⟩)
     hat
     (Ω.continuous_traceFun b hp1 L j hh).aestronglyMeasurable
@@ -339,7 +340,7 @@ theorem modNorm_traceSeries_le_of_atoms (hp : p ≠ ∞) (L : ℕ) {r : ℕ} {s 
     (hsr : s < r) {q : ℝ≥0∞} (hq : 1 ≤ q) {d : ℝ} {C : ℝ≥0∞} {N : ℕ} (hC : C ≠ ∞)
     (hatoms : ∀ (j : ℕ) {h : V → ℂ}, MemLp h p volume →
       (∀ m, IsRegularAtom p r r d C j (Ω.proj (cellCenter j m))
-        (cellAtom p (b.dual L j) j h m ∘ Ω.graphMap)) ∧
+        (cellAtom p (b.dualKernel L j) j h m ∘ Ω.graphMap)) ∧
       ∀ x' (S : Finset (Fin (finrank ℝ V) → ℤ)),
         (∀ m ∈ S, Ω.traceCoef b p L j h m ≠ 0 ∧ ‖x' - Ω.proj (cellCenter j m)‖ ≤ (d + r) / 2 ^ j) →
           S.card ≤ N) :
@@ -352,7 +353,7 @@ theorem modNorm_traceSeries_le_of_atoms (hp : p ≠ ∞) (L : ℕ) {r : ℕ} {s 
   have hp0 : p ≠ 0 := (zero_lt_one.trans_le hp1).ne'
   refine ⟨atomSynthConst p N C r s r, atomSynthConst_ne_top hp1 N hC r hs hsr, fun h hX => ?_⟩
   have hsyn := modNorm_le_coeffNorm hp (fun j m => Ω.proj (cellCenter j m))
-    (fun j m => cellAtom p (b.dual L j) j (h j) m ∘ Ω.graphMap)
+    (fun j m => cellAtom p (b.dualKernel L j) j (h j) m ∘ Ω.graphMap)
     (fun j => Ω.traceCoef b p L j (h j))
     (fun j x' S hS => (hatoms j (Lp.memLp (h j))).2 x' S hS)
     (fun j m => (hatoms j (Lp.memLp (h j))).1 m)
@@ -431,17 +432,17 @@ theorem sum_traceFun_eq_conv (hp : p ≠ ∞) (L J : ℕ) (f : Lp ℂ p (volume 
     (x' : Ω.hyperplane) :
     ∑ j ∈ Finset.range (J + 1),
         Ω.traceFun Ω.coneBump L j (Ω.cutoff (Ω.coneBump.localMean hp L j f)) x' =
-      conv (Ω.coneBump.scaled L J) (convLp hp (Ω.coneBump.integrable_scaled L J) f) volume
-        (Ω.graphMap x') := by
+      conv (Ω.coneBump.scaledMoment L J) (convLp hp (Ω.coneBump.integrable_scaledMoment L J) f)
+        volume (Ω.graphMap x') := by
   have hcut : ∀ j, Ω.traceFun Ω.coneBump L j (Ω.cutoff (Ω.coneBump.localMean hp L j f)) x' =
-      conv (Ω.coneBump.dual L j) (Ω.coneBump.localMean hp L j f) volume (Ω.graphMap x') :=
+      conv (Ω.coneBump.dualKernel L j) (Ω.coneBump.localMean hp L j f) volume (Ω.graphMap x') :=
     fun j => by
       rw [traceFun, conv_congr_ae (Ω.cutoff_apply_ae _),
         conv_indicator_eq_of_forall _ (fun z hz => ?_) volume]
       rw [sub_eq_add_neg]
-      exact Ω.graphMap_add_mem x' (Ω.coneSupported_dual L j z hz)
+      exact Ω.graphMap_add_mem x' (Ω.coneSupported_dualKernel L j z hz)
   simp_rw [hcut]
-  rw [Ω.coneBump.sum_conv_dual_localMean_apply hp L J f]
+  rw [Ω.coneBump.sum_conv_dualKernel_localMean_apply hp L J f]
 
 /-- The partial sums of the trace for a representative `G` of `f`:
 `(m_{2^J} ⋆ (m_{2^J} ⋆ G))(γ x')`. -/
@@ -449,11 +450,11 @@ theorem sum_traceFun_eq (hp : p ≠ ∞) (L J : ℕ) {f : Lp ℂ p (volume : Mea
     (hfG : (f : V → ℂ) =ᵐ[volume] G) (x' : Ω.hyperplane) :
     ∑ j ∈ Finset.range (J + 1),
         Ω.traceFun Ω.coneBump L j (Ω.cutoff (Ω.coneBump.localMean hp L j f)) x' =
-      conv (Ω.coneBump.scaled L J) (conv (Ω.coneBump.scaled L J) G volume) volume
+      conv (Ω.coneBump.scaledMoment L J) (conv (Ω.coneBump.scaledMoment L J) G volume) volume
         (Ω.graphMap x') := by
   rw [Ω.sum_traceFun_eq_conv hp L J f]
-  have hG : ⇑(convLp hp (Ω.coneBump.integrable_scaled L J) f) =ᵐ[volume]
-      conv (Ω.coneBump.scaled L J) G volume :=
+  have hG : ⇑(convLp hp (Ω.coneBump.integrable_scaledMoment L J) f) =ᵐ[volume]
+      conv (Ω.coneBump.scaledMoment L J) G volume :=
     (convLp_apply_ae hp _ f).trans (Filter.EventuallyEq.of_eq (conv_congr_ae hfG))
   rw [conv_congr_ae hG]
 
@@ -465,8 +466,8 @@ theorem exists_subseq_tendsto_trace (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0
     (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure V)}
     (hX : Ω.intrinsicNorm hp L (s + 1 / p.toReal) q f < ∞) :
     ∃ ns : ℕ → ℕ, StrictMono ns ∧ ∀ᵐ x' ∂(volume : Measure Ω.hyperplane),
-      Tendsto (fun k => conv (Ω.coneBump.scaled L (ns k))
-        (convLp hp (Ω.coneBump.integrable_scaled L (ns k)) f) volume (Ω.graphMap x')) atTop
+      Tendsto (fun k => conv (Ω.coneBump.scaledMoment L (ns k))
+        (convLp hp (Ω.coneBump.integrable_scaledMoment L (ns k)) f) volume (Ω.graphMap x')) atTop
           (𝓝 (Ω.trace hp L f x')) := by
   have hp0 : p ≠ 0 := (zero_lt_one.trans_le (Fact.out : 1 ≤ p)).ne'
   have hS := Ω.tendsto_sum_traceTerm Ω.coneBump hp L hs hq
@@ -474,8 +475,8 @@ theorem exists_subseq_tendsto_trace (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0
   have hSae : ∀ᵐ x' ∂(volume : Measure Ω.hyperplane), ∀ J,
       (∑ j ∈ Finset.range (J + 1), Ω.traceTerm Ω.coneBump hp L j
         (Ω.cutoff (Ω.coneBump.localMean hp L j f))) x' =
-      conv (Ω.coneBump.scaled L J) (convLp hp (Ω.coneBump.integrable_scaled L J) f) volume
-        (Ω.graphMap x') := by
+      conv (Ω.coneBump.scaledMoment L J) (convLp hp (Ω.coneBump.integrable_scaledMoment L J) f)
+        volume (Ω.graphMap x') := by
     rw [ae_all_iff]
     intro J
     have h1 := Lp.coeFn_fun_finsetSum (Finset.range (J + 1))
@@ -511,8 +512,8 @@ theorem trace_ae_eq_comp_graphMap (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s :
     mul_nonneg (Nat.cast_nonneg L) Ω.coneBump.radius_nonneg
   have hΦR : ∀ w, L * Ω.coneBump.radius < ‖w‖ → momentKernel Ω.coneBump.toFun L w = 0 :=
     fun w hw => Ω.coneBump.momentKernel_eq_zero L hw
-  have hlim : ∀ y : V, Tendsto (fun J => conv (Ω.coneBump.scaled L J)
-      (conv (Ω.coneBump.scaled L J) G volume) volume y) atTop (𝓝 (G y)) := fun y => by
+  have hlim : ∀ y : V, Tendsto (fun J => conv (Ω.coneBump.scaledMoment L J)
+      (conv (Ω.coneBump.scaledMoment L J) G volume) volume y) atTop (𝓝 (G y)) := fun y => by
     have hG1 := conv_dilate_near hΦ hone hR hΦR (F := fun _ => G)
       (fun _ => hG.aestronglyMeasurable) (y := y) (z₀ := G y) fun ε hε => by
         obtain ⟨δ, hδ, hδG⟩ := Metric.continuousAt_iff.1 hG.continuousAt ε hε
@@ -520,9 +521,9 @@ theorem trace_ae_eq_comp_graphMap (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s :
           rw [← dist_eq_norm]
           exact hδG (by rwa [dist_eq_norm])⟩
     have hG2 := conv_dilate_near hΦ hone hR hΦR
-      (F := fun J => conv (Ω.coneBump.scaled L J) G volume)
-      (fun J => ((Ω.coneBump.hasCompactSupport_scaled L J).continuous_convolution_left
-        (ContinuousLinearMap.mul ℂ ℂ) (Ω.coneBump.continuous_scaled L J)
+      (F := fun J => conv (Ω.coneBump.scaledMoment L J) G volume)
+      (fun J => ((Ω.coneBump.hasCompactSupport_scaledMoment L J).continuous_convolution_left
+        (ContinuousLinearMap.mul ℂ ℂ) (Ω.coneBump.continuous_scaledMoment L J)
           hG.locallyIntegrable).aestronglyMeasurable) hG1
     rw [Metric.tendsto_atTop]
     intro ε hε
@@ -532,9 +533,10 @@ theorem trace_ae_eq_comp_graphMap (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s :
       exact hJ J hJ0 y (by simpa using hδ)⟩
   filter_upwards [hae] with x' hx
   refine tendsto_nhds_unique hx ?_
-  have hJ : ∀ J, conv (Ω.coneBump.scaled L J) (convLp hp (Ω.coneBump.integrable_scaled L J) f)
-      volume (Ω.graphMap x') = conv (Ω.coneBump.scaled L J)
-        (conv (Ω.coneBump.scaled L J) G volume) volume (Ω.graphMap x') := fun J => by
+  have hJ : ∀ J,
+      conv (Ω.coneBump.scaledMoment L J) (convLp hp (Ω.coneBump.integrable_scaledMoment L J) f)
+      volume (Ω.graphMap x') = conv (Ω.coneBump.scaledMoment L J)
+        (conv (Ω.coneBump.scaledMoment L J) G volume) volume (Ω.graphMap x') := fun J => by
     rw [conv_congr_ae ((convLp_apply_ae hp _ f).trans
       (Filter.EventuallyEq.of_eq (conv_congr_ae hfG)))]
   simp_rw [hJ]
@@ -548,9 +550,9 @@ theorem traceTerm_sub (b : LocalMeansBump V) (hp : p ≠ ∞) (L j : ℕ)
     Ω.traceTerm b hp L j (h₁ - h₂) = Ω.traceTerm b hp L j h₁ - Ω.traceTerm b hp L j h₂ := by
   have hp1 : 1 ≤ p := Fact.out
   have hint : ∀ (h : Lp ℂ p (volume : Measure V)) (y : V),
-      Integrable (fun z => b.dual L j z * h (y - z)) volume := fun h y => by
-    simpa using integrable_translate_mul_of_locallyIntegrable (b.continuous_dual L j)
-      (b.hasCompactSupport_dual L j) ((Lp.memLp h).locallyIntegrable hp1) 0 y
+      Integrable (fun z => b.dualKernel L j z * h (y - z)) volume := fun h y => by
+    simpa using integrable_translate_mul_of_locallyIntegrable (b.continuous_dualKernel L j)
+      (b.hasCompactSupport_dualKernel L j) ((Lp.memLp h).locallyIntegrable hp1) 0 y
   refine Lp.ext ?_
   filter_upwards [Ω.traceTerm_ae b hp L j (h₁ - h₂), Ω.traceTerm_ae b hp L j h₁,
     Ω.traceTerm_ae b hp L j h₂, Lp.coeFn_sub (Ω.traceTerm b hp L j h₁)

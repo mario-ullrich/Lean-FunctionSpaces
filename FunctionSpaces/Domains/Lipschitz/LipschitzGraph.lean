@@ -32,8 +32,9 @@ The **cone bump** (`Rd.LipschitzGraph.coneBump`) is a bump for local means suppo
 (`Rd.LocalMeansBump.ofContDiffBump`). A kernel `k` is **supported in `-K`** if `k(y) ≠ 0` implies
 `-y ∈ K` (`Rd.LipschitzGraph.ConeSupported`); this passes to sums, differences and dilations, so
 the moment kernels and the dual kernels of every bump supported in `-K` are supported in `-K`
-(`Rd.LipschitzGraph.coneSupported_momentKernel_of`, `Rd.LipschitzGraph.coneSupported_dual_of`),
-and so are the local means kernels of the cone bump (`Rd.LipschitzGraph.coneSupported_kernel`).
+(`Rd.LipschitzGraph.coneSupported_momentKernel_of`,
+`Rd.LipschitzGraph.coneSupported_dualKernel_of`), and so are the local means kernels of the cone
+bump (`Rd.LipschitzGraph.coneSupported_meansKernel`).
 
 **Support principle** (`Rd.LipschitzGraph.conv_indicator_eq`): for a kernel supported in `-K` and
 `x ∈ Ω`, `(k ⋆ f)(x)` depends only on `f` on `Ω`, since `x - y ∈ x + K ⊆ Ω` whenever `k(y) ≠ 0`.
@@ -383,16 +384,18 @@ theorem coneSupported_momentKernel_of {b : LocalMeansBump V} (hb : Ω.ConeSuppor
   ConeSupported.finsetSum _ _ fun _ _ => hb.dilate (by positivity)
 
 /-- The dilated moment kernels of a bump supported in `-K` are supported in `-K`. -/
-theorem coneSupported_scaled_of {b : LocalMeansBump V} (hb : Ω.ConeSupported b.toFun)
-    (L j : ℕ) : Ω.ConeSupported (b.scaled L j) :=
+theorem coneSupported_scaledMoment_of {b : LocalMeansBump V} (hb : Ω.ConeSupported b.toFun)
+    (L j : ℕ) : Ω.ConeSupported (b.scaledMoment L j) :=
   (Ω.coneSupported_momentKernel_of hb L).dilate (by positivity)
 
 /-- The dual kernels of a bump supported in `-K` are supported in `-K`. -/
-theorem coneSupported_dual_of {b : LocalMeansBump V} (hb : Ω.ConeSupported b.toFun)
-    (L j : ℕ) : Ω.ConeSupported (b.dual L j) := by
+theorem coneSupported_dualKernel_of {b : LocalMeansBump V} (hb : Ω.ConeSupported b.toFun)
+    (L j : ℕ) : Ω.ConeSupported (b.dualKernel L j) := by
   cases j with
-  | zero => exact Ω.coneSupported_scaled_of hb L 0
-  | succ j => exact (Ω.coneSupported_scaled_of hb L (j + 1)).add (Ω.coneSupported_scaled_of hb L j)
+  | zero => exact Ω.coneSupported_scaledMoment_of hb L 0
+  | succ j =>
+    exact (Ω.coneSupported_scaledMoment_of hb L (j + 1)).add
+      (Ω.coneSupported_scaledMoment_of hb L j)
 
 /-- The moment kernels of the cone bump are supported in `-K`. -/
 theorem coneSupported_momentKernel (L : ℕ) :
@@ -400,18 +403,18 @@ theorem coneSupported_momentKernel (L : ℕ) :
   Ω.coneSupported_momentKernel_of Ω.coneSupported_coneBump L
 
 /-- The dilated moment kernels of the cone bump are supported in `-K`. -/
-theorem coneSupported_scaled (L j : ℕ) : Ω.ConeSupported (Ω.coneBump.scaled L j) :=
-  Ω.coneSupported_scaled_of Ω.coneSupported_coneBump L j
+theorem coneSupported_scaledMoment (L j : ℕ) : Ω.ConeSupported (Ω.coneBump.scaledMoment L j) :=
+  Ω.coneSupported_scaledMoment_of Ω.coneSupported_coneBump L j
 
 /-- The local means kernels of the cone bump are supported in `-K`. -/
-theorem coneSupported_kernel (L j : ℕ) : Ω.ConeSupported (Ω.coneBump.kernel L j) := by
+theorem coneSupported_meansKernel (L j : ℕ) : Ω.ConeSupported (Ω.coneBump.meansKernel L j) := by
   cases j with
-  | zero => exact Ω.coneSupported_scaled L 0
-  | succ j => exact (Ω.coneSupported_scaled L (j + 1)).sub (Ω.coneSupported_scaled L j)
+  | zero => exact Ω.coneSupported_scaledMoment L 0
+  | succ j => exact (Ω.coneSupported_scaledMoment L (j + 1)).sub (Ω.coneSupported_scaledMoment L j)
 
 /-- The dual kernels of the cone bump are supported in `-K`. -/
-theorem coneSupported_dual (L j : ℕ) : Ω.ConeSupported (Ω.coneBump.dual L j) :=
-  Ω.coneSupported_dual_of Ω.coneSupported_coneBump L j
+theorem coneSupported_dualKernel (L j : ℕ) : Ω.ConeSupported (Ω.coneBump.dualKernel L j) :=
+  Ω.coneSupported_dualKernel_of Ω.coneSupported_coneBump L j
 
 /-! ### The support principle -/
 

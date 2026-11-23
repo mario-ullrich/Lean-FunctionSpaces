@@ -377,8 +377,8 @@ gives the same spaces for $1 < p < \infty$ and $1 < q \leq \infty$
 
 \begin{definition}[Admissible kernels and their blocks]
 \label{def:lp-kernel-admissible}
-\lean{Rd.LPKernel, Rd.LPKernel.base, Rd.LPKernel.psiS, Rd.LPKernel.coe_psiS,
-  Rd.LPKernel.distribBlock, Rd.LPKernel.standard}
+\lean{Rd.LPKernel, Rd.LPKernel.kernelBase, Rd.LPKernel.kernelLpBlockS,
+  Rd.LPKernel.coe_kernelLpBlockS, Rd.LPKernel.kernelDistribBlock, Rd.LPKernel.standardKernel}
 \leanok
 \uses{def:schwartz-dilate, def:lp-kernels, lem:lp-kernels-basic, def:psi-base, def:distrib-block}
 An \emph{admissible kernel} $K$ is a Schwartz function $\Phi' \colon V \to \C$ with reals
@@ -392,8 +392,8 @@ the \emph{standard} admissible kernel.
 
 \begin{lemma}[The blocks of the standard kernel]
 \label{lem:lp-kernel-standard-blocks}
-\lean{Rd.LPKernel.standard_psiS, Rd.LPKernel.standard_distribBlock,
-  Rd.LPKernel.standard_distribBlock_eq_iff}
+\lean{Rd.LPKernel.standardKernel_kernelLpBlockS, Rd.LPKernel.standardKernel_kernelDistribBlock,
+  Rd.LPKernel.standardKernel_kernelDistribBlock_eq_iff}
 \leanok
 \uses{def:lp-kernel-admissible, def:psi-base, def:distrib-block}
 For the standard kernel and every $j \in \N$, $\psi'_j = \psi_j$ and $\Delta'_j = \Delta_j$.
@@ -408,8 +408,8 @@ The bases of the standard kernel are those of \Cref{def:psi-base}.
 
 \begin{definition}[Triebel--Lizorkin spaces of tempered distributions]
 \label{def:tl-distr}
-\lean{Rd.LPKernel.triebelLizorkinNormDistr, Rd.triebelLizorkinNormDistr,
-  Rd.MemTriebelLizorkinDistr, Rd.LPKernel.standard_triebelLizorkinNormDistr,
+\lean{Rd.LPKernel.kernelTriebelLizorkinNormDistr, Rd.triebelLizorkinNormDistr,
+  Rd.MemTriebelLizorkinDistr, Rd.LPKernel.standardKernel_kernelTriebelLizorkinNormDistr,
   Rd.aemeasurable_lqNorm_dyadicWeight_Lp}
 \leanok
 \uses{def:lp-kernel-admissible, def:lq-norm}
@@ -429,11 +429,11 @@ $x \mapsto \| (2^{js} |g_j(x)|)_j \|_{\ell_q}$ is almost everywhere measurable.
 
 \begin{lemma}[The quasi-norm of the representing family]
 \label{lem:tl-distr-eq}
-\lean{Rd.LPKernel.triebelLizorkinNormDistr_le, Rd.LPKernel.triebelLizorkinNormDistr_eq,
-  Rd.LPKernel.triebelLizorkinNormDistr_eq_top, Rd.LPKernel.le_mul_triebelLizorkinNormDistr,
-  Rd.triebelLizorkinNormDistr_le, Rd.triebelLizorkinNormDistr_eq,
-  Rd.triebelLizorkinNormDistr_eq_top, Rd.le_mul_triebelLizorkinNormDistr,
-  Rd.MemTriebelLizorkinDistr.exists_blocks}
+\lean{Rd.LPKernel.kernelTriebelLizorkinNormDistr_le, Rd.LPKernel.kernelTriebelLizorkinNormDistr_eq,
+  Rd.LPKernel.kernelTriebelLizorkinNormDistr_eq_top,
+  Rd.LPKernel.le_mul_kernelTriebelLizorkinNormDistr, Rd.triebelLizorkinNormDistr_le,
+  Rd.triebelLizorkinNormDistr_eq, Rd.triebelLizorkinNormDistr_eq_top,
+  Rd.le_mul_triebelLizorkinNormDistr, Rd.MemTriebelLizorkinDistr.exists_lp_blocks}
 \leanok
 \uses{def:tl-distr, lem:lp-distribution-determined, lem:lp-kernel-standard-blocks}
 Let $K$ be an admissible kernel, $1 \leq p \leq \infty$, $s \in \R$, $1 \leq q \leq \infty$ and
@@ -457,7 +457,7 @@ On $L_p$ each admissible kernel also gives a quasi-norm with the convolutions $\
 
 \begin{definition}[The quasi-norm of an admissible kernel on $L_p$]
 \label{def:lp-kernel-tl-norm}
-\lean{Rd.LPKernel.triebelLizorkinNorm}
+\lean{Rd.LPKernel.kernelTriebelLizorkinNorm}
 \leanok
 \uses{def:lp-kernel-admissible}
 Let $K$ be an admissible kernel, $1 \leq p \leq \infty$, $s \in \R$ and $1 \leq q \leq \infty$.
@@ -470,8 +470,8 @@ For $f \in L_p(V)$,
 
 \begin{lemma}[The quasi-norm of an admissible kernel on $L_p$]
 \label{lem:lp-kernel-tl-norm-basic}
-\lean{Rd.LPKernel.triebelLizorkinNormDistr_toTemperedDistribution,
-  Rd.LPKernel.standard_triebelLizorkinNorm}
+\lean{Rd.LPKernel.kernelTriebelLizorkinNormDistr_toTemperedDistribution,
+  Rd.LPKernel.standardKernel_kernelTriebelLizorkinNorm}
 \leanok
 \uses{def:lp-kernel-tl-norm, def:tl-distr, lem:tl-distr-eq, lem:lp-kernel-standard-blocks,
   lem:conv-fourier-multiplier, def:triebel-lizorkin}
@@ -512,8 +512,8 @@ This is \Cref{lem:lp-kernel-tl-norm-basic} for the standard kernel.
 
 \begin{proposition}[Monotonicity in $q$ and $s$]
 \label{prop:tl-distr-mono}
-\lean{Rd.LPKernel.triebelLizorkinNormDistr_mono_exponent,
-  Rd.LPKernel.triebelLizorkinNormDistr_mono_smoothness,
+\lean{Rd.LPKernel.kernelTriebelLizorkinNormDistr_mono_exponent,
+  Rd.LPKernel.kernelTriebelLizorkinNormDistr_mono_smoothness,
   Rd.triebelLizorkinNormDistr_mono_exponent, Rd.triebelLizorkinNormDistr_mono_smoothness,
   Rd.MemTriebelLizorkinDistr.mono_exponent, Rd.MemTriebelLizorkinDistr.mono_smoothness}
 \leanok
@@ -848,8 +848,8 @@ the integral.
 \begin{lemma}[Bounds of the local means kernels]
 \label{lem:local-means-kernel-bounds}
 \lean{Rd.LocalMeansBump.kernelSupConst, Rd.LocalMeansBump.kernelSupConst_nonneg,
-  Rd.LocalMeansBump.norm_scaled_le, Rd.LocalMeansBump.norm_kernel_le,
-  Rd.LocalMeansBump.kernel_eq_zero_of_lt, Rd.LocalMeansBump.enorm_kernel_le}
+  Rd.LocalMeansBump.norm_scaledMoment_le, Rd.LocalMeansBump.norm_meansKernel_le,
+  Rd.LocalMeansBump.meansKernel_eq_zero_of_lt, Rd.LocalMeansBump.enorm_meansKernel_le}
 \leanok
 \uses{def:local-means, lem:dual-kernel-bounds}
 Let $L \in \N$ and $A_L = 2 \sup_V |m|$. For all $j \in \N$ and $y \in V$,
@@ -865,7 +865,7 @@ $\overline B(0, L R \, 2^{-(j-1)})$ by \Cref{lem:dual-kernel-bounds}.
 
 \begin{lemma}[Local means kernels from one scale]
 \label{lem:local-means-one-scale}
-\lean{Rd.LocalMeansBump.ae_enorm_conv_kernel_le_of_scaled}
+\lean{Rd.LocalMeansBump.ae_enorm_conv_meansKernel_le_of_scaledMoment}
 \leanok
 \uses{def:local-means, lem:conv-assoc, lem:dyadic-weights-integer}
 For every $L \in \N$, all $j < i$, every $f \in L_1$, every $C \in [0, \infty]$ and every
@@ -887,14 +887,15 @@ and $2^{-(k-j)L} \leq 2^L \, 2^{-(i-j)L}$ for $k \in \{i - 1, i\}$
 \begin{theorem}[The cross kernel of local means and band-limiting kernels]
 \label{thm:cross-kernel-theta}
 \lean{Rd.LocalMeansBump.enorm_mul_higherDiff_Theta_le,
-  Rd.LocalMeansBump.ae_enorm_Theta_sub_conv_scaled_le, Rd.LocalMeansBump.kernelThetaMomentConst,
-  Rd.LocalMeansBump.kernelThetaMomentConst_ne_top,
-  Rd.LocalMeansBump.ae_enorm_conv_kernel_Theta_le_of_lt,
+  Rd.LocalMeansBump.ae_enorm_dilatedBandKernel_sub_conv_scaledMoment_le,
+  Rd.LocalMeansBump.kernelThetaMomentConst, Rd.LocalMeansBump.kernelThetaMomentConst_ne_top,
+  Rd.LocalMeansBump.ae_enorm_conv_meansKernel_dilatedBandKernel_le_of_lt,
   Rd.LocalMeansBump.kernelThetaSupportConst, Rd.LocalMeansBump.kernelThetaSupportConst_ne_top,
-  Rd.LocalMeansBump.lintegral_Theta_mul_kernel_le_near,
-  Rd.LocalMeansBump.lintegral_Theta_mul_kernel_le_far,
-  Rd.LocalMeansBump.enorm_conv_kernel_Theta_le_of_le, Rd.LocalMeansBump.kernelThetaConst,
-  Rd.LocalMeansBump.kernelThetaConst_ne_top, Rd.LocalMeansBump.enorm_conv_kernel_Theta_le}
+  Rd.LocalMeansBump.lintegral_dilatedBandKernel_mul_meansKernel_le_near,
+  Rd.LocalMeansBump.lintegral_dilatedBandKernel_mul_meansKernel_le_far,
+  Rd.LocalMeansBump.enorm_conv_meansKernel_dilatedBandKernel_le_of_le,
+  Rd.LocalMeansBump.kernelThetaConst, Rd.LocalMeansBump.kernelThetaConst_ne_top,
+  Rd.LocalMeansBump.enorm_conv_meansKernel_dilatedBandKernel_le}
 \leanok
 \uses{lem:local-means-kernel-bounds, lem:local-means-one-scale, lem:conv-second-argument,
   lem:schwartz-decay, lem:schwartz-tails, lem:peetre-weights, lem:dyadic-weights-integer,
@@ -1003,10 +1004,12 @@ $(1 + 2^k \|y - w\|)^{-N} \leq (1 + \rho)^N (1 + 2^k \|y\|)^{-N}$.
 
 \begin{lemma}[Averaged differences of the dual kernels]
 \label{lem:dual-averaged-differences}
-\lean{Rd.LocalMeansBump.enorm_higherDiff_dual_le, Rd.LocalMeansBump.higherDiff_dual_eq_zero,
-  Rd.LocalMeansBump.lintegral_lpKernel_mul_higherDiff_dual_le, Rd.LocalMeansBump.dualTailConst,
-  Rd.LocalMeansBump.dualTailConst_ne_top, Rd.LocalMeansBump.higherDiff_dual_eq_zero_of_norm_lt,
-  Rd.LocalMeansBump.ae_enorm_dual_sub_conv_lpMomentScaled_le}
+\lean{Rd.LocalMeansBump.enorm_higherDiff_dualKernel_le,
+  Rd.LocalMeansBump.higherDiff_dualKernel_eq_zero,
+  Rd.LocalMeansBump.lintegral_lpKernel_mul_higherDiff_dualKernel_le,
+  Rd.LocalMeansBump.dualTailConst, Rd.LocalMeansBump.dualTailConst_ne_top,
+  Rd.LocalMeansBump.higherDiff_dualKernel_eq_zero_of_norm_lt,
+  Rd.LocalMeansBump.ae_enorm_dualKernel_sub_conv_lpMomentScaled_le}
 \leanok
 \uses{lem:dual-kernel-derivatives, lem:dual-kernel-bounds, lem:smooth-differences,
   lem:conv-second-argument, lem:schwartz-tails, lem:peetre-weights, lem:dyadic-weights-integer,
@@ -1041,7 +1044,7 @@ $2^{iL'} 2^{-j'L'} = 4^{L'} 2^{-(j'+2-i)L'}$ (\Cref{lem:dyadic-weights-integer})
 \begin{theorem}[The cross kernel of blocks and dual kernels]
 \label{thm:cross-kernel-dual}
 \lean{Rd.LocalMeansBump.psiDualSupportConst, Rd.LocalMeansBump.psiDualSupportConst_ne_top,
-  Rd.LocalMeansBump.lintegral_enorm_dual_le,
+  Rd.LocalMeansBump.lintegral_enorm_dualKernel_le,
   Rd.LocalMeansBump.enorm_conv_lpBlockKernel_dualKernel_le_of_lt,
   Rd.LocalMeansBump.enorm_conv_lpBlockKernel_dualKernel_le_of_le_one,
   Rd.LocalMeansBump.conv_lpBlockKernel_dualKernel_ae_eq,
@@ -1129,9 +1132,9 @@ all $0 < p < \infty$ and $0 < q \leq \infty$, with the Peetre maximal function i
 \begin{definition}[Local means of Triebel--Lizorkin type]
 \label{def:tl-local-means}
 \lean{Rd.LocalMeansBump.tlLocalMeansNorm, Rd.LocalMeansBump.localMean_ae_eq,
-  Rd.LocalMeansBump.continuous_conv_kernel,
-  Rd.LocalMeansBump.measurable_dyadicWeight_mul_conv_kernel,
-  Rd.LocalMeansBump.aemeasurable_lqNorm_conv_kernel}
+  Rd.LocalMeansBump.continuous_conv_meansKernel,
+  Rd.LocalMeansBump.measurable_dyadicWeight_mul_conv_meansKernel,
+  Rd.LocalMeansBump.aemeasurable_lqNorm_conv_meansKernel}
 \leanok
 \uses{def:local-means, def:lq-norm, lem:reproducing-pointwise, lem:conv-op,
   lem:lp-norm-nonnegative}
@@ -1193,8 +1196,8 @@ Monotonicity and homogeneity of the $L_p$ norm, then \Cref{thm:fefferman-stein}.
 \label{thm:blocks-by-local-means}
 \lean{Rd.LocalMeansBump.blockByLocalMeansConst, Rd.LocalMeansBump.blockByLocalMeansConst_ne_top,
   Rd.LocalMeansBump.enorm_conv_conv_lpBlockKernel_dualKernel_le,
-  Rd.LocalMeansBump.lpBlock_sum_dual_localMean_ae, Rd.LocalMeansBump.ae_enorm_lpBlock_sum_dual_le,
-  Rd.LocalMeansBump.maximalFunction_enorm_localMean,
+  Rd.LocalMeansBump.lpBlock_sum_dualKernel_localMean_ae,
+  Rd.LocalMeansBump.ae_enorm_lpBlock_sum_dual_le, Rd.LocalMeansBump.maximalFunction_enorm_localMean,
   Rd.LocalMeansBump.enorm_blockFun_le_tsum_maximalFunction}
 \leanok
 \uses{thm:cross-kernel-dual, thm:decay-kernels-maximal, lem:maximal-function-kernels,
@@ -1230,8 +1233,9 @@ bound to $f$.
 \begin{theorem}[Local means by blocks]
 \label{thm:local-means-by-blocks}
 \lean{Rd.LocalMeansBump.localMeansByBlockConst, Rd.LocalMeansBump.localMeansByBlockConst_ne_top,
-  Rd.LocalMeansBump.enorm_conv_conv_kernel_Theta_le, Rd.LocalMeansBump.localMean_lpBlock,
-  Rd.LocalMeansBump.localMean_sum_lpBlock_ae, Rd.LocalMeansBump.ae_enorm_localMean_sum_lpBlock_le,
+  Rd.LocalMeansBump.enorm_conv_conv_meansKernel_dilatedBandKernel_le,
+  Rd.LocalMeansBump.localMean_lpBlock, Rd.LocalMeansBump.localMean_sum_lpBlock_ae,
+  Rd.LocalMeansBump.ae_enorm_localMean_sum_lpBlock_le,
   Rd.LocalMeansBump.enorm_localMean_le_tsum_maximalFunction}
 \leanok
 \uses{thm:cross-kernel-theta, thm:decay-kernels-maximal, lem:maximal-function-kernels,
@@ -1329,7 +1333,7 @@ and $A_{s,L} < \infty$ for $0 < s < L$. For $0 < s < L$ the order satisfies $L \
 
 \begin{theorem}[Synthesis in Triebel--Lizorkin spaces]
 \label{thm:tl-synthesis-dual}
-\lean{Rd.LocalMeansBump.lpBlock_sum_dual_ae,
+\lean{Rd.LocalMeansBump.lpBlock_sum_dualKernel_ae,
   Rd.LocalMeansBump.ae_enorm_lpBlock_sum_dualKernel_le_tsum_maximalFunction,
   Rd.LocalMeansBump.enorm_blockFun_le_tsum_maximalFunction_of_tendsto,
   Rd.LocalMeansBump.triebelLizorkinNorm_le_of_tendsto_sum_dual}
@@ -1410,11 +1414,12 @@ $\sup_x \|x\|^k \|D^l (\Phi' - \delta_{1/2} \Phi')(x)\|$.
 
 \begin{lemma}[The blocks of an admissible kernel]
 \label{lem:lp-kernel-blocks}
-\lean{Rd.fourier_schwartzDilate_apply, Rd.LPKernel.isUniformSchwartz_base,
-  Rd.LPKernel.fourier_psiS_zero, Rd.LPKernel.fourier_psiS_succ,
-  Rd.LPKernel.sum_range_fourier_psiS, Rd.LPKernel.fourier_kernel_inv_smul_eq_one,
-  Rd.LPKernel.fourier_kernel_inv_smul_eq_zero, Rd.LPKernel.norm_lt_of_fourier_psiS_ne_zero,
-  Rd.LPKernel.lt_norm_of_fourier_psiS_succ_ne_zero}
+\lean{Rd.fourier_schwartzDilate_apply, Rd.LPKernel.isUniformSchwartz_kernelBase,
+  Rd.LPKernel.fourier_kernelLpBlockS_zero, Rd.LPKernel.fourier_kernelLpBlockS_succ,
+  Rd.LPKernel.sum_range_fourier_kernelLpBlockS, Rd.LPKernel.fourier_kernel_inv_smul_eq_one,
+  Rd.LPKernel.fourier_kernel_inv_smul_eq_zero,
+  Rd.LPKernel.norm_lt_of_fourier_kernelLpBlockS_ne_zero,
+  Rd.LPKernel.lt_norm_of_fourier_kernelLpBlockS_succ_ne_zero}
 \leanok
 \uses{def:lp-kernel-admissible, def:lp-kernel-base-bound, lem:fourier-dilate,
   def:uniform-schwartz}
@@ -1439,9 +1444,9 @@ $\widehat{\psi'_{j+1}}(\xi)$ are $1$.
 
 \begin{lemma}[The finite identity]
 \label{lem:lp-kernel-finite-identity}
-\lean{Rd.LPKernel.exists_window, Rd.LPKernel.sum_Icc_fourier_psiS_eq_one,
-  Rd.LPKernel.fourier_psiS_mul_sum_Icc, Rd.LPKernel.distribBlock_eq_sum,
-  Rd.LPKernel.distribBlock_eq_sum_convLp}
+\lean{Rd.LPKernel.exists_window, Rd.LPKernel.sum_Icc_fourier_kernelLpBlockS_eq_one,
+  Rd.LPKernel.fourier_kernelLpBlockS_mul_sum_Icc, Rd.LPKernel.kernelDistribBlock_eq_sum,
+  Rd.LPKernel.kernelDistribBlock_eq_sum_convLp}
 \leanok
 \uses{lem:lp-kernel-blocks, lem:conv-fourier-multiplier}
 Let $K$, $K'$ be admissible kernels with $a, b$ and $a', b'$. There is $c \in \N$ with
@@ -1502,8 +1507,8 @@ $2^{js} \leq 2^{c|s|} 2^{ks}$ (\Cref{lem:window-sums}), and $2^{ks} M|g_k| = M(2
 
 \begin{lemma}[The comparison of two admissible kernels]
 \label{lem:lp-kernel-comparison-blocks}
-\lean{Rd.LPKernel.triebelLizorkinNormDistr_le_of_blocks,
-  Rd.LPKernel.triebelLizorkinNormDistr_le_mul}
+\lean{Rd.LPKernel.kernelTriebelLizorkinNormDistr_le_of_blocks,
+  Rd.LPKernel.kernelTriebelLizorkinNormDistr_le_mul}
 \leanok
 \uses{lem:lp-kernel-finite-identity, lem:tl-distr-eq, lem:lp-kernel-pointwise,
   lem:window-sums, lem:maximal-bounds-mixed-norm, thm:fefferman-stein, lem:conv-fourier-multiplier}
@@ -1540,7 +1545,8 @@ and \Cref{lem:maximal-bounds-mixed-norm} gives the bound. (2) follows from (1) b
 
 \begin{theorem}[Independence of the Littlewood--Paley family]
 \label{thm:lp-family-independence}
-\lean{Rd.LPKernel.exists_triebelLizorkinNormDistr_le, Rd.LPKernel.exists_triebelLizorkinNorm_le}
+\lean{Rd.LPKernel.exists_kernelTriebelLizorkinNormDistr_le,
+  Rd.LPKernel.exists_kernelTriebelLizorkinNorm_le}
 \leanok
 \uses{lem:lp-kernel-comparison-blocks, lem:lp-kernel-finite-identity, lem:lp-kernel-pointwise,
   lem:lp-kernel-tl-norm-basic, thm:fefferman-stein}
@@ -2111,14 +2117,16 @@ every $w$.
 \begin{theorem}[Ball means of the dual kernels]
 \label{thm:ball-means-dual}
 \lean{Rd.LocalMeansBump.diffByLocalMeansConst, Rd.LocalMeansBump.diffByLocalMeansConst_ne_top,
-  Rd.LocalMeansBump.enorm_higherDiff_dual_le_mul,
-  Rd.LocalMeansBump.enorm_higherDiff_dual_le_indicator,
-  Rd.LocalMeansBump.enorm_higherDiff_conv_dual_le_of_le,
-  Rd.LocalMeansBump.ballMeanDiff_conv_dual_le_of_le, Rd.LocalMeansBump.enorm_dual_le_indicator,
-  Rd.LocalMeansBump.enorm_conv_dual_le, Rd.LocalMeansBump.enorm_conv_dual_le_maximal,
-  Rd.LocalMeansBump.laverage_enorm_conv_dual_add_smul_le_of_one_le,
-  Rd.LocalMeansBump.laverage_enorm_conv_dual_add_smul_le,
-  Rd.LocalMeansBump.ballMeanDiff_conv_dual_le_of_lt, Rd.LocalMeansBump.ballMeanDiff_conv_dual_le}
+  Rd.LocalMeansBump.enorm_higherDiff_dualKernel_le_mul,
+  Rd.LocalMeansBump.enorm_higherDiff_dualKernel_le_indicator,
+  Rd.LocalMeansBump.enorm_higherDiff_conv_dualKernel_le_of_le,
+  Rd.LocalMeansBump.ballMeanDiff_conv_dualKernel_le_of_le,
+  Rd.LocalMeansBump.enorm_dualKernel_le_indicator, Rd.LocalMeansBump.enorm_conv_dualKernel_le,
+  Rd.LocalMeansBump.enorm_conv_dualKernel_le_maximalFunction,
+  Rd.LocalMeansBump.laverage_enorm_conv_dualKernel_add_smul_le_of_one_le,
+  Rd.LocalMeansBump.laverage_enorm_conv_dualKernel_add_smul_le,
+  Rd.LocalMeansBump.ballMeanDiff_conv_dualKernel_le_of_lt,
+  Rd.LocalMeansBump.ballMeanDiff_conv_dualKernel_le}
 \leanok
 \uses{lem:dual-kernel-derivatives, lem:dual-kernel-bounds, lem:dual-averaged-differences,
   lem:smooth-differences, lem:conv-pointwise, lem:moving-balls, lem:maximal-function-kernels,
@@ -2194,7 +2202,7 @@ everywhere.
 \lean{Rd.LocalMeansBump.enorm_le_tlLocalMeansNorm, Rd.LocalMeansBump.diffUpperConst,
   Rd.LocalMeansBump.diffUpperConst_ne_top, Rd.LocalMeansBump.tlDiffNorm_le_tlLocalMeansNorm,
   Rd.LocalMeansBump.diffLowerConst, Rd.LocalMeansBump.diffLowerConst_ne_top,
-  Rd.LocalMeansBump.eLpNorm_dyadicWeight_mul_conv_kernel_le,
+  Rd.LocalMeansBump.eLpNorm_dyadicWeight_mul_conv_meansKernel_le,
   Rd.LocalMeansBump.lqNorm_localMean_shift_le, Rd.LocalMeansBump.tlLocalMeansNorm_le_tlDiffNorm}
 \leanok
 \uses{thm:ball-means-by-local-means, thm:local-means-by-ball-means,
@@ -2385,9 +2393,9 @@ $K * f = K * \sum_m \lambda_m a_m$ (\Cref{def:conv}).
 
 \begin{lemma}[Coarse local means of atoms]
 \label{lem:coarse-local-means-atoms}
-\lean{Rd.LocalMeansBump.lintegral_enorm_kernel_mul_atom_le,
+\lean{Rd.LocalMeansBump.lintegral_enorm_meansKernel_mul_atom_le,
   Rd.LocalMeansBump.tlAtomCoarseConst, Rd.LocalMeansBump.tlAtomCoarseConst_ne_top,
-  Rd.LocalMeansBump.enorm_conv_kernel_level_le_of_le}
+  Rd.LocalMeansBump.enorm_conv_meansKernel_level_le_of_le}
 \leanok
 \uses{lem:local-means-kernel-bounds, lem:reproducing-pointwise, lem:dyadic-weights-integer,
   lem:smooth-atoms-basic, lem:conv-atom-series, lem:coefficients-maximal, lem:weighted-jensen}
@@ -2426,11 +2434,11 @@ $(2LR + d + n + 1)^n |B_1| 2^{-in} M \lambda_j(x)$.
 \begin{lemma}[Fine local means of atoms]
 \label{lem:fine-local-means-atoms}
 \lean{Rd.IsSmoothAtom.higherDiff_eq_zero_of_lt, Rd.LocalMeansBump.enorm_mul_higherDiff_atom_le,
-  Rd.LocalMeansBump.ae_enorm_atom_sub_conv_scaled_le, Rd.LocalMeansBump.momentAtomConst,
+  Rd.LocalMeansBump.ae_enorm_atom_sub_conv_scaledMoment_le, Rd.LocalMeansBump.momentAtomConst,
   Rd.LocalMeansBump.momentAtomConst_ne_top,
-  Rd.LocalMeansBump.ae_enorm_conv_kernel_atom_le_of_lt, Rd.LocalMeansBump.tlAtomFineConst,
+  Rd.LocalMeansBump.ae_enorm_conv_meansKernel_atom_le_of_lt, Rd.LocalMeansBump.tlAtomFineConst,
   Rd.LocalMeansBump.tlAtomFineConst_ne_top,
-  Rd.LocalMeansBump.ae_enorm_conv_kernel_level_le_of_lt}
+  Rd.LocalMeansBump.ae_enorm_conv_meansKernel_level_le_of_lt}
 \leanok
 \uses{lem:smooth-atoms-regular, lem:local-means-one-scale, lem:conv-second-argument,
   def:local-means, lem:local-means-kernel-bounds, lem:reproducing-pointwise, def:rd-modulus,
@@ -2481,8 +2489,8 @@ the smoothness of the atoms give the decay $2^{-(i-j)L}$.
 \begin{theorem}[Synthesis from atoms]
 \label{thm:tl-atomic-synthesis}
 \lean{Rd.LocalMeansBump.tlAtomSynthesisConst, Rd.LocalMeansBump.tlAtomSynthesisConst_ne_top,
-  Rd.LocalMeansBump.ae_enorm_conv_kernel_level_le,
-  Rd.LocalMeansBump.enorm_conv_kernel_le_tsum_level,
+  Rd.LocalMeansBump.ae_enorm_conv_meansKernel_level_le,
+  Rd.LocalMeansBump.enorm_conv_meansKernel_le_tsum_level,
   Rd.LocalMeansBump.enorm_localMean_le_tsum_maximalFunction_cellCoefFun,
   Rd.LocalMeansBump.tlLocalMeansNorm_le_tlCoeffNorm}
 \leanok
@@ -3304,15 +3312,15 @@ with convolution by Schwartz functions. Throughout, $K * f$ is the convolution o
 
 \begin{definition}[Reflection]
 \label{def:reflect}
-\lean{Rd.reflect, Rd.reflect_apply}
+\lean{Rd.reflectNeg, Rd.reflectNeg_apply}
 \leanok
 For every function $K : V \to \C$, the reflection of $K$ is $K^\vee(x) = K(-x)$.
 \end{definition}
 
 \begin{lemma}[Reflections and convolution integrals]
 \label{lem:reflect-basic}
-\lean{Rd.reflect_reflect, Rd.integrable_reflect, Rd.continuous_reflect, Rd.fourier_reflect,
-  Rd.conv_apply_eq_integral_sub, Rd.conv_reflect_apply}
+\lean{Rd.reflectNeg_reflectNeg, Rd.integrable_reflectNeg, Rd.continuous_reflectNeg,
+  Rd.fourier_reflectNeg, Rd.conv_apply_eq_integral_sub, Rd.conv_reflectNeg_apply}
 \leanok
 \uses{def:reflect, def:conv}
 For every function $K : V \to \C$, $(K^\vee)^\vee = K$, $K^\vee$ is integrable if $K$ is,
@@ -3364,7 +3372,7 @@ identity.
 
 \begin{corollary}[The adjoint identity with conjugation]
 \label{cor:convolution-adjoint-conj}
-\lean{Rd.conv_reflect_conj, Rd.integral_conv_mul_conj}
+\lean{Rd.conv_reflectNeg_conj, Rd.integral_conv_mul_conj}
 \leanok
 \uses{thm:convolution-adjoint, lem:reflect-basic}
 For all functions $K, u : V \to \C$ and every $x \in V$,
@@ -3414,7 +3422,7 @@ is \Cref{lem:reflect-basic}.
 
 \begin{lemma}[Derivatives move from the kernel to the Schwartz factor]
 \label{lem:conv-derivative-transfer}
-\lean{Rd.conv_reflect_lineDerivOp, Rd.integral_conv_lineDerivOp_mul,
+\lean{Rd.conv_reflectNeg_lineDerivOp, Rd.integral_conv_lineDerivOp_mul,
   Rd.integral_conv_iteratedLineDerivOp_mul}
 \leanok
 \uses{thm:convolution-adjoint, lem:schwartz-shift-reflect, lem:directional-derivatives-commute}
@@ -3547,7 +3555,7 @@ $T_K f = K * f$ almost everywhere (\Cref{lem:conv-op}).
 
 \begin{theorem}[The analysis bound on $L_2$]
 \label{thm:l2-analysis-bound}
-\lean{Rd.tsum_enorm_convLp_sq_le, Rd.lintegral_lqNorm_conv_sq_le}
+\lean{Rd.tsum_enorm_convLp_sq_le_of_fourier_bound, Rd.lintegral_lqNorm_conv_sq_le_of_fourier_bound}
 \leanok
 \uses{thm:convolution-theorem-l2, lem:plancherel-l2, lem:l2-squares, lem:fourier-integrable,
   def:lq-norm}
@@ -3594,7 +3602,8 @@ The Fourier transform on $L_2(V)$ is linear (Mathlib's
 
 \begin{theorem}[The synthesis bound on $L_2$]
 \label{thm:l2-synthesis-bound}
-\lean{Rd.enorm_sum_convLp_sq_le, Rd.lintegral_enorm_sum_conv_sq_le}
+\lean{Rd.enorm_sum_convLp_sq_le_of_fourier_bound,
+  Rd.lintegral_enorm_sum_conv_sq_le_of_fourier_bound}
 \leanok
 \uses{lem:fourier-sum-conv, lem:l2-squares, lem:plancherel-l2, def:lq-norm}
 For every $B \in [0, \infty]$, every family $(\theta_j)_{j \in \N}$ of integrable kernels on $V$

@@ -58,15 +58,16 @@ bump `b` and the order `L` acting on the torus: the `ℓ_q` norm at each point, 
 norm. -/
 noncomputable def tlLocalMeansNorm (L : ℕ) (s : ℝ) (q : ℝ≥0∞)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) : ℝ≥0∞ :=
-  eLpNorm (fun t => lqNorm q (fun j => dyadicWeight s j * ‖econv (b.kernel L j) f t‖ₑ)) p volume
+  eLpNorm (fun t => lqNorm q (fun j => dyadicWeight s j * ‖econv (b.meansKernel L j) f t‖ₑ))
+    p volume
 
 omit [Fact (1 ≤ p)] in
 /-- The weighted local means `2^(js) |k_j ⋆ f|` on the torus are almost everywhere
 measurable. -/
 theorem aemeasurable_dyadicWeight_mul_econv_kernel (L : ℕ) (s : ℝ) (j : ℕ)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
-    AEMeasurable (fun t => dyadicWeight s j * ‖econv (b.kernel L j) f t‖ₑ) volume :=
-  (aestronglyMeasurable_econv (b.integrable_kernel L j).aestronglyMeasurable
+    AEMeasurable (fun t => dyadicWeight s j * ‖econv (b.meansKernel L j) f t‖ₑ) volume :=
+  (aestronglyMeasurable_econv (b.integrable_meansKernel L j).aestronglyMeasurable
     (Lp.stronglyMeasurable f).measurable).enorm.const_mul _
 
 omit [Fact (1 ≤ p)] in
@@ -75,7 +76,7 @@ measurable. -/
 theorem aemeasurable_lqNorm_econv_kernel (L : ℕ) (s : ℝ) (q : ℝ≥0∞)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     AEMeasurable (fun t => lqNorm q (fun j => dyadicWeight s j *
-      ‖econv (b.kernel L j) f t‖ₑ)) volume :=
+      ‖econv (b.meansKernel L j) f t‖ₑ)) volume :=
   aemeasurable_lqNorm_comp (fun j => aemeasurable_dyadicWeight_mul_econv_kernel b L s j f) q
 
 /-! ### Operator identities -/
@@ -86,22 +87,26 @@ for the commuting operators `a = m_{2^(J+1)} ⋆`, `b = m_{2^J} ⋆`. -/
 theorem sum_econvLp_dual_kernel (hp : p ≠ ∞) (L J : ℕ)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     ∑ j ∈ Finset.range (J + 1),
-        econvLp hp (b.integrable_dual L j) (econvLp hp (b.integrable_kernel L j) f) =
-      econvLp hp (b.integrable_scaled L J) (econvLp hp (b.integrable_scaled L J) f) := by
+        econvLp hp (b.integrable_dualKernel L j) (econvLp hp (b.integrable_meansKernel L j) f) =
+      econvLp hp (b.integrable_scaledMoment L J)
+        (econvLp hp (b.integrable_scaledMoment L J) f) := by
   induction J with
   | zero =>
     rw [Finset.sum_range_one]
     rfl
   | succ J ih =>
-    have hk : econvLp hp (b.integrable_kernel L (J + 1)) f =
-        econvLp hp (b.integrable_scaled L (J + 1)) f - econvLp hp (b.integrable_scaled L J) f :=
-      econvLp_sub_kernel hp (b.integrable_scaled L (J + 1)) (b.integrable_scaled L J) f
+    have hk : econvLp hp (b.integrable_meansKernel L (J + 1)) f =
+        econvLp hp (b.integrable_scaledMoment L (J + 1)) f -
+          econvLp hp (b.integrable_scaledMoment L J) f :=
+      econvLp_sub_kernel hp (b.integrable_scaledMoment L (J + 1)) (b.integrable_scaledMoment L J) f
     have hd : ∀ g : Lp ℂ p (volume : Measure (UnitAddTorus d)),
-        econvLp hp (b.integrable_dual L (J + 1)) g =
-          econvLp hp (b.integrable_scaled L (J + 1)) g + econvLp hp (b.integrable_scaled L J) g :=
-      fun g => econvLp_add_kernel hp (b.integrable_scaled L (J + 1)) (b.integrable_scaled L J) g
+        econvLp hp (b.integrable_dualKernel L (J + 1)) g =
+          econvLp hp (b.integrable_scaledMoment L (J + 1)) g +
+            econvLp hp (b.integrable_scaledMoment L J) g :=
+      fun g => econvLp_add_kernel hp (b.integrable_scaledMoment L (J + 1))
+        (b.integrable_scaledMoment L J) g
     rw [Finset.sum_range_succ, ih, hd, hk, map_sub, map_sub,
-      econvLp_comm hp (b.integrable_scaled L (J + 1)) (b.integrable_scaled L J)]
+      econvLp_comm hp (b.integrable_scaledMoment L (J + 1)) (b.integrable_scaledMoment L J)]
     abel
 
 /-- **The reproducing formula on the torus**: `∑_j η_j ⋆ k_j ⋆ f = f` in `L_p(𝕋^d)` for `L ≥ 1`,
@@ -111,31 +116,33 @@ since `m_{2^J} ⋆ m_{2^J} ⋆ f → f` (`m` is an approximate identity on the t
 theorem tendsto_sum_econvLp_dual_kernel (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     Tendsto (fun J => ∑ j ∈ Finset.range (J + 1),
-      econvLp hp (b.integrable_dual L j) (econvLp hp (b.integrable_kernel L j) f)) atTop
+      econvLp hp (b.integrable_dualKernel L j) (econvLp hp (b.integrable_meansKernel L j) f)) atTop
         (𝓝 f) := by
   simp_rw [sum_econvLp_dual_kernel b hp L]
-  have h : Tendsto (fun J => econvLp hp (b.integrable_scaled L J) f) atTop (𝓝 f) :=
+  have h : Tendsto (fun J => econvLp hp (b.integrable_scaledMoment L J) f) atTop (𝓝 f) :=
     tendsto_econvLp_dilate hp (Rd.integrable_momentKernel b.integrable L)
       (Rd.integral_momentKernel b.integrable b.integral_eq_one hL) (c := fun J : ℕ => (2 : ℝ) ^ J)
       (fun J => by positivity) (tendsto_pow_atTop_atTop_of_one_lt one_lt_two) f
   have hm : eLpNorm (Rd.momentKernel b.toFun L) 1 volume ≠ ∞ :=
     (memLp_one_iff_integrable.2 (Rd.integrable_momentKernel b.integrable L)).eLpNorm_ne_top
-  refine Rd.tendsto_apply_apply_of_tendsto (T := fun J => econvLp hp (b.integrable_scaled L J))
+  refine Rd.tendsto_apply_apply_of_tendsto
+    (T := fun J => econvLp hp (b.integrable_scaledMoment L J))
     (fun J g => norm_econvLp_le hp _ hm (by
-      rw [← eLpNorm_one_eq_lintegral_enorm (b.integrable_scaled L J).1, b.eLpNorm_scaled_one]) g) h
+      rw [← eLpNorm_one_eq_lintegral_enorm (b.integrable_scaledMoment L J).1,
+        b.eLpNorm_scaledMoment_one]) g) h
 
 /-- A local mean of a block on the torus is the block convolved with the cross kernel:
 `k_j ⋆ Δ_i f = (k_j ⋆ Θ_i) ⋆ Δ_i f` in `L_p(𝕋^d)`, since `Θ_i ⋆ ψ_i = ψ_i`. -/
 theorem econvLp_kernel_lpBlock (hp : p ≠ ∞) (L i j : ℕ)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
-    econvLp hp (b.integrable_kernel L j) (lpBlock hp i f) =
-      econvLp hp (Rd.integrable_conv (b.integrable_kernel L j) (Rd.integrable_Theta i))
+    econvLp hp (b.integrable_meansKernel L j) (lpBlock hp i f) =
+      econvLp hp (Rd.integrable_conv (b.integrable_meansKernel L j) (Rd.integrable_Theta i))
         (lpBlock hp i f) := by
   have hT : econvLp hp (Rd.integrable_Theta i) (lpBlock hp i f) = lpBlock hp i f :=
     econvLp_comp_econvLp_of_eq hp _ _ (Rd.integrable_lpBlockKernel i)
       (Rd.conv_Theta_lpBlockKernel i) f
-  calc econvLp hp (b.integrable_kernel L j) (lpBlock hp i f)
-      = econvLp hp (b.integrable_kernel L j)
+  calc econvLp hp (b.integrable_meansKernel L j) (lpBlock hp i f)
+      = econvLp hp (b.integrable_meansKernel L j)
           (econvLp hp (Rd.integrable_Theta i) (lpBlock hp i f)) := by rw [hT]
     _ = _ := econvLp_comp_econvLp hp _ _ _
 
@@ -171,14 +178,15 @@ theorem ae_enorm_comp_proj_le_of_tendsto_Lp {a : d → ℝ}
 theorem lpBlock_sum_econvLp_dual_ae (hp : p ≠ ∞) (L J j : ℕ)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     ∀ᵐ t ∂volume, lpBlock hp j (∑ i ∈ Finset.range (J + 1),
-        econvLp hp (b.integrable_dual L i) (econvLp hp (b.integrable_kernel L i) f)) t =
-      ∑ i ∈ Finset.range (J + 1), econv (Rd.conv (Rd.lpBlockKernel j) (b.dual L i) volume)
-        (econvLp hp (b.integrable_kernel L i) f) t := by
+        econvLp hp (b.integrable_dualKernel L i) (econvLp hp (b.integrable_meansKernel L i) f)) t =
+      ∑ i ∈ Finset.range (J + 1), econv (Rd.conv (Rd.lpBlockKernel j) (b.dualKernel L i) volume)
+        (econvLp hp (b.integrable_meansKernel L i) f) t := by
   have hsum : lpBlock hp j (∑ i ∈ Finset.range (J + 1),
-      econvLp hp (b.integrable_dual L i) (econvLp hp (b.integrable_kernel L i) f)) =
+      econvLp hp (b.integrable_dualKernel L i) (econvLp hp (b.integrable_meansKernel L i) f)) =
       ∑ i ∈ Finset.range (J + 1),
-        econvLp hp (Rd.integrable_conv (Rd.integrable_lpBlockKernel j) (b.integrable_dual L i))
-          (econvLp hp (b.integrable_kernel L i) f) := by
+        econvLp hp
+          (Rd.integrable_conv (Rd.integrable_lpBlockKernel j) (b.integrable_dualKernel L i))
+          (econvLp hp (b.integrable_meansKernel L i) f) := by
     rw [map_sum]
     exact Finset.sum_congr rfl fun i _ => econvLp_comp_econvLp hp _ _ _
   rw [hsum]
@@ -188,9 +196,10 @@ theorem lpBlock_sum_econvLp_dual_ae (hp : p ≠ ∞) (L J j : ℕ)
 convolution `k_i ⋆ f`. -/
 theorem maximalFunction_periodicEconvLp_meansKernel_quotientProj (hp : p ≠ ∞) (L i : ℕ)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
-    Rd.maximalFunction (fun y => ‖econvLp hp (b.integrable_kernel L i) f (proj y)‖ₑ) =
-      Rd.maximalFunction (fun y => ‖econv (b.kernel L i) f (proj y)‖ₑ) :=
-  maximalFunction_enorm_comp_quotientProj_congr_ae (econvLp_apply_ae hp (b.integrable_kernel L i) f)
+    Rd.maximalFunction (fun y => ‖econvLp hp (b.integrable_meansKernel L i) f (proj y)‖ₑ) =
+      Rd.maximalFunction (fun y => ‖econv (b.meansKernel L i) f (proj y)‖ₑ) :=
+  maximalFunction_enorm_comp_quotientProj_congr_ae
+    (econvLp_apply_ae hp (b.integrable_meansKernel L i) f)
 
 /-- The bound of the blocks by local means for the partial sums of the reproducing formula, at
 lifted points: for `L' ≥ 1` and every `J`, for almost every `x ∈ ℝ^d`,
@@ -200,15 +209,16 @@ lifted points: for `L' ≥ 1` and every `J`, for almost every `x ∈ ℝ^d`,
 theorem ae_enorm_lpBlock_sum_proj_le (hp : p ≠ ∞) (L : ℕ) {L' : ℕ} (hL' : 1 ≤ L') (J j : ℕ)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ d)), ‖lpBlock hp j (∑ i ∈ Finset.range (J + 1),
-        econvLp hp (b.integrable_dual L i) (econvLp hp (b.integrable_kernel L i) f)) (proj x)‖ₑ ≤
+        econvLp hp (b.integrable_dualKernel L i) (econvLp hp (b.integrable_meansKernel L i) f))
+          (proj x)‖ₑ ≤
       b.blockByLocalMeansConst L L' * ∑' i, (if i ≤ j then dyadicWeight (-(L' : ℝ)) (j - i)
-        else 1) * Rd.maximalFunction (fun y => ‖econv (b.kernel L i) f (proj y)‖ₑ) x := by
+        else 1) * Rd.maximalFunction (fun y => ‖econv (b.meansKernel L i) f (proj y)‖ₑ) x := by
   filter_upwards [ae_comp_proj (lpBlock_sum_econvLp_dual_ae b hp L J j f)] with x hx
-  have hterm : ∀ i, ‖econv (Rd.conv (Rd.lpBlockKernel j) (b.dual L i) volume)
-      (econvLp hp (b.integrable_kernel L i) f) (proj x)‖ₑ ≤
+  have hterm : ∀ i, ‖econv (Rd.conv (Rd.lpBlockKernel j) (b.dualKernel L i) volume)
+      (econvLp hp (b.integrable_meansKernel L i) f) (proj x)‖ₑ ≤
         b.blockByLocalMeansConst L L' * ((if i ≤ j then dyadicWeight (-(L' : ℝ)) (j - i)
           else 1) * Rd.maximalFunction
-            (fun y => ‖econv (b.kernel L i) f (proj y)‖ₑ) x) := fun i => by
+            (fun y => ‖econv (b.meansKernel L i) f (proj y)‖ₑ) x) := fun i => by
     rw [econv_proj, ← maximalFunction_periodicEconvLp_meansKernel_quotientProj b hp L i f]
     exact b.enorm_conv_conv_lpBlockKernel_dualKernel_le L hL' i j _ x
   rw [hx]
@@ -227,7 +237,7 @@ theorem enorm_blockFun_proj_le_tsum_maximal {L : ℕ} (hL : 1 ≤ L) {L' : ℕ} 
     (hp : p ≠ ∞) (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     ∀ᵐ x ∂(volume.restrict (periodBox 0)), ∀ j, ‖blockFun j f (proj x)‖ₑ ≤
       b.blockByLocalMeansConst L L' * ∑' i, (if i ≤ j then dyadicWeight (-(L' : ℝ)) (j - i)
-        else 1) * Rd.maximalFunction (fun y => ‖econv (b.kernel L i) f (proj y)‖ₑ) x := by
+        else 1) * Rd.maximalFunction (fun y => ‖econv (b.meansKernel L i) f (proj y)‖ₑ) x := by
   refine ae_all_iff.2 fun j => ?_
   have h := ae_enorm_comp_proj_le_of_tendsto_Lp (a := 0)
     (((lpBlock hp j).continuous.tendsto f).comp (tendsto_sum_econvLp_dual_kernel b hp hL f))
@@ -244,8 +254,9 @@ theorem enorm_blockFun_proj_le_tsum_maximal {L : ℕ} (hL : 1 ≤ L) {L' : ℕ} 
 `Δ_i f ∈ L_p(𝕋^d)` on the right. -/
 theorem econvLp_kernel_sum_lpBlock_ae (hp : p ≠ ∞) (L J j : ℕ)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
-    ∀ᵐ t ∂volume, econvLp hp (b.integrable_kernel L j) (∑ i ∈ Finset.range J, lpBlock hp i f) t =
-      ∑ i ∈ Finset.range J, econv (Rd.conv (b.kernel L j) (Rd.Theta i) volume)
+    ∀ᵐ t ∂volume,
+      econvLp hp (b.integrable_meansKernel L j) (∑ i ∈ Finset.range J, lpBlock hp i f) t =
+      ∑ i ∈ Finset.range J, econv (Rd.conv (b.meansKernel L j) (Rd.Theta i) volume)
         (lpBlock hp i f) t := by
   simp only [map_sum, econvLp_kernel_lpBlock b hp L _ j f]
   exact coeFn_sum_econvLp_ae hp _ _ _
@@ -265,16 +276,16 @@ lifted points: for every `J`, for almost every `x ∈ ℝ^d`,
 theorem ae_enorm_econvLp_kernel_sum_proj_le (hp : p ≠ ∞) (L J j : ℕ)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ d)),
-      ‖econvLp hp (b.integrable_kernel L j) (∑ i ∈ Finset.range J, lpBlock hp i f) (proj x)‖ₑ ≤
+      ‖econvLp hp (b.integrable_meansKernel L j) (∑ i ∈ Finset.range J, lpBlock hp i f) (proj x)‖ₑ ≤
         b.localMeansByBlockConst L * ∑' i, (if i ≤ j then dyadicWeight (-(L : ℝ)) (j - i)
           else 1) * Rd.maximalFunction (fun y => ‖blockFun i f (proj y)‖ₑ) x := by
   filter_upwards [ae_comp_proj (econvLp_kernel_sum_lpBlock_ae b hp L J j f)] with x hx
-  have hterm : ∀ i, ‖econv (Rd.conv (b.kernel L j) (Rd.Theta i) volume)
+  have hterm : ∀ i, ‖econv (Rd.conv (b.meansKernel L j) (Rd.Theta i) volume)
       (lpBlock hp i f) (proj x)‖ₑ ≤
         b.localMeansByBlockConst L * ((if i ≤ j then dyadicWeight (-(L : ℝ)) (j - i)
           else 1) * Rd.maximalFunction (fun y => ‖blockFun i f (proj y)‖ₑ) x) := fun i => by
     rw [econv_proj, ← maximalFunction_periodicLpBlock_quotientProj hp i f]
-    exact b.enorm_conv_conv_kernel_Theta_le L i j _ x
+    exact b.enorm_conv_conv_meansKernel_dilatedBandKernel_le L i j _ x
   rw [hx]
   refine (enorm_sum_le _ _).trans ((Finset.sum_le_sum fun i _ => hterm i).trans ?_)
   rw [← Finset.mul_sum]
@@ -289,15 +300,16 @@ decomposition `f = ∑_i Δ_i f` holds in `L_p(𝕋^d)`, and the bound passes fr
 `f` (`Torus.ae_enorm_comp_proj_le_of_tendsto_Lp`). -/
 theorem enorm_econv_kernel_proj_le_tsum_maximal (L : ℕ) (hp : p ≠ ∞)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
-    ∀ᵐ x ∂(volume.restrict (periodBox 0)), ∀ j, ‖econv (b.kernel L j) f (proj x)‖ₑ ≤
+    ∀ᵐ x ∂(volume.restrict (periodBox 0)), ∀ j, ‖econv (b.meansKernel L j) f (proj x)‖ₑ ≤
       b.localMeansByBlockConst L * ∑' i, (if i ≤ j then dyadicWeight (-(L : ℝ)) (j - i)
         else 1) * Rd.maximalFunction (fun y => ‖blockFun i f (proj y)‖ₑ) x := by
   refine ae_all_iff.2 fun j => ?_
   have h := ae_enorm_comp_proj_le_of_tendsto_Lp (a := 0)
-    (((econvLp hp (b.integrable_kernel L j)).continuous.tendsto f).comp (tendsto_sum_lpBlock hp f))
+    (((econvLp hp (b.integrable_meansKernel L j)).continuous.tendsto f).comp
+      (tendsto_sum_lpBlock hp f))
     fun J => ae_restrict_of_ae (ae_enorm_econvLp_kernel_sum_proj_le b hp L J j f)
   filter_upwards [h,
-    ae_restrict_of_ae (ae_comp_proj (econvLp_apply_ae hp (b.integrable_kernel L j) f))]
+    ae_restrict_of_ae (ae_comp_proj (econvLp_apply_ae hp (b.integrable_meansKernel L j) f))]
     with x hx h2
   rw [← h2]
   exact hx
@@ -316,7 +328,7 @@ theorem lqNorm_blockFun_proj_le_lqNorm_maximal {L : ℕ} (hL : 1 ≤ L) {L' : �
       lqNorm q (fun j => dyadicWeight s j * ‖blockFun j f (proj x)‖ₑ) ≤
         b.blockByLocalMeansConst L L' * ENNReal.almostDiagonalConst s L' *
           lqNorm q (fun i => Rd.maximalFunction (fun y => dyadicWeight s i *
-            ‖econv (b.kernel L i) f (proj y)‖ₑ) x) := by
+            ‖econv (b.meansKernel L i) f (proj y)‖ₑ) x) := by
   filter_upwards [enorm_blockFun_proj_le_tsum_maximal b hL hL' hp f] with x hx
   refine (ENNReal.lqNorm_le_almostDiagonalConst_mul_of_le hq s L' hx).trans_eq ?_
   simp only [Rd.dyadicWeight_mul_maximalFunction]
@@ -328,7 +340,7 @@ theorem lqNorm_blockFun_proj_le_lqNorm_maximal {L : ℕ} (hL : 1 ≤ L) {L' : �
 theorem lqNorm_econv_kernel_proj_le_lqNorm_maximal (L : ℕ) (hp : p ≠ ∞) {q : ℝ≥0∞}
     (hq : 1 ≤ q) (s : ℝ) (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     ∀ᵐ x ∂(volume.restrict (periodBox 0)),
-      lqNorm q (fun j => dyadicWeight s j * ‖econv (b.kernel L j) f (proj x)‖ₑ) ≤
+      lqNorm q (fun j => dyadicWeight s j * ‖econv (b.meansKernel L j) f (proj x)‖ₑ) ≤
         b.localMeansByBlockConst L * ENNReal.almostDiagonalConst s L *
           lqNorm q (fun i => Rd.maximalFunction (fun y => dyadicWeight s i *
             ‖blockFun i f (proj y)‖ₑ) x) := by

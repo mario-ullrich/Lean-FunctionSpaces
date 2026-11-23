@@ -42,9 +42,10 @@ dilations (`Rd.dilate`).
   the dilates `G_{2^j}` have the Fourier overlap `4 C²` (`Rd.meanZeroOverlap`); in particular the
   dilated divergence kernels form Calderón–Zygmund families
   (`Rd.isCZFamily_divergenceSchwartz`).
-* **The local means kernels as dilation differences** (`Rd.LocalMeansBump.kernel_succ_eq_dilate`):
-  for a bump with moment kernel `m` of any order, `k_{j+1} = (m_2 - m)_{2^j}`, the identity that
-  the divergence kernels of `m_2 - m` turn into derivatives.
+* **The local means kernels as dilation differences**
+  (`Rd.LocalMeansBump.meansKernel_succ_eq_dilate`): for a bump with moment kernel `m` of any order,
+  `k_{j+1} = (m_2 - m)_{2^j}`, the identity that the divergence kernels of `m_2 - m` turn into
+  derivatives.
 -/
 
 @[expose] public section
@@ -653,8 +654,8 @@ theorem isCZFamily_divergenceSchwartz {m : V → ℂ} (hm : ContDiff ℝ ((⊤ :
 /-- **The local means kernels at dyadic scales**: for a bump with moment kernel `m` of order `L`,
 `k_{j+1} = (m_2 - m)_{2^j}`, since `k_{j+1} = m_{2^(j+1)} - m_{2^j}` and
 `(m_2)_{2^j} = m_{2^(j+1)}` (`Rd.dilate_sub`, `Rd.dilate_dilate`). -/
-theorem LocalMeansBump.kernel_succ_eq_dilate (b : LocalMeansBump V) (L j : ℕ) :
-    b.kernel L (j + 1) =
+theorem LocalMeansBump.meansKernel_succ_eq_dilate (b : LocalMeansBump V) (L j : ℕ) :
+    b.meansKernel L (j + 1) =
       dilate (2 ^ j) (fun y => dilate 2 (momentKernel b.toFun L) y - momentKernel b.toFun L y) := by
   rw [show (fun y => dilate 2 (momentKernel b.toFun L) y - momentKernel b.toFun L y) =
     dilate 2 (momentKernel b.toFun L) - momentKernel b.toFun L from rfl, dilate_sub,

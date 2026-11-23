@@ -138,8 +138,8 @@ $c^{-1} K \subseteq K$.
 \label{lem:cone-bump}
 \lean{Rd.LipschitzGraph.coneBumpBase, Rd.LipschitzGraph.coneBump,
   Rd.LipschitzGraph.coneBump_radius, Rd.LipschitzGraph.coneSupported_coneBump,
-  Rd.LipschitzGraph.coneSupported_momentKernel, Rd.LipschitzGraph.coneSupported_scaled,
-  Rd.LipschitzGraph.coneSupported_kernel, Rd.LipschitzGraph.coneSupported_dual}
+  Rd.LipschitzGraph.coneSupported_momentKernel, Rd.LipschitzGraph.coneSupported_scaledMoment,
+  Rd.LipschitzGraph.coneSupported_meansKernel, Rd.LipschitzGraph.coneSupported_dualKernel}
 \leanok
 \uses{lem:graph-cone, def:cone-supported, def:local-means, def:bump-mollifier,
   lem:bump-of-smooth-bump}
@@ -440,9 +440,9 @@ For $x \in U$, $k(y) (1_W h)(x - y) = k(y) h(x - y)$ for every $y$.
 \begin{lemma}[Bumps of every radius]
 \label{lem:bumps-every-radius}
 \lean{Rd.LocalMeansBump.rescale, Rd.LocalMeansBump.rescale_radius,
-  Rd.LocalMeansBump.scaled_eq_zero, Rd.LocalMeansBump.dual_eq_zero,
-  Rd.LocalMeansBump.kernel_eq_zero, Rd.LipschitzGraph.coneSupported_momentKernel_of,
-  Rd.LipschitzGraph.coneSupported_scaled_of, Rd.LipschitzGraph.coneSupported_dual_of,
+  Rd.LocalMeansBump.scaledMoment_eq_zero, Rd.LocalMeansBump.dualKernel_eq_zero,
+  Rd.LocalMeansBump.meansKernel_eq_zero, Rd.LipschitzGraph.coneSupported_momentKernel_of,
+  Rd.LipschitzGraph.coneSupported_scaledMoment_of, Rd.LipschitzGraph.coneSupported_dualKernel_of,
   Rd.LipschitzGraph.coneSupported_rescale, Rd.LipschitzGraph.exists_coneBump_radius_le}
 \leanok
 \uses{def:local-means, def:cone-supported, lem:dilate, lem:cone-bump}
@@ -2979,9 +2979,9 @@ $\|w\| \leq R 2^{-J}$ enters, and $\|\Phi_{2^J}\|_1 = \|\Phi\|_1$.
 
 \begin{lemma}[The reproducing formula at every point]
 \label{lem:reproducing-pointwise}
-\lean{Rd.LocalMeansBump.hasCompactSupport_scaled, Rd.LocalMeansBump.continuous_scaled,
-  Rd.LocalMeansBump.hasCompactSupport_kernel, Rd.LocalMeansBump.continuous_kernel,
-  Rd.LocalMeansBump.sum_conv_dual_localMean_apply}
+\lean{Rd.LocalMeansBump.hasCompactSupport_scaledMoment, Rd.LocalMeansBump.continuous_scaledMoment,
+  Rd.LocalMeansBump.hasCompactSupport_meansKernel, Rd.LocalMeansBump.continuous_meansKernel,
+  Rd.LocalMeansBump.sum_conv_dualKernel_localMean_apply}
 \leanok
 \uses{lem:reproducing-formula, lem:dual-kernel-bounds}
 For $f \in L_p$ and every $y \in V$,
@@ -3039,7 +3039,8 @@ Lipschitz graph does not give.
 \lean{Rd.higherDiff_one_apply, Rd.higherDiff_two_apply, Rd.integral_higherDiff_eq_zero,
   Rd.norm_conv_sub_conv_le,
   Rd.norm_conv_sub_self_le, Rd.norm_higherDiff_two_conv_le,
-  Rd.LocalMeansBump.integral_norm_scaled, Rd.LocalMeansBump.integral_norm_higherDiff_scaled_le}
+  Rd.LocalMeansBump.integral_norm_scaledMoment,
+  Rd.LocalMeansBump.integral_norm_higherDiff_scaledMoment_le}
 \leanok
 \uses{lem:conv-pointwise, lem:dual-kernel-bounds}
 Let $u$ satisfy $|u(x) - u(y)| \leq M \|x - y\|$, and let $K$ be integrable, continuous, with
@@ -3064,7 +3065,7 @@ $\|z\| \leq R + 2\|h\|$ on the support of $\Delta_h^2 K$.
   Rd.LipschitzGraph.continuous_graphFun, Rd.LipschitzGraph.graphBump,
   Rd.LipschitzGraph.graphBump_radius, Rd.LipschitzGraph.graphBumpNorm,
   Rd.LipschitzGraph.graphBumpNorm_nonneg, Rd.LipschitzGraph.graphBumpDeriv,
-  Rd.LipschitzGraph.graphBumpDeriv_nonneg, Rd.LipschitzGraph.graphBump_scaled_eq_zero,
+  Rd.LipschitzGraph.graphBumpDeriv_nonneg, Rd.LipschitzGraph.graphBump_scaledMoment_eq_zero,
   Rd.LipschitzGraph.integrable_graphBump_mul, Rd.LipschitzGraph.smoothGraph,
   Rd.LipschitzGraph.continuous_smoothGraph}
 \leanok
@@ -3495,7 +3496,7 @@ $P_1$, $P_2$.
 
 \begin{lemma}[Locality of the trace]
 \label{lem:trace-locality}
-\lean{Rd.LipschitzGraph.conv_scaled_convLp_eq_zero,
+\lean{Rd.LipschitzGraph.conv_scaledMoment_convLp_eq_zero,
   Rd.LipschitzGraph.trace_ae_eq_zero_of_ae_eq_zero, Rd.LipschitzGraph.intrinsicNorm_sub_le,
   Rd.LipschitzGraph.trace_ae_eq_of_ae_eq, Rd.LipschitzGraph.trace_congr}
 \leanok
@@ -4552,7 +4553,7 @@ of Calder\'on and Stein \cite[Chapter VI]{SteinSingular}.
 
 \begin{lemma}[$H^1(\Omega)$ is a linear space]
 \label{lem:sobolev-lipschitz-domain-basic}
-\lean{Rd.BoundedLipschitzDomain.memSobolevOn_of_memSobolev,
+\lean{Rd.BoundedLipschitzDomain.memSobolevOn_of_memWSobolev,
   Rd.BoundedLipschitzDomain.zero_memSobolevOn, Rd.BoundedLipschitzDomain.MemSobolevOn.congr_ae,
   Rd.BoundedLipschitzDomain.MemSobolevOn.add, Rd.BoundedLipschitzDomain.MemSobolevOn.smul}
 \leanok
@@ -4641,7 +4642,7 @@ $r = 2$, these $F$ are the $F \in \Sob{1}{2}(V)$ with $F = f$ almost everywhere 
 
 \begin{lemma}[Boundary traces of $H^1$ functions]
 \label{lem:sobolev-lipschitz-domain-trace-extensions}
-\lean{Rd.BoundedLipschitzDomain.isBoundaryTrace_iff_forall_memSobolev,
+\lean{Rd.BoundedLipschitzDomain.isBoundaryTrace_iff_forall_memWSobolev,
   Rd.BoundedLipschitzDomain.hasBoundaryTrace_iff_memSobolevOn}
 \leanok
 \uses{thm:sobolev-one-two-besov, thm:boundary-trace-space, lem:indicator-lp-eq-iff,
@@ -4883,7 +4884,7 @@ is the compactness that Hiptmair, Pauly and Schulz require (their Assumption F)
 
 \begin{lemma}[Weak derivatives of $H^1(V)$]
 \label{lem:sobolev-one-weak-gradient-norm}
-\lean{Rd.memSobolev_toL2, Rd.exists_toL2_eq_of_memSobolev, Rd.exists_hasWeakLineDeriv_toL2,
+\lean{Rd.memWSobolev_toL2, Rd.exists_toL2_eq_of_memWSobolev, Rd.exists_hasWeakLineDeriv_toL2,
   Rd.sq_norm_eq_of_hasWeakLineDeriv, Rd.norm_le_norm_toL2_add_sum}
 \leanok
 \uses{lem:sobolev-one-to-l2, thm:sobolev-one-two, cor:sobolev-tempered,
@@ -7182,7 +7183,7 @@ $K_i(y) \neq 0$ only if $m(t y) \neq 0$ for some $t \in [1, 2]$.
 
 \begin{lemma}[The local means kernels as divergences]
 \label{lem:bump-divergence-identity}
-\lean{Rd.LocalMeansBump.kernel_two_succ, Rd.LocalMeansBump.kernel_two_succ_apply,
+\lean{Rd.LocalMeansBump.meansKernel_two_succ, Rd.LocalMeansBump.meansKernel_two_succ_apply,
   Rd.LocalMeansBump.integral_inner_mul_momentKernel,
   Rd.LocalMeansBump.isCZFamily_divKernel}
 \leanok
@@ -7210,8 +7211,8 @@ Calder\'on--Zygmund families.
 \begin{lemma}[Local means by the gradient at a point]
 \label{lem:local-means-gradient-point}
 \lean{Rd.conv_indicator_eq_mul_sum_of_eq_sum_iteratedLineDerivOp,
-  Rd.LocalMeansBump.conv_kernel_two_succ_eq,
-  Rd.LocalMeansBump.dyadicWeight_mul_enorm_conv_kernel_le}
+  Rd.LocalMeansBump.conv_meansKernel_two_succ_eq,
+  Rd.LocalMeansBump.dyadicWeight_mul_enorm_conv_meansKernel_le}
 \leanok
 \uses{def:bump-divergence-kernels, lem:bump-divergence-identity,
   lem:weak-derivative-convolution-local, lem:weak-derivative-basic, lem:dilate}
@@ -7572,7 +7573,7 @@ $\Omega$.
 \begin{theorem}[The extension theorem]
 \label{thm:sobolev-extension}
 \lean{Rd.BoundedLipschitzDomain.exists_extendsSobolev,
-  Rd.exists_memSobolev_of_memWeakSobolev_of_subsingleton}
+  Rd.exists_memWSobolev_of_memWeakSobolev_of_subsingleton}
 \leanok
 \uses{lem:sobolev-patches, thm:pasting-sobolev, lem:bounded-lipschitz-geometry,
   def:extends-sobolev}
@@ -8407,8 +8408,8 @@ $C_j(\sum_i d_i)$ and $1 + \sum_i d_i$.
 \begin{theorem}[The extension theorem by reflection]
 \label{thm:reflection-extension}
 \lean{Rd.BoundedLipschitzDomain.exists_extendsSobolev_reflection,
-  Rd.BoundedLipschitzDomain.exists_memSobolev_of_memWeakSobolev,
-  Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev}
+  Rd.BoundedLipschitzDomain.exists_memWSobolev_of_memWeakSobolev,
+  Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memWSobolev}
 \leanok
 \uses{lem:reflection-patches, thm:pasting-sobolev, lem:bounded-lipschitz-geometry,
   def:extends-sobolev, lem:weak-derivative-basic, thm:sobolev-extension}
@@ -8546,7 +8547,7 @@ extension operators.
 \label{thm:reflection-extension-operator}
 \lean{Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp_reflection,
   Rd.BoundedLipschitzDomain.sobolevExtensionL,
-  Rd.BoundedLipschitzDomain.memSobolev_sobolevExtensionL,
+  Rd.BoundedLipschitzDomain.memWSobolev_sobolevExtensionL,
   Rd.BoundedLipschitzDomain.sobolevExtensionL_fst_ae_eq,
   Rd.BoundedLipschitzDomain.memWeakSobolev_of_mem_weakSobolevJet,
   Rd.BoundedLipschitzDomain.exists_enorm_sobolevExtensionL_le,
@@ -8948,7 +8949,7 @@ $\rho$ vanishes outside $(0, \log 2)$ (\Cref{lem:smoothed-bump}), and $\log$ is 
 \begin{theorem}[The kernels of the smoothed bump]
 \label{thm:smoothed-bump-kernels}
 \lean{Rd.LocalMeansBump.momentKernel_dilationSmoothed,
-  Rd.LocalMeansBump.kernel_succ_dilationSmoothed}
+  Rd.LocalMeansBump.meansKernel_succ_dilationSmoothed}
 \leanok
 \uses{def:smoothed-bump, def:moment-weight, lem:moment-weight-support,
   lem:weighted-dilation-algebra, def:moment-kernel, def:local-means,
@@ -9020,7 +9021,7 @@ is the Schwartz function $K^L_i = K^{-\log L, 2 \log 2}_{v_L, g, i}$.
 
 \begin{theorem}[The local means kernels as derivatives of order $m$]
 \label{thm:bump-higher-identity}
-\lean{Rd.LocalMeansBump.kernel_succ_eq_sum_higherKernel}
+\lean{Rd.LocalMeansBump.meansKernel_succ_eq_sum_higherKernel}
 \leanok
 \uses{def:bump-higher-kernels, thm:weighted-dilation-higher, thm:smoothed-bump-kernels,
   thm:kernel-weight-moments, lem:derivative-dilate, def:schwartz-dilate}
@@ -9095,8 +9096,8 @@ $\TL{m}{p}{2} \subseteq \Sob{m}{p}(V)$ and are pasted by the Leibniz rule
 
 \begin{lemma}[Local means by the derivatives of order $m$ at a point]
 \label{lem:local-means-higher-point}
-\lean{Rd.LocalMeansBump.conv_kernel_succ_eq_sum_higherKernel,
-  Rd.LocalMeansBump.dyadicWeight_mul_enorm_conv_kernel_succ_le}
+\lean{Rd.LocalMeansBump.conv_meansKernel_succ_eq_sum_higherKernel,
+  Rd.LocalMeansBump.dyadicWeight_mul_enorm_conv_meansKernel_succ_le}
 \leanok
 \uses{def:bump-higher-kernels, thm:bump-higher-identity, thm:bump-higher-kernels-cz,
   lem:local-means-gradient-point}
@@ -9374,8 +9375,8 @@ the constant $\sum_{k \leq m} \sum_{w \in I^k} C_k(\chi)$, finite by
 \begin{theorem}[The extension theorem of higher order]
 \label{thm:higher-sobolev-extension}
 \lean{Rd.BoundedLipschitzDomain.exists_extendsSobolevOrder,
-  Rd.BoundedLipschitzDomain.exists_memSobolev_of_memWeakSobolev_order,
-  Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev_order}
+  Rd.BoundedLipschitzDomain.exists_memWSobolev_of_memWeakSobolev_order,
+  Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memWSobolev_order}
 \leanok
 \uses{lem:higher-patches, thm:pasting-sobolev-higher, lem:extends-sobolev-order,
   lem:bounded-lipschitz-geometry, def:extends-sobolev-order, lem:weak-derivative-basic,
@@ -10286,9 +10287,9 @@ which is the weak derivative (\Cref{lem:weak-derivative-integral}).
 
 \begin{theorem}[The zero extension and the trace kernel]
 \label{thm:zero-extension-trace-kernel}
-\lean{Rd.BoundedLipschitzDomain.memSobolev_indicatorLp_of_mem_traceKer,
-  Rd.BoundedLipschitzDomain.mem_traceKer_of_memSobolev_indicatorLp,
-  Rd.BoundedLipschitzDomain.memSobolev_indicatorLp_iff_mem_traceKer}
+\lean{Rd.BoundedLipschitzDomain.memWSobolev_indicatorLp_of_mem_traceKer,
+  Rd.BoundedLipschitzDomain.mem_traceKer_of_memWSobolev_indicatorLp,
+  Rd.BoundedLipschitzDomain.memWSobolev_indicatorLp_iff_mem_traceKer}
 \leanok
 \uses{lem:green-trace-kernel, lem:weak-derivative-basic, thm:traces-both-sides,
   lem:trace-locality, lem:lower-graph-domain, thm:trace-kernel-boundary, thm:boundary-trace-charts,

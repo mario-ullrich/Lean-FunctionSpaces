@@ -124,7 +124,8 @@ theorem tensorScaled_tensorKernel (K : Fin d → ℝ → ℂ) (j : ℕ) (k : Fin
 `Φ_{j,k}(x) = ∏_i φ_{j,k_i}(x_i)` for every level `j`, position `k ∈ ℤ^d` and `x ∈ ℝ^d`
 (`Daubechies.tensorScaled_tensorKernel`). -/
 theorem tensorScaled_tensorGen_empty {N : ℕ} (m : Mask N) (j : ℕ) (k : Fin d → ℤ)
-    (x : Fin d → ℝ) : tensorScaled (tensorGen m ∅) j k x = ∏ i, scaled m j (k i) (x i) := by
+    (x : Fin d → ℝ) :
+    tensorScaled (tensorGen m ∅) j k x = ∏ i, daubechiesScaled m j (k i) (x i) := by
   rw [tensorGen, tensorScaled_tensorKernel, Rd.tensorKernel_apply]
   simp only [Finset.notMem_empty, ↓reduceIte]
 

@@ -16,7 +16,7 @@ Let `g : ℝ → ℂ` vanish outside a bounded interval `[a, b]`. Its dilated an
 `g_{j,k}(x) = 2^(j/2) g(2^j x - k)` of level `j ∈ ℕ` and position `k ∈ ℤ`
 (`Daubechies.scaledFun`) give the expansions and the coefficients
 
-`∑_{k ∈ ℤ} c_k g_{j,k}(x)` (`Daubechies.expand`) and
+`∑_{k ∈ ℤ} c_k g_{j,k}(x)` (`Daubechies.daubechiesExpand`) and
 `⟨f, g_{j,k}⟩ = ∫ f(y) conj g_{j,k}(y) dy` (`Daubechies.coeffFun`).
 
 The file is generic in `g`, so that it serves the scaling function `φ` (support `[0, 2N - 1]`,
@@ -26,20 +26,20 @@ The file is generic in `g`, so that it serves the scaling function `φ` (support
   `{x : 2^j x - k ∈ [a, b]} = [(k + a)/2^j, (k + b)/2^j]` (`Daubechies.supportWindow`), and
   every point lies in at most `M = ⌈b - a⌉ + 1` windows of one level
   (`Daubechies.card_le_of_forall_mem_supportWindow`). Hence every expansion is a finite sum at
-  each point (`Daubechies.expand_eq_sum`), continuous if `g` is continuous
-  (`Daubechies.continuous_expand`), even jointly in the coefficients and the point
-  (`Daubechies.continuous_expand_uncurry`), and a.e. strongly measurable if `g` is
-  (`Daubechies.aestronglyMeasurable_expand`).
+  each point (`Daubechies.daubechiesExpand_eq_sum`), continuous if `g` is continuous
+  (`Daubechies.continuous_daubechiesExpand`), even jointly in the coefficients and the point
+  (`Daubechies.continuous_daubechiesExpand_uncurry`), and a.e. strongly measurable if `g` is
+  (`Daubechies.aestronglyMeasurable_daubechiesExpand`).
 * **Orthonormality and coefficient recovery.** The generators of level `0` are the integer
   translates `g(· - k)` (`Daubechies.scaledFun_zero`). If these are orthonormal, then so are the
   `g_{j,k}` of every level (`Daubechies.integral_scaledFun_mul_conj`, by the substitution
   `u = 2^j x`, `Daubechies.integral_eq_two_pow_mul_integral_comp`), and
   `⟨∑_l c_l g_{j,l}, g_{j,k}⟩ = c_k` for every coefficient sequence `c`
-  (`Daubechies.coeffFun_expand`).
+  (`Daubechies.coeffFun_daubechiesExpand`).
 * **Stability.** Let `1 ≤ p < ∞`, let `M = ⌈b - a⌉ + 1` be the overlap number and `p'` the
   conjugate exponent. The upper estimate
   `‖∑_k c_k g_{j,k}‖_p ≤ M^(1 - 1/p) ‖g‖_p 2^(j(1/2 - 1/p)) ‖c‖_{ℓ_p}`
-  (`Daubechies.eLpNorm_expand_le`) follows from the bounded overlap inequality
+  (`Daubechies.eLpNorm_daubechiesExpand_le`) follows from the bounded overlap inequality
   (`Rd.eLpNorm_rpow_le_of_overlap`) and `‖g_{j,k}‖_p = 2^(j(1/2 - 1/p)) ‖g‖_p`
   (`Daubechies.eLpNorm_scaledFun`). The coefficient estimate
   `‖(⟨f, g_{j,k}⟩)_k‖_{ℓ_p} ≤ M^(1/p) ‖g‖_{p'} 2^(-j(1/2 - 1/p)) ‖f‖_p`
@@ -49,16 +49,16 @@ The file is generic in `g`, so that it serves the scaling function `φ` (support
   `ℓ_p` form (`MeasureTheory.lqNorm_le_mul_eLpNorm_of_overlap`).
   Together with coefficient recovery it gives the lower estimate
   `2^(j(1/2 - 1/p)) ‖c‖_{ℓ_p} ≤ M^(1/p) ‖g‖_{p'} ‖∑_k c_k g_{j,k}‖_p` for orthonormal translates
-  (`Daubechies.lqNorm_le_eLpNorm_expand`). The constants (`Daubechies.expandConst`,
+  (`Daubechies.lqNorm_le_eLpNorm_daubechiesExpand`). The constants (`Daubechies.expandConst`,
   `Daubechies.coeffConst`) are the same for every level.
 * **`L_p` membership and linearity.** Expansions with `ℓ_p` coefficients lie in `L_p`
-  (`Daubechies.memLp_expand`), and so does the expansion of the coefficients of an `L_p`
-  function (`Daubechies.memLp_expand_coeffFun`), with
+  (`Daubechies.memLp_daubechiesExpand`), and so does the expansion of the coefficients of an `L_p`
+  function (`Daubechies.memLp_daubechiesExpand_coeffFun`), with
   `‖∑_k ⟨f, g_{j,k}⟩ g_{j,k}‖_p ≤ C C' ‖f‖_p` uniformly in the level
-  (`Daubechies.eLpNorm_expand_coeffFun_le`). Expansions are linear in the coefficients and the
-  coefficients are linear in `f` (`Daubechies.expand_add`, `Daubechies.expand_const_mul`,
-  `Daubechies.coeffFun_add`, `Daubechies.coeffFun_const_mul`), also on finite combinations
-  (`Daubechies.coeffFun_sum_mul`).
+  (`Daubechies.eLpNorm_daubechiesExpand_coeffFun_le`). Expansions are linear in the coefficients and
+  the coefficients are linear in `f` (`Daubechies.daubechiesExpand_add`,
+  `Daubechies.daubechiesExpand_const_mul`, `Daubechies.coeffFun_add`,
+  `Daubechies.coeffFun_const_mul`), also on finite combinations (`Daubechies.coeffFun_sum_mul`).
 -/
 
 @[expose] public section
@@ -169,19 +169,19 @@ variable {g : ℝ → ℂ} {a b : ℝ}
 /-- **The dilated and translated generator** `g_{j,k}(x) = 2^(j/2) g(2^j x - k)` of level
 `j ∈ ℕ` and position `k ∈ ℤ`. The factor `2^(j/2)` makes the `L_2` norm independent of `j` and
 `k`. For the scaling function `g = φ` these are the functions `φ_{j,k}` of the multiresolution
-analysis (`Daubechies.scaled`). -/
+analysis (`Daubechies.daubechiesScaled`). -/
 noncomputable def scaledFun (g : ℝ → ℂ) (j : ℕ) (k : ℤ) (x : ℝ) : ℂ :=
   (((2 : ℝ) ^ ((j : ℝ) / 2) : ℝ) : ℂ) * g (2 ^ j * x - k)
 
 /-- **The expansion** `∑_{k ∈ ℤ} c_k g_{j,k}(x)` of level `j` with coefficients `c : ℤ → ℂ`. If
 `g` vanishes outside a bounded interval, only finitely many terms are nonzero at each point
-(`Daubechies.expand_eq_sum`), so the sum is meaningful for every coefficient sequence. -/
-noncomputable def expand (g : ℝ → ℂ) (j : ℕ) (c : ℤ → ℂ) (x : ℝ) : ℂ :=
+(`Daubechies.daubechiesExpand_eq_sum`), so the sum is meaningful for every coefficient sequence. -/
+noncomputable def daubechiesExpand (g : ℝ → ℂ) (j : ℕ) (c : ℤ → ℂ) (x : ℝ) : ℂ :=
   ∑' k : ℤ, c k * scaledFun g j k x
 
 /-- **The coefficient functional** `⟨f, g_{j,k}⟩ = ∫ f(y) conj g_{j,k}(y) dy` of level `j` and
 position `k`. For an orthonormal system it recovers the coefficients of an expansion
-(`Daubechies.coeffFun_expand`). -/
+(`Daubechies.coeffFun_daubechiesExpand`). -/
 noncomputable def coeffFun (g : ℝ → ℂ) (j : ℕ) (f : ℝ → ℂ) (k : ℤ) : ℂ :=
   ∫ y, f y * conj (scaledFun g j k y)
 
@@ -293,8 +293,8 @@ theorem mem_Icc_of_mem_supportWindow {j : ℕ} {k l : ℤ} {x : ℝ} (hl : x ∈
 /-- **Expansions are finite sums**: if `g` vanishes outside `[a, b]`, then for every level `j`,
 coefficients `c` and point `x`,
 `∑_{k ∈ ℤ} c_k g_{j,k}(x) = ∑_{k = ⌈2^j x - b⌉}^{⌊2^j x - a⌋} c_k g_{j,k}(x)`. -/
-theorem expand_eq_sum (hsupp : ∀ x ∉ Set.Icc a b, g x = 0) (j : ℕ) (c : ℤ → ℂ) (x : ℝ) :
-    expand g j c x =
+theorem daubechiesExpand_eq_sum (hsupp : ∀ x ∉ Set.Icc a b, g x = 0) (j : ℕ) (c : ℤ → ℂ) (x : ℝ) :
+    daubechiesExpand g j c x =
       ∑ k ∈ Finset.Icc ⌈2 ^ j * x - b⌉ ⌊2 ^ j * x - a⌋, c k * scaledFun g j k x :=
   tsum_eq_sum fun _ hk => by
     rw [scaledFun_eq_zero hsupp (fun hx => hk (mem_Icc_ceil_floor hx)), mul_zero]
@@ -311,8 +311,8 @@ and vanishes outside `[a, b]`, then `(c, x) ↦ ∑_k c_k g_{j,k}(x)` is continu
 `(ℤ → ℂ) × ℝ`, with the product topology on the coefficient sequences. Near `(c, x)`, at all
 `(c', y)` with `|2^j y - 2^j x| < 1`, the expansion is the same finite sum over
 `⌈2^j x - b - 1⌉ ≤ k ≤ ⌊2^j x - a + 1⌋`, continuous in `(c', y)`. -/
-theorem continuous_expand_uncurry (hg : Continuous g) (hsupp : ∀ x ∉ Set.Icc a b, g x = 0)
-    (j : ℕ) : Continuous fun q : (ℤ → ℂ) × ℝ => expand g j q.1 q.2 := by
+theorem continuous_daubechiesExpand_uncurry (hg : Continuous g) (hsupp : ∀ x ∉ Set.Icc a b, g x = 0)
+    (j : ℕ) : Continuous fun q : (ℤ → ℂ) × ℝ => daubechiesExpand g j q.1 q.2 := by
   refine continuous_iff_continuousAt.2 fun q => ?_
   have hU : ∀ᶠ q' in 𝓝 q,
       (2 : ℝ) ^ j * q'.2 ∈ Set.Ioo ((2 : ℝ) ^ j * q.2 - 1) (2 ^ j * q.2 + 1) :=
@@ -321,7 +321,7 @@ theorem continuous_expand_uncurry (hg : Continuous g) (hsupp : ∀ x ∉ Set.Icc
         (show (2 : ℝ) ^ j * q.2 < 2 ^ j * q.2 + 1 by linarith))
   have hev : (fun q' : (ℤ → ℂ) × ℝ => ∑ k ∈ Finset.Icc ⌈2 ^ j * q.2 - (b + 1)⌉
       ⌊2 ^ j * q.2 - (a - 1)⌋, q'.1 k * scaledFun g j k q'.2) =ᶠ[𝓝 q]
-      fun q' => expand g j q'.1 q'.2 := by
+      fun q' => daubechiesExpand g j q'.1 q'.2 := by
     filter_upwards [hU] with q' hy
     refine (tsum_eq_sum fun k hk => ?_).symm
     refine by_contra fun h => hk (mem_Icc_ceil_floor ?_)
@@ -333,10 +333,10 @@ theorem continuous_expand_uncurry (hg : Continuous g) (hsupp : ∀ x ∉ Set.Icc
 /-- **Expansions are continuous**: if `g` is continuous and vanishes outside `[a, b]`, then
 `x ↦ ∑_k c_k g_{j,k}(x)` is continuous for every level `j` and all coefficients `c`, the
 restriction of the jointly continuous map `(c, x) ↦ ∑_k c_k g_{j,k}(x)`
-(`Daubechies.continuous_expand_uncurry`). -/
-theorem continuous_expand (hg : Continuous g) (hsupp : ∀ x ∉ Set.Icc a b, g x = 0) (j : ℕ)
-    (c : ℤ → ℂ) : Continuous (expand g j c) :=
-  (continuous_expand_uncurry hg hsupp j).comp (continuous_const.prodMk continuous_id)
+(`Daubechies.continuous_daubechiesExpand_uncurry`). -/
+theorem continuous_daubechiesExpand (hg : Continuous g) (hsupp : ∀ x ∉ Set.Icc a b, g x = 0) (j : ℕ)
+    (c : ℤ → ℂ) : Continuous (daubechiesExpand g j c) :=
+  (continuous_daubechiesExpand_uncurry hg hsupp j).comp (continuous_const.prodMk continuous_id)
 
 /-! ### Orthonormality at every level -/
 
@@ -400,13 +400,13 @@ orthonormal integer translates. Then for every level `j`, every coefficient sequ
 `|l - k| ≤ ⌈b - a⌉` contribute to the integrand (`Daubechies.scaledFun_mul_conj_eq_zero`), so it
 is a finite sum, and orthonormality at level `j` (`Daubechies.integral_scaledFun_mul_conj`) leaves
 the term `l = k`. The sequence `c` is arbitrary: at each point the sum over `l` is finite. -/
-theorem coeffFun_expand (hg : Continuous g) (hsupp : ∀ x ∉ Set.Icc a b, g x = 0)
+theorem coeffFun_daubechiesExpand (hg : Continuous g) (hsupp : ∀ x ∉ Set.Icc a b, g x = 0)
     (horth : ∀ k l : ℤ, ∫ x, g (x - k) * conj (g (x - l)) = if k = l then 1 else 0)
-    (j : ℕ) (c : ℤ → ℂ) (k : ℤ) : coeffFun g j (expand g j c) k = c k := by
-  have h : ∀ y, expand g j c y * conj (scaledFun g j k y) =
+    (j : ℕ) (c : ℤ → ℂ) (k : ℤ) : coeffFun g j (daubechiesExpand g j c) k = c k := by
+  have h : ∀ y, daubechiesExpand g j c y * conj (scaledFun g j k y) =
       ∑ l ∈ Finset.Icc (k - ⌈b - a⌉₊) (k + ⌈b - a⌉₊),
         c l * (scaledFun g j l y * conj (scaledFun g j k y)) := fun y => by
-    rw [expand, ← tsum_mul_right]
+    rw [daubechiesExpand, ← tsum_mul_right]
     refine (tsum_eq_sum fun l hl => ?_).trans (Finset.sum_congr rfl fun l _ => mul_assoc _ _ _)
     rw [mul_assoc, scaledFun_mul_conj_eq_zero hsupp hl, mul_zero]
   rw [coeffFun]
@@ -445,8 +445,8 @@ theorem aestronglyMeasurable_scaledFun (hg : AEStronglyMeasurable g volume) (j :
 /-- **Expansions are a.e. strongly measurable** for every a.e. strongly measurable `g` and all
 coefficients `c`: a countable sum of a.e. strongly measurable functions (Mathlib's
 `MeasureTheory.AEStronglyMeasurable.tsum`). -/
-theorem aestronglyMeasurable_expand (hg : AEStronglyMeasurable g volume) (j : ℕ) (c : ℤ → ℂ) :
-    AEStronglyMeasurable (expand g j c) volume :=
+theorem aestronglyMeasurable_daubechiesExpand (hg : AEStronglyMeasurable g volume) (j : ℕ)
+    (c : ℤ → ℂ) : AEStronglyMeasurable (daubechiesExpand g j c) volume :=
   AEStronglyMeasurable.tsum fun k => (aestronglyMeasurable_scaledFun hg j k).const_mul (c k)
 
 /-- **Dilation and translation in `L_p`**: for every a.e. strongly measurable `F : ℝ → ℂ`, every
@@ -515,10 +515,10 @@ every `c`. At each point at most `M` terms are nonzero
 the bounded overlap inequality `‖∑_k F_k‖_p^p ≤ M^(p-1) ∑_k ‖F_k‖_p^p`
 (`Rd.eLpNorm_rpow_le_of_overlap`) applies, and
 `‖c_k g_{j,k}‖_p = |c_k| 2^(j(1/2 - 1/p)) ‖g‖_p` (`Daubechies.eLpNorm_const_mul_scaledFun`). -/
-theorem eLpNorm_expand_le (hg : AEStronglyMeasurable g volume)
+theorem eLpNorm_daubechiesExpand_le (hg : AEStronglyMeasurable g volume)
     (hsupp : ∀ x ∉ Set.Icc a b, g x = 0) {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) (j : ℕ)
     (c : ℤ → ℂ) :
-    eLpNorm (expand g j c) p volume ≤
+    eLpNorm (daubechiesExpand g j c) p volume ≤
       ((⌈b - a⌉₊ + 1 : ℕ) : ℝ≥0∞) ^ (1 - 1 / p.toReal) * eLpNorm g p volume *
         dyadicWeight (1 / 2 - 1 / p.toReal) j * ENNReal.lqNorm p (fun k => ‖c k‖ₑ) := by
   have hp0 : p ≠ 0 := (zero_lt_one.trans_le hp1).ne'
@@ -528,7 +528,7 @@ theorem eLpNorm_expand_le (hg : AEStronglyMeasurable g volume)
     (fun k => (aestronglyMeasurable_scaledFun hg j k).const_mul (c k)) (N := ⌈b - a⌉₊ + 1)
     (fun x S hS => card_le_of_forall_mem_supportWindow x S fun k hk =>
       mem_supportWindow_of_scaledFun_ne_zero hsupp (right_ne_zero_of_mul (hS k hk)))
-    (aestronglyMeasurable_expand hg j c) (Eventually.of_forall fun x => rfl)
+    (aestronglyMeasurable_daubechiesExpand hg j c) (Eventually.of_forall fun x => rfl)
   simp_rw [eLpNorm_const_mul_scaledFun hg] at h
   rw [← ENNReal.rpow_le_rpow_iff hr]
   refine h.trans (le_of_eq ?_)
@@ -537,7 +537,7 @@ theorem eLpNorm_expand_le (hg : AEStronglyMeasurable g volume)
   rw [ENNReal.tsum_mul_right, ← ENNReal.lqNorm_rpow hp0 hp (fun k => ‖c k‖ₑ)]
   ring
 
-/-- **The constant of the upper estimate** `Daubechies.eLpNorm_expand_le`:
+/-- **The constant of the upper estimate** `Daubechies.eLpNorm_daubechiesExpand_le`:
 `M^(1 - 1/p) ‖g‖_p` with the overlap number `M = ⌈b - a⌉ + 1`, which bounds the number of
 generators of one level that are nonzero at a point. It is the same for every level. -/
 noncomputable def expandConst (g : ℝ → ℂ) (a b : ℝ) (p : ℝ≥0∞) : ℝ≥0∞ :=
@@ -551,11 +551,11 @@ theorem expandConst_ne_top (a b : ℝ) {p : ℝ≥0∞} (hg : MemLp g p volume) 
 
 /-- **Expansions with `ℓ_p` coefficients lie in `L_p`**: if `g ∈ L_p` vanishes outside `[a, b]`,
 `1 ≤ p < ∞` and `‖c‖_{ℓ_p} < ∞`, then `∑_k c_k g_{j,k} ∈ L_p` for every level `j`, since its norm
-is finite by the upper estimate (`Daubechies.eLpNorm_expand_le`). -/
-theorem memLp_expand {p : ℝ≥0∞} (hg : MemLp g p volume) (hsupp : ∀ x ∉ Set.Icc a b, g x = 0)
-    (hp1 : 1 ≤ p) (hp : p ≠ ∞) (j : ℕ) {c : ℤ → ℂ}
-    (hc : ENNReal.lqNorm p (fun k => ‖c k‖ₑ) < ∞) : MemLp (expand g j c) p volume :=
-  memLp_iff.2 ((eLpNorm_expand_le hg.aestronglyMeasurable hsupp hp1 hp j c).trans_lt
+is finite by the upper estimate (`Daubechies.eLpNorm_daubechiesExpand_le`). -/
+theorem memLp_daubechiesExpand {p : ℝ≥0∞} (hg : MemLp g p volume)
+    (hsupp : ∀ x ∉ Set.Icc a b, g x = 0) (hp1 : 1 ≤ p) (hp : p ≠ ∞) (j : ℕ) {c : ℤ → ℂ}
+    (hc : ENNReal.lqNorm p (fun k => ‖c k‖ₑ) < ∞) : MemLp (daubechiesExpand g j c) p volume :=
+  memLp_iff.2 ((eLpNorm_daubechiesExpand_le hg.aestronglyMeasurable hsupp hp1 hp j c).trans_lt
     (ENNReal.mul_lt_top (ENNReal.mul_lt_top (expandConst_ne_top a b hg).lt_top
       (ENNReal.dyadicWeight_lt_top _ _)) hc))
 
@@ -689,16 +689,16 @@ theorem dyadicWeight_mul_lqNorm_coeffFun_le (hg : AEStronglyMeasurable g volume)
 have orthonormal integer translates, and let `1 ≤ p < ∞`. Then for every level `j` and all
 coefficients `c : ℤ → ℂ`, `2^(j(1/2 - 1/p)) ‖c‖_{ℓ_p} ≤ C' ‖∑_k c_k g_{j,k}‖_p` with the constant
 `C' = coeffConst g a b p`. The coefficients are recovered from the expansion,
-`c_k = ⟨∑_l c_l g_{j,l}, g_{j,k}⟩` (`Daubechies.coeffFun_expand`), and the coefficient estimate
-(`Daubechies.dyadicWeight_mul_lqNorm_coeffFun_le`) applies to the continuous expansion. -/
-theorem lqNorm_le_eLpNorm_expand (hg : Continuous g) (hsupp : ∀ x ∉ Set.Icc a b, g x = 0)
+`c_k = ⟨∑_l c_l g_{j,l}, g_{j,k}⟩` (`Daubechies.coeffFun_daubechiesExpand`), and the coefficient
+estimate (`Daubechies.dyadicWeight_mul_lqNorm_coeffFun_le`) applies to the continuous expansion. -/
+theorem lqNorm_le_eLpNorm_daubechiesExpand (hg : Continuous g) (hsupp : ∀ x ∉ Set.Icc a b, g x = 0)
     (horth : ∀ k l : ℤ, ∫ x, g (x - k) * conj (g (x - l)) = if k = l then 1 else 0)
     {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) (j : ℕ) (c : ℤ → ℂ) :
     dyadicWeight (1 / 2 - 1 / p.toReal) j * ENNReal.lqNorm p (fun k => ‖c k‖ₑ) ≤
-      coeffConst g a b p * eLpNorm (expand g j c) p volume := by
+      coeffConst g a b p * eLpNorm (daubechiesExpand g j c) p volume := by
   have h := dyadicWeight_mul_lqNorm_coeffFun_le hg.aestronglyMeasurable hsupp hp1 hp
-    (continuous_expand hg hsupp j c).aestronglyMeasurable j
-  simp only [coeffFun_expand hg hsupp horth] at h
+    (continuous_daubechiesExpand hg hsupp j c).aestronglyMeasurable j
+  simp only [coeffFun_daubechiesExpand hg hsupp horth] at h
   exact h
 
 /-! ### Expansions of the coefficients of `L_p` functions -/
@@ -718,28 +718,29 @@ theorem lqNorm_coeffFun_lt_top (hg : Continuous g) (hsupp : ∀ x ∉ Set.Icc a 
 a.e. strongly measurable and vanishes outside `[a, b]` and `1 ≤ p < ∞`, then for every a.e.
 strongly measurable `f` and every level `j`, `‖∑_k ⟨f, g_{j,k}⟩ g_{j,k}‖_p ≤ C C' ‖f‖_p` with the
 constants `C = expandConst g a b p` and `C' = coeffConst g a b p`: the upper estimate
-(`Daubechies.eLpNorm_expand_le`) and the coefficient estimate
+(`Daubechies.eLpNorm_daubechiesExpand_le`) and the coefficient estimate
 (`Daubechies.dyadicWeight_mul_lqNorm_coeffFun_le`), whose dyadic weights cancel. -/
-theorem eLpNorm_expand_coeffFun_le (hg : AEStronglyMeasurable g volume)
+theorem eLpNorm_daubechiesExpand_coeffFun_le (hg : AEStronglyMeasurable g volume)
     (hsupp : ∀ x ∉ Set.Icc a b, g x = 0) {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {f : ℝ → ℂ}
     (hf : AEStronglyMeasurable f volume) (j : ℕ) :
-    eLpNorm (expand g j (coeffFun g j f)) p volume ≤
+    eLpNorm (daubechiesExpand g j (coeffFun g j f)) p volume ≤
       expandConst g a b p * coeffConst g a b p * eLpNorm f p volume := by
-  calc eLpNorm (expand g j (coeffFun g j f)) p volume
+  calc eLpNorm (daubechiesExpand g j (coeffFun g j f)) p volume
       ≤ expandConst g a b p * (dyadicWeight (1 / 2 - 1 / p.toReal) j *
           ENNReal.lqNorm p (fun k => ‖coeffFun g j f k‖ₑ)) :=
-        (eLpNorm_expand_le hg hsupp hp1 hp j _).trans_eq (by rw [expandConst, mul_assoc])
+        (eLpNorm_daubechiesExpand_le hg hsupp hp1 hp j _).trans_eq (by rw [expandConst, mul_assoc])
     _ ≤ expandConst g a b p * (coeffConst g a b p * eLpNorm f p volume) :=
         mul_le_mul_right (dyadicWeight_mul_lqNorm_coeffFun_le hg hsupp hp1 hp hf j) _
     _ = expandConst g a b p * coeffConst g a b p * eLpNorm f p volume := (mul_assoc _ _ _).symm
 
 /-- **The expansion of the coefficients of an `L_p` function lies in `L_p`**: if `g` is
 continuous and vanishes outside `[a, b]`, `1 ≤ p < ∞` and `f ∈ L_p`, then
-`∑_k ⟨f, g_{j,k}⟩ g_{j,k} ∈ L_p` for every level `j` (`Daubechies.eLpNorm_expand_coeffFun_le`). -/
-theorem memLp_expand_coeffFun (hg : Continuous g) (hsupp : ∀ x ∉ Set.Icc a b, g x = 0)
+`∑_k ⟨f, g_{j,k}⟩ g_{j,k} ∈ L_p` for every level `j`
+(`Daubechies.eLpNorm_daubechiesExpand_coeffFun_le`). -/
+theorem memLp_daubechiesExpand_coeffFun (hg : Continuous g) (hsupp : ∀ x ∉ Set.Icc a b, g x = 0)
     {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {f : ℝ → ℂ} (hf : MemLp f p volume) (j : ℕ) :
-    MemLp (expand g j (coeffFun g j f)) p volume :=
-  memLp_iff.2 ((eLpNorm_expand_coeffFun_le hg.aestronglyMeasurable hsupp hp1 hp
+    MemLp (daubechiesExpand g j (coeffFun g j f)) p volume :=
+  memLp_iff.2 ((eLpNorm_daubechiesExpand_coeffFun_le hg.aestronglyMeasurable hsupp hp1 hp
     hf.aestronglyMeasurable j).trans_lt (ENNReal.mul_lt_top (ENNReal.mul_lt_top
       (expandConst_ne_top a b (memLp_of_continuous_of_eq_zero hg hsupp p)).lt_top
       (coeffConst_ne_top a b (memLp_of_continuous_of_eq_zero hg hsupp _)).lt_top)
@@ -750,16 +751,17 @@ theorem memLp_expand_coeffFun (hg : Continuous g) (hsupp : ∀ x ∉ Set.Icc a b
 /-- **Expansions are additive in the coefficients**: if `g` vanishes outside `[a, b]`, then
 `∑_k (c_k + d_k) g_{j,k}(x) = ∑_k c_k g_{j,k}(x) + ∑_k d_k g_{j,k}(x)` at every point `x`; both
 sums are finite (`Daubechies.summable_expand`). -/
-theorem expand_add (hsupp : ∀ x ∉ Set.Icc a b, g x = 0) (j : ℕ) (c d : ℤ → ℂ) (x : ℝ) :
-    expand g j (fun k => c k + d k) x = expand g j c x + expand g j d x := by
-  simp only [expand, add_mul]
+theorem daubechiesExpand_add (hsupp : ∀ x ∉ Set.Icc a b, g x = 0) (j : ℕ) (c d : ℤ → ℂ) (x : ℝ) :
+    daubechiesExpand g j (fun k => c k + d k) x =
+      daubechiesExpand g j c x + daubechiesExpand g j d x := by
+  simp only [daubechiesExpand, add_mul]
   exact (summable_expand hsupp j c x).tsum_add (summable_expand hsupp j d x)
 
 /-- **Expansions are homogeneous in the coefficients**:
 `∑_k (z c_k) g_{j,k}(x) = z ∑_k c_k g_{j,k}(x)` for every `z ∈ ℂ` and every point `x`. -/
-theorem expand_const_mul (j : ℕ) (z : ℂ) (c : ℤ → ℂ) (x : ℝ) :
-    expand g j (fun k => z * c k) x = z * expand g j c x := by
-  simp only [expand, mul_assoc]
+theorem daubechiesExpand_const_mul (j : ℕ) (z : ℂ) (c : ℤ → ℂ) (x : ℝ) :
+    daubechiesExpand g j (fun k => z * c k) x = z * daubechiesExpand g j c x := by
+  simp only [daubechiesExpand, mul_assoc]
   exact tsum_mul_left
 
 /-- **The coefficients depend only on the class of `f` almost everywhere**: if `f = f'` almost

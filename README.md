@@ -219,7 +219,7 @@ For a general scheme the project describes `A^s_q`
   constants depending on `V` and `p` (`Rd.triebelLizorkinNorm_zero_two_le`,
   `Rd.enorm_le_triebelLizorkinNorm_zero_two`). For `m ∈ ℕ`, `f ∈ L_p(V)` lies in `W^m_p(V)` iff
   in `F^m_{p,2}(V)` iff in `H^{m,p}(V)`, the last being Calderón's theorem
-  (`Rd.memSobolev_iff_memTriebelLizorkin`, `Rd.memSobolev_iff_memSobolev_bessel`). For real `s`,
+  (`Rd.memWSobolev_iff_memTriebelLizorkin`, `Rd.memWSobolev_iff_memSobolev_bessel`). For real `s`,
   a tempered distribution lies in `H^{s,p}(V)` iff it lies in `F^s_{p,2}(V)`
   (`Rd.memSobolev_bessel_iff_memTriebelLizorkinDistr`). For real `t ≤ s` the inclusion
   `H^s(V) ⊆ H^t(V)` has norm at most `1`, every derivative `∂_v : H^{s+1}(V) → H^s(V)` is
@@ -230,11 +230,11 @@ For a general scheme the project describes `A^s_q`
   constants (`Rd.modNorm_sobolevToL2_le`, `Rd.enorm_le_modNorm_sobolevToL2`).
 * **Sobolev embeddings.** Let `d ≥ 1`, `1 < p < ∞`, `m ∈ ℕ` and `f ∈ W^m_p(V)`. If `r < ∞` and
   `1/r = 1/p - m/d`, then `f` agrees almost everywhere with a function in `L_r(V)`
-  (`Rd.exists_memLp_ae_eq_of_memSobolev_of_eq`); if `m > d/p`, with a bounded continuous function
-  (`Rd.exists_boundedContinuous_ae_eq_of_memSobolev`). For `1 ≤ p < ∞`, `r < ∞`,
+  (`Rd.exists_memLp_ae_eq_of_memWSobolev_of_eq`); if `m > d/p`, with a bounded continuous function
+  (`Rd.exists_boundedContinuous_ae_eq_of_memWSobolev`). For `1 ≤ p < ∞`, `r < ∞`,
   `1/r = 1/p - 1/d` and `f ∈ W^1_p(V)`, some `u ∈ L_r(V)` equals `f` almost everywhere with
   `‖u‖_r ≤ C ∑_k ‖∂_k f‖_p`, `C` Mathlib's Gagliardo–Nirenberg–Sobolev constant
-  (`Rd.exists_memLp_ae_eq_of_memSobolev_one`).
+  (`Rd.exists_memLp_ae_eq_of_memWSobolev_one`).
 * **Bounded Lipschitz domains.** Let `Ω ⊆ V` be a bounded open set that agrees near each
   boundary point with the region above a Lipschitz graph (`Rd.isBoundedLipschitzDomain_iff_exists`),
   `1 ≤ p < ∞`, `1 ≤ q ≤ ∞` and `0 < s < r`. Then `f ∈ L_p(V)` agrees on `Ω` with some `F` with
@@ -244,7 +244,7 @@ For a general scheme the project describes `A^s_q`
   (`Rd.BoundedLipschitzDomain.exists_besov_extension_iff_modulusOn`,
   `Rd.BoundedLipschitzDomain.exists_besov_extension_le`). For `1 < p < ∞` and every `m`, every
   `f ∈ L_p(Ω)` with weak derivatives of order at most `m` in `L_p(Ω)` agrees on `Ω` with some
-  `F ∈ W^m_p(V)` (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev_order`); for
+  `F ∈ W^m_p(V)` (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memWSobolev_order`); for
   `m = 1`, `d ≥ 1` and `1 ≤ p ≤ ∞` a bounded linear operator does this
   (`Rd.BoundedLipschitzDomain.sobolevExtensionL`).
 * **Splines on bounded Lipschitz domains.** Let `Ω` be a bounded Lipschitz domain in a cube

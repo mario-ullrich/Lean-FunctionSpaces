@@ -20,7 +20,7 @@ one of a higher level, which has mean zero (`Haar.integral_haarFunction_mul`). T
 contains every conditional expectation `E[f | ℱ_j]`, by the telescoping sum
 `E[f | ℱ_j] = E[f | ℱ_0] + ∑_{k<j} (E[f | ℱ_{k+1}] - E[f | ℱ_k])` of Haar sums
 (`Haar.condExpLp_succ_sub_ae_eq`), and these step functions are dense
-(`Haar.closure_iUnion_scheme`). So the `φ_n` form a Hilbert basis (`Haar.haarBasis`), with the
+(`Haar.closure_iUnion_haarScheme`). So the `φ_n` form a Hilbert basis (`Haar.haarBasis`), with the
 coefficients `⟨φ_0, f⟩ = ∫_0^1 f` and `⟨φ_{2^k+i}, f⟩ = ⟨f, h_{k,i}⟩`
 (`Haar.haarBasis_repr_zero`, `Haar.haarBasis_repr_two_pow_add`). TauCeti's
 `TauCeti.unitInterval.haarBasis` uses the same order for the real, unnormalised Haar functions,
@@ -37,7 +37,7 @@ For `1 ≤ τ < 2` the right side is the Haar coefficient condition of `A^θ_τ(
 Haar scheme (`Haar.memApprox_iff_haarCoeff` with the Lebesgue exponent and the fine index both
 `τ`, where the weight `2^(k(θ + 1/2 - 1/τ))` is `1`), and since `θ < 1/τ`, of the Besov space
 `B^θ_{τ,τ}[0, 1]` defined by moduli of smoothness: nonlinear approximation in `L_2` is linear
-approximation in `L_τ` (`Haar.memApprox_nTerm_iff_memApprox_scheme`,
+approximation in `L_τ` (`Haar.memApprox_nTerm_iff_memApprox_haarScheme`,
 `Haar.memApprox_nTerm_iff_modulus`, `Haar.memApprox_nTerm_iff_perModulus`). In these three
 theorems the exponent is `p : ℝ≥0∞` with `1 ≤ p < 2`, as in `Haar.memApprox_iff_haarCoeff`, and
 `τ = p.toReal`. This is the case of the Haar system and `1 ≤ τ < 2` of the theorem of DeVore,
@@ -157,7 +157,8 @@ theorem integral_haarFunction (j : ℕ) (m : ℤ) : ∫ x, haarFunction j m x �
     have h := haarCoeff_eq (integrable_const (1 : ℂ)) j m
     have h2 : 2 * m + 1 < 2 ^ (j + 1) := by rw [pow_succ]; omega
     simp only [haarCoeff, mul_one, setIntegral_const] at h
-    rw [vol_real_dyadicInterval (by omega) (by omega), vol_real_dyadicInterval (by omega) h2,
+    rw [vol_real_haarDyadicInterval (by omega) (by omega),
+      vol_real_haarDyadicInterval (by omega) h2,
       sub_self, mul_zero, integral_complex_ofReal, Complex.ofReal_eq_zero] at h
     exact h
   · exact (integral_congr_ae (haarFunction_ae_eq_zero hm)).trans (integral_zero' _ _)
@@ -167,14 +168,14 @@ theorem integral_haarFunction (j : ℕ) (m : ℤ) : ∫ x, haarFunction j m x �
 theorem integral_haarFunction_mul_self {j : ℕ} {m : ℤ} (h0 : 0 ≤ m) (h1 : m < 2 ^ j) :
     ∫ x, haarFunction j m x * haarFunction j m x ∂vol = 1 := by
   have hpt : (fun x => haarFunction j m x * haarFunction j m x) =
-      (dyadicInterval j m).indicator fun _ => (2 : ℝ) ^ j := by
+      (haarDyadicInterval j m).indicator fun _ => (2 : ℝ) ^ j := by
     funext x
     by_cases hx : dyadicIndex j x = m
-    · rw [indicator_of_mem (mem_dyadicInterval.2 hx), ← abs_mul_abs_self, abs_haarFunction hx,
+    · rw [indicator_of_mem (mem_haarDyadicInterval.2 hx), ← abs_mul_abs_self, abs_haarFunction hx,
         ← Real.rpow_add two_pos, add_halves, Real.rpow_natCast]
-    · rw [indicator_of_notMem (mt mem_dyadicInterval.1 hx), haarFunction_eq_zero hx, zero_mul]
-  rw [hpt, integral_indicator_const _ (measurableSet_dyadicInterval j m),
-    vol_real_dyadicInterval h0 h1, smul_eq_mul, inv_mul_cancel₀ (by positivity)]
+    · rw [indicator_of_notMem (mt mem_haarDyadicInterval.1 hx), haarFunction_eq_zero hx, zero_mul]
+  rw [hpt, integral_indicator_const _ (measurableSet_haarDyadicInterval j m),
+    vol_real_haarDyadicInterval h0 h1, smul_eq_mul, inv_mul_cancel₀ (by positivity)]
 
 /-- Haar functions of one level at different positions have disjoint supports:
 `h_{j,m} h_{j,n} = 0` for `m ≠ n`. -/
@@ -287,8 +288,8 @@ theorem condExpLp_mem_span_haarVec (j : ℕ) (f : Lp ℂ 2 vol) :
 
 /-- **The Haar approximants lie in the span of the Haar vectors**: every step function on the
 dyadic intervals of one level is a finite combination of the `φ_n`. -/
-theorem iUnion_scheme_subset_span :
-    (⋃ n, scheme 2 n) ⊆ (Submodule.span ℂ (range haarVec) : Set (Lp ℂ 2 vol)) := by
+theorem iUnion_haarScheme_subset_span :
+    (⋃ n, haarScheme 2 n) ⊆ (Submodule.span ℂ (range haarVec) : Set (Lp ℂ 2 vol)) := by
   intro a ha
   obtain ⟨n, hn⟩ := mem_iUnion.1 ha
   rcases eq_or_ne n 0 with rfl | hn0
@@ -300,13 +301,13 @@ theorem iUnion_scheme_subset_span :
 
 /-- **The Haar vectors span a dense subspace** of `L_2[0, 1]`: the closure of their span is the
 whole space, since the step functions on the dyadic intervals are dense
-(`Haar.closure_iUnion_scheme`). -/
+(`Haar.closure_iUnion_haarScheme`). -/
 theorem span_haarVec_closure_eq_top :
     (Submodule.span ℂ (range haarVec)).topologicalClosure = ⊤ := by
   refine eq_top_iff.2 fun x _ => ?_
   rw [← SetLike.mem_coe, Submodule.topologicalClosure_coe]
-  have h := closure_mono iUnion_scheme_subset_span
-  rw [closure_iUnion_scheme (p := 2) ENNReal.ofNat_ne_top] at h
+  have h := closure_mono iUnion_haarScheme_subset_span
+  rw [closure_iUnion_haarScheme (p := 2) ENNReal.ofNat_ne_top] at h
   exact h (mem_univ x)
 
 /-! ### The Haar basis -/
@@ -383,10 +384,10 @@ fine index `q = p` and `s = θ` the weight `2^(k(s + 1/2 - 1/τ))` of the Haar c
 `Fact` instance as in `Haar.memApprox_iff_haarCoeff`; it is the Lebesgue exponent of `L_τ` and
 the fine index of both spaces. The case of the Haar system and `1 ≤ τ < 2` of the theorem of
 DeVore, Jawerth and Popov. -/
-theorem memApprox_nTerm_iff_memApprox_scheme {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp2 : p < 2)
+theorem memApprox_nTerm_iff_memApprox_haarScheme {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp2 : p < 2)
     (f : Lp ℂ 2 vol) :
     (nTerm haarBasis.coeffDictionary).MemApprox (1 / p.toReal - 1 / 2) p f ↔
-      (scheme p).MemApprox (1 / p.toReal - 1 / 2) p
+      (haarScheme p).MemApprox (1 / p.toReal - 1 / 2) p
         (Lp.inclusionOfExponentLe (𝕜 := ℝ) vol hp2.le f) := by
   have hp1 : 1 ≤ p := Fact.out
   have hpt : p ≠ ∞ := ne_top_of_lt hp2
@@ -417,7 +418,7 @@ theorem memApprox_nTerm_iff_modulus {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp2 : p <
         dyadicWeight (1 / p.toReal - 1 / 2) k *
           intervalLpModulus p 1 (Lp.inclusionOfExponentLe (𝕜 := ℝ) vol hp2.le f) k) < ∞ := by
   obtain ⟨-, -, hθ, hθp⟩ := toReal_and_theta_bounds_of_one_le_of_lt_two Fact.out hp2
-  rw [memApprox_nTerm_iff_memApprox_scheme hp2, ← memApprox_ppScheme_one_iff,
+  rw [memApprox_nTerm_iff_memApprox_haarScheme hp2, ← memApprox_ppScheme_one_iff,
     memApprox_ppScheme_iff le_rfl (ne_top_of_lt hp2) Fact.out hθ.le hθp]
 
 /-- **Best `n`-term Haar approximation in `L_2` and Besov spaces on the circle**: for an
@@ -433,7 +434,7 @@ theorem memApprox_nTerm_iff_perModulus {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp2 : 
         dyadicWeight (1 / p.toReal - 1 / 2) k *
           lpPerModulus p 1 (Lp.inclusionOfExponentLe (𝕜 := ℝ) vol hp2.le f) k) < ∞ := by
   obtain ⟨-, -, hθ, hθp⟩ := toReal_and_theta_bounds_of_one_le_of_lt_two Fact.out hp2
-  rw [memApprox_nTerm_iff_memApprox_scheme hp2, ← memApprox_ppScheme_one_iff,
+  rw [memApprox_nTerm_iff_memApprox_haarScheme hp2, ← memApprox_ppScheme_one_iff,
     memApprox_ppScheme_iff_per le_rfl (ne_top_of_lt hp2) Fact.out hθ.le hθp]
 
 end Haar

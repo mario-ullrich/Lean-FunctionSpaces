@@ -13,7 +13,7 @@ public import ApproximationSpaces.Decompositions.Projection
 
 For a Daubechies mask of order `N ≥ 2` with scaling function `φ` (`Daubechies.scalingFun`) and
 the functions `φ_{j,k}(x) = 2^(j/2) φ(2^j x - k)` of level `j ∈ ℕ` and position `k ∈ ℤ`
-(`Daubechies.scaled`), the **projection of level `j`** is
+(`Daubechies.daubechiesScaled`), the **projection of level `j`** is
 
 `P_j f(x) = ∑_{k ∈ ℤ} ⟨f, φ_{j,k}⟩ φ_{j,k}(x)`, with `⟨f, φ_{j,k}⟩ = ∫ f(y) conj φ_{j,k}(y) dy`,
 
@@ -28,22 +28,23 @@ at each point.
   (`Daubechies.eLpNorm_projFun_cell_le`). The projections reproduce the polynomials of degree
   `< N` (`Daubechies.projFun_poly`).
 * **Projections and scaling spaces.** On `L_p`, `1 ≤ p < ∞`, the classes of the `P_j f` form
-  bounded operators (`Daubechies.proj`, `Daubechies.norm_proj_le`) with `P_j P_j = P_j`
-  (`Daubechies.proj_proj`), by coefficient recovery. Their ranges, the **scaling spaces** `V_j`
-  (`Daubechies.scalingSpace`), increase with the level (`Daubechies.scalingSpace_mono`): by the
-  refinement equation an expansion of level `j` is one of level `j + 1`
-  (`Daubechies.expand_eq_expand_succ`, for any finite real filter
-  `Daubechies.expand_eq_tsum_refine_of_filter`), so `P_{j+1} P_j = P_j`.
+  bounded operators (`Daubechies.daubechiesProj`, `Daubechies.norm_daubechiesProj_le`) with
+  `P_j P_j = P_j` (`Daubechies.daubechiesProj_daubechiesProj`), by coefficient recovery. Their
+  ranges, the **scaling spaces** `V_j` (`Daubechies.scalingSpace`), increase with the level
+  (`Daubechies.scalingSpace_mono`): by the refinement equation an expansion of level `j` is one of
+  level `j + 1` (`Daubechies.daubechiesExpand_eq_daubechiesExpand_succ`, for any finite real filter
+  `Daubechies.daubechiesExpand_eq_tsum_refine_of_filter`), so `P_{j+1} P_j = P_j`.
 * **Density.** The partition of unity `∑_k φ(x - k) = 1` gives the kernel form
   `P_j f(x) - f(x) = ∑_k φ_{j,k}(x) ∫ (f(y) - f(x)) conj φ_{j,k}(y) dy`
   (`Daubechies.projFun_sub_eq_tsum`), and for continuous `f` with compact support uniform
   continuity gives `‖f - P_j f‖_p → 0` (`Daubechies.tendsto_eLpNorm_sub_projFun`). Hence
   `⋃_j V_j` is dense in `L_p` (`Daubechies.closure_iUnion_scalingSpace`), and `P_j f → f` for every
-  `f ∈ L_p` (`Daubechies.tendsto_proj`).
-* **Schemes.** The scaling spaces form the approximation scheme `Daubechies.scheme` (`{0}` at
-  complexity `0`, `V_{⌊log₂ n⌋}` at complexity `n ≥ 1`), dense in `L_p`
-  (`Daubechies.closure_iUnion_scheme`), with the projection scheme
-  `Daubechies.projectionScheme` (`0` at complexity `0`, `P_{⌊log₂ n⌋}` at complexity `n ≥ 1`).
+  `f ∈ L_p` (`Daubechies.tendsto_daubechiesProj`).
+* **Schemes.** The scaling spaces form the approximation scheme `Daubechies.daubechiesScheme` (`{0}`
+  at complexity `0`, `V_{⌊log₂ n⌋}` at complexity `n ≥ 1`), dense in `L_p`
+  (`Daubechies.closure_iUnion_daubechiesScheme`), with the projection scheme
+  `Daubechies.daubechiesProjectionScheme` (`0` at complexity `0`, `P_{⌊log₂ n⌋}` at complexity
+  `n ≥ 1`).
 -/
 
 @[expose] public section
@@ -61,21 +62,22 @@ variable {N : ℕ} (m : Mask N)
 /-- **The projection of level `j`, pointwise**: for every function `f : ℝ → ℂ`,
 `P_j f(x) = ∑_{k ∈ ℤ} ⟨f, φ_{j,k}⟩ φ_{j,k}(x)`, with the coefficients
 `⟨f, φ_{j,k}⟩ = ∫ f(y) conj φ_{j,k}(y) dy` (`Daubechies.coeffFun`) and the functions
-`φ_{j,k}(x) = 2^(j/2) φ(2^j x - k)` (`Daubechies.scaled`). Only finitely many terms are nonzero at
-each point, so the sum is meaningful for every `f`; for locally integrable `f` the coefficients
-are genuine integrals. -/
+`φ_{j,k}(x) = 2^(j/2) φ(2^j x - k)` (`Daubechies.daubechiesScaled`). Only finitely many terms are
+nonzero at each point, so the sum is meaningful for every `f`; for locally integrable `f` the
+coefficients are genuine integrals. -/
 noncomputable def projFun (j : ℕ) (f : ℝ → ℂ) : ℝ → ℂ :=
-  expand (scalingFun m) j (coeffFun (scalingFun m) j f)
+  daubechiesExpand (scalingFun m) j (coeffFun (scalingFun m) j f)
 
 /-- `P_j f(x) = ∑_{k ∈ ℤ} ⟨f, φ_{j,k}⟩ φ_{j,k}(x)`, by definition. -/
 theorem projFun_apply (j : ℕ) (f : ℝ → ℂ) (x : ℝ) :
-    projFun m j f x = ∑' k : ℤ, coeffFun (scalingFun m) j f k * scaled m j k x := rfl
+    projFun m j f x = ∑' k : ℤ, coeffFun (scalingFun m) j f k * daubechiesScaled m j k x := rfl
 
 /-- **The projection is continuous**: for `N ≥ 2`, `P_j f` is continuous for every level `j` and
 every `f`, as an expansion in the continuous functions `φ_{j,k}`
-(`Daubechies.continuous_expand`). -/
+(`Daubechies.continuous_daubechiesExpand`). -/
 theorem continuous_projFun (hN : 2 ≤ N) (j : ℕ) (f : ℝ → ℂ) : Continuous (projFun m j f) :=
-  continuous_expand (continuous_scalingFun m hN) (fun _ hx => scalingFun_eq_zero m hN hx) j _
+  continuous_daubechiesExpand (continuous_scalingFun m hN)
+    (fun _ hx => scalingFun_eq_zero m hN hx) j _
 
 /-- **The projection depends only on the class of `f`**: if `f = f'` almost everywhere, then
 `P_j f = P_j f'` at every point, since the coefficients agree
@@ -89,8 +91,9 @@ theorem projFun_congr_ae {f f' : ℝ → ℂ} (h : f =ᵐ[volume] f') (j : ℕ) 
 and locally integrable `f`, the function `y ↦ f(y) conj φ_{j,k}(y)` is integrable, since
 `φ_{j,k}` is continuous with compact support (Mathlib's
 `MeasureTheory.LocallyIntegrable.integrable_smul_right_of_hasCompactSupport`). -/
-theorem integrable_mul_conj_scaled (hN : 2 ≤ N) {f : ℝ → ℂ} (hf : LocallyIntegrable f volume)
-    (j : ℕ) (k : ℤ) : Integrable fun y => f y * conj (scaled m j k y) := by
+theorem integrable_mul_conj_daubechiesScaled (hN : 2 ≤ N) {f : ℝ → ℂ}
+    (hf : LocallyIntegrable f volume)
+    (j : ℕ) (k : ℤ) : Integrable fun y => f y * conj (daubechiesScaled m j k y) := by
   have h := hf.integrable_smul_right_of_hasCompactSupport
     (Complex.continuous_conj.comp (continuous_scaledFun (continuous_scalingFun m hN) j k))
     ((hasCompactSupport_scaledFun (fun _ hx => scalingFun_eq_zero m hN hx) j k).comp_left
@@ -99,20 +102,20 @@ theorem integrable_mul_conj_scaled (hN : 2 ≤ N) {f : ℝ → ℂ} (hf : Locall
 
 /-- **The projection is additive** on locally integrable functions: for `N ≥ 2`,
 `P_j (f + g) = P_j f + P_j g` at every point (`Daubechies.coeffFun_add`,
-`Daubechies.expand_add`). -/
+`Daubechies.daubechiesExpand_add`). -/
 theorem projFun_add (hN : 2 ≤ N) {f g : ℝ → ℂ} (hf : LocallyIntegrable f volume)
     (hg : LocallyIntegrable g volume) (j : ℕ) :
     projFun m j (fun y => f y + g y) = fun x => projFun m j f x + projFun m j g x := by
   funext x
   have hc : coeffFun (scalingFun m) j (fun y => f y + g y) =
       fun k => coeffFun (scalingFun m) j f k + coeffFun (scalingFun m) j g k :=
-    funext fun k => coeffFun_add (integrable_mul_conj_scaled m hN hf j k)
-      (integrable_mul_conj_scaled m hN hg j k)
+    funext fun k => coeffFun_add (integrable_mul_conj_daubechiesScaled m hN hf j k)
+      (integrable_mul_conj_daubechiesScaled m hN hg j k)
   rw [projFun, hc]
-  exact expand_add (fun _ hx => scalingFun_eq_zero m hN hx) j _ _ x
+  exact daubechiesExpand_add (fun _ hx => scalingFun_eq_zero m hN hx) j _ _ x
 
 /-- **The projection is homogeneous**: `P_j (z f) = z P_j f` for every `z ∈ ℂ` and every `f`
-(`Daubechies.coeffFun_const_mul`, `Daubechies.expand_const_mul`). -/
+(`Daubechies.coeffFun_const_mul`, `Daubechies.daubechiesExpand_const_mul`). -/
 theorem projFun_const_mul (z : ℂ) (f : ℝ → ℂ) (j : ℕ) :
     projFun m j (fun y => z * f y) = fun x => z * projFun m j f x := by
   funext x
@@ -120,7 +123,7 @@ theorem projFun_const_mul (z : ℂ) (f : ℝ → ℂ) (j : ℕ) :
       fun k => z * coeffFun (scalingFun m) j f k :=
     funext fun k => coeffFun_const_mul z f j k
   rw [projFun, hc]
-  exact expand_const_mul j z _ x
+  exact daubechiesExpand_const_mul j z _ x
 
 /-- **The projection is subtractive** on locally integrable functions: for `N ≥ 2`,
 `P_j (f - g) = P_j f - P_j g` at every point (`Daubechies.projFun_add` and
@@ -161,20 +164,20 @@ theorem ofReal_projConst (hN : 2 ≤ N) (p : ℝ≥0∞) :
 /-- **The projections are bounded on `L_p`, uniformly in the level**: for `N ≥ 2`, `1 ≤ p < ∞`,
 every a.e. strongly measurable `f` and every level `j`, `‖P_j f‖_p ≤ C ‖f‖_p` with
 `C = projConst m p`, from the upper estimate of the expansions and the coefficient estimate,
-whose dyadic weights cancel (`Daubechies.eLpNorm_expand_coeffFun_le`). -/
+whose dyadic weights cancel (`Daubechies.eLpNorm_daubechiesExpand_coeffFun_le`). -/
 theorem eLpNorm_projFun_le (hN : 2 ≤ N) {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {f : ℝ → ℂ}
     (hf : AEStronglyMeasurable f volume) (j : ℕ) :
     eLpNorm (projFun m j f) p volume ≤ ENNReal.ofReal (projConst m p) * eLpNorm f p volume := by
   rw [ofReal_projConst m hN]
-  exact eLpNorm_expand_coeffFun_le (continuous_scalingFun m hN).aestronglyMeasurable
+  exact eLpNorm_daubechiesExpand_coeffFun_le (continuous_scalingFun m hN).aestronglyMeasurable
     (fun _ hx => scalingFun_eq_zero m hN hx) hp1 hp hf j
 
 /-- **The projection of an `L_p` function lies in `L_p`**: for `N ≥ 2`, `1 ≤ p < ∞`, `f ∈ L_p`
-and every level `j` (`Daubechies.memLp_expand_coeffFun`). -/
+and every level `j` (`Daubechies.memLp_daubechiesExpand_coeffFun`). -/
 theorem memLp_projFun (hN : 2 ≤ N) {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {f : ℝ → ℂ}
     (hf : MemLp f p volume) (j : ℕ) : MemLp (projFun m j f) p volume :=
-  memLp_expand_coeffFun (continuous_scalingFun m hN) (fun _ hx => scalingFun_eq_zero m hN hx)
-    hp1 hp hf j
+  memLp_daubechiesExpand_coeffFun (continuous_scalingFun m hN)
+    (fun _ hx => scalingFun_eq_zero m hN hx) hp1 hp hf j
 
 /-! ### The local bound on a dyadic cell -/
 
@@ -183,9 +186,9 @@ the dyadic cell `[k/2^j, (k + 1)/2^j)` and `l` lies outside `[k - (2N - 2), k]`,
 `φ_{j,l}(x) = 0`. Indeed `φ` vanishes outside the open interval `(0, 2N - 1)`
 (`Daubechies.scalingFun_eq_zero_of_notMem_Ioo`), and `0 < 2^j x - l < 2N - 1` together with
 `k ≤ 2^j x < k + 1` forces `k - (2N - 1) < l < k + 1`. -/
-theorem scaled_eq_zero_of_mem_cell (hN : 2 ≤ N) {j : ℕ} {k l : ℤ} {x : ℝ}
+theorem daubechiesScaled_eq_zero_of_mem_cell (hN : 2 ≤ N) {j : ℕ} {k l : ℤ} {x : ℝ}
     (hx : x ∈ Set.Ico ((k : ℝ) / 2 ^ j) ((k + 1) / 2 ^ j))
-    (hl : l ∉ Finset.Icc (k - (2 * N - 2)) k) : scaled m j l x = 0 := by
+    (hl : l ∉ Finset.Icc (k - (2 * N - 2)) k) : daubechiesScaled m j l x = 0 := by
   have h2 : (0 : ℝ) < 2 ^ j := by positivity
   have hx1 : (k : ℝ) ≤ 2 ^ j * x := (div_le_iff₀' h2).1 hx.1
   have hx2 : 2 ^ j * x < (k : ℝ) + 1 := (lt_div_iff₀' h2).1 hx.2
@@ -204,14 +207,15 @@ theorem scaled_eq_zero_of_mem_cell (hN : 2 ≤ N) {j : ℕ} {k l : ℤ} {x : ℝ
 /-- **The projection on a dyadic cell is a finite sum**: for `N ≥ 2`, every `f` and every `x` in
 the dyadic cell `[k/2^j, (k + 1)/2^j)`,
 `P_j f(x) = ∑_{l = k - (2N - 2)}^{k} ⟨f, φ_{j,l}⟩ φ_{j,l}(x)`
-(`Daubechies.scaled_eq_zero_of_mem_cell`). -/
+(`Daubechies.daubechiesScaled_eq_zero_of_mem_cell`). -/
 theorem projFun_eq_sum_of_mem_cell (hN : 2 ≤ N) (j : ℕ) (f : ℝ → ℂ) {k : ℤ} {x : ℝ}
     (hx : x ∈ Set.Ico ((k : ℝ) / 2 ^ j) ((k + 1) / 2 ^ j)) :
     projFun m j f x =
-      ∑ l ∈ Finset.Icc (k - (2 * N - 2)) k, coeffFun (scalingFun m) j f l * scaled m j l x :=
+      ∑ l ∈ Finset.Icc (k - (2 * N - 2)) k,
+        coeffFun (scalingFun m) j f l * daubechiesScaled m j l x :=
   tsum_eq_sum fun l hl => by
-    rw [show scaledFun (scalingFun m) j l x = 0 from scaled_eq_zero_of_mem_cell m hN hx hl,
-      mul_zero]
+    rw [show scaledFun (scalingFun m) j l x = 0 from
+      daubechiesScaled_eq_zero_of_mem_cell m hN hx hl, mul_zero]
 
 /-- **The positions meeting a cell have their supports in one window**: for
 `k - (2N - 2) ≤ l ≤ k`, the support window `[l/2^j, (l + 2N - 1)/2^j]` of `φ_{j,l}` lies in the
@@ -250,10 +254,10 @@ strongly measurable, and let the set `W` contain the support window of `φ_{j,l}
 window (`Daubechies.enorm_coeffFun_le`) and the norms `‖φ_{j,l}‖_p = 2^(j(1/2 - 1/p)) ‖φ‖_p` and
 `‖φ_{j,l}‖_{p'} = 2^(-j(1/2 - 1/p)) ‖φ‖_{p'}` (`Daubechies.eLpNorm_const_mul_scaledFun`,
 `Daubechies.eLpNorm_scaledFun_conjExponent`), whose dyadic weights cancel. -/
-theorem eLpNorm_coeffFun_mul_scaled_le (hN : 2 ≤ N) {p : ℝ≥0∞} (hp1 : 1 ≤ p) {f : ℝ → ℂ}
+theorem eLpNorm_coeffFun_mul_daubechiesScaled_le (hN : 2 ≤ N) {p : ℝ≥0∞} (hp1 : 1 ≤ p) {f : ℝ → ℂ}
     (hf : AEStronglyMeasurable f volume) (j : ℕ) (l : ℤ) {W : Set ℝ}
     (hW : supportWindow 0 (2 * N - 1) j l ⊆ W) :
-    eLpNorm (fun x => coeffFun (scalingFun m) j f l * scaled m j l x) p volume ≤
+    eLpNorm (fun x => coeffFun (scalingFun m) j f l * daubechiesScaled m j l x) p volume ≤
       eLpNorm (scalingFun m) p volume * eLpNorm (scalingFun m) (ENNReal.conjExponent p) volume *
         eLpNorm f p (volume.restrict W) := by
   have hφ := (continuous_scalingFun m hN).aestronglyMeasurable (μ := volume)
@@ -284,7 +288,7 @@ theorem eLpNorm_coeffFun_mul_scaled_le (hN : 2 ≤ N) {p : ℝ≥0∞} (hp1 : 1 
 is the same for every `j` and `k`). On `I` only the `2N - 1` positions `k - (2N - 2) ≤ l ≤ k`
 contribute (`Daubechies.projFun_eq_sum_of_mem_cell`), the support windows of their `φ_{j,l}` lie
 in `W` (`Daubechies.supportWindow_subset_of_mem_Icc`), and each term is bounded by
-`Daubechies.eLpNorm_coeffFun_mul_scaled_le`. -/
+`Daubechies.eLpNorm_coeffFun_mul_daubechiesScaled_le`. -/
 theorem eLpNorm_projFun_cell_le (hN : 2 ≤ N) {p : ℝ≥0∞} (hp1 : 1 ≤ p) {f : ℝ → ℂ}
     (hf : AEStronglyMeasurable f volume) (j : ℕ) (k : ℤ) :
     eLpNorm (projFun m j f) p (volume.restrict (Set.Ico ((k : ℝ) / 2 ^ j) ((k + 1) / 2 ^ j))) ≤
@@ -294,7 +298,8 @@ theorem eLpNorm_projFun_cell_le (hN : 2 ≤ N) {p : ℝ≥0∞} (hp1 : 1 ≤ p) 
     fun x hx => projFun_eq_sum_of_mem_cell m hN j f hx), ← Finset.sum_fn]
   refine (eLpNorm_sum_le hp1).trans ((Finset.sum_le_card_nsmul _ _ _ fun l hl =>
     (eLpNorm_mono_measure _ Measure.restrict_le_self).trans
-      (eLpNorm_coeffFun_mul_scaled_le m hN hp1 hf j l (supportWindow_subset_of_mem_Icc hl))).trans
+      (eLpNorm_coeffFun_mul_daubechiesScaled_le m hN hp1 hf j l
+        (supportWindow_subset_of_mem_Icc hl))).trans
     (le_of_eq ?_))
   rw [nsmul_eq_mul, card_Icc_sub_two_mul_sub_two (by omega), cellConst]
   ring
@@ -304,17 +309,18 @@ theorem eLpNorm_projFun_cell_le (hN : 2 ≤ N) {p : ℝ≥0∞} (hp1 : 1 ≤ p) 
 /-- **The projection reproduces expansions**: for `N ≥ 2`, every level `j` and every coefficient
 sequence `a : ℤ → ℂ`, `P_j (∑_k a_k φ_{j,k}) = ∑_k a_k φ_{j,k}` at every point, since the
 coefficients are recovered, `⟨∑_l a_l φ_{j,l}, φ_{j,k}⟩ = a_k`
-(`Daubechies.coeffFun_expand_scalingFun`). -/
-theorem projFun_expand (hN : 2 ≤ N) (j : ℕ) (a : ℤ → ℂ) :
-    projFun m j (expand (scalingFun m) j a) = expand (scalingFun m) j a := by
-  rw [projFun, show coeffFun (scalingFun m) j (expand (scalingFun m) j a) = a from
-    funext (coeffFun_expand_scalingFun m hN j a)]
+(`Daubechies.coeffFun_daubechiesExpand_scalingFun`). -/
+theorem projFun_daubechiesExpand (hN : 2 ≤ N) (j : ℕ) (a : ℤ → ℂ) :
+    projFun m j (daubechiesExpand (scalingFun m) j a) = daubechiesExpand (scalingFun m) j a := by
+  rw [projFun, show coeffFun (scalingFun m) j (daubechiesExpand (scalingFun m) j a) = a from
+    funext (coeffFun_daubechiesExpand_scalingFun m hN j a)]
 
 /-- **The pointwise projection is idempotent**: `P_j (P_j f) = P_j f` at every point, for `N ≥ 2`
-and every `f`, since `P_j f` is an expansion of level `j` (`Daubechies.projFun_expand`). -/
+and every `f`, since `P_j f` is an expansion of level `j`
+(`Daubechies.projFun_daubechiesExpand`). -/
 theorem projFun_projFun (hN : 2 ≤ N) (j : ℕ) (f : ℝ → ℂ) :
     projFun m j (projFun m j f) = projFun m j f :=
-  projFun_expand m hN j _
+  projFun_daubechiesExpand m hN j _
 
 /-- **The projection reproduces polynomials**: for `N ≥ 2`, every complex polynomial `Q` of
 degree `< N` and every level `j`, `P_j Q = Q` at every point. This is the dyadic polynomial
@@ -333,7 +339,8 @@ theorem projFun_poly (hN : 2 ≤ N) {Q : Polynomial ℂ} (hQ : Q ∈ Polynomial.
     refine integral_congr_ae (Eventually.of_forall fun y => ?_)
     simp only [scaledFun, map_mul, Complex.conj_ofReal]
     ring
-  rw [hc, show scaled m j k x = (((2 : ℝ) ^ ((j : ℝ) / 2) : ℝ) : ℂ) * scalingFun m (2 ^ j * x - k)
+  rw [hc, show daubechiesScaled m j k x =
+    (((2 : ℝ) ^ ((j : ℝ) / 2) : ℝ) : ℂ) * scalingFun m (2 ^ j * x - k)
     from rfl, ← ofReal_two_rpow_half_mul_self j]
   ring
 
@@ -341,7 +348,7 @@ theorem projFun_poly (hN : 2 ≤ N) {Q : Polynomial ℂ} (hQ : Q ∈ Polynomial.
 `a'_n = ∑_{k ∈ ℤ} a_k c_{n-2k}/√2` of level `j + 1`, with the filter coefficients `c_i`
 (`Daubechies.daubechiesCoeff`); only the `k` with `0 ≤ n - 2k ≤ 2N - 1` contribute. They express an
 expansion of level `j` as one of level `j + 1`, `∑_k a_k φ_{j,k} = ∑_n a'_n φ_{j+1,n}`
-(`Daubechies.expand_eq_expand_succ`). -/
+(`Daubechies.daubechiesExpand_eq_daubechiesExpand_succ`). -/
 noncomputable def refineCoeff (a : ℤ → ℂ) (n : ℤ) : ℂ :=
   ∑' k : ℤ, a k * ((daubechiesCoeff m (n - 2 * k) / √2 : ℝ) : ℂ)
 
@@ -360,7 +367,7 @@ vanishing outside `[a, b]`, a level `j`, coefficients `c : ℤ → ℂ` and a po
 theorem summable_refine_of_filter (hN : 2 ≤ N) {h : ℤ → ℝ} {a b : ℤ}
     (hh : ∀ i, h i ≠ 0 → a ≤ i ∧ i ≤ b) (j : ℕ) (c : ℤ → ℂ) (x : ℝ) :
     Summable (Function.uncurry fun k n : ℤ =>
-      c k * (((h (n - 2 * k) / √2 : ℝ) : ℂ) * scaled m (j + 1) n x)) := by
+      c k * (((h (n - 2 * k) / √2 : ℝ) : ℂ) * daubechiesScaled m (j + 1) n x)) := by
   refine summable_of_ne_finset_zero
     (s := Finset.Icc ⌈2 ^ j * x - (b + (2 * N - 1)) / 2⌉ ⌊2 ^ j * x - a / 2⌋ ×ˢ
       Finset.Icc ⌈2 ^ (j + 1) * x - (2 * N - 1)⌉ ⌊2 ^ (j + 1) * x - 0⌋) fun kn hkn => ?_
@@ -384,20 +391,20 @@ theorem summable_refine_of_filter (hN : 2 ≤ N) {h : ℤ → ℝ} {a b : ℤ}
 `[a, b]` and `g_{j,k} = ∑_n (h_{n-2k}/√2) φ_{j+1,n}` for every `k`, then
 `∑_k c_k g_{j,k}(x) = ∑_n (∑_k c_k h_{n-2k}/√2) φ_{j+1,n}(x)` for all `c` and `x`; the two sums
 may be exchanged (`Daubechies.summable_refine_of_filter`). -/
-theorem expand_eq_tsum_refine_of_filter (hN : 2 ≤ N) {g : ℝ → ℂ} {h : ℤ → ℝ} {a b : ℤ}
+theorem daubechiesExpand_eq_tsum_refine_of_filter (hN : 2 ≤ N) {g : ℝ → ℂ} {h : ℤ → ℝ} {a b : ℤ}
     (hh : ∀ i, h i ≠ 0 → a ≤ i ∧ i ≤ b) (j : ℕ)
     (hg : ∀ (k : ℤ) (x : ℝ), scaledFun g j k x =
-      expand (scalingFun m) (j + 1) (fun n => ((h (n - 2 * k) / √2 : ℝ) : ℂ)) x)
+      daubechiesExpand (scalingFun m) (j + 1) (fun n => ((h (n - 2 * k) / √2 : ℝ) : ℂ)) x)
     (c : ℤ → ℂ) (x : ℝ) :
-    expand g j c x = ∑' n : ℤ,
-      (∑' k : ℤ, c k * ((h (n - 2 * k) / √2 : ℝ) : ℂ)) * scaled m (j + 1) n x := by
-  calc expand g j c x
+    daubechiesExpand g j c x = ∑' n : ℤ,
+      (∑' k : ℤ, c k * ((h (n - 2 * k) / √2 : ℝ) : ℂ)) * daubechiesScaled m (j + 1) n x := by
+  calc daubechiesExpand g j c x
       = ∑' k : ℤ, ∑' n : ℤ,
-          c k * (((h (n - 2 * k) / √2 : ℝ) : ℂ) * scaled m (j + 1) n x) := by
+          c k * (((h (n - 2 * k) / √2 : ℝ) : ℂ) * daubechiesScaled m (j + 1) n x) := by
         refine tsum_congr fun k => ?_
-        rw [hg k x, expand, ← tsum_mul_left]
+        rw [hg k x, daubechiesExpand, ← tsum_mul_left]
     _ = ∑' n : ℤ, ∑' k : ℤ,
-          c k * (((h (n - 2 * k) / √2 : ℝ) : ℂ) * scaled m (j + 1) n x) :=
+          c k * (((h (n - 2 * k) / √2 : ℝ) : ℂ) * daubechiesScaled m (j + 1) n x) :=
         (summable_refine_of_filter m hN hh j c x).tsum_comm.symm
     _ = _ := by
         refine tsum_congr fun n => ?_
@@ -409,29 +416,32 @@ theorem expand_eq_tsum_refine_of_filter (hN : 2 ≤ N) {g : ℝ → ℂ} {h : �
 (`Daubechies.summable_refine_of_filter`, `Daubechies.mem_Icc_of_daubechiesCoeff_ne_zero`). -/
 theorem summable_refine (hN : 2 ≤ N) (j : ℕ) (a : ℤ → ℂ) (x : ℝ) :
     Summable (Function.uncurry fun k n : ℤ =>
-      a k * (((daubechiesCoeff m (n - 2 * k) / √2 : ℝ) : ℂ) * scaled m (j + 1) n x)) :=
+      a k * (((daubechiesCoeff m (n - 2 * k) / √2 : ℝ) : ℂ) * daubechiesScaled m (j + 1) n x)) :=
   summable_refine_of_filter m hN (h := daubechiesCoeff m)
     (fun _ hi => mem_Icc_of_daubechiesCoeff_ne_zero m hi) j a x
 
 /-- **Expansions of level `j` are expansions of level `j + 1`**: for `N ≥ 2`, every level `j`,
 coefficients `a : ℤ → ℂ` and point `x`, `∑_k a_k φ_{j,k}(x) = ∑_n a'_n φ_{j+1,n}(x)` with the
 refined coefficients `a'_n = ∑_k a_k c_{n-2k}/√2` (`Daubechies.refineCoeff`), by
-`Daubechies.expand_eq_tsum_refine_of_filter` and `Daubechies.scaled_eq_expand`. -/
-theorem expand_eq_expand_succ (hN : 2 ≤ N) (j : ℕ) (a : ℤ → ℂ) (x : ℝ) :
-    expand (scalingFun m) j a x = expand (scalingFun m) (j + 1) (refineCoeff m a) x :=
-  expand_eq_tsum_refine_of_filter m hN (h := daubechiesCoeff m)
-    (fun _ hi => mem_Icc_of_daubechiesCoeff_ne_zero m hi) j (scaled_eq_expand m hN j) a x
+`Daubechies.daubechiesExpand_eq_tsum_refine_of_filter` and
+`Daubechies.daubechiesScaled_eq_daubechiesExpand`. -/
+theorem daubechiesExpand_eq_daubechiesExpand_succ (hN : 2 ≤ N) (j : ℕ) (a : ℤ → ℂ) (x : ℝ) :
+    daubechiesExpand (scalingFun m) j a x =
+      daubechiesExpand (scalingFun m) (j + 1) (refineCoeff m a) x :=
+  daubechiesExpand_eq_tsum_refine_of_filter m hN (h := daubechiesCoeff m)
+    (fun _ hi => mem_Icc_of_daubechiesCoeff_ne_zero m hi) j
+      (daubechiesScaled_eq_daubechiesExpand m hN j) a x
 
 /-- **The projections of consecutive levels**: `P_{j+1} (P_j f) = P_j f` at every point, for
 `N ≥ 2` and every `f`. The function `P_j f` is an expansion of level `j + 1`
-(`Daubechies.expand_eq_expand_succ`), which `P_{j+1}` reproduces
-(`Daubechies.projFun_expand`). -/
+(`Daubechies.daubechiesExpand_eq_daubechiesExpand_succ`), which `P_{j+1}` reproduces
+(`Daubechies.projFun_daubechiesExpand`). -/
 theorem projFun_succ_projFun (hN : 2 ≤ N) (j : ℕ) (f : ℝ → ℂ) :
     projFun m (j + 1) (projFun m j f) = projFun m j f := by
   have h : projFun m j f =
-      expand (scalingFun m) (j + 1) (refineCoeff m (coeffFun (scalingFun m) j f)) :=
-    funext (expand_eq_expand_succ m hN j _)
-  rw [h, projFun_expand m hN]
+      daubechiesExpand (scalingFun m) (j + 1) (refineCoeff m (coeffFun (scalingFun m) j f)) :=
+    funext (daubechiesExpand_eq_daubechiesExpand_succ m hN j _)
+  rw [h, projFun_daubechiesExpand m hN]
 
 /-! ### Convergence for continuous functions with compact support -/
 
@@ -447,16 +457,17 @@ theorem abs_sub_le_of_mem_supportWindow {a b : ℝ} {j : ℕ} {k : ℤ} {x y : �
 
 /-- **A pointwise bound of `φ_{j,k}`**: if `‖φ(t)‖ ≤ C` for every `t`, then
 `‖φ_{j,k}(x)‖ ≤ 2^(j/2) C` for every level `j`, position `k` and point `x`. -/
-theorem enorm_scaled_le {C : ℝ≥0∞} (hC : ∀ t, ‖scalingFun m t‖ₑ ≤ C) (j : ℕ) (k : ℤ) (x : ℝ) :
-    ‖scaled m j k x‖ₑ ≤ dyadicWeight (1 / 2) j * C := by
-  rw [show scaled m j k x = (((2 : ℝ) ^ ((j : ℝ) / 2) : ℝ) : ℂ) * scalingFun m (2 ^ j * x - k)
+theorem enorm_daubechiesScaled_le {C : ℝ≥0∞} (hC : ∀ t, ‖scalingFun m t‖ₑ ≤ C) (j : ℕ) (k : ℤ)
+    (x : ℝ) : ‖daubechiesScaled m j k x‖ₑ ≤ dyadicWeight (1 / 2) j * C := by
+  rw [show daubechiesScaled m j k x =
+    (((2 : ℝ) ^ ((j : ℝ) / 2) : ℝ) : ℂ) * scalingFun m (2 ^ j * x - k)
     from rfl, enorm_mul, enorm_two_rpow_half]
   gcongr
   exact hC _
 
 /-- `conj φ_{j,k}` is integrable for `N ≥ 2`: it is continuous with compact support. -/
-theorem integrable_conj_scaled (hN : 2 ≤ N) (j : ℕ) (k : ℤ) :
-    Integrable fun y => conj (scaled m j k y) :=
+theorem integrable_conj_daubechiesScaled (hN : 2 ≤ N) (j : ℕ) (k : ℤ) :
+    Integrable fun y => conj (daubechiesScaled m j k y) :=
   (Complex.continuous_conj.comp (continuous_scaledFun (continuous_scalingFun m hN) j k)
     ).integrable_of_hasCompactSupport
     ((hasCompactSupport_scaledFun (fun _ hx => scalingFun_eq_zero m hN hx) j k).comp_left
@@ -467,18 +478,20 @@ level `j`, position `k` and point `x`. The scaling function is real with `∫ φ
 (`Daubechies.conj_scalingFun`, `Daubechies.integral_scalingFun`), so the substitution `u = 2^j y`
 (`Daubechies.integral_eq_two_pow_mul_integral_comp`) gives
 `∫ conj φ_{j,k} = 2^(j/2) 2^(-j)`, and `2^(j/2) 2^(j/2) 2^(-j) = 1`. -/
-theorem scaled_mul_integral_conj (hN : 2 ≤ N) (j : ℕ) (k : ℤ) (x : ℝ) :
-    scaled m j k x * ∫ y, conj (scaled m j k y) = scalingFun m (2 ^ j * x - k) := by
+theorem daubechiesScaled_mul_integral_conj (hN : 2 ≤ N) (j : ℕ) (k : ℤ) (x : ℝ) :
+    daubechiesScaled m j k x * ∫ y, conj (daubechiesScaled m j k y) =
+      scalingFun m (2 ^ j * x - k) := by
   have h1 : (2 : ℂ) ^ j * ∫ y, scalingFun m (2 ^ j * y - k) = 1 := by
     have h := integral_eq_two_pow_mul_integral_comp (fun u => scalingFun m (u - k)) j
     rw [integral_sub_right_eq_self, integral_scalingFun m hN] at h
     exact h.symm
-  have h2 : (fun y => conj (scaled m j k y)) =
+  have h2 : (fun y => conj (daubechiesScaled m j k y)) =
       fun y => (((2 : ℝ) ^ ((j : ℝ) / 2) : ℝ) : ℂ) * scalingFun m (2 ^ j * y - k) := by
     funext y
-    rw [show scaled m j k y = (((2 : ℝ) ^ ((j : ℝ) / 2) : ℝ) : ℂ) * scalingFun m (2 ^ j * y - k)
+    rw [show daubechiesScaled m j k y =
+      (((2 : ℝ) ^ ((j : ℝ) / 2) : ℝ) : ℂ) * scalingFun m (2 ^ j * y - k)
       from rfl, map_mul, Complex.conj_ofReal, conj_scalingFun]
-  rw [h2, integral_const_mul, show scaled m j k x =
+  rw [h2, integral_const_mul, show daubechiesScaled m j k x =
     (((2 : ℝ) ^ ((j : ℝ) / 2) : ℝ) : ℂ) * scalingFun m (2 ^ j * x - k) from rfl]
   calc (((2 : ℝ) ^ ((j : ℝ) / 2) : ℝ) : ℂ) * scalingFun m (2 ^ j * x - k) *
         ((((2 : ℝ) ^ ((j : ℝ) / 2) : ℝ) : ℂ) * ∫ y, scalingFun m (2 ^ j * y - k))
@@ -488,34 +501,34 @@ theorem scaled_mul_integral_conj (hN : 2 ≤ N) (j : ℕ) (k : ℤ) (x : ℝ) :
 
 /-- **Partition of unity at level `j`**: for `N ≥ 2`, every level `j` and point `x`,
 `∑_{k ∈ ℤ} φ_{j,k}(x) ∫ conj φ_{j,k} = ∑_k φ(2^j x - k) = 1`
-(`Daubechies.scaled_mul_integral_conj`, `Daubechies.sum_scalingFun_translate`). -/
-theorem tsum_scaled_mul_integral_conj (hN : 2 ≤ N) (j : ℕ) (x : ℝ) :
-    ∑' k : ℤ, scaled m j k x * ∫ y, conj (scaled m j k y) = 1 := by
-  simp only [scaled_mul_integral_conj m hN]
+(`Daubechies.daubechiesScaled_mul_integral_conj`, `Daubechies.sum_scalingFun_translate`). -/
+theorem tsum_daubechiesScaled_mul_integral_conj (hN : 2 ≤ N) (j : ℕ) (x : ℝ) :
+    ∑' k : ℤ, daubechiesScaled m j k x * ∫ y, conj (daubechiesScaled m j k y) = 1 := by
+  simp only [daubechiesScaled_mul_integral_conj m hN]
   exact sum_scalingFun_translate m hN (2 ^ j * x)
 
 /-- **The positions contributing at a point**: for `N ≥ 2`, `φ_{j,k}(x) = 0` unless
 `⌈2^j x - (2N - 1)⌉ ≤ k ≤ ⌊2^j x⌋` (`Daubechies.scaledFun_eq_zero`,
 `Daubechies.mem_Icc_ceil_floor`). -/
-theorem scaled_eq_zero_of_notMem_Icc (hN : 2 ≤ N) {j : ℕ} {k : ℤ} {x : ℝ}
-    (hk : k ∉ Finset.Icc ⌈2 ^ j * x - (2 * N - 1)⌉ ⌊2 ^ j * x⌋) : scaled m j k x = 0 :=
+theorem daubechiesScaled_eq_zero_of_notMem_Icc (hN : 2 ≤ N) {j : ℕ} {k : ℤ} {x : ℝ}
+    (hk : k ∉ Finset.Icc ⌈2 ^ j * x - (2 * N - 1)⌉ ⌊2 ^ j * x⌋) : daubechiesScaled m j k x = 0 :=
   scaledFun_eq_zero (fun _ hy => scalingFun_eq_zero m hN hy) fun hx =>
     hk (by simpa only [sub_zero] using mem_Icc_ceil_floor hx)
 
 /-- **Sums over the positions at a point are finite**: for `N ≥ 2`, a level `j`, a point `x` and
 a family `F : ℤ → ℂ` with `F k = 0` whenever `φ_{j,k}(x) = 0`,
 `∑_{k ∈ ℤ} F k = ∑_{k = ⌈2^j x - (2N - 1)⌉}^{⌊2^j x⌋} F k`
-(`Daubechies.scaled_eq_zero_of_notMem_Icc`). -/
-theorem tsum_eq_sum_of_scaled_eq_zero (hN : 2 ≤ N) {j : ℕ} {x : ℝ} {F : ℤ → ℂ}
-    (hF : ∀ k, scaled m j k x = 0 → F k = 0) :
+(`Daubechies.daubechiesScaled_eq_zero_of_notMem_Icc`). -/
+theorem tsum_eq_sum_of_daubechiesScaled_eq_zero (hN : 2 ≤ N) {j : ℕ} {x : ℝ} {F : ℤ → ℂ}
+    (hF : ∀ k, daubechiesScaled m j k x = 0 → F k = 0) :
     ∑' k, F k = ∑ k ∈ Finset.Icc ⌈2 ^ j * x - (2 * N - 1)⌉ ⌊2 ^ j * x⌋, F k :=
-  tsum_eq_sum fun k hk => hF k (scaled_eq_zero_of_notMem_Icc m hN hk)
+  tsum_eq_sum fun k hk => hF k (daubechiesScaled_eq_zero_of_notMem_Icc m hN hk)
 
-/-- The families of `Daubechies.tsum_eq_sum_of_scaled_eq_zero` are summable: they have only
-finitely many nonzero terms. -/
-theorem summable_of_scaled_eq_zero (hN : 2 ≤ N) {j : ℕ} {x : ℝ} {F : ℤ → ℂ}
-    (hF : ∀ k, scaled m j k x = 0 → F k = 0) : Summable F :=
-  summable_of_ne_finset_zero fun k hk => hF k (scaled_eq_zero_of_notMem_Icc m hN hk)
+/-- The families of `Daubechies.tsum_eq_sum_of_daubechiesScaled_eq_zero` are summable: they have
+only finitely many nonzero terms. -/
+theorem summable_of_daubechiesScaled_eq_zero (hN : 2 ≤ N) {j : ℕ} {x : ℝ} {F : ℤ → ℂ}
+    (hF : ∀ k, daubechiesScaled m j k x = 0 → F k = 0) : Summable F :=
+  summable_of_ne_finset_zero fun k hk => hF k (daubechiesScaled_eq_zero_of_notMem_Icc m hN hk)
 
 /-- **Counting the contributing positions**: for `N ≥ 1` and every `t ∈ ℝ`, the interval
 `[⌈t - (2N - 1)⌉, ⌊t⌋]` contains at most `2N` integers (`Daubechies.card_Icc_ceil_floor_le`). -/
@@ -529,31 +542,33 @@ theorem card_Icc_ceil_floor_le_two_mul (hN : 1 ≤ N) (t : ℝ) :
 
 /-- **The kernel form of `P_j f - f`**: for `N ≥ 2`, locally integrable `f`, every level `j` and
 point `x`, `P_j f(x) - f(x) = ∑_{k ∈ ℤ} φ_{j,k}(x) ∫ (f(y) - f(x)) conj φ_{j,k}(y) dy`. Subtract
-`f(x) = ∑_k φ_{j,k}(x) f(x) ∫ conj φ_{j,k}` (`Daubechies.tsum_scaled_mul_integral_conj`) term by
-term; both sums have only finitely many nonzero terms. -/
+`f(x) = ∑_k φ_{j,k}(x) f(x) ∫ conj φ_{j,k}` (`Daubechies.tsum_daubechiesScaled_mul_integral_conj`)
+term by term; both sums have only finitely many nonzero terms. -/
 theorem projFun_sub_eq_tsum (hN : 2 ≤ N) {f : ℝ → ℂ} (hf : LocallyIntegrable f volume) (j : ℕ)
     (x : ℝ) :
     projFun m j f x - f x =
-      ∑' k : ℤ, scaled m j k x * ∫ y, (f y - f x) * conj (scaled m j k y) := by
-  have hint : ∀ k : ℤ, ∫ y, (f y - f x) * conj (scaled m j k y) =
-      coeffFun (scalingFun m) j f k - f x * ∫ y, conj (scaled m j k y) := fun k => by
+      ∑' k : ℤ, daubechiesScaled m j k x * ∫ y, (f y - f x) * conj (daubechiesScaled m j k y) := by
+  have hint : ∀ k : ℤ, ∫ y, (f y - f x) * conj (daubechiesScaled m j k y) =
+      coeffFun (scalingFun m) j f k - f x * ∫ y, conj (daubechiesScaled m j k y) := fun k => by
     simp only [sub_mul]
-    rw [integral_sub (integrable_mul_conj_scaled m hN hf j k)
-      ((integrable_conj_scaled m hN j k).const_mul (f x)), integral_const_mul]
+    rw [integral_sub (integrable_mul_conj_daubechiesScaled m hN hf j k)
+      ((integrable_conj_daubechiesScaled m hN j k).const_mul (f x)), integral_const_mul]
     rfl
-  have hs1 : Summable fun k : ℤ => scaled m j k x * coeffFun (scalingFun m) j f k :=
-    summable_of_scaled_eq_zero m hN fun k hk => by rw [hk, zero_mul]
-  have hs2 : Summable fun k : ℤ => scaled m j k x * (f x * ∫ y, conj (scaled m j k y)) :=
-    summable_of_scaled_eq_zero m hN fun k hk => by rw [hk, zero_mul]
+  have hs1 : Summable fun k : ℤ => daubechiesScaled m j k x * coeffFun (scalingFun m) j f k :=
+    summable_of_daubechiesScaled_eq_zero m hN fun k hk => by rw [hk, zero_mul]
+  have hs2 : Summable fun k : ℤ => daubechiesScaled m j k x *
+      (f x * ∫ y, conj (daubechiesScaled m j k y)) :=
+    summable_of_daubechiesScaled_eq_zero m hN fun k hk => by rw [hk, zero_mul]
   simp only [hint, mul_sub]
   rw [hs1.tsum_sub hs2]
   congr 1
   · rw [projFun_apply]
     exact tsum_congr fun k => mul_comm _ _
-  · rw [show (fun k : ℤ => scaled m j k x * (f x * ∫ y, conj (scaled m j k y))) =
-      fun k => f x * (scaled m j k x * ∫ y, conj (scaled m j k y)) from
-        funext fun k => mul_left_comm _ _ _, tsum_mul_left, tsum_scaled_mul_integral_conj m hN,
-      mul_one]
+  · rw [show (fun k : ℤ =>
+        daubechiesScaled m j k x * (f x * ∫ y, conj (daubechiesScaled m j k y))) =
+      fun k => f x * (daubechiesScaled m j k x * ∫ y, conj (daubechiesScaled m j k y)) from
+        funext fun k => mul_left_comm _ _ _, tsum_mul_left,
+      tsum_daubechiesScaled_mul_integral_conj m hN, mul_one]
 
 /-- **A local bound for one kernel term**: let `N ≥ 2`, `‖φ(t)‖ ≤ C` for all `t`, and let `η`
 bound `‖f(y) - f(x)‖` for all `y` with `|y - x| ≤ (2N - 1)/2^j`. Then
@@ -561,42 +576,45 @@ bound `‖f(y) - f(x)‖` for all `y` with `|y - x| ≤ (2N - 1)/2^j`. Then
 vanishes unless `x` lies in the support window of `φ_{j,k}`; then every `y` of that window has
 `|y - x| ≤ (2N - 1)/2^j` (`Daubechies.abs_sub_le_of_mem_supportWindow`), so the integral is at
 most `η ‖φ_{j,k}‖_1 = η 2^(-j/2) ‖φ‖_1` (`Daubechies.eLpNorm_scaledFun`), while
-`‖φ_{j,k}(x)‖ ≤ 2^(j/2) C` (`Daubechies.enorm_scaled_le`). -/
-theorem enorm_scaled_mul_integral_sub_le (hN : 2 ≤ N) {f : ℝ → ℂ} {C : ℝ≥0∞}
+`‖φ_{j,k}(x)‖ ≤ 2^(j/2) C` (`Daubechies.enorm_daubechiesScaled_le`). -/
+theorem enorm_daubechiesScaled_mul_integral_sub_le (hN : 2 ≤ N) {f : ℝ → ℂ} {C : ℝ≥0∞}
     (hC : ∀ t, ‖scalingFun m t‖ₑ ≤ C) (j : ℕ) (k : ℤ) (x : ℝ) {η : ℝ≥0∞}
     (hη : ∀ y, |y - x| ≤ (2 * N - 1) / 2 ^ j → ‖f y - f x‖ₑ ≤ η) :
-    ‖scaled m j k x * ∫ y, (f y - f x) * conj (scaled m j k y)‖ₑ ≤
+    ‖daubechiesScaled m j k x * ∫ y, (f y - f x) * conj (daubechiesScaled m j k y)‖ₑ ≤
       C * eLpNorm (scalingFun m) 1 volume * η := by
   have hsupp : ∀ t ∉ Set.Icc (0 : ℝ) (2 * N - 1), scalingFun m t = 0 :=
     fun _ ht => scalingFun_eq_zero m hN ht
-  by_cases hx : scaled m j k x = 0
+  by_cases hx : daubechiesScaled m j k x = 0
   · rw [hx, zero_mul, enorm_zero]
     positivity
   have hxw := mem_supportWindow_of_scaledFun_ne_zero hsupp hx
   have hs := continuous_scaledFun (continuous_scalingFun m hN) j k
-  have h1 : ∫⁻ y, ‖(f y - f x) * conj (scaled m j k y)‖ₑ ≤ ∫⁻ y, η * ‖scaled m j k y‖ₑ := by
+  have h1 : ∫⁻ y, ‖(f y - f x) * conj (daubechiesScaled m j k y)‖ₑ ≤
+      ∫⁻ y, η * ‖daubechiesScaled m j k y‖ₑ := by
     refine lintegral_mono fun y => ?_
     rw [enorm_mul, RCLike.enorm_conj]
-    by_cases hy : scaled m j k y = 0
+    by_cases hy : daubechiesScaled m j k y = 0
     · rw [hy, enorm_zero, mul_zero, mul_zero]
     · gcongr
       exact hη y ((abs_sub_le_of_mem_supportWindow hxw
         (mem_supportWindow_of_scaledFun_ne_zero hsupp hy)).trans_eq (by rw [sub_zero]))
-  have h2 : ‖∫ y, (f y - f x) * conj (scaled m j k y)‖ₑ ≤
+  have h2 : ‖∫ y, (f y - f x) * conj (daubechiesScaled m j k y)‖ₑ ≤
       η * (dyadicWeight (-(1 / 2)) j * eLpNorm (scalingFun m) 1 volume) := by
     have hw : (1 : ℝ) / 2 - 1 / (1 : ℝ≥0∞).toReal = -(1 / 2) := by norm_num
-    calc ‖∫ y, (f y - f x) * conj (scaled m j k y)‖ₑ
-        ≤ ∫⁻ y, ‖(f y - f x) * conj (scaled m j k y)‖ₑ := enorm_integral_le_lintegral_enorm _
-      _ ≤ ∫⁻ y, η * ‖scaled m j k y‖ₑ := h1
-      _ = η * ∫⁻ y, ‖scaled m j k y‖ₑ := lintegral_const_mul η hs.measurable.enorm
+    calc ‖∫ y, (f y - f x) * conj (daubechiesScaled m j k y)‖ₑ
+        ≤ ∫⁻ y, ‖(f y - f x) * conj (daubechiesScaled m j k y)‖ₑ :=
+          enorm_integral_le_lintegral_enorm _
+      _ ≤ ∫⁻ y, η * ‖daubechiesScaled m j k y‖ₑ := h1
+      _ = η * ∫⁻ y, ‖daubechiesScaled m j k y‖ₑ := lintegral_const_mul η hs.measurable.enorm
       _ = η * (dyadicWeight (-(1 / 2)) j * eLpNorm (scalingFun m) 1 volume) := by
           rw [← eLpNorm_one_eq_lintegral_enorm hs.aestronglyMeasurable,
             eLpNorm_scaledFun (continuous_scalingFun m hN).aestronglyMeasurable, hw]
-  calc ‖scaled m j k x * ∫ y, (f y - f x) * conj (scaled m j k y)‖ₑ
-      = ‖scaled m j k x‖ₑ * ‖∫ y, (f y - f x) * conj (scaled m j k y)‖ₑ := enorm_mul _ _
+  calc ‖daubechiesScaled m j k x * ∫ y, (f y - f x) * conj (daubechiesScaled m j k y)‖ₑ
+      = ‖daubechiesScaled m j k x‖ₑ * ‖∫ y, (f y - f x) * conj (daubechiesScaled m j k y)‖ₑ :=
+        enorm_mul _ _
     _ ≤ (dyadicWeight (1 / 2) j * C) *
           (η * (dyadicWeight (-(1 / 2)) j * eLpNorm (scalingFun m) 1 volume)) :=
-        mul_le_mul' (enorm_scaled_le m hC j k x) h2
+        mul_le_mul' (enorm_daubechiesScaled_le m hC j k x) h2
     _ = C * eLpNorm (scalingFun m) 1 volume * η *
           (dyadicWeight (1 / 2) j * dyadicWeight (-(1 / 2)) j) := by ring
     _ = C * eLpNorm (scalingFun m) 1 volume * η := by
@@ -607,15 +625,15 @@ theorem enorm_scaled_mul_integral_sub_le (hN : 2 ≤ N) {f : ℝ → ℂ} {C : �
 `|y - x| ≤ (2N - 1)/2^j`. Then `‖P_j f(x) - f(x)‖ ≤ 2N C ‖φ‖_1 η`. The kernel form
 (`Daubechies.projFun_sub_eq_tsum`) has at most `2N` nonzero terms at `x`
 (`Daubechies.card_Icc_ceil_floor_le_two_mul`), each bounded by
-`Daubechies.enorm_scaled_mul_integral_sub_le`. -/
+`Daubechies.enorm_daubechiesScaled_mul_integral_sub_le`. -/
 theorem enorm_projFun_sub_le (hN : 2 ≤ N) {f : ℝ → ℂ} (hf : LocallyIntegrable f volume)
     {C : ℝ≥0∞} (hC : ∀ t, ‖scalingFun m t‖ₑ ≤ C) (j : ℕ) (x : ℝ) {η : ℝ≥0∞}
     (hη : ∀ y, |y - x| ≤ (2 * N - 1) / 2 ^ j → ‖f y - f x‖ₑ ≤ η) :
     ‖projFun m j f x - f x‖ₑ ≤ 2 * N * (C * eLpNorm (scalingFun m) 1 volume * η) := by
   rw [projFun_sub_eq_tsum m hN hf j x,
-    tsum_eq_sum_of_scaled_eq_zero m hN fun k hk => by rw [hk, zero_mul]]
+    tsum_eq_sum_of_daubechiesScaled_eq_zero m hN fun k hk => by rw [hk, zero_mul]]
   refine (enorm_sum_le _ _).trans ((Finset.sum_le_card_nsmul _ _ _ fun k _ =>
-    enorm_scaled_mul_integral_sub_le m hN hC j k x hη).trans ?_)
+    enorm_daubechiesScaled_mul_integral_sub_le m hN hC j k x hη).trans ?_)
   rw [nsmul_eq_mul]
   gcongr
   exact_mod_cast card_Icc_ceil_floor_le_two_mul (by omega) _
@@ -737,8 +755,8 @@ noncomputable def projLinear (hN : 2 ≤ N) (hp : p ≠ ∞) (j : ℕ) :
 variable (p) in
 /-- **The projection of level `j` on `L_p`**, for `N ≥ 2` and `1 ≤ p < ∞`:
 `P_j f = ∑_{k ∈ ℤ} ⟨f, φ_{j,k}⟩ φ_{j,k}`, a bounded operator whose norm is at most
-`projConst m p` for every level (`Daubechies.norm_proj_le`). -/
-noncomputable def proj (hN : 2 ≤ N) (hp : p ≠ ∞) (j : ℕ) :
+`projConst m p` for every level (`Daubechies.norm_daubechiesProj_le`). -/
+noncomputable def daubechiesProj (hN : 2 ≤ N) (hp : p ≠ ∞) (j : ℕ) :
     Lp ℂ p (volume : Measure ℝ) →L[ℝ] Lp ℂ p (volume : Measure ℝ) :=
   LinearMap.mkContinuous (projLinear m p hN hp j) (projConst m p) fun f => by
     have hmem := memLp_projFun m hN Fact.out hp (Lp.memLp f) j
@@ -751,71 +769,78 @@ noncomputable def proj (hN : 2 ≤ N) (hp : p ≠ ∞) (j : ℕ) :
 
 /-- **The projection is the pointwise projection almost everywhere**:
 `P_j f = ∑_k ⟨f, φ_{j,k}⟩ φ_{j,k}` almost everywhere, for every `f ∈ L_p`. -/
-theorem proj_apply_ae (hN : 2 ≤ N) (hp : p ≠ ∞) (j : ℕ) (f : Lp ℂ p (volume : Measure ℝ)) :
-    proj m p hN hp j f =ᵐ[volume] projFun m j f :=
+theorem daubechiesProj_apply_ae (hN : 2 ≤ N) (hp : p ≠ ∞) (j : ℕ)
+    (f : Lp ℂ p (volume : Measure ℝ)) : daubechiesProj m p hN hp j f =ᵐ[volume] projFun m j f :=
   MemLp.coeFn_toLp (memLp_projFun m hN Fact.out hp (Lp.memLp f) j)
 
 /-- **The projections are uniformly bounded**: `‖P_j‖ ≤ projConst m p` for every level `j`. -/
-theorem norm_proj_le (hN : 2 ≤ N) (hp : p ≠ ∞) (j : ℕ) : ‖proj m p hN hp j‖ ≤ projConst m p :=
+theorem norm_daubechiesProj_le (hN : 2 ≤ N) (hp : p ≠ ∞) (j : ℕ) :
+    ‖daubechiesProj m p hN hp j‖ ≤ projConst m p :=
   LinearMap.mkContinuous_norm_le _ (projConst_nonneg m p) _
 
 /-- **The uniform bound in extended norms**: `‖P_j f‖_p ≤ C ‖f‖_p` with `C = projConst m p`, for
 every `f ∈ L_p` and every level `j` (`Daubechies.eLpNorm_projFun_le`). -/
-theorem enorm_proj_le (hN : 2 ≤ N) (hp : p ≠ ∞) (j : ℕ) (f : Lp ℂ p (volume : Measure ℝ)) :
-    ‖proj m p hN hp j f‖ₑ ≤ ENNReal.ofReal (projConst m p) * ‖f‖ₑ := by
-  rw [Lp.enorm_def, Lp.enorm_def, eLpNorm_congr_ae (proj_apply_ae m hN hp j f)]
+theorem enorm_daubechiesProj_le (hN : 2 ≤ N) (hp : p ≠ ∞) (j : ℕ)
+    (f : Lp ℂ p (volume : Measure ℝ)) :
+    ‖daubechiesProj m p hN hp j f‖ₑ ≤ ENNReal.ofReal (projConst m p) * ‖f‖ₑ := by
+  rw [Lp.enorm_def, Lp.enorm_def, eLpNorm_congr_ae (daubechiesProj_apply_ae m hN hp j f)]
   exact eLpNorm_projFun_le m hN Fact.out hp (Lp.aestronglyMeasurable f) j
 
 /-! ### The scaling spaces -/
 
 /-- **`P_j` is a projection**: `P_j (P_j f) = P_j f` for every `f ∈ L_p`, for `N ≥ 2` and
 `1 ≤ p < ∞` (`Daubechies.projFun_projFun`). -/
-theorem proj_proj (hN : 2 ≤ N) (hp : p ≠ ∞) (j : ℕ) (f : Lp ℂ p (volume : Measure ℝ)) :
-    proj m p hN hp j (proj m p hN hp j f) = proj m p hN hp j f := by
-  refine Lp.ext ((proj_apply_ae m hN hp j _).trans ?_)
-  rw [projFun_congr_ae m (proj_apply_ae m hN hp j f) j, projFun_projFun m hN]
-  exact (proj_apply_ae m hN hp j f).symm
+theorem daubechiesProj_daubechiesProj (hN : 2 ≤ N) (hp : p ≠ ∞) (j : ℕ)
+    (f : Lp ℂ p (volume : Measure ℝ)) :
+    daubechiesProj m p hN hp j (daubechiesProj m p hN hp j f) = daubechiesProj m p hN hp j f := by
+  refine Lp.ext ((daubechiesProj_apply_ae m hN hp j _).trans ?_)
+  rw [projFun_congr_ae m (daubechiesProj_apply_ae m hN hp j f) j, projFun_projFun m hN]
+  exact (daubechiesProj_apply_ae m hN hp j f).symm
 
 /-- **The projections of consecutive levels**: `P_{j+1} (P_j f) = P_j f` for every `f ∈ L_p`, for
 `N ≥ 2` and `1 ≤ p < ∞` (`Daubechies.projFun_succ_projFun`). -/
-theorem proj_succ_proj (hN : 2 ≤ N) (hp : p ≠ ∞) (j : ℕ) (f : Lp ℂ p (volume : Measure ℝ)) :
-    proj m p hN hp (j + 1) (proj m p hN hp j f) = proj m p hN hp j f := by
-  refine Lp.ext ((proj_apply_ae m hN hp (j + 1) _).trans ?_)
-  rw [projFun_congr_ae m (proj_apply_ae m hN hp j f) (j + 1), projFun_succ_projFun m hN]
-  exact (proj_apply_ae m hN hp j f).symm
+theorem daubechiesProj_succ_daubechiesProj (hN : 2 ≤ N) (hp : p ≠ ∞) (j : ℕ)
+    (f : Lp ℂ p (volume : Measure ℝ)) :
+    daubechiesProj m p hN hp (j + 1) (daubechiesProj m p hN hp j f) =
+      daubechiesProj m p hN hp j f := by
+  refine Lp.ext ((daubechiesProj_apply_ae m hN hp (j + 1) _).trans ?_)
+  rw [projFun_congr_ae m (daubechiesProj_apply_ae m hN hp j f) (j + 1), projFun_succ_projFun m hN]
+  exact (daubechiesProj_apply_ae m hN hp j f).symm
 
 variable (p) in
 /-- **The scaling space of level `j`**: the range `V_j` of the projection `P_j` in `L_p`, for
 `N ≥ 2` and `1 ≤ p < ∞`, a real subspace of `L_p`. It consists of the classes of the expansions
 `∑_k ⟨f, φ_{j,k}⟩ φ_{j,k}`, `f ∈ L_p`, and `P_j` is the identity on it
-(`Daubechies.proj_eq_self_of_mem`). -/
+(`Daubechies.daubechiesProj_eq_self_of_mem`). -/
 noncomputable def scalingSpace (hN : 2 ≤ N) (hp : p ≠ ∞) (j : ℕ) :
     Submodule ℝ (Lp ℂ p (volume : Measure ℝ)) :=
-  LinearMap.range (proj m p hN hp j).toLinearMap
+  LinearMap.range (daubechiesProj m p hN hp j).toLinearMap
 
 /-- `a ∈ V_j` iff `a = P_j f` for some `f ∈ L_p`. -/
 theorem mem_scalingSpace {hN : 2 ≤ N} {hp : p ≠ ∞} {j : ℕ} {a : Lp ℂ p (volume : Measure ℝ)} :
-    a ∈ scalingSpace m p hN hp j ↔ ∃ f, proj m p hN hp j f = a :=
+    a ∈ scalingSpace m p hN hp j ↔ ∃ f, daubechiesProj m p hN hp j f = a :=
   LinearMap.mem_range
 
 /-- The projection `P_j f` lies in the scaling space `V_j`. -/
-theorem proj_mem_scalingSpace (hN : 2 ≤ N) (hp : p ≠ ∞) (j : ℕ)
-    (f : Lp ℂ p (volume : Measure ℝ)) : proj m p hN hp j f ∈ scalingSpace m p hN hp j :=
+theorem daubechiesProj_mem_scalingSpace (hN : 2 ≤ N) (hp : p ≠ ∞) (j : ℕ)
+    (f : Lp ℂ p (volume : Measure ℝ)) : daubechiesProj m p hN hp j f ∈ scalingSpace m p hN hp j :=
   LinearMap.mem_range_self _ f
 
 /-- **The projection fixes the scaling space**: `P_j a = a` for every `a ∈ V_j`
-(`Daubechies.proj_proj`). -/
-theorem proj_eq_self_of_mem (hN : 2 ≤ N) (hp : p ≠ ∞) {j : ℕ} {a : Lp ℂ p (volume : Measure ℝ)}
-    (ha : a ∈ scalingSpace m p hN hp j) : proj m p hN hp j a = a := by
+(`Daubechies.daubechiesProj_daubechiesProj`). -/
+theorem daubechiesProj_eq_self_of_mem (hN : 2 ≤ N) (hp : p ≠ ∞) {j : ℕ}
+    {a : Lp ℂ p (volume : Measure ℝ)}
+    (ha : a ∈ scalingSpace m p hN hp j) : daubechiesProj m p hN hp j a = a := by
   obtain ⟨f, rfl⟩ := (mem_scalingSpace m).1 ha
-  exact proj_proj m hN hp j f
+  exact daubechiesProj_daubechiesProj m hN hp j f
 
 /-- **The scaling spaces are nested**: `V_j ⊆ V_{j+1}`, since `P_j f = P_{j+1} (P_j f)`
-(`Daubechies.proj_succ_proj`), a consequence of the refinement equation. -/
+(`Daubechies.daubechiesProj_succ_daubechiesProj`), a consequence of the refinement equation. -/
 theorem scalingSpace_le_succ (hN : 2 ≤ N) (hp : p ≠ ∞) (j : ℕ) :
     scalingSpace m p hN hp j ≤ scalingSpace m p hN hp (j + 1) := fun a ha => by
   obtain ⟨f, rfl⟩ := (mem_scalingSpace m).1 ha
-  exact (mem_scalingSpace m).2 ⟨proj m p hN hp j f, proj_succ_proj m hN hp j f⟩
+  exact (mem_scalingSpace m).2
+    ⟨daubechiesProj m p hN hp j f, daubechiesProj_succ_daubechiesProj m hN hp j f⟩
 
 /-- **The scaling spaces increase with the level**: `V_i ⊆ V_j` for `i ≤ j`
 (`Daubechies.scalingSpace_le_succ`). -/
@@ -828,40 +853,42 @@ variable (p) in
 /-- **The Daubechies scheme** in `L_p`, for `N ≥ 2` and `1 ≤ p < ∞`: `{0}` at complexity `0` and
 the scaling space `V_{⌊log₂ n⌋}` at complexity `n ≥ 1`, so that `V_k` is the set of approximants
 of complexity `2^k` (`ApproximationScheme.ofMonotoneSubmodules`). -/
-noncomputable def scheme (hN : 2 ≤ N) (hp : p ≠ ∞) :
+noncomputable def daubechiesScheme (hN : 2 ≤ N) (hp : p ≠ ∞) :
     ApproximationScheme (Lp ℂ p (volume : Measure ℝ)) :=
   ApproximationScheme.ofMonotoneSubmodules (scalingSpace m p hN hp) (scalingSpace_mono m hN hp)
 
 /-- The approximants of complexity `0` are `{0}`. -/
-theorem mem_scheme_zero {hN : 2 ≤ N} {hp : p ≠ ∞} {a : Lp ℂ p (volume : Measure ℝ)} :
-    a ∈ scheme m p hN hp 0 ↔ a = 0 :=
+theorem mem_daubechiesScheme_zero {hN : 2 ≤ N} {hp : p ≠ ∞} {a : Lp ℂ p (volume : Measure ℝ)} :
+    a ∈ daubechiesScheme m p hN hp 0 ↔ a = 0 :=
   ApproximationScheme.mem_ofMonotoneSubmodules_zero
 
 /-- The approximants of complexity `n ≥ 1` are the elements of the scaling space
 `V_{⌊log₂ n⌋}`. -/
-theorem mem_scheme {hN : 2 ≤ N} {hp : p ≠ ∞} {n : ℕ} (hn : n ≠ 0)
+theorem mem_daubechiesScheme {hN : 2 ≤ N} {hp : p ≠ ∞} {n : ℕ} (hn : n ≠ 0)
     {a : Lp ℂ p (volume : Measure ℝ)} :
-    a ∈ scheme m p hN hp n ↔ a ∈ scalingSpace m p hN hp (Nat.log 2 n) :=
+    a ∈ daubechiesScheme m p hN hp n ↔ a ∈ scalingSpace m p hN hp (Nat.log 2 n) :=
   ApproximationScheme.mem_ofMonotoneSubmodules hn
 
 /-- The approximants of complexity `2^k` are the elements of the scaling space `V_k`. -/
-theorem mem_scheme_two_pow {hN : 2 ≤ N} {hp : p ≠ ∞} {k : ℕ} {a : Lp ℂ p (volume : Measure ℝ)} :
-    a ∈ scheme m p hN hp (2 ^ k) ↔ a ∈ scalingSpace m p hN hp k :=
+theorem mem_daubechiesScheme_two_pow {hN : 2 ≤ N} {hp : p ≠ ∞} {k : ℕ}
+    {a : Lp ℂ p (volume : Measure ℝ)} :
+    a ∈ daubechiesScheme m p hN hp (2 ^ k) ↔ a ∈ scalingSpace m p hN hp k :=
   ApproximationScheme.mem_ofMonotoneSubmodules_two_pow
 
 variable (p) in
 /-- **The projection scheme of the Daubechies scaling spaces** in `L_p`, for `N ≥ 2` and
 `1 ≤ p < ∞`: the projection of complexity `n ≥ 1` is `P_{⌊log₂ n⌋}`, the one of complexity `0`
 is `0` (the approximants of complexity `0` are `{0}`), and all are bounded by `projConst m p`. -/
-noncomputable def projectionScheme (hN : 2 ≤ N) (hp : p ≠ ∞) :
-    (scheme m p hN hp).ProjectionScheme :=
+noncomputable def daubechiesProjectionScheme (hN : 2 ≤ N) (hp : p ≠ ∞) :
+    (daubechiesScheme m p hN hp).ProjectionScheme :=
   ApproximationScheme.ProjectionScheme.ofMonotone (scalingSpace m p hN hp)
-    (scalingSpace_mono m hN hp) (proj m p hN hp) (proj_mem_scalingSpace m hN hp)
-    (fun _ _ ha => proj_eq_self_of_mem m hN hp ha) (projConst m p) (norm_proj_le m hN hp)
+    (scalingSpace_mono m hN hp) (daubechiesProj m p hN hp) (daubechiesProj_mem_scalingSpace m hN hp)
+    (fun _ _ ha => daubechiesProj_eq_self_of_mem m hN hp ha) (projConst m p)
+      (norm_daubechiesProj_le m hN hp)
 
 /-- The projection of complexity `2^k` is `P_k`. -/
-theorem projectionScheme_two_pow (hN : 2 ≤ N) (hp : p ≠ ∞) (k : ℕ) :
-    (projectionScheme m p hN hp).P (2 ^ k) = proj m p hN hp k :=
+theorem daubechiesProjectionScheme_two_pow (hN : 2 ≤ N) (hp : p ≠ ∞) (k : ℕ) :
+    (daubechiesProjectionScheme m p hN hp).P (2 ^ k) = daubechiesProj m p hN hp k :=
   ApproximationScheme.ProjectionScheme.ofMonotone_two_pow k
 
 /-! ### Density of the scaling spaces -/
@@ -877,10 +904,10 @@ theorem closure_iUnion_scalingSpace (hN : 2 ≤ N) (hp : p ≠ ∞) :
     (Lp.memLp F).exists_hasCompactSupport_eLpNorm_sub_le hp (ENNReal.half_pos hε.ne').ne'
   obtain ⟨j, hj⟩ := ((tendsto_eLpNorm_sub_projFun m hN hg hgc p).eventually
     (gt_mem_nhds (ENNReal.half_pos hε.ne'))).exists
-  refine ⟨proj m p hN hp j (hgp.toLp g),
-    Set.mem_iUnion.2 ⟨j, proj_mem_scalingSpace m hN hp j _⟩, ?_⟩
-  have hP : ⇑(proj m p hN hp j (hgp.toLp g)) =ᵐ[volume] projFun m j g :=
-    (proj_apply_ae m hN hp j _).trans
+  refine ⟨daubechiesProj m p hN hp j (hgp.toLp g),
+    Set.mem_iUnion.2 ⟨j, daubechiesProj_mem_scalingSpace m hN hp j _⟩, ?_⟩
+  have hP : ⇑(daubechiesProj m p hN hp j (hgp.toLp g)) =ᵐ[volume] projFun m j g :=
+    (daubechiesProj_apply_ae m hN hp j _).trans
       (EventuallyEq.of_eq (projFun_congr_ae m (MemLp.coeFn_toLp hgp) j))
   rw [Lp.edist_def, eLpNorm_congr_ae ((EventuallyEq.refl _ (⇑F)).sub hP)]
   calc eLpNorm (⇑F - projFun m j g) p volume
@@ -893,24 +920,24 @@ theorem closure_iUnion_scalingSpace (hN : 2 ≤ N) (hp : p ≠ ∞) :
 
 /-- **The Daubechies scheme is dense** in `L_p`, for `N ≥ 2` and `1 ≤ p < ∞`: the closure of the
 union of its approximants is all of `L_p`, since `V_j` is the set of approximants of complexity
-`2^j` (`Daubechies.mem_scheme_two_pow`, `Daubechies.closure_iUnion_scalingSpace`). -/
-theorem closure_iUnion_scheme (hN : 2 ≤ N) (hp : p ≠ ∞) :
-    closure (⋃ n, scheme m p hN hp n) = Set.univ := by
+`2^j` (`Daubechies.mem_daubechiesScheme_two_pow`, `Daubechies.closure_iUnion_scalingSpace`). -/
+theorem closure_iUnion_daubechiesScheme (hN : 2 ≤ N) (hp : p ≠ ∞) :
+    closure (⋃ n, daubechiesScheme m p hN hp n) = Set.univ := by
   refine Set.eq_univ_of_univ_subset
     ((closure_iUnion_scalingSpace m hN hp).symm.subset.trans (closure_mono fun a ha => ?_))
   obtain ⟨j, hj⟩ := Set.mem_iUnion.1 ha
-  exact Set.mem_iUnion.2 ⟨2 ^ j, (mem_scheme_two_pow m).2 hj⟩
+  exact Set.mem_iUnion.2 ⟨2 ^ j, (mem_daubechiesScheme_two_pow m).2 hj⟩
 
 /-- **The projections converge**: `P_j f → f` in `L_p` as `j → ∞`, for every `f ∈ L_p`, `N ≥ 2`
 and `1 ≤ p < ∞`. The projections are uniformly bounded and `⋃_j V_j` is dense
-(`Daubechies.closure_iUnion_scheme`), so the projection scheme converges
+(`Daubechies.closure_iUnion_daubechiesScheme`), so the projection scheme converges
 (`ApproximationScheme.ProjectionScheme.tendsto_of_dense`) along the complexities `2^j`
-(`Daubechies.projectionScheme_two_pow`). -/
-theorem tendsto_proj (hN : 2 ≤ N) (hp : p ≠ ∞) (f : Lp ℂ p (volume : Measure ℝ)) :
-    Tendsto (fun j => proj m p hN hp j f) atTop (𝓝 f) := by
-  have h := ((projectionScheme m p hN hp).tendsto_of_dense (closure_iUnion_scheme m hN hp)
-    f).comp (tendsto_pow_atTop_atTop_of_one_lt one_lt_two)
-  simpa only [Function.comp_def, projectionScheme_two_pow] using h
+(`Daubechies.daubechiesProjectionScheme_two_pow`). -/
+theorem tendsto_daubechiesProj (hN : 2 ≤ N) (hp : p ≠ ∞) (f : Lp ℂ p (volume : Measure ℝ)) :
+    Tendsto (fun j => daubechiesProj m p hN hp j f) atTop (𝓝 f) := by
+  have h := ((daubechiesProjectionScheme m p hN hp).tendsto_of_dense
+    (closure_iUnion_daubechiesScheme m hN hp) f).comp (tendsto_pow_atTop_atTop_of_one_lt one_lt_two)
+  simpa only [Function.comp_def, daubechiesProjectionScheme_two_pow] using h
 
 end Lp
 

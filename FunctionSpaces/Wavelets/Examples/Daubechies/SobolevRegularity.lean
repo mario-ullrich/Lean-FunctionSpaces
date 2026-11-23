@@ -43,7 +43,7 @@ for every `s < N - log₄ λ` by moduli of smoothness (the bound for `s` says `�
   integrable with `𝓕 φ = Φ`, so `Δ_h^r φ` is continuous and integrable with the integrable
   transform `(e^(2πihξ) - 1)^r Φ(ξ)` (`Daubechies.fourier_higherDiff_scalingFun`,
   `Daubechies.integrable_fourier_higherDiff_scalingFun`). Plancherel's identity
-  (`Real.integral_norm_sq_fourier`) gives `‖Δ_h^r φ‖_2² = ∫ |e^(2πihξ) - 1|^(2r) |Φ(ξ)|² dξ`
+  (`Real.real_integral_norm_sq_fourier`) gives `‖Δ_h^r φ‖_2² = ∫ |e^(2πihξ) - 1|^(2r) |Φ(ξ)|² dξ`
   (`Daubechies.integral_norm_sq_higherDiff_scalingFun`,
   `Daubechies.eLpNorm_two_higherDiff_scalingFun_sq`).
 * **The `L²` modulus.** With the power form of the multiplier bound,
@@ -254,12 +254,12 @@ theorem integrable_fourier_higherDiff_scalingFun (hN : 2 ≤ N) (r : ℕ) (h : �
 The function `Δ_h^r φ` is continuous and integrable (`Daubechies.continuous_iterate_fwdDiff`,
 `Rd.integrable_higherDiff`) and has an integrable transform
 (`Daubechies.integrable_fourier_higherDiff_scalingFun`), so Plancherel's identity
-`Real.integral_norm_sq_fourier` applies; the transform is given by
+`Real.real_integral_norm_sq_fourier` applies; the transform is given by
 `Daubechies.fourier_higherDiff_scalingFun`. -/
 theorem integral_norm_sq_higherDiff_scalingFun (hN : 2 ≤ N) (r : ℕ) (h : ℝ) :
     ∫ x, ‖(fwdDiff h)^[r] (scalingFun m) x‖ ^ 2 =
       ∫ ξ : ℝ, ‖cexp (2 * π * h * ξ * I) - 1‖ ^ (2 * r) * ‖symbolProduct m ξ‖ ^ 2 := by
-  rw [← Real.integral_norm_sq_fourier
+  rw [← Real.real_integral_norm_sq_fourier
     (continuous_iterate_fwdDiff (continuous_scalingFun m hN) r h)
     (Rd.integrable_higherDiff (integrable_scalingFun m hN) r h)
     (integrable_fourier_higherDiff_scalingFun m hN r h)]

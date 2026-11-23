@@ -90,7 +90,7 @@ theorem fourierInv_sub_apply (hF : Integrable F) (hG : Integrable G) (x : ℝ) :
 /-- For integrable `F : ℝ → ℂ` and every `h ∈ ℝ`, the modulated function
 `ξ ↦ e^(2πihξ) F(ξ)` is integrable: the continuous factor has modulus `1`
 (Mathlib's `Complex.norm_exp_ofReal_mul_I`, `MeasureTheory.Integrable.bdd_mul`). -/
-theorem integrable_exp_mul (hF : Integrable F) (h : ℝ) :
+theorem integrable_cexp_mul (hF : Integrable F) (h : ℝ) :
     Integrable (fun ξ : ℝ => cexp (2 * π * h * ξ * I) * F ξ) :=
   hF.bdd_mul (c := 1)
     (by fun_prop : Continuous fun ξ : ℝ => cexp (2 * π * h * ξ * I)).aestronglyMeasurable
@@ -109,7 +109,7 @@ theorem fwdDiff_fourierInv_apply (hF : Integrable F) (h x : ℝ) :
     ext ξ
     simp only [Pi.sub_apply]
     ring
-  rw [hsub, fourierInv_sub_apply (integrable_exp_mul hF h) hF, fourierInv_exp_mul_apply]
+  rw [hsub, fourierInv_sub_apply (integrable_cexp_mul hF h) hF, fourierInv_exp_mul_apply]
   rfl
 
 /-- **The differences of an inverse Fourier transform**: for integrable `F : ℝ → ℂ`, every
@@ -132,11 +132,11 @@ theorem iterate_fwdDiff_fourierInv_apply (hF : Integrable F) (r : ℕ) (h x : �
 `F : ℝ → ℂ`, every `r ∈ ℕ` and all `h, x ∈ ℝ`,
 `|Δ_h^r (𝓕⁻ F)(x)| ≤ ∫ |e^(2πihξ) - 1|^r |F(ξ)| dξ`, the formula
 `Real.iterate_fwdDiff_fourierInv_apply` together with `|𝓕⁻ G(x)| ≤ ∫ |G|`
-(`Real.norm_fourierInv_le_integral_norm`). -/
+(`Real.real_norm_fourierInv_le_integral_norm`). -/
 theorem norm_iterate_fwdDiff_fourierInv_le (hF : Integrable F) (r : ℕ) (h x : ℝ) :
     ‖(fwdDiff h)^[r] (𝓕⁻ F) x‖ ≤ ∫ ξ : ℝ, ‖cexp (2 * π * h * ξ * I) - 1‖ ^ r * ‖F ξ‖ := by
   rw [iterate_fwdDiff_fourierInv_apply hF]
-  refine (norm_fourierInv_le_integral_norm _ x).trans_eq ?_
+  refine (real_norm_fourierInv_le_integral_norm _ x).trans_eq ?_
   simp_rw [norm_mul, norm_pow]
 
 end Real
@@ -254,7 +254,7 @@ theorem smoothnessModulus_scalingFun_top_le {lam C a : ℝ} {r : ℕ} (hg : Tran
     (ha0 : 0 ≤ a) (har : a ≤ r) (ha : a < N - Real.logb 4 lam - 1 / 2) :
     ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ t ∈ Set.Ioc (0 : ℝ) 1,
       Rd.smoothnessModulus volume r ∞ (scalingFun m) t ≤ K * ENNReal.ofReal (t ^ a) := by
-  have hφ : Continuous (scalingFun m) := Real.continuous_fourierInv_of_integrable
+  have hφ : Continuous (scalingFun m) := Real.real_continuous_fourierInv_of_integrable
     (integrable_symbolProduct_of_growth m hg (ha0.trans_lt ha))
   exact ⟨_, ENNReal.ofReal_ne_top, fun t _ =>
     smoothnessModulus_top_le_of_norm_le hφ.aestronglyMeasurable ha0

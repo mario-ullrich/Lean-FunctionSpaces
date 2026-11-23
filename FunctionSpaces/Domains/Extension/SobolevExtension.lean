@@ -17,8 +17,8 @@ public import FunctionSpaces.Rd.Sobolev.WeakDerivativeLeibniz
 # Bounded extensions of `W^1_p` by the local means of the gradient
 
 Let `V` be a finite-dimensional real inner product space of dimension `n` and `1 ≤ p ≤ ∞`; the
-bounds of the local extension need `1 < p < ∞`. This file holds the estimates behind the extension
-theorem of Calderón and Stein in Rychkov's form: the local extension
+bounds of the local extension need `1 < p < ∞`. This file holds the estimates behind the
+extension theorem of Calderón and Stein in Rychkov's form: the local extension
 `∑_j η_j ⋆ 1_W (k_j ⋆ 1_T f)` of a Sobolev function `f` on an open set `T` lies in `W^1_p(V)`,
 with a bound by `‖f‖_{L_p(T)} + ∑_i ‖∂_{e_i} f‖_{L_p(T)}`. The extension operators
 (`Rd.SobolevExtensionOp`, `Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp`) and the
@@ -26,17 +26,17 @@ extension theorem itself (`Rd.BoundedLipschitzDomain.exists_extendsSobolev`) are
 
 * **Local means by the gradient**: for a bump with moment kernel `m` of order two, the local
   means kernels are divergences, `k_{j+1} = 2^(-j) ∑_i ∂_{e_i} (K_i)_{2^j}` with the divergence
-  kernels `K_i` of `m` (`Rd.LocalMeansBump.divKernel`, `Rd.LocalMeansBump.kernel_two_succ_apply`).
-  If `g_i = ∂_{e_i} f` weakly on an open set `T` and the kernels at `x` only see `T`, then
+  kernels `K_i` of `m` (`Rd.LocalMeansBump.divKernel`,
+  `Rd.LocalMeansBump.meansKernel_two_succ_apply`). If `g_i = ∂_{e_i} f` weakly on an open set `T`
+  and the kernels at `x` only see `T`, then
   `(k_{j+1} ⋆ 1_T f)(x) = 2^(-j) ∑_i ((K_i)_{2^j} ⋆ 1_T g_i)(x)`
-  (`Rd.LocalMeansBump.conv_kernel_two_succ_eq`, by the general identity for kernels that are
-  sums of derivatives, `Rd.conv_indicator_eq_mul_sum_of_eq_sum_iteratedLineDerivOp`), and the
-  strong type of the Calderón–Zygmund
-  families `((K_i)_{2^j})_j` bounds the local means quasi-norm of Triebel–Lizorkin type on a set
-  (`Rd.LocalMeansBump.tlLocalNormOn`) by `‖f‖_{L_p(T)} + ∑_i ‖g_i‖_{L_p(T)}`
-  (`Rd.LocalMeansBump.tlLocalNormOn_le_patchConst`). The step from a pointwise bound of the
-  local means by convolutions with Schwartz kernels to the quasi-norm holds for every kernel family
-  (`Rd.LocalMeansBump.tlLocalNormOn_le_of_pointwise`).
+  (`Rd.LocalMeansBump.conv_meansKernel_two_succ_eq`, by the general identity for kernels that are
+  sums of derivatives, `Rd.conv_indicator_eq_mul_sum_of_eq_sum_iteratedLineDerivOp`), and the strong
+  type of the Calderón–Zygmund families `((K_i)_{2^j})_j` bounds the local means quasi-norm of
+  Triebel–Lizorkin type on a set (`Rd.LocalMeansBump.tlLocalNormOn`) by
+  `‖f‖_{L_p(T)} + ∑_i ‖g_i‖_{L_p(T)}` (`Rd.LocalMeansBump.tlLocalNormOn_le_patchConst`). The step
+  from a pointwise bound of the local means by convolutions with Schwartz kernels to the quasi-norm
+  holds for every kernel family (`Rd.LocalMeansBump.tlLocalNormOn_le_of_pointwise`).
 * **One patch**: the local extension lies in `F^1_{p,2}(V) = W^1_p(V)`
   (`Rd.LocalMeansBump.memTriebelLizorkin_localExtension_of_tlLocalNormOn`), agrees with `f` on the
   patch (`Rd.LocalMeansBump.ae_localExtension_eq_of_ae_eq_indicator`) and has the constant
@@ -53,7 +53,7 @@ extension theorem itself (`Rd.BoundedLipschitzDomain.exists_extendsSobolev`) are
   `Rd.BoundedLipschitzDomain.exists_cutoff_interior`), which serve the extensions by reflection and
   those of higher order.
 * **Dimension zero**: for `n = 0`, every `f ∈ W^m_p(O)` agrees on `O` with `F = f` or `F = 0` in
-  `W^m_p(V)` (`Rd.exists_memSobolev_of_memWeakSobolev_of_subsingleton`).
+  `W^m_p(V)` (`Rd.exists_memWSobolev_of_memWeakSobolev_of_subsingleton`).
 -/
 
 @[expose] public section
@@ -125,7 +125,8 @@ theorem momentKernel_two_eq_zero {z : V} (hz : 2 * b.radius < ‖z‖) :
 /-- The **divergence kernels** `K_i` of a bump: the divergence kernels (`Rd.divergenceSchwartz`) of
 its moment kernel `m` of order two in the directions of the orthonormal basis `e_i = Rd.gridBasis`,
 so that `∑_i ∂_{e_i} K_i = m_2 - m` (`Rd.sum_lineDerivOp_divergenceSchwartz`); at the dyadic scales
-this writes the local means kernels as divergences (`Rd.LocalMeansBump.kernel_two_succ_apply`). -/
+this writes the local means kernels as divergences
+(`Rd.LocalMeansBump.meansKernel_two_succ_apply`). -/
 noncomputable def divKernel (i : Fin (finrank ℝ V)) : 𝓢(V, ℂ) :=
   divergenceSchwartz (b.contDiff_momentKernel 2) (fun _ hz => b.momentKernel_two_eq_zero hz)
     (gridBasis V i)
@@ -142,19 +143,19 @@ theorem divKernel_eq_zero (i : Fin (finrank ℝ V)) {y : V}
   divergenceKernel_eq_zero _ hy
 
 /-- **The local means kernels of order two at dyadic scales**: `k_{j+1} = (m_2 - m)_{2^j}`
-(`Rd.LocalMeansBump.kernel_succ_eq_dilate`). -/
-theorem kernel_two_succ (j : ℕ) :
-    b.kernel 2 (j + 1) =
+(`Rd.LocalMeansBump.meansKernel_succ_eq_dilate`). -/
+theorem meansKernel_two_succ (j : ℕ) :
+    b.meansKernel 2 (j + 1) =
       dilate (2 ^ j) (fun y => dilate 2 (momentKernel b.toFun 2) y - momentKernel b.toFun 2 y) :=
-  b.kernel_succ_eq_dilate 2 j
+  b.meansKernel_succ_eq_dilate 2 j
 
 /-- **The local means kernels are divergences**: `k_{j+1} = 2^(-j) ∑_i ∂_{e_i} (K_i)_{2^j}`
 (`Rd.sum_lineDerivOp_schwartzDilate_divergenceSchwartz`). -/
-theorem kernel_two_succ_apply (j : ℕ) (y : V) :
-    b.kernel 2 (j + 1) y = ((((2 : ℝ) ^ j)⁻¹ : ℝ) : ℂ) * ∑ i, (∂_{gridBasis V i}
+theorem meansKernel_two_succ_apply (j : ℕ) (y : V) :
+    b.meansKernel 2 (j + 1) y = ((((2 : ℝ) ^ j)⁻¹ : ℝ) : ℂ) * ∑ i, (∂_{gridBasis V i}
       (schwartzDilate (2 ^ j) (by positivity) (b.divKernel i)) : 𝓢(V, ℂ)) y := by
   unfold divKernel
-  rw [sum_lineDerivOp_schwartzDilate_divergenceSchwartz (gridBasis V), kernel_two_succ]
+  rw [sum_lineDerivOp_schwartzDilate_divergenceSchwartz (gridBasis V), meansKernel_two_succ]
   have h : (((2 : ℝ) ^ j : ℝ) : ℂ) ≠ 0 := by exact_mod_cast (pow_pos two_pos j).ne'
   push_cast
   field_simp
@@ -183,17 +184,17 @@ variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 /-- **Local means of order two by the gradient, at one point**: let `g_i = ∂_{e_i} f` weakly on an
 open set `T`, `f ∈ L_p(T)`, and let `x - y ∈ T` for every `y` in the support of every
 `(K_i)_{2^j}`. Then `(k_{j+1} ⋆ 1_T f)(x) = 2^(-j) ∑_i ((K_i)_{2^j} ⋆ 1_T g_i)(x)`: the kernel is
-`2^(-j) ∑_i ∂_{e_i} (K_i)_{2^j}` (`Rd.LocalMeansBump.kernel_two_succ_apply`), and each derivative
-moves to `f` (`Rd.conv_indicator_eq_mul_sum_of_eq_sum_iteratedLineDerivOp`). -/
-theorem conv_kernel_two_succ_eq {T : Opens V} {f : V → ℂ} {g : Fin (finrank ℝ V) → V → ℂ}
+`2^(-j) ∑_i ∂_{e_i} (K_i)_{2^j}` (`Rd.LocalMeansBump.meansKernel_two_succ_apply`), and each
+derivative moves to `f` (`Rd.conv_indicator_eq_mul_sum_of_eq_sum_iteratedLineDerivOp`). -/
+theorem conv_meansKernel_two_succ_eq {T : Opens V} {f : V → ℂ} {g : Fin (finrank ℝ V) → V → ℂ}
     (hf : MemLp f p (volume.restrict T))
     (hfg : ∀ i, HasWeakLineDeriv T (fun _ : Fin 1 => gridBasis V i) f (g i)) (j : ℕ) {x : V}
     (hx : ∀ i, ∀ y ∈ tsupport (dilate (2 ^ j) (b.divKernel i : V → ℂ)), x - y ∈ T) :
-    conv (b.kernel 2 (j + 1)) ((T : Set V).indicator f) volume x =
+    conv (b.meansKernel 2 (j + 1)) ((T : Set V).indicator f) volume x =
       ((((2 : ℝ) ^ j)⁻¹ : ℝ) : ℂ) * ∑ i, conv (dilate (2 ^ j) (b.divKernel i : V → ℂ))
         ((T : Set V).indicator (g i)) volume x :=
   conv_indicator_eq_mul_sum_of_eq_sum_iteratedLineDerivOp hf hfg b.hasCompactSupport_divKernel
-    (by positivity) (b.kernel_two_succ_apply j) hx
+    (by positivity) (b.meansKernel_two_succ_apply j) hx
 
 /-- The constant `∑_i C_{p}(K_i)` of the gradient bound of the local means, with the constants
 `C_p(K_i) = Rd.czConst V p B_i H_i` of the Calderón–Zygmund families of the divergence kernels
@@ -296,7 +297,7 @@ c ∑_i ‖(((K_i)_{2^j} ⋆ h_i)(x))_j‖_{ℓ_2}`. -/
 theorem ae_lqNorm_le_of_pointwise (hp : p ≠ ∞) (L : ℕ) (s : ℝ) {W : Set V}
     (hW : MeasurableSet W) {φ : V → ℂ} {ι : Type*} [Fintype ι] (K : ι → 𝓢(V, ℂ))
     (h : ι → V → ℂ) (c : ℝ≥0∞)
-    (hpt : ∀ x ∈ W, ∀ j, dyadicWeight s (j + 1) * ‖conv (b.kernel L (j + 1)) φ volume x‖ₑ ≤
+    (hpt : ∀ x ∈ W, ∀ j, dyadicWeight s (j + 1) * ‖conv (b.meansKernel L (j + 1)) φ volume x‖ₑ ≤
       c * ∑ i, ‖conv (dilate (2 ^ j) (K i : V → ℂ)) (h i) volume x‖ₑ)
     {F : Lp ℂ p (volume : Measure V)} (hF : (F : V → ℂ) =ᵐ[volume] φ) :
     ∀ᵐ x ∂volume, lqNorm 2 (fun j => dyadicWeight s j *
@@ -304,7 +305,7 @@ theorem ae_lqNorm_le_of_pointwise (hp : p ≠ ∞) (L : ℕ) (s : ℝ) {W : Set 
       ‖(indicatorLp hW (b.localMean hp L 0 F) : V → ℂ) x‖ₑ + c * ∑ i, lqNorm 2 (fun j =>
         ‖conv (dilate (2 ^ j) (K i : V → ℂ)) (h i) volume x‖ₑ) := by
   have hae : ∀ᵐ x ∂volume, ∀ j, (indicatorLp hW (b.localMean hp L j F) : V → ℂ) x =
-      W.indicator (conv (b.kernel L j) φ volume) x := ae_all_iff.2 fun j => by
+      W.indicator (conv (b.meansKernel L j) φ volume) x := ae_all_iff.2 fun j => by
     filter_upwards [indicatorLp_apply_ae hW (b.localMean hp L j F), b.localMean_ae_eq hp L j F]
       with x h1 h2
     rw [h1, ← conv_congr_ae hF]
@@ -338,7 +339,7 @@ c ∑_i ‖ x ↦ ‖(((K_i)_{2^j} ⋆ h_i)(x))_j‖_{ℓ_2} ‖_p`, with the mo
 theorem tlLocalNormOn_le_of_pointwise (hp : p ≠ ∞) (L : ℕ) (s : ℝ) {W : Set V}
     (hW : MeasurableSet W) {φ : V → ℂ} {ι : Type*} [Fintype ι] (K : ι → 𝓢(V, ℂ))
     (h : ι → V → ℂ) (hh : ∀ i, AEStronglyMeasurable (h i) volume) (c : ℝ≥0∞)
-    (hpt : ∀ x ∈ W, ∀ j, dyadicWeight s (j + 1) * ‖conv (b.kernel L (j + 1)) φ volume x‖ₑ ≤
+    (hpt : ∀ x ∈ W, ∀ j, dyadicWeight s (j + 1) * ‖conv (b.meansKernel L (j + 1)) φ volume x‖ₑ ≤
       c * ∑ i, ‖conv (dilate (2 ^ j) (K i : V → ℂ)) (h i) volume x‖ₑ)
     {F : Lp ℂ p (volume : Measure V)} (hF : (F : V → ℂ) =ᵐ[volume] φ) :
     b.tlLocalNormOn hp hW L s 2 F ≤ eLpNorm (momentKernel b.toFun L) 1 volume * ‖F‖ₑ +
@@ -374,13 +375,13 @@ theorem tlLocalNormOn_le_of_pointwise (hp : p ≠ ∞) (L : ℕ) (s : ℝ) {W : 
 /-! ### The Triebel–Lizorkin local means of order two by the gradient -/
 
 /-- **One local mean by the gradient**: under the hypotheses of
-`Rd.LocalMeansBump.conv_kernel_two_succ_eq`,
+`Rd.LocalMeansBump.conv_meansKernel_two_succ_eq`,
 `2^(j+1) |(k_{j+1} ⋆ 1_T f)(x)| ≤ 2 ∑_i |((K_i)_{2^j} ⋆ 1_T g_i)(x)|`. -/
-theorem dyadicWeight_mul_enorm_conv_kernel_le {T : Opens V} {f : V → ℂ}
+theorem dyadicWeight_mul_enorm_conv_meansKernel_le {T : Opens V} {f : V → ℂ}
     {g : Fin (finrank ℝ V) → V → ℂ} (hf : MemLp f p (volume.restrict T))
     (hfg : ∀ i, HasWeakLineDeriv T (fun _ : Fin 1 => gridBasis V i) f (g i)) (j : ℕ) {x : V}
     (hx : ∀ i, ∀ y ∈ tsupport (dilate (2 ^ j) (b.divKernel i : V → ℂ)), x - y ∈ T) :
-    dyadicWeight 1 (j + 1) * ‖conv (b.kernel 2 (j + 1)) ((T : Set V).indicator f) volume x‖ₑ ≤
+    dyadicWeight 1 (j + 1) * ‖conv (b.meansKernel 2 (j + 1)) ((T : Set V).indicator f) volume x‖ₑ ≤
       2 * ∑ i, ‖conv (dilate (2 ^ j) (b.divKernel i : V → ℂ)) ((T : Set V).indicator (g i))
         volume x‖ₑ := by
   have hw : dyadicWeight 1 (j + 1) * ‖(((((2 : ℝ) ^ j)⁻¹ : ℝ) : ℂ))‖ₑ = 2 := by
@@ -389,7 +390,7 @@ theorem dyadicWeight_mul_enorm_conv_kernel_le {T : Opens V} {f : V → ℂ}
       ENNReal.ofReal_inv_of_pos (by positivity), ENNReal.ofReal_pow zero_le_two,
       ENNReal.ofReal_ofNat, mul_assoc, ENNReal.mul_inv_cancel (pow_ne_zero _ two_ne_zero)
         (ENNReal.pow_ne_top ENNReal.ofNat_ne_top), mul_one]
-  rw [b.conv_kernel_two_succ_eq hf hfg j hx, enorm_mul, ← mul_assoc, hw]
+  rw [b.conv_meansKernel_two_succ_eq hf hfg j hx, enorm_mul, ← mul_assoc, hw]
   gcongr
   exact enorm_sum_le _ _
 
@@ -409,7 +410,7 @@ theorem ae_lqNorm_le_of_hasWeakLineDeriv (hp : p ≠ ∞) {W : Set V} (hW : Meas
         ‖conv (dilate (2 ^ j) (b.divKernel i : V → ℂ)) ((T : Set V).indicator (g i)) volume
           x‖ₑ) :=
   b.ae_lqNorm_le_of_pointwise hp 2 1 hW b.divKernel (fun i => (T : Set V).indicator (g i)) 2
-    (fun x hx j => b.dyadicWeight_mul_enorm_conv_kernel_le hf hfg j (hsupp x hx j)) hF
+    (fun x hx j => b.dyadicWeight_mul_enorm_conv_meansKernel_le hf hfg j (hsupp x hx j)) hF
 
 omit [Fact (1 ≤ p)] in
 /-- The square functions of the divergence kernels: for `1 < p < ∞`,
@@ -449,7 +450,8 @@ theorem tlLocalNormOn_le_of_hasWeakLineDeriv [Nontrivial V] (hp1 : 1 < p) (hp : 
   refine (b.tlLocalNormOn_le_of_pointwise hp 2 1 hW b.divKernel
     (fun i => (T : Set V).indicator (g i))
     (fun i => ((memLp_indicator_iff_restrict hT.nullMeasurableSet).2 (hg i)).aestronglyMeasurable) 2
-    (fun x hx j => b.dyadicWeight_mul_enorm_conv_kernel_le hf hfg j (hsupp x hx j)) hF).trans ?_
+    (fun x hx j => b.dyadicWeight_mul_enorm_conv_meansKernel_le hf hfg j (hsupp x hx j))
+    hF).trans ?_
   rw [hFn]
   gcongr with i
   exact b.eLpNorm_lqNorm_conv_divKernel_le hp1 hp (hg i) i
@@ -469,7 +471,7 @@ def ExtendsSobolev (O : Opens V) (U : Set V) (C : ℝ≥0∞) : Prop :=
   ∀ (f : V → ℂ) (g : Fin (finrank ℝ V) → V → ℂ), MemLp f p (volume.restrict O) →
     (∀ i, MemLp (g i) p (volume.restrict O)) →
     (∀ i, HasWeakLineDeriv O (fun _ : Fin 1 => gridBasis V i) f (g i)) →
-    ∃ F : Lp ℂ p (volume : Measure V), MemSobolev 1 F ∧ (∀ᵐ x ∂volume, x ∈ U → F x = f x) ∧
+    ∃ F : Lp ℂ p (volume : Measure V), MemWSobolev 1 F ∧ (∀ᵐ x ∂volume, x ∈ U → F x = f x) ∧
       ∃ G : Fin (finrank ℝ V) → Lp ℂ p (volume : Measure V),
         (∀ i, HasWeakLineDeriv ⊤ (fun _ : Fin 1 => gridBasis V i) F (G i)) ∧
         ‖F‖ₑ + ∑ i, ‖G i‖ₑ ≤
@@ -525,7 +527,7 @@ theorem extendsSobolev_of_eLpNorm_le [Fact (1 ≤ p)] {O : Opens V} {U : Set V} 
       ((hGm i).toLp (G i)) := fun i =>
     (hG i).congr_ae (by rw [volume_restrict_top]; exact hFm.coeFn_toLp.symm)
       (by rw [volume_restrict_top]; exact (hGm i).coeFn_toLp.symm)
-  refine ⟨hFm.toLp F, memSobolev_one_of_forall_gridBasis hW, ?_, fun i => (hGm i).toLp (G i), hW,
+  refine ⟨hFm.toLp F, memWSobolev_one_of_forall_gridBasis hW, ?_, fun i => (hGm i).toLp (G i), hW,
     ?_⟩
   · filter_upwards [hFm.coeFn_toLp, hFf] with x h1 h2 hx
     rw [h1, h2 hx]
@@ -596,7 +598,7 @@ converges, then `∑_j η_j ⋆ 1_W (k_j ⋆ F) = f` almost everywhere on `U`
 (`Rd.LocalMeansBump.indicatorLp_localExtension_of_summable`). -/
 theorem ae_localExtension_eq_of_ae_eq_indicator [Fact (1 ≤ p)] (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L)
     {U W T : Set V} (hU : MeasurableSet U) (hW : MeasurableSet W) (hUT : U ⊆ T)
-    (hUW : ∀ x ∈ U, ∀ j y, b.dual L j y ≠ 0 → x - y ∈ W) {F : Lp ℂ p (volume : Measure V)}
+    (hUW : ∀ x ∈ U, ∀ j y, b.dualKernel L j y ≠ 0 → x - y ∈ W) {F : Lp ℂ p (volume : Measure V)}
     {f : V → ℂ} (hF : (F : V → ℂ) =ᵐ[volume] T.indicator f)
     (hsum : Summable fun j => b.localExtTerm hp hW L j F) :
     ∀ᵐ x ∂volume, x ∈ U → b.localExtension hp hW L F x = f x := by
@@ -673,7 +675,7 @@ theorem pasting_bound {ι κ : Type*} [Fintype ι] [Fintype κ] {nF : ℝ≥0∞
 let Sobolev functions on `O` extend from every `O ∩ U_k` with finite constants. Then they extend
 from `O` with a finite constant: for a smooth resolution of unity `(ψ_k)` subordinate to `(U_k)`
 (`Rd.exists_smooth_partition`), `F = ∑_k ψ_k F_k` agrees with `f` on `O` (`Rd.ae_sum_mul_eq`),
-lies in `W^1_p(V)` (`Rd.MemSobolev.mulLp`) and has the weak derivatives
+lies in `W^1_p(V)` (`Rd.MemWSobolev.mulLp`) and has the weak derivatives
 `∑_k (ψ_k ∂_{e_i} F_k + (∂_{e_i} ψ_k) F_k)`
 (`Rd.hasWeakLineDeriv_mulLp`). -/
 theorem extendsSobolev_of_cover [Fact (1 ≤ p)] {ι : Type*} [Fintype ι] {O : Opens V} (U : ι → Set V)
@@ -699,7 +701,7 @@ theorem extendsSobolev_of_cover [Fact (1 ≤ p)] {ι : Type*} [Fintype ι] {O : 
       ⟨ENNReal.ofReal_ne_top, ENNReal.sum_ne_top.2 fun _ _ => ENNReal.ofReal_ne_top⟩) (hC k), ?_⟩
   intro f g hf hg hfg
   choose F hF hFf G hG hb using fun k => hext k f g hf hg hfg
-  refine ⟨∑ k, mulLp (hc k) (ha k) (F k), MemSobolev.sum _ fun k _ =>
+  refine ⟨∑ k, mulLp (hc k) (ha k) (F k), MemWSobolev.sum _ fun k _ =>
     (hF k).mulLp (hψ k) (hcs k) (hc k) (ha k), ?_,
     fun i => ∑ k, (mulLp (hc k) (ha k) (G k i) + mulLp (hc' k i) (hd k i) (F k)), fun i => ?_, ?_⟩
   · filter_upwards [Lp.coeFn_fun_finsetSum Finset.univ fun k => mulLp (hc k) (ha k) (F k),
@@ -798,11 +800,11 @@ end LipschitzGraph
 `O`, of every order `m`, agrees almost everywhere on `O` with some `F ∈ W^m_p(V)`. Here `O` is
 empty, and `F = 0` serves, or `O = V`, and `F = f` serves (Mathlib's
 `Subsingleton.eq_univ_of_nonempty`). -/
-theorem exists_memSobolev_of_memWeakSobolev_of_subsingleton [Subsingleton V] {O : Opens V}
+theorem exists_memWSobolev_of_memWeakSobolev_of_subsingleton [Subsingleton V] {O : Opens V}
     {m : ℕ} {f : V → ℂ} (hf : MemWeakSobolev O m p f) :
-    ∃ F : Lp ℂ p (volume : Measure V), MemSobolev m F ∧ (F : V → ℂ) =ᵐ[volume.restrict O] f := by
+    ∃ F : Lp ℂ p (volume : Measure V), MemWSobolev m F ∧ (F : V → ℂ) =ᵐ[volume.restrict O] f := by
   rcases (O : Set V).eq_empty_or_nonempty with h | h
-  · refine ⟨0, zero_memSobolev, ?_⟩
+  · refine ⟨0, zero_memWSobolev, ?_⟩
     rw [h, Measure.restrict_empty, ae_zero]
     exact Filter.eventually_bot
   · obtain rfl : O = ⊤ :=

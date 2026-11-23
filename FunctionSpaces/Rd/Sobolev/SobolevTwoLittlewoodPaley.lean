@@ -45,11 +45,11 @@ explicit constants, and proves `W^1_2(V) = H^1(V) = B^1_{2,2}(V)`.
   `‖h‖_2 ≤ (2 · 5^s)^{1/2} ‖f‖_{F^s_{2,2}}`; the Besov form
   (`Rd.memSobolev_two_iff_exists_memApprox`) and the bundled space `H^{s}(V)`
   (`Rd.exists_eq_toDistr_two`) follow.
-* **`W^1_2 = H^1`** (`Rd.memSobolev_one_iff`), with `‖∂_v f‖_2 ≤ 2π ‖v‖ ‖J_1 f‖_2` and
+* **`W^1_2 = H^1`** (`Rd.memWSobolev_one_iff`), with `‖∂_v f‖_2 ≤ 2π ‖v‖ ‖J_1 f‖_2` and
   `(2π)² ‖J_1 f‖_2² = (2π)² ‖f‖_2² + ∑_i ‖∂_{e_i} f‖_2²` for an orthonormal basis `(e_i)`
   (`Rd.sq_norm_besselPotential_one_eq`), hence
   `‖J_1 f‖_2² ≤ ‖f‖_2² + ∑_i ‖∂_{e_i} f‖_2²` (`Rd.sq_norm_besselPotential_one_le`).
-* **`W^1_2 = B^1_{2,2}`** (`Rd.memSobolev_one_iff_memApprox`, `Rd.memSobolev_one_iff_modulus`):
+* **`W^1_2 = B^1_{2,2}`** (`Rd.memWSobolev_one_iff_memApprox`, `Rd.memWSobolev_one_iff_modulus`):
   `F ∈ W^1_2(V)` iff `‖F‖_2 + ‖(2^k ω_r(F, 2^(-k))_2)_k‖_{ℓ_2} < ∞`, for every order `r ≥ 2`.
 
 Two facts about tempered distributions carry the proofs: the product of a temperate weight `w`
@@ -810,13 +810,13 @@ theorem memSobolev_one_two_of_lineDerivOp_eq {ι : Type*} [Fintype ι]
       ENNReal.pow_ne_top enorm_ne_top⟩
 
 /-- **`W^1_2 = H^1`**: a function `f ∈ L_2(V)` lies in the Sobolev space `W^1_2(V)` of weak
-derivatives (`Rd.MemSobolev 1 f`) iff it lies in Mathlib's Sobolev space `H^1(V)`
+derivatives (`Rd.MemWSobolev 1 f`) iff it lies in Mathlib's Sobolev space `H^1(V)`
 (`TemperedDistribution.MemSobolev 1 2`). `⇒`: the weak derivatives along the orthonormal basis
 `Rd.gridBasis V` give `f ∈ H^1` (`Rd.memSobolev_one_two_of_lineDerivOp_eq`); `⇐`: Mathlib's
 `TemperedDistribution.MemSobolev.lineDerivOp` maps `H^1` to `H^0 = L_2`. -/
-theorem memSobolev_one_iff (f : Lp ℂ 2 (volume : Measure V)) :
-    MemSobolev 1 f ↔ TemperedDistribution.MemSobolev 1 2 (f : 𝓢'(V, ℂ)) := by
-  rw [memSobolev_iff_tempered]
+theorem memWSobolev_one_iff (f : Lp ℂ 2 (volume : Measure V)) :
+    MemWSobolev 1 f ↔ TemperedDistribution.MemSobolev 1 2 (f : 𝓢'(V, ℂ)) := by
+  rw [memWSobolev_iff_tempered]
   constructor
   · intro hf
     choose g hg using fun i : Fin (finrank ℝ V) => hf 1 le_rfl (fun _ => gridBasis V i)
@@ -886,21 +886,21 @@ theorem sq_norm_besselPotential_one_eq {ι : Type*} [Fintype ι] (b : Orthonorma
 
 /-- **`W^1_2 = B^1_{2,2}`**: `F ∈ L_2(V)` lies in the Sobolev space `W^1_2(V)` iff it lies in the
 approximation space `A^1_2` of the band-limited functions, the Besov space `B^1_{2,2}(V)`. This
-combines `W^1_2 = H^1` (`Rd.memSobolev_one_iff`) and `H^1 = B^1_{2,2}`
+combines `W^1_2 = H^1` (`Rd.memWSobolev_one_iff`) and `H^1 = B^1_{2,2}`
 (`Rd.memSobolev_two_iff_exists_memApprox`); an `L_2` function is determined by its tempered
 distribution (`Rd.eq_of_toTemperedDistribution_eq`). -/
-theorem memSobolev_one_iff_memApprox (F : Lp ℂ 2 (volume : Measure V)) :
-    MemSobolev 1 F ↔ (bandScheme two_ne_top).MemApprox 1 2 F := by
-  rw [memSobolev_one_iff, memSobolev_two_iff_exists_memApprox one_pos]
+theorem memWSobolev_one_iff_memApprox (F : Lp ℂ 2 (volume : Measure V)) :
+    MemWSobolev 1 F ↔ (bandScheme two_ne_top).MemApprox 1 2 F := by
+  rw [memWSobolev_one_iff, memSobolev_two_iff_exists_memApprox one_pos]
   refine ⟨fun ⟨f, hf, hfa⟩ => ?_, fun h => ⟨F, rfl, h⟩⟩
   rwa [← eq_of_toTemperedDistribution_eq hf]
 
 /-- **`W^1_2 = B^1_{2,2}` by differences**: for every order `r ≥ 2`, `F ∈ L_2(V)` lies in
 `W^1_2(V)` iff `‖F‖_2 + ‖(2^k ω_r(F, 2^(-k))_2)_k‖_{ℓ_2} < ∞`
 (`Rd.memApprox_bandScheme_iff_modulus` with `s = 1 < r`). -/
-theorem memSobolev_one_iff_modulus {r : ℕ} (hr : 2 ≤ r) (F : Lp ℂ 2 (volume : Measure V)) :
-    MemSobolev 1 F ↔ ‖F‖ₑ + lqNorm 2 (fun k => dyadicWeight 1 k * lpModulus 2 r F k) < ∞ := by
-  rw [memSobolev_one_iff_memApprox]
+theorem memWSobolev_one_iff_modulus {r : ℕ} (hr : 2 ≤ r) (F : Lp ℂ 2 (volume : Measure V)) :
+    MemWSobolev 1 F ↔ ‖F‖ₑ + lqNorm 2 (fun k => dyadicWeight 1 k * lpModulus 2 r F k) < ∞ := by
+  rw [memWSobolev_one_iff_memApprox]
   have hr' : (1 : ℝ) < r := by exact_mod_cast Nat.lt_of_lt_of_le one_lt_two hr
   exact memApprox_bandScheme_iff_modulus two_ne_top zero_le_one hr' one_le_two F
 

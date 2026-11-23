@@ -14,16 +14,16 @@ public import FunctionSpaces.Rd.LocalMeans.LocalMeans
 Let `b` be a bump for local means on `ℝ` (`Rd.LocalMeansBump ℝ`) with the kernels `k_j` and the dual
 kernels `η_j` of `FunctionSpaces.Rd.LocalMeans.LocalMeans`. On `ℝ^d = Fin d → ℝ` the **mixed local
 means** of `f ∈ L_p` are `k_k ⋆ f` with the tensor kernels `k_k = ⊗_i k_{k_i}`, `k ∈ ℕ^d`
-(`Rd.LocalMeansBump.mixedKernel`, `Rd.LocalMeansBump.mixedLocalMean`), and the **mixed local means
-quasi-norm** is `‖(2^(s|k|_1) ‖k_k ⋆ f‖_p)_{k ∈ ℕ^d}‖_{ℓ_q(ℕ^d)}`
+(`Rd.LocalMeansBump.mixedMeansKernel`, `Rd.LocalMeansBump.mixedLocalMean`), and the **mixed local
+means quasi-norm** is `‖(2^(s|k|_1) ‖k_k ⋆ f‖_p)_{k ∈ ℕ^d}‖_{ℓ_q(ℕ^d)}`
 (`Rd.LocalMeansBump.mixedLocalMeansNorm`).
 
 **Local means are bounded by the mixed modulus** (`Rd.LocalMeansBump.enorm_mixedLocalMean_le`):
 if the bump vanishes outside `[-1, 1]`, then
 `‖k_k ⋆ f‖_p ≤ (‖g‖_1 (2^L + 1))^d Ω^{e(k)}_L(f, 2^(-k))_p`. In one variable
 `k_j = ∑_l a_l (g_{2^j/(l+1)} - g_{2^j/(2(l+1))})` for `j ≥ 1` and `k_0 = ∑_l a_l g_{1/(l+1)}`
-(`Rd.LocalMeansBump.kernel_eq_sum_dilate`), with the polynomials `P(Y) - P(Y²)` and `P(Y)` in the
-translation `Y = δ_{-z/2^j}`, `P(Y) = 1 - (-1)^L (Y - 1)^L`. Since
+(`Rd.LocalMeansBump.meansKernel_eq_sum_dilate`), with the polynomials `P(Y) - P(Y²)` and `P(Y)` in
+the translation `Y = δ_{-z/2^j}`, `P(Y) = 1 - (-1)^L (Y - 1)^L`. Since
 `P(Y) - P(Y²) = (Y - 1)^L (-1)^L ((Y + 1)^L - 1)`, the tensor kernel averages the mixed differences
 `Δ^{L,e(k)}_h f` with steps `|h_i| ≤ 2^(-k_i)` (`Rd.conv_tensorKernel_sum_dilate_ae`), and
 Minkowski's inequality (`MeasureTheory.eLpNorm_integral_kernel_le`) gives the bound.
@@ -108,27 +108,27 @@ variable {d : ℕ} (b : LocalMeansBump ℝ)
 /-! ### Mixed kernels -/
 
 /-- The **mixed local means kernels** `k_k = ⊗_i k_{k_i}`. -/
-noncomputable def mixedKernel (L : ℕ) (k : Fin d → ℕ) : (Fin d → ℝ) → ℂ :=
-  tensorKernel fun i => b.kernel L (k i)
+noncomputable def mixedMeansKernel (L : ℕ) (k : Fin d → ℕ) : (Fin d → ℝ) → ℂ :=
+  tensorKernel fun i => b.meansKernel L (k i)
 
 /-- The **mixed dual kernels** `η_k = ⊗_i η_{k_i}`. -/
-noncomputable def mixedDual (L : ℕ) (k : Fin d → ℕ) : (Fin d → ℝ) → ℂ :=
-  tensorKernel fun i => b.dual L (k i)
+noncomputable def mixedDualKernel (L : ℕ) (k : Fin d → ℕ) : (Fin d → ℝ) → ℂ :=
+  tensorKernel fun i => b.dualKernel L (k i)
 
 /-- The mixed kernels are integrable. -/
-theorem integrable_mixedKernel (L : ℕ) (k : Fin d → ℕ) : Integrable (b.mixedKernel L k) :=
-  integrable_tensorKernel fun i => b.integrable_kernel L (k i)
+theorem integrable_mixedMeansKernel (L : ℕ) (k : Fin d → ℕ) : Integrable (b.mixedMeansKernel L k) :=
+  integrable_tensorKernel fun i => b.integrable_meansKernel L (k i)
 
 /-- The mixed dual kernels are integrable. -/
-theorem integrable_mixedDual (L : ℕ) (k : Fin d → ℕ) : Integrable (b.mixedDual L k) :=
-  integrable_tensorKernel fun i => b.integrable_dual L (k i)
+theorem integrable_mixedDualKernel (L : ℕ) (k : Fin d → ℕ) : Integrable (b.mixedDualKernel L k) :=
+  integrable_tensorKernel fun i => b.integrable_dualKernel L (k i)
 
 variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 
 /-- The **mixed local means** `f ↦ k_k ⋆ f` on `L_p(ℝ^d)`. -/
 noncomputable def mixedLocalMean (hp : p ≠ ∞) (L : ℕ) (k : Fin d → ℕ) :
     Lp ℂ p (volume : Measure (Fin d → ℝ)) →L[ℂ] Lp ℂ p (volume : Measure (Fin d → ℝ)) :=
-  convLp hp (b.integrable_mixedKernel L k)
+  convLp hp (b.integrable_mixedMeansKernel L k)
 
 /-- The **mixed local means quasi-norm** `‖(2^(s|k|_1) ‖k_k ⋆ f‖_p)_{k ∈ ℕ^d}‖_{ℓ_q(ℕ^d)}`. -/
 noncomputable def mixedLocalMeansNorm (hp : p ≠ ∞) (L : ℕ) (s : ℝ) (q : ℝ≥0∞)
@@ -159,8 +159,8 @@ theorem one_le_lmExp (t : Bool × ℕ) : 1 ≤ lmExp t := by
 
 /-- **The local means kernels are sums of dilated bumps**:
 `k_j = ∑_l a_l (g_{2^j/(l+1)} - g_{2^j/(2(l+1))})` for `j ≥ 1` and `k_0 = ∑_l a_l g_{1/(l+1)}`. -/
-theorem kernel_eq_sum_dilate (L j : ℕ) :
-    b.kernel L j = ∑ t ∈ Finset.univ ×ˢ Finset.range L,
+theorem meansKernel_eq_sum_dilate (L j : ℕ) :
+    b.meansKernel L j = ∑ t ∈ Finset.univ ×ˢ Finset.range L,
       lmCoeff L j t • dilate ((2 : ℝ) ^ j / lmExp t) b.toFun := by
   rw [Finset.sum_product, Fintype.sum_bool]
   funext x
@@ -168,14 +168,14 @@ theorem kernel_eq_sum_dilate (L j : ℕ) :
   cases j with
   | zero =>
     simp only [↓reduceIte, zero_mul, Finset.sum_const_zero, add_zero]
-    show b.scaled L 0 x = _
-    rw [scaled, dilate_momentKernel]
+    show b.scaledMoment L 0 x = _
+    rw [scaledMoment, dilate_momentKernel]
     refine Finset.sum_congr rfl fun l _ => ?_
     push_cast
     ring_nf
   | succ j =>
-    show (b.scaled L (j + 1) - b.scaled L j) x = _
-    rw [Pi.sub_apply, scaled, scaled, dilate_momentKernel, dilate_momentKernel,
+    show (b.scaledMoment L (j + 1) - b.scaledMoment L j) x = _
+    rw [Pi.sub_apply, scaledMoment, scaledMoment, dilate_momentKernel, dilate_momentKernel,
       sub_eq_add_neg, ← Finset.sum_neg_distrib]
     simp only [Nat.add_one_ne_zero, ↓reduceIte]
     congr 1
@@ -262,7 +262,7 @@ theorem actsBounded_lmRemainder (L : ℕ) (k : Fin d → ℕ) (w : Fin d → ℝ
 /-- **Mixed local means average translates**: for almost every `x`,
 `k_k ⋆ f(x) = ∫ (⊗g)(z) A(z) f(x) dz` with the polynomial
 `A(z) = ∏_i ∑_t c_{k_i}(t) δ_{-z_i 2^(-k_i) e_i}^{ν(t)}` in the translations
-(`Rd.LocalMeansBump.kernel_eq_sum_dilate`, `Rd.conv_tensorKernel_sum_dilate_ae`). -/
+(`Rd.LocalMeansBump.meansKernel_eq_sum_dilate`, `Rd.conv_tensorKernel_sum_dilate_ae`). -/
 theorem mixedLocalMean_ae_eq (hp : p ≠ ∞) (L : ℕ) (k : Fin d → ℕ)
     (f : Lp ℂ p (volume : Measure (Fin d → ℝ))) :
     (b.mixedLocalMean hp L k f : (Fin d → ℝ) → ℂ) =ᵐ[volume] fun x =>
@@ -272,14 +272,14 @@ theorem mixedLocalMean_ae_eq (hp : p ≠ ∞) (L : ℕ) (k : Fin d → ℕ)
           (f : (Fin d → ℝ) → ℂ) x := by
   have hp1 : 1 ≤ p := Fact.out
   have hc : ∀ i, (0 : ℝ) < 2 ^ k i := fun i => by positivity
-  have hkernel : b.mixedKernel L k = tensorKernel fun i =>
+  have hkernel : b.mixedMeansKernel L k = tensorKernel fun i =>
       ∑ t ∈ Finset.univ ×ˢ Finset.range L,
         lmCoeff L (k i) t • dilate ((2 : ℝ) ^ k i / lmExp t) b.toFun := by
-    simp only [mixedKernel]
+    simp only [mixedMeansKernel]
     congr 1
     funext i
-    exact b.kernel_eq_sum_dilate L (k i)
-  have h1 := convLp_apply_ae hp (b.integrable_mixedKernel L k) f
+    exact b.meansKernel_eq_sum_dilate L (k i)
+  have h1 := convLp_apply_ae hp (b.integrable_mixedMeansKernel L k) f
   have h2 := conv_tensorKernel_sum_dilate_ae hp1 hp b.integrable (Finset.univ ×ˢ Finset.range L)
     lmExp (fun t _ => one_le_lmExp t) (fun i => lmCoeff L (k i)) hc (Lp.memLp f)
   rw [← hkernel] at h2
@@ -373,34 +373,36 @@ theorem mixedLocalMeansNorm_le (hp : p ≠ ∞) (L : ℕ) (hR : b.radius ≤ 1) 
 /-- **The reproducing identity of the kernels** in one variable:
 `∑_{j ≤ J} η_j ⋆ k_j = m_{2^J} ⋆ m_{2^J}` at every point, from `(a + b) ⋆ (a - b) = a ⋆ a - b ⋆ b`
 for the commuting kernels `a = m_{2^(j+1)}`, `b = m_{2^j}`. -/
-theorem sum_conv_dual_kernel (L J : ℕ) :
-    ∑ j ∈ Finset.range (J + 1), conv (b.dual L j) (b.kernel L j) volume =
-      conv (b.scaled L J) (b.scaled L J) volume := by
+theorem sum_conv_dualKernel_meansKernel (L J : ℕ) :
+    ∑ j ∈ Finset.range (J + 1), conv (b.dualKernel L j) (b.meansKernel L j) volume =
+      conv (b.scaledMoment L J) (b.scaledMoment L J) volume := by
   induction J with
   | zero =>
     rw [Finset.sum_range_one]
     rfl
   | succ J ih =>
     rw [Finset.sum_range_succ, ih]
-    show conv (b.scaled L J) (b.scaled L J) volume +
-        conv (b.scaled L (J + 1) + b.scaled L J) (b.scaled L (J + 1) - b.scaled L J) volume = _
-    rw [conv_add_conv_sub (b.continuous_scaled L (J + 1)) (b.hasCompactSupport_scaled L (J + 1))
-      (b.continuous_scaled L J) (b.hasCompactSupport_scaled L J)]
+    show conv (b.scaledMoment L J) (b.scaledMoment L J) volume +
+        conv (b.scaledMoment L (J + 1) + b.scaledMoment L J)
+          (b.scaledMoment L (J + 1) - b.scaledMoment L J) volume = _
+    rw [conv_add_conv_sub (b.continuous_scaledMoment L (J + 1))
+      (b.hasCompactSupport_scaledMoment L (J + 1))
+      (b.continuous_scaledMoment L J) (b.hasCompactSupport_scaledMoment L J)]
     abel
 
 /-- **The mixed reproducing identity of the kernels**: over the boxes `{k : k_i ≤ J}`,
 `∑_k η_k ⋆ k_k = (⊗(m ⋆ m))_{2^J}`. -/
-theorem sum_conv_mixedDual_mixedKernel (L J : ℕ) :
+theorem sum_conv_mixedDualKernel_mixedMeansKernel (L J : ℕ) :
     ∑ k ∈ Fintype.piFinset (fun _ : Fin d => Finset.range (J + 1)),
-        conv (b.mixedDual L k) (b.mixedKernel L k) volume =
+        conv (b.mixedDualKernel L k) (b.mixedMeansKernel L k) volume =
       dilate ((2 : ℝ) ^ J)
         (tensorKernel fun _ : Fin d => conv (momentKernel b.toFun L) (momentKernel b.toFun L) volume) := by
-  simp only [mixedDual, mixedKernel, conv_tensorKernel]
+  simp only [mixedDualKernel, mixedMeansKernel, conv_tensorKernel]
   rw [sum_tensorKernel_piFinset (fun _ => Finset.range (J + 1))
-    (fun _ j => conv (b.dual L j) (b.kernel L j) volume), dilate_tensorKernel]
+    (fun _ j => conv (b.dualKernel L j) (b.meansKernel L j) volume), dilate_tensorKernel]
   congr 1
   funext i
-  rw [b.sum_conv_dual_kernel L J, scaled, conv_dilate_dilate _ _ (by positivity)]
+  rw [b.sum_conv_dualKernel_meansKernel L J, scaledMoment, conv_dilate_dilate _ _ (by positivity)]
 
 /-- The convolution `m ⋆ m` of the moment kernel has integral `1`. -/
 theorem integral_conv_momentKernel {L : ℕ} (hL : 1 ≤ L) :
@@ -414,10 +416,10 @@ theorem integral_conv_momentKernel {L : ℕ} (hL : 1 ≤ L) :
 
 /-- **The mixed reproducing formula**: `∑_{k ≤ J} η_k ⋆ k_k ⋆ f → f` in `L_p` over the boxes
 `{k : k_i ≤ J}`, since the partial sums are `(⊗(m ⋆ m))_{2^J} ⋆ f`, an approximate identity. -/
-theorem tendsto_sum_mixedDual_mixedLocalMean (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L)
+theorem tendsto_sum_mixedDualKernel_mixedLocalMean (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L)
     (f : Lp ℂ p (volume : Measure (Fin d → ℝ))) :
     Tendsto (fun J => ∑ k ∈ Fintype.piFinset (fun _ : Fin d => Finset.range (J + 1)),
-      convLp hp (b.integrable_mixedDual L k) (b.mixedLocalMean hp L k f)) atTop (𝓝 f) := by
+      convLp hp (b.integrable_mixedDualKernel L k) (b.mixedLocalMean hp L k f)) atTop (𝓝 f) := by
   set Φ : (Fin d → ℝ) → ℂ :=
     tensorKernel fun _ : Fin d => conv (momentKernel b.toFun L) (momentKernel b.toFun L) volume
   have hm := integrable_momentKernel b.integrable L
@@ -430,11 +432,11 @@ theorem tendsto_sum_mixedDual_mixedLocalMean (hp : p ≠ ∞) {L : ℕ} (hL : 1 
   refine hlim.congr fun J => ?_
   symm
   simp only [mixedLocalMean]
-  simp_rw [convLp_convLp hp (b.integrable_mixedDual L _) (b.integrable_mixedKernel L _)]
+  simp_rw [convLp_convLp hp (b.integrable_mixedDualKernel L _) (b.integrable_mixedMeansKernel L _)]
   rw [convLp_finsetSum_kernel]
   have hker : (fun a => ∑ k ∈ Fintype.piFinset (fun _ : Fin d => Finset.range (J + 1)),
-      conv (b.mixedDual L k) (b.mixedKernel L k) volume a) = dilate ((2 : ℝ) ^ J) Φ := by
-    rw [← b.sum_conv_mixedDual_mixedKernel L J]
+      conv (b.mixedDualKernel L k) (b.mixedMeansKernel L k) volume a) = dilate ((2 : ℝ) ^ J) Φ := by
+    rw [← b.sum_conv_mixedDualKernel_mixedMeansKernel L J]
     funext a
     rw [Finset.sum_apply]
   exact convLp_congr hp _ _ hker f
@@ -443,28 +445,29 @@ theorem tendsto_sum_mixedDual_mixedLocalMean (hp : p ≠ ∞) {L : ℕ} (hL : 1 
 
 /-- **The mixed moduli of the reproducing terms**:
 `Ω^{e(m)}_L(η_k ⋆ h, 2^(-m))_p ≤ C_η^d ∏_i c(m_i, k_i) ‖h‖_p`, by the differences of the
-one-dimensional dual kernels in `L_1` (`Rd.LocalMeansBump.eLpNorm_higherDiff_dual_le`). -/
-theorem lpMixedModulus_convLp_mixedDual_le (hp : p ≠ ∞) (L : ℕ) (m k : Fin d → ℕ)
+one-dimensional dual kernels in `L_1` (`Rd.LocalMeansBump.eLpNorm_higherDiff_dualKernel_le`). -/
+theorem lpMixedModulus_convLp_mixedDualKernel_le (hp : p ≠ ∞) (L : ℕ) (m k : Fin d → ℕ)
     (h : Lp ℂ p (volume : Measure (Fin d → ℝ))) :
-    lpMixedModulus p L (convLp hp (b.integrable_mixedDual L k) h) m ≤
+    lpMixedModulus p L (convLp hp (b.integrable_mixedDualKernel L k) h) m ≤
       b.dualConst L ^ d * (∏ i, almostDiagCoeff L (m i) (k i)) * ‖h‖ₑ := by
   have hp1 : 1 ≤ p := Fact.out
   refine iSup₂_le fun v hv => ?_
   set e := mixedSupp m
-  have hae := (mixedDiff_congr_ae (convLp_apply_ae hp (b.integrable_mixedDual L k) h) L e v).trans
-    (mixedDiff_conv_ae hp1 hp (b.integrable_mixedDual L k) (Lp.memLp h) L e v)
+  have hae :=
+    (mixedDiff_congr_ae (convLp_apply_ae hp (b.integrable_mixedDualKernel L k) h) L e v).trans
+    (mixedDiff_conv_ae hp1 hp (b.integrable_mixedDualKernel L k) (Lp.memLp h) L e v)
   rw [eLpNorm_congr_ae hae]
-  have hfac : ∀ i, Integrable (if i ∈ e then (fwdDiff (v i))^[L] (b.dual L (k i))
-      else b.dual L (k i)) := fun i => by
+  have hfac : ∀ i, Integrable (if i ∈ e then (fwdDiff (v i))^[L] (b.dualKernel L (k i))
+      else b.dualKernel L (k i)) := fun i => by
     split_ifs
-    · exact integrable_higherDiff (b.integrable_dual L (k i)) L _
-    · exact b.integrable_dual L (k i)
+    · exact integrable_higherDiff (b.integrable_dualKernel L (k i)) L _
+    · exact b.integrable_dualKernel L (k i)
   refine (eLpNorm_conv_le hp1 hp
-    (integrable_mixedDiff (b.integrable_mixedDual L k) L e v).aestronglyMeasurable
+    (integrable_mixedDiff (b.integrable_mixedDualKernel L k) L e v).aestronglyMeasurable
     (Lp.aestronglyMeasurable h)).trans ?_
   rw [Lp.enorm_def]
   refine mul_le_mul' ?_ le_rfl
-  rw [mixedDual, mixedDiff_tensorKernel, eLpNorm_tensorKernel_one hfac,
+  rw [mixedDualKernel, mixedDiff_tensorKernel, eLpNorm_tensorKernel_one hfac,
     ← Fin.prod_const d (b.dualConst L), ← Finset.prod_mul_distrib]
   refine Finset.prod_le_prod fun i _ => ?_
   by_cases hi : i ∈ e
@@ -472,7 +475,7 @@ theorem lpMixedModulus_convLp_mixedDual_le (hp : p ≠ ∞) (L : ℕ) (m k : Fin
     have hvi : ‖v i‖ ≤ 1 / 2 ^ m i := by
       rw [Real.norm_eq_abs]
       exact hv i hi
-    exact b.eLpNorm_higherDiff_dual_le L hvi
+    exact b.eLpNorm_higherDiff_dualKernel_le L hvi
   · simp only [hi, ↓reduceIte]
     have hm0 : m i = 0 := by
       by_contra h0
@@ -483,7 +486,7 @@ theorem lpMixedModulus_convLp_mixedDual_le (hp : p ≠ ∞) (L : ℕ) (m k : Fin
       · rw [show k i = 0 by omega, Nat.sub_zero, ENNReal.dyadicWeight_zero_right]
       · rfl
     rw [hc, mul_one]
-    refine (b.eLpNorm_dual_one_le L (k i)).trans ?_
+    refine (b.eLpNorm_dualKernel_one_le L (k i)).trans ?_
     rw [dualConst]
     refine mul_le_mul' le_rfl ?_
     exact le_add_left (le_mul_of_one_le_left' (one_le_pow₀ one_le_two))
@@ -497,20 +500,20 @@ theorem mixedModNorm_le_of_tendsto (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 
     (hq : 1 ≤ q) {F : Lp ℂ p (volume : Measure (Fin d → ℝ))}
     {h : (Fin d → ℕ) → Lp ℂ p (volume : Measure (Fin d → ℝ))}
     (hrep : Tendsto (fun J => ∑ k ∈ Fintype.piFinset (fun _ : Fin d => Finset.range (J + 1)),
-      convLp hp (b.integrable_mixedDual L k) (h k)) atTop (𝓝 F)) :
+      convLp hp (b.integrable_mixedDualKernel L k) (h k)) atTop (𝓝 F)) :
     mixedModNorm p L s q F ≤ (b.dualConst L * ENNReal.almostDiagonalConst s L) ^ d *
       lqNorm q (fun k => mixedWeight s k * ‖h k‖ₑ) := by
   have hmod : ∀ m, lpMixedModulus p L F m ≤ b.dualConst L ^ d *
       ∑' k, (∏ i, almostDiagCoeff L (m i) (k i)) * ‖h k‖ₑ := fun m => by
     have h1 : lpMixedModulus p L F m ≤
-        ∑' k, lpMixedModulus p L (convLp hp (b.integrable_mixedDual L k) (h k)) m :=
+        ∑' k, lpMixedModulus p L (convLp hp (b.integrable_mixedDualKernel L k) (h k)) m :=
       ENNReal.le_tsum_of_tendsto_finsetSum (C := 2 ^ (L * d)) (by simp)
         (fun x y => lpMixedModulus_add_le L x y m) (fun x => lpMixedModulus_le L x m) hrep
     refine h1.trans ?_
     rw [← ENNReal.tsum_mul_left]
     refine ENNReal.tsum_le_tsum fun k => ?_
     rw [← mul_assoc]
-    exact b.lpMixedModulus_convLp_mixedDual_le hp L m k (h k)
+    exact b.lpMixedModulus_convLp_mixedDualKernel_le hp L m k (h k)
   exact lqNorm_le_of_le_almostDiagonal_pi hq hs hmod
 
 /-- **The mixed modulus is bounded by the mixed local means**: for `0 ≤ s`,
@@ -520,7 +523,7 @@ theorem mixedModNorm_le_mixedLocalMeansNorm (hp : p ≠ ∞) {L : ℕ} (hL : 1 �
     (hs : 0 ≤ s) {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Lp ℂ p (volume : Measure (Fin d → ℝ))) :
     mixedModNorm p L s q f ≤
       (b.dualConst L * ENNReal.almostDiagonalConst s L) ^ d * b.mixedLocalMeansNorm hp L s q f :=
-  b.mixedModNorm_le_of_tendsto hp L hs hq (b.tendsto_sum_mixedDual_mixedLocalMean hp hL f)
+  b.mixedModNorm_le_of_tendsto hp L hs hq (b.tendsto_sum_mixedDualKernel_mixedLocalMean hp hL f)
 
 /-- **Mixed local means and mixed differences** (T. Ullrich; Vybíral): for `1 ≤ p < ∞`,
 `0 < s < L`, `1 ≤ q ≤ ∞` and a bump vanishing outside `[-1, 1]`,

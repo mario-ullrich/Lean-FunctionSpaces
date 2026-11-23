@@ -85,12 +85,12 @@ theorem exists_hasWeakLineDeriv_of_sobolevGridNorm_lt_top {m : ℕ}
   exact ⟨g, (iInf_lt_iff.1 hg).choose⟩
 
 /-- **Every `f ∈ W^m_p(V)` has finite grid norm**: the weak derivatives along the basis vectors
-exist in `L_p(V)` (`Rd.memSobolev_iff_exists_hasWeakLineDeriv`). -/
-theorem sobolevGridNorm_lt_top_of_memSobolev {m : ℕ} {f : Lp ℂ p (volume : Measure V)}
-    (hf : MemSobolev m f) : sobolevGridNorm m f < ∞ := by
+exist in `L_p(V)` (`Rd.memWSobolev_iff_exists_hasWeakLineDeriv`). -/
+theorem sobolevGridNorm_lt_top_of_memWSobolev {m : ℕ} {f : Lp ℂ p (volume : Measure V)}
+    (hf : MemWSobolev m f) : sobolevGridNorm m f < ∞ := by
   have hd : ∀ i : Fin m → Fin (finrank ℝ V), ∃ g : Lp ℂ p (volume : Measure V),
       HasWeakLineDeriv ⊤ (fun k => gridBasis V (i k)) f g := fun i =>
-    (memSobolev_iff_exists_hasWeakLineDeriv f).1 hf m le_rfl _
+    (memWSobolev_iff_exists_hasWeakLineDeriv f).1 hf m le_rfl _
   choose g hg using hd
   exact (sobolevGridNorm_le hg).trans_lt
     (ENNReal.add_lt_top.2 ⟨enorm_lt_top, ENNReal.sum_lt_top.2 fun _ _ => enorm_lt_top⟩)
@@ -98,12 +98,12 @@ theorem sobolevGridNorm_lt_top_of_memSobolev {m : ℕ} {f : Lp ℂ p (volume : M
 /-- **The grid norm is finite exactly on `W^m_p(V)`**: in dimension `n ≥ 1`, for `1 < p < ∞`,
 `m ∈ ℕ` and `f ∈ L_p(V)`, the grid norm of `f` is finite iff `f ∈ W^m_p(V)`.  Weak derivatives
 of order `m` along the basis vectors give `f ∈ F^m_{p,2}(V) = W^m_p(V)`
-(`Rd.memTriebelLizorkin_of_hasWeakLineDeriv`, `Rd.memSobolev_iff_memTriebelLizorkin`). -/
+(`Rd.memTriebelLizorkin_of_hasWeakLineDeriv`, `Rd.memWSobolev_iff_memTriebelLizorkin`). -/
 theorem sobolevGridNorm_lt_top_iff [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {m : ℕ}
-    {f : Lp ℂ p (volume : Measure V)} : sobolevGridNorm m f < ∞ ↔ MemSobolev m f := by
-  refine ⟨fun hf => ?_, sobolevGridNorm_lt_top_of_memSobolev⟩
+    {f : Lp ℂ p (volume : Measure V)} : sobolevGridNorm m f < ∞ ↔ MemWSobolev m f := by
+  refine ⟨fun hf => ?_, sobolevGridNorm_lt_top_of_memWSobolev⟩
   obtain ⟨g, hg⟩ := exists_hasWeakLineDeriv_of_sobolevGridNorm_lt_top hf
-  exact (memSobolev_iff_memTriebelLizorkin hp1 hp f).2
+  exact (memWSobolev_iff_memTriebelLizorkin hp1 hp f).2
     (memTriebelLizorkin_of_hasWeakLineDeriv hp1 hp hg)
 
 /-! ### The grid norm between two Besov quasi-norms -/

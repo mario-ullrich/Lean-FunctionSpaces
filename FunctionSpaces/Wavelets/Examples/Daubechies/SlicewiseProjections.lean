@@ -22,11 +22,11 @@ of `f : ℝ^d → ℂ` in coordinate `i`,
 Its slices are the projections of the slices (`Daubechies.slice_sliceProj`), and it is additive on
 differences of continuous functions (`Daubechies.sliceProj_sub`). The expansions of
 one variable are jointly continuous in the coefficients and the point
-(`Daubechies.continuous_expand_uncurry`), and for a continuous generator `g` the coefficients
-`⟨f_{x,i}, g_{j,k}⟩` of the slices depend continuously (measurably) on the point for continuous
-(measurable) `f` (`Daubechies.continuous_coeffFun_slice`, `Daubechies.measurable_coeffFun_slice`),
-so `P_j^{(i)} f` is continuous (measurable) as well (`Daubechies.continuous_sliceProj`,
-`Daubechies.measurable_sliceProj`).
+(`Daubechies.continuous_daubechiesExpand_uncurry`), and for a continuous generator `g` the
+coefficients `⟨f_{x,i}, g_{j,k}⟩` of the slices depend continuously (measurably) on the point for
+continuous (measurable) `f` (`Daubechies.continuous_coeffFun_slice`,
+`Daubechies.measurable_coeffFun_slice`), so `P_j^{(i)} f` is continuous (measurable) as well
+(`Daubechies.continuous_sliceProj`, `Daubechies.measurable_sliceProj`).
 
 * **The bound.** `‖P_j^{(i)} f‖_p ≤ C ‖f‖_p` for measurable `f` and `1 ≤ p < ∞`, with the bound
   `C = projConst m p` of one variable (`Daubechies.eLpNorm_sliceProj_le`): slice by slice
@@ -35,13 +35,13 @@ so `P_j^{(i)} f` is continuous (measurable) as well (`Daubechies.continuous_slic
   `‖f - P_j^{(i)} f‖_p ≤ C_J ω_N(f, 2^(-j))_p` with the isotropic modulus of smoothness of `ℝ^d`
   and the Jackson constant `C_J = daubechiesJacksonConst m p` of one variable
   (`Daubechies.eLpNorm_sub_sliceProj_le`). The proof of one variable runs slice by slice with the
-  Steklov smoothing in coordinate `i` (`Cube.cubeSmooth`): on each slice
+  Steklov smoothing in coordinate `i` (`Cube.cubeSteklovSmooth`): on each slice
   `‖g - P_j g‖ ≤ (1 + C) ‖g - S g‖ + C_S 2^(-jN) ‖(S g)^(N)‖`
   (`Daubechies.eLpNorm_slice_sub_sliceProj_le`), the slices pass the bound to `ℝ^d`
   (`Rd.eLpNorm_le_add_of_slice_le`), and on `ℝ^d` the smoothing satisfies
   `‖f - S^{(i)}_δ f‖_p ≤ ω_r(f, rδ)_p` and `‖∂_i^r S^{(i)}_δ f‖_p ≤ 2^r δ^(-r) ω_r(f, rδ)_p`
-  (`Cube.eLpNorm_sub_cubeSmooth_le_smoothnessModulus`,
-  `Cube.eLpNorm_cubeSmoothDeriv_le_smoothnessModulus`).
+  (`Cube.eLpNorm_sub_cubeSteklovSmooth_le_smoothnessModulus`,
+  `Cube.eLpNorm_cubeSteklovSmoothDeriv_le_smoothnessModulus`).
 
 The norm on `ℝ^d` is the sup norm.
 -/
@@ -123,21 +123,22 @@ theorem sliceProj_sub (hN : 2 ≤ N) {f g : (Fin d → ℝ) → ℂ} (hf : Conti
 
 /-- **The slicewise projection of a continuous function is continuous**, for `N ≥ 2`: it is the
 expansion of one variable, jointly continuous in its coefficients and its point
-(`Daubechies.continuous_expand_uncurry`), at the continuous coefficients of the slices
+(`Daubechies.continuous_daubechiesExpand_uncurry`), at the continuous coefficients of the slices
 (`Daubechies.continuous_coeffFun_slice`) and the point `x_i`. -/
 theorem continuous_sliceProj (hN : 2 ≤ N) {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) (j : ℕ)
     (i : Fin d) : Continuous (sliceProj m j i f) :=
-  (continuous_expand_uncurry (continuous_scalingFun m hN)
+  (continuous_daubechiesExpand_uncurry (continuous_scalingFun m hN)
     (fun _ hx => scalingFun_eq_zero m hN hx) j).comp
     ((continuous_pi fun k => continuous_coeffFun_slice (continuous_scalingFun m hN)
       (fun _ hx => scalingFun_eq_zero m hN hx) hf i j k).prodMk (continuous_apply i))
 
 /-- **The slicewise projection of a measurable function is measurable**, for `N ≥ 2`: the
-continuous expansion map (`Daubechies.continuous_expand_uncurry`) composed with the measurable
-coefficients of the slices (`Daubechies.measurable_coeffFun_slice`) and the coordinate `x_i`. -/
+continuous expansion map (`Daubechies.continuous_daubechiesExpand_uncurry`) composed with the
+measurable coefficients of the slices (`Daubechies.measurable_coeffFun_slice`) and the coordinate
+`x_i`. -/
 theorem measurable_sliceProj (hN : 2 ≤ N) {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) (j : ℕ)
     (i : Fin d) : Measurable (sliceProj m j i f) :=
-  (continuous_expand_uncurry (continuous_scalingFun m hN)
+  (continuous_daubechiesExpand_uncurry (continuous_scalingFun m hN)
     (fun _ hx => scalingFun_eq_zero m hN hx) j).measurable.comp
     ((measurable_pi_iff.2 fun k => measurable_coeffFun_slice (continuous_scalingFun m hN) hf i
       j k).prodMk (measurable_pi_apply i))
@@ -163,21 +164,21 @@ theorem eLpNorm_sliceProj_le (hN : 2 ≤ N) {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp
 `‖f_{x,i} - (P_j^{(i)} f)_{x,i}‖_p ≤ (1 + C) ‖f_{x,i} - (S^{(i)}_δ f)_{x,i}‖_p +
 C_S 2^(-jN) ‖(∂_i^N S^{(i)}_δ f)_{x,i}‖_p` with `C = projConst m p` and
 `C_S = smoothJacksonConst m p`. The slices are `g - P_j g`, `g - S_δ g` and `(S_δ g)^(N)` for the
-slice `g = f_{x,i}` (`Daubechies.slice_sliceProj`, `Cube.slice_cubeSmooth`,
-`Cube.slice_cubeSmoothDeriv`), and the bound is `Daubechies.eLpNorm_sub_projFun_le_add` with
+slice `g = f_{x,i}` (`Daubechies.slice_sliceProj`, `Cube.slice_cubeSteklovSmooth`,
+`Cube.slice_cubeSteklovSmoothDeriv`), and the bound is `Daubechies.eLpNorm_sub_projFun_le_add` with
 Jackson's inequality for the smooth function `S_δ g`
 (`Daubechies.eLpNorm_sub_projFun_le_of_contDiff`). -/
 theorem eLpNorm_slice_sub_sliceProj_le (hN : 2 ≤ N) {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞)
     {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) (j : ℕ) (i : Fin d) (δ : ℝ) (x : Fin d → ℝ) :
     eLpNorm (fun t => Cube.slice f x i t - Cube.slice (sliceProj m j i f) x i t) p volume ≤
       (1 + ENNReal.ofReal (projConst m p)) *
-          eLpNorm (fun t => Cube.slice f x i t - Cube.slice (Cube.cubeSmooth N δ i f) x i t) p
-            volume +
+          eLpNorm (fun t => Cube.slice f x i t - Cube.slice (Cube.cubeSteklovSmooth N δ i f) x i t)
+            p volume +
         smoothJacksonConst m p * (2 ^ (j * N))⁻¹ *
-          eLpNorm (Cube.slice (Cube.cubeSmoothDeriv N δ i f) x i) p volume := by
+          eLpNorm (Cube.slice (Cube.cubeSteklovSmoothDeriv N δ i f) x i) p volume := by
   have hg := Cube.continuous_slice hf x i
   have hS := Interval.contDiff_steklovSmooth hg N δ
-  rw [slice_sliceProj, Cube.slice_cubeSmooth, Cube.slice_cubeSmoothDeriv]
+  rw [slice_sliceProj, Cube.slice_cubeSteklovSmooth, Cube.slice_cubeSteklovSmoothDeriv]
   refine (eLpNorm_sub_projFun_le_add m hN hp1 hp hg.locallyIntegrable
     hS.continuous.locallyIntegrable j).trans ?_
   gcongr
@@ -191,8 +192,8 @@ theorem eLpNorm_slice_sub_sliceProj_le (hN : 2 ≤ N) {p : ℝ≥0∞} (hp1 : 1 
 slices satisfy the bound of `Daubechies.eLpNorm_slice_sub_sliceProj_le`, which passes to `ℝ^d`
 (`Rd.eLpNorm_le_add_of_slice_le`); there `‖f - S^{(i)}_δ f‖_p ≤ ω_N(f, 2^(-j))_p` and
 `‖∂_i^N S^{(i)}_δ f‖_p ≤ 2^N N^N 2^(jN) ω_N(f, 2^(-j))_p`
-(`Cube.eLpNorm_sub_cubeSmooth_le_smoothnessModulus`,
-`Cube.eLpNorm_cubeSmoothDeriv_le_smoothnessModulus`,
+(`Cube.eLpNorm_sub_cubeSteklovSmooth_le_smoothnessModulus`,
+`Cube.eLpNorm_cubeSteklovSmoothDeriv_le_smoothnessModulus`,
 `Daubechies.ofReal_one_div_mul_two_pow_inv_pow`), and the two bounds combine as in one variable
 (`Daubechies.add_le_daubechiesJacksonConst_mul`). The inequality holds in `[0, ∞]`. -/
 theorem eLpNorm_sub_sliceProj_le (hN : 2 ≤ N) {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞)
@@ -202,14 +203,14 @@ theorem eLpNorm_sub_sliceProj_le (hN : 2 ≤ N) {p : ℝ≥0∞} (hp1 : 1 ≤ p)
   have hN' : (0 : ℝ) < N := by exact_mod_cast (by omega : 0 < N)
   have hδ : (0 : ℝ) < 1 / (N * 2 ^ j) := by positivity
   have hNδ : (N : ℝ) * (1 / (N * 2 ^ j)) = 1 / 2 ^ j := by field_simp
-  have hB := Cube.eLpNorm_sub_cubeSmooth_le_smoothnessModulus hf N hδ hp1 hp i
-  have hD := Cube.eLpNorm_cubeSmoothDeriv_le_smoothnessModulus hf N hδ hp1 i
+  have hB := Cube.eLpNorm_sub_cubeSteklovSmooth_le_smoothnessModulus hf N hδ hp1 hp i
+  have hD := Cube.eLpNorm_cubeSteklovSmoothDeriv_le_smoothnessModulus hf N hδ hp1 i
   rw [hNδ] at hB hD
   rw [ofReal_one_div_mul_two_pow_inv_pow (by omega) j, ← mul_assoc] at hD
   refine (Rd.eLpNorm_le_add_of_slice_le hp1 hp
     (hf.sub (continuous_sliceProj m hN hf j i)).measurable
-    (hf.sub (Cube.continuous_cubeSmooth hf N hδ.ne' i)).measurable
-    (Cube.continuous_cubeSmoothDeriv hf N _ i).measurable i
+    (hf.sub (Cube.continuous_cubeSteklovSmooth hf N hδ.ne' i)).measurable
+    (Cube.continuous_cubeSteklovSmoothDeriv hf N _ i).measurable i
     (eLpNorm_slice_sub_sliceProj_le m hN hp1 hp hf j i _)).trans ?_
   exact add_le_daubechiesJacksonConst_mul m j hB hD
 

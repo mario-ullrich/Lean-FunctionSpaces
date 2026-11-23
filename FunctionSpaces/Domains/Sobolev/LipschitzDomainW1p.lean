@@ -13,7 +13,7 @@ public import FunctionSpaces.Domains.Extension.ReflectionExtensionOperator
 Let `Ω` be a bounded Lipschitz domain in a finite-dimensional real inner product space `V` of
 dimension `n`. By the extension theorem, every `f ∈ W^1_p(Ω)` (weak derivatives on `Ω`)
 agrees on `Ω` with some `F ∈ W^1_p(V)`, for every `1 ≤ p ≤ ∞`, by reflection
-(`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev`). For `p = 2` this gives:
+(`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memWSobolev`). For `p = 2` this gives:
 
 * `H^1(Ω) = W^1_2(Ω)`: the restriction space `H^1(Ω)` is the weak-derivative space
   (`Rd.BoundedLipschitzDomain.memSobolevOn_iff_memWeakSobolev`,
@@ -47,7 +47,7 @@ lies in the restriction space `H^1(Ω)` iff it lies in the Sobolev space
 `W^1_2(Ω)` of weak derivatives on `Ω`. -/
 theorem memSobolevOn_iff_memWeakSobolev (f : Lp ℂ 2 (volume : Measure V)) :
     Ω.MemSobolevOn f ↔ MemWeakSobolev Ω.toOpens 1 2 f :=
-  (Ω.memWeakSobolev_iff_exists_memSobolev one_le_two f).symm
+  (Ω.memWeakSobolev_iff_exists_memWSobolev one_le_two f).symm
 
 /-- **Rellich's theorem in `W^1_2(Ω)`**, the form with weak derivatives: for a bounded
 Lipschitz domain `Ω` in dimension `n ≥ 1`, every sequence `f_n ∈ L_2(Ω)` with weak derivatives
@@ -93,7 +93,7 @@ theorem exists_norm_le_restrictL2 [Nontrivial V] :
   have hf : MemLp (toL2 (u : H^{1}(V)) : V → ℂ) 2 (volume.restrict Ω.carrier) :=
     (Lp.memLp _).restrict _
   obtain ⟨F, hF, hFf, G, hG, hb⟩ := hext _ (fun i => g i) hf (fun i => Lp.memLp (g i)) hg
-  have hS := (memSobolev_one_iff F).1 hF
+  have hS := (memWSobolev_one_iff F).1 hF
   have hU : toL2 hS.toBesselPotentialSpace = F :=
     toL2_eq_of_toDistr_eq _ hS.toBesselPotentialSpace_toDistr.symm
   have hproj : restrictProj 1 Ω.toOpens hS.toBesselPotentialSpace = u :=

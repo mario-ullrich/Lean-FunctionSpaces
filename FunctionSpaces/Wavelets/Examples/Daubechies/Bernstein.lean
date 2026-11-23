@@ -24,7 +24,7 @@ Mathlib's `fwdDiff h f` and `Δ_h^r = (fwdDiff h)^[r]` its `r`-fold iterate.
   `Δ_h^r g_{j,k} = (Δ_{2^j h}^r g)_{j,k}` for `g_{j,k}(x) = 2^(j/2) g(2^j x - k)`
   (`Daubechies.iterate_fwdDiff_scaledFun`). Hence, for a generator `g` vanishing outside a bounded
   interval, `Δ_h^r ∑_k c_k g_{j,k} = ∑_k c_k (Δ_{2^j h}^r g)_{j,k}` at every point
-  (`Daubechies.iterate_fwdDiff_expand`).
+  (`Daubechies.iterate_fwdDiff_daubechiesExpand`).
 * **The Bernstein inequality.** For `a ∈ V_j` and `2^j t ≤ 1`,
   `ω_r(a, t)_p ≤ C ω_r(φ, 2^j t)_p ‖a‖_p` with `C = (2N + 2r)^(1 - 1/p) (2N)^(1/p) ‖φ‖_{p'}`
   independent of `j`, `a` and `t` (`Daubechies.smoothnessModulus_mem_scalingSpace_le`,
@@ -47,9 +47,9 @@ Mathlib's `fwdDiff h f` and `Δ_h^r = (fwdDiff h)^[r]` its `r`-fold iterate.
 * **The inverse inequality of the scheme.** Under a Bernstein bound of order `θ`, every
   approximant `a` of complexity `2^j` of the Daubechies scheme satisfies
   `ω_r(a, 2^(-k))_p ≤ C_B 2^(-(k-j)θ) ‖a‖_p` for all `k`, with `k - j` truncated at `0`
-  (`Daubechies.inverse_scheme`): for `k ≥ j` by the Bernstein inequality at `t = 2^(-k)` and the
-  bound `ω_r(φ, 2^(-(k-j)))_p ≤ K 2^(-(k-j)θ)`, for `k < j` by `ω_r(a, t)_p ≤ 2^r ‖a‖_p`. This is
-  the inverse inequality of `ApproximationScheme.ModulusData`.
+  (`Daubechies.inverse_daubechiesScheme`): for `k ≥ j` by the Bernstein inequality at `t = 2^(-k)`
+  and the bound `ω_r(φ, 2^(-(k-j)))_p ≤ K 2^(-(k-j)θ)`, for `k < j` by `ω_r(a, t)_p ≤ 2^r ‖a‖_p`.
+  This is the inverse inequality of `ApproximationScheme.ModulusData`.
 -/
 
 @[expose] public section
@@ -93,11 +93,11 @@ all coefficients `c : ℤ → ℂ` and every step `h`,
 `Δ_h (∑_k c_k g_{j,k}) = ∑_k c_k (Δ_{2^j h} g)_{j,k}` at every point. At each point only finitely
 many terms are nonzero (`Daubechies.summable_expand`), so the difference may be taken termwise
 (`Daubechies.fwdDiff_scaledFun`). -/
-theorem fwdDiff_expand (hsupp : ∀ x ∉ Set.Icc a b, g x = 0) (j : ℕ) (c : ℤ → ℂ) (h : ℝ) :
-    fwdDiff h (expand g j c) = expand (fwdDiff (2 ^ j * h) g) j c := by
+theorem fwdDiff_daubechiesExpand (hsupp : ∀ x ∉ Set.Icc a b, g x = 0) (j : ℕ) (c : ℤ → ℂ) (h : ℝ) :
+    fwdDiff h (daubechiesExpand g j c) = daubechiesExpand (fwdDiff (2 ^ j * h) g) j c := by
   funext x
-  show expand g j c (x + h) - expand g j c x = _
-  simp only [expand]
+  show daubechiesExpand g j c (x + h) - daubechiesExpand g j c x = _
+  simp only [daubechiesExpand]
   rw [← (summable_expand hsupp j c (x + h)).tsum_sub (summable_expand hsupp j c x)]
   refine tsum_congr fun k => ?_
   rw [← mul_sub]
@@ -106,15 +106,18 @@ theorem fwdDiff_expand (hsupp : ∀ x ∉ Set.Icc a b, g x = 0) (j : ℕ) (c : �
 /-- **Higher differences of an expansion**: if `g` vanishes outside `[a, b]`, then for every
 order `r`, level `j`, all coefficients `c : ℤ → ℂ` and every step `h`,
 `Δ_h^r (∑_k c_k g_{j,k}) = ∑_k c_k (Δ_{2^j h}^r g)_{j,k}` at every point. By induction on `r`
-from `Daubechies.fwdDiff_expand`; each generator `Δ_{2^j h}^i g` vanishes outside a bounded
-interval (`Daubechies.iterate_fwdDiff_eq_zero_of_notMem`). -/
-theorem iterate_fwdDiff_expand (hsupp : ∀ x ∉ Set.Icc a b, g x = 0) (r j : ℕ) (c : ℤ → ℂ)
-    (h : ℝ) : (fwdDiff h)^[r] (expand g j c) = expand ((fwdDiff (2 ^ j * h))^[r] g) j c := by
+from `Daubechies.fwdDiff_daubechiesExpand`; each generator `Δ_{2^j h}^i g` vanishes outside a
+bounded interval (`Daubechies.iterate_fwdDiff_eq_zero_of_notMem`). -/
+theorem iterate_fwdDiff_daubechiesExpand (hsupp : ∀ x ∉ Set.Icc a b, g x = 0) (r j : ℕ) (c : ℤ → ℂ)
+    (h : ℝ) :
+    (fwdDiff h)^[r] (daubechiesExpand g j c) =
+      daubechiesExpand ((fwdDiff (2 ^ j * h))^[r] g) j c := by
   induction r with
   | zero => rfl
   | succ r ih =>
     rw [Function.iterate_succ_apply', ih,
-      fwdDiff_expand (fun x hx => iterate_fwdDiff_eq_zero_of_notMem hsupp r (2 ^ j * h) hx),
+      fwdDiff_daubechiesExpand
+        (fun x hx => iterate_fwdDiff_eq_zero_of_notMem hsupp r (2 ^ j * h) hx),
       ← Function.iterate_succ_apply' (fwdDiff (2 ^ j * h)) r g]
 
 end Generic
@@ -127,7 +130,7 @@ variable {N : ℕ} (m : Mask N)
 `[-r, 2N - 1 + r]`, outside which the differences `Δ_H^r φ` with `|H| ≤ 1` vanish
 (`Daubechies.higherDiff_scalingFun_eq_zero`), has the overlap number
 `⌈(2N - 1 + r) - (-r)⌉ + 1 = 2N + 2r` of the upper estimate of expansions
-(`Daubechies.eLpNorm_expand_le`). -/
+(`Daubechies.eLpNorm_daubechiesExpand_le`). -/
 theorem natCeil_higherDiff_support_add_one (hN : 1 ≤ N) (r : ℕ) :
     ⌈(2 * N - 1 + r : ℝ) - -(r : ℝ)⌉₊ + 1 = 2 * N + 2 * r := by
   have h : (2 * N - 1 + r : ℝ) - -(r : ℝ) = ((2 * N - 1 + 2 * r : ℕ) : ℝ) := by
@@ -139,9 +142,9 @@ theorem natCeil_higherDiff_support_add_one (hN : 1 ≤ N) (r : ℕ) :
 
 /-- **The constant of the Bernstein inequality**: `(2N + 2r)^(1 - 1/p) (2N)^(1/p) ‖φ‖_{p'}` with
 the conjugate exponent `p'`. The first factor is the overlap factor of the upper estimate of
-expansions (`Daubechies.eLpNorm_expand_le`) for the generators `Δ_H^r φ`, `|H| ≤ 1`, which vanish
-outside `[-r, 2N - 1 + r]` (`Daubechies.natCeil_higherDiff_support_add_one`); the second is the
-constant of the coefficient estimate (`Daubechies.coeffConst` for `φ` and its support
+expansions (`Daubechies.eLpNorm_daubechiesExpand_le`) for the generators `Δ_H^r φ`, `|H| ≤ 1`, which
+vanish outside `[-r, 2N - 1 + r]` (`Daubechies.natCeil_higherDiff_support_add_one`); the second is
+the constant of the coefficient estimate (`Daubechies.coeffConst` for `φ` and its support
 `[0, 2N - 1]`). It is the same for every level and every scale. -/
 noncomputable def daubechiesBernsteinConst (p : ℝ≥0∞) (r : ℕ) : ℝ≥0∞ :=
   ((2 * N + 2 * r : ℕ) : ℝ≥0∞) ^ (1 - 1 / p.toReal) * coeffConst (scalingFun m) 0 (2 * N - 1) p
@@ -164,11 +167,11 @@ variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 (`Daubechies.daubechiesBernsteinConst_ne_top`) and independent of `j`, `a` and `t`.
 
 The element `a` is almost everywhere the expansion `∑_k λ_k φ_{j,k}` of its coefficients
-`λ_k = ⟨a, φ_{j,k}⟩` (`Daubechies.proj_eq_self_of_mem`), so for `|h| ≤ t`,
-`Δ_h^r a = ∑_k λ_k (Δ_{2^j h}^r φ)_{j,k}` (`Daubechies.iterate_fwdDiff_expand`). As `|2^j h| ≤ 1`,
-the generator `Δ_{2^j h}^r φ` vanishes outside `[-r, 2N - 1 + r]`
+`λ_k = ⟨a, φ_{j,k}⟩` (`Daubechies.daubechiesProj_eq_self_of_mem`), so for `|h| ≤ t`,
+`Δ_h^r a = ∑_k λ_k (Δ_{2^j h}^r φ)_{j,k}` (`Daubechies.iterate_fwdDiff_daubechiesExpand`). As
+`|2^j h| ≤ 1`, the generator `Δ_{2^j h}^r φ` vanishes outside `[-r, 2N - 1 + r]`
 (`Daubechies.higherDiff_scalingFun_eq_zero`), and the upper estimate of expansions
-(`Daubechies.eLpNorm_expand_le`) and the coefficient estimate
+(`Daubechies.eLpNorm_daubechiesExpand_le`) and the coefficient estimate
 (`Daubechies.dyadicWeight_mul_lqNorm_coeffFun_le`) give
 `‖Δ_h^r a‖_p ≤ (2N + 2r)^(1 - 1/p) ‖Δ_{2^j h}^r φ‖_p 2^(j(1/2 - 1/p)) ‖λ‖_{ℓ_p}`
 `≤ C ‖Δ_{2^j h}^r φ‖_p ‖a‖_p`, where the dyadic weights cancel. -/
@@ -179,8 +182,8 @@ theorem smoothnessModulus_mem_scalingSpace_le (hN : 2 ≤ N) (hp : p ≠ ∞) (r
       daubechiesBernsteinConst m p r * Rd.smoothnessModulus volume r p (scalingFun m) (2 ^ j * t) *
         ‖a‖ₑ := by
   have hae : (a : ℝ → ℂ) =ᵐ[volume] projFun m j a := by
-    have h := proj_apply_ae m hN hp j a
-    rwa [proj_eq_self_of_mem m hN hp ha] at h
+    have h := daubechiesProj_apply_ae m hN hp j a
+    rwa [daubechiesProj_eq_self_of_mem m hN hp ha] at h
   rw [Rd.smoothnessModulus_congr_ae hae]
   refine iSup₂_le fun h hh => ?_
   have h2 : (0 : ℝ) < 2 ^ j := by positivity
@@ -188,7 +191,7 @@ theorem smoothnessModulus_mem_scalingSpace_le (hN : 2 ≤ N) (hp : p ≠ ∞) (r
     rw [norm_mul, Real.norm_of_nonneg h2.le]
     exact mul_le_mul_of_nonneg_left hh h2.le
   have hH : |(2 : ℝ) ^ j * h| ≤ 1 := (Real.norm_eq_abs _ ▸ hHt).trans ht
-  have hexp := eLpNorm_expand_le
+  have hexp := eLpNorm_daubechiesExpand_le
     (continuous_iterate_fwdDiff (continuous_scalingFun m hN) r
       ((2 : ℝ) ^ j * h)).aestronglyMeasurable
     (fun x hx => higherDiff_scalingFun_eq_zero m hN r hH hx) (Fact.out : 1 ≤ p) hp j
@@ -197,8 +200,8 @@ theorem smoothnessModulus_mem_scalingSpace_le (hN : 2 ≤ N) (hp : p ≠ ∞) (r
     (continuous_scalingFun m hN).aestronglyMeasurable (fun _ hx => scalingFun_eq_zero m hN hx)
     (Fact.out : 1 ≤ p) hp (Lp.aestronglyMeasurable a) j
   rw [natCeil_higherDiff_support_add_one (by omega)] at hexp
-  rw [projFun, iterate_fwdDiff_expand (fun _ hx => scalingFun_eq_zero m hN hx)]
-  calc eLpNorm (expand ((fwdDiff (2 ^ j * h))^[r] (scalingFun m)) j
+  rw [projFun, iterate_fwdDiff_daubechiesExpand (fun _ hx => scalingFun_eq_zero m hN hx)]
+  calc eLpNorm (daubechiesExpand ((fwdDiff (2 ^ j * h))^[r] (scalingFun m)) j
         (coeffFun (scalingFun m) j a)) p volume
       ≤ ((2 * N + 2 * r : ℕ) : ℝ≥0∞) ^ (1 - 1 / p.toReal) *
           eLpNorm ((fwdDiff (2 ^ j * h))^[r] (scalingFun m)) p volume *
@@ -228,7 +231,7 @@ It is a hypothesis on the mask; the regularity theorems for `φ` prove it
 (`Daubechies.bernsteinBound_of_le_two`, `Daubechies.bernsteinBound_interp`), for instance for
 `N = 2` and `N = 3` with `p ≤ 2` and for D4 with `p ≥ 2` (`Daubechies.bernsteinBound_order_two`,
 `Daubechies.bernsteinBound_order_three`, `Daubechies.bernsteinBound_d4`), and a Bernstein bound
-gives the inverse inequality of the Daubechies scheme (`Daubechies.inverse_scheme`). -/
+gives the inverse inequality of the Daubechies scheme (`Daubechies.inverse_daubechiesScheme`). -/
 def BernsteinBound (p : ℝ≥0∞) (θ : ℝ) (r : ℕ) : Prop :=
   ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ t ∈ Set.Ioc (0 : ℝ) 1,
     Rd.smoothnessModulus volume r p (scalingFun m) t ≤ K * ENNReal.ofReal (t ^ θ)
@@ -350,14 +353,14 @@ theorem lpModulus_le_of_mem_scalingSpace (hN : 2 ≤ N) (hp : p ≠ ∞) {θ : �
 and let `φ` have a Bernstein bound of order `θ` with differences of order `r`
 (`Daubechies.BernsteinBound`). Then there is a finite constant `C_B` with
 `ω_r(a, 2^(-k))_p ≤ C_B 2^(-(k-j)θ) ‖a‖_p` for all `j, k ∈ ℕ` and every approximant `a` of
-complexity `2^j` of the Daubechies scheme (`Daubechies.scheme`; these are the elements of
+complexity `2^j` of the Daubechies scheme (`Daubechies.daubechiesScheme`; these are the elements of
 `V_j`), where `k - j` is truncated at `0`. For `k ≥ j` this is
 `Daubechies.lpModulus_le_of_mem_scalingSpace`; for `k < j` the weight is `1` and
 `ω_r(a, t)_p ≤ 2^r ‖a‖_p` (`Rd.lpModulus_le`). This is the inverse inequality of
 `ApproximationScheme.ModulusData` for the modulus `Rd.lpModulus p r`. -/
-theorem inverse_scheme (hN : 2 ≤ N) (hp : p ≠ ∞) {θ : ℝ} {r : ℕ}
+theorem inverse_daubechiesScheme (hN : 2 ≤ N) (hp : p ≠ ∞) {θ : ℝ} {r : ℕ}
     (hB : BernsteinBound m p θ r) :
-    ∃ CB : ℝ≥0∞, CB ≠ ∞ ∧ ∀ j k : ℕ, ∀ a ∈ scheme m p hN hp (2 ^ j),
+    ∃ CB : ℝ≥0∞, CB ≠ ∞ ∧ ∀ j k : ℕ, ∀ a ∈ daubechiesScheme m p hN hp (2 ^ j),
       Rd.lpModulus p r a k ≤ CB * dyadicWeight (-θ) (k - j) * ‖a‖ₑ := by
   obtain ⟨K, hK, hmod⟩ := hB
   refine ⟨daubechiesBernsteinConst m p r * K + 2 ^ r,
@@ -368,7 +371,7 @@ theorem inverse_scheme (hN : 2 ≤ N) (hp : p ≠ ∞) {θ : ℝ} {r : ℕ}
   · rw [Nat.sub_eq_zero_of_le hkj.le, ENNReal.dyadicWeight_zero_right, mul_one]
     exact (Rd.lpModulus_le r a k).trans (by gcongr; exact le_add_self)
   · exact (lpModulus_le_of_mem_scalingSpace m hN hp hmod hjk
-      ((mem_scheme_two_pow m).1 ha)).trans (by gcongr; exact le_self_add)
+      ((mem_daubechiesScheme_two_pow m).1 ha)).trans (by gcongr; exact le_self_add)
 
 end Lp
 

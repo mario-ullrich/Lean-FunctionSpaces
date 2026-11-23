@@ -307,13 +307,13 @@ theorem closure_ae_eq : closure Ω.carrier =ᵐ[volume] Ω.carrier :=
 (DeVore–Sharpley): for `1 ≤ p < ∞`, `0 < s < r`, `s < r'` and `1 ≤ q ≤ ∞` there is `C < ∞` with
 `N_Ω(f; r') ≤ C N_Ω(f; r)` whenever `N_Ω(f; r) < ∞`, where
 `N_Ω(f; r) = ‖1_Ω f‖_p + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q}`. This holds for every bounded
-Lipschitz domain, convex or not (`Rd.HasBesovExtension.modNormOn_order_le`). -/
+Lipschitz domain, convex or not (`Rd.HasBesovExtension.modNormOn_order_le_of_hasBesovExtension`). -/
 theorem modNormOn_order_le {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞) {r r' : ℕ} {s : ℝ}
     (hs : 0 < s) (hsr : s < r) (hsr' : s < r') {q : ℝ≥0∞} (hq : 1 ≤ q) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ f : Lp ℂ p (volume : Measure V),
       modNormOn Ω.measurableSet r s q f < ∞ →
       modNormOn Ω.measurableSet r' s q f ≤ C * modNormOn Ω.measurableSet r s q f :=
-  Ω.hasBesovExtension.modNormOn_order_le hp hs hsr hsr' hq
+  Ω.hasBesovExtension.modNormOn_order_le_of_hasBesovExtension hp hs hsr hsr' hq
 
 end BoundedLipschitzDomain
 

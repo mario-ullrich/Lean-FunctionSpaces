@@ -61,7 +61,7 @@ theorem fourier_two_pow_smul_lpBlockKernel_succ (m j : ℕ) (ξ : EuclideanSpace
       ∑ i : Fin m → Fin (finrank ℝ (EuclideanSpace ℝ d)),
         (∏ l, 2 * Real.pi * Complex.I *
           (inner ℝ ξ (Rd.gridBasis (EuclideanSpace ℝ d) (i l)) : ℂ)) *
-          𝓕 (Rd.derivFamily i j) ξ := by
+          𝓕 (Rd.derivKernelFamily i j) ξ := by
   have h := congrFun (congrArg 𝓕
     (Rd.two_pow_smul_lpBlockKernel_succ_eq_sum (V := EuclideanSpace ℝ d) m j)) ξ
   have hs : 𝓕 ((2 : ℂ) ^ (j * m) • Rd.lpBlockKernel (V := EuclideanSpace ℝ d) (j + 1)) ξ =
@@ -92,7 +92,7 @@ theorem two_pow_smul_lpBlock_succ (hp : p ≠ ∞) {m : ℕ}
     (hg : ∀ i, HasWeakLineDeriv (fun k => Rd.gridBasis (EuclideanSpace ℝ d) (i k)) f (g i))
     (j : ℕ) :
     (2 : ℂ) ^ (j * m) • lpBlock hp (j + 1) f =
-      ∑ i, econvLp hp ((Rd.isCZFamily_derivFamily i).integrable j) (g i) :=
+      ∑ i, econvLp hp ((Rd.isCZFamily_derivKernelFamily i).integrable j) (g i) :=
   eq_of_mFourierCoeff_eq fun n => by
     rw [mFourierCoeff_smul, lpBlock, mFourierCoeff_econvLp, mFourierCoeff_sum, ← mul_assoc,
       fourier_two_pow_smul_lpBlockKernel_succ, Finset.sum_mul]
@@ -109,11 +109,12 @@ theorem two_pow_mul_blockFun_succ_ae (hp : p ≠ ∞) {m : ℕ}
       Lp ℂ p (volume : Measure (UnitAddTorus d))}
     (hg : ∀ i, HasWeakLineDeriv (fun k => Rd.gridBasis (EuclideanSpace ℝ d) (i k)) f (g i)) :
     ∀ᵐ t ∂volume, ∀ j, (2 : ℂ) ^ (j * m) * blockFun (j + 1) f t =
-      ∑ i, econv (Rd.derivFamily i j) (g i) t := by
+      ∑ i, econv (Rd.derivKernelFamily i j) (g i) t := by
   refine ae_all_iff.2 fun j => ?_
   filter_upwards [Lp.coeFn_smul ((2 : ℂ) ^ (j * m)) (lpBlock hp (j + 1) f),
     lpBlock_ae_eq_blockFun hp (j + 1) f,
-    coeFn_sum_econvLp_ae hp Finset.univ (fun i => (Rd.isCZFamily_derivFamily i).integrable j) g]
+    coeFn_sum_econvLp_ae hp Finset.univ
+      (fun i => (Rd.isCZFamily_derivKernelFamily i).integrable j) g]
     with t h1 h2 h3
   rw [← h2, ← smul_eq_mul, ← Pi.smul_apply ((2 : ℂ) ^ (j * m)) (⇑(lpBlock hp (j + 1) f)), ← h1,
     two_pow_smul_lpBlock_succ hp hg j, h3]
@@ -129,7 +130,7 @@ theorem lqNorm_blockFun_succ_le_sum_ae (hp : p ≠ ∞) {m : ℕ}
     (hg : ∀ i, HasWeakLineDeriv (fun k => Rd.gridBasis (EuclideanSpace ℝ d) (i k)) f (g i)) :
     ∀ᵐ t ∂volume,
       lqNorm 2 (fun n => dyadicWeight (m : ℝ) (n + 1) * ‖blockFun (n + 1) f t‖ₑ) ≤
-        2 ^ m * ∑ i, lqNorm 2 (fun n => ‖econv (Rd.derivFamily i n) (g i) t‖ₑ) := by
+        2 ^ m * ∑ i, lqNorm 2 (fun n => ‖econv (Rd.derivKernelFamily i n) (g i) t‖ₑ) := by
   filter_upwards [two_pow_mul_blockFun_succ_ae hp hg] with t ht
   refine ENNReal.lqNorm_dyadicWeight_succ_le_sum one_le_two Finset.univ fun n => ?_
   rw [← Rd.enorm_two_pow_complex, ← enorm_mul, ht n]
@@ -140,8 +141,8 @@ theorem lqNorm_blockFun_succ_le_sum_ae (hp : p ≠ ∞) {m : ℕ}
 variable (d) in
 /-- The constant `K_α` of the bound `W^m_p ⊆ F^m_{p,2}` on the torus for the multi-index `α`: the
 constant `Torus.periodicCZConst d p 2 (4 H_{A^α}) (2 T_{A^α})` of the Calderón–Zygmund family of
-the dilated derivative kernels `(η_α)_{2^j}` (`Rd.isCZFamily_derivFamily`), with the far mass
-bound `2 T_{A^α}` (`Torus.farMass_derivFamily_le`), where `A^α = Rd.derivKernelBound α`. -/
+the dilated derivative kernels `(η_α)_{2^j}` (`Rd.isCZFamily_derivKernelFamily`), with the far mass
+bound `2 T_{A^α}` (`Torus.farMass_derivKernelFamily_le`), where `A^α = Rd.derivKernelBound α`. -/
 noncomputable def sobolevToTLConst (p : ℝ≥0∞) {m : ℕ}
     (i : Fin m → Fin (finrank ℝ (EuclideanSpace ℝ d))) : ℝ≥0∞ :=
   periodicCZConst d p 2
@@ -171,16 +172,16 @@ theorem eLpNorm_lqNorm_blockFun_succ_le [Nonempty d] (hp1 : 1 < p) (hp : p ≠ �
         dyadicWeight (m : ℝ) (n + 1) * ‖blockFun (n + 1) f t‖ₑ)) p volume ≤
       2 ^ m * ∑ i, sobolevToTLConst d p i * ‖g i‖ₑ := by
   have hF : ∀ i, AEMeasurable
-      (fun t => lqNorm 2 (fun n => ‖econv (Rd.derivFamily i n) (g i) t‖ₑ)) volume :=
+      (fun t => lqNorm 2 (fun n => ‖econv (Rd.derivKernelFamily i n) (g i) t‖ₑ)) volume :=
     fun i => aemeasurable_lqNorm_comp (fun n => (aestronglyMeasurable_econv
-      ((Rd.isCZFamily_derivFamily i).integrable n).aestronglyMeasurable
+      ((Rd.isCZFamily_derivKernelFamily i).integrable n).aestronglyMeasurable
       (Lp.stronglyMeasurable (g i)).measurable).enorm) 2
   refine (eLpNorm_le_const_mul_sum_of_ae_le (p := p) Fact.out Finset.univ
     (aemeasurable_lqNorm_comp (fun n =>
       (aestronglyMeasurable_blockFun (n + 1) f).enorm.const_mul _) 2)
     (fun i _ => hF i) _ (lqNorm_blockFun_succ_le_sum_ae hp hg)).trans ?_
   gcongr with i
-  exact eLpNorm_lqNorm_econv_le (Rd.isCZFamily_derivFamily i) (farMass_derivFamily_le i)
+  exact eLpNorm_lqNorm_econv_le (Rd.isCZFamily_derivKernelFamily i) (farMass_derivKernelFamily_le i)
     hp1 hp (g i)
 
 /-- **`W^m_p(𝕋^d) ⊆ F^m_{p,2}(𝕋^d)` with named constants**: for `d ≥ 1`, `1 < p < ∞` and

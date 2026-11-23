@@ -173,23 +173,23 @@ variable {W : Type*} [NormedAddCommGroup W] [InnerProductSpace ℝ W] [FiniteDim
   [MeasurableSpace W] [BorelSpace W] (b : LocalMeansBump W)
 
 /-- `∫ |m_{2^j}| = ∫ |m|`. -/
-theorem integral_norm_scaled (L j : ℕ) :
-    ∫ z, ‖b.scaled L j z‖ = ∫ z, ‖momentKernel b.toFun L z‖ := by
+theorem integral_norm_scaledMoment (L j : ℕ) :
+    ∫ z, ‖b.scaledMoment L j z‖ = ∫ z, ‖momentKernel b.toFun L z‖ := by
   have hm := integrable_momentKernel b.integrable L
-  rw [integral_norm_eq_lintegral_enorm (b.integrable_scaled L j).aestronglyMeasurable,
+  rw [integral_norm_eq_lintegral_enorm (b.integrable_scaledMoment L j).aestronglyMeasurable,
     integral_norm_eq_lintegral_enorm hm.aestronglyMeasurable,
-    ← eLpNorm_one_eq_lintegral_enorm (b.integrable_scaled L j).aestronglyMeasurable,
-    ← eLpNorm_one_eq_lintegral_enorm hm.aestronglyMeasurable, b.eLpNorm_scaled_one]
+    ← eLpNorm_one_eq_lintegral_enorm (b.integrable_scaledMoment L j).aestronglyMeasurable,
+    ← eLpNorm_one_eq_lintegral_enorm hm.aestronglyMeasurable, b.eLpNorm_scaledMoment_one]
 
 /-- `∫ |Δ_v^L m_{2^j}| ≤ (2^j ‖v‖)^L ‖D^L m‖_1`, as real numbers. -/
-theorem integral_norm_higherDiff_scaled_le (L j : ℕ) (v : W) :
-    ∫ z, ‖(fwdDiff v)^[L] (b.scaled L j) z‖ ≤ (2 ^ j * ‖v‖) ^ L * (b.derivNorm L).toReal := by
-  have hint := integrable_higherDiff (b.integrable_scaled L j) L v
+theorem integral_norm_higherDiff_scaledMoment_le (L j : ℕ) (v : W) :
+    ∫ z, ‖(fwdDiff v)^[L] (b.scaledMoment L j) z‖ ≤ (2 ^ j * ‖v‖) ^ L * (b.derivNorm L).toReal := by
+  have hint := integrable_higherDiff (b.integrable_scaledMoment L j) L v
   have hD : b.derivNorm L ≠ ∞ := lintegral_enorm_iteratedFDeriv_ne_top L _
   rw [integral_norm_eq_lintegral_enorm hint.aestronglyMeasurable,
     ← eLpNorm_one_eq_lintegral_enorm hint.aestronglyMeasurable]
-  have h := b.eLpNorm_higherDiff_scaled_le L j v
-  calc (eLpNorm ((fwdDiff v)^[L] (b.scaled L j)) 1 volume).toReal
+  have h := b.eLpNorm_higherDiff_scaledMoment_le L j v
+  calc (eLpNorm ((fwdDiff v)^[L] (b.scaledMoment L j)) 1 volume).toReal
       ≤ (ENNReal.ofReal (2 ^ j * ‖v‖) ^ L * b.derivNorm L).toReal :=
         ENNReal.toReal_mono (ENNReal.mul_ne_top (ENNReal.pow_ne_top ENNReal.ofReal_ne_top) hD) h
     _ = (2 ^ j * ‖v‖) ^ L * (b.derivNorm L).toReal := by
@@ -239,43 +239,44 @@ noncomputable def graphBumpDeriv : ℝ := (Ω.graphBump.derivNorm 2).toReal
 theorem graphBumpDeriv_nonneg : 0 ≤ Ω.graphBumpDeriv := ENNReal.toReal_nonneg
 
 /-- The mollifier vanishes outside `B̄(0, 2 · 2^(-j))`. -/
-theorem graphBump_scaled_eq_zero (j : ℕ) (z : Ω.hyperplane) (hz : 2 / 2 ^ j < ‖z‖) :
-    Ω.graphBump.scaled 2 j z = 0 :=
-  Ω.graphBump.scaled_eq_zero_of_lt 2 j (by rw [graphBump_radius]; simpa using hz)
+theorem graphBump_scaledMoment_eq_zero (j : ℕ) (z : Ω.hyperplane) (hz : 2 / 2 ^ j < ‖z‖) :
+    Ω.graphBump.scaledMoment 2 j z = 0 :=
+  Ω.graphBump.scaledMoment_eq_zero_of_lt 2 j (by rw [graphBump_radius]; simpa using hz)
 
 /-- The convolution integrals of the mollifiers with the graph function converge absolutely. -/
 theorem integrable_graphBump_mul (j : ℕ) (v x : Ω.hyperplane) :
-    Integrable (fun z => Ω.graphBump.scaled 2 j (z + v) * Ω.graphFun (x - z)) volume :=
-  integrable_translate_mul_of_locallyIntegrable (Ω.graphBump.continuous_scaled 2 j)
-    (Ω.graphBump.hasCompactSupport_scaled 2 j) Ω.continuous_graphFun.locallyIntegrable v x
+    Integrable (fun z => Ω.graphBump.scaledMoment 2 j (z + v) * Ω.graphFun (x - z)) volume :=
+  integrable_translate_mul_of_locallyIntegrable (Ω.graphBump.continuous_scaledMoment 2 j)
+    (Ω.graphBump.hasCompactSupport_scaledMoment 2 j) Ω.continuous_graphFun.locallyIntegrable v x
 
 /-- The **mollified graph** `φ_j = Re (ρ_{2^j} ⋆ φ)` on `H`. -/
 noncomputable def smoothGraph (j : ℕ) (x' : Ω.hyperplane) : ℝ :=
-  (conv (Ω.graphBump.scaled 2 j) Ω.graphFun volume x').re
+  (conv (Ω.graphBump.scaledMoment 2 j) Ω.graphFun volume x').re
 
 /-- **The mollified graph is Lipschitz**: `|φ_j(x') - φ_j(y')| ≤ M ‖ρ‖_1 ‖x' - y'‖`. -/
 theorem abs_smoothGraph_sub_le (j : ℕ) (x' y' : Ω.hyperplane) :
     |Ω.smoothGraph j x' - Ω.smoothGraph j y'| ≤ Ω.M * Ω.graphBumpNorm * ‖x' - y'‖ := by
   rw [smoothGraph, smoothGraph, ← Complex.sub_re, graphBumpNorm,
-    ← Ω.graphBump.integral_norm_scaled 2 j]
-  exact (Complex.abs_re_le_norm _).trans (norm_conv_sub_conv_le (Ω.graphBump.integrable_scaled 2 j)
-    Ω.norm_graphFun_sub_le (fun x => by simpa using Ω.integrable_graphBump_mul j 0 x) x' y')
+    ← Ω.graphBump.integral_norm_scaledMoment 2 j]
+  exact (Complex.abs_re_le_norm _).trans
+    (norm_conv_sub_conv_le (Ω.graphBump.integrable_scaledMoment 2 j) Ω.norm_graphFun_sub_le
+      (fun x => by simpa using Ω.integrable_graphBump_mul j 0 x) x' y')
 
 /-- **The mollified graph is close to the graph**: `|φ_j - φ| ≤ 2 M ‖ρ‖_1 2^(-j)`. -/
 theorem abs_smoothGraph_sub_phi_le (j : ℕ) (x' : Ω.hyperplane) :
     |Ω.smoothGraph j x' - Ω.phi x'| ≤ 2 * Ω.M * Ω.graphBumpNorm / 2 ^ j := by
-  have h1 : ∫ z, Ω.graphBump.scaled 2 j z = 1 := by
-    rw [LocalMeansBump.scaled, integral_dilate _ (by positivity)]
+  have h1 : ∫ z, Ω.graphBump.scaledMoment 2 j z = 1 := by
+    rw [LocalMeansBump.scaledMoment, integral_dilate _ (by positivity)]
     exact integral_momentKernel Ω.graphBump.integrable Ω.graphBump.integral_eq_one (by norm_num)
-  have h := norm_conv_sub_self_le (Ω.graphBump.integrable_scaled 2 j) h1
-    (Ω.graphBump_scaled_eq_zero j) Ω.M_nonneg Ω.norm_graphFun_sub_le
+  have h := norm_conv_sub_self_le (Ω.graphBump.integrable_scaledMoment 2 j) h1
+    (Ω.graphBump_scaledMoment_eq_zero j) Ω.M_nonneg Ω.norm_graphFun_sub_le
     (x := x') (by simpa using Ω.integrable_graphBump_mul j 0 x')
-  rw [Ω.graphBump.integral_norm_scaled 2 j] at h
+  rw [Ω.graphBump.integral_norm_scaledMoment 2 j] at h
   have hre : Ω.smoothGraph j x' - Ω.phi x' =
-      (conv (Ω.graphBump.scaled 2 j) Ω.graphFun volume x' - Ω.graphFun x').re := by
+      (conv (Ω.graphBump.scaledMoment 2 j) Ω.graphFun volume x' - Ω.graphFun x').re := by
     rw [Complex.sub_re, smoothGraph, graphFun, Complex.ofReal_re]
   rw [hre]
-  calc |(conv (Ω.graphBump.scaled 2 j) Ω.graphFun volume x' - Ω.graphFun x').re|
+  calc |(conv (Ω.graphBump.scaledMoment 2 j) Ω.graphFun volume x' - Ω.graphFun x').re|
       ≤ Ω.M * (2 / 2 ^ j) * Ω.graphBumpNorm := (Complex.abs_re_le_norm _).trans h
     _ = 2 * Ω.M * Ω.graphBumpNorm / 2 ^ j := by ring
 
@@ -285,12 +286,13 @@ theorem abs_second_smoothGraph_le (j : ℕ) {h' : Ω.hyperplane} (hh : ‖h'‖ 
     (x' : Ω.hyperplane) :
     |Ω.smoothGraph j (x' + (2 : ℝ) • h') - 2 * Ω.smoothGraph j (x' + h') + Ω.smoothGraph j x'| ≤
       4 * Ω.M * Ω.graphBumpDeriv * 2 ^ j * ‖h'‖ ^ 2 := by
-  have h := norm_higherDiff_two_conv_le (Ω.graphBump.integrable_scaled 2 j)
-    (Ω.graphBump_scaled_eq_zero j) Ω.M_nonneg Ω.norm_graphFun_sub_le
+  have h := norm_higherDiff_two_conv_le (Ω.graphBump.integrable_scaledMoment 2 j)
+    (Ω.graphBump_scaledMoment_eq_zero j) Ω.M_nonneg Ω.norm_graphFun_sub_le
     (Ω.integrable_graphBump_mul j) h' x'
-  have hD := Ω.graphBump.integral_norm_higherDiff_scaled_le 2 j h'
+  have hD := Ω.graphBump.integral_norm_higherDiff_scaledMoment_le 2 j h'
   have hre : Ω.smoothGraph j (x' + (2 : ℝ) • h') - 2 * Ω.smoothGraph j (x' + h') +
-      Ω.smoothGraph j x' = ((fwdDiff h')^[2] (conv (Ω.graphBump.scaled 2 j) Ω.graphFun volume) x').re := by
+      Ω.smoothGraph j x' =
+          ((fwdDiff h')^[2] (conv (Ω.graphBump.scaledMoment 2 j) Ω.graphFun volume) x').re := by
     rw [higherDiff_two_apply]
     simp [smoothGraph]
   rw [hre]
@@ -301,8 +303,8 @@ theorem abs_second_smoothGraph_le (j : ℕ) {h' : Ω.hyperplane} (hh : ‖h'‖ 
     have h4 : (4 : ℝ) / 2 ^ j = 2 / 2 ^ j + 2 / 2 ^ j := by ring
     linarith
   have hpos : (0 : ℝ) < 2 ^ j := by positivity
-  calc |((fwdDiff h')^[2] (conv (Ω.graphBump.scaled 2 j) Ω.graphFun volume) x').re|
-      ≤ Ω.M * (2 / 2 ^ j + 2 * ‖h'‖) * ∫ z, ‖(fwdDiff h')^[2] (Ω.graphBump.scaled 2 j) z‖ :=
+  calc |((fwdDiff h')^[2] (conv (Ω.graphBump.scaledMoment 2 j) Ω.graphFun volume) x').re|
+      ≤ Ω.M * (2 / 2 ^ j + 2 * ‖h'‖) * ∫ z, ‖(fwdDiff h')^[2] (Ω.graphBump.scaledMoment 2 j) z‖ :=
         (Complex.abs_re_le_norm _).trans h
     _ ≤ Ω.M * (4 / 2 ^ j) * ((2 ^ j * ‖h'‖) ^ 2 * Ω.graphBumpDeriv) :=
         mul_le_mul (mul_le_mul_of_nonneg_left hR Ω.M_nonneg) hD

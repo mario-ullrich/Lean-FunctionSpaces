@@ -315,18 +315,18 @@ positions `n` of coordinate `i` and the `k ∈ box_l(x)` of
 `⟨(c_k)_{x,i}, φ_{j,n}⟩ ∏_{i' ∈ l} φ_{j,k_{i'}}(x_{i'}) φ_{j,n}(x_i)`: the slice of `g` in
 coordinate `i` is a finite combination of the slices of the `c_k` with fixed weights
 (`Daubechies.foldBox_update`), the coefficients are linear (`Daubechies.coeffFun_sum_mul`), and
-the expansion of one variable is a finite sum (`Daubechies.expand_eq_sum`). -/
+the expansion of one variable is a finite sum (`Daubechies.daubechiesExpand_eq_sum`). -/
 theorem sliceProj_eq_sum_of_eq_sum (hN : 2 ≤ N) (j : ℕ) {i : Fin d} {l : List (Fin d)}
     (hi : i ∉ l) {g : (Fin d → ℝ) → ℂ} {c : (Fin d → ℤ) → (Fin d → ℝ) → ℂ}
     (hc : ∀ k, Continuous (c k))
     (hg : ∀ y, g y = ∑ k ∈ foldBox 0 (2 * N - 1) j l y,
-      c k y * ∏ i' ∈ l.toFinset, scaled m j (k i') (y i')) (x : Fin d → ℝ) :
+      c k y * ∏ i' ∈ l.toFinset, daubechiesScaled m j (k i') (y i')) (x : Fin d → ℝ) :
     sliceProj m j i g x = ∑ n ∈ Finset.Icc ⌈(2 : ℝ) ^ j * x i - (2 * N - 1)⌉
         ⌊(2 : ℝ) ^ j * x i - 0⌋, ∑ k ∈ foldBox 0 (2 * N - 1) j l x,
       coeffFun (scalingFun m) j (Cube.slice (c k) x i) n *
-        (∏ i' ∈ l.toFinset, scaled m j (k i') (x i')) * scaled m j n (x i) := by
+        (∏ i' ∈ l.toFinset, daubechiesScaled m j (k i') (x i')) * daubechiesScaled m j n (x i) := by
   have hslice : Cube.slice g x i = fun t => ∑ k ∈ foldBox 0 (2 * N - 1) j l x,
-      Cube.slice (c k) x i t * ∏ i' ∈ l.toFinset, scaled m j (k i') (x i') := by
+      Cube.slice (c k) x i t * ∏ i' ∈ l.toFinset, daubechiesScaled m j (k i') (x i') := by
     funext t
     rw [Cube.slice, hg, foldBox_update hi]
     refine Finset.sum_congr rfl fun k _ => ?_
@@ -334,10 +334,11 @@ theorem sliceProj_eq_sum_of_eq_sum (hN : 2 ≤ N) (j : ℕ) {i : Fin d} {l : Lis
     congr 1
     refine Finset.prod_congr rfl fun i' hi' => ?_
     rw [Function.update_of_ne fun h : i' = i => hi (h ▸ List.mem_toFinset.1 hi')]
-  rw [sliceProj, hslice, projFun, expand_eq_sum (fun _ hx => scalingFun_eq_zero m hN hx)]
+  rw [sliceProj, hslice, projFun, daubechiesExpand_eq_sum (fun _ hx => scalingFun_eq_zero m hN hx)]
   refine Finset.sum_congr rfl fun n _ => ?_
   rw [coeffFun_sum_mul (F := fun k => Cube.slice (c k) x i) _ _ fun k _ =>
-    integrable_mul_conj_scaled m hN (Cube.continuous_slice (hc k) x i).locallyIntegrable j n,
+    integrable_mul_conj_daubechiesScaled m hN
+      (Cube.continuous_slice (hc k) x i).locallyIntegrable j n,
     Finset.sum_mul]
 
 /-- **`R f` as a finite sum**: for `N ≥ 2`, continuous `f`, a list `l` without repetitions and
@@ -348,7 +349,7 @@ coordinate (`Daubechies.sum_foldBox_cons`, `Daubechies.foldCoeff_update_index`).
 theorem foldSliceProj_eq_sum (hN : 2 ≤ N) (j : ℕ) {f : (Fin d → ℝ) → ℂ} (hf : Continuous f)
     {l : List (Fin d)} (hl : l.Nodup) (x : Fin d → ℝ) :
     foldSliceProj m j l f x = ∑ k ∈ foldBox 0 (2 * N - 1) j l x,
-      foldCoeff m j l f k x * ∏ i ∈ l.toFinset, scaled m j (k i) (x i) := by
+      foldCoeff m j l f k x * ∏ i ∈ l.toFinset, daubechiesScaled m j (k i) (x i) := by
   induction l generalizing x with
   | nil =>
     rw [foldBox_nil, Finset.sum_singleton]
@@ -359,8 +360,8 @@ theorem foldSliceProj_eq_sum (hN : 2 ≤ N) (j : ℕ) {f : (Fin d → ℝ) → �
       (fun k => continuous_foldCoeff m hN j l hf k) (ih hl') x, sum_foldBox_cons hi]
     refine Finset.sum_congr rfl fun n _ => Finset.sum_congr rfl fun k _ => ?_
     have hi' : i ∉ l.toFinset := fun h => hi (List.mem_toFinset.1 h)
-    have hprod : ∏ i' ∈ l.toFinset, scaled m j (Function.update k i n i') (x i') =
-        ∏ i' ∈ l.toFinset, scaled m j (k i') (x i') :=
+    have hprod : ∏ i' ∈ l.toFinset, daubechiesScaled m j (Function.update k i n i') (x i') =
+        ∏ i' ∈ l.toFinset, daubechiesScaled m j (k i') (x i') :=
       Finset.prod_congr rfl fun i' hi'' => by
         rw [Function.update_of_ne fun h : i' = i => hi' (h ▸ hi'')]
     rw [foldCoeff_cons, foldCoeff_update_index m j hi, Function.update_self, List.toFinset_cons,

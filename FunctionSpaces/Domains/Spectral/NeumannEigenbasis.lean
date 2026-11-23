@@ -180,10 +180,10 @@ theorem neumannSpace.norm_toJet_le (u : neumannSpace O) : ‖neumannSpace.toJet 
 
 /-- **The two norms are equivalent**: `‖u‖ ≤ (n + 1) ‖toJet u‖`, the converse of
 `Rd.neumannSpace.norm_toJet_le` (`Rd.ValueGradientL2.norm_le_norm_fst_add_sum`,
-`Rd.norm_fst_add_sum_le`). -/
+`Rd.prod_pi_norm_fst_add_sum_le`). -/
 theorem neumannSpace.norm_le_norm_toJet (u : neumannSpace O) :
     ‖u‖ ≤ (finrank ℝ V + 1) * ‖neumannSpace.toJet O u‖ := by
-  have h := norm_fst_add_sum_le (neumannSpace.toJet O u).1
+  have h := prod_pi_norm_fst_add_sum_le (neumannSpace.toJet O u).1
   rw [Fintype.card_fin] at h
   exact (ValueGradientL2.norm_le_norm_fst_add_sum (u : ValueGradientL2 O)).trans h
 
@@ -316,15 +316,15 @@ variable [Nontrivial V]
 /-- **Every value of the Neumann space comes from `H^1(Ω)`**: for a bounded Lipschitz domain `Ω`
 in dimension `n ≥ 1` and every `u = (f, g)` in the Neumann space, `f = u_R|_Ω` for some
 `u_R ∈ H^1(Ω)`. The extension operator maps the jet of `u` to a jet `(F, G)` of `W^1_2(V)` with
-`F = f` on `Ω` (`Rd.BoundedLipschitzDomain.memSobolev_sobolevExtensionL`,
+`F = f` on `Ω` (`Rd.BoundedLipschitzDomain.memWSobolev_sobolevExtensionL`,
 `Rd.BoundedLipschitzDomain.sobolevExtensionL_fst_ae_eq`), and `u_R = F|_Ω`. -/
 theorem exists_restrictL2_eq_neumannEmbedding (u : neumannSpace Ω.toOpens) :
     ∃ uR : RestrictionSpace 1 Ω.toOpens,
       restrictL2 Ω.toOpens uR = neumannEmbedding Ω.toOpens u := by
-  have hF := Ω.memSobolev_sobolevExtensionL (neumannSpace.toJet Ω.toOpens u)
+  have hF := Ω.memWSobolev_sobolevExtensionL (neumannSpace.toJet Ω.toOpens u)
   have hFf := Ω.sobolevExtensionL_fst_ae_eq (neumannSpace.toJet Ω.toOpens u)
   set F := (Ω.sobolevExtensionL 2 (neumannSpace.toJet Ω.toOpens u)).1.1
-  have hS := (memSobolev_one_iff F).1 hF
+  have hS := (memWSobolev_one_iff F).1 hF
   have hU : toL2 hS.toBesselPotentialSpace = F :=
     toL2_eq_of_toDistr_eq _ hS.toBesselPotentialSpace_toDistr.symm
   refine ⟨restrictProj 1 Ω.toOpens hS.toBesselPotentialSpace, ?_⟩

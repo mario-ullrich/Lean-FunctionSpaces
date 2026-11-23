@@ -12,10 +12,10 @@ public import FunctionSpaces.Rd.TriebelLizorkin.SquareFunction
 # Sobolev spaces `W^m_p = F^m_{p,2}`
 
 Let `V` have dimension `n ≥ 1`, `1 < p < ∞` and `m ∈ ℕ`. A function `f ∈ L_p(V)` lies in the
-Sobolev space `W^m_p(V)` (`Rd.MemSobolev`: all weak derivatives `∂^w f` of order `k ≤ m` exist
+Sobolev space `W^m_p(V)` (`Rd.MemWSobolev`: all weak derivatives `∂^w f` of order `k ≤ m` exist
 and lie in `L_p(V)`) iff it lies in the Triebel–Lizorkin space `F^m_{p,2}(V)`
 (`Rd.MemTriebelLizorkin`: `‖ x ↦ ‖(2^{jm} (ψ_j ⋆ f)(x))_j‖_{ℓ_2} ‖_p < ∞`), see
-`Rd.memSobolev_iff_memTriebelLizorkin`. Both directions have named constants
+`Rd.memWSobolev_iff_memTriebelLizorkin`. Both directions have named constants
 (`Rd.sobolevToTLConst`, `Rd.tlToSobolevConst`), formulas in the Schwartz seminorms of fixed
 kernels that are proved finite.
 
@@ -44,10 +44,10 @@ kernels that are proved finite.
   sums.
 
 With the Besov sandwich of the Triebel–Lizorkin spaces, `B^m_{p,min(p,2)} ⊆ W^m_p` and, for
-`m ≥ 1`, `W^m_p ⊆ B^m_{p,max(p,2)}` (`Rd.memSobolev_of_memApprox`, `Rd.memApprox_of_memSobolev`,
+`m ≥ 1`, `W^m_p ⊆ B^m_{p,max(p,2)}` (`Rd.memWSobolev_of_memApprox`, `Rd.memApprox_of_memWSobolev`,
 with norm bounds in `Rd.exists_hasWeakLineDeriv_of_memApprox` and
 `Rd.approxNormDyadic_le_of_hasWeakLineDeriv`), and `W^m_2 = B^m_{2,2}` for `m ≥ 1`
-(`Rd.memSobolev_two_iff_memApprox`).
+(`Rd.memWSobolev_two_iff_memApprox`).
 -/
 
 @[expose] public section
@@ -69,7 +69,7 @@ variable (V) in
 /-- The constant `K_α = S_{V,p}(2, 4 H_{A^α})` of the bound `W^m_p ⊆ F^m_{p,2}` for the
 multi-index `α`: the strong type constant `Rd.czConst` of the Calderón–Zygmund family of the
 dilated derivative kernels `(η_α)_{2^j}`, with overlap `2` and Hörmander constant `4 H_{A^α}`
-(`Rd.isCZFamily_derivFamily`). -/
+(`Rd.isCZFamily_derivKernelFamily`). -/
 noncomputable def sobolevToTLConst (p : ℝ≥0∞) {m : ℕ} (i : Fin m → Fin (finrank ℝ V)) : ℝ≥0∞ :=
   czConst V p 2 (4 * familyHormanderConst V (derivKernelBound i))
 
@@ -90,7 +90,7 @@ theorem two_pow_mul_blockFun_succ_ae (hp : p ≠ ∞) {m : ℕ} {f : Lp ℂ p (v
     {g : (Fin m → Fin (finrank ℝ V)) → Lp ℂ p (volume : Measure V)}
     (hg : ∀ i, HasWeakLineDeriv ⊤ (fun k => gridBasis V (i k)) f (g i)) :
     ∀ᵐ x ∂volume, ∀ j, (2 : ℂ) ^ (j * m) * blockFun (j + 1) f x =
-      ∑ i, conv (derivFamily i j) (g i) volume x := by
+      ∑ i, conv (derivKernelFamily i j) (g i) volume x := by
   refine ae_all_iff.2 fun j => ?_
   set K : (Fin m → Fin (finrank ℝ V)) → 𝓢(V, ℂ) := fun i =>
     ∂^{fun k => gridBasis V (i k)} (schwartzDilate (2 ^ j) (pow_ne_zero j two_ne_zero)
@@ -119,7 +119,7 @@ theorem lqNorm_blockFun_succ_le_sum_ae (hp : p ≠ ∞) {m : ℕ} {f : Lp ℂ p 
     (hg : ∀ i, HasWeakLineDeriv ⊤ (fun k => gridBasis V (i k)) f (g i)) :
     ∀ᵐ x ∂volume,
       lqNorm 2 (fun n => dyadicWeight (m : ℝ) (n + 1) * ‖blockFun (n + 1) f x‖ₑ) ≤
-        2 ^ m * ∑ i, lqNorm 2 (fun n => ‖conv (derivFamily i n) (g i) volume x‖ₑ) := by
+        2 ^ m * ∑ i, lqNorm 2 (fun n => ‖conv (derivKernelFamily i n) (g i) volume x‖ₑ) := by
   filter_upwards [two_pow_mul_blockFun_succ_ae hp hg] with x hx
   refine ENNReal.lqNorm_dyadicWeight_succ_le_sum one_le_two Finset.univ fun n => ?_
   rw [← enorm_two_pow_complex, ← enorm_mul, hx n]
@@ -139,9 +139,9 @@ theorem eLpNorm_lqNorm_blockFun_succ_le [Nontrivial V] (hp1 : 1 < p) (hp : p ≠
         dyadicWeight (m : ℝ) (n + 1) * ‖blockFun (n + 1) f x‖ₑ)) p volume ≤
       2 ^ m * ∑ i, sobolevToTLConst V p i * ‖g i‖ₑ := by
   have hF : ∀ i, AEMeasurable
-      (fun x => lqNorm 2 (fun n => ‖conv (derivFamily i n) (g i) volume x‖ₑ)) volume :=
+      (fun x => lqNorm 2 (fun n => ‖conv (derivKernelFamily i n) (g i) volume x‖ₑ)) volume :=
     fun i => aemeasurable_lqNorm_comp (fun n => (aestronglyMeasurable_conv
-      ((isCZFamily_derivFamily i).integrable n).aestronglyMeasurable
+      ((isCZFamily_derivKernelFamily i).integrable n).aestronglyMeasurable
       (Lp.aestronglyMeasurable (g i))).enorm) 2
   refine (eLpNorm_le_const_mul_sum_of_ae_le (p := p) Fact.out Finset.univ
     (aemeasurable_lqNorm_comp (fun n =>
@@ -149,7 +149,7 @@ theorem eLpNorm_lqNorm_blockFun_succ_le [Nontrivial V] (hp1 : 1 < p) (hp : p ≠
     (fun i _ => hF i) _ (lqNorm_blockFun_succ_le_sum_ae hp hg)).trans ?_
   gcongr with i
   rw [Lp.enorm_def]
-  exact (isCZFamily_derivFamily i).eLpNorm_lqNorm_conv_le hp1 hp (Lp.memLp (g i))
+  exact (isCZFamily_derivKernelFamily i).eLpNorm_lqNorm_conv_le hp1 hp (Lp.memLp (g i))
 
 /-- **`W^m_p ⊆ F^m_{p,2}` with named constants**: in dimension `n ≥ 1`, for `1 < p < ∞` and
 `f ∈ L_p(V)` whose weak derivatives `g_α = ∂_{e_{α_0}} ⋯ ∂_{e_{α_{m-1}}} f` along the orthonormal
@@ -190,11 +190,11 @@ theorem memTriebelLizorkin_of_hasWeakLineDeriv [Nontrivial V] (hp1 : 1 < p) (hp 
 /-- **`W^m_p ⊆ F^m_{p,2}`**: in dimension `n ≥ 1`, for `1 < p < ∞`, every `f ∈ W^m_p(V)` lies in
 `F^m_{p,2}(V)`; the weak derivatives of order `m` along the basis vectors suffice
 (`Rd.memTriebelLizorkin_of_hasWeakLineDeriv`). -/
-theorem memTriebelLizorkin_of_memSobolev [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {m : ℕ}
-    {f : Lp ℂ p (volume : Measure V)} (hf : MemSobolev m f) : MemTriebelLizorkin (m : ℝ) 2 f := by
+theorem memTriebelLizorkin_of_memWSobolev [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {m : ℕ}
+    {f : Lp ℂ p (volume : Measure V)} (hf : MemWSobolev m f) : MemTriebelLizorkin (m : ℝ) 2 f := by
   have hd : ∀ i : Fin m → Fin (finrank ℝ V), ∃ g : Lp ℂ p (volume : Measure V),
       HasWeakLineDeriv ⊤ (fun k => gridBasis V (i k)) f g := fun i =>
-    (memSobolev_iff_exists_hasWeakLineDeriv f).1 hf m le_rfl _
+    (memWSobolev_iff_exists_hasWeakLineDeriv f).1 hf m le_rfl _
   choose g hg using hd
   exact memTriebelLizorkin_of_hasWeakLineDeriv hp1 hp hg
 
@@ -451,48 +451,48 @@ theorem exists_hasWeakLineDeriv_of_memTriebelLizorkin_of_le [Nontrivial V] (hp1 
 
 /-- **`F^m_{p,2} ⊆ W^m_p`**: in dimension `n ≥ 1`, for `1 < p < ∞`, every `f ∈ F^m_{p,2}(V)` lies
 in `W^m_p(V)` (`Rd.exists_hasWeakLineDeriv_of_memTriebelLizorkin_of_le`). -/
-theorem memSobolev_of_memTriebelLizorkin [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {m : ℕ}
-    {f : Lp ℂ p (volume : Measure V)} (hf : MemTriebelLizorkin (m : ℝ) 2 f) : MemSobolev m f :=
-  (memSobolev_iff_exists_hasWeakLineDeriv f).2 fun _ hk w =>
+theorem memWSobolev_of_memTriebelLizorkin [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {m : ℕ}
+    {f : Lp ℂ p (volume : Measure V)} (hf : MemTriebelLizorkin (m : ℝ) 2 f) : MemWSobolev m f :=
+  (memWSobolev_iff_exists_hasWeakLineDeriv f).2 fun _ hk w =>
     (exists_hasWeakLineDeriv_of_memTriebelLizorkin_of_le hp1 hp hk w hf).imp fun _ hg => hg.1
 
 /-- **`W^m_p = F^m_{p,2}`**: in dimension `n ≥ 1`, for `1 < p < ∞`, `m ∈ ℕ` and `f ∈ L_p(V)`,
 `f ∈ W^m_p(V)` iff `f ∈ F^m_{p,2}(V)`. The norm bounds are
 `Rd.triebelLizorkinNorm_le_of_hasWeakLineDeriv` and
 `Rd.exists_hasWeakLineDeriv_of_memTriebelLizorkin_of_le`. -/
-theorem memSobolev_iff_memTriebelLizorkin [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {m : ℕ}
-    (f : Lp ℂ p (volume : Measure V)) : MemSobolev m f ↔ MemTriebelLizorkin (m : ℝ) 2 f :=
-  ⟨memTriebelLizorkin_of_memSobolev hp1 hp, memSobolev_of_memTriebelLizorkin hp1 hp⟩
+theorem memWSobolev_iff_memTriebelLizorkin [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {m : ℕ}
+    (f : Lp ℂ p (volume : Measure V)) : MemWSobolev m f ↔ MemTriebelLizorkin (m : ℝ) 2 f :=
+  ⟨memTriebelLizorkin_of_memWSobolev hp1 hp, memWSobolev_of_memTriebelLizorkin hp1 hp⟩
 
 /-! ### The Besov sandwich -/
 
 /-- **`W^m_p ⊆ B^m_{p,max(p,2)}`**: in dimension `n ≥ 1`, for `1 < p < ∞` and `m ≥ 1`, every
 `f ∈ W^m_p(V)` lies in the approximation space `A^m_{max(p,2)}` of the band-limited scheme, the
 Besov space `B^m_{p,max(p,2)}(V)` (`Rd.memApprox_of_memTriebelLizorkin`). -/
-theorem memApprox_of_memSobolev [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {m : ℕ} (hm : 1 ≤ m)
-    {f : Lp ℂ p (volume : Measure V)} (hf : MemSobolev m f) :
+theorem memApprox_of_memWSobolev [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {m : ℕ} (hm : 1 ≤ m)
+    {f : Lp ℂ p (volume : Measure V)} (hf : MemWSobolev m f) :
     (bandScheme hp).MemApprox (m : ℝ) (max p 2) f :=
   memApprox_of_memTriebelLizorkin hp (Nat.cast_pos.2 hm) one_le_two
-    (memTriebelLizorkin_of_memSobolev hp1 hp hf)
+    (memTriebelLizorkin_of_memWSobolev hp1 hp hf)
 
 /-- **`B^m_{p,min(p,2)} ⊆ W^m_p`**: in dimension `n ≥ 1`, for `1 < p < ∞` and `m ∈ ℕ`, every
 `f` in the approximation space `A^m_{min(p,2)}` of the band-limited scheme, the Besov space
 `B^m_{p,min(p,2)}(V)`, lies in `W^m_p(V)` (`Rd.memTriebelLizorkin_two_of_memApprox`). -/
-theorem memSobolev_of_memApprox [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {m : ℕ}
+theorem memWSobolev_of_memApprox [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {m : ℕ}
     {f : Lp ℂ p (volume : Measure V)} (hf : (bandScheme hp).MemApprox (m : ℝ) (min p 2) f) :
-    MemSobolev m f :=
-  memSobolev_of_memTriebelLizorkin hp1 hp
+    MemWSobolev m f :=
+  memWSobolev_of_memTriebelLizorkin hp1 hp
     (memTriebelLizorkin_two_of_memApprox hp1 hp (Nat.cast_nonneg m) hf)
 
 /-- **`W^m_2 = B^m_{2,2}`**: for `p = 2` and every order `m ≥ 1`, in dimension `n ≥ 1`,
 `f ∈ L_2(V)` lies in `W^m_2(V)` iff `f` lies in the approximation space `A^m_2` of the
 band-limited scheme, the Besov space `B^m_{2,2}(V)`, since `F^m_{2,2} = B^m_{2,2}`
 (`Rd.memTriebelLizorkin_iff_memApprox`). The case `m = 1` holds in every dimension
-(`Rd.memSobolev_one_iff_memApprox`). -/
-theorem memSobolev_two_iff_memApprox [Nontrivial V] {m : ℕ} (hm : 1 ≤ m)
+(`Rd.memWSobolev_one_iff_memApprox`). -/
+theorem memWSobolev_two_iff_memApprox [Nontrivial V] {m : ℕ} (hm : 1 ≤ m)
     (f : Lp ℂ 2 (volume : Measure V)) :
-    MemSobolev m f ↔ (bandScheme (V := V) two_ne_top).MemApprox (m : ℝ) 2 f := by
-  rw [memSobolev_iff_memTriebelLizorkin ENNReal.one_lt_two two_ne_top,
+    MemWSobolev m f ↔ (bandScheme (V := V) two_ne_top).MemApprox (m : ℝ) 2 f := by
+  rw [memWSobolev_iff_memTriebelLizorkin ENNReal.one_lt_two two_ne_top,
     memTriebelLizorkin_iff_memApprox two_ne_top (Nat.cast_pos.2 hm)]
 
 /-- **`W^m_p ⊆ B^m_{p,max(p,2)}` with named constants**: under the hypotheses of

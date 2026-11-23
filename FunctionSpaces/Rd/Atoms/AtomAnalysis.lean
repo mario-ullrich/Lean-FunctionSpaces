@@ -30,7 +30,7 @@ inequality on balls (`Rd.enorm_conv_le_of_bound`) and `Δ_h^r (K ⋆ g) = (Δ_h^
 (`Rd.enorm_higherDiff_cellAtom_le`); by `Rd.isRegularAtom_of_pointwise` the cell atoms are
 regular atoms (`Rd.isRegularAtom_cellAtom`).
 The dual kernels `η_j` of a bump satisfy these bounds
-(`Rd.LocalMeansBump.exists_higherDiff_dual_bound`).
+(`Rd.LocalMeansBump.exists_higherDiff_dualKernel_bound`).
 
 **Atomic characterisation** (`Rd.LocalMeansBump.besov_iff_atomic`; Schneider–Vybíral,
 Corollary 2.8, for `p ≥ 1`): for `0 < s < L`, `F ∈ B^s_{p,q}(V)` iff `F = ∑_j ∑_m λ_{j,m} a_{j,m}`
@@ -455,17 +455,17 @@ variable (b : LocalMeansBump V)
 `|Δ_h^l η_j| ≤ A 2^(jn) min(1, (2^j ‖h‖)^l)` for `l ≤ r`, from the bounded derivatives of the
 moment kernel (`Rd.enorm_higherDiff_le_of_iteratedFDeriv`) and the scaling of differences of
 dilations (`Rd.higherDiff_dilate`). -/
-theorem exists_higherDiff_dual_bound (L r : ℕ) : ∃ A : ℝ≥0∞, A ≠ ∞ ∧ ∀ l ≤ r, ∀ j h y,
-    ‖(fwdDiff h)^[l] (b.dual L j) y‖ₑ ≤
+theorem exists_higherDiff_dualKernel_bound (L r : ℕ) : ∃ A : ℝ≥0∞, A ≠ ∞ ∧ ∀ l ≤ r, ∀ j h y,
+    ‖(fwdDiff h)^[l] (b.dualKernel L j) y‖ₑ ≤
       A * dyadicWeight (finrank ℝ V) j * min 1 (ENNReal.ofReal (2 ^ j * ‖h‖) ^ (l : ℝ)) := by
   obtain ⟨C, hC⟩ := exists_iteratedFDeriv_bound (b.contDiff_momentKernel L)
     (b.hasCompactSupport_momentKernel L) r
   have hC0 : 0 ≤ C := (norm_nonneg _).trans (hC 0 (Nat.zero_le r) 0)
-  have hscaled : ∀ l ≤ r, ∀ i j : ℕ, i ≤ j → ∀ h y, ‖(fwdDiff h)^[l] (b.scaled L i) y‖ₑ ≤
+  have hscaled : ∀ l ≤ r, ∀ i j : ℕ, i ≤ j → ∀ h y, ‖(fwdDiff h)^[l] (b.scaledMoment L i) y‖ₑ ≤
       ENNReal.ofReal (2 ^ r * C) * dyadicWeight (finrank ℝ V) j *
         min 1 (ENNReal.ofReal (2 ^ j * ‖h‖) ^ (l : ℝ)) := by
     intro l hl i j hij h y
-    rw [scaled, higherDiff_dilate, dilate, enorm_mul]
+    rw [scaledMoment, higherDiff_dilate, dilate, enorm_mul]
     have h1 := enorm_higherDiff_le_of_iteratedFDeriv (b.contDiff_momentKernel L) (r := l) (j := 0)
       hC0 (fun l' hl' x => by simpa using hC l' (hl'.trans hl) x) ((2 : ℝ) ^ i • h)
       ((2 : ℝ) ^ i • y)
@@ -496,10 +496,10 @@ theorem exists_higherDiff_dual_bound (L r : ℕ) : ∃ A : ℝ≥0∞, A ≠ ∞
     gcongr
     exact le_mul_of_one_le_left' one_le_two
   | succ j =>
-    rw [show b.dual L (j + 1) = b.scaled L (j + 1) + b.scaled L j from rfl, fwdDiff_iter_add,
-      Pi.add_apply]
+    rw [show b.dualKernel L (j + 1) = b.scaledMoment L (j + 1) + b.scaledMoment L j from rfl,
+      fwdDiff_iter_add, Pi.add_apply]
     refine (enorm_add_le _ _).trans ?_
-    calc ‖(fwdDiff h)^[l] (b.scaled L (j + 1)) y‖ₑ + ‖(fwdDiff h)^[l] (b.scaled L j) y‖ₑ
+    calc ‖(fwdDiff h)^[l] (b.scaledMoment L (j + 1)) y‖ₑ + ‖(fwdDiff h)^[l] (b.scaledMoment L j) y‖ₑ
         ≤ ENNReal.ofReal (2 ^ r * C) * dyadicWeight (finrank ℝ V) (j + 1) *
             min 1 (ENNReal.ofReal (2 ^ (j + 1) * ‖h‖) ^ (l : ℝ)) +
           ENNReal.ofReal (2 ^ r * C) * dyadicWeight (finrank ℝ V) (j + 1) *
@@ -512,9 +512,9 @@ the cell atoms of `η_j ⋆ g`, `g ∈ L_p`, satisfy `|Δ_h^l a_{j,m}| ≤ A min
 `l ≤ r`, `j`, `m`. -/
 theorem exists_cellAtom_pointwise_bound {p : ℝ≥0∞} (hp1 : 1 ≤ p) (L r : ℕ) :
     ∃ A : ℝ≥0∞, A ≠ ∞ ∧ ∀ (j : ℕ) {g : V → ℂ}, MemLp g p volume → ∀ m, ∀ l ≤ r, ∀ h x,
-      ‖(fwdDiff h)^[l] (cellAtom p (b.dual L j) j g m) x‖ₑ ≤
+      ‖(fwdDiff h)^[l] (cellAtom p (b.dualKernel L j) j g m) x‖ₑ ≤
         A * min 1 (ENNReal.ofReal (2 ^ j * ‖h‖) ^ (l : ℝ)) := by
-  obtain ⟨A, hA, hb⟩ := b.exists_higherDiff_dual_bound L r
+  obtain ⟨A, hA, hb⟩ := b.exists_higherDiff_dualKernel_bound L r
   have ht : 0 ≤ 1 - 1 / p.toReal := one_sub_one_div_toReal_nonneg hp1
   set ρ := 2 * (L : ℝ) * b.radius
   have hρ : 0 ≤ ρ := mul_nonneg (mul_nonneg zero_le_two (Nat.cast_nonneg L)) b.radius_nonneg
@@ -522,10 +522,10 @@ theorem exists_cellAtom_pointwise_bound {p : ℝ≥0∞} (hp1 : 1 ≤ p) (L r : 
       (1 - 1 / p.toReal), ENNReal.mul_ne_top (ENNReal.mul_ne_top (by simp) hA)
         (ENNReal.rpow_ne_top_of_nonneg ht (ENNReal.mul_ne_top ENNReal.ofReal_ne_top
           measure_ball_lt_top.ne)), fun j g hg m l hl h x => ?_⟩
-  have hK : ∀ y, ‖b.dual L j y‖ₑ ≤ A * dyadicWeight (finrank ℝ V) j := fun y => by
+  have hK : ∀ y, ‖b.dualKernel L j y‖ₑ ≤ A * dyadicWeight (finrank ℝ V) j := fun y => by
     simpa using hb 0 (Nat.zero_le r) j 0 y
-  have h1 := enorm_higherDiff_cellAtom_le hp1 (b.continuous_dual L j) hg m hK (hb l hl j) hρ
-    (fun y hy => b.dual_eq_zero_of_lt L j hy) h x
+  have h1 := enorm_higherDiff_cellAtom_le hp1 (b.continuous_dualKernel L j) hg m hK (hb l hl j) hρ
+    (fun y hy => b.dualKernel_eq_zero_of_lt L j hy) h x
   refine h1.trans (mul_le_mul' ?_ le_rfl)
   refine mul_le_mul' (mul_le_mul' (pow_le_pow_right₀ one_le_two hl) le_rfl)
     (ENNReal.rpow_le_rpow (mul_le_mul' (ENNReal.ofReal_le_ofReal
@@ -543,27 +543,28 @@ there is `C < ∞` such that for every `F ∈ L_p` the terms of the reproducing 
 theorem atomic_decomposition (hp : p ≠ ∞) (L r : ℕ) : ∃ C : ℝ≥0∞, C ≠ ∞ ∧
     ∀ F : Lp ℂ p (volume : Measure V),
       (∀ j m, IsRegularAtom p r r (2 * L * b.radius + finrank ℝ V) C j (cellCenter j m)
-        (cellAtom p (b.dual L j) j (b.localMean hp L j F) m)) ∧
-      (∀ j, ∀ᵐ x ∂volume, convLp hp (b.integrable_dual L j) (b.localMean hp L j F) x =
+        (cellAtom p (b.dualKernel L j) j (b.localMean hp L j F) m)) ∧
+      (∀ j, ∀ᵐ x ∂volume, convLp hp (b.integrable_dualKernel L j) (b.localMean hp L j F) x =
         ∑' m, cellCoef p j (b.localMean hp L j F) m *
-          cellAtom p (b.dual L j) j (b.localMean hp L j F) m x) ∧
+          cellAtom p (b.dualKernel L j) j (b.localMean hp L j F) m x) ∧
       ∀ s q, coeffNorm p (finrank ℝ V) s q (fun j => cellCoef p j (b.localMean hp L j F)) =
         b.localMeansNorm hp L s q F := by
   have hp1 : 1 ≤ p := Fact.out
   have hp0 : p ≠ 0 := (zero_lt_one.trans_le hp1).ne'
-  obtain ⟨A, hA, hb⟩ := b.exists_higherDiff_dual_bound L r
+  obtain ⟨A, hA, hb⟩ := b.exists_higherDiff_dualKernel_bound L r
   have hρ : 0 ≤ 2 * (L : ℝ) * b.radius :=
     mul_nonneg (mul_nonneg zero_le_two (Nat.cast_nonneg L)) b.radius_nonneg
-  have hK : ∀ j y, ‖b.dual L j y‖ₑ ≤ A * dyadicWeight (finrank ℝ V) j := fun j y => by
+  have hK : ∀ j y, ‖b.dualKernel L j y‖ₑ ≤ A * dyadicWeight (finrank ℝ V) j := fun j y => by
     simpa using hb 0 (Nat.zero_le r) j 0 y
   refine ⟨cellAtomConst V p A (2 * L * b.radius) r, cellAtomConst_ne_top hp1 hA _ r,
     fun F => ⟨fun j m => ?_, fun j => ?_, fun s q => ?_⟩⟩
-  · exact isRegularAtom_cellAtom hp1 (b.continuous_dual L j) (Lp.memLp _) m (hK j)
-      (hb r le_rfl j) hρ fun y hy => b.dual_eq_zero_of_lt L j hy
-  · filter_upwards [convLp_apply_ae hp (b.integrable_dual L j) (b.localMean hp L j F)] with x hx
+  · exact isRegularAtom_cellAtom hp1 (b.continuous_dualKernel L j) (Lp.memLp _) m (hK j)
+      (hb r le_rfl j) hρ fun y hy => b.dualKernel_eq_zero_of_lt L j hy
+  · filter_upwards [convLp_apply_ae hp (b.integrable_dualKernel L j) (b.localMean hp L j F)]
+      with x hx
     rw [hx]
-    exact conv_eq_tsum_cellAtom hp1 (b.continuous_dual L j) (by positivity)
-      (fun y hy => b.dual_eq_zero_of_lt L j hy) (Lp.memLp _) j x
+    exact conv_eq_tsum_cellAtom hp1 (b.continuous_dualKernel L j) (by positivity)
+      (fun y hy => b.dualKernel_eq_zero_of_lt L j hy) (Lp.memLp _) j x
   · rw [coeffNorm_cellCoef hp0 hp (fun j => Lp.memLp _), localMeansNorm]
     simp_rw [Lp.enorm_def]
 
@@ -596,9 +597,9 @@ theorem besov_iff_atomic (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s : ℝ} (hs
         b.radius_nonneg) (Nat.cast_nonneg _)) (Nat.cast_nonneg L)
     refine ⟨2 * L * b.radius + finrank ℝ V, C,
       ⌈(2 * (2 * L * b.radius + finrank ℝ V + L) + 2) ^ finrank ℝ V⌉₊,
-      fun j m => cellCenter j m, fun j => cellAtom p (b.dual L j) j (b.localMean hp L j F),
+      fun j m => cellCenter j m, fun j => cellAtom p (b.dualKernel L j) j (b.localMean hp L j F),
       fun j => cellCoef p j (b.localMean hp L j F),
-      fun j => convLp hp (b.integrable_dual L j) (b.localMean hp L j F), hC, hatom,
+      fun j => convLp hp (b.integrable_dualKernel L j) (b.localMean hp L j F), hC, hatom,
       fun j x S hS => card_le_of_norm_sub_cellCenter_le j hd x S fun m hm => (hS m hm).2, hsum,
       b.tendsto_sum_dual_localMean hp hL F, ?_⟩
     rw [hcoef]

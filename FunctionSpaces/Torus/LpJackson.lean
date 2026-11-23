@@ -178,13 +178,13 @@ theorem ae_sub_jacksonApprox_eq (hp : p ≠ ∞) (r k : ℕ)
 /-! ### Jackson's inequality -/
 
 /-- **Jackson's inequality on the torus**: for `f ∈ L_p(𝕋^d)`, `1 ≤ p < ∞`,
-`‖f - J_k f‖_p ≤ C ω_r(f, 2^(-k))_p`, with the constant `Rd.jacksonConst` of `ℝ^d`: by the weighted
-averages of `Rd.eLpNorm_integral_lpKernel_mul_le` and
+`‖f - J_k f‖_p ≤ C ω_r(f, 2^(-k))_p`, with the constant `Rd.bandJacksonConst` of `ℝ^d`: by the
+weighted averages of `Rd.eLpNorm_integral_lpKernel_mul_le` and
 `ω_r(f, 2^(-k) |z|)_p ≤ (1 + |z|)^r ω_r(f, 2^(-k))_p`. -/
 theorem enorm_sub_jacksonApprox_le (hp : p ≠ ∞) (r k : ℕ)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     ‖f - jacksonApprox hp r k f‖ₑ ≤
-      Rd.jacksonConst (EuclideanSpace ℝ d) r p * Rd.lpModulus p r f k := by
+      Rd.bandJacksonConst (EuclideanSpace ℝ d) r p * Rd.lpModulus p r f k := by
   have hp1 : 1 ≤ p := Fact.out
   have hfm : Measurable (f : UnitAddTorus d → ℂ) := (Lp.stronglyMeasurable f).measurable
   set w : EuclideanSpace ℝ d → UnitAddTorus d := fun z => proj (-((2 : ℝ) ^ k)⁻¹ • z) with hw
@@ -237,7 +237,7 @@ theorem enorm_sub_jacksonApprox_le (hp : p ≠ ∞) (r k : ℕ)
 theorem approxError_trigScheme_le (hp : p ≠ ∞) (r k : ℕ)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     ((trigScheme d).toLp volume p).approxError f (2 ^ (k + 1)) ≤
-      Rd.jacksonConst (EuclideanSpace ℝ d) r p * Rd.lpModulus p r f k :=
+      Rd.bandJacksonConst (EuclideanSpace ℝ d) r p * Rd.lpModulus p r f k :=
   (ApproximationScheme.approxError_le_of_mem
     (mem_toLp_trigScheme_iff.2 (jacksonApprox_mem_trigPolyLp hp r k f)) f).trans
     (enorm_sub_jacksonApprox_le hp r k f)

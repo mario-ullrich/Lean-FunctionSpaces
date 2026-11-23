@@ -100,8 +100,9 @@ theorem farMass_psiDual_le :
 
 /-- The far mass of the derivative family `j ↦ (η_i)_{2^j}` of a multi-index `i` is at most
 `2 T_{A^{η_i}}`, with the seminorm bounds `A^{η_i} = Rd.derivKernelBound i`. -/
-theorem farMass_derivFamily_le {m : ℕ} (i : Fin m → Fin (Module.finrank ℝ (EuclideanSpace ℝ d))) :
-    farMass (Rd.derivFamily i) ≤
+theorem farMass_derivKernelFamily_le {m : ℕ}
+    (i : Fin m → Fin (Module.finrank ℝ (EuclideanSpace ℝ d))) :
+    farMass (Rd.derivKernelFamily i) ≤
       2 * Rd.familyTailConst (EuclideanSpace ℝ d) (Rd.derivKernelBound i) 0 1 :=
   farMass_dilate_le (Rd.isUniformSchwartz_derivKernel i)
 

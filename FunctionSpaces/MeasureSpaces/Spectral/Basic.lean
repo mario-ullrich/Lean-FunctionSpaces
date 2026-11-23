@@ -152,7 +152,7 @@ theorem levelWeight_le {s : ℝ} (hs : 0 ≤ s) {n : ℕ} {i : ι} (hi : S.level
   Real.rpow_le_rpow (by positivity) (by exact_mod_cast (show 1 + S.level i ≤ n by omega)) hs
 
 /-- The diagonal operator `c ↦ ((1 + lvl i)^(-s) c_i)_i` on `ℓ²`, a contraction for `s ≥ 0`. -/
-noncomputable def diagInvWeight (s : ℝ) (hs : 0 ≤ s) : ℓ²(ι, ℂ) →L[ℂ] ℓ²(ι, ℂ) :=
+noncomputable def diagInvLevelWeight (s : ℝ) (hs : 0 ≤ s) : ℓ²(ι, ℂ) →L[ℂ] ℓ²(ι, ℂ) :=
   LinearMap.mkContinuous
     { toFun := fun c => ⟨fun i => ((S.levelWeight s i)⁻¹ : ℂ) * c i,
         ((lp.memℓp c).norm).mono fun i => by
@@ -178,19 +178,19 @@ noncomputable def diagInvWeight (s : ℝ) (hs : 0 ≤ s) : ℓ²(ι, ℂ) →L[�
         (inv_le_one_of_one_le₀ (S.one_le_levelWeight hs i))
 
 /-- The diagonal operator multiplies the `i`-th coordinate by `(1 + λ(i))^(-s)`. -/
-theorem diagInvWeight_apply (s : ℝ) (hs : 0 ≤ s) (c : ℓ²(ι, ℂ)) (i : ι) :
-    S.diagInvWeight s hs c i = ((S.levelWeight s i)⁻¹ : ℂ) * c i := rfl
+theorem diagInvLevelWeight_apply (s : ℝ) (hs : 0 ≤ s) (c : ℓ²(ι, ℂ)) (i : ι) :
+    S.diagInvLevelWeight s hs c i = ((S.levelWeight s i)⁻¹ : ℂ) * c i := rfl
 
 /-- The **Sobolev embedding** `J_s c = ∑_i (1 + lvl i)^(-s) c_i e_i` of `ℓ²` into `H`; its
 range is the Sobolev space of order `s`. -/
 noncomputable def sobolevEmbed (s : ℝ) (hs : 0 ≤ s) : ℓ²(ι, ℂ) →L[ℂ] H :=
-  (S.basis.repr.symm.toLinearIsometry.toContinuousLinearMap).comp (S.diagInvWeight s hs)
+  (S.basis.repr.symm.toLinearIsometry.toContinuousLinearMap).comp (S.diagInvLevelWeight s hs)
 
 /-- The coefficients of `J_s c` are `(1 + λ(i))^(-s) c_i`. -/
 theorem repr_sobolevEmbed (s : ℝ) (hs : 0 ≤ s) (c : ℓ²(ι, ℂ)) (i : ι) :
     S.basis.repr (S.sobolevEmbed s hs c) i = ((S.levelWeight s i)⁻¹ : ℂ) * c i := by
-  change S.basis.repr (S.basis.repr.symm (S.diagInvWeight s hs c)) i = _
-  rw [LinearIsometryEquiv.apply_symm_apply, diagInvWeight_apply]
+  change S.basis.repr (S.basis.repr.symm (S.diagInvLevelWeight s hs c)) i = _
+  rw [LinearIsometryEquiv.apply_symm_apply, diagInvLevelWeight_apply]
 
 /-- `J_s` is injective. -/
 theorem sobolevEmbed_injective (s : ℝ) (hs : 0 ≤ s) :

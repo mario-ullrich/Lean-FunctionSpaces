@@ -586,7 +586,7 @@ theorem exists_local_extension_interior_le (hp : p ≠ ∞) {r : ℕ} (hr : 1 �
   obtain ⟨F, hF, hFf⟩ := b.exists_local_extension_le hp hr hs hq hU hW Ω.measurableSet
     (setOf_lt_infDist_compl_subset _ (by positivity))
     (fun x hx j y hy => interior_patch_support Ω.carrier
-      (fun y hy => (not_lt.1 fun h => hy (b.dual_eq_zero r j h)).trans hLR) x hx y hy)
+      (fun y hy => (not_lt.1 fun h => hy (b.dualKernel_eq_zero r j h)).trans hLR) x hx y hy)
     (fun c hc z hz => interior_patch_step Ω.carrier (by
       have hz' : ‖z‖ ≤ b.radius := not_lt.1 fun h => hz (b.eq_zero z h)
       have hc0 : 0 < c := zero_lt_one.trans_le hc

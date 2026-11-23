@@ -13,7 +13,7 @@ public import FunctionSpaces.Wavelets.Examples.Daubechies.Projections
 # Jackson's inequality for the Daubechies projections
 
 For a Daubechies mask of order `N ≥ 2` with scaling function `φ`, the projections
-`P_j f = ∑_{k ∈ ℤ} ⟨f, φ_{j,k}⟩ φ_{j,k}` (`Daubechies.projFun`, `Daubechies.proj`) and the
+`P_j f = ∑_{k ∈ ℤ} ⟨f, φ_{j,k}⟩ φ_{j,k}` (`Daubechies.projFun`, `Daubechies.daubechiesProj`) and the
 scaling spaces `V_j` satisfy **Jackson's inequality**: for `1 ≤ p < ∞`, every `f ∈ L_p(ℝ)` and
 every level `j ∈ ℕ`, the error of best approximation from `V_j` obeys
 
@@ -21,10 +21,11 @@ every level `j ∈ ℕ`, the error of best approximation from `V_j` obeys
 
 with the modulus of smoothness `ω_N(f, t)_p = sup_{|h| ≤ t} ‖Δ_h^N f‖_{L_p(ℝ)}`
 (`Rd.smoothnessModulus`) and a constant `C_J` that depends only on the mask and on `p`
-(`Daubechies.daubechiesJacksonConst`, `Daubechies.approxError_scheme_le_jacksonConst_mul`). This is
-the Jackson inequality of the Daubechies scheme (`Daubechies.approxError_scheme_le`). With the
-uniform bound `C` of the projections it gives `‖f - P_j f‖_p ≤ (1 + C) C_J ω_N(f, 2^(-j))_p`
-(`Daubechies.enorm_sub_proj_le`), and for continuous `f` directly
+(`Daubechies.daubechiesJacksonConst`,
+`Daubechies.approxError_daubechiesScheme_le_daubechiesJacksonConst_mul`). This is the Jackson
+inequality of the Daubechies scheme (`Daubechies.approxError_daubechiesScheme_le`). With the uniform
+bound `C` of the projections it gives `‖f - P_j f‖_p ≤ (1 + C) C_J ω_N(f, 2^(-j))_p`
+(`Daubechies.enorm_sub_daubechiesProj_le`), and for continuous `f` directly
 `‖f - P_j f‖_p ≤ C_J ω_N(f, 2^(-j))_p` (`Daubechies.eLpNorm_sub_projFun_le_smoothnessModulus`).
 
 The proof has three steps.
@@ -51,7 +52,7 @@ The proof has three steps.
   projections (`Daubechies.eLpNorm_sub_projFun_le_add`). Together:
   `‖f - P_j f‖_p ≤ C_J ω_N(f, 2^(-j))_p` (`Daubechies.eLpNorm_sub_projFun_le_smoothnessModulus`),
   and the same for every `f ∈ L_p` with a continuous representative
-  (`Daubechies.enorm_sub_proj_le_of_continuous`).
+  (`Daubechies.enorm_sub_daubechiesProj_le_of_continuous`).
 * **All of `L_p`.** The functions with a bounded continuous representative are dense in `L_p`
   (Mathlib's `MeasureTheory.Lp.boundedContinuousFunction_dense`), and the error of best
   approximation and the modulus are both controlled by `‖f‖_p`, so the inequality for
@@ -417,27 +418,28 @@ variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 `‖f - P_j f‖_p ≤ C_J ω_N(f, 2^(-j))_p` with `C_J = daubechiesJacksonConst m p`
 (`Daubechies.eLpNorm_sub_projFun_le_smoothnessModulus` for `g`; both sides depend only on the class
 of `f`, `Daubechies.projFun_congr_ae` and `Rd.smoothnessModulus_congr_ae`). -/
-theorem enorm_sub_proj_le_of_continuous (hN : 2 ≤ N) (hp : p ≠ ∞)
+theorem enorm_sub_daubechiesProj_le_of_continuous (hN : 2 ≤ N) (hp : p ≠ ∞)
     {f : Lp ℂ p (volume : Measure ℝ)} {g : ℝ → ℂ} (hg : Continuous g) (hfg : ⇑f =ᵐ[volume] g)
-    (j : ℕ) : ‖f - proj m p hN hp j f‖ₑ ≤ daubechiesJacksonConst m p * Rd.lpModulus p N f j := by
-  have hP : ⇑(proj m p hN hp j f) =ᵐ[volume] projFun m j g :=
-    (proj_apply_ae m hN hp j f).trans (EventuallyEq.of_eq (projFun_congr_ae m hfg j))
+    (j : ℕ) :
+    ‖f - daubechiesProj m p hN hp j f‖ₑ ≤ daubechiesJacksonConst m p * Rd.lpModulus p N f j := by
+  have hP : ⇑(daubechiesProj m p hN hp j f) =ᵐ[volume] projFun m j g :=
+    (daubechiesProj_apply_ae m hN hp j f).trans (EventuallyEq.of_eq (projFun_congr_ae m hfg j))
   rw [Lp.enorm_def, eLpNorm_congr_ae ((Lp.coeFn_sub _ _).trans (hfg.sub hP)), Rd.lpModulus,
     Rd.smoothnessModulus_congr_ae hfg]
   exact eLpNorm_sub_projFun_le_smoothnessModulus m hN Fact.out hp hg j
 
 /-- **Jackson's inequality for the Daubechies scheme, with its constant**: for `N ≥ 2`,
 `1 ≤ p < ∞`, every `f ∈ L_p(ℝ)` and every level `j`, the error of best approximation from the
-scaling space `V_j` (the approximants of complexity `2^j`, `Daubechies.mem_scheme_two_pow`)
-satisfies `E_{2^j}(f)_p ≤ C_J ω_N(f, 2^(-j))_p` with `C_J = daubechiesJacksonConst m p`. For `f`
-with a bounded continuous representative, `P_j f ∈ V_j` gives `E_{2^j}(f)_p ≤ ‖f - P_j f‖_p`
-(`Daubechies.enorm_sub_proj_le_of_continuous`); these `f` are dense in `L_p` (Mathlib's
-`MeasureTheory.Lp.boundedContinuousFunction_dense`), and both sides are controlled by `‖f‖_p`
-(`Rd.lpModulus_add_le`, `Rd.lpModulus_le`), so the bound extends to all of `L_p`
-(`ApproximationScheme.approxError_le_of_dense`). -/
-theorem approxError_scheme_le_jacksonConst_mul (hN : 2 ≤ N) (hp : p ≠ ∞)
+scaling space `V_j` (the approximants of complexity `2^j`,
+`Daubechies.mem_daubechiesScheme_two_pow`) satisfies `E_{2^j}(f)_p ≤ C_J ω_N(f, 2^(-j))_p` with
+`C_J = daubechiesJacksonConst m p`. For `f` with a bounded continuous representative, `P_j f ∈ V_j`
+gives `E_{2^j}(f)_p ≤ ‖f - P_j f‖_p` (`Daubechies.enorm_sub_daubechiesProj_le_of_continuous`); these
+`f` are dense in `L_p` (Mathlib's `MeasureTheory.Lp.boundedContinuousFunction_dense`), and both
+sides are controlled by `‖f‖_p` (`Rd.lpModulus_add_le`, `Rd.lpModulus_le`), so the bound extends to
+all of `L_p` (`ApproximationScheme.approxError_le_of_dense`). -/
+theorem approxError_daubechiesScheme_le_daubechiesJacksonConst_mul (hN : 2 ≤ N) (hp : p ≠ ∞)
     (f : Lp ℂ p (volume : Measure ℝ)) (j : ℕ) :
-    (scheme m p hN hp).approxError f (2 ^ j) ≤
+    (daubechiesScheme m p hN hp).approxError f (2 ^ j) ≤
       daubechiesJacksonConst m p * Rd.lpModulus p N f j := by
   refine ApproximationScheme.approxError_le_of_dense
     (Lp.boundedContinuousFunction_dense ℂ volume hp) (fun f g => Rd.lpModulus_add_le N f g j)
@@ -448,38 +450,39 @@ theorem approxError_scheme_le_jacksonConst_mul (hN : 2 ≤ N) (hp : p ≠ ∞)
     have h := g₀.toContinuousMap.coeFn_toAEEqFun volume
     rw [hg₀] at h
     exact h
-  exact ((scheme m p hN hp).approxError_le_of_mem
-    ((mem_scheme_two_pow m).2 (proj_mem_scalingSpace m hN hp j g)) g).trans
-    (enorm_sub_proj_le_of_continuous m hN hp g₀.continuous hae j)
+  exact ((daubechiesScheme m p hN hp).approxError_le_of_mem
+    ((mem_daubechiesScheme_two_pow m).2 (daubechiesProj_mem_scalingSpace m hN hp j g)) g).trans
+    (enorm_sub_daubechiesProj_le_of_continuous m hN hp g₀.continuous hae j)
 
 /-- **Jackson's inequality for the Daubechies scheme**: for `N ≥ 2` and `1 ≤ p < ∞` there is a
 constant `C_J < ∞` such that for every `f ∈ L_p(ℝ)` and every level `j` the error of best
 approximation from the scaling space `V_j` satisfies `E_{2^j}(f)_p ≤ C_J ω_N(f, 2^(-j))_p`, the
 Jackson inequality of an approximation scheme with modulus `ω_N` at the dyadic scales. The
 constant `C_J = daubechiesJacksonConst m p` serves
-(`Daubechies.approxError_scheme_le_jacksonConst_mul`). -/
-theorem approxError_scheme_le (hN : 2 ≤ N) (hp : p ≠ ∞) :
+(`Daubechies.approxError_daubechiesScheme_le_daubechiesJacksonConst_mul`). -/
+theorem approxError_daubechiesScheme_le (hN : 2 ≤ N) (hp : p ≠ ∞) :
     ∃ C_J : ℝ≥0∞, C_J ≠ ∞ ∧ ∀ (f : Lp ℂ p (volume : Measure ℝ)) (j : ℕ),
-      (scheme m p hN hp).approxError f (2 ^ j) ≤ C_J * Rd.lpModulus p N f j :=
+      (daubechiesScheme m p hN hp).approxError f (2 ^ j) ≤ C_J * Rd.lpModulus p N f j :=
   ⟨daubechiesJacksonConst m p, daubechiesJacksonConst_ne_top m hN p,
-    approxError_scheme_le_jacksonConst_mul m hN hp⟩
+    approxError_daubechiesScheme_le_daubechiesJacksonConst_mul m hN hp⟩
 
 /-- **Jackson's inequality for the projections**: for `N ≥ 2`, `1 ≤ p < ∞`, every `f ∈ L_p(ℝ)` and
 every level `j`, `‖f - P_j f‖_p ≤ (1 + C) C_J ω_N(f, 2^(-j))_p` with the uniform bound
 `C = projConst m p` of the projections and `C_J = daubechiesJacksonConst m p`. This is the Lebesgue
 inequality `‖f - P_j f‖_p ≤ (1 + C) E_{2^j}(f)_p`
 (`ApproximationScheme.ProjectionScheme.enorm_sub_le_approxError` for the projection scheme
-`Daubechies.projectionScheme`, whose projection of complexity `2^j` is `P_j`,
-`Daubechies.projectionScheme_two_pow`) combined with
-`Daubechies.approxError_scheme_le_jacksonConst_mul`. -/
-theorem enorm_sub_proj_le (hN : 2 ≤ N) (hp : p ≠ ∞) (f : Lp ℂ p (volume : Measure ℝ)) (j : ℕ) :
-    ‖f - proj m p hN hp j f‖ₑ ≤
+`Daubechies.daubechiesProjectionScheme`, whose projection of complexity `2^j` is `P_j`,
+`Daubechies.daubechiesProjectionScheme_two_pow`) combined with
+`Daubechies.approxError_daubechiesScheme_le_daubechiesJacksonConst_mul`. -/
+theorem enorm_sub_daubechiesProj_le (hN : 2 ≤ N) (hp : p ≠ ∞) (f : Lp ℂ p (volume : Measure ℝ))
+    (j : ℕ) :
+    ‖f - daubechiesProj m p hN hp j f‖ₑ ≤
       (1 + ENNReal.ofReal (projConst m p)) * daubechiesJacksonConst m p * Rd.lpModulus p N f j := by
-  have h := (projectionScheme m p hN hp).enorm_sub_le_approxError (2 ^ j) f
-  rw [projectionScheme_two_pow] at h
+  have h := (daubechiesProjectionScheme m p hN hp).enorm_sub_le_approxError (2 ^ j) f
+  rw [daubechiesProjectionScheme_two_pow] at h
   refine h.trans ?_
   rw [mul_assoc]
-  exact mul_le_mul_right (approxError_scheme_le_jacksonConst_mul m hN hp f j) _
+  exact mul_le_mul_right (approxError_daubechiesScheme_le_daubechiesJacksonConst_mul m hN hp f j) _
 
 end Lp
 

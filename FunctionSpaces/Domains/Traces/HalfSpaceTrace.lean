@@ -115,7 +115,7 @@ theorem exists_trace_atoms_flat (b : LocalMeansBump V) {p : ℝ≥0∞} (hp1 : 1
     (hr : 1 ≤ r) :
     ∃ (d : ℝ) (C : ℝ≥0∞) (N : ℕ), 0 ≤ d ∧ C ≠ ∞ ∧ ∀ (j : ℕ) {h : V → ℂ}, MemLp h p volume →
       (∀ m, IsRegularAtom p r r d C j ((flat e he).proj (cellCenter j m))
-        (cellAtom p (b.dual L j) j h m ∘ (flat e he).graphMap)) ∧
+        (cellAtom p (b.dualKernel L j) j h m ∘ (flat e he).graphMap)) ∧
       ∀ x' (S : Finset (Fin (finrank ℝ V) → ℤ)),
         (∀ m ∈ S, (flat e he).traceCoef b p L j h m ≠ 0 ∧
           ‖x' - (flat e he).proj (cellCenter j m)‖ ≤ (d + r) / 2 ^ j) → S.card ≤ N := by
@@ -142,10 +142,11 @@ theorem exists_trace_atoms_flat (b : LocalMeansBump V) {p : ℝ≥0∞} (hp1 : 1
       (add_nonneg hd (mul_nonneg (by linarith [Ω.M_nonneg]) (by positivity))) (Ω.graphMap x') S
       fun m hm => ?_
     obtain ⟨hcoef, hdist⟩ := hS m hm
-    have hex : ∃ y', cellAtom p (b.dual L j) j h m (Ω.graphMap y') ≠ 0 := by
+    have hex : ∃ y', cellAtom p (b.dualKernel L j) j h m (Ω.graphMap y') ≠ 0 := by
       by_contra hcon
       exact hcoef (by simp [traceCoef, hcon])
-    exact Ω.norm_graphMap_sub_cellCenter_le (fun y hy => b.dual_eq_zero_of_lt L j hy) hex hdist
+    exact Ω.norm_graphMap_sub_cellCenter_le
+      (fun y hy => b.dualKernel_eq_zero_of_lt L j hy) hex hdist
 
 /-- **The trace of a series, of every order**: on the flat graph, for `0 < s < r` there is
 `K < ∞` with `‖Tr‖_{L_p(H)} + ‖(2^(ks) ω_r(Tr, 2^(-k))_p)_k‖_{ℓ_q} ≤

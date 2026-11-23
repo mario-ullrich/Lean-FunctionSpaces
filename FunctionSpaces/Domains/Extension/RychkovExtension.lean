@@ -69,7 +69,7 @@ noncomputable def localNormOn (hp : p ≠ ∞) {W : Set V} (hW : MeasurableSet W
 /-- The terms `η_j ⋆ 1_W (k_j ⋆ f)` of the local extension. -/
 noncomputable def localExtTerm (hp : p ≠ ∞) {W : Set V} (hW : MeasurableSet W) (L j : ℕ)
     (f : Lp ℂ p (volume : Measure V)) : Lp ℂ p (volume : Measure V) :=
-  convLp hp (b.integrable_dual L j) (indicatorLp hW (b.localMean hp L j f))
+  convLp hp (b.integrable_dualKernel L j) (indicatorLp hW (b.localMean hp L j f))
 
 /-- The terms of the local extension are additive in `f`. -/
 theorem localExtTerm_add (hp : p ≠ ∞) {W : Set V} (hW : MeasurableSet W) (L j : ℕ)
@@ -96,12 +96,12 @@ theorem enorm_localExtTerm_le_of_forall_le (hp : p ≠ ∞) {W : Set V} (hW : Me
     ‖b.localExtTerm hp hW L j f‖ₑ ≤
       2 * eLpNorm (momentKernel b.toFun L) 1 volume * (dyadicWeight (-s) j * X) :=
   calc ‖b.localExtTerm hp hW L j f‖ₑ
-      ≤ eLpNorm (b.dual L j) 1 volume * ‖indicatorLp hW (b.localMean hp L j f)‖ₑ :=
+      ≤ eLpNorm (b.dualKernel L j) 1 volume * ‖indicatorLp hW (b.localMean hp L j f)‖ₑ :=
         enorm_convLp_le hp _ _
     _ ≤ 2 * eLpNorm (momentKernel b.toFun L) 1 volume * (dyadicWeight (-s) j *
           (dyadicWeight s j * ‖indicatorLp hW (b.localMean hp L j f)‖ₑ)) := by
         rw [← mul_assoc (dyadicWeight (-s) j), ENNReal.dyadicWeight_neg_mul_self, one_mul]
-        exact mul_le_mul' (b.eLpNorm_dual_one_le L j) le_rfl
+        exact mul_le_mul' (b.eLpNorm_dualKernel_one_le L j) le_rfl
     _ ≤ _ := by gcongr; exact hX j
 
 /-- **The sum of the norms of the terms**: if `2^(js) ‖1_W (k_j ⋆ f)‖_p ≤ X` for every `j`, then
@@ -162,19 +162,19 @@ theorem modNorm_localExtension_le (hp : p ≠ ∞) {W : Set V} (hW : MeasurableS
     (hf : b.localNormOn hp hW L s q f < ∞) :
     ‖b.localExtension hp hW L f‖ₑ +
         lqNorm q (fun i => dyadicWeight s i * lpModulus p L (b.localExtension hp hW L f) i) ≤
-      b.synthConst L s * b.localNormOn hp hW L s q f :=
+      b.bumpSynthConst L s * b.localNormOn hp hW L s q f :=
   b.modNorm_le_of_tendsto hp L s hq (b.tendsto_sum_localExtTerm hp hW L hs hq hf)
 
 /-- **The local extension agrees with `f` on `U`** if its terms are summable and the dual kernels
 at points of `U` only see `W`: on `U` the terms are those of the reproducing formula. -/
 theorem indicatorLp_localExtension_of_summable (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {U W : Set V}
     (hU : MeasurableSet U) (hW : MeasurableSet W)
-    (hUW : ∀ x ∈ U, ∀ j y, b.dual L j y ≠ 0 → x - y ∈ W) {f : Lp ℂ p (volume : Measure V)}
+    (hUW : ∀ x ∈ U, ∀ j y, b.dualKernel L j y ≠ 0 → x - y ∈ W) {f : Lp ℂ p (volume : Measure V)}
     (hsum : Summable fun j => b.localExtTerm hp hW L j f) :
     indicatorLp hU (b.localExtension hp hW L f) = indicatorLp hU f := by
   have hsum' : ∀ J, indicatorLp hU (∑ j ∈ Finset.range (J + 1), b.localExtTerm hp hW L j f) =
       indicatorLp hU (∑ j ∈ Finset.range (J + 1),
-        convLp hp (b.integrable_dual L j) (b.localMean hp L j f)) := fun J => by
+        convLp hp (b.integrable_dualKernel L j) (b.localMean hp L j f)) := fun J => by
     rw [map_sum, map_sum]
     exact Finset.sum_congr rfl fun j _ =>
       indicatorLp_convLp_indicatorLp hp _ hU hW (fun x hx y hy => hUW x hx j y hy) _
@@ -183,7 +183,8 @@ theorem indicatorLp_localExtension_of_summable (hp : p ≠ ∞) {L : ℕ} (hL : 
     ((indicatorLp hU).continuous.tendsto _).comp
       (b.tendsto_sum_localExtTerm_of_summable hp hW L hsum)
   have h2 : Tendsto (fun J => indicatorLp hU (∑ j ∈ Finset.range (J + 1),
-      convLp hp (b.integrable_dual L j) (b.localMean hp L j f))) atTop (𝓝 (indicatorLp hU f)) :=
+      convLp hp (b.integrable_dualKernel L j) (b.localMean hp L j f))) atTop
+      (𝓝 (indicatorLp hU f)) :=
     ((indicatorLp hU).continuous.tendsto _).comp (b.tendsto_sum_dual_localMean hp hL f)
   simp_rw [hsum'] at h1
   exact tendsto_nhds_unique h1 h2
@@ -192,7 +193,7 @@ theorem indicatorLp_localExtension_of_summable (hp : p ≠ ∞) {L : ℕ} (hL : 
 `W`: on `U` the terms are those of the reproducing formula. -/
 theorem indicatorLp_localExtension (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {U W : Set V}
     (hU : MeasurableSet U) (hW : MeasurableSet W)
-    (hUW : ∀ x ∈ U, ∀ j y, b.dual L j y ≠ 0 → x - y ∈ W) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞}
+    (hUW : ∀ x ∈ U, ∀ j y, b.dualKernel L j y ≠ 0 → x - y ∈ W) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞}
     (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure V)} (hf : b.localNormOn hp hW L s q f < ∞) :
     indicatorLp hU (b.localExtension hp hW L f) = indicatorLp hU f :=
   b.indicatorLp_localExtension_of_summable hp hL hU hW hUW
@@ -234,8 +235,8 @@ theorem intrinsicNorm_congr (hp : p ≠ ∞) (L : ℕ) (s : ℝ) (q : ℝ≥0∞
   rw [intrinsicNorm_def, intrinsicNorm_def]
   congr 1
   funext j
-  exact congrArg (fun g => dyadicWeight s j * ‖g‖ₑ)
-    (Ω.cutoff_convLp_eq hp (Ω.coneBump.integrable_kernel L j) (Ω.coneSupported_kernel L j) hFf)
+  exact congrArg (fun g => dyadicWeight s j * ‖g‖ₑ) (Ω.cutoff_convLp_eq hp
+    (Ω.coneBump.integrable_meansKernel L j) (Ω.coneSupported_meansKernel L j) hFf)
 
 /-- The intrinsic quasi-norm is at most the local means quasi-norm. -/
 theorem intrinsicNorm_le_localMeansNorm (hp : p ≠ ∞) (L : ℕ) (s : ℝ) (q : ℝ≥0∞)
@@ -271,7 +272,7 @@ theorem cutoff_extension (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s : ℝ} (hs
     (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure V)} (hf : Ω.intrinsicNorm hp L s q f < ∞) :
     Ω.cutoff (Ω.extension hp L f) = Ω.cutoff f :=
   Ω.coneBump.indicatorLp_localExtension hp hL Ω.measurableSet_domain Ω.measurableSet_domain
-    (fun _ hx j _ hy => (Ω.coneSupported_dual L j).sub_mem hx hy) hs hq hf
+    (fun _ hx j _ hy => (Ω.coneSupported_dualKernel L j).sub_mem hx hy) hs hq hf
 
 /-- **The extension satisfies the Besov condition by differences**: for `0 < s < L`,
 `‖Ext f‖_p + ‖(2^(is) ω_L(Ext f, 2^(-i))_p)_i‖_{ℓ_q} ≤ C ‖(2^(js) ‖1_Ω (k_j ⋆ f)‖_p)_j‖_{ℓ_q}`. -/
@@ -279,7 +280,7 @@ theorem modNorm_extension_le (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 < s) {
     {f : Lp ℂ p (volume : Measure V)} (hf : Ω.intrinsicNorm hp L s q f < ∞) :
     ‖Ω.extension hp L f‖ₑ +
         lqNorm q (fun i => dyadicWeight s i * lpModulus p L (Ω.extension hp L f) i) ≤
-      Ω.coneBump.synthConst L s * Ω.intrinsicNorm hp L s q f :=
+      Ω.coneBump.bumpSynthConst L s * Ω.intrinsicNorm hp L s q f :=
   Ω.coneBump.modNorm_localExtension_le hp Ω.measurableSet_domain L hs hq hf
 
 /-- **Restrictions of Besov spaces to Lipschitz graph domains**: for `1 ≤ p < ∞`, `0 < s < L` and
@@ -300,7 +301,7 @@ theorem exists_besov_extension_iff (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s 
   · intro hf
     exact ⟨Ω.extension hp L f, Ω.cutoff_extension hp hL hs hq hf,
       (Ω.modNorm_extension_le hp L hs hq hf).trans_lt
-        (ENNReal.mul_lt_top (Ω.coneBump.synthConst_ne_top hs hsL).lt_top hf)⟩
+        (ENNReal.mul_lt_top (Ω.coneBump.bumpSynthConst_ne_top hs hsL).lt_top hf)⟩
 
 end LipschitzGraph
 

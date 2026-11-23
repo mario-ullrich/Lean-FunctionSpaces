@@ -91,12 +91,12 @@ theorem mem_lpMeas_of_le {j k : ℕ} (hjk : j ≤ k) {a : Lp ℂ p vol}
 
 /-- Over the dyadic intervals of level `k` in `[0, 1)` the integrals of `F ≥ 0` add up to the
 integral over `[0, 1]`. -/
-theorem sum_setLIntegral_dyadicInterval (F : ℝ → ℝ≥0∞) (k : ℕ) :
-    ∑ m : Fin (2 ^ k), ∫⁻ x in dyadicInterval k ((m : ℕ) : ℤ), F x ∂vol = ∫⁻ x, F x ∂vol := by
+theorem sum_setLIntegral_haarDyadicInterval (F : ℝ → ℝ≥0∞) (k : ℕ) :
+    ∑ m : Fin (2 ^ k), ∫⁻ x in haarDyadicInterval k ((m : ℕ) : ℤ), F x ∂vol = ∫⁻ x, F x ∂vol := by
   rw [show (∫⁻ x, F x ∂vol) = ∫⁻ x in Icc (0 : ℝ) 1, F x from rfl,
     Interval.lintegral_unit_eq_sum_dyadicIco F k, ← Fin.sum_univ_eq_sum_range]
   refine Finset.sum_congr rfl fun m _ => ?_
-  rw [dyadicInterval_natCast, Measure.restrict_restrict (Interval.measurableSet_dyadicIco _ _),
+  rw [haarDyadicInterval_natCast, Measure.restrict_restrict (Interval.measurableSet_dyadicIco _ _),
     inter_eq_left.2 ((Interval.dyadicIco_subset m.isLt).trans Ico_subset_Icc_self)]
 
 /-! ### Steps of level `j` in `L_1` -/
@@ -108,7 +108,7 @@ of level `j`. On a measurable set `S` that is a union of such intervals,
 `|G| = |G|^p |G|^(1-p)`. -/
 theorem setLIntegral_enorm_le_of_dyadicIndex (hp0 : p ≠ 0) (hp1 : p ≤ 1) {j : ℕ} {G : ℝ → ℂ}
     (hG : ∀ x y, dyadicIndex j x = dyadicIndex j y → G x = G y) {S : Set ℝ}
-    (hSm : MeasurableSet S) (hS : ∀ x ∈ S, dyadicInterval j (dyadicIndex j x) ⊆ S) :
+    (hSm : MeasurableSet S) (hS : ∀ x ∈ S, haarDyadicInterval j (dyadicIndex j x) ⊆ S) :
     ∫⁻ x in S, ‖G x‖ₑ ∂vol ≤
       dyadicWeight (1 / p.toReal - 1) j * (∫⁻ x in S, ‖G x‖ₑ ^ p.toReal ∂vol) ^ (1 / p.toReal) := by
   have hp : p ≠ ∞ := ne_top_of_le_ne_top ENNReal.one_ne_top hp1
@@ -121,11 +121,11 @@ theorem setLIntegral_enorm_le_of_dyadicIndex (hp0 : p ≠ 0) (hp1 : p ≤ 1) {j 
       ENNReal.mul_top (ENNReal.dyadicWeight_ne_zero _ _)]
     exact le_top
   have hpt : ∀ x ∈ S, x ∈ Ico (0 : ℝ) 1 → ‖G x‖ₑ ^ ρ ≤ dyadicWeight 1 j * J := fun x hxS hx => by
-    have hI : ∫⁻ y in dyadicInterval j (dyadicIndex j x), ‖G y‖ₑ ^ ρ ∂vol =
+    have hI : ∫⁻ y in haarDyadicInterval j (dyadicIndex j x), ‖G y‖ₑ ^ ρ ∂vol =
         ‖G x‖ₑ ^ ρ * dyadicWeight (-1) j := by
-      rw [setLIntegral_congr_fun (measurableSet_dyadicInterval _ _) fun y hy => by
+      rw [setLIntegral_congr_fun (measurableSet_haarDyadicInterval _ _) fun y hy => by
           rw [hG y x hy], setLIntegral_const,
-        vol_dyadicInterval (dyadicIndex_nonneg hx) (dyadicIndex_lt hx)]
+        vol_haarDyadicInterval (dyadicIndex_nonneg hx) (dyadicIndex_lt hx)]
     have hle : ‖G x‖ₑ ^ ρ * dyadicWeight (-1) j ≤ J := hI ▸ lintegral_mono_set (hS x hxS)
     calc ‖G x‖ₑ ^ ρ = ‖G x‖ₑ ^ ρ * dyadicWeight (-1) j * dyadicWeight 1 j := by
           rw [mul_assoc, ENNReal.dyadicWeight_neg_mul_self, mul_one]
@@ -195,13 +195,13 @@ theorem haarCoeff_sub {f g : ℝ → ℂ} (hf : Integrable f vol) (hg : Integrab
 `|⟨f, h_{k,m}⟩| ≤ 2^(k/2) ∫_{I_{k,m}} |f|`, since `h_{k,m}` vanishes off `I_{k,m}` and has modulus
 `2^(k/2)` on it. For non-integrable `f` the coefficient is `0`. -/
 theorem enorm_haarCoeff_le (f : ℝ → ℂ) (k : ℕ) (m : ℤ) :
-    ‖haarCoeff f k m‖ₑ ≤ dyadicWeight (1 / 2) k * ∫⁻ x in dyadicInterval k m, ‖f x‖ₑ ∂vol := by
+    ‖haarCoeff f k m‖ₑ ≤ dyadicWeight (1 / 2) k * ∫⁻ x in haarDyadicInterval k m, ‖f x‖ₑ ∂vol := by
   refine (enorm_integral_le_lintegral_enorm _).trans ?_
   rw [← lintegral_const_mul' _ _ (ENNReal.dyadicWeight_ne_top _ _),
-    ← lintegral_indicator (measurableSet_dyadicInterval k m)]
+    ← lintegral_indicator (measurableSet_haarDyadicInterval k m)]
   refine lintegral_mono fun x => ?_
   by_cases hx : dyadicIndex k x = m
-  · rw [indicator_of_mem (mem_dyadicInterval.2 hx), enorm_mul, enorm_haarFunction hx]
+  · rw [indicator_of_mem (mem_haarDyadicInterval.2 hx), enorm_mul, enorm_haarFunction hx]
   · rw [haarFunction_eq_zero hx]
     simp
 
@@ -311,18 +311,18 @@ theorem haarLevelNorm_le_of_mem_lpMeas (hp0 : p ≠ 0) (hp1 : p ≤ 1) {j k : �
   obtain ⟨g, hg, hag⟩ := mem_lpMeas_iff_aestronglyMeasurable.1 ha
   have hgm : AEStronglyMeasurable g vol := (hg.mono (dyadicFiltration.le j)).aestronglyMeasurable
   have hm : ∀ m : Fin (2 ^ k), ‖haarCoeff g k ((m : ℕ) : ℤ)‖ₑ ^ ρ ≤ dyadicWeight (ρ / 2) k *
-      (dyadicWeight (1 - ρ) j * ∫⁻ x in dyadicInterval k ((m : ℕ) : ℤ), ‖g x‖ₑ ^ ρ ∂vol) := by
+      (dyadicWeight (1 - ρ) j * ∫⁻ x in haarDyadicInterval k ((m : ℕ) : ℤ), ‖g x‖ₑ ^ ρ ∂vol) := by
     intro m
-    have hS : ∀ x ∈ dyadicInterval k ((m : ℕ) : ℤ),
-        dyadicInterval j (dyadicIndex j x) ⊆ dyadicInterval k ((m : ℕ) : ℤ) := fun x hx y hy =>
-      (dyadicIndex_eq_of_le hkj hy).trans hx
+    have hS : ∀ x ∈ haarDyadicInterval k ((m : ℕ) : ℤ),
+        haarDyadicInterval j (dyadicIndex j x) ⊆ haarDyadicInterval k ((m : ℕ) : ℤ) :=
+      fun x hx y hy => (dyadicIndex_eq_of_le hkj hy).trans hx
     calc ‖haarCoeff g k ((m : ℕ) : ℤ)‖ₑ ^ ρ
         ≤ (dyadicWeight (1 / 2) k * (dyadicWeight (1 / ρ - 1) j *
-            (∫⁻ x in dyadicInterval k ((m : ℕ) : ℤ), ‖g x‖ₑ ^ ρ ∂vol) ^ (1 / ρ))) ^ ρ := by
+            (∫⁻ x in haarDyadicInterval k ((m : ℕ) : ℤ), ‖g x‖ₑ ^ ρ ∂vol) ^ (1 / ρ))) ^ ρ := by
           refine ENNReal.rpow_le_rpow ((enorm_haarCoeff_le g k _).trans ?_) hρ.le
           gcongr
           exact setLIntegral_enorm_le_of_dyadicIndex hp0 hp1
-            (fun x y h => eq_of_dyadicIndex_eq hg h) (measurableSet_dyadicInterval _ _) hS
+            (fun x y h => eq_of_dyadicIndex_eq hg h) (measurableSet_haarDyadicInterval _ _) hS
       _ = _ := by
           rw [ENNReal.mul_rpow_of_nonneg _ _ hρ.le, ENNReal.mul_rpow_of_nonneg _ _ hρ.le,
             ENNReal.dyadicWeight_rpow, ENNReal.dyadicWeight_rpow, ← ENNReal.rpow_mul,
@@ -334,12 +334,13 @@ theorem haarLevelNorm_le_of_mem_lpMeas (hp0 : p ≠ 0) (hp1 : p ≤ 1) {j k : �
     one_div_mul_cancel hρ.ne', ENNReal.rpow_one]
   calc dyadicWeight (ρ / 2 - 1) k * ∑ m : Fin (2 ^ k), ‖haarCoeff g k ((m : ℕ) : ℤ)‖ₑ ^ ρ
       ≤ dyadicWeight (ρ / 2 - 1) k * ∑ m : Fin (2 ^ k), dyadicWeight (ρ / 2) k *
-          (dyadicWeight (1 - ρ) j * ∫⁻ x in dyadicInterval k ((m : ℕ) : ℤ), ‖g x‖ₑ ^ ρ ∂vol) := by
+          (dyadicWeight (1 - ρ) j * ∫⁻ x in haarDyadicInterval k ((m : ℕ) : ℤ),
+              ‖g x‖ₑ ^ ρ ∂vol) := by
         gcongr with m
         exact hm m
     _ = dyadicWeight (ρ / 2 - 1) k * dyadicWeight (ρ / 2) k * dyadicWeight (1 - ρ) j *
           ∫⁻ x, ‖g x‖ₑ ^ ρ ∂vol := by
-        rw [← sum_setLIntegral_dyadicInterval _ k, Finset.mul_sum, Finset.mul_sum]
+        rw [← sum_setLIntegral_haarDyadicInterval _ k, Finset.mul_sum, Finset.mul_sum]
         exact Finset.sum_congr rfl fun m _ => by ring
     _ = dyadicWeight ((1 / ρ - 1) * ρ) (j - k) * ∫⁻ x, ‖g x‖ₑ ^ ρ ∂vol := by
         congr 1
@@ -659,7 +660,7 @@ theorem integrable_of_eNormDyadic_lt_top (hp0 : p ≠ 0) (hp1 : p ≤ 1) (hs : 1
 /-- **Martingale convergence in `L_1[0, 1]`**: for integrable `F`, `E[F | ℱ_N] → F` in `L_1`. The
 conditional expectations form a projection scheme of bound `1` in `L_1`
 (`MeasureTheory.Filtration.filtrationProjectionScheme`) whose approximants are dense
-(`Haar.closure_iUnion_scheme`), so the projections converge
+(`Haar.closure_iUnion_haarScheme`), so the projections converge
 (`ApproximationScheme.ProjectionScheme.tendsto_of_dense`). -/
 theorem tendsto_eLpNorm_condExp_sub {F : ℝ → ℂ} (hF : Integrable F vol) :
     Tendsto (fun N => eLpNorm (vol[F | dyadicFiltration N] - F) 1 vol) atTop (𝓝 0) := by
@@ -668,7 +669,7 @@ theorem tendsto_eLpNorm_condExp_sub {F : ℝ → ℂ} (hF : Integrable F vol) :
       Lp.condExpLp (dyadicFiltration N) := fun N =>
     ApproximationScheme.ProjectionScheme.ofMonotone_two_pow N
   have hP := (dyadicFiltration.filtrationProjectionScheme (p := 1) (μ := vol)).tendsto_of_dense
-    (closure_iUnion_scheme (p := 1) ENNReal.one_ne_top) (hm.toLp F)
+    (closure_iUnion_haarScheme (p := 1) ENNReal.one_ne_top) (hm.toLp F)
   have h2 : Tendsto (fun N => Lp.condExpLp (dyadicFiltration N) (hm.toLp F)) atTop
       (𝓝 (hm.toLp F)) :=
     (hP.comp (tendsto_pow_atTop_atTop_of_one_lt one_lt_two)).congr fun N => by
