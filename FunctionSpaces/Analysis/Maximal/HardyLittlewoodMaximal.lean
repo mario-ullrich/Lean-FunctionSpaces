@@ -15,23 +15,23 @@ public import Mathlib.Topology.Semicontinuity.Basic
 # The Hardy–Littlewood maximal function
 
 For `g : V → [0, ∞]` the **Hardy–Littlewood maximal function** is
-`M g(x) = sup_{r > 0} |B(0,r)|⁻¹ ∫_{B(x,r)} g` (`Rd.maximal`). It is lower semicontinuous, hence
-measurable, for every `g` (`Rd.measurable_maximal`), and it controls convolutions with kernels
-bounded by `A 1_{B(0,ρ)}` (`Rd.lintegral_mul_le_maximal_of_ball`), by `A min(1, (ρ/‖y‖)^N)` with
-`N > n` (`Rd.lintegral_mul_le_maximal_of_decay`), or by the Peetre weight
-`A 2^(jn) (1 + 2^j ‖y‖)^(-N)` (`Rd.lintegral_mul_le_maximal_of_one_add_norm`).
+`M g(x) = sup_{r > 0} |B(0,r)|⁻¹ ∫_{B(x,r)} g` (`Rd.maximalFunction`). It is lower semicontinuous,
+hence measurable, for every `g` (`Rd.measurable_maximalFunction`), and it controls convolutions with
+kernels bounded by `A 1_{B(0,ρ)}` (`Rd.lintegral_mul_le_maximalFunction_of_ball`), by
+`A min(1, (ρ/‖y‖)^N)` with `N > n` (`Rd.lintegral_mul_le_maximalFunction_of_decay`), or by the
+Peetre weight `A 2^(jn) (1 + 2^j ‖y‖)^(-N)` (`Rd.lintegral_mul_le_maximalFunction_of_one_add_norm`).
 
 The **weighted weak type `(1,1)`** `∫_{M g > t} w ≤ 5^n t⁻¹ ∫ g M w` holds for all
-`g, w ≥ 0` (`Rd.setLIntegral_maximal_gt_le`), by Vitali's covering lemma. With the layer cake
-formula for `[0, ∞]`-valued functions
+`g, w ≥ 0` (`Rd.setLIntegral_maximalFunction_gt_le`), by Vitali's covering lemma. With the layer
+cake formula for `[0, ∞]`-valued functions
 (`MeasureTheory.lintegral_rpow_eq_lintegral_meas_lt_mul_ennreal`) and the integral of `t^(p-2)`
 over `(0, 2a)` (`MeasureTheory.lintegral_Ioi_indicator_half_lt_mul_rpow`), both from
 `FunctionSpaces.Analysis.Lp.LayerCake`, and Tonelli's theorem
 (`Rd.lintegral_Ioi_lintegral_indicator_mul_rpow`) it gives the **weighted strong type**
-`∫ (M g)^p w ≤ C_{n,p} ∫ g^p M w` for `1 < p < ∞` (`Rd.lintegral_maximal_rpow_mul_le`) and the
-**Hardy–Littlewood maximal theorem** `‖M g‖_p ≤ C_{n,p}^{1/p} ‖g‖_p` (`Rd.eLpNorm_maximal_le`),
-with the explicit constant `C_{n,p} = p 2^p 5^n / (p - 1)` (`Rd.maximalConst`). For `p = ∞`,
-`M g ≤ ‖g‖_∞` (`Rd.maximal_le_eLpNorm_top`).
+`∫ (M g)^p w ≤ C_{n,p} ∫ g^p M w` for `1 < p < ∞` (`Rd.lintegral_maximalFunction_rpow_mul_le`) and
+the **Hardy–Littlewood maximal theorem** `‖M g‖_p ≤ C_{n,p}^{1/p} ‖g‖_p`
+(`Rd.eLpNorm_maximalFunction_le`), with the explicit constant `C_{n,p} = p 2^p 5^n / (p - 1)`
+(`Rd.maximalConst`). For `p = ∞`, `M g ≤ ‖g‖_∞` (`Rd.maximalFunction_le_eLpNorm_top`).
 
 Two geometric facts serve the covering arguments: the balls of radius `ρ 2^(-j)` have the volume
 `ρ^n |B_1| 2^(-jn)` (`Rd.volume_ball_div_two_pow`, `Rd.volume_closedBall_div_two_pow`), and a set
@@ -79,7 +79,7 @@ variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDim
 `M g(x) = sup_{r > 0} |B(0,r)|⁻¹ ∫_{B(x,r)} g`, the supremum of the means of `g` over the open
 balls centred at `x`. The volume `|B(0,r)| = |B(x,r)|` of the centred ball keeps the factor
 independent of `x`. -/
-noncomputable def maximal (g : V → ℝ≥0∞) (x : V) : ℝ≥0∞ :=
+noncomputable def maximalFunction (g : V → ℝ≥0∞) (x : V) : ℝ≥0∞ :=
   ⨆ (r : ℝ) (_ : 0 < r), (volume (ball (0 : V) r))⁻¹ * ∫⁻ y in ball x r, g y
 
 /-- The ball `B(0,r)` of radius `r > 0` has positive volume. -/
@@ -108,78 +108,82 @@ theorem volume_closedBall_div_two_pow {d : ℝ} (hd : 0 ≤ d) (j : ℕ) (z : V)
   ring
 
 /-- Every mean over a ball centred at `x` is at most `M g(x)`. -/
-theorem le_maximal {r : ℝ} (hr : 0 < r) (g : V → ℝ≥0∞) (x : V) :
-    (volume (ball (0 : V) r))⁻¹ * ∫⁻ y in ball x r, g y ≤ maximal g x :=
+theorem le_maximalFunction {r : ℝ} (hr : 0 < r) (g : V → ℝ≥0∞) (x : V) :
+    (volume (ball (0 : V) r))⁻¹ * ∫⁻ y in ball x r, g y ≤ maximalFunction g x :=
   le_iSup₂ (f := fun (r : ℝ) (_ : 0 < r) =>
     (volume (ball (0 : V) r))⁻¹ * ∫⁻ y in ball x r, g y) r hr
 
 /-- `∫_{B(x,r)} g ≤ |B(0,r)| M g(x)` for every `g : V → [0, ∞]` and every `r > 0`. -/
-theorem setLIntegral_ball_le_mul_maximal {r : ℝ} (hr : 0 < r) (g : V → ℝ≥0∞) (x : V) :
-    ∫⁻ y in ball x r, g y ≤ volume (ball (0 : V) r) * maximal g x :=
-  (ENNReal.inv_mul_le_iff (volume_ball_ne_zero hr) (volume_ball_ne_top r)).1 (le_maximal hr g x)
+theorem setLIntegral_ball_le_mul_maximalFunction {r : ℝ} (hr : 0 < r) (g : V → ℝ≥0∞) (x : V) :
+    ∫⁻ y in ball x r, g y ≤ volume (ball (0 : V) r) * maximalFunction g x :=
+  (ENNReal.inv_mul_le_iff (volume_ball_ne_zero hr) (volume_ball_ne_top r)).1
+    (le_maximalFunction hr g x)
 
 /-- `M g(x) ≤ c` as soon as `∫_{B(x,r)} g ≤ |B(0,r)| c` for every `r > 0`. -/
-theorem maximal_le_of_forall {g : V → ℝ≥0∞} {x : V} {c : ℝ≥0∞}
+theorem maximalFunction_le_of_forall {g : V → ℝ≥0∞} {x : V} {c : ℝ≥0∞}
     (h : ∀ r : ℝ, 0 < r → ∫⁻ y in ball x r, g y ≤ volume (ball (0 : V) r) * c) :
-    maximal g x ≤ c :=
+    maximalFunction g x ≤ c :=
   iSup₂_le fun r hr =>
     (ENNReal.inv_mul_le_iff (volume_ball_ne_zero hr) (volume_ball_ne_top r)).2 (h r hr)
 
 /-- The maximal function is **monotone**: `g ≤ h` implies `M g ≤ M h`. -/
-theorem maximal_mono {g h : V → ℝ≥0∞} (hgh : g ≤ h) : maximal g ≤ maximal h := fun x =>
+theorem maximalFunction_mono {g h : V → ℝ≥0∞} (hgh : g ≤ h) :
+    maximalFunction g ≤ maximalFunction h := fun x =>
   iSup₂_mono fun _ _ => by gcongr with y; exact hgh y
 
 /-- The maximal function is **subadditive**: `M (g + h) ≤ M g + M h`. One summand has to be
 measurable, since the lower Lebesgue integral of a sum of two non-measurable functions can exceed
 the sum of their integrals. -/
-theorem maximal_add_le {g : V → ℝ≥0∞} (hg : AEMeasurable g volume) (h : V → ℝ≥0∞) (x : V) :
-    maximal (g + h) x ≤ maximal g x + maximal h x := by
-  refine maximal_le_of_forall fun r hr => ?_
+theorem maximalFunction_add_le {g : V → ℝ≥0∞} (hg : AEMeasurable g volume) (h : V → ℝ≥0∞) (x : V) :
+    maximalFunction (g + h) x ≤ maximalFunction g x + maximalFunction h x := by
+  refine maximalFunction_le_of_forall fun r hr => ?_
   rw [mul_add]
   calc ∫⁻ y in ball x r, (g + h) y
       = (∫⁻ y in ball x r, g y) + ∫⁻ y in ball x r, h y :=
         lintegral_add_left' hg.restrict h
-    _ ≤ _ := add_le_add (setLIntegral_ball_le_mul_maximal hr g x)
-        (setLIntegral_ball_le_mul_maximal hr h x)
+    _ ≤ _ := add_le_add (setLIntegral_ball_le_mul_maximalFunction hr g x)
+        (setLIntegral_ball_le_mul_maximalFunction hr h x)
 
 /-- The maximal function is **homogeneous**: `M (c g) = c M g` for a finite constant `c`. -/
-theorem maximal_const_mul {c : ℝ≥0∞} (hc : c ≠ ∞) (g : V → ℝ≥0∞) (x : V) :
-    maximal (fun y => c * g y) x = c * maximal g x := by
-  simp only [maximal, lintegral_const_mul' c _ hc, ENNReal.mul_iSup]
+theorem maximalFunction_const_mul {c : ℝ≥0∞} (hc : c ≠ ∞) (g : V → ℝ≥0∞) (x : V) :
+    maximalFunction (fun y => c * g y) x = c * maximalFunction g x := by
+  simp only [maximalFunction, lintegral_const_mul' c _ hc, ENNReal.mul_iSup]
   simp_rw [mul_left_comm c]
 
 /-- If `g ≤ c` almost everywhere, then `M g ≤ c` everywhere. -/
-theorem maximal_le_of_ae_le {g : V → ℝ≥0∞} {c : ℝ≥0∞} (h : ∀ᵐ y ∂volume, g y ≤ c) (x : V) :
-    maximal g x ≤ c := by
-  refine maximal_le_of_forall fun r _ => ?_
+theorem maximalFunction_le_of_ae_le {g : V → ℝ≥0∞} {c : ℝ≥0∞} (h : ∀ᵐ y ∂volume, g y ≤ c) (x : V) :
+    maximalFunction g x ≤ c := by
+  refine maximalFunction_le_of_forall fun r _ => ?_
   calc ∫⁻ y in ball x r, g y ≤ ∫⁻ _ in ball x r, c := lintegral_mono_ae (ae_restrict_of_ae h)
     _ = volume (ball (0 : V) r) * c := by
       rw [setLIntegral_const, Measure.addHaar_ball_center, mul_comm]
 
 /-- The maximal function of a **constant** is that constant. -/
-theorem maximal_const (c : ℝ≥0∞) : maximal (fun _ : V => c) = fun _ => c := by
+theorem maximalFunction_const (c : ℝ≥0∞) : maximalFunction (fun _ : V => c) = fun _ => c := by
   funext x
-  refine le_antisymm (maximal_le_of_ae_le (ae_of_all _ fun _ => le_rfl) x) ?_
+  refine le_antisymm (maximalFunction_le_of_ae_le (ae_of_all _ fun _ => le_rfl) x) ?_
   calc c = (volume (ball (0 : V) 1))⁻¹ * ∫⁻ _ in ball x 1, c := by
         rw [setLIntegral_const, Measure.addHaar_ball_center volume x, mul_comm c, ← mul_assoc,
           ENNReal.inv_mul_cancel (volume_ball_ne_zero one_pos) (volume_ball_ne_top 1), one_mul]
-    _ ≤ maximal (fun _ => c) x := le_maximal one_pos _ x
+    _ ≤ maximalFunction (fun _ => c) x := le_maximalFunction one_pos _ x
 
 /-- Functions that agree almost everywhere have the **same maximal function**. -/
-theorem maximal_congr_ae {g h : V → ℝ≥0∞} (hgh : g =ᵐ[volume] h) : maximal g = maximal h := by
+theorem maximalFunction_congr_ae {g h : V → ℝ≥0∞} (hgh : g =ᵐ[volume] h) :
+    maximalFunction g = maximalFunction h := by
   funext x
-  simp only [maximal, lintegral_congr_ae (ae_restrict_of_ae hgh)]
+  simp only [maximalFunction, lintegral_congr_ae (ae_restrict_of_ae hgh)]
 
 /-- Restricting `g` to a set decreases its maximal function: `M (1_s g) ≤ M g`. -/
-theorem maximal_indicator_le (s : Set V) (g : V → ℝ≥0∞) : maximal (s.indicator g) ≤ maximal g :=
-  maximal_mono (Set.indicator_le_self s g)
+theorem maximalFunction_indicator_le (s : Set V) (g : V → ℝ≥0∞) :
+    maximalFunction (s.indicator g) ≤ maximalFunction g :=
+  maximalFunction_mono (Set.indicator_le_self s g)
 
 /-- **Monotone convergence** for the maximal function: for an increasing sequence of almost
 everywhere measurable `g_N`, `M (sup_N g_N) = sup_N M g_N`. -/
-theorem maximal_iSup_of_monotone {g : ℕ → V → ℝ≥0∞} (hg : ∀ N, AEMeasurable (g N) volume)
-    (hmono : Monotone g) : maximal (⨆ N, g N) = ⨆ N, maximal (g N) := by
+theorem maximalFunction_iSup_of_monotone {g : ℕ → V → ℝ≥0∞} (hg : ∀ N, AEMeasurable (g N) volume)
+    (hmono : Monotone g) : maximalFunction (⨆ N, g N) = ⨆ N, maximalFunction (g N) := by
   funext x
-  simp only [maximal, iSup_apply]
+  simp only [maximalFunction, iSup_apply]
   rw [iSup_comm]
   refine iSup_congr fun r => ?_
   rw [iSup_comm]
@@ -189,7 +193,8 @@ theorem maximal_iSup_of_monotone {g : ℕ → V → ℝ≥0∞} (hg : ∀ N, AEM
 
 /-- On a space with one point (`n = 0`) every function is its own maximal function: every ball
 of positive radius is the whole space, of positive finite volume. -/
-theorem maximal_eq_self_of_subsingleton [Subsingleton V] (g : V → ℝ≥0∞) : maximal g = g := by
+theorem maximalFunction_eq_self_of_subsingleton [Subsingleton V] (g : V → ℝ≥0∞) :
+    maximalFunction g = g := by
   funext x
   have hball : ∀ r : ℝ, 0 < r → ∀ z : V, ball z r = univ := fun r hr z =>
     Set.eq_univ_of_forall fun y => by rw [Subsingleton.elim y z]; exact mem_ball_self hr
@@ -199,7 +204,7 @@ theorem maximal_eq_self_of_subsingleton [Subsingleton V] (g : V → ℝ≥0∞) 
     rw [hg, setLIntegral_const, hball r hr x, ← hball r hr 0, mul_comm (g x), ← mul_assoc,
       ENNReal.inv_mul_cancel (volume_ball_ne_zero hr) (volume_ball_ne_top r), one_mul]
   refine le_antisymm (iSup₂_le fun r hr => (hterm r hr).le) ?_
-  exact (hterm 1 one_pos).ge.trans (le_maximal one_pos g x)
+  exact (hterm 1 one_pos).ge.trans (le_maximalFunction one_pos g x)
 
 /-! ### Measurability by lower semicontinuity -/
 
@@ -227,15 +232,16 @@ theorem lowerSemicontinuous_setLIntegral_ball (g : V → ℝ≥0∞) (r : ℝ) :
 
 /-- The maximal function of every `g : V → [0, ∞]` is **lower semicontinuous**, as a supremum of
 the lower semicontinuous functions `x ↦ |B(0,r)|⁻¹ ∫_{B(x,r)} g`. -/
-theorem lowerSemicontinuous_maximal (g : V → ℝ≥0∞) : LowerSemicontinuous (maximal g) :=
+theorem lowerSemicontinuous_maximalFunction (g : V → ℝ≥0∞) :
+    LowerSemicontinuous (maximalFunction g) :=
   lowerSemicontinuous_biSup fun r hr =>
     Continuous.comp_lowerSemicontinuous
       (ENNReal.continuous_const_mul (ENNReal.inv_ne_top.2 (volume_ball_ne_zero hr)))
       (lowerSemicontinuous_setLIntegral_ball g r) fun _ _ h => mul_le_mul_right h _
 
 /-- The maximal function of every `g : V → [0, ∞]` is **measurable**. -/
-theorem measurable_maximal (g : V → ℝ≥0∞) : Measurable (maximal g) :=
-  (lowerSemicontinuous_maximal g).measurable
+theorem measurable_maximalFunction (g : V → ℝ≥0∞) : Measurable (maximalFunction g) :=
+  (lowerSemicontinuous_maximalFunction g).measurable
 
 /-! ### Kernels with radial majorants -/
 
@@ -265,11 +271,11 @@ theorem lintegral_mul_le_setLIntegral_ball {K : V → ℝ≥0∞} {A : ℝ≥0�
 /-- **Kernels bounded by a ball.** If `0 ≤ K ≤ A 1_{B(0,ρ)}`, then
 `∫ K(y) g(x - y) dy ≤ A |B(0,ρ)| M g(x)` for every `g : V → [0, ∞]` and every kernel `K`
 (`Rd.lintegral_mul_le_setLIntegral_ball` and the definition of `M g`). -/
-theorem lintegral_mul_le_maximal_of_ball {K : V → ℝ≥0∞} {A : ℝ≥0∞} {ρ : ℝ} (hA : A ≠ ∞)
+theorem lintegral_mul_le_maximalFunction_of_ball {K : V → ℝ≥0∞} {A : ℝ≥0∞} {ρ : ℝ} (hA : A ≠ ∞)
     (hK : ∀ y, K y ≤ A * (ball (0 : V) ρ).indicator 1 y) (hρ : 0 < ρ) (g : V → ℝ≥0∞) (x : V) :
-    ∫⁻ y, K y * g (x - y) ≤ A * volume (ball (0 : V) ρ) * maximal g x :=
+    ∫⁻ y, K y * g (x - y) ≤ A * volume (ball (0 : V) ρ) * maximalFunction g x :=
   (lintegral_mul_le_setLIntegral_ball hA hK g x).trans (by
-    rw [mul_assoc]; gcongr; exact setLIntegral_ball_le_mul_maximal hρ g x)
+    rw [mul_assoc]; gcongr; exact setLIntegral_ball_le_mul_maximalFunction hρ g x)
 
 /-- The dyadic **shell** `{y : ‖y‖ < 2^(i+1) ρ}` for `i = 0` and
 `{y : 2^i ρ ≤ ‖y‖ < 2^(i+1) ρ}` for `i ≥ 1`. -/
@@ -352,15 +358,16 @@ theorem tsum_two_inv_pow_mul_two_pow {n N : ℕ} (hN : n ≤ N) :
 `g : V → [0, ∞]`. The proof covers `V` by the ball `B(0,2ρ)` and the dyadic shells
 `2^i ρ ≤ ‖y‖ < 2^(i+1) ρ`, `i ≥ 1`, applies the ball bound on each, and sums a geometric
 series. -/
-theorem lintegral_mul_le_maximal_of_decay {K : V → ℝ≥0∞} {A : ℝ≥0∞} {ρ : ℝ} {N : ℕ}
+theorem lintegral_mul_le_maximalFunction_of_decay {K : V → ℝ≥0∞} {A : ℝ≥0∞} {ρ : ℝ} {N : ℕ}
     (hN : finrank ℝ V < N) (hA : A ≠ ∞) (hK₁ : ∀ y, ‖y‖ ≤ ρ → K y ≤ A)
     (hK₂ : ∀ y, ρ < ‖y‖ → K y ≤ A * ENNReal.ofReal ((ρ / ‖y‖) ^ N)) (hρ : 0 < ρ)
     (g : V → ℝ≥0∞) (x : V) :
     ∫⁻ y, K y * g (x - y) ≤
       A * volume (ball (0 : V) ρ) * 2 ^ finrank ℝ V * (1 - 2⁻¹ ^ (N - finrank ℝ V))⁻¹ *
-        maximal g x := by
+        maximalFunction g x := by
   have hshell : ∀ i : ℕ, ∫⁻ y in dyadicShell ρ i, K y * g (x - y) ≤
-      A * volume (ball (0 : V) ρ) * maximal g x * (2⁻¹ ^ (i * N) * 2 ^ ((i + 1) * finrank ℝ V)) :=
+      A * volume (ball (0 : V) ρ) * maximalFunction g x *
+          (2⁻¹ ^ (i * N) * 2 ^ ((i + 1) * finrank ℝ V)) :=
       fun i => by
     rw [← lintegral_indicator (measurableSet_dyadicShell ρ i)]
     have hAi : A * 2⁻¹ ^ (i * N) ≠ ∞ :=
@@ -371,8 +378,8 @@ theorem lintegral_mul_le_maximal_of_decay {K : V → ℝ≥0∞} {A : ℝ≥0∞
           by_cases hy : y ∈ dyadicShell ρ i
           · simp [Set.indicator_of_mem hy]
           · simp [Set.indicator_of_notMem hy]
-      _ ≤ A * 2⁻¹ ^ (i * N) * volume (ball (0 : V) (2 ^ (i + 1) * ρ)) * maximal g x := by
-          refine lintegral_mul_le_maximal_of_ball hAi (fun y => ?_) (by positivity) g x
+      _ ≤ A * 2⁻¹ ^ (i * N) * volume (ball (0 : V) (2 ^ (i + 1) * ρ)) * maximalFunction g x := by
+          refine lintegral_mul_le_maximalFunction_of_ball hAi (fun y => ?_) (by positivity) g x
           by_cases hy : y ∈ dyadicShell ρ i
           · rw [Set.indicator_of_mem hy, Set.indicator_of_mem (mem_ball_zero_iff.2 hy.1),
               Pi.one_apply, mul_one]
@@ -382,7 +389,7 @@ theorem lintegral_mul_le_maximal_of_decay {K : V → ℝ≥0∞} {A : ℝ≥0∞
   calc ∫⁻ y, K y * g (x - y) = ∫⁻ y in ⋃ i, dyadicShell ρ i, K y * g (x - y) := by
         rw [iUnion_dyadicShell hρ, Measure.restrict_univ]
     _ ≤ ∑' i, ∫⁻ y in dyadicShell ρ i, K y * g (x - y) := lintegral_iUnion_le _ _
-    _ ≤ ∑' i : ℕ, A * volume (ball (0 : V) ρ) * maximal g x *
+    _ ≤ ∑' i : ℕ, A * volume (ball (0 : V) ρ) * maximalFunction g x *
           (2⁻¹ ^ (i * N) * 2 ^ ((i + 1) * finrank ℝ V)) := ENNReal.tsum_le_tsum hshell
     _ = _ := by rw [ENNReal.tsum_mul_left, tsum_two_inv_pow_mul_two_pow hN.le]; ring
 
@@ -416,15 +423,15 @@ theorem inv_one_add_two_pow_mul_pow_le {j N : ℕ} {y : V} (hy0 : 0 < ‖y‖) :
 /-- **Kernels with Peetre decay.** If `K(y) ≤ A 2^(jn) (1 + 2^j ‖y‖)^(-N)` with `N > n`, then
 `∫ K(y) g(x - y) dy ≤ C_{n,N} A M g(x)` for every `g : V → [0, ∞]`, with the constant
 `C_{n,N} = decayMaximalConst V N` independent of the level `j`. -/
-theorem lintegral_mul_le_maximal_of_one_add_norm {K : V → ℝ≥0∞} {A : ℝ≥0∞} {j N : ℕ}
+theorem lintegral_mul_le_maximalFunction_of_one_add_norm {K : V → ℝ≥0∞} {A : ℝ≥0∞} {j N : ℕ}
     (hN : finrank ℝ V < N) (hA : A ≠ ∞)
     (hK : ∀ y, K y ≤ A * 2 ^ (j * finrank ℝ V) * ((1 + 2 ^ j * ‖y‖ₑ) ^ N)⁻¹)
     (g : V → ℝ≥0∞) (x : V) :
-    ∫⁻ y, K y * g (x - y) ≤ decayMaximalConst V N * A * maximal g x := by
+    ∫⁻ y, K y * g (x - y) ≤ decayMaximalConst V N * A * maximalFunction g x := by
   have hA' : A * 2 ^ (j * finrank ℝ V) ≠ ∞ :=
     ENNReal.mul_ne_top hA (ENNReal.pow_ne_top ENNReal.ofNat_ne_top)
   have hρ : (0 : ℝ) < ((2 : ℝ) ^ j)⁻¹ := by positivity
-  have h := lintegral_mul_le_maximal_of_decay hN hA'
+  have h := lintegral_mul_le_maximalFunction_of_decay hN hA'
     (fun y _ => (hK y).trans (mul_le_of_le_one_right zero_le
       (ENNReal.inv_le_one.2 (one_le_pow₀ le_self_add))))
     (fun y hy => (hK y).trans
@@ -439,19 +446,19 @@ theorem lintegral_mul_le_maximal_of_one_add_norm {K : V → ℝ≥0∞} {A : ℝ
     ENNReal.mul_inv_cancel (pow_ne_zero _ two_ne_zero) (ENNReal.pow_ne_top ENNReal.ofNat_ne_top)
   rw [hvol, decayMaximalConst]
   calc A * 2 ^ (j * finrank ℝ V) * ((2 ^ (j * finrank ℝ V))⁻¹ * volume (ball (0 : V) 1)) *
-        2 ^ finrank ℝ V * (1 - 2⁻¹ ^ (N - finrank ℝ V))⁻¹ * maximal g x
+        2 ^ finrank ℝ V * (1 - 2⁻¹ ^ (N - finrank ℝ V))⁻¹ * maximalFunction g x
       = (2 ^ (j * finrank ℝ V) * (2 ^ (j * finrank ℝ V))⁻¹) * (volume (ball (0 : V) 1) *
-        2 ^ finrank ℝ V * (1 - 2⁻¹ ^ (N - finrank ℝ V))⁻¹ * A * maximal g x) := by ring
+        2 ^ finrank ℝ V * (1 - 2⁻¹ ^ (N - finrank ℝ V))⁻¹ * A * maximalFunction g x) := by ring
     _ = _ := by rw [hc, one_mul]
 
 /-! ### The weighted weak type `(1,1)` -/
 
 /-- For `y ∈ B(b,r)`: `∫_{B̄(b,4r)} w ≤ 5^n |B(0,r)| M w(y)`, since `B̄(b,4r) ⊆ B(y,5r)` and
 `|B(0,5r)| = 5^n |B(0,r)|`. -/
-theorem setLIntegral_closedBall_le_maximal {r : ℝ} (hr : 0 < r) (w : V → ℝ≥0∞) {b y : V}
+theorem setLIntegral_closedBall_le_maximalFunction {r : ℝ} (hr : 0 < r) (w : V → ℝ≥0∞) {b y : V}
     (hy : y ∈ ball b r) :
     ∫⁻ z in closedBall b (4 * r), w z ≤
-      5 ^ finrank ℝ V * volume (ball (0 : V) r) * maximal w y := by
+      5 ^ finrank ℝ V * volume (ball (0 : V) r) * maximalFunction w y := by
   have hsub : closedBall b (4 * r) ⊆ ball y (5 * r) := fun z hz => by
     rw [mem_closedBall] at hz
     rw [mem_ball] at hy ⊢
@@ -459,8 +466,8 @@ theorem setLIntegral_closedBall_le_maximal {r : ℝ} (hr : 0 < r) (w : V → ℝ
       _ < 4 * r + r := by rw [dist_comm b y]; linarith
       _ = 5 * r := by ring
   calc ∫⁻ z in closedBall b (4 * r), w z ≤ ∫⁻ z in ball y (5 * r), w z := lintegral_mono_set hsub
-    _ ≤ volume (ball (0 : V) (5 * r)) * maximal w y :=
-      setLIntegral_ball_le_mul_maximal (by positivity) w y
+    _ ≤ volume (ball (0 : V) (5 * r)) * maximalFunction w y :=
+      setLIntegral_ball_le_mul_maximalFunction (by positivity) w y
     _ = _ := by
       rw [Measure.addHaar_ball_mul_of_pos volume (0 : V) (by norm_num : (0 : ℝ) < 5),
         ENNReal.ofReal_pow (by norm_num), ENNReal.ofReal_ofNat]
@@ -471,7 +478,7 @@ theorem setLIntegral_closedBall_le_maximal {r : ℝ} (hr : 0 < r) (w : V → ℝ
 theorem mul_setLIntegral_closedBall_le {r : ℝ} (hr : 0 < r) {g : V → ℝ≥0∞} (w : V → ℝ≥0∞)
     {b : V} {t : ℝ≥0∞} (hI : t * volume (ball (0 : V) r) ≤ ∫⁻ y in ball b r, g y) :
     t * ∫⁻ z in closedBall b (4 * r), w z ≤
-      5 ^ finrank ℝ V * ∫⁻ y in ball b r, g y * maximal w y := by
+      5 ^ finrank ℝ V * ∫⁻ y in ball b r, g y * maximalFunction w y := by
   have hc : (5 : ℝ≥0∞) ^ finrank ℝ V * volume (ball (0 : V) r) ≠ ∞ :=
     ENNReal.mul_ne_top (ENNReal.pow_ne_top ENNReal.ofNat_ne_top) (volume_ball_ne_top r)
   refine (ENNReal.mul_le_mul_iff_left (volume_ball_ne_zero (V := V) hr) (volume_ball_ne_top r)).1 ?_
@@ -480,10 +487,11 @@ theorem mul_setLIntegral_closedBall_le {r : ℝ} (hr : 0 < r) {g : V → ℝ≥0
     _ ≤ (∫⁻ z in closedBall b (4 * r), w z) * ∫⁻ y in ball b r, g y := by gcongr
     _ = (∫⁻ y in ball b r, g y) * ∫⁻ z in closedBall b (4 * r), w z := mul_comm _ _
     _ ≤ ∫⁻ y in ball b r, g y * ∫⁻ z in closedBall b (4 * r), w z := lintegral_mul_const_le _ _
-    _ ≤ ∫⁻ y in ball b r, g y * (5 ^ finrank ℝ V * volume (ball (0 : V) r) * maximal w y) :=
+    _ ≤ ∫⁻ y in ball b r, g y * (5 ^ finrank ℝ V * volume (ball (0 : V) r) * maximalFunction w y) :=
       setLIntegral_mono' measurableSet_ball fun y hy => by
-        gcongr; exact setLIntegral_closedBall_le_maximal hr w hy
-    _ = 5 ^ finrank ℝ V * volume (ball (0 : V) r) * ∫⁻ y in ball b r, g y * maximal w y := by
+        gcongr; exact setLIntegral_closedBall_le_maximalFunction hr w hy
+    _ = 5 ^ finrank ℝ V * volume (ball (0 : V) r) * ∫⁻ y in ball b r,
+        g y * maximalFunction w y := by
       rw [← lintegral_const_mul' _ _ hc]; congr 1; funext y; ring
     _ = _ := by ring
 
@@ -497,9 +505,9 @@ theorem bigBallSet_mono (g : V → ℝ≥0∞) (t : ℝ≥0∞) : Monotone (bigB
   fun _ _ hRR' _ ⟨r, hr0, hrR, hrI⟩ => ⟨r, hr0, hrR.trans hRR', hrI⟩
 
 /-- The level set `{M g > t}` lies in the union of the sets `bigBallSet g t N`, `N ∈ ℕ`. -/
-theorem setOf_lt_maximal_subset (g : V → ℝ≥0∞) (t : ℝ≥0∞) :
-    {x | t < maximal g x} ⊆ ⋃ N : ℕ, bigBallSet g t N := fun x hx => by
-  obtain ⟨r, hr⟩ := lt_iSup_iff.1 (show t < maximal g x from hx)
+theorem setOf_lt_maximalFunction_subset (g : V → ℝ≥0∞) (t : ℝ≥0∞) :
+    {x | t < maximalFunction g x} ⊆ ⋃ N : ℕ, bigBallSet g t N := fun x hx => by
+  obtain ⟨r, hr⟩ := lt_iSup_iff.1 (show t < maximalFunction g x from hx)
   obtain ⟨hr0, hlt⟩ := lt_iSup_iff.1 hr
   rw [← ENNReal.div_eq_inv_mul, ENNReal.lt_div_iff_mul_lt (Or.inl (volume_ball_ne_zero hr0))
     (Or.inl (volume_ball_ne_top r))] at hlt
@@ -510,7 +518,7 @@ covering lemma selects countably many disjoint balls `B(b, r_b)` from the balls 
 `E_R` such that the balls `B̄(b, 4 r_b)` cover `E_R`, and each of them is estimated by
 `Rd.mul_setLIntegral_closedBall_le`. -/
 theorem mul_setLIntegral_bigBallSet_le (g w : V → ℝ≥0∞) (t : ℝ≥0∞) (R : ℝ) :
-    t * ∫⁻ x in bigBallSet g t R, w x ≤ 5 ^ finrank ℝ V * ∫⁻ x, g x * maximal w x := by
+    t * ∫⁻ x in bigBallSet g t R, w x ≤ 5 ^ finrank ℝ V * ∫⁻ x, g x * maximalFunction w x := by
   have hex : ∀ x ∈ bigBallSet g t R, ∃ r, 0 < r ∧ r ≤ R ∧
       t * volume (ball (0 : V) r) < ∫⁻ y in ball x r, g y := fun x hx => hx
   choose! r hr0 hrR hrI using hex
@@ -524,8 +532,8 @@ theorem mul_setLIntegral_bigBallSet_le (g w : V → ℝ≥0∞) (t : ℝ≥0∞)
   have hcover : bigBallSet g t R ⊆ ⋃ b : u, closedBall (b : V) (4 * r b) := fun a ha => by
     obtain ⟨b, hb, hab⟩ := hcov a ha
     exact Set.mem_iUnion.2 ⟨⟨b, hb⟩, hab (mem_closedBall_self (hr0 a ha).le)⟩
-  have hball : ∫⁻ x in ⋃ b : u, ball (b : V) (r b), g x * maximal w x =
-      ∑' b : u, ∫⁻ x in ball (b : V) (r b), g x * maximal w x :=
+  have hball : ∫⁻ x in ⋃ b : u, ball (b : V) (r b), g x * maximalFunction w x =
+      ∑' b : u, ∫⁻ x in ball (b : V) (r b), g x * maximalFunction w x :=
     lintegral_iUnion (fun _ => measurableSet_ball) (hdisj'.subtype _ _) _
   calc t * ∫⁻ x in bigBallSet g t R, w x
       ≤ t * ∫⁻ x in ⋃ b : u, closedBall (b : V) (4 * r b), w x :=
@@ -533,43 +541,43 @@ theorem mul_setLIntegral_bigBallSet_le (g w : V → ℝ≥0∞) (t : ℝ≥0∞)
     _ ≤ t * ∑' b : u, ∫⁻ x in closedBall (b : V) (4 * r b), w x :=
         mul_le_mul_right (lintegral_iUnion_le _ _) t
     _ = ∑' b : u, t * ∫⁻ x in closedBall (b : V) (4 * r b), w x := ENNReal.tsum_mul_left.symm
-    _ ≤ ∑' b : u, 5 ^ finrank ℝ V * ∫⁻ x in ball (b : V) (r b), g x * maximal w x :=
+    _ ≤ ∑' b : u, 5 ^ finrank ℝ V * ∫⁻ x in ball (b : V) (r b), g x * maximalFunction w x :=
         ENNReal.tsum_le_tsum fun b =>
           mul_setLIntegral_closedBall_le (hr0 b (hus b.2)) w (hrI b (hus b.2)).le
-    _ = 5 ^ finrank ℝ V * ∫⁻ x in ⋃ b : u, ball (b : V) (r b), g x * maximal w x := by
+    _ = 5 ^ finrank ℝ V * ∫⁻ x in ⋃ b : u, ball (b : V) (r b), g x * maximalFunction w x := by
         rw [hball, ENNReal.tsum_mul_left]
-    _ ≤ 5 ^ finrank ℝ V * ∫⁻ x, g x * maximal w x :=
+    _ ≤ 5 ^ finrank ℝ V * ∫⁻ x, g x * maximalFunction w x :=
         mul_le_mul_right (setLIntegral_le_lintegral _ _) _
 
 /-- **Weighted weak type `(1,1)` of the maximal function** (Fefferman–Stein): for all
 `g, w : V → [0, ∞]` and `t > 0`, `∫_{M g > t} w ≤ 5^n t⁻¹ ∫ g M w`. The level set is exhausted
 by the sets `Rd.bigBallSet`, whose radii are bounded, and Vitali's covering lemma applies to each
 of them. -/
-theorem setLIntegral_maximal_gt_le (g w : V → ℝ≥0∞) {t : ℝ≥0∞} (ht0 : 0 < t) :
-    ∫⁻ x in {x | t < maximal g x}, w x ≤
-      5 ^ finrank ℝ V * t⁻¹ * ∫⁻ x, g x * maximal w x := by
+theorem setLIntegral_maximalFunction_gt_le (g w : V → ℝ≥0∞) {t : ℝ≥0∞} (ht0 : 0 < t) :
+    ∫⁻ x in {x | t < maximalFunction g x}, w x ≤
+      5 ^ finrank ℝ V * t⁻¹ * ∫⁻ x, g x * maximalFunction w x := by
   rcases eq_or_ne t ∞ with rfl | ht
   · simp
   have hmono : Monotone fun N : ℕ => bigBallSet g t N :=
     (bigBallSet_mono g t).comp Nat.mono_cast
-  have hle : t * ∫⁻ x in {x | t < maximal g x}, w x ≤
-      5 ^ finrank ℝ V * ∫⁻ x, g x * maximal w x := by
-    calc t * ∫⁻ x in {x | t < maximal g x}, w x
+  have hle : t * ∫⁻ x in {x | t < maximalFunction g x}, w x ≤
+      5 ^ finrank ℝ V * ∫⁻ x, g x * maximalFunction w x := by
+    calc t * ∫⁻ x in {x | t < maximalFunction g x}, w x
         ≤ t * ∫⁻ x in ⋃ N : ℕ, bigBallSet g t N, w x :=
-          mul_le_mul_right (lintegral_mono_set (setOf_lt_maximal_subset g t)) t
+          mul_le_mul_right (lintegral_mono_set (setOf_lt_maximalFunction_subset g t)) t
       _ = ⨆ N : ℕ, t * ∫⁻ x in bigBallSet g t N, w x := by
           rw [setLIntegral_iUnion_of_directed w hmono.directed_le, ENNReal.mul_iSup]
       _ ≤ _ := iSup_le fun N => mul_setLIntegral_bigBallSet_le g w t N
   rw [ENNReal.mul_le_iff_le_inv ht0.ne' ht] at hle
-  calc _ ≤ t⁻¹ * (5 ^ finrank ℝ V * ∫⁻ x, g x * maximal w x) := hle
+  calc _ ≤ t⁻¹ * (5 ^ finrank ℝ V * ∫⁻ x, g x * maximalFunction w x) := hle
     _ = _ := by ring
 
 /-- **Weak type `(1,1)` of the maximal function**: `|{M g > t}| ≤ 5^n t⁻¹ ∫ g` for every
 `g : V → [0, ∞]` and `t > 0` (the weight `w = 1`). -/
-theorem volume_maximal_gt_le (g : V → ℝ≥0∞) {t : ℝ≥0∞} (ht0 : 0 < t) :
-    volume {x | t < maximal g x} ≤ 5 ^ finrank ℝ V * t⁻¹ * ∫⁻ x, g x := by
-  have h := setLIntegral_maximal_gt_le g (fun _ => 1) ht0
-  rw [maximal_const] at h
+theorem volume_maximalFunction_gt_le (g : V → ℝ≥0∞) {t : ℝ≥0∞} (ht0 : 0 < t) :
+    volume {x | t < maximalFunction g x} ≤ 5 ^ finrank ℝ V * t⁻¹ * ∫⁻ x, g x := by
+  have h := setLIntegral_maximalFunction_gt_le g (fun _ => 1) ht0
+  rw [maximalFunction_const] at h
   simpa only [setLIntegral_one, mul_one] using h
 
 /-! ### The weighted strong type -/
@@ -588,64 +596,68 @@ theorem maximalConst_ne_top {n : ℕ} {p : ℝ} (hp : 1 < p) : maximalConst n p 
 
 /-- **Cutting `g` at the height `s`**: `M g ≤ M (1_{g > s} g) + s` for measurable `g`, since
 `g ≤ 1_{g > s} g + s`. -/
-theorem maximal_le_maximal_indicator_add {g : V → ℝ≥0∞} (hg : Measurable g) (s : ℝ≥0∞)
-    (x : V) : maximal g x ≤ maximal ({y | s < g y}.indicator g) x + s := by
+theorem maximalFunction_le_maximalFunction_indicator_add {g : V → ℝ≥0∞} (hg : Measurable g)
+    (s : ℝ≥0∞)
+    (x : V) : maximalFunction g x ≤ maximalFunction ({y | s < g y}.indicator g) x + s := by
   have hle : g ≤ {y | s < g y}.indicator g + fun _ => s := fun y => by
     by_cases hy : y ∈ {y | s < g y}
     · rw [Pi.add_apply, Set.indicator_of_mem hy]; exact le_self_add
     · rw [Pi.add_apply, Set.indicator_of_notMem hy, zero_add]; exact not_lt.1 hy
-  calc maximal g x ≤ maximal ({y | s < g y}.indicator g + fun _ => s) x := maximal_mono hle x
-    _ ≤ maximal ({y | s < g y}.indicator g) x + maximal (fun _ => s) x :=
-      maximal_add_le ((hg.indicator (measurableSet_lt measurable_const hg)).aemeasurable) _ x
-    _ = _ := by rw [maximal_const]
+  calc maximalFunction g x ≤ maximalFunction ({y | s < g y}.indicator g + fun _ => s) x :=
+        maximalFunction_mono hle x
+    _ ≤ maximalFunction ({y | s < g y}.indicator g) x + maximalFunction (fun _ => s) x :=
+      maximalFunction_add_le
+        ((hg.indicator (measurableSet_lt measurable_const hg)).aemeasurable) _ x
+    _ = _ := by rw [maximalFunction_const]
 
 /-- The weighted level sets of `M g` for measurable `g`:
 `∫_{M g > s} w ≤ 2 · 5^n s⁻¹ ∫_{g > s/2} g M w` for `s > 0`, by the weighted weak type
 applied to `1_{g > s/2} g`. -/
-theorem setLIntegral_maximal_gt_le_indicator {g : V → ℝ≥0∞} (hg : Measurable g)
+theorem setLIntegral_maximalFunction_gt_le_indicator {g : V → ℝ≥0∞} (hg : Measurable g)
     (w : V → ℝ≥0∞) {s : ℝ≥0∞} (hs0 : 0 < s) :
-    ∫⁻ x in {x | s < maximal g x}, w x ≤
-      5 ^ finrank ℝ V * 2 * s⁻¹ * ∫⁻ x, {y | s / 2 < g y}.indicator g x * maximal w x := by
-  have hsub : {x | s < maximal g x} ⊆
-      {x | s / 2 < maximal ({y | s / 2 < g y}.indicator g) x} := fun x (hx : s < _) => by
+    ∫⁻ x in {x | s < maximalFunction g x}, w x ≤
+      5 ^ finrank ℝ V * 2 * s⁻¹ * ∫⁻ x, {y | s / 2 < g y}.indicator g x * maximalFunction w x := by
+  have hsub : {x | s < maximalFunction g x} ⊆
+      {x | s / 2 < maximalFunction ({y | s / 2 < g y}.indicator g) x} := fun x (hx : s < _) => by
     show s / 2 < _
     refine lt_of_not_ge fun hle => lt_irrefl s ?_
-    calc s < maximal g x := hx
-      _ ≤ maximal ({y | s / 2 < g y}.indicator g) x + s / 2 :=
-        maximal_le_maximal_indicator_add hg (s / 2) x
+    calc s < maximalFunction g x := hx
+      _ ≤ maximalFunction ({y | s / 2 < g y}.indicator g) x + s / 2 :=
+        maximalFunction_le_maximalFunction_indicator_add hg (s / 2) x
       _ ≤ s / 2 + s / 2 := by gcongr
       _ = s := ENNReal.add_halves s
   have hinv : (s / 2)⁻¹ = 2 * s⁻¹ := by
     rw [ENNReal.inv_div (Or.inl ENNReal.ofNat_ne_top) (Or.inl two_ne_zero), div_eq_mul_inv]
-  calc ∫⁻ x in {x | s < maximal g x}, w x
-      ≤ ∫⁻ x in {x | s / 2 < maximal ({y | s / 2 < g y}.indicator g) x}, w x :=
+  calc ∫⁻ x in {x | s < maximalFunction g x}, w x
+      ≤ ∫⁻ x in {x | s / 2 < maximalFunction ({y | s / 2 < g y}.indicator g) x}, w x :=
         lintegral_mono_set hsub
     _ ≤ 5 ^ finrank ℝ V * (s / 2)⁻¹ *
-          ∫⁻ x, {y | s / 2 < g y}.indicator g x * maximal w x :=
-        setLIntegral_maximal_gt_le _ w (ENNReal.half_pos hs0.ne')
+          ∫⁻ x, {y | s / 2 < g y}.indicator g x * maximalFunction w x :=
+        setLIntegral_maximalFunction_gt_le _ w (ENNReal.half_pos hs0.ne')
     _ = _ := by rw [hinv]; ring
 
 /-- The integrand of the layer cake formula for `M g` in the measure `w dx`, for measurable `g`
 and `t > 0`: `|{M g > t}|_w t^(p-1) ≤ 2 · 5^n (∫_{g > t/2} g M w) t^(p-2)`. -/
-theorem withDensity_maximal_gt_mul_le {g : V → ℝ≥0∞} (hg : Measurable g) (w : V → ℝ≥0∞)
+theorem withDensity_maximalFunction_gt_mul_le {g : V → ℝ≥0∞} (hg : Measurable g) (w : V → ℝ≥0∞)
     (p : ℝ) {t : ℝ} (ht : 0 < t) :
-    volume.withDensity w {x | ENNReal.ofReal t < maximal g x} * ENNReal.ofReal (t ^ (p - 1)) ≤
+    volume.withDensity w {x | ENNReal.ofReal t < maximalFunction g x} *
+      ENNReal.ofReal (t ^ (p - 1)) ≤
       5 ^ finrank ℝ V * 2 * ((∫⁻ x, {y | ENNReal.ofReal t / 2 < g y}.indicator g x *
-        maximal w x) * ENNReal.ofReal (t ^ (p - 2))) := by
+        maximalFunction w x) * ENNReal.ofReal (t ^ (p - 2))) := by
   have hpow : (ENNReal.ofReal t)⁻¹ * ENNReal.ofReal (t ^ (p - 1)) =
       ENNReal.ofReal (t ^ (p - 2)) := by
     rw [show p - 1 = 1 + (p - 2) by ring, Real.rpow_add ht, Real.rpow_one,
       ENNReal.ofReal_mul ht.le, ← mul_assoc,
       ENNReal.inv_mul_cancel (ENNReal.ofReal_pos.2 ht).ne' ENNReal.ofReal_ne_top, one_mul]
   rw [withDensity_apply' w]
-  calc (∫⁻ x in {x | ENNReal.ofReal t < maximal g x}, w x) * ENNReal.ofReal (t ^ (p - 1))
+  calc (∫⁻ x in {x | ENNReal.ofReal t < maximalFunction g x}, w x) * ENNReal.ofReal (t ^ (p - 1))
       ≤ 5 ^ finrank ℝ V * 2 * (ENNReal.ofReal t)⁻¹ *
-          (∫⁻ x, {y | ENNReal.ofReal t / 2 < g y}.indicator g x * maximal w x) *
+          (∫⁻ x, {y | ENNReal.ofReal t / 2 < g y}.indicator g x * maximalFunction w x) *
           ENNReal.ofReal (t ^ (p - 1)) := by
         gcongr
-        exact setLIntegral_maximal_gt_le_indicator hg w (ENNReal.ofReal_pos.2 ht)
+        exact setLIntegral_maximalFunction_gt_le_indicator hg w (ENNReal.ofReal_pos.2 ht)
     _ = 5 ^ finrank ℝ V * 2 * ((∫⁻ x, {y | ENNReal.ofReal t / 2 < g y}.indicator g x *
-          maximal w x) * ((ENNReal.ofReal t)⁻¹ * ENNReal.ofReal (t ^ (p - 1)))) := by ring
+          maximalFunction w x) * ((ENNReal.ofReal t)⁻¹ * ENNReal.ofReal (t ^ (p - 1)))) := by ring
     _ = _ := by rw [hpow]
 
 omit [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] [BorelSpace V] in
@@ -692,32 +704,33 @@ theorem lintegral_Ioi_lintegral_indicator_mul_rpow {g v : V → ℝ≥0∞} (hg 
   exact lintegral_const_mul' _ _ hc
 
 /-- The **weighted strong type** for measurable `g` and `w`: `∫ (M g)^p w ≤ C_{n,p} ∫ g^p M w`
-for `p > 1`, the case of `Rd.lintegral_maximal_rpow_mul_le` before `g` and `w` are replaced by
-measurable representatives. -/
-theorem lintegral_maximal_rpow_mul_le_of_measurable {g w : V → ℝ≥0∞} (hg : Measurable g)
+for `p > 1`, the case of `Rd.lintegral_maximalFunction_rpow_mul_le` before `g` and `w` are replaced
+by measurable representatives. -/
+theorem lintegral_maximalFunction_rpow_mul_le_of_measurable {g w : V → ℝ≥0∞} (hg : Measurable g)
     (hw : Measurable w) {p : ℝ} (hp : 1 < p) :
-    ∫⁻ x, maximal g x ^ p * w x ≤ maximalConst (finrank ℝ V) p * ∫⁻ x, g x ^ p * maximal w x := by
+    ∫⁻ x, maximalFunction g x ^ p * w x ≤ maximalConst (finrank ℝ V) p * ∫⁻ x,
+      g x ^ p * maximalFunction w x := by
   have hc : (5 : ℝ≥0∞) ^ finrank ℝ V * 2 ≠ ∞ :=
     ENNReal.mul_ne_top (ENNReal.pow_ne_top ENNReal.ofNat_ne_top) ENNReal.ofNat_ne_top
-  calc ∫⁻ x, maximal g x ^ p * w x
-      = ∫⁻ x, maximal g x ^ p ∂(volume.withDensity w) := by
+  calc ∫⁻ x, maximalFunction g x ^ p * w x
+      = ∫⁻ x, maximalFunction g x ^ p ∂(volume.withDensity w) := by
         rw [lintegral_withDensity_eq_lintegral_mul volume hw
-          ((measurable_maximal g).pow_const p)]
+          ((measurable_maximalFunction g).pow_const p)]
         congr 1; funext x; exact mul_comm _ _
     _ = ENNReal.ofReal p * ∫⁻ t in Ioi (0 : ℝ),
-          volume.withDensity w {x | ENNReal.ofReal t < maximal g x} *
+          volume.withDensity w {x | ENNReal.ofReal t < maximalFunction g x} *
             ENNReal.ofReal (t ^ (p - 1)) :=
-        lintegral_rpow_eq_lintegral_meas_lt_mul_ennreal _ (measurable_maximal g).aemeasurable
-          (by linarith)
+        lintegral_rpow_eq_lintegral_meas_lt_mul_ennreal
+          _ (measurable_maximalFunction g).aemeasurable (by linarith)
     _ ≤ ENNReal.ofReal p * ∫⁻ t in Ioi (0 : ℝ), 5 ^ finrank ℝ V * 2 *
-          ((∫⁻ x, {y | ENNReal.ofReal t / 2 < g y}.indicator g x * maximal w x) *
+          ((∫⁻ x, {y | ENNReal.ofReal t / 2 < g y}.indicator g x * maximalFunction w x) *
             ENNReal.ofReal (t ^ (p - 2))) :=
         mul_le_mul_right (setLIntegral_mono' measurableSet_Ioi fun t ht =>
-          withDensity_maximal_gt_mul_le hg w p ht) _
+          withDensity_maximalFunction_gt_mul_le hg w p ht) _
     _ = ENNReal.ofReal p * (5 ^ finrank ℝ V * 2 *
-          (2 ^ (p - 1) / ENNReal.ofReal (p - 1) * ∫⁻ x, g x ^ p * maximal w x)) := by
+          (2 ^ (p - 1) / ENNReal.ofReal (p - 1) * ∫⁻ x, g x ^ p * maximalFunction w x)) := by
         rw [lintegral_const_mul' _ _ hc,
-          lintegral_Ioi_lintegral_indicator_mul_rpow hg (measurable_maximal w) hp]
+          lintegral_Ioi_lintegral_indicator_mul_rpow hg (measurable_maximalFunction w) hp]
     _ = _ := by
         rw [maximalConst, ENNReal.rpow_eq_mul_rpow_sub_one 2 hp.le, div_eq_mul_inv]; ring
 
@@ -726,16 +739,17 @@ almost everywhere measurable `g, w : V → [0, ∞]`, `∫ (M g)^p w ≤ C_{n,p}
 `C_{n,p} = p 2^p 5^n / (p - 1)`. The bound holds for every such `g` and `w`, with both sides
 possibly infinite. The proof is the layer cake formula in the measure `w dx`, the weighted weak
 type for the part of `g` above half the height, and Tonelli's theorem. -/
-theorem lintegral_maximal_rpow_mul_le {g w : V → ℝ≥0∞} (hg : AEMeasurable g volume)
+theorem lintegral_maximalFunction_rpow_mul_le {g w : V → ℝ≥0∞} (hg : AEMeasurable g volume)
     (hw : AEMeasurable w volume) {p : ℝ} (hp : 1 < p) :
-    ∫⁻ x, maximal g x ^ p * w x ≤ maximalConst (finrank ℝ V) p * ∫⁻ x, g x ^ p * maximal w x := by
-  calc ∫⁻ x, maximal g x ^ p * w x = ∫⁻ x, maximal (hg.mk g) x ^ p * hw.mk w x := by
-        rw [maximal_congr_ae hg.ae_eq_mk]
+    ∫⁻ x, maximalFunction g x ^ p * w x ≤ maximalConst (finrank ℝ V) p * ∫⁻ x,
+      g x ^ p * maximalFunction w x := by
+  calc ∫⁻ x, maximalFunction g x ^ p * w x = ∫⁻ x, maximalFunction (hg.mk g) x ^ p * hw.mk w x := by
+        rw [maximalFunction_congr_ae hg.ae_eq_mk]
         exact lintegral_congr_ae (hw.ae_eq_mk.mono fun x hx => by simp only [hx])
-    _ ≤ maximalConst (finrank ℝ V) p * ∫⁻ x, hg.mk g x ^ p * maximal (hw.mk w) x :=
-        lintegral_maximal_rpow_mul_le_of_measurable hg.measurable_mk hw.measurable_mk hp
+    _ ≤ maximalConst (finrank ℝ V) p * ∫⁻ x, hg.mk g x ^ p * maximalFunction (hw.mk w) x :=
+        lintegral_maximalFunction_rpow_mul_le_of_measurable hg.measurable_mk hw.measurable_mk hp
     _ = _ := by
-        rw [← maximal_congr_ae hw.ae_eq_mk]
+        rw [← maximalFunction_congr_ae hw.ae_eq_mk]
         congr 1
         exact lintegral_congr_ae (hg.ae_eq_mk.mono fun x hx => by simp only [hx])
 
@@ -747,17 +761,18 @@ theorem maximalConst_ne_zero {n : ℕ} {p : ℝ} (hp : 0 < p) : maximalConst n p
 
 /-- The **Hardy–Littlewood maximal theorem**: `‖M g‖_p ≤ C_{n,p}^{1/p} ‖g‖_p` for
 `1 < p < ∞` and every `g : V → [0, ∞]` (the weight `w = 1`). -/
-theorem eLpNorm_maximal_le (g : V → ℝ≥0∞) {p : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ ∞) :
-    eLpNorm (maximal g) p volume ≤
+theorem eLpNorm_maximalFunction_le (g : V → ℝ≥0∞) {p : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ ∞) :
+    eLpNorm (maximalFunction g) p volume ≤
       maximalConst (finrank ℝ V) p.toReal ^ (1 / p.toReal) * eLpNorm g p volume := by
   have hp0 : p ≠ 0 := (zero_lt_one.trans hp1).ne'
   have hpr : 1 < p.toReal := ENNReal.one_lt_toReal hp1 hp
   by_cases hg : AEStronglyMeasurable g volume
-  · have h := lintegral_maximal_rpow_mul_le (w := fun _ => (1 : ℝ≥0∞)) hg.aemeasurable
+  · have h := lintegral_maximalFunction_rpow_mul_le (w := fun _ => (1 : ℝ≥0∞)) hg.aemeasurable
       aemeasurable_const hpr
-    rw [maximal_const] at h
+    rw [maximalFunction_const] at h
     simp only [mul_one] at h
-    rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp (measurable_maximal g).aestronglyMeasurable,
+    rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp
+      (measurable_maximalFunction g).aestronglyMeasurable,
       eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hg]
     simp only [enorm_eq_self]
     rw [← ENNReal.mul_rpow_of_nonneg _ _ (by positivity)]
@@ -769,24 +784,27 @@ theorem eLpNorm_maximal_le (g : V → ℝ≥0∞) {p : ℝ≥0∞} (hp1 : 1 < p)
     exact le_top
 
 /-- The maximal function of `g ∈ L_p`, `1 < p < ∞`, is **finite almost everywhere**. -/
-theorem maximal_lt_top_ae {g : V → ℝ≥0∞} {p : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ ∞)
-    (hgp : eLpNorm g p volume ≠ ∞) : ∀ᵐ x ∂volume, maximal g x < ∞ := by
+theorem maximalFunction_lt_top_ae {g : V → ℝ≥0∞} {p : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ ∞)
+    (hgp : eLpNorm g p volume ≠ ∞) : ∀ᵐ x ∂volume, maximalFunction g x < ∞ := by
   have hp0 : p ≠ 0 := (zero_lt_one.trans hp1).ne'
   have hpr : 0 < p.toReal := zero_lt_one.trans (ENNReal.one_lt_toReal hp1 hp)
-  have hlt : eLpNorm (maximal g) p volume ≠ ∞ :=
+  have hlt : eLpNorm (maximalFunction g) p volume ≠ ∞ :=
     ne_top_of_le_ne_top (ENNReal.mul_ne_top (ENNReal.rpow_ne_top_of_nonneg (by positivity)
-      (maximalConst_ne_top (ENNReal.one_lt_toReal hp1 hp))) hgp) (eLpNorm_maximal_le g hp1 hp)
-  have hint : ∫⁻ x, maximal g x ^ p.toReal ≠ ∞ := by
-    rw [← eLpNorm_rpow_eq_lintegral hp0 hp (measurable_maximal g).aemeasurable]
+      (maximalConst_ne_top (ENNReal.one_lt_toReal hp1 hp))) hgp)
+        (eLpNorm_maximalFunction_le g hp1 hp)
+  have hint : ∫⁻ x, maximalFunction g x ^ p.toReal ≠ ∞ := by
+    rw [← eLpNorm_rpow_eq_lintegral hp0 hp (measurable_maximalFunction g).aemeasurable]
     exact ENNReal.rpow_ne_top_of_nonneg hpr.le hlt
-  filter_upwards [ae_lt_top ((measurable_maximal g).pow_const _) hint] with x hx
+  filter_upwards [ae_lt_top ((measurable_maximalFunction g).pow_const _) hint] with x hx
   exact (ENNReal.rpow_lt_top_iff_of_pos hpr).1 hx
 
 /-- The **`p = ∞` bound**: `M g ≤ ‖g‖_∞` everywhere. -/
-theorem maximal_le_eLpNorm_top (g : V → ℝ≥0∞) (x : V) : maximal g x ≤ eLpNorm g ∞ volume := by
+theorem maximalFunction_le_eLpNorm_top (g : V → ℝ≥0∞) (x : V) :
+    maximalFunction g x ≤ eLpNorm g ∞ volume := by
   by_cases hg : AEStronglyMeasurable g volume
   · rw [eLpNorm_exponent_top hg]
-    exact maximal_le_of_ae_le ((ae_le_eLpNormEssSup (f := g)).mono fun y hy => by simpa using hy) x
+    exact maximalFunction_le_of_ae_le
+      ((ae_le_eLpNormEssSup (f := g)).mono fun y hy => by simpa using hy) x
   · rw [eLpNorm_of_not_aestronglyMeasurable hg]
     exact le_top
 

@@ -159,13 +159,13 @@ theorem higherDiff_eq_add_sum_jumps {r j N m : ℕ} (hmr : m ≤ r) {P : ℕ →
     have hih : (i : ℝ) * h ≤ m * h := mul_le_mul_of_nonneg_right (by exact_mod_cast hi') hh0
     exact polyFun_eq_add_sum_jumps hJ hu hx (le_add_of_nonneg_right (mul_nonneg
       (Nat.cast_nonneg i) hh0)) (by linarith) (floor_add_mul_le hx hh0 hkh (hi'.trans hmr))
-  rw [higherDiff_apply, Finset.sum_congr rfl fun i hi => by rw [hdec i hi] ]
+  rw [interval_higherDiff_apply, Finset.sum_congr rfl fun i hi => by rw [hdec i hi] ]
   simp only [mul_add, Finset.sum_add_distrib, Finset.mul_sum]
   congr 1
-  · exact (higherDiff_apply _ _ _ _).symm
+  · exact (interval_higherDiff_apply _ _ _ _).symm
   · rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun l _ => ?_
-    rw [higherDiff_apply, Finset.mul_sum]
+    rw [interval_higherDiff_apply, Finset.mul_sum]
     exact Finset.sum_congr rfl fun i _ => by ring
 
 /-- **Differences of a spline are differences of its jumps**: on `[x, x + rh]` with
@@ -420,7 +420,7 @@ theorem eLpNorm_higherDiff_ppFun_spline_le {r j : ℕ} {Q : ℕ → ℂ[X]}
 and level `j` (and `k - j` truncated at `0`). -/
 theorem exists_inverse_splineScheme {r : ℕ} (hp : p ≠ ∞) :
     ∃ CB : ℝ≥0∞, CB ≠ ∞ ∧ ∀ j k : ℕ, ∀ a ∈ splineScheme p r (2 ^ j),
-      lpModulus p r a k ≤
+      intervalLpModulus p r a k ≤
         CB * dyadicWeight (-(((r - 1 : ℕ) : ℝ) + 1 / p.toReal)) (k - j) * ‖a‖ₑ := by
   obtain ⟨K, hK, hKb⟩ := enorm_polyFun_le (p := p) r hp
   refine ⟨2 ^ r * (1 + splineInverseConst r K p),
@@ -429,11 +429,11 @@ theorem exists_inverse_splineScheme {r : ℕ} (hp : p ≠ ∞) :
   obtain ⟨Q, hQ, hJ, hae⟩ := mem_splineScheme_two_pow.1 ha
   rcases lt_or_ge k j with hkj | hjk
   · rw [Nat.sub_eq_zero_of_le hkj.le, ENNReal.dyadicWeight_zero_right, mul_one]
-    exact (lpModulus_le r a k).trans (by gcongr; exact two_pow_le_two_pow_mul_one_add r _)
+    exact (intervalLpModulus_le r a k).trans (by gcongr; exact two_pow_le_two_pow_mul_one_add r _)
   · have hnorm : ‖a‖ₑ = eLpNorm (ppFun j Q) p unitVol := by
       rw [Lp.enorm_def]
       exact eLpNorm_congr_ae hae
-    rw [lpModulus, modulus_congr_ae hae, hnorm, modulus_eq_iSup_nonneg]
+    rw [intervalLpModulus, intervalModulus_congr_ae hae, hnorm, intervalModulus_eq_iSup_nonneg]
     refine iSup₂_le fun h hh => ?_
     have hhj : h ≤ 1 / 2 ^ j := hh.2.trans (one_div_le_one_div_of_le (by positivity)
       (pow_le_pow_right₀ (by norm_num) hjk))

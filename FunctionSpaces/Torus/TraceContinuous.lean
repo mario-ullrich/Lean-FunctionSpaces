@@ -254,7 +254,8 @@ theorem exists_trace_eq_restrictFace (hp : p ≠ ∞) {s : ℝ} (hs : (n : ℝ) 
     rw [Fintype.card_fin]
     push_cast
     linarith
-  obtain ⟨f, hf⟩ := FunctionScheme.MemBesov.exists_boundedContinuous trigScheme_hasNikolskii
+  obtain ⟨f, hf⟩ :=
+    FunctionScheme.MemBesov.exists_boundedContinuous_of_nikolskii trigScheme_hasNikolskii
     (Nat.cast_nonneg _) hD hq hF
   rw [BoundedContinuousFunction.inclusionOfExponentLe_toLp] at hf
   have hs0 : 0 < s := lt_of_le_of_lt (by positivity) hs

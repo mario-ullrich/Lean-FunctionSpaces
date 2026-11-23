@@ -246,7 +246,7 @@ in the eigenbasis of the chart form (`Manifold.BesovAtlas.memApprox_chartScheme_
 theorem memBesov_iff_blockNorm_lt_top [T2Space M] (hθ : 0 < θ) (hθ' : θ < 1) (hq : 1 ≤ q)
     (f : Lp ℂ 2 μ) :
     Manifold.MemBesov I μ Rd.two_ne_top θ q f ↔
-      (A.chartScheme μ).projectionScheme.blockNorm θ q f < ⊤ := by
+      (A.chartScheme μ).spectralProjectionScheme.blockNorm θ q f < ⊤ := by
   rw [← A.memApprox_chartScheme_iff hθ hθ' hq,
     (A.chartScheme μ).memApprox_iff_blockNorm_lt_top hθ hq]
 

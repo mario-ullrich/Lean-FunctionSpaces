@@ -21,11 +21,11 @@ all of whose slices lie in `V`,
 
 (`Cube.eLpNorm_higherDiff_le_sum`). The isotropic difference is a sum of `d^r` translated mixed
 coordinate differences (`Cube.higherDiff_eq_sum`). A translate stays in the cube on `Q_{rh}`, so its
-norm is at most the norm of the mixed difference on a box (`Cube.eLpNorm_shift_mixedDiff_le`),
+norm is at most the norm of the mixed difference on a box (`Cube.eLpNorm_shift_cubeMixedDiff_le`),
 and the mixed difference is bounded one coordinate at a time by Tonelli's theorem
-(`Cube.eLpNorm_cubeDiff_inter_le`, `Cube.eLpNorm_mixedDiff_le`): the box constraint in the other
+(`Cube.eLpNorm_cubeDiff_inter_le`, `Cube.eLpNorm_cubeMixedDiff_le`): the box constraint in the other
 coordinates does not depend on the coordinate of the step (`Cube.eLpNorm_inter_le_of_slice_le`), and
-the slices of the intermediate functions stay in `V` (`Cube.slice_mixedDiff_mem`).
+the slices of the intermediate functions stay in `V` (`Cube.slice_cubeMixedDiff_mem`).
 
 If `β(m, t) = C (2^j |t|)^{θ_m}` for `|t| ≤ 2^(-j)` and `Θ ≤ ∑_i θ_{m_i}` whenever `∑_i m_i = r`,
 this gives `‖Δ_h^r f‖ ≤ d^r C^d (2^j ‖h‖_∞)^Θ ‖f‖` for `‖h‖_∞ ≤ 2^(-j)`
@@ -117,35 +117,35 @@ theorem update_mem_listRegion_iff (m : Fin d → ℕ) (h : Fin d → ℝ) {l : L
 the differences of order `m_i` and step `h_i` of the functions in `V` are bounded by `β_i` on the
 step regions, then the mixed difference along a list of distinct coordinates satisfies
 `‖M f‖_{L_p(box)} ≤ (∏_{i ∈ l} β_i) ‖f‖_{L_p(Q)}`. -/
-theorem eLpNorm_mixedDiff_le (V : Submodule ℂ (ℝ → ℂ)) {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞)
+theorem eLpNorm_cubeMixedDiff_le (V : Submodule ℂ (ℝ → ℂ)) {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞)
     (m : Fin d → ℕ) (h : Fin d → ℝ) (β : Fin d → ℝ≥0∞)
     (hβ : ∀ u ∈ V, ∀ i, eLpNorm (higherDiff (m i) (h i) u) p
       (volume.restrict (stepRegion (m i) (h i))) ≤ β i * eLpNorm u p unitVol)
     {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) (hfV : ∀ i x, slice f x i ∈ V) :
     ∀ l : List (Fin d), l.Nodup →
-      eLpNorm (mixedDiff m h l f) p ((cubeVol d).restrict (listRegion m h l)) ≤
+      eLpNorm (cubeMixedDiff m h l f) p ((cubeVol d).restrict (listRegion m h l)) ≤
         (l.map β).prod * eLpNorm f p (cubeVol d)
   | [], _ => by
-    rw [mixedDiff_nil, listRegion_nil, Measure.restrict_univ, List.map_nil, List.prod_nil,
+    rw [cubeMixedDiff_nil, listRegion_nil, Measure.restrict_univ, List.map_nil, List.prod_nil,
       one_mul]
   | i :: l, hl => by
     obtain ⟨hil, hl'⟩ := List.nodup_cons.1 hl
-    rw [mixedDiff_cons, listRegion_cons, List.map_cons, List.prod_cons, mul_assoc]
-    refine (eLpNorm_cubeDiff_inter_le (measurable_mixedDiff m h l hf) hp0 hp (m i) (h i) i
+    rw [cubeMixedDiff_cons, listRegion_cons, List.map_cons, List.prod_cons, mul_assoc]
+    refine (eLpNorm_cubeDiff_inter_le (measurable_cubeMixedDiff m h l hf) hp0 hp (m i) (h i) i
       (measurableSet_listRegion m h l) (update_mem_listRegion_iff m h hil)
-      fun x => hβ _ (slice_mixedDiff_mem V m h hil (hfV i) x) i).trans ?_
-    exact mul_le_mul' le_rfl (eLpNorm_mixedDiff_le V hp0 hp m h β hβ hf hfV l hl')
+      fun x => hβ _ (slice_cubeMixedDiff_mem V m h hil (hfV i) x) i).trans ?_
+    exact mul_le_mul' le_rfl (eLpNorm_cubeMixedDiff_le V hp0 hp m h β hβ hf hfV l hl')
 
 /-- **The translated terms**: on the isotropic region the translate of the mixed difference of
 a word `α` by its shift `s_α` stays in the cube, and lands in the box of the mixed difference, so
 `‖M f(· + s_α)‖_{L_p(Q_{rh})} ≤ ‖M f‖_{L_p(box)}`. -/
-theorem eLpNorm_shift_mixedDiff_le {r : ℕ} (h : Fin d → ℝ) (α : Fin r → Fin d)
+theorem eLpNorm_shift_cubeMixedDiff_le {r : ℕ} (h : Fin d → ℝ) (α : Fin r → Fin d)
     {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) (p : ℝ≥0∞) :
-    eLpNorm (fun x => mixedDiff (letterCount α) h (List.finRange d) f (x + shiftVec h α)) p
+    eLpNorm (fun x => cubeMixedDiff (letterCount α) h (List.finRange d) f (x + shiftVec h α)) p
         ((cubeVol d).restrict (isoRegion r h)) ≤
-      eLpNorm (mixedDiff (letterCount α) h (List.finRange d) f) p
+      eLpNorm (cubeMixedDiff (letterCount α) h (List.finRange d) f) p
         ((cubeVol d).restrict (listRegion (letterCount α) h (List.finRange d))) := by
-  refine eLpNorm_comp_add_le (measurable_mixedDiff _ h _ hf) p (measurableSet_isoRegion r h)
+  refine eLpNorm_comp_add_le (measurable_cubeMixedDiff _ h _ hf) p (measurableSet_isoRegion r h)
     (measurableSet_listRegion _ h _) _ fun x hx => ?_
   have hle := card_lt_add_letterCount_le α
   have hcoord : ∀ c, x c + ((Finset.univ.filter fun l => c < α l).card : ℝ) * h c ∈
@@ -181,13 +181,14 @@ theorem eLpNorm_higherDiff_le_sum (V : Submodule ℂ (ℝ → ℂ)) {p : ℝ≥0
       (∑ α : Fin r → Fin d, ∏ i, β (letterCount α i) (h i)) * eLpNorm f p (cubeVol d) := by
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one hp1).ne'
   have hsum : higherDiff r h f = ∑ α : Fin r → Fin d,
-      fun x => mixedDiff (letterCount α) h (List.finRange d) f (x + shiftVec h α) := by
+      fun x => cubeMixedDiff (letterCount α) h (List.finRange d) f (x + shiftVec h α) := by
     funext x
     rw [higherDiff_eq_sum, Finset.sum_apply]
   rw [hsum, Finset.sum_mul]
   refine (eLpNorm_sum_le hp1).trans (Finset.sum_le_sum fun α _ => ?_)
-  refine (eLpNorm_shift_mixedDiff_le h α hf p).trans ?_
-  have hmix := eLpNorm_mixedDiff_le V hp0 hp (letterCount α) h (fun i => β (letterCount α i) (h i))
+  refine (eLpNorm_shift_cubeMixedDiff_le h α hf p).trans ?_
+  have hmix :=
+    eLpNorm_cubeMixedDiff_le V hp0 hp (letterCount α) h (fun i => β (letterCount α i) (h i))
     (fun u hu i => hβ u hu _ (letterCount_le α i) i) hf hfV
     (List.finRange d) (List.nodup_finRange d)
   rwa [← Fin.prod_univ_def] at hmix

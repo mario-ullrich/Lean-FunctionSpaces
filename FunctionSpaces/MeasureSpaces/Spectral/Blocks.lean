@@ -13,8 +13,8 @@ public import ApproximationSpaces.Decompositions.Projection
 
 For a spectral scheme `(e_i, lvl)` in a Hilbert space `H`, the truncation
 `P n f = ∑_{lvl i < n} ⟨e_i, f⟩ e_i` is the orthogonal projection onto the approximants, so
-the scheme is a projection scheme with bound `1` (`SpectralScheme.projectionScheme`), and the
-union of the approximants is dense.  The dyadic block
+the scheme is a projection scheme with bound `1` (`SpectralScheme.spectralProjectionScheme`), and
+the union of the approximants is dense.  The dyadic block
 
 `Δ_k f = P (2^(k+1)) f - P (2^k) f = ∑_{2^k ≤ lvl i < 2^(k+1)} ⟨e_i, f⟩ e_i`
 
@@ -25,8 +25,8 @@ of `ApproximationSpaces.Decompositions.Projection` then gives, for `s > 0`:
   `f ∈ A^s_q` iff `(2^(ks) (∑_{2^k ≤ lvl i < 2^(k+1)} |⟨e_i, f⟩|²)^(1/2))_k ∈ ℓ_q`; on the
   torus with the Fourier basis this is the Littlewood–Paley description of `B^s_{2,q}` with
   sharp dyadic cut-offs;
-* **`H^s = A^s_2`** (`memApprox_two_iff`): the Sobolev space of order `s` is the approximation
-  space with fine index `2`, i.e. `H^s = B^s_{2,2}`.
+* **`H^s = A^s_2`** (`memApprox_two_iff_levelWeight`): the Sobolev space of order `s` is the
+  approximation space with fine index `2`, i.e. `H^s = B^s_{2,2}`.
 -/
 
 @[expose] public section
@@ -41,60 +41,65 @@ open ApproximationScheme ENNReal
 variable {ι H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] (S : SpectralScheme ι H)
 
 /-- Truncation is additive. -/
-theorem truncate_add (n : ℕ) (f g : H) : S.truncate n (f + g) = S.truncate n f + S.truncate n g := by
-  simp only [truncate, map_add, lp.coeFn_add, Pi.add_apply, add_smul, Finset.sum_add_distrib]
+theorem levelTruncate_add (n : ℕ) (f g : H) :
+    S.levelTruncate n (f + g) = S.levelTruncate n f + S.levelTruncate n g := by
+  simp only [levelTruncate, map_add, lp.coeFn_add, Pi.add_apply, add_smul, Finset.sum_add_distrib]
 
 /-- Truncation is homogeneous. -/
-theorem truncate_smul (n : ℕ) (c : ℂ) (f : H) : S.truncate n (c • f) = c • S.truncate n f := by
-  simp only [truncate, map_smul, lp.coeFn_smul, Pi.smul_apply, smul_eq_mul, mul_smul,
+theorem levelTruncate_smul (n : ℕ) (c : ℂ) (f : H) :
+    S.levelTruncate n (c • f) = c • S.levelTruncate n f := by
+  simp only [levelTruncate, map_smul, lp.coeFn_smul, Pi.smul_apply, smul_eq_mul, mul_smul,
     Finset.smul_sum]
 
 /-- Truncation does not increase the norm, by Bessel's inequality. -/
-theorem norm_truncate_le (n : ℕ) (f : H) : ‖S.truncate n f‖ ≤ ‖f‖ := by
+theorem norm_levelTruncate_le (n : ℕ) (f : H) : ‖S.levelTruncate n f‖ ≤ ‖f‖ := by
   rw [← S.basis.repr.norm_map, ← S.basis.repr.norm_map f]
   refine lp.norm_mono (by norm_num) fun i => ?_
-  rw [repr_truncate]
+  rw [repr_levelTruncate]
   split_ifs <;> simp
 
 /-- The truncation as a bounded linear operator of norm at most `1`. -/
-noncomputable def truncateCLM (n : ℕ) : H →L[ℂ] H :=
+noncomputable def levelTruncateCLM (n : ℕ) : H →L[ℂ] H :=
   LinearMap.mkContinuous
-    { toFun := S.truncate n
-      map_add' := S.truncate_add n
-      map_smul' := S.truncate_smul n }
-    1 fun f => by rw [one_mul]; exact S.norm_truncate_le n f
+    { toFun := S.levelTruncate n
+      map_add' := S.levelTruncate_add n
+      map_smul' := S.levelTruncate_smul n }
+    1 fun f => by rw [one_mul]; exact S.norm_levelTruncate_le n f
 
 /-- The bounded linear truncation is the truncation. -/
-theorem truncateCLM_apply (n : ℕ) (f : H) : S.truncateCLM n f = S.truncate n f := rfl
+theorem levelTruncateCLM_apply (n : ℕ) (f : H) : S.levelTruncateCLM n f = S.levelTruncate n f := rfl
 
 /-- The truncation fixes the approximants. -/
-theorem truncate_of_mem {n : ℕ} {a : H} (ha : a ∈ S.span n) : S.truncate n a = a := by
+theorem levelTruncate_of_mem {n : ℕ} {a : H} (ha : a ∈ S.levelSpan n) :
+    S.levelTruncate n a = a := by
   refine S.basis.repr.injective (lp.ext (funext fun i => ?_))
-  rw [repr_truncate]
+  rw [repr_levelTruncate]
   split_ifs with hi
   · rfl
-  · exact (S.repr_eq_zero_of_mem_span ha (not_lt.1 hi)).symm
+  · exact (S.repr_eq_zero_of_mem_levelSpan ha (not_lt.1 hi)).symm
 
 /-- **The spectral scheme as a projection scheme**, with the truncations as projections of
 norm at most `1`. -/
-noncomputable def projectionScheme : S.toScheme.ProjectionScheme where
-  P n := (S.truncateCLM n).restrictScalars ℝ
-  mem n f := S.truncate_mem_span n f
-  proj n a ha := S.truncate_of_mem ha
+noncomputable def spectralProjectionScheme : S.toScheme.ProjectionScheme where
+  P n := (S.levelTruncateCLM n).restrictScalars ℝ
+  mem n f := S.levelTruncate_mem_levelSpan n f
+  proj n a ha := S.levelTruncate_of_mem ha
   bound := 1
   norm_le n := by
     rw [ContinuousLinearMap.norm_restrictScalars]
     exact LinearMap.mkContinuous_norm_le _ zero_le_one _
 
 /-- The projections of the spectral projection scheme are the truncations. -/
-theorem projectionScheme_P (n : ℕ) (f : H) : S.projectionScheme.P n f = S.truncate n f := rfl
+theorem spectralProjectionScheme_P (n : ℕ) (f : H) :
+    S.spectralProjectionScheme.P n f = S.levelTruncate n f := rfl
 
 /-- The approximants of all complexities span the span of the basis. -/
-theorem iUnion_span : (⋃ n, (S.span n : Set H)) = Submodule.span ℂ (Set.range S.basis) := by
+theorem iUnion_levelSpan :
+    (⋃ n, (S.levelSpan n : Set H)) = Submodule.span ℂ (Set.range S.basis) := by
   apply le_antisymm
   · exact Set.iUnion_subset fun n => Submodule.span_mono (Set.image_subset_range _ _)
-  · have hdir : Directed (· ≤ ·) S.span := S.span_mono.directed_le
-    have h : Submodule.span ℂ (Set.range S.basis) ≤ ⨆ n, S.span n := by
+  · have hdir : Directed (· ≤ ·) S.levelSpan := S.levelSpan_mono.directed_le
+    have h : Submodule.span ℂ (Set.range S.basis) ≤ ⨆ n, S.levelSpan n := by
       rw [Submodule.span_le]
       rintro _ ⟨i, rfl⟩
       exact Submodule.mem_iSup_of_mem (S.level i + 1)
@@ -106,15 +111,16 @@ theorem iUnion_span : (⋃ n, (S.span n : Set H)) = Submodule.span ℂ (Set.rang
 
 /-- The union of the approximants is dense. -/
 theorem closure_iUnion_toScheme [CompleteSpace H] : closure (⋃ n, S.toScheme n) = Set.univ := by
-  have h : (⋃ n, S.toScheme n) = (Submodule.span ℂ (Set.range S.basis) : Set H) := S.iUnion_span
+  have h : (⋃ n, S.toScheme n) = (Submodule.span ℂ (Set.range S.basis) : Set H) :=
+    S.iUnion_levelSpan
   rw [h, ← Submodule.topologicalClosure_coe, S.basis.dense_span, Submodule.top_coe]
 
 /-- The coefficients of a dyadic block are those of `f` with `2^k ≤ lvl i < 2^(k+1)`. -/
 theorem repr_block (k : ℕ) (f : H) (i : ι) :
-    S.basis.repr (S.projectionScheme.block k f) i =
+    S.basis.repr (S.spectralProjectionScheme.block k f) i =
       if 2 ^ k ≤ S.level i ∧ S.level i < 2 ^ (k + 1) then S.basis.repr f i else 0 := by
-  rw [ProjectionScheme.block, S.projectionScheme_P, S.projectionScheme_P, map_sub, lp.coeFn_sub,
-    Pi.sub_apply, repr_truncate, repr_truncate]
+  rw [ProjectionScheme.block, S.spectralProjectionScheme_P, S.spectralProjectionScheme_P, map_sub,
+    lp.coeFn_sub, Pi.sub_apply, repr_levelTruncate, repr_levelTruncate]
   by_cases h1 : S.level i < 2 ^ k
   · have h2 : S.level i < 2 ^ (k + 1) := h1.trans (Nat.pow_lt_pow_right one_lt_two (Nat.lt_succ_self k))
     simp [h1, h2, not_le.2 h1]
@@ -124,7 +130,7 @@ theorem repr_block (k : ℕ) (f : H) (i : ι) :
 
 /-- `‖Δ_k f‖² = ∑_{2^k ≤ lvl i < 2^(k+1)} |⟨e_i, f⟩|²`. -/
 theorem enorm_block_sq (k : ℕ) (f : H) :
-    ‖S.projectionScheme.block k f‖ₑ ^ 2 = ∑' i,
+    ‖S.spectralProjectionScheme.block k f‖ₑ ^ 2 = ∑' i,
       if 2 ^ k ≤ S.level i ∧ S.level i < 2 ^ (k + 1) then ‖S.basis.repr f i‖ₑ ^ 2 else 0 := by
   rw [← S.basis.repr.enorm_map, lp.enorm_sq_eq_tsum]
   congr 1; funext i
@@ -135,8 +141,9 @@ theorem enorm_block_sq (k : ℕ) (f : H) :
 `s > 0`, `f ∈ A^s_q` iff `‖P 1 f‖ + ‖(2^(ks) ‖Δ_k f‖)_k‖_q < ∞`, where
 `‖Δ_k f‖² = ∑_{2^k ≤ lvl i < 2^(k+1)} |⟨e_i, f⟩|²` (`enorm_block_sq`). -/
 theorem memApprox_iff_blockNorm_lt_top [CompleteSpace H] {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞}
-    (hq : 1 ≤ q) {f : H} : S.toScheme.MemApprox s q f ↔ S.projectionScheme.blockNorm s q f < ∞ :=
-  S.projectionScheme.memApprox_iff_blockNorm_lt_top_of_dense S.closure_iUnion_toScheme hs hq
+    (hq : 1 ≤ q) {f : H} :
+    S.toScheme.MemApprox s q f ↔ S.spectralProjectionScheme.blockNorm s q f < ∞ :=
+  S.spectralProjectionScheme.memApprox_iff_blockNorm_lt_top_of_dense S.closure_iUnion_toScheme hs hq
 
 /-- Membership in `ℓ²` through the series of squares in `ℝ≥0∞`. -/
 theorem mem_l2_iff (g : ι → ℂ) : Memℓp g 2 ↔ ∑' i, ‖g i‖ₑ ^ 2 ≠ ∞ := by
@@ -147,9 +154,9 @@ theorem mem_l2_iff (g : ι → ℂ) : Memℓp g 2 ↔ ∑' i, ‖g i‖ₑ ^ 2 �
   simp
 
 /-- The squared Sobolev weight `(1 + lvl i)^(2s)` in `ℝ≥0∞`. -/
-theorem enorm_weight_mul_sq (s : ℝ) (i : ι) (z : ℂ) :
-    ‖(S.weight s i : ℂ) * z‖ₑ ^ 2 = ((1 + S.level i : ℕ) : ℝ≥0∞) ^ (2 * s) * ‖z‖ₑ ^ 2 := by
-  rw [enorm_mul, mul_pow, ← ofReal_norm, S.norm_ofReal_weight, weight,
+theorem enorm_levelWeight_mul_sq (s : ℝ) (i : ι) (z : ℂ) :
+    ‖(S.levelWeight s i : ℂ) * z‖ₑ ^ 2 = ((1 + S.level i : ℕ) : ℝ≥0∞) ^ (2 * s) * ‖z‖ₑ ^ 2 := by
+  rw [enorm_mul, mul_pow, ← ofReal_norm, S.norm_ofReal_levelWeight, levelWeight,
     ← ENNReal.ofReal_rpow_of_pos (by positivity), ENNReal.ofReal_natCast, ← ENNReal.rpow_natCast,
     ← ENNReal.rpow_mul]
   congr 2
@@ -169,12 +176,12 @@ theorem tsum_ite_block_eq (s : ℝ) (m : ℕ) :
 
 /-- **`H^s = B^s_{2,2}`** for a spectral scheme: for `s > 0`, `f ∈ A^s_2` if and only if
 `∑_i (1 + lvl i)^(2s) |⟨e_i, f⟩|² < ∞`, i.e. `f` lies in the Sobolev space of order `s`. -/
-theorem memApprox_two_iff [CompleteSpace H] {s : ℝ} (hs : 0 < s) (f : H) :
-    S.toScheme.MemApprox s 2 f ↔ Memℓp (fun i => (S.weight s i : ℂ) * S.basis.repr f i) 2 := by
+theorem memApprox_two_iff_levelWeight [CompleteSpace H] {s : ℝ} (hs : 0 < s) (f : H) :
+    S.toScheme.MemApprox s 2 f ↔ Memℓp (fun i => (S.levelWeight s i : ℂ) * S.basis.repr f i) 2 := by
   set e : ι → ℝ≥0∞ := fun i => ‖S.basis.repr f i‖ₑ ^ 2
   set Wt : ι → ℝ≥0∞ := fun i => ((1 + S.level i : ℕ) : ℝ≥0∞) ^ (2 * s)
   set blk : ℕ → ι → Prop := fun k i => 2 ^ k ≤ S.level i ∧ S.level i < 2 ^ (k + 1)
-  set B : ℝ≥0∞ := ∑' k, dyadicWeight (2 * s) k * ‖S.projectionScheme.block k f‖ₑ ^ 2
+  set B : ℝ≥0∞ := ∑' k, dyadicWeight (2 * s) k * ‖S.spectralProjectionScheme.block k f‖ₑ ^ 2
   set T : ℝ≥0∞ := ∑' i, Wt i * e i
   -- the block sum as a sum over the coefficients
   have hB : B = ∑' i, (∑' k : ℕ, if blk k i then dyadicWeight (2 * s) k else 0) * e i := by
@@ -227,11 +234,12 @@ theorem memApprox_two_iff [CompleteSpace H] {s : ℝ} (hs : 0 < s) (f : H) :
                 ENNReal.tsum_le_tsum fun i => by split_ifs <;> simp
             _ = ‖f‖ₑ ^ 2 := by rw [← S.basis.repr.enorm_map, lp.enorm_sq_eq_tsum]
   -- the block norm is finite iff `B` is
-  have hblk : S.projectionScheme.blockNorm s 2 f < ∞ ↔ B ≠ ∞ := by
+  have hblk : S.spectralProjectionScheme.blockNorm s 2 f < ∞ ↔ B ≠ ∞ := by
     rw [ProjectionScheme.blockNorm, ENNReal.add_lt_top, and_iff_right enorm_lt_top]
     have h2 := lqNorm_rpow (q := 2) (by norm_num) (by norm_num)
-      (fun k => dyadicWeight s k * ‖S.projectionScheme.block k f‖ₑ)
-    have hB' : (∑' k, (dyadicWeight s k * ‖S.projectionScheme.block k f‖ₑ) ^ (2 : ℝ≥0∞).toReal) = B := by
+      (fun k => dyadicWeight s k * ‖S.spectralProjectionScheme.block k f‖ₑ)
+    have hB' : (∑' k, (dyadicWeight s k * ‖S.spectralProjectionScheme.block k f‖ₑ) ^
+        (2 : ℝ≥0∞).toReal) = B := by
       simp only [B, ENNReal.toReal_ofNat]
       congr 1; funext k
       rw [ENNReal.mul_rpow_of_nonneg _ _ (by norm_num), ENNReal.dyadicWeight_rpow, mul_comm s,
@@ -239,7 +247,7 @@ theorem memApprox_two_iff [CompleteSpace H] {s : ℝ} (hs : 0 < s) (f : H) :
     rw [hB'] at h2
     rw [← h2, ← lt_top_iff_ne_top, ENNReal.rpow_lt_top_iff_of_pos (by norm_num)]
   rw [memApprox_iff_blockNorm_lt_top S hs one_le_two, hblk, mem_l2_iff]
-  simp_rw [S.enorm_weight_mul_sq]
+  simp_rw [S.enorm_levelWeight_mul_sq]
   change B ≠ ∞ ↔ T ≠ ∞
   constructor
   · intro h

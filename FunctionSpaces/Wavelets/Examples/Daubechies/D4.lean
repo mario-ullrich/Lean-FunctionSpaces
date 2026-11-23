@@ -29,9 +29,9 @@ since `a² + b² = 2` and `2ab = -1` (`Daubechies.normSq_add_mul_expFreq`,
 
 `c_0 = (1 + √3)/4`, `c_1 = (3 + √3)/4`, `c_2 = (3 - √3)/4`, `c_3 = (1 - √3)/4`
 
-(`Daubechies.coeff_d4`), and `c_k = 0` for every other `k ∈ ℤ` (`Daubechies.coeff_d4_eq_zero`).
-They are normalised by `∑_k c_k = 2`; the orthonormal filter `h_k = c_k/√2` is the form in which
-the coefficients are usually tabulated.
+(`Daubechies.daubechiesCoeff_d4`), and `c_k = 0` for every other `k ∈ ℤ`
+(`Daubechies.daubechiesCoeff_d4_eq_zero`). They are normalised by `∑_k c_k = 2`; the orthonormal
+filter `h_k = c_k/√2` is the form in which the coefficients are usually tabulated.
 -/
 
 @[expose] public section
@@ -59,8 +59,8 @@ theorem daubFun_two_eq_two_sub_cos (ξ : ℝ) : daubFun 2 ξ = 2 - Real.cos (2 *
 
 /-- **The Daubechies mask D4**, the mask of order `N = 2` with the polynomial factor
 `L(z) = (1 + √3)/2 + ((1 - √3)/2) z` (`Daubechies.d4_L`). Its filter coefficients are
-`c_0, …, c_3 = (1 + √3)/4, (3 + √3)/4, (3 - √3)/4, (1 - √3)/4` (`Daubechies.coeff_d4`). The
-condition `|L(e^(-2πiξ))|² = P(ξ)` holds since both sides equal `2 - cos(2πξ)`
+`c_0, …, c_3 = (1 + √3)/4, (3 + √3)/4, (3 - √3)/4, (1 - √3)/4` (`Daubechies.daubechiesCoeff_d4`).
+The condition `|L(e^(-2πiξ))|² = P(ξ)` holds since both sides equal `2 - cos(2πξ)`
 (`Daubechies.normSq_add_mul_expFreq`, `Daubechies.daubFun_two_eq_two_sub_cos`). -/
 noncomputable def d4 : Mask 2 where
   L := C ((1 + √3) / 2) + C ((1 - √3) / 2) * X
@@ -93,38 +93,39 @@ theorem maskPoly_d4 :
 
 /-- The filter coefficient `c_0 = (1 + √3)/4` of D4. -/
 @[simp]
-theorem coeff_d4_zero : coeff d4 0 = (1 + √3) / 4 := by
-  simp [coeff, maskPoly_d4]
+theorem daubechiesCoeff_d4_zero : daubechiesCoeff d4 0 = (1 + √3) / 4 := by
+  simp [daubechiesCoeff, maskPoly_d4]
   ring
 
 /-- The filter coefficient `c_1 = (3 + √3)/4` of D4. -/
 @[simp]
-theorem coeff_d4_one : coeff d4 1 = (3 + √3) / 4 := by
-  simp [coeff, maskPoly_d4]
+theorem daubechiesCoeff_d4_one : daubechiesCoeff d4 1 = (3 + √3) / 4 := by
+  simp [daubechiesCoeff, maskPoly_d4]
   ring
 
 /-- The filter coefficient `c_2 = (3 - √3)/4` of D4. -/
 @[simp]
-theorem coeff_d4_two : coeff d4 2 = (3 - √3) / 4 := by
-  simp [coeff, maskPoly_d4]
+theorem daubechiesCoeff_d4_two : daubechiesCoeff d4 2 = (3 - √3) / 4 := by
+  simp [daubechiesCoeff, maskPoly_d4]
   ring
 
 /-- The filter coefficient `c_3 = (1 - √3)/4` of D4. -/
 @[simp]
-theorem coeff_d4_three : coeff d4 3 = (1 - √3) / 4 := by
-  simp [coeff, maskPoly_d4]
+theorem daubechiesCoeff_d4_three : daubechiesCoeff d4 3 = (1 - √3) / 4 := by
+  simp [daubechiesCoeff, maskPoly_d4]
   ring
 
 /-- **The filter coefficients of D4**:
 `c_0 = (1 + √3)/4`, `c_1 = (3 + √3)/4`, `c_2 = (3 - √3)/4`, `c_3 = (1 - √3)/4`. -/
-theorem coeff_d4 :
-    coeff d4 0 = (1 + √3) / 4 ∧ coeff d4 1 = (3 + √3) / 4 ∧ coeff d4 2 = (3 - √3) / 4 ∧
-      coeff d4 3 = (1 - √3) / 4 :=
-  ⟨coeff_d4_zero, coeff_d4_one, coeff_d4_two, coeff_d4_three⟩
+theorem daubechiesCoeff_d4 :
+    daubechiesCoeff d4 0 = (1 + √3) / 4 ∧ daubechiesCoeff d4 1 = (3 + √3) / 4 ∧
+      daubechiesCoeff d4 2 = (3 - √3) / 4 ∧ daubechiesCoeff d4 3 = (1 - √3) / 4 :=
+  ⟨daubechiesCoeff_d4_zero, daubechiesCoeff_d4_one, daubechiesCoeff_d4_two,
+    daubechiesCoeff_d4_three⟩
 
 /-- The filter coefficients of D4 vanish outside `0 ≤ k ≤ 3`: `c_k = 0` for `k < 0` and for
-`k ≥ 4` (`Daubechies.coeff_eq_zero` with `2N = 4`). -/
-theorem coeff_d4_eq_zero {k : ℤ} (hk : k < 0 ∨ 4 ≤ k) : coeff d4 k = 0 :=
-  coeff_eq_zero d4 (by omega)
+`k ≥ 4` (`Daubechies.daubechiesCoeff_eq_zero` with `2N = 4`). -/
+theorem daubechiesCoeff_d4_eq_zero {k : ℤ} (hk : k < 0 ∨ 4 ≤ k) : daubechiesCoeff d4 k = 0 :=
+  daubechiesCoeff_eq_zero d4 (by omega)
 
 end Daubechies

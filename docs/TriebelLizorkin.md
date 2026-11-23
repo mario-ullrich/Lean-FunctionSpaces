@@ -129,7 +129,7 @@ and of `L_p` and one of them, are Besov spaces.
   with the local means quasi-norm of a bump (`Rd.LocalMeansBump.tlDiffNorm_le_tlLocalMeansNorm`,
   `Rd.LocalMeansBump.tlLocalMeansNorm_le_tlDiffNorm`). Pointwise, a local mean is bounded by a
   ball mean (`Rd.LocalMeansBump.enorm_localMean_le_ballMeanDiff`), and a ball mean by maximal
-  functions of the local means (`Rd.LocalMeansBump.ballMeanDiff_le_tsum_maximal`).
+  functions of the local means (`Rd.LocalMeansBump.ballMeanDiff_le_tsum_maximalFunction`).
 * **Atoms.** For complex coefficients `λ_{j,m}` of the dyadic cells `P_{j,m}` let `λ_j(x)` be
   `|λ_{j,m}|` for the cell of level `j` containing `x` (`Rd.cellCoefFun`) and
   `‖λ‖_{f^s_{p,q}} = ‖ x ↦ ‖(2^(js) λ_j(x))_j‖_{ℓ_q} ‖_p` (`Rd.tlCoeffNorm`). For `1 < p < ∞`,

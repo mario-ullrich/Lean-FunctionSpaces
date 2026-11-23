@@ -11,8 +11,9 @@ public import FunctionSpaces.Wavelets.Examples.Daubechies.Orthonormality
 /-!
 # The scaling functions of every level
 
-For a Daubechies mask of order `N ≥ 2` with filter coefficients `c_k` (`Daubechies.coeff`) and
-scaling function `φ` (`Daubechies.scalingFun`), the functions of the multiresolution analysis are
+For a Daubechies mask of order `N ≥ 2` with filter coefficients `c_k` (`Daubechies.daubechiesCoeff`)
+and scaling function `φ` (`Daubechies.scalingFun`), the functions of the multiresolution analysis
+are
 
 `φ_{j,k}(x) = 2^(j/2) φ(2^j x - k)`, `j ∈ ℕ`, `k ∈ ℤ` (`Daubechies.scaled`),
 
@@ -86,7 +87,7 @@ equation `φ(y) = ∑_i c_i φ(2y - i)` (`Daubechies.scalingFun_refine`) at `y =
 (`Daubechies.two_rpow_succ_div_two`). -/
 theorem scaled_refine (hN : 2 ≤ N) (j : ℕ) (k : ℤ) (x : ℝ) :
     scaled m j k x = ∑ i ∈ Finset.range (2 * N),
-      ((coeff m i / √2 : ℝ) : ℂ) * scaled m (j + 1) (2 * k + i) x := by
+      ((daubechiesCoeff m i / √2 : ℝ) : ℂ) * scaled m (j + 1) (2 * k + i) x := by
   simp only [scaled, scaledFun]
   rw [scalingFun_refine m hN (2 ^ j * x - k), Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
@@ -94,8 +95,8 @@ theorem scaled_refine (hN : 2 ≤ N) (j : ℕ) (k : ℤ) (x : ℝ) :
     push_cast
     ring
   have hs : (√2 : ℝ) ≠ 0 := by positivity
-  have hc : (2 : ℝ) ^ ((j : ℝ) / 2) * coeff m i =
-      coeff m i / √2 * ((2 : ℝ) ^ ((j : ℝ) / 2) * √2) := by
+  have hc : (2 : ℝ) ^ ((j : ℝ) / 2) * daubechiesCoeff m i =
+      daubechiesCoeff m i / √2 * ((2 : ℝ) ^ ((j : ℝ) / 2) * √2) := by
     field_simp
   rw [h2, two_rpow_succ_div_two, ← mul_assoc, ← mul_assoc, ← Complex.ofReal_mul,
     ← Complex.ofReal_mul, hc]
@@ -103,17 +104,17 @@ theorem scaled_refine (hN : 2 ≤ N) (j : ℕ) (k : ℤ) (x : ℝ) :
 /-- **`φ_{j,k}` is an expansion of level `j + 1`**: for `N ≥ 2`, every level `j`, position `k`
 and point `x`, `φ_{j,k}(x) = ∑_{n ∈ ℤ} (c_{n-2k}/√2) φ_{j+1,n}(x)`. This is the refinement
 relation `Daubechies.scaled_refine` after the substitution `n = 2k + i`; the filter coefficients
-`c_i` vanish outside `0 ≤ i ≤ 2N - 1` (`Daubechies.coeff_eq_zero`). -/
+`c_i` vanish outside `0 ≤ i ≤ 2N - 1` (`Daubechies.daubechiesCoeff_eq_zero`). -/
 theorem scaled_eq_expand (hN : 2 ≤ N) (j : ℕ) (k : ℤ) (x : ℝ) :
-    scaled m j k x =
-      expand (scalingFun m) (j + 1) (fun n => ((coeff m (n - 2 * k) / √2 : ℝ) : ℂ)) x := by
+    scaled m j k x = expand (scalingFun m) (j + 1)
+      (fun n => ((daubechiesCoeff m (n - 2 * k) / √2 : ℝ) : ℂ)) x := by
   rw [scaled_refine m hN, expand, ← (Equiv.addLeft (2 * k)).tsum_eq]
   simp only [Equiv.coe_addLeft, add_sub_cancel_left]
   rw [tsum_eq_sum (s := (Finset.range (2 * N)).map Nat.castEmbedding) ?_, Finset.sum_map]
   · rfl
   · intro i hi
-    have h0 : coeff m i = 0 := by
-      refine coeff_eq_zero m ?_
+    have h0 : daubechiesCoeff m i = 0 := by
+      refine daubechiesCoeff_eq_zero m ?_
       by_contra h
       push Not at h
       exact hi (Finset.mem_map.2 ⟨i.toNat, Finset.mem_range.2 (by omega), by simp [h.1]⟩)

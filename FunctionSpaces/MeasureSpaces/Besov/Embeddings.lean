@@ -16,10 +16,10 @@ finite measure `μ`, and write `α = D (1/p - 1/r)` for `1 ≤ p ≤ r ≤ ∞`.
 
 * **the Besov embedding** (`MemBesov.exists_inclusion_eq_of_nikolskii`): for `s > α`,
   every `f ∈ B^s_{p,q}` lies in `L_r` and belongs to `B^{s - α}_{r,q}`; with a norm bound
-  (`exists_inclusion_eq_of_nikolskii`);
+  (`exists_uniform_inclusion_eq_of_nikolskii`);
 * **into `L_∞`** (the case `r = ∞`, `α = D/p`), for `s > D/p`;
-* **into bounded continuous functions** (`MemBesov.exists_boundedContinuous`): if moreover
-  `μ` charges every nonempty open set, every `f ∈ B^s_{p,q}` with `s > D/p` has a bounded
+* **into bounded continuous functions** (`MemBesov.exists_boundedContinuous_of_nikolskii`): if
+  moreover `μ` charges every nonempty open set, every `f ∈ B^s_{p,q}` with `s > D/p` has a bounded
   continuous representative.
 
 All three are the abstract Nikolskii transfer theorem
@@ -46,7 +46,7 @@ variable {Ω : Type*} [TopologicalSpace Ω] [MeasurableSpace Ω] [BorelSpace Ω]
 /-- **The Besov embedding**, with a norm bound: for `1 ≤ p ≤ r ≤ ∞`, `α = D(1/p - 1/r) < s`
 and `1 ≤ q ≤ ∞`, there is `K < ∞` such that every `f ∈ B^s_{p,q}` is the inclusion of some
 `g ∈ L_r` with `‖g‖_{B^{s-α}_{r,q}} ≤ K ‖f‖_{B^s_{p,q}}` (dyadic quasi-norms). -/
-theorem exists_inclusion_eq_of_nikolskii (h : S.HasNikolskii μ D) (hD : 0 ≤ D) (hpr : p ≤ r)
+theorem exists_uniform_inclusion_eq_of_nikolskii (h : S.HasNikolskii μ D) (hD : 0 ≤ D) (hpr : p ≤ r)
     (hs : nikolskiiExponent D p r < s) (hq : 1 ≤ q) :
     ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ f : Lp ℂ p μ, S.MemBesov μ p s q f →
       ∃ g : Lp ℂ r μ, Lp.inclusionOfExponentLe (𝕜 := ℝ) μ hpr g = f ∧
@@ -88,7 +88,7 @@ theorem MemBesov.exists_inclusion_eq_top (h : S.HasNikolskii μ D) (hD : 0 ≤ D
 
 /-- **Embedding into bounded continuous functions**: if `μ` charges every nonempty open set
 and `s > D/p`, every `f ∈ B^s_{p,q}` has a bounded continuous representative. -/
-theorem MemBesov.exists_boundedContinuous [μ.IsOpenPosMeasure] (h : S.HasNikolskii μ D)
+theorem MemBesov.exists_boundedContinuous_of_nikolskii [μ.IsOpenPosMeasure] (h : S.HasNikolskii μ D)
     (hD : 0 ≤ D) (hs : D * p.toReal⁻¹ < s) (hq : 1 ≤ q) {f : Lp ℂ p μ}
     (hf : S.MemBesov μ p s q f) :
     ∃ a : Ω →ᵇ ℂ, Lp.inclusionOfExponentLe (𝕜 := ℝ) μ le_top

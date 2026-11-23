@@ -627,7 +627,7 @@ spectral basis.
 \label{prop:fourier-eigenbasis}
 \lean{Torus.fourierEigenbasis, Torus.fourierEigenbasis_level, Torus.fourierEigenbasis_basisFun,
   Torus.basisSpan_fourierEigenbasis, Torus.basisScheme_fourierEigenbasis,
-  Torus.levelSet_fourierEigenbasis, Torus.localWeylBound_fourierEigenbasis,
+  Torus.spectralLevelSet_fourierEigenbasis, Torus.localWeylBound_fourierEigenbasis,
   Torus.hasNikolskii_fourierEigenbasis}
 \leanok
 \uses{def:continuous-spectral-basis, def:local-weyl, def:torus-sobolev, thm:torus-nikolskii}
@@ -1703,8 +1703,8 @@ which Mathlib provides; linearity holds almost everywhere.
 
 \begin{definition}[Filtration scheme]
 \label{def:filtration-scheme}
-\lean{MeasureTheory.Filtration.scheme, MeasureTheory.Filtration.mem_scheme,
-  MeasureTheory.Filtration.projectionScheme}
+\lean{MeasureTheory.Filtration.filtrationScheme, MeasureTheory.Filtration.mem_filtrationScheme,
+  MeasureTheory.Filtration.filtrationProjectionScheme}
 \leanok
 \uses{lem:condexp-lp, def:projection-scheme, def:comap}
 Let $\mathcal{F}_0 \subseteq \mathcal{F}_1 \subseteq \cdots \subseteq \mathcal{F}$ be a
@@ -2040,11 +2040,12 @@ on subintervals with Lebesgue measure.
 
 \begin{definition}[Differences of higher order]
 \label{def:iter-diff}
-\lean{Rd.higherDiff, Rd.higherDiff_def, Rd.measurable_higherDiff, Interval.higherDiff_apply,
-  Interval.higherDiff_eq_sum_smul, Interval.higherDiff_zero, Interval.higherDiff_succ,
-  Interval.higherDiff_succ', Interval.higherDiff_add, Interval.higherDiff_sub,
-  Interval.higherDiff_const_mul, Interval.higherDiff_comp_add, Interval.higherDiff_reflect,
-  Interval.enorm_higherDiff_coeff, Interval.enorm_higherDiff_le_of_forall}
+\lean{Rd.higherDiff, Rd.higherDiff_def, Rd.measurable_higherDiff,
+  Interval.interval_higherDiff_apply, Interval.higherDiff_eq_sum_smul, Interval.higherDiff_zero,
+  Interval.higherDiff_succ, Interval.higherDiff_succ', Interval.interval_higherDiff_add,
+  Interval.higherDiff_sub, Interval.higherDiff_const_mul, Interval.interval_higherDiff_comp_add,
+  Interval.higherDiff_reflect, Interval.enorm_higherDiff_coeff,
+  Interval.enorm_higherDiff_le_of_forall}
 \leanok
 For $f : \R \to \C$, $r \in \N$ and $h \in \R$ the difference of order $r$ is
 $\Delta_h^r f(x) = \sum_{k=0}^r (-1)^{r-k} \binom{r}{k} f(x + k h)$, the $r$-fold iterate of
@@ -2071,10 +2072,10 @@ its differences with step $1$ at $0$ are those of $P$ with step $h$ at $x$.
 
 \begin{definition}[Modulus of smoothness on an interval]
 \label{def:interval-modulus}
-\lean{Interval.modulus, Interval.diffStepSet_Icc_of_nonneg,
-  Interval.eLpNorm_indicator_diffStepSet_Icc, Interval.modulus_eq_iSup_nonneg,
-  Interval.eLpNorm_higherDiff_le_modulus, Interval.modulus_mono, Interval.eLpNorm_comp_add_Icc,
-  Interval.eLpNorm_comp_sub_Icc, Interval.eLpNorm_Icc_mono}
+\lean{Interval.intervalModulus, Interval.diffStepSet_Icc_of_nonneg,
+  Interval.eLpNorm_indicator_diffStepSet_Icc, Interval.intervalModulus_eq_iSup_nonneg,
+  Interval.eLpNorm_higherDiff_le_intervalModulus, Interval.intervalModulus_mono,
+  Interval.eLpNorm_comp_add_Icc, Interval.eLpNorm_comp_sub_Icc, Interval.eLpNorm_Icc_mono}
 \leanok
 \uses{def:iter-diff, def:rd-modulus-on}
 For $1 \leq p \leq \infty$, $r \in \N$ and $t \geq 0$ the modulus of smoothness of $f$ on
@@ -2091,9 +2092,11 @@ $h \geq 0$. The two suprema agree since the steps $h$ and $-h$ give the same nor
 \begin{lemma}[Properties of the modulus]
 \label{lem:interval-modulus}
 \lean{Interval.eLpNorm_higherDiff_le_of_forall, Interval.eLpNorm_comp_add_mul_le,
-  Interval.eLpNorm_higherDiff_le, Interval.modulus_le, Interval.modulus_add_le,
-  Interval.modulus_const_mul, Interval.modulus_polynomial, Interval.eLpNorm_higherDiff_congr_ae,
-  Interval.modulus_congr_ae, Interval.eLpNorm_higherDiff_reflect, Interval.modulus_reflect}
+  Interval.interval_eLpNorm_higherDiff_le, Interval.intervalModulus_le,
+  Interval.intervalModulus_add_le, Interval.intervalModulus_const_mul,
+  Interval.intervalModulus_polynomial, Interval.eLpNorm_higherDiff_congr_ae,
+  Interval.intervalModulus_congr_ae, Interval.eLpNorm_higherDiff_reflect,
+  Interval.intervalModulus_reflect}
 \leanok
 \uses{def:interval-modulus, lem:iter-diff-poly}
 The modulus $\omega_r(f, t, [a, b])_p$ increases in $t$, is subadditive and homogeneous in $f$,
@@ -2119,7 +2122,7 @@ point.
   Interval.enorm_coeffToLp, Interval.coeffToLp_injective,
   Interval.norm_polyFun_degreeLTEquiv_symm_le, Interval.exists_enorm_linearMap_le_eLpNorm,
   Interval.exists_enorm_le_eLpNorm,
-  Interval.eLpNorm_comp_affine, Interval.NikolskiiBound, Interval.NikolskiiBound.enorm_le,
+  Interval.interval_eLpNorm_comp_affine, Interval.NikolskiiBound, Interval.NikolskiiBound.enorm_le,
   Interval.enorm_polyFun_le}
 \leanok
 Let $r \in \N$ and $1 \leq p < \infty$. There is $K < \infty$ such that for every polynomial $P$ of
@@ -2226,12 +2229,12 @@ $\sup_{0 < t \leq \delta} \|K(t, \cdot)\|_{L_p(\mu)} \leq
 \begin{theorem}[Steklov smoothing]
 \label{thm:steklov-smoothing}
 \lean{Interval.avgStepIter_const, Interval.avgStepIter_shift, Interval.avgStepIter_sum,
-  Interval.smooth, Interval.sub_smooth_eq, Interval.contDiff_smooth, Interval.iteratedDeriv_smooth,
-  Interval.continuous_higherDiff_uncurry, Interval.eLpNorm_higherDiff_Icc_le_modulus,
-  Interval.eLpNorm_sub_smooth_le, Interval.iteratedDeriv_smooth_eq_sum_smul,
-  Interval.sum_range_choose_succ_le,
+  Interval.steklovSmooth, Interval.sub_steklovSmooth_eq, Interval.contDiff_steklovSmooth,
+  Interval.iteratedDeriv_steklovSmooth, Interval.continuous_higherDiff_uncurry,
+  Interval.eLpNorm_higherDiff_Icc_le_intervalModulus, Interval.eLpNorm_sub_steklovSmooth_le,
+  Interval.iteratedDeriv_steklovSmooth_eq_sum_smul, Interval.sum_range_choose_succ_le,
   Interval.eLpNorm_smoothCoeff_smul_le, Interval.eLpNorm_sum_smoothCoeff_smul_le,
-  Interval.eLpNorm_iteratedDeriv_smooth_le}
+  Interval.eLpNorm_iteratedDeriv_steklovSmooth_le}
 \leanok
 \uses{lem:steklov-deriv, lem:minkowski-avg, def:interval-modulus}
 Let $f$ be continuous, $r \in \N$, $\delta > 0$ and
@@ -2331,7 +2334,7 @@ the triangle inequality.
 \begin{theorem}[Whitney's inequality]
 \label{thm:whitney}
 \lean{Interval.eLpNorm_Icc_split, Interval.eLpNorm_sub_polyFun_le_of_smoothing,
-  Interval.exists_eLpNorm_sub_polyFun_le_modulus}
+  Interval.exists_eLpNorm_sub_polyFun_le_intervalModulus}
 \leanok
 \uses{lem:two-sided-smoothing, lem:poly-glue, lem:interval-modulus}
 Let $1 \leq p < \infty$, $r \geq 1$ and $0 < t \leq \tfrac13$. There is $W < \infty$ such that
@@ -2437,11 +2440,12 @@ slices of functions on a cube as well (\Cref{thm:cube-jackson}).
 
 \begin{theorem}[Jackson's inequality for piecewise polynomials]
 \label{thm:pp-jackson}
-\lean{Interval.jacksonConst, Interval.jacksonConst_ne_top,
-  Interval.add_ofReal_pow_mul_le_jacksonConst, Interval.exists_ppFun_approx, Interval.lpModulus,
-  Interval.lpModulus_add_le, Interval.lpModulus_le, Interval.lpModulus_anti,
-  Interval.approxError_le_of_continuous, Interval.approxError_ppScheme_le,
-  Interval.exists_approxError_ppScheme_one_le, Interval.exists_approxError_ppScheme_le}
+\lean{Interval.intervalJacksonConst, Interval.intervalJacksonConst_ne_top,
+  Interval.add_ofReal_pow_mul_le_intervalJacksonConst, Interval.exists_ppFun_approx,
+  Interval.intervalLpModulus, Interval.intervalLpModulus_add_le, Interval.intervalLpModulus_le,
+  Interval.intervalLpModulus_anti, Interval.interval_approxError_le_of_continuous,
+  Interval.approxError_ppScheme_le, Interval.exists_approxError_ppScheme_one_le,
+  Interval.exists_approxError_ppScheme_le}
 \leanok
 \uses{def:pp-scheme, lem:pp-taylor, lem:two-sided-smoothing, thm:whitney, lem:error-dense}
 Let $1 \leq p < \infty$ and $r \geq 1$. For every $f \in L_p[0,1]$ and $k \geq 1$,
@@ -2583,8 +2587,8 @@ near $1$ with values near $0$.
 \label{lem:per-modulus}
 \lean{Interval.perExt_ae_eq, Interval.higherDiff_perExt_ae_eq, Interval.lintegral_Icc_periodic,
   Interval.perModulus_congr_ae, Interval.perModulus_add_le, Interval.eLpNorm_perExt_Icc,
-  Interval.perModulus_le, Interval.modulus_le_perModulus, Interval.perExt_eq_of_periodic,
-  Interval.higherDiff_periodic, Interval.lintegral_Icc_nat_le, Interval.modulus_perExt_le}
+  Interval.perModulus_le, Interval.intervalModulus_le_perModulus, Interval.perExt_eq_of_periodic,
+  Interval.higherDiff_periodic, Interval.lintegral_Icc_nat_le, Interval.intervalModulus_perExt_le}
 \leanok
 \uses{def:per-modulus, lem:interval-modulus}
 Let $1 \leq p < \infty$, $r \in \N$ and $t \geq 0$. The periodic modulus depends only on the class
@@ -2615,7 +2619,7 @@ $\|\Delta_h^r \tilde f\|_{L_p[0, n]}^p \leq n \|\Delta_h^r \tilde f\|_{L_p[0, 1]
 \lean{Interval.perPieces, Interval.perPieces_eq, Interval.perPieces_mem,
   Interval.perExt_ppFun_eq, Interval.isPiecewisePoly_perExt_ppFun, Interval.sum_localMass_perExt_le,
   Interval.sum_sum_localMass_perExt_le, Interval.lpPerModulus, Interval.lpPerModulus_add_le,
-  Interval.lpPerModulus_le, Interval.lpModulus_le_lpPerModulus,
+  Interval.lpPerModulus_le, Interval.intervalLpModulus_le_lpPerModulus,
   Interval.exists_approxError_ppScheme_le_per, Interval.exists_inverse_ppScheme_per,
   Interval.ppPerModulusData, Interval.memApprox_ppScheme_iff_per}
 \leanok
@@ -2785,9 +2789,9 @@ identifies the spaces.
 
 \begin{lemma}[Moduli for $0 < p \leq 1$]
 \label{lem:modulus-below-one}
-\lean{Interval.modulus_add_rpow_le, Interval.eLpNorm_higherDiff_le_of_forall_of_le_one,
-  Interval.eLpNorm_higherDiff_le_of_le_one, Interval.modulus_le_of_le_one,
-  Interval.lpModulus_add_rpow_le, Interval.lpModulus_le_of_le_one}
+\lean{Interval.intervalModulus_add_rpow_le, Interval.eLpNorm_higherDiff_le_of_forall_of_le_one,
+  Interval.eLpNorm_higherDiff_le_of_le_one, Interval.intervalModulus_le_of_le_one,
+  Interval.intervalLpModulus_add_rpow_le, Interval.intervalLpModulus_le_of_le_one}
 \leanok
 \uses{def:iter-diff, def:interval-modulus, lem:interval-modulus, lem:lp-rho-triangle,
   thm:pp-jackson}
@@ -2817,8 +2821,8 @@ translate has norm at most $\|f\|_{L_p[a, b]}$.
 \label{lem:step-jackson-below-one}
 \lean{MeasureTheory.exists_setLIntegral_enorm_sub_rpow_le, Interval.volume_dyadicIco_eq_inv,
   Interval.exists_ppFun_lintegral_le, Interval.setLIntegral_dyadicIco_le,
-  Interval.lintegral_indicator_add_eq_eLpNorm, Interval.two_pow_mul_sum_lintegral_le_modulus,
-  Haar.eFunctional_stepCouple_le}
+  Interval.lintegral_indicator_add_eq_eLpNorm,
+  Interval.two_pow_mul_sum_lintegral_le_intervalModulus, Haar.eFunctional_stepCouple_le}
 \leanok
 \uses{def:step-couple, lem:step-couple, def:interval-modulus, lem:rd-modulus-on, def:pp-scheme,
   lem:pp-bookkeeping, lem:haar-density, cor:haar-besov, thm:pp-jackson}
@@ -2852,7 +2856,7 @@ $0 < p < \infty$ with the constant $2^{1/p}$.
 \begin{lemma}[The inverse inequality for steps, $0 < p \leq 1$]
 \label{lem:step-inverse-below-one}
 \lean{Interval.enorm_higherDiff_one_rpow_le_stripBound, Interval.lintegral_rpow_eq_of_step,
-  Interval.eLpNorm_higherDiff_one_le_of_step, Haar.lpModulus_le_of_mem_lpMeas}
+  Interval.eLpNorm_higherDiff_one_le_of_step, Haar.intervalLpModulus_le_of_mem_lpMeas}
 \leanok
 \uses{def:step-couple, def:pp-scheme, lem:pp-bookkeeping, lem:pp-local,
   lem:modulus-below-one, cor:haar-besov, thm:pp-jackson, thm:pp-inverse}
@@ -2926,7 +2930,7 @@ modulus and lies outside it (\Cref{lem:steps-line}).
 
 \begin{lemma}[The line]
 \label{lem:steps-line}
-\lean{Interval.modulus_two_id, Haar.idLp, Haar.lpModulus_two_idLp,
+\lean{Interval.intervalModulus_two_id, Haar.idLp, Haar.intervalLpModulus_two_idLp,
   Interval.le_lintegral_dyadicIco_enorm_sub_rpow, Haar.le_eFunctional_stepCouple_idLp,
   Haar.not_memEMethod_stepCouple_idLp}
 \leanok
@@ -3341,7 +3345,7 @@ Fourier-analytic $\Besov{s}{p}{q}[0, 1]$~\cite{TriebelHaar1978},
 \label{thm:haar-nterm-besov-all}
 \lean{Haar.ofReal_le_two, Haar.mem_l2_of_tsum_enorm_rpow_ne_top,
   Haar.memApprox_nTerm_iff_memEMethod, Haar.exists_inclusion_eq_of_memEMethod,
-  Haar.memApprox_nTerm_iff_modulus_of_lt_two}
+  Haar.memApprox_nTerm_iff_intervalModulus_of_lt_two}
 \leanok
 \uses{thm:haar-nterm, thm:haar-below-one, lem:haar-martingale-l1, prop:haar-basis,
   thm:steps-besov-below-one, cor:haar-nterm-besov, lem:lq-basic, lem:inclusion}
@@ -4173,9 +4177,10 @@ so the join is that of $Q_k g$ at the knot $1$.
 \begin{theorem}[Jackson's inequality for periodic splines]
 \label{thm:per-spline-jackson}
 \lean{Interval.eLpNorm_comp_add_one_dyadicIco, Interval.qiWindow_subset_Icc_zero_two,
-  Interval.eLpNorm_sub_perQiPieces_eq, Interval.exists_eLpNorm_sub_perQi_le, Interval.cutoff,
-  Interval.continuous_cutoff, Interval.cutoff_zero, Interval.cutoff_one, Interval.cutoff_nonneg,
-  Interval.cutoff_le_one, Interval.cutoff_eq_one, Interval.dense_periodic,
+  Interval.eLpNorm_sub_perQiPieces_eq, Interval.exists_eLpNorm_sub_perQi_le,
+  Interval.intervalCutoff, Interval.continuous_intervalCutoff, Interval.intervalCutoff_zero,
+  Interval.intervalCutoff_one, Interval.intervalCutoff_nonneg, Interval.intervalCutoff_le_one,
+  Interval.intervalCutoff_eq_one, Interval.dense_periodic,
   Interval.exists_approxError_perSplineScheme_le}
 \leanok
 \uses{lem:per-qi, lem:qi-taylor, lem:two-sided-smoothing, lem:per-modulus, lem:error-dense}
@@ -4272,7 +4277,7 @@ $y, y + m\sigma \in [0, 1]$; the substitution $x = u + 2Ly$ rescales.
 
 \begin{lemma}[Steps of either sign]
 \label{lem:step-regions}
-\lean{Interval.higherDiff_neg, Interval.stepRegion, Interval.mem_stepRegion,
+\lean{Interval.interval_higherDiff_neg, Interval.stepRegion, Interval.mem_stepRegion,
   Interval.stepRegion_of_nonneg, Interval.stepRegion_of_neg, Interval.stepRegion_eq_diffStepSet,
   Interval.eLpNorm_higherDiff_stepRegion_eq}
 \leanok
@@ -4531,9 +4536,9 @@ $Q_i[0, w]$ and $D_h = \Delta^r_{h e_i} f$, bounds the derivative.
 
 \begin{lemma}[Smoothing near the two ends of a coordinate]
 \label{lem:cube-two-sided-smoothing}
-\lean{Cube.exists_left_cubeSmoothing, Cube.reflect, Cube.reflect_reflect, Cube.continuous_reflect,
-  Cube.slice_reflect, Cube.coordModulus_reflect, Cube.eLpNorm_reflect_regionVol,
-  Cube.exists_right_cubeSmoothing}
+\lean{Cube.exists_left_cubeSmoothing, Cube.reflectCoord, Cube.reflectCoord_reflectCoord,
+  Cube.continuous_reflectCoord, Cube.slice_reflectCoord, Cube.coordModulus_reflectCoord,
+  Cube.eLpNorm_reflectCoord_regionVol, Cube.exists_right_cubeSmoothing}
 \leanok
 \uses{lem:cube-smoothing, lem:two-sided-smoothing, lem:taylor-lp, lem:interval-modulus}
 Let $f$ be continuous on $\R^d$, $r \geq 1$, $1 \leq p < \infty$, $L > 0$, $w + L \leq 1$ and
@@ -4559,11 +4564,11 @@ reflection $x_i \mapsto 1 - x_i$, which preserves $\omega_r^{(i)}$ slice by slic
 \lean{Cube.BddMeas, Cube.BddMeas.add, Cube.BddMeas.const_mul, Cube.bddMeas_zero, Cube.bddMeas_sum,
   Cube.BddMeas.integrableOn_Icc, Cube.BddMeas.memLp, Cube.BddMeas.slice, Cube.KernelOp,
   Cube.KernelOp.kernel, Cube.KernelOp.rangeFn, Cube.KernelOp.bddMeas_kernel,
-  Cube.KernelOp.bddMeas_rangeFn, Cube.KernelOp.coef, Cube.KernelOp.apply,
-  Cube.KernelOp.integrableOn_mul_kernel, Cube.KernelOp.coef_add, Cube.KernelOp.coef_sub,
-  Cube.KernelOp.coef_const_mul, Cube.KernelOp.coef_sum, Cube.KernelOp.apply_sub,
-  Cube.KernelOp.norm_coef_le, Cube.KernelOp.slicewise, Cube.KernelOp.slicewise_eq,
-  Cube.KernelOp.slice_slicewise, Cube.KernelOp.measurable_coef_slice,
+  Cube.KernelOp.bddMeas_rangeFn, Cube.KernelOp.kernelCoef, Cube.KernelOp.apply,
+  Cube.KernelOp.integrableOn_mul_kernel, Cube.KernelOp.kernelCoef_add, Cube.KernelOp.kernelCoef_sub,
+  Cube.KernelOp.kernelCoef_const_mul, Cube.KernelOp.kernelCoef_sum, Cube.KernelOp.apply_sub,
+  Cube.KernelOp.norm_kernelCoef_le, Cube.KernelOp.slicewise, Cube.KernelOp.slicewise_eq,
+  Cube.KernelOp.slice_slicewise, Cube.KernelOp.measurable_kernelCoef_slice,
   Cube.KernelOp.measurable_slicewise, Cube.KernelOp.bddMeas_slicewise,
   Cube.KernelOp.slicewise_sub}
 \leanok
@@ -4610,7 +4615,7 @@ $S^{(j)} g(x) = \sum_a S^{(j)} c_a(x) \varphi_a(x_i)$, and $S^{(j)} c_a$ does no
 \begin{lemma}[Tensor products of a kernel operator]
 \label{lem:kernel-tensor}
 \lean{Cube.bddMeas_prod_coord, Cube.KernelOp.Reproduces, Cube.KernelOp.Reproduces.apply_sum,
-  Cube.KernelOp.IsForm.slicewise_self, Cube.KernelOp.IsForm.coef_slice,
+  Cube.KernelOp.IsForm.slicewise_self, Cube.KernelOp.IsForm.kernelCoef_slice,
   Cube.KernelOp.partialTensor, Cube.KernelOp.partialTensor_subset_span,
   Cube.KernelOp.mem_span_prod_of_isForm, Cube.KernelOp.isForm_prod,
   Cube.KernelOp.isForm_of_mem_span_prod}
@@ -4663,7 +4668,7 @@ $g - T^{(i)} h = (g - T^{(i)} g) + T^{(i)} (g - h)$; induction on $m$.
 
 \begin{lemma}[The local projection as a kernel operator]
 \label{lem:pp-kernel}
-\lean{Cube.norm_indicator_polyFun_le, Cube.ppKernel, Cube.ppKernel_coef, Cube.ppKernel_apply,
+\lean{Cube.norm_indicator_polyFun_le, Cube.ppKernel, Cube.ppKernel_kernelCoef, Cube.ppKernel_apply,
   Cube.eLpNorm_ppKernel_apply_le, Cube.ppKernel_apply_ppFun, Cube.bddMeas_ppFun,
   Cube.ppKernel_rangeFn_eq_ppFun, Cube.ppKernel_rangeFn_eq_sum, Cube.eLpNorm_sub_ppKernel_apply_le}
 \leanok
@@ -4741,7 +4746,7 @@ combinations expands into a combination of products of the $\varphi_{n,l}$.
 
 \begin{lemma}[From slices to the cube]
 \label{lem:slices-to-cube}
-\lean{Cube.eLpNorm_le_of_slice_le, Cube.slice_sub_slicewise,
+\lean{Cube.cube_eLpNorm_le_of_slice_le, Cube.slice_sub_slicewise,
   Cube.eLpNorm_sub_slicewise_le_of_smoothing,
   Cube.KernelOp.eLpNorm_sub_foldSlicewise_le_of_coord, Cube.eLpNorm_sub_cubeProj_le_of_coord}
 \leanok
@@ -4880,7 +4885,7 @@ the moduli in the coordinates.
 
 \begin{lemma}[The quasi-interpolant as a kernel operator]
 \label{lem:qi-kernel}
-\lean{Cube.toNat_lt_of_mem_qiIdx, Cube.qiKernel, Cube.qiKernel_coef, Cube.qiKernel_apply,
+\lean{Cube.toNat_lt_of_mem_qiIdx, Cube.qiKernel, Cube.qiKernel_kernelCoef, Cube.qiKernel_apply,
   Cube.exists_eLpNorm_qiKernel_apply_le}
 \leanok
 \uses{def:quasi-interp, lem:qi-local-error, lem:pp-kernel, lem:qi-taylor}
@@ -4901,7 +4906,7 @@ bound is \Cref{lem:qi-taylor} when $u \in L_p[0,1]$, and trivial otherwise.
 \begin{definition}[Splines on the cube]
 \label{def:cube-spline}
 \lean{Cube.IsCubeSpline, Cube.IsCubeSpline.succ, Cube.IsCubeSpline.add,
-  Cube.IsCubeSpline.const_mul, Cube.isCubeSpline_zero, Cube.IsCubePP.isCubeSpline_zero,
+  Cube.IsCubeSpline.const_mul, Cube.isCubeSpline_zero_fun, Cube.IsCubePP.isCubeSpline_zero,
   Cube.isCubeSpline_of_isForm, Cube.cubeQI, Cube.isCubeSpline_cubeQI, Cube.cubeSplineSpace,
   Cube.cubeSplineSpace_mono,
   Cube.cubeSplineScheme, Cube.mem_cubeSplineScheme_two_pow, Cube.cubeSplineScheme_isLinearScheme,
@@ -5037,7 +5042,7 @@ The algebra $\C[G]$ is commutative, so identities between differences are ring i
 
 \begin{definition}[Isotropic differences]
 \label{def:iso-diff}
-\lean{Cube.higherDiff_apply, Cube.higherDiff_add, Cube.higherDiff_single}
+\lean{Cube.cube_higherDiff_apply, Cube.higherDiff_add, Cube.higherDiff_single}
 \leanok
 \uses{def:cube-modulus, def:translation-algebra}
 For $h \in \R^d$ and $r \in \N$ the isotropic difference is
@@ -5051,13 +5056,14 @@ $\Delta^r_{t e_i}$ in coordinate $i$ of \Cref{def:cube-modulus}.
 
 \begin{lemma}[Expansion into mixed coordinate differences]
 \label{lem:iso-expansion}
-\lean{Cube.mixedDiff, Cube.mixedDiff_nil, Cube.mixedDiff_cons, Cube.measurable_mixedDiff,
-  TranslationAlgebra.coordElem, Cube.diffAct_coordElem_pow, Cube.diffAct_list_prod,
-  TranslationAlgebra.letterCount, TranslationAlgebra.sum_letterCount, Cube.letterCount_le,
-  TranslationAlgebra.lowerVec, TranslationAlgebra.shiftVec, TranslationAlgebra.shiftVec_apply,
-  TranslationAlgebra.card_lt_add_letterCount_le, TranslationAlgebra.prod_lt_single,
-  TranslationAlgebra.single_sub_one_eq_sum, TranslationAlgebra.single_sub_one_pow_eq_sum,
-  Cube.higherDiff_eq_sum, Cube.slice_cubeDiff_of_ne, Cube.slice_mixedDiff_mem}
+\lean{Cube.cubeMixedDiff, Cube.cubeMixedDiff_nil, Cube.cubeMixedDiff_cons,
+  Cube.measurable_cubeMixedDiff, TranslationAlgebra.coordElem, Cube.diffAct_coordElem_pow,
+  Cube.diffAct_list_prod, TranslationAlgebra.letterCount, TranslationAlgebra.sum_letterCount,
+  Cube.letterCount_le, TranslationAlgebra.lowerVec, TranslationAlgebra.shiftVec,
+  TranslationAlgebra.shiftVec_apply, TranslationAlgebra.card_lt_add_letterCount_le,
+  TranslationAlgebra.prod_lt_single, TranslationAlgebra.single_sub_one_eq_sum,
+  TranslationAlgebra.single_sub_one_pow_eq_sum, Cube.higherDiff_eq_sum, Cube.slice_cubeDiff_of_ne,
+  Cube.slice_cubeMixedDiff_mem}
 \leanok
 \uses{def:iso-diff}
 For a word $\alpha \colon \{1, \dots, r\} \to \{1, \dots, d\}$ let $m_i(\alpha) = \#\alpha^{-1}(i)$
@@ -5102,7 +5108,7 @@ the supremum over steps of every direction and sign.
 \label{lem:iso-modulus}
 \lean{Cube.eLpNorm_comp_add_le, Cube.ae_comp_add_of_ae, Cube.add_mul_mem_Icc,
   Cube.add_smul_mem_cubeSet, Cube.isoModulus_mono, Cube.isoModulus_add_le,
-  Cube.eLpNorm_higherDiff_le, Cube.isoModulus_le, Cube.isoModulus_congr_ae,
+  Cube.cube_eLpNorm_higherDiff_le, Cube.isoModulus_le, Cube.isoModulus_congr_ae,
   Cube.diffRegion_eq_isoRegion, Cube.coordModulus_le_isoModulus, Cube.cubeModulus_le_isoModulus,
   Cube.lpIsoModulus_add_le, Cube.lpIsoModulus_le, Cube.lpIsoModulus_anti,
   Cube.lpCubeModulus_le_lpIsoModulus}
@@ -5127,8 +5133,8 @@ $Q$ the region $Q_{r s e_i}$ is $\{x_i \leq 1 - rs\}$.
 \label{thm:iso-diff-bound}
 \lean{Cube.eLpNorm_cubeDiff_inter_le, Cube.listRegion,
   Cube.listRegion_nil, Cube.listRegion_cons, Cube.measurableSet_listRegion,
-  Cube.update_mem_listRegion_iff, Cube.eLpNorm_mixedDiff_le, Cube.eLpNorm_shift_mixedDiff_le,
-  Cube.eLpNorm_higherDiff_le_sum, Cube.prod_rpow_eq_rpow_sum,
+  Cube.update_mem_listRegion_iff, Cube.eLpNorm_cubeMixedDiff_le,
+  Cube.eLpNorm_shift_cubeMixedDiff_le, Cube.eLpNorm_higherDiff_le_sum, Cube.prod_rpow_eq_rpow_sum,
   Cube.eLpNorm_higherDiff_le_of_exponents, Cube.lpIsoModulus_le_of_exponents}
 \leanok
 \uses{lem:iso-expansion, lem:iso-modulus, lem:cube-slices, lem:step-regions}
@@ -6800,9 +6806,9 @@ order of the differences that measure them.
 
 \begin{definition}[Dyadic cells]
 \label{def:dyadic-cells}
-\lean{Rd.cellIndex, Rd.cell, Rd.cellCenter, Rd.zcellIndex_natCast, Rd.zcell_natCast,
-  Rd.zcellCenter_natCast, Rd.mem_cell_cellIndex, Rd.repr_cellCenter, Rd.measurable_cellIndex,
-  Rd.measurableSet_cell}
+\lean{Rd.cellIndex, Rd.dyadicCell, Rd.cellCenter, Rd.zcellIndex_natCast, Rd.zcell_natCast,
+  Rd.zcellCenter_natCast, Rd.mem_dyadicCell_cellIndex, Rd.repr_cellCenter, Rd.measurable_cellIndex,
+  Rd.measurableSet_dyadicCell}
 \leanok
 \uses{def:dyadic-cubes}
 For $j \in \N$ and $m \in \Z^n$ the dyadic cell of level $j$ and index $m$ is the dyadic cube
@@ -6814,7 +6820,7 @@ $(\lfloor 2^j \langle b_i, x \rangle \rfloor)_i$, and the cells are measurable.
 
 \begin{lemma}[Cells and centres]
 \label{lem:dyadic-cells}
-\lean{Rd.abs_repr_sub_cellCenter_le, Rd.norm_sub_cellCenter_le, Rd.volume_cell,
+\lean{Rd.abs_repr_sub_cellCenter_le, Rd.norm_sub_cellCenter_le, Rd.volume_dyadicCell,
   Rd.card_le_of_norm_cellCenter_sub_le}
 \leanok
 \uses{def:dyadic-cells, lem:dyadic-cubes}
@@ -6977,8 +6983,8 @@ $|\Delta_h^r a| \leq 2^r \sup |a|$ (\Cref{lem:conv-pointwise}).
 
 \begin{lemma}[The cells partition the space]
 \label{lem:cells-partition}
-\lean{Rd.cell_disjoint, Rd.iUnion_cell, Rd.lintegral_eq_tsum_cell, Rd.eLpNorm_rpow_eq_tsum_cell,
-  Rd.card_le_of_norm_sub_cellCenter_le}
+\lean{Rd.dyadicCell_disjoint, Rd.iUnion_dyadicCell, Rd.lintegral_eq_tsum_dyadicCell,
+  Rd.eLpNorm_rpow_eq_tsum_dyadicCell, Rd.card_le_of_norm_sub_cellCenter_le}
 \leanok
 \uses{def:dyadic-cells, lem:dyadic-cells}
 The cells of one level are disjoint and cover $V$. Hence $\int F = \sum_m \int_{P_{j,m}} F$ for
@@ -7035,7 +7041,7 @@ $1_{P_{j,m}} g \in L_p$.
 
 \begin{lemma}[Cell decomposition of a convolution]
 \label{lem:cell-decomposition}
-\lean{Rd.volume_cell_ne_top, Rd.memLp_one_indicator_cell, Rd.tsum_indicator_cell,
+\lean{Rd.volume_dyadicCell_ne_top, Rd.memLp_one_indicator_dyadicCell, Rd.tsum_indicator_dyadicCell,
   Rd.conv_tsum_of_finset, Rd.conv_eq_tsum_cellAtom_of_indicator, Rd.conv_eq_tsum_cellAtom,
   Rd.continuous_cellAtom}
 \leanok

@@ -311,8 +311,8 @@ theorem enorm_qiCoeff_le {r : ℕ} (hr : 1 ≤ r) {Cb : ℝ≥0∞}
   have hnorm : eLpNorm (polyFun R) p (volume.restrict (Icc 0 1)) =
       ENNReal.ofReal (2 ^ k) ^ (1 / p.toReal) *
         eLpNorm (polyFun (locProj r k g m)) p (volume.restrict (dyadicIco k m)) := by
-    rw [hRfun, eLpNorm_comp_affine (measurable_polyFun _) hp _ hL, mul_zero, add_zero, mul_one,
-      one_div ((2 : ℝ) ^ k), inv_inv, dyadicIco]
+    rw [hRfun, interval_eLpNorm_comp_affine (measurable_polyFun _) hp _ hL, mul_zero, add_zero,
+      mul_one, one_div ((2 : ℝ) ^ k), inv_inv, dyadicIco]
     congr 2
     rw [show (m : ℝ) / 2 ^ k + (2 ^ k)⁻¹ = (m + 1) / 2 ^ k by field_simp]
     exact (Measure.restrict_congr_set Ico_ae_eq_Icc).symm

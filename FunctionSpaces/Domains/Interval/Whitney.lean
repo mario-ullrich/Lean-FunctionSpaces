@@ -15,7 +15,7 @@ that every continuous `F` has a polynomial `P` of degree `< r` with
 
 `‖F - P‖_{L_p[0, 1]} ≤ W ω_r(F, t, [0, 1])_p`
 
-(`Interval.exists_eLpNorm_sub_polyFun_le_modulus`). The best approximation by polynomials on
+(`Interval.exists_eLpNorm_sub_polyFun_le_intervalModulus`). The best approximation by polynomials on
 the whole interval is controlled by the modulus at a single scale `t`.
 
 The proof uses two one-sided smoothings with `L = t` (`Interval.exists_left_smoothing`,
@@ -138,11 +138,11 @@ theorem exists_eLpNorm_sub_polyFun_le_glue (r : ℕ) (hp : p ≠ ∞) :
 /-- **Whitney's inequality for continuous functions**: for `1 ≤ p < ∞`, `r ≥ 1` and
 `0 < t ≤ 1/3` there is `W < ∞` such that every continuous `F` has a polynomial `P` of degree
 `< r` with `‖F - P‖_{L_p[0, 1]} ≤ W ω_r(F, t, [0, 1])_p`. -/
-theorem exists_eLpNorm_sub_polyFun_le_modulus {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) {t : ℝ}
+theorem exists_eLpNorm_sub_polyFun_le_intervalModulus {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) {t : ℝ}
     (ht : 0 < t) (ht3 : t ≤ 1 / 3) :
     ∃ W : ℝ≥0∞, W ≠ ∞ ∧ ∀ F : ℝ → ℂ, Continuous F → ∃ P ∈ degreeLT ℂ r,
       eLpNorm (fun x => F x - polyFun P x) p (volume.restrict (Icc 0 1)) ≤
-        W * modulus r p 0 1 F t := by
+        W * intervalModulus r p 0 1 F t := by
   have hp1 : 1 ≤ p := Fact.out
   obtain ⟨K, hK, hKb⟩ := exists_eLpNorm_sub_polyFun_le_glue (p := p) r hp
   set c : ℝ≥0∞ := ENNReal.ofReal t⁻¹ ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r))
@@ -151,7 +151,7 @@ theorem exists_eLpNorm_sub_polyFun_le_modulus {r : ℕ} (hr : 1 ≤ r) (hp : p �
   refine ⟨(1 + K) * (2 * (1 + c)), ENNReal.mul_ne_top (ENNReal.add_ne_top.2
     ⟨ENNReal.one_ne_top, hK⟩) (ENNReal.mul_ne_top (by simp)
       (ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top, hc⟩)), fun F hF => ?_⟩
-  set ω := modulus r p 0 1 F t
+  set ω := intervalModulus r p 0 1 F t
   have hwL : (1 - t) + t ≤ 1 := by linarith
   -- the left polynomial, on `[0, 1 - t] ⊇ [0, 2/3]`
   obtain ⟨gl, Dl, -, -, hl1, hl2, hl3⟩ := exists_left_smoothing hF hr hp1 hp ht hwL

@@ -225,13 +225,13 @@ theorem approxError_sq_le_tsum (n : ℕ) (f : Lp ℂ 2 (volume : Measure (UnitAd
     ((trigScheme d).toLp volume 2).approxError f n ^ 2 ≤
       ∑' k, if n ≤ deg k then ‖mFourierCoeff f k‖ₑ ^ 2 else 0 := by
   rw [toLp_trigScheme_eq]
-  have h1 := (fourierScheme d).projectionScheme.approxError_le_enorm_sub n f
+  have h1 := (fourierScheme d).spectralProjectionScheme.approxError_le_enorm_sub n f
   refine (pow_le_pow_left₀ bot_le h1 2).trans (le_of_eq ?_)
-  rw [SpectralScheme.projectionScheme_P, ← mFourierBasis.repr.enorm_map,
+  rw [SpectralScheme.spectralProjectionScheme_P, ← mFourierBasis.repr.enorm_map,
     lp.enorm_sq_eq_tsum]
   congr 1; funext k
-  change ‖(fourierScheme d).basis.repr (f - (fourierScheme d).truncate n f) k‖ₑ ^ 2 = _
-  rw [SpectralScheme.repr_sub_truncate]
+  change ‖(fourierScheme d).basis.repr (f - (fourierScheme d).levelTruncate n f) k‖ₑ ^ 2 = _
+  rw [SpectralScheme.repr_sub_levelTruncate]
   change (‖if deg k < n then 0 else mFourierBasis.repr f k‖ₑ) ^ 2 = _
   rw [mFourierBasis_repr]
   split_ifs with h1 h2 h2

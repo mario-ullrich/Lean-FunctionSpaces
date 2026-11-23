@@ -41,7 +41,7 @@ variable {d : Type*} [Fintype d] {s : ℝ} {q : ℝ≥0∞}
 theorem memBesov_two_two_iff (hs : 0 < s) (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
     (trigScheme d).MemBesov volume 2 s 2 f ↔
       Memℓp (fun k => ((((1 + deg k : ℕ) : ℝ) ^ s : ℝ) : ℂ) * mFourierCoeff f k) 2 := by
-  have h := (fourierScheme d).memApprox_two_iff hs f
+  have h := (fourierScheme d).memApprox_two_iff_levelWeight hs f
   simp only [fourierScheme, mFourierBasis_repr] at h
   change ((trigScheme d).toLp volume 2).MemApprox s 2 f ↔ _
   rw [toLp_trigScheme_eq]
@@ -50,7 +50,7 @@ theorem memBesov_two_two_iff (hs : 0 < s) (f : Lp ℂ 2 (volume : Measure (UnitA
 /-- The **dyadic Fourier block** `Δ_k f = ∑_{2^k ≤ max_i |k_i| < 2^(k+1)} f̂(k) e_k`. -/
 noncomputable abbrev fourierBlock (k : ℕ) (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
     Lp ℂ 2 (volume : Measure (UnitAddTorus d)) :=
-  (fourierScheme d).projectionScheme.block k f
+  (fourierScheme d).spectralProjectionScheme.block k f
 
 /-- `‖Δ_k f‖² = ∑_{2^k ≤ max_i |k_i| < 2^(k+1)} |f̂(k)|²`. -/
 theorem enorm_fourierBlock_sq (k : ℕ) (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
@@ -67,7 +67,7 @@ for `s > 0` and `1 ≤ q ≤ ∞`, `f ∈ B^s_{2,q}` iff
 theorem memBesov_two_iff_blockNorm_lt_top (hs : 0 < s) (hq : 1 ≤ q)
     (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
     (trigScheme d).MemBesov volume 2 s q f ↔
-      (fourierScheme d).projectionScheme.blockNorm s q f < ∞ := by
+      (fourierScheme d).spectralProjectionScheme.blockNorm s q f < ∞ := by
   change ((trigScheme d).toLp volume 2).MemApprox s q f ↔ _
   rw [toLp_trigScheme_eq]
   exact (fourierScheme d).memApprox_iff_blockNorm_lt_top hs hq

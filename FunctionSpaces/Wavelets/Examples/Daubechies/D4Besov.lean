@@ -18,7 +18,7 @@ the Besov spaces `B^s_{p,q}(ℝ)` are described by the D4 coefficients. Let
 `‖f‖_p + ‖(2^(ks) ω_2(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞` with differences of order `2`
 (`Rd.lpModulus p 2`), and the **coefficient condition** is the finiteness of
 `‖(⟨f, φ(· - k)⟩)_k‖_{ℓ_p} + ‖(2^(j(s + 1/2 - 1/p)) ‖(⟨f, ψ_{j,k}⟩)_k‖_{ℓ_p})_j‖_{ℓ_q}`
-(`Daubechies.coeffNorm`).
+(`Daubechies.daubechiesCoeffNorm`).
 
 * **Hölder regularity.** `‖φ(x) - φ(y)‖ ≤ K |x - y|^a` for every `0 ≤ a ≤ 0.55`
   (`Daubechies.holder_d4_of_le_055`), which is `Daubechies.holder_d4` together with
@@ -119,25 +119,26 @@ variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 Then for every `f ∈ L_p(ℝ)`,
 `‖f‖_p + ‖(2^(ks) ω_2(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff
 `‖(⟨f, φ(· - k)⟩)_k‖_{ℓ_p} + ‖(2^(j(s + 1/2 - 1/p)) ‖(⟨f, ψ_{j,k}⟩)_k‖_{ℓ_p})_j‖_{ℓ_q} < ∞`
-(`Daubechies.coeffNorm`), with the scaling function `φ` and the wavelet `ψ` of D4. This is
+(`Daubechies.daubechiesCoeffNorm`), with the scaling function `φ` and the wavelet `ψ` of D4. This is
 `Daubechies.besov_iff_coeff_of_le_two` with the growth bound `T^n 1 ≤ 4^n`
 (`Daubechies.transferGrowth_two`), whose exponent is `2 - log₄ 4 = 1`; `p ≤ 2` forces `p < ∞`.
 Differences of any order `r > s` give the same condition (`Rd.modNorm_le_modNorm_of_lt`). -/
 theorem besov_iff_coeff_d4_le_two (hp2 : p ≤ 2) {s : ℝ} (hs : 0 < s) (hs1 : s < 1)
     {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Lp ℂ p (volume : Measure ℝ)) :
     ‖f‖ₑ + ENNReal.lqNorm q (fun k => dyadicWeight s k * Rd.lpModulus p 2 f k) < ∞ ↔
-      coeffNorm d4 p s q f < ∞ :=
+      daubechiesCoeffNorm d4 p s q f < ∞ :=
   besov_iff_coeff_of_le_two d4 le_rfl (ne_top_of_le_ne_top ENNReal.ofNat_ne_top hp2) hp2
     transferGrowth_two hs (by rw [Nat.cast_ofNat, two_sub_logb_four_four]; exact hs1) hq f
 
 /-- **Littlewood–Paley blocks and D4 coefficients, `p ≤ 2`**: let `1 ≤ p ≤ 2`, `1 ≤ q ≤ ∞` and
 `0 < s < 1`. Then for every `f ∈ L_p(ℝ)` the Littlewood–Paley quasi-norm
 `‖(2^(js) ‖Δ_j f‖_p)_j‖_{ℓ_q}` (`Rd.littlewoodPaleyNorm`) is finite iff the D4 coefficient
-quasi-norm `Daubechies.coeffNorm` is (`Daubechies.littlewoodPaleyNorm_lt_top_iff_coeff_of_le_two`
-with `Daubechies.transferGrowth_two`). -/
+quasi-norm `Daubechies.daubechiesCoeffNorm` is
+(`Daubechies.littlewoodPaleyNorm_lt_top_iff_coeff_of_le_two` with
+`Daubechies.transferGrowth_two`). -/
 theorem littlewoodPaleyNorm_lt_top_iff_coeff_d4_le_two (hp : p ≠ ∞) (hp2 : p ≤ 2) {s : ℝ}
     (hs : 0 < s) (hs1 : s < 1) {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Lp ℂ p (volume : Measure ℝ)) :
-    Rd.littlewoodPaleyNorm hp s q f < ∞ ↔ coeffNorm d4 p s q f < ∞ :=
+    Rd.littlewoodPaleyNorm hp s q f < ∞ ↔ daubechiesCoeffNorm d4 p s q f < ∞ :=
   littlewoodPaleyNorm_lt_top_iff_coeff_of_le_two d4 le_rfl hp hp2 transferGrowth_two hs
     (by rw [Nat.cast_ofNat, two_sub_logb_four_four]; exact hs1) hq f
 
@@ -146,29 +147,29 @@ theorem littlewoodPaleyNorm_lt_top_iff_coeff_d4_le_two (hp : p ≠ ∞) (hp2 : p
 Then for every `f ∈ L_p(ℝ)`,
 `‖f‖_p + ‖(2^(ks) ω_2(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff
 `‖(⟨f, φ(· - k)⟩)_k‖_{ℓ_p} + ‖(2^(j(s + 1/2 - 1/p)) ‖(⟨f, ψ_{j,k}⟩)_k‖_{ℓ_p})_j‖_{ℓ_q} < ∞`
-(`Daubechies.coeffNorm`). This is `Daubechies.besov_iff_coeff` with a Bernstein bound of an order
-`θ > s` (`Daubechies.exists_bernsteinBound_d4_of_two_le`). The bound decreases from `1` at
+(`Daubechies.daubechiesCoeffNorm`). This is `Daubechies.besov_iff_coeff` with a Bernstein bound of
+an order `θ > s` (`Daubechies.exists_bernsteinBound_d4_of_two_le`). The bound decreases from `1` at
 `p = 2` to `α` as `p → ∞`. Differences of any order `r > s` give the same condition
 (`Rd.modNorm_le_modNorm_of_lt`). -/
 theorem besov_iff_coeff_d4_two_le (hp : p ≠ ∞) (hp2 : 2 ≤ p) {s : ℝ} (hs : 0 < s)
     (hsb : s < 2 / p.toReal + (1 - 2 / p.toReal) * (2 - Real.logb 2 (1 + √3))) {q : ℝ≥0∞}
     (hq : 1 ≤ q) (f : Lp ℂ p (volume : Measure ℝ)) :
     ‖f‖ₑ + ENNReal.lqNorm q (fun k => dyadicWeight s k * Rd.lpModulus p 2 f k) < ∞ ↔
-      coeffNorm d4 p s q f < ∞ := by
+      daubechiesCoeffNorm d4 p s q f < ∞ := by
   obtain ⟨θ, hsθ, -, hB⟩ := exists_bernsteinBound_d4_of_two_le hp hp2 hsb
   exact besov_iff_coeff d4 le_rfl hp hB hs hsθ hq f
 
 /-- **Littlewood–Paley blocks and D4 coefficients, `p ≥ 2`**: let `2 ≤ p < ∞`, `1 ≤ q ≤ ∞` and
 `0 < s < 2/p + (1 - 2/p) α` with `α = 2 - log₂(1 + √3)`. Then for every `f ∈ L_p(ℝ)` the
 Littlewood–Paley quasi-norm `‖(2^(js) ‖Δ_j f‖_p)_j‖_{ℓ_q}` (`Rd.littlewoodPaleyNorm`) is finite
-iff the D4 coefficient quasi-norm `Daubechies.coeffNorm` is
+iff the D4 coefficient quasi-norm `Daubechies.daubechiesCoeffNorm` is
 (`Daubechies.littlewoodPaleyNorm_lt_top_iff_coeff` with the Bernstein bound of
 `Daubechies.exists_bernsteinBound_d4_of_two_le`, whose order `θ ≤ 1` gives `s < 2`). -/
 theorem littlewoodPaleyNorm_lt_top_iff_coeff_d4_two_le (hp : p ≠ ∞) (hp2 : 2 ≤ p) {s : ℝ}
     (hs : 0 < s)
     (hsb : s < 2 / p.toReal + (1 - 2 / p.toReal) * (2 - Real.logb 2 (1 + √3))) {q : ℝ≥0∞}
     (hq : 1 ≤ q) (f : Lp ℂ p (volume : Measure ℝ)) :
-    Rd.littlewoodPaleyNorm hp s q f < ∞ ↔ coeffNorm d4 p s q f < ∞ := by
+    Rd.littlewoodPaleyNorm hp s q f < ∞ ↔ daubechiesCoeffNorm d4 p s q f < ∞ := by
   obtain ⟨θ, hsθ, hθ1, hB⟩ := exists_bernsteinBound_d4_of_two_le hp hp2 hsb
   exact littlewoodPaleyNorm_lt_top_iff_coeff d4 le_rfl hp hB hs hsθ (by push_cast; linarith) hq f
 
@@ -176,14 +177,14 @@ theorem littlewoodPaleyNorm_lt_top_iff_coeff_d4_two_le (hp : p ≠ ∞) (hp2 : 2
 `0 < s < α = 2 - log₂(1 + √3) ≈ 0.5500`. Then for every `f ∈ L_p(ℝ)`,
 `‖f‖_p + ‖(2^(ks) ω_2(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff
 `‖(⟨f, φ(· - k)⟩)_k‖_{ℓ_p} + ‖(2^(j(s + 1/2 - 1/p)) ‖(⟨f, ψ_{j,k}⟩)_k‖_{ℓ_p})_j‖_{ℓ_q} < ∞`
-(`Daubechies.coeffNorm`). For `p ≤ 2` this is `Daubechies.besov_iff_coeff_d4_le_two`, since
-`α < 1`; for `p ≥ 2` it is `Daubechies.besov_iff_coeff_d4_two_le`, since
+(`Daubechies.daubechiesCoeffNorm`). For `p ≤ 2` this is `Daubechies.besov_iff_coeff_d4_le_two`,
+since `α < 1`; for `p ≥ 2` it is `Daubechies.besov_iff_coeff_d4_two_le`, since
 `α ≤ 2/p + (1 - 2/p) α`. -/
 theorem besov_iff_coeff_d4 (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s)
     (hsα : s < 2 - Real.logb 2 (1 + √3)) {q : ℝ≥0∞} (hq : 1 ≤ q)
     (f : Lp ℂ p (volume : Measure ℝ)) :
     ‖f‖ₑ + ENNReal.lqNorm q (fun k => dyadicWeight s k * Rd.lpModulus p 2 f k) < ∞ ↔
-      coeffNorm d4 p s q f < ∞ := by
+      daubechiesCoeffNorm d4 p s q f < ∞ := by
   have hα1 := two_sub_logb_two_one_add_sqrt_three_lt_one
   rcases le_total p 2 with hp2 | hp2
   · exact besov_iff_coeff_d4_le_two hp2 hs (hsα.trans hα1) hq f

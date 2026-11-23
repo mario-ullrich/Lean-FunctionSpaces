@@ -4603,10 +4603,10 @@ in $L_p$.
 
 \begin{theorem}[Besov embeddings]
 \label{thm:besov-embedding}
-\lean{FunctionScheme.exists_inclusion_eq_of_nikolskii,
+\lean{FunctionScheme.exists_uniform_inclusion_eq_of_nikolskii,
   FunctionScheme.MemBesov.exists_inclusion_eq_of_nikolskii,
   FunctionScheme.MemBesov.exists_inclusion_eq_top,
-  FunctionScheme.MemBesov.exists_boundedContinuous}
+  FunctionScheme.MemBesov.exists_boundedContinuous_of_nikolskii}
 \leanok
 \uses{lem:nikolskii-inequality, thm:nikolskii-transfer, lem:function-scheme-inclusion,
   lem:approx-closure, lem:bc-linfty}
@@ -4749,11 +4749,12 @@ $\hat f(i) = \langle e_i, f \rangle$ are the coefficients of $f \in H$.
 
 \begin{definition}[Spectral scheme]
 \label{def:spectral}
-\lean{SpectralScheme, SpectralScheme.span, SpectralScheme.toScheme, SpectralScheme.weight,
-  SpectralScheme.span_zero, SpectralScheme.span_mono, SpectralScheme.mem_toScheme,
-  SpectralScheme.weight_pos, SpectralScheme.one_le_weight, SpectralScheme.norm_ofReal_inv_weight,
-  SpectralScheme.norm_ofReal_weight, SpectralScheme.ofReal_weight_ne_zero,
-  SpectralScheme.inv_weight_le, SpectralScheme.weight_le}
+\lean{SpectralScheme, SpectralScheme.levelSpan, SpectralScheme.toScheme, SpectralScheme.levelWeight,
+  SpectralScheme.levelSpan_zero, SpectralScheme.levelSpan_mono, SpectralScheme.mem_toScheme,
+  SpectralScheme.levelWeight_pos, SpectralScheme.one_le_levelWeight,
+  SpectralScheme.norm_ofReal_inv_levelWeight, SpectralScheme.norm_ofReal_levelWeight,
+  SpectralScheme.ofReal_levelWeight_ne_zero, SpectralScheme.inv_levelWeight_le,
+  SpectralScheme.levelWeight_le}
 \leanok
 \uses{def:comap}
 A \emph{level function} is a map $\lambda : I \to \N$ such that $\{i : \lambda(i) < n\}$ is
@@ -4800,10 +4801,10 @@ The preimage is $c_i = (1 + \lambda(i))^s \hat f(i)$.
 
 \begin{proposition}[Jackson and Bernstein inequalities]
 \label{prop:spectral-jackson-bernstein}
-\lean{SpectralScheme.norm_sub_truncate_le, SpectralScheme.jacksonBound, SpectralScheme.liftBound,
-  SpectralScheme.toSmoothnessSpace, SpectralScheme.truncate,
-  SpectralScheme.repr_eq_zero_of_mem_span, SpectralScheme.truncate_mem_span,
-  SpectralScheme.repr_truncate, SpectralScheme.repr_sub_truncate}
+\lean{SpectralScheme.norm_sub_levelTruncate_le, SpectralScheme.jacksonBound,
+  SpectralScheme.liftBound, SpectralScheme.toSmoothnessSpace, SpectralScheme.levelTruncate,
+  SpectralScheme.repr_eq_zero_of_mem_levelSpan, SpectralScheme.levelTruncate_mem_levelSpan,
+  SpectralScheme.repr_levelTruncate, SpectralScheme.repr_sub_levelTruncate}
 \leanok
 \uses{def:sobolev-embed, def:jackson, def:lift-bound, def:smoothness}
 Let $s \geq 0$. For every $n \geq 1$ and $c \in \ell_2(I)$, $E_n(J_s c) \leq n^{-s} \|c\|$;
@@ -4823,11 +4824,12 @@ $|c_i| \leq n^s |\hat a(i)|$.
 
 \begin{proposition}[Spectral projections]
 \label{prop:spectral-projections}
-\lean{SpectralScheme.projectionScheme, SpectralScheme.truncateCLM,
+\lean{SpectralScheme.spectralProjectionScheme, SpectralScheme.levelTruncateCLM,
   SpectralScheme.closure_iUnion_toScheme, SpectralScheme.repr_block, SpectralScheme.enorm_block_sq,
-  SpectralScheme.truncate_add, SpectralScheme.truncate_smul, SpectralScheme.norm_truncate_le,
-  SpectralScheme.truncateCLM_apply, SpectralScheme.truncate_of_mem,
-  SpectralScheme.projectionScheme_P, SpectralScheme.iUnion_span}
+  SpectralScheme.levelTruncate_add, SpectralScheme.levelTruncate_smul,
+  SpectralScheme.norm_levelTruncate_le, SpectralScheme.levelTruncateCLM_apply,
+  SpectralScheme.levelTruncate_of_mem, SpectralScheme.spectralProjectionScheme_P,
+  SpectralScheme.iUnion_levelSpan}
 \leanok
 \uses{def:spectral, def:projection-scheme, def:blocks}
 The truncations $P_n$ form a projection scheme with bound $1$ for the spectral scheme, the
@@ -4848,8 +4850,9 @@ basis, which is dense. The formulas are Parseval's identity (\Cref{lem:l2-norm-s
 
 \begin{theorem}[Coefficient characterisation]
 \label{thm:spectral-coefficients}
-\lean{SpectralScheme.memApprox_iff_blockNorm_lt_top, SpectralScheme.memApprox_two_iff,
-  SpectralScheme.mem_l2_iff, SpectralScheme.tsum_ite_block_eq, SpectralScheme.enorm_weight_mul_sq}
+\lean{SpectralScheme.memApprox_iff_blockNorm_lt_top, SpectralScheme.memApprox_two_iff_levelWeight,
+  SpectralScheme.mem_l2_iff, SpectralScheme.tsum_ite_block_eq,
+  SpectralScheme.enorm_levelWeight_mul_sq}
 \leanok
 \uses{prop:spectral-projections, thm:blocks, lem:sobolev-range}
 Let $s > 0$ and $1 \leq q \leq \infty$. An element $f \in H$ lies in $A^s_q$ if and only if
@@ -5181,9 +5184,9 @@ the range is dense.
 
 \begin{lemma}[The operator $J J^*$]
 \label{lem:gram-operator}
-\lean{CompactDenseEmbedding.gram, CompactDenseEmbedding.isCompactOperator_gram,
-  CompactDenseEmbedding.isPositive_gram, CompactDenseEmbedding.isSymmetric_gram,
-  CompactDenseEmbedding.ker_gram}
+\lean{CompactDenseEmbedding.gramOperator, CompactDenseEmbedding.isCompactOperator_gramOperator,
+  CompactDenseEmbedding.isPositive_gramOperator, CompactDenseEmbedding.isSymmetric_gramOperator,
+  CompactDenseEmbedding.ker_gramOperator}
 \leanok
 \uses{def:compact-dense-embedding}
 For every compact dense embedding $J : V \to H$, the operator $T = J J^*$ on $H$ is compact,
@@ -5198,9 +5201,9 @@ orthogonal complement of the range of $J$, which is trivial since the range is d
 
 \begin{theorem}[Eigenvector basis of a compact dense embedding]
 \label{thm:eigenbasis-compact-embedding}
-\lean{CompactDenseEmbedding.index, CompactDenseEmbedding.eigenBasis,
-  CompactDenseEmbedding.coe_eigenBasis, CompactDenseEmbedding.gram_eigenBasis,
-  CompactDenseEmbedding.index_fst_ne_zero}
+\lean{CompactDenseEmbedding.eigenpairIndex, CompactDenseEmbedding.eigenBasis,
+  CompactDenseEmbedding.coe_eigenBasis, CompactDenseEmbedding.gramOperator_eigenBasis,
+  CompactDenseEmbedding.eigenpairIndex_fst_ne_zero}
 \leanok
 \uses{thm:compact-self-adjoint-eigenbasis, lem:gram-operator}
 For every compact dense embedding $J : V \to H$ there is a Hilbert basis $(e_i)_{i \in I}$ of
@@ -5279,7 +5282,7 @@ equation of the Dirichlet Laplacian.
 
 \begin{lemma}[Eigenvalues of $J J^*$ and the singular value $1$]
 \label{lem:gram-eigenvalue-index}
-\lean{CompactDenseEmbedding.exists_index_fst_eq_of_gram_apply_eq_smul,
+\lean{CompactDenseEmbedding.exists_eigenpairIndex_fst_eq_of_gramOperator_apply_eq_smul,
   CompactDenseEmbedding.exists_singularValue_eq_one}
 \leanok
 \uses{def:singular-basis, lem:gram-operator}
@@ -5321,12 +5324,12 @@ $\|J v_{i_n} - J v_{i_m}\| \geq \sigma_{i_n} \geq \varepsilon$ for $n \neq m$.
 
 \begin{definition}[The spectral scheme of a compact dense embedding]
 \label{def:compact-embedding-scheme}
-\lean{CompactDenseEmbedding.level, CompactDenseEmbedding.spectralScheme,
+\lean{CompactDenseEmbedding.eigenLevel, CompactDenseEmbedding.spectralScheme,
   CompactDenseEmbedding.spectralScheme_basis, CompactDenseEmbedding.spectralScheme_level,
-  CompactDenseEmbedding.level_le_inv_singularValue,
-  CompactDenseEmbedding.inv_singularValue_lt_level_add_one,
-  CompactDenseEmbedding.inv_singularValue_lt_of_level_lt,
-  CompactDenseEmbedding.singularValue_le_of_le_level, CompactDenseEmbedding.finite_level}
+  CompactDenseEmbedding.eigenLevel_le_inv_singularValue,
+  CompactDenseEmbedding.inv_singularValue_lt_eigenLevel_add_one,
+  CompactDenseEmbedding.inv_singularValue_lt_of_eigenLevel_lt,
+  CompactDenseEmbedding.singularValue_le_of_le_eigenLevel, CompactDenseEmbedding.finite_eigenLevel}
 \leanok
 \uses{lem:finite-large-singular-values, def:spectral}
 For a compact dense embedding $J : V \to H$, the \emph{level} of $i \in I$ is
@@ -5367,8 +5370,8 @@ so $\sum_i \sigma_i^{-2} |\langle e_i, a \rangle|^2 \leq n^2 \|a\|^2$, and
 \label{cor:compact-embedding-interpolation}
 \lean{CompactDenseEmbedding.memKMethod_iff_memApprox,
   CompactDenseEmbedding.range_eq_range_sobolevEmbed,
-  CompactDenseEmbedding.inv_singularValue_le_one_add_level,
-  CompactDenseEmbedding.one_add_level_le, CompactDenseEmbedding.memApprox_two_iff}
+  CompactDenseEmbedding.inv_singularValue_le_one_add_eigenLevel,
+  CompactDenseEmbedding.one_add_eigenLevel_le, CompactDenseEmbedding.memApprox_two_iff}
 \leanok
 \uses{thm:compact-embedding-jackson-bernstein, cor:representation-sandwich, def:map-couple,
   lem:sobolev-range, lem:singular-coefficients, thm:spectral-coefficients}
@@ -5467,8 +5470,8 @@ The classes in $L_2$ of the scheme form the spectral scheme
 
 \begin{definition}[Local Weyl bound]
 \label{def:local-weyl}
-\lean{ContinuousSpectralBasis.LocalWeylBound, ContinuousSpectralBasis.levelSet,
-  ContinuousSpectralBasis.mem_levelSet}
+\lean{ContinuousSpectralBasis.LocalWeylBound, ContinuousSpectralBasis.spectralLevelSet,
+  ContinuousSpectralBasis.mem_spectralLevelSet}
 \leanok
 \uses{def:continuous-spectral-basis}
 A continuous spectral basis satisfies the \emph{local Weyl bound} of dimension $D$ with
@@ -5519,10 +5522,12 @@ The embedding into continuous functions needs only the local Weyl bound.
 
 \begin{theorem}[Continuity of $H^s(M)$]
 \label{thm:local-weyl-continuity}
-\lean{ContinuousSpectralBasis.exists_continuous_of_localWeyl, ContinuousSpectralBasis.partialSum,
-  ContinuousSpectralBasis.partialSum_mem_basisSpan, ContinuousSpectralBasis.toLp_partialSum,
-  ContinuousSpectralBasis.norm_truncate_sub_truncate_le,
-  ContinuousSpectralBasis.norm_partialSum_succ_sub_le, Real.natCast_two_pow_rpow}
+\lean{ContinuousSpectralBasis.exists_continuous_of_localWeyl,
+  ContinuousSpectralBasis.spectralPartialSum,
+  ContinuousSpectralBasis.spectralPartialSum_mem_basisSpan,
+  ContinuousSpectralBasis.toLp_spectralPartialSum,
+  ContinuousSpectralBasis.norm_levelTruncate_sub_levelTruncate_le,
+  ContinuousSpectralBasis.norm_spectralPartialSum_succ_sub_le, Real.natCast_two_pow_rpow}
 \leanok
 \uses{thm:local-weyl-nikolskii, thm:continuous-spectral-basis-besov}
 Let the continuous spectral basis satisfy the local Weyl bound of dimension $D$, and let

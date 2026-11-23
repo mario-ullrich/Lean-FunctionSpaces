@@ -339,17 +339,18 @@ theorem projFun_poly (hN : 2 ≤ N) {Q : Polynomial ℂ} (hQ : Q ∈ Polynomial.
 
 /-- **The refined coefficients**: for coefficients `a : ℤ → ℂ` of level `j`, the coefficients
 `a'_n = ∑_{k ∈ ℤ} a_k c_{n-2k}/√2` of level `j + 1`, with the filter coefficients `c_i`
-(`Daubechies.coeff`); only the `k` with `0 ≤ n - 2k ≤ 2N - 1` contribute. They express an
+(`Daubechies.daubechiesCoeff`); only the `k` with `0 ≤ n - 2k ≤ 2N - 1` contribute. They express an
 expansion of level `j` as one of level `j + 1`, `∑_k a_k φ_{j,k} = ∑_n a'_n φ_{j+1,n}`
 (`Daubechies.expand_eq_expand_succ`). -/
 noncomputable def refineCoeff (a : ℤ → ℂ) (n : ℤ) : ℂ :=
-  ∑' k : ℤ, a k * ((coeff m (n - 2 * k) / √2 : ℝ) : ℂ)
+  ∑' k : ℤ, a k * ((daubechiesCoeff m (n - 2 * k) / √2 : ℝ) : ℂ)
 
 /-- **Support of the filter**: if the filter coefficient `c_i` is nonzero, then
-`0 ≤ i ≤ 2N - 1` (`Daubechies.coeff_eq_zero`). -/
-theorem mem_Icc_of_coeff_ne_zero {i : ℤ} (h : coeff m i ≠ 0) : 0 ≤ i ∧ i ≤ 2 * N - 1 := by
+`0 ≤ i ≤ 2N - 1` (`Daubechies.daubechiesCoeff_eq_zero`). -/
+theorem mem_Icc_of_daubechiesCoeff_ne_zero {i : ℤ} (h : daubechiesCoeff m i ≠ 0) :
+    0 ≤ i ∧ i ≤ 2 * N - 1 := by
   by_contra h'
-  exact h (coeff_eq_zero m (by omega))
+  exact h (daubechiesCoeff_eq_zero m (by omega))
 
 /-- **The double sum of a refinement has finitely many terms**: for `N ≥ 2`, a real filter `h`
 vanishing outside `[a, b]`, a level `j`, coefficients `c : ℤ → ℂ` and a point `x`, the family
@@ -405,12 +406,12 @@ theorem expand_eq_tsum_refine_of_filter (hN : 2 ≤ N) {g : ℝ → ℂ} {h : �
 
 /-- **The double sum of the refinement has finitely many terms**: for `N ≥ 2` the family
 `(k, n) ↦ a_k (c_{n-2k}/√2) φ_{j+1,n}(x)` is summable over `ℤ × ℤ`
-(`Daubechies.summable_refine_of_filter`, `Daubechies.mem_Icc_of_coeff_ne_zero`). -/
+(`Daubechies.summable_refine_of_filter`, `Daubechies.mem_Icc_of_daubechiesCoeff_ne_zero`). -/
 theorem summable_refine (hN : 2 ≤ N) (j : ℕ) (a : ℤ → ℂ) (x : ℝ) :
     Summable (Function.uncurry fun k n : ℤ =>
-      a k * (((coeff m (n - 2 * k) / √2 : ℝ) : ℂ) * scaled m (j + 1) n x)) :=
-  summable_refine_of_filter m hN (h := coeff m) (fun _ hi => mem_Icc_of_coeff_ne_zero m hi)
-    j a x
+      a k * (((daubechiesCoeff m (n - 2 * k) / √2 : ℝ) : ℂ) * scaled m (j + 1) n x)) :=
+  summable_refine_of_filter m hN (h := daubechiesCoeff m)
+    (fun _ hi => mem_Icc_of_daubechiesCoeff_ne_zero m hi) j a x
 
 /-- **Expansions of level `j` are expansions of level `j + 1`**: for `N ≥ 2`, every level `j`,
 coefficients `a : ℤ → ℂ` and point `x`, `∑_k a_k φ_{j,k}(x) = ∑_n a'_n φ_{j+1,n}(x)` with the
@@ -418,8 +419,8 @@ refined coefficients `a'_n = ∑_k a_k c_{n-2k}/√2` (`Daubechies.refineCoeff`)
 `Daubechies.expand_eq_tsum_refine_of_filter` and `Daubechies.scaled_eq_expand`. -/
 theorem expand_eq_expand_succ (hN : 2 ≤ N) (j : ℕ) (a : ℤ → ℂ) (x : ℝ) :
     expand (scalingFun m) j a x = expand (scalingFun m) (j + 1) (refineCoeff m a) x :=
-  expand_eq_tsum_refine_of_filter m hN (h := coeff m)
-    (fun _ hi => mem_Icc_of_coeff_ne_zero m hi) j (scaled_eq_expand m hN j) a x
+  expand_eq_tsum_refine_of_filter m hN (h := daubechiesCoeff m)
+    (fun _ hi => mem_Icc_of_daubechiesCoeff_ne_zero m hi) j (scaled_eq_expand m hN j) a x
 
 /-- **The projections of consecutive levels**: `P_{j+1} (P_j f) = P_j f` at every point, for
 `N ≥ 2` and every `f`. The function `P_j f` is an expansion of level `j + 1`
@@ -715,8 +716,8 @@ section Lp
 variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 
 variable (p) in
-/-- **The projection of level `j` as a linear map on `L_p`**, for `N ≥ 2` and `1 ≤ p < ∞`: the
-class of the pointwise projection `P_j f` (`Daubechies.projFun`) of a representative of `f`. -/
+/-- **The projection of level `j` as a linear map on `L_p`**, for `N ≥ 2` and `1 ≤ p < ∞`:
+the class of the pointwise projection `P_j f` (`Daubechies.projFun`) of a representative of `f`. -/
 noncomputable def projLinear (hN : 2 ≤ N) (hp : p ≠ ∞) (j : ℕ) :
     Lp ℂ p (volume : Measure ℝ) →ₗ[ℝ] Lp ℂ p (volume : Measure ℝ) where
   toFun f := (memLp_projFun m hN Fact.out hp (Lp.memLp f) j).toLp _

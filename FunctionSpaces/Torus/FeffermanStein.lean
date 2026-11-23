@@ -18,15 +18,15 @@ on `ℝ^d` satisfy the Fefferman–Stein inequality on the period box `P_0 = (0,
 `‖ x ↦ ‖(M(g_j ∘ π)(x))_j‖_{ℓ_q} ‖_{L_p(P_0)} ≤ C ‖ t ↦ ‖(g_j(t))_j‖_{ℓ_q} ‖_{L_p(𝕋^d)}`
 
 with the explicit constant `C = Torus.periodicFSConst d p q`. The proof localises
-(`Torus.maximal_comp_proj_le`): at a point of `P_0`, balls of radius `r ≤ 1` lie in the box
-`(-1, 2]^d`, so they see only the lift cut off to that box, to which the inequality on `ℝ^d`
+(`Torus.maximalFunction_comp_quotientProj_le`): at a point of `P_0`, balls of radius `r ≤ 1` lie in
+the box `(-1, 2]^d`, so they see only the lift cut off to that box, to which the inequality on `ℝ^d`
 (`Rd.feffermanStein`) applies; a ball of radius `r > 1` meets at most `(2r + 2)^d ≤ (4r)^d`
 period boxes, so its mean is at most `4^d |B(0,1)|⁻¹ ∫_{𝕋^d} g`. The mean term is bounded by
 Minkowski's integral inequality on the probability space `𝕋^d`
 (`MeasureTheory.lqNorm_lintegral_le_eLpNorm`).
 
 Lifts of functions that agree almost everywhere have the same maximal function
-(`Torus.maximal_enorm_comp_proj_congr_ae`).
+(`Torus.maximalFunction_enorm_comp_quotientProj_congr_ae`).
 -/
 
 @[expose] public section
@@ -45,10 +45,10 @@ variable {d : Type*} [Fintype d]
 /-- **The maximal function of a lift sees only the class of the function**: if `u = v` almost
 everywhere on `𝕋^d`, then `M(|u| ∘ π) = M(|v| ∘ π)`, since the lifts agree almost everywhere on
 `ℝ^d` (`Torus.ae_comp_proj`). -/
-theorem maximal_enorm_comp_proj_congr_ae {E : Type*} [ENorm E] {u v : UnitAddTorus d → E}
-    (h : u =ᵐ[volume] v) :
-    Rd.maximal (fun y => ‖u (proj y)‖ₑ) = Rd.maximal (fun y => ‖v (proj y)‖ₑ) :=
-  Rd.maximal_congr_ae ((ae_comp_proj h).mono fun y hy => by simp only [hy])
+theorem maximalFunction_enorm_comp_quotientProj_congr_ae {E : Type*} [ENorm E]
+    {u v : UnitAddTorus d → E} (h : u =ᵐ[volume] v) :
+    Rd.maximalFunction (fun y => ‖u (proj y)‖ₑ) = Rd.maximalFunction (fun y => ‖v (proj y)‖ₑ) :=
+  Rd.maximalFunction_congr_ae ((ae_comp_proj h).mono fun y hy => by simp only [hy])
 
 /-- **Large balls**: for `r ≥ 1`, `(2r + 2)^d ≤ |B(0,r)| 4^d |B(0,1)|⁻¹`, since
 `|B(0,r)| = r^d |B(0,1)|` and `2r + 2 ≤ 4r`. -/
@@ -69,19 +69,19 @@ theorem ofReal_two_mul_add_two_pow_le_volume_ball_mul {r : ℝ} (hr : 1 ≤ r) :
 `M(g ∘ π)(x) ≤ M(1_{(-1,2]^d} (g ∘ π))(x) + 4^d |B(0,1)|⁻¹ ∫_{𝕋^d} g`. Balls of radius `r ≤ 1`
 lie in `(-1, 2]^d`; a ball of radius `r > 1` meets at most `(2r + 2)^d` period boxes
 (`Torus.setLIntegral_ball_comp_proj_le`). -/
-theorem maximal_comp_proj_le (g : UnitAddTorus d → ℝ≥0∞) {x : EuclideanSpace ℝ d}
+theorem maximalFunction_comp_quotientProj_le (g : UnitAddTorus d → ℝ≥0∞) {x : EuclideanSpace ℝ d}
     (hx : x ∈ periodBox 0) :
-    Rd.maximal (fun y => g (proj y)) x ≤
-      Rd.maximal (tripleBox.indicator fun y => g (proj y)) x +
+    Rd.maximalFunction (fun y => g (proj y)) x ≤
+      Rd.maximalFunction (tripleBox.indicator fun y => g (proj y)) x +
         4 ^ Fintype.card d * (volume (ball (0 : EuclideanSpace ℝ d) 1))⁻¹ * ∫⁻ t, g t := by
-  refine Rd.maximal_le_of_forall fun r hr => ?_
+  refine Rd.maximalFunction_le_of_forall fun r hr => ?_
   rcases le_or_gt r 1 with hr1 | hr1
   · have heq : ∫⁻ y in ball x r, g (proj y) =
         ∫⁻ y in ball x r, tripleBox.indicator (fun y => g (proj y)) y :=
       setLIntegral_congr_fun measurableSet_ball fun y hy =>
         (indicator_of_mem (ball_subset_tripleBox hx hr1 hy) (fun y => g (proj y))).symm
     rw [heq]
-    exact (Rd.setLIntegral_ball_le_mul_maximal hr _ x).trans
+    exact (Rd.setLIntegral_ball_le_mul_maximalFunction hr _ x).trans
       (mul_le_mul_right le_self_add _)
   · calc ∫⁻ y in ball x r, g (proj y)
         ≤ ENNReal.ofReal (2 * r + 2) ^ Fintype.card d * ∫⁻ t, g t :=
@@ -115,14 +115,14 @@ theorem periodicFSConst_ne_top {p q : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ ∞)
 /-- The pointwise localisation in `ℓ_q`: for `1 ≤ q ≤ ∞`, on `P_0`,
 `‖(M(g_j ∘ π)(x))_j‖_{ℓ_q} ≤ ‖(M(1_{(-1,2]^d} (g_j ∘ π))(x))_j‖_{ℓ_q} +
 4^d |B(0,1)|⁻¹ ‖(∫_{𝕋^d} g_j)_j‖_{ℓ_q}`. -/
-theorem lqNorm_maximal_comp_proj_le {q : ℝ≥0∞} (hq : 1 ≤ q) (g : ℕ → UnitAddTorus d → ℝ≥0∞)
-    {x : EuclideanSpace ℝ d} (hx : x ∈ periodBox 0) :
-    lqNorm q (fun j => Rd.maximal (fun y => g j (proj y)) x) ≤
-      lqNorm q (fun j => Rd.maximal (tripleBox.indicator fun y => g j (proj y)) x) +
+theorem lqNorm_maximalFunction_comp_quotientProj_le {q : ℝ≥0∞} (hq : 1 ≤ q)
+    (g : ℕ → UnitAddTorus d → ℝ≥0∞) {x : EuclideanSpace ℝ d} (hx : x ∈ periodBox 0) :
+    lqNorm q (fun j => Rd.maximalFunction (fun y => g j (proj y)) x) ≤
+      lqNorm q (fun j => Rd.maximalFunction (tripleBox.indicator fun y => g j (proj y)) x) +
         4 ^ Fintype.card d * (volume (ball (0 : EuclideanSpace ℝ d) 1))⁻¹ *
           lqNorm q (fun j => ∫⁻ t, g j t) := by
   rw [← ENNReal.lqNorm_const_mul]
-  exact (ENNReal.lqNorm_mono fun j => maximal_comp_proj_le (g j) hx).trans
+  exact (ENNReal.lqNorm_mono fun j => maximalFunction_comp_quotientProj_le (g j) hx).trans
     (ENNReal.lqNorm_add_le hq _ _)
 
 /-- **The Fefferman–Stein inequality for periodic lifts**: for `1 < p < ∞`, `1 < q ≤ ∞` and
@@ -131,17 +131,17 @@ almost everywhere measurable `g_j : 𝕋^d → [0, ∞]`, `j ∈ ℕ`,
 `C = Torus.periodicFSConst d p q` and the period box `P_0 = (0, 1]^d`. -/
 theorem feffermanStein_periodic {p q : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ ∞) (hq1 : 1 < q)
     (g : ℕ → UnitAddTorus d → ℝ≥0∞) (hg : ∀ j, AEMeasurable (g j) volume) :
-    eLpNorm (fun x => lqNorm q (fun j => Rd.maximal (fun y => g j (proj y)) x)) p
+    eLpNorm (fun x => lqNorm q (fun j => Rd.maximalFunction (fun y => g j (proj y)) x)) p
         (volume.restrict (periodBox 0)) ≤
       periodicFSConst d p q * eLpNorm (fun t => lqNorm q (fun j => g j t)) p volume := by
   set G : UnitAddTorus d → ℝ≥0∞ := fun t => lqNorm q (fun j => g j t)
   set c : ℝ≥0∞ := 4 ^ Fintype.card d * (volume (ball (0 : EuclideanSpace ℝ d) 1))⁻¹
   set A : EuclideanSpace ℝ d → ℝ≥0∞ := fun x =>
-    lqNorm q (fun j => Rd.maximal (tripleBox.indicator fun y => g j (proj y)) x)
+    lqNorm q (fun j => Rd.maximalFunction (tripleBox.indicator fun y => g j (proj y)) x)
   have hgl : ∀ j, AEMeasurable (tripleBox.indicator fun y => g j (proj y)) volume := fun j =>
     ((hg j).comp_quasiMeasurePreserving quasiMeasurePreserving_proj).indicator
       measurableSet_tripleBox
-  have hA : Measurable A := measurable_lqNorm_comp (fun j => Rd.measurable_maximal _) q
+  have hA : Measurable A := measurable_lqNorm_comp (fun j => Rd.measurable_maximalFunction _) q
   have h1 : eLpNorm A p (volume.restrict (periodBox 0)) ≤
       3 ^ ((Fintype.card d : ℝ) / p.toReal) * Rd.feffermanSteinConst (EuclideanSpace ℝ d) p q *
         eLpNorm G p volume := by
@@ -159,15 +159,15 @@ theorem feffermanStein_periodic {p q : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ ∞
       volume_periodBox, ENNReal.one_rpow, mul_one, enorm_eq_self]
     gcongr
     exact lqNorm_lintegral_le_eLpNorm hp1.le hq1.le hg
-  calc eLpNorm (fun x => lqNorm q (fun j => Rd.maximal (fun y => g j (proj y)) x)) p
+  calc eLpNorm (fun x => lqNorm q (fun j => Rd.maximalFunction (fun y => g j (proj y)) x)) p
         (volume.restrict (periodBox 0))
       ≤ eLpNorm (A + fun _ => c * lqNorm q (fun j => ∫⁻ t, g j t)) p
           (volume.restrict (periodBox 0)) := by
-        refine eLpNorm_mono_enorm_ae
-          (measurable_lqNorm_comp (fun j => Rd.measurable_maximal _) q).aestronglyMeasurable ?_
+        refine eLpNorm_mono_enorm_ae (measurable_lqNorm_comp
+          (fun j => Rd.measurable_maximalFunction _) q).aestronglyMeasurable ?_
         filter_upwards [ae_restrict_mem (measurableSet_periodBox 0)] with x hx
         simp only [enorm_eq_self, Pi.add_apply]
-        exact lqNorm_maximal_comp_proj_le hq1.le g hx
+        exact lqNorm_maximalFunction_comp_quotientProj_le hq1.le g hx
     _ ≤ eLpNorm A p (volume.restrict (periodBox 0)) +
           eLpNorm (fun _ : EuclideanSpace ℝ d => c * lqNorm q (fun j => ∫⁻ t, g j t)) p
             (volume.restrict (periodBox 0)) :=

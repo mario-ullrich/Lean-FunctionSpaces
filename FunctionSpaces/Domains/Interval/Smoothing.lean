@@ -14,16 +14,17 @@ public import Mathlib.MeasureTheory.Integral.Prod
 
 For continuous `f`, `r ≥ 1` and `δ > 0` the **Steklov smoothing**
 
-`S_δ f = ∑_{k=1}^r (-1)^(k+1) C(r,k) M_{kδ}^r f`   (`Interval.smooth`)
+`S_δ f = ∑_{k=1}^r (-1)^(k+1) C(r,k) M_{kδ}^r f`   (`Interval.steklovSmooth`)
 
 is `r` times continuously differentiable, and it is close to `f` in terms of differences:
 
 * `f - S_δ f = (-1)^r avg_{v ∈ [0, δ]^r} Δ^r_{v_1 + ⋯ + v_r} f`, so
-  `‖f - S_δ f‖_{L_p(J)} ≤ sup_{0 ≤ h ≤ rδ} ‖Δ_h^r f‖_{L_p(J)}` (`Interval.eLpNorm_sub_smooth_le`);
+  `‖f - S_δ f‖_{L_p(J)} ≤ sup_{0 ≤ h ≤ rδ} ‖Δ_h^r f‖_{L_p(J)}`
+  (`Interval.eLpNorm_sub_steklovSmooth_le`);
 * `(S_δ f)^(r) = ∑_{k=1}^r (-1)^(k+1) C(r,k) (kδ)^(-r) Δ_{kδ}^r f`
-  (`Interval.iteratedDeriv_smooth_eq_sum_smul`), so
+  (`Interval.iteratedDeriv_steklovSmooth_eq_sum_smul`), so
   `‖(S_δ f)^(r)‖_{L_p(J)} ≤ 2^r δ^(-r) sup_{0 ≤ h ≤ rδ} ‖Δ_h^r f‖_{L_p(J)}`
-  (`Interval.eLpNorm_iteratedDeriv_smooth_le`).
+  (`Interval.eLpNorm_iteratedDeriv_steklovSmooth_le`).
 
 The derivative bound holds for any measure and any family `D_h` with `‖D_h‖_{L_p(μ)} ≤ B`
 (`Interval.eLpNorm_sum_smoothCoeff_smul_le`); the cube and the whole line use it.
@@ -222,18 +223,18 @@ theorem avgStepIter_sum {ι : Type*} (s : Finset ι) {G : ι → ℝ → ℝ →
     ring
 
 /-- The **Steklov smoothing** `S_δ f = ∑_{k=1}^r (-1)^(k+1) C(r,k) M_{kδ}^r f`. -/
-noncomputable def smooth (r : ℕ) (δ : ℝ) (f : ℝ → ℂ) (x : ℝ) : ℂ :=
+noncomputable def steklovSmooth (r : ℕ) (δ : ℝ) (f : ℝ → ℂ) (x : ℝ) : ℂ :=
   ∑ k ∈ Finset.range r, ((-1 : ℂ) ^ (k + 2) * (r.choose (k + 1) : ℂ)) *
     steklovIter r ((k + 1 : ℕ) * δ) f x
 
 /-- **`f - S_δ f` is an averaged difference**:
 `f - S_δ f = (-1)^r avg^r_{h} Δ_h^r f` at step `0`. -/
-theorem sub_smooth_eq {f : ℝ → ℂ} (hf : Continuous f) (r : ℕ) {δ : ℝ} (hδ : δ ≠ 0) (x : ℝ) :
-    f x - smooth r δ f x =
+theorem sub_steklovSmooth_eq {f : ℝ → ℂ} (hf : Continuous f) (r : ℕ) {δ : ℝ} (hδ : δ ≠ 0) (x : ℝ) :
+    f x - steklovSmooth r δ f x =
       (-1 : ℂ) ^ r * avgStepIter r δ (fun h y => higherDiff r h f y) 0 x := by
   have hrepr : (fun h y => higherDiff r h f y) = fun h y => ∑ k ∈ Finset.range (r + 1),
       ((-1 : ℂ) ^ (r - k) * (r.choose k : ℂ)) * f (y + k * h) :=
-    funext fun h => funext fun y => higherDiff_apply r h f y
+    funext fun h => funext fun y => interval_higherDiff_apply r h f y
   have hcont : ∀ k ∈ Finset.range (r + 1),
       Continuous (Function.uncurry fun (h y : ℝ) => f (y + k * h)) := fun k _ =>
     hf.comp (by fun_prop)
@@ -249,7 +250,7 @@ theorem sub_smooth_eq {f : ℝ → ℂ} (hf : Continuous f) (r : ℕ) {δ : ℝ}
       0 x = steklovIter r ((k + 1 : ℕ) * δ) f x := fun k _ => by
     rw [avgStepIter_shift f (by omega) δ]
     simp
-  rw [Finset.sum_congr rfl fun k hk' => by rw [hk k hk'], smooth]
+  rw [Finset.sum_congr rfl fun k hk' => by rw [hk k hk'], steklovSmooth]
   have hsign : ∀ k ∈ Finset.range r, (-1 : ℂ) ^ r * (((-1 : ℂ) ^ (r - (k + 1)) *
       (r.choose (k + 1) : ℂ)) * steklovIter r ((k + 1 : ℕ) * δ) f x) =
       -(((-1 : ℂ) ^ (k + 2) * (r.choose (k + 1) : ℂ)) * steklovIter r ((k + 1 : ℕ) * δ) f x) :=
@@ -274,21 +275,21 @@ theorem sub_smooth_eq {f : ℝ → ℂ} (hf : Continuous f) (r : ℕ) {δ : ℝ}
   ring
 
 /-- The Steklov smoothing of a continuous function lies in `C^r`. -/
-theorem contDiff_smooth {f : ℝ → ℂ} (hf : Continuous f) (r : ℕ) (δ : ℝ) :
-    ContDiff ℝ r (smooth r δ f) := by
+theorem contDiff_steklovSmooth {f : ℝ → ℂ} (hf : Continuous f) (r : ℕ) (δ : ℝ) :
+    ContDiff ℝ r (steklovSmooth r δ f) := by
   show ContDiff ℝ r fun x => ∑ k ∈ Finset.range r,
     ((-1 : ℂ) ^ (k + 2) * (r.choose (k + 1) : ℂ)) * steklovIter r ((k + 1 : ℕ) * δ) f x
   exact ContDiff.sum fun k _ => contDiff_const.mul (contDiff_steklovIter hf r _)
 
 /-- **The derivative of order `r` of the smoothing is a combination of differences**:
 `(S_δ f)^(r) = ∑_{k=1}^r (-1)^(k+1) C(r,k) (kδ)^(-r) Δ_{kδ}^r f`. -/
-theorem iteratedDeriv_smooth {f : ℝ → ℂ} (hf : Continuous f) (r : ℕ) (δ : ℝ) :
-    iteratedDeriv r (smooth r δ f) = fun x => ∑ k ∈ Finset.range r,
+theorem iteratedDeriv_steklovSmooth {f : ℝ → ℂ} (hf : Continuous f) (r : ℕ) (δ : ℝ) :
+    iteratedDeriv r (steklovSmooth r δ f) = fun x => ∑ k ∈ Finset.range r,
       ((-1 : ℂ) ^ (k + 2) * (r.choose (k + 1) : ℂ)) *
         ((((k + 1 : ℕ) * δ : ℝ) : ℂ)⁻¹ ^ r * higherDiff r ((k + 1 : ℕ) * δ) f x) := by
-  have : smooth r δ f = ∑ k ∈ Finset.range r, fun x =>
+  have : steklovSmooth r δ f = ∑ k ∈ Finset.range r, fun x =>
       ((-1 : ℂ) ^ (k + 2) * (r.choose (k + 1) : ℂ)) * steklovIter r ((k + 1 : ℕ) * δ) f x := by
-    funext x; simp [smooth, Finset.sum_apply]
+    funext x; simp [steklovSmooth, Finset.sum_apply]
   rw [this]
   funext x
   rw [iteratedDeriv_sum fun k _ =>
@@ -301,48 +302,49 @@ theorem continuous_higherDiff_uncurry {f : ℝ → ℂ} (hf : Continuous f) (r :
     Continuous (Function.uncurry fun (h y : ℝ) => higherDiff r h f y) := by
   have : (Function.uncurry fun (h y : ℝ) => higherDiff r h f y) = fun q : ℝ × ℝ =>
       ∑ k ∈ Finset.range (r + 1), ((-1 : ℂ) ^ (r - k) * (r.choose k : ℂ)) * f (q.2 + k * q.1) :=
-    funext fun q => higherDiff_apply r q.1 f q.2
+    funext fun q => interval_higherDiff_apply r q.1 f q.2
   rw [this]
   exact continuous_finsetSum _ fun k _ => continuous_const.mul (hf.comp (by fun_prop))
 
 /-- **Differences on a subinterval are bounded by the modulus**: for `a ≤ u`, `w + r (rδ) ≤ b` and
 `0 ≤ h ≤ rδ`, `‖Δ_h^r f‖_{L_p[u, w]} ≤ ω_r(f, rδ, [a, b])_p`, since `[u, w]` lies in
 `[a, b - rh]`. -/
-theorem eLpNorm_higherDiff_Icc_le_modulus {f : ℝ → ℂ} {r : ℕ} {δ : ℝ} {p : ℝ≥0∞}
+theorem eLpNorm_higherDiff_Icc_le_intervalModulus {f : ℝ → ℂ} {r : ℕ} {δ : ℝ} {p : ℝ≥0∞}
     {a b u w h : ℝ} (hau : a ≤ u) (hwb : w + r * (r * δ) ≤ b) (h0 : 0 ≤ h) (hh : h ≤ r * δ) :
-    eLpNorm (higherDiff r h f) p (volume.restrict (Icc u w)) ≤ modulus r p a b f (r * δ) := by
-  refine (eLpNorm_Icc_mono _ p hau ?_).trans (eLpNorm_higherDiff_le_modulus ⟨h0, hh⟩)
+    eLpNorm (higherDiff r h f) p (volume.restrict (Icc u w)) ≤
+      intervalModulus r p a b f (r * δ) := by
+  refine (eLpNorm_Icc_mono _ p hau ?_).trans (eLpNorm_higherDiff_le_intervalModulus ⟨h0, hh⟩)
   have : (r : ℝ) * h ≤ r * (r * δ) := mul_le_mul_of_nonneg_left hh (Nat.cast_nonneg r)
   linarith
 
 /-- **The smoothing is close to `f`**: for `[u, w]` with `a ≤ u` and `w + r² δ ≤ b`,
 `‖f - S_δ f‖_{L_p[u, w]} ≤ ω_r(f, rδ, [a, b])_p`. -/
-theorem eLpNorm_sub_smooth_le {f : ℝ → ℂ} (hf : Continuous f) (r : ℕ) {δ : ℝ} (hδ : 0 < δ)
+theorem eLpNorm_sub_steklovSmooth_le {f : ℝ → ℂ} (hf : Continuous f) (r : ℕ) {δ : ℝ} (hδ : 0 < δ)
     {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p ≠ ∞) {a b u w : ℝ} (hau : a ≤ u)
     (hwb : w + r * (r * δ) ≤ b) :
-    eLpNorm (fun x => f x - smooth r δ f x) p (volume.restrict (Icc u w)) ≤
-      modulus r p a b f (r * δ) := by
-  have heq : (fun x => f x - smooth r δ f x) = ((-1 : ℂ) ^ r) •
+    eLpNorm (fun x => f x - steklovSmooth r δ f x) p (volume.restrict (Icc u w)) ≤
+      intervalModulus r p a b f (r * δ) := by
+  have heq : (fun x => f x - steklovSmooth r δ f x) = ((-1 : ℂ) ^ r) •
       avgStepIter r δ (fun h y => higherDiff r h f y) 0 := by
     funext x
-    rw [sub_smooth_eq hf r hδ.ne' x]
+    rw [sub_steklovSmooth_eq hf r hδ.ne' x]
     rfl
   rw [heq, eLpNorm_const_smul, enorm_pow, enorm_neg, enorm_one, one_pow, one_mul]
   refine (eLpNorm_avgStepIter_le (continuous_higherDiff_uncurry hf r) hδ hp hp' _ r 0).trans ?_
   refine iSup₂_le fun h hh => ?_
   rw [zero_add] at hh
-  exact eLpNorm_higherDiff_Icc_le_modulus hau hwb hh.1 hh.2
+  exact eLpNorm_higherDiff_Icc_le_intervalModulus hau hwb hh.1 hh.2
 
 /-- **The derivative of the smoothing as a sum of functions**: for continuous `f : ℝ → ℂ`,
 `(S_δ f)^(r) = ∑_{k=1}^r (-1)^(k+1) C(r, k) (kδ)^(-r) Δ_{kδ}^r f`
-as an identity of functions `ℝ → ℂ` (`Interval.iteratedDeriv_smooth` at every point), written
+as an identity of functions `ℝ → ℂ` (`Interval.iteratedDeriv_steklovSmooth` at every point), written
 with the index `k + 1` for `k < r` and as a sum `∑_k c_k • g_k`, the form to which the triangle
 inequality in `L_p` applies. -/
-theorem iteratedDeriv_smooth_eq_sum_smul {f : ℝ → ℂ} (hf : Continuous f) (r : ℕ) (δ : ℝ) :
-    iteratedDeriv r (smooth r δ f) = ∑ k ∈ Finset.range r,
+theorem iteratedDeriv_steklovSmooth_eq_sum_smul {f : ℝ → ℂ} (hf : Continuous f) (r : ℕ) (δ : ℝ) :
+    iteratedDeriv r (steklovSmooth r δ f) = ∑ k ∈ Finset.range r,
       (((-1 : ℂ) ^ (k + 2) * (r.choose (k + 1) : ℂ)) *
         (((k + 1 : ℕ) * δ : ℝ) : ℂ)⁻¹ ^ r) • higherDiff r ((k + 1 : ℕ) * δ) f := by
-  rw [iteratedDeriv_smooth hf r δ]
+  rw [iteratedDeriv_steklovSmooth hf r δ]
   funext x
   rw [Finset.sum_apply]
   refine Finset.sum_congr rfl fun k _ => ?_
@@ -380,8 +382,8 @@ theorem eLpNorm_smoothCoeff_smul_le [MeasurableSpace α] {μ : Measure α} {r k 
 `1 ≤ p ≤ ∞`, a measure `μ` and functions `D_h` with `‖D_h‖_{L_p(μ)} ≤ B` for `0 ≤ h ≤ rδ`,
 `‖∑_{k=1}^r (-1)^(k+1) C(r, k) (kδ)^(-r) D_{kδ}‖_{L_p(μ)} ≤ 2^r δ^(-r) B`, by the triangle
 inequality and `∑_{k=1}^r C(r, k) ≤ 2^r`. With `D_h = Δ_h^r f` this bounds `(S_δ f)^(r)`
-(`Interval.iteratedDeriv_smooth_eq_sum_smul`) on an interval, on a region of the cube and on the
-whole line. -/
+(`Interval.iteratedDeriv_steklovSmooth_eq_sum_smul`) on an interval, on a region of the cube and on
+the whole line. -/
 theorem eLpNorm_sum_smoothCoeff_smul_le [MeasurableSpace α] {μ : Measure α} {r : ℕ} {δ : ℝ}
     (hδ : 0 < δ) {p : ℝ≥0∞} (hp : 1 ≤ p) {D : ℝ → α → ℂ} {B : ℝ≥0∞}
     (hD : ∀ h, 0 ≤ h → h ≤ r * δ → eLpNorm (D h) p μ ≤ B) :
@@ -400,14 +402,14 @@ theorem eLpNorm_sum_smoothCoeff_smul_le [MeasurableSpace α] {μ : Measure α} {
 
 /-- **The derivative of order `r` of the smoothing**: for `[u, w]` with `a ≤ u` and
 `w + r² δ ≤ b`, `‖(S_δ f)^(r)‖_{L_p[u, w]} ≤ 2^r δ^(-r) ω_r(f, rδ, [a, b])_p`. -/
-theorem eLpNorm_iteratedDeriv_smooth_le {f : ℝ → ℂ} (hf : Continuous f) (r : ℕ) {δ : ℝ}
+theorem eLpNorm_iteratedDeriv_steklovSmooth_le {f : ℝ → ℂ} (hf : Continuous f) (r : ℕ) {δ : ℝ}
     (hδ : 0 < δ) {p : ℝ≥0∞} (hp : 1 ≤ p) {a b u w : ℝ} (hau : a ≤ u)
     (hwb : w + r * (r * δ) ≤ b) :
-    eLpNorm (iteratedDeriv r (smooth r δ f)) p (volume.restrict (Icc u w)) ≤
-      2 ^ r * (ENNReal.ofReal δ)⁻¹ ^ r * modulus r p a b f (r * δ) := by
-  rw [iteratedDeriv_smooth_eq_sum_smul hf r δ]
+    eLpNorm (iteratedDeriv r (steklovSmooth r δ f)) p (volume.restrict (Icc u w)) ≤
+      2 ^ r * (ENNReal.ofReal δ)⁻¹ ^ r * intervalModulus r p a b f (r * δ) := by
+  rw [iteratedDeriv_steklovSmooth_eq_sum_smul hf r δ]
   exact eLpNorm_sum_smoothCoeff_smul_le (D := fun h => higherDiff r h f) hδ hp
-    fun h h0 hh => eLpNorm_higherDiff_Icc_le_modulus hau hwb h0 hh
+    fun h h0 hh => eLpNorm_higherDiff_Icc_le_intervalModulus hau hwb h0 hh
 
 /-- **The step `δ = L / r²` of the smoothing**: for `r ≥ 1` and `L > 0`, `δ > 0`, `rδ ≤ L` and
 `r (rδ) = L`. -/
@@ -466,37 +468,39 @@ degree `< r` with `‖g - T‖_{L_p[u,v]} ≤ (v - u)^r ‖D‖_{L_p[u,v]}` (Tay
 theorem exists_left_smoothing {F : ℝ → ℂ} (hF : Continuous F) {r : ℕ} (hr : 1 ≤ r)
     {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p ≠ ∞) {b L w : ℝ} (hL : 0 < L) (hwL : w + L ≤ b) :
     ∃ g D : ℝ → ℂ, Measurable g ∧ Measurable D ∧
-      eLpNorm (fun x => F x - g x) p (volume.restrict (Icc 0 w)) ≤ modulus r p 0 b F L ∧
+      eLpNorm (fun x => F x - g x) p (volume.restrict (Icc 0 w)) ≤ intervalModulus r p 0 b F L ∧
       eLpNorm D p (volume.restrict (Icc 0 w)) ≤
-        ENNReal.ofReal L⁻¹ ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r)) * modulus r p 0 b F L ∧
+        ENNReal.ofReal L⁻¹ ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r)) * intervalModulus r p 0 b F L ∧
       ∀ u v : ℝ, u ≤ v → ∃ T ∈ degreeLT ℂ r,
         eLpNorm (fun x => g x - polyFun T x) p (volume.restrict (Icc u v)) ≤
           ENNReal.ofReal (v - u) ^ r * eLpNorm D p (volume.restrict (Icc u v)) := by
   obtain ⟨hδ, hrδ, hrrδ⟩ := step_div_sq_bounds hr hL
   have hwb : w + r * (r * (L / r ^ 2)) ≤ b := by rw [hrrδ]; exact hwL
-  have hg := contDiff_smooth hF r (L / r ^ 2)
-  refine ⟨smooth r (L / r ^ 2) F, iteratedDeriv r (smooth r (L / r ^ 2) F),
+  have hg := contDiff_steklovSmooth hF r (L / r ^ 2)
+  refine ⟨steklovSmooth r (L / r ^ 2) F, iteratedDeriv r (steklovSmooth r (L / r ^ 2) F),
     hg.continuous.measurable, (hg.continuous_iteratedDeriv r le_rfl).measurable, ?_, ?_,
     fun u v huv => exists_eLpNorm_sub_polyFun_le hp r hg huv⟩
-  · exact (eLpNorm_sub_smooth_le hF r hδ hp hp' le_rfl hwb).trans (modulus_mono r p 0 b F hrδ)
-  · exact (eLpNorm_iteratedDeriv_smooth_le hF r hδ hp le_rfl hwb).trans
-      (two_pow_mul_inv_div_sq_pow_mul_le hr hL (modulus_mono r p 0 b F hrδ))
+  · exact (eLpNorm_sub_steklovSmooth_le hF r hδ hp hp' le_rfl hwb).trans
+      (intervalModulus_mono r p 0 b F hrδ)
+  · exact (eLpNorm_iteratedDeriv_steklovSmooth_le hF r hδ hp le_rfl hwb).trans
+      (two_pow_mul_inv_div_sq_pow_mul_le hr hL (intervalModulus_mono r p 0 b F hrδ))
 
 /-- **Smoothing on a right part**: the same on `[b - w, b]`, by the reflection `x ↦ b - x`, which
-preserves the modulus on `[0, b]` (`Interval.modulus_reflect`). -/
+preserves the modulus on `[0, b]` (`Interval.intervalModulus_reflect`). -/
 theorem exists_right_smoothing {F : ℝ → ℂ} (hF : Continuous F) {r : ℕ} (hr : 1 ≤ r)
     {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p ≠ ∞) {b L w : ℝ} (hL : 0 < L) (hwL : w + L ≤ b) :
     ∃ g D : ℝ → ℂ, Measurable g ∧ Measurable D ∧
-      eLpNorm (fun x => F x - g x) p (volume.restrict (Icc (b - w) b)) ≤ modulus r p 0 b F L ∧
+      eLpNorm (fun x => F x - g x) p (volume.restrict (Icc (b - w) b)) ≤
+        intervalModulus r p 0 b F L ∧
       eLpNorm D p (volume.restrict (Icc (b - w) b)) ≤
-        ENNReal.ofReal L⁻¹ ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r)) * modulus r p 0 b F L ∧
+        ENNReal.ofReal L⁻¹ ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r)) * intervalModulus r p 0 b F L ∧
       ∀ u v : ℝ, u ≤ v → ∃ T ∈ degreeLT ℂ r,
         eLpNorm (fun x => g x - polyFun T x) p (volume.restrict (Icc u v)) ≤
           ENNReal.ofReal (v - u) ^ r * eLpNorm D p (volume.restrict (Icc u v)) := by
   have hF' : Continuous fun x => F (b - x) := hF.comp (continuous_const.sub continuous_id)
   obtain ⟨G, DG, hGm, hDm, h1, h2, h3⟩ := exists_left_smoothing hF' hr hp hp' hL hwL
-  have hmod : modulus r p 0 b (fun x => F (b - x)) L = modulus r p 0 b F L := by
-    simpa using modulus_reflect hF.measurable r p 0 b L
+  have hmod : intervalModulus r p 0 b (fun x => F (b - x)) L = intervalModulus r p 0 b F L := by
+    simpa using intervalModulus_reflect hF.measurable r p 0 b L
   rw [hmod] at h1 h2
   refine ⟨fun x => G (b - x), fun x => DG (b - x), hGm.comp (measurable_const.sub measurable_id),
     hDm.comp (measurable_const.sub measurable_id), ?_, ?_, fun u v huv => ?_⟩

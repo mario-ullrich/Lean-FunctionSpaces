@@ -74,7 +74,7 @@ theorem memApprox_ppScheme_iff_block (hp : p ≠ ∞) {r : ℕ} (hr : 1 ≤ r) {
 is finite iff `‖P_0 f‖_p + ‖(2^(ks) ‖P_{k+1} f - P_k f‖_p)_k‖_{ℓ_q} < ∞`. -/
 theorem lqNorm_modulus_lt_top_iff_block (hp : p ≠ ∞) {r : ℕ} (hr : 1 ≤ r) {s : ℝ} (hs : 0 < s)
     (hsp : s < 1 / p.toReal) {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Lp ℂ p unitVol) :
-    ‖f‖ₑ + ENNReal.lqNorm q (fun k => dyadicWeight s k * lpModulus p r f k) < ∞ ↔
+    ‖f‖ₑ + ENNReal.lqNorm q (fun k => dyadicWeight s k * intervalLpModulus p r f k) < ∞ ↔
       ‖ppProj p hp r 0 f‖ₑ + ENNReal.lqNorm q (fun k =>
         dyadicWeight s k * ‖ppProj p hp r (k + 1) f - ppProj p hp r k f‖ₑ) < ∞ := by
   rw [← memApprox_ppScheme_iff hr hp hq hs.le hsp f, memApprox_ppScheme_iff_block hp hr hs hq]

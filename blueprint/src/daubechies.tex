@@ -275,7 +275,8 @@ Every Daubechies mask has order $N \geq 1$.
 
 \begin{definition}[Mask polynomial, filter coefficients and symbol]
 \label{def:daub-symbol}
-\lean{Daubechies.maskPoly, Daubechies.coeff, Daubechies.coeff_natCast, Daubechies.symbol}
+\lean{Daubechies.maskPoly, Daubechies.daubechiesCoeff, Daubechies.daubechiesCoeff_natCast,
+  Daubechies.symbol}
 \leanok
 \uses{def:daub-mask}
 Let $L$ be a Daubechies mask of order $N$. Its \emph{mask polynomial} is
@@ -293,8 +294,8 @@ mask $L$ of order $N$, which the notation omits.
 \begin{lemma}[The mask polynomial]
 \label{lem:daub-mask-poly}
 \lean{Daubechies.X_add_one_pow_dvd_maskPoly, Daubechies.natDegree_maskPoly_le,
-  Daubechies.natDegree_maskPoly_lt, Daubechies.eval_one_maskPoly, Daubechies.coeff_eq_zero,
-  Daubechies.sum_coeff}
+  Daubechies.natDegree_maskPoly_lt, Daubechies.eval_one_maskPoly,
+  Daubechies.daubechiesCoeff_eq_zero, Daubechies.sum_daubechiesCoeff}
 \leanok
 \uses{def:daub-symbol}
 For every Daubechies mask of order $N$ the mask polynomial $m$ is divisible by $(z + 1)^N$, has
@@ -461,8 +462,8 @@ same sum, and by item~2 the two sums add up to $\sum_k g(k)$.
 
 \begin{lemma}[The filter coefficients as a sequence on $\Z$]
 \label{lem:daub-coeff-finsum}
-\lean{Daubechies.finite_support_coeff, Daubechies.finsum_eq_sum_range_of_coeff,
-  Daubechies.finsum_coeff, Daubechies.symbol_eq_finsum}
+\lean{Daubechies.finite_support_daubechiesCoeff, Daubechies.finsum_eq_sum_range_of_daubechiesCoeff,
+  Daubechies.finsum_daubechiesCoeff, Daubechies.symbol_eq_finsum}
 \leanok
 \uses{def:daub-symbol}
 For every Daubechies mask of order $N$ the sequence $(c_k)_{k \in \Z}$ has finite support,
@@ -518,7 +519,7 @@ shifts the coefficients to $a_{k-n}$, and $|z|^2 = z \bar z$.
 
 \begin{proposition}[Orthogonality of the even shifts]
 \label{prop:daub-even-shifts}
-\lean{Daubechies.sum_coeff_mul_coeff_add, Daubechies.norm_half_mul_sq,
+\lean{Daubechies.sum_daubechiesCoeff_mul_daubechiesCoeff_add, Daubechies.norm_half_mul_sq,
   Daubechies.integral_expFreq_mul_normSq_symbol, Daubechies.periodic_expFreq_intCast_mul,
   Daubechies.integral_expFreq_mul_normSq_symbol_add_half}
 \leanok
@@ -596,10 +597,10 @@ than $N$.
 
 \begin{proposition}[The first moment]
 \label{prop:daub-first-moments}
-\lean{Daubechies.firstMoment, Daubechies.sum_two_mul_add_mul_coeff,
-  Daubechies.sum_mul_coeff_two_mul_add, Daubechies.finsum_neg_one_zpow_mul_coeff,
-  Daubechies.sum_coeff_two_mul_add, Daubechies.sum_coeff_two_mul,
-  Daubechies.sum_coeff_two_mul_add_one}
+\lean{Daubechies.firstMoment, Daubechies.sum_two_mul_add_mul_daubechiesCoeff,
+  Daubechies.sum_mul_daubechiesCoeff_two_mul_add,
+  Daubechies.finsum_neg_one_zpow_mul_daubechiesCoeff, Daubechies.sum_daubechiesCoeff_two_mul_add,
+  Daubechies.sum_daubechiesCoeff_two_mul, Daubechies.sum_daubechiesCoeff_two_mul_add_one}
 \leanok
 \uses{def:daub-symbol}
 For a Daubechies mask let $\mu = \frac12 \sum_{k \in \Z} k c_k$ be its \emph{first moment}. If
@@ -672,7 +673,7 @@ wherever $g_k = 0$.
 
 \begin{proposition}[Orthogonality of the dual filter]
 \label{prop:daub-dual-orthogonality}
-\lean{Daubechies.sum_dualCoeff_mul_dualCoeff_add, Daubechies.sum_coeff_mul_dualCoeff_add}
+\lean{Daubechies.sum_dualCoeff_mul_dualCoeff_add, Daubechies.sum_daubechiesCoeff_mul_dualCoeff_add}
 \leanok
 \uses{def:daub-dual-filter}
 For every Daubechies mask and every $j \in \Z$,
@@ -693,8 +694,8 @@ $k + 2j$ have different parity.
 
 \begin{theorem}[The filter and its dual resolve the identity]
 \label{thm:daub-filter-identity}
-\lean{Daubechies.sum_coeff_mul_add_dual, Daubechies.finsum_coeff_sub_two_mul_mul,
-  Daubechies.finsum_dualCoeff_sub_two_mul_mul}
+\lean{Daubechies.sum_daubechiesCoeff_mul_add_dual,
+  Daubechies.finsum_daubechiesCoeff_sub_two_mul_mul, Daubechies.finsum_dualCoeff_sub_two_mul_mul}
 \leanok
 \uses{def:daub-dual-filter}
 For every Daubechies mask and all $a, b \in \Z$,
@@ -786,9 +787,9 @@ $a^2 + b^2 = 2$ and $2ab = -1$, so $|L(e^{-2\pi i \xi})|^2 = 2 - \cos 2\pi\xi = 
 
 \begin{proposition}[The filter coefficients of D4]
 \label{prop:daub-d4-coeff}
-\lean{Daubechies.maskPoly_d4, Daubechies.coeff_d4_zero, Daubechies.coeff_d4_one,
-  Daubechies.coeff_d4_two, Daubechies.coeff_d4_three, Daubechies.coeff_d4,
-  Daubechies.coeff_d4_eq_zero}
+\lean{Daubechies.maskPoly_d4, Daubechies.daubechiesCoeff_d4_zero, Daubechies.daubechiesCoeff_d4_one,
+  Daubechies.daubechiesCoeff_d4_two, Daubechies.daubechiesCoeff_d4_three,
+  Daubechies.daubechiesCoeff_d4, Daubechies.daubechiesCoeff_d4_eq_zero}
 \leanok
 \uses{prop:daub-d4, def:daub-symbol}
 The mask polynomial of D4 is
@@ -1126,7 +1127,7 @@ $\eta \mapsto 2\eta$ modulo $1$.
 
 \begin{definition}[The transfer operator]
 \label{def:daub-transfer}
-\lean{Daubechies.transfer, Daubechies.transfer_add, Daubechies.transfer_smul}
+\lean{Daubechies.transferOp, Daubechies.transferOp_add, Daubechies.transferOp_smul}
 \leanok
 \uses{def:daub-fun}
 The \emph{transfer operator} $T$ of order $N \in \N$ maps a function $g : \R \to \R$ to
@@ -1139,12 +1140,12 @@ It is linear.
 
 \begin{lemma}[The iterates of $T$]
 \label{lem:daub-transfer-iterates}
-\lean{Daubechies.continuous_iterate_transfer, Daubechies.periodic_iterate_transfer,
-  Daubechies.iterate_transfer_nonneg, Daubechies.abs_iterate_transfer_le,
-  Daubechies.continuous_iterate_transfer_one, Daubechies.periodic_iterate_transfer_one,
-  Daubechies.iterate_transfer_one_nonneg, Daubechies.transfer_periodic,
-  Daubechies.continuous_transfer, Daubechies.transfer_nonneg, Daubechies.transfer_mono,
-  Daubechies.abs_transfer_le}
+\lean{Daubechies.continuous_iterate_transferOp, Daubechies.periodic_iterate_transferOp,
+  Daubechies.iterate_transferOp_nonneg, Daubechies.abs_iterate_transferOp_le,
+  Daubechies.continuous_iterate_transferOp_one, Daubechies.periodic_iterate_transferOp_one,
+  Daubechies.iterate_transferOp_one_nonneg, Daubechies.transferOp_periodic,
+  Daubechies.continuous_transferOp, Daubechies.transferOp_nonneg, Daubechies.transferOp_mono,
+  Daubechies.abs_transferOp_le}
 \leanok
 \uses{def:daub-transfer}
 Let $N, n \in \N$ and $g : \R \to \R$. If $g$ is continuous, has period $1$, or is nonnegative,
@@ -1192,8 +1193,8 @@ function is the same over every interval of length $1$.
 
 \begin{proposition}[The adjoint identity for the iterates]
 \label{prop:daub-transfer-iterates-adjoint}
-\lean{Daubechies.integral_iterate_transfer, Daubechies.integral_iterate_transfer_one,
-  Daubechies.integral_transfer}
+\lean{Daubechies.integral_iterate_transferOp, Daubechies.integral_iterate_transferOp_one,
+  Daubechies.integral_transferOp}
 \leanok
 \uses{def:daub-transfer}
 For all $N, n \in \N$ and all continuous $h, g : \R \to \R$ with period $1$,
@@ -1272,7 +1273,7 @@ every $N$ (\Cref{prop:daub-symbol-product-integrable}).
 \begin{lemma}[Integrals under a growth bound]
 \label{lem:daub-growth-integrals}
 \lean{Daubechies.prod_daubFun_nonneg, Daubechies.continuous_prod_daubFun,
-  Daubechies.TransferGrowth.integral_iterate_transfer_one_le,
+  Daubechies.TransferGrowth.integral_iterate_transferOp_one_le,
   Daubechies.TransferGrowth.integral_prod_daubFun_le,
   Daubechies.TransferGrowth.setIntegral_prod_daubFun_le}
 \leanok
@@ -1464,8 +1465,8 @@ eigenvalue equation becomes a polynomial identity in $y$.
 
 \begin{lemma}[Linearity of the iterates and eigenfunctions]
 \label{lem:daub-transfer-eigen}
-\lean{Daubechies.iterate_transfer_add, Daubechies.iterate_transfer_smul,
-  Daubechies.iterate_transfer_eq_pow_smul}
+\lean{Daubechies.iterate_transferOp_add, Daubechies.iterate_transferOp_smul,
+  Daubechies.iterate_transferOp_eq_pow_smul}
 \leanok
 \uses{def:daub-transfer}
 For all $N, n \in \N$, all $g, g_1, g_2 : \R \to \R$ and every $c \in \R$,
@@ -1480,7 +1481,7 @@ Induction on $n$, since $T$ is linear (\Cref{def:daub-transfer}).
 
 \begin{lemma}[The variable $y$]
 \label{lem:daub-transfer-sin-sq}
-\lean{Daubechies.transfer_eq_eval_sin_sq, Daubechies.cos_two_pi_mul_div_two,
+\lean{Daubechies.transferOp_eq_eval_sin_sq, Daubechies.cos_two_pi_mul_div_two,
   Daubechies.cos_two_pi_mul_add_one_div_two, Daubechies.cos_two_pi_mul_eq_sin_sq}
 \leanok
 \uses{def:daub-transfer, def:daub-poly}
@@ -1503,7 +1504,7 @@ $\cos 2\pi\xi = 1 - 2 \sin^2 \pi\xi = 1 - 8y(1 - y)$, and $\cos(\pi\xi + \pi) = 
 
 \begin{proposition}[Order two]
 \label{prop:daub-transfer-two}
-\lean{Daubechies.transfer_two_one, Daubechies.iterate_transfer_two_one,
+\lean{Daubechies.transferOp_two_one, Daubechies.iterate_transferOp_two_one,
   Daubechies.transferGrowth_two, Daubechies.two_sub_logb_four_four}
 \leanok
 \uses{def:daub-transfer-growth}
@@ -1520,9 +1521,9 @@ $P_2(y) = 1 + 2y$ (\Cref{def:daub-poly}), so $(T 1)(\xi) = (1 + 2y) + (1 + 2(1 -
 
 \begin{proposition}[Order three]
 \label{prop:daub-transfer-three}
-\lean{Daubechies.iterate_transfer_three_one, Daubechies.iterate_transfer_three_one_le,
+\lean{Daubechies.iterate_transferOp_three_one, Daubechies.iterate_transferOp_three_one_le,
   Daubechies.transferGrowth_three, Daubechies.three_sub_logb_four_nine,
-  Daubechies.transfer_three_eigen_one, Daubechies.transfer_three_eigen_two}
+  Daubechies.transferOp_three_eigen_one, Daubechies.transferOp_three_eigen_two}
 \leanok
 \uses{def:daub-transfer-growth}
 For $N = 3$, every $n \in \N$ and every $\xi \in \R$,
@@ -4086,8 +4087,8 @@ $\langle Q, \varphi_{j,k} \rangle \varphi_{j,k}(x)
 
 \begin{definition}[Refined coefficients]
 \label{def:daub-refine-coeff}
-\lean{Daubechies.refineCoeff, Daubechies.mem_Icc_of_coeff_ne_zero, Daubechies.summable_refine,
-  Daubechies.summable_refine_of_filter}
+\lean{Daubechies.refineCoeff, Daubechies.mem_Icc_of_daubechiesCoeff_ne_zero,
+  Daubechies.summable_refine, Daubechies.summable_refine_of_filter}
 \leanok
 \uses{def:daub-symbol, def:daub-scaled}
 For a Daubechies mask of order $N$ and $\lambda : \Z \to \C$ let
@@ -4385,7 +4386,7 @@ coefficients (\Cref{prop:daub-scaled-orthonormal}).
 
 \begin{lemma}[Sums of shifted filters]
 \label{lem:daub-shifted-filters}
-\lean{Daubechies.mem_Icc_of_dualCoeff_ne_zero, Daubechies.coeff_sub_eq_zero,
+\lean{Daubechies.mem_Icc_of_dualCoeff_ne_zero, Daubechies.daubechiesCoeff_sub_eq_zero,
   Daubechies.dualCoeff_sub_eq_zero, Daubechies.sum_mul_conj_filter,
   Daubechies.finsum_mul_sub_two_mul}
 \leanok
@@ -4481,7 +4482,7 @@ and exchange the two sums, which have only finitely many nonzero terms
 \begin{proposition}[Perfect reconstruction]
 \label{prop:daub-perfect-reconstruction}
 \lean{Daubechies.tsum_tsum_add_tsum_tsum, Daubechies.summable_filter_mul_filter,
-  Daubechies.tsum_coeff_mul_add_dual, Daubechies.refineCoeff_add_waveletRefineCoeff}
+  Daubechies.tsum_daubechiesCoeff_mul_add_dual, Daubechies.refineCoeff_add_waveletRefineCoeff}
 \leanok
 \uses{def:daub-refine-coeff, def:daub-wavelet-refine-coeff}
 For a Daubechies mask and $\lambda : \Z \to \C$ let
@@ -4697,8 +4698,9 @@ every point of $\R$, and its bounds hold on the whole line with the modulus of $
 \begin{proposition}[Steklov smoothing on the line]
 \label{prop:daub-steklov-line}
 \lean{Daubechies.eLpNorm_higherDiff_le_smoothnessModulus_of_nonneg,
-  Daubechies.eLpNorm_sub_smooth_le_modulus, Daubechies.eLpNorm_iteratedDeriv_smooth_le_modulus,
-  Daubechies.memLp_smooth, Daubechies.memLp_iteratedDeriv_smooth}
+  Daubechies.eLpNorm_sub_steklovSmooth_le_smoothnessModulus,
+  Daubechies.eLpNorm_iteratedDeriv_steklovSmooth_le_smoothnessModulus,
+  Daubechies.memLp_steklovSmooth, Daubechies.memLp_iteratedDeriv_steklovSmooth}
 \leanok
 \uses{thm:steklov-smoothing, def:rd-modulus}
 Let $f : \R \to \C$ be continuous, $r \in \N$ and $\delta > 0$. For $1 \leq p < \infty$,
@@ -4820,10 +4822,11 @@ constant $C_I$ is finite (\Cref{prop:daub-proj-cell-bound}).
 
 \begin{proposition}[Jackson's inequality for continuous functions]
 \label{prop:daub-jackson-continuous}
-\lean{Daubechies.eLpNorm_sub_smooth_le_dyadic, Daubechies.ofReal_one_div_mul_two_pow_inv_pow,
-  Daubechies.eLpNorm_iteratedDeriv_smooth_le_dyadic, Daubechies.eLpNorm_sub_projFun_le_add,
-  Daubechies.jacksonConst, Daubechies.jacksonConst_ne_top, Daubechies.add_le_jacksonConst_mul,
-  Daubechies.eLpNorm_sub_projFun_le_smoothnessModulus, Daubechies.enorm_sub_proj_le_of_continuous}
+\lean{Daubechies.eLpNorm_sub_steklovSmooth_le_dyadic, Daubechies.ofReal_one_div_mul_two_pow_inv_pow,
+  Daubechies.eLpNorm_iteratedDeriv_steklovSmooth_le_dyadic, Daubechies.eLpNorm_sub_projFun_le_add,
+  Daubechies.daubechiesJacksonConst, Daubechies.daubechiesJacksonConst_ne_top,
+  Daubechies.add_le_daubechiesJacksonConst_mul, Daubechies.eLpNorm_sub_projFun_le_smoothnessModulus,
+  Daubechies.enorm_sub_proj_le_of_continuous}
 \leanok
 \uses{def:daub-proj-fun, def:daub-proj, def:rd-modulus}
 Let $N \geq 2$ and $1 \leq p < \infty$, and let $C_J = 1 + C_P + 2^N N^N C_S$. Then
@@ -4919,8 +4922,8 @@ term.
 
 \begin{theorem}[Bernstein's inequality]
 \label{thm:daub-bernstein}
-\lean{Daubechies.natCeil_higherDiff_support_add_one, Daubechies.bernsteinConst,
-  Daubechies.bernsteinConst_ne_top, Daubechies.smoothnessModulus_mem_scalingSpace_le}
+\lean{Daubechies.natCeil_higherDiff_support_add_one, Daubechies.daubechiesBernsteinConst,
+  Daubechies.daubechiesBernsteinConst_ne_top, Daubechies.smoothnessModulus_mem_scalingSpace_le}
 \leanok
 \uses{def:daub-scaling-space, def:rd-modulus}
 Let $N \geq 2$, $1 \leq p < \infty$ and $r \in \N$, and let
@@ -5050,7 +5053,7 @@ the scaling function and of the wavelet.
 
 \begin{definition}[The coefficient quasi-norm]
 \label{def:daub-coeff-norm}
-\lean{Daubechies.coeffNorm}
+\lean{Daubechies.daubechiesCoeffNorm}
 \leanok
 \uses{def:daub-wavelet, def:daub-generators, def:lq-norm}
 Let $\varphi$ and $\psi$ be the scaling function and the wavelet of a Daubechies mask, let
@@ -5176,7 +5179,7 @@ applies as well.
 
 \begin{lemma}[Growth bounds have rate at least one]
 \label{lem:daub-growth-rate}
-\lean{Daubechies.one_le_iterate_transfer_one, Daubechies.TransferGrowth.one_le_lam,
+\lean{Daubechies.one_le_iterate_transferOp_one, Daubechies.TransferGrowth.one_le_lam,
   Daubechies.TransferGrowth.sub_logb_le}
 \leanok
 \uses{def:daub-transfer, def:daub-transfer-growth}
@@ -6155,7 +6158,7 @@ $\omega_r(\psi, t)_p \leq 2^\theta (C_B K + 2^r) \|\psi\|_p \, t^\theta$ for $t 
 
 \begin{lemma}[Mixed coordinate differences of tensor products]
 \label{lem:tensor-kernel-mixed-differences}
-\lean{Cube.mixedDiff_tensorKernel}
+\lean{Cube.cubeMixedDiff_tensorKernel}
 \leanok
 \uses{lem:iso-expansion, def:tensor-kernel}
 Let $K_1, \dots, K_d : \R \to \C$, $m \in \N^d$ and $h \in \R^d$, and let $l$ be a list of

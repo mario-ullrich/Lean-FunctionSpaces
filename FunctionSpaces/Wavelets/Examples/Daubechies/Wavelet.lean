@@ -11,9 +11,9 @@ public import FunctionSpaces.Wavelets.Examples.Daubechies.Projections
 /-!
 # The Daubechies wavelet
 
-For a Daubechies mask of order `N ≥ 2` with filter coefficients `c_k` (`Daubechies.coeff`), dual
-filter `g_k = (-1)^k c_{1-k}` (`Daubechies.dualCoeff`) and scaling function `φ`
-(`Daubechies.scalingFun`), the **Daubechies wavelet** is
+For a Daubechies mask of order `N ≥ 2` with filter coefficients `c_k`
+(`Daubechies.daubechiesCoeff`), dual filter `g_k = (-1)^k c_{1-k}` (`Daubechies.dualCoeff`) and
+scaling function `φ` (`Daubechies.scalingFun`), the **Daubechies wavelet** is
 
 `ψ(x) = ∑_{k = 2 - 2N}^{1} g_k φ(2x - k)` (`Daubechies.wavelet`),
 
@@ -193,11 +193,11 @@ theorem mem_Icc_of_dualCoeff_ne_zero {i : ℤ} (h : dualCoeff m i ≠ 0) :
   exact h (dualCoeff_eq_zero m (by omega))
 
 /-- The shifted filter `n ↦ c_{n-2l}` vanishes outside `[2l, 2l + 2N - 1]`
-(`Daubechies.coeff_eq_zero`). -/
-theorem coeff_sub_eq_zero {l n : ℤ} (hn : n ∉ Finset.Icc (2 * l) (2 * l + (2 * N - 1))) :
-    coeff m (n - 2 * l) = 0 := by
+(`Daubechies.daubechiesCoeff_eq_zero`). -/
+theorem daubechiesCoeff_sub_eq_zero {l n : ℤ} (hn : n ∉ Finset.Icc (2 * l) (2 * l + (2 * N - 1))) :
+    daubechiesCoeff m (n - 2 * l) = 0 := by
   rw [Finset.mem_Icc, not_and_or, not_le, not_le] at hn
-  exact coeff_eq_zero m (by omega)
+  exact daubechiesCoeff_eq_zero m (by omega)
 
 /-- The shifted dual filter `n ↦ g_{n-2l}` vanishes outside `[2l + 2 - 2N, 2l + 1]`
 (`Daubechies.dualCoeff_eq_zero`). -/
@@ -256,16 +256,16 @@ theorem integral_waveletScaled_mul_conj (hN : 2 ≤ N) (j : ℕ) (k l : ℤ) :
 every level `j` and all positions `k, l`, `∫ ψ_{j,k}(x) conj φ_{j,l}(x) dx = 0`. As expansions of
 level `j + 1` (`Daubechies.waveletScaled_eq_expand`, `Daubechies.scaled_eq_expand`), Parseval's
 identity gives `(1/2) ∑_n g_{n-2k} c_{n-2l} = (1/2) ∑_a c_a g_{a+2(l-k)} = 0`
-(`Daubechies.sum_coeff_mul_dualCoeff_add`). -/
+(`Daubechies.sum_daubechiesCoeff_mul_dualCoeff_add`). -/
 theorem integral_waveletScaled_mul_conj_scaled (hN : 2 ≤ N) (j : ℕ) (k l : ℤ) :
     ∫ x, waveletScaled m j k x * conj (scaled m j l x) = 0 := by
   simp_rw [waveletScaled_eq_expand m j, scaled_eq_expand m hN j]
   rw [integral_expand_mul_conj_expand m hN (j + 1) _
       (T := Finset.Icc (2 * l) (2 * l + (2 * N - 1))) fun n hn => by
-        simp only [coeff_sub_eq_zero m hn, zero_div, Complex.ofReal_zero],
-    sum_mul_conj_filter fun n hn => coeff_sub_eq_zero m hn,
-    finsum_congr fun n => mul_comm (dualCoeff m (n - 2 * k)) (coeff m (n - 2 * l)),
-    finsum_mul_sub_two_mul, sum_coeff_mul_dualCoeff_add, mul_zero, Complex.ofReal_zero]
+        simp only [daubechiesCoeff_sub_eq_zero m hn, zero_div, Complex.ofReal_zero],
+    sum_mul_conj_filter fun n hn => daubechiesCoeff_sub_eq_zero m hn,
+    finsum_congr fun n => mul_comm (dualCoeff m (n - 2 * k)) (daubechiesCoeff m (n - 2 * l)),
+    finsum_mul_sub_two_mul, sum_daubechiesCoeff_mul_dualCoeff_add, mul_zero, Complex.ofReal_zero]
 
 /-- **Orthonormality of the integer translates of the wavelet**: for `N ≥ 2` and all `k, l ∈ ℤ`,
 `∫ ψ(x - k) conj ψ(x - l) dx` is `1` for `k = l` and `0` otherwise: the level `j = 0` of
@@ -314,9 +314,10 @@ locally integrable `f`, `⟨f, φ_{j,k}⟩ = ∑_n (c_{n-2k}/√2) ⟨f, φ_{j+1
 theorem coeffFun_scalingFun_eq_tsum (hN : 2 ≤ N) {f : ℝ → ℂ} (hf : LocallyIntegrable f volume)
     (j : ℕ) (k : ℤ) :
     coeffFun (scalingFun m) j f k =
-      ∑' n : ℤ, ((coeff m (n - 2 * k) / √2 : ℝ) : ℂ) * coeffFun (scalingFun m) (j + 1) f n :=
-  coeffFun_eq_tsum_of_filter m hN (h := coeff m) (fun _ hi => mem_Icc_of_coeff_ne_zero m hi) hf
-    j k (scaled_eq_expand m hN j k)
+      ∑' n : ℤ, ((daubechiesCoeff m (n - 2 * k) / √2 : ℝ) : ℂ) *
+        coeffFun (scalingFun m) (j + 1) f n :=
+  coeffFun_eq_tsum_of_filter m hN (h := daubechiesCoeff m)
+    (fun _ hi => mem_Icc_of_daubechiesCoeff_ne_zero m hi) hf j k (scaled_eq_expand m hN j k)
 
 /-- **The wavelet coefficients of level `j` through the scaling coefficients of level `j + 1`**:
 for `N ≥ 2` and locally integrable `f`, `⟨f, ψ_{j,k}⟩ = ∑_n (g_{n-2k}/√2) ⟨f, φ_{j+1,n}⟩`
@@ -396,34 +397,38 @@ theorem summable_filter_mul_filter {h h' : ℤ → ℝ} {B : ℤ}
 
 /-- **The filter identity with normalised filters**: for all `n, n' ∈ ℤ`,
 `∑_{k ∈ ℤ} ((c_{n-2k}/√2)(c_{n'-2k}/√2) + (g_{n-2k}/√2)(g_{n'-2k}/√2))` is `1` for `n = n'` and
-`0` otherwise (`Daubechies.sum_coeff_mul_add_dual`); only finitely many terms are nonzero. -/
-theorem tsum_coeff_mul_add_dual (n n' : ℤ) :
-    ∑' k : ℤ, (((coeff m (n - 2 * k) / √2 : ℝ) : ℂ) * ((coeff m (n' - 2 * k) / √2 : ℝ) : ℂ) +
+`0` otherwise (`Daubechies.sum_daubechiesCoeff_mul_add_dual`); only finitely many terms are
+nonzero. -/
+theorem tsum_daubechiesCoeff_mul_add_dual (n n' : ℤ) :
+    ∑' k : ℤ,
+      (((daubechiesCoeff m (n - 2 * k) / √2 : ℝ) : ℂ) *
+        ((daubechiesCoeff m (n' - 2 * k) / √2 : ℝ) : ℂ) +
       ((dualCoeff m (n - 2 * k) / √2 : ℝ) : ℂ) * ((dualCoeff m (n' - 2 * k) / √2 : ℝ) : ℂ)) =
     if n = n' then 1 else 0 := by
   have hinj : Function.Injective fun k : ℤ => n' - 2 * k := fun i i' hii' => by
     simp only at hii'
     omega
   have hfin : Function.HasFiniteSupport fun k : ℤ =>
-      coeff m (n - 2 * k) * coeff m (n' - 2 * k) +
+      daubechiesCoeff m (n - 2 * k) * daubechiesCoeff m (n' - 2 * k) +
         dualCoeff m (n - 2 * k) * dualCoeff m (n' - 2 * k) :=
     Set.Finite.subset (Set.Finite.union
       (Set.Finite.subset (Function.HasFiniteSupport.fun_comp_of_injective hinj
-        (finite_support_coeff m)) (Function.support_mul_subset_right _ _))
+        (finite_support_daubechiesCoeff m)) (Function.support_mul_subset_right _ _))
       (Set.Finite.subset (Function.HasFiniteSupport.fun_comp_of_injective hinj
         (finite_support_dualCoeff m)) (Function.support_mul_subset_right _ _)))
       (Function.support_add _ _)
   have h : ∀ k : ℤ,
-      ((coeff m (n - 2 * k) / √2 : ℝ) : ℂ) * ((coeff m (n' - 2 * k) / √2 : ℝ) : ℂ) +
+      ((daubechiesCoeff m (n - 2 * k) / √2 : ℝ) : ℂ) *
+        ((daubechiesCoeff m (n' - 2 * k) / √2 : ℝ) : ℂ) +
         ((dualCoeff m (n - 2 * k) / √2 : ℝ) : ℂ) * ((dualCoeff m (n' - 2 * k) / √2 : ℝ) : ℂ) =
-      ((1 / 2 * (coeff m (n - 2 * k) * coeff m (n' - 2 * k) +
+      ((1 / 2 * (daubechiesCoeff m (n - 2 * k) * daubechiesCoeff m (n' - 2 * k) +
         dualCoeff m (n - 2 * k) * dualCoeff m (n' - 2 * k)) : ℝ) : ℂ) := fun k => by
     rw [← Complex.ofReal_mul, ← Complex.ofReal_mul, ← Complex.ofReal_add, div_mul_div_comm,
       div_mul_div_comm, Real.mul_self_sqrt zero_le_two]
     congr 1
     ring
   simp_rw [h]
-  rw [← Complex.ofReal_tsum, tsum_mul_left, tsum_eq_finsum hfin, sum_coeff_mul_add_dual]
+  rw [← Complex.ofReal_tsum, tsum_mul_left, tsum_eq_finsum hfin, sum_daubechiesCoeff_mul_add_dual]
   split_ifs <;> norm_num
 
 /-- **Perfect reconstruction**: for every `a : ℤ → ℂ` and `n' ∈ ℤ`,
@@ -431,21 +436,22 @@ theorem tsum_coeff_mul_add_dual (n n' : ℤ) :
 the left side is `∑_n a_n ∑_k ((c_{n-2k}/√2)(c_{n'-2k}/√2) + (g_{n-2k}/√2)(g_{n'-2k}/√2))` after
 exchanging the sums (`Daubechies.summable_filter_mul_filter`,
 `Daubechies.tsum_tsum_add_tsum_tsum`), and the inner sum is `δ_{nn'}`
-(`Daubechies.tsum_coeff_mul_add_dual`). In terms of the refined coefficients
+(`Daubechies.tsum_daubechiesCoeff_mul_add_dual`). In terms of the refined coefficients
 (`Daubechies.refineCoeff`, `Daubechies.waveletRefineCoeff`) this reads `H* H a + G* G a = a`. -/
 theorem refineCoeff_add_waveletRefineCoeff (a : ℤ → ℂ) (n' : ℤ) :
-    refineCoeff m (fun k => ∑' n, ((coeff m (n - 2 * k) / √2 : ℝ) : ℂ) * a n) n' +
+    refineCoeff m (fun k => ∑' n, ((daubechiesCoeff m (n - 2 * k) / √2 : ℝ) : ℂ) * a n) n' +
       waveletRefineCoeff m (fun k => ∑' n, ((dualCoeff m (n - 2 * k) / √2 : ℝ) : ℂ) * a n) n' =
     a n' := by
-  have hc : ∀ i, coeff m i ≠ 0 → -(2 * N : ℤ) ≤ i ∧ i ≤ 2 * N := fun i hi => by
-    have := mem_Icc_of_coeff_ne_zero m hi
+  have hc : ∀ i, daubechiesCoeff m i ≠ 0 → -(2 * N : ℤ) ≤ i ∧ i ≤ 2 * N := fun i hi => by
+    have := mem_Icc_of_daubechiesCoeff_ne_zero m hi
     omega
   have hg : ∀ i, dualCoeff m i ≠ 0 → -(2 * N : ℤ) ≤ i ∧ i ≤ 2 * N := fun i hi => by
     have := mem_Icc_of_dualCoeff_ne_zero m hi
     omega
-  have e1 : refineCoeff m (fun k => ∑' n, ((coeff m (n - 2 * k) / √2 : ℝ) : ℂ) * a n) n' =
+  have e1 : refineCoeff m (fun k => ∑' n, ((daubechiesCoeff m (n - 2 * k) / √2 : ℝ) : ℂ) * a n) n' =
       ∑' k : ℤ, ∑' n : ℤ,
-        ((coeff m (n - 2 * k) / √2 : ℝ) : ℂ) * ((coeff m (n' - 2 * k) / √2 : ℝ) : ℂ) * a n := by
+        ((daubechiesCoeff m (n - 2 * k) / √2 : ℝ) : ℂ) *
+            ((daubechiesCoeff m (n' - 2 * k) / √2 : ℝ) : ℂ) * a n := by
     rw [refineCoeff]
     refine tsum_congr fun k => ?_
     rw [← tsum_mul_right]
@@ -459,10 +465,12 @@ theorem refineCoeff_add_waveletRefineCoeff (a : ℤ → ℂ) (n' : ℤ) :
     rw [← tsum_mul_right]
     exact tsum_congr fun n => by ring
   have e3 : ∀ n : ℤ, ∑' k : ℤ,
-      (((coeff m (n - 2 * k) / √2 : ℝ) : ℂ) * ((coeff m (n' - 2 * k) / √2 : ℝ) : ℂ) * a n +
+      (((daubechiesCoeff m (n - 2 * k) / √2 : ℝ) : ℂ) *
+        ((daubechiesCoeff m (n' - 2 * k) / √2 : ℝ) : ℂ) * a n +
         ((dualCoeff m (n - 2 * k) / √2 : ℝ) : ℂ) * ((dualCoeff m (n' - 2 * k) / √2 : ℝ) : ℂ) *
           a n) = if n = n' then a n else 0 := fun n => by
-    rw [tsum_congr fun k => (add_mul _ _ (a n)).symm, tsum_mul_right, tsum_coeff_mul_add_dual]
+    rw [tsum_congr fun k => (add_mul _ _ (a n)).symm, tsum_mul_right,
+      tsum_daubechiesCoeff_mul_add_dual]
     split_ifs <;> simp
   rw [e1, e2, tsum_tsum_add_tsum_tsum (summable_filter_mul_filter hc hc a n')
     (summable_filter_mul_filter hg hg a n'), tsum_congr e3]
@@ -521,7 +529,7 @@ theorem tsum_scaled_mul_scaled_succ (hN : 2 ≤ N) (j : ℕ) (x y : ℝ) :
         waveletRefineCoeff m (fun k => waveletScaled m j k y) n := by
     funext n
     have hb : (fun k => scaled m j k y) = fun k =>
-        ∑' i, ((coeff m (i - 2 * k) / √2 : ℝ) : ℂ) * scaled m (j + 1) i y :=
+        ∑' i, ((daubechiesCoeff m (i - 2 * k) / √2 : ℝ) : ℂ) * scaled m (j + 1) i y :=
       funext fun k => scaled_eq_expand m hN j k y
     have hb' : (fun k => waveletScaled m j k y) = fun k =>
         ∑' i, ((dualCoeff m (i - 2 * k) / √2 : ℝ) : ℂ) * scaled m (j + 1) i y :=

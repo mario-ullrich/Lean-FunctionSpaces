@@ -57,7 +57,7 @@ noncomputable def cubeDiff (r : ℕ) (h : ℝ) (i : Fin d) (f : (Fin d → ℝ) 
 theorem cubeDiff_eq (r : ℕ) (h : ℝ) (i : Fin d) (f : (Fin d → ℝ) → ℂ) (x : Fin d → ℝ) :
     cubeDiff r h i f x = ∑ k ∈ Finset.range (r + 1),
       ((-1 : ℂ) ^ (r - k) * (r.choose k : ℂ)) * f (Function.update x i (x i + k * h)) := by
-  rw [cubeDiff, Interval.higherDiff_apply]
+  rw [cubeDiff, Interval.interval_higherDiff_apply]
   rfl
 
 /-- Coordinate differences of measurable functions are measurable. -/
@@ -82,7 +82,7 @@ theorem cubeDiff_add (r : ℕ) (h : ℝ) (i : Fin d) (f g : (Fin d → ℝ) → 
     cubeDiff r h i (f + g) = cubeDiff r h i f + cubeDiff r h i g := by
   funext x
   simp only [cubeDiff, Pi.add_apply]
-  rw [show slice (f + g) x i = slice f x i + slice g x i from rfl, Interval.higherDiff_add]
+  rw [show slice (f + g) x i = slice f x i + slice g x i from rfl, Interval.interval_higherDiff_add]
   rfl
 
 /-- The region `{x ∈ Q : x_i ≤ 1 - r h}` of the differences of step `h` in coordinate `i`, as a
@@ -153,7 +153,7 @@ theorem eLpNorm_cubeDiff_le {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) {p
     (hp' : p ≠ ∞) (r : ℕ) {h : ℝ} (hh : 0 ≤ h) (i : Fin d) :
     eLpNorm (cubeDiff r h i f) p (diffRegion d r h i) ≤ 2 ^ r * eLpNorm f p (cubeVol d) :=
   eLpNorm_cubeDiff_le_of_slice_le hf (zero_lt_one.trans_le hp).ne' hp' r hh i fun x =>
-    Interval.eLpNorm_higherDiff_le (measurable_slice hf x i) hp r hh 0 1
+    Interval.interval_eLpNorm_higherDiff_le (measurable_slice hf x i) hp r hh 0 1
 
 /-- `ω_r^{(i)}(f, t)_p ≤ 2^r ‖f‖_{L_p(Q)}`. -/
 theorem coordModulus_le {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) {p : ℝ≥0∞} (hp : 1 ≤ p)

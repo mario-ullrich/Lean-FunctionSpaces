@@ -24,12 +24,12 @@ The coordinates `x ↦ (⟪b_i, x⟫)_i` form a continuous linear equivalence of
 (`Rd.gridCoord`) that preserves Lebesgue measure in both directions
 (`Rd.measurePreserving_gridCoord`, `Rd.measurePreserving_gridCoord_symm`).
 
-The **dyadic cells** `P_{j,m}` of level `j ∈ ℕ` are the cubes of natural level (`Rd.cell`,
+The **dyadic cells** `P_{j,m}` of level `j ∈ ℕ` are the cubes of natural level (`Rd.dyadicCell`,
 `Rd.cellIndex`, `Rd.cellCenter`, `Rd.zcell_natCast`), and their lemmas are the cases `k = j` of
 those for cubes. **Counting**: at most `(2ρ + 2)^n` centres of level `j` lie in a ball of radius
 `ρ 2^(-j)` (`Rd.card_le_of_norm_cellCenter_sub_le`), since each coordinate of such a centre lies
 in an interval of length `2ρ 2^(-j)`. The cells of one level split integrals and `L_p` norms into
-sums (`Rd.lintegral_eq_tsum_cell`, `Rd.eLpNorm_rpow_eq_tsum_cell`).
+sums (`Rd.lintegral_eq_tsum_dyadicCell`, `Rd.eLpNorm_rpow_eq_tsum_dyadicCell`).
 
 **Bounded overlap**: if at every point at most `N` of the functions `g_m` are nonzero and
 `F = ∑_m g_m`, then `‖F‖_p^p ≤ N^(p-1) ∑_m ‖g_m‖_p^p` (`Rd.eLpNorm_rpow_le_of_overlap`).
@@ -188,7 +188,7 @@ theorem iUnion_zcell (k : ℤ) : ⋃ m, zcell (V := V) k m = Set.univ :=
 noncomputable def cellIndex (j : ℕ) (x : V) : Fin (finrank ℝ V) → ℤ := zcellIndex j x
 
 /-- The **dyadic cell** `P_{j,m}` of level `j ∈ ℕ` and index `m`: the dyadic cube `Q_{j,m}`. -/
-def cell (j : ℕ) (m : Fin (finrank ℝ V) → ℤ) : Set V := zcell j m
+def dyadicCell (j : ℕ) (m : Fin (finrank ℝ V) → ℤ) : Set V := zcell j m
 
 /-- The **centre** of the dyadic cell `P_{j,m}`, with the coordinates `(m_i + 1/2) 2^(-j)`. -/
 noncomputable def cellCenter (j : ℕ) (m : Fin (finrank ℝ V) → ℤ) : V := zcellCenter j m
@@ -196,15 +196,15 @@ noncomputable def cellCenter (j : ℕ) (m : Fin (finrank ℝ V) → ℤ) : V := 
 /-- For natural levels the cube indices are the cell indices of `Rd.cellIndex`. -/
 theorem zcellIndex_natCast (j : ℕ) : zcellIndex (V := V) (j : ℤ) = cellIndex j := rfl
 
-/-- For natural levels the cubes are the cells of `Rd.cell`. -/
-theorem zcell_natCast (j : ℕ) : zcell (V := V) (j : ℤ) = cell j := rfl
+/-- For natural levels the cubes are the cells of `Rd.dyadicCell`. -/
+theorem zcell_natCast (j : ℕ) : zcell (V := V) (j : ℤ) = dyadicCell j := rfl
 
 /-- For natural levels the centres are those of `Rd.cellCenter`. -/
 theorem zcellCenter_natCast (j : ℕ) (m : Fin (finrank ℝ V) → ℤ) :
     zcellCenter (V := V) (j : ℤ) m = cellCenter j m := rfl
 
 /-- Every point lies in the cell of its index. -/
-theorem mem_cell_cellIndex (j : ℕ) (x : V) : x ∈ cell j (cellIndex j x) := rfl
+theorem mem_dyadicCell_cellIndex (j : ℕ) (x : V) : x ∈ dyadicCell j (cellIndex j x) := rfl
 
 /-- The coordinates of a centre. -/
 theorem repr_cellCenter (j : ℕ) (m : Fin (finrank ℝ V) → ℤ) (i : Fin (finrank ℝ V)) :
@@ -213,14 +213,14 @@ theorem repr_cellCenter (j : ℕ) (m : Fin (finrank ℝ V) → ℤ) (i : Fin (fi
 
 /-- On a cell, every coordinate differs from that of the centre by at most `2^(-j)/2`. -/
 theorem abs_repr_sub_cellCenter_le {j : ℕ} {m : Fin (finrank ℝ V) → ℤ} {x : V}
-    (hx : x ∈ cell j m) (i : Fin (finrank ℝ V)) :
+    (hx : x ∈ dyadicCell j m) (i : Fin (finrank ℝ V)) :
     |(gridBasis V).repr (x - cellCenter j m) i| ≤ 1 / 2 / 2 ^ j := by
   rw [← zcellCenter_natCast, ← zpow_natCast]
   exact abs_repr_sub_zcellCenter_le hx i
 
 /-- **Cells are small**: `‖x - c_{j,m}‖ ≤ n 2^(-j)` on `P_{j,m}`. -/
-theorem norm_sub_cellCenter_le {j : ℕ} {m : Fin (finrank ℝ V) → ℤ} {x : V} (hx : x ∈ cell j m) :
-    ‖x - cellCenter j m‖ ≤ finrank ℝ V / 2 ^ j := by
+theorem norm_sub_cellCenter_le {j : ℕ} {m : Fin (finrank ℝ V) → ℤ} {x : V}
+    (hx : x ∈ dyadicCell j m) : ‖x - cellCenter j m‖ ≤ finrank ℝ V / 2 ^ j := by
   rw [← zcellCenter_natCast, ← zpow_natCast]
   exact norm_sub_zcellCenter_le hx
 
@@ -230,8 +230,8 @@ theorem measurable_cellIndex [MeasurableSpace V] [BorelSpace V] (j : ℕ) :
   measurable_zcellIndex j
 
 /-- Cells are measurable. -/
-theorem measurableSet_cell [MeasurableSpace V] [BorelSpace V] (j : ℕ)
-    (m : Fin (finrank ℝ V) → ℤ) : MeasurableSet (cell (V := V) j m) :=
+theorem measurableSet_dyadicCell [MeasurableSpace V] [BorelSpace V] (j : ℕ)
+    (m : Fin (finrank ℝ V) → ℤ) : MeasurableSet (dyadicCell (V := V) j m) :=
   measurableSet_zcell j m
 
 /-- **Counting centres**: at most `(2ρ + 2)^n` centres of level `j` lie in the ball of radius
@@ -288,29 +288,29 @@ variable [MeasurableSpace V] [BorelSpace V]
 omit [MeasurableSpace V] [BorelSpace V] in
 /-- Cells of the same level with different indices are disjoint: they are the fibres of
 `Rd.cellIndex j` (Mathlib's `pairwise_disjoint_fiber`). -/
-theorem cell_disjoint (j : ℕ) : Pairwise (Function.onFun Disjoint (cell (V := V) j)) :=
+theorem dyadicCell_disjoint (j : ℕ) : Pairwise (Function.onFun Disjoint (dyadicCell (V := V) j)) :=
   zcell_disjoint j
 
 omit [MeasurableSpace V] [BorelSpace V] in
 /-- The cells of one level cover the space. -/
-theorem iUnion_cell (j : ℕ) : ⋃ m, cell (V := V) j m = Set.univ :=
+theorem iUnion_dyadicCell (j : ℕ) : ⋃ m, dyadicCell (V := V) j m = Set.univ :=
   iUnion_zcell j
 
 /-- `∫ F = ∑_m ∫_{P_{j,m}} F`. -/
-theorem lintegral_eq_tsum_cell (j : ℕ) (F : V → ℝ≥0∞) :
-    ∫⁻ x, F x = ∑' m, ∫⁻ x in cell j m, F x := by
-  rw [← lintegral_iUnion (measurableSet_cell j) (cell_disjoint j), iUnion_cell,
+theorem lintegral_eq_tsum_dyadicCell (j : ℕ) (F : V → ℝ≥0∞) :
+    ∫⁻ x, F x = ∑' m, ∫⁻ x in dyadicCell j m, F x := by
+  rw [← lintegral_iUnion (measurableSet_dyadicCell j) (dyadicCell_disjoint j), iUnion_dyadicCell,
     Measure.restrict_univ]
 
 /-- `‖g‖_p^p = ∑_m ‖1_{P_{j,m}} g‖_p^p`. -/
-theorem eLpNorm_rpow_eq_tsum_cell {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞) {g : V → ℂ}
+theorem eLpNorm_rpow_eq_tsum_dyadicCell {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞) {g : V → ℂ}
     (hg : AEStronglyMeasurable g volume) (j : ℕ) :
     eLpNorm g p volume ^ p.toReal =
-      ∑' m, eLpNorm ((cell j m).indicator g) p volume ^ p.toReal := by
-  rw [eLpNorm_rpow_eq hg hp0 hp, lintegral_eq_tsum_cell j]
+      ∑' m, eLpNorm ((dyadicCell j m).indicator g) p volume ^ p.toReal := by
+  rw [eLpNorm_rpow_eq hg hp0 hp, lintegral_eq_tsum_dyadicCell j]
   congr 1
   funext m
-  rw [eLpNorm_indicator_eq_eLpNorm_restrict (measurableSet_cell j m).nullMeasurableSet,
+  rw [eLpNorm_indicator_eq_eLpNorm_restrict (measurableSet_dyadicCell j m).nullMeasurableSet,
     eLpNorm_rpow_eq hg.restrict hp0 hp]
 
 omit [MeasurableSpace V] [BorelSpace V] in

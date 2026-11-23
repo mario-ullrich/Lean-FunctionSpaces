@@ -28,7 +28,7 @@ smoothings in coordinate `i` on the halves `{x_i ≤ 1/2}` and `{x_i ≥ 1/2}`
 (`Cube.exists_left_cubeSmoothing`, `Cube.exists_right_cubeSmoothing`,
 `Interval.exists_ppFun_approx_of_taylor`), so it need not depend measurably on the slice.
 Minkowski's inequality in the point turns the bounds of the slices into bounds on two regions of
-the cube (`Cube.eLpNorm_le_of_slice_le`), and every one-variable bound through such smoothings
+the cube (`Cube.cube_eLpNorm_le_of_slice_le`), and every one-variable bound through such smoothings
 becomes a bound in coordinate `i` (`Cube.eLpNorm_sub_slicewise_le_of_smoothing`, used in
 `Cube.eLpNorm_sub_slicewise_ppKernel_le`).
 General `f ∈ L_p(Q)` follow by density of the bounded continuous functions
@@ -61,7 +61,7 @@ variable {d : ℕ}
 then the same bound holds for the norms on the cube and on the regions `{x_i ∈ [a_ν, b_ν]}`: the
 norms are mixed norms of the slices (`Cube.eLpNorm_cubeVol_eq_slice`,
 `Cube.eLpNorm_regionVol_eq_slice`), and Minkowski's inequality in `L_p` over the point applies. -/
-theorem eLpNorm_le_of_slice_le {F G₁ D₁ G₂ D₂ : (Fin d → ℝ) → ℂ} (hF : Measurable F)
+theorem cube_eLpNorm_le_of_slice_le {F G₁ D₁ G₂ D₂ : (Fin d → ℝ) → ℂ} (hF : Measurable F)
     (hG₁ : Measurable G₁) (hD₁ : Measurable D₁) (hG₂ : Measurable G₂) (hD₂ : Measurable D₂)
     {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p ≠ ∞) (i : Fin d) {a₁ b₁ a₂ b₂ : ℝ} (ha₁ : 0 ≤ a₁)
     (hb₁ : b₁ ≤ 1) (ha₂ : 0 ≤ a₂) (hb₂ : b₂ ≤ 1) {c M : ℝ≥0∞}
@@ -137,7 +137,7 @@ polynomials of degree `< r` up to `(b - a)^r ‖D_ν‖_{L_p[a,b]}`:
 If `a + M b ≤ J ω` whenever `a ≤ ω` and `b ≤ L^(-r) 2^r r^(2r) ω`, then
 `‖f - T^{(i)} f‖_{L_p(Q)} ≤ c (2 J) ω_r^{(i)}(f, L)_p`: apply the bound on every slice to the
 smoothings of `f` in coordinate `i` (`Cube.exists_left_cubeSmoothing`,
-`Cube.exists_right_cubeSmoothing`) and pass to the cube as in `Cube.eLpNorm_le_of_slice_le`.
+`Cube.exists_right_cubeSmoothing`) and pass to the cube as in `Cube.cube_eLpNorm_le_of_slice_le`.
 The constants `c, M, J` may be any elements of `[0, ∞]`. -/
 theorem eLpNorm_sub_slicewise_le_of_smoothing {ι : Type*} [Fintype ι] (T : KernelOp ι)
     {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) {r : ℕ} (hr : 1 ≤ r) {p : ℝ≥0∞} (hp : 1 ≤ p)
@@ -162,7 +162,7 @@ theorem eLpNorm_sub_slicewise_le_of_smoothing {ι : Type*} [Fintype ι] (T : Ker
   have hfm := hf.measurable
   obtain ⟨G₁, D₁, hG₁, hD₁, h1L, h2L, hTL⟩ := exists_left_cubeSmoothing hf hr hp hp' i hL hwL
   obtain ⟨G₂, D₂, hG₂, hD₂, h1R, h2R, hTR⟩ := exists_right_cubeSmoothing hf hr hp hp' i hL hwL
-  refine (eLpNorm_le_of_slice_le (hfm.sub (T.measurable_slicewise hfm i)) (hfm.sub hG₁) hD₁
+  refine (cube_eLpNorm_le_of_slice_le (hfm.sub (T.measurable_slicewise hfm i)) (hfm.sub hG₁) hD₁
     (hfm.sub hG₂) hD₂ hp hp' i (a₁ := 0) (b₁ := w) (a₂ := 1 - w) (b₂ := 1) le_rfl (by linarith)
     (by linarith) le_rfl (c := c) (M := M) fun x => ?_).trans ?_
   · exact (congrArg (eLpNorm · p unitVol) (slice_sub_slicewise T f i x)).trans_le
@@ -178,12 +178,13 @@ theorem eLpNorm_sub_slicewise_le_of_smoothing {ι : Type*} [Fintype ι] (T : Ker
 theorem eLpNorm_sub_slicewise_ppKernel_le {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) {r : ℕ}
     (hr : 1 ≤ r) {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p ≠ ∞) (i : Fin d) (k : ℕ) :
     eLpNorm (fun x => f x - (ppKernel r (k + 1)).slicewise i f x) p (cubeVol d) ≤
-      (1 + ppProjConst r) * (2 * jacksonConst r) * coordModulus r p i f (1 / 2 ^ (k + 1)) := by
+      (1 + ppProjConst r) * (2 * intervalJacksonConst r) *
+        coordModulus r p i f (1 / 2 ^ (k + 1)) := by
   have hL : (0 : ℝ) < 1 / 2 ^ (k + 1) := by positivity
   refine eLpNorm_sub_slicewise_le_of_smoothing (ppKernel r (k + 1)) hf hr hp hp' i hL
     (one_half_add_le_one k) (c := 1 + ppProjConst r) (M := ENNReal.ofReal (1 / 2 ^ (k + 1)) ^ r)
     (fun hu hG₁ hD₁ hG₂ hD₂ hTL hTR => ?_)
-    fun ha hb => add_ofReal_pow_mul_le_jacksonConst hL r ha hb
+    fun ha hb => add_ofReal_pow_mul_le_intervalJacksonConst hL r ha hb
   obtain ⟨Q, hQ, hb⟩ := exists_ppFun_approx_of_taylor hu.measurable hG₁ hD₁ hG₂ hD₂ hp hp' hTL hTR k
   rw [show (1 : ℝ) - 1 / 2 = 1 / 2 by norm_num]
   exact (eLpNorm_sub_ppKernel_apply_le hp hp' hu.measurable hu.integrableOn_Icc hQ).trans
@@ -192,13 +193,13 @@ theorem eLpNorm_sub_slicewise_ppKernel_le {f : (Fin d → ℝ) → ℂ} (hf : Co
 /-- The constant of Jackson's inequality on the cube, `(1 + C_r)^(d+1) 2 (1 + 2^r r^(2r))`, with
 the bound `C_r` of the local projections. -/
 noncomputable def cubeJacksonConst (d r : ℕ) : ℝ≥0∞ :=
-  (1 + ppProjConst r) ^ (d + 1) * (2 * jacksonConst r)
+  (1 + ppProjConst r) ^ (d + 1) * (2 * intervalJacksonConst r)
 
 /-- The Jackson constant on the cube is finite. -/
 theorem cubeJacksonConst_ne_top (d r : ℕ) : cubeJacksonConst d r ≠ ∞ :=
   ENNReal.mul_ne_top
     (ENNReal.pow_ne_top (ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top, ppProjConst_ne_top r⟩))
-    (ENNReal.mul_ne_top (by norm_num) (jacksonConst_ne_top r))
+    (ENNReal.mul_ne_top (by norm_num) (intervalJacksonConst_ne_top r))
 
 /-- **Jackson's estimate for continuous functions on the cube**: for bounded continuous `f`,
 `r ≥ 1` and `k ≥ 0`, the tensor projection satisfies
@@ -217,7 +218,7 @@ variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 /-- **From continuous functions to `L_p(Q)` by density**: a bound
 `E_n(g) ≤ C ω_r(g, 2^(-k))_p` for every bounded continuous `g`, given by an approximant
 `u ∈ A_n` of `g`, holds for every `f ∈ L_p(Q)`, `p < ∞`, as in one variable
-(`Interval.approxError_le_of_continuous`). -/
+(`Interval.interval_approxError_le_of_continuous`). -/
 theorem approxError_le_of_continuous {A : ApproximationScheme (Lp ℂ p (cubeVol d))} (hp : p ≠ ∞)
     {r n k : ℕ} {C : ℝ≥0∞} (hC : C ≠ ∞)
     (h : ∀ g : (Fin d → ℝ) →ᵇ ℂ, ∃ u : (Fin d → ℝ) → ℂ,

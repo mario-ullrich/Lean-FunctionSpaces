@@ -149,17 +149,17 @@ theorem eLpNorm_sub_foldSliceProj_le (hN : 2 ≤ N) {p : ℝ≥0∞} (hp1 : 1 �
 
 /-- **The Jackson constant on `ℝ^d`**: `C_{J,d} = (1 + C)^d d C_J` with the bound
 `C = projConst m p` of the projections of one variable and the Jackson constant
-`C_J = jacksonConst m p` of one variable. -/
+`C_J = daubechiesJacksonConst m p` of one variable. -/
 noncomputable def tensorJacksonConst (p : ℝ≥0∞) (d : ℕ) : ℝ≥0∞ :=
-  (1 + ENNReal.ofReal (projConst m p)) ^ d * (d * jacksonConst m p)
+  (1 + ENNReal.ofReal (projConst m p)) ^ d * (d * daubechiesJacksonConst m p)
 
 /-- The constant `tensorJacksonConst m p d` is finite for `N ≥ 2`
-(`Daubechies.jacksonConst_ne_top`). -/
+(`Daubechies.daubechiesJacksonConst_ne_top`). -/
 theorem tensorJacksonConst_ne_top (hN : 2 ≤ N) (p : ℝ≥0∞) (d : ℕ) :
     tensorJacksonConst m p d ≠ ∞ :=
   ENNReal.mul_ne_top (ENNReal.pow_ne_top (ENNReal.add_ne_top.2
     ⟨ENNReal.one_ne_top, ENNReal.ofReal_ne_top⟩))
-    (ENNReal.mul_ne_top (ENNReal.natCast_ne_top d) (jacksonConst_ne_top m hN p))
+    (ENNReal.mul_ne_top (ENNReal.natCast_ne_top d) (daubechiesJacksonConst_ne_top m hN p))
 
 /-- **Jackson's inequality for `R_j` in all coordinates**: for `N ≥ 2`, `1 ≤ p < ∞`, every
 continuous `f : ℝ^d → ℂ` and every level `j`, with `R_j f` the projections of one variable in all
@@ -175,7 +175,8 @@ theorem eLpNorm_sub_foldSliceProj_le_smoothnessModulus (hN : 2 ≤ N) {p : ℝ�
   rw [List.length_finRange, tensorJacksonConst, mul_assoc]
   gcongr
   refine (List.sum_le_length_nsmul _
-    (jacksonConst m p * Rd.smoothnessModulus volume N p f (1 / 2 ^ j)) fun x hx => ?_).trans_eq ?_
+    (daubechiesJacksonConst m p * Rd.smoothnessModulus volume N p f (1 / 2 ^ j))
+    fun x hx => ?_).trans_eq ?_
   · obtain ⟨i, -, rfl⟩ := List.mem_map.1 hx
     exact eLpNorm_sub_sliceProj_le m hN hp1 hp hf j i
   · rw [List.length_map, List.length_finRange, nsmul_eq_mul, mul_assoc]

@@ -65,13 +65,13 @@ theorem approxError_le_modulus {n : ℕ} (hn : 1 ≤ n)
 /-! ### The inverse inequality -/
 
 /-- **Trigonometric polynomials have no high frequencies**: for `a` of degree `< n`,
-`â(k) = 0` whenever `deg k ≥ n` (`SpectralScheme.repr_eq_zero_of_mem_span`). -/
+`â(k) = 0` whenever `deg k ≥ n` (`SpectralScheme.repr_eq_zero_of_mem_levelSpan`). -/
 theorem mFourierCoeff_eq_zero_of_mem {n : ℕ} {a : Lp ℂ 2 (volume : Measure (UnitAddTorus d))}
     (ha : a ∈ (trigScheme d).toLp volume 2 n) {k : d → ℤ} (hk : n ≤ deg k) :
     mFourierCoeff a k = 0 := by
   rw [toLp_trigScheme_eq d] at ha
   rw [← mFourierBasis_repr]
-  exact (fourierScheme d).repr_eq_zero_of_mem_span ha hk
+  exact (fourierScheme d).repr_eq_zero_of_mem_levelSpan ha hk
 
 /-- **Bernstein's inequality for translations**: a trigonometric polynomial `a` of degree `< n`
 satisfies `‖τ_h a - a‖_2 ≤ 2πd n ‖h‖ ‖a‖_2`, by Parseval and `|e_k(h) - 1| ≤ 2πd deg k ‖h‖`

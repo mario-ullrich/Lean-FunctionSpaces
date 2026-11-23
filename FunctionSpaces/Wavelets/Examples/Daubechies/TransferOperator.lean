@@ -12,7 +12,7 @@ public import Mathlib.MeasureTheory.Integral.IntervalIntegral.Periodic
 # The transfer operator
 
 The **transfer operator** of order `N` acts on functions `g : ℝ → ℝ` by
-`(T g)(ξ) = P(ξ/2) g(ξ/2) + P((ξ + 1)/2) g((ξ + 1)/2)` (`Daubechies.transfer`), where
+`(T g)(ξ) = P(ξ/2) g(ξ/2) + P((ξ + 1)/2) g((ξ + 1)/2)` (`Daubechies.transferOp`), where
 `P(ξ) = P_N(sin²(πξ))` is the trigonometric Daubechies polynomial (`Daubechies.daubFun`). The
 points `ξ/2` and `(ξ + 1)/2` are the two preimages of `ξ` under the doubling map `η ↦ 2η` modulo
 `1`. The operator governs the decay of the symbol product `Φ(ξ) = ∏_{j ≥ 0} m_0(ξ/2^(j+1))` of a
@@ -23,17 +23,17 @@ the factors `P(ξ/2^(j+1))` integrate to the integrals of the iterates `T^n 1`.
 continuous functions, `1`-periodic functions to `1`-periodic functions (from `ξ` to `ξ + 1` the
 two points `ξ/2`, `(ξ + 1)/2` become `(ξ + 1)/2`, `ξ/2 + 1`, so the two summands swap) and
 nonnegative functions to nonnegative ones. Since `0 ≤ P ≤ C(2N - 1, N)`,
-`|T g| ≤ 2 C(2N - 1, N) sup |g|` (`Daubechies.abs_transfer_le`), and the same holds for the
-iterates with the factor `(2 C(2N - 1, N))^n` (`Daubechies.abs_iterate_transfer_le`).
+`|T g| ≤ 2 C(2N - 1, N) sup |g|` (`Daubechies.abs_transferOp_le`), and the same holds for the
+iterates with the factor `(2 C(2N - 1, N))^n` (`Daubechies.abs_iterate_transferOp_le`).
 
 **The adjoint identity.** For continuous `1`-periodic `h` and `g`,
 `∫_{-1/2}^{1/2} h(η) (T g)(η) dη = 2 ∫_{-1/2}^{1/2} h(2η) P(η) g(η) dη`
-(`Daubechies.integral_transfer`). The substitutions `u = η/2` and `u = (η + 1)/2` turn the two
+(`Daubechies.integral_transferOp`). The substitutions `u = η/2` and `u = (η + 1)/2` turn the two
 summands into integrals over `[-1/4, 1/4]` and `[1/4, 3/4]`, which together form one period of
 the `1`-periodic function `u ↦ h(2u) P(u) g(u)`
 (`Daubechies.integral_comp_div_two_add_comp_add_one_div_two`). By induction on `n`,
 `∫_{-1/2}^{1/2} h(η) (T^n g)(η) dη = 2^n ∫_{-1/2}^{1/2} h(2^n η) ∏_{i<n} P(2^i η) g(η) dη`
-(`Daubechies.integral_iterate_transfer`), and for `h = g = 1` the substitution `ξ = 2^n η` gives
+(`Daubechies.integral_iterate_transferOp`), and for `h = g = 1` the substitution `ξ = 2^n η` gives
 `∫_{-2^n/2}^{2^n/2} ∏_{j<n} P(ξ/2^(j+1)) dξ = ∫_{-1/2}^{1/2} (T^n 1)(η) dη`
 (`Daubechies.integral_prod_daubFun`).
 
@@ -55,58 +55,58 @@ namespace Daubechies
 `(T g)(ξ) = P(ξ/2) g(ξ/2) + P((ξ + 1)/2) g((ξ + 1)/2)`, where `P = daubFun N` is the
 trigonometric Daubechies polynomial `P(ξ) = P_N(sin²(πξ))`. The points `ξ/2` and `(ξ + 1)/2` are
 the two preimages of `ξ` under the doubling map `η ↦ 2η` modulo `1`. -/
-noncomputable def transfer (N : ℕ) (g : ℝ → ℝ) (ξ : ℝ) : ℝ :=
+noncomputable def transferOp (N : ℕ) (g : ℝ → ℝ) (ξ : ℝ) : ℝ :=
   daubFun N (ξ / 2) * g (ξ / 2) + daubFun N ((ξ + 1) / 2) * g ((ξ + 1) / 2)
 
 /-- `T` is additive: `T (g₁ + g₂) = T g₁ + T g₂`. -/
-theorem transfer_add (N : ℕ) (g₁ g₂ : ℝ → ℝ) :
-    transfer N (g₁ + g₂) = transfer N g₁ + transfer N g₂ := by
+theorem transferOp_add (N : ℕ) (g₁ g₂ : ℝ → ℝ) :
+    transferOp N (g₁ + g₂) = transferOp N g₁ + transferOp N g₂ := by
   ext ξ
-  simp only [transfer, Pi.add_apply]
+  simp only [transferOp, Pi.add_apply]
   ring
 
 /-- `T` is homogeneous: `T (c g) = c T g` for every real `c`. -/
-theorem transfer_smul (N : ℕ) (c : ℝ) (g : ℝ → ℝ) :
-    transfer N (c • g) = c • transfer N g := by
+theorem transferOp_smul (N : ℕ) (c : ℝ) (g : ℝ → ℝ) :
+    transferOp N (c • g) = c • transferOp N g := by
   ext ξ
-  simp only [transfer, Pi.smul_apply, smul_eq_mul]
+  simp only [transferOp, Pi.smul_apply, smul_eq_mul]
   ring
 
 /-- `T` maps `1`-periodic functions to `1`-periodic functions: from `ξ` to `ξ + 1` the points
 `ξ/2` and `(ξ + 1)/2` become `(ξ + 1)/2` and `(ξ + 2)/2 = ξ/2 + 1`, so the two summands swap,
 since `P` and `g` have period `1`. -/
-theorem transfer_periodic (N : ℕ) {g : ℝ → ℝ} (hg : Periodic g 1) :
-    Periodic (transfer N g) 1 := fun ξ => by
+theorem transferOp_periodic (N : ℕ) {g : ℝ → ℝ} (hg : Periodic g 1) :
+    Periodic (transferOp N g) 1 := fun ξ => by
   have h : (ξ + 1 + 1) / 2 = ξ / 2 + 1 := by ring
-  simp only [transfer, h, daubFun_periodic N (ξ / 2), hg (ξ / 2)]
+  simp only [transferOp, h, daubFun_periodic N (ξ / 2), hg (ξ / 2)]
   ring
 
 /-- `T` maps continuous functions to continuous functions. -/
-theorem continuous_transfer (N : ℕ) {g : ℝ → ℝ} (hg : Continuous g) :
-    Continuous (transfer N g) := by
+theorem continuous_transferOp (N : ℕ) {g : ℝ → ℝ} (hg : Continuous g) :
+    Continuous (transferOp N g) := by
   have hP := continuous_daubFun N
-  unfold transfer
+  unfold transferOp
   fun_prop
 
 /-- `T` is positive: `T g ≥ 0` for `g ≥ 0`, since `P ≥ 0`. -/
-theorem transfer_nonneg (N : ℕ) {g : ℝ → ℝ} (hg : ∀ x, 0 ≤ g x) (ξ : ℝ) :
-    0 ≤ transfer N g ξ :=
+theorem transferOp_nonneg (N : ℕ) {g : ℝ → ℝ} (hg : ∀ x, 0 ≤ g x) (ξ : ℝ) :
+    0 ≤ transferOp N g ξ :=
   add_nonneg (mul_nonneg (daubFun_nonneg N _) (hg _)) (mul_nonneg (daubFun_nonneg N _) (hg _))
 
 /-- `T` is monotone: `g₁ ≤ g₂` everywhere implies `T g₁ ≤ T g₂` everywhere, since `P ≥ 0`. -/
-theorem transfer_mono (N : ℕ) {g₁ g₂ : ℝ → ℝ} (h : ∀ x, g₁ x ≤ g₂ x) (ξ : ℝ) :
-    transfer N g₁ ξ ≤ transfer N g₂ ξ :=
+theorem transferOp_mono (N : ℕ) {g₁ g₂ : ℝ → ℝ} (h : ∀ x, g₁ x ≤ g₂ x) (ξ : ℝ) :
+    transferOp N g₁ ξ ≤ transferOp N g₂ ξ :=
   add_le_add (mul_le_mul_of_nonneg_left (h _) (daubFun_nonneg N _))
     (mul_le_mul_of_nonneg_left (h _) (daubFun_nonneg N _))
 
 /-- **The crude bound**: if `|g(x)| ≤ B` for every `x`, then `|(T g)(ξ)| ≤ 2 C(2N - 1, N) B` for
 every `ξ`, since `0 ≤ P ≤ C(2N - 1, N)` (`Daubechies.daubFun_le_choose`). -/
-theorem abs_transfer_le (N : ℕ) {g : ℝ → ℝ} {B : ℝ} (hg : ∀ x, |g x| ≤ B) (ξ : ℝ) :
-    |transfer N g ξ| ≤ 2 * ((2 * N - 1).choose N : ℝ) * B := by
+theorem abs_transferOp_le (N : ℕ) {g : ℝ → ℝ} {B : ℝ} (hg : ∀ x, |g x| ≤ B) (ξ : ℝ) :
+    |transferOp N g ξ| ≤ 2 * ((2 * N - 1).choose N : ℝ) * B := by
   have key : ∀ x, |daubFun N x * g x| ≤ ((2 * N - 1).choose N : ℝ) * B := fun x => by
     rw [abs_mul, abs_of_nonneg (daubFun_nonneg N x)]
     exact mul_le_mul (daubFun_le_choose N x) (hg x) (abs_nonneg _) (Nat.cast_nonneg _)
-  calc |transfer N g ξ| ≤ |daubFun N (ξ / 2) * g (ξ / 2)| +
+  calc |transferOp N g ξ| ≤ |daubFun N (ξ / 2) * g (ξ / 2)| +
         |daubFun N ((ξ + 1) / 2) * g ((ξ + 1) / 2)| := abs_add_le _ _
     _ ≤ ((2 * N - 1).choose N : ℝ) * B + ((2 * N - 1).choose N : ℝ) * B :=
         add_le_add (key _) (key _)
@@ -115,55 +115,55 @@ theorem abs_transfer_le (N : ℕ) {g : ℝ → ℝ} {B : ℝ} (hg : ∀ x, |g x|
 /-! ### The iterates -/
 
 /-- The iterates `T^n g` of a continuous `g` are continuous. -/
-theorem continuous_iterate_transfer (N : ℕ) {g : ℝ → ℝ} (hg : Continuous g) (n : ℕ) :
-    Continuous ((transfer N)^[n] g) := by
+theorem continuous_iterate_transferOp (N : ℕ) {g : ℝ → ℝ} (hg : Continuous g) (n : ℕ) :
+    Continuous ((transferOp N)^[n] g) := by
   induction n with
   | zero => exact hg
   | succ n ih =>
     rw [iterate_succ_apply']
-    exact continuous_transfer N ih
+    exact continuous_transferOp N ih
 
 /-- The iterates `T^n g` of a `1`-periodic `g` are `1`-periodic. -/
-theorem periodic_iterate_transfer (N : ℕ) {g : ℝ → ℝ} (hg : Periodic g 1) (n : ℕ) :
-    Periodic ((transfer N)^[n] g) 1 := by
+theorem periodic_iterate_transferOp (N : ℕ) {g : ℝ → ℝ} (hg : Periodic g 1) (n : ℕ) :
+    Periodic ((transferOp N)^[n] g) 1 := by
   induction n with
   | zero => exact hg
   | succ n ih =>
     rw [iterate_succ_apply']
-    exact transfer_periodic N ih
+    exact transferOp_periodic N ih
 
 /-- The iterates `T^n g` of a nonnegative `g` are nonnegative. -/
-theorem iterate_transfer_nonneg (N : ℕ) {g : ℝ → ℝ} (hg : ∀ x, 0 ≤ g x) (n : ℕ) (ξ : ℝ) :
-    0 ≤ (transfer N)^[n] g ξ := by
+theorem iterate_transferOp_nonneg (N : ℕ) {g : ℝ → ℝ} (hg : ∀ x, 0 ≤ g x) (n : ℕ) (ξ : ℝ) :
+    0 ≤ (transferOp N)^[n] g ξ := by
   induction n generalizing ξ with
   | zero => exact hg ξ
   | succ n ih =>
     rw [iterate_succ_apply']
-    exact transfer_nonneg N ih ξ
+    exact transferOp_nonneg N ih ξ
 
 /-- If `|g(x)| ≤ B` for every `x`, then `|(T^n g)(ξ)| ≤ (2 C(2N - 1, N))^n B` for every `n` and
-`ξ`, by induction from `Daubechies.abs_transfer_le`. -/
-theorem abs_iterate_transfer_le (N : ℕ) {g : ℝ → ℝ} {B : ℝ} (hg : ∀ x, |g x| ≤ B) (n : ℕ)
-    (ξ : ℝ) : |(transfer N)^[n] g ξ| ≤ (2 * ((2 * N - 1).choose N : ℝ)) ^ n * B := by
+`ξ`, by induction from `Daubechies.abs_transferOp_le`. -/
+theorem abs_iterate_transferOp_le (N : ℕ) {g : ℝ → ℝ} {B : ℝ} (hg : ∀ x, |g x| ≤ B) (n : ℕ)
+    (ξ : ℝ) : |(transferOp N)^[n] g ξ| ≤ (2 * ((2 * N - 1).choose N : ℝ)) ^ n * B := by
   induction n generalizing ξ with
   | zero => simpa using hg ξ
   | succ n ih =>
     rw [iterate_succ_apply', pow_succ', mul_assoc]
-    exact abs_transfer_le N ih ξ
+    exact abs_transferOp_le N ih ξ
 
 /-- The iterates `T^n 1` of the constant function `1` are continuous. -/
-theorem continuous_iterate_transfer_one (N n : ℕ) :
-    Continuous ((transfer N)^[n] (fun _ => 1)) :=
-  continuous_iterate_transfer N continuous_const n
+theorem continuous_iterate_transferOp_one (N n : ℕ) :
+    Continuous ((transferOp N)^[n] (fun _ => 1)) :=
+  continuous_iterate_transferOp N continuous_const n
 
 /-- The iterates `T^n 1` of the constant function `1` are `1`-periodic. -/
-theorem periodic_iterate_transfer_one (N n : ℕ) :
-    Periodic ((transfer N)^[n] (fun _ => 1)) 1 :=
-  periodic_iterate_transfer N (fun _ => rfl) n
+theorem periodic_iterate_transferOp_one (N n : ℕ) :
+    Periodic ((transferOp N)^[n] (fun _ => 1)) 1 :=
+  periodic_iterate_transferOp N (fun _ => rfl) n
 
 /-- The iterates `T^n 1` of the constant function `1` are nonnegative. -/
-theorem iterate_transfer_one_nonneg (N n : ℕ) (ξ : ℝ) : 0 ≤ (transfer N)^[n] (fun _ => 1) ξ :=
-  iterate_transfer_nonneg N (fun _ => zero_le_one) n ξ
+theorem iterate_transferOp_one_nonneg (N n : ℕ) (ξ : ℝ) : 0 ≤ (transferOp N)^[n] (fun _ => 1) ξ :=
+  iterate_transferOp_nonneg N (fun _ => zero_le_one) n ξ
 
 /-! ### The adjoint identity -/
 
@@ -203,9 +203,9 @@ theorem integral_comp_div_two_add_comp_add_one_div_two {f : ℝ → ℝ} (hf : C
 `f(u) = h(2u) P(u) g(u)`, which is continuous and `1`-periodic, the integrand on the left is
 `f(η/2) + f((η + 1)/2)`, because `h(η) = h(η + 1)`; then
 `Daubechies.integral_comp_div_two_add_comp_add_one_div_two` applies. -/
-theorem integral_transfer (N : ℕ) {h g : ℝ → ℝ} (hhc : Continuous h) (hhp : Periodic h 1)
+theorem integral_transferOp (N : ℕ) {h g : ℝ → ℝ} (hhc : Continuous h) (hhp : Periodic h 1)
     (hgc : Continuous g) (hgp : Periodic g 1) :
-    ∫ η in (-1/2 : ℝ)..1/2, h η * transfer N g η =
+    ∫ η in (-1/2 : ℝ)..1/2, h η * transferOp N g η =
       2 * ∫ η in (-1/2 : ℝ)..1/2, h (2 * η) * daubFun N η * g η := by
   have hP := continuous_daubFun N
   have hfc : Continuous fun u => h (2 * u) * daubFun N u * g u := by fun_prop
@@ -213,18 +213,18 @@ theorem integral_transfer (N : ℕ) {h g : ℝ → ℝ} (hhc : Continuous h) (hh
     ((periodic_comp_two_mul hhp).mul (daubFun_periodic N)).mul hgp
   rw [← integral_comp_div_two_add_comp_add_one_div_two hfc hfp]
   refine intervalIntegral.integral_congr fun η _ => ?_
-  simp only [transfer, show 2 * (η / 2) = η by ring, show 2 * ((η + 1) / 2) = η + 1 by ring,
+  simp only [transferOp, show 2 * (η / 2) = η by ring, show 2 * ((η + 1) / 2) = η + 1 by ring,
     hhp η]
   ring
 
 /-- **The adjoint identity for the iterates**: for continuous `1`-periodic `h` and `g` and every
 `n`, `∫_{-1/2}^{1/2} h(η) (T^n g)(η) dη = 2^n ∫_{-1/2}^{1/2} h(2^n η) ∏_{i<n} P(2^i η) g(η) dη`.
-Induction on `n`: `T^(n+1) g = T (T^n g)`, `Daubechies.integral_transfer` for `T^n g`, and the
+Induction on `n`: `T^(n+1) g = T (T^n g)`, `Daubechies.integral_transferOp` for `T^n g`, and the
 induction hypothesis for the continuous `1`-periodic function `η ↦ h(2η) P(η)` in place of
 `h`. -/
-theorem integral_iterate_transfer (N n : ℕ) {h g : ℝ → ℝ} (hhc : Continuous h)
+theorem integral_iterate_transferOp (N n : ℕ) {h g : ℝ → ℝ} (hhc : Continuous h)
     (hhp : Periodic h 1) (hgc : Continuous g) (hgp : Periodic g 1) :
-    ∫ η in (-1/2 : ℝ)..1/2, h η * (transfer N)^[n] g η =
+    ∫ η in (-1/2 : ℝ)..1/2, h η * (transferOp N)^[n] g η =
       2 ^ n * ∫ η in (-1/2 : ℝ)..1/2,
         h (2 ^ n * η) * (∏ i ∈ Finset.range n, daubFun N (2 ^ i * η)) * g η := by
   induction n generalizing h with
@@ -234,8 +234,8 @@ theorem integral_iterate_transfer (N n : ℕ) {h g : ℝ → ℝ} (hhc : Continu
     have hc : Continuous fun η => h (2 * η) * daubFun N η := by fun_prop
     have hp : Periodic (fun η => h (2 * η) * daubFun N η) 1 :=
       (periodic_comp_two_mul hhp).mul (daubFun_periodic N)
-    rw [iterate_succ_apply', integral_transfer N hhc hhp (continuous_iterate_transfer N hgc n)
-      (periodic_iterate_transfer N hgp n), ih hc hp, ← mul_assoc, ← pow_succ']
+    rw [iterate_succ_apply', integral_transferOp N hhc hhp (continuous_iterate_transferOp N hgc n)
+      (periodic_iterate_transferOp N hgp n), ih hc hp, ← mul_assoc, ← pow_succ']
     congr 1
     refine intervalIntegral.integral_congr fun η _ => ?_
     simp only [Finset.prod_range_succ, show (2 : ℝ) ^ (n + 1) * η = 2 * (2 ^ n * η) by ring]
@@ -243,10 +243,10 @@ theorem integral_iterate_transfer (N n : ℕ) {h g : ℝ → ℝ} (hhc : Continu
 
 /-- The adjoint identity for `h = g = 1`:
 `∫_{-1/2}^{1/2} (T^n 1)(η) dη = 2^n ∫_{-1/2}^{1/2} ∏_{i<n} P(2^i η) dη`. -/
-theorem integral_iterate_transfer_one (N n : ℕ) :
-    ∫ η in (-1/2 : ℝ)..1/2, (transfer N)^[n] (fun _ => 1) η =
+theorem integral_iterate_transferOp_one (N n : ℕ) :
+    ∫ η in (-1/2 : ℝ)..1/2, (transferOp N)^[n] (fun _ => 1) η =
       2 ^ n * ∫ η in (-1/2 : ℝ)..1/2, ∏ i ∈ Finset.range n, daubFun N (2 ^ i * η) := by
-  have h := integral_iterate_transfer N n (h := fun _ => 1) (g := fun _ => 1) continuous_const
+  have h := integral_iterate_transferOp N n (h := fun _ => 1) (g := fun _ => 1) continuous_const
     (fun _ => rfl) continuous_const (fun _ => rfl)
   simpa only [one_mul, mul_one] using h
 
@@ -269,16 +269,16 @@ theorem prod_daubFun_two_pow_mul_div (N n : ℕ) (η : ℝ) :
 `∫_{-2^n/2}^{2^n/2} ∏_{j<n} P(ξ/2^(j+1)) dξ = ∫_{-1/2}^{1/2} (T^n 1)(η) dη`. The substitution
 `ξ = 2^n η` (Mathlib's `intervalIntegral.smul_integral_comp_mul_left`) turns the left side into
 `2^n ∫_{-1/2}^{1/2} ∏_{j<n} P(2^n η/2^(j+1)) dη = 2^n ∫_{-1/2}^{1/2} ∏_{i<n} P(2^i η) dη`, which is
-`Daubechies.integral_iterate_transfer_one`. -/
+`Daubechies.integral_iterate_transferOp_one`. -/
 theorem integral_prod_daubFun (N n : ℕ) :
     ∫ ξ in -(2 ^ n / 2 : ℝ)..2 ^ n / 2, ∏ j ∈ Finset.range n, daubFun N (ξ / 2 ^ (j + 1)) =
-      ∫ η in (-1/2 : ℝ)..1/2, (transfer N)^[n] (fun _ => 1) η := by
+      ∫ η in (-1/2 : ℝ)..1/2, (transferOp N)^[n] (fun _ => 1) η := by
   have h := intervalIntegral.smul_integral_comp_mul_left
     (fun ξ => ∏ j ∈ Finset.range n, daubFun N (ξ / 2 ^ (j + 1))) ((2 : ℝ) ^ n)
     (a := -1/2) (b := 1/2)
   rw [show (2 : ℝ) ^ n * (-1/2) = -(2 ^ n / 2) by ring,
     show (2 : ℝ) ^ n * (1/2) = 2 ^ n / 2 by ring, smul_eq_mul] at h
-  rw [← h, integral_iterate_transfer_one]
+  rw [← h, integral_iterate_transferOp_one]
   congr 1
   exact intervalIntegral.integral_congr fun η _ => prod_daubFun_two_pow_mul_div N n η
 
@@ -292,7 +292,7 @@ bound controls the decay of the symbol product `Φ` of a Daubechies mask of orde
 `Daubechies.transferGrowth_three`) and with a crude rate for every `N`
 (`Daubechies.transferGrowth_crude`). -/
 def TransferGrowth (N : ℕ) (lam C : ℝ) : Prop :=
-  0 < lam ∧ ∀ (n : ℕ) (ξ : ℝ), (transfer N)^[n] (fun _ => 1) ξ ≤ C * lam ^ n
+  0 < lam ∧ ∀ (n : ℕ) (ξ : ℝ), (transferOp N)^[n] (fun _ => 1) ξ ≤ C * lam ^ n
 
 /-- A growth bound `T^n 1 ≤ C λ^n` forces `C ≥ 1`: for `n = 0` it says `1 ≤ C`. -/
 theorem TransferGrowth.one_le {N : ℕ} {lam C : ℝ} (hg : TransferGrowth N lam C) : 1 ≤ C := by
@@ -300,11 +300,11 @@ theorem TransferGrowth.one_le {N : ℕ} {lam C : ℝ} (hg : TransferGrowth N lam
 
 /-- Under a growth bound `T^n 1 ≤ C λ^n`, the integral of `T^n 1` over one period is at most
 `C λ^n`. -/
-theorem TransferGrowth.integral_iterate_transfer_one_le {N : ℕ} {lam C : ℝ}
+theorem TransferGrowth.integral_iterate_transferOp_one_le {N : ℕ} {lam C : ℝ}
     (hg : TransferGrowth N lam C) (n : ℕ) :
-    ∫ η in (-1/2 : ℝ)..1/2, (transfer N)^[n] (fun _ => 1) η ≤ C * lam ^ n := by
+    ∫ η in (-1/2 : ℝ)..1/2, (transferOp N)^[n] (fun _ => 1) η ≤ C * lam ^ n := by
   have h := intervalIntegral.integral_mono (μ := MeasureTheory.volume) (a := -1/2) (b := 1/2)
-    (by norm_num) ((continuous_iterate_transfer_one N n).intervalIntegrable _ _)
+    (by norm_num) ((continuous_iterate_transferOp_one N n).intervalIntegrable _ _)
     (continuous_const.intervalIntegrable _ _) (hg.2 n)
   rwa [intervalIntegral.integral_const, smul_eq_mul, show (1/2 : ℝ) - (-1/2) = 1 by norm_num,
     one_mul] at h
@@ -316,14 +316,14 @@ theorem TransferGrowth.integral_prod_daubFun_le {N : ℕ} {lam C : ℝ}
     ∫ ξ in -(2 ^ n / 2 : ℝ)..2 ^ n / 2, ∏ j ∈ Finset.range n, daubFun N (ξ / 2 ^ (j + 1)) ≤
       C * lam ^ n := by
   rw [integral_prod_daubFun]
-  exact hg.integral_iterate_transfer_one_le n
+  exact hg.integral_iterate_transferOp_one_le n
 
 /-- **The crude growth bound**: `T^n 1 ≤ (2 C(2N - 1, N))^n` for every `N`, from
-`|T g| ≤ 2 C(2N - 1, N) sup |g|` (`Daubechies.abs_iterate_transfer_le`). By
+`|T g| ≤ 2 C(2N - 1, N) sup |g|` (`Daubechies.abs_iterate_transferOp_le`). By
 `Daubechies.choose_lt_four_pow`, `2 C(2N - 1, N) < 4^(N - 1/2)` for `N ≥ 2`. -/
 theorem transferGrowth_crude (N : ℕ) : TransferGrowth N (2 * (2 * N - 1).choose N) 1 := by
   refine ⟨mul_pos two_pos (Nat.cast_pos.2 (Nat.choose_pos (by omega))), fun n ξ => ?_⟩
-  have h := abs_iterate_transfer_le N (g := fun _ => 1) (B := 1) (fun _ => by simp) n ξ
+  have h := abs_iterate_transferOp_le N (g := fun _ => 1) (B := 1) (fun _ => by simp) n ξ
   rw [mul_one] at h
   rw [one_mul]
   exact (le_abs_self _).trans h

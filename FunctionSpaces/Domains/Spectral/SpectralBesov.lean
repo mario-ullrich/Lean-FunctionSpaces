@@ -250,7 +250,7 @@ theorem memApprox_neumannScheme_iff {θ : ℝ} {q : ℝ≥0∞} (hθ : 0 < θ) (
 theorem modNormOn_lt_top_iff_blockNorm_lt_top {θ : ℝ} {q : ℝ≥0∞} (hθ : 0 < θ) (hθ' : θ < 1)
     (hq : 1 ≤ q) {r : ℕ} (hr : 1 ≤ r) (f : Lp ℂ 2 (volume : Measure V)) :
     modNormOn Ω.measurableSet r θ q f < ∞ ↔
-      Ω.neumannScheme.projectionScheme.blockNorm θ q
+      Ω.neumannScheme.spectralProjectionScheme.blockNorm θ q
         (LpToLpRestrictCLM V ℂ ℂ volume 2 (Ω.toOpens : Set V) f) < ∞ := by
   rw [← Ω.memApprox_neumannScheme_iff hθ hθ' hq hr,
     Ω.neumannScheme.memApprox_iff_blockNorm_lt_top hθ hq]

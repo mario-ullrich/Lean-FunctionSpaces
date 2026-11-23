@@ -94,7 +94,7 @@ theorem mem_scheme_of_mem_ppScheme {n : ℕ} {a : Lp ℂ p unitVol} (ha : a ∈ 
   · rw [mem_ppScheme_zero.1 ha]
     exact (scheme p).zero_mem 0
   · obtain ⟨Q, hQ, hae⟩ := (mem_ppScheme hn).1 ha
-    rw [dyadicFiltration.mem_scheme hn, mem_lpMeas_iff_aestronglyMeasurable]
+    rw [dyadicFiltration.mem_filtrationScheme hn, mem_lpMeas_iff_aestronglyMeasurable]
     exact ⟨stepFun (ppFun (Nat.log 2 n) Q) (Nat.log 2 n), stronglyMeasurable_stepFun _ _,
       hae.trans (ppFun_ae_eq_stepFun hQ _)⟩
 
@@ -105,7 +105,7 @@ theorem mem_ppScheme_of_mem_scheme {n : ℕ} {a : Lp ℂ p unitVol} (ha : a ∈ 
   rcases eq_or_ne n 0 with rfl | hn
   · rw [mem_ppScheme_zero, ApproximationScheme.mem_ofMonotoneSubmodules_zero.1 ha]
   · rw [mem_ppScheme hn]
-    rw [dyadicFiltration.mem_scheme hn, mem_lpMeas_iff_aestronglyMeasurable] at ha
+    rw [dyadicFiltration.mem_filtrationScheme hn, mem_lpMeas_iff_aestronglyMeasurable] at ha
     obtain ⟨g, hg, hag⟩ := ha
     exact ⟨fun m => C (g ((m : ℝ) / 2 ^ Nat.log 2 n)), fun m =>
       mem_degreeLT.2 (degree_C_le.trans_lt (by norm_num)),
@@ -130,7 +130,7 @@ theorem memApprox_ppScheme_one_iff {s : ℝ} {q : ℝ≥0∞} (f : Lp ℂ p unit
 `|∫_0^1 f| + ‖(2^(k(s+1/2-1/p)) ‖(⟨f, h_{k,m}⟩)_{m<2^k}‖_{ℓ_p})_k‖_{ℓ_q} < ∞`. -/
 theorem lqNorm_modulus_lt_top_iff_haarCoeff (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s)
     (hsp : s < 1 / p.toReal) {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Lp ℂ p unitVol) :
-    ‖f‖ₑ + ENNReal.lqNorm q (fun k => dyadicWeight s k * lpModulus p 1 f k) < ∞ ↔
+    ‖f‖ₑ + ENNReal.lqNorm q (fun k => dyadicWeight s k * intervalLpModulus p 1 f k) < ∞ ↔
       ‖∫ x, f x ∂vol‖ₑ + ENNReal.lqNorm q (fun k =>
         dyadicWeight (s + (1 / 2 - 1 / p.toReal)) k *
           ENNReal.lqNorm p (fun m : Fin (2 ^ k) => ‖haarCoeff f k ((m : ℕ) : ℤ)‖ₑ)) < ∞ := by

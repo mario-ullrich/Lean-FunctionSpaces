@@ -658,16 +658,16 @@ theorem integrable_of_eNormDyadic_lt_top (hp0 : p ≠ 0) (hp1 : p ≤ 1) (hs : 1
 
 /-- **Martingale convergence in `L_1[0, 1]`**: for integrable `F`, `E[F | ℱ_N] → F` in `L_1`. The
 conditional expectations form a projection scheme of bound `1` in `L_1`
-(`MeasureTheory.Filtration.projectionScheme`) whose approximants are dense
+(`MeasureTheory.Filtration.filtrationProjectionScheme`) whose approximants are dense
 (`Haar.closure_iUnion_scheme`), so the projections converge
 (`ApproximationScheme.ProjectionScheme.tendsto_of_dense`). -/
 theorem tendsto_eLpNorm_condExp_sub {F : ℝ → ℂ} (hF : Integrable F vol) :
     Tendsto (fun N => eLpNorm (vol[F | dyadicFiltration N] - F) 1 vol) atTop (𝓝 0) := by
   have hm : MemLp F 1 vol := memLp_one_iff_integrable.2 hF
-  have hP2 : ∀ N, (dyadicFiltration.projectionScheme (p := 1) (μ := vol)).P (2 ^ N) =
+  have hP2 : ∀ N, (dyadicFiltration.filtrationProjectionScheme (p := 1) (μ := vol)).P (2 ^ N) =
       Lp.condExpLp (dyadicFiltration N) := fun N =>
     ApproximationScheme.ProjectionScheme.ofMonotone_two_pow N
-  have hP := (dyadicFiltration.projectionScheme (p := 1) (μ := vol)).tendsto_of_dense
+  have hP := (dyadicFiltration.filtrationProjectionScheme (p := 1) (μ := vol)).tendsto_of_dense
     (closure_iUnion_scheme (p := 1) ENNReal.one_ne_top) (hm.toLp F)
   have h2 : Tendsto (fun N => Lp.condExpLp (dyadicFiltration N) (hm.toLp F)) atTop
       (𝓝 (hm.toLp F)) :=
@@ -862,7 +862,7 @@ theorem memEMethod_stepCouple_iff_haarCoeff (hp0 : p ≠ 0) (hp1 : p ≤ 1)
 `Haar.memEMethod_stepCouple_iff_haarCoeff`). -/
 theorem lqNorm_modulus_lt_top_iff_haarCoeff_of_le_one (hp0 : p ≠ 0) (hp1 : p ≤ 1)
     (hs : 1 / p.toReal - 1 < s) (hsp : s < 1 / p.toReal) (hq0 : q ≠ 0) (f : Lp ℂ p vol) :
-    ‖f‖ₑ + lqNorm q (fun k => dyadicWeight s k * Interval.lpModulus p 1 f k) < ∞ ↔
+    ‖f‖ₑ + lqNorm q (fun k => dyadicWeight s k * Interval.intervalLpModulus p 1 f k) < ∞ ↔
       Integrable f vol ∧ ‖∫ x, f x ∂vol‖ₑ +
         lqNorm q (fun k => dyadicWeight (s + (1 / 2 - 1 / p.toReal)) k *
           lqNorm p (fun m : Fin (2 ^ k) => ‖haarCoeff f k ((m : ℕ) : ℤ)‖ₑ)) < ∞ :=

@@ -21,18 +21,20 @@ constant `Rd.feffermanSteinConst` (`Rd.feffermanStein`). The cases:
 * `q = ∞` and `q = p` follow from the Hardy–Littlewood maximal theorem one function at a time
   (`Rd.feffermanStein_top`, `Rd.feffermanStein_self`);
 * `q < p` follows by duality with the weighted strong type, first for finitely many functions
-  (`Rd.lintegral_rpow_sum_maximal_le`) and then by monotone convergence in the number of
-  functions (`Rd.lintegral_lqNorm_maximal_rpow_le_of_gt`), with the norm form
+  (`Rd.lintegral_rpow_sum_maximalFunction_le`) and then by monotone convergence in the number of
+  functions (`Rd.lintegral_lqNorm_maximalFunction_rpow_le_of_gt`), with the norm form
   `Rd.feffermanStein_of_gt`;
 * `p < q` follows by interpolation between the case `q = p` and the vector-valued weak type
-  `(1,1)` (`Rd.volume_lqNorm_maximal_gt_le`, `Rd.lintegral_lqNorm_maximal_rpow_le_of_lt`), with
-  the norm form `Rd.feffermanStein_of_lt`.
+  `(1,1)` (`Rd.volume_lqNorm_maximalFunction_gt_le`,
+  `Rd.lintegral_lqNorm_maximalFunction_rpow_le_of_lt`), with the norm form
+  `Rd.feffermanStein_of_lt`.
 
 The weak type rests on the Calderón–Zygmund decomposition of `G = ‖(g_j)_j‖_{ℓ_q}`: off the
 enlarged exceptional set, the maximal function of `1_Ω g` is at most `3^n` times the maximal
-function of the averages of `g` over the maximal big cubes (`Rd.maximal_indicator_iUnion_le`,
-`Rd.maximal_indicator_czSet_le`), and the good parts (`Rd.czGood`) keep the integral
-(`Rd.lintegral_czGood`) and have `ℓ_q` norm at most `2^n t` (`Rd.ae_czGood_self_le`).
+function of the averages of `g` over the maximal big cubes
+(`Rd.maximalFunction_indicator_iUnion_le`, `Rd.maximalFunction_indicator_czSet_le`), and the good
+parts (`Rd.czGood`) keep the integral (`Rd.lintegral_czGood`) and have `ℓ_q` norm at most `2^n t`
+(`Rd.ae_czGood_self_le`).
 -/
 
 @[expose] public section
@@ -66,14 +68,15 @@ measurable sets of positive finite measure and `x` a point outside every `B̄(c_
 replaces `g` on each `Q_i` by its mean. A ball `B(x, r)` that meets `Q_i` has radius `r > ρ_i`
 and `Q_i ⊆ B(x, 3r)`, so `∫_{B(x,r)} 1_{⋃ Q_i} g ≤ ∫_{B(x,3r)} g̃`. The bound holds for arbitrary,
 possibly overlapping sets `Q_i` and every `g`. -/
-theorem maximal_indicator_iUnion_le {ι : Type*} [Countable ι] (Q : ι → Set V) (c : ι → V)
+theorem maximalFunction_indicator_iUnion_le {ι : Type*} [Countable ι] (Q : ι → Set V) (c : ι → V)
     (ρ : ι → ℝ) (hQ : ∀ i, Q i ⊆ closedBall (c i) (ρ i)) (hm : ∀ i, MeasurableSet (Q i))
     (h0 : ∀ i, volume (Q i) ≠ 0) (htop : ∀ i, volume (Q i) ≠ ∞) (g : V → ℝ≥0∞) {x : V}
     (hx : ∀ i, x ∉ closedBall (c i) (2 * ρ i)) :
-    maximal ((⋃ i, Q i).indicator g) x ≤
+    maximalFunction ((⋃ i, Q i).indicator g) x ≤
       3 ^ finrank ℝ V *
-        maximal (fun y => ∑' i, (Q i).indicator (fun _ => ⨍⁻ z in Q i, g z ∂volume) y) x := by
-  refine maximal_le_of_forall fun r hr => ?_
+        maximalFunction
+          (fun y => ∑' i, (Q i).indicator (fun _ => ⨍⁻ z in Q i, g z ∂volume) y) x := by
+  refine maximalFunction_le_of_forall fun r hr => ?_
   calc ∫⁻ y in ball x r, (⋃ i, Q i).indicator g y
       = ∫⁻ y in ⋃ i, Q i ∩ ball x r, g y := by
         rw [setLIntegral_indicator (MeasurableSet.iUnion hm), Set.iUnion_inter]
@@ -85,11 +88,11 @@ theorem maximal_indicator_iUnion_le {ι : Type*} [Countable ι] (Q : ι → Set 
         rw [lintegral_tsum fun i => (measurable_const.indicator (hm i)).aemeasurable]
         refine tsum_congr fun i => ?_
         rw [lintegral_indicator_const (hm i), Measure.restrict_apply (hm i)]
-    _ ≤ volume (ball (0 : V) (3 * r)) *
-          maximal (fun y => ∑' i, (Q i).indicator (fun _ => ⨍⁻ z in Q i, g z ∂volume) y) x :=
-        setLIntegral_ball_le_mul_maximal (by positivity) _ x
-    _ = volume (ball (0 : V) r) * (3 ^ finrank ℝ V *
-          maximal (fun y => ∑' i, (Q i).indicator (fun _ => ⨍⁻ z in Q i, g z ∂volume) y) x) := by
+    _ ≤ volume (ball (0 : V) (3 * r)) * maximalFunction
+          (fun y => ∑' i, (Q i).indicator (fun _ => ⨍⁻ z in Q i, g z ∂volume) y) x :=
+        setLIntegral_ball_le_mul_maximalFunction (by positivity) _ x
+    _ = volume (ball (0 : V) r) * (3 ^ finrank ℝ V * maximalFunction
+          (fun y => ∑' i, (Q i).indicator (fun _ => ⨍⁻ z in Q i, g z ∂volume) y) x) := by
         rw [Measure.addHaar_ball_mul_of_pos volume (0 : V) (by norm_num : (0 : ℝ) < 3),
           ENNReal.ofReal_pow (by norm_num), ENNReal.ofReal_ofNat]
         ring
@@ -169,13 +172,14 @@ theorem czAverage_self_le (x : V) : czAverage G t G x ≤ 2 ^ finrank ℝ V * t 
 set, `M(1_Ω h)(x) ≤ 3^n M(czAverage h)(x)` for every `h : V → [0, ∞]`, since every maximal big
 cube `Q_{k,m}` lies in `B̄(c_{k,m}, n 2^(-k))` and `Ω*` contains the balls of twice this
 radius. -/
-theorem maximal_indicator_czSet_le (h : V → ℝ≥0∞) {x : V} (hx : x ∉ czEnlarged G t) :
-    maximal ((czSet G t).indicator h) x ≤ 3 ^ finrank ℝ V * maximal (czAverage G t h) x := by
+theorem maximalFunction_indicator_czSet_le (h : V → ℝ≥0∞) {x : V} (hx : x ∉ czEnlarged G t) :
+    maximalFunction ((czSet G t).indicator h) x ≤
+      3 ^ finrank ℝ V * maximalFunction (czAverage G t h) x := by
   have := (czMaximal_countable (V := V) (G := G) (t := t)).to_subtype
   have hU : czSet G t = ⋃ km : czMaximal G t, zcell (V := V) km.1.1 km.1.2 :=
     Set.biUnion_eq_iUnion _ _
   rw [hU]
-  exact maximal_indicator_iUnion_le (fun km : czMaximal G t => zcell km.1.1 km.1.2)
+  exact maximalFunction_indicator_iUnion_le (fun km : czMaximal G t => zcell km.1.1 km.1.2)
     (fun km => zcellCenter km.1.1 km.1.2) (fun km => finrank ℝ V / 2 ^ km.1.1)
     (fun _ => zcell_subset_closedBall _ _) (fun _ => measurableSet_zcell _ _)
     (fun _ => (volume_zcell_pos _ _).ne') (fun _ => (volume_zcell_lt_top _ _).ne) h
@@ -289,46 +293,49 @@ theorem lintegral_lqNorm_czGood_le {q : ℝ≥0∞} (hq : 1 ≤ q) {g : ℕ → 
 /-- **The maximal function off `Ω*` is controlled by the good part**: for `x ∉ Ω*` and almost
 everywhere measurable `g`, `M g(x) ≤ (1 + 3^n) M(czGood g)(x)`. Split `g = 1_{Ωᶜ} g + 1_Ω g`;
 the first part is at most the good part, and `M(1_Ω g)(x) ≤ 3^n M(czAverage g)(x)` by
-`Rd.maximal_indicator_czSet_le`. -/
-theorem maximal_le_maximal_czGood {g : V → ℝ≥0∞} (hg : AEMeasurable g volume) {x : V}
-    (hx : x ∉ czEnlarged G t) :
-    maximal g x ≤ (1 + 3 ^ finrank ℝ V) * maximal (czGood G t g) x := by
-  have h1 : maximal ((czSet G t)ᶜ.indicator g) x ≤ maximal (czGood G t g) x :=
-    maximal_mono (fun y => le_self_add) x
-  have h2 : maximal (czAverage G t g) x ≤ maximal (czGood G t g) x :=
-    maximal_mono (fun y => le_add_self) x
-  calc maximal g x
-      = maximal ((czSet G t)ᶜ.indicator g + (czSet G t).indicator g) x := by
+`Rd.maximalFunction_indicator_czSet_le`. -/
+theorem maximalFunction_le_maximalFunction_czGood {g : V → ℝ≥0∞} (hg : AEMeasurable g volume)
+    {x : V} (hx : x ∉ czEnlarged G t) :
+    maximalFunction g x ≤ (1 + 3 ^ finrank ℝ V) * maximalFunction (czGood G t g) x := by
+  have h1 : maximalFunction ((czSet G t)ᶜ.indicator g) x ≤ maximalFunction (czGood G t g) x :=
+    maximalFunction_mono (fun y => le_self_add) x
+  have h2 : maximalFunction (czAverage G t g) x ≤ maximalFunction (czGood G t g) x :=
+    maximalFunction_mono (fun y => le_add_self) x
+  calc maximalFunction g x
+      = maximalFunction ((czSet G t)ᶜ.indicator g + (czSet G t).indicator g) x := by
         rw [Set.indicator_compl_add_self]
-    _ ≤ maximal ((czSet G t)ᶜ.indicator g) x + maximal ((czSet G t).indicator g) x :=
-        maximal_add_le (hg.indicator measurableSet_czSet.compl) _ x
-    _ ≤ maximal (czGood G t g) x + 3 ^ finrank ℝ V * maximal (czGood G t g) x :=
-        add_le_add h1 ((maximal_indicator_czSet_le g hx).trans (mul_le_mul_right h2 _))
-    _ = (1 + 3 ^ finrank ℝ V) * maximal (czGood G t g) x := by ring
+    _ ≤ maximalFunction ((czSet G t)ᶜ.indicator g) x +
+        maximalFunction ((czSet G t).indicator g) x :=
+        maximalFunction_add_le (hg.indicator measurableSet_czSet.compl) _ x
+    _ ≤ maximalFunction (czGood G t g) x + 3 ^ finrank ℝ V * maximalFunction (czGood G t g) x :=
+        add_le_add h1 ((maximalFunction_indicator_czSet_le g hx).trans (mul_le_mul_right h2 _))
+    _ = (1 + 3 ^ finrank ℝ V) * maximalFunction (czGood G t g) x := by ring
 
 /-! ### The case `q = p` and the vector-valued weak type -/
 
 /-- **The strong type in integral form**: `∫ (M g)^p ≤ C_{n,p} ∫ g^p` for `p > 1` and almost
-everywhere measurable `g : V → [0, ∞]` (`Rd.lintegral_maximal_rpow_mul_le` with `w = 1`). -/
-theorem lintegral_maximal_rpow_le {g : V → ℝ≥0∞} (hg : AEMeasurable g volume) {p : ℝ}
-    (hp : 1 < p) : ∫⁻ x, maximal g x ^ p ≤ maximalConst (finrank ℝ V) p * ∫⁻ x, g x ^ p := by
-  have h := lintegral_maximal_rpow_mul_le (w := fun _ => (1 : ℝ≥0∞)) hg aemeasurable_const hp
-  simpa only [maximal_const, mul_one] using h
+everywhere measurable `g : V → [0, ∞]` (`Rd.lintegral_maximalFunction_rpow_mul_le` with `w = 1`). -/
+theorem lintegral_maximalFunction_rpow_le {g : V → ℝ≥0∞} (hg : AEMeasurable g volume) {p : ℝ}
+    (hp : 1 < p) :
+    ∫⁻ x, maximalFunction g x ^ p ≤ maximalConst (finrank ℝ V) p * ∫⁻ x, g x ^ p := by
+  have h :=
+    lintegral_maximalFunction_rpow_mul_le (w := fun _ => (1 : ℝ≥0∞)) hg aemeasurable_const hp
+  simpa only [maximalFunction_const, mul_one] using h
 
 /-- **The Fefferman–Stein inequality for `q = p` in integral form**: for `1 < q < ∞` and almost
 everywhere measurable `g_j : V → [0, ∞]`,
 `∫ ‖(M g_j(x))_j‖_{ℓ_q}^q dx ≤ C_{n,q} ∫ ‖(g_j(x))_j‖_{ℓ_q}^q dx`. Both sides are `∑_j ∫ (·)^q`, and
 the maximal theorem applies to each `j`. -/
-theorem lintegral_lqNorm_maximal_rpow_le {q : ℝ≥0∞} (hq1 : 1 < q) (hq : q ≠ ∞)
+theorem lintegral_lqNorm_maximalFunction_rpow_le {q : ℝ≥0∞} (hq1 : 1 < q) (hq : q ≠ ∞)
     {g : ℕ → V → ℝ≥0∞} (hg : ∀ j, AEMeasurable (g j) volume) :
-    ∫⁻ x, lqNorm q (fun j => maximal (g j) x) ^ q.toReal ≤
+    ∫⁻ x, lqNorm q (fun j => maximalFunction (g j) x) ^ q.toReal ≤
       maximalConst (finrank ℝ V) q.toReal * ∫⁻ x, lqNorm q (fun j => g j x) ^ q.toReal := by
   have hq0 : q ≠ 0 := (zero_lt_one.trans hq1).ne'
   simp_rw [ENNReal.lqNorm_rpow hq0 hq]
-  rw [lintegral_tsum fun j => (measurable_maximal _).aemeasurable.pow_const _,
+  rw [lintegral_tsum fun j => (measurable_maximalFunction _).aemeasurable.pow_const _,
     lintegral_tsum fun j => (hg j).pow_const _, ← ENNReal.tsum_mul_left]
   exact ENNReal.tsum_le_tsum fun j =>
-    lintegral_maximal_rpow_le (hg j) (ENNReal.one_lt_toReal hq1 hq)
+    lintegral_maximalFunction_rpow_le (hg j) (ENNReal.one_lt_toReal hq1 hq)
 
 variable (V) in
 /-- The constant of the vector-valued weak type `(1,1)`:
@@ -377,11 +384,11 @@ everywhere measurable `g_j` with `G = ‖(g_j)_j‖_{ℓ_q}` integrable, and `0 
 be the good part of the decomposition of `G` at height `t` and `c = 1 + 3^n`. The set where
 `c ‖(M(czGood g_j)(x))_j‖_{ℓ_q}` exceeds `t` has measure at most `c^q 2^(n(q-1)) C_{n,q} t⁻¹ ∫ G`,
 by the case `q = p` and the bound of the good parts. -/
-theorem volume_lt_mul_lqNorm_maximal_czGood_le [Nontrivial V] {q : ℝ≥0∞} (hq1 : 1 < q)
+theorem volume_lt_mul_lqNorm_maximalFunction_czGood_le [Nontrivial V] {q : ℝ≥0∞} (hq1 : 1 < q)
     (hq : q ≠ ∞) {g : ℕ → V → ℝ≥0∞} (hg : ∀ j, AEMeasurable (g j) volume)
     (hGi : ∫⁻ x, lqNorm q (fun j => g j x) ≠ ∞) (ht0 : 0 < t) (ht : t ≠ ∞) :
     volume {x | t < (1 + 3 ^ finrank ℝ V) * lqNorm q (fun j =>
-        maximal (czGood (fun y => lqNorm q (fun j => g j y)) t (g j)) x)} ≤
+        maximalFunction (czGood (fun y => lqNorm q (fun j => g j y)) t (g j)) x)} ≤
       (1 + 3 ^ finrank ℝ V) ^ q.toReal * 2 ^ ((finrank ℝ V : ℝ) * (q.toReal - 1)) *
         maximalConst (finrank ℝ V) q.toReal * t⁻¹ * ∫⁻ x, lqNorm q (fun j => g j x) := by
   have hr : 1 < q.toReal := ENNReal.one_lt_toReal hq1 hq
@@ -389,9 +396,9 @@ theorem volume_lt_mul_lqNorm_maximal_czGood_le [Nontrivial V] {q : ℝ≥0∞} (
     ENNReal.rpow_ne_top_of_nonneg (by linarith)
       (ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top, ENNReal.pow_ne_top ENNReal.ofNat_ne_top⟩)
   have hL : Measurable fun x => lqNorm q (fun j =>
-      maximal (czGood (fun y => lqNorm q (fun j => g j y)) t (g j)) x) :=
-    measurable_lqNorm_comp (fun _ => measurable_maximal _) q
-  have hint := (lintegral_lqNorm_maximal_rpow_le hq1 hq
+      maximalFunction (czGood (fun y => lqNorm q (fun j => g j y)) t (g j)) x) :=
+    measurable_lqNorm_comp (fun _ => measurable_maximalFunction _) q
+  have hint := (lintegral_lqNorm_maximalFunction_rpow_le hq1 hq
     (fun j => aemeasurable_czGood (G := fun y => lqNorm q (fun j => g j y)) (t := t) (hg j))).trans
     (mul_le_mul_right (lintegral_lqNorm_czGood_rpow_le hq1 hq hg hGi ht0) _)
   have htt : (t ^ q.toReal)⁻¹ * t ^ (q.toReal - 1) = t⁻¹ := by
@@ -399,9 +406,9 @@ theorem volume_lt_mul_lqNorm_maximal_czGood_le [Nontrivial V] {q : ℝ≥0∞} (
       ENNReal.inv_mul_cancel (ENNReal.rpow_pos ht0 ht).ne'
         (ENNReal.rpow_ne_top_of_nonneg (by linarith) ht), one_mul]
   calc volume {x | t < (1 + 3 ^ finrank ℝ V) * lqNorm q (fun j =>
-        maximal (czGood (fun y => lqNorm q (fun j => g j y)) t (g j)) x)}
+        maximalFunction (czGood (fun y => lqNorm q (fun j => g j y)) t (g j)) x)}
       ≤ (t ^ q.toReal)⁻¹ * ∫⁻ x, ((1 + 3 ^ finrank ℝ V) * lqNorm q (fun j =>
-          maximal (czGood (fun y => lqNorm q (fun j => g j y)) t (g j)) x)) ^ q.toReal :=
+          maximalFunction (czGood (fun y => lqNorm q (fun j => g j y)) t (g j)) x)) ^ q.toReal :=
         measure_lt_le_inv_rpow_mul_lintegral (hL.const_mul _).aemeasurable (by linarith)
           ht0.ne' ht
     _ ≤ (t ^ q.toReal)⁻¹ * ((1 + 3 ^ finrank ℝ V) ^ q.toReal * (maximalConst (finrank ℝ V)
@@ -419,33 +426,34 @@ dimension `n ≥ 1`, for `1 < q < ∞`, almost everywhere measurable `g_j : V �
 Calderón–Zygmund decomposition of `G` at height `t` splits the level set into the enlarged
 exceptional set `Ω*`, of measure at most `(2n)^n |B(0,1)| t⁻¹ ∫ G`, and the set where
 `(1 + 3^n) ‖(M(czGood g_j))_j‖_{ℓ_q} > t`, which Chebyshev's inequality bounds. -/
-theorem volume_lqNorm_maximal_gt_le [Nontrivial V] {q : ℝ≥0∞} (hq1 : 1 < q) (hq : q ≠ ∞)
+theorem volume_lqNorm_maximalFunction_gt_le [Nontrivial V] {q : ℝ≥0∞} (hq1 : 1 < q) (hq : q ≠ ∞)
     (g : ℕ → V → ℝ≥0∞) (hg : ∀ j, AEMeasurable (g j) volume)
     (hGi : ∫⁻ x, lqNorm q (fun j => g j x) ≠ ∞) (ht0 : 0 < t) (ht : t ≠ ∞) :
-    volume {x | t < lqNorm q (fun j => maximal (g j) x)} ≤
+    volume {x | t < lqNorm q (fun j => maximalFunction (g j) x)} ≤
       weakTypeConst V q.toReal * t⁻¹ * ∫⁻ x, lqNorm q (fun j => g j x) := by
-  have hsub : {x | t < lqNorm q (fun j => maximal (g j) x)} ⊆
+  have hsub : {x | t < lqNorm q (fun j => maximalFunction (g j) x)} ⊆
       czEnlarged (fun y => lqNorm q (fun j => g j y)) t ∪
-        {x | t < (1 + 3 ^ finrank ℝ V) * lqNorm q (fun j =>
-          maximal (czGood (fun y => lqNorm q (fun j => g j y)) t (g j)) x)} := fun x hx => by
+        {x | t < (1 + 3 ^ finrank ℝ V) * lqNorm q (fun j => maximalFunction
+          (czGood (fun y => lqNorm q (fun j => g j y)) t (g j)) x)} := fun x hx => by
     by_cases hxE : x ∈ czEnlarged (fun y => lqNorm q (fun j => g j y)) t
     · exact Or.inl hxE
-    have h : lqNorm q (fun j => maximal (g j) x) ≤ (1 + 3 ^ finrank ℝ V) * lqNorm q (fun j =>
-        maximal (czGood (fun y => lqNorm q (fun j => g j y)) t (g j)) x) := by
+    have h : lqNorm q (fun j => maximalFunction (g j) x) ≤
+        (1 + 3 ^ finrank ℝ V) * lqNorm q (fun j =>
+          maximalFunction (czGood (fun y => lqNorm q (fun j => g j y)) t (g j)) x) := by
       rw [← ENNReal.lqNorm_const_mul]
-      exact ENNReal.lqNorm_mono fun j => maximal_le_maximal_czGood (hg j) hxE
+      exact ENNReal.lqNorm_mono fun j => maximalFunction_le_maximalFunction_czGood (hg j) hxE
     exact Or.inr (show t < _ from lt_of_lt_of_le hx h)
-  calc volume {x | t < lqNorm q (fun j => maximal (g j) x)}
+  calc volume {x | t < lqNorm q (fun j => maximalFunction (g j) x)}
       ≤ volume (czEnlarged (fun y => lqNorm q (fun j => g j y)) t) +
           volume {x | t < (1 + 3 ^ finrank ℝ V) * lqNorm q (fun j =>
-            maximal (czGood (fun y => lqNorm q (fun j => g j y)) t (g j)) x)} :=
+            maximalFunction (czGood (fun y => lqNorm q (fun j => g j y)) t (g j)) x)} :=
         (measure_mono hsub).trans (measure_union_le _ _)
     _ ≤ (2 * finrank ℝ V) ^ finrank ℝ V * volume (ball (0 : V) 1) *
           (t⁻¹ * ∫⁻ x, lqNorm q (fun j => g j x)) +
         (1 + 3 ^ finrank ℝ V) ^ q.toReal * 2 ^ ((finrank ℝ V : ℝ) * (q.toReal - 1)) *
           maximalConst (finrank ℝ V) q.toReal * t⁻¹ * ∫⁻ x, lqNorm q (fun j => g j x) :=
         add_le_add volume_czEnlarged_le
-          (volume_lt_mul_lqNorm_maximal_czGood_le hq1 hq hg hGi ht0 ht)
+          (volume_lt_mul_lqNorm_maximalFunction_czGood_le hq1 hq hg hGi ht0 ht)
     _ = _ := by rw [weakTypeConst]; ring
 
 /-! ### Interpolation for `p < q` -/
@@ -453,15 +461,15 @@ theorem volume_lqNorm_maximal_gt_le [Nontrivial V] {q : ℝ≥0∞} (hq1 : 1 < q
 /-- **Splitting a family along a set**: for almost everywhere measurable `g_j`, measurable `S` and
 `1 ≤ q ≤ ∞`, `‖(M g_j(x))_j‖_{ℓ_q} ≤ ‖(M(1_S g_j)(x))_j‖_{ℓ_q} + ‖(M(1_{Sᶜ} g_j)(x))_j‖_{ℓ_q}`, by
 the subadditivity of `M` and Minkowski's inequality in `ℓ_q`. -/
-theorem lqNorm_maximal_le_indicator_add {q : ℝ≥0∞} (hq : 1 ≤ q) {g : ℕ → V → ℝ≥0∞}
+theorem lqNorm_maximalFunction_le_indicator_add {q : ℝ≥0∞} (hq : 1 ≤ q) {g : ℕ → V → ℝ≥0∞}
     (hg : ∀ j, AEMeasurable (g j) volume) {S : Set V} (hS : MeasurableSet S) (x : V) :
-    lqNorm q (fun j => maximal (g j) x) ≤
-      lqNorm q (fun j => maximal (S.indicator (g j)) x) +
-        lqNorm q (fun j => maximal (Sᶜ.indicator (g j)) x) := by
+    lqNorm q (fun j => maximalFunction (g j) x) ≤
+      lqNorm q (fun j => maximalFunction (S.indicator (g j)) x) +
+        lqNorm q (fun j => maximalFunction (Sᶜ.indicator (g j)) x) := by
   refine (ENNReal.lqNorm_mono fun j => ?_).trans (ENNReal.lqNorm_add_le hq _ _)
-  calc maximal (g j) x = maximal (S.indicator (g j) + Sᶜ.indicator (g j)) x := by
+  calc maximalFunction (g j) x = maximalFunction (S.indicator (g j) + Sᶜ.indicator (g j)) x := by
         rw [Set.indicator_self_add_compl]
-    _ ≤ _ := maximal_add_le ((hg j).indicator hS) _ x
+    _ ≤ _ := maximalFunction_add_le ((hg j).indicator hS) _ x
 
 /-- **The two pieces at a level**: in dimension `n ≥ 1`, for `1 < q < ∞`, almost everywhere
 measurable `g_j`, a measurable set `S` on which `G = ‖(g_j)_j‖_{ℓ_q}` is integrable, and
@@ -469,11 +477,11 @@ measurable `g_j`, a measurable set `S` on which `G = ‖(g_j)_j‖_{ℓ_q}` is i
 `|{‖(M g_j)_j‖_{ℓ_q} > s}| ≤ C (s/2)⁻¹ ∫ 1_S G + ((s/2)^q)⁻¹ C_{n,q} ∫ (1_{Sᶜ} G)^q` with
 `C = weakTypeConst V q`: the vector-valued weak type for `1_S g_j` and Chebyshev's inequality
 with the case `q = p` for `1_{Sᶜ} g_j`. -/
-theorem volume_lqNorm_maximal_gt_le_split [Nontrivial V] {q : ℝ≥0∞} (hq1 : 1 < q) (hq : q ≠ ∞)
-    {g : ℕ → V → ℝ≥0∞} (hg : ∀ j, AEMeasurable (g j) volume) {S : Set V}
+theorem volume_lqNorm_maximalFunction_gt_le_split [Nontrivial V] {q : ℝ≥0∞} (hq1 : 1 < q)
+    (hq : q ≠ ∞) {g : ℕ → V → ℝ≥0∞} (hg : ∀ j, AEMeasurable (g j) volume) {S : Set V}
     (hS : MeasurableSet S) (hSi : ∫⁻ x, S.indicator (fun y => lqNorm q (fun j => g j y)) x ≠ ∞)
     {s : ℝ≥0∞} (hs0 : 0 < s) (hs : s ≠ ∞) :
-    volume {x | s < lqNorm q (fun j => maximal (g j) x)} ≤
+    volume {x | s < lqNorm q (fun j => maximalFunction (g j) x)} ≤
       weakTypeConst V q.toReal * (s / 2)⁻¹ *
           (∫⁻ x, S.indicator (fun y => lqNorm q (fun j => g j y)) x) +
         ((s / 2) ^ q.toReal)⁻¹ * (maximalConst (finrank ℝ V) q.toReal *
@@ -481,30 +489,31 @@ theorem volume_lqNorm_maximal_gt_le_split [Nontrivial V] {q : ℝ≥0∞} (hq1 :
   have hs2 : 0 < s / 2 := ENNReal.half_pos hs0.ne'
   have hs2t : s / 2 ≠ ∞ := ENNReal.div_ne_top hs two_ne_zero
   have hr : 1 < q.toReal := ENNReal.one_lt_toReal hq1 hq
-  have hsub : {x | s < lqNorm q (fun j => maximal (g j) x)} ⊆
-      {x | s / 2 < lqNorm q (fun j => maximal (S.indicator (g j)) x)} ∪
-        {x | s / 2 < lqNorm q (fun j => maximal (Sᶜ.indicator (g j)) x)} := fun x hx => by
+  have hsub : {x | s < lqNorm q (fun j => maximalFunction (g j) x)} ⊆
+      {x | s / 2 < lqNorm q (fun j => maximalFunction (S.indicator (g j)) x)} ∪
+        {x | s / 2 < lqNorm q (fun j => maximalFunction (Sᶜ.indicator (g j)) x)} := fun x hx => by
     by_contra hnot
     simp only [Set.mem_union, Set.mem_ofPred_eq, not_or, not_lt] at hnot
-    have h := (lqNorm_maximal_le_indicator_add hq1.le hg hS x).trans (add_le_add hnot.1 hnot.2)
+    have h :=
+      (lqNorm_maximalFunction_le_indicator_add hq1.le hg hS x).trans (add_le_add hnot.1 hnot.2)
     rw [ENNReal.add_halves] at h
     exact absurd hx (not_lt.2 h)
-  have h1 := volume_lqNorm_maximal_gt_le hq1 hq (fun j => S.indicator (g j))
+  have h1 := volume_lqNorm_maximalFunction_gt_le hq1 hq (fun j => S.indicator (g j))
     (fun j => (hg j).indicator hS) (by simpa only [ENNReal.lqNorm_indicator] using hSi) hs2 hs2t
   simp only [ENNReal.lqNorm_indicator] at h1
-  have hL : Measurable fun x => lqNorm q (fun j => maximal (Sᶜ.indicator (g j)) x) :=
-    measurable_lqNorm_comp (fun _ => measurable_maximal _) q
-  have h2 : volume {x | s / 2 < lqNorm q (fun j => maximal (Sᶜ.indicator (g j)) x)} ≤
+  have hL : Measurable fun x => lqNorm q (fun j => maximalFunction (Sᶜ.indicator (g j)) x) :=
+    measurable_lqNorm_comp (fun _ => measurable_maximalFunction _) q
+  have h2 : volume {x | s / 2 < lqNorm q (fun j => maximalFunction (Sᶜ.indicator (g j)) x)} ≤
       ((s / 2) ^ q.toReal)⁻¹ * (maximalConst (finrank ℝ V) q.toReal *
         ∫⁻ x, Sᶜ.indicator (fun y => lqNorm q (fun j => g j y)) x ^ q.toReal) := by
     refine (measure_lt_le_inv_rpow_mul_lintegral hL.aemeasurable (by linarith) hs2.ne'
       hs2t).trans ?_
     gcongr
-    have := lintegral_lqNorm_maximal_rpow_le hq1 hq fun j => (hg j).indicator hS.compl
+    have := lintegral_lqNorm_maximalFunction_rpow_le hq1 hq fun j => (hg j).indicator hS.compl
     simpa only [ENNReal.lqNorm_indicator] using this
-  calc volume {x | s < lqNorm q (fun j => maximal (g j) x)}
-      ≤ volume {x | s / 2 < lqNorm q (fun j => maximal (S.indicator (g j)) x)} +
-          volume {x | s / 2 < lqNorm q (fun j => maximal (Sᶜ.indicator (g j)) x)} :=
+  calc volume {x | s < lqNorm q (fun j => maximalFunction (g j) x)}
+      ≤ volume {x | s / 2 < lqNorm q (fun j => maximalFunction (S.indicator (g j)) x)} +
+          volume {x | s / 2 < lqNorm q (fun j => maximalFunction (Sᶜ.indicator (g j)) x)} :=
         (measure_mono hsub).trans (measure_union_le _ _)
     _ ≤ _ := add_le_add h1 h2
 
@@ -512,12 +521,12 @@ theorem volume_lqNorm_maximal_gt_le_split [Nontrivial V] {q : ℝ≥0∞} (hq1 :
 for `p > 1`, `1 < q < ∞`, measurable `g_j` with `∫ G^p < ∞` for `G = ‖(g_j)_j‖_{ℓ_q}`, and
 `τ > 0`, `|{‖(M g_j)_j‖_{ℓ_q} > τ}| τ^(p-1)` is at most
 `2 C (∫_{G > τ} G) τ^(p-2) + 2^q C_{n,q} (∫_{G ≤ τ} G^q) τ^(p-1-q)` with
-`C = weakTypeConst V q`: `Rd.volume_lqNorm_maximal_gt_le_split` for the set `{G > τ}`, on which
-`G` is integrable since `∫_{G > τ} G ≤ τ^(1-p) ∫ G^p`. -/
-theorem volume_lqNorm_maximal_gt_mul_rpow_le [Nontrivial V] {p : ℝ} (hp1 : 1 < p) {q : ℝ≥0∞}
+`C = weakTypeConst V q`: `Rd.volume_lqNorm_maximalFunction_gt_le_split` for the set `{G > τ}`, on
+which `G` is integrable since `∫_{G > τ} G ≤ τ^(1-p) ∫ G^p`. -/
+theorem volume_lqNorm_maximalFunction_gt_mul_rpow_le [Nontrivial V] {p : ℝ} (hp1 : 1 < p) {q : ℝ≥0∞}
     (hq1 : 1 < q) (hq : q ≠ ∞) {g : ℕ → V → ℝ≥0∞} (hg : ∀ j, Measurable (g j))
     (hA : ∫⁻ x, lqNorm q (fun j => g j x) ^ p ≠ ∞) {τ : ℝ} (hτ : 0 < τ) :
-    volume {x | ENNReal.ofReal τ < lqNorm q (fun j => maximal (g j) x)} *
+    volume {x | ENNReal.ofReal τ < lqNorm q (fun j => maximalFunction (g j) x)} *
         ENNReal.ofReal (τ ^ (p - 1)) ≤
       2 * weakTypeConst V q.toReal *
           ((∫⁻ x, {y | ENNReal.ofReal τ < lqNorm q (fun j => g j y)}.indicator
@@ -534,7 +543,7 @@ theorem volume_lqNorm_maximal_gt_mul_rpow_le [Nontrivial V] {p : ℝ} (hp1 : 1 <
   have hSi := ne_top_of_le_ne_top (ENNReal.mul_ne_top (ENNReal.inv_ne_top.2 hc0) hA)
     (lintegral_indicator_lt_le hp1.le (ENNReal.ofReal_pos.2 hτ).ne' ENNReal.ofReal_ne_top
       (fun y => lqNorm q (fun j => g j y)))
-  have h := volume_lqNorm_maximal_gt_le_split hq1 hq (fun j => (hg j).aemeasurable) hS hSi
+  have h := volume_lqNorm_maximalFunction_gt_le_split hq1 hq (fun j => (hg j).aemeasurable) hS hSi
     (ENNReal.ofReal_pos.2 hτ) ENNReal.ofReal_ne_top
   refine (mul_le_mul_left h _).trans_eq ?_
   calc _ = weakTypeConst V q.toReal *
@@ -582,12 +591,12 @@ theorem interpolationConst_ne_zero {p q : ℝ} (hp : 0 < p) (hq : 0 < q) :
 dimension `n ≥ 1`, for `1 < p < q < ∞` and measurable `g_j : V → [0, ∞]`,
 `∫ ‖(M g_j(x))_j‖_{ℓ_q}^p dx ≤ C ∫ G^p` with `G = ‖(g_j)_j‖_{ℓ_q}` and
 `C = interpolationConst V p q`. The layer cake formula, the level estimate
-`Rd.volume_lqNorm_maximal_gt_mul_rpow_le` and the two Tonelli steps give it. The bound
+`Rd.volume_lqNorm_maximalFunction_gt_mul_rpow_le` and the two Tonelli steps give it. The bound
 `1 < p < q.toReal` forces `q < ∞`. -/
-theorem lintegral_lqNorm_maximal_rpow_le_of_lt_of_measurable [Nontrivial V] {p : ℝ}
+theorem lintegral_lqNorm_maximalFunction_rpow_le_of_lt_of_measurable [Nontrivial V] {p : ℝ}
     {q : ℝ≥0∞} (hp1 : 1 < p) (hpq : p < q.toReal) {g : ℕ → V → ℝ≥0∞}
     (hg : ∀ j, Measurable (g j)) :
-    ∫⁻ x, lqNorm q (fun j => maximal (g j) x) ^ p ≤
+    ∫⁻ x, lqNorm q (fun j => maximalFunction (g j) x) ^ p ≤
       interpolationConst V p q.toReal * ∫⁻ x, lqNorm q (fun j => g j x) ^ p := by
   have hq : q ≠ ∞ := (ENNReal.toReal_pos_iff.1 ((zero_lt_one.trans hp1).trans hpq)).2.ne
   have hq1 : 1 < q :=
@@ -609,9 +618,9 @@ theorem lintegral_lqNorm_maximal_rpow_le_of_lt_of_measurable [Nontrivial V] {p :
       (measurable_indicator_section (measurableSet_ofReal_lt hGm) hGm)).mul
       (ENNReal.measurable_ofReal.comp (measurable_id.pow_const _))
   rw [lintegral_rpow_eq_lintegral_meas_lt_mul_ennreal volume
-    (measurable_lqNorm_comp (fun _ => measurable_maximal _) q).aemeasurable (by linarith)]
+    (measurable_lqNorm_comp (fun _ => measurable_maximalFunction _) q).aemeasurable (by linarith)]
   refine (mul_le_mul_right (setLIntegral_mono' measurableSet_Ioi fun τ hτ =>
-    volume_lqNorm_maximal_gt_mul_rpow_le hp1 hq1 hq hg hA hτ) _).trans ?_
+    volume_lqNorm_maximalFunction_gt_mul_rpow_le hp1 hq1 hq hg hA hτ) _).trans ?_
   rw [lintegral_add_left' (hm1.const_mul _).aemeasurable, lintegral_const_mul' _ _ hc1,
     lintegral_const_mul' _ _ hc2, lintegral_Ioi_lintegral_indicator_lt_mul_rpow hGm hp1]
   calc ENNReal.ofReal p * (2 * weakTypeConst V q.toReal *
@@ -634,13 +643,13 @@ theorem lintegral_lqNorm_maximal_rpow_le_of_lt_of_measurable [Nontrivial V] {p :
 `C = interpolationConst V p q`. At each level `τ` the family is split at `{G > τ}`; the
 vector-valued weak type `(1,1)` controls the large part and the case `q = p` the small part, as
 in Marcinkiewicz's interpolation theorem. -/
-theorem lintegral_lqNorm_maximal_rpow_le_of_lt [Nontrivial V] {p q : ℝ≥0∞} (hp1 : 1 < p)
+theorem lintegral_lqNorm_maximalFunction_rpow_le_of_lt [Nontrivial V] {p q : ℝ≥0∞} (hp1 : 1 < p)
     (hpq : p < q) (hq : q ≠ ∞) (g : ℕ → V → ℝ≥0∞) (hg : ∀ j, AEMeasurable (g j) volume) :
-    ∫⁻ x, lqNorm q (fun j => maximal (g j) x) ^ p.toReal ≤
+    ∫⁻ x, lqNorm q (fun j => maximalFunction (g j) x) ^ p.toReal ≤
       interpolationConst V p.toReal q.toReal * ∫⁻ x, lqNorm q (fun j => g j x) ^ p.toReal := by
   have hp : p ≠ ∞ := ne_top_of_lt hpq
-  have hmax : ∀ j, maximal (g j) = maximal ((hg j).mk (g j)) := fun j =>
-    maximal_congr_ae (hg j).ae_eq_mk
+  have hmax : ∀ j, maximalFunction (g j) = maximalFunction ((hg j).mk (g j)) := fun j =>
+    maximalFunction_congr_ae (hg j).ae_eq_mk
   have hae : ∀ᵐ x ∂volume, ∀ j, g j x = (hg j).mk (g j) x :=
     ae_all_iff.2 fun j => (hg j).ae_eq_mk
   have hint : ∫⁻ x, lqNorm q (fun j => g j x) ^ p.toReal =
@@ -648,7 +657,7 @@ theorem lintegral_lqNorm_maximal_rpow_le_of_lt [Nontrivial V] {p q : ℝ≥0∞}
     lintegral_congr_ae (hae.mono fun x hx => by simp only [hx])
   simp_rw [hmax]
   rw [hint]
-  exact lintegral_lqNorm_maximal_rpow_le_of_lt_of_measurable (ENNReal.one_lt_toReal hp1 hp)
+  exact lintegral_lqNorm_maximalFunction_rpow_le_of_lt_of_measurable (ENNReal.one_lt_toReal hp1 hp)
     ((ENNReal.toReal_lt_toReal hp hq).2 hpq) fun j => (hg j).measurable_mk
 
 /-! ### Duality for `q < p` -/
@@ -679,10 +688,10 @@ theorem dualityConst_ne_zero {n : ℕ} {p q : ℝ} (hq : 0 < q) (hqp : q < p) :
 measurable `g_j` and `∫ (∑_j g_j^q)^(p/q) < ∞`, also `∫ (∑_j (M g_j)^q)^(p/q) < ∞`: each `g_j^p`
 is at most `(∑_j g_j^q)^(p/q)`, the maximal theorem bounds `∫ (M g_j)^p`, and
 `(∑_{j ∈ S} a_j)^u ≤ |S|^(u-1) ∑_{j ∈ S} a_j^u`. -/
-theorem lintegral_rpow_sum_maximal_ne_top {p q : ℝ} (hq1 : 1 < q) (hqp : q < p) (S : Finset ℕ)
-    {g : ℕ → V → ℝ≥0∞} (hg : ∀ j, AEMeasurable (g j) volume)
+theorem lintegral_rpow_sum_maximalFunction_ne_top {p q : ℝ} (hq1 : 1 < q) (hqp : q < p)
+    (S : Finset ℕ) {g : ℕ → V → ℝ≥0∞} (hg : ∀ j, AEMeasurable (g j) volume)
     (hA : ∫⁻ x, (∑ j ∈ S, g j x ^ q) ^ (p / q) ≠ ∞) :
-    ∫⁻ x, (∑ j ∈ S, maximal (g j) x ^ q) ^ (p / q) ≠ ∞ := by
+    ∫⁻ x, (∑ j ∈ S, maximalFunction (g j) x ^ q) ^ (p / q) ≠ ∞ := by
   have hq0 : 0 < q := zero_lt_one.trans hq1
   have hu : 1 ≤ p / q := (one_le_div hq0).2 hqp.le
   have hpow : ∀ a : ℝ≥0∞, (a ^ q) ^ (p / q) = a ^ p := fun a => by
@@ -692,15 +701,15 @@ theorem lintegral_rpow_sum_maximal_ne_top {p q : ℝ} (hq1 : 1 < q) (hqp : q < p
       rw [← hpow]
       exact ENNReal.rpow_le_rpow (Finset.single_le_sum (f := fun i => g i x ^ q)
         (fun _ _ => zero_le) hj) (by linarith))
-  have hMj : ∀ j ∈ S, ∫⁻ x, maximal (g j) x ^ p ≠ ∞ := fun j hj =>
+  have hMj : ∀ j ∈ S, ∫⁻ x, maximalFunction (g j) x ^ p ≠ ∞ := fun j hj =>
     ne_top_of_le_ne_top (ENNReal.mul_ne_top (maximalConst_ne_top (hq1.trans hqp)) (hgj j hj))
-      (lintegral_maximal_rpow_le (hg j) (hq1.trans hqp))
+      (lintegral_maximalFunction_rpow_le (hg j) (hq1.trans hqp))
   have hc : (S.card : ℝ≥0∞) ^ (p / q - 1) ≠ ∞ :=
     ENNReal.rpow_ne_top_of_nonneg (by linarith) (ENNReal.natCast_ne_top _)
   refine ne_top_of_le_ne_top ?_ (lintegral_mono fun x =>
-    ENNReal.rpow_sum_le_const_mul_sum_rpow (s := S) (f := fun j => maximal (g j) x ^ q) hu)
+    ENNReal.rpow_sum_le_const_mul_sum_rpow (s := S) (f := fun j => maximalFunction (g j) x ^ q) hu)
   rw [lintegral_const_mul' _ _ hc, lintegral_finsetSum' S fun j _ =>
-    (((measurable_maximal _).pow_const _).pow_const _).aemeasurable]
+    (((measurable_maximalFunction _).pow_const _).pow_const _).aemeasurable]
   simp_rw [hpow]
   exact ENNReal.mul_ne_top hc (ENNReal.sum_ne_top.2 hMj)
 
@@ -710,66 +719,71 @@ and almost everywhere measurable `g_j`, with `H = ∑_{j ∈ S} (M g_j)^q`,
 `w = H^(u-1)`, `∫ H^u = ∑_j ∫ (M g_j)^q w ≤ C_{n,q} ∫ (∑_j g_j^q) M w` by the weighted strong type,
 then Hölder's inequality and the maximal theorem for `w` in `L_{u'}`, where
 `∫ w^{u'} = ∫ H^u`. -/
-theorem lintegral_rpow_sum_maximal_le_mul {q u u' : ℝ} (hq1 : 1 < q)
+theorem lintegral_rpow_sum_maximalFunction_le_mul {q u u' : ℝ} (hq1 : 1 < q)
     (hu : u.HolderConjugate u') (S : Finset ℕ) {g : ℕ → V → ℝ≥0∞}
     (hg : ∀ j, AEMeasurable (g j) volume) :
-    ∫⁻ x, (∑ j ∈ S, maximal (g j) x ^ q) ^ u ≤
+    ∫⁻ x, (∑ j ∈ S, maximalFunction (g j) x ^ q) ^ u ≤
       maximalConst (finrank ℝ V) q * maximalConst (finrank ℝ V) u' ^ (1 / u') *
         (∫⁻ x, (∑ j ∈ S, g j x ^ q) ^ u) ^ (1 / u) *
-          (∫⁻ x, (∑ j ∈ S, maximal (g j) x ^ q) ^ u) ^ (1 / u') := by
-  have hH : Measurable fun x => ∑ j ∈ S, maximal (g j) x ^ q :=
-    Finset.measurable_fun_sum S fun j _ => (measurable_maximal _).pow_const _
-  have hw : Measurable fun x => (∑ j ∈ S, maximal (g j) x ^ q) ^ (u - 1) := hH.pow_const _
+          (∫⁻ x, (∑ j ∈ S, maximalFunction (g j) x ^ q) ^ u) ^ (1 / u') := by
+  have hH : Measurable fun x => ∑ j ∈ S, maximalFunction (g j) x ^ q :=
+    Finset.measurable_fun_sum S fun j _ => (measurable_maximalFunction _).pow_const _
+  have hw : Measurable fun x => (∑ j ∈ S, maximalFunction (g j) x ^ q) ^ (u - 1) := hH.pow_const _
   have hGq : AEMeasurable (fun x => ∑ j ∈ S, g j x ^ q) volume :=
     Finset.aemeasurable_fun_sum S fun j _ => (hg j).pow_const _
   have hu'0 : (0 : ℝ) ≤ 1 / u' := one_div_nonneg.2 hu.symm.pos.le
-  have hM : ∫⁻ x, maximal (fun y => (∑ j ∈ S, maximal (g j) y ^ q) ^ (u - 1)) x ^ u' ≤
-      maximalConst (finrank ℝ V) u' * ∫⁻ x, (∑ j ∈ S, maximal (g j) x ^ q) ^ u := by
-    have hww : ∫⁻ x, (∑ j ∈ S, maximal (g j) x ^ q) ^ u =
-        ∫⁻ x, ((∑ j ∈ S, maximal (g j) x ^ q) ^ (u - 1)) ^ u' := by
+  have hM : ∫⁻ x,
+      maximalFunction (fun y => (∑ j ∈ S, maximalFunction (g j) y ^ q) ^ (u - 1)) x ^ u' ≤
+      maximalConst (finrank ℝ V) u' * ∫⁻ x, (∑ j ∈ S, maximalFunction (g j) x ^ q) ^ u := by
+    have hww : ∫⁻ x, (∑ j ∈ S, maximalFunction (g j) x ^ q) ^ u =
+        ∫⁻ x, ((∑ j ∈ S, maximalFunction (g j) x ^ q) ^ (u - 1)) ^ u' := by
       congr 1
       funext x
       rw [← ENNReal.rpow_mul, hu.sub_one_mul_conj]
     rw [hww]
-    exact lintegral_maximal_rpow_le hw.aemeasurable hu.symm.lt
-  calc ∫⁻ x, (∑ j ∈ S, maximal (g j) x ^ q) ^ u
-      = ∑ j ∈ S, ∫⁻ x, maximal (g j) x ^ q * (∑ i ∈ S, maximal (g i) x ^ q) ^ (u - 1) := by
+    exact lintegral_maximalFunction_rpow_le hw.aemeasurable hu.symm.lt
+  calc ∫⁻ x, (∑ j ∈ S, maximalFunction (g j) x ^ q) ^ u
+      = ∑ j ∈ S, ∫⁻ x,
+          maximalFunction (g j) x ^ q * (∑ i ∈ S, maximalFunction (g i) x ^ q) ^ (u - 1) := by
         rw [← lintegral_finsetSum' S (f := fun j x =>
-          maximal (g j) x ^ q * (∑ i ∈ S, maximal (g i) x ^ q) ^ (u - 1)) fun j _ =>
-          (((measurable_maximal _).pow_const _).mul hw).aemeasurable]
+          maximalFunction (g j) x ^ q * (∑ i ∈ S, maximalFunction (g i) x ^ q) ^ (u - 1)) fun j _ =>
+          (((measurable_maximalFunction _).pow_const _).mul hw).aemeasurable]
         congr 1
         funext x
         rw [← Finset.sum_mul, ← ENNReal.rpow_eq_mul_rpow_sub_one _ hu.lt.le]
     _ ≤ ∑ j ∈ S, maximalConst (finrank ℝ V) q * ∫⁻ x, g j x ^ q *
-          maximal (fun y => (∑ i ∈ S, maximal (g i) y ^ q) ^ (u - 1)) x :=
-        Finset.sum_le_sum fun j _ => lintegral_maximal_rpow_mul_le (hg j) hw.aemeasurable hq1
+          maximalFunction (fun y => (∑ i ∈ S, maximalFunction (g i) y ^ q) ^ (u - 1)) x :=
+        Finset.sum_le_sum fun j _ =>
+          lintegral_maximalFunction_rpow_mul_le (hg j) hw.aemeasurable hq1
     _ = maximalConst (finrank ℝ V) q * ∫⁻ x, (∑ j ∈ S, g j x ^ q) *
-          maximal (fun y => (∑ i ∈ S, maximal (g i) y ^ q) ^ (u - 1)) x := by
+          maximalFunction (fun y => (∑ i ∈ S, maximalFunction (g i) y ^ q) ^ (u - 1)) x := by
         rw [← Finset.mul_sum, ← lintegral_finsetSum' S (f := fun j x =>
-          g j x ^ q * maximal (fun y => (∑ i ∈ S, maximal (g i) y ^ q) ^ (u - 1)) x) fun j _ =>
-          ((hg j).pow_const _).mul (measurable_maximal _).aemeasurable]
+          g j x ^ q * maximalFunction (fun y => (∑ i ∈ S, maximalFunction (g i) y ^ q) ^ (u - 1)) x)
+              fun j _ =>
+          ((hg j).pow_const _).mul (measurable_maximalFunction _).aemeasurable]
         congr 2
         funext x
         rw [Finset.sum_mul]
     _ ≤ maximalConst (finrank ℝ V) q * ((∫⁻ x, (∑ j ∈ S, g j x ^ q) ^ u) ^ (1 / u) *
-          (∫⁻ x, maximal (fun y => (∑ i ∈ S, maximal (g i) y ^ q) ^ (u - 1)) x ^ u') ^
+          (∫⁻ x,
+            maximalFunction (fun y => (∑ i ∈ S, maximalFunction (g i) y ^ q) ^ (u - 1)) x ^ u') ^
             (1 / u')) :=
         mul_le_mul_right (ENNReal.lintegral_mul_le_Lp_mul_Lq volume hu hGq
-          (measurable_maximal _).aemeasurable) _
+          (measurable_maximalFunction _).aemeasurable) _
     _ ≤ maximalConst (finrank ℝ V) q * ((∫⁻ x, (∑ j ∈ S, g j x ^ q) ^ u) ^ (1 / u) *
           (maximalConst (finrank ℝ V) u' *
-            ∫⁻ x, (∑ j ∈ S, maximal (g j) x ^ q) ^ u) ^ (1 / u')) :=
+            ∫⁻ x, (∑ j ∈ S, maximalFunction (g j) x ^ q) ^ u) ^ (1 / u')) :=
         mul_le_mul_right (mul_le_mul_right (ENNReal.rpow_le_rpow hM hu'0) _) _
     _ = _ := by rw [ENNReal.mul_rpow_of_nonneg _ _ hu'0]; ring
 
 /-- **The Fefferman–Stein inequality for `q < p` and finitely many functions**: for `1 < q < p` and
 almost everywhere measurable `g_j`, `∫ (∑_{j ∈ S} (M g_j)^q)^(p/q) ≤ C ∫ (∑_{j ∈ S} g_j^q)^(p/q)`
-with `C = dualityConst n p q`. The duality step `Rd.lintegral_rpow_sum_maximal_le_mul` with
+with `C = dualityConst n p q`. The duality step `Rd.lintegral_rpow_sum_maximalFunction_le_mul` with
 `u = p/q` and `u' = p/(p - q)` gives `X ≤ K A^{1/u} X^{1/u'}`, and since `X < ∞` the factor
 `X^{1/u'}` cancels (`ENNReal.le_rpow_mul_of_le_mul_rpow`). -/
-theorem lintegral_rpow_sum_maximal_le {p q : ℝ} (hq1 : 1 < q) (hqp : q < p) (S : Finset ℕ)
+theorem lintegral_rpow_sum_maximalFunction_le {p q : ℝ} (hq1 : 1 < q) (hqp : q < p) (S : Finset ℕ)
     {g : ℕ → V → ℝ≥0∞} (hg : ∀ j, AEMeasurable (g j) volume) :
-    ∫⁻ x, (∑ j ∈ S, maximal (g j) x ^ q) ^ (p / q) ≤
+    ∫⁻ x, (∑ j ∈ S, maximalFunction (g j) x ^ q) ^ (p / q) ≤
       dualityConst (finrank ℝ V) p q * ∫⁻ x, (∑ j ∈ S, g j x ^ q) ^ (p / q) := by
   have hq0 : 0 < q := zero_lt_one.trans hq1
   have hpq0 : p - q ≠ 0 := (sub_pos.2 hqp).ne'
@@ -780,19 +794,19 @@ theorem lintegral_rpow_sum_maximal_le {p q : ℝ} (hq1 : 1 < q) (hqp : q < p) (S
   · rw [hA, ENNReal.mul_top (dualityConst_ne_zero hq0 hqp)]
     exact le_top
   have h := ENNReal.le_rpow_mul_of_le_mul_rpow hconj
-    (lintegral_rpow_sum_maximal_ne_top hq1 hqp S hg hA)
-    (lintegral_rpow_sum_maximal_le_mul hq1 hconj S hg)
+    (lintegral_rpow_sum_maximalFunction_ne_top hq1 hqp S hg hA)
+    (lintegral_rpow_sum_maximalFunction_le_mul hq1 hconj S hg)
   rw [one_div_div] at h
   exact h
 
 /-- **The Fefferman–Stein inequality for `q < p` in integral form** (duality): for
 `1 < q < p < ∞` and almost everywhere measurable `g_j : V → [0, ∞]`, in every dimension,
 `∫ ‖(M g_j(x))_j‖_{ℓ_q}^p dx ≤ C ∫ ‖(g_j(x))_j‖_{ℓ_q}^p dx` with `C = dualityConst n p q`. The
-finite partial sums satisfy `Rd.lintegral_rpow_sum_maximal_le`, and monotone convergence passes
-to the series. -/
-theorem lintegral_lqNorm_maximal_rpow_le_of_gt {p q : ℝ≥0∞} (hq1 : 1 < q) (hqp : q < p)
+finite partial sums satisfy `Rd.lintegral_rpow_sum_maximalFunction_le`, and monotone convergence
+passes to the series. -/
+theorem lintegral_lqNorm_maximalFunction_rpow_le_of_gt {p q : ℝ≥0∞} (hq1 : 1 < q) (hqp : q < p)
     (hp : p ≠ ∞) (g : ℕ → V → ℝ≥0∞) (hg : ∀ j, AEMeasurable (g j) volume) :
-    ∫⁻ x, lqNorm q (fun j => maximal (g j) x) ^ p.toReal ≤
+    ∫⁻ x, lqNorm q (fun j => maximalFunction (g j) x) ^ p.toReal ≤
       dualityConst (finrank ℝ V) p.toReal q.toReal *
         ∫⁻ x, lqNorm q (fun j => g j x) ^ p.toReal := by
   have hq : q ≠ ∞ := ne_top_of_lt hqp
@@ -809,12 +823,12 @@ theorem lintegral_lqNorm_maximal_rpow_le_of_gt {p q : ℝ≥0∞} (hq1 : 1 < q) 
     simpa only [ENNReal.orderIsoRpow_apply] using h
   simp_rw [hpow]
   rw [lintegral_iSup (f := fun J x =>
-      (∑ j ∈ Finset.range J, maximal (g j) x ^ q.toReal) ^ (p.toReal / q.toReal))
+      (∑ j ∈ Finset.range J, maximalFunction (g j) x ^ q.toReal) ^ (p.toReal / q.toReal))
     (fun J => (Finset.measurable_fun_sum _ fun j _ =>
-      (measurable_maximal (g j)).pow_const _).pow_const _)
+      (measurable_maximalFunction (g j)).pow_const _).pow_const _)
     fun J J' hJ x => ENNReal.rpow_le_rpow (Finset.sum_le_sum_of_subset (Finset.range_mono hJ))
       hu.le]
-  refine iSup_le fun J => (lintegral_rpow_sum_maximal_le hR hRP _ hg).trans
+  refine iSup_le fun J => (lintegral_rpow_sum_maximalFunction_le hR hRP _ hg).trans
     (mul_le_mul_right (lintegral_mono fun x => ?_) _)
   exact le_iSup (fun J : ℕ => (∑ j ∈ Finset.range J, g j x ^ q.toReal) ^
     (p.toReal / q.toReal)) J
@@ -825,50 +839,50 @@ theorem lintegral_lqNorm_maximal_rpow_le_of_gt {p q : ℝ≥0∞} (hq1 : 1 < q) 
 `g_j : V → [0, ∞]`, `‖sup_j M g_j‖_p ≤ C_{n,p}^{1/p} ‖sup_j g_j‖_p`, since
 `M g_j ≤ M(sup_k g_k)` for every `j`. -/
 theorem feffermanStein_top {p : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ ∞) (g : ℕ → V → ℝ≥0∞) :
-    eLpNorm (fun x => lqNorm ∞ (fun j => maximal (g j) x)) p volume ≤
+    eLpNorm (fun x => lqNorm ∞ (fun j => maximalFunction (g j) x)) p volume ≤
       maximalConst (finrank ℝ V) p.toReal ^ (1 / p.toReal) *
         eLpNorm (fun x => lqNorm ∞ (fun j => g j x)) p volume := by
   simp only [ENNReal.lqNorm_top]
   refine (eLpNorm_mono_enorm
-    (Measurable.iSup fun j => measurable_maximal (g j)).aestronglyMeasurable fun x => ?_).trans
-    (eLpNorm_maximal_le (fun y => ⨆ j, g j y) hp1 hp)
+    (Measurable.iSup fun j => measurable_maximalFunction (g j)).aestronglyMeasurable
+      fun x => ?_).trans (eLpNorm_maximalFunction_le (fun y => ⨆ j, g j y) hp1 hp)
   simp only [enorm_eq_self]
-  exact iSup_le fun j => maximal_mono (fun y => le_iSup (fun k => g k y) j) x
+  exact iSup_le fun j => maximalFunction_mono (fun y => le_iSup (fun k => g k y) j) x
 
 /-- **The Fefferman–Stein inequality for `q = p`**: for `1 < p < ∞` and almost everywhere
 measurable `g_j : V → [0, ∞]`, `‖(M g_j)_j‖_{L_p(ℓ_p)} ≤ C_{n,p}^{1/p} ‖(g_j)_j‖_{L_p(ℓ_p)}`. -/
 theorem feffermanStein_self {p : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ ∞) (g : ℕ → V → ℝ≥0∞)
     (hg : ∀ j, AEMeasurable (g j) volume) :
-    eLpNorm (fun x => lqNorm p (fun j => maximal (g j) x)) p volume ≤
+    eLpNorm (fun x => lqNorm p (fun j => maximalFunction (g j) x)) p volume ≤
       maximalConst (finrank ℝ V) p.toReal ^ (1 / p.toReal) *
         eLpNorm (fun x => lqNorm p (fun j => g j x)) p volume :=
   eLpNorm_le_rpow_mul_of_lintegral_le (zero_lt_one.trans hp1).ne' hp
-    (measurable_lqNorm_comp (fun _ => measurable_maximal _) p).aemeasurable
-    (aemeasurable_lqNorm_comp hg p) (lintegral_lqNorm_maximal_rpow_le hp1 hp hg)
+    (measurable_lqNorm_comp (fun _ => measurable_maximalFunction _) p).aemeasurable
+    (aemeasurable_lqNorm_comp hg p) (lintegral_lqNorm_maximalFunction_rpow_le hp1 hp hg)
 
 /-- **The Fefferman–Stein inequality for `q < p`**: for `1 < q < p < ∞` and almost everywhere
 measurable `g_j : V → [0, ∞]`,
 `‖(M g_j)_j‖_{L_p(ℓ_q)} ≤ (dualityConst n p q)^{1/p} ‖(g_j)_j‖_{L_p(ℓ_q)}`. -/
 theorem feffermanStein_of_gt {p q : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ ∞) (hq1 : 1 < q)
     (hqp : q < p) (g : ℕ → V → ℝ≥0∞) (hg : ∀ j, AEMeasurable (g j) volume) :
-    eLpNorm (fun x => lqNorm q (fun j => maximal (g j) x)) p volume ≤
+    eLpNorm (fun x => lqNorm q (fun j => maximalFunction (g j) x)) p volume ≤
       dualityConst (finrank ℝ V) p.toReal q.toReal ^ (1 / p.toReal) *
         eLpNorm (fun x => lqNorm q (fun j => g j x)) p volume :=
   eLpNorm_le_rpow_mul_of_lintegral_le (zero_lt_one.trans hp1).ne' hp
-    (measurable_lqNorm_comp (fun _ => measurable_maximal _) q).aemeasurable
-    (aemeasurable_lqNorm_comp hg q) (lintegral_lqNorm_maximal_rpow_le_of_gt hq1 hqp hp g hg)
+    (measurable_lqNorm_comp (fun _ => measurable_maximalFunction _) q).aemeasurable
+    (aemeasurable_lqNorm_comp hg q) (lintegral_lqNorm_maximalFunction_rpow_le_of_gt hq1 hqp hp g hg)
 
 /-- **The Fefferman–Stein inequality for `p < q`**: in dimension `n ≥ 1`, for `1 < p < q < ∞` and
 almost everywhere measurable `g_j : V → [0, ∞]`,
 `‖(M g_j)_j‖_{L_p(ℓ_q)} ≤ (interpolationConst V p q)^{1/p} ‖(g_j)_j‖_{L_p(ℓ_q)}`. -/
 theorem feffermanStein_of_lt [Nontrivial V] {p q : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ ∞)
     (hpq : p < q) (hq : q ≠ ∞) (g : ℕ → V → ℝ≥0∞) (hg : ∀ j, AEMeasurable (g j) volume) :
-    eLpNorm (fun x => lqNorm q (fun j => maximal (g j) x)) p volume ≤
+    eLpNorm (fun x => lqNorm q (fun j => maximalFunction (g j) x)) p volume ≤
       interpolationConst V p.toReal q.toReal ^ (1 / p.toReal) *
         eLpNorm (fun x => lqNorm q (fun j => g j x)) p volume :=
   eLpNorm_le_rpow_mul_of_lintegral_le (zero_lt_one.trans hp1).ne' hp
-    (measurable_lqNorm_comp (fun _ => measurable_maximal _) q).aemeasurable
-    (aemeasurable_lqNorm_comp hg q) (lintegral_lqNorm_maximal_rpow_le_of_lt hp1 hpq hq g hg)
+    (measurable_lqNorm_comp (fun _ => measurable_maximalFunction _) q).aemeasurable
+    (aemeasurable_lqNorm_comp hg q) (lintegral_lqNorm_maximalFunction_rpow_le_of_lt hp1 hpq hq g hg)
 
 variable (V) in
 /-- The constant of the **Fefferman–Stein inequality**: `1` in dimension `0`, otherwise
@@ -907,11 +921,12 @@ the cases `q = ∞`, `q = p`, `q < p` (duality) and `p < q` (interpolation) are
 of the spaces `H^s_p = F^s_{p,2}`. -/
 theorem feffermanStein {p q : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ ∞) (hq1 : 1 < q)
     (g : ℕ → V → ℝ≥0∞) (hg : ∀ j, AEMeasurable (g j) volume) :
-    eLpNorm (fun x => lqNorm q (fun j => maximal (g j) x)) p volume ≤
+    eLpNorm (fun x => lqNorm q (fun j => maximalFunction (g j) x)) p volume ≤
       feffermanSteinConst V p q * eLpNorm (fun x => lqNorm q (fun j => g j x)) p volume := by
   rcases subsingleton_or_nontrivial V with hV | hV
   · have h0 : finrank ℝ V = 0 := Module.finrank_zero_iff.2 hV
-    simp only [feffermanSteinConst, h0, ↓reduceIte, one_mul, maximal_eq_self_of_subsingleton]
+    simp only [feffermanSteinConst, h0, ↓reduceIte, one_mul,
+      maximalFunction_eq_self_of_subsingleton]
     exact le_rfl
   have h0 : finrank ℝ V ≠ 0 := Module.finrank_pos.ne'
   rcases eq_or_ne q ∞ with rfl | hq

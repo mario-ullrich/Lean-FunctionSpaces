@@ -686,7 +686,8 @@ theorem eLpNorm_detailFun_dyadicIco (hp : p ≠ ∞) {g : ℝ → ℂ} (hg : Int
       eLpNorm (fun t => ∑ i, ((((2 : ℝ) ^ ((k : ℝ) / 2) : ℝ) : ℂ) * coeff r g k m i) *
         psi r i t) p unitVol := by
   have hmeas : Measurable (detailFun r g k) := (measurable_ppFun _ _).sub (measurable_ppFun _ _)
-  have h := eLpNorm_comp_affine hmeas hp ((m : ℝ) / 2 ^ k) (L := 1 / 2 ^ k) (by positivity) 0 1
+  have h :=
+    interval_eLpNorm_comp_affine hmeas hp ((m : ℝ) / 2 ^ k) (L := 1 / 2 ^ k) (by positivity) 0 1
   rw [mul_zero, add_zero, mul_one] at h
   have hL : eLpNorm (fun y => detailFun r g k ((m : ℝ) / 2 ^ k + 1 / 2 ^ k * y)) p unitVol =
       eLpNorm (fun t => ∑ i, ((((2 : ℝ) ^ ((k : ℝ) / 2) : ℝ) : ℂ) * coeff r g k m i) *
@@ -810,7 +811,7 @@ theorem memApprox_ppScheme_iff_coeff (hp : p ≠ ∞) (hr : 1 ≤ r) {s : ℝ} (
 `‖P_0 f‖_p + ‖(2^(k(s + 1/2 - 1/p)) ‖(⟨f, ψ_{k,m,i}⟩)_{m,i}‖_{ℓ_p})_k‖_{ℓ_q}` is. -/
 theorem lqNorm_modulus_lt_top_iff_coeff (hp : p ≠ ∞) (hr : 1 ≤ r) {s : ℝ} (hs : 0 < s)
     (hsp : s < 1 / p.toReal) {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Lp ℂ p unitVol) :
-    ‖f‖ₑ + ENNReal.lqNorm q (fun k => dyadicWeight s k * lpModulus p r f k) < ∞ ↔
+    ‖f‖ₑ + ENNReal.lqNorm q (fun k => dyadicWeight s k * intervalLpModulus p r f k) < ∞ ↔
       ‖ppProj p hp r 0 f‖ₑ + ENNReal.lqNorm q (fun k =>
         dyadicWeight (s + (1 / 2 - 1 / p.toReal)) k * ENNReal.lqNorm p
           (fun mi : Fin (2 ^ k) × Fin r => ‖coeff r f k mi.1 mi.2‖ₑ)) < ∞ :=

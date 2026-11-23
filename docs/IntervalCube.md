@@ -22,9 +22,10 @@ the quasi-Banach space `L_τ`.
 
 * **Whitney's inequality.** For `1 ≤ p < ∞`, `r ≥ 1` and `0 < t ≤ 1/3` there is `W` such that
   every continuous `F` has a polynomial `P` of degree `< r` with
-  `‖F - P‖_{L_p[0, 1]} ≤ W ω_r(F, t, [0, 1])_p` (`Interval.exists_eLpNorm_sub_polyFun_le_modulus`),
-  with the modulus `ω_r` of the next item. In `L_p[0, 1]` the error of best approximation by the
-  polynomials of degree `< r` satisfies `E_1(f)_p ≤ W ω_r(f, 2^(-m), [0, 1])_p` for `m ≥ 2`
+  `‖F - P‖_{L_p[0, 1]} ≤ W ω_r(F, t, [0, 1])_p`
+  (`Interval.exists_eLpNorm_sub_polyFun_le_intervalModulus`), with the modulus `ω_r` of the next
+  item. In `L_p[0, 1]` the error of best approximation by the polynomials of degree `< r` satisfies
+  `E_1(f)_p ≤ W ω_r(f, 2^(-m), [0, 1])_p` for `m ≥ 2`
   (`Interval.exists_approxError_ppScheme_one_le`).
 * **Piecewise polynomials on an interval.** Let `V_k ⊆ L_p[0, 1]` consist of the functions that
   agree on each dyadic interval `[n 2^(-k), (n+1) 2^(-k))` with a polynomial of degree `< r`,
@@ -138,13 +139,13 @@ the quasi-Banach space `L_τ`.
   step functions in the quasi-Banach space `L_p[0, 1]` (the spaces `E_{s,q}` of the couple
   `Haar.stepCouple`) iff `‖f‖_p + ‖(2^(ks) ω_1(f, 2^(-k), [0, 1])_p)_k‖_{ℓ_q} < ∞`
   (`Haar.memEMethod_stepCouple_iff_modulus`), by Jackson's inequality by averaging and an inverse
-  inequality of order `1/p` (`Haar.eFunctional_stepCouple_le`, `Haar.lpModulus_le_of_mem_lpMeas`);
-  for `s > 1`, and for `s = 1` with `q < ∞`, this space misses the line `x ↦ x`, whose second
-  modulus vanishes (`Haar.not_memEMethod_stepCouple_idLp`). For `1 ≤ p` the step couple is the
-  complexity couple of the Haar scheme (`Haar.memEMethod_stepCouple_iff_memApprox`). For
-  `0 < p ≤ 1`, `s > 1/p - 1` and `0 < q ≤ ∞` the space `E_{s,q}` embeds into `L_1[0, 1]`
-  (`Haar.eLpNorm_one_le_eNormDyadic`), and `f ∈ E_{s,q}` iff `f ∈ L_1[0, 1]` and
-  `|∫_0^1 f| + ‖(2^(k(s+1/2-1/p)) ‖(⟨f, h_{k,m}⟩)_{m<2^k}‖_{ℓ_p})_k‖_{ℓ_q} < ∞`
+  inequality of order `1/p` (`Haar.eFunctional_stepCouple_le`,
+  `Haar.intervalLpModulus_le_of_mem_lpMeas`); for `s > 1`, and for `s = 1` with `q < ∞`, this space
+  misses the line `x ↦ x`, whose second modulus vanishes (`Haar.not_memEMethod_stepCouple_idLp`).
+  For `1 ≤ p` the step couple is the complexity couple of the Haar scheme
+  (`Haar.memEMethod_stepCouple_iff_memApprox`). For `0 < p ≤ 1`, `s > 1/p - 1` and `0 < q ≤ ∞` the
+  space `E_{s,q}` embeds into `L_1[0, 1]` (`Haar.eLpNorm_one_le_eNormDyadic`), and `f ∈ E_{s,q}` iff
+  `f ∈ L_1[0, 1]` and `|∫_0^1 f| + ‖(2^(k(s+1/2-1/p)) ‖(⟨f, h_{k,m}⟩)_{m<2^k}‖_{ℓ_p})_k‖_{ℓ_q} < ∞`
   (`Haar.memEMethod_stepCouple_iff_haarCoeff`); for `1/p - 1 < s < 1/p` this describes
   `B^s_{p,q,1}[0, 1]` by Haar coefficients (`Haar.lqNorm_modulus_lt_top_iff_haarCoeff_of_le_one`).
   For `q < ∞` the Haar system is a Schauder basis of `E_{s,q}`: the partial sums converge
@@ -166,7 +167,7 @@ the quasi-Banach space `L_τ`.
   approximation space `E_{θ,τ}` of dyadic steps in `L_τ` (`Haar.memApprox_nTerm_iff_memEMethod`,
   `Haar.exists_inclusion_eq_of_memEMethod`), and for every `0 < τ < 2`, `f ∈ A^θ_τ` iff
   `‖f‖_τ + ‖(2^(kθ) ω_1(f, 2^(-k), [0, 1])_τ)_k‖_{ℓ_τ} < ∞`
-  (`Haar.memApprox_nTerm_iff_modulus_of_lt_two`), the classical `B^θ_{τ,τ}[0, 1]` for
+  (`Haar.memApprox_nTerm_iff_intervalModulus_of_lt_two`), the classical `B^θ_{τ,τ}[0, 1]` for
   `2/3 < τ < 2`.
 
 ## What is formalised

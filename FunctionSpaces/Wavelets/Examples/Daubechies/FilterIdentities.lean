@@ -15,23 +15,23 @@ public import Mathlib.MeasureTheory.Integral.IntervalIntegral.Periodic
 /-!
 # Filter identities of Daubechies masks
 
-For a Daubechies mask of order `N` with filter coefficients `c_k` (`Daubechies.coeff`, zero
-outside `0 ≤ k < 2N`) and symbol `m_0(ξ) = (1/2) ∑_k c_k e^(-2πikξ)` this file proves the
+For a Daubechies mask of order `N` with filter coefficients `c_k` (`Daubechies.daubechiesCoeff`,
+zero outside `0 ≤ k < 2N`) and symbol `m_0(ξ) = (1/2) ∑_k c_k e^(-2πikξ)` this file proves the
 identities between the coefficients that the scaling function and the wavelet are built on.
 
 **Sums over `ℤ`.** All sums run over `k ∈ ℤ` and are Mathlib's `finsum`, written `∑ᶠ k : ℤ`:
 the sum of the finitely many nonzero terms, with the value `0` by convention when infinitely many
 terms are nonzero. The filter coefficients have finite support
-(`Daubechies.finite_support_coeff`), so every sum here has finitely many nonzero terms. Three
-conversions connect these sums with the other notations: a sum whose terms vanish wherever `c_k`
-vanishes is the finite sum `∑_{k<2N}` (`Daubechies.finsum_eq_sum_range_of_coeff`), a sum whose
-terms vanish wherever `g_k` vanishes is the finite sum `∑_{2-2N ≤ k ≤ 1}`
+(`Daubechies.finite_support_daubechiesCoeff`), so every sum here has finitely many nonzero terms.
+Three conversions connect these sums with the other notations: a sum whose terms vanish wherever
+`c_k` vanishes is the finite sum `∑_{k<2N}` (`Daubechies.finsum_eq_sum_range_of_daubechiesCoeff`), a
+sum whose terms vanish wherever `g_k` vanishes is the finite sum `∑_{2-2N ≤ k ≤ 1}`
 (`Daubechies.finsum_eq_sum_Icc_of_dualCoeff`), and a series `∑'` with finitely many nonzero terms
 is the `finsum` (Mathlib's `tsum_eq_finsum`).
 
 * **Orthogonality of the even shifts**: `∑_k c_k c_(k+2j) = 2 δ_(j0)` for every `j ∈ ℤ`
-  (`Daubechies.sum_coeff_mul_coeff_add`). The proof integrates the quadrature mirror filter
-  identity `|m_0(ξ)|² + |m_0(ξ + 1/2)|² = 1` against `e^(2πi·2jξ)` over `[0, 1]`. The
+  (`Daubechies.sum_daubechiesCoeff_mul_daubechiesCoeff_add`). The proof integrates the quadrature
+  mirror filter identity `|m_0(ξ)|² + |m_0(ξ + 1/2)|² = 1` against `e^(2πi·2jξ)` over `[0, 1]`. The
   exponentials `e^(-2πikξ)` are orthonormal there (`Daubechies.integral_finsum_mul_conj_finsum`),
   so the `2j`-th Fourier coefficient of `|m_0|²` is `(1/4) ∑_k c_k c_(k+2j)`; the substitution
   `η = ξ + 1/2` and the period `1` give the same `2j`-th Fourier coefficient for
@@ -42,10 +42,11 @@ is the `finsum` (Mathlib's `tsum_eq_finsum`).
   operator `p ↦ z p'` multiplies the `k`-th coefficient by `k` and lowers the power of `z + 1`
   dividing `p` by at most one, and a polynomial divisible by `z + 1` vanishes at `z = -1`.
 * **Parity sums and first moments**: `∑_i c_(2i+r) = 1` for every `r ∈ ℤ`
-  (`Daubechies.sum_coeff_two_mul_add`) and, for `N ≥ 2`, `∑_i (2i + r) c_(2i+r) = μ` with
-  `μ = (1/2) ∑_k k c_k` (`Daubechies.firstMoment`, `Daubechies.sum_two_mul_add_mul_coeff`): by
-  the sum rules for `l = 0` and `l = 1` the even and the odd indices contribute equally. Together
-  they give `∑_i i c_(2i+r) = (μ - r)/2` (`Daubechies.sum_mul_coeff_two_mul_add`).
+  (`Daubechies.sum_daubechiesCoeff_two_mul_add`) and, for `N ≥ 2`, `∑_i (2i + r) c_(2i+r) = μ` with
+  `μ = (1/2) ∑_k k c_k` (`Daubechies.firstMoment`,
+  `Daubechies.sum_two_mul_add_mul_daubechiesCoeff`): by the sum rules for `l = 0` and `l = 1` the
+  even and the odd indices contribute equally. Together they give `∑_i i c_(2i+r) = (μ - r)/2`
+  (`Daubechies.sum_mul_daubechiesCoeff_two_mul_add`).
 * **Derivatives of the symbol at the half-integers**: `m_0^(l)(1/2 + n) = 0` for `l < N` and
   `n ∈ ℤ` (`Daubechies.iteratedDeriv_symbol_half_add_int`), since
   `m_0^(l)(ξ) = (1/2) ∑_k c_k (-2πik)^l e^(-2πikξ)` (`Daubechies.iteratedDeriv_symbol`) and
@@ -54,11 +55,11 @@ is the `finsum` (Mathlib's `tsum_eq_finsum`).
   Each of its identities comes from an identity for `c_k` by a substitution:
   - `∑_k g_k g_(k+2j) = 2 δ_(j0)` (`Daubechies.sum_dualCoeff_mul_dualCoeff_add`): `k ↦ 1 - 2j - k`
     turns the sum into `∑_k c_k c_(k+2j)`;
-  - `∑_k c_k g_(k+2j) = 0` (`Daubechies.sum_coeff_mul_dualCoeff_add`): `k ↦ 1 - 2j - k` turns the
-    sum into its negative;
+  - `∑_k c_k g_(k+2j) = 0` (`Daubechies.sum_daubechiesCoeff_mul_dualCoeff_add`): `k ↦ 1 - 2j - k`
+    turns the sum into its negative;
   - `∑_j (c_(a-2j) c_(b-2j) + g_(a-2j) g_(b-2j)) = 2 δ_(ab)` for all `a, b ∈ ℤ`
-    (`Daubechies.sum_coeff_mul_add_dual`): `j ↦ -j` turns both sums into sums over one parity
-    class of `h(k) = c_(k+(a-b)) c_k`; for `a - b` even the two classes are complementary and
+    (`Daubechies.sum_daubechiesCoeff_mul_add_dual`): `j ↦ -j` turns both sums into sums over one
+    parity class of `h(k) = c_(k+(a-b)) c_k`; for `a - b` even the two classes are complementary and
     add up to `∑_k c_k c_(k+(a-b))`, for `a - b` odd they cancel;
   - the vanishing moments `∑_k g_k k^l = 0` for `l < N` (`Daubechies.sum_dualCoeff_mul_pow`):
     `k ↦ 1 - k` turns the sum into `-∑_k (-1)^k (1 - k)^l c_k`, a sum rule for the polynomial
@@ -180,27 +181,29 @@ variable {N : ℕ} (m : Mask N)
 /-! ### The filter coefficients as a function on `ℤ` -/
 
 /-- The filter coefficients have finite support: they vanish outside `0 ≤ k < 2N`. -/
-theorem finite_support_coeff : (Function.support (coeff m)).Finite :=
+theorem finite_support_daubechiesCoeff : (Function.support (daubechiesCoeff m)).Finite :=
   (Set.finite_Ico 0 (2 * (N : ℤ))).subset fun k hk => by
     by_contra h
     simp only [Set.mem_Ico, not_and_or, not_le, not_lt] at h
-    exact hk (coeff_eq_zero m h)
+    exact hk (daubechiesCoeff_eq_zero m h)
 
 /-- A sum over `k ∈ ℤ` of a function that vanishes wherever the filter coefficients vanish is the
 finite sum over `k = 0, …, 2N - 1`. -/
-theorem finsum_eq_sum_range_of_coeff {M : Type*} [AddCommMonoid M] (f : ℤ → M)
-    (hf : ∀ k : ℤ, coeff m k = 0 → f k = 0) :
+theorem finsum_eq_sum_range_of_daubechiesCoeff {M : Type*} [AddCommMonoid M] (f : ℤ → M)
+    (hf : ∀ k : ℤ, daubechiesCoeff m k = 0 → f k = 0) :
     ∑ᶠ k : ℤ, f k = ∑ k ∈ Finset.range (2 * N), f k :=
-  finsum_eq_sum_range_of_eq_zero fun k hk => hf k (coeff_eq_zero m (by push_cast at hk; exact hk))
+  finsum_eq_sum_range_of_eq_zero fun k hk =>
+    hf k (daubechiesCoeff_eq_zero m (by push_cast at hk; exact hk))
 
 /-- `∑_k c_k = 2`, as a sum over `k ∈ ℤ`. -/
-theorem finsum_coeff : ∑ᶠ k : ℤ, coeff m k = 2 := by
-  rw [finsum_eq_sum_range_of_coeff m (coeff m) fun k hk => hk, sum_coeff]
+theorem finsum_daubechiesCoeff : ∑ᶠ k : ℤ, daubechiesCoeff m k = 2 := by
+  rw [finsum_eq_sum_range_of_daubechiesCoeff m (daubechiesCoeff m) fun k hk => hk,
+    sum_daubechiesCoeff]
 
 /-- **The symbol as a sum over `ℤ`**: `m_0(ξ) = (1/2) ∑_{k ∈ ℤ} c_k e^(-2πikξ)`. -/
 theorem symbol_eq_finsum (ξ : ℝ) :
-    symbol m ξ = 1 / 2 * ∑ᶠ k : ℤ, (coeff m k : ℂ) * expFreq (k * ξ) := by
-  rw [symbol_eq_sum, finsum_eq_sum_range_of_coeff m _ fun k hk => by simp [hk]]
+    symbol m ξ = 1 / 2 * ∑ᶠ k : ℤ, (daubechiesCoeff m k : ℂ) * expFreq (k * ξ) := by
+  rw [symbol_eq_sum, finsum_eq_sum_range_of_daubechiesCoeff m _ fun k hk => by simp [hk]]
   congr 1
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [expFreq_pow, Int.cast_natCast]
@@ -320,11 +323,11 @@ theorem norm_half_mul_sq (z : ℂ) : ‖(1 / 2 : ℂ) * z‖ ^ 2 = 1 / 4 * ‖z�
 `∫_0^1 e^(-2πinξ) |m_0(ξ)|² dξ = (1/4) ∑_k c_(k-n) c_k`. -/
 theorem integral_expFreq_mul_normSq_symbol (n : ℤ) :
     ∫ ξ in (0 : ℝ)..1, expFreq (n * ξ) * ((‖symbol m ξ‖ ^ 2 : ℝ) : ℂ) =
-      1 / 4 * ∑ᶠ k : ℤ, ((coeff m (k - n) * coeff m k : ℝ) : ℂ) := by
-  have hfin : (Function.support fun k : ℤ => (coeff m k : ℂ)).Finite :=
-    (finite_support_coeff m).subset fun k hk => by simpa using hk
+      1 / 4 * ∑ᶠ k : ℤ, ((daubechiesCoeff m (k - n) * daubechiesCoeff m k : ℝ) : ℂ) := by
+  have hfin : (Function.support fun k : ℤ => (daubechiesCoeff m k : ℂ)).Finite :=
+    (finite_support_daubechiesCoeff m).subset fun k hk => by simpa using hk
   have hsym : ∀ ξ : ℝ, expFreq (n * ξ) * ((‖symbol m ξ‖ ^ 2 : ℝ) : ℂ) = 1 / 4 *
-      (expFreq (n * ξ) * ((‖∑ᶠ k : ℤ, (coeff m k : ℂ) * expFreq (k * ξ)‖ ^ 2 : ℝ) : ℂ)) :=
+      (expFreq (n * ξ) * ((‖∑ᶠ k : ℤ, (daubechiesCoeff m k : ℂ) * expFreq (k * ξ)‖ ^ 2 : ℝ) : ℂ)) :=
     fun ξ => by
       rw [symbol_eq_finsum, norm_half_mul_sq]
       push_cast
@@ -354,7 +357,8 @@ theorem periodic_expFreq_intCast_mul (k : ℤ) :
 applies. -/
 theorem integral_expFreq_mul_normSq_symbol_add_half (n : ℤ) :
     ∫ ξ in (0 : ℝ)..1, expFreq (n * ξ) * ((‖symbol m (ξ + 1 / 2)‖ ^ 2 : ℝ) : ℂ) =
-      1 / 4 * expFreq (-(n : ℝ) / 2) * ∑ᶠ k : ℤ, ((coeff m (k - n) * coeff m k : ℝ) : ℂ) := by
+      1 / 4 * expFreq (-(n : ℝ) / 2) * ∑ᶠ k : ℤ,
+        ((daubechiesCoeff m (k - n) * daubechiesCoeff m k : ℝ) : ℂ) := by
   have hshift : ∀ ξ : ℝ, expFreq (n * ξ) * ((‖symbol m (ξ + 1 / 2)‖ ^ 2 : ℝ) : ℂ) =
       expFreq (-(n : ℝ) / 2) *
         (expFreq (n * (ξ + 1 / 2)) * ((‖symbol m (ξ + 1 / 2)‖ ^ 2 : ℝ) : ℂ)) := fun ξ => by
@@ -376,8 +380,8 @@ theorem integral_expFreq_mul_normSq_symbol_add_half (n : ℤ) :
 `j ∈ ℤ`. Integrating the quadrature mirror filter identity
 `|m_0(ξ)|² + |m_0(ξ + 1/2)|² = 1` (`Daubechies.qmf`) against `e^(2πi·2jξ)` over `[0, 1]` gives
 `(1/4) ∑_k c_k c_(k+2j) + (1/4) ∑_k c_k c_(k+2j) = δ_(j0)`. -/
-theorem sum_coeff_mul_coeff_add (j : ℤ) :
-    ∑ᶠ k : ℤ, coeff m k * coeff m (k + 2 * j) = if j = 0 then 2 else 0 := by
+theorem sum_daubechiesCoeff_mul_daubechiesCoeff_add (j : ℤ) :
+    ∑ᶠ k : ℤ, daubechiesCoeff m k * daubechiesCoeff m (k + 2 * j) = if j = 0 then 2 else 0 := by
   have hc1 : Continuous fun ξ : ℝ =>
       expFreq (((-(2 * j) : ℤ) : ℝ) * ξ) * ((‖symbol m ξ‖ ^ 2 : ℝ) : ℂ) :=
     (continuous_expFreq_mul _).mul
@@ -398,11 +402,13 @@ theorem sum_coeff_mul_coeff_add (j : ℤ) :
   have hE : expFreq (-(((-(2 * j) : ℤ) : ℝ)) / 2) = 1 := by
     rw [show -(((-(2 * j) : ℤ) : ℝ)) / 2 = ((j : ℤ) : ℝ) by push_cast; ring]
     exact expFreq_intCast j
-  have hS : ∑ᶠ k : ℤ, ((coeff m (k - -(2 * j)) * coeff m k : ℝ) : ℂ) =
-      ((∑ᶠ k : ℤ, coeff m k * coeff m (k + 2 * j) : ℝ) : ℂ) := by
-    rw [finsum_eq_sum_range_of_coeff m
-        (fun k : ℤ => ((coeff m (k - -(2 * j)) * coeff m k : ℝ) : ℂ)) fun k hk => by simp [hk],
-      finsum_eq_sum_range_of_coeff m (fun k : ℤ => coeff m k * coeff m (k + 2 * j))
+  have hS : ∑ᶠ k : ℤ, ((daubechiesCoeff m (k - -(2 * j)) * daubechiesCoeff m k : ℝ) : ℂ) =
+      ((∑ᶠ k : ℤ, daubechiesCoeff m k * daubechiesCoeff m (k + 2 * j) : ℝ) : ℂ) := by
+    rw [finsum_eq_sum_range_of_daubechiesCoeff m
+        (fun k : ℤ => ((daubechiesCoeff m (k - -(2 * j)) * daubechiesCoeff m k : ℝ) : ℂ))
+          fun k hk => by simp [hk],
+      finsum_eq_sum_range_of_daubechiesCoeff m
+        (fun k : ℤ => daubechiesCoeff m k * daubechiesCoeff m (k + 2 * j))
         fun k hk => by simp [hk], Complex.ofReal_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [sub_neg_eq_add, mul_comm]
@@ -413,7 +419,7 @@ theorem sum_coeff_mul_coeff_add (j : ℤ) :
     · simp [hj, show -(2 * j) ≠ 0 by omega]
   rw [integral_expFreq_mul_normSq_symbol, integral_expFreq_mul_normSq_symbol_add_half, hE,
     mul_one, hS, hite] at h
-  have h2 : ((∑ᶠ k : ℤ, coeff m k * coeff m (k + 2 * j) : ℝ) : ℂ) =
+  have h2 : ((∑ᶠ k : ℤ, daubechiesCoeff m k * daubechiesCoeff m (k + 2 * j) : ℝ) : ℂ) =
       ((if j = 0 then 2 else 0 : ℝ) : ℂ) := by
     linear_combination 2 * h
   exact_mod_cast h2
@@ -475,35 +481,35 @@ theorem sum_range_neg_one_pow_mul_pow_mul_coeff {p : ℝ[X]} {j l n : ℕ} (h : 
 /-- **The sum rules** as finite sums over `k = 0, …, 2N - 1`:
 `∑_{k < 2N} (-1)^k k^l c_k = 0` for `l < N`. -/
 theorem sum_range_rule {l : ℕ} (hl : l < N) :
-    ∑ k ∈ Finset.range (2 * N), (-1) ^ k * (k : ℝ) ^ l * coeff m k = 0 := by
+    ∑ k ∈ Finset.range (2 * N), (-1) ^ k * (k : ℝ) ^ l * daubechiesCoeff m k = 0 := by
   have h := sum_range_neg_one_pow_mul_pow_mul_coeff (X_add_one_pow_dvd_maskPoly m) hl
     (natDegree_maskPoly_lt m)
-  calc ∑ k ∈ Finset.range (2 * N), (-1) ^ k * (k : ℝ) ^ l * coeff m k
+  calc ∑ k ∈ Finset.range (2 * N), (-1) ^ k * (k : ℝ) ^ l * daubechiesCoeff m k
       = 2 * ∑ k ∈ Finset.range (2 * N), (-1) ^ k * (k : ℝ) ^ l * (maskPoly m).coeff k := by
         rw [Finset.mul_sum]
         refine Finset.sum_congr rfl fun k _ => ?_
-        rw [coeff_natCast]
+        rw [daubechiesCoeff_natCast]
         ring
     _ = 0 := by rw [h, mul_zero]
 
 /-- **The sum rules** `∑_k (-1)^k k^l c_k = 0` for `l < N`, as a sum over `k ∈ ℤ`. They express
 that the mask polynomial is divisible by `(z + 1)^N` (`Daubechies.X_add_one_pow_dvd_maskPoly`). -/
 theorem sum_rule {l : ℕ} (hl : l < N) :
-    ∑ᶠ k : ℤ, (-1 : ℝ) ^ k * (k : ℝ) ^ l * coeff m k = 0 := by
-  rw [finsum_eq_sum_range_of_coeff m _ fun k hk => by rw [hk, mul_zero]]
+    ∑ᶠ k : ℤ, (-1 : ℝ) ^ k * (k : ℝ) ^ l * daubechiesCoeff m k = 0 := by
+  rw [finsum_eq_sum_range_of_daubechiesCoeff m _ fun k hk => by rw [hk, mul_zero]]
   simpa only [zpow_natCast, Int.cast_natCast] using sum_range_rule m hl
 
 /-- **The sum rules for polynomials**: `∑_k (-1)^k Q(k) c_k = 0` for every real polynomial `Q`
 of degree `< N`, a linear combination of the sum rules `Daubechies.sum_rule`. -/
 theorem sum_rule_poly {Q : ℝ[X]} (hQ : Q.natDegree < N) :
-    ∑ᶠ k : ℤ, (-1 : ℝ) ^ k * Q.eval (k : ℝ) * coeff m k = 0 := by
-  rw [finsum_eq_sum_range_of_coeff m _ fun k hk => by rw [hk, mul_zero]]
+    ∑ᶠ k : ℤ, (-1 : ℝ) ^ k * Q.eval (k : ℝ) * daubechiesCoeff m k = 0 := by
+  rw [finsum_eq_sum_range_of_daubechiesCoeff m _ fun k hk => by rw [hk, mul_zero]]
   simp only [zpow_natCast, Int.cast_natCast, eval_eq_sum_range' hQ, Finset.mul_sum,
     Finset.sum_mul]
   rw [Finset.sum_comm]
   refine Finset.sum_eq_zero fun i hi => ?_
-  calc ∑ k ∈ Finset.range (2 * N), (-1) ^ k * (Q.coeff i * (k : ℝ) ^ i) * coeff m k
-      = Q.coeff i * ∑ k ∈ Finset.range (2 * N), (-1) ^ k * (k : ℝ) ^ i * coeff m k := by
+  calc ∑ k ∈ Finset.range (2 * N), (-1) ^ k * (Q.coeff i * (k : ℝ) ^ i) * daubechiesCoeff m k
+      = Q.coeff i * ∑ k ∈ Finset.range (2 * N), (-1) ^ k * (k : ℝ) ^ i * daubechiesCoeff m k := by
         rw [Finset.mul_sum]
         refine Finset.sum_congr rfl fun k _ => ?_
         ring
@@ -513,60 +519,61 @@ theorem sum_rule_poly {Q : ℝ[X]} (hQ : Q.natDegree < N) :
 
 /-- The alternating sum of the filter coefficients vanishes: `∑_k (-1)^k c_k = 0`, the sum rule
 for `l = 0`; equivalently `m_0(1/2) = 0`. -/
-theorem finsum_neg_one_zpow_mul_coeff : ∑ᶠ k : ℤ, (-1 : ℝ) ^ k * coeff m k = 0 := by
+theorem finsum_neg_one_zpow_mul_daubechiesCoeff :
+    ∑ᶠ k : ℤ, (-1 : ℝ) ^ k * daubechiesCoeff m k = 0 := by
   simpa using sum_rule m (l := 0) m.one_le
 
 /-- **The parity sums** `∑_i c_(2i+r) = 1` for every `r ∈ ℤ`: the filter coefficients with even
 and with odd indices each add up to `1`, since `∑_k c_k = 2` and `∑_k (-1)^k c_k = 0`. -/
-theorem sum_coeff_two_mul_add (r : ℤ) : ∑ᶠ i : ℤ, coeff m (2 * i + r) = 1 := by
-  rw [finsum_two_mul_add_eq_half (finite_support_coeff m) (finsum_neg_one_zpow_mul_coeff m) r,
-    finsum_coeff]
+theorem sum_daubechiesCoeff_two_mul_add (r : ℤ) : ∑ᶠ i : ℤ, daubechiesCoeff m (2 * i + r) = 1 := by
+  rw [finsum_two_mul_add_eq_half (finite_support_daubechiesCoeff m)
+    (finsum_neg_one_zpow_mul_daubechiesCoeff m) r, finsum_daubechiesCoeff]
   norm_num
 
 /-- The filter coefficients with even indices add up to `1`: `∑_i c_(2i) = 1`. -/
-theorem sum_coeff_two_mul : ∑ᶠ i : ℤ, coeff m (2 * i) = 1 := by
-  simpa using sum_coeff_two_mul_add m 0
+theorem sum_daubechiesCoeff_two_mul : ∑ᶠ i : ℤ, daubechiesCoeff m (2 * i) = 1 := by
+  simpa using sum_daubechiesCoeff_two_mul_add m 0
 
 /-- The filter coefficients with odd indices add up to `1`: `∑_i c_(2i+1) = 1`. -/
-theorem sum_coeff_two_mul_add_one : ∑ᶠ i : ℤ, coeff m (2 * i + 1) = 1 :=
-  sum_coeff_two_mul_add m 1
+theorem sum_daubechiesCoeff_two_mul_add_one : ∑ᶠ i : ℤ, daubechiesCoeff m (2 * i + 1) = 1 :=
+  sum_daubechiesCoeff_two_mul_add m 1
 
 /-- **The first moment** `μ = (1/2) ∑_k k c_k` of the filter coefficients. -/
-noncomputable def firstMoment : ℝ := 1 / 2 * ∑ᶠ k : ℤ, (k : ℝ) * coeff m k
+noncomputable def firstMoment : ℝ := 1 / 2 * ∑ᶠ k : ℤ, (k : ℝ) * daubechiesCoeff m k
 
 /-- **The first moments of the two parity classes** (`N ≥ 2`): `∑_i (2i + r) c_(2i+r) = μ` for
 every `r ∈ ℤ`, where `μ = (1/2) ∑_k k c_k`. By the sum rule for `l = 1`, the even and the odd
 indices contribute equally to `∑_k k c_k = 2μ`. -/
-theorem sum_two_mul_add_mul_coeff (hN : 2 ≤ N) (r : ℤ) :
-    ∑ᶠ i : ℤ, (2 * (i : ℝ) + r) * coeff m (2 * i + r) = firstMoment m := by
-  have hfin : (Function.support fun k : ℤ => (k : ℝ) * coeff m k).Finite :=
-    (finite_support_coeff m).subset (Function.support_mul_subset_right _ _)
-  have halt : ∑ᶠ k : ℤ, (-1 : ℝ) ^ k * ((k : ℝ) * coeff m k) = 0 := by
+theorem sum_two_mul_add_mul_daubechiesCoeff (hN : 2 ≤ N) (r : ℤ) :
+    ∑ᶠ i : ℤ, (2 * (i : ℝ) + r) * daubechiesCoeff m (2 * i + r) = firstMoment m := by
+  have hfin : (Function.support fun k : ℤ => (k : ℝ) * daubechiesCoeff m k).Finite :=
+    (finite_support_daubechiesCoeff m).subset (Function.support_mul_subset_right _ _)
+  have halt : ∑ᶠ k : ℤ, (-1 : ℝ) ^ k * ((k : ℝ) * daubechiesCoeff m k) = 0 := by
     simpa only [pow_one, mul_assoc] using sum_rule m (l := 1) (by omega)
-  calc ∑ᶠ i : ℤ, (2 * (i : ℝ) + r) * coeff m (2 * i + r)
-      = ∑ᶠ i : ℤ, ((2 * i + r : ℤ) : ℝ) * coeff m (2 * i + r) :=
+  calc ∑ᶠ i : ℤ, (2 * (i : ℝ) + r) * daubechiesCoeff m (2 * i + r)
+      = ∑ᶠ i : ℤ, ((2 * i + r : ℤ) : ℝ) * daubechiesCoeff m (2 * i + r) :=
         finsum_congr fun i => by push_cast; ring
-    _ = (∑ᶠ k : ℤ, (k : ℝ) * coeff m k) / 2 := finsum_two_mul_add_eq_half hfin halt r
+    _ = (∑ᶠ k : ℤ, (k : ℝ) * daubechiesCoeff m k) / 2 := finsum_two_mul_add_eq_half hfin halt r
     _ = firstMoment m := by rw [firstMoment]; ring
 
 /-- **The index moments of the two parity classes** (`N ≥ 2`): `∑_i i c_(2i+r) = (μ - r)/2` for
 every `r ∈ ℤ`, where `μ = (1/2) ∑_k k c_k`. It follows from `∑_i (2i + r) c_(2i+r) = μ`
-(`Daubechies.sum_two_mul_add_mul_coeff`) and `∑_i c_(2i+r) = 1`
-(`Daubechies.sum_coeff_two_mul_add`). -/
-theorem sum_mul_coeff_two_mul_add (hN : 2 ≤ N) (r : ℤ) :
-    ∑ᶠ i : ℤ, (i : ℝ) * coeff m (2 * i + r) = (firstMoment m - r) / 2 := by
+(`Daubechies.sum_two_mul_add_mul_daubechiesCoeff`) and `∑_i c_(2i+r) = 1`
+(`Daubechies.sum_daubechiesCoeff_two_mul_add`). -/
+theorem sum_mul_daubechiesCoeff_two_mul_add (hN : 2 ≤ N) (r : ℤ) :
+    ∑ᶠ i : ℤ, (i : ℝ) * daubechiesCoeff m (2 * i + r) = (firstMoment m - r) / 2 := by
   have hinj : Function.Injective fun i : ℤ => 2 * i + r := fun i j h => by
     simp only at h
     omega
-  have hfin : (Function.support fun i : ℤ => coeff m (2 * i + r)).Finite :=
-    Function.HasFiniteSupport.fun_comp_of_injective hinj (finite_support_coeff m)
-  have h1 : (Function.support fun i : ℤ => 2 * (i : ℝ) * coeff m (2 * i + r)).Finite :=
+  have hfin : (Function.support fun i : ℤ => daubechiesCoeff m (2 * i + r)).Finite :=
+    Function.HasFiniteSupport.fun_comp_of_injective hinj (finite_support_daubechiesCoeff m)
+  have h1 : (Function.support fun i : ℤ => 2 * (i : ℝ) * daubechiesCoeff m (2 * i + r)).Finite :=
     hfin.subset (Function.support_mul_subset_right _ _)
-  have h2 : (Function.support fun i : ℤ => (r : ℝ) * coeff m (2 * i + r)).Finite :=
+  have h2 : (Function.support fun i : ℤ => (r : ℝ) * daubechiesCoeff m (2 * i + r)).Finite :=
     hfin.subset (Function.support_mul_subset_right _ _)
-  have h := sum_two_mul_add_mul_coeff m hN r
+  have h := sum_two_mul_add_mul_daubechiesCoeff m hN r
   simp only [add_mul] at h
-  rw [finsum_add_distrib h1 h2, ← mul_finsum, sum_coeff_two_mul_add, mul_one] at h
+  rw [finsum_add_distrib h1 h2, ← mul_finsum, sum_daubechiesCoeff_two_mul_add, mul_one] at h
   simp only [mul_assoc] at h
   rw [← mul_finsum] at h
   linarith
@@ -593,7 +600,7 @@ theorem iteratedDeriv_sum_mul_cexp {ι : Type*} (s : Finset ι) (a b : ι → �
 /-- The symbol as a finite exponential sum: `m_0(ξ) = ∑_{k < 2N} (c_k/2) e^(-2πikξ)`. -/
 theorem symbol_eq_sum_cexp :
     symbol m = fun ξ : ℝ => ∑ k ∈ Finset.range (2 * N),
-      (coeff m k / 2 : ℂ) * Complex.exp (-(2 * π * Complex.I * k) * ξ) := by
+      (daubechiesCoeff m k / 2 : ℂ) * Complex.exp (-(2 * π * Complex.I * k) * ξ) := by
   funext ξ
   rw [symbol_eq_sum, Finset.mul_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
@@ -605,7 +612,7 @@ theorem symbol_eq_sum_cexp :
 /-- **The derivatives of the symbol**: `m_0^(l)(ξ) = ∑_{k < 2N} (c_k/2) (-2πik)^l e^(-2πikξ)`. -/
 theorem iteratedDeriv_symbol (l : ℕ) (ξ : ℝ) :
     iteratedDeriv l (symbol m) ξ = ∑ k ∈ Finset.range (2 * N),
-      (coeff m k / 2 : ℂ) * (-(2 * π * Complex.I * k)) ^ l * expFreq ξ ^ k := by
+      (daubechiesCoeff m k / 2 : ℂ) * (-(2 * π * Complex.I * k)) ^ l * expFreq ξ ^ k := by
   rw [symbol_eq_sum_cexp, iteratedDeriv_sum_mul_cexp]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [expFreq_pow, expFreq_eq_exp_mul]
@@ -619,13 +626,13 @@ theorem iteratedDeriv_symbol (l : ℕ) (ξ : ℝ) :
 by the sum rules. -/
 theorem iteratedDeriv_symbol_half_add_int {l : ℕ} (hl : l < N) (n : ℤ) :
     iteratedDeriv l (symbol m) (1 / 2 + n) = 0 := by
-  have h : ∑ k ∈ Finset.range (2 * N), ((-1) ^ k * (k : ℂ) ^ l * coeff m k) = 0 := by
+  have h : ∑ k ∈ Finset.range (2 * N), ((-1) ^ k * (k : ℂ) ^ l * daubechiesCoeff m k) = 0 := by
     exact_mod_cast sum_range_rule m hl
   rw [iteratedDeriv_symbol, expFreq_half_add_int]
   calc ∑ k ∈ Finset.range (2 * N),
-        (coeff m k / 2 : ℂ) * (-(2 * π * Complex.I * k)) ^ l * (-1) ^ k
+        (daubechiesCoeff m k / 2 : ℂ) * (-(2 * π * Complex.I * k)) ^ l * (-1) ^ k
       = (-(2 * π * Complex.I)) ^ l / 2 *
-          ∑ k ∈ Finset.range (2 * N), ((-1) ^ k * (k : ℂ) ^ l * coeff m k) := by
+          ∑ k ∈ Finset.range (2 * N), ((-1) ^ k * (k : ℂ) ^ l * daubechiesCoeff m k) := by
         rw [Finset.mul_sum]
         refine Finset.sum_congr rfl fun k _ => ?_
         rw [show -(2 * (π : ℂ) * Complex.I * k) = -(2 * π * Complex.I) * k by ring, mul_pow]
@@ -637,11 +644,11 @@ theorem iteratedDeriv_symbol_half_add_int {l : ℕ} (hl : l < N) (n : ℤ) :
 /-- **The dual filter** `g_k = (-1)^k c_(1-k)` of a mask, the coefficients of the refinement
 equation `ψ(x) = ∑_k g_k φ(2x - k)` of the wavelet. They vanish outside `2 - 2N ≤ k ≤ 1`
 (`Daubechies.dualCoeff_eq_zero`). -/
-noncomputable def dualCoeff (k : ℤ) : ℝ := (-1) ^ k * coeff m (1 - k)
+noncomputable def dualCoeff (k : ℤ) : ℝ := (-1) ^ k * daubechiesCoeff m (1 - k)
 
 /-- The dual filter vanishes outside `2 - 2N ≤ k ≤ 1`. -/
 theorem dualCoeff_eq_zero {k : ℤ} (hk : k < 2 - 2 * (N : ℤ) ∨ 1 < k) : dualCoeff m k = 0 := by
-  rw [dualCoeff, coeff_eq_zero m (by omega), mul_zero]
+  rw [dualCoeff, daubechiesCoeff_eq_zero m (by omega), mul_zero]
 
 /-- The dual filter has finite support. -/
 theorem finite_support_dualCoeff : (Function.support (dualCoeff m)).Finite :=
@@ -663,14 +670,14 @@ theorem finsum_eq_sum_Icc_of_dualCoeff {M : Type*} [AddCommMonoid M] (f : ℤ �
 
 /-- **Orthogonality of the even shifts of the dual filter**: `∑_k g_k g_(k+2j) = 2 δ_(j0)` for
 every `j ∈ ℤ`. The substitution `k ↦ 1 - 2j - k` turns the sum into `∑_k c_k c_(k+2j)`
-(`Daubechies.sum_coeff_mul_coeff_add`). -/
+(`Daubechies.sum_daubechiesCoeff_mul_daubechiesCoeff_add`). -/
 theorem sum_dualCoeff_mul_dualCoeff_add (j : ℤ) :
     ∑ᶠ k : ℤ, dualCoeff m k * dualCoeff m (k + 2 * j) = if j = 0 then 2 else 0 := by
   calc ∑ᶠ k : ℤ, dualCoeff m k * dualCoeff m (k + 2 * j)
       = ∑ᶠ k : ℤ, dualCoeff m (1 - 2 * j - k) * dualCoeff m (1 - 2 * j - k + 2 * j) :=
         (finsum_comp_equiv (Equiv.subLeft (1 - 2 * j))
           (f := fun k => dualCoeff m k * dualCoeff m (k + 2 * j))).symm
-    _ = ∑ᶠ k : ℤ, coeff m k * coeff m (k + 2 * j) := finsum_congr fun k => by
+    _ = ∑ᶠ k : ℤ, daubechiesCoeff m k * daubechiesCoeff m (k + 2 * j) := finsum_congr fun k => by
         simp only [dualCoeff]
         rw [show 1 - (1 - 2 * j - k) = k + 2 * j by ring,
           show 1 - 2 * j - k + 2 * j = 1 - k by ring, show 1 - (1 - k) = k by ring,
@@ -678,23 +685,24 @@ theorem sum_dualCoeff_mul_dualCoeff_add (j : ℤ) :
         have h1 : (-1 : ℝ) ^ (1 - k) * (-1) ^ (1 - k) = 1 := by
           rw [← zpow_add₀ (by norm_num : (-1 : ℝ) ≠ 0)]
           exact Even.neg_one_zpow ⟨1 - k, rfl⟩
-        calc (-1) ^ (1 - k) * coeff m (k + 2 * j) * ((-1) ^ (1 - k) * coeff m k)
-            = ((-1) ^ (1 - k) * (-1) ^ (1 - k)) * (coeff m k * coeff m (k + 2 * j)) := by ring
-          _ = coeff m k * coeff m (k + 2 * j) := by rw [h1, one_mul]
-    _ = if j = 0 then 2 else 0 := sum_coeff_mul_coeff_add m j
+        calc (-1) ^ (1 - k) * daubechiesCoeff m (k + 2 * j) * ((-1) ^ (1 - k) * daubechiesCoeff m k)
+            = ((-1) ^ (1 - k) * (-1) ^ (1 - k)) *
+              (daubechiesCoeff m k * daubechiesCoeff m (k + 2 * j)) := by ring
+          _ = daubechiesCoeff m k * daubechiesCoeff m (k + 2 * j) := by rw [h1, one_mul]
+    _ = if j = 0 then 2 else 0 := sum_daubechiesCoeff_mul_daubechiesCoeff_add m j
 
 /-- **The dual filter is orthogonal to the even shifts of the filter**: `∑_k c_k g_(k+2j) = 0`
 for every `j ∈ ℤ`. The substitution `k ↦ 1 - 2j - k` maps the sum to its negative. -/
-theorem sum_coeff_mul_dualCoeff_add (j : ℤ) :
-    ∑ᶠ k : ℤ, coeff m k * dualCoeff m (k + 2 * j) = 0 := by
-  have h : ∑ᶠ k : ℤ, coeff m k * dualCoeff m (k + 2 * j) =
-      -∑ᶠ k : ℤ, coeff m k * dualCoeff m (k + 2 * j) := by
+theorem sum_daubechiesCoeff_mul_dualCoeff_add (j : ℤ) :
+    ∑ᶠ k : ℤ, daubechiesCoeff m k * dualCoeff m (k + 2 * j) = 0 := by
+  have h : ∑ᶠ k : ℤ, daubechiesCoeff m k * dualCoeff m (k + 2 * j) =
+      -∑ᶠ k : ℤ, daubechiesCoeff m k * dualCoeff m (k + 2 * j) := by
     rw [← finsum_neg_distrib]
-    calc ∑ᶠ k : ℤ, coeff m k * dualCoeff m (k + 2 * j)
-        = ∑ᶠ k : ℤ, coeff m (1 - 2 * j - k) * dualCoeff m (1 - 2 * j - k + 2 * j) :=
+    calc ∑ᶠ k : ℤ, daubechiesCoeff m k * dualCoeff m (k + 2 * j)
+        = ∑ᶠ k : ℤ, daubechiesCoeff m (1 - 2 * j - k) * dualCoeff m (1 - 2 * j - k + 2 * j) :=
           (finsum_comp_equiv (Equiv.subLeft (1 - 2 * j))
-            (f := fun k => coeff m k * dualCoeff m (k + 2 * j))).symm
-      _ = ∑ᶠ k : ℤ, -(coeff m k * dualCoeff m (k + 2 * j)) := finsum_congr fun k => by
+            (f := fun k => daubechiesCoeff m k * dualCoeff m (k + 2 * j))).symm
+      _ = ∑ᶠ k : ℤ, -(daubechiesCoeff m k * dualCoeff m (k + 2 * j)) := finsum_congr fun k => by
           simp only [dualCoeff]
           rw [show 1 - (1 - 2 * j - k + 2 * j) = k by ring,
             show 1 - 2 * j - k + 2 * j = 1 - k by ring,
@@ -705,14 +713,14 @@ theorem sum_coeff_mul_dualCoeff_add (j : ℤ) :
 
 /-- Reindexing a sum of products of filter coefficients over one parity class:
 `∑_j c_(a-2j) c_(b-2j) = ∑_i c_(2i+b+(a-b)) c_(2i+b)`. -/
-theorem finsum_coeff_sub_two_mul_mul (a b : ℤ) :
-    ∑ᶠ j : ℤ, coeff m (a - 2 * j) * coeff m (b - 2 * j) =
-      ∑ᶠ i : ℤ, coeff m (2 * i + b + (a - b)) * coeff m (2 * i + b) := by
-  calc ∑ᶠ j : ℤ, coeff m (a - 2 * j) * coeff m (b - 2 * j)
-      = ∑ᶠ i : ℤ, coeff m (a - 2 * -i) * coeff m (b - 2 * -i) :=
+theorem finsum_daubechiesCoeff_sub_two_mul_mul (a b : ℤ) :
+    ∑ᶠ j : ℤ, daubechiesCoeff m (a - 2 * j) * daubechiesCoeff m (b - 2 * j) =
+      ∑ᶠ i : ℤ, daubechiesCoeff m (2 * i + b + (a - b)) * daubechiesCoeff m (2 * i + b) := by
+  calc ∑ᶠ j : ℤ, daubechiesCoeff m (a - 2 * j) * daubechiesCoeff m (b - 2 * j)
+      = ∑ᶠ i : ℤ, daubechiesCoeff m (a - 2 * -i) * daubechiesCoeff m (b - 2 * -i) :=
         (finsum_comp_equiv (Equiv.neg ℤ)
-          (f := fun j => coeff m (a - 2 * j) * coeff m (b - 2 * j))).symm
-    _ = ∑ᶠ i : ℤ, coeff m (2 * i + b + (a - b)) * coeff m (2 * i + b) :=
+          (f := fun j => daubechiesCoeff m (a - 2 * j) * daubechiesCoeff m (b - 2 * j))).symm
+    _ = ∑ᶠ i : ℤ, daubechiesCoeff m (2 * i + b + (a - b)) * daubechiesCoeff m (2 * i + b) :=
         finsum_congr fun i => by
           rw [show a - 2 * -i = 2 * i + b + (a - b) by ring, show b - 2 * -i = 2 * i + b by ring]
 
@@ -721,7 +729,8 @@ theorem finsum_coeff_sub_two_mul_mul (a b : ℤ) :
 theorem finsum_dualCoeff_sub_two_mul_mul (a b : ℤ) :
     ∑ᶠ j : ℤ, dualCoeff m (a - 2 * j) * dualCoeff m (b - 2 * j) =
       (-1) ^ (a + b) *
-        ∑ᶠ i : ℤ, coeff m (2 * i + (1 - a) + (a - b)) * coeff m (2 * i + (1 - a)) := by
+        ∑ᶠ i : ℤ, daubechiesCoeff m (2 * i + (1 - a) + (a - b)) *
+          daubechiesCoeff m (2 * i + (1 - a)) := by
   rw [mul_finsum]
   refine finsum_congr fun j => ?_
   simp only [dualCoeff]
@@ -734,36 +743,40 @@ theorem finsum_dualCoeff_sub_two_mul_mul (a b : ℤ) :
 /-- **The filter and its dual resolve the identity**: for all `a, b ∈ ℤ`,
 `∑_j (c_(a-2j) c_(b-2j) + g_(a-2j) g_(b-2j)) = 2 δ_(ab)`. Both sums run over one parity class
 of the products `h(k) = c_(k+(a-b)) c_k`. For `a - b` even the two classes are complementary and
-the sum is `∑_k c_k c_(k+(a-b)) = 2 δ_(ab)` (`Daubechies.sum_coeff_mul_coeff_add`); for `a - b`
-odd the two classes agree and the sign `(-1)^(a+b) = -1` makes them cancel. -/
-theorem sum_coeff_mul_add_dual (a b : ℤ) :
-    ∑ᶠ j : ℤ, (coeff m (a - 2 * j) * coeff m (b - 2 * j) +
+the sum is `∑_k c_k c_(k+(a-b)) = 2 δ_(ab)`
+(`Daubechies.sum_daubechiesCoeff_mul_daubechiesCoeff_add`); for `a - b` odd the two classes agree
+and the sign `(-1)^(a+b) = -1` makes them cancel. -/
+theorem sum_daubechiesCoeff_mul_add_dual (a b : ℤ) :
+    ∑ᶠ j : ℤ, (daubechiesCoeff m (a - 2 * j) * daubechiesCoeff m (b - 2 * j) +
       dualCoeff m (a - 2 * j) * dualCoeff m (b - 2 * j)) = if a = b then 2 else 0 := by
   have hinj : Function.Injective fun j : ℤ => b - 2 * j := fun i j hij => by
     simp only at hij
     omega
   have hfin1 : (Function.support fun j : ℤ =>
-      coeff m (a - 2 * j) * coeff m (b - 2 * j)).Finite :=
+      daubechiesCoeff m (a - 2 * j) * daubechiesCoeff m (b - 2 * j)).Finite :=
     Set.Finite.subset (Function.HasFiniteSupport.fun_comp_of_injective hinj
-      (finite_support_coeff m)) (Function.support_mul_subset_right _ _)
+      (finite_support_daubechiesCoeff m)) (Function.support_mul_subset_right _ _)
   have hfin2 : (Function.support fun j : ℤ =>
       dualCoeff m (a - 2 * j) * dualCoeff m (b - 2 * j)).Finite :=
     Set.Finite.subset (Function.HasFiniteSupport.fun_comp_of_injective hinj
       (finite_support_dualCoeff m)) (Function.support_mul_subset_right _ _)
-  have hfinh : (Function.support fun k : ℤ => coeff m (k + (a - b)) * coeff m k).Finite :=
-    (finite_support_coeff m).subset (Function.support_mul_subset_right _ _)
-  rw [finsum_add_distrib hfin1 hfin2, finsum_coeff_sub_two_mul_mul,
+  have hfinh : (Function.support fun k : ℤ =>
+      daubechiesCoeff m (k + (a - b)) * daubechiesCoeff m k).Finite :=
+    (finite_support_daubechiesCoeff m).subset (Function.support_mul_subset_right _ _)
+  rw [finsum_add_distrib hfin1 hfin2, finsum_daubechiesCoeff_sub_two_mul_mul,
     finsum_dualCoeff_sub_two_mul_mul]
   rcases Int.even_or_odd (a - b) with ⟨t, ht⟩ | ⟨t, ht⟩
   · rw [Even.neg_one_zpow ⟨b + t, by omega⟩, one_mul,
       show 1 - a = b + 1 + 2 * (-b - t) by omega,
-      finsum_two_mul_add_add_two_mul (fun k : ℤ => coeff m (k + (a - b)) * coeff m k),
+      finsum_two_mul_add_add_two_mul
+        (fun k : ℤ => daubechiesCoeff m (k + (a - b)) * daubechiesCoeff m k),
       finsum_two_mul_add_add_finsum hfinh b, show a - b = 2 * t by omega]
-    rw [finsum_congr fun k => mul_comm (coeff m (k + 2 * t)) (coeff m k),
-      sum_coeff_mul_coeff_add m t]
+    rw [finsum_congr fun k => mul_comm (daubechiesCoeff m (k + 2 * t)) (daubechiesCoeff m k),
+      sum_daubechiesCoeff_mul_daubechiesCoeff_add m t]
     simp only [show t = 0 ↔ a = b by omega]
   · rw [Odd.neg_one_zpow ⟨b + t, by omega⟩, show 1 - a = b + 2 * (-b - t) by omega,
-      finsum_two_mul_add_add_two_mul (fun k : ℤ => coeff m (k + (a - b)) * coeff m k)]
+      finsum_two_mul_add_add_two_mul
+        (fun k : ℤ => daubechiesCoeff m (k + (a - b)) * daubechiesCoeff m k)]
     simp only [show ¬a = b by omega, ↓reduceIte]
     ring
 
@@ -778,7 +791,7 @@ theorem sum_dualCoeff_mul_pow {l : ℕ} (hl : l < N) :
   calc ∑ᶠ k : ℤ, dualCoeff m k * (k : ℝ) ^ l
       = ∑ᶠ k : ℤ, dualCoeff m (1 - k) * ((1 - k : ℤ) : ℝ) ^ l :=
         (finsum_comp_equiv (Equiv.subLeft 1) (f := fun k => dualCoeff m k * (k : ℝ) ^ l)).symm
-    _ = ∑ᶠ k : ℤ, -((-1 : ℝ) ^ k * ((1 - X : ℝ[X]) ^ l).eval (k : ℝ) * coeff m k) :=
+    _ = ∑ᶠ k : ℤ, -((-1 : ℝ) ^ k * ((1 - X : ℝ[X]) ^ l).eval (k : ℝ) * daubechiesCoeff m k) :=
         finsum_congr fun k => by
           simp only [dualCoeff]
           rw [show (1 : ℤ) - (1 - k) = k by ring,

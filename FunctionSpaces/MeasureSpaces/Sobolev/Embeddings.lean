@@ -91,6 +91,6 @@ theorem SobolevSpace.exists_boundedContinuous [μ.IsOpenPosMeasure] (h : S.HasNi
     (hD : 0 ≤ D) (V : S.SobolevSpace μ p W) (hs : D * p.toReal⁻¹ < V.order) (y : W) :
     ∃ a : Ω →ᵇ ℂ, Lp.inclusionOfExponentLe (𝕜 := ℝ) μ le_top
       (BoundedContinuousFunction.toLp (E := ℂ) ∞ μ ℝ a) = V.incl y :=
-  MemBesov.exists_boundedContinuous h hD hs le_top (V.memApprox_top y)
+  MemBesov.exists_boundedContinuous_of_nikolskii h hD hs le_top (V.memApprox_top y)
 
 end FunctionScheme

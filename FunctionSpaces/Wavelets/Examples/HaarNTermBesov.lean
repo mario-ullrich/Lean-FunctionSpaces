@@ -27,7 +27,7 @@ weight `2^(k(s + 1/2 - 1/p))` is `1` and `θ > 1/τ - 1` holds always) gives
 With the step-couple characterisation by the first modulus
 (`Haar.memEMethod_stepCouple_iff_modulus`) for `τ ≤ 1`, and the case `1 ≤ τ < 2`
 (`Haar.memApprox_nTerm_iff_modulus`), this gives for every `0 < τ < 2`
-(`Haar.memApprox_nTerm_iff_modulus_of_lt_two`)
+(`Haar.memApprox_nTerm_iff_intervalModulus_of_lt_two`)
 
 `f ∈ A^θ_τ(L_2, n-term Haar)  ⟺  ‖f‖_τ + ‖(2^(kθ) ω_1(f, 2^(-k), [0, 1])_τ)_k‖_{ℓ_τ} < ∞`.
 
@@ -147,12 +147,12 @@ For `τ ≤ 1` by the step couple in the quasi-Banach space `L_τ`
 `1 < τ < 2` by `Haar.memApprox_nTerm_iff_modulus`. For `2/3 < τ < 2` the right side is the
 classical Besov space `B^θ_{τ,τ}[0, 1]` (DeVore 1998, §3.6); for `τ ≤ 2/3`, where `θ ≥ 1`, it is
 the space of the first modulus. -/
-theorem memApprox_nTerm_iff_modulus_of_lt_two {τ : ℝ} (hτ0 : 0 < τ) (hτ2 : τ < 2)
+theorem memApprox_nTerm_iff_intervalModulus_of_lt_two {τ : ℝ} (hτ0 : 0 < τ) (hτ2 : τ < 2)
     (f : Lp ℂ 2 vol) :
     (nTerm haarBasis.coeffDictionary).MemApprox (1 / τ - 1 / 2) (ENNReal.ofReal τ) f ↔
       eLpNorm f (ENNReal.ofReal τ) vol + lqNorm (ENNReal.ofReal τ) (fun k =>
-        dyadicWeight (1 / τ - 1 / 2) k * Interval.modulus 1 (ENNReal.ofReal τ) 0 1 f (1 / 2 ^ k))
-          < ∞ := by
+        dyadicWeight (1 / τ - 1 / 2) k *
+          Interval.intervalModulus 1 (ENNReal.ofReal τ) 0 1 f (1 / 2 ^ k)) < ∞ := by
   have hpτ : (ENNReal.ofReal τ).toReal = τ := ENNReal.toReal_ofReal hτ0.le
   rcases le_or_gt τ 1 with hτ1 | hτ1
   · have hp0 : ENNReal.ofReal τ ≠ 0 := (ENNReal.ofReal_pos.2 hτ0).ne'
@@ -166,7 +166,7 @@ theorem memApprox_nTerm_iff_modulus_of_lt_two {τ : ℝ} (hτ0 : 0 < τ) (hτ2 :
       (ofReal_le_two (τ := τ) (by linarith)) f
     rw [memApprox_nTerm_iff_memEMethod hτ0 hτ1 f, memEMethod_stepCouple_iff_modulus hp0
       (ENNReal.ofReal_le_one.2 hτ1) hp0 hθ0 hθp, Lp.enorm_def, eLpNorm_congr_ae hg]
-    simp only [Interval.lpModulus, modulus_congr_ae hg]
+    simp only [Interval.intervalLpModulus, intervalModulus_congr_ae hg]
   · have : Fact (1 ≤ ENNReal.ofReal τ) := ⟨ENNReal.one_le_ofReal.2 hτ1.le⟩
     have hp2 : ENNReal.ofReal τ < 2 := by
       rw [← ENNReal.ofReal_ofNat 2]
@@ -175,6 +175,6 @@ theorem memApprox_nTerm_iff_modulus_of_lt_two {τ : ℝ} (hτ0 : 0 < τ) (hτ2 :
     have h := memApprox_nTerm_iff_modulus hp2 f
     rw [hpτ] at h
     rw [h, Lp.enorm_def, eLpNorm_congr_ae hg]
-    simp only [Interval.lpModulus, modulus_congr_ae hg]
+    simp only [Interval.intervalLpModulus, intervalModulus_congr_ae hg]
 
 end Haar

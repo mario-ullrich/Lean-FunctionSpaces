@@ -22,8 +22,8 @@ Besov spaces `B^s_{p,q}(ℝ)` by the coefficients `⟨f, φ(· - k)⟩` and `⟨
 
 `‖f‖_coef = ‖(⟨f, φ(· - k)⟩)_k‖_{ℓ_p} + ‖(2^(j(s + 1/2 - 1/p)) ‖(⟨f, ψ_{j,k}⟩)_k‖_{ℓ_p})_j‖_{ℓ_q}`
 
-(`Daubechies.coeffNorm`), the main theorem (`Daubechies.besov_iff_coeff`) reads: if `φ` has a
-Bernstein bound `ω_N(φ, t)_p ≤ K t^θ` for `0 < t ≤ 1` (`Daubechies.BernsteinBound`), then for
+(`Daubechies.daubechiesCoeffNorm`), the main theorem (`Daubechies.besov_iff_coeff`) reads: if `φ`
+has a Bernstein bound `ω_N(φ, t)_p ≤ K t^θ` for `0 < t ≤ 1` (`Daubechies.BernsteinBound`), then for
 `0 < s < θ` and every `f ∈ L_p(ℝ)`
 
 `‖f‖_p + ‖(2^(ks) ω_N(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞  ⟺  ‖f‖_coef < ∞`.
@@ -71,21 +71,21 @@ namespace Daubechies
 (`Daubechies.one_le_daubFun`), for `g ≥ 1` the first summand of
 `(T g)(ξ) = P(ξ/2) g(ξ/2) + P((ξ + 1)/2) g((ξ + 1)/2)` is at least `1` and the second is
 nonnegative. -/
-theorem one_le_iterate_transfer_one {N : ℕ} (hN : 1 ≤ N) (n : ℕ) (ξ : ℝ) :
-    1 ≤ (transfer N)^[n] (fun _ => 1) ξ := by
+theorem one_le_iterate_transferOp_one {N : ℕ} (hN : 1 ≤ N) (n : ℕ) (ξ : ℝ) :
+    1 ≤ (transferOp N)^[n] (fun _ => 1) ξ := by
   induction n generalizing ξ with
   | zero => exact le_rfl
   | succ n ih =>
     rw [Function.iterate_succ_apply']
-    have h1 : 1 ≤ daubFun N (ξ / 2) * (transfer N)^[n] (fun _ => 1) (ξ / 2) :=
+    have h1 : 1 ≤ daubFun N (ξ / 2) * (transferOp N)^[n] (fun _ => 1) (ξ / 2) :=
       one_le_mul_of_one_le_of_one_le (one_le_daubFun hN _) (ih _)
-    have h2 : 0 ≤ daubFun N ((ξ + 1) / 2) * (transfer N)^[n] (fun _ => 1) ((ξ + 1) / 2) :=
-      mul_nonneg (daubFun_nonneg N _) (iterate_transfer_one_nonneg N n _)
+    have h2 : 0 ≤ daubFun N ((ξ + 1) / 2) * (transferOp N)^[n] (fun _ => 1) ((ξ + 1) / 2) :=
+      mul_nonneg (daubFun_nonneg N _) (iterate_transferOp_one_nonneg N n _)
     exact le_add_of_le_of_nonneg h1 h2
 
 /-- **The rate of a growth bound is at least `1`**: for `N ≥ 1`, every growth bound
 `T^n 1 ≤ C λ^n` for the transfer operator (`Daubechies.TransferGrowth`) has `λ ≥ 1`. Otherwise
-`C λ^n → 0`, while `(T^n 1)(0) ≥ 1` for every `n` (`Daubechies.one_le_iterate_transfer_one`). -/
+`C λ^n → 0`, while `(T^n 1)(0) ≥ 1` for every `n` (`Daubechies.one_le_iterate_transferOp_one`). -/
 theorem TransferGrowth.one_le_lam {N : ℕ} {lam C : ℝ} (hN : 1 ≤ N)
     (hg : TransferGrowth N lam C) : 1 ≤ lam := by
   by_contra h
@@ -93,7 +93,7 @@ theorem TransferGrowth.one_le_lam {N : ℕ} {lam C : ℝ} (hN : 1 ≤ N)
   have ht : Tendsto (fun n : ℕ => C * lam ^ n) atTop (𝓝 0) := by
     simpa using (tendsto_pow_atTop_nhds_zero_of_lt_one hg.1.le h).const_mul C
   obtain ⟨n, hn⟩ := (ht.eventually (gt_mem_nhds one_pos)).exists
-  linarith [hg.2 n 0, one_le_iterate_transfer_one hN n 0]
+  linarith [hg.2 n 0, one_le_iterate_transferOp_one hN n 0]
 
 /-- **The Sobolev exponent of a growth bound is at most `N`**: for `N ≥ 1` and every growth
 bound `T^n 1 ≤ C λ^n` for the transfer operator, `N - log₄ λ ≤ N`, since `λ ≥ 1`
@@ -112,7 +112,7 @@ smoothness `s`:
 coefficients `⟨f, g_{j,k}⟩ = ∫ f(x) conj g_{j,k}(x) dx` (`Daubechies.coeffFun`) of the scaling
 function `φ` at level `0` and of the wavelet `ψ` at the levels `j ∈ ℕ`. Its finiteness describes
 `B^s_{p,q}(ℝ)` (`Daubechies.besov_iff_coeff`). -/
-noncomputable def coeffNorm (p : ℝ≥0∞) (s : ℝ) (q : ℝ≥0∞) (f : ℝ → ℂ) : ℝ≥0∞ :=
+noncomputable def daubechiesCoeffNorm (p : ℝ≥0∞) (s : ℝ) (q : ℝ≥0∞) (f : ℝ → ℂ) : ℝ≥0∞ :=
   ENNReal.lqNorm p (fun k : ℤ => ‖coeffFun (scalingFun m) 0 f k‖ₑ) +
     ENNReal.lqNorm q (fun j => dyadicWeight (s + (1 / 2 - 1 / p.toReal)) j *
       ENNReal.lqNorm p (fun k : ℤ => ‖coeffFun (wavelet m) j f k‖ₑ))
@@ -141,8 +141,8 @@ noncomputable def modulusData (hN : 2 ≤ N) (hp : p ≠ ∞) {θ : ℝ} (hB : B
   C0_ne_top := by simp
   le_enorm := Rd.lpModulus_le N
   jacksonStart := 0
-  CJ := jacksonConst m p
-  CJ_ne_top := jacksonConst_ne_top m hN p
+  CJ := daubechiesJacksonConst m p
+  CJ_ne_top := daubechiesJacksonConst_ne_top m hN p
   jackson f k _ := approxError_scheme_le_jacksonConst_mul m hN hp f k
   CB := (inverse_scheme m hN hp hB).choose
   CB_ne_top := (inverse_scheme m hN hp hB).choose_spec.1
@@ -182,7 +182,7 @@ theorem projectionScheme_block (hN : 2 ≤ N) (hp : p ≠ ∞) (j : ℕ)
 `1 ≤ p < ∞`, `s > 0` and `1 ≤ q ≤ ∞`, an `f ∈ L_p(ℝ)` lies in the approximation space `A^s_q`
 of the Daubechies scheme iff its coefficient quasi-norm
 `‖(⟨f, φ(· - k)⟩)_k‖_{ℓ_p} + ‖(2^(j(s + 1/2 - 1/p)) ‖(⟨f, ψ_{j,k}⟩)_k‖_{ℓ_p})_j‖_{ℓ_q}`
-(`Daubechies.coeffNorm`) is finite.
+(`Daubechies.daubechiesCoeffNorm`) is finite.
 
 The projections form a projection scheme with dense union, so `f ∈ A^s_q` iff
 `‖P_0 f‖_p + ‖(2^(js) ‖P_{j+1} f - P_j f‖_p)_j‖_{ℓ_q} < ∞`
@@ -194,12 +194,12 @@ and
 so the two `ℓ_q` norms are finite together (`ENNReal.lqNorm_lt_top_iff_of_le_mul`). -/
 theorem memApprox_scheme_iff_coeff (hN : 2 ≤ N) (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞}
     (hq : 1 ≤ q) (f : Lp ℂ p (volume : Measure ℝ)) :
-    (scheme m p hN hp).MemApprox s q f ↔ coeffNorm m p s q f < ∞ := by
+    (scheme m p hN hp).MemApprox s q f ↔ daubechiesCoeffNorm m p s q f < ∞ := by
   obtain ⟨K₀, _, hK₀, _, hKM₀⟩ := enorm_proj_zero_equiv m hN hp
   obtain ⟨K, M, hK, hM, hKM⟩ := enorm_block_equiv m hN hp
   rw [(projectionScheme m p hN hp).memApprox_iff_blockNorm_lt_top_of_dense
     (closure_iUnion_scheme m hN hp) hs hq, ApproximationScheme.ProjectionScheme.blockNorm,
-    projectionScheme_one, coeffNorm]
+    projectionScheme_one, daubechiesCoeffNorm]
   simp only [projectionScheme_block, ENNReal.add_lt_top]
   refine and_congr ⟨fun _ => (hKM₀ f).1.trans_lt (ENNReal.mul_lt_top hK₀.lt_top enorm_lt_top),
     fun _ => enorm_lt_top⟩
@@ -216,14 +216,14 @@ theorem memApprox_scheme_iff_coeff (hN : 2 ≤ N) (hp : p ≠ ∞) {s : ℝ} (hs
 Then for `0 < s < θ` and every `f ∈ L_p(ℝ)`,
 `‖f‖_p + ‖(2^(ks) ω_N(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff
 `‖(⟨f, φ(· - k)⟩)_k‖_{ℓ_p} + ‖(2^(j(s + 1/2 - 1/p)) ‖(⟨f, ψ_{j,k}⟩)_k‖_{ℓ_p})_j‖_{ℓ_q} < ∞`
-(`Daubechies.coeffNorm`). Both conditions describe the approximation space `A^s_q` of the
+(`Daubechies.daubechiesCoeffNorm`). Both conditions describe the approximation space `A^s_q` of the
 Daubechies scheme (`Daubechies.memApprox_scheme_iff_modulus`,
 `Daubechies.memApprox_scheme_iff_coeff`). -/
 theorem besov_iff_coeff (hN : 2 ≤ N) (hp : p ≠ ∞) {θ : ℝ} (hB : BernsteinBound m p θ N)
     {s : ℝ} (hs : 0 < s) (hsθ : s < θ) {q : ℝ≥0∞} (hq : 1 ≤ q)
     (f : Lp ℂ p (volume : Measure ℝ)) :
     ‖f‖ₑ + ENNReal.lqNorm q (fun k => dyadicWeight s k * Rd.lpModulus p N f k) < ∞ ↔
-      coeffNorm m p s q f < ∞ :=
+      daubechiesCoeffNorm m p s q f < ∞ :=
   (memApprox_scheme_iff_modulus m hN hp hB hq hs.le hsθ f).symm.trans
     (memApprox_scheme_iff_coeff m hN hp hs hq f)
 
@@ -234,13 +234,13 @@ theorem besov_iff_coeff (hN : 2 ≤ N) (hp : p ≠ ∞) {θ : ℝ} (hB : Bernste
 Littlewood–Paley blocks `Δ_j f` (`Rd.littlewoodPaleyNorm`, `Rd.lpBlock`) is finite iff the
 coefficient quasi-norm
 `‖(⟨f, φ(· - k)⟩)_k‖_{ℓ_p} + ‖(2^(j(s + 1/2 - 1/p)) ‖(⟨f, ψ_{j,k}⟩)_k‖_{ℓ_p})_j‖_{ℓ_q}`
-(`Daubechies.coeffNorm`) is: both are equivalent to the finiteness of the Besov quasi-norm by
-differences of order `N` (`Rd.littlewoodPaleyNorm_lt_top_iff_modulus`,
+(`Daubechies.daubechiesCoeffNorm`) is: both are equivalent to the finiteness of the Besov quasi-norm
+by differences of order `N` (`Rd.littlewoodPaleyNorm_lt_top_iff_modulus`,
 `Daubechies.besov_iff_coeff`). -/
 theorem littlewoodPaleyNorm_lt_top_iff_coeff (hN : 2 ≤ N) (hp : p ≠ ∞) {θ : ℝ}
     (hB : BernsteinBound m p θ N) {s : ℝ} (hs : 0 < s) (hsθ : s < θ) (hsN : s < N) {q : ℝ≥0∞}
     (hq : 1 ≤ q) (f : Lp ℂ p (volume : Measure ℝ)) :
-    Rd.littlewoodPaleyNorm hp s q f < ∞ ↔ coeffNorm m p s q f < ∞ :=
+    Rd.littlewoodPaleyNorm hp s q f < ∞ ↔ daubechiesCoeffNorm m p s q f < ∞ :=
   (Rd.littlewoodPaleyNorm_lt_top_iff_modulus hp hs hsN hq f).trans
     (besov_iff_coeff m hN hp hB hs hsθ hq f)
 
@@ -290,7 +290,7 @@ theorem besov_iff_coeff_of_le_two (hN : 2 ≤ N) (hp : p ≠ ∞) (hp2 : p ≤ 2
     (hg : TransferGrowth N lam C) {s : ℝ} (hs : 0 < s) (hsl : s < N - Real.logb 4 lam)
     {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Lp ℂ p (volume : Measure ℝ)) :
     ‖f‖ₑ + ENNReal.lqNorm q (fun k => dyadicWeight s k * Rd.lpModulus p N f k) < ∞ ↔
-      coeffNorm m p s q f < ∞ := by
+      daubechiesCoeffNorm m p s q f < ∞ := by
   obtain ⟨θ, hsθ, hB⟩ := exists_bernsteinBound_of_le_two m hN hp2 hg hs.le hsl
   exact besov_iff_coeff m hN hp hB hs hsθ hq f
 
@@ -298,12 +298,12 @@ theorem besov_iff_coeff_of_le_two (hN : 2 ≤ N) (hp : p ≠ ∞) (hp2 : p ≤ 2
 `1 ≤ p ≤ 2`, `1 ≤ q ≤ ∞`, and let `T^n 1 ≤ C λ^n` be a growth bound for the transfer operator.
 Then for `0 < s < N - log₄ λ` and every `f ∈ L_p(ℝ)`, the Littlewood–Paley quasi-norm
 `‖(2^(js) ‖Δ_j f‖_p)_j‖_{ℓ_q}` (`Rd.littlewoodPaleyNorm`) is finite iff the coefficient
-quasi-norm `Daubechies.coeffNorm` is (`Daubechies.littlewoodPaleyNorm_lt_top_iff_coeff`; here
-`s < N` since `λ ≥ 1`, `Daubechies.TransferGrowth.sub_logb_le`). -/
+quasi-norm `Daubechies.daubechiesCoeffNorm` is (`Daubechies.littlewoodPaleyNorm_lt_top_iff_coeff`;
+here `s < N` since `λ ≥ 1`, `Daubechies.TransferGrowth.sub_logb_le`). -/
 theorem littlewoodPaleyNorm_lt_top_iff_coeff_of_le_two (hN : 2 ≤ N) (hp : p ≠ ∞) (hp2 : p ≤ 2)
     {lam C : ℝ} (hg : TransferGrowth N lam C) {s : ℝ} (hs : 0 < s)
     (hsl : s < N - Real.logb 4 lam) {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Lp ℂ p (volume : Measure ℝ)) :
-    Rd.littlewoodPaleyNorm hp s q f < ∞ ↔ coeffNorm m p s q f < ∞ := by
+    Rd.littlewoodPaleyNorm hp s q f < ∞ ↔ daubechiesCoeffNorm m p s q f < ∞ := by
   obtain ⟨θ, hsθ, hB⟩ := exists_bernsteinBound_of_le_two m hN hp2 hg hs.le hsl
   exact littlewoodPaleyNorm_lt_top_iff_coeff m hN hp hB hs hsθ
     (hsl.trans_le (hg.sub_logb_le (by omega))) hq f
@@ -322,7 +322,7 @@ theorem besov_iff_coeff_of_two_le (hN : 2 ≤ N) (hp : p ≠ ∞) (hp2 : 2 ≤ p
     (hsθ : s < 2 / p.toReal * s' + (1 - 2 / p.toReal) * a) {q : ℝ≥0∞} (hq : 1 ≤ q)
     (f : Lp ℂ p (volume : Measure ℝ)) :
     ‖f‖ₑ + ENNReal.lqNorm q (fun k => dyadicWeight s k * Rd.lpModulus p N f k) < ∞ ↔
-      coeffNorm m p s q f < ∞ := by
+      daubechiesCoeffNorm m p s q f < ∞ := by
   have hle := hg.sub_logb_le (by omega)
   exact besov_iff_coeff m hN hp (bernsteinBound_interp m hN hp2 hg hs'0 hs' (by linarith) ha0
     (by linarith) ha) hs hsθ hq f
@@ -330,15 +330,15 @@ theorem besov_iff_coeff_of_two_le (hN : 2 ≤ N) (hp : p ≠ ∞) (hp2 : 2 ≤ p
 /-- **Littlewood–Paley blocks and Daubechies coefficients, `p ≥ 2`**: under the hypotheses of
 `Daubechies.besov_iff_coeff_of_two_le`, for `0 < s < (2/p) s' + (1 - 2/p) a` and every
 `f ∈ L_p(ℝ)`, the Littlewood–Paley quasi-norm `‖(2^(js) ‖Δ_j f‖_p)_j‖_{ℓ_q}`
-(`Rd.littlewoodPaleyNorm`) is finite iff the coefficient quasi-norm `Daubechies.coeffNorm` is.
-The interpolated order is at most `N`, since `s', a ≤ N` and `2/p ∈ [0, 1]`
+(`Rd.littlewoodPaleyNorm`) is finite iff the coefficient quasi-norm `Daubechies.daubechiesCoeffNorm`
+is. The interpolated order is at most `N`, since `s', a ≤ N` and `2/p ∈ [0, 1]`
 (`Daubechies.mul_add_one_sub_mul_le`), so `s < N`. -/
 theorem littlewoodPaleyNorm_lt_top_iff_coeff_of_two_le (hN : 2 ≤ N) (hp : p ≠ ∞)
     (hp2 : 2 ≤ p) {lam C : ℝ} (hg : TransferGrowth N lam C) {s' a : ℝ} (hs'0 : 0 ≤ s')
     (hs' : s' < N - Real.logb 4 lam) (ha0 : 0 ≤ a) (ha : a < N - Real.logb 4 lam - 1 / 2)
     {s : ℝ} (hs : 0 < s) (hsθ : s < 2 / p.toReal * s' + (1 - 2 / p.toReal) * a) {q : ℝ≥0∞}
     (hq : 1 ≤ q) (f : Lp ℂ p (volume : Measure ℝ)) :
-    Rd.littlewoodPaleyNorm hp s q f < ∞ ↔ coeffNorm m p s q f < ∞ := by
+    Rd.littlewoodPaleyNorm hp s q f < ∞ ↔ daubechiesCoeffNorm m p s q f < ∞ := by
   have hle := hg.sub_logb_le (by omega)
   exact littlewoodPaleyNorm_lt_top_iff_coeff m hN hp (bernsteinBound_interp m hN hp2 hg hs'0 hs'
     (by linarith) ha0 (by linarith) ha) hs hsθ
@@ -361,7 +361,7 @@ theorem besov_iff_coeff_of_two_le_of_holder (hN : 2 ≤ N) (hp : p ≠ ∞) (hp2
     (hsθ : s < 2 / p.toReal * s' + (1 - 2 / p.toReal) * a) {q : ℝ≥0∞} (hq : 1 ≤ q)
     (f : Lp ℂ p (volume : Measure ℝ)) :
     ‖f‖ₑ + ENNReal.lqNorm q (fun k => dyadicWeight s k * Rd.lpModulus p N f k) < ∞ ↔
-      coeffNorm m p s q f < ∞ := by
+      daubechiesCoeffNorm m p s q f < ∞ := by
   have hle := hg.sub_logb_le (by omega)
   exact besov_iff_coeff m hN hp (bernsteinBound_interp_of_holder m hN hp2 (by omega) hg hs'0 hs'
     (by linarith) ha0 hK) hs hsθ hq f

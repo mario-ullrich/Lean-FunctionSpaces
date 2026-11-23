@@ -44,7 +44,7 @@ theorems the exponent is `p : ℝ≥0∞` with `1 ≤ p < 2`, as in `Haar.memApp
 Jawerth and Popov (*Compression of wavelet decompositions*, Amer. J. Math. 114, 1992; DeVore,
 *Nonlinear approximation*, Acta Numer. 7, 1998, §3.6 and Remark 7.6). For `τ < 1` the Besov
 space lies in the quasi-Banach space `L_τ`; that case goes through approximation by steps in
-`L_τ` (`Haar.memApprox_nTerm_iff_modulus_of_lt_two` in
+`L_τ` (`Haar.memApprox_nTerm_iff_intervalModulus_of_lt_two` in
 `FunctionSpaces.Wavelets.Examples.HaarNTermBesov`).
 -/
 
@@ -294,7 +294,7 @@ theorem iUnion_scheme_subset_span :
   rcases eq_or_ne n 0 with rfl | hn0
   · rw [ApproximationScheme.mem_ofMonotoneSubmodules_zero.1 hn]
     exact zero_mem _
-  · rw [dyadicFiltration.mem_scheme hn0] at hn
+  · rw [dyadicFiltration.mem_filtrationScheme hn0] at hn
     rw [← Lp.condExpLp_of_mem (dyadicFiltration.le _) hn]
     exact condExpLp_mem_span_haarVec _ a
 
@@ -415,7 +415,7 @@ theorem memApprox_nTerm_iff_modulus {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp2 : p <
     (nTerm haarBasis.coeffDictionary).MemApprox (1 / p.toReal - 1 / 2) p f ↔
       ‖Lp.inclusionOfExponentLe (𝕜 := ℝ) vol hp2.le f‖ₑ + ENNReal.lqNorm p (fun k =>
         dyadicWeight (1 / p.toReal - 1 / 2) k *
-          lpModulus p 1 (Lp.inclusionOfExponentLe (𝕜 := ℝ) vol hp2.le f) k) < ∞ := by
+          intervalLpModulus p 1 (Lp.inclusionOfExponentLe (𝕜 := ℝ) vol hp2.le f) k) < ∞ := by
   obtain ⟨-, -, hθ, hθp⟩ := toReal_and_theta_bounds_of_one_le_of_lt_two Fact.out hp2
   rw [memApprox_nTerm_iff_memApprox_scheme hp2, ← memApprox_ppScheme_one_iff,
     memApprox_ppScheme_iff le_rfl (ne_top_of_lt hp2) Fact.out hθ.le hθp]

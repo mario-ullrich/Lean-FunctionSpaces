@@ -32,7 +32,7 @@ of order `L` centred at the cells and `‖λ‖_{f^s_{p,q}} < ∞`. No moment co
   `Rd.LocalMeansBump.tlCoeffNorm_cellCoef_le`). The atoms of `F` are the cell atoms of
   `η_j ⋆ (k_j ⋆ F)` with the coefficients `2^(jn) ∫_{P_{j,m}} |k_j ⋆ F|`, and each coefficient is
   at most a multiple of `M(k_j ⋆ F)` at every point of its cell
-  (`Rd.cellCoefFun_le_maximal`).
+  (`Rd.cellCoefFun_le_maximalFunction`).
 -/
 
 @[expose] public section
@@ -70,7 +70,7 @@ noncomputable def cellCoefFun (j : ℕ) (coef : ℕ → (Fin (finrank ℝ V) →
 
 omit [MeasurableSpace V] [BorelSpace V] in
 /-- On the cell `P_{j,m}` the step function of the coefficients is `|λ_{j,m}|`. -/
-theorem cellCoefFun_of_mem {j : ℕ} {m : Fin (finrank ℝ V) → ℤ} {x : V} (hx : x ∈ cell j m)
+theorem cellCoefFun_of_mem {j : ℕ} {m : Fin (finrank ℝ V) → ℤ} {x : V} (hx : x ∈ dyadicCell j m)
     (coef : ℕ → (Fin (finrank ℝ V) → ℤ) → ℂ) : cellCoefFun j coef x = ‖coef j m‖ₑ := by
   rw [cellCoefFun, show cellIndex j x = m from hx]
 
@@ -103,13 +103,13 @@ theorem aemeasurable_lqNorm_cellCoefFun (s : ℝ) (q : ℝ≥0∞)
 theorem dyadicWeight_mul_setLIntegral_ball_le {ρ : ℝ} (hρ : 0 < ρ) (j : ℕ) (g : V → ℝ≥0∞)
     (x : V) :
     dyadicWeight (finrank ℝ V : ℝ) j * ∫⁻ y in ball x (ρ / 2 ^ j), g y ≤
-      ENNReal.ofReal (ρ ^ finrank ℝ V) * volume (ball (0 : V) 1) * maximal g x := by
+      ENNReal.ofReal (ρ ^ finrank ℝ V) * volume (ball (0 : V) 1) * maximalFunction g x := by
   calc dyadicWeight (finrank ℝ V : ℝ) j * ∫⁻ y in ball x (ρ / 2 ^ j), g y
       ≤ dyadicWeight (finrank ℝ V : ℝ) j *
-          (volume (ball (0 : V) (ρ / 2 ^ j)) * maximal g x) := by
+          (volume (ball (0 : V) (ρ / 2 ^ j)) * maximalFunction g x) := by
         gcongr
-        exact setLIntegral_ball_le_mul_maximal (by positivity) g x
-    _ = ENNReal.ofReal (ρ ^ finrank ℝ V) * volume (ball (0 : V) 1) * maximal g x *
+        exact setLIntegral_ball_le_mul_maximalFunction (by positivity) g x
+    _ = ENNReal.ofReal (ρ ^ finrank ℝ V) * volume (ball (0 : V) 1) * maximalFunction g x *
           (dyadicWeight (-(finrank ℝ V : ℝ)) j * dyadicWeight (finrank ℝ V : ℝ) j) := by
         rw [volume_ball_div_two_pow hρ j 0]
         ring
@@ -118,15 +118,16 @@ theorem dyadicWeight_mul_setLIntegral_ball_le {ρ : ℝ} (hρ : 0 < ρ) (j : ℕ
 /-- **Coefficients below the maximal function**: if `|λ_{j,m}| ≤ 2^(jn) ∫_{P_{j,m}} g` for every
 cell of level `j`, then at every point `x` the coefficient of the cell containing `x` is at most
 `(2n + 1)^n |B_1| M g(x)`, since that cell lies in `B(x, (2n + 1) 2^(-j))`. -/
-theorem cellCoefFun_le_maximal {j : ℕ} {coef : ℕ → (Fin (finrank ℝ V) → ℤ) → ℂ}
+theorem cellCoefFun_le_maximalFunction {j : ℕ} {coef : ℕ → (Fin (finrank ℝ V) → ℤ) → ℂ}
     {g : V → ℝ≥0∞}
-    (hcoef : ∀ m, ‖coef j m‖ₑ ≤ dyadicWeight (finrank ℝ V : ℝ) j * ∫⁻ y in cell j m, g y)
+    (hcoef : ∀ m, ‖coef j m‖ₑ ≤ dyadicWeight (finrank ℝ V : ℝ) j * ∫⁻ y in dyadicCell j m, g y)
     (x : V) :
     cellCoefFun j coef x ≤ ENNReal.ofReal ((2 * finrank ℝ V + 1) ^ finrank ℝ V) *
-      volume (ball (0 : V) 1) * maximal g x := by
-  have hsub : cell j (cellIndex j x) ⊆ ball x ((2 * finrank ℝ V + 1) / 2 ^ j) := fun y hy => by
+      volume (ball (0 : V) 1) * maximalFunction g x := by
+  have hsub : dyadicCell j (cellIndex j x) ⊆
+      ball x ((2 * finrank ℝ V + 1) / 2 ^ j) := fun y hy => by
     have h1 := norm_sub_cellCenter_le hy
-    have h2 := norm_sub_cellCenter_le (mem_cell_cellIndex j x)
+    have h2 := norm_sub_cellCenter_le (mem_dyadicCell_cellIndex j x)
     rw [mem_ball, dist_eq_norm]
     calc ‖y - x‖ ≤ ‖y - cellCenter j (cellIndex j x)‖ + ‖x - cellCenter j (cellIndex j x)‖ := by
           simpa only [dist_eq_norm] using dist_triangle_right y x (cellCenter j (cellIndex j x))
@@ -135,7 +136,7 @@ theorem cellCoefFun_le_maximal {j : ℕ} {coef : ℕ → (Fin (finrank ℝ V) �
           rw [← add_div, div_lt_div_iff_of_pos_right (by positivity)]
           linarith
   calc cellCoefFun j coef x = ‖coef j (cellIndex j x)‖ₑ := rfl
-    _ ≤ dyadicWeight (finrank ℝ V : ℝ) j * ∫⁻ y in cell j (cellIndex j x), g y := hcoef _
+    _ ≤ dyadicWeight (finrank ℝ V : ℝ) j * ∫⁻ y in dyadicCell j (cellIndex j x), g y := hcoef _
     _ ≤ dyadicWeight (finrank ℝ V : ℝ) j *
           ∫⁻ y in ball x ((2 * finrank ℝ V + 1) / 2 ^ j), g y := by
         gcongr
@@ -145,15 +146,15 @@ theorem cellCoefFun_le_maximal {j : ℕ} {coef : ℕ → (Fin (finrank ℝ V) �
 `ρ 2^(-j)` of the centre of `P_{j,m}`, then `|λ_{j,m}| ≤ (2(ρ + 1))^n M(x)`, with `M` the maximal
 function of the step function of the coefficients of level `j`: the ball
 `B(c_{j,m}, 2^(-j)/2)` lies in `P_{j,m}` and in `B(x, (ρ + 1) 2^(-j))`. -/
-theorem enorm_coef_le_maximal_cellCoefFun {j : ℕ} (coef : ℕ → (Fin (finrank ℝ V) → ℤ) → ℂ)
+theorem enorm_coef_le_maximalFunction_cellCoefFun {j : ℕ} (coef : ℕ → (Fin (finrank ℝ V) → ℤ) → ℂ)
     {m : Fin (finrank ℝ V) → ℤ} {ρ : ℝ} {x : V} (hx : ‖x - cellCenter j m‖ ≤ ρ / 2 ^ j) :
     ‖coef j m‖ₑ ≤ ENNReal.ofReal ((2 * (ρ + 1)) ^ finrank ℝ V) *
-      maximal (cellCoefFun j coef) x := by
+      maximalFunction (cellCoefFun j coef) x := by
   have hρ : 0 ≤ ρ := by
     have h := (norm_nonneg _).trans hx
     rwa [le_div_iff₀ (by positivity), zero_mul] at h
   have hr : (0 : ℝ) < 1 / 2 / 2 ^ j := by positivity
-  have hsub : ball (cellCenter j m) (1 / 2 / 2 ^ j) ⊆ cell j m := by
+  have hsub : ball (cellCenter j m) (1 / 2 / 2 ^ j) ⊆ dyadicCell j m := by
     have h := ball_subset_zcell (V := V) (j : ℤ) m
     rwa [zcell_natCast, zcellCenter_natCast, zpow_natCast] at h
   have hball : ball (cellCenter j m) (1 / 2 / 2 ^ j) ⊆
@@ -174,8 +175,9 @@ theorem enorm_coef_le_maximal_cellCoefFun {j : ℕ} (coef : ℕ → (Fin (finran
           setLIntegral_const, Measure.addHaar_ball_center volume (cellCenter j m)]
     _ ≤ ∫⁻ y in ball x (2 * (ρ + 1) * (1 / 2 / 2 ^ j)), cellCoefFun j coef y :=
         lintegral_mono_set hball
-    _ ≤ volume (ball (0 : V) (2 * (ρ + 1) * (1 / 2 / 2 ^ j))) * maximal (cellCoefFun j coef) x :=
-        setLIntegral_ball_le_mul_maximal (by positivity) _ x
+    _ ≤ volume (ball (0 : V) (2 * (ρ + 1) * (1 / 2 / 2 ^ j))) *
+        maximalFunction (cellCoefFun j coef) x :=
+        setLIntegral_ball_le_mul_maximalFunction (by positivity) _ x
     _ = _ := by
         rw [Measure.addHaar_ball_mul_of_pos volume (0 : V) hc]
         ring
@@ -185,14 +187,15 @@ theorem enorm_coef_le_maximal_cellCoefFun {j : ℕ} (coef : ℕ → (Fin (finran
 the maximal function of the step function of the coefficients of level `j`: these cells lie in
 `B(x, (ρ + n + 1) 2^(-i))`, and `2^(-jn) |λ_{j,m}|` is the integral of the step function over
 `P_{j,m}`. -/
-theorem dyadicWeight_mul_tsum_ite_le_maximal {i j : ℕ} (hij : i ≤ j)
+theorem dyadicWeight_mul_tsum_ite_le_maximalFunction {i j : ℕ} (hij : i ≤ j)
     (coef : ℕ → (Fin (finrank ℝ V) → ℤ) → ℂ) {ρ : ℝ} (hρ : 0 ≤ ρ) (x : V) :
     dyadicWeight (-(finrank ℝ V : ℝ)) j *
         ∑' m, (if ‖x - cellCenter j m‖ ≤ ρ / 2 ^ i then ‖coef j m‖ₑ else 0) ≤
       ENNReal.ofReal ((ρ + finrank ℝ V + 1) ^ finrank ℝ V) * volume (ball (0 : V) 1) *
-        dyadicWeight (-(finrank ℝ V : ℝ)) i * maximal (cellCoefFun j coef) x := by
+        dyadicWeight (-(finrank ℝ V : ℝ)) i * maximalFunction (cellCoefFun j coef) x := by
   set r : ℝ := (ρ + finrank ℝ V + 1) / 2 ^ i
-  have hsub : ∀ m, ‖x - cellCenter j m‖ ≤ ρ / 2 ^ i → cell j m ⊆ ball x r := fun m hm y hy => by
+  have hsub : ∀ m, ‖x - cellCenter j m‖ ≤ ρ / 2 ^ i →
+      dyadicCell j m ⊆ ball x r := fun m hm y hy => by
     have h1 := norm_sub_cellCenter_le hy
     have h2 : (finrank ℝ V : ℝ) / 2 ^ j ≤ finrank ℝ V / 2 ^ i :=
       div_le_div_of_nonneg_left (Nat.cast_nonneg _) (by positivity)
@@ -205,22 +208,22 @@ theorem dyadicWeight_mul_tsum_ite_le_maximal {i j : ℕ} (hij : i ≤ j)
       _ < r := by linarith
   have hterm : ∀ m, dyadicWeight (-(finrank ℝ V : ℝ)) j *
       (if ‖x - cellCenter j m‖ ≤ ρ / 2 ^ i then ‖coef j m‖ₑ else 0) ≤
-        ∫⁻ y in cell j m, (ball x r).indicator (cellCoefFun j coef) y := fun m => by
+        ∫⁻ y in dyadicCell j m, (ball x r).indicator (cellCoefFun j coef) y := fun m => by
     split_ifs with hm
-    · rw [setLIntegral_congr_fun (measurableSet_cell j m) fun y hy => by
+    · rw [setLIntegral_congr_fun (measurableSet_dyadicCell j m) fun y hy => by
         rw [indicator_of_mem (hsub m hm hy), cellCoefFun_of_mem hy coef],
-        setLIntegral_const, volume_cell, mul_comm]
+        setLIntegral_const, volume_dyadicCell, mul_comm]
     · rw [mul_zero]
       exact zero_le
   calc dyadicWeight (-(finrank ℝ V : ℝ)) j *
         ∑' m, (if ‖x - cellCenter j m‖ ≤ ρ / 2 ^ i then ‖coef j m‖ₑ else 0)
-      ≤ ∑' m, ∫⁻ y in cell j m, (ball x r).indicator (cellCoefFun j coef) y := by
+      ≤ ∑' m, ∫⁻ y in dyadicCell j m, (ball x r).indicator (cellCoefFun j coef) y := by
         rw [← ENNReal.tsum_mul_left]
         exact ENNReal.tsum_le_tsum hterm
     _ = ∫⁻ y in ball x r, cellCoefFun j coef y := by
-        rw [← lintegral_eq_tsum_cell j, lintegral_indicator measurableSet_ball]
-    _ ≤ volume (ball (0 : V) r) * maximal (cellCoefFun j coef) x :=
-        setLIntegral_ball_le_mul_maximal (by positivity) _ x
+        rw [← lintegral_eq_tsum_dyadicCell j, lintegral_indicator measurableSet_ball]
+    _ ≤ volume (ball (0 : V) r) * maximalFunction (cellCoefFun j coef) x :=
+        setLIntegral_ball_le_mul_maximalFunction (by positivity) _ x
     _ = _ := by rw [volume_ball_div_two_pow (by positivity) i 0]
 
 /-! ### Smooth atoms -/
@@ -310,16 +313,16 @@ theorem enorm_conv_le_tsum_atom {K : V → ℂ} (hKc : Continuous K) {ρ : ℝ} 
 everywhere strongly measurable functions `g_j`, the step functions of the coefficients
 `λ_{j,m} = Rd.cellCoef 1 j g_j m` satisfy, at every point,
 `‖(2^(js) |λ_{j,m_j(x)}|)_j‖_{ℓ_q} ≤ (2n + 1)^n |B_1| ‖(M(2^(js) |g_j|)(x))_j‖_{ℓ_q}`. -/
-theorem lqNorm_cellCoefFun_le_lqNorm_maximal (q : ℝ≥0∞) (s : ℝ) {g : ℕ → V → ℂ}
+theorem lqNorm_cellCoefFun_le_lqNorm_maximalFunction (q : ℝ≥0∞) (s : ℝ) {g : ℕ → V → ℂ}
     (hg : ∀ j, AEStronglyMeasurable (g j) volume) (x : V) :
     lqNorm q (fun j => dyadicWeight s j * cellCoefFun j (fun j => cellCoef 1 j (g j)) x) ≤
       ENNReal.ofReal ((2 * finrank ℝ V + 1) ^ finrank ℝ V) * volume (ball (0 : V) 1) *
-        lqNorm q (fun j => maximal (fun y => dyadicWeight s j * ‖g j y‖ₑ) x) := by
+        lqNorm q (fun j => maximalFunction (fun y => dyadicWeight s j * ‖g j y‖ₑ) x) := by
   rw [← ENNReal.lqNorm_const_mul]
   refine ENNReal.lqNorm_mono fun j => ?_
-  rw [← dyadicWeight_mul_maximal, mul_left_comm]
+  rw [← dyadicWeight_mul_maximalFunction, mul_left_comm]
   gcongr
-  exact cellCoefFun_le_maximal (fun m => enorm_cellCoef_one_le j (hg j) m) x
+  exact cellCoefFun_le_maximalFunction (fun m => enorm_cellCoef_one_le j (hg j) m) x
 
 namespace LocalMeansBump
 
@@ -398,7 +401,7 @@ theorem enorm_conv_kernel_level_le_of_le (L : ℕ) {i j : ℕ} (hij : i ≤ j) {
     (hatom : ∀ m, IsSmoothAtom univ K d A j (cellCenter j m) (a j m)) {f : V → ℂ}
     (hf : ∀ᵐ x ∂volume, f x = ∑' m, coef j m * a j m x) (x : V) :
     ‖conv (b.kernel L i) f volume x‖ₑ ≤
-      b.tlAtomCoarseConst L d A * maximal (cellCoefFun j coef) x := by
+      b.tlAtomCoarseConst L d A * maximalFunction (cellCoefFun j coef) x := by
   have hR := b.radius_nonneg
   have hρ : 0 ≤ 2 * L * b.radius + d := by positivity
   refine (enorm_conv_le_tsum_atom (b.continuous_kernel L i) (by positivity)
@@ -420,9 +423,9 @@ theorem enorm_conv_kernel_level_le_of_le (L : ℕ) {i j : ℕ} (hij : i ≤ j) {
           dyadicWeight (finrank ℝ V : ℝ) i *
         (ENNReal.ofReal ((2 * L * b.radius + d + finrank ℝ V + 1) ^ finrank ℝ V) *
           volume (ball (0 : V) 1) * dyadicWeight (-(finrank ℝ V : ℝ)) i *
-            maximal (cellCoefFun j coef) x) :=
-        mul_le_mul_right (dyadicWeight_mul_tsum_ite_le_maximal hij coef hρ x) _
-    _ = b.tlAtomCoarseConst L d A * maximal (cellCoefFun j coef) x *
+            maximalFunction (cellCoefFun j coef) x) :=
+        mul_le_mul_right (dyadicWeight_mul_tsum_ite_le_maximalFunction hij coef hρ x) _
+    _ = b.tlAtomCoarseConst L d A * maximalFunction (cellCoefFun j coef) x *
           (dyadicWeight (-(finrank ℝ V : ℝ)) i * dyadicWeight (finrank ℝ V : ℝ) i) := by
         rw [tlAtomCoarseConst]
         ring
@@ -551,7 +554,7 @@ theorem ae_enorm_conv_kernel_level_le_of_lt {L : ℕ} (hL : 1 ≤ L) {d A : ℝ}
     (hf : ∀ᵐ x ∂volume, f x = ∑' m, coef j m * a j m x) {i : ℕ} (hji : j < i) :
     ∀ᵐ x ∂volume, ‖conv (b.kernel L i) f volume x‖ₑ ≤
       b.tlAtomFineConst L d A * dyadicWeight (-(L : ℝ)) (i - j) *
-        maximal (cellCoefFun j coef) x := by
+        maximalFunction (cellCoefFun j coef) x := by
   have hR := b.radius_nonneg
   have hρ : 0 ≤ d + L * b.radius := by positivity
   filter_upwards [ae_all_iff.2 fun m => b.ae_enorm_conv_kernel_atom_le_of_lt hL (hatom m) hji]
@@ -561,16 +564,16 @@ theorem ae_enorm_conv_kernel_level_le_of_lt {L : ℕ} (hL : 1 ≤ L) {d A : ℝ}
     ((ENNReal.tsum_mul_le_of_le hx).trans ?_)
   have hS : ∑' m, (if ‖x - cellCenter j m‖ ≤ (d + L * b.radius) / 2 ^ j then ‖coef j m‖ₑ
       else 0) ≤ ENNReal.ofReal ((d + L * b.radius + finrank ℝ V + 1) ^ finrank ℝ V) *
-        volume (ball (0 : V) 1) * maximal (cellCoefFun j coef) x := by
+        volume (ball (0 : V) 1) * maximalFunction (cellCoefFun j coef) x := by
     refine (ENNReal.mul_le_mul_iff_right (ENNReal.dyadicWeight_ne_zero (-(finrank ℝ V : ℝ)) j)
       (ENNReal.dyadicWeight_ne_top _ _)).1
-      ((dyadicWeight_mul_tsum_ite_le_maximal (le_refl j) coef hρ x).trans_eq ?_)
+      ((dyadicWeight_mul_tsum_ite_le_maximalFunction (le_refl j) coef hρ x).trans_eq ?_)
     ring
   calc b.momentAtomConst L A * dyadicWeight (-(L : ℝ)) (i - j) *
         ∑' m, (if ‖x - cellCenter j m‖ ≤ (d + L * b.radius) / 2 ^ j then ‖coef j m‖ₑ else 0)
       ≤ b.momentAtomConst L A * dyadicWeight (-(L : ℝ)) (i - j) *
         (ENNReal.ofReal ((d + L * b.radius + finrank ℝ V + 1) ^ finrank ℝ V) *
-          volume (ball (0 : V) 1) * maximal (cellCoefFun j coef) x) := by gcongr
+          volume (ball (0 : V) 1) * maximalFunction (cellCoefFun j coef) x) := by gcongr
     _ = _ := by rw [tlAtomFineConst]; ring
 
 /-! ### Synthesis: the theorem -/
@@ -598,7 +601,7 @@ theorem ae_enorm_conv_kernel_level_le {L : ℕ} (hL : 1 ≤ L) {d A : ℝ} (hd :
     (hf : ∀ᵐ x ∂volume, f x = ∑' m, coef j m * a j m x) (i : ℕ) :
     ∀ᵐ x ∂volume, ‖conv (b.kernel L i) f volume x‖ₑ ≤ b.tlAtomSynthesisConst L d A *
       ((if j ≤ i then dyadicWeight (-(L : ℝ)) (i - j) else 1) *
-        maximal (cellCoefFun j coef) x) := by
+        maximalFunction (cellCoefFun j coef) x) := by
   rcases lt_or_ge j i with hji | hij
   · filter_upwards [b.ae_enorm_conv_kernel_level_le_of_lt hL hd hatom hf hji] with x hx
     simp only [hji.le, ↓reduceIte]
@@ -611,8 +614,8 @@ theorem ae_enorm_conv_kernel_level_le {L : ℕ} (hL : 1 ≤ L) {d A : ℝ} (hd :
       split_ifs with hji
       · rw [le_antisymm hji hij, Nat.sub_self, ENNReal.dyadicWeight_zero_right]
       · exact le_rfl
-    calc b.tlAtomCoarseConst L d A * maximal (cellCoefFun j coef) x
-        ≤ b.tlAtomSynthesisConst L d A * (1 * maximal (cellCoefFun j coef) x) := by
+    calc b.tlAtomCoarseConst L d A * maximalFunction (cellCoefFun j coef) x
+        ≤ b.tlAtomSynthesisConst L d A * (1 * maximalFunction (cellCoefFun j coef) x) := by
           rw [one_mul, tlAtomSynthesisConst]
           gcongr
           exact le_max_left _ _
@@ -649,7 +652,7 @@ sums `f_j = ∑_m λ_{j,m} a_{j,m}` almost everywhere and `∑_{j ≤ J} f_j →
 `|k_i ⋆ F(x)| ≤ C ∑_j c_{ij} M_j(x)` with `c_{ij} = 2^(-(i-j)L)` for `j ≤ i`, `c_{ij} = 1` for
 `j > i`, `M_j` the maximal function of the step function of the coefficients of level `j` and
 `C = Rd.LocalMeansBump.tlAtomSynthesisConst L d A`. -/
-theorem enorm_localMean_le_tsum_maximal_cellCoefFun {L : ℕ} (hL : 1 ≤ L) (hp : p ≠ ∞)
+theorem enorm_localMean_le_tsum_maximalFunction_cellCoefFun {L : ℕ} (hL : 1 ≤ L) (hp : p ≠ ∞)
     {d A : ℝ} (hd : 0 ≤ d) {coef : ℕ → (Fin (finrank ℝ V) → ℤ) → ℂ}
     {a : ℕ → (Fin (finrank ℝ V) → ℤ) → V → ℂ}
     (hatom : ∀ j m, IsSmoothAtom univ L d A j (cellCenter j m) (a j m))
@@ -658,7 +661,7 @@ theorem enorm_localMean_le_tsum_maximal_cellCoefFun {L : ℕ} (hL : 1 ≤ L) (hp
     (hF : Tendsto (fun J => ∑ j ∈ Finset.range (J + 1), f j) atTop (𝓝 F)) :
     ∀ᵐ x ∂volume, ∀ i, ‖conv (b.kernel L i) F volume x‖ₑ ≤ b.tlAtomSynthesisConst L d A *
       ∑' j, (if j ≤ i then dyadicWeight (-(L : ℝ)) (i - j) else 1) *
-        maximal (cellCoefFun j coef) x := by
+        maximalFunction (cellCoefFun j coef) x := by
   have h1 := ae_all_iff.2 fun i => b.enorm_conv_kernel_le_tsum_level hp L f hF i
   have h2 := ae_all_iff.2 fun i => ae_all_iff.2 fun j =>
     b.ae_enorm_conv_kernel_level_le hL hd (hatom j) (hf j) i
@@ -684,11 +687,11 @@ theorem tlLocalMeansNorm_le_tlCoeffNorm {L : ℕ} (hL : 1 ≤ L) (hp1 : 1 < p) (
     (hF : Tendsto (fun J => ∑ j ∈ Finset.range (J + 1), f j) atTop (𝓝 F)) :
     b.tlLocalMeansNorm L s q F ≤ b.tlAtomSynthesisConst L d A * ENNReal.almostDiagonalConst s L *
       feffermanSteinConst V p q * tlCoeffNorm p s q coef :=
-  eLpNorm_le_of_le_lqNorm_maximal hp1 hp hq1 (b.aemeasurable_lqNorm_conv_kernel L s q F)
+  eLpNorm_le_of_le_lqNorm_maximalFunction hp1 hp hq1 (b.aemeasurable_lqNorm_conv_kernel L s q F)
     (fun j => ((measurable_cellCoefFun j coef).const_mul _).aemeasurable)
-    ((b.enorm_localMean_le_tsum_maximal_cellCoefFun hL hp hd hatom hf hF).mono fun x hx =>
+    ((b.enorm_localMean_le_tsum_maximalFunction_cellCoefFun hL hp hd hatom hf hF).mono fun x hx =>
       (ENNReal.lqNorm_le_almostDiagonalConst_mul_of_le hq1.le s L hx).trans_eq
-        (by simp only [dyadicWeight_mul_maximal]))
+        (by simp only [dyadicWeight_mul_maximalFunction]))
 
 /-! ### Analysis -/
 
@@ -708,8 +711,8 @@ theorem tl_atomic_decomposition {L : ℕ} (hL : 1 ≤ L) (K : ℕ) (hp : p ≠ �
         cellAtom 1 (b.dual L j) j (conv (b.kernel L j) F volume) m x) ∧
     Tendsto (fun J => ∑ j ∈ Finset.range (J + 1),
       convLp hp (b.integrable_dual L j) (b.localMean hp L j F)) atTop (𝓝 F) := by
-  have hcell : ∀ j m, MemLp ((cell j m).indicator (conv (b.kernel L j) F volume)) 1 volume :=
-    fun j m => memLp_one_indicator_cell Fact.out
+  have hcell : ∀ j m, MemLp ((dyadicCell j m).indicator (conv (b.kernel L j) F volume)) 1 volume :=
+    fun j m => memLp_one_indicator_dyadicCell Fact.out
       (memLp_conv Fact.out hp (b.integrable_kernel L j) (Lp.memLp F)) j m
   refine ⟨fun j m => ?_, fun j x => ?_, b.tendsto_sum_dual_localMean hp hL F⟩
   · have h := b.isSmoothAtom_cellAtom le_rfl L K j (hcell j m) m
@@ -730,9 +733,9 @@ theorem tlCoeffNorm_cellCoef_le (L : ℕ) (hp1 : 1 < p) (hp : p ≠ ∞) {q : �
     tlCoeffNorm p s q (fun j => cellCoef 1 j (conv (b.kernel L j) F volume)) ≤
       ENNReal.ofReal ((2 * finrank ℝ V + 1) ^ finrank ℝ V) * volume (ball (0 : V) 1) *
         feffermanSteinConst V p q * b.tlLocalMeansNorm L s q F :=
-  eLpNorm_le_of_le_lqNorm_maximal hp1 hp hq1 (aemeasurable_lqNorm_cellCoefFun s q _)
+  eLpNorm_le_of_le_lqNorm_maximalFunction hp1 hp hq1 (aemeasurable_lqNorm_cellCoefFun s q _)
     (fun j => (b.measurable_dyadicWeight_mul_conv_kernel L s j F).aemeasurable)
-    (ae_of_all _ (lqNorm_cellCoefFun_le_lqNorm_maximal q s fun j =>
+    (ae_of_all _ (lqNorm_cellCoefFun_le_lqNorm_maximalFunction q s fun j =>
       (b.continuous_conv_kernel L j F).aestronglyMeasurable))
 
 end LocalMeansBump

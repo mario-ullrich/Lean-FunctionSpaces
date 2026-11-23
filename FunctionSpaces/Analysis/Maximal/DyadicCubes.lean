@@ -84,8 +84,8 @@ theorem volume_real_zcell (k : ℤ) (m : Fin (finrank ℝ V) → ℤ) :
   rw [measureReal_def, volume_zcell, ENNReal.toReal_pow, ENNReal.toReal_ofReal (by positivity)]
 
 /-- The cells of level `j ∈ ℕ` have volume `2^(-jn)`. -/
-theorem volume_cell (j : ℕ) (m : Fin (finrank ℝ V) → ℤ) :
-    volume (cell (V := V) j m) = ENNReal.dyadicWeight (-(finrank ℝ V : ℝ)) j := by
+theorem volume_dyadicCell (j : ℕ) (m : Fin (finrank ℝ V) → ℤ) :
+    volume (dyadicCell (V := V) j m) = ENNReal.dyadicWeight (-(finrank ℝ V : ℝ)) j := by
   rw [← zcell_natCast, volume_zcell, zpow_natCast, ← one_div,
     ← ENNReal.ofReal_pow (by positivity), ENNReal.ofReal_one_div_two_pow_pow]
 

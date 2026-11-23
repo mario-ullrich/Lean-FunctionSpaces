@@ -32,7 +32,7 @@ exist (`Daubechies.exists_mask`), so every statement below applies to at least o
 * **Besov spaces by coefficients.** For `1 ≤ q ≤ ∞` and every `f ∈ L_p(ℝ)`,
   `‖f‖_p + ‖(2^(ks) ω_3(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff the coefficient quasi-norm
   `‖(⟨f, φ(· - k)⟩)_k‖_{ℓ_p} + ‖(2^(j(s + 1/2 - 1/p)) ‖(⟨f, ψ_{j,k}⟩)_k‖_{ℓ_p})_j‖_{ℓ_q}`
-  (`Daubechies.coeffNorm`) is finite, for `1 ≤ p ≤ 2` and `0 < s < 3 - log₂ 3`
+  (`Daubechies.daubechiesCoeffNorm`) is finite, for `1 ≤ p ≤ 2` and `0 < s < 3 - log₂ 3`
   (`Daubechies.besov_iff_coeff_order_three_le_two`) and for `2 ≤ p < ∞` and
   `0 < s < (2/p)(3 - log₂ 3) + (1 - 2/p)(5/2 - log₂ 3) = 5/2 - log₂ 3 + 1/p`
   (`Daubechies.besov_iff_coeff_order_three_two_le`), hence for every `1 ≤ p < ∞` and
@@ -192,13 +192,13 @@ variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 mask of order `N = 3`, every `1 ≤ p ≤ 2`, every `1 ≤ q ≤ ∞` and every `0 < s < 3 - log₂ 3`, an
 `f ∈ L_p(ℝ)` satisfies `‖f‖_p + ‖(2^(ks) ω_3(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff
 `‖(⟨f, φ(· - k)⟩)_k‖_{ℓ_p} + ‖(2^(j(s + 1/2 - 1/p)) ‖(⟨f, ψ_{j,k}⟩)_k‖_{ℓ_p})_j‖_{ℓ_q} < ∞`
-(`Daubechies.coeffNorm`). This is `Daubechies.besov_iff_coeff_of_le_two` for the growth bound
-`T^n 1 ≤ 2 · 9^n` (`Daubechies.transferGrowth_three`), whose exponent is
+(`Daubechies.daubechiesCoeffNorm`). This is `Daubechies.besov_iff_coeff_of_le_two` for the growth
+bound `T^n 1 ≤ 2 · 9^n` (`Daubechies.transferGrowth_three`), whose exponent is
 `3 - log₄ 9 = 3 - log₂ 3` (`Daubechies.three_sub_logb_four_nine`); `p ≤ 2` forces `p < ∞`. -/
 theorem besov_iff_coeff_order_three_le_two (m : Mask 3) (hp2 : p ≤ 2) {s : ℝ} (hs : 0 < s)
     (hsl : s < 3 - Real.logb 2 3) {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Lp ℂ p (volume : Measure ℝ)) :
     ‖f‖ₑ + ENNReal.lqNorm q (fun k => dyadicWeight s k * Rd.lpModulus p 3 f k) < ∞ ↔
-      coeffNorm m p s q f < ∞ :=
+      daubechiesCoeffNorm m p s q f < ∞ :=
   besov_iff_coeff_of_le_two m (by norm_num) (ne_top_of_le_ne_top ENNReal.ofNat_ne_top hp2) hp2
     transferGrowth_three hs (by rw [Nat.cast_ofNat, three_sub_logb_four_nine]; exact hsl) hq f
 
@@ -206,12 +206,12 @@ theorem besov_iff_coeff_order_three_le_two (m : Mask 3) (hp2 : p ≤ 2) {s : ℝ
 Daubechies mask of order `N = 3`, every `1 ≤ p ≤ 2`, every `1 ≤ q ≤ ∞` and every
 `0 < s < 3 - log₂ 3`, the Littlewood–Paley quasi-norm `‖(2^(js) ‖Δ_j f‖_p)_j‖_{ℓ_q}`
 (`Rd.littlewoodPaleyNorm`) of an `f ∈ L_p(ℝ)` is finite iff its coefficient quasi-norm
-`Daubechies.coeffNorm` is (`Daubechies.littlewoodPaleyNorm_lt_top_iff_coeff_of_le_two` for the
-growth bound `Daubechies.transferGrowth_three`). -/
+`Daubechies.daubechiesCoeffNorm` is (`Daubechies.littlewoodPaleyNorm_lt_top_iff_coeff_of_le_two` for
+the growth bound `Daubechies.transferGrowth_three`). -/
 theorem littlewoodPaleyNorm_lt_top_iff_coeff_order_three_le_two (m : Mask 3) (hp : p ≠ ∞)
     (hp2 : p ≤ 2) {s : ℝ} (hs : 0 < s) (hsl : s < 3 - Real.logb 2 3) {q : ℝ≥0∞} (hq : 1 ≤ q)
     (f : Lp ℂ p (volume : Measure ℝ)) :
-    Rd.littlewoodPaleyNorm hp s q f < ∞ ↔ coeffNorm m p s q f < ∞ :=
+    Rd.littlewoodPaleyNorm hp s q f < ∞ ↔ daubechiesCoeffNorm m p s q f < ∞ :=
   littlewoodPaleyNorm_lt_top_iff_coeff_of_le_two m (by norm_num) hp hp2 transferGrowth_three hs
     (by rw [Nat.cast_ofNat, three_sub_logb_four_nine]; exact hsl) hq f
 
@@ -236,8 +236,8 @@ mask of order `N = 3`, every `2 ≤ p < ∞`, every `1 ≤ q ≤ ∞` and every 
 `0 < s < (2/p)(3 - log₂ 3) + (1 - 2/p)(5/2 - log₂ 3)`, an `f ∈ L_p(ℝ)` satisfies
 `‖f‖_p + ‖(2^(ks) ω_3(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff
 `‖(⟨f, φ(· - k)⟩)_k‖_{ℓ_p} + ‖(2^(j(s + 1/2 - 1/p)) ‖(⟨f, ψ_{j,k}⟩)_k‖_{ℓ_p})_j‖_{ℓ_q} < ∞`
-(`Daubechies.coeffNorm`). The bound on `s` equals `5/2 - log₂ 3 + 1/p`: it is `3 - log₂ 3` for
-`p = 2` and decreases to the Hölder exponent `5/2 - log₂ 3` as `p → ∞`. Orders
+(`Daubechies.daubechiesCoeffNorm`). The bound on `s` equals `5/2 - log₂ 3 + 1/p`: it is `3 - log₂ 3`
+for `p = 2` and decreases to the Hölder exponent `5/2 - log₂ 3` as `p → ∞`. Orders
 `s' < 3 - log₂ 3` and `a < 5/2 - log₂ 3` with `s < (2/p) s' + (1 - 2/p) a`
 (`Daubechies.exists_orders_order_three`) make `Daubechies.besov_iff_coeff_of_two_le` applicable
 with the growth bound `Daubechies.transferGrowth_three`. -/
@@ -246,7 +246,7 @@ theorem besov_iff_coeff_order_three_two_le (m : Mask 3) (hp : p ≠ ∞) (hp2 : 
     (hsθ : s < 2 / p.toReal * (3 - Real.logb 2 3) + (1 - 2 / p.toReal) * (5 / 2 - Real.logb 2 3))
     {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Lp ℂ p (volume : Measure ℝ)) :
     ‖f‖ₑ + ENNReal.lqNorm q (fun k => dyadicWeight s k * Rd.lpModulus p 3 f k) < ∞ ↔
-      coeffNorm m p s q f < ∞ :=
+      daubechiesCoeffNorm m p s q f < ∞ :=
   let ⟨_, _, hs'0, hs', ha0, ha, hsθ'⟩ := exists_orders_order_three hsθ
   besov_iff_coeff_of_two_le m (by norm_num) hp hp2 transferGrowth_three hs'0 hs' ha0 ha hs hsθ'
     hq f
@@ -255,14 +255,14 @@ theorem besov_iff_coeff_order_three_two_le (m : Mask 3) (hp : p ≠ ∞) (hp2 : 
 Daubechies mask of order `N = 3`, every `2 ≤ p < ∞`, every `1 ≤ q ≤ ∞` and every `s` with
 `0 < s < (2/p)(3 - log₂ 3) + (1 - 2/p)(5/2 - log₂ 3)`, the Littlewood–Paley quasi-norm
 `‖(2^(js) ‖Δ_j f‖_p)_j‖_{ℓ_q}` (`Rd.littlewoodPaleyNorm`) of an `f ∈ L_p(ℝ)` is finite iff its
-coefficient quasi-norm `Daubechies.coeffNorm` is
+coefficient quasi-norm `Daubechies.daubechiesCoeffNorm` is
 (`Daubechies.littlewoodPaleyNorm_lt_top_iff_coeff_of_two_le` with the orders of
 `Daubechies.exists_orders_order_three`). -/
 theorem littlewoodPaleyNorm_lt_top_iff_coeff_order_three_two_le (m : Mask 3) (hp : p ≠ ∞)
     (hp2 : 2 ≤ p) {s : ℝ} (hs : 0 < s)
     (hsθ : s < 2 / p.toReal * (3 - Real.logb 2 3) + (1 - 2 / p.toReal) * (5 / 2 - Real.logb 2 3))
     {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Lp ℂ p (volume : Measure ℝ)) :
-    Rd.littlewoodPaleyNorm hp s q f < ∞ ↔ coeffNorm m p s q f < ∞ :=
+    Rd.littlewoodPaleyNorm hp s q f < ∞ ↔ daubechiesCoeffNorm m p s q f < ∞ :=
   let ⟨_, _, hs'0, hs', ha0, ha, hsθ'⟩ := exists_orders_order_three hsθ
   littlewoodPaleyNorm_lt_top_iff_coeff_of_two_le m (by norm_num) hp hp2 transferGrowth_three hs'0
     hs' ha0 ha hs hsθ' hq f
@@ -272,15 +272,15 @@ Daubechies mask of order `N = 3`, every `1 ≤ p < ∞`, every `1 ≤ q ≤ ∞`
 `0 < s < 5/2 - log₂ 3 ≈ 0.915`, an `f ∈ L_p(ℝ)` satisfies
 `‖f‖_p + ‖(2^(ks) ω_3(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff
 `‖(⟨f, φ(· - k)⟩)_k‖_{ℓ_p} + ‖(2^(j(s + 1/2 - 1/p)) ‖(⟨f, ψ_{j,k}⟩)_k‖_{ℓ_p})_j‖_{ℓ_q} < ∞`
-(`Daubechies.coeffNorm`). For `p ≤ 2` this is `Daubechies.besov_iff_coeff_order_three_le_two`,
-since `5/2 - log₂ 3 < 3 - log₂ 3`; for `p ≥ 2` it is
-`Daubechies.besov_iff_coeff_order_three_two_le`, since the bound there is
+(`Daubechies.daubechiesCoeffNorm`). For `p ≤ 2` this is
+`Daubechies.besov_iff_coeff_order_three_le_two`, since `5/2 - log₂ 3 < 3 - log₂ 3`; for `p ≥ 2` it
+is `Daubechies.besov_iff_coeff_order_three_two_le`, since the bound there is
 `5/2 - log₂ 3 + 1/p ≥ 5/2 - log₂ 3`. -/
 theorem besov_iff_coeff_order_three (m : Mask 3) (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s)
     (hsa : s < 5 / 2 - Real.logb 2 3) {q : ℝ≥0∞} (hq : 1 ≤ q)
     (f : Lp ℂ p (volume : Measure ℝ)) :
     ‖f‖ₑ + ENNReal.lqNorm q (fun k => dyadicWeight s k * Rd.lpModulus p 3 f k) < ∞ ↔
-      coeffNorm m p s q f < ∞ := by
+      daubechiesCoeffNorm m p s q f < ∞ := by
   rcases le_total p 2 with hp2 | hp2
   · exact besov_iff_coeff_order_three_le_two m hp2 hs (by linarith) hq f
   · have hw := (two_div_toReal_mem_Icc hp hp2).1

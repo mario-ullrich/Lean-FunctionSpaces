@@ -1092,7 +1092,7 @@ for every $L'$, independently of the order $L$ of the local means.
 
 \begin{theorem}[Convolutions under Peetre majorants]
 \label{thm:decay-kernels-maximal}
-\lean{Rd.enorm_conv_le_maximal_of_decay}
+\lean{Rd.enorm_conv_le_maximalFunction_of_decay}
 \leanok
 \uses{lem:maximal-function-kernels, def:conv, lem:weighted-jensen}
 Let $N > n$ and $\nu \geq 0$ be integers, $C \in [0, \infty)$, and let $K : V \to \C$
@@ -1149,7 +1149,7 @@ the other order.
 
 \begin{lemma}[Almost diagonal sums at one point]
 \label{lem:almost-diagonal-pointwise}
-\lean{Rd.ite_dyadicWeight_ne_top, Rd.dyadicWeight_mul_maximal}
+\lean{Rd.ite_dyadicWeight_ne_top, Rd.dyadicWeight_mul_maximalFunction}
 \leanok
 \uses{lem:almost-diagonal, lem:maximal-function-basic}
 For every $L \in \R$ and all $i, j \in \N$, $c^L_{ji} < \infty$. For every $s \in \R$, every
@@ -1170,7 +1170,7 @@ The weights are powers of $2$ or $1$. The second claim is part (3) of
 
 \begin{lemma}[From pointwise maximal bounds to $L_p(\ell_q)$]
 \label{lem:maximal-bounds-mixed-norm}
-\lean{Rd.eLpNorm_le_of_le_lqNorm_maximal}
+\lean{Rd.eLpNorm_le_of_le_lqNorm_maximalFunction}
 \leanok
 \uses{thm:fefferman-stein, lem:lp-norm-nonnegative, lem:lp-norm-homogeneity,
   lem:maximal-function-measurable}
@@ -1194,7 +1194,8 @@ Monotonicity and homogeneity of the $L_p$ norm, then \Cref{thm:fefferman-stein}.
 \lean{Rd.LocalMeansBump.blockByLocalMeansConst, Rd.LocalMeansBump.blockByLocalMeansConst_ne_top,
   Rd.LocalMeansBump.enorm_conv_conv_lpBlockKernel_dualKernel_le,
   Rd.LocalMeansBump.lpBlock_sum_dual_localMean_ae, Rd.LocalMeansBump.ae_enorm_lpBlock_sum_dual_le,
-  Rd.LocalMeansBump.maximal_enorm_localMean, Rd.LocalMeansBump.enorm_blockFun_le_tsum_maximal}
+  Rd.LocalMeansBump.maximalFunction_enorm_localMean,
+  Rd.LocalMeansBump.enorm_blockFun_le_tsum_maximalFunction}
 \leanok
 \uses{thm:cross-kernel-dual, thm:decay-kernels-maximal, lem:maximal-function-kernels,
   lem:reproducing-formula, lem:lp-limits-pointwise, lem:conv-op, lem:almost-diagonal-pointwise,
@@ -1231,7 +1232,7 @@ bound to $f$.
 \lean{Rd.LocalMeansBump.localMeansByBlockConst, Rd.LocalMeansBump.localMeansByBlockConst_ne_top,
   Rd.LocalMeansBump.enorm_conv_conv_kernel_Theta_le, Rd.LocalMeansBump.localMean_lpBlock,
   Rd.LocalMeansBump.localMean_sum_lpBlock_ae, Rd.LocalMeansBump.ae_enorm_localMean_sum_lpBlock_le,
-  Rd.LocalMeansBump.enorm_localMean_le_tsum_maximal}
+  Rd.LocalMeansBump.enorm_localMean_le_tsum_maximalFunction}
 \leanok
 \uses{thm:cross-kernel-theta, thm:decay-kernels-maximal, lem:maximal-function-kernels,
   lem:lp-blocks, thm:kernel-identities, lem:lp-limits-pointwise, lem:conv-op,
@@ -1266,8 +1267,8 @@ $\int g = 1$.
 
 \begin{lemma}[The almost diagonal step]
 \label{lem:tl-local-means-lq}
-\lean{Rd.LocalMeansBump.lqNorm_blockFun_le_lqNorm_maximal,
-  Rd.LocalMeansBump.lqNorm_localMean_le_lqNorm_maximal}
+\lean{Rd.LocalMeansBump.lqNorm_blockFun_le_lqNorm_maximalFunction,
+  Rd.LocalMeansBump.lqNorm_localMean_le_lqNorm_maximalFunction}
 \leanok
 \uses{thm:blocks-by-local-means, thm:local-means-by-blocks, lem:almost-diagonal-pointwise}
 Let $1 \leq p < \infty$, $1 \leq q \leq \infty$, $s \in \R$ and $L, L' \in \N$. For every
@@ -1329,8 +1330,8 @@ and $A_{s,L} < \infty$ for $0 < s < L$. For $0 < s < L$ the order satisfies $L \
 \begin{theorem}[Synthesis in Triebel--Lizorkin spaces]
 \label{thm:tl-synthesis-dual}
 \lean{Rd.LocalMeansBump.lpBlock_sum_dual_ae,
-  Rd.LocalMeansBump.ae_enorm_lpBlock_sum_dual_le_tsum_maximal,
-  Rd.LocalMeansBump.enorm_blockFun_le_tsum_maximal_of_tendsto,
+  Rd.LocalMeansBump.ae_enorm_lpBlock_sum_dualKernel_le_tsum_maximalFunction,
+  Rd.LocalMeansBump.enorm_blockFun_le_tsum_maximalFunction_of_tendsto,
   Rd.LocalMeansBump.triebelLizorkinNorm_le_of_tendsto_sum_dual}
 \leanok
 \uses{thm:blocks-by-local-means, thm:tl-local-means, lem:lp-limits-pointwise, lem:conv-op,
@@ -1704,8 +1705,9 @@ $h(\pi x + l \pi z) = (h \circ \pi)(x + l z)$.
 
 \begin{lemma}[Localisation of the maximal function]
 \label{lem:torus-maximal-localisation}
-\lean{Torus.ofReal_two_mul_add_two_pow_le_volume_ball_mul, Torus.maximal_comp_proj_le,
-  Torus.lqNorm_maximal_comp_proj_le, Torus.maximal_enorm_comp_proj_congr_ae}
+\lean{Torus.ofReal_two_mul_add_two_pow_le_volume_ball_mul,
+  Torus.maximalFunction_comp_quotientProj_le, Torus.lqNorm_maximalFunction_comp_quotientProj_le,
+  Torus.maximalFunction_enorm_comp_quotientProj_congr_ae}
 \leanok
 \uses{def:maximal-function, lem:period-box-counting, def:period-box, lem:lq-basic,
   lem:period-box-measure, lem:maximal-function-basic}
@@ -1765,7 +1767,7 @@ gives $\|(\int u_j)_j\|_{\ell_q} \leq \|G\|_{L_p(\T^d)}$.
 
 \begin{lemma}[From maximal bounds on the lift to $L_p(\ell_q)$]
 \label{lem:torus-maximal-bounds-mixed-norm}
-\lean{Torus.eLpNorm_le_of_le_lqNorm_maximal_proj}
+\lean{Torus.eLpNorm_le_of_le_lqNorm_maximalFunction_quotientProj}
 \leanok
 \uses{thm:fefferman-stein-periodic, lem:period-box-measure, lem:lp-norm-homogeneity,
   lem:maximal-function-measurable}
@@ -1829,7 +1831,8 @@ last identity is $\Theta_i * \psi_i = \psi_i$ (\Cref{thm:kernel-identities}) and
 
 \begin{theorem}[Blocks by local means on the torus]
 \label{thm:torus-blocks-by-local-means}
-\lean{Torus.lpBlock_sum_econvLp_dual_ae, Torus.maximal_econvLp_kernel_proj,
+\lean{Torus.lpBlock_sum_econvLp_dual_ae,
+  Torus.maximalFunction_periodicEconvLp_meansKernel_quotientProj,
   Torus.ae_enorm_lpBlock_sum_proj_le, Torus.ae_enorm_comp_proj_le_of_tendsto_Lp,
   Torus.enorm_blockFun_proj_le_tsum_maximal}
 \leanok
@@ -1862,7 +1865,7 @@ bound to $f$.
 
 \begin{theorem}[Local means by blocks on the torus]
 \label{thm:torus-local-means-by-blocks}
-\lean{Torus.econvLp_kernel_sum_lpBlock_ae, Torus.maximal_lpBlock_proj,
+\lean{Torus.econvLp_kernel_sum_lpBlock_ae, Torus.maximalFunction_periodicLpBlock_quotientProj,
   Torus.ae_enorm_econvLp_kernel_sum_proj_le, Torus.enorm_econv_kernel_proj_le_tsum_maximal}
 \leanok
 \uses{thm:local-means-by-blocks, lem:torus-reproducing-formula, lem:torus-lift-conv,
@@ -2162,7 +2165,7 @@ costs the factor $2^{(i-j)n}$; the average over the steps $h \in B_j$ removes it
 \label{thm:ball-means-by-local-means}
 \lean{Rd.LocalMeansBump.ballMeanDiff_partialSum_le, Rd.LocalMeansBump.ballMeanDiff_le_tsum_add,
   Rd.LocalMeansBump.tendsto_eLpNorm_ballMeanDiff_sub,
-  Rd.LocalMeansBump.ballMeanDiff_le_tsum_maximal}
+  Rd.LocalMeansBump.ballMeanDiff_le_tsum_maximalFunction}
 \leanok
 \uses{thm:ball-means-dual, lem:reproducing-formula, lem:reproducing-pointwise,
   lem:ball-means-basic, lem:ball-means-lp, lem:limits-of-pointwise-bounds,
@@ -2293,9 +2296,9 @@ and $x \mapsto \|(2^{js} \lambda_j(x))_j\|_{\ell_q}$ is measurable.
 
 \begin{lemma}[Coefficients and the maximal function]
 \label{lem:coefficients-maximal}
-\lean{Rd.dyadicWeight_mul_setLIntegral_ball_le, Rd.cellCoefFun_le_maximal,
-  Rd.enorm_coef_le_maximal_cellCoefFun,
-  Rd.dyadicWeight_mul_tsum_ite_le_maximal, ENNReal.tsum_mul_le_of_le}
+\lean{Rd.dyadicWeight_mul_setLIntegral_ball_le, Rd.cellCoefFun_le_maximalFunction,
+  Rd.enorm_coef_le_maximalFunction_cellCoefFun, Rd.dyadicWeight_mul_tsum_ite_le_maximalFunction,
+  ENNReal.tsum_mul_le_of_le}
 \leanok
 \uses{def:tl-sequence-space, def:maximal-function, lem:dyadic-ball-volume, lem:dyadic-cubes,
   lem:dyadic-cells, lem:cells-partition, lem:product-modulus}
@@ -2480,7 +2483,7 @@ the smoothness of the atoms give the decay $2^{-(i-j)L}$.
 \lean{Rd.LocalMeansBump.tlAtomSynthesisConst, Rd.LocalMeansBump.tlAtomSynthesisConst_ne_top,
   Rd.LocalMeansBump.ae_enorm_conv_kernel_level_le,
   Rd.LocalMeansBump.enorm_conv_kernel_le_tsum_level,
-  Rd.LocalMeansBump.enorm_localMean_le_tsum_maximal_cellCoefFun,
+  Rd.LocalMeansBump.enorm_localMean_le_tsum_maximalFunction_cellCoefFun,
   Rd.LocalMeansBump.tlLocalMeansNorm_le_tlCoeffNorm}
 \leanok
 \uses{lem:coarse-local-means-atoms, lem:fine-local-means-atoms, lem:lp-limits-pointwise,
@@ -2519,7 +2522,7 @@ $2^{js} \lambda_j$ finish.
 
 \begin{lemma}[Coefficients with exponent one]
 \label{lem:cell-coefficients-exponent-one}
-\lean{Rd.enorm_cellCoef_one_le, Rd.lqNorm_cellCoefFun_le_lqNorm_maximal}
+\lean{Rd.enorm_cellCoef_one_le, Rd.lqNorm_cellCoefFun_le_lqNorm_maximalFunction}
 \leanok
 \uses{def:cell-atoms, lem:coefficients-maximal, lem:almost-diagonal-pointwise, lem:lq-basic}
 For every almost everywhere strongly measurable $u : V \to \C$, every $j \in \N$ and every

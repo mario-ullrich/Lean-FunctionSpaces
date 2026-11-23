@@ -106,7 +106,7 @@ level `< n`. -/
 theorem toLp_basisScheme_eq : B.basisScheme.toLp μ 2 = B.toScheme := by
   ext n f
   change f ∈ (BoundedContinuousFunction.toLp (E := ℂ) 2 μ ℝ) '' (B.basisSpan n : Set _) ↔
-    f ∈ (B.span n : Set _)
+    f ∈ (B.levelSpan n : Set _)
   have hmap : (BoundedContinuousFunction.toLp (E := ℂ) 2 μ ℝ : _ → _) '' (B.basisSpan n : Set _)
       = SetLike.coe ((B.basisSpan n).map
           (BoundedContinuousFunction.toLp (E := ℂ) 2 μ ℂ).toLinearMap) := by
@@ -130,14 +130,14 @@ theorem memBesov_two_two_iff (hs : 0 < s) (f : Lp ℂ 2 μ) :
       Memℓp (fun i => ((((1 + B.level i : ℕ) : ℝ) ^ s : ℝ) : ℂ) * B.basis.repr f i) 2 := by
   change (B.basisScheme.toLp μ 2).MemApprox s 2 f ↔ _
   rw [toLp_basisScheme_eq]
-  exact B.memApprox_two_iff hs f
+  exact B.memApprox_two_iff_levelWeight hs f
 
 /-- **The Littlewood–Paley characterisation of `B^s_{2,q}`** for a continuous spectral basis,
 with sharp cut-offs at the levels `2^k`: for `s > 0` and `1 ≤ q ≤ ∞`, `f ∈ B^s_{2,q}` iff
 `‖P_1 f‖ + ‖(2^(ks) ‖Δ_k f‖_2)_k‖_{ℓ_q} < ∞`, with
 `‖Δ_k f‖_2² = ∑_{2^k ≤ λ(i) < 2^(k+1)} |⟨e_i, f⟩|²`. -/
 theorem memBesov_two_iff_blockNorm_lt_top (hs : 0 < s) (hq : 1 ≤ q) (f : Lp ℂ 2 μ) :
-    B.basisScheme.MemBesov μ 2 s q f ↔ B.projectionScheme.blockNorm s q f < ∞ := by
+    B.basisScheme.MemBesov μ 2 s q f ↔ B.spectralProjectionScheme.blockNorm s q f < ∞ := by
   change (B.basisScheme.toLp μ 2).MemApprox s q f ↔ _
   rw [toLp_basisScheme_eq]
   exact B.memApprox_iff_blockNorm_lt_top hs hq

@@ -1208,8 +1208,8 @@ Stein~\cite{Stein}.
 
 \begin{definition}[Hardy--Littlewood maximal function]
 \label{def:maximal-function}
-\lean{Rd.maximal, Rd.volume_ball_ne_zero, Rd.volume_ball_ne_top, Rd.le_maximal,
-  Rd.setLIntegral_ball_le_mul_maximal, Rd.maximal_le_of_forall}
+\lean{Rd.maximalFunction, Rd.volume_ball_ne_zero, Rd.volume_ball_ne_top, Rd.le_maximalFunction,
+  Rd.setLIntegral_ball_le_mul_maximalFunction, Rd.maximalFunction_le_of_forall}
 \leanok
 For $g : V \to [0, \infty]$ and $x \in V$,
 \[
@@ -1241,10 +1241,11 @@ and the closed ball has the volume of the open one (Mathlib's
 
 \begin{lemma}[Elementary properties of the maximal function]
 \label{lem:maximal-function-basic}
-\lean{Rd.maximal_mono, Rd.maximal_add_le, Rd.maximal_const_mul, Rd.maximal_le_of_ae_le,
-  Rd.maximal_const, Rd.maximal_congr_ae, Rd.maximal_indicator_le, Rd.maximal_iSup_of_monotone,
-  Rd.maximal_eq_self_of_subsingleton, Rd.maximal_le_eLpNorm_top,
-  Rd.maximal_le_maximal_indicator_add}
+\lean{Rd.maximalFunction_mono, Rd.maximalFunction_add_le, Rd.maximalFunction_const_mul,
+  Rd.maximalFunction_le_of_ae_le, Rd.maximalFunction_const, Rd.maximalFunction_congr_ae,
+  Rd.maximalFunction_indicator_le, Rd.maximalFunction_iSup_of_monotone,
+  Rd.maximalFunction_eq_self_of_subsingleton, Rd.maximalFunction_le_eLpNorm_top,
+  Rd.maximalFunction_le_maximalFunction_indicator_add}
 \leanok
 \uses{def:maximal-function}
 For all $g, h : V \to [0, \infty]$, every $x \in V$, every $c \in [0, \infty]$, every
@@ -1274,8 +1275,8 @@ one-point space.
 
 \begin{lemma}[Measurability of the maximal function]
 \label{lem:maximal-function-measurable}
-\lean{Rd.lowerSemicontinuous_setLIntegral_ball, Rd.lowerSemicontinuous_maximal,
-  Rd.measurable_maximal}
+\lean{Rd.lowerSemicontinuous_setLIntegral_ball, Rd.lowerSemicontinuous_maximalFunction,
+  Rd.measurable_maximalFunction}
 \leanok
 \uses{def:maximal-function}
 For every $g : V \to [0, \infty]$ and every $r \in \R$, the function
@@ -1295,12 +1296,11 @@ The lemma holds for every $g$; the measurability comes from the open balls.
 
 \begin{lemma}[Convolutions with kernels under radial majorants]
 \label{lem:maximal-function-kernels}
-\lean{Rd.lintegral_mul_le_setLIntegral_ball, Rd.lintegral_mul_le_maximal_of_ball, Rd.dyadicShell,
-  Rd.measurableSet_dyadicShell,
-  Rd.iUnion_dyadicShell, Rd.kernel_le_of_mem_dyadicShell, Rd.volume_ball_two_pow_mul,
-  Rd.tsum_two_inv_pow_mul_two_pow, Rd.lintegral_mul_le_maximal_of_decay, Rd.decayMaximalConst,
-  Rd.decayMaximalConst_ne_top, Rd.inv_one_add_two_pow_mul_pow_le,
-  Rd.lintegral_mul_le_maximal_of_one_add_norm}
+\lean{Rd.lintegral_mul_le_setLIntegral_ball, Rd.lintegral_mul_le_maximalFunction_of_ball,
+  Rd.dyadicShell, Rd.measurableSet_dyadicShell, Rd.iUnion_dyadicShell,
+  Rd.kernel_le_of_mem_dyadicShell, Rd.volume_ball_two_pow_mul, Rd.tsum_two_inv_pow_mul_two_pow,
+  Rd.lintegral_mul_le_maximalFunction_of_decay, Rd.decayMaximalConst, Rd.decayMaximalConst_ne_top,
+  Rd.inv_one_add_two_pow_mul_pow_le, Rd.lintegral_mul_le_maximalFunction_of_one_add_norm}
 \leanok
 \uses{def:maximal-function}
 For every integer $N > n$ let $c_{n,N} = 2^n \bigl(1 - 2^{-(N - n)}\bigr)^{-1}$ and
@@ -1335,9 +1335,10 @@ $C_{n,N}$ is the same for every level $j$.
 
 \begin{theorem}[Weighted weak type $(1,1)$]
 \label{thm:maximal-weak-type}
-\lean{Rd.setLIntegral_closedBall_le_maximal, Rd.mul_setLIntegral_closedBall_le, Rd.bigBallSet,
-  Rd.bigBallSet_mono, Rd.setOf_lt_maximal_subset, Rd.mul_setLIntegral_bigBallSet_le,
-  Rd.setLIntegral_maximal_gt_le, Rd.volume_maximal_gt_le}
+\lean{Rd.setLIntegral_closedBall_le_maximalFunction, Rd.mul_setLIntegral_closedBall_le,
+  Rd.bigBallSet, Rd.bigBallSet_mono, Rd.setOf_lt_maximalFunction_subset,
+  Rd.mul_setLIntegral_bigBallSet_le, Rd.setLIntegral_maximalFunction_gt_le,
+  Rd.volume_maximalFunction_gt_le}
 \leanok
 \uses{def:maximal-function, lem:maximal-function-basic}
 For all $g, w : V \to [0, \infty]$ and every $t \in (0, \infty]$,
@@ -1378,12 +1379,12 @@ exhaustion in $R$ takes the place of a bound of the radii by $\int g$.
 
 \begin{theorem}[Weighted strong type and the Hardy--Littlewood maximal theorem]
 \label{thm:maximal-strong-type}
-\lean{Rd.maximalConst, Rd.maximalConst_ne_top, Rd.setLIntegral_maximal_gt_le_indicator,
-  Rd.withDensity_maximal_gt_mul_le, Rd.measurable_indicator_half_lt,
+\lean{Rd.maximalConst, Rd.maximalConst_ne_top, Rd.setLIntegral_maximalFunction_gt_le_indicator,
+  Rd.withDensity_maximalFunction_gt_mul_le, Rd.measurable_indicator_half_lt,
   MeasureTheory.lintegral_Ioi_indicator_half_lt_mul_rpow,
   Rd.lintegral_Ioi_lintegral_indicator_mul_rpow,
-  Rd.lintegral_maximal_rpow_mul_le_of_measurable, Rd.lintegral_maximal_rpow_mul_le,
-  Rd.maximalConst_ne_zero, Rd.eLpNorm_maximal_le, Rd.maximal_lt_top_ae}
+  Rd.lintegral_maximalFunction_rpow_mul_le_of_measurable, Rd.lintegral_maximalFunction_rpow_mul_le,
+  Rd.maximalConst_ne_zero, Rd.eLpNorm_maximalFunction_le, Rd.maximalFunction_lt_top_ae}
 \leanok
 \uses{thm:maximal-weak-type, lem:maximal-function-basic, lem:maximal-function-measurable,
   lem:layer-cake, lem:power-integrals}
@@ -1539,7 +1540,7 @@ pattern of the original proof by Fefferman and Stein~\cite{FeffermanStein}.
 \begin{lemma}[The maximal function off enlarged sets]
 \label{lem:maximal-off-enlarged}
 \lean{Metric.subset_ball_three_mul_of_inter_nonempty, Rd.setLIntegral_inter_ball_le,
-  Rd.maximal_indicator_iUnion_le}
+  Rd.maximalFunction_indicator_iUnion_le}
 \leanok
 \uses{def:maximal-function}
 Let $I$ be a countable set, and for every $i \in I$ let $Q_i \subseteq \bar B(c_i, \rho_i)$ be
@@ -1595,7 +1596,7 @@ is almost everywhere measurable if $h$ is.
 \label{lem:calderon-zygmund-averages}
 \lean{Rd.czAverage_eq_of_mem, Rd.czAverage_eq_zero_of_notMem, Rd.tsum_setLIntegral_czMaximal,
   Rd.tsum_le_mul_lintegral_of_le_setLIntegral, Rd.lintegral_czAverage, Rd.czAverage_self_le,
-  Rd.maximal_indicator_czSet_le, Rd.volume_closedBall_zcellCenter, Rd.volume_czEnlarged_le}
+  Rd.maximalFunction_indicator_czSet_le, Rd.volume_closedBall_zcellCenter, Rd.volume_czEnlarged_le}
 \leanok
 \uses{def:calderon-zygmund-good-part, thm:calderon-zygmund, lem:maximal-off-enlarged,
   lem:dyadic-cubes}
@@ -1648,7 +1649,7 @@ a series.
 \begin{lemma}[The good parts]
 \label{lem:calderon-zygmund-good-parts}
 \lean{Rd.lintegral_czGood, Rd.ae_czGood_self_le, Rd.lqNorm_czGood_le, Rd.ae_lqNorm_czGood_le,
-  Rd.lintegral_lqNorm_czGood_le, Rd.maximal_le_maximal_czGood,
+  Rd.lintegral_lqNorm_czGood_le, Rd.maximalFunction_le_maximalFunction_czGood,
   MeasureTheory.lintegral_rpow_le_mul_lintegral_of_ae_le, Rd.lintegral_lqNorm_czGood_rpow_le}
 \leanok
 \uses{def:calderon-zygmund-good-part, lem:calderon-zygmund-averages, lem:lq-norm-means,
@@ -1698,7 +1699,7 @@ $q$-th power.
 
 \begin{lemma}[The case $q = p$ in integral form]
 \label{lem:fefferman-stein-diagonal}
-\lean{Rd.lintegral_maximal_rpow_le, Rd.lintegral_lqNorm_maximal_rpow_le}
+\lean{Rd.lintegral_maximalFunction_rpow_le, Rd.lintegral_lqNorm_maximalFunction_rpow_le}
 \leanok
 \uses{thm:maximal-strong-type, lem:lp-norm-nonnegative, lem:maximal-function-measurable}
 For every $p > 1$ and every almost everywhere measurable $g : V \to [0, \infty]$,
@@ -1717,8 +1718,8 @@ $\sum_j \int (\cdot)^q$ by Tonelli's theorem, and the first bound applies to eac
 
 \begin{theorem}[Vector-valued weak type $(1,1)$]
 \label{thm:vector-weak-type}
-\lean{Rd.weakTypeConst, Rd.weakTypeConst_ne_top, Rd.volume_lt_mul_lqNorm_maximal_czGood_le,
-  Rd.volume_lqNorm_maximal_gt_le}
+\lean{Rd.weakTypeConst, Rd.weakTypeConst_ne_top, Rd.volume_lt_mul_lqNorm_maximalFunction_czGood_le,
+  Rd.volume_lqNorm_maximalFunction_gt_le}
 \leanok
 \uses{lem:calderon-zygmund-good-parts, lem:calderon-zygmund-averages,
   lem:fefferman-stein-diagonal, def:calderon-zygmund-good-part, lem:maximal-function-measurable,
@@ -1749,8 +1750,8 @@ and \Cref{lem:calderon-zygmund-averages} bounds $|\Omega^*|$.
 
 \begin{lemma}[Splitting at a level]
 \label{lem:fefferman-stein-split}
-\lean{ENNReal.lqNorm_indicator, Rd.lqNorm_maximal_le_indicator_add,
-  Rd.volume_lqNorm_maximal_gt_le_split, Rd.volume_lqNorm_maximal_gt_mul_rpow_le}
+\lean{ENNReal.lqNorm_indicator, Rd.lqNorm_maximalFunction_le_indicator_add,
+  Rd.volume_lqNorm_maximalFunction_gt_le_split, Rd.volume_lqNorm_maximalFunction_gt_mul_rpow_le}
 \leanok
 \uses{thm:vector-weak-type, lem:fefferman-stein-diagonal, lem:maximal-function-basic,
   lem:maximal-function-measurable, lem:lq-norm-means, lem:parts-above-below-level,
@@ -1790,8 +1791,8 @@ $(\tau/2)^{-1} \tau^{p-1} = 2 \tau^{p-2}$ and $(\tau/2)^{-q} \tau^{p-1} = 2^q \t
 \begin{theorem}[The case $p < q$]
 \label{thm:fefferman-stein-interpolation}
 \lean{Rd.interpolationConst, Rd.interpolationConst_ne_top, Rd.interpolationConst_ne_zero,
-  Rd.lintegral_lqNorm_maximal_rpow_le_of_lt_of_measurable,
-  Rd.lintegral_lqNorm_maximal_rpow_le_of_lt}
+  Rd.lintegral_lqNorm_maximalFunction_rpow_le_of_lt_of_measurable,
+  Rd.lintegral_lqNorm_maximalFunction_rpow_le_of_lt}
 \leanok
 \uses{lem:fefferman-stein-split, lem:tonelli-steps-measure-space, lem:layer-cake,
   lem:maximal-function-basic, lem:maximal-function-measurable, lem:lq-norm-means}
@@ -1818,8 +1819,8 @@ $r = q$ evaluates the two resulting integrals.
 \begin{theorem}[The case $q < p$]
 \label{thm:fefferman-stein-duality}
 \lean{Rd.dualityConst, Rd.dualityConst_ne_top, Rd.dualityConst_ne_zero,
-  Rd.lintegral_rpow_sum_maximal_ne_top, Rd.lintegral_rpow_sum_maximal_le_mul,
-  Rd.lintegral_rpow_sum_maximal_le, Rd.lintegral_lqNorm_maximal_rpow_le_of_gt}
+  Rd.lintegral_rpow_sum_maximalFunction_ne_top, Rd.lintegral_rpow_sum_maximalFunction_le_mul,
+  Rd.lintegral_rpow_sum_maximalFunction_le, Rd.lintegral_lqNorm_maximalFunction_rpow_le_of_gt}
 \leanok
 \uses{thm:maximal-strong-type, lem:fefferman-stein-diagonal, lem:cancel-conjugate-power,
   lem:maximal-function-measurable}

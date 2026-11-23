@@ -64,13 +64,13 @@ noncomputable def qiKernel {r : ℕ} (hr : 1 ≤ r) (k : ℕ) : KernelOp (qiIdx 
 
 /-- The coefficients of the kernel operator are the quasi-interpolant coefficients, for `g`
 integrable on `[0, 1]`. -/
-theorem qiKernel_coef {r : ℕ} (hr : 1 ≤ r) (k : ℕ) {g : ℝ → ℂ}
+theorem qiKernel_kernelCoef {r : ℕ} (hr : 1 ≤ r) (k : ℕ) {g : ℝ → ℂ}
     (hg : IntegrableOn g (Icc (0 : ℝ) 1)) (n : qiIdx r (2 ^ k)) :
-    (qiKernel hr k).coef g n = qiCoeff hr k g n := by
-  calc (qiKernel hr k).coef g n
+    (qiKernel hr k).kernelCoef g n = qiCoeff hr k g n := by
+  calc (qiKernel hr k).kernelCoef g n
       = ∫ s in Icc (0 : ℝ) 1, ∑ i : Fin r, bsplineCoef hr (qiBasisPoly r k (n : ℤ).toNat i) n *
           (g s * (ppKernel r k).kernel (⟨(n : ℤ).toNat, toNat_lt_of_mem_qiIdx n.2⟩, i) s) := by
-        rw [KernelOp.coef]
+        rw [KernelOp.kernelCoef]
         congr 1
         funext s
         simp only [qiKernel]
@@ -83,7 +83,7 @@ theorem qiKernel_coef {r : ℕ} (hr : 1 ≤ r) (k : ℕ) {g : ℝ → ℂ}
     _ = ∑ i : Fin r, bsplineCoef hr (qiBasisPoly r k (n : ℤ).toNat i) n *
           locCoeff r k g (n : ℤ).toNat i := by
         refine Finset.sum_congr rfl fun i _ => ?_
-        rw [integral_const_mul, ← KernelOp.coef, ppKernel_coef]
+        rw [integral_const_mul, ← KernelOp.kernelCoef, ppKernel_kernelCoef]
     _ = qiCoeff hr k g n := by
         rw [qiCoeff_eq_sum]
         exact Finset.sum_congr rfl fun i _ => mul_comm _ _
@@ -97,7 +97,7 @@ theorem qiKernel_apply {r : ℕ} (hr : 1 ≤ r) (k : ℕ) {g : ℝ → ℂ}
   rw [KernelOp.apply, qiPieces, ppFun_sum, Finset.sum_apply,
     ← Finset.sum_coe_sort (qiIdx r (2 ^ k))]
   refine Finset.sum_congr rfl fun n _ => ?_
-  rw [qiKernel_coef hr k hg n, ppFun_const_mul]
+  rw [qiKernel_kernelCoef hr k hg n, ppFun_const_mul]
   rfl
 
 /-- **The quasi-interpolant is bounded on `L_p[0, 1]`** as a kernel operator, uniformly in the
@@ -158,7 +158,7 @@ theorem IsCubeSpline.const_mul {r k : ℕ} {g : (Fin d → ℝ) → ℂ} (hg : I
     rfl⟩
 
 /-- The zero function is a spline on the cube. -/
-theorem isCubeSpline_zero (r k : ℕ) : IsCubeSpline (d := d) r k 0 :=
+theorem isCubeSpline_zero_fun (r k : ℕ) : IsCubeSpline (d := d) r k 0 :=
   ⟨bddMeas_zero, fun _ _ => ⟨0, fun _ => Submodule.zero_mem _, splineJoins_zero r k, by
     rw [ppFun_zero]; rfl⟩⟩
 
@@ -255,13 +255,14 @@ theorem isCubeSpline_iff_mem_span_prod_ppFun {r k : ℕ} (hr : 1 ≤ r) {g : (Fi
   · refine fun h => (Submodule.span_le.2 ?_) h
     rintro _ ⟨Q, hQ, hJ, rfl⟩
     have hexp : ∀ i (t : ℝ), ppFun k (Q i) t =
-        ∑ m, (qiKernel hr k).coef (ppFun k (Q i)) m * (qiKernel hr k).rangeFn m t := fun i t => by
+        ∑ m, (qiKernel hr k).kernelCoef (ppFun k (Q i)) m *
+            (qiKernel hr k).rangeFn m t := fun i t => by
       have h := congrFun (qiKernel_apply hr k (bddMeas_ppFun k (Q i)).integrableOn_Icc) t
       rw [ppFun_qiPieces_ppFun hr (hQ i) (hJ i)] at h
       rw [← h]
       rfl
     have hG : (fun x : Fin d → ℝ => ∏ i, ppFun k (Q i) (x i)) =
-        ∑ j : Fin d → qiIdx r (2 ^ k), (∏ i, (qiKernel hr k).coef (ppFun k (Q i)) (j i)) •
+        ∑ j : Fin d → qiIdx r (2 ^ k), (∏ i, (qiKernel hr k).kernelCoef (ppFun k (Q i)) (j i)) •
           fun x : Fin d → ℝ => ∏ i, (qiKernel hr k).rangeFn (j i) (x i) := by
       funext x
       simp only [hexp, Finset.prod_univ_sum, Fintype.piFinset_univ, Finset.sum_apply,
@@ -278,7 +279,7 @@ noncomputable def cubeSplineSpace (r k : ℕ) : Submodule ℝ (Lp ℂ p (cubeVol
   add_mem' := by
     rintro f f' ⟨g, hg, hfg⟩ ⟨g', hg', hfg'⟩
     exact ⟨g + g', hg.add hg', (Lp.coeFn_add f f').trans (hfg.add hfg')⟩
-  zero_mem' := ⟨0, isCubeSpline_zero r k, Lp.coeFn_zero ℂ p (cubeVol d)⟩
+  zero_mem' := ⟨0, isCubeSpline_zero_fun r k, Lp.coeFn_zero ℂ p (cubeVol d)⟩
   smul_mem' := by
     rintro c f ⟨g, hg, hfg⟩
     refine ⟨fun x => (c : ℂ) * g x, hg.const_mul c, ?_⟩

@@ -28,7 +28,7 @@ Mathlib's `fwdDiff h f` and `Δ_h^r = (fwdDiff h)^[r]` its `r`-fold iterate.
 * **The Bernstein inequality.** For `a ∈ V_j` and `2^j t ≤ 1`,
   `ω_r(a, t)_p ≤ C ω_r(φ, 2^j t)_p ‖a‖_p` with `C = (2N + 2r)^(1 - 1/p) (2N)^(1/p) ‖φ‖_{p'}`
   independent of `j`, `a` and `t` (`Daubechies.smoothnessModulus_mem_scalingSpace_le`,
-  `Daubechies.bernsteinConst`). The element `a` is the expansion `∑_k λ_k φ_{j,k}` of its
+  `Daubechies.daubechiesBernsteinConst`). The element `a` is the expansion `∑_k λ_k φ_{j,k}` of its
   coefficients `λ_k = ⟨a, φ_{j,k}⟩`, so `Δ_h^r a = ∑_k λ_k (Δ_{2^j h}^r φ)_{j,k}`. For
   `|2^j h| ≤ 1` the generator `Δ_{2^j h}^r φ` vanishes outside `[-r, 2N - 1 + r]`, and the upper
   stability of the expansions and the coefficient estimate of
@@ -143,12 +143,13 @@ expansions (`Daubechies.eLpNorm_expand_le`) for the generators `Δ_H^r φ`, `|H|
 outside `[-r, 2N - 1 + r]` (`Daubechies.natCeil_higherDiff_support_add_one`); the second is the
 constant of the coefficient estimate (`Daubechies.coeffConst` for `φ` and its support
 `[0, 2N - 1]`). It is the same for every level and every scale. -/
-noncomputable def bernsteinConst (p : ℝ≥0∞) (r : ℕ) : ℝ≥0∞ :=
+noncomputable def daubechiesBernsteinConst (p : ℝ≥0∞) (r : ℕ) : ℝ≥0∞ :=
   ((2 * N + 2 * r : ℕ) : ℝ≥0∞) ^ (1 - 1 / p.toReal) * coeffConst (scalingFun m) 0 (2 * N - 1) p
 
 /-- The constant of the Bernstein inequality is finite for `N ≥ 2`, since `φ` lies in every
 `L_p` (`Daubechies.coeffConst_ne_top`). -/
-theorem bernsteinConst_ne_top (hN : 2 ≤ N) (p : ℝ≥0∞) (r : ℕ) : bernsteinConst m p r ≠ ∞ :=
+theorem daubechiesBernsteinConst_ne_top (hN : 2 ≤ N) (p : ℝ≥0∞) (r : ℕ) :
+    daubechiesBernsteinConst m p r ≠ ∞ :=
   ENNReal.mul_ne_top (ENNReal.rpow_ne_top_of_ne_zero (Nat.cast_ne_zero.2 (by omega))
     (ENNReal.natCast_ne_top _)) (coeffConst_ne_top _ _ (memLp_scalingFun m hN _))
 
@@ -158,8 +159,9 @@ variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 
 /-- **The Bernstein inequality for the scaling spaces**: for `N ≥ 2`, `1 ≤ p < ∞`, every order
 `r`, every level `j`, every `a ∈ V_j` (`Daubechies.scalingSpace`) and every `t` with `2^j t ≤ 1`,
-`ω_r(a, t)_p ≤ C ω_r(φ, 2^j t)_p ‖a‖_p` with the constant `C = Daubechies.bernsteinConst m p r`,
-which is finite (`Daubechies.bernsteinConst_ne_top`) and independent of `j`, `a` and `t`.
+`ω_r(a, t)_p ≤ C ω_r(φ, 2^j t)_p ‖a‖_p` with the constant
+`C = Daubechies.daubechiesBernsteinConst m p r`, which is finite
+(`Daubechies.daubechiesBernsteinConst_ne_top`) and independent of `j`, `a` and `t`.
 
 The element `a` is almost everywhere the expansion `∑_k λ_k φ_{j,k}` of its coefficients
 `λ_k = ⟨a, φ_{j,k}⟩` (`Daubechies.proj_eq_self_of_mem`), so for `|h| ≤ t`,
@@ -174,7 +176,8 @@ theorem smoothnessModulus_mem_scalingSpace_le (hN : 2 ≤ N) (hp : p ≠ ∞) (r
     {a : Lp ℂ p (volume : Measure ℝ)} (ha : a ∈ scalingSpace m p hN hp j) {t : ℝ}
     (ht : 2 ^ j * t ≤ 1) :
     Rd.smoothnessModulus volume r p (a : ℝ → ℂ) t ≤
-      bernsteinConst m p r * Rd.smoothnessModulus volume r p (scalingFun m) (2 ^ j * t) * ‖a‖ₑ := by
+      daubechiesBernsteinConst m p r * Rd.smoothnessModulus volume r p (scalingFun m) (2 ^ j * t) *
+        ‖a‖ₑ := by
   have hae : (a : ℝ → ℂ) =ᵐ[volume] projFun m j a := by
     have h := proj_apply_ae m hN hp j a
     rwa [proj_eq_self_of_mem m hN hp ha] at h
@@ -209,9 +212,10 @@ theorem smoothnessModulus_mem_scalingSpace_le (hN : 2 ≤ N) (hp : p ≠ ∞) (r
         rw [Lp.enorm_def]
         exact mul_le_mul' (mul_le_mul_right (Rd.eLpNorm_higherDiff_le_smoothnessModulus hHt) _)
           hcoef
-    _ = bernsteinConst m p r * Rd.smoothnessModulus volume r p (scalingFun m) (2 ^ j * t) *
+    _ = daubechiesBernsteinConst m p r *
+        Rd.smoothnessModulus volume r p (scalingFun m) (2 ^ j * t) *
           ‖a‖ₑ := by
-        rw [bernsteinConst]
+        rw [daubechiesBernsteinConst]
         ring
 
 end Lp
@@ -317,7 +321,7 @@ variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 /-- **The modulus of an element of `V_j` at the dyadic scales `2^(-k)`, `k ≥ j`**: let `N ≥ 2`,
 `1 ≤ p < ∞`, and let `ω_r(φ, t)_p ≤ K t^θ` for all `0 < t ≤ 1`. Then for all levels `j ≤ k` and
 every `a ∈ V_j` (`Daubechies.scalingSpace`), `ω_r(a, 2^(-k))_p ≤ C K 2^(-(k-j)θ) ‖a‖_p` with
-`C = Daubechies.bernsteinConst m p r`. This is the Bernstein inequality
+`C = Daubechies.daubechiesBernsteinConst m p r`. This is the Bernstein inequality
 `Daubechies.smoothnessModulus_mem_scalingSpace_le` at `t = 2^(-k)`, where
 `2^j t = 2^(-(k-j)) ∈ (0, 1]`. -/
 theorem lpModulus_le_of_mem_scalingSpace (hN : 2 ≤ N) (hp : p ≠ ∞) {θ : ℝ} {r : ℕ}
@@ -325,19 +329,20 @@ theorem lpModulus_le_of_mem_scalingSpace (hN : 2 ≤ N) (hp : p ≠ ∞) {θ : �
       Rd.smoothnessModulus volume r p (scalingFun m) t ≤ K * ENNReal.ofReal (t ^ θ))
     {j k : ℕ} (hjk : j ≤ k) {a : Lp ℂ p (volume : Measure ℝ)}
     (ha : a ∈ scalingSpace m p hN hp j) :
-    Rd.lpModulus p r a k ≤ bernsteinConst m p r * K * dyadicWeight (-θ) (k - j) * ‖a‖ₑ := by
+    Rd.lpModulus p r a k ≤
+      daubechiesBernsteinConst m p r * K * dyadicWeight (-θ) (k - j) * ‖a‖ₑ := by
   have hmem : (2 : ℝ) ^ j * (1 / 2 ^ k) ∈ Set.Ioc (0 : ℝ) 1 := by
     rw [two_pow_mul_one_div_two_pow hjk]
     exact ⟨by positivity, (div_le_one (by positivity)).2 (one_le_pow₀ one_le_two)⟩
   calc Rd.lpModulus p r a k = Rd.smoothnessModulus volume r p (a : ℝ → ℂ) (1 / 2 ^ k) := rfl
-    _ ≤ bernsteinConst m p r *
+    _ ≤ daubechiesBernsteinConst m p r *
           Rd.smoothnessModulus volume r p (scalingFun m) (2 ^ j * (1 / 2 ^ k)) * ‖a‖ₑ :=
         smoothnessModulus_mem_scalingSpace_le m hN hp r ha hmem.2
-    _ ≤ bernsteinConst m p r * (K * ENNReal.ofReal (((2 : ℝ) ^ j * (1 / 2 ^ k)) ^ θ)) *
+    _ ≤ daubechiesBernsteinConst m p r * (K * ENNReal.ofReal (((2 : ℝ) ^ j * (1 / 2 ^ k)) ^ θ)) *
           ‖a‖ₑ := by
         gcongr
         exact hK _ hmem
-    _ = bernsteinConst m p r * K * dyadicWeight (-θ) (k - j) * ‖a‖ₑ := by
+    _ = daubechiesBernsteinConst m p r * K * dyadicWeight (-θ) (k - j) * ‖a‖ₑ := by
         rw [two_pow_mul_one_div_two_pow hjk, ENNReal.ofReal_one_div_two_pow_rpow]
         ring
 
@@ -355,8 +360,9 @@ theorem inverse_scheme (hN : 2 ≤ N) (hp : p ≠ ∞) {θ : ℝ} {r : ℕ}
     ∃ CB : ℝ≥0∞, CB ≠ ∞ ∧ ∀ j k : ℕ, ∀ a ∈ scheme m p hN hp (2 ^ j),
       Rd.lpModulus p r a k ≤ CB * dyadicWeight (-θ) (k - j) * ‖a‖ₑ := by
   obtain ⟨K, hK, hmod⟩ := hB
-  refine ⟨bernsteinConst m p r * K + 2 ^ r,
-    ENNReal.add_ne_top.2 ⟨ENNReal.mul_ne_top (bernsteinConst_ne_top m hN p r) hK, by simp⟩,
+  refine ⟨daubechiesBernsteinConst m p r * K + 2 ^ r,
+    ENNReal.add_ne_top.2
+      ⟨ENNReal.mul_ne_top (daubechiesBernsteinConst_ne_top m hN p r) hK, by simp⟩,
     fun j k a ha => ?_⟩
   rcases lt_or_ge k j with hkj | hjk
   · rw [Nat.sub_eq_zero_of_le hkj.le, ENNReal.dyadicWeight_zero_right, mul_one]

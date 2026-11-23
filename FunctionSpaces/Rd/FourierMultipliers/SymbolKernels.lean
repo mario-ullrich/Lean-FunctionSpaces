@@ -38,7 +38,7 @@ A smooth function `m` on a real normed space has **symbol growth of order `σ`**
   (`Rd.HasSymbolGrowth.exists_isUniformSchwartz_psiDualS`).
 * **The maximal bound**: convolutions with the dilates `(G_j)_{2^j}` of a uniform family are
   bounded by the Hardy–Littlewood maximal function, uniformly in `j`, with the finite constant
-  `C_{n,N} C_{A,0,N}` (`Rd.IsUniformSchwartz.enorm_conv_dilate_le_maximal`,
+  `C_{n,N} C_{A,0,N}` (`Rd.IsUniformSchwartz.enorm_conv_dilate_le_maximalFunction`,
   `Rd.decayMaximalConst_mul_familyDecayConst_ne_top`).
 -/
 
@@ -619,18 +619,18 @@ bounds `A` and `N > n`, then for every level `j`, function `g` and point `x`,
 `C_{A,0,N} = Rd.familyDecayConst A 0 N`, both finite, independent of `j`. The dilates obey the
 Peetre bound `|(G_j)_{2^j}(y)| ≤ C_{A,0,N} 2^{jn} (1 + 2^j ‖y‖)^{-N}`
 (`Rd.enorm_dilate_schwartz_le`, `Rd.schwartzDecayConst_le_familyDecayConst`), and such kernels
-lie below the maximal function (`Rd.enorm_conv_le_maximal_of_decay`). -/
-theorem IsUniformSchwartz.enorm_conv_dilate_le_maximal {G : ℕ → 𝓢(V, ℂ)} {A : ℕ → ℕ → ℝ}
+lie below the maximal function (`Rd.enorm_conv_le_maximalFunction_of_decay`). -/
+theorem IsUniformSchwartz.enorm_conv_dilate_le_maximalFunction {G : ℕ → 𝓢(V, ℂ)} {A : ℕ → ℕ → ℝ}
     (h : IsUniformSchwartz G A) {N : ℕ} (hN : finrank ℝ V < N) (j : ℕ) (g : V → ℂ) (x : V) :
     ‖conv (dilate (2 ^ j) (G j : V → ℂ)) g volume x‖ₑ ≤
-      decayMaximalConst V N * familyDecayConst A 0 N * maximal (fun y => ‖g y‖ₑ) x :=
-  enorm_conv_le_maximal_of_decay hN (familyDecayConst_ne_top A 0 N)
+      decayMaximalConst V N * familyDecayConst A 0 N * maximalFunction (fun y => ‖g y‖ₑ) x :=
+  enorm_conv_le_maximalFunction_of_decay hN (familyDecayConst_ne_top A 0 N)
     (Filter.Eventually.of_forall fun y => (enorm_dilate_schwartz_le (G j) N j y).trans (by
       gcongr
       exact schwartzDecayConst_le_familyDecayConst h j 0 N)) g x
 
-/-- The constant `C_{n,N} C_{A,0,N}` of `Rd.IsUniformSchwartz.enorm_conv_dilate_le_maximal` is
-finite for `N > n` (`Rd.decayMaximalConst_ne_top`, `Rd.familyDecayConst_ne_top`). -/
+/-- The constant `C_{n,N} C_{A,0,N}` of `Rd.IsUniformSchwartz.enorm_conv_dilate_le_maximalFunction`
+is finite for `N > n` (`Rd.decayMaximalConst_ne_top`, `Rd.familyDecayConst_ne_top`). -/
 theorem decayMaximalConst_mul_familyDecayConst_ne_top {N : ℕ} (hN : finrank ℝ V < N)
     (A : ℕ → ℕ → ℝ) : decayMaximalConst V N * familyDecayConst A 0 N ≠ ∞ :=
   ENNReal.mul_ne_top (decayMaximalConst_ne_top hN) (familyDecayConst_ne_top A 0 N)

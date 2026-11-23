@@ -233,25 +233,26 @@ product of `H^1`, `σ_i⁻² = 1 + λ_i/(4π²)` for the Dirichlet eigenvalue `�
 (`Rd.dirichletScheme_level`), the frequency in the units of the Fourier scheme of the torus. The
 factor `2π` rescales the levels only and changes no approximation space. -/
 noncomputable def dirichletScheme :
-    SpectralScheme (dirichletCompactEmbedding hΩ).index (Lp ℂ 2 (volume.restrict (Ω : Set V))) :=
+    SpectralScheme (dirichletCompactEmbedding hΩ).eigenpairIndex
+      (Lp ℂ 2 (volume.restrict (Ω : Set V))) :=
   (dirichletCompactEmbedding hΩ).spectralScheme
 
 /-- The singular values of the Dirichlet embedding are at most `1`
 (`Rd.norm_dirichletEmbedding_le`). -/
 theorem singularValue_dirichletCompactEmbedding_le_one
-    (i : (dirichletCompactEmbedding hΩ).index) :
+    (i : (dirichletCompactEmbedding hΩ).eigenpairIndex) :
     (dirichletCompactEmbedding hΩ).singularValue i ≤ 1 :=
   ((dirichletCompactEmbedding hΩ).singularValue_le_norm i).trans norm_dirichletEmbedding_le
 
 /-- **The Dirichlet eigenvalue** `λ_i = 4π² (σ_i⁻² - 1)` of the index `i`, `σ_i` the singular value
 of the Dirichlet embedding; `-Δ φ_i = λ_i φ_i` weakly (`Rd.dirichletEigenfunction_weak`). These
 are the eigenvalues `λ_n` of Brezis (Theorem 9.31). -/
-noncomputable def dirichletEigenvalue (i : (dirichletCompactEmbedding hΩ).index) : ℝ :=
+noncomputable def dirichletEigenvalue (i : (dirichletCompactEmbedding hΩ).eigenpairIndex) : ℝ :=
   4 * π ^ 2 * (((dirichletCompactEmbedding hΩ).singularValue i)⁻¹ ^ 2 - 1)
 
 /-- The Dirichlet eigenvalues are nonnegative, since `σ_i ≤ 1`
 (`Rd.singularValue_dirichletCompactEmbedding_le_one`). -/
-theorem dirichletEigenvalue_nonneg (i : (dirichletCompactEmbedding hΩ).index) :
+theorem dirichletEigenvalue_nonneg (i : (dirichletCompactEmbedding hΩ).eigenpairIndex) :
     0 ≤ dirichletEigenvalue hΩ i := by
   have hσ := (dirichletCompactEmbedding hΩ).singularValue_pos i
   have h1 : 1 ≤ ((dirichletCompactEmbedding hΩ).singularValue i)⁻¹ :=
@@ -262,7 +263,7 @@ theorem dirichletEigenvalue_nonneg (i : (dirichletCompactEmbedding hΩ).index) :
   positivity
 
 /-- `1 + λ_i/(4π²) = σ_i⁻²`. -/
-theorem one_add_dirichletEigenvalue_div (i : (dirichletCompactEmbedding hΩ).index) :
+theorem one_add_dirichletEigenvalue_div (i : (dirichletCompactEmbedding hΩ).eigenpairIndex) :
     1 + dirichletEigenvalue hΩ i / (4 * π ^ 2) =
       ((dirichletCompactEmbedding hΩ).singularValue i)⁻¹ ^ 2 := by
   unfold dirichletEigenvalue
@@ -270,7 +271,7 @@ theorem one_add_dirichletEigenvalue_div (i : (dirichletCompactEmbedding hΩ).ind
   ring
 
 /-- **The level of a Dirichlet eigenfunction** is `⌊√(1 + λ_i/(4π²))⌋₊`. -/
-theorem dirichletScheme_level (i : (dirichletCompactEmbedding hΩ).index) :
+theorem dirichletScheme_level (i : (dirichletCompactEmbedding hΩ).eigenpairIndex) :
     (dirichletScheme hΩ).level i = ⌊Real.sqrt (1 + dirichletEigenvalue hΩ i / (4 * π ^ 2))⌋₊ := by
   rw [one_add_dirichletEigenvalue_div, Real.sqrt_sq
     (inv_nonneg.2 ((dirichletCompactEmbedding hΩ).singularValue_pos i).le)]
@@ -279,7 +280,7 @@ theorem dirichletScheme_level (i : (dirichletCompactEmbedding hΩ).index) :
 /-- **The Dirichlet eigenfunction** `φ_i = σ_i⁻¹ v_i ∈ H^1_0(Ω)`, `v_i` the singular basis of the
 Dirichlet embedding; its restriction to `Ω` is the basis vector `e_i` of `L_2(Ω)`
 (`Rd.dirichletEmbedding_dirichletEigenfunction`). -/
-noncomputable def dirichletEigenfunction (i : (dirichletCompactEmbedding hΩ).index) :
+noncomputable def dirichletEigenfunction (i : (dirichletCompactEmbedding hΩ).eigenpairIndex) :
     zeroBoundarySpace 1 Ω :=
   ((((dirichletCompactEmbedding hΩ).singularValue i)⁻¹ : ℝ) : ℂ) •
     (dirichletCompactEmbedding hΩ).singularBasis i
@@ -288,7 +289,7 @@ noncomputable def dirichletEigenfunction (i : (dirichletCompactEmbedding hΩ).in
 vector `e_i` of the Dirichlet scheme, since `J v_i = σ_i e_i`
 (`CompactDenseEmbedding.apply_singularBasis`). -/
 theorem dirichletEmbedding_dirichletEigenfunction
-    (i : (dirichletCompactEmbedding hΩ).index) :
+    (i : (dirichletCompactEmbedding hΩ).eigenpairIndex) :
     dirichletEmbedding Ω (dirichletEigenfunction hΩ i) = (dirichletScheme hΩ).basis i := by
   have h := (dirichletCompactEmbedding hΩ).apply_singularBasis i
   rw [dirichletCompactEmbedding_toCLM] at h
@@ -320,7 +321,7 @@ basis `(b_k)` of `V`, every index `i` and every `w ∈ H^1_0(Ω)`,
 (`CompactDenseEmbedding.inner_singularBasis`) with the inner product of `H^1_0(Ω)`
 (`Rd.inner_zeroBoundarySpace_eq`). -/
 theorem dirichletEigenfunction_weak {ι : Type*} [Fintype ι] (b : OrthonormalBasis ι ℝ V)
-    (i : (dirichletCompactEmbedding hΩ).index) (w : zeroBoundarySpace 1 Ω) :
+    (i : (dirichletCompactEmbedding hΩ).eigenpairIndex) (w : zeroBoundarySpace 1 Ω) :
     ∑ k, ⟪weakDerivL2 (b k) ((dirichletEigenfunction hΩ i : RestrictionSpace 1 Ω) : H^{1}(V)),
         weakDerivL2 (b k) ((w : RestrictionSpace 1 Ω) : H^{1}(V))⟫_ℂ =
       (dirichletEigenvalue hΩ i : ℂ) *
@@ -359,9 +360,9 @@ theorem exists_dirichletEmbedding_eq_iff (f : Lp ℂ 2 (volume.restrict (Ω : Se
     Iff.rfl
   rw [h, (dirichletCompactEmbedding hΩ).range_eq_range_sobolevEmbed,
     SpectralScheme.mem_range_sobolevEmbed_iff]
-  have hw : ∀ i, (((dirichletCompactEmbedding hΩ).spectralScheme.weight 1 i : ℝ) : ℂ) =
+  have hw : ∀ i, (((dirichletCompactEmbedding hΩ).spectralScheme.levelWeight 1 i : ℝ) : ℂ) =
       ((1 + (dirichletScheme hΩ).level i : ℕ) : ℂ) := fun i => by
-    simp [SpectralScheme.weight, dirichletScheme]
+    simp [SpectralScheme.levelWeight, dirichletScheme]
   simp only [hw]
   rfl
 
@@ -381,7 +382,7 @@ blocks of the expansion of `f` in the Dirichlet eigenbasis have finite `B^θ_{2,
 theorem memKMethod_dirichlet_iff_blockNorm_lt_top {θ : ℝ} {q : ℝ≥0∞} (hθ : 0 < θ) (hθ' : θ < 1)
     (hq : 1 ≤ q) {f : Lp ℂ 2 (volume.restrict (Ω : Set V))} :
     (InterpCouple.ofMap ((dirichletEmbedding Ω).restrictScalars ℝ)).MemKMethod θ q f ↔
-      (dirichletScheme hΩ).projectionScheme.blockNorm θ q f < ∞ := by
+      (dirichletScheme hΩ).spectralProjectionScheme.blockNorm θ q f < ∞ := by
   rw [memKMethod_dirichlet_iff hΩ hθ hθ' hq,
     (dirichletScheme hΩ).memApprox_iff_blockNorm_lt_top hθ hq]
 

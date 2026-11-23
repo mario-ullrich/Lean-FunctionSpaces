@@ -379,8 +379,8 @@ theorem norm_iteratedFDeriv_cellAtom_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) {K g : 
     (ENNReal.mul_ne_top ENNReal.ofReal_ne_top measure_ball_lt_top.ne)
   have hKs : HasCompactSupport K := HasCompactSupport.intro (isCompact_closedBall 0 (ρ / 2 ^ j))
     fun y hy => hKρ y (by simpa [mem_closedBall, dist_zero_right, not_le] using hy)
-  have hgl : LocallyIntegrable ((cell j m).indicator g) volume :=
-    (hg.indicator (measurableSet_cell j m).nullMeasurableSet).locallyIntegrable hp1
+  have hgl : LocallyIntegrable ((dyadicCell j m).indicator g) volume :=
+    (hg.indicator (measurableSet_dyadicCell j m).nullMeasurableSet).locallyIntegrable hp1
   refine norm_iteratedFDeriv_const_mul_conv_le hK hKs hgl _ l x (by positivity) fun v => ?_
   set K' : V → ℂ := fun y => iteratedFDeriv ℝ l K y v
   have hK'ρ : ∀ y, ρ / 2 ^ j < ‖y‖ → K' y = 0 := fun y hy => by
@@ -407,7 +407,7 @@ theorem norm_iteratedFDeriv_cellAtom_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) {K g : 
   have h := enorm_inv_cellCoef_mul_conv_le hp1 hg m hK' hρ hK'ρ x
   have h' := ENNReal.toReal_mono (ENNReal.mul_ne_top ENNReal.ofReal_ne_top hX) h
   rw [toReal_enorm, ENNReal.toReal_mul, ENNReal.toReal_ofReal (by positivity)] at h'
-  calc ‖(cellCoef p j g m)⁻¹ * conv K' ((cell j m).indicator g) volume x‖
+  calc ‖(cellCoef p j g m)⁻¹ * conv K' ((dyadicCell j m).indicator g) volume x‖
       ≤ A * 2 ^ (j * l) * (∏ i, ‖v i‖) * X.toReal := h'
     _ = A * 2 ^ (j * l) * X.toReal * ∏ i, ‖v i‖ := by ring
 
@@ -429,8 +429,8 @@ theorem isSmoothAtom_cellAtom {p : ℝ≥0∞} (hp1 : 1 ≤ p) (L K j : ℕ) {g 
   have hKρ : ∀ y, 2 * L * b.radius / 2 ^ j < ‖y‖ → b.dual L j y = 0 := fun y hy =>
     b.dual_eq_zero_of_lt L j hy
   have hKs := b.hasCompactSupport_dual L j
-  have hgl : LocallyIntegrable ((cell j m).indicator g) volume :=
-    (hg.indicator (measurableSet_cell j m).nullMeasurableSet).locallyIntegrable hp1
+  have hgl : LocallyIntegrable ((dyadicCell j m).indicator g) volume :=
+    (hg.indicator (measurableSet_dyadicCell j m).nullMeasurableSet).locallyIntegrable hp1
   have hsmooth : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (cellAtom p (b.dual L j) j g m) := by
     have := (contDiff_conv (b.contDiff_dual L j) hKs hgl).const_smul (cellCoef p j g m)⁻¹
     exact this

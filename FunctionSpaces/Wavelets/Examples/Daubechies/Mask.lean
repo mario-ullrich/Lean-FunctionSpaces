@@ -20,9 +20,9 @@ mask has order `N ≥ 1` (`Daubechies.Mask.one_le`). From `L` one builds
 * the **mask polynomial** `m(z) = ((1 + z)/2)^N L(z)` (`Daubechies.maskPoly`), with
   `deg m ≤ 2N - 1` (`Daubechies.natDegree_maskPoly_le`) and `(z + 1)^N ∣ m(z)`
   (`Daubechies.X_add_one_pow_dvd_maskPoly`);
-* the **filter coefficients** `c_k = 2 [z^k] m(z)` for `k ∈ ℤ` (`Daubechies.coeff`), with
-  `c_k = 0` for `k < 0` and for `k ≥ 2N` (`Daubechies.coeff_eq_zero`) and
-  `∑_{k<2N} c_k = 2 m(1) = 2` (`Daubechies.sum_coeff`);
+* the **filter coefficients** `c_k = 2 [z^k] m(z)` for `k ∈ ℤ` (`Daubechies.daubechiesCoeff`), with
+  `c_k = 0` for `k < 0` and for `k ≥ 2N` (`Daubechies.daubechiesCoeff_eq_zero`) and
+  `∑_{k<2N} c_k = 2 m(1) = 2` (`Daubechies.sum_daubechiesCoeff`);
 * the **symbol** `m_0(ξ) = m(e^(-2πiξ)) = (1/2) ∑_k c_k e^(-2πikξ)` (`Daubechies.symbol`,
   `Daubechies.symbol_eq_sum`), a smooth function of period `1` with `m_0(0) = 1`
   (`Daubechies.contDiff_symbol`, `Daubechies.symbol_periodic`, `Daubechies.symbol_zero`).
@@ -217,8 +217,9 @@ noncomputable def maskPoly : ℝ[X] := (C (1 / 2 : ℝ) * (1 + X)) ^ N * m.L
 
 /-- **The filter coefficients** `c_k = 2 [z^k] m(z)` of a mask, for `k ∈ ℤ`: twice the
 coefficients of the mask polynomial for `k ≥ 0`, and `0` for `k < 0`. They vanish outside
-`0 ≤ k < 2N` (`Daubechies.coeff_eq_zero`) and add up to `2` (`Daubechies.sum_coeff`). -/
-noncomputable def coeff (k : ℤ) : ℝ :=
+`0 ≤ k < 2N` (`Daubechies.daubechiesCoeff_eq_zero`) and add up to `2`
+(`Daubechies.sum_daubechiesCoeff`). -/
+noncomputable def daubechiesCoeff (k : ℤ) : ℝ :=
   if 0 ≤ k then 2 * (maskPoly m).coeff k.toNat else 0
 
 /-- **The symbol** `m_0(ξ) = m(e^(-2πiξ))` of a mask, the mask polynomial evaluated on the unit
@@ -228,7 +229,7 @@ noncomputable def symbol (ξ : ℝ) : ℂ := aeval (expFreq ξ) (maskPoly m)
 /-- **The Lipschitz constant of the symbol at `0`**, `π ∑_{k < 2N} k |c_k|`: by
 `Daubechies.norm_symbol_sub_one_le`, `|m_0(ξ) - 1| ≤ π ∑_k k |c_k| · |ξ|`. -/
 noncomputable def symbolLip : ℝ :=
-  π * ∑ k ∈ Finset.range (2 * N), (k : ℝ) * |coeff m k|
+  π * ∑ k ∈ Finset.range (2 * N), (k : ℝ) * |daubechiesCoeff m k|
 
 /-- The mask polynomial is divisible by `(z + 1)^N`: `m(z) = (z + 1)^N · 2^(-N) L(z)`. This is the
 source of the sum rules of the filter coefficients. -/
@@ -253,27 +254,28 @@ theorem natDegree_maskPoly_lt : (maskPoly m).natDegree < 2 * N := by
   omega
 
 /-- For `k ∈ ℕ` the filter coefficient is `c_k = 2 [z^k] m(z)`. -/
-theorem coeff_natCast (k : ℕ) : coeff m k = 2 * (maskPoly m).coeff k := by
-  simp [coeff]
+theorem daubechiesCoeff_natCast (k : ℕ) : daubechiesCoeff m k = 2 * (maskPoly m).coeff k := by
+  simp [daubechiesCoeff]
 
 /-- The filter coefficients vanish outside `0 ≤ k < 2N`: for `k < 0` by definition, for
 `k ≥ 2N` since the mask polynomial has degree `< 2N`. -/
-theorem coeff_eq_zero {k : ℤ} (hk : k < 0 ∨ 2 * (N : ℤ) ≤ k) : coeff m k = 0 := by
+theorem daubechiesCoeff_eq_zero {k : ℤ} (hk : k < 0 ∨ 2 * (N : ℤ) ≤ k) :
+    daubechiesCoeff m k = 0 := by
   rcases hk with hk | hk
-  · simp only [coeff, not_le.2 hk, ↓reduceIte]
+  · simp only [daubechiesCoeff, not_le.2 hk, ↓reduceIte]
   · lift k to ℕ using (by omega)
     have := natDegree_maskPoly_lt m
-    rw [coeff_natCast, coeff_eq_zero_of_natDegree_lt (by omega), mul_zero]
+    rw [daubechiesCoeff_natCast, coeff_eq_zero_of_natDegree_lt (by omega), mul_zero]
 
 /-- `m(1) = 1`: `((1 + 1)/2)^N L(1) = 1`. -/
 theorem eval_one_maskPoly : (maskPoly m).eval 1 = 1 := by
   norm_num [maskPoly, m.eval_L_one]
 
 /-- **The filter coefficients add up to `2`**: `∑_{k < 2N} c_k = 2 m(1) = 2`. -/
-theorem sum_coeff : ∑ k ∈ Finset.range (2 * N), coeff m k = 2 := by
+theorem sum_daubechiesCoeff : ∑ k ∈ Finset.range (2 * N), daubechiesCoeff m k = 2 := by
   have h := eval_eq_sum_range' (natDegree_maskPoly_lt m) (1 : ℝ)
   simp only [eval_one_maskPoly, one_pow, mul_one] at h
-  simp only [coeff_natCast, ← Finset.mul_sum, ← h, mul_one]
+  simp only [daubechiesCoeff_natCast, ← Finset.mul_sum, ← h, mul_one]
 
 /-! ### The symbol -/
 
@@ -289,10 +291,10 @@ theorem symbol_eq_mul (ξ : ℝ) :
 /-- **The symbol as a trigonometric polynomial**:
 `m_0(ξ) = (1/2) ∑_{k < 2N} c_k e^(-2πikξ)`, with `e^(-2πikξ) = (e^(-2πiξ))^k`. -/
 theorem symbol_eq_sum (ξ : ℝ) :
-    symbol m ξ = 1 / 2 * ∑ k ∈ Finset.range (2 * N), (coeff m k : ℂ) * expFreq ξ ^ k := by
+    symbol m ξ = 1 / 2 * ∑ k ∈ Finset.range (2 * N), (daubechiesCoeff m k : ℂ) * expFreq ξ ^ k := by
   rw [symbol, aeval_eq_sum_range' (natDegree_maskPoly_lt m), Finset.mul_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
-  rw [coeff_natCast, Complex.real_smul]
+  rw [daubechiesCoeff_natCast, Complex.real_smul]
   push_cast
   ring
 
@@ -365,16 +367,16 @@ theorem symbolLip_nonneg : 0 ≤ symbolLip m :=
 `∑_k c_k = 2`, `m_0(ξ) - 1 = (1/2) ∑_k c_k (e^(-2πikξ) - 1)`, and
 `|e^(-2πikξ) - 1| ≤ 2πk|ξ|`. -/
 theorem norm_symbol_sub_one_le (ξ : ℝ) : ‖symbol m ξ - 1‖ ≤ symbolLip m * |ξ| := by
-  have hsum : ∑ k ∈ Finset.range (2 * N), (coeff m k : ℂ) = 2 := by
-    exact_mod_cast sum_coeff m
+  have hsum : ∑ k ∈ Finset.range (2 * N), (daubechiesCoeff m k : ℂ) = 2 := by
+    exact_mod_cast sum_daubechiesCoeff m
   have h : symbol m ξ - 1 =
-      1 / 2 * ∑ k ∈ Finset.range (2 * N), (coeff m k : ℂ) * (expFreq ξ ^ k - 1) := by
+      1 / 2 * ∑ k ∈ Finset.range (2 * N), (daubechiesCoeff m k : ℂ) * (expFreq ξ ^ k - 1) := by
     simp only [symbol_eq_sum, mul_sub, mul_one, Finset.sum_sub_distrib, hsum]
     ring
   have hhalf : ‖(1 / 2 : ℂ)‖ = 1 / 2 := by norm_num
   rw [h, norm_mul, hhalf]
-  calc 1 / 2 * ‖∑ k ∈ Finset.range (2 * N), (coeff m k : ℂ) * (expFreq ξ ^ k - 1)‖
-      ≤ 1 / 2 * ∑ k ∈ Finset.range (2 * N), |coeff m k| * (2 * π * k * |ξ|) := by
+  calc 1 / 2 * ‖∑ k ∈ Finset.range (2 * N), (daubechiesCoeff m k : ℂ) * (expFreq ξ ^ k - 1)‖
+      ≤ 1 / 2 * ∑ k ∈ Finset.range (2 * N), |daubechiesCoeff m k| * (2 * π * k * |ξ|) := by
         gcongr
         refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun k _ => ?_)
         rw [norm_mul, Complex.norm_real, Real.norm_eq_abs]

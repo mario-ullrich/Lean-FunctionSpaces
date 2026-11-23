@@ -26,7 +26,7 @@ splines of order `r` and level `k ≥ r` is bounded by the periodic modulus of s
   has the local error estimates of the interval case (`Interval.eLpNorm_sub_perQiPieces_eq`), on
   windows inside `[0, 2]` (`Interval.qiWindow_subset_Icc_zero_two`). One Steklov
   smoothing of `G` on `[0, 2]`, with the modulus on `[0, 3]`, gives polynomials on all windows,
-  and `ω_r(G, t, [0, 3])_p ≤ 3^(1/p) ω_r^per(G, t)_p` (`Interval.modulus_perExt_le`). Hence
+  and `ω_r(G, t, [0, 3])_p ≤ 3^(1/p) ω_r^per(G, t)_p` (`Interval.intervalModulus_perExt_le`). Hence
   `‖G - Q_k^per G‖_p ≤ C ω_r^per(G, 2^(-k))_p` (`Interval.exists_eLpNorm_sub_perQi_le`).
 * **Density.** The continuous periodic functions are dense in `L_p[0, 1]`, `p < ∞`
   (`Interval.dense_periodic`): a bounded continuous function, cut off near `0` and `1`, extends
@@ -267,7 +267,7 @@ theorem exists_eLpNorm_sub_perQi_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
     (ENNReal.mul_ne_top (by simp) (ENNReal.pow_ne_top (ENNReal.natCast_ne_top r)))⟩
   refine ⟨A * J * 3 ^ (1 / p.toReal), ENNReal.mul_ne_top (ENNReal.mul_ne_top hA hJ)
     (ENNReal.rpow_ne_top_of_nonneg (by positivity) (by simp)), fun G hG hGp k => ?_⟩
-  set ω := modulus r p 0 3 G (1 / 2 ^ k)
+  set ω := intervalModulus r p 0 3 G (1 / 2 ^ k)
   have hpos : (0 : ℝ) < 2 ^ k := by positivity
   have hL : (0 : ℝ) < 1 / 2 ^ k := by positivity
   have hwL : (2 : ℝ) + 1 / 2 ^ k ≤ 3 := by
@@ -305,7 +305,7 @@ theorem exists_eLpNorm_sub_perQi_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
           gcongr
           exact add_ofReal_div_pow_mul_le r k h1 h2
   have hω : ω ≤ 3 ^ (1 / p.toReal) * perModulus r p G (1 / 2 ^ k) := by
-    have h := modulus_perExt_le hG.measurable hp0 hp r 3 (1 / 2 ^ k)
+    have h := intervalModulus_perExt_le hG.measurable hp0 hp r 3 (1 / 2 ^ k)
     rw [perExt_eq_of_periodic hGp] at h
     simp only [Nat.cast_ofNat] at h
     exact h
@@ -318,27 +318,29 @@ theorem exists_eLpNorm_sub_perQi_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
 
 /-- A continuous **cut-off** vanishing at `0` and `1`, `φ_δ(x) = min(1, max(0, min(x, 1 - x)/δ))`,
 with values in `[0, 1]` and equal to `1` on `[δ, 1 - δ]`. -/
-noncomputable def cutoff (δ x : ℝ) : ℝ := min 1 (max 0 (min x (1 - x) / δ))
+noncomputable def intervalCutoff (δ x : ℝ) : ℝ := min 1 (max 0 (min x (1 - x) / δ))
 
 /-- The cut-off is continuous. -/
-theorem continuous_cutoff (δ : ℝ) : Continuous (cutoff δ) :=
+theorem continuous_intervalCutoff (δ : ℝ) : Continuous (intervalCutoff δ) :=
   continuous_const.min (continuous_const.max
     ((continuous_id.min (continuous_const.sub continuous_id)).div_const δ))
 
 /-- The cut-off vanishes at `0`. -/
-theorem cutoff_zero (δ : ℝ) : cutoff δ 0 = 0 := by simp [cutoff]
+theorem intervalCutoff_zero (δ : ℝ) : intervalCutoff δ 0 = 0 := by simp [intervalCutoff]
 
 /-- The cut-off vanishes at `1`. -/
-theorem cutoff_one (δ : ℝ) : cutoff δ 1 = 0 := by simp [cutoff]
+theorem intervalCutoff_one (δ : ℝ) : intervalCutoff δ 1 = 0 := by simp [intervalCutoff]
 
 /-- The cut-off is nonnegative. -/
-theorem cutoff_nonneg (δ x : ℝ) : 0 ≤ cutoff δ x := le_min zero_le_one (le_max_left _ _)
+theorem intervalCutoff_nonneg (δ x : ℝ) : 0 ≤ intervalCutoff δ x :=
+  le_min zero_le_one (le_max_left _ _)
 
 /-- The cut-off is at most `1`. -/
-theorem cutoff_le_one (δ x : ℝ) : cutoff δ x ≤ 1 := min_le_left _ _
+theorem intervalCutoff_le_one (δ x : ℝ) : intervalCutoff δ x ≤ 1 := min_le_left _ _
 
 /-- The cut-off is `1` on `[δ, 1 - δ]`. -/
-theorem cutoff_eq_one {δ x : ℝ} (hδ : 0 < δ) (h1 : δ ≤ x) (h2 : x ≤ 1 - δ) : cutoff δ x = 1 := by
+theorem intervalCutoff_eq_one {δ x : ℝ} (hδ : 0 < δ) (h1 : δ ≤ x) (h2 : x ≤ 1 - δ) :
+    intervalCutoff δ x = 1 := by
   have h : 1 ≤ min x (1 - x) / δ := by
     rw [le_div_iff₀ hδ, one_mul]
     exact le_min h1 (by linarith)
@@ -359,17 +361,18 @@ theorem dense_periodic (hp : p ≠ ∞) :
     (ε := ENNReal.ofReal (ε / 4)) (ENNReal.ofReal_pos.2 (by positivity)).ne'
   set δ : ℝ := min ((η : ℝ) / 2) (1 / 2)
   have hδ : 0 < δ := lt_min (by positivity) (by norm_num)
-  set F : ℝ → ℂ := fun x => (cutoff δ x : ℂ) * G x
+  set F : ℝ → ℂ := fun x => (intervalCutoff δ x : ℂ) * G x
   have hFc : Continuous F :=
-    (Complex.continuous_ofReal.comp (continuous_cutoff δ)).mul G.continuous
+    (Complex.continuous_ofReal.comp (continuous_intervalCutoff δ)).mul G.continuous
   set Gp : ℝ → ℂ := F ∘ Int.fract
   have hGpc : Continuous Gp :=
-    ContinuousOn.comp_fract'' hFc.continuousOn (by simp [F, cutoff_zero, cutoff_one])
+    ContinuousOn.comp_fract'' hFc.continuousOn
+      (by simp [F, intervalCutoff_zero, intervalCutoff_one])
   have hGpp : Function.Periodic Gp 1 := fun x => by simp [Gp, Int.fract_add_one]
   have hbound : ∀ x, ‖Gp x‖ ≤ ‖G‖ := fun x => by
     simp only [Gp, F, Function.comp, norm_mul, Complex.norm_real, Real.norm_eq_abs,
-      abs_of_nonneg (cutoff_nonneg _ _)]
-    exact (mul_le_of_le_one_left (norm_nonneg _) (cutoff_le_one _ _)).trans
+      abs_of_nonneg (intervalCutoff_nonneg _ _)]
+    exact (mul_le_of_le_one_left (norm_nonneg _) (intervalCutoff_le_one _ _)).trans
       (G.norm_coe_le_norm _)
   have hmem : MemLp Gp p unitVol :=
     MemLp.of_bound hGpc.aestronglyMeasurable ‖G‖ (Filter.Eventually.of_forall hbound)
@@ -390,17 +393,17 @@ theorem dense_periodic (hp : p ≠ ∞) :
           exact ENNReal.ofReal_le_ofReal (by linarith [min_le_left ((η : ℝ) / 2) (1 / 2)])
   have hpt : ∀ᵐ x ∂unitVol, ‖(G : ℝ → ℂ) x - Gp x‖ ≤ ‖S.indicator (fun _ => ‖G‖) x‖ := by
     filter_upwards [ae_mem_Ico_unitVol] with x hx
-    have hsub : (G : ℝ → ℂ) x - Gp x = ((1 - cutoff δ x : ℝ) : ℂ) * G x := by
+    have hsub : (G : ℝ → ℂ) x - Gp x = ((1 - intervalCutoff δ x : ℝ) : ℂ) * G x := by
       simp only [Gp, F, Function.comp, Int.fract_eq_self.2 hx]
       push_cast
       ring
     rw [hsub, norm_mul, Complex.norm_real, Real.norm_eq_abs,
-      abs_of_nonneg (by linarith [cutoff_le_one δ x])]
+      abs_of_nonneg (by linarith [intervalCutoff_le_one δ x])]
     by_cases hxS : x ∈ S
     · rw [indicator_of_mem hxS, norm_norm]
-      calc (1 - cutoff δ x) * ‖G x‖ ≤ 1 * ‖G‖ :=
-            mul_le_mul (by linarith [cutoff_nonneg δ x]) (G.norm_coe_le_norm x) (norm_nonneg _)
-              zero_le_one
+      calc (1 - intervalCutoff δ x) * ‖G x‖ ≤ 1 * ‖G‖ :=
+            mul_le_mul (by linarith [intervalCutoff_nonneg δ x]) (G.norm_coe_le_norm x)
+              (norm_nonneg _) zero_le_one
         _ = ‖G‖ := one_mul _
     · have h1 : δ < x := by
         by_contra h
@@ -408,7 +411,7 @@ theorem dense_periodic (hp : p ≠ ∞) :
       have h2 : x < 1 - δ := by
         by_contra h
         exact hxS (Or.inr ⟨not_lt.1 h, hx.2.le⟩)
-      rw [cutoff_eq_one hδ h1.le h2.le, sub_self, zero_mul]
+      rw [intervalCutoff_eq_one hδ h1.le h2.le, sub_self, zero_mul]
       exact norm_nonneg _
   have hdist : dist (BoundedContinuousFunction.toLp (E := ℂ) p unitVol ℝ G) (hmem.toLp Gp) ≤
       ε / 4 := by

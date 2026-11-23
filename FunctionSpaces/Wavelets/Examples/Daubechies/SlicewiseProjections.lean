@@ -33,7 +33,7 @@ so `P_j^{(i)} f` is continuous (measurable) as well (`Daubechies.continuous_slic
   (`Daubechies.eLpNorm_projFun_le`) and through the slices (`Rd.eLpNorm_le_of_slice_le`).
 * **Jackson's inequality in one coordinate.** For continuous `f`,
   `‖f - P_j^{(i)} f‖_p ≤ C_J ω_N(f, 2^(-j))_p` with the isotropic modulus of smoothness of `ℝ^d`
-  and the Jackson constant `C_J = jacksonConst m p` of one variable
+  and the Jackson constant `C_J = daubechiesJacksonConst m p` of one variable
   (`Daubechies.eLpNorm_sub_sliceProj_le`). The proof of one variable runs slice by slice with the
   Steklov smoothing in coordinate `i` (`Cube.cubeSmooth`): on each slice
   `‖g - P_j g‖ ≤ (1 + C) ‖g - S g‖ + C_S 2^(-jN) ‖(S g)^(N)‖`
@@ -176,7 +176,7 @@ theorem eLpNorm_slice_sub_sliceProj_le (hN : 2 ≤ N) {p : ℝ≥0∞} (hp1 : 1 
         smoothJacksonConst m p * (2 ^ (j * N))⁻¹ *
           eLpNorm (Cube.slice (Cube.cubeSmoothDeriv N δ i f) x i) p volume := by
   have hg := Cube.continuous_slice hf x i
-  have hS := Interval.contDiff_smooth hg N δ
+  have hS := Interval.contDiff_steklovSmooth hg N δ
   rw [slice_sliceProj, Cube.slice_cubeSmooth, Cube.slice_cubeSmoothDeriv]
   refine (eLpNorm_sub_projFun_le_add m hN hp1 hp hg.locallyIntegrable
     hS.continuous.locallyIntegrable j).trans ?_
@@ -185,20 +185,20 @@ theorem eLpNorm_slice_sub_sliceProj_le (hN : 2 ≤ N) {p : ℝ≥0∞} (hp1 : 1 
 
 /-- **Jackson's inequality in one coordinate**: for `N ≥ 2`, `1 ≤ p < ∞`, every continuous
 `f : ℝ^d → ℂ`, every level `j` and every coordinate `i`,
-`‖f - P_j^{(i)} f‖_p ≤ C_J ω_N(f, 2^(-j))_p` with the Jackson constant `C_J = jacksonConst m p`
-of one variable and the isotropic modulus of smoothness of `ℝ^d` (sup norm). With the smoothing
-`S^{(i)}_δ f` in coordinate `i` at the step `δ = 1/(N 2^j)`, the slices satisfy the bound of
-`Daubechies.eLpNorm_slice_sub_sliceProj_le`, which passes to `ℝ^d`
+`‖f - P_j^{(i)} f‖_p ≤ C_J ω_N(f, 2^(-j))_p` with the Jackson constant
+`C_J = daubechiesJacksonConst m p` of one variable and the isotropic modulus of smoothness of `ℝ^d`
+(sup norm). With the smoothing `S^{(i)}_δ f` in coordinate `i` at the step `δ = 1/(N 2^j)`, the
+slices satisfy the bound of `Daubechies.eLpNorm_slice_sub_sliceProj_le`, which passes to `ℝ^d`
 (`Rd.eLpNorm_le_add_of_slice_le`); there `‖f - S^{(i)}_δ f‖_p ≤ ω_N(f, 2^(-j))_p` and
 `‖∂_i^N S^{(i)}_δ f‖_p ≤ 2^N N^N 2^(jN) ω_N(f, 2^(-j))_p`
 (`Cube.eLpNorm_sub_cubeSmooth_le_smoothnessModulus`,
 `Cube.eLpNorm_cubeSmoothDeriv_le_smoothnessModulus`,
 `Daubechies.ofReal_one_div_mul_two_pow_inv_pow`), and the two bounds combine as in one variable
-(`Daubechies.add_le_jacksonConst_mul`). The inequality holds in `[0, ∞]`. -/
+(`Daubechies.add_le_daubechiesJacksonConst_mul`). The inequality holds in `[0, ∞]`. -/
 theorem eLpNorm_sub_sliceProj_le (hN : 2 ≤ N) {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞)
     {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) (j : ℕ) (i : Fin d) :
     eLpNorm (fun x => f x - sliceProj m j i f x) p volume ≤
-      jacksonConst m p * Rd.smoothnessModulus volume N p f (1 / 2 ^ j) := by
+      daubechiesJacksonConst m p * Rd.smoothnessModulus volume N p f (1 / 2 ^ j) := by
   have hN' : (0 : ℝ) < N := by exact_mod_cast (by omega : 0 < N)
   have hδ : (0 : ℝ) < 1 / (N * 2 ^ j) := by positivity
   have hNδ : (N : ℝ) * (1 / (N * 2 ^ j)) = 1 / 2 ^ j := by field_simp
@@ -211,6 +211,6 @@ theorem eLpNorm_sub_sliceProj_le (hN : 2 ≤ N) {p : ℝ≥0∞} (hp1 : 1 ≤ p)
     (hf.sub (Cube.continuous_cubeSmooth hf N hδ.ne' i)).measurable
     (Cube.continuous_cubeSmoothDeriv hf N _ i).measurable i
     (eLpNorm_slice_sub_sliceProj_le m hN hp1 hp hf j i _)).trans ?_
-  exact add_le_jacksonConst_mul m j hB hD
+  exact add_le_daubechiesJacksonConst_mul m j hB hD
 
 end Daubechies

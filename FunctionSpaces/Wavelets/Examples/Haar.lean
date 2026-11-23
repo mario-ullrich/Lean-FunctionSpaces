@@ -23,8 +23,8 @@ generate the dyadic σ-algebras `ℱ_j`, an increasing filtration of `ℝ` (`Haa
 and on `[0, 1]` with Lebesgue measure (`Haar.vol`, which is `Interval.unitVol`) the
 conditional expectation `E[f | ℱ_j]` is the average of `f` over the dyadic interval of level `j`
 (`Haar.condExp_dyadic_ae_eq`, from the general formula `MeasureTheory.condExp_comap_ae_eq` for
-countable partitions).  The filtration scheme `MeasureTheory.Filtration.scheme` is then the
-scheme of dyadic step functions (`Haar.scheme`).
+countable partitions).  The filtration scheme `MeasureTheory.Filtration.filtrationScheme` is then
+the scheme of dyadic step functions (`Haar.scheme`).
 
 The Haar function `h_{j,m} = 2^(j/2) (1_{I_{j+1,2m}} - 1_{I_{j+1,2m+1}})`
 (`Haar.haarFunction`) lives on `I_{j,m}`, and the martingale differences are Haar sums of one
@@ -166,7 +166,8 @@ variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 variable (p) in
 /-- The **Haar scheme** in `L_p[0, 1]`: the approximants of complexity `2^j` are the step
 functions on the dyadic intervals of level `j`. -/
-noncomputable abbrev scheme : ApproximationScheme (Lp ℂ p vol) := dyadicFiltration.scheme p vol
+noncomputable abbrev scheme : ApproximationScheme (Lp ℂ p vol) :=
+  dyadicFiltration.filtrationScheme p vol
 
 /-- **Conditional expectation onto `ℱ_j`**: `E[f | ℱ_j](x) = 2^j ∫_{I_{j,⌊2^j x⌋}} f`, the
 average of `f` over the dyadic interval of level `j` containing `x`. -/
@@ -445,8 +446,8 @@ theorem toLp_mem_closure (g : ℝ →ᵇ ℂ) :
   have hmem : MemLp (stepFun g j) p vol :=
     MemLp.of_bound hmeas ‖g‖ (ae_of_all _ fun x => g.norm_coe_le_norm _)
   refine ⟨hmem.toLp _, mem_iUnion.2 ⟨2 ^ j, ?_⟩, ?_⟩
-  · rw [dyadicFiltration.mem_scheme (pow_ne_zero j two_ne_zero), Nat.log_pow Nat.one_lt_two,
-      mem_lpMeas_iff_aestronglyMeasurable]
+  · rw [dyadicFiltration.mem_filtrationScheme (pow_ne_zero j two_ne_zero),
+      Nat.log_pow Nat.one_lt_two, mem_lpMeas_iff_aestronglyMeasurable]
     exact hsm.aestronglyMeasurable.congr (MemLp.coeFn_toLp hmem).symm
   · rw [dist_eq_norm, Lp.norm_def, eLpNorm_congr_ae ((Lp.coeFn_sub _ _).trans
       ((BoundedContinuousFunction.coeFn_toLp p vol ℝ g).sub (MemLp.coeFn_toLp hmem)))]

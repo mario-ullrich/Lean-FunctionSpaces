@@ -80,8 +80,8 @@ noncomputable def ppKernel (r k : ℕ) : KernelOp (Fin (2 ^ k) × Fin r) where
       _⟩
 
 /-- The coefficients of the kernel operator are the local coefficients. -/
-theorem ppKernel_coef (r k : ℕ) (g : ℝ → ℂ) (j : Fin (2 ^ k) × Fin r) :
-    (ppKernel r k).coef g j = locCoeff r k g j.1 j.2 := by
+theorem ppKernel_kernelCoef (r k : ℕ) (g : ℝ → ℂ) (j : Fin (2 ^ k) × Fin r) :
+    (ppKernel r k).kernelCoef g j = locCoeff r k g j.1 j.2 := by
   have hsub : dyadicIco k j.1 ⊆ Icc (0 : ℝ) 1 :=
     (dyadicIco_subset j.1.isLt).trans Ico_subset_Icc_self
   have hfun : (fun s => g s * (ppKernel r k).kernel j s) = (dyadicIco k j.1).indicator
@@ -92,14 +92,14 @@ theorem ppKernel_coef (r k : ℕ) (g : ℝ → ℂ) (j : Fin (2 ^ k) × Fin r) :
     by_cases hs : s ∈ dyadicIco k j.1
     · rw [indicator_of_mem hs, indicator_of_mem hs]; ring
     · rw [indicator_of_notMem hs, indicator_of_notMem hs, mul_zero]
-  rw [KernelOp.coef, hfun, setIntegral_indicator (measurableSet_dyadicIco _ _),
+  rw [KernelOp.kernelCoef, hfun, setIntegral_indicator (measurableSet_dyadicIco _ _),
     Set.inter_eq_right.2 hsub, integral_const_mul, locCoeff]
 
 /-- **The kernel operator is the local projection**: `(ppKernel r k).apply g = P_k g`. -/
 theorem ppKernel_apply (r k : ℕ) (g : ℝ → ℂ) :
     (ppKernel r k).apply g = ppFun k (locProj r k g) := by
   funext t
-  simp only [KernelOp.apply, ppKernel_coef, Fintype.sum_prod_type, ppFun]
+  simp only [KernelOp.apply, ppKernel_kernelCoef, Fintype.sum_prod_type, ppFun]
   rw [← Fin.sum_univ_eq_sum_range]
   refine Finset.sum_congr rfl fun n _ => ?_
   by_cases ht : t ∈ dyadicIco k n
@@ -160,7 +160,8 @@ theorem ppKernel_rangeFn_eq_ppFun (r k : ℕ) (j : Fin (2 ^ k) × Fin r) :
 /-- **Refinement**: the functions of level `k` are combinations of those of level `k + 1`,
 `φ^{(k)}_j = P_{k+1} φ^{(k)}_j = ∑_{j'} (∫_0^1 φ^{(k)}_j κ^{(k+1)}_{j'}) φ^{(k+1)}_{j'}`. -/
 theorem ppKernel_rangeFn_eq_sum (r k : ℕ) (j : Fin (2 ^ k) × Fin r) (t : ℝ) :
-    (ppKernel r k).rangeFn j t = ∑ j', (ppKernel r (k + 1)).coef ((ppKernel r k).rangeFn j) j' *
+    (ppKernel r k).rangeFn j t =
+      ∑ j', (ppKernel r (k + 1)).kernelCoef ((ppKernel r k).rangeFn j) j' *
       (ppKernel r (k + 1)).rangeFn j' t := by
   set Q : ℕ → ℂ[X] := fun m => if m = j.1 then
     (dualPoly r j.2 : ℂ[X]).comp (C ((-(j.1 : ℝ) : ℝ) : ℂ) + C (((2 : ℝ) ^ k : ℝ) : ℂ) * X)
@@ -327,10 +328,10 @@ theorem isCubePP_iff_mem_span_prod_ppFun {r k : ℕ} (hr : 1 ≤ r) {g : (Fin d 
   · refine fun h => (Submodule.span_le.2 ?_) h
     rintro _ ⟨Q, hQ, rfl⟩
     have hexp : ∀ i (t : ℝ), ppFun k (Q i) t =
-        ∑ m, (ppKernel r k).coef (ppFun k (Q i)) m * (ppKernel r k).rangeFn m t := fun i t =>
+        ∑ m, (ppKernel r k).kernelCoef (ppFun k (Q i)) m * (ppKernel r k).rangeFn m t := fun i t =>
       (congrFun (ppKernel_apply_ppFun (r := r) (k := k) (hQ i)) t).symm
     have hG : (fun x : Fin d → ℝ => ∏ i, ppFun k (Q i) (x i)) =
-        ∑ j : Fin d → Fin (2 ^ k) × Fin r, (∏ i, (ppKernel r k).coef (ppFun k (Q i)) (j i)) •
+        ∑ j : Fin d → Fin (2 ^ k) × Fin r, (∏ i, (ppKernel r k).kernelCoef (ppFun k (Q i)) (j i)) •
           fun x : Fin d → ℝ => ∏ i, (ppKernel r k).rangeFn (j i) (x i) := by
       funext x
       simp only [hexp, Finset.prod_univ_sum, Fintype.piFinset_univ, Finset.sum_apply,

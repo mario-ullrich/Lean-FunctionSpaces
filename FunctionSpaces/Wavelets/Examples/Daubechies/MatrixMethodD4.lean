@@ -90,16 +90,17 @@ theorem scalingFun_d4_add_add_eq_one {x : ℝ} (hx : x ∈ Ico (0 : ℝ) 1) :
 `φ(x) = c_0 φ(2x) + c_1 φ(2x - 1) + c_2 φ(2x - 2) + c_3 φ(2x - 3)` for every `x ∈ ℝ`
 (`Daubechies.scalingFun_refine` with `2N = 4`). -/
 theorem scalingFun_d4_refine (x : ℝ) :
-    scalingFun d4 x = (coeff d4 0 : ℂ) * scalingFun d4 (2 * x) +
-      (coeff d4 1 : ℂ) * scalingFun d4 (2 * x - 1) + (coeff d4 2 : ℂ) * scalingFun d4 (2 * x - 2) +
-      (coeff d4 3 : ℂ) * scalingFun d4 (2 * x - 3) := by
+    scalingFun d4 x = (daubechiesCoeff d4 0 : ℂ) * scalingFun d4 (2 * x) +
+      (daubechiesCoeff d4 1 : ℂ) * scalingFun d4 (2 * x - 1) + (daubechiesCoeff d4 2 : ℂ) *
+        scalingFun d4 (2 * x - 2) +
+      (daubechiesCoeff d4 3 : ℂ) * scalingFun d4 (2 * x - 3) := by
   rw [scalingFun_refine d4 le_rfl x]
   simp [Finset.sum_range_succ]
 
 /-- **The refinement equation on the left half**: for `x ∈ [0, 1/2)`, `φ(x) = c_0 φ(2x)`; the
 other terms of `Daubechies.scalingFun_d4_refine` vanish since `2x - j < 0` for `j ≥ 1`. -/
 theorem scalingFun_d4_left {x : ℝ} (hx : x ∈ Ico (0 : ℝ) (1 / 2)) :
-    scalingFun d4 x = (coeff d4 0 : ℂ) * scalingFun d4 (2 * x) := by
+    scalingFun d4 x = (daubechiesCoeff d4 0 : ℂ) * scalingFun d4 (2 * x) := by
   rw [scalingFun_d4_refine, scalingFun_d4_eq_zero (x := 2 * x - 1) fun h => by linarith [h.1, hx.2],
     scalingFun_d4_eq_zero (x := 2 * x - 2) fun h => by linarith [h.1, hx.2],
     scalingFun_d4_eq_zero (x := 2 * x - 3) fun h => by linarith [h.1, hx.2]]
@@ -108,9 +109,9 @@ theorem scalingFun_d4_left {x : ℝ} (hx : x ∈ Ico (0 : ℝ) (1 / 2)) :
 /-- **The refinement equation on the left half**, second translate: for `x ∈ [0, 1/2)`,
 `φ(x + 1) = c_2 φ(2x) + c_1 φ(2x + 1) + c_0 φ(2x + 2)`; the term `c_3 φ(2x - 1)` vanishes. -/
 theorem scalingFun_d4_add_one_left {x : ℝ} (hx : x ∈ Ico (0 : ℝ) (1 / 2)) :
-    scalingFun d4 (x + 1) = (coeff d4 2 : ℂ) * scalingFun d4 (2 * x) +
-      (coeff d4 1 : ℂ) * scalingFun d4 (2 * x + 1) +
-      (coeff d4 0 : ℂ) * scalingFun d4 (2 * x + 2) := by
+    scalingFun d4 (x + 1) = (daubechiesCoeff d4 2 : ℂ) * scalingFun d4 (2 * x) +
+      (daubechiesCoeff d4 1 : ℂ) * scalingFun d4 (2 * x + 1) +
+      (daubechiesCoeff d4 0 : ℂ) * scalingFun d4 (2 * x + 2) := by
   rw [scalingFun_d4_refine, show 2 * (x + 1) = 2 * x + 2 by ring,
     show 2 * x + 2 - 1 = 2 * x + 1 by ring, show 2 * x + 2 - 2 = 2 * x by ring,
     show 2 * x + 2 - 3 = 2 * x - 1 by ring,
@@ -120,8 +121,8 @@ theorem scalingFun_d4_add_one_left {x : ℝ} (hx : x ∈ Ico (0 : ℝ) (1 / 2)) 
 /-- **The refinement equation on the left half**, third translate: for `x ∈ [0, 1/2)`,
 `φ(x + 2) = c_3 φ(2x + 1) + c_2 φ(2x + 2)`; the terms with `φ(2x + 3)` and `φ(2x + 4)` vanish. -/
 theorem scalingFun_d4_add_two_left {x : ℝ} (hx : x ∈ Ico (0 : ℝ) (1 / 2)) :
-    scalingFun d4 (x + 2) = (coeff d4 3 : ℂ) * scalingFun d4 (2 * x + 1) +
-      (coeff d4 2 : ℂ) * scalingFun d4 (2 * x + 2) := by
+    scalingFun d4 (x + 2) = (daubechiesCoeff d4 3 : ℂ) * scalingFun d4 (2 * x + 1) +
+      (daubechiesCoeff d4 2 : ℂ) * scalingFun d4 (2 * x + 2) := by
   rw [scalingFun_d4_refine, show 2 * (x + 2) = 2 * x + 4 by ring,
     show 2 * x + 4 - 1 = 2 * x + 3 by ring, show 2 * x + 4 - 2 = 2 * x + 2 by ring,
     show 2 * x + 4 - 3 = 2 * x + 1 by ring,
@@ -132,8 +133,8 @@ theorem scalingFun_d4_add_two_left {x : ℝ} (hx : x ∈ Ico (0 : ℝ) (1 / 2)) 
 /-- **The refinement equation on the right half**: for `x ∈ [1/2, 1)`,
 `φ(x) = c_1 φ(2x - 1) + c_0 φ(2x)`; the terms with `φ(2x - 2)` and `φ(2x - 3)` vanish. -/
 theorem scalingFun_d4_right {x : ℝ} (hx : x ∈ Ico (1 / 2 : ℝ) 1) :
-    scalingFun d4 x = (coeff d4 1 : ℂ) * scalingFun d4 (2 * x - 1) +
-      (coeff d4 0 : ℂ) * scalingFun d4 (2 * x) := by
+    scalingFun d4 x = (daubechiesCoeff d4 1 : ℂ) * scalingFun d4 (2 * x - 1) +
+      (daubechiesCoeff d4 0 : ℂ) * scalingFun d4 (2 * x) := by
   rw [scalingFun_d4_refine, scalingFun_d4_eq_zero (x := 2 * x - 2) fun h => by linarith [h.1, hx.2],
     scalingFun_d4_eq_zero (x := 2 * x - 3) fun h => by linarith [h.1, hx.2]]
   ring
@@ -141,9 +142,9 @@ theorem scalingFun_d4_right {x : ℝ} (hx : x ∈ Ico (1 / 2 : ℝ) 1) :
 /-- **The refinement equation on the right half**, second translate: for `x ∈ [1/2, 1)`,
 `φ(x + 1) = c_3 φ(2x - 1) + c_2 φ(2x) + c_1 φ(2x + 1)`; the term `c_0 φ(2x + 2)` vanishes. -/
 theorem scalingFun_d4_add_one_right {x : ℝ} (hx : x ∈ Ico (1 / 2 : ℝ) 1) :
-    scalingFun d4 (x + 1) = (coeff d4 3 : ℂ) * scalingFun d4 (2 * x - 1) +
-      (coeff d4 2 : ℂ) * scalingFun d4 (2 * x) +
-      (coeff d4 1 : ℂ) * scalingFun d4 (2 * x + 1) := by
+    scalingFun d4 (x + 1) = (daubechiesCoeff d4 3 : ℂ) * scalingFun d4 (2 * x - 1) +
+      (daubechiesCoeff d4 2 : ℂ) * scalingFun d4 (2 * x) +
+      (daubechiesCoeff d4 1 : ℂ) * scalingFun d4 (2 * x + 1) := by
   rw [scalingFun_d4_refine, show 2 * (x + 1) = 2 * x + 2 by ring,
     show 2 * x + 2 - 1 = 2 * x + 1 by ring, show 2 * x + 2 - 2 = 2 * x by ring,
     show 2 * x + 2 - 3 = 2 * x - 1 by ring,
@@ -153,7 +154,7 @@ theorem scalingFun_d4_add_one_right {x : ℝ} (hx : x ∈ Ico (1 / 2 : ℝ) 1) :
 /-- **The refinement equation on the right half**, third translate: for `x ∈ [1/2, 1)`,
 `φ(x + 2) = c_3 φ(2x + 1)`; the other terms vanish since `2x + j ≥ 3` for `j ≥ 2`. -/
 theorem scalingFun_d4_add_two_right {x : ℝ} (hx : x ∈ Ico (1 / 2 : ℝ) 1) :
-    scalingFun d4 (x + 2) = (coeff d4 3 : ℂ) * scalingFun d4 (2 * x + 1) := by
+    scalingFun d4 (x + 2) = (daubechiesCoeff d4 3 : ℂ) * scalingFun d4 (2 * x + 1) := by
   rw [scalingFun_d4_refine, show 2 * (x + 2) = 2 * x + 4 by ring,
     show 2 * x + 4 - 1 = 2 * x + 3 by ring, show 2 * x + 4 - 2 = 2 * x + 2 by ring,
     show 2 * x + 4 - 3 = 2 * x + 1 by ring,
@@ -185,8 +186,8 @@ theorem d4A_left {x : ℝ} (hx : x ∈ Ico (0 : ℝ) (1 / 2)) :
     d4A x = d4A (2 * x) / 2 + (((3 - √3) / 4 : ℝ) : ℂ) := by
   have hp := scalingFun_d4_add_add_eq_one (x := 2 * x) ⟨by linarith [hx.1], by linarith [hx.2]⟩
   simp only [d4A]
-  rw [scalingFun_d4_add_one_left hx, scalingFun_d4_add_two_left hx, coeff_d4_zero, coeff_d4_one,
-    coeff_d4_two, coeff_d4_three]
+  rw [scalingFun_d4_add_one_left hx, scalingFun_d4_add_two_left hx, daubechiesCoeff_d4_zero,
+    daubechiesCoeff_d4_one, daubechiesCoeff_d4_two, daubechiesCoeff_d4_three]
   push_cast
   linear_combination ((3 - (√3 : ℂ)) / 4) * hp
 
@@ -202,8 +203,9 @@ theorem d4A_right {x : ℝ} (hx : x ∈ Ico (1 / 2 : ℝ) 1) :
   rw [show 2 * x - 1 + 1 = 2 * x by ring, show 2 * x - 1 + 2 = 2 * x + 1 by ring] at hp
   simp only [d4A]
   rw [show 2 * x - 1 + 1 = 2 * x by ring, show 2 * x - 1 + 2 = 2 * x + 1 by ring,
-    scalingFun_d4_add_one_right hx, scalingFun_d4_add_two_right hx, coeff_d4_one, coeff_d4_two,
-    coeff_d4_three]
+    scalingFun_d4_add_one_right hx, scalingFun_d4_add_two_right hx, daubechiesCoeff_d4_one,
+      daubechiesCoeff_d4_two,
+    daubechiesCoeff_d4_three]
   push_cast
   linear_combination ((1 - (√3 : ℂ)) / 4) * hp
 
@@ -218,7 +220,8 @@ theorem d4B_left {x : ℝ} (hx : x ∈ Ico (0 : ℝ) (1 / 2)) :
   have hp := scalingFun_d4_add_add_eq_one (x := 2 * x) ⟨by linarith [hx.1], by linarith [hx.2]⟩
   simp only [d4B, d4A]
   rw [scalingFun_d4_left hx, scalingFun_d4_add_one_left hx, scalingFun_d4_add_two_left hx,
-    coeff_d4_zero, coeff_d4_one, coeff_d4_two, coeff_d4_three]
+    daubechiesCoeff_d4_zero, daubechiesCoeff_d4_one, daubechiesCoeff_d4_two,
+    daubechiesCoeff_d4_three]
   push_cast
   linear_combination ((3 - (√3 : ℂ)) / 4) * hp
 
@@ -234,7 +237,8 @@ theorem d4B_right {x : ℝ} (hx : x ∈ Ico (1 / 2 : ℝ) 1) :
   simp only [d4B, d4A]
   rw [show 2 * x - 1 + 1 = 2 * x by ring, show 2 * x - 1 + 2 = 2 * x + 1 by ring,
     scalingFun_d4_right hx, scalingFun_d4_add_one_right hx, scalingFun_d4_add_two_right hx,
-    coeff_d4_zero, coeff_d4_one, coeff_d4_two, coeff_d4_three]
+    daubechiesCoeff_d4_zero, daubechiesCoeff_d4_one, daubechiesCoeff_d4_two,
+    daubechiesCoeff_d4_three]
   push_cast
   linear_combination ((3 + (√3 : ℂ)) / 4) * hp
 

@@ -14,7 +14,7 @@ public import Mathlib.Analysis.Complex.Basic
 
 The **difference of order `r` with step `h`** of `f : ℝ → ℂ` is
 
-`Δ_h^r f(x) = ∑_{k=0}^r (-1)^(r-k) C(r,k) f(x + k h)`   (`Interval.higherDiff_apply`),
+`Δ_h^r f(x) = ∑_{k=0}^r (-1)^(r-k) C(r,k) f(x + k h)`   (`Interval.interval_higherDiff_apply`),
 
 the `r`-fold iterate `Rd.higherDiff r h f` of Mathlib's forward difference `fwdDiff h`
 (`Δ_h f(x) = f(x + h) - f(x)`).
@@ -38,7 +38,7 @@ open scoped ENNReal
 namespace Interval
 
 /-- `Δ_h^r f(x) = ∑_{k=0}^r (-1)^(r-k) C(r,k) f(x + k h)`. -/
-theorem higherDiff_apply (r : ℕ) (h : ℝ) (f : ℝ → ℂ) (x : ℝ) :
+theorem interval_higherDiff_apply (r : ℕ) (h : ℝ) (f : ℝ → ℂ) (x : ℝ) :
     higherDiff r h f x =
       ∑ k ∈ range (r + 1), ((-1 : ℂ) ^ (r - k) * (r.choose k : ℂ)) * f (x + k * h) := by
   rw [higherDiff_def, Rd.higherDiff_apply]
@@ -50,7 +50,7 @@ theorem higherDiff_eq_sum_smul (r : ℕ) (h : ℝ) (f : ℝ → ℂ) :
     higherDiff r h f =
       ∑ k ∈ range (r + 1), ((-1 : ℂ) ^ (r - k) * (r.choose k : ℂ)) • fun x => f (x + k * h) := by
   funext x
-  rw [higherDiff_apply, Finset.sum_apply]
+  rw [interval_higherDiff_apply, Finset.sum_apply]
   rfl
 
 /-- `Δ_h^0 f = f`. -/
@@ -69,7 +69,7 @@ theorem higherDiff_succ' (r : ℕ) (h : ℝ) (f : ℝ → ℂ) :
   rfl
 
 /-- Differences are additive (Mathlib's `fwdDiff_iter_add`). -/
-theorem higherDiff_add (r : ℕ) (h : ℝ) (f g : ℝ → ℂ) :
+theorem interval_higherDiff_add (r : ℕ) (h : ℝ) (f g : ℝ → ℂ) :
     higherDiff r h (f + g) = higherDiff r h f + higherDiff r h g :=
   fwdDiff_iter_add h f g r
 
@@ -77,7 +77,7 @@ theorem higherDiff_add (r : ℕ) (h : ℝ) (f g : ℝ → ℂ) :
 theorem higherDiff_sub (r : ℕ) (h : ℝ) (f g : ℝ → ℂ) :
     higherDiff r h (f - g) = higherDiff r h f - higherDiff r h g := by
   funext x
-  simp only [higherDiff_apply, Pi.sub_apply, mul_sub, sum_sub_distrib]
+  simp only [interval_higherDiff_apply, Pi.sub_apply, mul_sub, sum_sub_distrib]
 
 /-- Differences are homogeneous (Mathlib's `fwdDiff_iter_const_smul`). -/
 theorem higherDiff_const_mul (r : ℕ) (h : ℝ) (c : ℂ) (f : ℝ → ℂ) :
@@ -86,14 +86,14 @@ theorem higherDiff_const_mul (r : ℕ) (h : ℝ) (c : ℂ) (f : ℝ → ℂ) :
 
 /-- Differences commute with translations: `Δ_h^r (f(· + c))(x) = Δ_h^r f(x + c)` (Mathlib's
 `fwdDiff_iter_comp_add`). -/
-theorem higherDiff_comp_add (r : ℕ) (h : ℝ) (f : ℝ → ℂ) (c x : ℝ) :
+theorem interval_higherDiff_comp_add (r : ℕ) (h : ℝ) (f : ℝ → ℂ) (c x : ℝ) :
     higherDiff r h (fun y => f (y + c)) x = higherDiff r h f (x + c) :=
   fwdDiff_iter_comp_add h f c r x
 
 /-- **Reflection**: for `g(x) = f(c - x)`, `Δ_h^r g(x) = (-1)^r Δ_h^r f(c - x - r h)`. -/
 theorem higherDiff_reflect (r : ℕ) (h : ℝ) (f : ℝ → ℂ) (c x : ℝ) :
     higherDiff r h (fun y => f (c - y)) x = (-1 : ℂ) ^ r * higherDiff r h f (c - x - r * h) := by
-  simp only [higherDiff_apply, mul_sum]
+  simp only [interval_higherDiff_apply, mul_sum]
   rw [← sum_range_reflect]
   refine sum_congr rfl fun k hk => ?_
   have hk' : k ≤ r := Nat.lt_succ_iff.1 (mem_range.1 hk)
@@ -113,7 +113,7 @@ theorem enorm_higherDiff_coeff (r k : ℕ) :
 `|Δ_h^r f(x)| ≤ 2^r B`, since the coefficients `C(r, k)` add up to `2^r`. -/
 theorem enorm_higherDiff_le_of_forall {r : ℕ} {h x : ℝ} {f : ℝ → ℂ} {B : ℝ≥0∞}
     (hB : ∀ k ∈ range (r + 1), ‖f (x + k * h)‖ₑ ≤ B) : ‖higherDiff r h f x‖ₑ ≤ 2 ^ r * B := by
-  rw [higherDiff_apply]
+  rw [interval_higherDiff_apply]
   refine (enorm_sum_le _ _).trans ?_
   calc ∑ k ∈ range (r + 1), ‖(-1 : ℂ) ^ (r - k) * (r.choose k : ℂ) * f (x + k * h)‖ₑ
       ≤ ∑ k ∈ range (r + 1), (r.choose k : ℝ≥0∞) * B :=
@@ -151,13 +151,13 @@ theorem higherDiff_polynomial {r : ℕ} {P : ℂ[X]} (hP : P ∈ degreeLT ℂ r)
     higherDiff r h (fun x => P.eval (x : ℂ)) = 0 := by
   funext x
   rcases eq_or_ne P 0 with rfl | hP0
-  · simp [higherDiff_apply]
+  · simp [interval_higherDiff_apply]
   set Q : ℂ[X] := P.comp (C (x : ℂ) + C (h : ℂ) * X)
   have hdeg : Q.natDegree < r := (natDegree_comp_affine_le P _ _).trans_lt
     ((natDegree_lt_iff_degree_lt hP0).2 (mem_degreeLT.1 hP))
   have hzero := congrFun (Polynomial.fwdDiff_iter_eq_zero_of_degree_lt hdeg) 0
   rw [fwdDiff_iter_eq_sum_shift] at hzero
-  rw [higherDiff_apply, Pi.zero_apply]
+  rw [interval_higherDiff_apply, Pi.zero_apply]
   rw [Pi.zero_apply] at hzero
   rw [← hzero]
   refine sum_congr rfl fun k _ => ?_

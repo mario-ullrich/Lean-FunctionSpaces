@@ -215,7 +215,7 @@ theorem isoModulus_le {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) {p : ℝ
 
 /-- **`‖Δ_h^r f‖_{L_p(Q_{rh})} ≤ 2^r ‖f‖_{L_p(Q)}`**, the bound of `Cube.isoModulus_le` at
 `t = ‖h‖_∞`. -/
-theorem eLpNorm_higherDiff_le {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) {p : ℝ≥0∞} (hp : 1 ≤ p)
+theorem cube_eLpNorm_higherDiff_le {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) {p : ℝ≥0∞} (hp : 1 ≤ p)
     (r : ℕ) (h : Fin d → ℝ) :
     eLpNorm (higherDiff r h f) p ((cubeVol d).restrict (isoRegion r h)) ≤
       2 ^ r * eLpNorm f p (cubeVol d) :=

@@ -38,7 +38,7 @@ the order of the pieces. The isotropic modulus on the cube needs differences of 
 For steps `t` of either sign the difference lives on `{x ∈ [0, 1] : x + mt ∈ [0, 1]}`
 (`Interval.stepRegion`), and its norm there depends only on `|t|`
 (`Interval.eLpNorm_higherDiff_stepRegion_eq`), since `Δ_{-t}^m f(x) = (-1)^m Δ_t^m f(x - mt)`
-(`Interval.higherDiff_neg`).
+(`Interval.interval_higherDiff_neg`).
 -/
 
 @[expose] public section
@@ -52,7 +52,7 @@ namespace Interval
 /-! ### Steps of either sign -/
 
 /-- **Negative steps**: `Δ_{-t}^m f(x) = (-1)^m Δ_t^m f(x - mt)` (`Rd.higherDiff_neg` on `ℝ`). -/
-theorem higherDiff_neg (m : ℕ) (t : ℝ) (f : ℝ → ℂ) (x : ℝ) :
+theorem interval_higherDiff_neg (m : ℕ) (t : ℝ) (f : ℝ → ℂ) (x : ℝ) :
     higherDiff m (-t) f x = (-1 : ℂ) ^ m * higherDiff m t f (x - m * t) := by
   rw [higherDiff_def, higherDiff_def, Rd.higherDiff_neg, nsmul_eq_mul]
 
@@ -415,7 +415,7 @@ theorem eLpNorm_higherDiff_le_of_lt_mul {u : ℝ → ℂ} (hu : Measurable u) {m
     eLpNorm (higherDiff m h u) p (volume.restrict (Icc 0 (1 - m * h))) ≤
       2 ^ m * (m : ℝ≥0∞) ^ m * ENNReal.ofReal (2 ^ j * h) ^ m * eLpNorm u p unitVol := by
   have hpos : (0 : ℝ) < 2 ^ j := by positivity
-  have h1 := eLpNorm_higherDiff_le hu (Fact.out : 1 ≤ p) m hh0 0 1
+  have h1 := interval_eLpNorm_higherDiff_le hu (Fact.out : 1 ≤ p) m hh0 0 1
   have hmσ : 1 ≤ (m : ℝ≥0∞) * ENNReal.ofReal (2 ^ j * h) := by
     rw [← ENNReal.ofReal_natCast, ← ENNReal.ofReal_mul (Nat.cast_nonneg _),
       ← ENNReal.ofReal_one]

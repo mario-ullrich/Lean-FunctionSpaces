@@ -131,10 +131,10 @@ namespace KernelOp
 variable {ι : Type*} [Fintype ι] (T : KernelOp ι)
 
 /-- The coefficient `∫_0^1 g κ_j`. -/
-noncomputable def coef (g : ℝ → ℂ) (j : ι) : ℂ := ∫ s in Icc (0 : ℝ) 1, g s * T.kernel j s
+noncomputable def kernelCoef (g : ℝ → ℂ) (j : ι) : ℂ := ∫ s in Icc (0 : ℝ) 1, g s * T.kernel j s
 
 /-- The operator `T g = ∑_j (∫_0^1 g κ_j) φ_j`. -/
-noncomputable def apply (g : ℝ → ℂ) (t : ℝ) : ℂ := ∑ j, T.coef g j * T.rangeFn j t
+noncomputable def apply (g : ℝ → ℂ) (t : ℝ) : ℂ := ∑ j, T.kernelCoef g j * T.rangeFn j t
 
 /-- The products `g κ_j` of a function `g` integrable on `[0, 1]` are integrable on `[0, 1]`. -/
 theorem integrableOn_mul_kernel {g : ℝ → ℂ} (hg : IntegrableOn g (Icc (0 : ℝ) 1)) (j : ι) :
@@ -143,30 +143,30 @@ theorem integrableOn_mul_kernel {g : ℝ → ℂ} (hg : IntegrableOn g (Icc (0 :
     (Filter.Eventually.of_forall fun s => (T.bddMeas_kernel j).2.choose_spec s)
 
 /-- The coefficients are additive on functions integrable on `[0, 1]`. -/
-theorem coef_add {g h : ℝ → ℂ} (hg : IntegrableOn g (Icc (0 : ℝ) 1))
+theorem kernelCoef_add {g h : ℝ → ℂ} (hg : IntegrableOn g (Icc (0 : ℝ) 1))
     (hh : IntegrableOn h (Icc (0 : ℝ) 1)) (j : ι) :
-    T.coef (fun s => g s + h s) j = T.coef g j + T.coef h j := by
-  simp only [coef, add_mul]
+    T.kernelCoef (fun s => g s + h s) j = T.kernelCoef g j + T.kernelCoef h j := by
+  simp only [kernelCoef, add_mul]
   exact integral_add (T.integrableOn_mul_kernel hg j) (T.integrableOn_mul_kernel hh j)
 
 /-- The coefficients of a difference of functions integrable on `[0, 1]`. -/
-theorem coef_sub {g h : ℝ → ℂ} (hg : IntegrableOn g (Icc (0 : ℝ) 1))
+theorem kernelCoef_sub {g h : ℝ → ℂ} (hg : IntegrableOn g (Icc (0 : ℝ) 1))
     (hh : IntegrableOn h (Icc (0 : ℝ) 1)) (j : ι) :
-    T.coef (fun s => g s - h s) j = T.coef g j - T.coef h j := by
-  simp only [coef, sub_mul]
+    T.kernelCoef (fun s => g s - h s) j = T.kernelCoef g j - T.kernelCoef h j := by
+  simp only [kernelCoef, sub_mul]
   exact integral_sub (T.integrableOn_mul_kernel hg j) (T.integrableOn_mul_kernel hh j)
 
 /-- The coefficients are homogeneous. -/
-theorem coef_const_mul (c : ℂ) (g : ℝ → ℂ) (j : ι) :
-    T.coef (fun s => c * g s) j = c * T.coef g j := by
-  simp only [coef, mul_assoc]
+theorem kernelCoef_const_mul (c : ℂ) (g : ℝ → ℂ) (j : ι) :
+    T.kernelCoef (fun s => c * g s) j = c * T.kernelCoef g j := by
+  simp only [kernelCoef, mul_assoc]
   exact integral_const_mul c _
 
 /-- The coefficients of finite sums of functions integrable on `[0, 1]`. -/
-theorem coef_sum {κι : Type*} (s : Finset κι) {g : κι → ℝ → ℂ}
+theorem kernelCoef_sum {κι : Type*} (s : Finset κι) {g : κι → ℝ → ℂ}
     (hg : ∀ a ∈ s, IntegrableOn (g a) (Icc (0 : ℝ) 1)) (j : ι) :
-    T.coef (fun t => ∑ a ∈ s, g a t) j = ∑ a ∈ s, T.coef (g a) j := by
-  simp only [coef, Finset.sum_mul]
+    T.kernelCoef (fun t => ∑ a ∈ s, g a t) j = ∑ a ∈ s, T.kernelCoef (g a) j := by
+  simp only [kernelCoef, Finset.sum_mul]
   exact integral_finsetSum _ fun a ha => T.integrableOn_mul_kernel (hg a ha) j
 
 /-- **Kernel operators are linear** on functions integrable on `[0, 1]`:
@@ -174,17 +174,17 @@ theorem coef_sum {κι : Type*} (s : Finset κι) {g : κι → ℝ → ℂ}
 theorem apply_sub {g h : ℝ → ℂ} (hg : IntegrableOn g (Icc (0 : ℝ) 1))
     (hh : IntegrableOn h (Icc (0 : ℝ) 1)) (t : ℝ) :
     T.apply (fun s => g s - h s) t = T.apply g t - T.apply h t := by
-  simp only [apply, T.coef_sub hg hh, sub_mul, Finset.sum_sub_distrib]
+  simp only [apply, T.kernelCoef_sub hg hh, sub_mul, Finset.sum_sub_distrib]
 
 /-- `|∫_0^1 g κ_j| ≤ M B` for `|g| ≤ M` and `|κ_j| ≤ B`. -/
-theorem norm_coef_le {g : ℝ → ℂ} {M : ℝ} (hM : ∀ s, ‖g s‖ ≤ M) (j : ι) :
-    ‖T.coef g j‖ ≤ M * (T.bddMeas_kernel j).2.choose := by
+theorem norm_kernelCoef_le {g : ℝ → ℂ} {M : ℝ} (hM : ∀ s, ‖g s‖ ≤ M) (j : ι) :
+    ‖T.kernelCoef g j‖ ≤ M * (T.bddMeas_kernel j).2.choose := by
   have h := norm_setIntegral_le_of_norm_le_const (μ := volume) (s := Icc (0 : ℝ) 1)
     (f := fun s => g s * T.kernel j s) (C := M * (T.bddMeas_kernel j).2.choose) (by simp) fun s _ => by
       rw [norm_mul]
       exact mul_le_mul (hM s) ((T.bddMeas_kernel j).2.choose_spec s) (norm_nonneg _)
         ((norm_nonneg _).trans (hM s))
-  rw [coef]
+  rw [kernelCoef]
   simpa [Real.volume_real_Icc] using h
 
 /-! ### The slicewise action -/
@@ -197,7 +197,7 @@ noncomputable def slicewise (i : Fin d) (g : (Fin d → ℝ) → ℂ) (x : Fin d
 
 /-- The slicewise action as a sum: `T^{(i)} g(x) = ∑_j (∫_0^1 g(x with s in place i) κ_j(s) ds) φ_j(x_i)`. -/
 theorem slicewise_eq (i : Fin d) (g : (Fin d → ℝ) → ℂ) (x : Fin d → ℝ) :
-    T.slicewise i g x = ∑ j, T.coef (slice g x i) j * T.rangeFn j (x i) := rfl
+    T.slicewise i g x = ∑ j, T.kernelCoef (slice g x i) j * T.rangeFn j (x i) := rfl
 
 /-- The slices of `T^{(i)} g` in coordinate `i` are the images of the slices under `T`. -/
 theorem slice_slicewise (i : Fin d) (g : (Fin d → ℝ) → ℂ) (x : Fin d → ℝ) :
@@ -207,8 +207,8 @@ theorem slice_slicewise (i : Fin d) (g : (Fin d → ℝ) → ℂ) (x : Fin d →
   rw [slice_update, Function.update_self]
 
 /-- The coefficients of the slices are measurable in the point. -/
-theorem measurable_coef_slice {g : (Fin d → ℝ) → ℂ} (hg : Measurable g) (i : Fin d) (j : ι) :
-    Measurable fun x => T.coef (slice g x i) j := by
+theorem measurable_kernelCoef_slice {g : (Fin d → ℝ) → ℂ} (hg : Measurable g) (i : Fin d) (j : ι) :
+    Measurable fun x => T.kernelCoef (slice g x i) j := by
   have h : StronglyMeasurable (Function.uncurry fun (x : Fin d → ℝ) (s : ℝ) =>
       slice g x i s * T.kernel j s) :=
     ((measurable_slice_uncurry hg i).mul ((T.bddMeas_kernel j).1.comp measurable_snd)).stronglyMeasurable
@@ -217,7 +217,7 @@ theorem measurable_coef_slice {g : (Fin d → ℝ) → ℂ} (hg : Measurable g) 
 /-- The slicewise action of a measurable function is measurable. -/
 theorem measurable_slicewise {g : (Fin d → ℝ) → ℂ} (hg : Measurable g) (i : Fin d) :
     Measurable (T.slicewise i g) :=
-  Finset.measurable_sum _ fun j _ => (T.measurable_coef_slice hg i j).mul
+  Finset.measurable_sum _ fun j _ => (T.measurable_kernelCoef_slice hg i j).mul
     ((T.bddMeas_rangeFn j).1.comp (measurable_pi_apply i))
 
 /-- The slicewise action keeps functions bounded and measurable. -/
@@ -229,9 +229,9 @@ theorem bddMeas_slicewise {g : (Fin d → ℝ) → ℂ} (hg : BddMeas g) (i : Fi
   rw [slicewise_eq]
   refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun j _ => ?_)
   rw [norm_mul]
-  exact mul_le_mul (T.norm_coef_le (g := slice g x i) (fun s => hM _) j)
+  exact mul_le_mul (T.norm_kernelCoef_le (g := slice g x i) (fun s => hM _) j)
     ((T.bddMeas_rangeFn j).2.choose_spec _) (norm_nonneg _)
-    ((norm_nonneg _).trans (T.norm_coef_le (g := slice g x i) (fun s => hM _) j))
+    ((norm_nonneg _).trans (T.norm_kernelCoef_le (g := slice g x i) (fun s => hM _) j))
 
 /-- **The slicewise action is linear** on bounded measurable functions. -/
 theorem slicewise_sub {g h : (Fin d → ℝ) → ℂ} (hg : BddMeas g) (hh : BddMeas h) (i : Fin d)
@@ -252,8 +252,9 @@ for bounded measurable `g`, with the coefficients `c_j(x) = ∫_0^1 g(x with s i
 theorem isForm_slicewise {g : (Fin d → ℝ) → ℂ} (hg : BddMeas g) (i : Fin d) :
     T.IsForm i (T.slicewise i g) := by
   obtain ⟨hgm, M, hM⟩ := hg
-  refine ⟨fun j x => T.coef (slice g x i) j, fun j => ⟨T.measurable_coef_slice hgm i j,
-    M * (T.bddMeas_kernel j).2.choose, fun x => T.norm_coef_le (g := slice g x i) (fun s => hM _) j⟩,
+  refine ⟨fun j x => T.kernelCoef (slice g x i) j, fun j => ⟨T.measurable_kernelCoef_slice hgm i j,
+    M * (T.bddMeas_kernel j).2.choose,
+    fun x => T.norm_kernelCoef_le (g := slice g x i) (fun s => hM _) j⟩,
     fun j x t => by simp only [slice_update], fun x => rfl⟩
 
 /-- The slices of a function of the form of `T` in coordinate `i` are combinations of the `φ_j`. -/
@@ -280,17 +281,19 @@ theorem IsForm.slicewise {κι : Type*} [Fintype κι] (S : KernelOp κι) {i j 
       funext s
       simp only [slice, hgc, Function.update_of_ne hij]
     rw [KernelOp.slicewise_eq, hslice]
-    have hcoef : ∀ b, S.coef (fun s => ∑ a, c a (Function.update x j s) * T.rangeFn a (x i)) b =
-        ∑ a, S.coef (fun s => c a (Function.update x j s)) b * T.rangeFn a (x i) := fun b => by
+    have hcoef : ∀ b,
+        S.kernelCoef (fun s => ∑ a, c a (Function.update x j s) * T.rangeFn a (x i)) b =
+        ∑ a, S.kernelCoef (fun s => c a (Function.update x j s)) b *
+            T.rangeFn a (x i) := fun b => by
       have hb : ∀ a ∈ (Finset.univ : Finset ι),
           BddMeas (fun s => c a (Function.update x j s) * T.rangeFn a (x i)) := fun a _ => by
         obtain ⟨hcm, M, hM⟩ := hcb a
         exact ⟨(hcm.comp (measurable_update x)).mul measurable_const, M * ‖T.rangeFn a (x i)‖,
           fun s => by rw [norm_mul]; exact mul_le_mul_of_nonneg_right (hM _) (norm_nonneg _)⟩
-      rw [S.coef_sum _ fun a ha => (hb a ha).integrableOn_Icc]
+      rw [S.kernelCoef_sum _ fun a ha => (hb a ha).integrableOn_Icc]
       refine Finset.sum_congr rfl fun a _ => ?_
       simp only [mul_comm _ (T.rangeFn a (x i))]
-      rw [S.coef_const_mul]
+      rw [S.kernelCoef_const_mul]
     simp only [hcoef, Finset.sum_mul]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun a _ => ?_
@@ -346,11 +349,11 @@ def Reproduces : Prop := ∀ m, T.apply (T.rangeFn m) = T.rangeFn m
 /-- A reproducing operator is the identity on the combinations of its functions. -/
 theorem Reproduces.apply_sum (hT : T.Reproduces) (a : ι → ℂ) (t : ℝ) :
     T.apply (fun s => ∑ m, a m * T.rangeFn m s) t = ∑ m, a m * T.rangeFn m t := by
-  have hcoef : ∀ j, T.coef (fun s => ∑ m, a m * T.rangeFn m s) j =
-      ∑ m, a m * T.coef (T.rangeFn m) j := fun j => by
-    rw [T.coef_sum (g := fun m s => a m * T.rangeFn m s) _
+  have hcoef : ∀ j, T.kernelCoef (fun s => ∑ m, a m * T.rangeFn m s) j =
+      ∑ m, a m * T.kernelCoef (T.rangeFn m) j := fun j => by
+    rw [T.kernelCoef_sum (g := fun m s => a m * T.rangeFn m s) _
       fun m _ => ((T.bddMeas_rangeFn m).const_mul (a m)).integrableOn_Icc]
-    exact Finset.sum_congr rfl fun m _ => T.coef_const_mul _ _ _
+    exact Finset.sum_congr rfl fun m _ => T.kernelCoef_const_mul _ _ _
   simp only [apply, hcoef, Finset.sum_mul]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun m _ => ?_
@@ -373,20 +376,20 @@ theorem IsForm.slicewise_self (hT : T.Reproduces) {i : Fin d} {g : (Fin d → �
 /-- **The coefficients of slices keep the forms in other coordinates**: if `g` has the form of
 `T` in coordinate `i` and `j ≠ i`, then `x ↦ ∫_0^1 g(x with s in place j) κ'_m(s) ds` has the
 form of `T` in coordinate `i`. -/
-theorem IsForm.coef_slice {κι : Type*} [Fintype κι] (S : KernelOp κι) {i j : Fin d}
+theorem IsForm.kernelCoef_slice {κι : Type*} [Fintype κι] (S : KernelOp κι) {i j : Fin d}
     (hij : i ≠ j) {g : (Fin d → ℝ) → ℂ} (hg : T.IsForm i g) (m : κι) :
-    T.IsForm i (fun x => S.coef (slice g x j) m) := by
+    T.IsForm i (fun x => S.kernelCoef (slice g x j) m) := by
   obtain ⟨c, hcb, hci, hgc⟩ := hg
-  refine ⟨fun a x => S.coef (slice (c a) x j) m, fun a => ?_, fun a x t => ?_, fun x => ?_⟩
+  refine ⟨fun a x => S.kernelCoef (slice (c a) x j) m, fun a => ?_, fun a x t => ?_, fun x => ?_⟩
   · obtain ⟨hcm, M, hM⟩ := hcb a
-    exact ⟨S.measurable_coef_slice hcm j m, M * (S.bddMeas_kernel m).2.choose,
-      fun x => S.norm_coef_le (g := slice (c a) x j) (fun s => hM _) m⟩
+    exact ⟨S.measurable_kernelCoef_slice hcm j m, M * (S.bddMeas_kernel m).2.choose,
+      fun x => S.norm_kernelCoef_le (g := slice (c a) x j) (fun s => hM _) m⟩
   · have hs : slice (c a) (Function.update x i t) j = slice (c a) x j := by
       funext s
       simp only [slice]
       rw [Function.update_comm hij, hci]
     simp only [hs]
-  · show S.coef (slice g x j) m = ∑ a, S.coef (slice (c a) x j) m * T.rangeFn a (x i)
+  · show S.kernelCoef (slice g x j) m = ∑ a, S.kernelCoef (slice (c a) x j) m * T.rangeFn a (x i)
     have hslice : slice g x j = fun s => ∑ a, c a (Function.update x j s) * T.rangeFn a (x i) := by
       funext s
       simp only [slice, hgc, Function.update_of_ne hij]
@@ -397,10 +400,10 @@ theorem IsForm.coef_slice {κι : Type*} [Fintype κι] (S : KernelOp κι) {i j
       exact BddMeas.integrableOn_Icc ⟨(hcm.comp (measurable_update x)).mul measurable_const,
         M * ‖T.rangeFn a (x i)‖, fun s => by
           rw [norm_mul]; exact mul_le_mul_of_nonneg_right (hM _) (norm_nonneg _)⟩
-    rw [S.coef_sum (g := fun a s => c a (Function.update x j s) * T.rangeFn a (x i)) _ hb]
+    rw [S.kernelCoef_sum (g := fun a s => c a (Function.update x j s) * T.rangeFn a (x i)) _ hb]
     refine Finset.sum_congr rfl fun a _ => ?_
     simp only [mul_comm _ (T.rangeFn a (x i))]
-    rw [S.coef_const_mul]
+    rw [S.kernelCoef_const_mul]
     rfl
 
 /-- The **partial tensor products** for a set `S` of coordinates: `c(x) ∏_{i ∈ S} φ_{j_i}(x_i)`
@@ -418,10 +421,10 @@ theorem partialTensor_subset_span (hT : T.Reproduces) {S : Finset (Fin d)} {i₀
     (hi₀ : i₀ ∉ S) : T.partialTensor S ⊆ Submodule.span ℂ (T.partialTensor (insert i₀ S)) := by
   classical
   rintro G ⟨c, j, hcb, hci, hcf, rfl⟩
-  have hc : ∀ x, c x = ∑ m, T.coef (slice c x i₀) m * T.rangeFn m (x i₀) := fun x =>
+  have hc : ∀ x, c x = ∑ m, T.kernelCoef (slice c x i₀) m * T.rangeFn m (x i₀) := fun x =>
     (congrFun (KernelOp.IsForm.slicewise_self T hT (hcf i₀ hi₀)) x).symm
   have hG : (fun x => c x * ∏ i ∈ S, T.rangeFn (j i) (x i)) = ∑ m, fun x =>
-      T.coef (slice c x i₀) m *
+      T.kernelCoef (slice c x i₀) m *
         ∏ i ∈ insert i₀ S, T.rangeFn (Function.update j i₀ m i) (x i) := by
     funext x
     rw [Finset.sum_apply, hc x, Finset.sum_mul]
@@ -435,10 +438,10 @@ theorem partialTensor_subset_span (hT : T.Reproduces) {S : Finset (Fin d)} {i₀
     ring
   rw [hG]
   refine Submodule.sum_mem _ fun m _ => Submodule.subset_span
-    ⟨fun x => T.coef (slice c x i₀) m, Function.update j i₀ m, ?_, ?_, ?_, rfl⟩
+    ⟨fun x => T.kernelCoef (slice c x i₀) m, Function.update j i₀ m, ?_, ?_, ?_, rfl⟩
   · obtain ⟨hcm, M, hM⟩ := hcb
-    exact ⟨T.measurable_coef_slice hcm i₀ m, M * (T.bddMeas_kernel m).2.choose,
-      fun x => T.norm_coef_le (g := slice c x i₀) (fun s => hM _) m⟩
+    exact ⟨T.measurable_kernelCoef_slice hcm i₀ m, M * (T.bddMeas_kernel m).2.choose,
+      fun x => T.norm_kernelCoef_le (g := slice c x i₀) (fun s => hM _) m⟩
   · intro x i hi t
     rcases Finset.mem_insert.1 hi with rfl | hi'
     · simp only [slice_update]
@@ -450,7 +453,7 @@ theorem partialTensor_subset_span (hT : T.Reproduces) {S : Finset (Fin d)} {i₀
   · intro i hi
     have hi' : i ∉ S := fun h => hi (Finset.mem_insert_of_mem h)
     have hne : i ≠ i₀ := fun h => hi (h ▸ Finset.mem_insert_self i₀ S)
-    exact KernelOp.IsForm.coef_slice T T hne (hcf i hi') m
+    exact KernelOp.IsForm.kernelCoef_slice T T hne (hcf i hi') m
 
 /-- **Forms in every coordinate are tensor products**: for a reproducing operator, a bounded
 measurable function with the form of `T` in every coordinate is a combination of the products

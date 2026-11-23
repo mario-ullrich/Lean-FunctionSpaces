@@ -33,7 +33,7 @@ uses:
 * **Isotropic differences of tensor products.** The isotropic difference `Δ_h^r` on `ℝ^d` is a sum
   of `d^r` translated mixed coordinate differences (`Cube.higherDiff_eq_sum`), and a mixed
   coordinate difference of a tensor product is the tensor product of the one-dimensional
-  differences (`Cube.mixedDiff_tensorKernel`). With `‖⊗K‖_p = ∏_i ‖K_i‖_p`
+  differences (`Cube.cubeMixedDiff_tensorKernel`). With `‖⊗K‖_p = ∏_i ‖K_i‖_p`
   (`Rd.eLpNorm_tensorKernel`), bounds `‖Δ_t^n K_i‖_p ≤ A |t|^{θ_n}` for all orders `n ≤ r` give
   `‖Δ_h^r (⊗K)‖_p ≤ d^r A^d ‖h‖^Θ` whenever `Θ ≤ ∑_i θ_{n_i}` for all `n` with `∑_i n_i = r`
   (`Rd.eLpNorm_higherDiff_tensorKernel_le`).
@@ -69,15 +69,15 @@ variable {d : ℕ}
 distinct coordinates, the mixed difference `M_m (⊗K)` with orders `m_i` and steps `h_i` is the
 tensor product `⊗K'` with `K'_i = Δ^{m_i}_{h_i} K_i` for `i ∈ l` and `K'_i = K_i` otherwise
 (`Rd.higherDiff_single_tensorKernel`, one coordinate at a time). -/
-theorem mixedDiff_tensorKernel (m : Fin d → ℕ) (h : Fin d → ℝ) {l : List (Fin d)}
+theorem cubeMixedDiff_tensorKernel (m : Fin d → ℕ) (h : Fin d → ℝ) {l : List (Fin d)}
     (hl : l.Nodup) (K : Fin d → ℝ → ℂ) :
-    mixedDiff m h l (Rd.tensorKernel K) =
+    cubeMixedDiff m h l (Rd.tensorKernel K) =
       Rd.tensorKernel fun i => if i ∈ l then (fwdDiff (h i))^[m i] (K i) else K i := by
   induction l with
-  | nil => simp [mixedDiff_nil]
+  | nil => simp [cubeMixedDiff_nil]
   | cons c l ih =>
     rw [List.nodup_cons] at hl
-    rw [mixedDiff_cons, ih hl.2, ← higherDiff_single, Rd.higherDiff_def,
+    rw [cubeMixedDiff_cons, ih hl.2, ← higherDiff_single, Rd.higherDiff_def,
       Rd.higherDiff_single_tensorKernel]
     congr 1
     funext i
@@ -125,7 +125,7 @@ for every `n ∈ ℕ^d` with `∑_i n_i = r`, and let `‖Δ_t^n K_i‖_p ≤ A 
 coordinate `i`, every order `n ≤ r` and every `|t| ≤ 1`. Then for every `h ∈ ℝ^d` with
 `‖h‖ ≤ 1`, `‖Δ_h^r (⊗K)‖_p ≤ d^r A^d ‖h‖^Θ`. The isotropic difference is the sum of the `d^r`
 translated mixed coordinate differences of its words (`Cube.higherDiff_eq_sum`), each the tensor
-product of one-dimensional differences (`Cube.mixedDiff_tensorKernel`) with the norm
+product of one-dimensional differences (`Cube.cubeMixedDiff_tensorKernel`) with the norm
 `∏_i ‖Δ^{n_i}_{h_i} K_i‖_p` (`Rd.eLpNorm_tensorKernel`, translation invariance) for the
 multiplicities `n_i ≤ r` of the word, and each word contributes at most `A^d ‖h‖^Θ`
 (`Rd.prod_eLpNorm_higherDiff_le`). -/
@@ -147,7 +147,7 @@ theorem eLpNorm_higherDiff_tensorKernel_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp 
     funext x
     rw [Finset.sum_apply, ← higherDiff_def, Cube.higherDiff_eq_sum]
     refine Finset.sum_congr rfl fun α _ => ?_
-    rw [Cube.mixedDiff_tensorKernel _ _ (List.nodup_finRange d)]
+    rw [Cube.cubeMixedDiff_tensorKernel _ _ (List.nodup_finRange d)]
     simp [G]
   have hA1 : ENNReal.ofReal ‖h‖ ≤ 1 := ENNReal.ofReal_le_one.2 hh
   have hword : ∀ α : Fin r → Fin d,
@@ -435,13 +435,13 @@ theorem modulusBound_wavelet (hN : 2 ≤ N) {p : ℝ≥0∞} [Fact (1 ≤ p)] (h
     {r : ℕ} (hθ : 0 ≤ θ) (hB : BernsteinBound m p θ r) : ModulusBound (wavelet m) p θ r := by
   obtain ⟨K, hK, hmod⟩ := hB
   set a := (memLp_wavelet m hN p).toLp _
-  refine ⟨ENNReal.ofReal (2 ^ θ) * (bernsteinConst m p r * K + 2 ^ r) * ‖a‖ₑ,
-    by finiteness [bernsteinConst_ne_top m hN p r], fun t ht => ?_⟩
+  refine ⟨ENNReal.ofReal (2 ^ θ) * (daubechiesBernsteinConst m p r * K + 2 ^ r) * ‖a‖ₑ,
+    by finiteness [daubechiesBernsteinConst_ne_top m hN p r], fun t ht => ?_⟩
   rw [← Rd.smoothnessModulus_congr_ae (MemLp.coeFn_toLp (memLp_wavelet m hN p)) r p t]
   have h2t : ENNReal.ofReal ((2 * t) ^ θ) = ENNReal.ofReal (2 ^ θ) * ENNReal.ofReal (t ^ θ) := by
     rw [Real.mul_rpow zero_le_two ht.1.le, ENNReal.ofReal_mul (by positivity)]
   suffices h : Rd.smoothnessModulus volume r p (a : ℝ → ℂ) t ≤
-      (bernsteinConst m p r * K + 2 ^ r) * ENNReal.ofReal ((2 * t) ^ θ) * ‖a‖ₑ by
+      (daubechiesBernsteinConst m p r * K + 2 ^ r) * ENNReal.ofReal ((2 * t) ^ θ) * ‖a‖ₑ by
     refine h.trans_eq ?_
     rw [h2t]
     ring
@@ -449,11 +449,12 @@ theorem modulusBound_wavelet (hN : 2 ≤ N) {p : ℝ≥0∞} [Fact (1 ≤ p)] (h
   · refine (smoothnessModulus_mem_scalingSpace_le m hN hp r (toLp_wavelet_mem_scalingSpace m hN hp)
       (by rwa [pow_one])).trans ?_
     rw [pow_one]
-    calc bernsteinConst m p r * Rd.smoothnessModulus volume r p (scalingFun m) (2 * t) * ‖a‖ₑ
-        ≤ bernsteinConst m p r * (K * ENNReal.ofReal ((2 * t) ^ θ)) * ‖a‖ₑ := by
+    calc daubechiesBernsteinConst m p r * Rd.smoothnessModulus volume r p (scalingFun m) (2 * t) *
+            ‖a‖ₑ
+        ≤ daubechiesBernsteinConst m p r * (K * ENNReal.ofReal ((2 * t) ^ θ)) * ‖a‖ₑ := by
           gcongr
           exact hmod _ ⟨by linarith [ht.1], h2⟩
-      _ ≤ (bernsteinConst m p r * K + 2 ^ r) * ENNReal.ofReal ((2 * t) ^ θ) * ‖a‖ₑ := by
+      _ ≤ (daubechiesBernsteinConst m p r * K + 2 ^ r) * ENNReal.ofReal ((2 * t) ^ θ) * ‖a‖ₑ := by
           rw [← mul_assoc]
           gcongr
           exact le_self_add
@@ -463,10 +464,10 @@ theorem modulusBound_wavelet (hN : 2 ≤ N) {p : ℝ≥0∞} [Fact (1 ≤ p)] (h
     calc Rd.smoothnessModulus volume r p (a : ℝ → ℂ) t ≤ 2 ^ r * ‖a‖ₑ := by
           rw [Lp.enorm_def]
           exact Rd.smoothnessModulus_le (Lp.aestronglyMeasurable a) Fact.out r t
-      _ ≤ (bernsteinConst m p r * K + 2 ^ r) * ENNReal.ofReal ((2 * t) ^ θ) * ‖a‖ₑ := by
+      _ ≤ (daubechiesBernsteinConst m p r * K + 2 ^ r) * ENNReal.ofReal ((2 * t) ^ θ) * ‖a‖ₑ := by
           gcongr
-          calc (2 : ℝ≥0∞) ^ r ≤ bernsteinConst m p r * K + 2 ^ r := le_add_self
-            _ ≤ (bernsteinConst m p r * K + 2 ^ r) * ENNReal.ofReal ((2 * t) ^ θ) :=
+          calc (2 : ℝ≥0∞) ^ r ≤ daubechiesBernsteinConst m p r * K + 2 ^ r := le_add_self
+            _ ≤ (daubechiesBernsteinConst m p r * K + 2 ^ r) * ENNReal.ofReal ((2 * t) ^ θ) :=
               le_mul_of_one_le_right' h1
 
 /-! ### The moduli of the tensor generators -/

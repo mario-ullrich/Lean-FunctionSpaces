@@ -55,7 +55,7 @@ theorem toLp_trigScheme_eq :
     (trigScheme d).toLp volume 2 = (fourierScheme d).toScheme := by
   ext n f
   change f ∈ (BoundedContinuousFunction.toLp (E := ℂ) 2 volume ℝ) '' (trigPoly d n : Set _) ↔
-    f ∈ ((fourierScheme d).span n : Set _)
+    f ∈ ((fourierScheme d).levelSpan n : Set _)
   have hmap : (BoundedContinuousFunction.toLp (E := ℂ) 2 volume ℝ : _ → _) '' (trigPoly d n : Set _)
       = SetLike.coe ((trigPoly d n).map
           (BoundedContinuousFunction.toLp (E := ℂ) 2 volume ℂ).toLinearMap) := by

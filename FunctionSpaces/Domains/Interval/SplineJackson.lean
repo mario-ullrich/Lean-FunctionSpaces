@@ -24,8 +24,8 @@ polynomial of the Steklov smoothing of `f`, forward on `[0, 3/4]` and backward o
 (`Interval.exists_left_smoothing`, `Interval.exists_right_smoothing` with `L = 2^(-k)`); every
 window lies in one of the two parts, and the windows overlap at most `r` times
 (`Interval.sum_lintegral_window_le`). This works for `k ≥ r + 2`; general `f ∈ L_p` follow by
-density (`Interval.approxError_le_of_continuous`). The coarse levels `k ≤ r + 1` need Whitney's
-inequality:
+density (`Interval.interval_approxError_le_of_continuous`). The coarse levels `k ≤ r + 1` need
+Whitney's inequality:
 `E_{2^k}(f) ≤ E_1(f)`, and the splines of level `0` are the polynomials of degree `< r`
 (`Interval.approxError_splineScheme_one`), so `E_1(f) ≤ W ω_r(f, 2^(-(r+1)))_p ≤ W ω_r(f, 2^(-k))_p`
 (`Interval.exists_approxError_ppScheme_one_le`).
@@ -515,7 +515,7 @@ the smoothings of `F` from the left on `[0, 3/4]` and from the right on `[1/4, 1
 theorem exists_eLpNorm_sub_qi_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ F : ℝ → ℂ, Continuous F → ∀ k : ℕ, r + 2 ≤ k →
       eLpNorm (fun x => F x - ppFun k (qiPieces hr k (2 ^ k) F) x) p unitVol ≤
-        C * modulus r p 0 1 F (1 / 2 ^ k) := by
+        C * intervalModulus r p 0 1 F (1 / 2 ^ k) := by
   obtain ⟨A, hA, hAb⟩ := exists_eLpNorm_sub_qi_le_of_taylor (p := p) hr hp
   have hJ : 1 + (r : ℝ≥0∞) ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r)) ≠ ∞ :=
     ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top, ENNReal.mul_ne_top
@@ -596,7 +596,7 @@ theorem approxError_splineScheme_one (r : ℕ) (f : Lp ℂ p unitVol) :
 quasi-interpolant for `k ≥ r + 2`, Whitney's inequality for `k ≤ r + 1`. -/
 theorem exists_approxError_splineScheme_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
     ∃ CJ : ℝ≥0∞, CJ ≠ ∞ ∧ ∀ (f : Lp ℂ p unitVol) (k : ℕ),
-      (splineScheme p r).approxError f (2 ^ k) ≤ CJ * lpModulus p r f k := by
+      (splineScheme p r).approxError f (2 ^ k) ≤ CJ * intervalLpModulus p r f k := by
   obtain ⟨C, hC, hCb⟩ := exists_eLpNorm_sub_qi_le hr hp
   obtain ⟨W, hW, hWb⟩ := exists_approxError_ppScheme_one_le (p := p) hr hp (m := r + 1) (by omega)
   refine ⟨W + C, ENNReal.add_ne_top.2 ⟨hW, hC⟩, fun f k => ?_⟩
@@ -606,11 +606,11 @@ theorem exists_approxError_splineScheme_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ 
         ≤ (splineScheme p r).approxError f 1 :=
           ApproximationScheme.approxError_anti f Nat.one_le_two_pow
       _ = (ppScheme p r).approxError f 1 := approxError_splineScheme_one r f
-      _ ≤ W * lpModulus p r f (r + 1) := hWb f
-      _ ≤ (W + C) * lpModulus p r f k :=
-          mul_le_mul' le_self_add (lpModulus_anti r f (by omega))
+      _ ≤ W * intervalLpModulus p r f (r + 1) := hWb f
+      _ ≤ (W + C) * intervalLpModulus p r f k :=
+          mul_le_mul' le_self_add (intervalLpModulus_anti r f (by omega))
   · -- the fine levels: the quasi-interpolant
-    refine (approxError_le_of_continuous hp hC (fun g => ?_) f).trans
+    refine (interval_approxError_le_of_continuous hp hC (fun g => ?_) f).trans
       (mul_le_mul' le_add_self le_rfl)
     exact ⟨ppFun k (qiPieces hr k (2 ^ k) g), ⟨(memLp_ppFun k (qiPieces hr k (2 ^ k) g) p).toLp _,
       mem_splineScheme_two_pow.2 ⟨qiPieces hr k (2 ^ k) g, qiPieces_mem hr k (2 ^ k) g,
@@ -621,7 +621,8 @@ theorem exists_approxError_splineScheme_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ 
 order `r`, with inverse order `θ = r - 1 + 1/p` and Jackson's inequality at every level. -/
 noncomputable def splineModulusData {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
     ApproximationScheme.ModulusData (splineScheme p r) (((r - 1 : ℕ) : ℝ) + 1 / p.toReal) :=
-  .ofExists (lpModulus p r) (lpModulus_add_le r) (2 ^ r) (by simp) (lpModulus_le r) 0
+  .ofExists (intervalLpModulus p r) (intervalLpModulus_add_le r) (2 ^ r) (by simp)
+    (intervalLpModulus_le r) 0
     ((exists_approxError_splineScheme_le hr hp).imp fun _ h => ⟨h.1, fun f k _ => h.2 f k⟩)
     (exists_inverse_splineScheme hp)
 
@@ -632,7 +633,7 @@ of order `r` (degree `< r`, `C^(r-2)`) on dyadic partitions iff its Besov quasi-
 theorem memApprox_splineScheme_iff {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) {s : ℝ} {q : ℝ≥0∞}
     (hq : 1 ≤ q) (hs : 0 ≤ s) (hsr : s < (r : ℝ) - 1 + 1 / p.toReal) (f : Lp ℂ p unitVol) :
     (splineScheme p r).MemApprox s q f ↔
-      ‖f‖ₑ + ENNReal.lqNorm q (fun k => dyadicWeight s k * lpModulus p r f k) < ∞ := by
+      ‖f‖ₑ + ENNReal.lqNorm q (fun k => dyadicWeight s k * intervalLpModulus p r f k) < ∞ := by
   have hθ : (r : ℝ) - 1 + 1 / p.toReal = ((r - 1 : ℕ) : ℝ) + 1 / p.toReal := by
     rw [Nat.cast_sub hr, Nat.cast_one]
   exact (splineModulusData hr hp).memApprox_iff_modNorm_lt_top hq hs (hθ ▸ hsr) f

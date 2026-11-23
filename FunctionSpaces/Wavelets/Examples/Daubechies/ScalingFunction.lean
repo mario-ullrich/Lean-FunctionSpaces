@@ -11,8 +11,8 @@ public import FunctionSpaces.Wavelets.Examples.Daubechies.SymbolDecay
 /-!
 # The Daubechies scaling function
 
-For a Daubechies mask of order `N` with filter coefficients `c_k` (`Daubechies.coeff`), symbol
-`m_0(ξ) = (1/2) ∑_k c_k e^(-2πikξ)` (`Daubechies.symbol`) and symbol product
+For a Daubechies mask of order `N` with filter coefficients `c_k` (`Daubechies.daubechiesCoeff`),
+symbol `m_0(ξ) = (1/2) ∑_k c_k e^(-2πikξ)` (`Daubechies.symbol`) and symbol product
 `Φ(ξ) = ∏_{j ≥ 0} m_0(ξ/2^(j+1))` (`Daubechies.symbolProduct`), the **scaling function** is the
 inverse Fourier transform of `Φ`,
 
@@ -118,7 +118,7 @@ theorem norm_scalingFun_le (x : ℝ) : ‖scalingFun m x‖ ≤ ∫ ξ, ‖symbo
 (`Daubechies.symbolProduct_two_mul` and `Daubechies.symbol_eq_sum`). -/
 theorem symbolProduct_two_mul_eq_sum (ξ : ℝ) :
     symbolProduct m (2 * ξ) = ∑ k ∈ Finset.range (2 * N),
-      (coeff m k : ℂ) / 2 * (expFreq (k * ξ) * symbolProduct m ξ) := by
+      (daubechiesCoeff m k : ℂ) / 2 * (expFreq (k * ξ) * symbolProduct m ξ) := by
   rw [symbolProduct_two_mul, symbol_eq_sum, Finset.mul_sum, Finset.sum_mul]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [expFreq_pow]
@@ -143,7 +143,7 @@ the inverse transform is linear on the integrable summands (`Φ ∈ L¹` for `N 
 (`Daubechies.fourierInv_expFreq_mul_apply`). -/
 theorem scalingFun_refine (hN : 2 ≤ N) (x : ℝ) :
     scalingFun m x =
-      ∑ k ∈ Finset.range (2 * N), (coeff m k : ℂ) * scalingFun m (2 * x - k) := by
+      ∑ k ∈ Finset.range (2 * N), (daubechiesCoeff m k : ℂ) * scalingFun m (2 * x - k) := by
   have hΦ := integrable_symbolProduct m hN
   rw [scalingFun_eq_two_mul_fourierInv, funext (symbolProduct_two_mul_eq_sum m),
     Real.fourierInv_sum_apply, Finset.mul_sum]

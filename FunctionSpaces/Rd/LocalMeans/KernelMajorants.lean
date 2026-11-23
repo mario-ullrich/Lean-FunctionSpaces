@@ -40,7 +40,7 @@ Both bounds have the shape `|K(y)| ≤ C c_{ji} 2^(mn) (1 + 2^m ‖y‖)^(-N)` w
 `c_{ji} = 1` for `i > j`; for `i ≤ j`, `c_{ji} = 2^(-(j-i)L)` for `k_j ⋆ Θ_i` and
 `c_{ji} = 2^(-(j-i)L')` for `ψ_j ⋆ η_i`, with the free order `L'` of the moment kernel of `Φ`.
 Such kernels act below the Hardy–Littlewood maximal function: `|K ⋆ h(x)| ≤ C_{n,N} C M|h|(x)`
-for every function `h` (`Rd.enorm_conv_le_maximal_of_decay`).
+for every function `h` (`Rd.enorm_conv_le_maximalFunction_of_decay`).
 -/
 
 @[expose] public section
@@ -1443,14 +1443,14 @@ end LocalMeansBump
 /-- **Convolutions under a Peetre majorant**: if `|K(y)| ≤ C 2^(mn) (1 + 2^m ‖y‖)^(-N)` almost
 everywhere with `C < ∞` and `N > n`, then `|K ⋆ h(x)| ≤ C_{n,N} C M|h|(x)` for every function
 `h` and every `x`, with `C_{n,N} = Rd.decayMaximalConst V N`. -/
-theorem enorm_conv_le_maximal_of_decay {N m : ℕ} (hN : finrank ℝ V < N) {C : ℝ≥0∞}
+theorem enorm_conv_le_maximalFunction_of_decay {N m : ℕ} (hN : finrank ℝ V < N) {C : ℝ≥0∞}
     (hC : C ≠ ∞) {K : V → ℂ}
     (hK : ∀ᵐ y ∂volume, ‖K y‖ₑ ≤ C * 2 ^ (m * finrank ℝ V) * ((1 + 2 ^ m * ‖y‖ₑ) ^ N)⁻¹)
     (h : V → ℂ) (x : V) :
-    ‖conv K h volume x‖ₑ ≤ decayMaximalConst V N * C * maximal (fun y => ‖h y‖ₑ) x :=
+    ‖conv K h volume x‖ₑ ≤ decayMaximalConst V N * C * maximalFunction (fun y => ‖h y‖ₑ) x :=
   (enorm_conv_le_lintegral K h x).trans ((lintegral_mono_ae (hK.mono fun _ hy =>
     mul_le_mul_left hy _)).trans
-      (lintegral_mul_le_maximal_of_one_add_norm (j := m) hN hC (fun _ => le_rfl)
+      (lintegral_mul_le_maximalFunction_of_one_add_norm (j := m) hN hC (fun _ => le_rfl)
         (fun y => ‖h y‖ₑ) x))
 
 end Rd

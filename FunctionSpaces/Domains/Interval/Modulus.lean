@@ -17,21 +17,22 @@ public import Mathlib.MeasureTheory.Function.LpSeminorm.SMul
 # The modulus of smoothness on an interval
 
 For `f : ℝ → ℂ`, `1 ≤ p ≤ ∞` and an interval `[a, b]`, the **modulus of smoothness of order `r`**
-is the modulus on the set `[a, b]` of `Rd.modulusOn` (`Interval.modulus`),
+is the modulus on the set `[a, b]` of `Rd.modulusOn` (`Interval.intervalModulus`),
 
 `ω_r(f, t, [a, b])_p = sup_{|h| ≤ t} ‖Δ_h^r(f, ·, [a, b])‖_p
-  = sup_{0 ≤ h ≤ t} ‖Δ_h^r f‖_{L_p[a, b - r h]}`   (`Interval.modulus_eq_iSup_nonneg`):
+  = sup_{0 ≤ h ≤ t} ‖Δ_h^r f‖_{L_p[a, b - r h]}`   (`Interval.intervalModulus_eq_iSup_nonneg`):
 
 the differences are taken only where all points `x, x + h, …, x + r h` lie in `[a, b]`, and the
 steps `h` and `-h` give the same norm.  It
 increases in `t`, is subadditive and homogeneous in `f`, satisfies
 `ω_r(f, t) ≤ 2^r ‖f‖_{L_p[a,b]}`, vanishes on polynomials of degree `< r`, depends only on
-the class of `f` in `L_p[a, b]` (`Interval.modulus_congr_ae`) and is invariant under the
-reflection `x ↦ a + b - x` (`Interval.modulus_reflect`).
+the class of `f` in `L_p[a, b]` (`Interval.intervalModulus_congr_ae`) and is invariant under the
+reflection `x ↦ a + b - x` (`Interval.intervalModulus_reflect`).
 
 The same formula defines the modulus for `0 < p < 1`. For `0 < p ≤ 1` the `p`-th power of the
-modulus is subadditive and `ω_r(f, t) ≤ 2^(r/p) ‖f‖_{L_p[a,b]}` (`Interval.modulus_add_rpow_le`,
-`Interval.modulus_le_of_le_one`), since the `p`-th power of the `L_p` quasi-norm is subadditive.
+modulus is subadditive and `ω_r(f, t) ≤ 2^(r/p) ‖f‖_{L_p[a,b]}`
+(`Interval.intervalModulus_add_rpow_le`, `Interval.intervalModulus_le_of_le_one`), since the `p`-th
+power of the `L_p` quasi-norm is subadditive.
 
 All norms are `eLpNorm` on the restriction of Lebesgue measure; the functions are measurable
 functions on `ℝ`, as the representatives of elements of `L_p` are.
@@ -159,8 +160,8 @@ theorem eLpNorm_comp_add_mul_le {f : ℝ → ℂ} (hf : Measurable f) (p : ℝ�
   exact eLpNorm_Icc_mono f p (by nlinarith) (by nlinarith [mul_le_mul_of_nonneg_right hkr' hh])
 
 /-- **`‖Δ_h^r f‖_{L_p[a, b - rh]} ≤ 2^r ‖f‖_{L_p[a,b]}`** for `h ≥ 0`. -/
-theorem eLpNorm_higherDiff_le {f : ℝ → ℂ} (hf : Measurable f) {p : ℝ≥0∞} (hp : 1 ≤ p) (r : ℕ)
-    {h : ℝ} (hh : 0 ≤ h) (a b : ℝ) :
+theorem interval_eLpNorm_higherDiff_le {f : ℝ → ℂ} (hf : Measurable f) {p : ℝ≥0∞} (hp : 1 ≤ p)
+    (r : ℕ) {h : ℝ} (hh : 0 ≤ h) (a b : ℝ) :
     eLpNorm (higherDiff r h f) p (volume.restrict (Icc a (b - r * h))) ≤
       2 ^ r * eLpNorm f p (volume.restrict (Icc a b)) :=
   eLpNorm_higherDiff_le_of_forall hp fun _ hk =>
@@ -202,24 +203,25 @@ theorem eLpNorm_indicator_diffStepSet_Icc (r : ℕ) {h : ℝ} (hh : 0 ≤ h) (p 
 /-- The **modulus of smoothness of order `r`** on `[a, b]` in `L_p`, the modulus on the set
 `[a, b]` (`Rd.modulusOn`): `ω_r(f, t, [a, b])_p = sup_{|h| ≤ t} ‖Δ_h^r(f, ·, [a, b])‖_p`, with the
 differences taken at the points `x` with `x, x + h, …, x + r h ∈ [a, b]`. -/
-noncomputable def modulus (r : ℕ) (p : ℝ≥0∞) (a b : ℝ) (f : ℝ → ℂ) (t : ℝ) : ℝ≥0∞ :=
+noncomputable def intervalModulus (r : ℕ) (p : ℝ≥0∞) (a b : ℝ) (f : ℝ → ℂ) (t : ℝ) : ℝ≥0∞ :=
   Rd.modulusOn volume (Icc a b) r p f t
 
 /-- `‖Δ_h^r f‖_{L_p[a, b - rh]} ≤ ω_r(f, t)` for `0 ≤ h ≤ t`. -/
-theorem eLpNorm_higherDiff_le_modulus {r : ℕ} {p : ℝ≥0∞} {a b : ℝ} {f : ℝ → ℂ} {t h : ℝ}
+theorem eLpNorm_higherDiff_le_intervalModulus {r : ℕ} {p : ℝ≥0∞} {a b : ℝ} {f : ℝ → ℂ} {t h : ℝ}
     (hh : h ∈ Icc 0 t) :
-    eLpNorm (higherDiff r h f) p (volume.restrict (Icc a (b - r * h))) ≤ modulus r p a b f t := by
+    eLpNorm (higherDiff r h f) p (volume.restrict (Icc a (b - r * h))) ≤
+      intervalModulus r p a b f t := by
   rw [← eLpNorm_indicator_diffStepSet_Icc r hh.1]
   exact Rd.eLpNorm_indicator_higherDiff_le_modulusOn (by rw [Real.norm_of_nonneg hh.1]; exact hh.2)
 
 /-- **The modulus on an interval through steps `h ≥ 0`**:
 `ω_r(f, t, [a, b])_p = sup_{0 ≤ h ≤ t} ‖Δ_h^r f‖_{L_p[a, b - rh]}`, since the step `-h` gives the
 norm of the step `h` (`Rd.eLpNorm_indicator_diffStepSet_neg`). -/
-theorem modulus_eq_iSup_nonneg (r : ℕ) (p : ℝ≥0∞) (a b : ℝ) (f : ℝ → ℂ) (t : ℝ) :
-    modulus r p a b f t = ⨆ (h : ℝ) (_ : h ∈ Icc 0 t),
+theorem intervalModulus_eq_iSup_nonneg (r : ℕ) (p : ℝ≥0∞) (a b : ℝ) (f : ℝ → ℂ) (t : ℝ) :
+    intervalModulus r p a b f t = ⨆ (h : ℝ) (_ : h ∈ Icc 0 t),
       eLpNorm (higherDiff r h f) p (volume.restrict (Icc a (b - r * h))) := by
   refine le_antisymm (iSup₂_le fun h hh => ?_)
-    (iSup₂_le fun h hh => eLpNorm_higherDiff_le_modulus hh)
+    (iSup₂_le fun h hh => eLpNorm_higherDiff_le_intervalModulus hh)
   rcases le_or_gt 0 h with h0 | h0
   · rw [eLpNorm_indicator_diffStepSet_Icc r h0]
     exact le_iSup₂_of_le h ⟨h0, by rwa [Real.norm_of_nonneg h0] at hh⟩ le_rfl
@@ -229,55 +231,59 @@ theorem modulus_eq_iSup_nonneg (r : ℕ) (p : ℝ≥0∞) (a b : ℝ) (f : ℝ �
     exact le_iSup₂_of_le s ⟨hs, by rwa [norm_neg, Real.norm_of_nonneg hs] at hh⟩ le_rfl
 
 /-- The modulus increases in `t`. -/
-theorem modulus_mono (r : ℕ) (p : ℝ≥0∞) (a b : ℝ) (f : ℝ → ℂ) : Monotone (modulus r p a b f) :=
+theorem intervalModulus_mono (r : ℕ) (p : ℝ≥0∞) (a b : ℝ) (f : ℝ → ℂ) :
+    Monotone (intervalModulus r p a b f) :=
   Rd.modulusOn_mono _ r p f
 
 /-- `ω_r(f, t) ≤ 2^r ‖f‖_{L_p[a,b]}`. -/
-theorem modulus_le {f : ℝ → ℂ} (hf : Measurable f) {p : ℝ≥0∞} (hp : 1 ≤ p) (r : ℕ) (a b t : ℝ) :
-    modulus r p a b f t ≤ 2 ^ r * eLpNorm f p (volume.restrict (Icc a b)) := by
-  rw [modulus_eq_iSup_nonneg]
-  exact iSup₂_le fun _ hh => eLpNorm_higherDiff_le hf hp r hh.1 a b
+theorem intervalModulus_le {f : ℝ → ℂ} (hf : Measurable f) {p : ℝ≥0∞} (hp : 1 ≤ p) (r : ℕ)
+    (a b t : ℝ) :
+    intervalModulus r p a b f t ≤ 2 ^ r * eLpNorm f p (volume.restrict (Icc a b)) := by
+  rw [intervalModulus_eq_iSup_nonneg]
+  exact iSup₂_le fun _ hh => interval_eLpNorm_higherDiff_le hf hp r hh.1 a b
 
 /-- **The modulus is bounded by the quasi-norm for `0 < p ≤ 1`**:
 `ω_r(f, t, [a, b])_p ≤ 2^(r/p) ‖f‖_{L_p[a, b]}`. -/
-theorem modulus_le_of_le_one {f : ℝ → ℂ} (hf : Measurable f) {p : ℝ≥0∞} (hp1 : p ≤ 1) (r : ℕ)
-    (a b t : ℝ) :
-    modulus r p a b f t ≤ 2 ^ ((r : ℝ) / p.toReal) * eLpNorm f p (volume.restrict (Icc a b)) := by
-  rw [modulus_eq_iSup_nonneg]
+theorem intervalModulus_le_of_le_one {f : ℝ → ℂ} (hf : Measurable f) {p : ℝ≥0∞} (hp1 : p ≤ 1)
+    (r : ℕ) (a b t : ℝ) :
+    intervalModulus r p a b f t ≤
+      2 ^ ((r : ℝ) / p.toReal) * eLpNorm f p (volume.restrict (Icc a b)) := by
+  rw [intervalModulus_eq_iSup_nonneg]
   exact iSup₂_le fun _ hh => eLpNorm_higherDiff_le_of_le_one hf hp1 r hh.1 a b
 
 /-- The modulus is subadditive. -/
-theorem modulus_add_le {p : ℝ≥0∞} (hp : 1 ≤ p) (r : ℕ) (a b : ℝ) (f g : ℝ → ℂ) (t : ℝ) :
-    modulus r p a b (f + g) t ≤ modulus r p a b f t + modulus r p a b g t :=
+theorem intervalModulus_add_le {p : ℝ≥0∞} (hp : 1 ≤ p) (r : ℕ) (a b : ℝ) (f g : ℝ → ℂ) (t : ℝ) :
+    intervalModulus r p a b (f + g) t ≤ intervalModulus r p a b f t + intervalModulus r p a b g t :=
   Rd.modulusOn_add_le hp _ r f g t
 
 /-- **The `p`-th power of the modulus is subadditive for `0 < p ≤ 1`**:
 `ω_r(f + g, t, [a, b])_p^p ≤ ω_r(f, t, [a, b])_p^p + ω_r(g, t, [a, b])_p^p`, from the same
 inequality for the `L_p` quasi-norm of each difference
 (`MeasureTheory.eLpNorm_add_rpow_le_of_le_one`). -/
-theorem modulus_add_rpow_le {p : ℝ≥0∞} (hp1 : p ≤ 1) (r : ℕ) (a b : ℝ) (f g : ℝ → ℂ) (t : ℝ) :
-    modulus r p a b (f + g) t ^ p.toReal ≤
-      modulus r p a b f t ^ p.toReal + modulus r p a b g t ^ p.toReal := by
+theorem intervalModulus_add_rpow_le {p : ℝ≥0∞} (hp1 : p ≤ 1) (r : ℕ) (a b : ℝ) (f g : ℝ → ℂ)
+    (t : ℝ) :
+    intervalModulus r p a b (f + g) t ^ p.toReal ≤
+      intervalModulus r p a b f t ^ p.toReal + intervalModulus r p a b g t ^ p.toReal := by
   rcases eq_or_ne p 0 with rfl | hp0
   · simp only [ENNReal.toReal_zero, ENNReal.rpow_zero]
     exact le_self_add
   have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 (ne_top_of_le_ne_top ENNReal.one_ne_top hp1)
-  set M := modulus r p a b f t ^ p.toReal + modulus r p a b g t ^ p.toReal
-  have key : modulus r p a b (f + g) t ≤ M ^ (1 / p.toReal) := by
+  set M := intervalModulus r p a b f t ^ p.toReal + intervalModulus r p a b g t ^ p.toReal
+  have key : intervalModulus r p a b (f + g) t ≤ M ^ (1 / p.toReal) := by
     refine iSup₂_le fun h hh => ?_
     rw [fwdDiff_iter_add, Set.indicator_add', ← ENNReal.rpow_le_rpow_iff hq, ← ENNReal.rpow_mul,
       one_div_mul_cancel hq.ne', ENNReal.rpow_one]
     exact (eLpNorm_add_rpow_le_of_le_one hp0 hp1 _ _).trans (add_le_add
       (ENNReal.rpow_le_rpow (Rd.eLpNorm_indicator_higherDiff_le_modulusOn hh) hq.le)
       (ENNReal.rpow_le_rpow (Rd.eLpNorm_indicator_higherDiff_le_modulusOn hh) hq.le))
-  calc modulus r p a b (f + g) t ^ p.toReal ≤ (M ^ (1 / p.toReal)) ^ p.toReal :=
+  calc intervalModulus r p a b (f + g) t ^ p.toReal ≤ (M ^ (1 / p.toReal)) ^ p.toReal :=
         ENNReal.rpow_le_rpow key hq.le
     _ = M := by rw [← ENNReal.rpow_mul, one_div_mul_cancel hq.ne', ENNReal.rpow_one]
 
 /-- The modulus is homogeneous. -/
-theorem modulus_const_mul (r : ℕ) (p : ℝ≥0∞) (a b : ℝ) (c : ℂ) (f : ℝ → ℂ) (t : ℝ) :
-    modulus r p a b (fun x => c * f x) t = ‖c‖ₑ * modulus r p a b f t := by
-  simp only [modulus_eq_iSup_nonneg, higherDiff_const_mul, ENNReal.mul_iSup]
+theorem intervalModulus_const_mul (r : ℕ) (p : ℝ≥0∞) (a b : ℝ) (c : ℂ) (f : ℝ → ℂ) (t : ℝ) :
+    intervalModulus r p a b (fun x => c * f x) t = ‖c‖ₑ * intervalModulus r p a b f t := by
+  simp only [intervalModulus_eq_iSup_nonneg, higherDiff_const_mul, ENNReal.mul_iSup]
   congr 1
   funext h
   congr 1
@@ -285,14 +291,15 @@ theorem modulus_const_mul (r : ℕ) (p : ℝ≥0∞) (a b : ℝ) (c : ℂ) (f : 
   exact eLpNorm_const_smul c (higherDiff r h f) p _
 
 /-- The modulus vanishes on polynomials of degree `< r`. -/
-theorem modulus_polynomial {r : ℕ} {P : Polynomial ℂ} (hP : P ∈ Polynomial.degreeLT ℂ r)
-    (p : ℝ≥0∞) (a b t : ℝ) : modulus r p a b (fun x => P.eval (x : ℂ)) t = 0 := by
-  simp [modulus_eq_iSup_nonneg, higherDiff_polynomial hP]
+theorem intervalModulus_polynomial {r : ℕ} {P : Polynomial ℂ} (hP : P ∈ Polynomial.degreeLT ℂ r)
+    (p : ℝ≥0∞) (a b t : ℝ) : intervalModulus r p a b (fun x => P.eval (x : ℂ)) t = 0 := by
+  simp [intervalModulus_eq_iSup_nonneg, higherDiff_polynomial hP]
 
 /-- **The line has vanishing second modulus**: `ω_2(x ↦ x, t, [0, 1])_p = 0` for every `p` and
-`t` (`Interval.modulus_polynomial` with `P = X`, of degree `1 < 2`). -/
-theorem modulus_two_id (p : ℝ≥0∞) (t : ℝ) : modulus 2 p 0 1 (fun x => (x : ℂ)) t = 0 := by
-  simpa using modulus_polynomial (P := Polynomial.X)
+`t` (`Interval.intervalModulus_polynomial` with `P = X`, of degree `1 < 2`). -/
+theorem intervalModulus_two_id (p : ℝ≥0∞) (t : ℝ) :
+    intervalModulus 2 p 0 1 (fun x => (x : ℂ)) t = 0 := by
+  simpa using intervalModulus_polynomial (P := Polynomial.X)
     (Polynomial.mem_degreeLT.2 (Polynomial.degree_X_le.trans_lt (by exact_mod_cast one_lt_two)))
     p 0 1 t
 
@@ -319,9 +326,9 @@ theorem eLpNorm_higherDiff_congr_ae {f g : ℝ → ℂ} {a b : ℝ}
 
 /-- **The modulus depends only on the class in `L_p[a, b]`**: functions that agree almost
 everywhere on `[a, b]` have the same modulus. -/
-theorem modulus_congr_ae {f g : ℝ → ℂ} {a b : ℝ} (hfg : f =ᵐ[volume.restrict (Icc a b)] g)
+theorem intervalModulus_congr_ae {f g : ℝ → ℂ} {a b : ℝ} (hfg : f =ᵐ[volume.restrict (Icc a b)] g)
     (r : ℕ) (p : ℝ≥0∞) (t : ℝ) :
-    modulus r p a b f t = modulus r p a b g t := by
+    intervalModulus r p a b f t = intervalModulus r p a b g t := by
   rw [ae_eq_restrict_iff_indicator_ae_eq measurableSet_Icc] at hfg
   exact Rd.modulusOn_congr_ae hfg r p t
 
@@ -345,9 +352,9 @@ theorem eLpNorm_higherDiff_reflect {f : ℝ → ℂ} (hf : Measurable f) (r : �
   congr 3 <;> ring
 
 /-- **Reflection**: `ω_r(f(a + b - ·), t, [a, b]) = ω_r(f, t, [a, b])`. -/
-theorem modulus_reflect {f : ℝ → ℂ} (hf : Measurable f) (r : ℕ) (p : ℝ≥0∞) (a b t : ℝ) :
-    modulus r p a b (fun x => f (a + b - x)) t = modulus r p a b f t := by
-  simp only [modulus_eq_iSup_nonneg]
+theorem intervalModulus_reflect {f : ℝ → ℂ} (hf : Measurable f) (r : ℕ) (p : ℝ≥0∞) (a b t : ℝ) :
+    intervalModulus r p a b (fun x => f (a + b - x)) t = intervalModulus r p a b f t := by
+  simp only [intervalModulus_eq_iSup_nonneg]
   congr 1
   funext h
   congr 1

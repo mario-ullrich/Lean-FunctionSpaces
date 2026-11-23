@@ -396,8 +396,8 @@ declarations.
   finite with at most `N` elements (`Rd.exists_finset_of_card_le`).
 * **Dyadic cubes of a finite-dimensional inner product space**
   (`FunctionSpaces/Analysis/Maximal/DyadicGrid.lean`): the cubes `⌊2^k ⟪b_i, x⟫⌋ = m_i` of every
-  level `k ∈ ℤ` (`Rd.zcell`), the cells `Rd.cell` of the levels `j ∈ ℕ`, their centres, and the
-  count of at most `(2ρ + 2)^n` centres in a ball of radius `ρ 2^(-j)`
+  level `k ∈ ℤ` (`Rd.zcell`), the cells `Rd.dyadicCell` of the levels `j ∈ ℕ`, their centres, and
+  the count of at most `(2ρ + 2)^n` centres in a ball of radius `ρ 2^(-j)`
   (`Rd.card_le_of_norm_cellCenter_sub_le`).
 * **Pointwise bounds of convolutions** (`FunctionSpaces/Rd/Atoms/AtomAnalysis.lean`): Hölder's
   inequality on a ball `∫_B |g| ≤ |B|^(1-1/p) ‖g‖_p` (`Rd.lintegral_closedBall_le`),
@@ -468,13 +468,14 @@ declarations.
   (`MeasureTheory.lintegral_Ioi_rpow_eq_top`).
 * **The Hardy–Littlewood maximal function**
   (`FunctionSpaces/Analysis/Maximal/HardyLittlewoodMaximal.lean`): the centred maximal function on a
-  finite-dimensional inner product space (`Rd.maximal`), its lower semicontinuity and measurability
-  for every `g` (`Rd.lowerSemicontinuous_maximal`, `Rd.measurable_maximal`), the weighted weak type
-  `∫_{Mg > t} w ≤ C t⁻¹ ∫ g Mw` (`Rd.setLIntegral_maximal_gt_le`), the weak type `(1,1)`
-  (`Rd.volume_maximal_gt_le`), the weighted strong type `∫ (Mg)^p w ≤ C ∫ g^p Mw`
-  (`Rd.lintegral_maximal_rpow_mul_le`) and the maximal theorem `‖Mg‖_p ≤ C ‖g‖_p` for `1 < p < ∞`
-  (`Rd.eLpNorm_maximal_le`), with explicit constants. Mathlib has Vitali's covering lemma and the
-  differentiation theorem, but no maximal function.
+  finite-dimensional inner product space (`Rd.maximalFunction`), its lower semicontinuity and
+  measurability for every `g` (`Rd.lowerSemicontinuous_maximalFunction`,
+  `Rd.measurable_maximalFunction`), the weighted weak type `∫_{Mg > t} w ≤ C t⁻¹ ∫ g Mw`
+  (`Rd.setLIntegral_maximalFunction_gt_le`), the weak type `(1,1)`
+  (`Rd.volume_maximalFunction_gt_le`), the weighted strong type `∫ (Mg)^p w ≤ C ∫ g^p Mw`
+  (`Rd.lintegral_maximalFunction_rpow_mul_le`) and the maximal theorem `‖Mg‖_p ≤ C ‖g‖_p` for
+  `1 < p < ∞` (`Rd.eLpNorm_maximalFunction_le`), with explicit constants. Mathlib has Vitali's
+  covering lemma and the differentiation theorem, but no maximal function.
 * **Dyadic cubes and Lebesgue differentiation along them**
   (`FunctionSpaces/Analysis/Maximal/DyadicCubes.lean`): the volume and the nesting of the dyadic
   cubes (`Rd.volume_zcell`, `Rd.zcell_subset_or_disjoint`), and the convergence of the averages
@@ -488,10 +489,10 @@ declarations.
 * **The Fefferman–Stein inequality** (`FunctionSpaces/Analysis/Maximal/FeffermanStein.lean`):
   `‖ ‖(M g_j)_j‖_{ℓ_q} ‖_p ≤ C ‖ ‖(g_j)_j‖_{ℓ_q} ‖_p` for `1 < p < ∞`, `1 < q ≤ ∞`
   (`Rd.feffermanStein`), with the vector-valued weak type `(1,1)`
-  (`Rd.volume_lqNorm_maximal_gt_le`) and the bound of the maximal function off enlarged sets,
-  `M(1_{⋃ Q_i} g)(x) ≤ 3^n M g̃(x)` for countably many sets `Q_i ⊆ B̄(c_i, ρ_i)` of positive
+  (`Rd.volume_lqNorm_maximalFunction_gt_le`) and the bound of the maximal function off enlarged
+  sets, `M(1_{⋃ Q_i} g)(x) ≤ 3^n M g̃(x)` for countably many sets `Q_i ⊆ B̄(c_i, ρ_i)` of positive
   finite measure and `x` outside every `B̄(c_i, 2ρ_i)`, where `g̃ = ∑_i (⨍_{Q_i} g) 1_{Q_i}`
-  (`Rd.maximal_indicator_iUnion_le`).
+  (`Rd.maximalFunction_indicator_iUnion_le`).
 * **Norms of means of vector-valued functions**
   (`FunctionSpaces/Analysis/Maximal/CalderonZygmund.lean`): `‖⨍ f‖ₑ ≤ ⨍⁻ ‖f‖ₑ` for `f` with
   values in a real normed space (`MeasureTheory.enorm_average_le`), next to Mathlib's

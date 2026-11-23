@@ -72,16 +72,17 @@ theorem basisScheme_fourierEigenbasis : (fourierEigenbasis d).basisScheme = trig
   rw [basisSpan_fourierEigenbasis]
 
 /-- The levels `< n` are the frequencies of degree `< n`. -/
-theorem levelSet_fourierEigenbasis (n : ℕ) : (fourierEigenbasis d).levelSet n = boxLt d n := by
+theorem spectralLevelSet_fourierEigenbasis (n : ℕ) :
+    (fourierEigenbasis d).spectralLevelSet n = boxLt d n := by
   ext k
-  rw [ContinuousSpectralBasis.mem_levelSet, mem_boxLt, fourierEigenbasis_level]
+  rw [ContinuousSpectralBasis.mem_spectralLevelSet, mem_boxLt, fourierEigenbasis_level]
 
 /-- **The local Weyl bound on the torus**: `∑_{deg k < n} |e_k(x)|² ≤ 2^d n^d`, since every
 monomial has modulus `1` and there are at most `(2n)^d` frequencies of degree `< n`. -/
 theorem localWeylBound_fourierEigenbasis :
     (fourierEigenbasis d).LocalWeylBound (Fintype.card d) (2 ^ Fintype.card d) := by
   refine ⟨by positivity, fun n _ x => ?_⟩
-  rw [levelSet_fourierEigenbasis]
+  rw [spectralLevelSet_fourierEigenbasis]
   have h1 : ∑ k ∈ boxLt d n, ‖(fourierEigenbasis d).basisFun k x‖ ^ 2 = (boxLt d n).card := by
     simp only [fourierEigenbasis_basisFun, norm_trigMonomial_apply, one_pow, Finset.sum_const,
       nsmul_eq_mul, mul_one]

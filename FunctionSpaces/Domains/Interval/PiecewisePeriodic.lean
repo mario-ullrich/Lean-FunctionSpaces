@@ -162,9 +162,9 @@ theorem lpPerModulus_le (hp : p ≠ ∞) (r : ℕ) (f : Lp ℂ p unitVol) (k : �
 
 omit [Fact (1 ≤ p)] in
 /-- The modulus on `[0, 1]` is at most the periodic modulus. -/
-theorem lpModulus_le_lpPerModulus (r : ℕ) (f : Lp ℂ p unitVol) (k : ℕ) :
-    lpModulus p r f k ≤ lpPerModulus p r f k :=
-  modulus_le_perModulus r p _ _
+theorem intervalLpModulus_le_lpPerModulus (r : ℕ) (f : Lp ℂ p unitVol) (k : ℕ) :
+    intervalLpModulus p r f k ≤ lpPerModulus p r f k :=
+  intervalModulus_le_perModulus r p _ _
 
 /-- **Jackson's inequality on the circle**: for `1 ≤ p < ∞` and `r ≥ 1` there is `C_J < ∞` with
 `E_{2^k}(f)_p ≤ C_J ω_r^per(f, 2^(-k))_p` for all `f` and all `k ≥ 0`, since the periodic modulus
@@ -173,7 +173,8 @@ theorem exists_approxError_ppScheme_le_per {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ 
     ∃ CJ : ℝ≥0∞, CJ ≠ ∞ ∧ ∀ (f : Lp ℂ p unitVol) (k : ℕ),
       (ppScheme p r).approxError f (2 ^ k) ≤ CJ * lpPerModulus p r f k := by
   obtain ⟨CJ, hCJ, h⟩ := exists_approxError_ppScheme_le (p := p) hr hp
-  exact ⟨CJ, hCJ, fun f k => (h f k).trans (mul_le_mul' le_rfl (lpModulus_le_lpPerModulus r f k))⟩
+  exact ⟨CJ, hCJ,
+    fun f k => (h f k).trans (mul_le_mul' le_rfl (intervalLpModulus_le_lpPerModulus r f k))⟩
 
 /-- **The inverse inequality on the circle**, of order `1/p`: there is `C_B < ∞` with
 `ω_r^per(a, 2^(-k))_p ≤ C_B 2^(-(k-j)/p) ‖a‖_p` for every piecewise polynomial `a` of level `j`
@@ -223,7 +224,7 @@ defined by the modulus on `[0, 1]` is finite iff the one defined by the periodic
 Both conditions describe the same approximation space. -/
 theorem lqNorm_modulus_lt_top_iff_perModulus {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) {s : ℝ}
     {q : ℝ≥0∞} (hq : 1 ≤ q) (hs : 0 ≤ s) (hsp : s < 1 / p.toReal) (f : Lp ℂ p unitVol) :
-    ‖f‖ₑ + ENNReal.lqNorm q (fun k => dyadicWeight s k * lpModulus p r f k) < ∞ ↔
+    ‖f‖ₑ + ENNReal.lqNorm q (fun k => dyadicWeight s k * intervalLpModulus p r f k) < ∞ ↔
       ‖f‖ₑ + ENNReal.lqNorm q (fun k => dyadicWeight s k * lpPerModulus p r f k) < ∞ :=
   (memApprox_ppScheme_iff hr hp hq hs hsp f).symm.trans
     (memApprox_ppScheme_iff_per hr hp hq hs hsp f)

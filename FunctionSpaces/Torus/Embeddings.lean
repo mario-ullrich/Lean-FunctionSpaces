@@ -68,8 +68,8 @@ theorem memBesov_exists_continuous (hs : (Fintype.card d : ℝ) * p.toReal⁻¹ 
     ∃ g : C(UnitAddTorus d, ℂ),
       Lp.inclusionOfExponentLe (𝕜 := ℝ) volume le_top (ContinuousMap.toLp (E := ℂ) ∞ volume ℝ g) =
         f := by
-  obtain ⟨a, ha⟩ :=
-    MemBesov.exists_boundedContinuous trigScheme_hasNikolskii (Nat.cast_nonneg _) hs hq hf
+  obtain ⟨a, ha⟩ := MemBesov.exists_boundedContinuous_of_nikolskii trigScheme_hasNikolskii
+    (Nat.cast_nonneg _) hs hq hf
   exact ⟨a.toContinuousMap, by rw [toLp_toContinuousMap, ha]⟩
 
 /-- **`H^s(𝕋^d) ⊆ B^s_{2,∞}(𝕋^d)`**, from Jackson's inequality. -/

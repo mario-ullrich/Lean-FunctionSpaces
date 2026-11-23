@@ -33,13 +33,13 @@ wavelets of all levels form a Hilbert basis of `L_2(ℝ^d)`, in which `H^s` is a
 * **Masks of every order.** A mask of order `N` is a real polynomial `L` of degree `< N` with
   `L(1) = 1` and `|L(e^(-2πiξ))|² = P_N(sin²(πξ))`, where `P_N(y) = ∑_{k<N} C(N-1+k, k) y^k`
   (`Daubechies.Mask`, `Daubechies.daubPoly`); its filter coefficients `c_k` are those of
-  `2 ((1 + z)/2)^N L(z)` (`Daubechies.coeff`). Masks of order `N` exist iff `N ≥ 1`
+  `2 ((1 + z)/2)^N L(z)` (`Daubechies.daubechiesCoeff`). Masks of order `N` exist iff `N ≥ 1`
   (`Daubechies.nonempty_mask_iff`), by the Fejér–Riesz theorem: a real polynomial `Q` with
   `Q > 0` on `[-1, 1]` satisfies `Q(cos θ) = |L(e^(iθ))|²` for all `θ` with a real polynomial `L`
   of degree `≤ deg Q` and `L(1) > 0` (`Polynomial.fejer_riesz`). For `N = 2` the mask whose
   polynomial `L` has no zeros in the closed unit disk is D4, with
   `c = ((1+√3), (3+√3), (3-√3), (1-√3))/4` (`Daubechies.eq_d4_iff_aeval_ne_zero`,
-  `Daubechies.coeff_d4`).
+  `Daubechies.daubechiesCoeff_d4`).
 * **The scaling function.** Let `N ≥ 2`, `m_0(ξ) = (1/2) ∑_k c_k e^(-2πikξ)` and
   `Φ(ξ) = ∏_{j ≥ 1} m_0(2^(-j) ξ)`. Then `Φ` is integrable, and `φ = 𝓕⁻¹ Φ` is a continuous real
   function with `φ(x) = ∑_k c_k φ(2x - k)` (`Daubechies.scalingFun_refine`), `φ = 0` outside
@@ -49,7 +49,7 @@ wavelets of all levels form a Hilbert basis of `L_2(ℝ^d)`, in which `H^s` is a
   degree `< N` satisfies `∑_k ⟨Q, φ(· - k)⟩ φ(x - k) = Q(x)` for all `x`
   (`Daubechies.sum_inner_poly_mul_scalingFun`).
 * **Sobolev regularity.** Let `T g(ξ) = P(ξ/2) g(ξ/2) + P((ξ+1)/2) g((ξ+1)/2)` with
-  `P(ξ) = P_N(sin²(πξ))` (`Daubechies.transfer`). If `T^n 1 ≤ C λ^n` for all `n` (the
+  `P(ξ) = P_N(sin²(πξ))` (`Daubechies.transferOp`). If `T^n 1 ≤ C λ^n` for all `n` (the
   hypothesis `Daubechies.TransferGrowth`), then `∫ (1 + |ξ|)^(2s) |Φ(ξ)|² dξ < ∞` for every
   `s < N - log₄ λ` (`Daubechies.integrable_rpow_mul_normSq`), and for `p ≤ 2`, `0 ≤ s ≤ r` and
   `0 < t ≤ 1`, `ω_r(φ, t)_p ≤ K t^s` (`Daubechies.smoothnessModulus_scalingFun_le_two`). For
@@ -68,7 +68,7 @@ wavelets of all levels form a Hilbert basis of `L_2(ℝ^d)`, in which `H^s` is a
   let `0 < s < θ`. Then `f ∈ L_p(ℝ)` satisfies the Besov condition
   `‖f‖_p + ‖(2^(ks) ω_N(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff it satisfies the coefficient condition
   `‖(⟨f, φ(· - k)⟩)_k‖_{ℓ_p} + ‖(2^(j(s+1/2-1/p)) ‖(⟨f, ψ_{j,k}⟩)_k‖_{ℓ_p})_j‖_{ℓ_q} < ∞`
-  (`Daubechies.besov_iff_coeff`, `Daubechies.coeffNorm`), and the same holds for the
+  (`Daubechies.besov_iff_coeff`, `Daubechies.daubechiesCoeffNorm`), and the same holds for the
   Littlewood–Paley norm (`Daubechies.littlewoodPaleyNorm_lt_top_iff_coeff`). The bound holds
   for every `θ < N - log₄ λ` if `p ≤ 2` (`Daubechies.besov_iff_coeff_of_le_two`) and for
   `θ = (2/p) s' + (1 - 2/p) a` with `s' < N - log₄ λ` and a Hölder exponent `a` of `φ` if

@@ -241,12 +241,13 @@ product of `H^1_A(M)`, `σ_i⁻² = 1 + λ_i` for the eigenvalue `λ_i` of the c
 (`Manifold.BesovAtlas.one_add_chartEigenvalue`), so the level is `⌊√(1 + λ_i)⌋₊`
 (`Manifold.BesovAtlas.chartScheme_level`). -/
 noncomputable def chartScheme :
-    SpectralScheme (A.chartCompactEmbedding μ).index (Lp ℂ 2 μ) :=
+    SpectralScheme (A.chartCompactEmbedding μ).eigenpairIndex (Lp ℂ 2 μ) :=
   (A.chartCompactEmbedding μ).spectralScheme
 
 /-- The singular values of the chart Sobolev embedding are at most `1`
 (`Manifold.BesovAtlas.norm_chartSobolevEmbedding_le`). -/
-theorem singularValue_chartCompactEmbedding_le_one (i : (A.chartCompactEmbedding μ).index) :
+theorem singularValue_chartCompactEmbedding_le_one
+    (i : (A.chartCompactEmbedding μ).eigenpairIndex) :
     (A.chartCompactEmbedding μ).singularValue i ≤ 1 :=
   ((A.chartCompactEmbedding μ).singularValue_le_norm i).trans A.norm_chartSobolevEmbedding_le
 
@@ -254,12 +255,12 @@ variable (μ) in
 /-- **The eigenvalue of the chart form** `λ_i = σ_i⁻² - 1` of the index `i`, `σ_i` the singular
 value of the chart Sobolev embedding; `a_A(φ_i, w) = λ_i ⟨e_i, J w⟩` for every `w`
 (`Manifold.BesovAtlas.chartForm_eigenfunction`). -/
-noncomputable def chartEigenvalue (i : (A.chartCompactEmbedding μ).index) : ℝ :=
+noncomputable def chartEigenvalue (i : (A.chartCompactEmbedding μ).eigenpairIndex) : ℝ :=
   ((A.chartCompactEmbedding μ).singularValue i)⁻¹ ^ 2 - 1
 
 /-- The eigenvalues of the chart form are nonnegative, since `σ_i ≤ 1`
 (`Manifold.BesovAtlas.singularValue_chartCompactEmbedding_le_one`). -/
-theorem chartEigenvalue_nonneg (i : (A.chartCompactEmbedding μ).index) :
+theorem chartEigenvalue_nonneg (i : (A.chartCompactEmbedding μ).eigenpairIndex) :
     0 ≤ A.chartEigenvalue μ i := by
   have h1 : 1 ≤ ((A.chartCompactEmbedding μ).singularValue i)⁻¹ :=
     one_le_inv_iff₀.2 ⟨(A.chartCompactEmbedding μ).singularValue_pos i,
@@ -269,19 +270,19 @@ theorem chartEigenvalue_nonneg (i : (A.chartCompactEmbedding μ).index) :
   linarith
 
 /-- `1 + λ_i = σ_i⁻²`. -/
-theorem one_add_chartEigenvalue (i : (A.chartCompactEmbedding μ).index) :
+theorem one_add_chartEigenvalue (i : (A.chartCompactEmbedding μ).eigenpairIndex) :
     1 + A.chartEigenvalue μ i = ((A.chartCompactEmbedding μ).singularValue i)⁻¹ ^ 2 := by
   unfold chartEigenvalue
   ring
 
 /-- `σ_i⁻¹ = √(1 + λ_i)`. -/
-theorem inv_singularValue_eq_sqrt (i : (A.chartCompactEmbedding μ).index) :
+theorem inv_singularValue_eq_sqrt (i : (A.chartCompactEmbedding μ).eigenpairIndex) :
     ((A.chartCompactEmbedding μ).singularValue i)⁻¹ = Real.sqrt (1 + A.chartEigenvalue μ i) := by
   rw [one_add_chartEigenvalue, Real.sqrt_sq
     (inv_nonneg.2 ((A.chartCompactEmbedding μ).singularValue_pos i).le)]
 
 /-- **The level of an eigenfunction of the chart form** is `⌊√(1 + λ_i)⌋₊`. -/
-theorem chartScheme_level (i : (A.chartCompactEmbedding μ).index) :
+theorem chartScheme_level (i : (A.chartCompactEmbedding μ).eigenpairIndex) :
     (A.chartScheme μ).level i = ⌊Real.sqrt (1 + A.chartEigenvalue μ i)⌋₊ := by
   rw [← inv_singularValue_eq_sqrt]
   rfl
@@ -300,13 +301,14 @@ variable (μ) in
 /-- **The eigenfunction of the chart form** `φ_i = σ_i⁻¹ v_i ∈ H^1_A(M)`, `v_i` the singular basis
 of the chart Sobolev embedding; its value is the basis vector `e_i` of `L_2(μ)`
 (`Manifold.BesovAtlas.chartSobolevEmbedding_chartEigenfunction`). -/
-noncomputable def chartEigenfunction (i : (A.chartCompactEmbedding μ).index) : A.chartSobolev μ :=
+noncomputable def chartEigenfunction (i : (A.chartCompactEmbedding μ).eigenpairIndex) :
+    A.chartSobolev μ :=
   ((((A.chartCompactEmbedding μ).singularValue i)⁻¹ : ℝ) : ℂ) •
     (A.chartCompactEmbedding μ).singularBasis i
 
 /-- **`J φ_i = e_i`**: the chart Sobolev embedding maps the eigenfunction `φ_i` to the basis vector
 `e_i` of the chart scheme, since `J v_i = σ_i e_i` (`CompactDenseEmbedding.apply_singularBasis`). -/
-theorem chartSobolevEmbedding_chartEigenfunction (i : (A.chartCompactEmbedding μ).index) :
+theorem chartSobolevEmbedding_chartEigenfunction (i : (A.chartCompactEmbedding μ).eigenpairIndex) :
     A.chartSobolevEmbedding μ (A.chartEigenfunction μ i) = (A.chartScheme μ).basis i := by
   have h := (A.chartCompactEmbedding μ).apply_singularBasis i
   rw [chartCompactEmbedding_toCLM] at h
@@ -325,7 +327,8 @@ theorem chartSobolevEmbedding_chartEigenfunction (i : (A.chartCompactEmbedding �
 `⟨u, w⟩ = ⟨J u, J w⟩ + a_A(u, w)` of `H^1_A(M)` (`Manifold.BesovAtlas.inner_chartSobolev`). The
 test functions `w` are arbitrary near the boundary of `M`, so the boundary condition is the natural
 one. -/
-theorem chartForm_eigenfunction (i : (A.chartCompactEmbedding μ).index) (w : A.chartSobolev μ) :
+theorem chartForm_eigenfunction (i : (A.chartCompactEmbedding μ).eigenpairIndex)
+    (w : A.chartSobolev μ) :
     A.chartForm μ (A.chartEigenfunction μ i) w =
       (A.chartEigenvalue μ i : ℂ) * ⟪(A.chartScheme μ).basis i, A.chartSobolevEmbedding μ w⟫_ℂ := by
   have hφ : ⟪A.chartEigenfunction μ i, w⟫_ℂ =
@@ -361,7 +364,7 @@ theorem chartForm_eq_sum_integral (u w : A.chartSobolev μ) :
 `∑_{k,j} ∫_{O_I} conj (g_{kj}) g'_{kj} = λ_i ∫_M conj (e_i) f' dμ`, where
 `g_{kj} = ∂_{b_j} P_k e_i` weakly on `O_I` (`Manifold.BesovAtlas.chartForm_eigenfunction`,
 `Manifold.BesovAtlas.chartForm_eq_sum_integral`). -/
-theorem chartForm_eigenfunction_integral (i : (A.chartCompactEmbedding μ).index)
+theorem chartForm_eigenfunction_integral (i : (A.chartCompactEmbedding μ).eigenpairIndex)
     (w : A.chartSobolev μ) :
     ∑ ij, ∫ y in interior (range I),
         conj ((A.chartEigenfunction μ i : A.chartValueGradientL2 μ).snd ij y) *
@@ -385,9 +388,9 @@ theorem mem_range_chartSobolevEmbedding_iff_spectral (f : Lp ℂ 2 μ) :
   simp only [← A.chartScheme_level]
   -- unfolding the scheme first keeps the definitional unfolding in the rewrites cheap
   unfold chartScheme
-  have hw : ∀ i, (((A.chartCompactEmbedding μ).spectralScheme.weight 1 i : ℝ) : ℂ) =
+  have hw : ∀ i, (((A.chartCompactEmbedding μ).spectralScheme.levelWeight 1 i : ℝ) : ℂ) =
       ((1 + (A.chartCompactEmbedding μ).spectralScheme.level i : ℕ) : ℂ) := fun i => by
-    simp [SpectralScheme.weight]
+    simp [SpectralScheme.levelWeight]
   refine ((Set.ext_iff.1 (A.chartCompactEmbedding μ).range_eq_range_sobolevEmbed f).trans
     ((A.chartCompactEmbedding μ).spectralScheme.mem_range_sobolevEmbed_iff 1 zero_le_one f)).trans
       ?_

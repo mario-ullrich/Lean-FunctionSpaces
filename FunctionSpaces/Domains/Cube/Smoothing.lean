@@ -14,10 +14,11 @@ public import FunctionSpaces.Domains.Interval.Taylor
 
 The **Steklov smoothing in coordinate `i`** smooths every slice in coordinate `i`,
 `S^{(i)}_δ f(x) = S_δ (slice f x i)(x_i)` (`Cube.cubeSmooth`), with the smoothing `S_δ` of one
-variable (`Interval.smooth`). For continuous `f` its two identities hold pointwise on the cube:
+variable (`Interval.steklovSmooth`). For continuous `f` its two identities hold pointwise on the
+cube:
 
 * `f - S^{(i)}_δ f = (-1)^r avg_v Δ^r_{(v_1 + ⋯ + v_r) e_i} f`, the average being over the steps
-  only (`Cube.sub_cubeSmooth_eq`, from `Interval.sub_smooth_eq` and
+  only (`Cube.sub_cubeSmooth_eq`, from `Interval.sub_steklovSmooth_eq` and
   `Interval.avgStepIter_congr_point`);
 * the derivative of order `r` in `x_i` (`Cube.cubeSmoothDeriv`) is the finite combination
   `∑_k (-1)^(k+1) C(r,k) (kδ)^(-r) Δ^r_{kδ e_i} f` (`Cube.cubeSmoothDeriv_eq`).
@@ -31,10 +32,11 @@ with the supremum over the steps outside the integral over the cube
 isotropic modulus of smoothness (`Cube.eLpNorm_sub_cubeSmooth_le_smoothnessModulus`,
 `Cube.eLpNorm_cubeSmoothDeriv_le_smoothnessModulus`). With `δ = L / r²`
 this gives smoothings on the regions `{x_i ≤ w}` and, by the reflection `x_i ↦ 1 - x_i`
-(`Cube.coordModulus_reflect`), `{x_i ≥ 1 - w}`, `w + L ≤ 1`, whose slices have Taylor polynomials
-on all intervals (`Cube.exists_left_cubeSmoothing`, `Cube.exists_right_cubeSmoothing`), with the
-step bounds and the reflected Taylor polynomials of the interval (`Interval.step_div_sq_bounds`,
-`Interval.two_pow_mul_inv_div_sq_pow_mul_le`, `Interval.exists_eLpNorm_sub_polyFun_reflect_le`).
+(`Cube.coordModulus_reflectCoord`), `{x_i ≥ 1 - w}`, `w + L ≤ 1`, whose slices have Taylor
+polynomials on all intervals (`Cube.exists_left_cubeSmoothing`, `Cube.exists_right_cubeSmoothing`),
+with the step bounds and the reflected Taylor polynomials of the interval
+(`Interval.step_div_sq_bounds`, `Interval.two_pow_mul_inv_div_sq_pow_mul_le`,
+`Interval.exists_eLpNorm_sub_polyFun_reflect_le`).
 -/
 
 @[expose] public section
@@ -73,17 +75,17 @@ theorem continuous_cubeDiff {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) (r
 /-- The **Steklov smoothing in coordinate `i`**: `S^{(i)}_δ f(x) = S_δ (slice f x i)(x_i)`. -/
 noncomputable def cubeSmooth (r : ℕ) (δ : ℝ) (i : Fin d) (f : (Fin d → ℝ) → ℂ)
     (x : Fin d → ℝ) : ℂ :=
-  smooth r δ (slice f x i) (x i)
+  steklovSmooth r δ (slice f x i) (x i)
 
 /-- The **derivative of order `r` in coordinate `i`** of the smoothing,
 `∂_i^r S^{(i)}_δ f(x) = (S_δ (slice f x i))^(r)(x_i)`. -/
 noncomputable def cubeSmoothDeriv (r : ℕ) (δ : ℝ) (i : Fin d) (f : (Fin d → ℝ) → ℂ)
     (x : Fin d → ℝ) : ℂ :=
-  iteratedDeriv r (smooth r δ (slice f x i)) (x i)
+  iteratedDeriv r (steklovSmooth r δ (slice f x i)) (x i)
 
 /-- The slices of the smoothing are the smoothings of the slices. -/
 theorem slice_cubeSmooth (r : ℕ) (δ : ℝ) (i : Fin d) (f : (Fin d → ℝ) → ℂ) (x : Fin d → ℝ) :
-    slice (cubeSmooth r δ i f) x i = smooth r δ (slice f x i) := by
+    slice (cubeSmooth r δ i f) x i = steklovSmooth r δ (slice f x i) := by
   funext t
   simp only [slice, cubeSmooth]
   rw [slice_update, Function.update_self]
@@ -91,7 +93,7 @@ theorem slice_cubeSmooth (r : ℕ) (δ : ℝ) (i : Fin d) (f : (Fin d → ℝ) �
 /-- The slices of the derivative are the derivatives of the smoothed slices. -/
 theorem slice_cubeSmoothDeriv (r : ℕ) (δ : ℝ) (i : Fin d) (f : (Fin d → ℝ) → ℂ)
     (x : Fin d → ℝ) :
-    slice (cubeSmoothDeriv r δ i f) x i = iteratedDeriv r (smooth r δ (slice f x i)) := by
+    slice (cubeSmoothDeriv r δ i f) x i = iteratedDeriv r (steklovSmooth r δ (slice f x i)) := by
   funext t
   simp only [slice, cubeSmoothDeriv]
   rw [slice_update, Function.update_self]
@@ -102,7 +104,7 @@ theorem sub_cubeSmooth_eq {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) (r :
     (hδ : δ ≠ 0) (i : Fin d) (x : Fin d → ℝ) :
     f x - cubeSmooth r δ i f x =
       (-1 : ℂ) ^ r * avgStepIter r δ (fun h y => cubeDiff r h i f y) 0 x := by
-  have h := sub_smooth_eq (continuous_slice hf x i) r hδ (x i)
+  have h := sub_steklovSmooth_eq (continuous_slice hf x i) r hδ (x i)
   rw [show slice f x i (x i) = f x by simp [slice] ] at h
   rw [cubeSmooth, h]
   congr 1
@@ -116,7 +118,7 @@ theorem cubeSmoothDeriv_eq {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) (r 
     cubeSmoothDeriv r δ i f x = ∑ k ∈ Finset.range r,
       ((-1 : ℂ) ^ (k + 2) * (r.choose (k + 1) : ℂ)) *
         ((((k + 1 : ℕ) * δ : ℝ) : ℂ)⁻¹ ^ r * cubeDiff r ((k + 1 : ℕ) * δ) i f x) := by
-  rw [cubeSmoothDeriv, iteratedDeriv_smooth (continuous_slice hf x i) r δ]
+  rw [cubeSmoothDeriv, iteratedDeriv_steklovSmooth (continuous_slice hf x i) r δ]
   rfl
 
 /-- **The derivative of the smoothing as a sum of functions**:
@@ -268,47 +270,50 @@ theorem exists_left_cubeSmoothing {f : (Fin d → ℝ) → ℂ} (hf : Continuous
       (two_pow_mul_inv_div_sq_pow_mul_le hr hL (coordModulus_mono r p i f hrδ))
   · rw [slice_cubeSmooth, slice_cubeSmoothDeriv]
     exact exists_eLpNorm_sub_polyFun_le hp r
-      (contDiff_smooth (continuous_slice hf x i) r (L / r ^ 2)) huv
+      (contDiff_steklovSmooth (continuous_slice hf x i) r (L / r ^ 2)) huv
 
 /-- The **reflection in coordinate `i`**, `x ↦ x` with `x_i` replaced by `1 - x_i`. -/
-def reflect (i : Fin d) (x : Fin d → ℝ) : Fin d → ℝ := Function.update x i (1 - x i)
+def reflectCoord (i : Fin d) (x : Fin d → ℝ) : Fin d → ℝ := Function.update x i (1 - x i)
 
 /-- The reflection is an involution. -/
-theorem reflect_reflect (i : Fin d) (x : Fin d → ℝ) : reflect i (reflect i x) = x := by
-  simp [reflect]
+theorem reflectCoord_reflectCoord (i : Fin d) (x : Fin d → ℝ) :
+    reflectCoord i (reflectCoord i x) = x := by
+  simp [reflectCoord]
 
 /-- The reflection is continuous. -/
-theorem continuous_reflect (i : Fin d) : Continuous (reflect (d := d) i) :=
+theorem continuous_reflectCoord (i : Fin d) : Continuous (reflectCoord (d := d) i) :=
   continuous_id.update i (continuous_const.sub (continuous_apply i))
 
 /-- The slice of a reflected function is the reflected slice. -/
-theorem slice_reflect (f : (Fin d → ℝ) → ℂ) (x : Fin d → ℝ) (i : Fin d) :
-    slice (fun y => f (reflect i y)) x i = fun t => slice f x i (1 - t) := by
+theorem slice_reflectCoord (f : (Fin d → ℝ) → ℂ) (x : Fin d → ℝ) (i : Fin d) :
+    slice (fun y => f (reflectCoord i y)) x i = fun t => slice f x i (1 - t) := by
   funext t
-  simp [slice, reflect]
+  simp [slice, reflectCoord]
 
 /-- **Reflection preserves the coordinate modulus**: `ω_r^{(i)}(f(reflect_i ·), t) = ω_r^{(i)}(f, t)`,
 slice by slice (`Interval.eLpNorm_higherDiff_reflect`, `Cube.coordModulus_eq_of_slice`). -/
-theorem coordModulus_reflect {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) {p : ℝ≥0∞} (hp0 : p ≠ 0)
+theorem coordModulus_reflectCoord {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) {p : ℝ≥0∞} (hp0 : p ≠ 0)
     (hp : p ≠ ∞) (r : ℕ) (i : Fin d) (t : ℝ) :
-    coordModulus r p i (fun y => f (reflect i y)) t = coordModulus r p i f t :=
-  coordModulus_eq_of_slice (f := fun y => f (reflect i y))
-    (hf.comp (continuous_reflect i).measurable) hf hp0 hp r i t fun h _ => ae_of_all _ fun x => by
-      rw [slice_reflect]
+    coordModulus r p i (fun y => f (reflectCoord i y)) t = coordModulus r p i f t :=
+  coordModulus_eq_of_slice (f := fun y => f (reflectCoord i y))
+    (hf.comp (continuous_reflectCoord i).measurable) hf hp0 hp r i t
+    fun h _ => ae_of_all _ fun x => by
+      rw [slice_reflectCoord]
       simpa only [zero_add] using eLpNorm_higherDiff_reflect (measurable_slice hf x i) r p 0 1 h
 
 /-- **Reflection of a region**: `‖F(reflect_i ·)‖_{L_p({x_i ∈ [0, w]})} = ‖F‖_{L_p({x_i ∈ [1-w, 1]})}`
 for `w ≤ 1`. -/
-theorem eLpNorm_reflect_regionVol {F : (Fin d → ℝ) → ℂ} (hF : Measurable F) {p : ℝ≥0∞}
+theorem eLpNorm_reflectCoord_regionVol {F : (Fin d → ℝ) → ℂ} (hF : Measurable F) {p : ℝ≥0∞}
     (hp0 : p ≠ 0) (hp : p ≠ ∞) (i : Fin d) {w : ℝ} (hw1 : w ≤ 1) :
-    eLpNorm (fun y => F (reflect i y)) p (regionVol d i 0 w) =
+    eLpNorm (fun y => F (reflectCoord i y)) p (regionVol d i 0 w) =
       eLpNorm F p (regionVol d i (1 - w) 1) := by
-  have hFr : Measurable fun y => F (reflect i y) := hF.comp (continuous_reflect i).measurable
+  have hFr : Measurable fun y => F (reflectCoord i y) :=
+    hF.comp (continuous_reflectCoord i).measurable
   rw [eLpNorm_regionVol_eq_slice hFr hp0 hp i le_rfl hw1,
     eLpNorm_regionVol_eq_slice hF hp0 hp i (by linarith) le_rfl]
   congr 1
   funext x
-  rw [slice_reflect, eLpNorm_comp_sub_Icc (measurable_slice hF x i), sub_zero]
+  rw [slice_reflectCoord, eLpNorm_comp_sub_Icc (measurable_slice hF x i), sub_zero]
 
 /-- **Smoothing on a right region**: the same as `Cube.exists_left_cubeSmoothing` on
 `{x_i ≥ 1 - w}`, by the reflection in coordinate `i`. -/
@@ -324,23 +329,24 @@ theorem exists_right_cubeSmoothing {f : (Fin d → ℝ) → ℂ} (hf : Continuou
           ENNReal.ofReal (v - u) ^ r * eLpNorm (slice D x i) p (volume.restrict (Icc u v)) := by
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one hp).ne'
   have hw1 : w ≤ 1 := by linarith
-  have hfr : Continuous fun y => f (reflect i y) := hf.comp (continuous_reflect i)
+  have hfr : Continuous fun y => f (reflectCoord i y) := hf.comp (continuous_reflectCoord i)
   obtain ⟨G, D, hGm, hDm, h1, h2, h3⟩ := exists_left_cubeSmoothing hfr hr hp hp' i hL hwL
-  rw [coordModulus_reflect hf.measurable hp0 hp'] at h1 h2
-  have hrefl : Measurable (reflect (d := d) i) := (continuous_reflect i).measurable
-  refine ⟨fun y => G (reflect i y), fun y => D (reflect i y), hGm.comp hrefl, hDm.comp hrefl,
-    ?_, ?_, fun x u v huv => ?_⟩
-  · have h := eLpNorm_reflect_regionVol (F := fun y => f y - G (reflect i y))
+  rw [coordModulus_reflectCoord hf.measurable hp0 hp'] at h1 h2
+  have hrefl : Measurable (reflectCoord (d := d) i) := (continuous_reflectCoord i).measurable
+  refine ⟨fun y => G (reflectCoord i y), fun y => D (reflectCoord i y), hGm.comp hrefl,
+    hDm.comp hrefl, ?_, ?_, fun x u v huv => ?_⟩
+  · have h := eLpNorm_reflectCoord_regionVol (F := fun y => f y - G (reflectCoord i y))
       (hf.measurable.sub (hGm.comp hrefl)) hp0 hp' i hw1
-    simp only [reflect_reflect] at h
+    simp only [reflectCoord_reflectCoord] at h
     rw [← h]
     exact h1
-  · have h := eLpNorm_reflect_regionVol (F := fun y => D (reflect i y)) (hDm.comp hrefl) hp0 hp'
+  · have h :=
+      eLpNorm_reflectCoord_regionVol (F := fun y => D (reflectCoord i y)) (hDm.comp hrefl) hp0 hp'
       i hw1
-    simp only [reflect_reflect] at h
+    simp only [reflectCoord_reflectCoord] at h
     rw [← h]
     exact h2
-  · simp only [slice_reflect]
+  · simp only [slice_reflectCoord]
     exact exists_eLpNorm_sub_polyFun_reflect_le (measurable_slice hGm x i)
       (measurable_slice hDm x i) (h3 x (1 - v) (1 - u) (by linarith))
 

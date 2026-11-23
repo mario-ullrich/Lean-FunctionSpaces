@@ -186,11 +186,11 @@ theorem lpBlock_sum_econvLp_dual_ae (hp : p ≠ ∞) (L J j : ℕ)
 
 /-- The maximal function of the lift of `k_i ⋆ f ∈ L_p(𝕋^d)` is that of the lift of the pointwise
 convolution `k_i ⋆ f`. -/
-theorem maximal_econvLp_kernel_proj (hp : p ≠ ∞) (L i : ℕ)
+theorem maximalFunction_periodicEconvLp_meansKernel_quotientProj (hp : p ≠ ∞) (L i : ℕ)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
-    Rd.maximal (fun y => ‖econvLp hp (b.integrable_kernel L i) f (proj y)‖ₑ) =
-      Rd.maximal (fun y => ‖econv (b.kernel L i) f (proj y)‖ₑ) :=
-  maximal_enorm_comp_proj_congr_ae (econvLp_apply_ae hp (b.integrable_kernel L i) f)
+    Rd.maximalFunction (fun y => ‖econvLp hp (b.integrable_kernel L i) f (proj y)‖ₑ) =
+      Rd.maximalFunction (fun y => ‖econv (b.kernel L i) f (proj y)‖ₑ) :=
+  maximalFunction_enorm_comp_quotientProj_congr_ae (econvLp_apply_ae hp (b.integrable_kernel L i) f)
 
 /-- The bound of the blocks by local means for the partial sums of the reproducing formula, at
 lifted points: for `L' ≥ 1` and every `J`, for almost every `x ∈ ℝ^d`,
@@ -202,13 +202,14 @@ theorem ae_enorm_lpBlock_sum_proj_le (hp : p ≠ ∞) (L : ℕ) {L' : ℕ} (hL' 
     ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ d)), ‖lpBlock hp j (∑ i ∈ Finset.range (J + 1),
         econvLp hp (b.integrable_dual L i) (econvLp hp (b.integrable_kernel L i) f)) (proj x)‖ₑ ≤
       b.blockByLocalMeansConst L L' * ∑' i, (if i ≤ j then dyadicWeight (-(L' : ℝ)) (j - i)
-        else 1) * Rd.maximal (fun y => ‖econv (b.kernel L i) f (proj y)‖ₑ) x := by
+        else 1) * Rd.maximalFunction (fun y => ‖econv (b.kernel L i) f (proj y)‖ₑ) x := by
   filter_upwards [ae_comp_proj (lpBlock_sum_econvLp_dual_ae b hp L J j f)] with x hx
   have hterm : ∀ i, ‖econv (Rd.conv (Rd.lpBlockKernel j) (b.dual L i) volume)
       (econvLp hp (b.integrable_kernel L i) f) (proj x)‖ₑ ≤
         b.blockByLocalMeansConst L L' * ((if i ≤ j then dyadicWeight (-(L' : ℝ)) (j - i)
-          else 1) * Rd.maximal (fun y => ‖econv (b.kernel L i) f (proj y)‖ₑ) x) := fun i => by
-    rw [econv_proj, ← maximal_econvLp_kernel_proj b hp L i f]
+          else 1) * Rd.maximalFunction
+            (fun y => ‖econv (b.kernel L i) f (proj y)‖ₑ) x) := fun i => by
+    rw [econv_proj, ← maximalFunction_periodicEconvLp_meansKernel_quotientProj b hp L i f]
     exact b.enorm_conv_conv_lpBlockKernel_dualKernel_le L hL' i j _ x
   rw [hx]
   refine (enorm_sum_le _ _).trans ((Finset.sum_le_sum fun i _ => hterm i).trans ?_)
@@ -226,7 +227,7 @@ theorem enorm_blockFun_proj_le_tsum_maximal {L : ℕ} (hL : 1 ≤ L) {L' : ℕ} 
     (hp : p ≠ ∞) (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     ∀ᵐ x ∂(volume.restrict (periodBox 0)), ∀ j, ‖blockFun j f (proj x)‖ₑ ≤
       b.blockByLocalMeansConst L L' * ∑' i, (if i ≤ j then dyadicWeight (-(L' : ℝ)) (j - i)
-        else 1) * Rd.maximal (fun y => ‖econv (b.kernel L i) f (proj y)‖ₑ) x := by
+        else 1) * Rd.maximalFunction (fun y => ‖econv (b.kernel L i) f (proj y)‖ₑ) x := by
   refine ae_all_iff.2 fun j => ?_
   have h := ae_enorm_comp_proj_le_of_tendsto_Lp (a := 0)
     (((lpBlock hp j).continuous.tendsto f).comp (tendsto_sum_econvLp_dual_kernel b hp hL f))
@@ -251,11 +252,11 @@ theorem econvLp_kernel_sum_lpBlock_ae (hp : p ≠ ∞) (L J j : ℕ)
 
 /-- The maximal function of the lift of `Δ_i f ∈ L_p(𝕋^d)` is that of the lift of the pointwise
 block `ψ_i ⋆ f`. -/
-theorem maximal_lpBlock_proj (hp : p ≠ ∞) (i : ℕ)
+theorem maximalFunction_periodicLpBlock_quotientProj (hp : p ≠ ∞) (i : ℕ)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
-    Rd.maximal (fun y => ‖lpBlock hp i f (proj y)‖ₑ) =
-      Rd.maximal (fun y => ‖blockFun i f (proj y)‖ₑ) :=
-  maximal_enorm_comp_proj_congr_ae (lpBlock_ae_eq_blockFun hp i f)
+    Rd.maximalFunction (fun y => ‖lpBlock hp i f (proj y)‖ₑ) =
+      Rd.maximalFunction (fun y => ‖blockFun i f (proj y)‖ₑ) :=
+  maximalFunction_enorm_comp_quotientProj_congr_ae (lpBlock_ae_eq_blockFun hp i f)
 
 /-- The bound of the local means by blocks for the partial sums of the block decomposition, at
 lifted points: for every `J`, for almost every `x ∈ ℝ^d`,
@@ -266,13 +267,13 @@ theorem ae_enorm_econvLp_kernel_sum_proj_le (hp : p ≠ ∞) (L J j : ℕ)
     ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ d)),
       ‖econvLp hp (b.integrable_kernel L j) (∑ i ∈ Finset.range J, lpBlock hp i f) (proj x)‖ₑ ≤
         b.localMeansByBlockConst L * ∑' i, (if i ≤ j then dyadicWeight (-(L : ℝ)) (j - i)
-          else 1) * Rd.maximal (fun y => ‖blockFun i f (proj y)‖ₑ) x := by
+          else 1) * Rd.maximalFunction (fun y => ‖blockFun i f (proj y)‖ₑ) x := by
   filter_upwards [ae_comp_proj (econvLp_kernel_sum_lpBlock_ae b hp L J j f)] with x hx
   have hterm : ∀ i, ‖econv (Rd.conv (b.kernel L j) (Rd.Theta i) volume)
       (lpBlock hp i f) (proj x)‖ₑ ≤
         b.localMeansByBlockConst L * ((if i ≤ j then dyadicWeight (-(L : ℝ)) (j - i)
-          else 1) * Rd.maximal (fun y => ‖blockFun i f (proj y)‖ₑ) x) := fun i => by
-    rw [econv_proj, ← maximal_lpBlock_proj hp i f]
+          else 1) * Rd.maximalFunction (fun y => ‖blockFun i f (proj y)‖ₑ) x) := fun i => by
+    rw [econv_proj, ← maximalFunction_periodicLpBlock_quotientProj hp i f]
     exact b.enorm_conv_conv_kernel_Theta_le L i j _ x
   rw [hx]
   refine (enorm_sum_le _ _).trans ((Finset.sum_le_sum fun i _ => hterm i).trans ?_)
@@ -290,7 +291,7 @@ theorem enorm_econv_kernel_proj_le_tsum_maximal (L : ℕ) (hp : p ≠ ∞)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     ∀ᵐ x ∂(volume.restrict (periodBox 0)), ∀ j, ‖econv (b.kernel L j) f (proj x)‖ₑ ≤
       b.localMeansByBlockConst L * ∑' i, (if i ≤ j then dyadicWeight (-(L : ℝ)) (j - i)
-        else 1) * Rd.maximal (fun y => ‖blockFun i f (proj y)‖ₑ) x := by
+        else 1) * Rd.maximalFunction (fun y => ‖blockFun i f (proj y)‖ₑ) x := by
   refine ae_all_iff.2 fun j => ?_
   have h := ae_enorm_comp_proj_le_of_tendsto_Lp (a := 0)
     (((econvLp hp (b.integrable_kernel L j)).continuous.tendsto f).comp (tendsto_sum_lpBlock hp f))
@@ -314,11 +315,11 @@ theorem lqNorm_blockFun_proj_le_lqNorm_maximal {L : ℕ} (hL : 1 ≤ L) {L' : �
     ∀ᵐ x ∂(volume.restrict (periodBox 0)),
       lqNorm q (fun j => dyadicWeight s j * ‖blockFun j f (proj x)‖ₑ) ≤
         b.blockByLocalMeansConst L L' * ENNReal.almostDiagonalConst s L' *
-          lqNorm q (fun i => Rd.maximal (fun y => dyadicWeight s i *
+          lqNorm q (fun i => Rd.maximalFunction (fun y => dyadicWeight s i *
             ‖econv (b.kernel L i) f (proj y)‖ₑ) x) := by
   filter_upwards [enorm_blockFun_proj_le_tsum_maximal b hL hL' hp f] with x hx
   refine (ENNReal.lqNorm_le_almostDiagonalConst_mul_of_le hq s L' hx).trans_eq ?_
-  simp only [Rd.dyadicWeight_mul_maximal]
+  simp only [Rd.dyadicWeight_mul_maximalFunction]
 
 /-- **The local means by blocks in `ℓ_q` on the torus**: for every order `L`, `1 ≤ p < ∞`,
 `1 ≤ q ≤ ∞`, `s ∈ ℝ` and `f ∈ L_p(𝕋^d)`, for almost every `x ∈ P_0`,
@@ -329,36 +330,36 @@ theorem lqNorm_econv_kernel_proj_le_lqNorm_maximal (L : ℕ) (hp : p ≠ ∞) {q
     ∀ᵐ x ∂(volume.restrict (periodBox 0)),
       lqNorm q (fun j => dyadicWeight s j * ‖econv (b.kernel L j) f (proj x)‖ₑ) ≤
         b.localMeansByBlockConst L * ENNReal.almostDiagonalConst s L *
-          lqNorm q (fun i => Rd.maximal (fun y => dyadicWeight s i *
+          lqNorm q (fun i => Rd.maximalFunction (fun y => dyadicWeight s i *
             ‖blockFun i f (proj y)‖ₑ) x) := by
   filter_upwards [enorm_econv_kernel_proj_le_tsum_maximal b L hp f] with x hx
   refine (ENNReal.lqNorm_le_almostDiagonalConst_mul_of_le hq s L hx).trans_eq ?_
-  simp only [Rd.dyadicWeight_mul_maximal]
+  simp only [Rd.dyadicWeight_mul_maximalFunction]
 
 omit [Fact (1 ≤ p)] in
 /-- **From pointwise maximal bounds on the lift to `L_p(ℓ_q)` on the torus**: for `1 < p < ∞`
 and `1 < q ≤ ∞`, if `F(π x) ≤ C ‖(M(g_i ∘ π)(x))_i‖_{ℓ_q}` for almost every `x ∈ P_0`, with
 almost everywhere measurable `F` and `g_i` on `𝕋^d`, then
 `‖F‖_p ≤ C C_P ‖ t ↦ ‖(g_i(t))_i‖_{ℓ_q} ‖_p` with `C_P = Torus.periodicFSConst d p q`. -/
-theorem eLpNorm_le_of_le_lqNorm_maximal_proj (hp1 : 1 < p) (hp : p ≠ ∞) {q : ℝ≥0∞}
+theorem eLpNorm_le_of_le_lqNorm_maximalFunction_quotientProj (hp1 : 1 < p) (hp : p ≠ ∞) {q : ℝ≥0∞}
     (hq1 : 1 < q) {F : UnitAddTorus d → ℝ≥0∞} (hF : AEMeasurable F volume)
     {g : ℕ → UnitAddTorus d → ℝ≥0∞} (hg : ∀ i, AEMeasurable (g i) volume) {C : ℝ≥0∞}
     (h : ∀ᵐ x ∂(volume.restrict (periodBox 0)),
-      F (proj x) ≤ C * lqNorm q (fun i => Rd.maximal (fun y => g i (proj y)) x)) :
+      F (proj x) ≤ C * lqNorm q (fun i => Rd.maximalFunction (fun y => g i (proj y)) x)) :
     eLpNorm F p volume ≤
       C * periodicFSConst d p q * eLpNorm (fun t => lqNorm q (fun i => g i t)) p volume := by
   have hmp := measurePreserving_proj_periodBox (d := d) 0
   calc eLpNorm F p volume = eLpNorm (F ∘ proj) p (volume.restrict (periodBox 0)) :=
         (eLpNorm_comp_proj_periodBox 0 hF.aestronglyMeasurable p).symm
-    _ ≤ eLpNorm (fun x => C * lqNorm q (fun i => Rd.maximal (fun y => g i (proj y)) x)) p
+    _ ≤ eLpNorm (fun x => C * lqNorm q (fun i => Rd.maximalFunction (fun y => g i (proj y)) x)) p
           (volume.restrict (periodBox 0)) :=
         eLpNorm_mono_enorm_ae
           (hF.comp_quasiMeasurePreserving hmp.quasiMeasurePreserving).aestronglyMeasurable
           (h.mono fun x hx => by simpa only [enorm_eq_self, Function.comp_apply] using hx)
-    _ = C * eLpNorm (fun x => lqNorm q (fun i => Rd.maximal (fun y => g i (proj y)) x)) p
+    _ = C * eLpNorm (fun x => lqNorm q (fun i => Rd.maximalFunction (fun y => g i (proj y)) x)) p
           (volume.restrict (periodBox 0)) :=
         eLpNorm_const_mul_ennreal (c := C)
-          (measurable_lqNorm_comp (fun i => Rd.measurable_maximal _) q).aestronglyMeasurable
+          (measurable_lqNorm_comp (fun i => Rd.measurable_maximalFunction _) q).aestronglyMeasurable
     _ ≤ C * (periodicFSConst d p q * eLpNorm (fun t => lqNorm q (fun i => g i t)) p volume) := by
         gcongr
         exact feffermanStein_periodic hp1 hp hq1 g hg
@@ -402,7 +403,8 @@ theorem triebelLizorkinNorm_le_tlLocalMeansNorm {L : ℕ} (hL : 1 ≤ L) (hp1 : 
     (hp : p ≠ ∞) {q : ℝ≥0∞} (hq1 : 1 < q) (s : ℝ)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     triebelLizorkinNorm s q f ≤ tlUpperConst b L p q s * tlLocalMeansNorm b L s q f :=
-  eLpNorm_le_of_le_lqNorm_maximal_proj hp1 hp hq1 (aemeasurable_lqNorm_blockFun s q f)
+  eLpNorm_le_of_le_lqNorm_maximalFunction_quotientProj hp1 hp hq1
+    (aemeasurable_lqNorm_blockFun s q f)
     (fun i => aemeasurable_dyadicWeight_mul_econv_kernel b L s i f)
     (lqNorm_blockFun_proj_le_lqNorm_maximal b hL (Nat.le_add_left 1 _) hp hq1.le s f)
 
@@ -413,7 +415,8 @@ theorem triebelLizorkinNorm_le_tlLocalMeansNorm {L : ℕ} (hL : 1 ≤ L) (hp1 : 
 theorem tlLocalMeansNorm_le_triebelLizorkinNorm (L : ℕ) (hp1 : 1 < p) (hp : p ≠ ∞)
     {q : ℝ≥0∞} (hq1 : 1 < q) (s : ℝ) (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     tlLocalMeansNorm b L s q f ≤ tlLowerConst b L p q s * triebelLizorkinNorm s q f :=
-  eLpNorm_le_of_le_lqNorm_maximal_proj hp1 hp hq1 (aemeasurable_lqNorm_econv_kernel b L s q f)
+  eLpNorm_le_of_le_lqNorm_maximalFunction_quotientProj hp1 hp hq1
+    (aemeasurable_lqNorm_econv_kernel b L s q f)
     (fun i => (aestronglyMeasurable_blockFun i f).enorm.const_mul _)
     (lqNorm_econv_kernel_proj_le_lqNorm_maximal b L hp hq1.le s f)
 

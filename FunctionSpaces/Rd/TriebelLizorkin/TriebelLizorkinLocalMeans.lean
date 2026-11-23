@@ -27,10 +27,10 @@ order `L > s` give the same space (`Rd.LocalMeansBump.tlLocalMeansNorm_lt_top_if
 The proof is pointwise in `x`. The reproducing formula `f = ∑_i η_i ⋆ k_i ⋆ f` and the cross
 kernels `ψ_j ⋆ η_i` of `FunctionSpaces.Rd.LocalMeans.KernelMajorants` give
 `|ψ_j ⋆ f(x)| ≤ C ∑_i c_{ji} M(k_i ⋆ f)(x)` almost everywhere
-(`Rd.LocalMeansBump.enorm_blockFun_le_tsum_maximal`); the decomposition `f = ∑_i ψ_i ⋆ f`
+(`Rd.LocalMeansBump.enorm_blockFun_le_tsum_maximalFunction`); the decomposition `f = ∑_i ψ_i ⋆ f`
 and the cross kernels `k_j ⋆ Θ_i` give `|k_j ⋆ f(x)| ≤ C ∑_i c_{ji} M(ψ_i ⋆ f)(x)`
-(`Rd.LocalMeansBump.enorm_localMean_le_tsum_maximal`). The factors `c_{ji}` decay geometrically
-below the diagonal, so the almost diagonal estimate in `ℓ_q`
+(`Rd.LocalMeansBump.enorm_localMean_le_tsum_maximalFunction`). The factors `c_{ji}` decay
+geometrically below the diagonal, so the almost diagonal estimate in `ℓ_q`
 (`ENNReal.lqNorm_le_almostDiagonalConst_mul_of_le`) and the Fefferman–Stein inequality
 (`Rd.feffermanStein`) finish. The partial sums of the two decompositions converge in `L_p`, and
 the pointwise bounds pass to the limit by `MeasureTheory.ae_enorm_le_of_tendsto_Lp`.
@@ -62,9 +62,9 @@ theorem ite_dyadicWeight_ne_top (L : ℝ) (i j : ℕ) :
   · exact ENNReal.one_ne_top
 
 /-- The weights go inside the maximal function: `2^(is) M g(x) = M(2^(is) g)(x)`. -/
-theorem dyadicWeight_mul_maximal (s : ℝ) (i : ℕ) (g : V → ℝ≥0∞) (x : V) :
-    dyadicWeight s i * maximal g x = maximal (fun y => dyadicWeight s i * g y) x :=
-  (maximal_const_mul (ENNReal.dyadicWeight_ne_top s i) g x).symm
+theorem dyadicWeight_mul_maximalFunction (s : ℝ) (i : ℕ) (g : V → ℝ≥0∞) (x : V) :
+    dyadicWeight s i * maximalFunction g x = maximalFunction (fun y => dyadicWeight s i * g y) x :=
+  (maximalFunction_const_mul (ENNReal.dyadicWeight_ne_top s i) g x).symm
 
 omit [Fact (1 ≤ p)] in
 /-- **From pointwise maximal bounds to `L_p(ℓ_q)`**: for `1 < p < ∞` and `1 < q ≤ ∞`, if
@@ -72,19 +72,19 @@ omit [Fact (1 ≤ p)] in
 then
 `‖F‖_p ≤ C C_{FS} ‖ x ↦ ‖(g_i(x))_i‖_{ℓ_q} ‖_p` with the Fefferman–Stein constant
 `C_{FS} = Rd.feffermanSteinConst V p q`. -/
-theorem eLpNorm_le_of_le_lqNorm_maximal (hp1 : 1 < p) (hp : p ≠ ∞) {q : ℝ≥0∞} (hq1 : 1 < q)
+theorem eLpNorm_le_of_le_lqNorm_maximalFunction (hp1 : 1 < p) (hp : p ≠ ∞) {q : ℝ≥0∞} (hq1 : 1 < q)
     {F : V → ℝ≥0∞} (hF : AEMeasurable F volume) {g : ℕ → V → ℝ≥0∞}
     (hg : ∀ i, AEMeasurable (g i) volume) {C : ℝ≥0∞}
-    (h : ∀ᵐ x ∂volume, F x ≤ C * lqNorm q (fun i => maximal (g i) x)) :
+    (h : ∀ᵐ x ∂volume, F x ≤ C * lqNorm q (fun i => maximalFunction (g i) x)) :
     eLpNorm F p volume ≤
       C * feffermanSteinConst V p q * eLpNorm (fun x => lqNorm q (fun i => g i x)) p volume :=
   calc eLpNorm F p volume
-      ≤ eLpNorm (fun x => C * lqNorm q (fun i => maximal (g i) x)) p volume :=
+      ≤ eLpNorm (fun x => C * lqNorm q (fun i => maximalFunction (g i) x)) p volume :=
         eLpNorm_mono_enorm_ae hF.aestronglyMeasurable (h.mono fun x hx => by
           simpa only [enorm_eq_self] using hx)
-    _ = C * eLpNorm (fun x => lqNorm q (fun i => maximal (g i) x)) p volume :=
+    _ = C * eLpNorm (fun x => lqNorm q (fun i => maximalFunction (g i) x)) p volume :=
         eLpNorm_const_mul_ennreal (c := C) (aemeasurable_lqNorm_comp
-          (fun i => (measurable_maximal (g i)).aemeasurable) q).aestronglyMeasurable
+          (fun i => (measurable_maximalFunction (g i)).aemeasurable) q).aestronglyMeasurable
     _ ≤ C * (feffermanSteinConst V p q *
           eLpNorm (fun x => lqNorm q (fun i => g i x)) p volume) := by
         gcongr
@@ -152,12 +152,12 @@ theorem enorm_conv_conv_lpBlockKernel_dualKernel_le (L : ℕ) {L' : ℕ} (hL' : 
     (h : V → ℂ) (x : V) :
     ‖conv (conv (lpBlockKernel j) (b.dual L i) volume) h volume x‖ₑ ≤
       b.blockByLocalMeansConst L L' * ((if i ≤ j then dyadicWeight (-(L' : ℝ)) (j - i) else 1) *
-        maximal (fun y => ‖h y‖ₑ) x) := by
+        maximalFunction (fun y => ‖h y‖ₑ) x) := by
   have hC : b.psiDualConst L L' (finrank ℝ V + 1) *
       (if i ≤ j then dyadicWeight (-(L' : ℝ)) (j - i) else 1) ≠ ∞ :=
     ENNReal.mul_ne_top (b.psiDualConst_ne_top L L' (Nat.lt_succ_self _))
       (ite_dyadicWeight_ne_top _ i j)
-  refine (enorm_conv_le_maximal_of_decay (Nat.lt_succ_self _) hC
+  refine (enorm_conv_le_maximalFunction_of_decay (Nat.lt_succ_self _) hC
     (b.enorm_conv_lpBlockKernel_dualKernel_le L hL' (finrank ℝ V + 1) i j) h x).trans (le_of_eq ?_)
   rw [blockByLocalMeansConst]
   ring
@@ -184,12 +184,12 @@ theorem lpBlock_sum_dual_ae (hp : p ≠ ∞) (L J j : ℕ) (h : ℕ → Lp ℂ p
 `h_i ∈ L_p`, almost everywhere, `|Δ_j (∑_{i ≤ J} η_i ⋆ h_i)| ≤ C ∑_i c_{ji} M|h_i|` with
 `c_{ji} = 2^(-(j-i)L')` for `i ≤ j`, `c_{ji} = 1` for `i > j`, and
 `C = Rd.LocalMeansBump.blockByLocalMeansConst L L'`. -/
-theorem ae_enorm_lpBlock_sum_dual_le_tsum_maximal (hp : p ≠ ∞) (L : ℕ) {L' : ℕ} (hL' : 1 ≤ L')
-    (J j : ℕ) (h : ℕ → Lp ℂ p (volume : Measure V)) :
+theorem ae_enorm_lpBlock_sum_dualKernel_le_tsum_maximalFunction (hp : p ≠ ∞) (L : ℕ) {L' : ℕ}
+    (hL' : 1 ≤ L') (J j : ℕ) (h : ℕ → Lp ℂ p (volume : Measure V)) :
     ∀ᵐ x ∂volume, ‖lpBlock hp j (∑ i ∈ Finset.range (J + 1),
         convLp hp (b.integrable_dual L i) (h i)) x‖ₑ ≤
       b.blockByLocalMeansConst L L' * ∑' i, (if i ≤ j then dyadicWeight (-(L' : ℝ)) (j - i)
-        else 1) * maximal (fun y => ‖h i y‖ₑ) x := by
+        else 1) * maximalFunction (fun y => ‖h i y‖ₑ) x := by
   filter_upwards [b.lpBlock_sum_dual_ae hp L J j h] with x hx
   rw [hx]
   refine (enorm_sum_le _ _).trans ((Finset.sum_le_sum fun i _ =>
@@ -203,16 +203,16 @@ of the partial sums), then for `L' ≥ 1`, almost everywhere and for all levels 
 `|ψ_j ⋆ F(x)| ≤ C ∑_i c_{ji} M|h_i|(x)` with `c_{ji} = 2^(-(j-i)L')` for `i ≤ j`, `c_{ji} = 1` for
 `i > j`, and `C = Rd.LocalMeansBump.blockByLocalMeansConst L L'`
 (`MeasureTheory.ae_enorm_le_of_tendsto_Lp`). -/
-theorem enorm_blockFun_le_tsum_maximal_of_tendsto (hp : p ≠ ∞) (L : ℕ) {L' : ℕ} (hL' : 1 ≤ L')
-    {F : Lp ℂ p (volume : Measure V)} {h : ℕ → Lp ℂ p (volume : Measure V)}
+theorem enorm_blockFun_le_tsum_maximalFunction_of_tendsto (hp : p ≠ ∞) (L : ℕ) {L' : ℕ}
+    (hL' : 1 ≤ L') {F : Lp ℂ p (volume : Measure V)} {h : ℕ → Lp ℂ p (volume : Measure V)}
     (hrep : Tendsto (fun J => ∑ i ∈ Finset.range (J + 1),
       convLp hp (b.integrable_dual L i) (h i)) atTop (𝓝 F)) :
     ∀ᵐ x ∂volume, ∀ j, ‖blockFun j F x‖ₑ ≤ b.blockByLocalMeansConst L L' *
       ∑' i, (if i ≤ j then dyadicWeight (-(L' : ℝ)) (j - i) else 1) *
-        maximal (fun y => ‖h i y‖ₑ) x := by
+        maximalFunction (fun y => ‖h i y‖ₑ) x := by
   refine ae_all_iff.2 fun j => ?_
   have hlim := ae_enorm_le_of_tendsto_Lp (((lpBlock hp j).continuous.tendsto F).comp hrep)
-    (fun J => b.ae_enorm_lpBlock_sum_dual_le_tsum_maximal hp L hL' J j h)
+    (fun J => b.ae_enorm_lpBlock_sum_dualKernel_le_tsum_maximalFunction hp L hL' J j h)
   filter_upwards [hlim, lpBlock_ae_eq_blockFun hp j F] with x hx hb
   rwa [← hb]
 
@@ -231,39 +231,41 @@ theorem lpBlock_sum_dual_localMean_ae (hp : p ≠ ∞) (L J j : ℕ)
   exact Finset.sum_congr rfl fun i _ => by rw [conv_congr_ae (b.localMean_ae_eq hp L i f)]
 
 /-- The maximal function of a local mean is that of the pointwise convolution `k_i ⋆ f`
-(`Rd.maximal_congr_ae`). -/
-theorem maximal_enorm_localMean (hp : p ≠ ∞) (L i : ℕ) (f : Lp ℂ p (volume : Measure V)) :
-    maximal (fun y => ‖(b.localMean hp L i f : V → ℂ) y‖ₑ) =
-      maximal (fun y => ‖conv (b.kernel L i) f volume y‖ₑ) :=
-  maximal_congr_ae ((b.localMean_ae_eq hp L i f).mono fun y hy => by simp only [hy])
+(`Rd.maximalFunction_congr_ae`). -/
+theorem maximalFunction_enorm_localMean (hp : p ≠ ∞) (L i : ℕ) (f : Lp ℂ p (volume : Measure V)) :
+    maximalFunction (fun y => ‖(b.localMean hp L i f : V → ℂ) y‖ₑ) =
+      maximalFunction (fun y => ‖conv (b.kernel L i) f volume y‖ₑ) :=
+  maximalFunction_congr_ae ((b.localMean_ae_eq hp L i f).mono fun y hy => by simp only [hy])
 
 /-- The bound of the blocks by local means for the partial sums of the reproducing formula: for
 `L' ≥ 1` and every `J`, almost everywhere,
 `|Δ_j (∑_{i ≤ J} η_i ⋆ k_i ⋆ f)| ≤ C ∑_i c_{ji} M(k_i ⋆ f)` with `c_{ji} = 2^(-(j-i)L')` for
 `i ≤ j`, `c_{ji} = 1` for `i > j`, and `C = Rd.LocalMeansBump.blockByLocalMeansConst L L'`
-(`Rd.LocalMeansBump.ae_enorm_lpBlock_sum_dual_le_tsum_maximal`). -/
+(`Rd.LocalMeansBump.ae_enorm_lpBlock_sum_dualKernel_le_tsum_maximalFunction`). -/
 theorem ae_enorm_lpBlock_sum_dual_le (hp : p ≠ ∞) (L : ℕ) {L' : ℕ} (hL' : 1 ≤ L') (J j : ℕ)
     (f : Lp ℂ p (volume : Measure V)) :
     ∀ᵐ x ∂volume, ‖lpBlock hp j (∑ i ∈ Finset.range (J + 1),
         convLp hp (b.integrable_dual L i) (b.localMean hp L i f)) x‖ₑ ≤
       b.blockByLocalMeansConst L L' * ∑' i, (if i ≤ j then dyadicWeight (-(L' : ℝ)) (j - i)
-        else 1) * maximal (fun y => ‖conv (b.kernel L i) f volume y‖ₑ) x := by
-  simpa only [b.maximal_enorm_localMean hp L] using
-    b.ae_enorm_lpBlock_sum_dual_le_tsum_maximal hp L hL' J j fun i => b.localMean hp L i f
+        else 1) * maximalFunction (fun y => ‖conv (b.kernel L i) f volume y‖ₑ) x := by
+  simpa only [b.maximalFunction_enorm_localMean hp L] using
+    b.ae_enorm_lpBlock_sum_dualKernel_le_tsum_maximalFunction hp L hL' J j fun i =>
+      b.localMean hp L i f
 
 /-- **The blocks by local means, pointwise**: for `L ≥ 1`, `L' ≥ 1`, `1 ≤ p < ∞` and
 `f ∈ L_p`, almost everywhere and for all levels `j`,
 `|ψ_j ⋆ f(x)| ≤ C ∑_i c_{ji} M(k_i ⋆ f)(x)` with `c_{ji} = 2^(-(j-i)L')` for `i ≤ j`,
 `c_{ji} = 1` for `i > j`, and `C = Rd.LocalMeansBump.blockByLocalMeansConst L L'`. The reproducing
 formula `f = ∑_i η_i ⋆ k_i ⋆ f` holds in `L_p`
-(`Rd.LocalMeansBump.enorm_blockFun_le_tsum_maximal_of_tendsto`). -/
-theorem enorm_blockFun_le_tsum_maximal {L : ℕ} (hL : 1 ≤ L) {L' : ℕ} (hL' : 1 ≤ L')
+(`Rd.LocalMeansBump.enorm_blockFun_le_tsum_maximalFunction_of_tendsto`). -/
+theorem enorm_blockFun_le_tsum_maximalFunction {L : ℕ} (hL : 1 ≤ L) {L' : ℕ} (hL' : 1 ≤ L')
     (hp : p ≠ ∞) (f : Lp ℂ p (volume : Measure V)) :
     ∀ᵐ x ∂volume, ∀ j, ‖blockFun j f x‖ₑ ≤ b.blockByLocalMeansConst L L' *
       ∑' i, (if i ≤ j then dyadicWeight (-(L' : ℝ)) (j - i) else 1) *
-        maximal (fun y => ‖conv (b.kernel L i) f volume y‖ₑ) x := by
-  simpa only [b.maximal_enorm_localMean hp L] using
-    b.enorm_blockFun_le_tsum_maximal_of_tendsto hp L hL' (b.tendsto_sum_dual_localMean hp hL f)
+        maximalFunction (fun y => ‖conv (b.kernel L i) f volume y‖ₑ) x := by
+  simpa only [b.maximalFunction_enorm_localMean hp L] using
+    b.enorm_blockFun_le_tsum_maximalFunction_of_tendsto hp L hL'
+      (b.tendsto_sum_dual_localMean hp hL f)
 
 /-! ### Local means by blocks -/
 
@@ -285,11 +287,11 @@ function `h` and every `x`, `|((k_j ⋆ Θ_i) ⋆ h)(x)| ≤ C c_{ji} M|h|(x)` w
 theorem enorm_conv_conv_kernel_Theta_le (L i j : ℕ) (h : V → ℂ) (x : V) :
     ‖conv (conv (b.kernel L j) (Theta i) volume) h volume x‖ₑ ≤
       b.localMeansByBlockConst L * ((if i ≤ j then dyadicWeight (-(L : ℝ)) (j - i) else 1) *
-        maximal (fun y => ‖h y‖ₑ) x) := by
+        maximalFunction (fun y => ‖h y‖ₑ) x) := by
   have hC : b.kernelThetaConst L (finrank ℝ V + 1) *
       (if i ≤ j then dyadicWeight (-(L : ℝ)) (j - i) else 1) ≠ ∞ :=
     ENNReal.mul_ne_top (b.kernelThetaConst_ne_top L _) (ite_dyadicWeight_ne_top _ i j)
-  refine (enorm_conv_le_maximal_of_decay (Nat.lt_succ_self _) hC
+  refine (enorm_conv_le_maximalFunction_of_decay (Nat.lt_succ_self _) hC
     (b.enorm_conv_kernel_Theta_le L (finrank ℝ V + 1) i j) h x).trans (le_of_eq ?_)
   rw [localMeansByBlockConst]
   ring
@@ -333,7 +335,7 @@ theorem ae_enorm_localMean_sum_lpBlock_le (hp : p ≠ ∞) (L J j : ℕ)
     (f : Lp ℂ p (volume : Measure V)) :
     ∀ᵐ x ∂volume, ‖b.localMean hp L j (∑ i ∈ Finset.range J, lpBlock hp i f) x‖ₑ ≤
       b.localMeansByBlockConst L * ∑' i, (if i ≤ j then dyadicWeight (-(L : ℝ)) (j - i)
-        else 1) * maximal (fun y => ‖blockFun i f y‖ₑ) x := by
+        else 1) * maximalFunction (fun y => ‖blockFun i f y‖ₑ) x := by
   filter_upwards [b.localMean_sum_lpBlock_ae hp L J j f] with x hx
   rw [hx]
   refine (enorm_sum_le _ _).trans ((Finset.sum_le_sum fun i _ =>
@@ -348,10 +350,11 @@ almost everywhere and for all levels `j`, `|k_j ⋆ f(x)| ≤ C ∑_i c_{ji} M(�
 `C = Rd.LocalMeansBump.localMeansByBlockConst L`. The decomposition `f = ∑_i Δ_i f` holds in
 `L_p`, and the bound passes from its partial sums to `f`
 (`MeasureTheory.ae_enorm_le_of_tendsto_Lp`). -/
-theorem enorm_localMean_le_tsum_maximal (L : ℕ) (hp : p ≠ ∞) (f : Lp ℂ p (volume : Measure V)) :
+theorem enorm_localMean_le_tsum_maximalFunction (L : ℕ) (hp : p ≠ ∞)
+    (f : Lp ℂ p (volume : Measure V)) :
     ∀ᵐ x ∂volume, ∀ j, ‖conv (b.kernel L j) f volume x‖ₑ ≤ b.localMeansByBlockConst L *
       ∑' i, (if i ≤ j then dyadicWeight (-(L : ℝ)) (j - i) else 1) *
-        maximal (fun y => ‖blockFun i f y‖ₑ) x := by
+        maximalFunction (fun y => ‖blockFun i f y‖ₑ) x := by
   refine ae_all_iff.2 fun j => ?_
   have h := ae_enorm_le_of_tendsto_Lp
     (((b.localMean hp L j).continuous.tendsto f).comp (tendsto_sum_lpBlock hp f))
@@ -366,29 +369,29 @@ theorem enorm_localMean_le_tsum_maximal (L : ℕ) (hp : p ≠ ∞) (f : Lp ℂ p
 `‖(2^(js) |ψ_j ⋆ f(x)|)_j‖_{ℓ_q} ≤ C A_{s,L'} ‖(M(2^(is) |k_i ⋆ f|)(x))_i‖_{ℓ_q}` with
 `C = Rd.LocalMeansBump.blockByLocalMeansConst L L'` and
 `A_{s,L'} = ENNReal.almostDiagonalConst s L'`, finite for `0 < s < L'`. -/
-theorem lqNorm_blockFun_le_lqNorm_maximal {L : ℕ} (hL : 1 ≤ L) {L' : ℕ} (hL' : 1 ≤ L')
+theorem lqNorm_blockFun_le_lqNorm_maximalFunction {L : ℕ} (hL : 1 ≤ L) {L' : ℕ} (hL' : 1 ≤ L')
     (hp : p ≠ ∞) {q : ℝ≥0∞} (hq : 1 ≤ q) (s : ℝ) (f : Lp ℂ p (volume : Measure V)) :
     ∀ᵐ x ∂volume, lqNorm q (fun j => dyadicWeight s j * ‖blockFun j f x‖ₑ) ≤
       b.blockByLocalMeansConst L L' * ENNReal.almostDiagonalConst s L' *
-        lqNorm q (fun i => maximal (fun y => dyadicWeight s i *
+        lqNorm q (fun i => maximalFunction (fun y => dyadicWeight s i *
           ‖conv (b.kernel L i) f volume y‖ₑ) x) := by
-  filter_upwards [b.enorm_blockFun_le_tsum_maximal hL hL' hp f] with x hx
+  filter_upwards [b.enorm_blockFun_le_tsum_maximalFunction hL hL' hp f] with x hx
   refine (ENNReal.lqNorm_le_almostDiagonalConst_mul_of_le hq s L' hx).trans_eq ?_
-  simp only [dyadicWeight_mul_maximal]
+  simp only [dyadicWeight_mul_maximalFunction]
 
 /-- **The local means by blocks in `ℓ_q`**: for every order `L`, `1 ≤ p < ∞`, `1 ≤ q ≤ ∞`,
 `s ∈ ℝ` and `f ∈ L_p`, almost everywhere,
 `‖(2^(js) |k_j ⋆ f(x)|)_j‖_{ℓ_q} ≤ C A_{s,L} ‖(M(2^(is) |ψ_i ⋆ f|)(x))_i‖_{ℓ_q}` with
 `C = Rd.LocalMeansBump.localMeansByBlockConst L` and `A_{s,L} = ENNReal.almostDiagonalConst s L`,
 finite for `0 < s < L`. -/
-theorem lqNorm_localMean_le_lqNorm_maximal (L : ℕ) (hp : p ≠ ∞) {q : ℝ≥0∞} (hq : 1 ≤ q)
+theorem lqNorm_localMean_le_lqNorm_maximalFunction (L : ℕ) (hp : p ≠ ∞) {q : ℝ≥0∞} (hq : 1 ≤ q)
     (s : ℝ) (f : Lp ℂ p (volume : Measure V)) :
     ∀ᵐ x ∂volume, lqNorm q (fun j => dyadicWeight s j * ‖conv (b.kernel L j) f volume x‖ₑ) ≤
       b.localMeansByBlockConst L * ENNReal.almostDiagonalConst s L *
-        lqNorm q (fun i => maximal (fun y => dyadicWeight s i * ‖blockFun i f y‖ₑ) x) := by
-  filter_upwards [b.enorm_localMean_le_tsum_maximal L hp f] with x hx
+        lqNorm q (fun i => maximalFunction (fun y => dyadicWeight s i * ‖blockFun i f y‖ₑ) x) := by
+  filter_upwards [b.enorm_localMean_le_tsum_maximalFunction L hp f] with x hx
   refine (ENNReal.lqNorm_le_almostDiagonalConst_mul_of_le hq s L hx).trans_eq ?_
-  simp only [dyadicWeight_mul_maximal]
+  simp only [dyadicWeight_mul_maximalFunction]
 
 /-! ### The characterisation -/
 
@@ -431,9 +434,9 @@ bounds those in `L_p(ℓ_q)`. -/
 theorem triebelLizorkinNorm_le_tlLocalMeansNorm {L : ℕ} (hL : 1 ≤ L) (hp1 : 1 < p)
     (hp : p ≠ ∞) {q : ℝ≥0∞} (hq1 : 1 < q) (s : ℝ) (f : Lp ℂ p (volume : Measure V)) :
     triebelLizorkinNorm s q f ≤ b.tlUpperConst L p q s * b.tlLocalMeansNorm L s q f :=
-  eLpNorm_le_of_le_lqNorm_maximal hp1 hp hq1 (aemeasurable_lqNorm_blockFun s q f)
+  eLpNorm_le_of_le_lqNorm_maximalFunction hp1 hp hq1 (aemeasurable_lqNorm_blockFun s q f)
     (fun i => (b.measurable_dyadicWeight_mul_conv_kernel L s i f).aemeasurable)
-    (b.lqNorm_blockFun_le_lqNorm_maximal hL (Nat.le_add_left 1 _) hp hq1.le s f)
+    (b.lqNorm_blockFun_le_lqNorm_maximalFunction hL (Nat.le_add_left 1 _) hp hq1.le s f)
 
 /-- **The local means by the Triebel–Lizorkin quasi-norm**: for every order `L`, `1 < p < ∞`,
 `1 < q ≤ ∞`, `s ∈ ℝ` and `f ∈ L_p`, `‖f‖_{F^s_{p,q}}^{b,L} ≤ C ‖f‖_{F^s_{p,q}}` with
@@ -441,9 +444,9 @@ theorem triebelLizorkinNorm_le_tlLocalMeansNorm {L : ℕ} (hL : 1 ≤ L) (hp1 : 
 theorem tlLocalMeansNorm_le_triebelLizorkinNorm (L : ℕ) (hp1 : 1 < p) (hp : p ≠ ∞) {q : ℝ≥0∞}
     (hq1 : 1 < q) (s : ℝ) (f : Lp ℂ p (volume : Measure V)) :
     b.tlLocalMeansNorm L s q f ≤ b.tlLowerConst L p q s * triebelLizorkinNorm s q f :=
-  eLpNorm_le_of_le_lqNorm_maximal hp1 hp hq1 (b.aemeasurable_lqNorm_conv_kernel L s q f)
+  eLpNorm_le_of_le_lqNorm_maximalFunction hp1 hp hq1 (b.aemeasurable_lqNorm_conv_kernel L s q f)
     (fun i => ((aestronglyMeasurable_blockFun i f).enorm.const_mul _))
-    (b.lqNorm_localMean_le_lqNorm_maximal L hp hq1.le s f)
+    (b.lqNorm_localMean_le_lqNorm_maximalFunction L hp hq1.le s f)
 
 /-- **The local means characterisation of Triebel–Lizorkin spaces**: for a bump `b`, an order
 `L`, `1 < p < ∞`, `1 < q ≤ ∞` and `0 < s < L`, `f ∈ F^s_{p,q}` iff
@@ -488,8 +491,9 @@ theorem tlLocalMeansNorm_lt_top_iff (b' : LocalMeansBump V) {L L' : ℕ} (hp1 : 
 the partial sums) for a family `h_i ∈ L_p`, then for `1 < p < ∞`, `1 < q ≤ ∞` and `s ∈ ℝ`,
 `‖F‖_{F^s_{p,q}} ≤ C ‖ x ↦ ‖(2^(is) |h_i(x)|)_i‖_{ℓ_q} ‖_p` with
 `C = Rd.LocalMeansBump.tlUpperConst L p q s`, finite for `s > 0`. The blocks of `F` are bounded by
-maximal functions of the `h_i` (`Rd.LocalMeansBump.enorm_blockFun_le_tsum_maximal_of_tendsto`),
-then the almost diagonal estimate and the Fefferman–Stein inequality finish. -/
+maximal functions of the `h_i`
+(`Rd.LocalMeansBump.enorm_blockFun_le_tsum_maximalFunction_of_tendsto`), then the almost diagonal
+estimate and the Fefferman–Stein inequality finish. -/
 theorem triebelLizorkinNorm_le_of_tendsto_sum_dual (L : ℕ) (hp1 : 1 < p) (hp : p ≠ ∞)
     {q : ℝ≥0∞} (hq1 : 1 < q) (s : ℝ) {F : Lp ℂ p (volume : Measure V)}
     {h : ℕ → Lp ℂ p (volume : Measure V)}
@@ -497,12 +501,12 @@ theorem triebelLizorkinNorm_le_of_tendsto_sum_dual (L : ℕ) (hp1 : 1 < p) (hp :
       convLp hp (b.integrable_dual L i) (h i)) atTop (𝓝 F)) :
     triebelLizorkinNorm s q F ≤ b.tlUpperConst L p q s *
       eLpNorm (fun x => lqNorm q (fun i => dyadicWeight s i * ‖h i x‖ₑ)) p volume := by
-  refine eLpNorm_le_of_le_lqNorm_maximal hp1 hp hq1 (aemeasurable_lqNorm_blockFun s q F)
+  refine eLpNorm_le_of_le_lqNorm_maximalFunction hp1 hp hq1 (aemeasurable_lqNorm_blockFun s q F)
     (fun i => ((Lp.aestronglyMeasurable (h i)).enorm.const_mul _)) ?_
-  filter_upwards [b.enorm_blockFun_le_tsum_maximal_of_tendsto hp L (Nat.le_add_left 1 ⌈s⌉₊) hrep]
-    with x hx
+  filter_upwards [b.enorm_blockFun_le_tsum_maximalFunction_of_tendsto hp L (Nat.le_add_left 1 ⌈s⌉₊)
+    hrep] with x hx
   refine (ENNReal.lqNorm_le_almostDiagonalConst_mul_of_le hq1.le s _ hx).trans_eq ?_
-  simp only [dyadicWeight_mul_maximal]
+  simp only [dyadicWeight_mul_maximalFunction]
 
 end LocalMeansBump
 

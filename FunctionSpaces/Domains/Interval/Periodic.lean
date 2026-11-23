@@ -22,9 +22,9 @@ differs from the modulus on `[0, 1]` in that its differences wrap around and com
 `1` with values near `0`. It depends only on the class of `f` in `L_p[0, 1]`
 (`Interval.perModulus_congr_ae`), since `f̃` changes only on the integer translates of a null set
 (`Interval.perExt_ae_eq`), and it dominates the modulus on the interval
-(`Interval.modulus_le_perModulus`). The `L_p` norm of a periodic function over a unit interval
-does not depend on the interval (`Interval.lintegral_Icc_periodic`), from Mathlib's integration
-over the circle (`UnitAddCircle.lintegral_preimage`).
+(`Interval.intervalModulus_le_perModulus`). The `L_p` norm of a periodic function over a unit
+interval does not depend on the interval (`Interval.lintegral_Icc_periodic`), from Mathlib's
+integration over the circle (`UnitAddCircle.lintegral_preimage`).
 -/
 
 @[expose] public section
@@ -61,7 +61,7 @@ theorem perExt_eq_of_periodic {f : ℝ → ℂ} (hf : Function.Periodic f 1) : p
 /-- The differences of a `1`-periodic function are `1`-periodic. -/
 theorem higherDiff_periodic {f : ℝ → ℂ} (hf : Function.Periodic f 1) (r : ℕ) (h : ℝ) :
     Function.Periodic (higherDiff r h f) 1 := fun x => by
-  rw [higherDiff_apply, higherDiff_apply]
+  rw [interval_higherDiff_apply, interval_higherDiff_apply]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [show x + 1 + k * h = x + k * h + 1 by ring, hf]
 
@@ -147,7 +147,7 @@ theorem perModulus_congr_ae {f g : ℝ → ℂ} (hfg : f =ᵐ[volume.restrict (I
 theorem perModulus_add_le {p : ℝ≥0∞} (hp : 1 ≤ p) (r : ℕ) (f g : ℝ → ℂ) (t : ℝ) :
     perModulus r p (f + g) t ≤ perModulus r p f t + perModulus r p g t := by
   refine iSup₂_le fun h hh => ?_
-  rw [perExt_add, higherDiff_add]
+  rw [perExt_add, interval_higherDiff_add]
   exact (eLpNorm_add_le hp).trans
     (add_le_add (eLpNorm_higherDiff_le_perModulus hh) (eLpNorm_higherDiff_le_perModulus hh))
 
@@ -176,16 +176,16 @@ theorem perModulus_le {f : ℝ → ℂ} (hf : Measurable f) {p : ℝ≥0∞} (hp
 
 /-- **The periodic modulus dominates the modulus on `[0, 1]`**: on `[0, 1 - rh)` the differences
 of `f̃` and of `f` agree, since `x, …, x + rh` stay in `[0, 1)`. -/
-theorem modulus_le_perModulus (r : ℕ) (p : ℝ≥0∞) (f : ℝ → ℂ) (t : ℝ) :
-    modulus r p 0 1 f t ≤ perModulus r p f t := by
-  rw [modulus_eq_iSup_nonneg]
+theorem intervalModulus_le_perModulus (r : ℕ) (p : ℝ≥0∞) (f : ℝ → ℂ) (t : ℝ) :
+    intervalModulus r p 0 1 f t ≤ perModulus r p f t := by
+  rw [intervalModulus_eq_iSup_nonneg]
   refine iSup₂_le fun h hh => ?_
   have hrh : (0 : ℝ) ≤ r * h := mul_nonneg (Nat.cast_nonneg r) hh.1
   have hae : higherDiff r h f =ᵐ[volume.restrict (Icc 0 (1 - r * h))]
       higherDiff r h (perExt f) := by
     rw [← Measure.restrict_congr_set Ico_ae_eq_Icc]
     filter_upwards [ae_restrict_mem measurableSet_Ico] with x hx
-    rw [higherDiff_apply, higherDiff_apply]
+    rw [interval_higherDiff_apply, interval_higherDiff_apply]
     refine Finset.sum_congr rfl fun i hi => ?_
     have hi' : (i : ℝ) ≤ r := by exact_mod_cast Nat.lt_succ_iff.1 (Finset.mem_range.1 hi)
     have hih : (i : ℝ) * h ≤ r * h := mul_le_mul_of_nonneg_right hi' hh.1
@@ -197,11 +197,11 @@ theorem modulus_le_perModulus (r : ℕ) (p : ℝ≥0∞) (f : ℝ → ℂ) (t : 
 /-- **The modulus of a periodic extension over `n` periods**:
 `ω_r(f̃, t, [0, n])_p ≤ n^(1/p) ω_r^per(f, t)_p`, since `Δ_h^r f̃` is `1`-periodic
 (`Interval.lintegral_Icc_nat_le`). -/
-theorem modulus_perExt_le {f : ℝ → ℂ} (hf : Measurable f) {p : ℝ≥0∞} (hp0 : p ≠ 0)
+theorem intervalModulus_perExt_le {f : ℝ → ℂ} (hf : Measurable f) {p : ℝ≥0∞} (hp0 : p ≠ 0)
     (hp : p ≠ ∞) (r n : ℕ) (t : ℝ) :
-    modulus r p 0 n (perExt f) t ≤ (n : ℝ≥0∞) ^ (1 / p.toReal) * perModulus r p f t := by
+    intervalModulus r p 0 n (perExt f) t ≤ (n : ℝ≥0∞) ^ (1 / p.toReal) * perModulus r p f t := by
   have hθ : (0 : ℝ) ≤ 1 / p.toReal := by positivity
-  rw [modulus_eq_iSup_nonneg]
+  rw [intervalModulus_eq_iSup_nonneg]
   refine iSup₂_le fun h hh => ?_
   have hm := measurable_higherDiff (measurable_perExt hf) r h
   have hrh : (0 : ℝ) ≤ r * h := mul_nonneg (Nat.cast_nonneg r) hh.1

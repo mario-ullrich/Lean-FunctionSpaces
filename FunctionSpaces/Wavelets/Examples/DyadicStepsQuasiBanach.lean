@@ -25,22 +25,23 @@ complexity couple of the Haar scheme (`Haar.stepCouple_eq_complexityCouple`,
 
 The modulus of smoothness `ω_r(f, t, [0, 1])_p` satisfies, for `0 < p ≤ 1`,
 `ω_r(f + g, t)_p^p ≤ ω_r(f, t)_p^p + ω_r(g, t)_p^p` and `ω_r(f, t)_p ≤ 2^(r/p) ‖f‖_p`
-(`Interval.modulus_add_rpow_le`, `Interval.modulus_le_of_le_one`, and their forms on `L_p`,
-`Interval.lpModulus_add_rpow_le`, `Interval.lpModulus_le_of_le_one`). Two inequalities connect
-it with the steps:
+(`Interval.intervalModulus_add_rpow_le`, `Interval.intervalModulus_le_of_le_one`, and their forms on
+`L_p`, `Interval.intervalLpModulus_add_rpow_le`, `Interval.intervalLpModulus_le_of_le_one`). Two
+inequalities connect it with the steps:
 
 * **Jackson's inequality by averaging**, `E(2^j, f)_p ≤ 2^(1/p) ω_1(f, 2^(-j), [0, 1])_p` for
   every `0 < p < ∞` (`Haar.eFunctional_stepCouple_le`). On each dyadic interval `I` some value
   `f(y)` approximates `f` at least as well as the mean over `y` of `∫_I |f - f(y)|^p`
   (`MeasureTheory.exists_setLIntegral_enorm_sub_rpow_le`, the first moment method), and the double
   integrals over the dyadic squares add up to at most `2 ω_1(f, 2^(-j))_p^p`
-  (`Interval.two_pow_mul_sum_lintegral_le_modulus`). The proof averages pointwise and uses
+  (`Interval.two_pow_mul_sum_lintegral_le_intervalModulus`). The proof averages pointwise and uses
   Tonelli's theorem, so it holds for every `0 < p < ∞` with the constant `2^(1/p)`.
 * **The inverse inequality of order `1/p`**: for a step function `a` of level `j`,
-  `ω_1(a, 2^(-k), [0, 1])_p ≤ 2^(1/p) 2^(-(k-j)/p) ‖a‖_p` (`Haar.lpModulus_le_of_mem_lpMeas`).
-  A difference `Δ_h a` lives on strips of width `h` left of the jumps, where
-  `|Δ_h a|^p ≤ |a_n|^p + |a_{n+1}|^p` (`Interval.enorm_higherDiff_one_rpow_le_stripBound`), and
-  the strip integral of the piecewise polynomials, `Interval.eLpNorm_le_of_strip`, adds these up
+  `ω_1(a, 2^(-k), [0, 1])_p ≤ 2^(1/p) 2^(-(k-j)/p) ‖a‖_p`
+  (`Haar.intervalLpModulus_le_of_mem_lpMeas`). A difference `Δ_h a` lives on strips of width `h`
+  left of the jumps, where `|Δ_h a|^p ≤ |a_n|^p + |a_{n+1}|^p`
+  (`Interval.enorm_higherDiff_one_rpow_le_stripBound`), and the strip integral of the piecewise
+  polynomials, `Interval.eLpNorm_le_of_strip`, adds these up
   (`Interval.eLpNorm_higherDiff_one_le_of_step`).
 
 With the coincidence theorem for `ρ`-normed couples (`InterpCouple.CoupleModulusData`, here
@@ -56,7 +57,7 @@ arXiv:1808.08156, (7)). For `s < 1` it is the Besov space of DeVore–Popov (Tra
 305 (1988), (2.4) with `r = 1`, Theorem 5.1); for `1/p - 1 < s < 1` and `q < ∞` it is also the
 Fourier-analytic `B^s_{p,q}[0, 1]` (Oswald 2018, (2)). For `s > 1`, and for `s = 1` with
 `q < ∞`, it differs from the space of the second modulus: the line `x ↦ x` has `ω_2 = 0`
-(`Haar.lpModulus_two_idLp`) but `E(2^j, x)_p ≥ 2^(-1/p) 2^(-j)/4`
+(`Haar.intervalLpModulus_two_idLp`) but `E(2^j, x)_p ≥ 2^(-1/p) 2^(-j)/4`
 (`Haar.le_eFunctional_stepCouple_idLp`), so it lies outside `A^s_q(L_p, steps)`
 (`Haar.not_memEMethod_stepCouple_idLp`).
 -/
@@ -224,14 +225,14 @@ integrals (Mathlib's `lintegral_lintegral_swap`), the integral over `y` is
 `‖Δ_h(F, ·, [0, 1])‖_p^p ≤ ω_1(F, 2^(-j))_p^p` for each `|h| < 2^(-j)`
 (`Interval.lintegral_indicator_add_eq_eLpNorm`), and these steps fill an interval of length
 `2 · 2^(-j)`. -/
-theorem two_pow_mul_sum_lintegral_le_modulus (hp0 : p ≠ 0) (hp : p ≠ ∞) {F : ℝ → ℂ}
+theorem two_pow_mul_sum_lintegral_le_intervalModulus (hp0 : p ≠ 0) (hp : p ≠ ∞) {F : ℝ → ℂ}
     (hF : Measurable F) (j : ℕ) :
     2 ^ j * ∑ n ∈ Finset.range (2 ^ j),
       ∫⁻ y in dyadicIco j n, ∫⁻ x in dyadicIco j n, ‖F x - F y‖ₑ ^ p.toReal ≤
-        2 * modulus 1 p 0 1 F (1 / 2 ^ j) ^ p.toReal := by
+        2 * intervalModulus 1 p 0 1 F (1 / 2 ^ j) ^ p.toReal := by
   have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
   set t : ℝ := 1 / 2 ^ j with ht
-  set ω := modulus 1 p 0 1 F t
+  set ω := intervalModulus 1 p 0 1 F t
   set Φ : ℝ → ℝ → ℝ≥0∞ := fun y h =>
     (Icc (0 : ℝ) 1).indicator (fun x => ‖F x - F y‖ₑ ^ p.toReal) (y + h) with hΦdef
   have hΦ : Measurable (Function.uncurry Φ) := by
@@ -449,7 +450,8 @@ theorem stepCouple_eq_complexityCouple [Fact (1 ≤ p)] :
     · rw [InterpCouple.dyadicLevels_zero, (scheme p).sets_zero]
     · simp only [InterpCouple.dyadicLevels, hn, ↓reduceIte, SetLike.mem_coe]
       rw [mem_lpMeasSubgroup_iff_aestronglyMeasurable]
-      exact mem_lpMeas_iff_aestronglyMeasurable.symm.trans (dyadicFiltration.mem_scheme hn).symm
+      exact mem_lpMeas_iff_aestronglyMeasurable.symm.trans
+        (dyadicFiltration.mem_filtrationScheme hn).symm
   show InterpCouple.complexity _ _ = InterpCouple.complexity _ _
   rw [hS]
 
@@ -468,12 +470,12 @@ theorem memEMethod_stepCouple_iff_memApprox [Fact (1 ≤ p)] {s : ℝ} {q : ℝ�
 `E(2^j, f) ≤ 2^(1/p) ω_1(f, 2^(-j), [0, 1])_p` in the step couple. The step function takes on
 each dyadic interval a value `f(y_n)` at least as good as the average
 (`Interval.exists_ppFun_lintegral_le`), and the double integrals over the dyadic squares add up to
-at most `2 ω_1(f, 2^(-j))_p^p` (`Interval.two_pow_mul_sum_lintegral_le_modulus`). The proof
+at most `2 ω_1(f, 2^(-j))_p^p` (`Interval.two_pow_mul_sum_lintegral_le_intervalModulus`). The proof
 averages pointwise and uses Tonelli's theorem, so it holds for every `0 < p < ∞`; at `p = 0` the
 quasi-norm vanishes. -/
 theorem eFunctional_stepCouple_le (hp : p ≠ ∞) (f : Lp ℂ p vol) (j : ℕ) :
     (stepCouple p).eFunctional ((2 ^ j : ℕ) : ℝ≥0∞) f ≤
-      2 ^ (1 / p.toReal) * lpModulus p 1 f j := by
+      2 ^ (1 / p.toReal) * intervalLpModulus p 1 f j := by
   rcases eq_or_ne p 0 with rfl | hp0
   · refine (InterpCouple.eFunctional_le
       (InterpCouple.ofMonotoneSubgroups_norm1_zero.trans_le zero_le)).trans ?_
@@ -495,8 +497,9 @@ theorem eFunctional_stepCouple_le (hp : p ≠ ∞) (f : Lp ℂ p vol) (j : ℕ) 
   calc ∫⁻ x, ‖((f : ℝ → ℂ) - ppFun j fun n => C (c n)) x‖ₑ ^ p.toReal ∂vol
       ≤ 2 ^ j * ∑ n ∈ Finset.range (2 ^ j),
           ∫⁻ y in dyadicIco j n, ∫⁻ x in dyadicIco j n, ‖f x - f y‖ₑ ^ p.toReal := hc
-    _ ≤ 2 * lpModulus p 1 f j ^ p.toReal := two_pow_mul_sum_lintegral_le_modulus hp0 hp hF j
-    _ = (2 ^ (1 / p.toReal) * lpModulus p 1 f j) ^ p.toReal := by
+    _ ≤ 2 * intervalLpModulus p 1 f j ^ p.toReal :=
+        two_pow_mul_sum_lintegral_le_intervalModulus hp0 hp hF j
+    _ = (2 ^ (1 / p.toReal) * intervalLpModulus p 1 f j) ^ p.toReal := by
         rw [ENNReal.mul_rpow_of_nonneg _ _ hq.le, ← ENNReal.rpow_mul, one_div_mul_cancel hq.ne',
           ENNReal.rpow_one]
 
@@ -508,12 +511,13 @@ theorem eFunctional_stepCouple_le (hp : p ≠ ∞) (f : Lp ℂ p vol) (j : ℕ) 
 difference of first order of a step function lives on the strips at its jumps
 (`Interval.enorm_higherDiff_one_rpow_le_stripBound`), so the order is `1/p`; DeVore–Popov's
 general order `min(r, r - 1 + 1/p)` (their Theorem 4.8) is `1` for `r = 1`. -/
-theorem lpModulus_le_of_mem_lpMeas (hp0 : p ≠ 0) (hp1 : p ≤ 1) {j k : ℕ} {a : Lp ℂ p vol}
+theorem intervalLpModulus_le_of_mem_lpMeas (hp0 : p ≠ 0) (hp1 : p ≤ 1) {j k : ℕ} {a : Lp ℂ p vol}
     (ha : a ∈ lpMeas ℂ ℝ (dyadicFiltration j) p vol) :
-    lpModulus p 1 a k ≤ 2 ^ (1 / p.toReal) * dyadicWeight (-(1 / p.toReal)) (k - j) * ‖a‖ₑ := by
+    intervalLpModulus p 1 a k ≤
+      2 ^ (1 / p.toReal) * dyadicWeight (-(1 / p.toReal)) (k - j) * ‖a‖ₑ := by
   rcases lt_or_ge k j with hkj | hjk
   · rw [Nat.sub_eq_zero_of_le hkj.le, ENNReal.dyadicWeight_zero_right, mul_one]
-    exact (lpModulus_le_of_le_one hp1 1 a k).trans_eq (by rw [Nat.cast_one])
+    exact (intervalLpModulus_le_of_le_one hp1 1 a k).trans_eq (by rw [Nat.cast_one])
   obtain ⟨g, hg, hag⟩ := mem_lpMeas_iff_aestronglyMeasurable.1 ha
   have hae : (a : ℝ → ℂ) =ᵐ[vol] ppFun j fun m => C (g ((m : ℝ) / 2 ^ j)) :=
     hag.trans (ae_eq_ppFun_of_stronglyMeasurable hg)
@@ -524,7 +528,7 @@ theorem lpModulus_le_of_mem_lpMeas (hp0 : p ≠ 0) (hp1 : p ≤ 1) {j k : ℕ} {
   have hnorm : ‖a‖ₑ = eLpNorm (ppFun j fun m => C (g ((m : ℝ) / 2 ^ j))) p vol := by
     rw [Lp.enorm_def]
     exact eLpNorm_congr_ae hae
-  rw [lpModulus, modulus_congr_ae hae, hnorm, modulus_eq_iSup_nonneg]
+  rw [intervalLpModulus, intervalModulus_congr_ae hae, hnorm, intervalModulus_eq_iSup_nonneg]
   refine iSup₂_le fun h hh => ?_
   have hhj : h ≤ 1 / 2 ^ j := hh.2.trans (one_div_le_one_div_of_le (by positivity)
     (pow_le_pow_right₀ (by norm_num) hjk))
@@ -544,7 +548,7 @@ exponent `ρ = p` (the `p`-th power of the quasi-norm is subadditive) and invers
 `θ = 1/p`: `ω_1(f, 2^(-k), [0, 1])_p ≤ 2^(1/p) ‖f‖_p`, Jackson's inequality
 `E(2^k, f) ≤ 2^(1/p) ω_1(f, 2^(-k))_p` (`Haar.eFunctional_stepCouple_le`) and the inverse
 inequality `ω_1(a, 2^(-k))_p ≤ 2^(1/p) 2^(-(k-j)/p) ‖a‖_p` for steps `a` of level `j`
-(`Haar.lpModulus_le_of_mem_lpMeas`). -/
+(`Haar.intervalLpModulus_le_of_mem_lpMeas`). -/
 noncomputable def stepModulusData (hp0 : p ≠ 0) (hp1 : p ≤ 1) :
     (stepCouple p).CoupleModulusData p.toReal (1 / p.toReal) where
   rho_pos := ENNReal.toReal_pos hp0 (ne_top_of_le_ne_top ENNReal.one_ne_top hp1)
@@ -554,17 +558,18 @@ noncomputable def stepModulusData (hp0 : p ≠ 0) (hp1 : p ≤ 1) :
   norm1_zero := InterpCouple.ofMonotoneSubgroups_norm1_zero
   norm1_neg := InterpCouple.ofMonotoneSubgroups_norm1_neg
   norm1_add_le := InterpCouple.ofMonotoneSubgroups_norm1_add_le
-  modulus f k := lpModulus p 1 f k
-  add_rpow_le f g k := lpModulus_add_rpow_le hp1 1 f g k
+  modulus f k := intervalLpModulus p 1 f k
+  add_rpow_le f g k := intervalLpModulus_add_rpow_le hp1 1 f g k
   C0 := 2 ^ (1 / p.toReal)
   C0_ne_top := ENNReal.two_rpow_ne_top _
-  le_norm0 f k := (lpModulus_le_of_le_one hp1 1 f k).trans_eq (by rw [Nat.cast_one]; rfl)
+  le_norm0 f k := (intervalLpModulus_le_of_le_one hp1 1 f k).trans_eq (by rw [Nat.cast_one]; rfl)
   CJ := 2 ^ (1 / p.toReal)
   CJ_ne_top := ENNReal.two_rpow_ne_top _
   jackson f k := eFunctional_stepCouple_le (ne_top_of_le_ne_top ENNReal.one_ne_top hp1) f k
   CB := 2 ^ (1 / p.toReal)
   CB_ne_top := ENNReal.two_rpow_ne_top _
-  inverse _ _ _ ha := lpModulus_le_of_mem_lpMeas hp0 hp1 (mem_lpMeas_of_stepCouple_norm1_le ha)
+  inverse _ _ _ ha :=
+    intervalLpModulus_le_of_mem_lpMeas hp0 hp1 (mem_lpMeas_of_stepCouple_norm1_le ha)
 
 variable {s : ℝ} {q : ℝ≥0∞}
 
@@ -574,7 +579,7 @@ variable {s : ℝ} {q : ℝ≥0∞}
 theorem eNormDyadic_stepCouple_lt_top_iff_modulus (hp0 : p ≠ 0) (hp1 : p ≤ 1) (hs : 0 ≤ s)
     (hsp : s < 1 / p.toReal) (f : Lp ℂ p vol) :
     (stepCouple p).eNormDyadic s q f < ∞ ↔
-      ‖f‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p 1 f k) < ∞ :=
+      ‖f‖ₑ + lqNorm q (fun k => dyadicWeight s k * intervalLpModulus p 1 f k) < ∞ :=
   (stepModulusData hp0 hp1).eNormDyadic_lt_top_iff hs hsp f
 
 /-- **Approximation by dyadic step functions in `L_p[0, 1]`, `0 < p ≤ 1`.** For `q ≠ 0` and
@@ -589,7 +594,7 @@ and for `s = 1` with `q < ∞`, it misses the line `x ↦ x`, whose second modul
 theorem memEMethod_stepCouple_iff_modulus (hp0 : p ≠ 0) (hp1 : p ≤ 1) (hq0 : q ≠ 0)
     (hs : 0 < s) (hsp : s < 1 / p.toReal) (f : Lp ℂ p vol) :
     (stepCouple p).MemEMethod s q f ↔
-      ‖f‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p 1 f k) < ∞ :=
+      ‖f‖ₑ + lqNorm q (fun k => dyadicWeight s k * intervalLpModulus p 1 f k) < ∞ :=
   (stepModulusData hp0 hp1).memEMethod_iff_coupleModNorm_lt_top
     (fun _ hb => InterpCouple.eq_zero_of_ofMonotoneSubgroups_norm1_lt_one hb) hq0 hs hsp f
 
@@ -600,11 +605,11 @@ variable (p) in
 noncomputable def idLp : Lp ℂ p vol := (memLp_polyFun X p 0 1).toLp (polyFun X)
 
 /-- **The line has vanishing second modulus in `L_p[0, 1]`**:
-`ω_2(x ↦ x, 2^(-k), [0, 1])_p = 0` for every `p` and `k` (`Interval.modulus_two_id`). -/
-theorem lpModulus_two_idLp (k : ℕ) : lpModulus p 2 (idLp p) k = 0 := by
+`ω_2(x ↦ x, 2^(-k), [0, 1])_p = 0` for every `p` and `k` (`Interval.intervalModulus_two_id`). -/
+theorem intervalLpModulus_two_idLp (k : ℕ) : intervalLpModulus p 2 (idLp p) k = 0 := by
   have hX : polyFun X = fun x : ℝ => (x : ℂ) := funext fun x => by simp [polyFun]
-  rw [lpModulus, idLp, modulus_congr_ae (MemLp.coeFn_toLp _), hX]
-  exact modulus_two_id p _
+  rw [intervalLpModulus, idLp, intervalModulus_congr_ae (MemLp.coeFn_toLp _), hX]
+  exact intervalModulus_two_id p _
 
 /-- **The line is far from the steps of level `j`**: for `0 < p < ∞`,
 `E(2^j, x)_p ≥ 2^(-1/p) 2^(-j)/4` in the step couple, since every step function `b` of level `j`
@@ -650,8 +655,8 @@ theorem le_eFunctional_stepCouple_idLp (hp0 : p ≠ 0) (hp : p ≠ ∞) (j : ℕ
 `q < ∞`**: for `0 < p < ∞`, `q ≠ 0` and `s ≥ 1` with `s > 1` or `q < ∞`, the line `x ↦ x` does
 not lie in `E_{s,q}` of the step couple. By `Haar.le_eFunctional_stepCouple_idLp`,
 `2^(ks) E(2^k, x)_p ≥ 2^(-1/p) 2^(k(s-1))/4`, which is unbounded for `s > 1` and bounded below by
-a positive constant for `s = 1`. Its second modulus vanishes (`Haar.lpModulus_two_idLp`), so for
-these `s < 1/p` the space of `Haar.memEMethod_stepCouple_iff_modulus` differs from the space
+a positive constant for `s = 1`. Its second modulus vanishes (`Haar.intervalLpModulus_two_idLp`), so
+for these `s < 1/p` the space of `Haar.memEMethod_stepCouple_iff_modulus` differs from the space
 defined by the second modulus. -/
 theorem not_memEMethod_stepCouple_idLp (hp0 : p ≠ 0) (hp : p ≠ ∞) (hq0 : q ≠ 0) (hs : 1 ≤ s)
     (hsq : 1 < s ∨ q ≠ ∞) : ¬ (stepCouple p).MemEMethod s q (idLp p) := by

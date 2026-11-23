@@ -31,9 +31,9 @@ The `L_p` tools are in [Tools from analysis](Analysis.md).
   `1 ≤ p ≤ r ≤ ∞`, `1 ≤ q ≤ ∞` and `α = D (1/p - 1/r) < s`. Then every `f ∈ B^s_{p,q}` belongs to
   `L_r` and to `B^{s-α}_{r,q}`, with `‖f‖_{B^{s-α}_{r,q}} ≤ K ‖f‖_{B^s_{p,q}}`
   (`FunctionScheme.MemBesov.exists_inclusion_eq_of_nikolskii`,
-  `FunctionScheme.exists_inclusion_eq_of_nikolskii`). If `μ` charges every nonempty open set and
-  `s > D/p`, every `f ∈ B^s_{p,q}` has a bounded continuous representative
-  (`FunctionScheme.MemBesov.exists_boundedContinuous`).
+  `FunctionScheme.exists_uniform_inclusion_eq_of_nikolskii`). If `μ` charges every nonempty open set
+  and `s > D/p`, every `f ∈ B^s_{p,q}` has a bounded continuous representative
+  (`FunctionScheme.MemBesov.exists_boundedContinuous_of_nikolskii`).
 * **Besov spaces interpolate.** For every scheme of functions `S`, `1 ≤ p ≤ ∞`, `0 < η < 1` and
   `1 ≤ q₀, q₁, q ≤ ∞`, the real interpolation spaces of the continuous K-method of the couples
   of dyadic quasi-norms are `(B^{s₀}_{p,q₀}, B^{s₁}_{p,q₁})_{η,q} = B^{(1-η)s₀+ηs₁}_{p,q}` for

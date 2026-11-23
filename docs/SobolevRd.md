@@ -346,7 +346,7 @@ theorem are in [Triebel–Lizorkin spaces](TriebelLizorkin.md).
   in particular `m(D) ψ̃_j = 2^{jσ} (G_j)_{2^j}` for the synthesis kernels with a uniform family
   `(G_j)` (`Rd.HasSymbolGrowth.exists_isUniformSchwartz_psiDualS`). Convolutions with the
   dilates of a uniform family lie below the maximal function, uniformly in `j`
-  (`Rd.IsUniformSchwartz.enorm_conv_dilate_le_maximal`).
+  (`Rd.IsUniformSchwartz.enorm_conv_dilate_le_maximalFunction`).
 * **Fourier multipliers on Triebel–Lizorkin spaces.** Let `1 < p < ∞`, `1 < q ≤ ∞` and `m` a
   symbol of order `σ`. For every real `s` there is `C < ∞` with
   `‖m(D) u‖_{F^{s-σ}_{p,q}} ≤ C ‖u‖_{F^s_{p,q}}` for every tempered distribution `u`, in the

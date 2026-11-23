@@ -369,8 +369,8 @@ For a general scheme the project describes `A^s_q`
   `0 < τ < 2` and `θ = 1/τ - 1/2`, `f ∈ L_2[0, 1]` lies in the approximation space `A^θ_τ` of
   `n`-term approximation from the Haar basis iff
   `‖f‖_τ + ‖(2^(kθ) ω_1(f, 2^(-k), [0, 1])_τ)_k‖_{ℓ_τ} < ∞`
-  (`Haar.memApprox_nTerm_iff_modulus_of_lt_two`). For `s < 1`, and for `τ > 2/3`, these are the
-  Besov spaces of DeVore–Popov; for `1/p - 1 < s < 1` and `q < ∞` also the Fourier-analytic
+  (`Haar.memApprox_nTerm_iff_intervalModulus_of_lt_two`). For `s < 1`, and for `τ > 2/3`, these are
+  the Besov spaces of DeVore–Popov; for `1/p - 1 < s < 1` and `q < ∞` also the Fourier-analytic
   `B^s_{p,q}[0, 1]` (Oswald).
 
 ## Organisation

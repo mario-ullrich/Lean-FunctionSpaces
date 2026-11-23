@@ -224,7 +224,7 @@ theorem exists_enorm_le_eLpNorm (r : ℕ) {α β : ℝ} (hαβ : α < β) :
 
 /-- **Affine change of variables in `L_p`**: for `L > 0` and `p ≠ ∞`,
 `‖g(u + L ·)‖_{L_p[α, β]} = L^(-1/p) ‖g‖_{L_p[u + Lα, u + Lβ]}`. -/
-theorem eLpNorm_comp_affine {g : ℝ → ℂ} (hg : Measurable g) {q : ℝ≥0∞} (hq : q ≠ ∞)
+theorem interval_eLpNorm_comp_affine {g : ℝ → ℂ} (hg : Measurable g) {q : ℝ≥0∞} (hq : q ≠ ∞)
     (u : ℝ) {L : ℝ} (hL : 0 < L) (α β : ℝ) :
     eLpNorm (fun y => g (u + L * y)) q (volume.restrict (Icc α β)) =
       ENNReal.ofReal L⁻¹ ^ (1 / q.toReal) *
@@ -286,7 +286,7 @@ theorem enorm_polyFun_le (r : ℕ) (hp : p ≠ ∞) : ∃ K : ℝ≥0∞, K ≠ 
     · rw [div_le_one h2L]; linarith [hx.2]
   have hQx : polyFun Q ((x - u) / (2 * L)) = polyFun P x := by
     rw [polyFun_comp_affine]; congr 1; field_simp; ring
-  have hnorm := eLpNorm_comp_affine (measurable_polyFun P) hp u h2L 0 (1 / 2)
+  have hnorm := interval_eLpNorm_comp_affine (measurable_polyFun P) hp u h2L 0 (1 / 2)
   rw [mul_zero, add_zero, show 2 * L * (1 / 2) = L by ring] at hnorm
   have hQfun : (fun y => polyFun P (u + 2 * L * y)) = polyFun Q :=
     funext fun y => (polyFun_comp_affine P u (2 * L) y).symm

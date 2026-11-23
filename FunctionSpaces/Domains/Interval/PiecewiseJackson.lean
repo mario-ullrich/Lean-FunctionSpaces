@@ -29,12 +29,13 @@ polynomials of both halves form one piecewise polynomial
 (`Interval.exists_ppFun_approx_of_taylor`, stated for any function and any two smoothings, so
 that the slices of functions on the cube use it too). The point `1/2` is a knot of every level
 `k ≥ 1`, which is why `k ≥ 1` in this part of the argument. General `f ∈ L_p` follow by density
-of bounded continuous functions (`Interval.approxError_le_of_continuous`, which serves every scheme
-in `L_p[0, 1]`).
+of bounded continuous functions (`Interval.interval_approxError_le_of_continuous`, which serves
+every scheme in `L_p[0, 1]`).
 
-The modulus of elements of `L_p[0, 1]` at the dyadic scales (`Interval.lpModulus`) is defined for
-every `p`; for `0 < p ≤ 1` its `p`-th power is subadditive and it is at most `2^(r/p) ‖f‖_p`
-(`Interval.lpModulus_add_rpow_le`, `Interval.lpModulus_le_of_le_one`).
+The modulus of elements of `L_p[0, 1]` at the dyadic scales (`Interval.intervalLpModulus`) is
+defined for every `p`; for `0 < p ≤ 1` its `p`-th power is subadditive and it is at most
+`2^(r/p) ‖f‖_p` (`Interval.intervalLpModulus_add_rpow_le`,
+`Interval.intervalLpModulus_le_of_le_one`).
 -/
 
 @[expose] public section
@@ -48,19 +49,19 @@ namespace Interval
 variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 
 /-- The constant of the local Jackson estimate, `1 + 2^r r^(2r)`. -/
-noncomputable def jacksonConst (r : ℕ) : ℝ≥0∞ := 1 + 2 ^ r * (r : ℝ≥0∞) ^ (2 * r)
+noncomputable def intervalJacksonConst (r : ℕ) : ℝ≥0∞ := 1 + 2 ^ r * (r : ℝ≥0∞) ^ (2 * r)
 
 /-- The local Jackson constant is finite. -/
-theorem jacksonConst_ne_top (r : ℕ) : jacksonConst r ≠ ∞ := by
-  unfold jacksonConst
+theorem intervalJacksonConst_ne_top (r : ℕ) : intervalJacksonConst r ≠ ∞ := by
+  unfold intervalJacksonConst
   exact ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top, ENNReal.mul_ne_top (by simp)
     (ENNReal.pow_ne_top (ENNReal.natCast_ne_top r))⟩
 
 /-- The bound of a smoothing and of its Taylor remainders at scale `L` combine to the local
 Jackson constant: `a ≤ ω` and `b ≤ L^(-r) 2^r r^(2r) ω` give `a + L^r b ≤ (1 + 2^r r^(2r)) ω`. -/
-theorem add_ofReal_pow_mul_le_jacksonConst {L : ℝ} (hL : 0 < L) (r : ℕ) {a b ω : ℝ≥0∞}
+theorem add_ofReal_pow_mul_le_intervalJacksonConst {L : ℝ} (hL : 0 < L) (r : ℕ) {a b ω : ℝ≥0∞}
     (ha : a ≤ ω) (hb : b ≤ ENNReal.ofReal L⁻¹ ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r)) * ω) :
-    a + ENNReal.ofReal L ^ r * b ≤ jacksonConst r * ω := by
+    a + ENNReal.ofReal L ^ r * b ≤ intervalJacksonConst r * ω := by
   have hLL : ENNReal.ofReal L * ENNReal.ofReal L⁻¹ = 1 := by
     rw [← ENNReal.ofReal_mul hL.le, mul_inv_cancel₀ hL.ne', ENNReal.ofReal_one]
   calc a + ENNReal.ofReal L ^ r * b
@@ -68,7 +69,7 @@ theorem add_ofReal_pow_mul_le_jacksonConst {L : ℝ} (hL : 0 < L) (r : ℕ) {a b
         add_le_add ha (mul_le_mul' le_rfl hb)
     _ = ω + (ENNReal.ofReal L * ENNReal.ofReal L⁻¹) ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r)) * ω := by
         rw [mul_pow]; ring
-    _ = jacksonConst r * ω := by rw [hLL, one_pow, one_mul, jacksonConst]; ring
+    _ = intervalJacksonConst r * ω := by rw [hLL, one_pow, one_mul, intervalJacksonConst]; ring
 
 /-- The half `[0, 1/2]` and the scale `2^(-(k+1))` fit into `[0, 1]`: `1/2 + 2^(-(k+1)) ≤ 1`. -/
 theorem one_half_add_le_one (k : ℕ) : (1 / 2 : ℝ) + 1 / 2 ^ (k + 1) ≤ 1 := by
@@ -207,7 +208,7 @@ theorem exists_ppFun_approx {F : ℝ → ℂ} (hF : Continuous F) {r : ℕ} (hr 
     (hp : 1 ≤ p) (hp' : p ≠ ∞) (k : ℕ) :
     ∃ Q : ℕ → ℂ[X], (∀ n, Q n ∈ degreeLT ℂ r) ∧
       eLpNorm (fun x => F x - ppFun (k + 1) Q x) p unitVol ≤
-        2 * jacksonConst r * modulus r p 0 1 F (1 / 2 ^ (k + 1)) := by
+        2 * intervalJacksonConst r * intervalModulus r p 0 1 F (1 / 2 ^ (k + 1)) := by
   have hL : (0 : ℝ) < 1 / 2 ^ (k + 1) := by positivity
   obtain ⟨gL, DL, hgL, hDL, h1L, h2L, hTL⟩ :=
     exists_left_smoothing hF hr hp hp' hL (one_half_add_le_one k)
@@ -218,31 +219,32 @@ theorem exists_ppFun_approx {F : ℝ → ℂ} (hF : Continuous F) {r : ℕ} (hr 
     exists_ppFun_approx_of_taylor hF.measurable hgL hDL hgR hDR hp hp' hTL hTR k
   refine ⟨Q, hQ, hbound.trans ?_⟩
   rw [two_mul, add_mul]
-  exact add_le_add (add_ofReal_pow_mul_le_jacksonConst hL r h1L h2L)
-    (add_ofReal_pow_mul_le_jacksonConst hL r h1R h2R)
+  exact add_le_add (add_ofReal_pow_mul_le_intervalJacksonConst hL r h1L h2L)
+    (add_ofReal_pow_mul_le_intervalJacksonConst hL r h1R h2R)
 
 variable (p) in
 /-- The modulus of an element of `L_p[0, 1]` at the dyadic scale `2^(-k)`,
 `ω_r(f, 2^(-k), [0, 1])_p`. -/
-noncomputable def lpModulus (r : ℕ) (f : Lp ℂ p unitVol) (k : ℕ) : ℝ≥0∞ :=
-  modulus r p 0 1 (f : ℝ → ℂ) (1 / 2 ^ k)
+noncomputable def intervalLpModulus (r : ℕ) (f : Lp ℂ p unitVol) (k : ℕ) : ℝ≥0∞ :=
+  intervalModulus r p 0 1 (f : ℝ → ℂ) (1 / 2 ^ k)
 
 /-- The modulus of elements of `L_p[0, 1]` is subadditive. -/
-theorem lpModulus_add_le (r : ℕ) (f g : Lp ℂ p unitVol) (k : ℕ) :
-    lpModulus p r (f + g) k ≤ lpModulus p r f k + lpModulus p r g k := by
-  rw [lpModulus, modulus_congr_ae (Lp.coeFn_add f g)]
-  exact modulus_add_le Fact.out r 0 1 _ _ _
+theorem intervalLpModulus_add_le (r : ℕ) (f g : Lp ℂ p unitVol) (k : ℕ) :
+    intervalLpModulus p r (f + g) k ≤ intervalLpModulus p r f k + intervalLpModulus p r g k := by
+  rw [intervalLpModulus, intervalModulus_congr_ae (Lp.coeFn_add f g)]
+  exact intervalModulus_add_le Fact.out r 0 1 _ _ _
 
 /-- `ω_r(f, t) ≤ 2^r ‖f‖_p` in `L_p[0, 1]`. -/
-theorem lpModulus_le (r : ℕ) (f : Lp ℂ p unitVol) (k : ℕ) :
-    lpModulus p r f k ≤ 2 ^ r * ‖f‖ₑ := by
+theorem intervalLpModulus_le (r : ℕ) (f : Lp ℂ p unitVol) (k : ℕ) :
+    intervalLpModulus p r f k ≤ 2 ^ r * ‖f‖ₑ := by
   rw [Lp.enorm_def]
-  exact modulus_le (Lp.stronglyMeasurable f).measurable Fact.out r 0 1 _
+  exact intervalModulus_le (Lp.stronglyMeasurable f).measurable Fact.out r 0 1 _
 
 omit [Fact (1 ≤ p)] in
 /-- The modulus at the dyadic scales decreases with the level. -/
-theorem lpModulus_anti (r : ℕ) (f : Lp ℂ p unitVol) : Antitone (lpModulus p r f) := fun _ _ hjk =>
-  modulus_mono r p 0 1 _ (one_div_le_one_div_of_le (by positivity)
+theorem intervalLpModulus_anti (r : ℕ) (f : Lp ℂ p unitVol) :
+    Antitone (intervalLpModulus p r f) := fun _ _ hjk =>
+  intervalModulus_mono r p 0 1 _ (one_div_le_one_div_of_le (by positivity)
     (pow_le_pow_right₀ (by norm_num) hjk))
 
 /-- **From continuous functions to `L_p` by density**: a bound `E_n(g) ≤ C ω_r(g, 2^(-k))_p`
@@ -250,33 +252,35 @@ for every bounded continuous `g`, given by an approximant `u ∈ A_n` of `g`, ho
 `f ∈ L_p[0, 1]`, `p < ∞`. The bounded continuous functions are dense in `L_p` (Mathlib's
 `BoundedContinuousFunction.toLp_denseRange`), so `ApproximationScheme.approxError_le_of_dense`
 applies. -/
-theorem approxError_le_of_continuous {A : ApproximationScheme (Lp ℂ p unitVol)} (hp : p ≠ ∞)
-    {r n k : ℕ} {C : ℝ≥0∞} (hC : C ≠ ∞)
+theorem interval_approxError_le_of_continuous {A : ApproximationScheme (Lp ℂ p unitVol)}
+    (hp : p ≠ ∞) {r n k : ℕ} {C : ℝ≥0∞} (hC : C ≠ ∞)
     (h : ∀ g : ℝ →ᵇ ℂ, ∃ u : ℝ → ℂ, (∃ a ∈ A n, (a : ℝ → ℂ) =ᵐ[unitVol] u) ∧
-      eLpNorm (fun x => g x - u x) p unitVol ≤ C * modulus r p 0 1 g (1 / 2 ^ k))
-    (f : Lp ℂ p unitVol) : A.approxError f n ≤ C * lpModulus p r f k := by
+      eLpNorm (fun x => g x - u x) p unitVol ≤ C * intervalModulus r p 0 1 g (1 / 2 ^ k))
+    (f : Lp ℂ p unitVol) : A.approxError f n ≤ C * intervalLpModulus p r f k := by
   refine ApproximationScheme.approxError_le_of_dense
     (BoundedContinuousFunction.toLp_denseRange ℂ unitVol ℝ hp)
-    (fun f g => lpModulus_add_le r f g k) (C0 := 2 ^ r) (by simp) (fun f => lpModulus_le r f k) hC
+    (fun f g => intervalLpModulus_add_le r f g k) (C0 := 2 ^ r) (by simp)
+      (fun f => intervalLpModulus_le r f k) hC
     ?_ f
   rintro _ ⟨g, rfl⟩
   obtain ⟨u, ⟨a, ha, hau⟩, hbound⟩ := h g
   have hg := BoundedContinuousFunction.coeFn_toLp (E := ℂ) p unitVol ℝ g
   refine (A.approxError_le_of_mem ha _).trans ?_
-  rw [Lp.enorm_def, eLpNorm_congr_ae ((Lp.coeFn_sub _ _).trans (hg.sub hau)), lpModulus,
-    modulus_congr_ae hg]
+  rw [Lp.enorm_def, eLpNorm_congr_ae ((Lp.coeFn_sub _ _).trans (hg.sub hau)), intervalLpModulus,
+    intervalModulus_congr_ae hg]
   exact hbound
 
 /-- **Jackson's inequality for dyadic piecewise polynomials**: for `1 ≤ p < ∞`, `r ≥ 1` and
 `k ≥ 1`, `E_{2^k}(f)_p ≤ 2 (1 + 2^r r^(2r)) ω_r(f, 2^(-k), [0, 1])_p`; first for continuous
 functions (`Interval.exists_ppFun_approx`), then by density
-(`Interval.approxError_le_of_continuous`). -/
+(`Interval.interval_approxError_le_of_continuous`). -/
 theorem approxError_ppScheme_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) (f : Lp ℂ p unitVol) {k : ℕ}
     (hk : 1 ≤ k) :
-    (ppScheme p r).approxError f (2 ^ k) ≤ 2 * jacksonConst r * lpModulus p r f k := by
+    (ppScheme p r).approxError f (2 ^ k) ≤
+      2 * intervalJacksonConst r * intervalLpModulus p r f k := by
   obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le' hk
-  refine approxError_le_of_continuous hp (ENNReal.mul_ne_top (by norm_num) (jacksonConst_ne_top r))
-    (fun g => ?_) f
+  refine interval_approxError_le_of_continuous hp
+    (ENNReal.mul_ne_top (by norm_num) (intervalJacksonConst_ne_top r)) (fun g => ?_) f
   obtain ⟨Q, hQ, hbound⟩ := exists_ppFun_approx g.continuous hr Fact.out hp k
   exact ⟨ppFun (k + 1) Q, ⟨(memLp_ppFun (k + 1) Q p).toLp _,
     mem_ppScheme_two_pow.2 ⟨Q, hQ, MemLp.coeFn_toLp _⟩, MemLp.coeFn_toLp _⟩, hbound⟩
@@ -287,14 +291,14 @@ error of best approximation by the polynomials of degree `< r` (the approximants
 complexity `1`). -/
 theorem exists_approxError_ppScheme_one_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) {m : ℕ} (hm : 2 ≤ m) :
     ∃ W : ℝ≥0∞, W ≠ ∞ ∧ ∀ f : Lp ℂ p unitVol,
-      (ppScheme p r).approxError f 1 ≤ W * lpModulus p r f m := by
+      (ppScheme p r).approxError f 1 ≤ W * intervalLpModulus p r f m := by
   have ht : (0 : ℝ) < 1 / 2 ^ m := by positivity
   have ht3 : (1 : ℝ) / 2 ^ m ≤ 1 / 3 := by
     rw [div_le_div_iff₀ (by positivity) (by norm_num), one_mul, one_mul]
     calc (3 : ℝ) ≤ 2 ^ 2 := by norm_num
       _ ≤ 2 ^ m := pow_le_pow_right₀ (by norm_num) hm
-  obtain ⟨W, hW, hWb⟩ := exists_eLpNorm_sub_polyFun_le_modulus hr hp ht ht3
-  refine ⟨W, hW, fun f => approxError_le_of_continuous hp hW (fun g => ?_) f⟩
+  obtain ⟨W, hW, hWb⟩ := exists_eLpNorm_sub_polyFun_le_intervalModulus hr hp ht ht3
+  refine ⟨W, hW, fun f => interval_approxError_le_of_continuous hp hW (fun g => ?_) f⟩
   obtain ⟨P, hP, hbound⟩ := hWb g g.continuous
   have hae : (fun x => g x - ppFun 0 (fun _ => P) x) =ᵐ[unitVol] fun x => g x - polyFun P x := by
     filter_upwards [ae_mem_Ico_unitVol] with x hx
@@ -310,13 +314,13 @@ theorem exists_approxError_ppScheme_one_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ 
 `f ∈ L_p[0, 1]` and every `k ≥ 0`; level `0` is Whitney's inequality. -/
 theorem exists_approxError_ppScheme_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
     ∃ CJ : ℝ≥0∞, CJ ≠ ∞ ∧ ∀ (f : Lp ℂ p unitVol) (k : ℕ),
-      (ppScheme p r).approxError f (2 ^ k) ≤ CJ * lpModulus p r f k := by
+      (ppScheme p r).approxError f (2 ^ k) ≤ CJ * intervalLpModulus p r f k := by
   obtain ⟨W, hW, hWb⟩ := exists_approxError_ppScheme_one_le (p := p) hr hp (le_refl 2)
-  refine ⟨W + 2 * jacksonConst r, ENNReal.add_ne_top.2 ⟨hW, ENNReal.mul_ne_top (by norm_num)
-    (jacksonConst_ne_top r)⟩, fun f k => ?_⟩
+  refine ⟨W + 2 * intervalJacksonConst r, ENNReal.add_ne_top.2 ⟨hW, ENNReal.mul_ne_top (by norm_num)
+    (intervalJacksonConst_ne_top r)⟩, fun f k => ?_⟩
   rcases Nat.eq_zero_or_pos k with rfl | hk
   · rw [pow_zero]
-    exact (hWb f).trans (mul_le_mul' le_self_add (lpModulus_anti r f (Nat.zero_le 2)))
+    exact (hWb f).trans (mul_le_mul' le_self_add (intervalLpModulus_anti r f (Nat.zero_le 2)))
   · exact (approxError_ppScheme_le hr hp f hk).trans (mul_le_mul' le_add_self le_rfl)
 
 end Interval
@@ -329,16 +333,16 @@ variable {p : ℝ≥0∞}
 
 /-- The `p`-th power of the modulus of elements of `L_p[0, 1]`, `0 < p ≤ 1`, at the dyadic scale
 `2^(-k)` is subadditive. -/
-theorem lpModulus_add_rpow_le (hp1 : p ≤ 1) (r : ℕ) (f g : Lp ℂ p unitVol) (k : ℕ) :
-    lpModulus p r (f + g) k ^ p.toReal ≤
-      lpModulus p r f k ^ p.toReal + lpModulus p r g k ^ p.toReal := by
-  rw [lpModulus, modulus_congr_ae (Lp.coeFn_add f g)]
-  exact modulus_add_rpow_le hp1 r 0 1 _ _ _
+theorem intervalLpModulus_add_rpow_le (hp1 : p ≤ 1) (r : ℕ) (f g : Lp ℂ p unitVol) (k : ℕ) :
+    intervalLpModulus p r (f + g) k ^ p.toReal ≤
+      intervalLpModulus p r f k ^ p.toReal + intervalLpModulus p r g k ^ p.toReal := by
+  rw [intervalLpModulus, intervalModulus_congr_ae (Lp.coeFn_add f g)]
+  exact intervalModulus_add_rpow_le hp1 r 0 1 _ _ _
 
 /-- `ω_r(f, 2^(-k), [0, 1])_p ≤ 2^(r/p) ‖f‖_p` in `L_p[0, 1]`, `0 < p ≤ 1`. -/
-theorem lpModulus_le_of_le_one (hp1 : p ≤ 1) (r : ℕ) (f : Lp ℂ p unitVol) (k : ℕ) :
-    lpModulus p r f k ≤ 2 ^ ((r : ℝ) / p.toReal) * ‖f‖ₑ := by
+theorem intervalLpModulus_le_of_le_one (hp1 : p ≤ 1) (r : ℕ) (f : Lp ℂ p unitVol) (k : ℕ) :
+    intervalLpModulus p r f k ≤ 2 ^ ((r : ℝ) / p.toReal) * ‖f‖ₑ := by
   rw [Lp.enorm_def]
-  exact modulus_le_of_le_one (Lp.stronglyMeasurable f).measurable hp1 r 0 1 _
+  exact intervalModulus_le_of_le_one (Lp.stronglyMeasurable f).measurable hp1 r 0 1 _
 
 end Interval

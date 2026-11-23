@@ -228,31 +228,31 @@ theorem distribBlock_eq_sum_convLp (hp : p ≠ ∞) {c : ℕ} (hb : K.b ≤ 2 ^ 
 `g_k : V → ℂ` and every `x`,
 `2^{js} |∑_{k = j - c}^{j + c} (ψ_j ⋆ g_k)(x)| ≤ 2^{c|s|} C_{n,N} C_{A,0,N} ∑_k M(2^{ks} |g_k|)(x)`
 with the bounds `A = K.baseBound` of the bases of `K`: the convolutions lie below the maximal
-function (`Rd.IsUniformSchwartz.enorm_conv_dilate_le_maximal`), and every `k` in the window has
-`|j - k| ≤ c`, so `2^{js} ≤ 2^{c|s|} 2^{ks}` (`ENNReal.dyadicWeight_le_of_mem_Icc`). -/
+function (`Rd.IsUniformSchwartz.enorm_conv_dilate_le_maximalFunction`), and every `k` in the window
+has `|j - k| ≤ c`, so `2^{js} ≤ 2^{c|s|} 2^{ks}` (`ENNReal.dyadicWeight_le_of_mem_Icc`). -/
 theorem dyadicWeight_mul_enorm_sum_conv_le {N : ℕ} (hN : finrank ℝ V < N) (c : ℕ) (s : ℝ)
     (j : ℕ) (g : ℕ → V → ℂ) (x : V) :
     dyadicWeight s j * ‖∑ k ∈ Finset.Icc (j - c) (j + c), conv (K.psiS j) (g k) volume x‖ₑ ≤
       dyadicWeight |s| c * (decayMaximalConst V N * familyDecayConst K.baseBound 0 N) *
         ∑ k ∈ Finset.Icc (j - c) (j + c),
-          maximal (fun y => dyadicWeight s k * ‖g k y‖ₑ) x := by
+          maximalFunction (fun y => dyadicWeight s k * ‖g k y‖ₑ) x := by
   set D := decayMaximalConst V N * familyDecayConst K.baseBound 0 N
   calc dyadicWeight s j * ‖∑ k ∈ Finset.Icc (j - c) (j + c), conv (K.psiS j) (g k) volume x‖ₑ
       ≤ ∑ k ∈ Finset.Icc (j - c) (j + c),
-          dyadicWeight s j * (D * maximal (fun y => ‖g k y‖ₑ) x) := by
+          dyadicWeight s j * (D * maximalFunction (fun y => ‖g k y‖ₑ) x) := by
         rw [← Finset.mul_sum]
         refine mul_le_mul_of_nonneg_left ((enorm_sum_le _ _).trans
           (Finset.sum_le_sum fun k _ => ?_)) (zero_le (a := dyadicWeight s j))
         rw [K.coe_psiS]
-        exact K.isUniformSchwartz_base.enorm_conv_dilate_le_maximal hN j _ x
+        exact K.isUniformSchwartz_base.enorm_conv_dilate_le_maximalFunction hN j _ x
     _ ≤ ∑ k ∈ Finset.Icc (j - c) (j + c),
-          dyadicWeight |s| c * dyadicWeight s k * (D * maximal (fun y => ‖g k y‖ₑ) x) :=
+          dyadicWeight |s| c * dyadicWeight s k * (D * maximalFunction (fun y => ‖g k y‖ₑ) x) :=
         Finset.sum_le_sum fun k hk => mul_le_mul_of_nonneg_right
           (ENNReal.dyadicWeight_le_of_mem_Icc s hk) (zero_le (a := D * _))
     _ = _ := by
         rw [Finset.mul_sum]
         refine Finset.sum_congr rfl fun k _ => ?_
-        rw [← dyadicWeight_mul_maximal]
+        rw [← dyadicWeight_mul_maximalFunction]
         ring
 
 /-- The **comparison constant** `2^{c|s|} C_{n,N} C_{A,0,N} (2c + 1)` of two kernels, with the
@@ -273,7 +273,7 @@ theorem comparisonConst_ne_top {N : ℕ} (hN : finrank ℝ V < N) (c : ℕ) (s :
 are window sums of convolutions of the `g_k` (`Rd.LPKernel.distribBlock_eq_sum_convLp`), bounded
 pointwise by maximal functions (`Rd.LPKernel.dyadicWeight_mul_enorm_sum_conv_le`); the window
 sums cost `2c + 1` in `ℓ_q` (`ENNReal.lqNorm_sum_Icc_le`), and
-`Rd.eLpNorm_le_of_le_lqNorm_maximal` finishes. -/
+`Rd.eLpNorm_le_of_le_lqNorm_maximalFunction` finishes. -/
 theorem triebelLizorkinNormDistr_le_of_blocks (hp1 : 1 < p) (hp : p ≠ ∞) {q : ℝ≥0∞}
     (hq1 : 1 < q) {N : ℕ} (hN : finrank ℝ V < N) {c : ℕ} (hb : K.b ≤ 2 ^ c * K'.a)
     (hb' : K'.b ≤ 2 ^ c * K.a) (s : ℝ) {u : 𝓢'(V, ℂ)} {g : ℕ → Lp ℂ p (volume : Measure V)}
@@ -287,7 +287,8 @@ theorem triebelLizorkinNormDistr_le_of_blocks (hp1 : 1 < p) (hp : p ≠ ∞) {q 
     coeFn_sum_convLp_ae hp (fun _ => K.psiS j) g _
   refine (K.triebelLizorkinNormDistr_le (g := h)
     (K.distribBlock_eq_sum_convLp K' hp hb hb' hg)).trans ?_
-  refine eLpNorm_le_of_le_lqNorm_maximal hp1 hp hq1 (aemeasurable_lqNorm_dyadicWeight_Lp _ q _)
+  refine eLpNorm_le_of_le_lqNorm_maximalFunction hp1 hp hq1
+    (aemeasurable_lqNorm_dyadicWeight_Lp _ q _)
     (fun k => ((Lp.aestronglyMeasurable (g k)).enorm.const_mul _)) ?_
   filter_upwards [ae_all_iff.2 hae] with x hx
   simp_rw [hx]
@@ -296,10 +297,11 @@ theorem triebelLizorkinNormDistr_le_of_blocks (hp1 : 1 < p) (hp : p ≠ ∞) {q 
       ≤ lqNorm q (fun j => dyadicWeight |s| c *
           (decayMaximalConst V N * familyDecayConst K.baseBound 0 N) *
           ∑ k ∈ Finset.Icc (j - c) (j + c),
-            maximal (fun y => dyadicWeight s k * ‖g k y‖ₑ) x) :=
+            maximalFunction (fun y => dyadicWeight s k * ‖g k y‖ₑ) x) :=
         ENNReal.lqNorm_mono fun j => K.dyadicWeight_mul_enorm_sum_conv_le hN c s j _ x
     _ ≤ dyadicWeight |s| c * (decayMaximalConst V N * familyDecayConst K.baseBound 0 N) *
-          ((2 * c + 1) * lqNorm q (fun k => maximal (fun y => dyadicWeight s k * ‖g k y‖ₑ) x)) := by
+          ((2 * c + 1) *
+              lqNorm q (fun k => maximalFunction (fun y => dyadicWeight s k * ‖g k y‖ₑ) x)) := by
         rw [ENNReal.lqNorm_const_mul]
         exact mul_le_mul_of_nonneg_left (ENNReal.lqNorm_sum_Icc_le hq1.le c _) (zero_le (a := _))
     _ = _ := by rw [comparisonConst, mul_assoc _ (2 * c + 1 : ℝ≥0∞)]

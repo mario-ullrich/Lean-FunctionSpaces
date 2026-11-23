@@ -15,12 +15,11 @@ public import Mathlib.Analysis.InnerProductSpace.Positive
 
 Let `J : V → H` be a compact, injective linear map with dense range between complex Hilbert
 spaces (`CompactDenseEmbedding`), the model being `H^1_0(Ω) ↪ L_2(Ω)`.  The operator
-`T = J J†` on `H` is compact, positive and injective (`CompactDenseEmbedding.gram`,
-`CompactDenseEmbedding.isPositive_gram`), so it has a
-Hilbert basis `(e_i)` of eigenvectors with eigenvalues `μ_i ≠ 0`
-(`CompactDenseEmbedding.eigenBasis`, from `ContinuousLinearMap.eigenHilbertBasis`).  With the
-**singular values** `σ_i = ‖J† e_i‖ > 0` one has `σ_i² = μ_i`, and
-`v_i = σ_i⁻¹ J† e_i` is a Hilbert basis of `V` with `J v_i = σ_i e_i`
+`T = J J†` on `H` is compact, positive and injective (`CompactDenseEmbedding.gramOperator`,
+`CompactDenseEmbedding.isPositive_gramOperator`), so it has a Hilbert basis `(e_i)` of eigenvectors
+with eigenvalues `μ_i ≠ 0` (`CompactDenseEmbedding.eigenBasis`, from
+`ContinuousLinearMap.eigenHilbertBasis`).  With the **singular values** `σ_i = ‖J† e_i‖ > 0` one has
+`σ_i² = μ_i`, and `v_i = σ_i⁻¹ J† e_i` is a Hilbert basis of `V` with `J v_i = σ_i e_i`
 (`CompactDenseEmbedding.singularBasis`).  Consequently:
 
 * the coefficients satisfy `⟨e_i, J u⟩ = σ_i ⟨v_i, u⟩`, so `f ∈ J(V)` iff
@@ -85,25 +84,25 @@ theorem adjoint_injective : Function.Injective (J.toCLM)† := by
 /-! ### The operator `J J†` -/
 
 /-- The operator `T = J J†` on `H`. -/
-noncomputable def gram : H →L[ℂ] H := J.toCLM ∘L (J.toCLM)†
+noncomputable def gramOperator : H →L[ℂ] H := J.toCLM ∘L (J.toCLM)†
 
 /-- `J J†` is compact, as `J` is. -/
-theorem isCompactOperator_gram : IsCompactOperator J.gram :=
+theorem isCompactOperator_gramOperator : IsCompactOperator J.gramOperator :=
   J.isCompact.comp_clm _
 
 /-- `J J†` is a positive operator: `⟨J J† f, f⟩ = ‖J† f‖² ≥ 0`
 (`ContinuousLinearMap.isPositive_self_comp_adjoint`). -/
-theorem isPositive_gram : J.gram.IsPositive :=
+theorem isPositive_gramOperator : J.gramOperator.IsPositive :=
   ContinuousLinearMap.isPositive_self_comp_adjoint J.toCLM
 
 /-- `J J†` is symmetric, being positive. -/
-theorem isSymmetric_gram : (J.gram : H →ₗ[ℂ] H).IsSymmetric :=
-  J.isPositive_gram.isSymmetric
+theorem isSymmetric_gramOperator : (J.gramOperator : H →ₗ[ℂ] H).IsSymmetric :=
+  J.isPositive_gramOperator.isSymmetric
 
 /-- `J J†` is injective: its kernel is the kernel of `J†`. -/
-theorem ker_gram : LinearMap.ker (J.gram : H →ₗ[ℂ] H) = ⊥ := by
+theorem ker_gramOperator : LinearMap.ker (J.gramOperator : H →ₗ[ℂ] H) = ⊥ := by
   have h := J.toCLM.ker_self_comp_adjoint
-  change LinearMap.ker (J.gram : H →ₗ[ℂ] H) = LinearMap.ker ((J.toCLM)† : H →ₗ[ℂ] V) at h
+  change LinearMap.ker (J.gramOperator : H →ₗ[ℂ] H) = LinearMap.ker ((J.toCLM)† : H →ₗ[ℂ] V) at h
   rw [h, LinearMap.ker_eq_bot]
   exact J.adjoint_injective
 
@@ -111,73 +110,74 @@ theorem ker_gram : LinearMap.ker (J.gram : H →ₗ[ℂ] H) = ⊥ := by
 
 /-- The index set of the eigenvector basis of `J J†`: pairs `⟨μ, j⟩` of an eigenvalue and an
 index of a Hilbert basis of its eigenspace. -/
-abbrev index : Type _ := J.gram.eigenIndex
+abbrev eigenpairIndex : Type _ := J.gramOperator.eigenIndex
 
 /-- **The Hilbert basis of `H` of eigenvectors of `J J†`**, from Mathlib's spectral theorem
 for compact self-adjoint operators (`ContinuousLinearMap.eigenHilbertBasis`). -/
-noncomputable def eigenBasis : HilbertBasis J.index ℂ H :=
-  ContinuousLinearMap.eigenHilbertBasis J.isSymmetric_gram
-    (ContinuousLinearMap.orthogonalComplement_iSup_eigenspaces_eq_bot J.isCompactOperator_gram
-      J.isSymmetric_gram)
+noncomputable def eigenBasis : HilbertBasis J.eigenpairIndex ℂ H :=
+  ContinuousLinearMap.eigenHilbertBasis J.isSymmetric_gramOperator
+    (ContinuousLinearMap.orthogonalComplement_iSup_eigenspaces_eq_bot
+      J.isCompactOperator_gramOperator J.isSymmetric_gramOperator)
 
 /-- The basis vectors are the eigenvectors of `J J†`. -/
-theorem coe_eigenBasis : ⇑J.eigenBasis = J.gram.eigenvector :=
+theorem coe_eigenBasis : ⇑J.eigenBasis = J.gramOperator.eigenvector :=
   ContinuousLinearMap.coe_eigenHilbertBasis _ _
 
 /-- `J J† e_i = μ_i e_i`, where the eigenvalue `μ_i` is the first component of the index. -/
-theorem gram_eigenBasis (i : J.index) : J.gram (J.eigenBasis i) = i.1 • J.eigenBasis i := by
+theorem gramOperator_eigenBasis (i : J.eigenpairIndex) :
+    J.gramOperator (J.eigenBasis i) = i.1 • J.eigenBasis i := by
   rw [coe_eigenBasis]
-  exact J.gram.apply_eigenvector i
+  exact J.gramOperator.apply_eigenvector i
 
 /-- The eigenvalues of `J J†` in the index are nonzero, as `J J†` is injective. -/
-theorem index_fst_ne_zero (i : J.index) : i.1 ≠ 0 :=
-  J.gram.eigenIndex_fst_ne_zero J.ker_gram i
+theorem eigenpairIndex_fst_ne_zero (i : J.eigenpairIndex) : i.1 ≠ 0 :=
+  J.gramOperator.eigenIndex_fst_ne_zero J.ker_gramOperator i
 
 /-! ### Singular values and the singular basis -/
 
 /-- The **singular value** `σ_i = ‖J† e_i‖`. -/
-noncomputable def singularValue (i : J.index) : ℝ := ‖(J.toCLM)† (J.eigenBasis i)‖
+noncomputable def singularValue (i : J.eigenpairIndex) : ℝ := ‖(J.toCLM)† (J.eigenBasis i)‖
 
 /-- `⟨J† e_i, J† e_j⟩ = μ_j ⟨e_i, e_j⟩`. -/
-theorem inner_adjoint_eigenBasis (i j : J.index) :
+theorem inner_adjoint_eigenBasis (i j : J.eigenpairIndex) :
     ⟪(J.toCLM)† (J.eigenBasis i), (J.toCLM)† (J.eigenBasis j)⟫_ℂ =
       j.1 * ⟪J.eigenBasis i, J.eigenBasis j⟫_ℂ := by
-  rw [ContinuousLinearMap.adjoint_inner_left, ← inner_smul_right, ← J.gram_eigenBasis]
+  rw [ContinuousLinearMap.adjoint_inner_left, ← inner_smul_right, ← J.gramOperator_eigenBasis]
   rfl
 
 /-- **`σ_i² = μ_i`**: the eigenvalues of `J J†` are the squares of the singular values; in
 particular they are real and positive. -/
-theorem sq_singularValue (i : J.index) : (((J.singularValue i) ^ 2 : ℝ) : ℂ) = i.1 := by
+theorem sq_singularValue (i : J.eigenpairIndex) : (((J.singularValue i) ^ 2 : ℝ) : ℂ) = i.1 := by
   have h := J.inner_adjoint_eigenBasis i i
   rw [inner_self_eq_norm_sq_to_K, inner_self_eq_norm_sq_to_K, J.eigenBasis.orthonormal.1 i] at h
   simpa [singularValue] using h
 
 /-- The singular values are positive. -/
-theorem singularValue_pos (i : J.index) : 0 < J.singularValue i := by
-  refine (norm_nonneg _).lt_of_ne fun h => J.index_fst_ne_zero i ?_
+theorem singularValue_pos (i : J.eigenpairIndex) : 0 < J.singularValue i := by
+  refine (norm_nonneg _).lt_of_ne fun h => J.eigenpairIndex_fst_ne_zero i ?_
   rw [← J.sq_singularValue i, singularValue, ← h]
   simp
 
 /-- The singular values are nonzero as complex numbers. -/
-theorem ofReal_singularValue_ne_zero (i : J.index) : ((J.singularValue i : ℝ) : ℂ) ≠ 0 :=
+theorem ofReal_singularValue_ne_zero (i : J.eigenpairIndex) : ((J.singularValue i : ℝ) : ℂ) ≠ 0 :=
   Complex.ofReal_ne_zero.2 (J.singularValue_pos i).ne'
 
 /-- `‖σ_i⁻¹ z‖ = σ_i⁻¹ ‖z‖` for every complex number `z`. -/
-theorem norm_inv_singularValue_mul (i : J.index) (z : ℂ) :
+theorem norm_inv_singularValue_mul (i : J.eigenpairIndex) (z : ℂ) :
     ‖((J.singularValue i)⁻¹ : ℂ) * z‖ = (J.singularValue i)⁻¹ * ‖z‖ := by
   rw [norm_mul, norm_inv, Complex.norm_real, Real.norm_eq_abs, abs_of_pos (J.singularValue_pos i)]
 
 /-- The singular values are at most `‖J‖`. -/
-theorem singularValue_le_norm (i : J.index) : J.singularValue i ≤ ‖J.toCLM‖ := by
+theorem singularValue_le_norm (i : J.eigenpairIndex) : J.singularValue i ≤ ‖J.toCLM‖ := by
   refine ((J.toCLM)†.le_opNorm _).trans ?_
   rw [J.eigenBasis.orthonormal.1 i, mul_one, LinearIsometryEquiv.norm_map]
 
 /-- The singular vector `v_i = σ_i⁻¹ J† e_i` in `V`. -/
-noncomputable def singularVector (i : J.index) : V :=
+noncomputable def singularVector (i : J.eigenpairIndex) : V :=
   (((J.singularValue i)⁻¹ : ℝ) : ℂ) • (J.toCLM)† (J.eigenBasis i)
 
 /-- `J† e_i = σ_i v_i`. -/
-theorem adjoint_eigenBasis_eq (i : J.index) :
+theorem adjoint_eigenBasis_eq (i : J.eigenpairIndex) :
     (J.toCLM)† (J.eigenBasis i) = ((J.singularValue i : ℝ) : ℂ) • J.singularVector i := by
   rw [singularVector, smul_smul, ← Complex.ofReal_mul, mul_inv_cancel₀ (J.singularValue_pos i).ne',
     Complex.ofReal_one, one_smul]
@@ -219,7 +219,7 @@ theorem orthogonal_span_singularVector_eq_bot :
   exact J.injective (by rw [hJw, map_zero])
 
 /-- **The singular basis**: the Hilbert basis `v_i = σ_i⁻¹ J† e_i` of `V`. -/
-noncomputable def singularBasis : HilbertBasis J.index ℂ V :=
+noncomputable def singularBasis : HilbertBasis J.eigenpairIndex ℂ V :=
   HilbertBasis.mkOfOrthogonalEqBot J.orthonormal_singularVector
     J.orthogonal_span_singularVector_eq_bot
 
@@ -228,14 +228,15 @@ theorem coe_singularBasis : ⇑J.singularBasis = J.singularVector :=
   HilbertBasis.coe_mkOfOrthogonalEqBot _ _
 
 /-- `J† e_i = σ_i v_i`. -/
-theorem adjoint_eigenBasis (i : J.index) :
+theorem adjoint_eigenBasis (i : J.eigenpairIndex) :
     (J.toCLM)† (J.eigenBasis i) = ((J.singularValue i : ℝ) : ℂ) • J.singularBasis i := by
   rw [coe_singularBasis, J.adjoint_eigenBasis_eq]
 
 /-- `J v_i = σ_i e_i`. -/
-theorem apply_singularBasis (i : J.index) :
+theorem apply_singularBasis (i : J.eigenpairIndex) :
     J.toCLM (J.singularBasis i) = ((J.singularValue i : ℝ) : ℂ) • J.eigenBasis i := by
-  have h : J.toCLM ((J.toCLM)† (J.eigenBasis i)) = i.1 • J.eigenBasis i := J.gram_eigenBasis i
+  have h : J.toCLM ((J.toCLM)† (J.eigenBasis i)) = i.1 • J.eigenBasis i :=
+    J.gramOperator_eigenBasis i
   rw [J.adjoint_eigenBasis, map_smul, ← J.sq_singularValue i] at h
   refine smul_right_injective H (J.ofReal_singularValue_ne_zero i) ?_
   simp only
@@ -244,31 +245,32 @@ theorem apply_singularBasis (i : J.index) :
 /-- **Every eigenvalue of `J J†` occurs in the index**: if `J J† y = μ y` for some `y ≠ 0`, then
 `μ = μ_i` for some `i`. Otherwise `y` is orthogonal to every `e_i`, since
 `μ_i ⟨e_i, y⟩ = ⟨J J† e_i, y⟩ = ⟨e_i, J J† y⟩ = μ ⟨e_i, y⟩` with `μ_i = σ_i²` real. -/
-theorem exists_index_fst_eq_of_gram_apply_eq_smul {μ : ℂ} {y : H} (hy : J.gram y = μ • y)
-    (hy0 : y ≠ 0) : ∃ i : J.index, i.1 = μ := by
+theorem exists_eigenpairIndex_fst_eq_of_gramOperator_apply_eq_smul {μ : ℂ} {y : H}
+    (hy : J.gramOperator y = μ • y) (hy0 : y ≠ 0) : ∃ i : J.eigenpairIndex, i.1 = μ := by
   by_contra h
   push Not at h
   refine hy0 (J.eq_zero_of_forall_inner_eigenBasis fun i => ?_)
-  have hs : ⟪J.gram (J.eigenBasis i), y⟫_ℂ = ⟪J.eigenBasis i, J.gram y⟫_ℂ :=
-    J.isSymmetric_gram (J.eigenBasis i) y
+  have hs : ⟪J.gramOperator (J.eigenBasis i), y⟫_ℂ = ⟪J.eigenBasis i, J.gramOperator y⟫_ℂ :=
+    J.isSymmetric_gramOperator (J.eigenBasis i) y
   have hr : (starRingEnd ℂ) i.1 = i.1 := by rw [← J.sq_singularValue i, Complex.conj_ofReal]
-  rw [J.gram_eigenBasis, hy, inner_smul_left, inner_smul_right, hr] at hs
+  rw [J.gramOperator_eigenBasis, hy, inner_smul_left, inner_smul_right, hr] at hs
   have h0 : (i.1 - μ) * ⟪J.eigenBasis i, y⟫_ℂ = 0 := by rw [sub_mul, hs, sub_self]
   exact (mul_eq_zero.1 h0).resolve_left (sub_ne_zero.2 (h i))
 
 /-- **A singular value `1`**: if some `u ≠ 0` in `V` satisfies `⟨u, w⟩_V = ⟨J u, J w⟩_H` for
 every `w ∈ V`, then `σ_i = 1` for some `i`. Indeed `J† J u = u`, so `J u ≠ 0` is an eigenvector
 of `J J†` with eigenvalue `1 = σ_i²`
-(`CompactDenseEmbedding.exists_index_fst_eq_of_gram_apply_eq_smul`). -/
+(`CompactDenseEmbedding.exists_eigenpairIndex_fst_eq_of_gramOperator_apply_eq_smul`). -/
 theorem exists_singularValue_eq_one {u : V} (hu0 : u ≠ 0)
-    (hu : ∀ w, ⟪u, w⟫_ℂ = ⟪J.toCLM u, J.toCLM w⟫_ℂ) : ∃ i : J.index, J.singularValue i = 1 := by
+    (hu : ∀ w, ⟪u, w⟫_ℂ = ⟪J.toCLM u, J.toCLM w⟫_ℂ) :
+    ∃ i : J.eigenpairIndex, J.singularValue i = 1 := by
   have hadj : (J.toCLM)† (J.toCLM u) = u :=
     ext_inner_right ℂ fun w => by rw [ContinuousLinearMap.adjoint_inner_left, hu]
-  have hg : J.gram (J.toCLM u) = (1 : ℂ) • J.toCLM u := by
+  have hg : J.gramOperator (J.toCLM u) = (1 : ℂ) • J.toCLM u := by
     rw [one_smul]
     exact congrArg J.toCLM hadj
   have hJu : J.toCLM u ≠ 0 := fun h0 => hu0 (J.injective (by rw [h0, map_zero]))
-  obtain ⟨i, hi⟩ := J.exists_index_fst_eq_of_gram_apply_eq_smul hg hJu
+  obtain ⟨i, hi⟩ := J.exists_eigenpairIndex_fst_eq_of_gramOperator_apply_eq_smul hg hJu
   refine ⟨i, (pow_eq_one_iff_of_nonneg (J.singularValue_pos i).le two_ne_zero).1 ?_⟩
   rw [← Complex.ofReal_eq_one, J.sq_singularValue i, hi]
 
@@ -276,21 +278,21 @@ theorem exists_singularValue_eq_one {u : V} (hu0 : u ≠ 0)
 
 /-- **`⟨e_i, J u⟩ = σ_i ⟨v_i, u⟩`**: the coefficients of `J u` in the eigenvector basis are
 `σ_i` times those of `u` in the singular basis. -/
-theorem repr_apply (u : V) (i : J.index) :
+theorem repr_apply (u : V) (i : J.eigenpairIndex) :
     J.eigenBasis.repr (J.toCLM u) i = (J.singularValue i : ℂ) * J.singularBasis.repr u i := by
   rw [J.eigenBasis.repr_apply_apply, J.singularBasis.repr_apply_apply,
     ← ContinuousLinearMap.adjoint_inner_left, J.adjoint_eigenBasis, inner_smul_left,
     Complex.conj_ofReal]
 
 /-- The coefficients of `J (∑ c_i v_i)` are `σ_i c_i`. -/
-theorem repr_apply_repr_symm (c : ℓ²(J.index, ℂ)) (i : J.index) :
+theorem repr_apply_repr_symm (c : ℓ²(J.eigenpairIndex, ℂ)) (i : J.eigenpairIndex) :
     J.eigenBasis.repr (J.toCLM (J.singularBasis.repr.symm c)) i =
       (J.singularValue i : ℂ) * c i := by
   rw [repr_apply, LinearIsometryEquiv.apply_symm_apply]
 
 /-- The singular coefficients of a preimage: if `J u = f`, then
 `⟨v_i, u⟩ = σ_i⁻¹ ⟨e_i, f⟩`. -/
-theorem repr_singularBasis_eq {u : V} {f : H} (h : J.toCLM u = f) (i : J.index) :
+theorem repr_singularBasis_eq {u : V} {f : H} (h : J.toCLM u = f) (i : J.eigenpairIndex) :
     J.singularBasis.repr u i = ((J.singularValue i)⁻¹ : ℂ) * J.eigenBasis.repr f i := by
   rw [← h, repr_apply, ← mul_assoc, inv_mul_cancel₀ (J.ofReal_singularValue_ne_zero i), one_mul]
 
@@ -324,7 +326,7 @@ theorem norm_sq_eq_of_apply_eq {u : V} {f : H} (h : J.toCLM u = f) :
 For `V = H^1_0(Ω)` with the inner product `⟨u, w⟩ + (2π)⁻²⟨∇u, ∇w⟩` and `H = L_2(Ω)`, this is
 the weak form of `-Δ v_i = λ_i v_i` for the Dirichlet eigenvalue `λ_i`, with
 `σ_i⁻² = 1 + λ_i/(4π²)`. -/
-theorem inner_singularBasis (i : J.index) (w : V) :
+theorem inner_singularBasis (i : J.eigenpairIndex) (w : V) :
     ⟪J.singularBasis i, w⟫_ℂ =
       (((J.singularValue i)⁻¹ ^ 2 : ℝ) : ℂ) * ⟪J.toCLM (J.singularBasis i), J.toCLM w⟫_ℂ := by
   have := J.ofReal_singularValue_ne_zero i
@@ -338,7 +340,7 @@ theorem inner_singularBasis (i : J.index) (w : V) :
 
 /-- For `i ≠ j`, `‖J v_i - J v_j‖ ≥ σ_i`, since the coefficient of
 `J v_i - J v_j = σ_i e_i - σ_j e_j` at `e_i` is `σ_i`. -/
-theorem singularValue_le_norm_sub {i j : J.index} (hij : i ≠ j) :
+theorem singularValue_le_norm_sub {i j : J.eigenpairIndex} (hij : i ≠ j) :
     J.singularValue i ≤ ‖J.toCLM (J.singularBasis i) - J.toCLM (J.singularBasis j)‖ := by
   have h := norm_inner_le_norm (𝕜 := ℂ) (J.eigenBasis i)
     (J.toCLM (J.singularBasis i) - J.toCLM (J.singularBasis j))
@@ -367,51 +369,52 @@ theorem finite_setOf_le_singularValue {ε : ℝ} (hε : 0 < ε) :
   obtain ⟨N, hN⟩ := Metric.cauchySeq_iff'.1 hlim.cauchySeq ε hε
   have h1 := hN (N + 1) (Nat.le_succ N)
   rw [Function.comp_apply, Function.comp_apply, dist_eq_norm] at h1
-  have hne : (e (φ (N + 1)) : J.index) ≠ e (φ N) := fun h =>
+  have hne : (e (φ (N + 1)) : J.eigenpairIndex) ≠ e (φ N) := fun h =>
     Nat.succ_ne_self N (hφ.injective (e.injective (Subtype.ext h)))
   exact absurd ((e (φ (N + 1))).2.trans (J.singularValue_le_norm_sub hne)) (not_le.2 h1)
 
 /-! ### The spectral scheme of the embedding -/
 
 /-- The **level** `⌊σ_i⁻¹⌋₊` of the eigenvector `e_i`. -/
-noncomputable def level (i : J.index) : ℕ := ⌊(J.singularValue i)⁻¹⌋₊
+noncomputable def eigenLevel (i : J.eigenpairIndex) : ℕ := ⌊(J.singularValue i)⁻¹⌋₊
 
 /-- `⌊σ_i⁻¹⌋₊ ≤ σ_i⁻¹`. -/
-theorem level_le_inv_singularValue (i : J.index) : (J.level i : ℝ) ≤ (J.singularValue i)⁻¹ :=
+theorem eigenLevel_le_inv_singularValue (i : J.eigenpairIndex) :
+    (J.eigenLevel i : ℝ) ≤ (J.singularValue i)⁻¹ :=
   Nat.floor_le (inv_nonneg.2 (J.singularValue_pos i).le)
 
 /-- `σ_i⁻¹ < ⌊σ_i⁻¹⌋₊ + 1`. -/
-theorem inv_singularValue_lt_level_add_one (i : J.index) :
-    (J.singularValue i)⁻¹ < J.level i + 1 :=
+theorem inv_singularValue_lt_eigenLevel_add_one (i : J.eigenpairIndex) :
+    (J.singularValue i)⁻¹ < J.eigenLevel i + 1 :=
   Nat.lt_floor_add_one _
 
 /-- A level below `n` means `σ_i⁻¹ < n`. -/
-theorem inv_singularValue_lt_of_level_lt {n : ℕ} {i : J.index} (h : J.level i < n) :
-    (J.singularValue i)⁻¹ < n :=
+theorem inv_singularValue_lt_of_eigenLevel_lt {n : ℕ} {i : J.eigenpairIndex}
+    (h : J.eigenLevel i < n) : (J.singularValue i)⁻¹ < n :=
   (Nat.floor_lt (inv_nonneg.2 (J.singularValue_pos i).le)).1 h
 
 /-- A level at least `n ≥ 1` means `σ_i ≤ n⁻¹`. -/
-theorem singularValue_le_of_le_level {n : ℕ} (hn : 1 ≤ n) {i : J.index} (h : n ≤ J.level i) :
-    J.singularValue i ≤ (n : ℝ)⁻¹ := by
+theorem singularValue_le_of_le_eigenLevel {n : ℕ} (hn : 1 ≤ n) {i : J.eigenpairIndex}
+    (h : n ≤ J.eigenLevel i) : J.singularValue i ≤ (n : ℝ)⁻¹ := by
   have hle : (n : ℝ) ≤ (J.singularValue i)⁻¹ :=
-    (Nat.cast_le.2 h).trans (J.level_le_inv_singularValue i)
+    (Nat.cast_le.2 h).trans (J.eigenLevel_le_inv_singularValue i)
   exact (le_inv_comm₀ (by exact_mod_cast hn) (J.singularValue_pos i)).1 hle
 
-/-- The levels have finite level sets: `level i < n` gives `σ_i⁻¹ < n`, so
+/-- The levels have finite level sets: `eigenLevel i < n` gives `σ_i⁻¹ < n`, so
 `σ_i ≥ (n + 1)⁻¹`, which holds for finitely many `i`
 (`CompactDenseEmbedding.finite_setOf_le_singularValue`). -/
-theorem finite_level (n : ℕ) : {i | J.level i < n}.Finite :=
+theorem finite_eigenLevel (n : ℕ) : {i | J.eigenLevel i < n}.Finite :=
   (J.finite_setOf_le_singularValue (ε := ((n : ℝ) + 1)⁻¹) (by positivity)).subset fun i hi => by
-    have h := J.inv_singularValue_lt_of_level_lt hi
+    have h := J.inv_singularValue_lt_of_eigenLevel_lt hi
     show ((n : ℝ) + 1)⁻¹ ≤ J.singularValue i
     exact (inv_le_comm₀ (by positivity) (J.singularValue_pos i)).2 (by linarith)
 
 /-- **The spectral scheme of a compact dense embedding**: the eigenvector basis `(e_i)` of
 `J J†` with the levels `⌊σ_i⁻¹⌋₊`. -/
-noncomputable def spectralScheme : SpectralScheme J.index H where
+noncomputable def spectralScheme : SpectralScheme J.eigenpairIndex H where
   basis := J.eigenBasis
-  level := J.level
-  finite_level := J.finite_level
+  level := J.eigenLevel
+  finite_level := J.finite_eigenLevel
 
 /-- The basis of the spectral scheme is the eigenvector basis. -/
 @[simp]
@@ -419,18 +422,18 @@ theorem spectralScheme_basis : J.spectralScheme.basis = J.eigenBasis := rfl
 
 /-- The levels of the spectral scheme are `⌊σ_i⁻¹⌋₊`. -/
 @[simp]
-theorem spectralScheme_level : J.spectralScheme.level = J.level := rfl
+theorem spectralScheme_level : J.spectralScheme.level = J.eigenLevel := rfl
 
 /-- **The truncation error of `J u`**: `‖J u - P_n J u‖ ≤ n⁻¹ ‖u‖` for `n ≥ 1`, by Parseval's
 identity, since only coefficients `σ_i ⟨v_i, u⟩` of level `≥ n` remain and `σ_i ≤ n⁻¹`
 there. -/
 theorem norm_sub_truncate_le {n : ℕ} (hn : 1 ≤ n) (u : V) :
-    ‖J.toCLM u - J.spectralScheme.truncate n (J.toCLM u)‖ ≤ (n : ℝ)⁻¹ * ‖u‖ := by
+    ‖J.toCLM u - J.spectralScheme.levelTruncate n (J.toCLM u)‖ ≤ (n : ℝ)⁻¹ * ‖u‖ := by
   rw [← J.eigenBasis.repr.norm_map, ← J.singularBasis.repr.norm_map u]
-  calc ‖J.eigenBasis.repr (J.toCLM u - J.spectralScheme.truncate n (J.toCLM u))‖
+  calc ‖J.eigenBasis.repr (J.toCLM u - J.spectralScheme.levelTruncate n (J.toCLM u))‖
       ≤ ‖((((n : ℝ)⁻¹ : ℝ)) : ℂ) • J.singularBasis.repr u‖ := by
         refine lp.norm_mono (by norm_num) fun i => ?_
-        have h := J.spectralScheme.repr_sub_truncate n (J.toCLM u) i
+        have h := J.spectralScheme.repr_sub_levelTruncate n (J.toCLM u) i
         rw [spectralScheme_basis, spectralScheme_level] at h
         rw [h, lp.coeFn_smul, Pi.smul_apply, smul_eq_mul]
         split_ifs with hi
@@ -439,7 +442,7 @@ theorem norm_sub_truncate_le {n : ℕ} (hn : 1 ≤ n) (u : V) :
             Real.norm_eq_abs, Real.norm_eq_abs, abs_of_pos (J.singularValue_pos i),
             abs_of_pos (by positivity)]
           gcongr
-          exact J.singularValue_le_of_le_level hn (not_lt.1 hi)
+          exact J.singularValue_le_of_le_eigenLevel hn (not_lt.1 hi)
     _ = (n : ℝ)⁻¹ * ‖J.singularBasis.repr u‖ := by
         rw [norm_smul, Complex.norm_real, Real.norm_eq_abs, abs_of_pos (by positivity)]
 
@@ -448,7 +451,7 @@ theorem jacksonBound :
     ApproximationScheme.JacksonBound (J.toCLM.restrictScalars ℝ) J.spectralScheme.toScheme 1 1 := by
   intro n hn u
   refine (ENNReal.toReal_mono enorm_ne_top (ApproximationScheme.approxError_le_of_mem
-    (J.spectralScheme.truncate_mem_span n (J.toCLM u)) _)).trans ?_
+    (J.spectralScheme.levelTruncate_mem_levelSpan n (J.toCLM u)) _)).trans ?_
   rw [toReal_enorm, one_mul, Real.rpow_neg_one]
   exact J.norm_sub_truncate_le hn u
 
@@ -460,9 +463,9 @@ theorem liftBound :
   have hle : ∀ i, ‖((J.singularValue i)⁻¹ : ℂ) * J.eigenBasis.repr a i‖ ≤
       (n : ℝ) * ‖J.eigenBasis.repr a i‖ := fun i => by
     rw [J.norm_inv_singularValue_mul]
-    by_cases hi : J.level i < n
-    · gcongr; exact (J.inv_singularValue_lt_of_level_lt hi).le
-    · have h0 := J.spectralScheme.repr_eq_zero_of_mem_span ha (i := i) (not_lt.1 hi)
+    by_cases hi : J.eigenLevel i < n
+    · gcongr; exact (J.inv_singularValue_lt_of_eigenLevel_lt hi).le
+    · have h0 := J.spectralScheme.repr_eq_zero_of_mem_levelSpan ha (i := i) (not_lt.1 hi)
       rw [spectralScheme_basis] at h0
       rw [h0]; simp
   have hmem : Memℓp (fun i => ((J.singularValue i)⁻¹ : ℂ) * J.eigenBasis.repr a i) 2 :=
@@ -494,18 +497,18 @@ theorem memKMethod_iff_memApprox {θ : ℝ} {q : ℝ≥0∞} (hθ : 0 < θ) (hθ
   rwa [mul_one] at h
 
 /-- `σ_i⁻¹ ≤ 1 + ⌊σ_i⁻¹⌋₊`. -/
-theorem inv_singularValue_le_one_add_level (i : J.index) :
-    (J.singularValue i)⁻¹ ≤ 1 + J.level i := by
-  linarith [J.inv_singularValue_lt_level_add_one i]
+theorem inv_singularValue_le_one_add_eigenLevel (i : J.eigenpairIndex) :
+    (J.singularValue i)⁻¹ ≤ 1 + J.eigenLevel i := by
+  linarith [J.inv_singularValue_lt_eigenLevel_add_one i]
 
 /-- `1 + ⌊σ_i⁻¹⌋₊ ≤ (1 + ‖J‖) σ_i⁻¹`, since `1 = σ_i σ_i⁻¹ ≤ ‖J‖ σ_i⁻¹`. -/
-theorem one_add_level_le (i : J.index) :
-    1 + (J.level i : ℝ) ≤ (1 + ‖J.toCLM‖) * (J.singularValue i)⁻¹ := by
+theorem one_add_eigenLevel_le (i : J.eigenpairIndex) :
+    1 + (J.eigenLevel i : ℝ) ≤ (1 + ‖J.toCLM‖) * (J.singularValue i)⁻¹ := by
   have hσ := J.singularValue_pos i
   have h1 : 1 ≤ ‖J.toCLM‖ * (J.singularValue i)⁻¹ := by
     rw [← mul_inv_cancel₀ hσ.ne']
     exact mul_le_mul_of_nonneg_right (J.singularValue_le_norm i) (inv_nonneg.2 hσ.le)
-  linarith [J.level_le_inv_singularValue i]
+  linarith [J.eigenLevel_le_inv_singularValue i]
 
 /-- **`J(V)` is the Sobolev space of order `1` of the spectral scheme**:
 `J(V) = {f : ∑_i (1 + ⌊σ_i⁻¹⌋₊)² |⟨e_i, f⟩|² < ∞}`, by
@@ -513,35 +516,35 @@ theorem one_add_level_le (i : J.index) :
 theorem range_eq_range_sobolevEmbed :
     Set.range J.toCLM = Set.range (J.spectralScheme.sobolevEmbed 1 zero_le_one) := by
   ext f
-  have hw : ∀ i, J.spectralScheme.weight 1 i = 1 + J.level i := fun i => by
-    simp [SpectralScheme.weight]
+  have hw : ∀ i, J.spectralScheme.levelWeight 1 i = 1 + J.eigenLevel i := fun i => by
+    simp [SpectralScheme.levelWeight]
   rw [J.mem_range_iff, SpectralScheme.mem_range_sobolevEmbed_iff, spectralScheme_basis]
   constructor
   · intro h
     refine ((h.norm).const_mul (1 + ‖J.toCLM‖)).mono fun i => ?_
     rw [J.norm_inv_singularValue_mul, norm_mul, hw, Complex.norm_real, Real.norm_eq_abs,
-      abs_of_pos (show (0 : ℝ) < 1 + J.level i by positivity), ← mul_assoc]
+      abs_of_pos (show (0 : ℝ) < 1 + J.eigenLevel i by positivity), ← mul_assoc]
     gcongr
-    exact J.one_add_level_le i
+    exact J.one_add_eigenLevel_le i
   · intro h
     refine h.mono' fun i => ?_
     rw [J.norm_inv_singularValue_mul, norm_mul, hw, Complex.norm_real, Real.norm_eq_abs,
-      abs_of_pos (show (0 : ℝ) < 1 + J.level i by positivity)]
+      abs_of_pos (show (0 : ℝ) < 1 + J.eigenLevel i by positivity)]
     gcongr
-    exact J.inv_singularValue_le_one_add_level i
+    exact J.inv_singularValue_le_one_add_eigenLevel i
 
 /-- **`A^s_2` by the singular values**: for `s > 0`, `f ∈ H` lies in the approximation space
 `A^s_2` of the spectral scheme iff `∑_i σ_i^(-2s) |⟨e_i, f⟩|² < ∞`, that is,
 `(σ_i^(-s) ⟨e_i, f⟩)_i ∈ ℓ_2`: by
-`SpectralScheme.memApprox_two_iff` the weights are `(1 + ⌊σ_i⁻¹⌋₊)^s`, and
+`SpectralScheme.memApprox_two_iff_levelWeight` the weights are `(1 + ⌊σ_i⁻¹⌋₊)^s`, and
 `σ_i⁻¹ ≤ 1 + ⌊σ_i⁻¹⌋₊ ≤ (1 + ‖J‖) σ_i⁻¹`. -/
 theorem memApprox_two_iff {s : ℝ} (hs : 0 < s) (f : H) :
     J.spectralScheme.toScheme.MemApprox s 2 f ↔
       Memℓp (fun i => (((J.singularValue i)⁻¹ ^ s : ℝ) : ℂ) * J.eigenBasis.repr f i) 2 := by
-  have hw : ∀ i, J.spectralScheme.weight s i = (1 + J.level i) ^ s := fun i => by
-    simp [SpectralScheme.weight]
+  have hw : ∀ i, J.spectralScheme.levelWeight s i = (1 + J.eigenLevel i) ^ s := fun i => by
+    simp [SpectralScheme.levelWeight]
   have hσ : ∀ i, 0 ≤ (J.singularValue i)⁻¹ := fun i => inv_nonneg.2 (J.singularValue_pos i).le
-  rw [J.spectralScheme.memApprox_two_iff hs f, spectralScheme_basis]
+  rw [J.spectralScheme.memApprox_two_iff_levelWeight hs f, spectralScheme_basis]
   constructor
   · intro h
     refine h.mono' fun i => ?_
@@ -549,7 +552,7 @@ theorem memApprox_two_iff {s : ℝ} (hs : 0 < s) (f : H) :
       Real.norm_eq_abs, abs_of_nonneg (Real.rpow_nonneg (hσ i) s), hw,
       abs_of_nonneg (Real.rpow_nonneg (by positivity) s)]
     exact mul_le_mul_of_nonneg_right
-      (Real.rpow_le_rpow (hσ i) (J.inv_singularValue_le_one_add_level i) hs.le) (norm_nonneg _)
+      (Real.rpow_le_rpow (hσ i) (J.inv_singularValue_le_one_add_eigenLevel i) hs.le) (norm_nonneg _)
   · intro h
     refine ((h.norm).const_mul ((1 + ‖J.toCLM‖) ^ s)).mono fun i => ?_
     rw [norm_mul, norm_mul, Complex.norm_real, Complex.norm_real, Real.norm_eq_abs,
@@ -557,6 +560,6 @@ theorem memApprox_two_iff {s : ℝ} (hs : 0 < s) (f : H) :
       abs_of_nonneg (Real.rpow_nonneg (by positivity) s), ← mul_assoc,
       ← Real.mul_rpow (by positivity) (hσ i)]
     exact mul_le_mul_of_nonneg_right
-      (Real.rpow_le_rpow (by positivity) (J.one_add_level_le i) hs.le) (norm_nonneg _)
+      (Real.rpow_le_rpow (by positivity) (J.one_add_eigenLevel_le i) hs.le) (norm_nonneg _)
 
 end CompactDenseEmbedding

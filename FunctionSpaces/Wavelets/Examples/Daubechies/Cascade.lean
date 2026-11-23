@@ -10,8 +10,8 @@ public import FunctionSpaces.Wavelets.Examples.Daubechies.ScalingFunction
 /-!
 # The cascade algorithm and the support of the scaling function
 
-For a Daubechies mask of order `N` with filter coefficients `c_k` (`Daubechies.coeff`), symbol
-`m_0` (`Daubechies.symbol`) and symbol product `Φ(ξ) = ∏_{j ≥ 0} m_0(ξ/2^(j+1))`
+For a Daubechies mask of order `N` with filter coefficients `c_k` (`Daubechies.daubechiesCoeff`),
+symbol `m_0` (`Daubechies.symbol`) and symbol product `Φ(ξ) = ∏_{j ≥ 0} m_0(ξ/2^(j+1))`
 (`Daubechies.symbolProduct`), the scaling function is `φ = 𝓕⁻ Φ` (`Daubechies.scalingFun`).
 This file proves that `φ` vanishes outside `[0, 2N - 1]` and that `𝓕 φ = Φ`, with the help of
 the **cascade algorithm**
@@ -61,7 +61,7 @@ the functions `η_n` converge to the scaling function `φ` against every Schwart
 (`Daubechies.tendsto_integral_cascade_mul`). -/
 noncomputable def cascade : ℕ → ℝ → ℂ
   | 0 => (Set.Ico (0 : ℝ) 1).indicator 1
-  | n + 1 => fun x => ∑ k ∈ Finset.range (2 * N), (coeff m k : ℂ) * cascade n (2 * x - k)
+  | n + 1 => fun x => ∑ k ∈ Finset.range (2 * N), (daubechiesCoeff m k : ℂ) * cascade n (2 * x - k)
 
 /-- `η_0 = 1_[0,1)`, the indicator function of `[0, 1)`. -/
 theorem cascade_zero : cascade m 0 = (Set.Ico (0 : ℝ) 1).indicator 1 := rfl
@@ -70,13 +70,14 @@ theorem cascade_zero : cascade m 0 = (Set.Ico (0 : ℝ) 1).indicator 1 := rfl
 `η_(n+1) = (x ↦ ∑_{k=0}^{2N-1} c_k η_n(2x - k))`. -/
 theorem cascade_succ (n : ℕ) :
     cascade m (n + 1) =
-      fun x => ∑ k ∈ Finset.range (2 * N), (coeff m k : ℂ) * cascade m n (2 * x - k) := rfl
+      fun x => ∑ k ∈ Finset.range (2 * N), (daubechiesCoeff m k : ℂ) * cascade m n (2 * x - k) :=
+  rfl
 
 /-- **The cascade recursion** `η_(n+1)(x) = ∑_{k=0}^{2N-1} c_k η_n(2x - k)` for every
 `x ∈ ℝ`. -/
 theorem cascade_succ_apply (n : ℕ) (x : ℝ) :
     cascade m (n + 1) x =
-      ∑ k ∈ Finset.range (2 * N), (coeff m k : ℂ) * cascade m n (2 * x - k) := rfl
+      ∑ k ∈ Finset.range (2 * N), (daubechiesCoeff m k : ℂ) * cascade m n (2 * x - k) := rfl
 
 /-! ### Support and integrability of the cascade -/
 

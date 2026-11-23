@@ -54,8 +54,8 @@ theorem hasDerivAt_higherDiff_polyFun (m : ℕ) (σ : ℝ) (P : ℂ[X]) (z : ℝ
     HasDerivAt (higherDiff m σ (polyFun P)) (higherDiff m σ (polyFun (derivative P)) z) z := by
   have h : higherDiff m σ (polyFun P) = fun z => ∑ k ∈ Finset.range (m + 1),
       ((-1 : ℂ) ^ (m - k) * (m.choose k : ℂ)) * polyFun P (z + k * σ) :=
-    funext fun z => higherDiff_apply m σ _ z
-  rw [h, higherDiff_apply]
+    funext fun z => interval_higherDiff_apply m σ _ z
+  rw [h, interval_higherDiff_apply]
   exact HasDerivAt.fun_sum fun k _ =>
     ((hasDerivAt_polyFun P (z + k * σ)).comp_add_const z (k * σ)).const_mul _
 
@@ -121,7 +121,7 @@ theorem exists_diffBound (r m : ℕ) (hp : p ≠ ∞) : ∃ K : ℝ≥0∞, K �
   have hσ : 0 ≤ σ := div_nonneg ht h2L.le
   -- the difference in the new variable
   have hdiff : higherDiff m t (polyFun P) x = higherDiff m σ (polyFun Q) y := by
-    rw [higherDiff_apply, higherDiff_apply]
+    rw [interval_higherDiff_apply, interval_higherDiff_apply]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [polyFun_comp_affine]
     congr 2
@@ -148,7 +148,7 @@ theorem exists_diffBound (r m : ℕ) (hp : p ≠ ∞) : ∃ K : ℝ≥0∞, K �
     exact (ENNReal.ofReal_le_iff_le_toReal hKQ).1 h
   have hval := norm_higherDiff_polyFun_le m hσ Q y hder
   -- the norm of `Q` on `[0, 1/2]`
-  have hnorm := eLpNorm_comp_affine (measurable_polyFun P) hp u h2L 0 (1 / 2)
+  have hnorm := interval_eLpNorm_comp_affine (measurable_polyFun P) hp u h2L 0 (1 / 2)
   rw [mul_zero, add_zero, show 2 * L * (1 / 2) = L by ring] at hnorm
   have hQfun : (fun y => polyFun P (u + 2 * L * y)) = polyFun Q :=
     funext fun y => (polyFun_comp_affine P u (2 * L) y).symm

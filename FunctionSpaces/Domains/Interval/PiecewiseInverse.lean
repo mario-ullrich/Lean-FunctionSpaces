@@ -152,7 +152,7 @@ theorem higherDiff_eq_of_mem_piece {k m : ℕ} {u : ℝ → ℂ} {P : ℂ[X]} {h
     higherDiff m h u x = higherDiff m h (polyFun P) x := by
   have hpos : (0 : ℝ) < 2 ^ k := by positivity
   have hfl : (⌊2 ^ k * x⌋₊ : ℝ) ≤ 2 ^ k * x := Nat.floor_le (by positivity)
-  rw [higherDiff_apply, higherDiff_apply]
+  rw [interval_higherDiff_apply, interval_higherDiff_apply]
   refine Finset.sum_congr rfl fun i hi => ?_
   have hi' : (i : ℝ) ≤ m := by exact_mod_cast Nat.lt_succ_iff.1 (Finset.mem_range.1 hi)
   have hmem : x + i * h ∈ dyadicIco k ⌊2 ^ k * x⌋₊ := by
@@ -413,17 +413,17 @@ theorem le_ppInverseConst_mul {r j k : ℕ} (hjk : j ≤ k) (K : ℝ≥0∞) {h 
 a single jump has `ω_r(a, t)_p ≈ t^(1/p)`. -/
 theorem exists_inverse_ppScheme {r : ℕ} (hp : p ≠ ∞) :
     ∃ CB : ℝ≥0∞, CB ≠ ∞ ∧ ∀ j k : ℕ, ∀ a ∈ ppScheme p r (2 ^ j),
-      lpModulus p r a k ≤ CB * dyadicWeight (-(1 / p.toReal)) (k - j) * ‖a‖ₑ := by
+      intervalLpModulus p r a k ≤ CB * dyadicWeight (-(1 / p.toReal)) (k - j) * ‖a‖ₑ := by
   obtain ⟨K, hK, hKb⟩ := enorm_polyFun_le (p := p) r hp
   refine ⟨ppInverseConst p r K, ppInverseConst_ne_top r hK, fun j k a ha => ?_⟩
   obtain ⟨Q, hQ, hae⟩ := mem_ppScheme_two_pow.1 ha
   rcases lt_or_ge k j with hkj | hjk
   · rw [Nat.sub_eq_zero_of_le hkj.le, ENNReal.dyadicWeight_zero_right, mul_one]
-    exact (lpModulus_le r a k).trans (by gcongr; exact two_pow_le_ppInverseConst r K)
+    exact (intervalLpModulus_le r a k).trans (by gcongr; exact two_pow_le_ppInverseConst r K)
   · have hnorm : ‖a‖ₑ = eLpNorm (ppFun j Q) p unitVol := by
       rw [Lp.enorm_def]
       exact eLpNorm_congr_ae hae
-    rw [lpModulus, modulus_congr_ae hae, hnorm, modulus_eq_iSup_nonneg]
+    rw [intervalLpModulus, intervalModulus_congr_ae hae, hnorm, intervalModulus_eq_iSup_nonneg]
     refine iSup₂_le fun h hh => ?_
     have hhj : h ≤ 1 / 2 ^ j := hh.2.trans (one_div_le_one_div_of_le (by positivity)
       (pow_le_pow_right₀ (by norm_num) hjk))
@@ -437,7 +437,8 @@ polynomials of degree `< r`, with inverse order `θ = 1/p` and Jackson's inequal
 level (Whitney's inequality at level `0`). -/
 noncomputable def ppModulusData {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
     ApproximationScheme.ModulusData (ppScheme p r) (1 / p.toReal) :=
-  .ofExists (lpModulus p r) (lpModulus_add_le r) (2 ^ r) (by simp) (lpModulus_le r) 0
+  .ofExists (intervalLpModulus p r) (intervalLpModulus_add_le r) (2 ^ r) (by simp)
+    (intervalLpModulus_le r) 0
     ((exists_approxError_ppScheme_le hr hp).imp fun _ h => ⟨h.1, fun f k _ => h.2 f k⟩)
     (exists_inverse_ppScheme hp)
 
@@ -449,7 +450,7 @@ for discontinuous pieces; higher smoothness needs smooth splines. -/
 theorem memApprox_ppScheme_iff {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) {s : ℝ} {q : ℝ≥0∞}
     (hq : 1 ≤ q) (hs : 0 ≤ s) (hsp : s < 1 / p.toReal) (f : Lp ℂ p unitVol) :
     (ppScheme p r).MemApprox s q f ↔
-      ‖f‖ₑ + ENNReal.lqNorm q (fun k => dyadicWeight s k * lpModulus p r f k) < ∞ :=
+      ‖f‖ₑ + ENNReal.lqNorm q (fun k => dyadicWeight s k * intervalLpModulus p r f k) < ∞ :=
   (ppModulusData hr hp).memApprox_iff_modNorm_lt_top hq hs hsp f
 
 end Interval

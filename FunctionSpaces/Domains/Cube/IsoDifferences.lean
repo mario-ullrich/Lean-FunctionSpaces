@@ -12,8 +12,8 @@ public import FunctionSpaces.Analysis.Differences.TranslationAlgebra
 # Isotropic differences and their expansion into coordinate differences
 
 The **isotropic difference** of order `r` with step `h ∈ ℝ^d`,
-`Δ_h^r f(x) = ∑_k (-1)^(r-k) C(r,k) f(x + kh)` (`Rd.higherDiff`, `Cube.higherDiff_apply`), moves all
-coordinates at once; with the step `t e_i` it is the difference in coordinate `i`
+`Δ_h^r f(x) = ∑_k (-1)^(r-k) C(r,k) f(x + kh)` (`Rd.higherDiff`, `Cube.cube_higherDiff_apply`),
+moves all coordinates at once; with the step `t e_i` it is the difference in coordinate `i`
 (`Cube.higherDiff_single`), so the isotropic modulus of smoothness of `ℝ^d` (sup norm) bounds the
 coordinate differences with `|t| ≤ s` at scale `s` (`Cube.eLpNorm_cubeDiff_le_smoothnessModulus`).
 The translation algebra `ℂ[ℝ^d]` of
@@ -21,13 +21,13 @@ The translation algebra `ℂ[ℝ^d]` of
 coordinates: the element `(δ_{h_i e_i} - 1)^m` acts by the coordinate difference `Δ^m_{h_i e_i}`
 (`Cube.diffAct_coordElem_pow`), a product of such elements along a list of coordinates by the mixed
 coordinate difference `M_m f = Δ^{m_0}_{h_0 e_0} ⋯ Δ^{m_{d-1}}_{h_{d-1} e_{d-1}} f`
-(`Cube.mixedDiff`, `Cube.diffAct_list_prod`), and the expansion
+(`Cube.cubeMixedDiff`, `Cube.diffAct_list_prod`), and the expansion
 `(δ_h - 1)^r = ∑_α δ_{s_α} ∏_i (δ_i - 1)^{m_i(α)}` (`TranslationAlgebra.single_sub_one_pow_eq_sum`)
 gives `Δ_h^r f(x) = ∑_α M_{m(α)} f(x + s_α)` (`Cube.higherDiff_eq_sum`): a sum of `d^r` mixed
 coordinate differences of total order `r`, at points shifted by `s_α`.
 
 The slices in coordinate `i` of a mixed difference in other coordinates are combinations of
-slices of `f` (`Cube.slice_mixedDiff_mem`), so they stay in every subspace of functions of one
+slices of `f` (`Cube.slice_cubeMixedDiff_mem`), so they stay in every subspace of functions of one
 variable that contains the slices of `f`.
 -/
 
@@ -46,7 +46,7 @@ variable {d : ℕ}
 /-! ### Isotropic differences -/
 
 /-- `Δ_h^r f(x) = ∑_{k ≤ r} (-1)^(r-k) C(r,k) f(x + kh)`. -/
-theorem higherDiff_apply (r : ℕ) (h : Fin d → ℝ) (f : (Fin d → ℝ) → ℂ) (x : Fin d → ℝ) :
+theorem cube_higherDiff_apply (r : ℕ) (h : Fin d → ℝ) (f : (Fin d → ℝ) → ℂ) (x : Fin d → ℝ) :
     higherDiff r h f x = ∑ k ∈ Finset.range (r + 1),
       ((-1 : ℂ) ^ (r - k) * (r.choose k : ℂ)) * f (x + (k : ℝ) • h) :=
   Rd.higherDiff_apply r h f x
@@ -61,7 +61,7 @@ isotropic difference with step `t e_i` is the difference `Cube.cubeDiff r t i` i
 theorem higherDiff_single (r : ℕ) (i : Fin d) (t : ℝ) (f : (Fin d → ℝ) → ℂ) :
     higherDiff r (Pi.single i t) f = cubeDiff r t i f := by
   funext x
-  rw [higherDiff_apply, cubeDiff_eq]
+  rw [cube_higherDiff_apply, cubeDiff_eq]
   refine Finset.sum_congr rfl fun k _ => ?_
   congr 2
   funext c
@@ -83,22 +83,22 @@ theorem eLpNorm_cubeDiff_le_smoothnessModulus {r : ℕ} {p : ℝ≥0∞} {f : (F
 
 /-- The **mixed coordinate difference** along a list of coordinates: the difference of order
 `m_i` with step `h_i` in each coordinate `i` of the list, the last one first. -/
-noncomputable def mixedDiff (m : Fin d → ℕ) (h : Fin d → ℝ) (l : List (Fin d))
+noncomputable def cubeMixedDiff (m : Fin d → ℕ) (h : Fin d → ℝ) (l : List (Fin d))
     (f : (Fin d → ℝ) → ℂ) : (Fin d → ℝ) → ℂ :=
   l.foldr (fun i g => cubeDiff (m i) (h i) i g) f
 
 /-- The mixed difference along the empty list is the function itself. -/
-theorem mixedDiff_nil (m : Fin d → ℕ) (h : Fin d → ℝ) (f : (Fin d → ℝ) → ℂ) :
-    mixedDiff m h [] f = f := rfl
+theorem cubeMixedDiff_nil (m : Fin d → ℕ) (h : Fin d → ℝ) (f : (Fin d → ℝ) → ℂ) :
+    cubeMixedDiff m h [] f = f := rfl
 
 /-- The mixed difference along `i :: l`. -/
-theorem mixedDiff_cons (m : Fin d → ℕ) (h : Fin d → ℝ) (i : Fin d) (l : List (Fin d))
+theorem cubeMixedDiff_cons (m : Fin d → ℕ) (h : Fin d → ℝ) (i : Fin d) (l : List (Fin d))
     (f : (Fin d → ℝ) → ℂ) :
-    mixedDiff m h (i :: l) f = cubeDiff (m i) (h i) i (mixedDiff m h l f) := rfl
+    cubeMixedDiff m h (i :: l) f = cubeDiff (m i) (h i) i (cubeMixedDiff m h l f) := rfl
 
 /-- Mixed differences of measurable functions are measurable. -/
-theorem measurable_mixedDiff (m : Fin d → ℕ) (h : Fin d → ℝ) (l : List (Fin d))
-    {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) : Measurable (mixedDiff m h l f) := by
+theorem measurable_cubeMixedDiff (m : Fin d → ℕ) (h : Fin d → ℝ) (l : List (Fin d))
+    {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) : Measurable (cubeMixedDiff m h l f) := by
   induction l with
   | nil => exact hf
   | cons i l ih => exact measurable_cubeDiff ih _ _ i
@@ -111,12 +111,12 @@ theorem diffAct_coordElem_pow (h : Fin d → ℝ) (i : Fin d) (m : ℕ) (f : (Fi
 /-- **Products of coordinate elements act by mixed differences**. -/
 theorem diffAct_list_prod (m : Fin d → ℕ) (h : Fin d → ℝ) (l : List (Fin d))
     (f : (Fin d → ℝ) → ℂ) :
-    diffAct ((l.map fun i => coordElem h i ^ m i).prod) f = mixedDiff m h l f := by
+    diffAct ((l.map fun i => coordElem h i ^ m i).prod) f = cubeMixedDiff m h l f := by
   induction l with
-  | nil => simp [mixedDiff_nil]
+  | nil => simp [cubeMixedDiff_nil]
   | cons i l ih =>
     rw [List.map_cons, List.prod_cons, map_mul, Module.End.mul_apply, ih,
-      diffAct_coordElem_pow, mixedDiff_cons]
+      diffAct_coordElem_pow, cubeMixedDiff_cons]
 
 /-! ### The expansion -/
 
@@ -125,7 +125,7 @@ theorem diffAct_list_prod (m : Fin d → ℕ) (h : Fin d → ℝ) (l : List (Fin
 multiplicities `m_i(α)` and the shifts `s_α`. -/
 theorem higherDiff_eq_sum (r : ℕ) (h : Fin d → ℝ) (f : (Fin d → ℝ) → ℂ) (x : Fin d → ℝ) :
     higherDiff r h f x = ∑ α : Fin r → Fin d,
-      mixedDiff (letterCount α) h (List.finRange d) f (x + shiftVec h α) := by
+      cubeMixedDiff (letterCount α) h (List.finRange d) f (x + shiftVec h α) := by
   rw [higherDiff_eq_diffAct, single_sub_one_pow_eq_sum, map_sum, LinearMap.sum_apply,
     Finset.sum_apply]
   refine Finset.sum_congr rfl fun α _ => ?_
@@ -150,15 +150,15 @@ theorem slice_cubeDiff_of_ne (m : ℕ) (t : ℝ) {c i : Fin d} (hci : c ≠ i)
 /-- **Slices of mixed differences stay in a subspace**: if every slice of `f` in coordinate `i`
 lies in a subspace `V` of functions of one variable, so does every slice in coordinate `i` of a
 mixed difference along a list of coordinates `≠ i`. -/
-theorem slice_mixedDiff_mem (V : Submodule ℂ (ℝ → ℂ)) (m : Fin d → ℕ) (h : Fin d → ℝ)
+theorem slice_cubeMixedDiff_mem (V : Submodule ℂ (ℝ → ℂ)) (m : Fin d → ℕ) (h : Fin d → ℝ)
     {i : Fin d} {l : List (Fin d)} (hl : i ∉ l) {f : (Fin d → ℝ) → ℂ}
-    (hf : ∀ x, slice f x i ∈ V) (x : Fin d → ℝ) : slice (mixedDiff m h l f) x i ∈ V := by
+    (hf : ∀ x, slice f x i ∈ V) (x : Fin d → ℝ) : slice (cubeMixedDiff m h l f) x i ∈ V := by
   induction l generalizing x with
   | nil => exact hf x
   | cons c l ih =>
     have hci : c ≠ i := fun h => hl (h ▸ List.mem_cons_self)
     have hl' : i ∉ l := fun h => hl (List.mem_cons_of_mem c h)
-    rw [mixedDiff_cons, slice_cubeDiff_of_ne _ _ hci]
+    rw [cubeMixedDiff_cons, slice_cubeDiff_of_ne _ _ hci]
     exact Submodule.sum_mem _ fun k _ => Submodule.smul_mem _ _ (ih hl' _)
 
 end Cube

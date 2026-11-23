@@ -48,7 +48,7 @@ ranges, orthogonal complements and duals, on which the vector-valued Sobolev spa
   almost everywhere measurable `g_j : V → [0, ∞]`, `j ∈ ℕ`,
   `‖ x ↦ ‖(M g_j(x))_j‖_{ℓ_q} ‖_p ≤ C ‖ x ↦ ‖(g_j(x))_j‖_{ℓ_q} ‖_p` with the explicit constant
   `C = Rd.feffermanSteinConst V p q` (`Rd.feffermanStein`). The case `p < q` rests on a
-  vector-valued weak type `(1,1)` (`Rd.volume_lqNorm_maximal_gt_le`), proved with the
+  vector-valued weak type `(1,1)` (`Rd.volume_lqNorm_maximalFunction_gt_le`), proved with the
   Calderón–Zygmund decomposition on dyadic cubes.
 * **The signed Calderón–Zygmund decomposition.** Let `E` be a real normed space, such as `ℂ`,
   and `f : V → E`. For the maximal big dyadic cubes `Q` of a function `G : V → [0, ∞]` at height

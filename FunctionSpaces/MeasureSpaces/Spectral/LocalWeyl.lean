@@ -36,8 +36,8 @@ frequencies of degree `< n` (`Torus.localWeylBound_fourierEigenbasis`).
   (`ContinuousSpectralBasis.exists_continuous_of_localWeyl`): every `f ∈ L_2(μ)` with
   `∑_i (1 + λ(i))^(2s) |⟨e_i, f⟩|² < ∞` has a bounded continuous representative. The partial
   sums `S_n f = ∑_{λ(i) < n} ⟨e_i, f⟩ ẽ_i` are continuous
-  (`ContinuousSpectralBasis.partialSum`), and on the dyadic levels the Nikolskii inequality and
-  the truncation error `‖f - P_n f‖_2 ≤ n^(-s) ‖c‖` give
+  (`ContinuousSpectralBasis.spectralPartialSum`), and on the dyadic levels the Nikolskii inequality
+  and the truncation error `‖f - P_n f‖_2 ≤ n^(-s) ‖c‖` give
   `‖S_{2^(k+1)} f - S_{2^k} f‖_∞ ≤ C^(1/2) 2^(D/2) ‖c‖ (2^(D/2 - s))^k`, a geometric series; the
   uniform limit represents `f`.
 -/
@@ -59,12 +59,12 @@ namespace ContinuousSpectralBasis
 variable {ι : Type*} {μ : Measure M} [IsFiniteMeasure μ] (B : ContinuousSpectralBasis ι μ)
 
 /-- The finite set of the indices of level `< n`. -/
-noncomputable def levelSet (n : ℕ) : Finset ι := (B.finite_level n).toFinset
+noncomputable def spectralLevelSet (n : ℕ) : Finset ι := (B.finite_level n).toFinset
 
 /-- `i` lies in the level set `< n` iff `λ(i) < n`. -/
 @[simp]
-theorem mem_levelSet {n : ℕ} {i : ι} : i ∈ B.levelSet n ↔ B.level i < n := by
-  simp [levelSet]
+theorem mem_spectralLevelSet {n : ℕ} {i : ι} : i ∈ B.spectralLevelSet n ↔ B.level i < n := by
+  simp [spectralLevelSet]
 
 /-- The **local Weyl bound** of dimension `D` with constant `C ≥ 0`:
 `∑_{λ(i) < n} |ẽ_i(x)|² ≤ C n^D` for every point `x` and every `n ≥ 1`. A hypothesis on the
@@ -73,14 +73,14 @@ structure LocalWeylBound (D C : ℝ) : Prop where
   /-- The constant is nonnegative. -/
   nonneg : 0 ≤ C
   /-- `∑_{λ(i) < n} |ẽ_i(x)|² ≤ C n^D` for every `n ≥ 1` and every `x`. -/
-  le : ∀ n : ℕ, 1 ≤ n → ∀ x : M, ∑ i ∈ B.levelSet n, ‖B.basisFun i x‖ ^ 2 ≤ C * (n : ℝ) ^ D
+  le : ∀ n : ℕ, 1 ≤ n → ∀ x : M, ∑ i ∈ B.spectralLevelSet n, ‖B.basisFun i x‖ ^ 2 ≤ C * (n : ℝ) ^ D
 
 /-- An element of the span of level `< n` is a combination `∑_{λ(i) < n} c_i ẽ_i`. -/
 theorem exists_sum_of_mem_basisSpan {n : ℕ} {a : M →ᵇ ℂ} (ha : a ∈ B.basisSpan n) :
-    ∃ c : ι → ℂ, a = ∑ i ∈ B.levelSet n, c i • B.basisFun i := by
+    ∃ c : ι → ℂ, a = ∑ i ∈ B.spectralLevelSet n, c i • B.basisFun i := by
   classical
   obtain ⟨t, ht, c, hc⟩ := (Submodule.mem_span_image_iff_exists_fun ℂ).1 ha
-  have hsub : t ⊆ B.levelSet n := fun i hi => B.mem_levelSet.2 (ht hi)
+  have hsub : t ⊆ B.spectralLevelSet n := fun i hi => B.mem_spectralLevelSet.2 (ht hi)
   refine ⟨fun i => if hi : i ∈ t then c ⟨i, hi⟩ else 0, ?_⟩
   calc a = ∑ i ∈ t, (if hi : i ∈ t then c ⟨i, hi⟩ else 0) • B.basisFun i := by
         rw [← hc, ← Finset.sum_coe_sort t]
@@ -108,7 +108,7 @@ theorem norm_sq_le_of_localWeyl {D C : ℝ} (hW : B.LocalWeylBound D C) {n : ℕ
     ‖a‖ ^ 2 ≤ C * (n : ℝ) ^ D * ‖BoundedContinuousFunction.toLp (E := ℂ) 2 μ ℂ a‖ ^ 2 := by
   obtain ⟨c, rfl⟩ := B.exists_sum_of_mem_basisSpan ha
   rw [B.norm_toLp_sum_sq]
-  set t := B.levelSet n
+  set t := B.spectralLevelSet n
   set N := ∑ i ∈ t, ‖c i‖ ^ 2
   have hK : 0 ≤ C * (n : ℝ) ^ D := mul_nonneg hW.nonneg (by positivity)
   have hN : 0 ≤ N := Finset.sum_nonneg fun _ _ => by positivity
@@ -204,54 +204,60 @@ theorem norm_le_of_localWeyl {D C : ℝ} (hW : B.LocalWeylBound D C) {n : ℕ} (
 variable (B)
 
 /-- The **partial sum** `S_n f = ∑_{λ(i) < n} ⟨e_i, f⟩ ẽ_i`, a bounded continuous function. -/
-noncomputable def partialSum (n : ℕ) (f : Lp ℂ 2 μ) : M →ᵇ ℂ :=
-  ∑ i ∈ B.levelSet n, B.basis.repr f i • B.basisFun i
+noncomputable def spectralPartialSum (n : ℕ) (f : Lp ℂ 2 μ) : M →ᵇ ℂ :=
+  ∑ i ∈ B.spectralLevelSet n, B.basis.repr f i • B.basisFun i
 
 /-- The partial sum lies in the span of level `< n`. -/
-theorem partialSum_mem_basisSpan (n : ℕ) (f : Lp ℂ 2 μ) : B.partialSum n f ∈ B.basisSpan n :=
+theorem spectralPartialSum_mem_basisSpan (n : ℕ) (f : Lp ℂ 2 μ) :
+    B.spectralPartialSum n f ∈ B.basisSpan n :=
   Submodule.sum_mem _ fun _ hi =>
-    Submodule.smul_mem _ _ (B.basisFun_mem_basisSpan (B.mem_levelSet.1 hi))
+    Submodule.smul_mem _ _ (B.basisFun_mem_basisSpan (B.mem_spectralLevelSet.1 hi))
 
 /-- The `L_2` class of the partial sum is the truncation `P_n f`. -/
-theorem toLp_partialSum (n : ℕ) (f : Lp ℂ 2 μ) :
-    BoundedContinuousFunction.toLp (E := ℂ) 2 μ ℂ (B.partialSum n f) = B.truncate n f := by
-  rw [partialSum, map_sum]
+theorem toLp_spectralPartialSum (n : ℕ) (f : Lp ℂ 2 μ) :
+    BoundedContinuousFunction.toLp (E := ℂ) 2 μ ℂ (B.spectralPartialSum n f) =
+      B.levelTruncate n f := by
+  rw [spectralPartialSum, map_sum]
   simp_rw [map_smul, B.toLp_basisFun]
   rfl
 
 /-- For `m ≤ n`, `‖P_n f - P_m f‖_2 ≤ ‖f - P_m f‖_2`: the difference keeps the coefficients of
 the levels in `[m, n)`. -/
-theorem norm_truncate_sub_truncate_le {m n : ℕ} (hmn : m ≤ n) (f : Lp ℂ 2 μ) :
-    ‖B.truncate n f - B.truncate m f‖ ≤ ‖f - B.truncate m f‖ := by
-  have hsub : B.truncate n f - B.truncate m f = B.truncate n (f - B.truncate m f) := by
-    rw [sub_eq_add_neg f, B.truncate_add, ← neg_one_smul ℂ (B.truncate m f), B.truncate_smul,
-      B.truncate_of_mem (B.span_mono hmn (B.truncate_mem_span m f)), neg_one_smul,
+theorem norm_levelTruncate_sub_levelTruncate_le {m n : ℕ} (hmn : m ≤ n) (f : Lp ℂ 2 μ) :
+    ‖B.levelTruncate n f - B.levelTruncate m f‖ ≤ ‖f - B.levelTruncate m f‖ := by
+  have hsub : B.levelTruncate n f - B.levelTruncate m f =
+      B.levelTruncate n (f - B.levelTruncate m f) := by
+    rw [sub_eq_add_neg f, B.levelTruncate_add, ← neg_one_smul ℂ (B.levelTruncate m f),
+      B.levelTruncate_smul,
+      B.levelTruncate_of_mem (B.levelSpan_mono hmn (B.levelTruncate_mem_levelSpan m f)),
+        neg_one_smul,
       ← sub_eq_add_neg]
   rw [hsub]
-  exact B.norm_truncate_le n _
+  exact B.norm_levelTruncate_le n _
 
 variable {B}
 
 /-- **The dyadic steps of the partial sums** of a Sobolev element `f = J_s c` under the local
 Weyl bound: `‖S_{2^(k+1)} f - S_{2^k} f‖_∞ ≤ C^(1/2) 2^(D/2) ‖c‖ (2^(D/2 - s))^k`. -/
-theorem norm_partialSum_succ_sub_le {D C : ℝ} (hW : B.LocalWeylBound D C) {s : ℝ} (hs : 0 ≤ s)
-    (c : ℓ²(ι, ℂ)) (k : ℕ) :
-    ‖B.partialSum (2 ^ (k + 1)) (B.sobolevEmbed s hs c) -
-        B.partialSum (2 ^ k) (B.sobolevEmbed s hs c)‖ ≤
+theorem norm_spectralPartialSum_succ_sub_le {D C : ℝ} (hW : B.LocalWeylBound D C) {s : ℝ}
+    (hs : 0 ≤ s) (c : ℓ²(ι, ℂ)) (k : ℕ) :
+    ‖B.spectralPartialSum (2 ^ (k + 1)) (B.sobolevEmbed s hs c) -
+        B.spectralPartialSum (2 ^ k) (B.sobolevEmbed s hs c)‖ ≤
       Real.sqrt C * (2 : ℝ) ^ (D / 2) * ‖c‖ * ((2 : ℝ) ^ (D / 2 - s)) ^ k := by
   set f := B.sobolevEmbed s hs c
   have hC := hW.nonneg
-  have hmem : B.partialSum (2 ^ (k + 1)) f - B.partialSum (2 ^ k) f ∈ B.basisSpan (2 ^ (k + 1)) :=
-    Submodule.sub_mem _ (B.partialSum_mem_basisSpan _ f)
+  have hmem : B.spectralPartialSum (2 ^ (k + 1)) f - B.spectralPartialSum (2 ^ k) f ∈
+      B.basisSpan (2 ^ (k + 1)) :=
+    Submodule.sub_mem _ (B.spectralPartialSum_mem_basisSpan _ f)
       (B.basisSpan_mono (Nat.pow_le_pow_right two_pos (Nat.le_succ k))
-        (B.partialSum_mem_basisSpan _ f))
+        (B.spectralPartialSum_mem_basisSpan _ f))
   have hL2 : ‖BoundedContinuousFunction.toLp (E := ℂ) 2 μ ℂ
-      (B.partialSum (2 ^ (k + 1)) f - B.partialSum (2 ^ k) f)‖ ≤
+      (B.spectralPartialSum (2 ^ (k + 1)) f - B.spectralPartialSum (2 ^ k) f)‖ ≤
         ((2 ^ k : ℕ) : ℝ) ^ (-s) * ‖c‖ := by
-    rw [map_sub, B.toLp_partialSum, B.toLp_partialSum]
-    exact (B.norm_truncate_sub_truncate_le
+    rw [map_sub, B.toLp_spectralPartialSum, B.toLp_spectralPartialSum]
+    exact (B.norm_levelTruncate_sub_levelTruncate_le
       (Nat.pow_le_pow_right two_pos (Nat.le_succ k)) f).trans
-      (B.norm_sub_truncate_le s hs (Nat.one_le_two_pow) c)
+      (B.norm_sub_levelTruncate_le s hs (Nat.one_le_two_pow) c)
   have h2 : (0 : ℝ) < 2 := two_pos
   calc _ ≤ Real.sqrt (C * ((2 ^ (k + 1) : ℕ) : ℝ) ^ D) * (((2 ^ k : ℕ) : ℝ) ^ (-s) * ‖c‖) :=
         (norm_le_sqrt_mul_of_localWeyl hW Nat.one_le_two_pow hmem).trans
@@ -277,12 +283,12 @@ theorem exists_continuous_of_localWeyl {D C : ℝ} (hW : B.LocalWeylBound D C) {
     ∃ g : M →ᵇ ℂ, BoundedContinuousFunction.toLp (E := ℂ) 2 μ ℂ g = f := by
   obtain ⟨c, rfl⟩ := (B.mem_range_sobolevEmbed_iff s hs.le f).2 hf
   set f := B.sobolevEmbed s hs.le c
-  set u : ℕ → M →ᵇ ℂ := fun k => B.partialSum (2 ^ k) f
+  set u : ℕ → M →ᵇ ℂ := fun k => B.spectralPartialSum (2 ^ k) f
   have hr : (2 : ℝ) ^ (D / 2 - s) < 1 := Real.rpow_lt_one_of_one_lt_of_neg one_lt_two (by linarith)
   have hcauchy : CauchySeq u := by
     refine cauchySeq_of_le_geometric _ (Real.sqrt C * (2 : ℝ) ^ (D / 2) * ‖c‖) hr fun k => ?_
     rw [dist_comm, dist_eq_norm]
-    exact norm_partialSum_succ_sub_le hW hs.le c k
+    exact norm_spectralPartialSum_succ_sub_le hW hs.le c k
   obtain ⟨g, hg⟩ := cauchySeq_tendsto_of_complete hcauchy
   refine ⟨g, tendsto_nhds_unique
     ((BoundedContinuousFunction.toLp (E := ℂ) 2 μ ℂ).continuous.tendsto g |>.comp hg) ?_⟩
@@ -293,8 +299,8 @@ theorem exists_continuous_of_localWeyl {D C : ℝ} (hW : B.LocalWeylBound D C) {
       (Real.rpow_lt_one_of_one_lt_of_neg one_lt_two (neg_lt_zero.2 hs))).mul_const ‖c‖
   rw [tendsto_iff_norm_sub_tendsto_zero]
   refine squeeze_zero (fun k => norm_nonneg _) (fun k => ?_) hlim
-  change ‖BoundedContinuousFunction.toLp (E := ℂ) 2 μ ℂ (B.partialSum (2 ^ k) f) - f‖ ≤ _
-  rw [B.toLp_partialSum, norm_sub_rev]
-  exact B.norm_sub_truncate_le s hs.le Nat.one_le_two_pow c
+  change ‖BoundedContinuousFunction.toLp (E := ℂ) 2 μ ℂ (B.spectralPartialSum (2 ^ k) f) - f‖ ≤ _
+  rw [B.toLp_spectralPartialSum, norm_sub_rev]
+  exact B.norm_sub_levelTruncate_le s hs.le Nat.one_le_two_pow c
 
 end ContinuousSpectralBasis

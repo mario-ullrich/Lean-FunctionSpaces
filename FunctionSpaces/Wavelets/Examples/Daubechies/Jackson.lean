@@ -21,9 +21,9 @@ every level `j ∈ ℕ`, the error of best approximation from `V_j` obeys
 
 with the modulus of smoothness `ω_N(f, t)_p = sup_{|h| ≤ t} ‖Δ_h^N f‖_{L_p(ℝ)}`
 (`Rd.smoothnessModulus`) and a constant `C_J` that depends only on the mask and on `p`
-(`Daubechies.jacksonConst`, `Daubechies.approxError_scheme_le_jacksonConst_mul`). This is the
-Jackson inequality of the Daubechies scheme (`Daubechies.approxError_scheme_le`). With the uniform
-bound `C` of the projections it gives `‖f - P_j f‖_p ≤ (1 + C) C_J ω_N(f, 2^(-j))_p`
+(`Daubechies.daubechiesJacksonConst`, `Daubechies.approxError_scheme_le_jacksonConst_mul`). This is
+the Jackson inequality of the Daubechies scheme (`Daubechies.approxError_scheme_le`). With the
+uniform bound `C` of the projections it gives `‖f - P_j f‖_p ≤ (1 + C) C_J ω_N(f, 2^(-j))_p`
 (`Daubechies.enorm_sub_proj_le`), and for continuous `f` directly
 `‖f - P_j f‖_p ≤ C_J ω_N(f, 2^(-j))_p` (`Daubechies.eLpNorm_sub_projFun_le_smoothnessModulus`).
 
@@ -349,12 +349,12 @@ theorem eLpNorm_sub_projFun_le_add (hN : 2 ≤ N) {p : ℝ≥0∞} (hp1 : 1 ≤ 
 `C = projConst m p` of the projections and the constant `C_S = smoothJacksonConst m p` for smooth
 functions (`Daubechies.eLpNorm_sub_projFun_le_smoothnessModulus`). It depends only on the mask and
 on `p`. -/
-noncomputable def jacksonConst (p : ℝ≥0∞) : ℝ≥0∞ :=
+noncomputable def daubechiesJacksonConst (p : ℝ≥0∞) : ℝ≥0∞ :=
   1 + ENNReal.ofReal (projConst m p) + smoothJacksonConst m p * (2 ^ N * (N : ℝ≥0∞) ^ N)
 
-/-- The constant `jacksonConst m p` is finite for `N ≥ 2`
+/-- The constant `daubechiesJacksonConst m p` is finite for `N ≥ 2`
 (`Daubechies.smoothJacksonConst_ne_top`). -/
-theorem jacksonConst_ne_top (hN : 2 ≤ N) (p : ℝ≥0∞) : jacksonConst m p ≠ ∞ :=
+theorem daubechiesJacksonConst_ne_top (hN : 2 ≤ N) (p : ℝ≥0∞) : daubechiesJacksonConst m p ≠ ∞ :=
   ENNReal.add_ne_top.2 ⟨ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top, ENNReal.ofReal_ne_top⟩,
     ENNReal.mul_ne_top (smoothJacksonConst_ne_top m hN p)
       (ENNReal.mul_ne_top (ENNReal.pow_ne_top ENNReal.ofNat_ne_top)
@@ -363,11 +363,11 @@ theorem jacksonConst_ne_top (hN : 2 ≤ N) (p : ℝ≥0∞) : jacksonConst m p �
 /-- **Combining the two bounds of Jackson's inequality**: for all `A, B, ω ∈ [0, ∞]` and every
 level `j`, if `A ≤ ω` and `B ≤ 2^N N^N 2^(jN) ω`, then
 `(1 + C) A + C_S 2^(-jN) B ≤ C_J ω` with `C = projConst m p`, `C_S = smoothJacksonConst m p` and
-`C_J = jacksonConst m p`: the factors `2^(-jN)` and `2^(jN)` cancel. -/
-theorem add_le_jacksonConst_mul {p A B ω : ℝ≥0∞} (j : ℕ) (hA : A ≤ ω)
+`C_J = daubechiesJacksonConst m p`: the factors `2^(-jN)` and `2^(jN)` cancel. -/
+theorem add_le_daubechiesJacksonConst_mul {p A B ω : ℝ≥0∞} (j : ℕ) (hA : A ≤ ω)
     (hB : B ≤ 2 ^ N * (N : ℝ≥0∞) ^ N * 2 ^ (j * N) * ω) :
     (1 + ENNReal.ofReal (projConst m p)) * A + smoothJacksonConst m p * (2 ^ (j * N))⁻¹ * B ≤
-      jacksonConst m p * ω := by
+      daubechiesJacksonConst m p * ω := by
   have h0 : (2 : ℝ≥0∞) ^ (j * N) ≠ 0 := pow_ne_zero _ two_ne_zero
   have htop : (2 : ℝ≥0∞) ^ (j * N) ≠ ∞ := ENNReal.pow_ne_top ENNReal.ofNat_ne_top
   calc (1 + ENNReal.ofReal (projConst m p)) * A + smoothJacksonConst m p * (2 ^ (j * N))⁻¹ * B
@@ -379,31 +379,32 @@ theorem add_le_jacksonConst_mul {p A B ω : ℝ≥0∞} (j : ℕ) (hA : A ≤ ω
         smoothJacksonConst m p * (2 ^ N * (N : ℝ≥0∞) ^ N) * ω *
           ((2 ^ (j * N))⁻¹ * 2 ^ (j * N)) := by
         ring
-    _ = jacksonConst m p * ω := by
-        rw [ENNReal.inv_mul_cancel h0 htop, mul_one, jacksonConst]
+    _ = daubechiesJacksonConst m p * ω := by
+        rw [ENNReal.inv_mul_cancel h0 htop, mul_one, daubechiesJacksonConst]
         ring
 
 /-- **Jackson's inequality for continuous functions**: for `N ≥ 2`, `1 ≤ p < ∞`, every continuous
 `f : ℝ → ℂ` and every level `j`,
-`‖f - P_j f‖_p ≤ C_J ω_N(f, 2^(-j))_p` with `C_J = jacksonConst m p` and the modulus of
+`‖f - P_j f‖_p ≤ C_J ω_N(f, 2^(-j))_p` with `C_J = daubechiesJacksonConst m p` and the modulus of
 smoothness `ω_N(f, t)_p = sup_{|h| ≤ t} ‖Δ_h^N f‖_{L_p(ℝ)}` (`Rd.smoothnessModulus volume`). With
 the Steklov smoothing `S = S_δ f` at the step `δ = 1/(N 2^j)`, which lies in `C^N`
-(`Interval.contDiff_smooth`): `‖f - S‖_p ≤ ω_N(f, 2^(-j))_p`
-(`Daubechies.eLpNorm_sub_smooth_le_dyadic`), `‖S^(N)‖_p ≤ 2^N N^N 2^(jN) ω_N(f, 2^(-j))_p`
-(`Daubechies.eLpNorm_iteratedDeriv_smooth_le_dyadic`), hence
+(`Interval.contDiff_steklovSmooth`): `‖f - S‖_p ≤ ω_N(f, 2^(-j))_p`
+(`Daubechies.eLpNorm_sub_steklovSmooth_le_dyadic`), `‖S^(N)‖_p ≤ 2^N N^N 2^(jN) ω_N(f, 2^(-j))_p`
+(`Daubechies.eLpNorm_iteratedDeriv_steklovSmooth_le_dyadic`), hence
 `‖S - P_j S‖_p ≤ C_S 2^N N^N ω_N(f, 2^(-j))_p` (`Daubechies.eLpNorm_sub_projFun_le_of_contDiff`),
-and `Daubechies.eLpNorm_sub_projFun_le_add` with `Daubechies.add_le_jacksonConst_mul` combines
-the two bounds. The inequality holds in `[0, ∞]` for every continuous `f`. -/
+and `Daubechies.eLpNorm_sub_projFun_le_add` with `Daubechies.add_le_daubechiesJacksonConst_mul`
+combines the two bounds. The inequality holds in `[0, ∞]` for every continuous `f`. -/
 theorem eLpNorm_sub_projFun_le_smoothnessModulus (hN : 2 ≤ N) {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞)
     {f : ℝ → ℂ} (hf : Continuous f) (j : ℕ) :
     eLpNorm (fun x => f x - projFun m j f x) p volume ≤
-      jacksonConst m p * Rd.smoothnessModulus volume N p f (1 / 2 ^ j) := by
-  have hS := Interval.contDiff_smooth hf N (1 / (N * 2 ^ j))
+      daubechiesJacksonConst m p * Rd.smoothnessModulus volume N p f (1 / 2 ^ j) := by
+  have hS := Interval.contDiff_steklovSmooth hf N (1 / (N * 2 ^ j))
   refine (eLpNorm_sub_projFun_le_add m hN hp1 hp hf.locallyIntegrable
     hS.continuous.locallyIntegrable j).trans ((add_le_add le_rfl
       (eLpNorm_sub_projFun_le_of_contDiff m hN hp1 hp hS j)).trans ?_)
-  exact add_le_jacksonConst_mul m j (eLpNorm_sub_smooth_le_dyadic hf (by omega) j hp1 hp)
-    (eLpNorm_iteratedDeriv_smooth_le_dyadic hf (by omega) j hp1)
+  exact add_le_daubechiesJacksonConst_mul m j
+    (eLpNorm_sub_steklovSmooth_le_dyadic hf (by omega) j hp1 hp)
+    (eLpNorm_iteratedDeriv_steklovSmooth_le_dyadic hf (by omega) j hp1)
 
 /-! ### Jackson's inequality on `L_p` -/
 
@@ -413,12 +414,12 @@ variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 
 /-- **Jackson's inequality for a continuous representative**: for `N ≥ 2`, `1 ≤ p < ∞`, every
 `f ∈ L_p(ℝ)` that agrees almost everywhere with a continuous function `g`, and every level `j`,
-`‖f - P_j f‖_p ≤ C_J ω_N(f, 2^(-j))_p` with `C_J = jacksonConst m p`
+`‖f - P_j f‖_p ≤ C_J ω_N(f, 2^(-j))_p` with `C_J = daubechiesJacksonConst m p`
 (`Daubechies.eLpNorm_sub_projFun_le_smoothnessModulus` for `g`; both sides depend only on the class
 of `f`, `Daubechies.projFun_congr_ae` and `Rd.smoothnessModulus_congr_ae`). -/
 theorem enorm_sub_proj_le_of_continuous (hN : 2 ≤ N) (hp : p ≠ ∞)
     {f : Lp ℂ p (volume : Measure ℝ)} {g : ℝ → ℂ} (hg : Continuous g) (hfg : ⇑f =ᵐ[volume] g)
-    (j : ℕ) : ‖f - proj m p hN hp j f‖ₑ ≤ jacksonConst m p * Rd.lpModulus p N f j := by
+    (j : ℕ) : ‖f - proj m p hN hp j f‖ₑ ≤ daubechiesJacksonConst m p * Rd.lpModulus p N f j := by
   have hP : ⇑(proj m p hN hp j f) =ᵐ[volume] projFun m j g :=
     (proj_apply_ae m hN hp j f).trans (EventuallyEq.of_eq (projFun_congr_ae m hfg j))
   rw [Lp.enorm_def, eLpNorm_congr_ae ((Lp.coeFn_sub _ _).trans (hfg.sub hP)), Rd.lpModulus,
@@ -428,19 +429,20 @@ theorem enorm_sub_proj_le_of_continuous (hN : 2 ≤ N) (hp : p ≠ ∞)
 /-- **Jackson's inequality for the Daubechies scheme, with its constant**: for `N ≥ 2`,
 `1 ≤ p < ∞`, every `f ∈ L_p(ℝ)` and every level `j`, the error of best approximation from the
 scaling space `V_j` (the approximants of complexity `2^j`, `Daubechies.mem_scheme_two_pow`)
-satisfies `E_{2^j}(f)_p ≤ C_J ω_N(f, 2^(-j))_p` with `C_J = jacksonConst m p`. For `f` with a
-bounded continuous representative, `P_j f ∈ V_j` gives `E_{2^j}(f)_p ≤ ‖f - P_j f‖_p`
+satisfies `E_{2^j}(f)_p ≤ C_J ω_N(f, 2^(-j))_p` with `C_J = daubechiesJacksonConst m p`. For `f`
+with a bounded continuous representative, `P_j f ∈ V_j` gives `E_{2^j}(f)_p ≤ ‖f - P_j f‖_p`
 (`Daubechies.enorm_sub_proj_le_of_continuous`); these `f` are dense in `L_p` (Mathlib's
 `MeasureTheory.Lp.boundedContinuousFunction_dense`), and both sides are controlled by `‖f‖_p`
 (`Rd.lpModulus_add_le`, `Rd.lpModulus_le`), so the bound extends to all of `L_p`
 (`ApproximationScheme.approxError_le_of_dense`). -/
 theorem approxError_scheme_le_jacksonConst_mul (hN : 2 ≤ N) (hp : p ≠ ∞)
     (f : Lp ℂ p (volume : Measure ℝ)) (j : ℕ) :
-    (scheme m p hN hp).approxError f (2 ^ j) ≤ jacksonConst m p * Rd.lpModulus p N f j := by
+    (scheme m p hN hp).approxError f (2 ^ j) ≤
+      daubechiesJacksonConst m p * Rd.lpModulus p N f j := by
   refine ApproximationScheme.approxError_le_of_dense
     (Lp.boundedContinuousFunction_dense ℂ volume hp) (fun f g => Rd.lpModulus_add_le N f g j)
     (C0 := 2 ^ N) (ENNReal.pow_ne_top ENNReal.ofNat_ne_top) (fun f => Rd.lpModulus_le N f j)
-    (jacksonConst_ne_top m hN p) (fun g hg => ?_) f
+    (daubechiesJacksonConst_ne_top m hN p) (fun g hg => ?_) f
   obtain ⟨g₀, hg₀⟩ := Lp.mem_boundedContinuousFunction_iff.1 hg
   have hae : ⇑g =ᵐ[volume] g₀ := by
     have h := g₀.toContinuousMap.coeFn_toAEEqFun volume
@@ -454,15 +456,17 @@ theorem approxError_scheme_le_jacksonConst_mul (hN : 2 ≤ N) (hp : p ≠ ∞)
 constant `C_J < ∞` such that for every `f ∈ L_p(ℝ)` and every level `j` the error of best
 approximation from the scaling space `V_j` satisfies `E_{2^j}(f)_p ≤ C_J ω_N(f, 2^(-j))_p`, the
 Jackson inequality of an approximation scheme with modulus `ω_N` at the dyadic scales. The
-constant `C_J = jacksonConst m p` serves (`Daubechies.approxError_scheme_le_jacksonConst_mul`). -/
+constant `C_J = daubechiesJacksonConst m p` serves
+(`Daubechies.approxError_scheme_le_jacksonConst_mul`). -/
 theorem approxError_scheme_le (hN : 2 ≤ N) (hp : p ≠ ∞) :
     ∃ C_J : ℝ≥0∞, C_J ≠ ∞ ∧ ∀ (f : Lp ℂ p (volume : Measure ℝ)) (j : ℕ),
       (scheme m p hN hp).approxError f (2 ^ j) ≤ C_J * Rd.lpModulus p N f j :=
-  ⟨jacksonConst m p, jacksonConst_ne_top m hN p, approxError_scheme_le_jacksonConst_mul m hN hp⟩
+  ⟨daubechiesJacksonConst m p, daubechiesJacksonConst_ne_top m hN p,
+    approxError_scheme_le_jacksonConst_mul m hN hp⟩
 
 /-- **Jackson's inequality for the projections**: for `N ≥ 2`, `1 ≤ p < ∞`, every `f ∈ L_p(ℝ)` and
 every level `j`, `‖f - P_j f‖_p ≤ (1 + C) C_J ω_N(f, 2^(-j))_p` with the uniform bound
-`C = projConst m p` of the projections and `C_J = jacksonConst m p`. This is the Lebesgue
+`C = projConst m p` of the projections and `C_J = daubechiesJacksonConst m p`. This is the Lebesgue
 inequality `‖f - P_j f‖_p ≤ (1 + C) E_{2^j}(f)_p`
 (`ApproximationScheme.ProjectionScheme.enorm_sub_le_approxError` for the projection scheme
 `Daubechies.projectionScheme`, whose projection of complexity `2^j` is `P_j`,
@@ -470,7 +474,7 @@ inequality `‖f - P_j f‖_p ≤ (1 + C) E_{2^j}(f)_p`
 `Daubechies.approxError_scheme_le_jacksonConst_mul`. -/
 theorem enorm_sub_proj_le (hN : 2 ≤ N) (hp : p ≠ ∞) (f : Lp ℂ p (volume : Measure ℝ)) (j : ℕ) :
     ‖f - proj m p hN hp j f‖ₑ ≤
-      (1 + ENNReal.ofReal (projConst m p)) * jacksonConst m p * Rd.lpModulus p N f j := by
+      (1 + ENNReal.ofReal (projConst m p)) * daubechiesJacksonConst m p * Rd.lpModulus p N f j := by
   have h := (projectionScheme m p hN hp).enorm_sub_le_approxError (2 ^ j) f
   rw [projectionScheme_two_pow] at h
   refine h.trans ?_

@@ -406,25 +406,26 @@ Neumann space, `σ_i⁻² = 1 + λ_i` for the Neumann eigenvalue `λ_i`
 (`Rd.BoundedLipschitzDomain.one_add_neumannEigenvalue`), so the level is `⌊√(1 + λ_i)⌋₊`
 (`Rd.BoundedLipschitzDomain.neumannScheme_level`). -/
 noncomputable def neumannScheme :
-    SpectralScheme Ω.neumannCompactEmbedding.index
+    SpectralScheme Ω.neumannCompactEmbedding.eigenpairIndex
       (Lp ℂ 2 (volume.restrict (Ω.toOpens : Set V))) :=
   Ω.neumannCompactEmbedding.spectralScheme
 
 /-- The singular values of the Neumann embedding are at most `1`
 (`Rd.norm_neumannEmbedding_le`). -/
-theorem singularValue_neumannCompactEmbedding_le_one (i : Ω.neumannCompactEmbedding.index) :
+theorem singularValue_neumannCompactEmbedding_le_one
+    (i : Ω.neumannCompactEmbedding.eigenpairIndex) :
     Ω.neumannCompactEmbedding.singularValue i ≤ 1 :=
   (Ω.neumannCompactEmbedding.singularValue_le_norm i).trans norm_neumannEmbedding_le
 
 /-- **The Neumann eigenvalue** `λ_i = σ_i⁻² - 1` of the index `i`, `σ_i` the singular value of the
 Neumann embedding; `-Δ φ_i = λ_i φ_i` weakly with the natural boundary condition
 (`Rd.BoundedLipschitzDomain.neumannEigenfunction_weak`). -/
-noncomputable def neumannEigenvalue (i : Ω.neumannCompactEmbedding.index) : ℝ :=
+noncomputable def neumannEigenvalue (i : Ω.neumannCompactEmbedding.eigenpairIndex) : ℝ :=
   (Ω.neumannCompactEmbedding.singularValue i)⁻¹ ^ 2 - 1
 
 /-- The Neumann eigenvalues are nonnegative, since `σ_i ≤ 1`
 (`Rd.BoundedLipschitzDomain.singularValue_neumannCompactEmbedding_le_one`). -/
-theorem neumannEigenvalue_nonneg (i : Ω.neumannCompactEmbedding.index) :
+theorem neumannEigenvalue_nonneg (i : Ω.neumannCompactEmbedding.eigenpairIndex) :
     0 ≤ Ω.neumannEigenvalue i := by
   have h1 : 1 ≤ (Ω.neumannCompactEmbedding.singularValue i)⁻¹ :=
     one_le_inv_iff₀.2 ⟨Ω.neumannCompactEmbedding.singularValue_pos i,
@@ -434,13 +435,13 @@ theorem neumannEigenvalue_nonneg (i : Ω.neumannCompactEmbedding.index) :
   linarith
 
 /-- `1 + λ_i = σ_i⁻²`. -/
-theorem one_add_neumannEigenvalue (i : Ω.neumannCompactEmbedding.index) :
+theorem one_add_neumannEigenvalue (i : Ω.neumannCompactEmbedding.eigenpairIndex) :
     1 + Ω.neumannEigenvalue i = (Ω.neumannCompactEmbedding.singularValue i)⁻¹ ^ 2 := by
   unfold neumannEigenvalue
   ring
 
 /-- **The level of a Neumann eigenfunction** is `⌊√(1 + λ_i)⌋₊`. -/
-theorem neumannScheme_level (i : Ω.neumannCompactEmbedding.index) :
+theorem neumannScheme_level (i : Ω.neumannCompactEmbedding.eigenpairIndex) :
     Ω.neumannScheme.level i = ⌊Real.sqrt (1 + Ω.neumannEigenvalue i)⌋₊ := by
   rw [one_add_neumannEigenvalue, Real.sqrt_sq
     (inv_nonneg.2 (Ω.neumannCompactEmbedding.singularValue_pos i).le)]
@@ -449,7 +450,7 @@ theorem neumannScheme_level (i : Ω.neumannCompactEmbedding.index) :
 /-- **The Neumann eigenfunction** `φ_i = σ_i⁻¹ v_i` in the Neumann space, `v_i` the singular basis
 of the Neumann embedding; its value is the basis vector `e_i` of `L_2(Ω)`
 (`Rd.BoundedLipschitzDomain.neumannEmbedding_neumannEigenfunction`). -/
-noncomputable def neumannEigenfunction (i : Ω.neumannCompactEmbedding.index) :
+noncomputable def neumannEigenfunction (i : Ω.neumannCompactEmbedding.eigenpairIndex) :
     neumannSpace Ω.toOpens :=
   (((Ω.neumannCompactEmbedding.singularValue i)⁻¹ : ℝ) : ℂ) •
     Ω.neumannCompactEmbedding.singularBasis i
@@ -457,7 +458,7 @@ noncomputable def neumannEigenfunction (i : Ω.neumannCompactEmbedding.index) :
 /-- **`φ_i = e_i` on `Ω`**: the Neumann embedding maps the eigenfunction `φ_i` to the basis vector
 `e_i` of the Neumann scheme, since `J v_i = σ_i e_i` (`CompactDenseEmbedding.apply_singularBasis`).
 -/
-theorem neumannEmbedding_neumannEigenfunction (i : Ω.neumannCompactEmbedding.index) :
+theorem neumannEmbedding_neumannEigenfunction (i : Ω.neumannCompactEmbedding.eigenpairIndex) :
     neumannEmbedding Ω.toOpens (Ω.neumannEigenfunction i) = Ω.neumannScheme.basis i := by
   have h := Ω.neumannCompactEmbedding.apply_singularBasis i
   rw [neumannCompactEmbedding_toCLM] at h
@@ -475,7 +476,7 @@ form of `-Δ φ_i = λ_i φ_i` in `Ω` with `∂_ν φ_i = 0` on `∂Ω`. It is 
 `⟨v_i, w⟩ = σ_i⁻² ⟨J v_i, J w⟩` of the singular basis
 (`CompactDenseEmbedding.inner_singularBasis`) with the inner product of the Neumann space
 (`Rd.inner_neumannSpace`). -/
-theorem neumannEigenfunction_weak (i : Ω.neumannCompactEmbedding.index)
+theorem neumannEigenfunction_weak (i : Ω.neumannCompactEmbedding.eigenpairIndex)
     (w : neumannSpace Ω.toOpens) :
     ∑ k, ⟪(Ω.neumannEigenfunction i : ValueGradientL2 Ω.toOpens).snd k,
         (w : ValueGradientL2 Ω.toOpens).snd k⟫_ℂ =
@@ -523,9 +524,9 @@ theorem exists_neumannEmbedding_eq_iff (f : Lp ℂ 2 (volume.restrict (Ω.toOpen
         Ω.neumannScheme.basis.repr f i) 2 := by
   -- unfolding the scheme first keeps the definitional unfolding in the rewrites cheap
   unfold neumannScheme
-  have hw : ∀ i, ((Ω.neumannCompactEmbedding.spectralScheme.weight 1 i : ℝ) : ℂ) =
+  have hw : ∀ i, ((Ω.neumannCompactEmbedding.spectralScheme.levelWeight 1 i : ℝ) : ℂ) =
       ((1 + Ω.neumannCompactEmbedding.spectralScheme.level i : ℕ) : ℂ) := fun i => by
-    simp [SpectralScheme.weight]
+    simp [SpectralScheme.levelWeight]
   refine ((Set.ext_iff.1 Ω.neumannCompactEmbedding.range_eq_range_sobolevEmbed f).trans
     (Ω.neumannCompactEmbedding.spectralScheme.mem_range_sobolevEmbed_iff 1 zero_le_one f)).trans
       ?_
@@ -549,7 +550,7 @@ eigenbasis have finite `B^θ_{2,q}` norm (`Rd.BoundedLipschitzDomain.memKMethod_
 theorem memKMethod_neumann_iff_blockNorm_lt_top {θ : ℝ} {q : ℝ≥0∞} (hθ : 0 < θ) (hθ' : θ < 1)
     (hq : 1 ≤ q) {f : Lp ℂ 2 (volume.restrict (Ω.toOpens : Set V))} :
     (InterpCouple.ofMap ((neumannEmbedding Ω.toOpens).restrictScalars ℝ)).MemKMethod θ q f ↔
-      Ω.neumannScheme.projectionScheme.blockNorm θ q f < ∞ := by
+      Ω.neumannScheme.spectralProjectionScheme.blockNorm θ q f < ∞ := by
   rw [Ω.memKMethod_neumann_iff hθ hθ' hq, Ω.neumannScheme.memApprox_iff_blockNorm_lt_top hθ hq]
 
 end BoundedLipschitzDomain

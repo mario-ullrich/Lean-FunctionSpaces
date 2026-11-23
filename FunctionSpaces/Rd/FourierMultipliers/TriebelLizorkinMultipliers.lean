@@ -26,8 +26,9 @@ The proof is pointwise. Since `𝓕ψ̃_j 𝓕ψ_j = 𝓕ψ_j`, the block of `m(
 `Δ_j u = g_j ∈ L_p` it is the convolution `(m(D) ψ̃_j) ⋆ g_j`
 (`Rd.distribBlock_fourierMultiplierCLM_eq_convLp`). Here `m(D) ψ̃_j = 2^{jσ} (G_j)_{2^j}` with a
 uniform family `(G_j)` (`Rd.HasSymbolGrowth.exists_isUniformSchwartz_psiDualS`), so
-`2^{j(s-σ)} |Δ_j(m(D) u)| ≤ C M(2^{js} |g_j|)` (`Rd.dyadicWeight_mul_enorm_conv_le_maximal`), and
-the Fefferman–Stein inequality (`Rd.eLpNorm_le_of_le_lqNorm_maximal`) finishes.
+`2^{j(s-σ)} |Δ_j(m(D) u)| ≤ C M(2^{js} |g_j|)`
+(`Rd.dyadicWeight_mul_enorm_conv_le_maximalFunction`), and the Fefferman–Stein inequality
+(`Rd.eLpNorm_le_of_le_lqNorm_maximalFunction`) finishes.
 -/
 
 @[expose] public section
@@ -82,25 +83,25 @@ theorem distribBlock_fourierMultiplierCLM_eq_convLp {p : ℝ≥0∞} [Fact (1 �
 uniformly Schwartz with bounds `A`, `N > n` and `K = 2^{jσ} (G_j)_{2^j}`. Then for every real `s`,
 function `g` and point `x`,
 `2^{j(s-σ)} |(K ⋆ g)(x)| ≤ C_{n,N} C_{A,0,N} M(2^{js} |g|)(x)`
-(`Rd.IsUniformSchwartz.enorm_conv_dilate_le_maximal`, `Rd.enorm_two_pow_rpow`,
-`Rd.dyadicWeight_mul_maximal`). -/
-theorem dyadicWeight_mul_enorm_conv_le_maximal {G : ℕ → 𝓢(V, ℂ)} {A : ℕ → ℕ → ℝ}
+(`Rd.IsUniformSchwartz.enorm_conv_dilate_le_maximalFunction`, `Rd.enorm_two_pow_rpow`,
+`Rd.dyadicWeight_mul_maximalFunction`). -/
+theorem dyadicWeight_mul_enorm_conv_le_maximalFunction {G : ℕ → 𝓢(V, ℂ)} {A : ℕ → ℕ → ℝ}
     (hG : IsUniformSchwartz G A) {N : ℕ} (hN : finrank ℝ V < N) {j : ℕ} {K : 𝓢(V, ℂ)}
     (hK : K = ((((2 : ℝ) ^ j) ^ σ : ℝ) : ℂ) •
       schwartzDilate (2 ^ j) (pow_ne_zero j two_ne_zero) (G j))
     (s : ℝ) (g : V → ℂ) (x : V) :
     dyadicWeight (s - σ) j * ‖conv K g volume x‖ₑ ≤
       decayMaximalConst V N * familyDecayConst A 0 N *
-        maximal (fun y => dyadicWeight s j * ‖g y‖ₑ) x := by
+        maximalFunction (fun y => dyadicWeight s j * ‖g y‖ₑ) x := by
   rw [hK, FunLike.coe_smul, smul_conv, Pi.smul_apply, smul_eq_mul, enorm_mul,
     enorm_two_pow_rpow j σ,
     coe_schwartzDilate, ← mul_assoc, ← ENNReal.dyadicWeight_add, sub_add_cancel,
-    ← dyadicWeight_mul_maximal]
+    ← dyadicWeight_mul_maximalFunction]
   calc dyadicWeight s j * ‖conv (dilate (2 ^ j) (G j : V → ℂ)) g volume x‖ₑ
       ≤ dyadicWeight s j * (decayMaximalConst V N * familyDecayConst A 0 N *
-          maximal (fun y => ‖g y‖ₑ) x) := by
+          maximalFunction (fun y => ‖g y‖ₑ) x) := by
         gcongr
-        exact hG.enorm_conv_dilate_le_maximal hN j g x
+        exact hG.enorm_conv_dilate_le_maximalFunction hN j g x
     _ = _ := by ring
 
 /-! ### Fourier multipliers on `F^s_{p,q}` -/
@@ -114,7 +115,8 @@ with `m(D) ψ̃_j = 2^{jσ} (G_j)_{2^j}` and `(G_j)` uniformly Schwartz with bou
 with the Fefferman–Stein constant `C_{FS} = Rd.feffermanSteinConst V p q`. The blocks of
 `m(D) u` are the convolutions `(m(D) ψ̃_j) ⋆ g_j`
 (`Rd.distribBlock_fourierMultiplierCLM_eq_convLp`), bounded at almost every point by
-`Rd.dyadicWeight_mul_enorm_conv_le_maximal`, and `Rd.eLpNorm_le_of_le_lqNorm_maximal` applies. -/
+`Rd.dyadicWeight_mul_enorm_conv_le_maximalFunction`, and
+`Rd.eLpNorm_le_of_le_lqNorm_maximalFunction` applies. -/
 theorem triebelLizorkinNormDistr_fourierMultiplier_le (hp1 : 1 < p) (hp : p ≠ ∞) {q : ℝ≥0∞}
     (hq1 : 1 < q) (hm : m.HasTemperateGrowth) {G : ℕ → 𝓢(V, ℂ)} {A : ℕ → ℕ → ℝ}
     (hG : IsUniformSchwartz G A) (hK : ∀ j, SchwartzMap.fourierMultiplierCLM ℂ m (psiDualS j) =
@@ -127,12 +129,13 @@ theorem triebelLizorkinNormDistr_fourierMultiplier_le (hp1 : 1 < p) (hp : p ≠ 
   set K : ℕ → 𝓢(V, ℂ) := fun j => SchwartzMap.fourierMultiplierCLM ℂ m (psiDualS j) with hKdef
   refine (triebelLizorkinNormDistr_le (g := fun j => convLp hp (K j).integrable (g j))
     fun j => distribBlock_fourierMultiplierCLM_eq_convLp hp hm (hg j)).trans ?_
-  refine eLpNorm_le_of_le_lqNorm_maximal hp1 hp hq1 (aemeasurable_lqNorm_dyadicWeight_Lp _ q _)
+  refine eLpNorm_le_of_le_lqNorm_maximalFunction hp1 hp hq1
+    (aemeasurable_lqNorm_dyadicWeight_Lp _ q _)
     (fun j => ((Lp.aestronglyMeasurable (g j)).enorm.const_mul _)) ?_
   filter_upwards [ae_all_iff.2 fun j => convLp_apply_ae hp (K j).integrable (g j)] with x hx
   simp_rw [hx, ← ENNReal.lqNorm_const_mul]
   exact ENNReal.lqNorm_mono fun j =>
-    dyadicWeight_mul_enorm_conv_le_maximal hG hN (hK j) s (g j) x
+    dyadicWeight_mul_enorm_conv_le_maximalFunction hG hN (hK j) s (g j) x
 
 /-- **Fourier multipliers on `F^s_{p,q}` of tempered distributions**: for `1 < p < ∞`,
 `1 < q ≤ ∞`, a symbol `m` of order `σ` and every real `s` there is a finite constant `C` with
