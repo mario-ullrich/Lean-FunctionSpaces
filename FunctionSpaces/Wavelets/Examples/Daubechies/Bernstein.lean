@@ -16,9 +16,9 @@ For a Daubechies mask of order `N ≥ 2` with scaling function `φ` (`Daubechies
 `1 ≤ p < ∞`, let `V_j ⊆ L_p(ℝ)` be the scaling space of level `j` (`Daubechies.scalingSpace`),
 the range of the projection `P_j f = ∑_k ⟨f, φ_{j,k}⟩ φ_{j,k}` with
 `φ_{j,k}(x) = 2^(j/2) φ(2^j x - k)`. This file proves the inverse inequality of the Daubechies
-scheme: the moduli of smoothness `ω_r(f, t)_p = sup_{|h| ≤ t} ‖Δ_h^r f‖_p` (`Rd.modulus`) of the
-elements of `V_j` are controlled by those of `φ`. Here `Δ_h f(x) = f(x + h) - f(x)` is Mathlib's
-`fwdDiff h f` and `Δ_h^r = (fwdDiff h)^[r]` its `r`-fold iterate.
+scheme: the moduli of smoothness `ω_r(f, t)_p = sup_{|h| ≤ t} ‖Δ_h^r f‖_p` (`Rd.smoothnessModulus`)
+of the elements of `V_j` are controlled by those of `φ`. Here `Δ_h f(x) = f(x + h) - f(x)` is
+Mathlib's `fwdDiff h f` and `Δ_h^r = (fwdDiff h)^[r]` its `r`-fold iterate.
 
 * **Differences of expansions.** Differences commute with dilation and translation:
   `Δ_h^r g_{j,k} = (Δ_{2^j h}^r g)_{j,k}` for `g_{j,k}(x) = 2^(j/2) g(2^j x - k)`
@@ -27,7 +27,7 @@ elements of `V_j` are controlled by those of `φ`. Here `Δ_h f(x) = f(x + h) - 
   (`Daubechies.iterate_fwdDiff_expand`).
 * **The Bernstein inequality.** For `a ∈ V_j` and `2^j t ≤ 1`,
   `ω_r(a, t)_p ≤ C ω_r(φ, 2^j t)_p ‖a‖_p` with `C = (2N + 2r)^(1 - 1/p) (2N)^(1/p) ‖φ‖_{p'}`
-  independent of `j`, `a` and `t` (`Daubechies.modulus_mem_scalingSpace_le`,
+  independent of `j`, `a` and `t` (`Daubechies.smoothnessModulus_mem_scalingSpace_le`,
   `Daubechies.bernsteinConst`). The element `a` is the expansion `∑_k λ_k φ_{j,k}` of its
   coefficients `λ_k = ⟨a, φ_{j,k}⟩`, so `Δ_h^r a = ∑_k λ_k (Δ_{2^j h}^r φ)_{j,k}`. For
   `|2^j h| ≤ 1` the generator `Δ_{2^j h}^r φ` vanishes outside `[-r, 2N - 1 + r]`, and the upper
@@ -170,15 +170,15 @@ the generator `Δ_{2^j h}^r φ` vanishes outside `[-r, 2N - 1 + r]`
 (`Daubechies.dyadicWeight_mul_lqNorm_coeffFun_le`) give
 `‖Δ_h^r a‖_p ≤ (2N + 2r)^(1 - 1/p) ‖Δ_{2^j h}^r φ‖_p 2^(j(1/2 - 1/p)) ‖λ‖_{ℓ_p}`
 `≤ C ‖Δ_{2^j h}^r φ‖_p ‖a‖_p`, where the dyadic weights cancel. -/
-theorem modulus_mem_scalingSpace_le (hN : 2 ≤ N) (hp : p ≠ ∞) (r : ℕ) {j : ℕ}
+theorem smoothnessModulus_mem_scalingSpace_le (hN : 2 ≤ N) (hp : p ≠ ∞) (r : ℕ) {j : ℕ}
     {a : Lp ℂ p (volume : Measure ℝ)} (ha : a ∈ scalingSpace m p hN hp j) {t : ℝ}
     (ht : 2 ^ j * t ≤ 1) :
-    Rd.modulus volume r p (a : ℝ → ℂ) t ≤
-      bernsteinConst m p r * Rd.modulus volume r p (scalingFun m) (2 ^ j * t) * ‖a‖ₑ := by
+    Rd.smoothnessModulus volume r p (a : ℝ → ℂ) t ≤
+      bernsteinConst m p r * Rd.smoothnessModulus volume r p (scalingFun m) (2 ^ j * t) * ‖a‖ₑ := by
   have hae : (a : ℝ → ℂ) =ᵐ[volume] projFun m j a := by
     have h := proj_apply_ae m hN hp j a
     rwa [proj_eq_self_of_mem m hN hp ha] at h
-  rw [Rd.modulus_congr_ae hae]
+  rw [Rd.smoothnessModulus_congr_ae hae]
   refine iSup₂_le fun h hh => ?_
   have h2 : (0 : ℝ) < 2 ^ j := by positivity
   have hHt : ‖(2 : ℝ) ^ j * h‖ ≤ 2 ^ j * t := by
@@ -204,11 +204,13 @@ theorem modulus_mem_scalingSpace_le (hN : 2 ≤ N) (hp : p ≠ ∞) (r : ℕ) {j
         rw [← mul_assoc]
         exact hexp
     _ ≤ ((2 * N + 2 * r : ℕ) : ℝ≥0∞) ^ (1 - 1 / p.toReal) *
-          Rd.modulus volume r p (scalingFun m) (2 ^ j * t) *
+          Rd.smoothnessModulus volume r p (scalingFun m) (2 ^ j * t) *
           (coeffConst (scalingFun m) 0 (2 * N - 1) p * ‖a‖ₑ) := by
         rw [Lp.enorm_def]
-        exact mul_le_mul' (mul_le_mul_right (Rd.eLpNorm_higherDiff_le_modulus hHt) _) hcoef
-    _ = bernsteinConst m p r * Rd.modulus volume r p (scalingFun m) (2 ^ j * t) * ‖a‖ₑ := by
+        exact mul_le_mul' (mul_le_mul_right (Rd.eLpNorm_higherDiff_le_smoothnessModulus hHt) _)
+          hcoef
+    _ = bernsteinConst m p r * Rd.smoothnessModulus volume r p (scalingFun m) (2 ^ j * t) *
+          ‖a‖ₑ := by
         rw [bernsteinConst]
         ring
 
@@ -225,7 +227,7 @@ It is a hypothesis on the mask; the regularity theorems for `φ` prove it
 gives the inverse inequality of the Daubechies scheme (`Daubechies.inverse_scheme`). -/
 def BernsteinBound (p : ℝ≥0∞) (θ : ℝ) (r : ℕ) : Prop :=
   ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ t ∈ Set.Ioc (0 : ℝ) 1,
-    Rd.modulus volume r p (scalingFun m) t ≤ K * ENNReal.ofReal (t ^ θ)
+    Rd.smoothnessModulus volume r p (scalingFun m) t ≤ K * ENNReal.ofReal (t ^ θ)
 
 /-- **Lower orders**: a Bernstein bound of order `θ` is one of every order `θ₁ ≤ θ`, since
 `t^θ ≤ t^θ₁` for `0 < t ≤ 1`. -/
@@ -238,51 +240,51 @@ theorem BernsteinBound.mono {p : ℝ≥0∞} {θ θ₁ : ℝ} {r : ℕ} (hB : Be
 /-- **Bernstein bounds for `p ≤ 2`**: let `N ≥ 2`, `p ≤ 2`, let `T^n 1 ≤ C λ^n` be a growth bound
 for the transfer operator (`Daubechies.TransferGrowth`), and let `s ∈ ℝ`, `r ∈ ℕ` with
 `0 ≤ s ≤ r` and `s < N - log₄ λ`. Then `φ` has a Bernstein bound of order `s` in `L_p` with
-differences of order `r` (`Daubechies.modulus_scalingFun_le_two`). -/
+differences of order `r` (`Daubechies.smoothnessModulus_scalingFun_le_two`). -/
 theorem bernsteinBound_of_le_two (hN : 2 ≤ N) {p : ℝ≥0∞} (hp2 : p ≤ 2) {lam C s : ℝ} {r : ℕ}
     (hg : TransferGrowth N lam C) (hs0 : 0 ≤ s) (hs : s < N - Real.logb 4 lam) (hsr : s ≤ r) :
     BernsteinBound m p s r :=
-  modulus_scalingFun_le_two m hN hp2 hg hs0 hs hsr
+  smoothnessModulus_scalingFun_le_two m hN hp2 hg hs0 hs hsr
 
 /-- **Bernstein bounds for `p ≥ 2`** (Fourier route): let `N ≥ 2`, `2 ≤ p ≤ ∞`, let
 `T^n 1 ≤ C λ^n` be a growth bound for the transfer operator (`Daubechies.TransferGrowth`), and
 let `s, a ∈ ℝ`, `r ∈ ℕ` with `0 ≤ s ≤ r`, `s < N - log₄ λ`, `0 ≤ a ≤ r` and
 `a < N - log₄ λ - 1/2`. Then `φ` has a Bernstein bound of order `θ = (2/p) s + (1 - 2/p) a` in
-`L_p` with differences of order `r` (`Daubechies.modulus_scalingFun_interp`). -/
+`L_p` with differences of order `r` (`Daubechies.smoothnessModulus_scalingFun_interp`). -/
 theorem bernsteinBound_interp (hN : 2 ≤ N) {p : ℝ≥0∞} (hp2 : 2 ≤ p) {lam C s a : ℝ} {r : ℕ}
     (hg : TransferGrowth N lam C) (hs0 : 0 ≤ s) (hs : s < N - Real.logb 4 lam) (hsr : s ≤ r)
     (ha0 : 0 ≤ a) (har : a ≤ r) (ha : a < N - Real.logb 4 lam - 1 / 2) :
     BernsteinBound m p (2 / p.toReal * s + (1 - 2 / p.toReal) * a) r :=
-  modulus_scalingFun_interp m hN hp2 hg hs0 hs hsr ha0 har ha
+  smoothnessModulus_scalingFun_interp m hN hp2 hg hs0 hs hsr ha0 har ha
 
 /-- **Bernstein bounds for `p ≥ 2` from a Hölder estimate**: let `N ≥ 2`, `2 ≤ p ≤ ∞`, let
 `T^n 1 ≤ C λ^n` be a growth bound for the transfer operator (`Daubechies.TransferGrowth`), let
 `s ∈ ℝ` and an order `r ≥ 1` with `0 ≤ s ≤ r` and `s < N - log₄ λ`, and suppose
 `|φ(x) - φ(y)| ≤ K₀ |x - y|^a` for all `x, y ∈ ℝ`, with `a ≥ 0`. Then `φ` has a Bernstein bound
 of order `θ = (2/p) s + (1 - 2/p) a` in `L_p` with differences of order `r`
-(`Daubechies.modulus_scalingFun_interp_of_holder`). -/
+(`Daubechies.smoothnessModulus_scalingFun_interp_of_holder`). -/
 theorem bernsteinBound_interp_of_holder (hN : 2 ≤ N) {p : ℝ≥0∞} (hp2 : 2 ≤ p)
     {lam C s a K₀ : ℝ} {r : ℕ} (hr : 1 ≤ r) (hg : TransferGrowth N lam C) (hs0 : 0 ≤ s)
     (hs : s < N - Real.logb 4 lam) (hsr : s ≤ r) (ha0 : 0 ≤ a)
     (hK : ∀ x y : ℝ, ‖scalingFun m x - scalingFun m y‖ ≤ K₀ * |x - y| ^ a) :
     BernsteinBound m p (2 / p.toReal * s + (1 - 2 / p.toReal) * a) r :=
-  modulus_scalingFun_interp_of_holder m hN hp2 hr hg hs0 hs hsr ha0 hK
+  smoothnessModulus_scalingFun_interp_of_holder m hN hp2 hr hg hs0 hs hsr ha0 hK
 
 /-- **Bernstein bounds of order two, `p ≤ 2`**: for every Daubechies mask of order `N = 2`, every
 `p ≤ 2`, every real `s` with `0 ≤ s < 1` and every order `r ≥ s`, `φ` has a Bernstein bound of
 order `s` in `L_p` with differences of order `r`
-(`Daubechies.modulus_scalingFun_le_two_order_two`). -/
+(`Daubechies.smoothnessModulus_scalingFun_le_two_order_two`). -/
 theorem bernsteinBound_order_two (m : Mask 2) {p : ℝ≥0∞} (hp2 : p ≤ 2) {s : ℝ} {r : ℕ}
     (hs0 : 0 ≤ s) (hs : s < 1) (hsr : s ≤ r) : BernsteinBound m p s r :=
-  modulus_scalingFun_le_two_order_two m hp2 hs0 hs hsr
+  smoothnessModulus_scalingFun_le_two_order_two m hp2 hs0 hs hsr
 
 /-- **Bernstein bounds of order three, `p ≤ 2`**: for every Daubechies mask of order `N = 3`,
 every `p ≤ 2`, every real `s` with `0 ≤ s < 3 - log₂ 3 ≈ 1.415` and every order `r ≥ s`, `φ` has
 a Bernstein bound of order `s` in `L_p` with differences of order `r`
-(`Daubechies.modulus_scalingFun_le_two_order_three`). -/
+(`Daubechies.smoothnessModulus_scalingFun_le_two_order_three`). -/
 theorem bernsteinBound_order_three (m : Mask 3) {p : ℝ≥0∞} (hp2 : p ≤ 2) {s : ℝ} {r : ℕ}
     (hs0 : 0 ≤ s) (hs : s < 3 - Real.logb 2 3) (hsr : s ≤ r) : BernsteinBound m p s r :=
-  modulus_scalingFun_le_two_order_three m hp2 hs0 hs hsr
+  smoothnessModulus_scalingFun_le_two_order_three m hp2 hs0 hs hsr
 
 /-- **Bernstein bounds for D4, `p ≥ 2`**: for the mask D4 (`Daubechies.d4`), every
 `2 ≤ p ≤ ∞`, all real `s, a` with `0 ≤ s < 1` and `0 ≤ a ≤ 2 - log₂(1 + √3) ≈ 0.5500`, and every
@@ -316,19 +318,21 @@ variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 `1 ≤ p < ∞`, and let `ω_r(φ, t)_p ≤ K t^θ` for all `0 < t ≤ 1`. Then for all levels `j ≤ k` and
 every `a ∈ V_j` (`Daubechies.scalingSpace`), `ω_r(a, 2^(-k))_p ≤ C K 2^(-(k-j)θ) ‖a‖_p` with
 `C = Daubechies.bernsteinConst m p r`. This is the Bernstein inequality
-`Daubechies.modulus_mem_scalingSpace_le` at `t = 2^(-k)`, where `2^j t = 2^(-(k-j)) ∈ (0, 1]`. -/
+`Daubechies.smoothnessModulus_mem_scalingSpace_le` at `t = 2^(-k)`, where
+`2^j t = 2^(-(k-j)) ∈ (0, 1]`. -/
 theorem lpModulus_le_of_mem_scalingSpace (hN : 2 ≤ N) (hp : p ≠ ∞) {θ : ℝ} {r : ℕ}
     {K : ℝ≥0∞} (hK : ∀ t ∈ Set.Ioc (0 : ℝ) 1,
-      Rd.modulus volume r p (scalingFun m) t ≤ K * ENNReal.ofReal (t ^ θ))
+      Rd.smoothnessModulus volume r p (scalingFun m) t ≤ K * ENNReal.ofReal (t ^ θ))
     {j k : ℕ} (hjk : j ≤ k) {a : Lp ℂ p (volume : Measure ℝ)}
     (ha : a ∈ scalingSpace m p hN hp j) :
     Rd.lpModulus p r a k ≤ bernsteinConst m p r * K * dyadicWeight (-θ) (k - j) * ‖a‖ₑ := by
   have hmem : (2 : ℝ) ^ j * (1 / 2 ^ k) ∈ Set.Ioc (0 : ℝ) 1 := by
     rw [two_pow_mul_one_div_two_pow hjk]
     exact ⟨by positivity, (div_le_one (by positivity)).2 (one_le_pow₀ one_le_two)⟩
-  calc Rd.lpModulus p r a k = Rd.modulus volume r p (a : ℝ → ℂ) (1 / 2 ^ k) := rfl
-    _ ≤ bernsteinConst m p r * Rd.modulus volume r p (scalingFun m) (2 ^ j * (1 / 2 ^ k)) *
-          ‖a‖ₑ := modulus_mem_scalingSpace_le m hN hp r ha hmem.2
+  calc Rd.lpModulus p r a k = Rd.smoothnessModulus volume r p (a : ℝ → ℂ) (1 / 2 ^ k) := rfl
+    _ ≤ bernsteinConst m p r *
+          Rd.smoothnessModulus volume r p (scalingFun m) (2 ^ j * (1 / 2 ^ k)) * ‖a‖ₑ :=
+        smoothnessModulus_mem_scalingSpace_le m hN hp r ha hmem.2
     _ ≤ bernsteinConst m p r * (K * ENNReal.ofReal (((2 : ℝ) ^ j * (1 / 2 ^ k)) ^ θ)) *
           ‖a‖ₑ := by
         gcongr

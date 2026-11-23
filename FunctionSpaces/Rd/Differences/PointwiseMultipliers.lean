@@ -27,7 +27,7 @@ The ingredients:
   (`Rd.norm_higherDiff_le_of_iteratedFDeriv`);
 * **Leibniz's rule for differences** (`Rd.higherDiff_mul`):
   `Δ_h^r(u v)(x) = ∑_{l ≤ r} C(r, l) Δ_h^l u(x) Δ_h^(r-l) v(x + l h)`, hence
-  `ω_r(ψ f, t)_p ≤ ∑_{l ≤ r} C(r, l) C t^l ω_(r-l)(f, t)_p` (`Rd.modulus_mul_smooth_le`);
+  `ω_r(ψ f, t)_p ≤ ∑_{l ≤ r} C(r, l) C t^l ω_(r-l)(f, t)_p` (`Rd.smoothnessModulus_mul_smooth_le`);
 * **moduli of lower order** (`Rd.lqNorm_lpModulus_sub_le`): for `1 ≤ l ≤ s`, the quasi-norm with
   smoothness `s - l` and order `r - l` is bounded by the one with smoothness `s` and order `r`,
   through band-limited approximation, which does not depend on the order of the modulus
@@ -260,16 +260,16 @@ theorem eLpNorm_higherDiff_mul_le {ψ F : V → ℂ} (hψ : ContDiff ℝ ((⊤ :
 
 /-- **The modulus of a product**:
 `ω_r(ψ F, t)_p ≤ ∑_{l ≤ r} C(r, l) C t^l ω_(r-l)(F, t)_p` for `t ≥ 0`. -/
-theorem modulus_mul_smooth_le {ψ F : V → ℂ} (hψ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) ψ) {r : ℕ}
-    {C : ℝ} (hC : ∀ l ≤ r, ∀ x, ‖iteratedFDeriv ℝ l ψ x‖ ≤ C) (hF : AEStronglyMeasurable F μ)
-    {p : ℝ≥0∞} (hp : 1 ≤ p) {t : ℝ} :
-    modulus μ r p (fun x => ψ x * F x) t ≤ ∑ l ∈ Finset.range (r + 1),
-      (r.choose l : ℝ≥0∞) * ENNReal.ofReal (C * t ^ l) * modulus μ (r - l) p F t := by
+theorem smoothnessModulus_mul_smooth_le {ψ F : V → ℂ} (hψ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) ψ)
+    {r : ℕ} {C : ℝ} (hC : ∀ l ≤ r, ∀ x, ‖iteratedFDeriv ℝ l ψ x‖ ≤ C)
+    (hF : AEStronglyMeasurable F μ) {p : ℝ≥0∞} (hp : 1 ≤ p) {t : ℝ} :
+    smoothnessModulus μ r p (fun x => ψ x * F x) t ≤ ∑ l ∈ Finset.range (r + 1),
+      (r.choose l : ℝ≥0∞) * ENNReal.ofReal (C * t ^ l) * smoothnessModulus μ (r - l) p F t := by
   have hC0 : 0 ≤ C := (norm_nonneg _).trans (hC 0 (Nat.zero_le r) 0)
   refine iSup₂_le fun h hh => (eLpNorm_higherDiff_mul_le hψ hC hF hp h).trans
     (Finset.sum_le_sum fun l _ => ?_)
   gcongr
-  exact eLpNorm_higherDiff_le_modulus hh
+  exact eLpNorm_higherDiff_le_smoothnessModulus hh
 
 end Lp
 
@@ -466,8 +466,8 @@ theorem modNorm_mulLp_le (hp : p ≠ ∞) {ψ : V → ℂ} (hψ : ContDiff ℝ (
   have hC0 : 0 ≤ C := (norm_nonneg _).trans (hC 0 (Nat.zero_le r) 0)
   have hmod : ∀ k, lpModulus p r G k ≤ ∑ l ∈ Finset.range (r + 1), (r.choose l : ℝ≥0∞) *
       ENNReal.ofReal C * (dyadicWeight (-(l : ℝ)) k * lpModulus p (r - l) F k) := fun k => by
-    rw [lpModulus, modulus_congr_ae (mulLp_apply_ae _ _ F)]
-    refine (modulus_mul_smooth_le hψ hC (Lp.aestronglyMeasurable F) Fact.out).trans_eq ?_
+    rw [lpModulus, smoothnessModulus_congr_ae (mulLp_apply_ae _ _ F)]
+    refine (smoothnessModulus_mul_smooth_le hψ hC (Lp.aestronglyMeasurable F) Fact.out).trans_eq ?_
     refine Finset.sum_congr rfl fun l _ => ?_
     rw [ENNReal.ofReal_mul hC0, ENNReal.ofReal_one_div_two_pow_pow, lpModulus]
     ring

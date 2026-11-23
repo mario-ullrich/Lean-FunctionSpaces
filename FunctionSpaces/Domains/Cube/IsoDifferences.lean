@@ -15,8 +15,8 @@ The **isotropic difference** of order `r` with step `h ∈ ℝ^d`,
 `Δ_h^r f(x) = ∑_k (-1)^(r-k) C(r,k) f(x + kh)` (`Rd.higherDiff`, `Cube.higherDiff_apply`), moves all
 coordinates at once; with the step `t e_i` it is the difference in coordinate `i`
 (`Cube.higherDiff_single`), so the isotropic modulus of smoothness of `ℝ^d` (sup norm) bounds the
-coordinate differences with `|t| ≤ s` at scale `s` (`Cube.eLpNorm_cubeDiff_le_modulus`). The
-translation algebra `ℂ[ℝ^d]` of
+coordinate differences with `|t| ≤ s` at scale `s` (`Cube.eLpNorm_cubeDiff_le_smoothnessModulus`).
+The translation algebra `ℂ[ℝ^d]` of
 `FunctionSpaces.Analysis.Differences.TranslationAlgebra` expands it into differences in single
 coordinates: the element `(δ_{h_i e_i} - 1)^m` acts by the coordinate difference `Δ^m_{h_i e_i}`
 (`Cube.diffAct_coordElem_pow`), a product of such elements along a list of coordinates by the mixed
@@ -73,11 +73,11 @@ theorem higherDiff_single (r : ℕ) (i : Fin d) (t : ℝ) (f : (Fin d → ℝ) �
 /-- **Coordinate differences are bounded by the isotropic modulus**: for `|h| ≤ t`,
 `‖Δ^r_{h e_i} f‖_{L_p(ℝ^d)} ≤ ω_r(f, t)_p`, since the coordinate difference is the isotropic
 difference with step `h e_i` (`Cube.higherDiff_single`) and `‖h e_i‖ = |h|` in the sup norm. -/
-theorem eLpNorm_cubeDiff_le_modulus {r : ℕ} {p : ℝ≥0∞} {f : (Fin d → ℝ) → ℂ} {i : Fin d}
+theorem eLpNorm_cubeDiff_le_smoothnessModulus {r : ℕ} {p : ℝ≥0∞} {f : (Fin d → ℝ) → ℂ} {i : Fin d}
     {h t : ℝ} (hh : |h| ≤ t) :
-    eLpNorm (cubeDiff r h i f) p volume ≤ Rd.modulus volume r p f t := by
+    eLpNorm (cubeDiff r h i f) p volume ≤ Rd.smoothnessModulus volume r p f t := by
   rw [← higherDiff_single]
-  exact Rd.eLpNorm_higherDiff_le_modulus (by rwa [Pi.norm_single, Real.norm_eq_abs])
+  exact Rd.eLpNorm_higherDiff_le_smoothnessModulus (by rwa [Pi.norm_single, Real.norm_eq_abs])
 
 /-! ### Mixed coordinate differences -/
 
@@ -125,7 +125,7 @@ theorem diffAct_list_prod (m : Fin d → ℕ) (h : Fin d → ℝ) (l : List (Fin
 multiplicities `m_i(α)` and the shifts `s_α`. -/
 theorem higherDiff_eq_sum (r : ℕ) (h : Fin d → ℝ) (f : (Fin d → ℝ) → ℂ) (x : Fin d → ℝ) :
     higherDiff r h f x = ∑ α : Fin r → Fin d,
-      mixedDiff (count α) h (List.finRange d) f (x + shiftVec h α) := by
+      mixedDiff (letterCount α) h (List.finRange d) f (x + shiftVec h α) := by
   rw [higherDiff_eq_diffAct, single_sub_one_pow_eq_sum, map_sum, LinearMap.sum_apply,
     Finset.sum_apply]
   refine Finset.sum_congr rfl fun α _ => ?_

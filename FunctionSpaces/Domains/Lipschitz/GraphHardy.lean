@@ -222,11 +222,11 @@ theorem lintegral_verticalQuotient_le {s : ℝ} (hs : -(1 / 2) ≤ s)
       ← ENNReal.ofReal_one_div_two_pow_rpow, ← ENNReal.ofReal_rpow_of_nonneg (by positivity) hb,
       ← ofReal_norm]
     exact ENNReal.rpow_le_rpow (ENNReal.ofReal_le_ofReal hr.1.le) hb
-  have hpt : ∀ x, Ω.verticalQuotient s G (x, r) ≤ ‖(stepSet Ω.domain 1 (r • Ω.e)).indicator
+  have hpt : ∀ x, Ω.verticalQuotient s G (x, r) ≤ ‖(diffStepSet Ω.domain 1 (r • Ω.e)).indicator
       (fwdDiff (r • Ω.e) (G : V → ℂ)) x‖ₑ ^ 2 * dyadicWeight (1 + 2 * s) (k + 1) := fun x => by
     simp only [verticalQuotient]
     by_cases hx : (x, r) ∈ Ω.heightPairs
-    · have hst : x ∈ stepSet Ω.domain 1 (r • Ω.e) := fun l hl => by
+    · have hst : x ∈ diffStepSet Ω.domain 1 (r • Ω.e) := fun l hl => by
         rcases Nat.le_one_iff_eq_zero_or_eq_one.1 hl with rfl | rfl
         · simpa [Ω.mem_domain_iff_height_pos] using hx.1.1
         · simpa [Ω.mem_domain_iff_height_pos, Ω.height_add_smul] using hx.2.1
@@ -234,15 +234,15 @@ theorem lintegral_verticalQuotient_le {s : ℝ} (hs : -(1 / 2) ≤ s)
       exact mul_le_mul' le_rfl hinv
     · rw [indicator_of_notMem hx]
       exact zero_le
-  calc ∫⁻ x, Ω.verticalQuotient s G (x, r) ≤ ∫⁻ x, ‖(stepSet Ω.domain 1 (r • Ω.e)).indicator
+  calc ∫⁻ x, Ω.verticalQuotient s G (x, r) ≤ ∫⁻ x, ‖(diffStepSet Ω.domain 1 (r • Ω.e)).indicator
         (fwdDiff (r • Ω.e) (G : V → ℂ)) x‖ₑ ^ 2 * dyadicWeight (1 + 2 * s) (k + 1) :=
         lintegral_mono hpt
-    _ = eLpNorm ((stepSet Ω.domain 1 (r • Ω.e)).indicator (fwdDiff (r • Ω.e) (G : V → ℂ)))
+    _ = eLpNorm ((diffStepSet Ω.domain 1 (r • Ω.e)).indicator (fwdDiff (r • Ω.e) (G : V → ℂ)))
           2 volume ^ 2 * dyadicWeight (1 + 2 * s) (k + 1) := by
         rw [lintegral_mul_const' _ _ (ENNReal.dyadicWeight_ne_top _ _),
           lintegral_enorm_sq_eq_eLpNorm_sq]
         exact ((hG.comp (measurable_add_const _)).sub hG).aestronglyMeasurable.indicator
-          (measurableSet_stepSet Ω.measurableSet_domain 1 _)
+          (measurableSet_diffStepSet Ω.measurableSet_domain 1 _)
     _ ≤ _ := by
         rw [mul_comm]
         refine mul_le_mul' le_rfl (pow_le_pow_left₀ zero_le ?_ 2)
@@ -385,12 +385,12 @@ omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 (`Rd.LipschitzGraph.abs_height_le_of_mem_switchSet`). -/
 theorem enorm_fwdDiff_indicator_le (G : V → ℂ) (y x : V) :
     ‖fwdDiff y (Ω.domain.indicator G) x‖ₑ ≤
-      ‖(stepSet Ω.domain 1 y).indicator (fwdDiff y G) x‖ₑ +
+      ‖(diffStepSet Ω.domain 1 y).indicator (fwdDiff y G) x‖ₑ +
         ‖(Ω.height ⁻¹' Ioc 0 ((1 + Ω.M) * ‖y‖)).indicator G x‖ₑ +
         ‖(Ω.height ⁻¹' Ioc 0 ((1 + Ω.M) * ‖y‖)).indicator G (x + y)‖ₑ := by
   simp only [fwdDiff]
   by_cases hx : x ∈ Ω.domain <;> by_cases hxy : x + y ∈ Ω.domain
-  · have hst : x ∈ stepSet Ω.domain 1 y := fun l hl => by
+  · have hst : x ∈ diffStepSet Ω.domain 1 y := fun l hl => by
       rcases Nat.le_one_iff_eq_zero_or_eq_one.1 hl with rfl | rfl
       · simpa using hx
       · simpa using hxy
@@ -421,7 +421,7 @@ pointwise bound `Rd.LipschitzGraph.enorm_fwdDiff_indicator_le`, Minkowski's ineq
 translation invariance of the `L_2` norm (Mathlib's `eLpNorm_comp_measurePreserving`). -/
 theorem eLpNorm_fwdDiff_indicator_le {G : V → ℂ} (hG : AEStronglyMeasurable G volume) (y : V) :
     eLpNorm (fwdDiff y (Ω.domain.indicator G)) 2 volume ≤
-      eLpNorm ((stepSet Ω.domain 1 y).indicator (fwdDiff y G)) 2 volume +
+      eLpNorm ((diffStepSet Ω.domain 1 y).indicator (fwdDiff y G)) 2 volume +
         2 * eLpNorm ((Ω.height ⁻¹' Ioc 0 ((1 + Ω.M) * ‖y‖)).indicator G) 2 volume := by
   have hτ := measurePreserving_add_right (volume : Measure V) y
   have hL : MeasurableSet (Ω.height ⁻¹' Ioc (0 : ℝ) ((1 + Ω.M) * ‖y‖)) :=
@@ -430,13 +430,13 @@ theorem eLpNorm_fwdDiff_indicator_le {G : V → ℂ} (hG : AEStronglyMeasurable 
   have hfd : AEStronglyMeasurable (fwdDiff y (Ω.domain.indicator G)) volume := by
     unfold fwdDiff
     exact (hGΩ.comp_measurePreserving hτ).sub hGΩ
-  have hst : AEStronglyMeasurable ((stepSet Ω.domain 1 y).indicator (fwdDiff y G)) volume := by
+  have hst : AEStronglyMeasurable ((diffStepSet Ω.domain 1 y).indicator (fwdDiff y G)) volume := by
     unfold fwdDiff
     exact ((hG.comp_measurePreserving hτ).sub hG).indicator
-      (measurableSet_stepSet Ω.measurableSet_domain 1 y)
+      (measurableSet_diffStepSet Ω.measurableSet_domain 1 y)
   have hLG := hG.indicator hL
   have hpt : ∀ x, ‖fwdDiff y (Ω.domain.indicator G) x‖ₑ ≤
-      ‖((fun x => ‖(stepSet Ω.domain 1 y).indicator (fwdDiff y G) x‖ₑ) +
+      ‖((fun x => ‖(diffStepSet Ω.domain 1 y).indicator (fwdDiff y G) x‖ₑ) +
         (fun x => ‖(Ω.height ⁻¹' Ioc 0 ((1 + Ω.M) * ‖y‖)).indicator G x‖ₑ) +
         (fun x => ‖(Ω.height ⁻¹' Ioc 0 ((1 + Ω.M) * ‖y‖)).indicator G x‖ₑ) ∘ (· + y)) x‖ₑ :=
     fun x => by
@@ -456,7 +456,7 @@ theorem lpModulus_indicatorLp_le (G : Lp ℂ 2 (volume : Measure V)) (k : ℕ) :
     lpModulus 2 1 (indicatorLp Ω.measurableSet_domain G) k ≤
       lpModulusOn 2 Ω.domain 1 G k +
         2 * eLpNorm ((Ω.height ⁻¹' Ioc 0 ((1 + Ω.M) / 2 ^ k)).indicator G) 2 volume := by
-  rw [lpModulus, modulus_congr_ae (indicatorLp_apply_ae Ω.measurableSet_domain G)]
+  rw [lpModulus, smoothnessModulus_congr_ae (indicatorLp_apply_ae Ω.measurableSet_domain G)]
   refine iSup₂_le fun y hy => ?_
   refine (Ω.eLpNorm_fwdDiff_indicator_le (Lp.aestronglyMeasurable G) y).trans
     (add_le_add (eLpNorm_indicator_higherDiff_le_modulusOn (r := 1) hy) ?_)

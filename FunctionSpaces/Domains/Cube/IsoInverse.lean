@@ -141,13 +141,13 @@ a word `α` by its shift `s_α` stays in the cube, and lands in the box of the m
 `‖M f(· + s_α)‖_{L_p(Q_{rh})} ≤ ‖M f‖_{L_p(box)}`. -/
 theorem eLpNorm_shift_mixedDiff_le {r : ℕ} (h : Fin d → ℝ) (α : Fin r → Fin d)
     {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) (p : ℝ≥0∞) :
-    eLpNorm (fun x => mixedDiff (count α) h (List.finRange d) f (x + shiftVec h α)) p
+    eLpNorm (fun x => mixedDiff (letterCount α) h (List.finRange d) f (x + shiftVec h α)) p
         ((cubeVol d).restrict (isoRegion r h)) ≤
-      eLpNorm (mixedDiff (count α) h (List.finRange d) f) p
-        ((cubeVol d).restrict (listRegion (count α) h (List.finRange d))) := by
+      eLpNorm (mixedDiff (letterCount α) h (List.finRange d) f) p
+        ((cubeVol d).restrict (listRegion (letterCount α) h (List.finRange d))) := by
   refine eLpNorm_comp_add_le (measurable_mixedDiff _ h _ hf) p (measurableSet_isoRegion r h)
     (measurableSet_listRegion _ h _) _ fun x hx => ?_
-  have hle := card_lt_add_count_le α
+  have hle := card_lt_add_letterCount_le α
   have hcoord : ∀ c, x c + ((Finset.univ.filter fun l => c < α l).card : ℝ) * h c ∈
       Icc (0 : ℝ) 1 := fun c =>
     add_mul_mem_Icc (hx.2 c (mem_univ c)) (hx.1 c) (Nat.cast_nonneg _)
@@ -163,8 +163,8 @@ theorem eLpNorm_shift_mixedDiff_le {r : ℕ} (h : Fin d → ℝ) (α : Fin r →
 /-! ### The isotropic difference -/
 
 /-- The multiplicities of a word are at most its length. -/
-theorem count_le {r : ℕ} (α : Fin r → Fin d) (i : Fin d) : count α i ≤ r := by
-  rw [count]
+theorem letterCount_le {r : ℕ} (α : Fin r → Fin d) (i : Fin d) : letterCount α i ≤ r := by
+  rw [letterCount]
   exact (Finset.card_le_univ _).trans (by rw [Fintype.card_fin])
 
 /-- **Isotropic differences of functions with slices in a class**: if the differences of order
@@ -178,17 +178,17 @@ theorem eLpNorm_higherDiff_le_sum (V : Submodule ℂ (ℝ → ℂ)) {p : ℝ≥0
       (volume.restrict (stepRegion m (h i))) ≤ β m (h i) * eLpNorm u p unitVol)
     {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) (hfV : ∀ i x, slice f x i ∈ V) :
     eLpNorm (higherDiff r h f) p ((cubeVol d).restrict (isoRegion r h)) ≤
-      (∑ α : Fin r → Fin d, ∏ i, β (count α i) (h i)) * eLpNorm f p (cubeVol d) := by
+      (∑ α : Fin r → Fin d, ∏ i, β (letterCount α i) (h i)) * eLpNorm f p (cubeVol d) := by
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one hp1).ne'
   have hsum : higherDiff r h f = ∑ α : Fin r → Fin d,
-      fun x => mixedDiff (count α) h (List.finRange d) f (x + shiftVec h α) := by
+      fun x => mixedDiff (letterCount α) h (List.finRange d) f (x + shiftVec h α) := by
     funext x
     rw [higherDiff_eq_sum, Finset.sum_apply]
   rw [hsum, Finset.sum_mul]
   refine (eLpNorm_sum_le hp1).trans (Finset.sum_le_sum fun α _ => ?_)
   refine (eLpNorm_shift_mixedDiff_le h α hf p).trans ?_
-  have hmix := eLpNorm_mixedDiff_le V hp0 hp (count α) h (fun i => β (count α i) (h i))
-    (fun u hu i => hβ u hu _ (count_le α i) i) hf hfV
+  have hmix := eLpNorm_mixedDiff_le V hp0 hp (letterCount α) h (fun i => β (letterCount α i) (h i))
+    (fun u hu i => hβ u hu _ (letterCount_le α i) i) hf hfV
     (List.finRange d) (List.nodup_finRange d)
   rwa [← Fin.prod_univ_def] at hmix
 
@@ -233,17 +233,17 @@ theorem eLpNorm_higherDiff_le_of_exponents (V : Submodule ℂ (ℝ → ℂ)) {p 
   refine (eLpNorm_higherDiff_le_sum V hp1 hp r h β
     (fun u hu m hm i => hV u hu m hm (h i) ((hhi i).trans hh)) hf hfV).trans ?_
   -- each word contributes at most `C^d A^Θ`
-  have hword : ∀ α : Fin r → Fin d, ∏ i, β (count α i) (h i) ≤ C ^ d * A ^ Θ := fun α => by
+  have hword : ∀ α : Fin r → Fin d, ∏ i, β (letterCount α i) (h i) ≤ C ^ d * A ^ Θ := fun α => by
     simp only [β]
     rw [Finset.prod_mul_distrib, Finset.prod_const, Finset.card_univ, Fintype.card_fin]
     refine mul_le_mul' le_rfl ?_
-    calc ∏ i, ENNReal.ofReal (2 ^ j * |h i|) ^ θ (count α i)
-        ≤ ∏ i, A ^ θ (count α i) := Finset.prod_le_prod fun i _ =>
+    calc ∏ i, ENNReal.ofReal (2 ^ j * |h i|) ^ θ (letterCount α i)
+        ≤ ∏ i, A ^ θ (letterCount α i) := Finset.prod_le_prod fun i _ =>
           ENNReal.rpow_le_rpow (ENNReal.ofReal_le_ofReal (by
             have := hhi i; nlinarith)) (hθ _)
-      _ = A ^ ∑ i, θ (count α i) := prod_rpow_eq_rpow_sum _ A fun i _ => hθ _
-      _ ≤ A ^ Θ := ENNReal.rpow_le_rpow_of_exponent_ge hA1 (hΘ _ (sum_count α))
-  calc (∑ α : Fin r → Fin d, ∏ i, β (count α i) (h i)) * eLpNorm f p (cubeVol d)
+      _ = A ^ ∑ i, θ (letterCount α i) := prod_rpow_eq_rpow_sum _ A fun i _ => hθ _
+      _ ≤ A ^ Θ := ENNReal.rpow_le_rpow_of_exponent_ge hA1 (hΘ _ (sum_letterCount α))
+  calc (∑ α : Fin r → Fin d, ∏ i, β (letterCount α i) (h i)) * eLpNorm f p (cubeVol d)
       ≤ (∑ _α : Fin r → Fin d, C ^ d * A ^ Θ) * eLpNorm f p (cubeVol d) :=
         mul_le_mul' (Finset.sum_le_sum fun α _ => hword α) le_rfl
     _ = (d : ℝ≥0∞) ^ r * C ^ d * A ^ Θ * eLpNorm f p (cubeVol d) := by

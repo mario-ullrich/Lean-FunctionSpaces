@@ -337,7 +337,7 @@ The notation is that of the previous section.
 
 \begin{lemma}[Steps in the cone]
 \label{lem:cone-steps}
-\lean{Rd.LipschitzGraph.subset_stepSet, Rd.LipschitzGraph.subset_stepSet_of_coneSupported,
+\lean{Rd.LipschitzGraph.subset_diffStepSet, Rd.LipschitzGraph.subset_diffStepSet_of_coneSupported,
   Rd.LipschitzGraph.enorm_cutoff_sub_convLp_scaled_le}
 \leanok
 \uses{lem:graph-cone, def:rd-modulus-on, thm:moment-approx, lem:cone-bump}
@@ -682,7 +682,7 @@ $C = \sum_i C_i$ works, and $\psi_i F_i = \psi_i f$ almost everywhere on $O$, so
 
 \begin{lemma}[Restrictions and smaller sets]
 \label{lem:restriction-moduli}
-\lean{Rd.modNormOn_le_modNorm_of_indicatorLp, Rd.modNormOn_mono_set,
+\lean{Rd.modNormOn_le_modNorm_of_indicatorLp, Rd.modNormOn_mono_of_subset,
   Rd.BoundedLipschitzDomain.modNormOn_mono_set}
 \leanok
 \uses{lem:rd-modulus-on}

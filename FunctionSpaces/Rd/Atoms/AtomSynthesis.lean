@@ -33,9 +33,9 @@ sums `f_j = ∑_m λ_{j,m} a_{j,m}`, then for `0 < s < σ`
 The proof: by bounded overlap (`Rd.eLpNorm_rpow_le_of_overlap`),
 `‖f_j‖_p ≲ 2^(-jn/p) ‖λ_{j,·}‖_{ℓ_p}` and
 `ω_r(f_j, 2^(-k))_p ≲ 2^(-jn/p) ‖λ_{j,·}‖_{ℓ_p} min(1, 2^(-(k-j)σ))`
-(`Rd.eLpNorm_levelSum_le`, `Rd.modulus_levelSum_le`); the almost diagonal lemma with exponent `σ`
-sums the levels. Smooth functions with `‖D^l a‖ ≤ A 2^(jl)` for `l ≤ r` satisfy the pointwise
-bounds with `σ = r` (`Rd.enorm_higherDiff_le_of_iteratedFDeriv`).
+(`Rd.eLpNorm_levelSum_le`, `Rd.smoothnessModulus_levelSum_le`); the almost diagonal lemma with
+exponent `σ` sums the levels. Smooth functions with `‖D^l a‖ ≤ A 2^(jl)` for `l ≤ r` satisfy the
+pointwise bounds with `σ = r` (`Rd.enorm_higherDiff_le_of_iteratedFDeriv`).
 
 **Atoms on a set.** A regular atom on a measurable set `Ω` (`Rd.IsRegularAtomOn`) satisfies the
 bounds with `‖1_Ω a‖_p` and with the differences restricted to the step sets `Ω_{rh}`; regular
@@ -60,14 +60,15 @@ variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDim
 /-- A **regular atom on `Ω`** of level `j`, exponent `σ` and order `r` with centre `c`, radius
 factor `d` and constant `C`: `a = 0` outside `B(c, d 2^(-j))`, `‖a‖_{L_p(Ω)} ≤ C 2^(-jn/p)` and
 `‖Δ_h^r a‖_{L_p(Ω_{rh})} ≤ C 2^(-jn/p) min(1, (2^j ‖h‖)^σ)`, where `Ω_{rh}` are the points whose
-steps `x + l h`, `l ≤ r`, stay in `Ω` (`Rd.stepSet`). Only the values of `a` on `Ω` enter. -/
+steps `x + l h`, `l ≤ r`, stay in `Ω` (`Rd.diffStepSet`). Only the values of `a` on `Ω` enter. -/
 structure IsRegularAtomOn (Ω : Set V) (p : ℝ≥0∞) (σ : ℝ) (r : ℕ) (d : ℝ) (C : ℝ≥0∞) (j : ℕ)
     (c : V) (a : V → ℂ) : Prop where
   aestronglyMeasurable : AEStronglyMeasurable a volume
   eq_zero : ∀ x, d / 2 ^ j < ‖x - c‖ → a x = 0
   eLpNorm_le : eLpNorm (Ω.indicator a) p volume ≤ C * dyadicWeight (-(finrank ℝ V / p.toReal)) j
-  eLpNorm_higherDiff_le : ∀ h : V, eLpNorm ((stepSet Ω r h).indicator ((fwdDiff h)^[r] a)) p volume ≤
-    C * dyadicWeight (-(finrank ℝ V / p.toReal)) j * min 1 (ENNReal.ofReal (2 ^ j * ‖h‖) ^ σ)
+  eLpNorm_higherDiff_le : ∀ h : V,
+    eLpNorm ((diffStepSet Ω r h).indicator ((fwdDiff h)^[r] a)) p volume ≤
+      C * dyadicWeight (-(finrank ℝ V / p.toReal)) j * min 1 (ENNReal.ofReal (2 ^ j * ‖h‖) ^ σ)
 
 /-- A **regular atom** of level `j`, exponent `σ` and order `r` with centre `c`, radius factor `d`
 and constant `C`: a regular atom on `V`, that is, `a = 0` outside `B(c, d 2^(-j))`,
@@ -240,8 +241,8 @@ theorem modulusOn_levelSum_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) 
     levelNorm p coef
   split_ifs with hjk
   · refine iSup₂_le fun h hh => ?_
-    set T := stepSet Ω r h
-    have hT : MeasurableSet T := measurableSet_stepSet hΩ r h
+    set T := diffStepSet Ω r h
+    have hT : MeasurableSet T := measurableSet_diffStepSet hΩ r h
     have hsum : ∀ y, Summable fun m => coef m * a m y := summable_levelSum c a coef hN ha
     have hae : T.indicator ((fwdDiff h)^[r] F) =ᵐ[volume]
         fun x => ∑' m, coef m * T.indicator ((fwdDiff h)^[r] (a m)) x := by
@@ -296,14 +297,14 @@ theorem modulusOn_levelSum_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) 
 /-- **Moduli of the level sums**: `ω_r(∑_m λ_m a_m, 2^(-k))_p ≤
 2^r N^(1-1/p) C 2^(-jn/p) ‖λ‖_{ℓ_p} c_{kj}` with `c_{kj} = 2^(-(k-j)σ)` for `j ≤ k` and `1`
 otherwise, the case `Ω = V` of `Rd.modulusOn_levelSum_le`. -/
-theorem modulus_levelSum_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {ι : Type*} [Countable ι]
-    [MeasurableSpace ι] [MeasurableSingletonClass ι]
+theorem smoothnessModulus_levelSum_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {ι : Type*}
+    [Countable ι] [MeasurableSpace ι] [MeasurableSingletonClass ι]
     {σ : ℝ} (hσ : 0 ≤ σ) {r : ℕ} {d : ℝ} {C : ℝ≥0∞} {j N : ℕ} (c : ι → V) (a : ι → V → ℂ)
     (coef : ι → ℂ)
     (hN : ∀ x (S : Finset ι), (∀ m ∈ S, coef m ≠ 0 ∧ ‖x - c m‖ ≤ (d + r) / 2 ^ j) → S.card ≤ N)
     (ha : ∀ m, IsRegularAtom p σ r d C j (c m) (a m)) {F : V → ℂ} (hF : AEStronglyMeasurable F volume)
     (hFa : ∀ᵐ x ∂volume, F x = ∑' m, coef m * a m x) (k : ℕ) :
-    modulus volume r p F (1 / 2 ^ k) ≤ 2 ^ r * ((N : ℝ≥0∞) ^ (1 - 1 / p.toReal) *
+    smoothnessModulus volume r p F (1 / 2 ^ k) ≤ 2 ^ r * ((N : ℝ≥0∞) ^ (1 - 1 / p.toReal) *
       (C * dyadicWeight (-(finrank ℝ V / p.toReal)) j) * levelNorm p coef) *
         (if j ≤ k then dyadicWeight (-σ) (k - j) else 1) := by
   rw [← modulusOn_univ]
@@ -550,7 +551,7 @@ theorem isRegularAtomOn_of_pointwise {p : ℝ≥0∞} {σ : ℝ} {r : ℕ} {d : 
     {A : ℝ≥0∞} {j : ℕ} {c : V} {a : V → ℂ} {Ω : Set V} (hΩ : MeasurableSet Ω)
     (hm : AEStronglyMeasurable a volume)
     (h0 : ∀ x, d / 2 ^ j < ‖x - c‖ → a x = 0) (hle : ∀ x ∈ Ω, ‖a x‖ₑ ≤ A)
-    (hdiff : ∀ h, ∀ x ∈ stepSet Ω r h,
+    (hdiff : ∀ h, ∀ x ∈ diffStepSet Ω r h,
       ‖(fwdDiff h)^[r] a x‖ₑ ≤ A * min 1 (ENNReal.ofReal (2 ^ j * ‖h‖) ^ σ)) :
     IsRegularAtomOn Ω p σ r d (A * (((r + 1 : ℕ) : ℝ≥0∞) * (ENNReal.ofReal (d ^ finrank ℝ V) *
       volume (ball (0 : V) 1))) ^ (1 / p.toReal)) j c a := by
@@ -594,10 +595,10 @@ theorem isRegularAtomOn_of_pointwise {p : ℝ≥0∞} {σ : ℝ} {r : ℕ} {d : 
       push_cast
       ring
     refine (eLpNorm_le_of_bound_of_support
-      ((aestronglyMeasurable_higherDiff hm r h).indicator (measurableSet_stepSet hΩ r h))
+      ((aestronglyMeasurable_higherDiff hm r h).indicator (measurableSet_diffStepSet hΩ r h))
       (B := A * min 1 (ENNReal.ofReal (2 ^ j * ‖h‖) ^ σ))
       (fun x hx => Set.indicator_apply_eq_zero.2 fun _ => hT x hx) (fun x => ?_)).trans ?_
-    · by_cases hx : x ∈ stepSet Ω r h
+    · by_cases hx : x ∈ diffStepSet Ω r h
       · rw [Set.indicator_of_mem hx]
         exact hdiff h x hx
       · rw [Set.indicator_of_notMem hx, enorm_zero]

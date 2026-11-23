@@ -13,17 +13,17 @@ public import ApproximationSpaces.Sequences.Lq
 # Moduli of smoothness on subsets of `V`
 
 For `U ⊆ V`, a step `h ∈ V` and `r ∈ ℕ`, the points `x` with `x, x + h, …, x + r h ∈ U` form the
-set `U_{rh}` (`Rd.stepSet`, a subset of `U`). The **restricted difference** is
+set `U_{rh}` (`Rd.diffStepSet`, a subset of `U`). The **restricted difference** is
 `Δ_h^r(f, x, U) = Δ_h^r f(x)` for `x ∈ U_{rh}` and `0` otherwise, and the **modulus of
 smoothness on `U`** is
 
 `ω_r(f, t, U)_p = sup_{‖h‖ ≤ t} ‖Δ_h^r(f, ·, U)‖_{L_p(U)}`
 
 (DeVore–Sharpley, (2.1); `Rd.modulusOn`). The steps `h` and `-h` give the same norm, since
-`Δ_{-h}^r(f, x, U) = (-1)^r Δ_h^r(f, x - r h, U)` (`Rd.eLpNorm_indicator_stepSet_neg`). The
+`Δ_{-h}^r(f, x, U) = (-1)^r Δ_h^r(f, x - r h, U)` (`Rd.eLpNorm_indicator_diffStepSet_neg`). The
 modulus uses only the values of `f` on `U` (`Rd.modulusOn_indicator`, `Rd.modulusOn_congr_ae`),
 increases in `t`, is subadditive, is bounded by `2^r ‖f‖_{L_p(U)}` (`Rd.modulusOn_le`) and by
-the modulus on `V` (`Rd.modulusOn_le_modulus`), and on `U = V` it is the modulus on `V`
+the modulus on `V` (`Rd.modulusOn_le_smoothnessModulus`), and on `U = V` it is the modulus on `V`
 (`Rd.modulusOn_univ`). `Rd.lpModulusOn` samples it for `f ∈ L_p` at the dyadic scales `2^(-k)`;
 for every `G ∈ L_p`, `ω_r(f, 2^(-k), Ω)_p ≤ 2^r ‖1_Ω (f - G)‖_p + ω_r(G, 2^(-k))_p`
 (`Rd.lpModulusOn_le_add_lpModulus`).
@@ -31,7 +31,7 @@ The **intrinsic Besov quasi-norm** on a measurable set `Ω` is
 `N_Ω(G) = ‖1_Ω G‖_p + ‖(2^(ks) ω_r(G, 2^(-k), Ω)_p)_k‖_{ℓ_q}` (`Rd.modNormOn`); it depends only
 on `1_Ω G` (`Rd.modNormOn_congr`), is subadditive for `q ≥ 1` and homogeneous
 (`Rd.modNormOn_add_le`, `Rd.modNormOn_finsetSum_le`, `Rd.modNormOn_const_smul`), and grows with
-the set (`Rd.modNormOn_mono_set`). If
+the set (`Rd.modNormOn_mono_of_subset`). If
 `1_O F = 1_O f`, the intrinsic quasi-norm of `f` on `O` is at most that of `F` on `V`
 (`Rd.modNormOn_le_modNorm_of_indicatorLp`), and on `O = V` the two agree (`Rd.modNormOn_univ`).
 
@@ -43,8 +43,8 @@ Cauchy for `N_Ω` and converges in `L_p` converges for `N_Ω`
 domains and on boundaries.
 
 On `V` with Lebesgue measure, sets that agree up to a null set have almost equal step sets
-(`Rd.stepSet_ae_eq`), the same moduli (`Rd.modulusOn_congr_set`, `Rd.lpModulusOn_congr_set`), the
-same cut-offs (`Rd.indicatorLp_congr_set`) and the same intrinsic quasi-norms
+(`Rd.diffStepSet_ae_eq`), the same moduli (`Rd.modulusOn_congr_set`, `Rd.lpModulusOn_congr_set`),
+the same cut-offs (`Rd.indicatorLp_congr_set`) and the same intrinsic quasi-norms
 (`Rd.modNormOn_congr_set`).
 -/
 
@@ -62,36 +62,37 @@ variable {V : Type*} [NormedAddCommGroup V] [NormedSpace ℝ V]
 /-! ### Points whose steps stay in a set -/
 
 /-- The set `U_{rh}` of the points `x` with `x, x + h, …, x + r h ∈ U`. -/
-def stepSet (U : Set V) (r : ℕ) (h : V) : Set V := {x | ∀ l ≤ r, x + (l : ℝ) • h ∈ U}
+def diffStepSet (U : Set V) (r : ℕ) (h : V) : Set V := {x | ∀ l ≤ r, x + (l : ℝ) • h ∈ U}
 
 /-- `U_{rh} ⊆ U` (the case `l = 0`). -/
-theorem stepSet_subset (U : Set V) (r : ℕ) (h : V) : stepSet U r h ⊆ U := fun x hx => by
+theorem diffStepSet_subset (U : Set V) (r : ℕ) (h : V) : diffStepSet U r h ⊆ U := fun x hx => by
   simpa using hx 0 (Nat.zero_le r)
 
 /-- `U_{rh} ⊆ O_{rh}` for `U ⊆ O`. -/
-theorem stepSet_mono {U O : Set V} (hUO : U ⊆ O) (r : ℕ) (h : V) : stepSet U r h ⊆ stepSet O r h :=
+theorem diffStepSet_mono {U O : Set V} (hUO : U ⊆ O) (r : ℕ) (h : V) :
+    diffStepSet U r h ⊆ diffStepSet O r h :=
   fun _ hx l hl => hUO (hx l hl)
 
 /-- `V_{rh} = V`. -/
 @[simp]
-theorem stepSet_univ (r : ℕ) (h : V) : stepSet (Set.univ : Set V) r h = Set.univ :=
+theorem diffStepSet_univ (r : ℕ) (h : V) : diffStepSet (Set.univ : Set V) r h = Set.univ :=
   Set.eq_univ_of_forall fun _ _ _ => Set.mem_univ _
 
 /-- **Restricted differences use only the values on `U`**:
 `1_{U_{rh}} Δ_h^r (1_U f) = 1_{U_{rh}} Δ_h^r f`. -/
-theorem indicator_stepSet_higherDiff_indicator (U : Set V) (r : ℕ) (h : V) (f : V → ℂ) :
-    (stepSet U r h).indicator ((fwdDiff h)^[r] (U.indicator f)) =
-      (stepSet U r h).indicator ((fwdDiff h)^[r] f) := by
+theorem indicator_diffStepSet_higherDiff_indicator (U : Set V) (r : ℕ) (h : V) (f : V → ℂ) :
+    (diffStepSet U r h).indicator ((fwdDiff h)^[r] (U.indicator f)) =
+      (diffStepSet U r h).indicator ((fwdDiff h)^[r] f) := by
   funext x
-  by_cases hx : x ∈ stepSet U r h
+  by_cases hx : x ∈ diffStepSet U r h
   · rw [Set.indicator_of_mem hx, Set.indicator_of_mem hx, higherDiff_apply, higherDiff_apply]
     refine Finset.sum_congr rfl fun l hl => ?_
     rw [Set.indicator_of_mem (hx l (Nat.lt_succ_iff.1 (Finset.mem_range.1 hl)))]
   · rw [Set.indicator_of_notMem hx, Set.indicator_of_notMem hx]
 
 /-- **Negative steps**: `x ∈ U_{r(-h)}` iff `x - r h ∈ U_{rh}`, by `l ↦ r - l`. -/
-theorem mem_stepSet_neg {U : Set V} {r : ℕ} {h x : V} :
-    x ∈ stepSet U r (-h) ↔ x - (r : ℝ) • h ∈ stepSet U r h := by
+theorem mem_diffStepSet_neg {U : Set V} {r : ℕ} {h x : V} :
+    x ∈ diffStepSet U r (-h) ↔ x - (r : ℝ) • h ∈ diffStepSet U r h := by
   have key : ∀ l ≤ r, x - (r : ℝ) • h + ((r - l : ℕ) : ℝ) • h = x + (l : ℝ) • -h :=
     fun l hl => by
       rw [Nat.cast_sub hl, smul_neg, sub_smul]
@@ -105,13 +106,13 @@ theorem mem_stepSet_neg {U : Set V} {r : ℕ} {h x : V} :
 
 /-- **Restricted differences with a negative step**:
 `Δ_{-h}^r(f, x, U) = (-1)^r Δ_h^r(f, x - r h, U)`, from `Rd.higherDiff_neg`. -/
-theorem indicator_stepSet_neg (U : Set V) (r : ℕ) (h : V) (f : V → ℂ) (x : V) :
-    (stepSet U r (-h)).indicator ((fwdDiff (-h))^[r] f) x =
-      (-1 : ℂ) ^ r * (stepSet U r h).indicator ((fwdDiff h)^[r] f) (x - (r : ℝ) • h) := by
-  by_cases hx : x ∈ stepSet U r (-h)
-  · rw [Set.indicator_of_mem hx, Set.indicator_of_mem (mem_stepSet_neg.1 hx), higherDiff_neg,
+theorem indicator_diffStepSet_neg (U : Set V) (r : ℕ) (h : V) (f : V → ℂ) (x : V) :
+    (diffStepSet U r (-h)).indicator ((fwdDiff (-h))^[r] f) x =
+      (-1 : ℂ) ^ r * (diffStepSet U r h).indicator ((fwdDiff h)^[r] f) (x - (r : ℝ) • h) := by
+  by_cases hx : x ∈ diffStepSet U r (-h)
+  · rw [Set.indicator_of_mem hx, Set.indicator_of_mem (mem_diffStepSet_neg.1 hx), higherDiff_neg,
       Nat.cast_smul_eq_nsmul]
-  · rw [Set.indicator_of_notMem hx, Set.indicator_of_notMem (mt mem_stepSet_neg.2 hx), mul_zero]
+  · rw [Set.indicator_of_notMem hx, Set.indicator_of_notMem (mt mem_diffStepSet_neg.2 hx), mul_zero]
 
 /-! ### The modulus of smoothness on a set -/
 
@@ -121,14 +122,14 @@ variable (μ) in
 /-- The **modulus of smoothness on `U`**, `ω_r(f, t, U)_p = sup_{‖h‖ ≤ t} ‖Δ_h^r(f, ·, U)‖_p`,
 with the restricted difference `Δ_h^r(f, ·, U) = 1_{U_{rh}} Δ_h^r f`. -/
 noncomputable def modulusOn (U : Set V) (r : ℕ) (p : ℝ≥0∞) (f : V → ℂ) (t : ℝ) : ℝ≥0∞ :=
-  ⨆ (h : V) (_ : ‖h‖ ≤ t), eLpNorm ((stepSet U r h).indicator ((fwdDiff h)^[r] f)) p μ
+  ⨆ (h : V) (_ : ‖h‖ ≤ t), eLpNorm ((diffStepSet U r h).indicator ((fwdDiff h)^[r] f)) p μ
 
 /-- `‖Δ_h^r(f, ·, U)‖_p ≤ ω_r(f, t, U)_p` for `‖h‖ ≤ t`. -/
 theorem eLpNorm_indicator_higherDiff_le_modulusOn {U : Set V} {r : ℕ} {p : ℝ≥0∞} {f : V → ℂ}
     {t : ℝ} {h : V} (hh : ‖h‖ ≤ t) :
-    eLpNorm ((stepSet U r h).indicator ((fwdDiff h)^[r] f)) p μ ≤ modulusOn μ U r p f t :=
+    eLpNorm ((diffStepSet U r h).indicator ((fwdDiff h)^[r] f)) p μ ≤ modulusOn μ U r p f t :=
   le_iSup₂ (f := fun (h : V) (_ : ‖h‖ ≤ t) =>
-    eLpNorm ((stepSet U r h).indicator ((fwdDiff h)^[r] f)) p μ) h hh
+    eLpNorm ((diffStepSet U r h).indicator ((fwdDiff h)^[r] f)) p μ) h hh
 
 /-- The modulus on `U` increases in `t`. -/
 theorem modulusOn_mono (U : Set V) (r : ℕ) (p : ℝ≥0∞) (f : V → ℂ) :
@@ -138,13 +139,13 @@ theorem modulusOn_mono (U : Set V) (r : ℕ) (p : ℝ≥0∞) (f : V → ℂ) :
 /-- The modulus on `V` is the modulus. -/
 @[simp]
 theorem modulusOn_univ (r : ℕ) (p : ℝ≥0∞) (f : V → ℂ) (t : ℝ) :
-    modulusOn μ Set.univ r p f t = modulus μ r p f t := by
-  simp [modulusOn, modulus]
+    modulusOn μ Set.univ r p f t = smoothnessModulus μ r p f t := by
+  simp [modulusOn, smoothnessModulus]
 
 /-- **The modulus on `U` uses only the values on `U`**: `ω_r(1_U f, t, U)_p = ω_r(f, t, U)_p`. -/
 theorem modulusOn_indicator (U : Set V) (r : ℕ) (p : ℝ≥0∞) (f : V → ℂ) (t : ℝ) :
     modulusOn μ U r p (U.indicator f) t = modulusOn μ U r p f t := by
-  simp only [modulusOn, indicator_stepSet_higherDiff_indicator]
+  simp only [modulusOn, indicator_diffStepSet_higherDiff_indicator]
 
 /-- The modulus on `U` is subadditive. -/
 theorem modulusOn_add_le {p : ℝ≥0∞} (hp : 1 ≤ p) (U : Set V) (r : ℕ) (f g : V → ℂ) (t : ℝ) :
@@ -157,31 +158,31 @@ theorem modulusOn_add_le {p : ℝ≥0∞} (hp : 1 ≤ p) (U : Set V) (r : ℕ) (
 variable [BorelSpace V]
 
 /-- `U_{rh}` is measurable for measurable `U`. -/
-theorem measurableSet_stepSet {U : Set V} (hU : MeasurableSet U) (r : ℕ) (h : V) :
-    MeasurableSet (stepSet U r h) := by
-  simp only [stepSet, Set.ofPred_forall]
+theorem measurableSet_diffStepSet {U : Set V} (hU : MeasurableSet U) (r : ℕ) (h : V) :
+    MeasurableSet (diffStepSet U r h) := by
+  simp only [diffStepSet, Set.ofPred_forall]
   exact MeasurableSet.iInter fun l => MeasurableSet.iInter fun _ => measurable_add_const _ hU
 
 /-- **A restricted difference has the same norm for the steps `h` and `-h`**:
 `‖Δ_{-h}^r(f, ·, U)‖_p = ‖Δ_h^r(f, ·, U)‖_p` for a translation-invariant `μ`, by the substitution
 `x ↦ x - r h` (Mathlib's `MeasurableEmbedding.eLpNorm_map_measure`). -/
-theorem eLpNorm_indicator_stepSet_neg [μ.IsAddRightInvariant] (U : Set V) (r : ℕ) (p : ℝ≥0∞)
+theorem eLpNorm_indicator_diffStepSet_neg [μ.IsAddRightInvariant] (U : Set V) (r : ℕ) (p : ℝ≥0∞)
     (h : V) (f : V → ℂ) :
-    eLpNorm ((stepSet U r (-h)).indicator ((fwdDiff (-h))^[r] f)) p μ =
-      eLpNorm ((stepSet U r h).indicator ((fwdDiff h)^[r] f)) p μ := by
-  set G := (stepSet U r h).indicator ((fwdDiff h)^[r] f)
+    eLpNorm ((diffStepSet U r (-h)).indicator ((fwdDiff (-h))^[r] f)) p μ =
+      eLpNorm ((diffStepSet U r h).indicator ((fwdDiff h)^[r] f)) p μ := by
+  set G := (diffStepSet U r h).indicator ((fwdDiff h)^[r] f)
   have hemb : MeasurableEmbedding fun x : V => x - (r : ℝ) • h :=
     (MeasurableEquiv.subRight ((r : ℝ) • h)).measurableEmbedding
-  have hfun : (stepSet U r (-h)).indicator ((fwdDiff (-h))^[r] f) =
+  have hfun : (diffStepSet U r (-h)).indicator ((fwdDiff (-h))^[r] f) =
       ((-1 : ℂ) ^ r) • (G ∘ fun x => x - (r : ℝ) • h) :=
-    funext fun x => indicator_stepSet_neg U r h f x
+    funext fun x => indicator_diffStepSet_neg U r h f x
   rw [hfun, eLpNorm_const_smul, enorm_pow, enorm_neg, enorm_one, one_pow, one_mul,
     ← hemb.eLpNorm_map_measure, map_sub_right_eq_self]
 
 /-- **The modulus on `U` is at most the modulus on `V`**, `ω_r(f, t, U)_p ≤ ω_r(f, t)_p`. -/
-theorem modulusOn_le_modulus {U : Set V} (hU : MeasurableSet U) (r : ℕ) (p : ℝ≥0∞) (f : V → ℂ)
-    (t : ℝ) : modulusOn μ U r p f t ≤ modulus μ r p f t :=
-  iSup₂_mono fun h _ => eLpNorm_indicator_le _ (measurableSet_stepSet hU r h).nullMeasurableSet
+theorem modulusOn_le_smoothnessModulus {U : Set V} (hU : MeasurableSet U) (r : ℕ) (p : ℝ≥0∞)
+    (f : V → ℂ) (t : ℝ) : modulusOn μ U r p f t ≤ smoothnessModulus μ r p f t :=
+  iSup₂_mono fun h _ => eLpNorm_indicator_le _ (measurableSet_diffStepSet hU r h).nullMeasurableSet
 
 variable [μ.IsAddHaarMeasure]
 
@@ -190,15 +191,16 @@ theorem modulusOn_mono_set {f : V → ℂ} (hf : AEStronglyMeasurable f μ) {U O
     (hU : MeasurableSet U) (hUO : U ⊆ O) (r : ℕ) (p : ℝ≥0∞) (t : ℝ) :
     modulusOn μ U r p f t ≤ modulusOn μ O r p f t :=
   iSup₂_mono fun h _ => eLpNorm_mono
-    ((aestronglyMeasurable_higherDiff hf r h).indicator (measurableSet_stepSet hU r h))
-    fun x => norm_indicator_le_of_subset (stepSet_mono hUO r h) _ x
+    ((aestronglyMeasurable_higherDiff hf r h).indicator (measurableSet_diffStepSet hU r h))
+    fun x => norm_indicator_le_of_subset (diffStepSet_mono hUO r h) _ x
 
 /-- `ω_r(f, t, U)_p ≤ 2^r ‖f‖_{L_p(U)}`. -/
 theorem modulusOn_le {f : V → ℂ} (hf : AEStronglyMeasurable f μ) {U : Set V}
     (hU : MeasurableSet U) {p : ℝ≥0∞} (hp : 1 ≤ p) (r : ℕ) (t : ℝ) :
     modulusOn μ U r p f t ≤ 2 ^ r * eLpNorm (U.indicator f) p μ := by
   rw [← modulusOn_indicator]
-  exact (modulusOn_le_modulus hU r p _ t).trans (modulus_le (hf.indicator hU) hp r t)
+  exact (modulusOn_le_smoothnessModulus hU r p _ t).trans
+    (smoothnessModulus_le (hf.indicator hU) hp r t)
 
 /-- **The modulus on `U` depends only on the class of `f` on `U`**: if `1_U f = 1_U g` almost
 everywhere, then `ω_r(f, t, U)_p = ω_r(g, t, U)_p`. -/
@@ -212,7 +214,7 @@ theorem modulusOn_congr_ae {U : Set V} {f g : V → ℂ} (hfg : U.indicator f =�
   funext _
   refine eLpNorm_congr_ae ?_
   filter_upwards [higherDiff_congr_ae hfg r h] with x hx
-  by_cases hxU : x ∈ stepSet U r h
+  by_cases hxU : x ∈ diffStepSet U r h
   · rw [Set.indicator_of_mem hxU, Set.indicator_of_mem hxU, hx]
   · rw [Set.indicator_of_notMem hxU, Set.indicator_of_notMem hxU]
 
@@ -236,7 +238,7 @@ omit [μ.IsAddHaarMeasure] in
 /-- `ω_r(f, 2^(-k), U)_p ≤ ω_r(f, 2^(-k))_p` on `L_p`. -/
 theorem lpModulusOn_le_lpModulus [Fact (1 ≤ p)] {U : Set V} (hU : MeasurableSet U) (r : ℕ)
     (f : Lp ℂ p μ) (k : ℕ) : lpModulusOn p U r f k ≤ lpModulus p r f k :=
-  modulusOn_le_modulus hU r p _ _
+  modulusOn_le_smoothnessModulus hU r p _ _
 
 /-- The modulus on a set at the dyadic scales grows with the set. -/
 theorem lpModulusOn_mono_set {U O : Set V} (hU : MeasurableSet U) (hUO : U ⊆ O) (r : ℕ)
@@ -261,7 +263,7 @@ theorem modulusOn_const_smul (U : Set V) (r : ℕ) (p : ℝ≥0∞) (c : ℂ) (f
   rw [← eLpNorm_const_smul]
   congr 1
   funext x
-  by_cases hx : x ∈ stepSet U r h
+  by_cases hx : x ∈ diffStepSet U r h
   · simp only [Set.indicator_of_mem hx, Pi.smul_apply]
   · simp only [Set.indicator_of_notMem hx, Pi.smul_apply, smul_zero]
 
@@ -387,7 +389,7 @@ end ModNormOn
 /-- **The intrinsic quasi-norm grows with the set**: for measurable `T ⊆ U`,
 `N_T(f) ≤ N_U(f)`, where `N_U(f) = ‖1_U f‖_p + ‖(2^(ks) ω_r(f, 2^(-k), U)_p)_k‖_{ℓ_q}`
 (`Rd.lpModulusOn_mono_set`). -/
-theorem modNormOn_mono_set [Fact (1 ≤ p)] {T U : Set V} (hT : MeasurableSet T)
+theorem modNormOn_mono_of_subset [Fact (1 ≤ p)] {T U : Set V} (hT : MeasurableSet T)
     (hU : MeasurableSet U) (hTU : T ⊆ U) (r : ℕ) (s : ℝ) (q : ℝ≥0∞) (f : Lp ℂ p μ) :
     modNormOn hT r s q f ≤ modNormOn hU r s q f := by
   unfold modNormOn
@@ -512,8 +514,8 @@ variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDim
 
 /-- **Step sets of almost equal sets are almost equal**: the translates by `l h` of almost equal
 sets are almost equal, by the translation invariance of the Lebesgue measure. -/
-theorem stepSet_ae_eq {U U' : Set V} (hUU' : U =ᵐ[volume] U') (r : ℕ) (h : V) :
-    stepSet U r h =ᵐ[volume] stepSet U' r h := by
+theorem diffStepSet_ae_eq {U U' : Set V} (hUU' : U =ᵐ[volume] U') (r : ℕ) (h : V) :
+    diffStepSet U r h =ᵐ[volume] diffStepSet U' r h := by
   have hl : ∀ l : ℕ, ∀ᵐ x ∂(volume : Measure V),
       (x + (l : ℝ) • h ∈ U) = (x + (l : ℝ) • h ∈ U') := fun l =>
     (measurePreserving_add_right volume ((l : ℝ) • h)).quasiMeasurePreserving.ae_eq_comp hUU'
@@ -529,7 +531,7 @@ theorem modulusOn_congr_set {U U' : Set V} (hUU' : U =ᵐ[volume] U') (r : ℕ) 
   funext h
   congr 1
   funext _
-  exact eLpNorm_congr_ae (indicator_ae_eq_of_ae_eq_set (stepSet_ae_eq hUU' r h))
+  exact eLpNorm_congr_ae (indicator_ae_eq_of_ae_eq_set (diffStepSet_ae_eq hUU' r h))
 
 /-- The dyadic moduli on almost equal sets agree. -/
 theorem lpModulusOn_congr_set {p : ℝ≥0∞} {U U' : Set V} (hUU' : U =ᵐ[volume] U') (r : ℕ)

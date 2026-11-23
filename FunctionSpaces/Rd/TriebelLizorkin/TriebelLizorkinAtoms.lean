@@ -455,7 +455,7 @@ theorem enorm_mul_higherDiff_atom_le {L : ℕ} (hL : 1 ≤ L) {d A : ℝ} {j : �
   split_ifs with hx
   · rw [mul_one, mul_assoc]
     refine (ha.enorm_higherDiff_le convex_univ (by rw [interior_univ]; exact univ_nonempty) hA hL
-      le_rfl (by rw [stepSet_univ]; trivial)).trans
+      le_rfl (by rw [diffStepSet_univ]; trivial)).trans
       (mul_le_mul_right ((min_le_right _ _).trans ?_) _)
     have h1 : 2 ^ j * ‖-((2 : ℝ) ^ k)⁻¹ • z‖ ≤ b.radius * (1 / 2 ^ (k - j)) := by
       have hk : (2 : ℝ) ^ k = 2 ^ (k - j) * 2 ^ j := by rw [← pow_add, Nat.sub_add_cancel hjk]

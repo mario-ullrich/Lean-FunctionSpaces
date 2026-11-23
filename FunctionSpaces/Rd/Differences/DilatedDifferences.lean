@@ -19,7 +19,7 @@ of a convolution by the `L_1` norms of the differences of the kernel (`Rd.lpModu
 
 Since translation is continuous in `L_p`, `1 ≤ p < ∞`, the modulus of smoothness of every
 `f ∈ L_p` tends to zero with the scale: `ω_r(f, t)_p → 0` as `t → 0` for `r ≥ 1`
-(`Rd.tendsto_modulus`, `Rd.tendsto_lpModulus`).
+(`Rd.tendsto_smoothnessModulus`, `Rd.tendsto_lpModulus`).
 -/
 
 @[expose] public section
@@ -79,7 +79,7 @@ variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 theorem lpModulus_convLp_le (hp : p ≠ ∞) {K : V → ℂ} (hK : Integrable K μ) (r k : ℕ)
     {B : ℝ≥0∞} (hB : ∀ v : V, ‖v‖ ≤ 1 / 2 ^ k → eLpNorm ((fwdDiff v)^[r] K) 1 μ ≤ B)
     (h : Lp ℂ p μ) : lpModulus p r (convLp hp hK h) k ≤ B * ‖h‖ₑ := by
-  rw [lpModulus, modulus_congr_ae (convLp_apply_ae hp hK h)]
+  rw [lpModulus, smoothnessModulus_congr_ae (convLp_apply_ae hp hK h)]
   refine iSup₂_le fun v hv => ?_
   rw [eLpNorm_congr_ae (higherDiff_conv_ae Fact.out hp hK (Lp.memLp h) r v), Lp.enorm_def]
   exact (eLpNorm_conv_le Fact.out hp (integrable_higherDiff hK r v).aestronglyMeasurable
@@ -89,11 +89,11 @@ theorem lpModulus_convLp_le (hp : p ≠ ∞) {K : V → ℂ} (hK : Integrable K 
 
 /-- **The modulus of smoothness tends to zero**: for `1 ≤ p < ∞`, every additive Haar measure
 `μ`, every order `r ≥ 1` and every `f ∈ L_p(μ)`, `ω_r(f, t)_p → 0` as `t → 0`. For `‖h‖ ≤ t`,
-`‖Δ_h^r f‖_p ≤ 2^(r-1) ‖Δ_h f‖_p` (`Rd.eLpNorm_higherDiff_le` for `Δ_h f`), and
+`‖Δ_h^r f‖_p ≤ 2^(r-1) ‖Δ_h f‖_p` (`Rd.eLpNorm_higherDiff_le_two_pow_mul` for `Δ_h f`), and
 `‖Δ_h f‖_p = ‖f(· + h) - f‖_p` is small for small `h`, since translation is continuous in `L_p`
 (`Rd.continuous_eLpNorm_comp_sub_sub`). -/
-theorem tendsto_modulus (hp : p ≠ ∞) {r : ℕ} (hr : 1 ≤ r) {f : V → ℂ} (hf : MemLp f p μ) :
-    Tendsto (modulus μ r p f) (𝓝 0) (𝓝 0) := by
+theorem tendsto_smoothnessModulus (hp : p ≠ ∞) {r : ℕ} (hr : 1 ≤ r) {f : V → ℂ} (hf : MemLp f p μ) :
+    Tendsto (smoothnessModulus μ r p f) (𝓝 0) (𝓝 0) := by
   obtain ⟨r, rfl⟩ : ∃ r', r = r' + 1 := ⟨r - 1, by omega⟩
   have hc := (continuous_eLpNorm_comp_sub_sub (μ := μ) hp hf).tendsto 0
   simp only [sub_zero, sub_self, eLpNorm_fun_zero] at hc
@@ -114,20 +114,21 @@ theorem tendsto_modulus (hp : p ≠ ∞) {r : ℕ} (hr : 1 ≤ r) {f : V → ℂ
   rw [Function.iterate_succ_apply]
   calc eLpNorm ((fwdDiff h)^[r] (fwdDiff h f)) p μ
       ≤ 2 ^ r * eLpNorm (fwdDiff h f) p μ :=
-        eLpNorm_higherDiff_le (aestronglyMeasurable_higherDiff hf.aestronglyMeasurable 1 h)
-          Fact.out r h
+        eLpNorm_higherDiff_le_two_pow_mul
+          (aestronglyMeasurable_higherDiff hf.aestronglyMeasurable 1 h) Fact.out r h
     _ ≤ 2 ^ r * (ε / 2 ^ r) := by gcongr
     _ = ε := ENNReal.mul_div_cancel h2 h2'
 
 /-- **The dyadic moduli tend to zero**: for `1 ≤ p < ∞`, every order `r ≥ 1` and every
-`f ∈ L_p(μ)`, `ω_r(f, 2^(-k))_p → 0` as `k → ∞` (`Rd.tendsto_modulus`, since `2^(-k) → 0`). -/
+`f ∈ L_p(μ)`, `ω_r(f, 2^(-k))_p → 0` as `k → ∞` (`Rd.tendsto_smoothnessModulus`, since
+`2^(-k) → 0`). -/
 theorem tendsto_lpModulus (hp : p ≠ ∞) {r : ℕ} (hr : 1 ≤ r) (f : Lp ℂ p μ) :
     Tendsto (lpModulus p r f) atTop (𝓝 0) := by
   have h2 : Tendsto (fun k : ℕ => (1 : ℝ) / 2 ^ k) atTop (𝓝 0) := by
     simpa only [one_div, inv_pow] using
       tendsto_pow_atTop_nhds_zero_of_lt_one (by norm_num : (0 : ℝ) ≤ 2⁻¹)
         (by norm_num : (2 : ℝ)⁻¹ < 1)
-  exact (tendsto_modulus hp hr (Lp.memLp f)).comp h2
+  exact (tendsto_smoothnessModulus hp hr (Lp.memLp f)).comp h2
 
 end Rd
 

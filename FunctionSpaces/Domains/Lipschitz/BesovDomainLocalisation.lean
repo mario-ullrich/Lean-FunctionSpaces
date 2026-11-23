@@ -22,9 +22,9 @@ described on the bounded convex pieces `D = O ∩ B(0, R')`, `R < R'`
   convex set is a null set.
 * **Localisation** (`Rd.BesovDomain.modNormOn_lt_top_iff_ballDomain`): for such functions the
   intrinsic quasi-norm `N_Ω` is finite iff `N_D` is finite. One direction is the monotonicity in
-  the set (`Rd.modNormOn_mono_set`); for the other, extend from `D`, multiply by a cutoff equal to
-  `1` on `B̄(0, R)` and supported in `B(0, R')`, and restrict to `Ω`. Multiplication by a smooth
-  `χ` with compact support is bounded in the Besov quasi-norm by differences on `V`:
+  the set (`Rd.modNormOn_mono_of_subset`); for the other, extend from `D`, multiply by a cutoff
+  equal to `1` on `B̄(0, R)` and supported in `B(0, R')`, and restrict to `Ω`. Multiplication by a
+  smooth `χ` with compact support is bounded in the Besov quasi-norm by differences on `V`:
   `N(χ F) ≤ C N(F)` (`Rd.exists_mul_modNorm_le`).
 * **`W^1_2 = B^1_{2,2}`** (`Rd.BesovDomain.exists_hasWeakLineDeriv_iff_modNormOn_lt_top`): such a
   function has a weak gradient on `O` with values in `L_2(O)` iff its intrinsic quasi-norm on `Ω`
@@ -143,14 +143,14 @@ theorem modNormOn_lt_top_of_ballDomain {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p
 /-- **Localisation on Besov domains**: for `1 ≤ p < ∞`, `0 < s < r`, `1 ≤ q ≤ ∞`, `R < R'` and
 every `g ∈ L_p(V)` vanishing almost everywhere outside `B(0, R)`, the intrinsic quasi-norm of `g`
 on `Ω` is finite iff the one on the bounded convex piece `D = O ∩ B(0, R')` is finite:
-`N_D(g) ≤ N_Ω(g)` (`Rd.modNormOn_mono_set`), and
+`N_D(g) ≤ N_Ω(g)` (`Rd.modNormOn_mono_of_subset`), and
 `Rd.BesovDomain.modNormOn_lt_top_of_ballDomain`. -/
 theorem modNormOn_lt_top_iff_ballDomain {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞) {r : ℕ} {s : ℝ}
     (hs : 0 < s) (hsr : s < r) {q : ℝ≥0∞} (hq : 1 ≤ q) {R R' : ℝ} (hR : R < R')
     {g : Lp ℂ p (volume : Measure V)} (hg : ∀ᵐ y ∂volume, y ∉ ball (0 : V) R → g y = 0) :
     modNormOn (measurableSet Ω) r s q g < ∞ ↔
       modNormOn (ballDomain Ω R').measurableSet r s q g < ∞ :=
-  ⟨fun h => (modNormOn_mono_set _ _ (ballDomain_subset Ω R') r s q g).trans_lt h,
+  ⟨fun h => (modNormOn_mono_of_subset _ _ (ballDomain_subset Ω R') r s q g).trans_lt h,
     modNormOn_lt_top_of_ballDomain hp hs hsr hq hR hg⟩
 
 /-! ### The weak gradient on the interior -/

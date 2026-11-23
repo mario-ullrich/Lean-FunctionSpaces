@@ -27,8 +27,8 @@ give Jackson's inequality for the tensor scaling spaces `V_j` of
   `‖f - R f‖_p ≤ (1 + C)^{|l|} ∑_{i ∈ l} ‖f - P_j^{(i)} f‖_p`
   (`Daubechies.eLpNorm_sub_foldSliceProj_le`). With Jackson's inequality in one coordinate
   (`Daubechies.eLpNorm_sub_sliceProj_le`) and all `d` coordinates,
-  `‖f - R_j f‖_p ≤ C_{J,d} ω_N(f, 2^(-j))_p` (`Daubechies.eLpNorm_sub_foldSliceProj_le_modulus`,
-  `Daubechies.tensorJacksonConst`).
+  `‖f - R_j f‖_p ≤ C_{J,d} ω_N(f, 2^(-j))_p`
+  (`Daubechies.eLpNorm_sub_foldSliceProj_le_smoothnessModulus`, `Daubechies.tensorJacksonConst`).
 * **The range.** `R_j f` lies in `V_j`. Applying the projection in coordinate `i` to a finite sum
   `∑_k c_k(x) ∏_{i' ∈ S} φ_{j,k_{i'}}(x_{i'})` whose coefficients do not depend on the coordinates
   in `S ∌ i` expands each coefficient in the coordinate `i`
@@ -167,15 +167,15 @@ continuous `f : ℝ^d → ℂ` and every level `j`, with `R_j f` the projections
 `C_{J,d} = tensorJacksonConst m p d` and the isotropic modulus of `ℝ^d`: the telescoping bound
 (`Daubechies.eLpNorm_sub_foldSliceProj_le`) and Jackson's inequality in each coordinate
 (`Daubechies.eLpNorm_sub_sliceProj_le`). -/
-theorem eLpNorm_sub_foldSliceProj_le_modulus (hN : 2 ≤ N) {p : ℝ≥0∞} (hp1 : 1 ≤ p)
+theorem eLpNorm_sub_foldSliceProj_le_smoothnessModulus (hN : 2 ≤ N) {p : ℝ≥0∞} (hp1 : 1 ≤ p)
     (hp : p ≠ ∞) (j : ℕ) {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) :
     eLpNorm (fun x => f x - foldSliceProj m j (List.finRange d) f x) p volume ≤
-      tensorJacksonConst m p d * Rd.modulus volume N p f (1 / 2 ^ j) := by
+      tensorJacksonConst m p d * Rd.smoothnessModulus volume N p f (1 / 2 ^ j) := by
   refine (eLpNorm_sub_foldSliceProj_le m hN hp1 hp j _ hf).trans ?_
   rw [List.length_finRange, tensorJacksonConst, mul_assoc]
   gcongr
-  refine (List.sum_le_length_nsmul _ (jacksonConst m p * Rd.modulus volume N p f (1 / 2 ^ j))
-    fun x hx => ?_).trans_eq ?_
+  refine (List.sum_le_length_nsmul _
+    (jacksonConst m p * Rd.smoothnessModulus volume N p f (1 / 2 ^ j)) fun x hx => ?_).trans_eq ?_
   · obtain ⟨i, -, rfl⟩ := List.mem_map.1 hx
     exact eLpNorm_sub_sliceProj_le m hN hp1 hp hf j i
   · rw [List.length_map, List.length_finRange, nsmul_eq_mul, mul_assoc]
@@ -420,10 +420,10 @@ variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 `E_{2^j}(f)_p ≤ C_{J,d} ω_N(f, 2^(-j))_p` with `C_{J,d} = tensorJacksonConst m p d` and the
 isotropic modulus of `ℝ^d`. For `f` with a bounded continuous representative `g`,
 `R_j g ∈ V_j` (`Daubechies.toLp_foldSliceProj_mem_tensorScalingSpace`) and
-`‖g - R_j g‖_p ≤ C_{J,d} ω_N(g, 2^(-j))_p` (`Daubechies.eLpNorm_sub_foldSliceProj_le_modulus`);
-these `f` are dense (Mathlib's `MeasureTheory.Lp.boundedContinuousFunction_dense`), and both sides
-are controlled by `‖f‖_p`, so the bound extends to all of `L_p`
-(`ApproximationScheme.approxError_le_of_dense`). -/
+`‖g - R_j g‖_p ≤ C_{J,d} ω_N(g, 2^(-j))_p`
+(`Daubechies.eLpNorm_sub_foldSliceProj_le_smoothnessModulus`); these `f` are dense (Mathlib's
+`MeasureTheory.Lp.boundedContinuousFunction_dense`), and both sides are controlled by `‖f‖_p`, so
+the bound extends to all of `L_p` (`ApproximationScheme.approxError_le_of_dense`). -/
 theorem approxError_tensorScheme_le (hN : 2 ≤ N) (hp : p ≠ ∞)
     (f : Lp ℂ p (volume : Measure (Fin d → ℝ))) (j : ℕ) :
     (tensorScheme m p d hN hp).approxError f (2 ^ j) ≤
@@ -441,8 +441,8 @@ theorem approxError_tensorScheme_le (hN : 2 ≤ N) (hp : p ≠ ∞)
   refine ((tensorScheme m p d hN hp).approxError_le_of_mem ((mem_tensorScheme_two_pow m).2
     (toLp_foldSliceProj_mem_tensorScalingSpace m hN hp j g₀.continuous hgp)) g).trans ?_
   rw [Lp.enorm_def, eLpNorm_congr_ae ((Lp.coeFn_sub _ _).trans
-    (hae.sub (MemLp.coeFn_toLp _))), Rd.lpModulus, Rd.modulus_congr_ae hae]
-  exact eLpNorm_sub_foldSliceProj_le_modulus m hN Fact.out hp j g₀.continuous
+    (hae.sub (MemLp.coeFn_toLp _))), Rd.lpModulus, Rd.smoothnessModulus_congr_ae hae]
+  exact eLpNorm_sub_foldSliceProj_le_smoothnessModulus m hN Fact.out hp j g₀.continuous
 
 /-- **Jackson's inequality for the tensor projections**: for `N ≥ 2`, `1 ≤ p < ∞`, every
 `f ∈ L_p(ℝ^d)` and every level `j`, `‖f - P_j f‖_p ≤ (1 + C_P) C_{J,d} ω_N(f, 2^(-j))_p` with the

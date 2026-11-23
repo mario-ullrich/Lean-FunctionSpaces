@@ -22,7 +22,7 @@ This transfers the band-limited approximation of `ℝ^d` to trigonometric polyno
 (`Torus.jacksonApprox`) is a trigonometric polynomial of degree `< 2^(k+1)`
 (`Torus.jacksonApprox_mem_trigPolyLp`) and an averaged difference,
 `f - J_k f = ∫ Φ(z) (-1)^r Δ^r_{π(-2^(-k) z)} f dz` (`Torus.ae_sub_jacksonApprox_eq`). With
-`ω_r(f, c t)_p ≤ (1 + c)^r ω_r(f, t)_p` (`Torus.modulus_mul_le`) this gives
+`ω_r(f, c t)_p ≤ (1 + c)^r ω_r(f, t)_p` (`Torus.periodic_smoothnessModulus_mul_le`) this gives
 `‖f - J_k f‖_p ≤ C ω_r(f, 2^(-k))_p` with the constant of `ℝ^d`
 (`Torus.enorm_sub_jacksonApprox_le`).
 
@@ -219,11 +219,12 @@ theorem enorm_sub_jacksonApprox_le (hp : p ≠ ∞) (r k : ℕ)
           refine eLpNorm_congr_norm_ae ((hG.comp measurable_prodMk_right).aestronglyMeasurable)
             hD (Eventually.of_forall fun t => ?_)
           simp [G]
-      _ ≤ Rd.modulus volume r p (f : UnitAddTorus d → ℂ) (‖z‖ * (1 / 2 ^ k)) :=
-          Rd.eLpNorm_higherDiff_le_modulus hnorm
+      _ ≤ Rd.smoothnessModulus volume r p (f : UnitAddTorus d → ℂ) (‖z‖ * (1 / 2 ^ k)) :=
+          Rd.eLpNorm_higherDiff_le_smoothnessModulus hnorm
       _ ≤ ENNReal.ofReal (1 + ‖z‖) ^ r *
-            Rd.modulus volume r p (f : UnitAddTorus d → ℂ) (1 / 2 ^ k) :=
-          modulus_mul_le (Lp.aestronglyMeasurable f) hp1 r (norm_nonneg z) (by positivity)
+            Rd.smoothnessModulus volume r p (f : UnitAddTorus d → ℂ) (1 / 2 ^ k) :=
+          periodic_smoothnessModulus_mul_le (Lp.aestronglyMeasurable f) hp1 r (norm_nonneg z)
+            (by positivity)
   have hlhs : ‖f - jacksonApprox hp r k f‖ₑ =
       eLpNorm (fun t => ∫ z, Rd.lpKernel z * G t z) p volume := by
     rw [Lp.enorm_def]
@@ -242,12 +243,12 @@ theorem approxError_trigScheme_le (hp : p ≠ ∞) (r k : ℕ)
     (enorm_sub_jacksonApprox_le hp r k f)
 
 /-- **Halving the step**: `ω_r(f, 2^(-k))_p ≤ 2^r ω_r(f, 2^(-(k+1)))_p` on the torus
-(`Torus.modulus_nat_mul_le` with `m = 2`). -/
+(`Torus.periodic_smoothnessModulus_nat_mul_le` with `m = 2`). -/
 theorem lpModulus_le_two_pow_mul_succ (r k : ℕ)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     Rd.lpModulus p r f k ≤ 2 ^ r * Rd.lpModulus p r f (k + 1) := by
-  have h := modulus_nat_mul_le (Lp.aestronglyMeasurable f) (Fact.out : 1 ≤ p) r (m := 2)
-    one_le_two (t := 1 / 2 ^ (k + 1)) (by positivity)
+  have h := periodic_smoothnessModulus_nat_mul_le (Lp.aestronglyMeasurable f) (Fact.out : 1 ≤ p) r
+    (m := 2) one_le_two (t := 1 / 2 ^ (k + 1)) (by positivity)
   rw [show ((2 : ℕ) : ℝ) * (1 / 2 ^ (k + 1)) = 1 / 2 ^ k by
     push_cast; rw [pow_succ]; field_simp] at h
   simpa [Rd.lpModulus] using h
@@ -307,7 +308,7 @@ theorem lpModulus_le_of_mem_trigPolyLp (hp : p ≠ ∞) (r : ℕ) {j k : ℕ}
     set D := ∫⁻ x, ‖iteratedFDeriv ℝ r (Rd.bandKernelS (V := EuclideanSpace ℝ d) :
       EuclideanSpace ℝ d → ℂ) x‖ₑ
     set c := (2 : ℝ) ^ Fintype.card d * Fintype.card d
-    rw [Rd.lpModulus, Rd.modulus_congr_ae hae]
+    rw [Rd.lpModulus, Rd.smoothnessModulus_congr_ae hae]
     refine iSup₂_le fun h hh => ?_
     obtain ⟨x, rfl, hxn⟩ := exists_proj_eq h
     have h1 : eLpNorm ((fwdDiff (proj x))^[r] (econv Θ a)) p volume ≤

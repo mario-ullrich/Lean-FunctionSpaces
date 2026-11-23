@@ -14,20 +14,23 @@ public import FunctionSpaces.Wavelets.Examples.Daubechies.SobolevRegularity
 For a Daubechies mask of order `N` with symbol product `Φ` (`Daubechies.symbolProduct`) and
 scaling function `φ = 𝓕⁻ Φ` (`Daubechies.scalingFun`), this file bounds the differences
 `Δ_h^r φ(x)` pointwise and the moduli of smoothness `ω_r(φ, t)_p = sup_{|h| ≤ t} ‖Δ_h^r φ‖_p`
-(`Rd.modulus`) for `2 ≤ p ≤ ∞`. Here `Δ_h f(x) = f(x + h) - f(x)` is Mathlib's `fwdDiff h f` and
-`Δ_h^r = (fwdDiff h)^[r]` its `r`-fold iterate. Under a growth bound `T^n 1 ≤ C λ^n` for the
-transfer operator `T` (`Daubechies.TransferGrowth N λ C`), for every real `a` with
-`0 ≤ a < N - log₄ λ - 1/2` and every order `r ∈ ℕ` with `r ≥ a` there is a constant `K` with
+(`Rd.smoothnessModulus`) for `2 ≤ p ≤ ∞`. Here `Δ_h f(x) = f(x + h) - f(x)` is Mathlib's
+`fwdDiff h f` and `Δ_h^r = (fwdDiff h)^[r]` its `r`-fold iterate. Under a growth bound
+`T^n 1 ≤ C λ^n` for the transfer operator `T` (`Daubechies.TransferGrowth N λ C`), for every real
+`a` with `0 ≤ a < N - log₄ λ - 1/2` and every order `r ∈ ℕ` with `r ≥ a` there is a constant
+`K` with
 
 `|Δ_h^r φ(x)| ≤ K |h|^a` for all `x, h ∈ ℝ` (`Daubechies.norm_higherDiff_scalingFun_le`).
 
 For `r = 1` and `a ≤ 1` this is the Hölder estimate `|φ(x) - φ(y)| ≤ K |x - y|^a`
 (`Daubechies.holder_scalingFun_fourier`); in `L^∞` it reads `ω_r(φ, t)_∞ ≤ K t^a`
-(`Daubechies.modulus_scalingFun_top_le`). Interpolation with the `L²` bound `ω_r(φ, t)_2 ≤ K t^s`,
-`0 ≤ s < N - log₄ λ`, of `FunctionSpaces.Wavelets.Examples.Daubechies.SobolevRegularity` gives, for
-`N ≥ 2`, `2 ≤ p ≤ ∞` and `0 < t ≤ 1`,
+(`Daubechies.smoothnessModulus_scalingFun_top_le`). Interpolation with the `L²` bound
+`ω_r(φ, t)_2 ≤ K t^s`, `0 ≤ s < N - log₄ λ`, of
+`FunctionSpaces.Wavelets.Examples.Daubechies.SobolevRegularity` gives, for `N ≥ 2`, `2 ≤ p ≤ ∞` and
+`0 < t ≤ 1`,
 
-`ω_r(φ, t)_p ≤ K t^θ`, `θ = (2/p) s + (1 - 2/p) a` (`Daubechies.modulus_scalingFun_interp`).
+`ω_r(φ, t)_p ≤ K t^θ`, `θ = (2/p) s + (1 - 2/p) a`
+(`Daubechies.smoothnessModulus_scalingFun_interp`).
 
 * **Differences on the Fourier side.** For integrable `F : ℝ → ℂ`, the translate of `𝓕⁻ F` by `h`
   is the inverse transform of `e^(2πihξ) F(ξ)`, so
@@ -48,10 +51,11 @@ For `r = 1` and `a ≤ 1` this is the Hölder estimate `|φ(x) - φ(y)| ≤ K |x
   (`Daubechies.eLpNorm_le_rpow_mul_rpow_of_eLpNorm_two_le`, from the project's
   `MeasureTheory.eLpNorm_le_rpow_mul_eLpNorm_rpow`). For differences with a uniform bound
   `|Δ_h^r f(x)| ≤ K |h|^a` and an `L²` bound `‖Δ_h^r f‖_2 ≤ B |h|^s` it gives
-  `ω_r(f, t)_p ≤ K^(1 - 2/p) B^(2/p) t^θ` (`Daubechies.modulus_le_of_norm_le_of_eLpNorm_two_le`).
-  For the scaling function the uniform bound may be the Fourier one
-  (`Daubechies.modulus_scalingFun_interp`) or come from any Hölder estimate
-  `|φ(x) - φ(y)| ≤ K₀ |x - y|^a` (`Daubechies.modulus_scalingFun_interp_of_holder`), through
+  `ω_r(f, t)_p ≤ K^(1 - 2/p) B^(2/p) t^θ`
+  (`Daubechies.smoothnessModulus_le_of_norm_le_of_eLpNorm_two_le`). For the scaling function the
+  uniform bound may be the Fourier one (`Daubechies.smoothnessModulus_scalingFun_interp`) or come
+  from any Hölder estimate `|φ(x) - φ(y)| ≤ K₀ |x - y|^a`
+  (`Daubechies.smoothnessModulus_scalingFun_interp_of_holder`), through
   `|Δ_h^r f(x)| ≤ 2^(r-1) K₀ |h|^a` for `r ≥ 1` (`Daubechies.norm_iterate_fwdDiff_le_of_holder`);
   the Hölder estimate of the mask D4 by the matrix method is of this kind.
 * **Orders two and three.** The growth bounds `T^n 1 ≤ 4^n` for `N = 2` and `T^n 1 ≤ 2 · 9^n` for
@@ -59,8 +63,8 @@ For `r = 1` and `a ≤ 1` this is the Hölder estimate `|φ(x) - φ(y)| ≤ K |x
   estimates for every `0 ≤ a < 1/2` and every `0 ≤ a < 5/2 - log₂ 3 ≈ 0.915`
   (`Daubechies.holder_scalingFun_order_two`, `Daubechies.holder_scalingFun_order_three`), and the
   interpolated `L_p` bounds with `s < 1` and `s < 3 - log₂ 3`
-  (`Daubechies.modulus_scalingFun_interp_order_two`,
-  `Daubechies.modulus_scalingFun_interp_order_three`).
+  (`Daubechies.smoothnessModulus_scalingFun_interp_order_two`,
+  `Daubechies.smoothnessModulus_scalingFun_interp_order_three`).
 -/
 
 @[expose] public section
@@ -230,9 +234,9 @@ theorem eLpNorm_top_le_of_norm_le {α E : Type*} [MeasurableSpace α] {μ : Meas
 measurable, `r ∈ ℕ` and `a ≥ 0`, and suppose `|Δ_h^r f(x)| ≤ K |h|^a` for all `x, h ∈ ℝ`. Then
 `ω_r(f, t)_∞ ≤ K t^a` for every `t ∈ ℝ`, since every step `|h| ≤ t` has
 `‖Δ_h^r f‖_∞ ≤ K |h|^a ≤ K t^a` (`Daubechies.eLpNorm_top_le_of_norm_le`). -/
-theorem modulus_top_le_of_norm_le {f : ℝ → ℂ} (hf : AEStronglyMeasurable f) {r : ℕ} {K a : ℝ}
-    (ha0 : 0 ≤ a) (hK : ∀ x h : ℝ, ‖(fwdDiff h)^[r] f x‖ ≤ K * |h| ^ a) (t : ℝ) :
-    Rd.modulus volume r ∞ f t ≤ ENNReal.ofReal K * ENNReal.ofReal (t ^ a) := by
+theorem smoothnessModulus_top_le_of_norm_le {f : ℝ → ℂ} (hf : AEStronglyMeasurable f) {r : ℕ}
+    {K a : ℝ} (ha0 : 0 ≤ a) (hK : ∀ x h : ℝ, ‖(fwdDiff h)^[r] f x‖ ≤ K * |h| ^ a) (t : ℝ) :
+    Rd.smoothnessModulus volume r ∞ f t ≤ ENNReal.ofReal K * ENNReal.ofReal (t ^ a) := by
   refine iSup₂_le fun h hh => ?_
   refine (eLpNorm_top_le_of_norm_le (Rd.aestronglyMeasurable_higherDiff hf r h)
     fun x => hK x h).trans ?_
@@ -242,18 +246,19 @@ theorem modulus_top_le_of_norm_le {f : ℝ → ℂ} (hf : AEStronglyMeasurable f
 /-- **The uniform modulus of smoothness of the scaling function**: let `T^n 1 ≤ C λ^n` be a
 growth bound for the transfer operator (`Daubechies.TransferGrowth`), and let `a ∈ ℝ`, `r ∈ ℕ`
 with `0 ≤ a ≤ r` and `a < N - log₄ λ - 1/2`. Then there is a finite constant `K` with
-`ω_r(φ, t)_∞ ≤ K t^a` for all `0 < t ≤ 1` (`Daubechies.modulus_top_le_of_norm_le` with the
+`ω_r(φ, t)_∞ ≤ K t^a` for all `0 < t ≤ 1` (`Daubechies.smoothnessModulus_top_le_of_norm_le` with the
 pointwise bound `Daubechies.norm_higherDiff_scalingFun_le_mul_rpow`). The scaling function is
 continuous as the inverse Fourier transform of the integrable function `Φ`
 (`Daubechies.integrable_symbolProduct_of_growth`). -/
-theorem modulus_scalingFun_top_le {lam C a : ℝ} {r : ℕ} (hg : TransferGrowth N lam C)
+theorem smoothnessModulus_scalingFun_top_le {lam C a : ℝ} {r : ℕ} (hg : TransferGrowth N lam C)
     (ha0 : 0 ≤ a) (har : a ≤ r) (ha : a < N - Real.logb 4 lam - 1 / 2) :
     ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ t ∈ Set.Ioc (0 : ℝ) 1,
-      Rd.modulus volume r ∞ (scalingFun m) t ≤ K * ENNReal.ofReal (t ^ a) := by
+      Rd.smoothnessModulus volume r ∞ (scalingFun m) t ≤ K * ENNReal.ofReal (t ^ a) := by
   have hφ : Continuous (scalingFun m) := Real.continuous_fourierInv_of_integrable
     (integrable_symbolProduct_of_growth m hg (ha0.trans_lt ha))
-  exact ⟨_, ENNReal.ofReal_ne_top, fun t _ => modulus_top_le_of_norm_le hφ.aestronglyMeasurable
-    ha0 (fun x h => norm_higherDiff_scalingFun_le_mul_rpow m hg ha0 har ha h x) t⟩
+  exact ⟨_, ENNReal.ofReal_ne_top, fun t _ =>
+    smoothnessModulus_top_le_of_norm_le hφ.aestronglyMeasurable ha0
+      (fun x h => norm_higherDiff_scalingFun_le_mul_rpow m hg ha0 har ha h x) t⟩
 
 /-! ### Interpolation between `L²` and `L^∞` -/
 
@@ -299,13 +304,14 @@ For each step `h` the interpolation inequality
 `‖g‖_p ≤ ‖g‖_∞^(1 - 2/p) ‖g‖_2^(2/p)` (`Daubechies.eLpNorm_le_rpow_mul_rpow_of_eLpNorm_two_le`)
 gives `‖Δ_h^r f‖_p ≤ K^(1 - 2/p) B^(2/p) |h|^θ` (`Daubechies.mul_rpow_mul_mul_rpow`), and
 `|h|^θ ≤ t^θ` for `|h| ≤ t`. -/
-theorem modulus_le_of_norm_le_of_eLpNorm_two_le {f : ℝ → ℂ} (hf : AEStronglyMeasurable f)
+theorem smoothnessModulus_le_of_norm_le_of_eLpNorm_two_le {f : ℝ → ℂ} (hf : AEStronglyMeasurable f)
     {r : ℕ} {K a s : ℝ} {B : ℝ≥0∞} (ha0 : 0 ≤ a) (hs0 : 0 ≤ s)
     (hK : ∀ x h : ℝ, ‖(fwdDiff h)^[r] f x‖ ≤ K * |h| ^ a)
     (hB : ∀ h : ℝ, eLpNorm ((fwdDiff h)^[r] f) 2 volume ≤ B * ENNReal.ofReal (|h| ^ s))
     {p : ℝ≥0∞} (hp2 : 2 ≤ p) (hp : p ≠ ∞) (t : ℝ) :
-    Rd.modulus volume r p f t ≤ ENNReal.ofReal K ^ (1 - 2 / p.toReal) * B ^ (2 / p.toReal) *
-      ENNReal.ofReal (t ^ (2 / p.toReal * s + (1 - 2 / p.toReal) * a)) := by
+    Rd.smoothnessModulus volume r p f t ≤
+      ENNReal.ofReal K ^ (1 - 2 / p.toReal) * B ^ (2 / p.toReal) *
+        ENNReal.ofReal (t ^ (2 / p.toReal * s + (1 - 2 / p.toReal) * a)) := by
   have hα := one_sub_two_div_toReal_nonneg hp2 hp
   have hβ : 0 ≤ 2 / p.toReal := by positivity
   have hθ : 0 ≤ 2 / p.toReal * s + (1 - 2 / p.toReal) * a :=
@@ -333,27 +339,27 @@ satisfy a uniform bound `|Δ_h^r φ(x)| ≤ K₀ |h|^a` for all `x, h ∈ ℝ`, 
 every `p ∈ [2, ∞]` there is a finite constant `K` with `ω_r(φ, t)_p ≤ K t^θ` for all
 `0 < t ≤ 1`, where `θ = (2/p) s + (1 - 2/p) a`; for `p = ∞` the weight `2/p` is `0` (in Lean,
 `(∞ : ℝ≥0∞).toReal = 0`), so `θ = a`. For `p < ∞` this is the interpolation
-`Daubechies.modulus_le_of_norm_le_of_eLpNorm_two_le` with the `L²` bound
+`Daubechies.smoothnessModulus_le_of_norm_le_of_eLpNorm_two_le` with the `L²` bound
 `Daubechies.eLpNorm_two_higherDiff_scalingFun_le`; for `p = ∞` it is
-`Daubechies.modulus_top_le_of_norm_le`. -/
-theorem modulus_scalingFun_interp_of_norm_le (hN : 2 ≤ N) {p : ℝ≥0∞} (hp2 : 2 ≤ p)
+`Daubechies.smoothnessModulus_top_le_of_norm_le`. -/
+theorem smoothnessModulus_scalingFun_interp_of_norm_le (hN : 2 ≤ N) {p : ℝ≥0∞} (hp2 : 2 ≤ p)
     {lam C s a K₀ : ℝ} {r : ℕ} (hg : TransferGrowth N lam C) (hs0 : 0 ≤ s)
     (hs : s < N - Real.logb 4 lam) (hsr : s ≤ r) (ha0 : 0 ≤ a)
     (hK : ∀ x h : ℝ, ‖(fwdDiff h)^[r] (scalingFun m) x‖ ≤ K₀ * |h| ^ a) :
     ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ t ∈ Set.Ioc (0 : ℝ) 1,
-      Rd.modulus volume r p (scalingFun m) t ≤
+      Rd.smoothnessModulus volume r p (scalingFun m) t ≤
         K * ENNReal.ofReal (t ^ (2 / p.toReal * s + (1 - 2 / p.toReal) * a)) := by
   have hφ : AEStronglyMeasurable (scalingFun m) := (continuous_scalingFun m hN).aestronglyMeasurable
   rcases eq_or_ne p ∞ with rfl | hp
   · refine ⟨ENNReal.ofReal K₀, ENNReal.ofReal_ne_top, fun t _ => ?_⟩
     rw [ENNReal.toReal_top, div_zero, zero_mul, zero_add, sub_zero, one_mul]
-    exact modulus_top_le_of_norm_le hφ ha0 hK t
+    exact smoothnessModulus_top_le_of_norm_le hφ ha0 hK t
   · refine ⟨ENNReal.ofReal K₀ ^ (1 - 2 / p.toReal) * ENNReal.ofReal ((2 * π) ^ r *
       √(∫ ξ, (1 + |ξ|) ^ (2 * s) * ‖symbolProduct m ξ‖ ^ 2)) ^ (2 / p.toReal),
       ENNReal.mul_ne_top (ENNReal.rpow_ne_top_of_nonneg (one_sub_two_div_toReal_nonneg hp2 hp)
         ENNReal.ofReal_ne_top) (ENNReal.rpow_ne_top_of_nonneg (by positivity)
         ENNReal.ofReal_ne_top), fun t _ => ?_⟩
-    exact modulus_le_of_norm_le_of_eLpNorm_two_le hφ ha0 hs0 hK
+    exact smoothnessModulus_le_of_norm_le_of_eLpNorm_two_le hφ ha0 hs0 hK
       (eLpNorm_two_higherDiff_scalingFun_le m hN hg hs0 hs hsr) hp2 hp t
 
 /-- **The `L_p` modulus of the scaling function, `p ≥ 2`** (Fourier route): let `N ≥ 2`, let
@@ -363,15 +369,15 @@ let `s, a ∈ ℝ`, `r ∈ ℕ` with `0 ≤ s ≤ r`, `s < N - log₄ λ`, `0 �
 `ω_r(φ, t)_p ≤ K t^θ` for all `0 < t ≤ 1`, where `θ = (2/p) s + (1 - 2/p) a` interpolates between
 the `L²` exponent `s` (`p = 2`) and the uniform exponent `a` (`p = ∞`, where `2/p = 0`). The
 uniform bound is `Daubechies.norm_higherDiff_scalingFun_le`, and
-`Daubechies.modulus_scalingFun_interp_of_norm_le` interpolates. -/
-theorem modulus_scalingFun_interp (hN : 2 ≤ N) {p : ℝ≥0∞} (hp2 : 2 ≤ p) {lam C s a : ℝ} {r : ℕ}
-    (hg : TransferGrowth N lam C) (hs0 : 0 ≤ s) (hs : s < N - Real.logb 4 lam) (hsr : s ≤ r)
-    (ha0 : 0 ≤ a) (har : a ≤ r) (ha : a < N - Real.logb 4 lam - 1 / 2) :
+`Daubechies.smoothnessModulus_scalingFun_interp_of_norm_le` interpolates. -/
+theorem smoothnessModulus_scalingFun_interp (hN : 2 ≤ N) {p : ℝ≥0∞} (hp2 : 2 ≤ p) {lam C s a : ℝ}
+    {r : ℕ} (hg : TransferGrowth N lam C) (hs0 : 0 ≤ s) (hs : s < N - Real.logb 4 lam)
+    (hsr : s ≤ r) (ha0 : 0 ≤ a) (har : a ≤ r) (ha : a < N - Real.logb 4 lam - 1 / 2) :
     ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ t ∈ Set.Ioc (0 : ℝ) 1,
-      Rd.modulus volume r p (scalingFun m) t ≤
+      Rd.smoothnessModulus volume r p (scalingFun m) t ≤
         K * ENNReal.ofReal (t ^ (2 / p.toReal * s + (1 - 2 / p.toReal) * a)) := by
   obtain ⟨K₀, hK⟩ := norm_higherDiff_scalingFun_le m hg ha0 har ha
-  exact modulus_scalingFun_interp_of_norm_le m hN hp2 hg hs0 hs hsr ha0 hK
+  exact smoothnessModulus_scalingFun_interp_of_norm_le m hN hp2 hg hs0 hs hsr ha0 hK
 
 /-! ### Hölder estimates from other sources -/
 
@@ -403,17 +409,17 @@ let `T^n 1 ≤ C λ^n` be a growth bound for the transfer operator (`Daubechies.
 there is a finite constant `K` with `ω_r(φ, t)_p ≤ K t^θ` for all `0 < t ≤ 1`, where
 `θ = (2/p) s + (1 - 2/p) a`. The Hölder estimate bounds the differences,
 `|Δ_h^r φ(x)| ≤ 2^(r-1) K₀ |h|^a` (`Daubechies.norm_iterate_fwdDiff_le_of_holder`), and
-`Daubechies.modulus_scalingFun_interp_of_norm_le` interpolates. The Hölder exponent may come from
-any source, such as the matrix method for the mask D4. -/
-theorem modulus_scalingFun_interp_of_holder (hN : 2 ≤ N) {p : ℝ≥0∞} (hp2 : 2 ≤ p)
+`Daubechies.smoothnessModulus_scalingFun_interp_of_norm_le` interpolates. The Hölder exponent may
+come from any source, such as the matrix method for the mask D4. -/
+theorem smoothnessModulus_scalingFun_interp_of_holder (hN : 2 ≤ N) {p : ℝ≥0∞} (hp2 : 2 ≤ p)
     {lam C s a K₀ : ℝ} {r : ℕ} (hr : 1 ≤ r) (hg : TransferGrowth N lam C) (hs0 : 0 ≤ s)
     (hs : s < N - Real.logb 4 lam) (hsr : s ≤ r) (ha0 : 0 ≤ a)
     (hK : ∀ x y : ℝ, ‖scalingFun m x - scalingFun m y‖ ≤ K₀ * |x - y| ^ a) :
     ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ t ∈ Set.Ioc (0 : ℝ) 1,
-      Rd.modulus volume r p (scalingFun m) t ≤
+      Rd.smoothnessModulus volume r p (scalingFun m) t ≤
         K * ENNReal.ofReal (t ^ (2 / p.toReal * s + (1 - 2 / p.toReal) * a)) := by
   obtain ⟨k, rfl⟩ : ∃ k, r = k + 1 := ⟨r - 1, by omega⟩
-  exact modulus_scalingFun_interp_of_norm_le m hN hp2 hg hs0 hs hsr ha0 (K₀ := 2 ^ k * K₀)
+  exact smoothnessModulus_scalingFun_interp_of_norm_le m hN hp2 hg hs0 hs hsr ha0 (K₀ := 2 ^ k * K₀)
     fun x h => norm_iterate_fwdDiff_le_of_holder hK k h x
 
 /-! ### Orders two and three -/
@@ -455,15 +461,15 @@ theorem holder_scalingFun_order_three (m : Mask 3) {a : ℝ} (ha0 : 0 ≤ a)
 mask of order `N = 2`, every `p ∈ [2, ∞]`, all real `s, a` with `0 ≤ s < 1` and `0 ≤ a < 1/2`,
 and every order `r ∈ ℕ` with `r ≥ s` and `r ≥ a`, there is a finite constant `K` with
 `ω_r(φ, t)_p ≤ K t^θ` for all `0 < t ≤ 1`, where `θ = (2/p) s + (1 - 2/p) a`
-(`Daubechies.modulus_scalingFun_interp` with the growth bound `Daubechies.transferGrowth_two`,
-whose exponents are `2 - log₄ 4 = 1` and `1 - 1/2 = 1/2`). -/
-theorem modulus_scalingFun_interp_order_two (m : Mask 2) {p : ℝ≥0∞} (hp2 : 2 ≤ p) {s a : ℝ}
-    {r : ℕ} (hs0 : 0 ≤ s) (hs : s < 1) (hsr : s ≤ r) (ha0 : 0 ≤ a) (har : a ≤ r)
+(`Daubechies.smoothnessModulus_scalingFun_interp` with the growth bound
+`Daubechies.transferGrowth_two`, whose exponents are `2 - log₄ 4 = 1` and `1 - 1/2 = 1/2`). -/
+theorem smoothnessModulus_scalingFun_interp_order_two (m : Mask 2) {p : ℝ≥0∞} (hp2 : 2 ≤ p)
+    {s a : ℝ} {r : ℕ} (hs0 : 0 ≤ s) (hs : s < 1) (hsr : s ≤ r) (ha0 : 0 ≤ a) (har : a ≤ r)
     (ha : a < 1 / 2) :
     ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ t ∈ Set.Ioc (0 : ℝ) 1,
-      Rd.modulus volume r p (scalingFun m) t ≤
+      Rd.smoothnessModulus volume r p (scalingFun m) t ≤
         K * ENNReal.ofReal (t ^ (2 / p.toReal * s + (1 - 2 / p.toReal) * a)) :=
-  modulus_scalingFun_interp m le_rfl hp2 transferGrowth_two hs0
+  smoothnessModulus_scalingFun_interp m le_rfl hp2 transferGrowth_two hs0
     (by rw [Nat.cast_ofNat, two_sub_logb_four_four]; exact hs) hsr ha0 har
     (by rw [Nat.cast_ofNat, two_sub_logb_four_four]; linarith)
 
@@ -471,15 +477,15 @@ theorem modulus_scalingFun_interp_order_two (m : Mask 2) {p : ℝ≥0∞} (hp2 :
 mask of order `N = 3`, every `p ∈ [2, ∞]`, all real `s, a` with `0 ≤ s < 3 - log₂ 3` and
 `0 ≤ a < 5/2 - log₂ 3`, and every order `r ∈ ℕ` with `r ≥ s` and `r ≥ a`, there is a finite
 constant `K` with `ω_r(φ, t)_p ≤ K t^θ` for all `0 < t ≤ 1`, where `θ = (2/p) s + (1 - 2/p) a`
-(`Daubechies.modulus_scalingFun_interp` with the growth bound `Daubechies.transferGrowth_three`,
-whose exponent is `3 - log₄ 9 = 3 - log₂ 3`). -/
-theorem modulus_scalingFun_interp_order_three (m : Mask 3) {p : ℝ≥0∞} (hp2 : 2 ≤ p) {s a : ℝ}
-    {r : ℕ} (hs0 : 0 ≤ s) (hs : s < 3 - Real.logb 2 3) (hsr : s ≤ r) (ha0 : 0 ≤ a) (har : a ≤ r)
-    (ha : a < 5 / 2 - Real.logb 2 3) :
+(`Daubechies.smoothnessModulus_scalingFun_interp` with the growth bound
+`Daubechies.transferGrowth_three`, whose exponent is `3 - log₄ 9 = 3 - log₂ 3`). -/
+theorem smoothnessModulus_scalingFun_interp_order_three (m : Mask 3) {p : ℝ≥0∞} (hp2 : 2 ≤ p)
+    {s a : ℝ} {r : ℕ} (hs0 : 0 ≤ s) (hs : s < 3 - Real.logb 2 3) (hsr : s ≤ r) (ha0 : 0 ≤ a)
+    (har : a ≤ r) (ha : a < 5 / 2 - Real.logb 2 3) :
     ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ t ∈ Set.Ioc (0 : ℝ) 1,
-      Rd.modulus volume r p (scalingFun m) t ≤
+      Rd.smoothnessModulus volume r p (scalingFun m) t ≤
         K * ENNReal.ofReal (t ^ (2 / p.toReal * s + (1 - 2 / p.toReal) * a)) :=
-  modulus_scalingFun_interp m (by norm_num) hp2 transferGrowth_three hs0
+  smoothnessModulus_scalingFun_interp m (by norm_num) hp2 transferGrowth_three hs0
     (by rw [Nat.cast_ofNat, three_sub_logb_four_nine]; exact hs) hsr ha0 har
     (by rw [Nat.cast_ofNat, three_sub_logb_four_nine]; linarith)
 

@@ -495,11 +495,11 @@ omit [FiniteDimensional ℝ V] in
 theorem measurableSet : MeasurableSet Ω.carrier := Ω.isOpen.measurableSet
 
 /-- The intrinsic quasi-norm of `f` on a measurable `T ⊆ Ω` is at most that on `Ω`
-(`Rd.modNormOn_mono_set`). -/
+(`Rd.modNormOn_mono_of_subset`). -/
 theorem modNormOn_mono_set {T : Set V} (hT : MeasurableSet T) (hTΩ : T ⊆ Ω.carrier) (r : ℕ)
     (s : ℝ) (q : ℝ≥0∞) (f : Lp ℂ p (volume : Measure V)) :
     modNormOn hT r s q f ≤ modNormOn Ω.measurableSet r s q f :=
-  Rd.modNormOn_mono_set hT Ω.measurableSet hTΩ r s q f
+  Rd.modNormOn_mono_of_subset hT Ω.measurableSet hTΩ r s q f
 
 /-- **The boundary patches with a bound**: there is `C < ∞` such that on `Ω ∩ B(c_j, ρ_j - 2ε)`
 every `f` with `N_Ω(f) = ‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞` agrees with a

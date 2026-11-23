@@ -350,7 +350,7 @@ splines of order `r` on `Q` and `f ∈ L_p(ℝ^d)` agrees with `G` on `Ω`, then
 `N_Ω(f) = ‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`: the cube theorem with the
 Euclidean modulus (`Cube.memApprox_cubeSplineScheme_restrictEuclidean_iff`), moved to `Q` along
 the inverse affine map (`Rd.exists_modNormOn_compAffineLp_le`), and `N_Ω ≤ N_Q`
-(`Rd.modNormOn_mono_set`). -/
+(`Rd.modNormOn_mono_of_subset`). -/
 theorem modNormOn_lt_top_of_memApprox_cubeSplineSchemeAt (hp : p ≠ ∞)
     {a : EuclideanSpace ℝ (Fin d)} {L : ℝ} (hL : 0 < L) {Ω : Set (EuclideanSpace ℝ (Fin d))}
     (hΩ : MeasurableSet Ω) (hΩQ : Ω ⊆ euclideanCubeAt a L) {r : ℕ} (hr : 1 ≤ r) {s : ℝ}
@@ -379,7 +379,7 @@ theorem modNormOn_lt_top_of_memApprox_cubeSplineSchemeAt (hp : p ≠ ∞)
     (indicatorLp_eq_of_subset hΩ hQ hΩQ
       (indicatorLp_extendEuclideanAt_restrictEuclideanAt a hL _)).trans hfG
   rw [← modNormOn_congr hΩ h3]
-  exact (modNormOn_mono_set hΩ hQ hΩQ r s q _).trans_lt h2
+  exact (modNormOn_mono_of_subset hΩ hQ hΩQ r s q _).trans_lt h2
 
 /-! ### Functions of finite intrinsic quasi-norm as restrictions -/
 

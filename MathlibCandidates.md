@@ -293,17 +293,17 @@ declarations.
 * **Moduli of smoothness on finite-dimensional spaces**
   (`FunctionSpaces/Analysis/Differences/Differences.lean`): for Mathlib's `fwdDiff` and a Haar
   measure, `‖Δ_h^r f‖_p ≤ 2^r ‖f‖_p`, the dilation property `ω_r(f, c t)_p ≤ (1 + c)^r ω_r(f, t)_p`
-  (`Rd.modulus_mul_le`), and `Δ_h^r (K ⋆ f) = (Δ_h^r K) ⋆ f` almost everywhere
+  (`Rd.smoothnessModulus_mul_le`), and `Δ_h^r (K ⋆ f) = (Δ_h^r K) ⋆ f` almost everywhere
   (`Rd.higherDiff_conv_ae`); the modulus on a subset `U`, with the differences restricted to the
   points `x` with `x, …, x + rh ∈ U` (`Rd.modulusOn`,
   `FunctionSpaces/Analysis/Differences/DomainModuli.lean`); `ω_r(f, t)_p → 0` as `t → 0` for
-  `f ∈ L_p`, `1 ≤ p < ∞` (`Rd.tendsto_modulus`,
+  `f ∈ L_p`, `1 ≤ p < ∞` (`Rd.tendsto_smoothnessModulus`,
   `FunctionSpaces/Rd/Differences/DilatedDifferences.lean`); `Δ_h^r (f ∘ e) = (Δ_{e h}^r f) ∘ e`
   for every additive map `e` (`Rd.higherDiff_comp_addHom`, `Differences.lean`) and
   `ω_r(f ∘ e, t)_p ≤ ω_r(f, ‖e‖ t)_p` for a measure preserving continuous linear map `e`
-  (`Rd.modulus_comp_le`, `FunctionSpaces/Analysis/Differences/LinearEquivModuli.lean`), also for
-  the modulus on a set, `ω_r(f ∘ e, t, e⁻¹(U))_p ≤ ω_r(f, ‖e‖ t, U)_p` (`Rd.modulusOn_comp_le`),
-  and for affine maps `A x = a + L x`,
+  (`Rd.smoothnessModulus_comp_le`, `FunctionSpaces/Analysis/Differences/LinearEquivModuli.lean`),
+  also for the modulus on a set, `ω_r(f ∘ e, t, e⁻¹(U))_p ≤ ω_r(f, ‖e‖ t, U)_p`
+  (`Rd.modulusOn_comp_le`), and for affine maps `A x = a + L x`,
   `ω_r(f ∘ A, t, A⁻¹(U))_p ≤ L^(-n/p) ω_r(f, L t, U)_p` (`Rd.modulusOn_comp_affine_le`).
 * **Composition with measure preserving maps in `L_p`**
   (`FunctionSpaces/Analysis/Differences/LinearEquivModuli.lean`): `‖g ∘ f‖_p = ‖g‖_p` in

@@ -318,7 +318,7 @@ theorem lpModulus_le_of_mem_bandSpace (hp : p ≠ ∞) (r : ℕ) {j k : ℕ}
       rw [ha] at h1
       exact h1
     set D := ∫⁻ x, ‖iteratedFDeriv ℝ r (bandKernelS (V := V) : V → ℂ) x‖ₑ
-    rw [lpModulus, modulus_congr_ae hae]
+    rw [lpModulus, smoothnessModulus_congr_ae hae]
     refine iSup₂_le fun h hh => ?_
     have h1 : eLpNorm ((fwdDiff h)^[r] (conv (Theta j) (a : V → ℂ) volume)) p volume ≤
         eLpNorm ((fwdDiff h)^[r] (Theta (V := V) j)) 1 volume * ‖a‖ₑ := by

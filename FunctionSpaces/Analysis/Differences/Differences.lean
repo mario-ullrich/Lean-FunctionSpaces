@@ -26,19 +26,20 @@ measurable `f`
 (`Rd.measurable_enorm_higherDiff_uncurry`). A negative step reflects the difference:
 `Δ_{-h}^r f(x) = (-1)^r Δ_h^r f(x - r h)` (`Rd.higherDiff_neg`). For a Haar
 measure `μ` the **modulus of smoothness** in `L_p(μ)` is
-`ω_r(f, t)_p = sup_{‖h‖ ≤ t} ‖Δ_h^r f‖_p` (`Rd.modulus`). It increases in `t`, is subadditive and
-homogeneous in `f` (`Rd.modulus_const_smul`), is bounded by `2^r ‖f‖_p` (`Rd.modulus_le`), and
-depends only on the class of `f` modulo null sets (`Rd.modulus_congr_ae`).
+`ω_r(f, t)_p = sup_{‖h‖ ≤ t} ‖Δ_h^r f‖_p` (`Rd.smoothnessModulus`). It increases in `t`, is
+subadditive and homogeneous in `f` (`Rd.smoothnessModulus_const_smul`), is bounded by `2^r ‖f‖_p`
+(`Rd.smoothnessModulus_le`), and depends only on the class of `f` modulo null sets
+(`Rd.smoothnessModulus_congr_ae`).
 
-**Dilating the step** (`Rd.modulus_mul_le`): `ω_r(f, c t)_p ≤ (1 + c)^r ω_r(f, t)_p` for
+**Dilating the step** (`Rd.smoothnessModulus_mul_le`): `ω_r(f, c t)_p ≤ (1 + c)^r ω_r(f, t)_p` for
 `c, t ≥ 0`. For an integer `m ≥ 1`, `Δ_{mh} = ∑_{i<m} τ_{ih} Δ_h` with the translations
 `τ_a g = g(· + a)` (`Rd.fwdDiff_nsmul`), translations commute with differences
 (`Rd.higherDiff_comp_add`; more generally `Δ_h^r (f ∘ e) = (Δ_{e h}^r f) ∘ e` for every additive
 map `e`, `Rd.higherDiff_comp_addHom`), and translations keep `L_p` norms, so
 `‖Δ_{mh}^r f‖_p ≤ m^r ‖Δ_h^r f‖_p` (`Rd.eLpNorm_higherDiff_nsmul_higherDiff_le`). The two steps,
 from steps `m h'` to the scale `m t` and from integers to real dilations
-(`Rd.modulus_nat_mul_le_of_forall_exists_nsmul`, `Rd.modulus_mul_le_of_nat_mul_le`), hold on
-every normed group, the torus included.
+(`Rd.smoothnessModulus_nat_mul_le_of_forall_exists_nsmul`,
+`Rd.smoothnessModulus_mul_le_of_nat_mul_le`), hold on every normed group, the torus included.
 
 `Rd.lpModulus` samples the modulus of `f ∈ L_p` at the dyadic scales `2^(-k)`.  The file needs
 only Mathlib; differences of convolutions and dilations are in
@@ -233,7 +234,7 @@ theorem higherDiff_congr_ae {f g : V → ℂ} (hfg : f =ᵐ[μ] g) (r : ℕ) (h 
 
 omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] in
 /-- **`‖Δ_h^r f‖_p ≤ 2^r ‖f‖_p`**, from `‖Δ_h g‖_p ≤ ‖g(· + h)‖_p + ‖g‖_p = 2 ‖g‖_p`. -/
-theorem eLpNorm_higherDiff_le {f : V → ℂ} (hf : AEStronglyMeasurable f μ) {p : ℝ≥0∞}
+theorem eLpNorm_higherDiff_le_two_pow_mul {f : V → ℂ} (hf : AEStronglyMeasurable f μ) {p : ℝ≥0∞}
     (hp : 1 ≤ p) (r : ℕ) (h : V) :
     eLpNorm ((fwdDiff h)^[r] f) p μ ≤ 2 ^ r * eLpNorm f p μ := by
   induction r with
@@ -298,41 +299,43 @@ theorem integrable_higherDiff {K : V → ℂ} (hK : Integrable K μ) (r : ℕ) (
 
 variable (μ) in
 /-- The **modulus of smoothness** `ω_r(f, t)_p = sup_{‖h‖ ≤ t} ‖Δ_h^r f‖_p`. -/
-noncomputable def modulus (r : ℕ) (p : ℝ≥0∞) (f : V → ℂ) (t : ℝ) : ℝ≥0∞ :=
+noncomputable def smoothnessModulus (r : ℕ) (p : ℝ≥0∞) (f : V → ℂ) (t : ℝ) : ℝ≥0∞ :=
   ⨆ (h : V) (_ : ‖h‖ ≤ t), eLpNorm ((fwdDiff h)^[r] f) p μ
 
 omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] [BorelSpace V] [μ.IsAddHaarMeasure] in
 /-- `‖Δ_h^r f‖_p ≤ ω_r(f, t)_p` for `‖h‖ ≤ t`. -/
-theorem eLpNorm_higherDiff_le_modulus {r : ℕ} {p : ℝ≥0∞} {f : V → ℂ} {t : ℝ}
-    {h : V} (hh : ‖h‖ ≤ t) : eLpNorm ((fwdDiff h)^[r] f) p μ ≤ modulus μ r p f t :=
+theorem eLpNorm_higherDiff_le_smoothnessModulus {r : ℕ} {p : ℝ≥0∞} {f : V → ℂ} {t : ℝ}
+    {h : V} (hh : ‖h‖ ≤ t) : eLpNorm ((fwdDiff h)^[r] f) p μ ≤ smoothnessModulus μ r p f t :=
   le_iSup₂ (f := fun (h : V) (_ : ‖h‖ ≤ t) => eLpNorm ((fwdDiff h)^[r] f) p μ) h hh
 
 omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] [BorelSpace V] [μ.IsAddHaarMeasure] in
 /-- The modulus increases in `t`. -/
-theorem modulus_mono (r : ℕ) (p : ℝ≥0∞) (f : V → ℂ) :
-    Monotone (modulus μ r p f) :=
-  fun _ _ hst => iSup₂_le fun _ hh => eLpNorm_higherDiff_le_modulus (hh.trans hst)
+theorem smoothnessModulus_mono (r : ℕ) (p : ℝ≥0∞) (f : V → ℂ) :
+    Monotone (smoothnessModulus μ r p f) :=
+  fun _ _ hst => iSup₂_le fun _ hh => eLpNorm_higherDiff_le_smoothnessModulus (hh.trans hst)
 
 omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] [BorelSpace V] [μ.IsAddHaarMeasure] in
 /-- The modulus is subadditive. -/
-theorem modulus_add_le {p : ℝ≥0∞} (hp : 1 ≤ p) (r : ℕ) (f g : V → ℂ)
-    (t : ℝ) : modulus μ r p (f + g) t ≤ modulus μ r p f t + modulus μ r p g t := by
+theorem smoothnessModulus_add_le {p : ℝ≥0∞} (hp : 1 ≤ p) (r : ℕ) (f g : V → ℂ) (t : ℝ) :
+    smoothnessModulus μ r p (f + g) t ≤
+      smoothnessModulus μ r p f t + smoothnessModulus μ r p g t := by
   refine iSup₂_le fun h hh => ?_
   rw [fwdDiff_iter_add]
   exact (eLpNorm_add_le hp).trans
-    (add_le_add (eLpNorm_higherDiff_le_modulus hh) (eLpNorm_higherDiff_le_modulus hh))
+    (add_le_add (eLpNorm_higherDiff_le_smoothnessModulus hh)
+      (eLpNorm_higherDiff_le_smoothnessModulus hh))
 
 omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] in
 /-- `ω_r(f, t)_p ≤ 2^r ‖f‖_p`. -/
-theorem modulus_le {f : V → ℂ} (hf : AEStronglyMeasurable f μ) {p : ℝ≥0∞} (hp : 1 ≤ p)
-    (r : ℕ) (t : ℝ) : modulus μ r p f t ≤ 2 ^ r * eLpNorm f p μ :=
-  iSup₂_le fun h _ => eLpNorm_higherDiff_le hf hp r h
+theorem smoothnessModulus_le {f : V → ℂ} (hf : AEStronglyMeasurable f μ) {p : ℝ≥0∞} (hp : 1 ≤ p)
+    (r : ℕ) (t : ℝ) : smoothnessModulus μ r p f t ≤ 2 ^ r * eLpNorm f p μ :=
+  iSup₂_le fun h _ => eLpNorm_higherDiff_le_two_pow_mul hf hp r h
 
 omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] in
 /-- **The modulus depends only on the class modulo null sets.** -/
-theorem modulus_congr_ae {f g : V → ℂ} (hfg : f =ᵐ[μ] g) (r : ℕ) (p : ℝ≥0∞) (t : ℝ) :
-    modulus μ r p f t = modulus μ r p g t := by
-  simp only [modulus]
+theorem smoothnessModulus_congr_ae {f g : V → ℂ} (hfg : f =ᵐ[μ] g) (r : ℕ) (p : ℝ≥0∞) (t : ℝ) :
+    smoothnessModulus μ r p f t = smoothnessModulus μ r p g t := by
+  simp only [smoothnessModulus]
   congr 1
   funext h
   congr 1
@@ -342,32 +345,33 @@ theorem modulus_congr_ae {f g : V → ℂ} (hfg : f =ᵐ[μ] g) (r : ℕ) (p : �
 omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] [BorelSpace V] [μ.IsAddHaarMeasure] in
 /-- **The modulus is homogeneous**: `ω_r(c f, t)_p = |c| ω_r(f, t)_p`, since
 `Δ_h^r (c f) = c Δ_h^r f` (Mathlib's `fwdDiff_iter_const_smul`, `eLpNorm_const_smul`). -/
-theorem modulus_const_smul (r : ℕ) (p : ℝ≥0∞) (c : ℂ) (f : V → ℂ) (t : ℝ) :
-    modulus μ r p (c • f) t = ‖c‖ₑ * modulus μ r p f t := by
-  simp only [modulus, fwdDiff_iter_const_smul, eLpNorm_const_smul, ENNReal.mul_iSup]
+theorem smoothnessModulus_const_smul (r : ℕ) (p : ℝ≥0∞) (c : ℂ) (f : V → ℂ) (t : ℝ) :
+    smoothnessModulus μ r p (c • f) t = ‖c‖ₑ * smoothnessModulus μ r p f t := by
+  simp only [smoothnessModulus, fwdDiff_iter_const_smul, eLpNorm_const_smul, ENNReal.mul_iSup]
 
 omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] in
 /-- **Integer multiples of the scale, for divisible steps**: if every step `h` with
 `‖h‖ ≤ m t` is `m h'` for a step `h'` with `‖h'‖ ≤ t`, then `ω_r(f, m t)_p ≤ m^r ω_r(f, t)_p`,
 since `‖Δ^r_{m h'} f‖_p ≤ m^r ‖Δ^r_{h'} f‖_p` (`Rd.eLpNorm_higherDiff_nsmul_higherDiff_le`). The
 hypothesis holds on every normed space and on the torus. -/
-theorem modulus_nat_mul_le_of_forall_exists_nsmul {f : V → ℂ} (hf : AEStronglyMeasurable f μ)
-    {p : ℝ≥0∞} (hp : 1 ≤ p) (r : ℕ) {m : ℕ} {t : ℝ}
+theorem smoothnessModulus_nat_mul_le_of_forall_exists_nsmul {f : V → ℂ}
+    (hf : AEStronglyMeasurable f μ) {p : ℝ≥0∞} (hp : 1 ≤ p) (r : ℕ) {m : ℕ} {t : ℝ}
     (hdiv : ∀ h : V, ‖h‖ ≤ m * t → ∃ h' : V, ‖h'‖ ≤ t ∧ h = m • h') :
-    modulus μ r p f (m * t) ≤ (m : ℝ≥0∞) ^ r * modulus μ r p f t := by
+    smoothnessModulus μ r p f (m * t) ≤ (m : ℝ≥0∞) ^ r * smoothnessModulus μ r p f t := by
   refine iSup₂_le fun h hh => ?_
   obtain ⟨h', hh', rfl⟩ := hdiv h hh
   have h1 := eLpNorm_higherDiff_nsmul_higherDiff_le hf hp m h' r 0
   simp only [Function.iterate_zero, id_eq, add_zero] at h1
-  exact h1.trans (by gcongr; exact eLpNorm_higherDiff_le_modulus hh')
+  exact h1.trans (by gcongr; exact eLpNorm_higherDiff_le_smoothnessModulus hh')
 
 omit [FiniteDimensional ℝ V] in
 /-- **Integer multiples of the scale**: `ω_r(f, m t)_p ≤ m^r ω_r(f, t)_p` for `m ≥ 1`. -/
-theorem modulus_nat_mul_le {f : V → ℂ} (hf : AEStronglyMeasurable f μ) {p : ℝ≥0∞} (hp : 1 ≤ p)
-    (r : ℕ) {m : ℕ} (hm : 1 ≤ m) (t : ℝ) :
-    modulus μ r p f (m * t) ≤ (m : ℝ≥0∞) ^ r * modulus μ r p f t := by
+theorem smoothnessModulus_nat_mul_le {f : V → ℂ} (hf : AEStronglyMeasurable f μ) {p : ℝ≥0∞}
+    (hp : 1 ≤ p) (r : ℕ) {m : ℕ} (hm : 1 ≤ m) (t : ℝ) :
+    smoothnessModulus μ r p f (m * t) ≤ (m : ℝ≥0∞) ^ r * smoothnessModulus μ r p f t := by
   have hm0 : (0 : ℝ) < m := by exact_mod_cast hm
-  refine modulus_nat_mul_le_of_forall_exists_nsmul hf hp r fun h hh => ⟨(m : ℝ)⁻¹ • h, ?_, ?_⟩
+  refine smoothnessModulus_nat_mul_le_of_forall_exists_nsmul hf hp r fun h hh =>
+    ⟨(m : ℝ)⁻¹ • h, ?_, ?_⟩
   · rw [norm_smul, Real.norm_of_nonneg (inv_nonneg.2 hm0.le), inv_mul_le_iff₀ hm0]
     exact hh
   · rw [← Nat.cast_smul_eq_nsmul ℝ, smul_inv_smul₀ hm0.ne']
@@ -376,10 +380,12 @@ omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] [BorelSpace V] [μ.IsAddHaarM
 /-- **From integer to real dilations of the scale**: if `ω_r(f, m t)_p ≤ m^r ω_r(f, t)_p` for
 every integer `m ≥ 1`, then `ω_r(f, c t)_p ≤ (1 + c)^r ω_r(f, t)_p` for every `c ≥ 0`, with the
 integer `m = ⌊c⌋ + 1 ≤ 1 + c` and the monotonicity of the modulus. -/
-theorem modulus_mul_le_of_nat_mul_le {r : ℕ} {p : ℝ≥0∞} {f : V → ℂ} {c t : ℝ} (hc : 0 ≤ c)
+theorem smoothnessModulus_mul_le_of_nat_mul_le {r : ℕ} {p : ℝ≥0∞} {f : V → ℂ} {c t : ℝ} (hc : 0 ≤ c)
     (ht : 0 ≤ t)
-    (hnat : ∀ m : ℕ, 1 ≤ m → modulus μ r p f (m * t) ≤ (m : ℝ≥0∞) ^ r * modulus μ r p f t) :
-    modulus μ r p f (c * t) ≤ ENNReal.ofReal (1 + c) ^ r * modulus μ r p f t := by
+    (hnat : ∀ m : ℕ, 1 ≤ m →
+      smoothnessModulus μ r p f (m * t) ≤ (m : ℝ≥0∞) ^ r * smoothnessModulus μ r p f t) :
+    smoothnessModulus μ r p f (c * t) ≤
+      ENNReal.ofReal (1 + c) ^ r * smoothnessModulus μ r p f t := by
   have hm : 1 ≤ ⌊c⌋₊ + 1 := Nat.le_add_left 1 _
   have hcm : c ≤ ((⌊c⌋₊ + 1 : ℕ) : ℝ) := by
     push_cast
@@ -389,18 +395,18 @@ theorem modulus_mul_le_of_nat_mul_le {r : ℕ} {p : ℝ≥0∞} {f : V → ℂ} 
     refine ENNReal.ofReal_le_ofReal ?_
     push_cast
     linarith [Nat.floor_le hc]
-  calc modulus μ r p f (c * t) ≤ modulus μ r p f ((⌊c⌋₊ + 1 : ℕ) * t) :=
-        modulus_mono r p f (mul_le_mul_of_nonneg_right hcm ht)
-    _ ≤ ((⌊c⌋₊ + 1 : ℕ) : ℝ≥0∞) ^ r * modulus μ r p f t := hnat _ hm
-    _ ≤ ENNReal.ofReal (1 + c) ^ r * modulus μ r p f t := by gcongr
+  calc smoothnessModulus μ r p f (c * t) ≤ smoothnessModulus μ r p f ((⌊c⌋₊ + 1 : ℕ) * t) :=
+        smoothnessModulus_mono r p f (mul_le_mul_of_nonneg_right hcm ht)
+    _ ≤ ((⌊c⌋₊ + 1 : ℕ) : ℝ≥0∞) ^ r * smoothnessModulus μ r p f t := hnat _ hm
+    _ ≤ ENNReal.ofReal (1 + c) ^ r * smoothnessModulus μ r p f t := by gcongr
 
 omit [FiniteDimensional ℝ V] in
 /-- **Dilating the scale**: `ω_r(f, c t)_p ≤ (1 + c)^r ω_r(f, t)_p` for `c, t ≥ 0`
-(`Rd.modulus_nat_mul_le`, `Rd.modulus_mul_le_of_nat_mul_le`). -/
-theorem modulus_mul_le {f : V → ℂ} (hf : AEStronglyMeasurable f μ) {p : ℝ≥0∞} (hp : 1 ≤ p)
+(`Rd.smoothnessModulus_nat_mul_le`, `Rd.smoothnessModulus_mul_le_of_nat_mul_le`). -/
+theorem smoothnessModulus_mul_le {f : V → ℂ} (hf : AEStronglyMeasurable f μ) {p : ℝ≥0∞} (hp : 1 ≤ p)
     (r : ℕ) {c t : ℝ} (hc : 0 ≤ c) (ht : 0 ≤ t) :
-    modulus μ r p f (c * t) ≤ ENNReal.ofReal (1 + c) ^ r * modulus μ r p f t :=
-  modulus_mul_le_of_nat_mul_le hc ht fun _ hm => modulus_nat_mul_le hf hp r hm t
+    smoothnessModulus μ r p f (c * t) ≤ ENNReal.ofReal (1 + c) ^ r * smoothnessModulus μ r p f t :=
+  smoothnessModulus_mul_le_of_nat_mul_le hc ht fun _ hm => smoothnessModulus_nat_mul_le hf hp r hm t
 
 /-! ### The modulus on `L_p` at dyadic scales -/
 
@@ -409,31 +415,32 @@ variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 variable (p) in
 /-- The modulus of an element of `L_p` at the dyadic scale `2^(-k)`. -/
 noncomputable def lpModulus (r : ℕ) (f : Lp ℂ p μ) (k : ℕ) : ℝ≥0∞ :=
-  modulus μ r p (f : V → ℂ) (1 / 2 ^ k)
+  smoothnessModulus μ r p (f : V → ℂ) (1 / 2 ^ k)
 
 omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] in
 /-- The modulus on `L_p` is subadditive. -/
 theorem lpModulus_add_le (r : ℕ) (f g : Lp ℂ p μ) (k : ℕ) :
     lpModulus p r (f + g) k ≤ lpModulus p r f k + lpModulus p r g k := by
-  rw [lpModulus, modulus_congr_ae (Lp.coeFn_add f g)]
-  exact modulus_add_le Fact.out r _ _ _
+  rw [lpModulus, smoothnessModulus_congr_ae (Lp.coeFn_add f g)]
+  exact smoothnessModulus_add_le Fact.out r _ _ _
 
 omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] in
 /-- `ω_r(f, 2^(-k))_p ≤ 2^r ‖f‖_p` on `L_p`. -/
 theorem lpModulus_le (r : ℕ) (f : Lp ℂ p μ) (k : ℕ) : lpModulus p r f k ≤ 2 ^ r * ‖f‖ₑ := by
   rw [Lp.enorm_def]
-  exact modulus_le (Lp.aestronglyMeasurable f) Fact.out r _
+  exact smoothnessModulus_le (Lp.aestronglyMeasurable f) Fact.out r _
 
 omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] in
 /-- `ω_{r+l}(f, t)_p ≤ 2^l ω_r(f, t)_p`. -/
 theorem lpModulus_add_order_le (r l : ℕ) (f : Lp ℂ p μ)
     (k : ℕ) : lpModulus p (r + l) f k ≤ 2 ^ l * lpModulus p r f k := by
-  show modulus μ (r + l) p (f : V → ℂ) (1 / 2 ^ k) ≤
-    2 ^ l * modulus μ r p (f : V → ℂ) (1 / 2 ^ k)
+  show smoothnessModulus μ (r + l) p (f : V → ℂ) (1 / 2 ^ k) ≤
+    2 ^ l * smoothnessModulus μ r p (f : V → ℂ) (1 / 2 ^ k)
   refine iSup₂_le fun h hh => ?_
   rw [add_comm r l, Function.iterate_add_apply]
-  exact (eLpNorm_higherDiff_le (aestronglyMeasurable_higherDiff (Lp.aestronglyMeasurable f) r h)
-    Fact.out l h).trans (mul_le_mul' le_rfl (eLpNorm_higherDiff_le_modulus hh))
+  exact (eLpNorm_higherDiff_le_two_pow_mul
+    (aestronglyMeasurable_higherDiff (Lp.aestronglyMeasurable f) r h) Fact.out l h).trans
+      (mul_le_mul' le_rfl (eLpNorm_higherDiff_le_smoothnessModulus hh))
 
 omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] in
 /-- The modulus of `0` vanishes. -/
@@ -442,10 +449,10 @@ theorem lpModulus_zero (r k : ℕ) : lpModulus p r (0 : Lp ℂ p μ) k = 0 :=
 
 omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] [Fact (1 ≤ p)] in
 /-- The dyadic moduli are homogeneous: `ω_r(c f, 2^(-k))_p = |c| ω_r(f, 2^(-k))_p`
-(`Rd.modulus_const_smul`). -/
+(`Rd.smoothnessModulus_const_smul`). -/
 theorem lpModulus_const_smul (r : ℕ) (c : ℂ) (f : Lp ℂ p μ) (k : ℕ) :
     lpModulus p r (c • f) k = ‖c‖ₑ * lpModulus p r f k := by
-  rw [lpModulus, modulus_congr_ae (Lp.coeFn_smul c f), modulus_const_smul]
+  rw [lpModulus, smoothnessModulus_congr_ae (Lp.coeFn_smul c f), smoothnessModulus_const_smul]
   rfl
 
 end Rd

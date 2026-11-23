@@ -17,11 +17,11 @@ Let `V` and `W` be finite-dimensional real normed spaces with additive Haar meas
 
 * **Moduli.** Differences commute with additive maps, `Δ_h^r (f ∘ e) = (Δ_{e h}^r f) ∘ e`
   (`Rd.higherDiff_comp_addHom`). Since `‖e h‖ ≤ ‖e‖ ‖h‖` and `e` preserves the measures,
-  `ω_r(f ∘ e, t)_{L_p(μ)} ≤ ω_r(f, ‖e‖ t)_{L_p(ν)}` for every `p` (`Rd.modulus_comp_le`), and with
-  the dilation of the scale `ω_r(f ∘ e, 2^(-k))_p ≤ (1 + ‖e‖)^r ω_r(f, 2^(-k))_p` on `L_p`,
+  `ω_r(f ∘ e, t)_{L_p(μ)} ≤ ω_r(f, ‖e‖ t)_{L_p(ν)}` for every `p` (`Rd.smoothnessModulus_comp_le`),
+  and with the dilation of the scale `ω_r(f ∘ e, 2^(-k))_p ≤ (1 + ‖e‖)^r ω_r(f, 2^(-k))_p` on `L_p`,
   `1 ≤ p ≤ ∞` (`Rd.lpModulus_compMeasurePreserving_le`).
 * **Moduli on subsets.** The step sets of a preimage are preimages of step sets,
-  `(e⁻¹(U))_{rh} = e⁻¹(U_{r(eh)})` (`Rd.stepSet_preimage`), so the same argument gives
+  `(e⁻¹(U))_{rh} = e⁻¹(U_{r(eh)})` (`Rd.diffStepSet_preimage`), so the same argument gives
   `ω_r(f ∘ e, t, e⁻¹(U))_{L_p(μ)} ≤ ω_r(f, ‖e‖ t, U)_{L_p(ν)}` for the modulus on a measurable
   set `U` (`Rd.modulusOn_comp_le`). For the coordinates `ofLp : ℓ_p^ι → ∏_i β_i` of Mathlib's
   `PiLp`, `‖ofLp‖ ≤ 1` and `‖ofLp⁻¹‖ ≤ (#ι)^(1/p)` (`PiLp.norm_continuousLinearEquiv_le`,
@@ -37,7 +37,7 @@ Let `V` and `W` be finite-dimensional real normed spaces with additive Haar meas
   `L^(-n) μ` (`Rd.measurePreserving_affine`, from Mathlib's `Measure.map_addHaar_smul`), so
   `‖G ∘ A‖_p = L^(-n/p) ‖G‖_p` for every `p`, with `L^(-n/p) = 1` for `p = ∞`
   (`Rd.eLpNorm_comp_affine`). Differences and step sets move along `A` with the step `L h`
-  (`Rd.higherDiff_comp_affine`, `Rd.stepSet_preimage_affine`), so
+  (`Rd.higherDiff_comp_affine`, `Rd.diffStepSet_preimage_affine`), so
   `ω_r(f ∘ A, t, A⁻¹(U))_p ≤ L^(-n/p) ω_r(f, L t, U)_p` (`Rd.modulusOn_comp_affine_le`).
   Composition with `A` is a bounded operator on `L_p`, `1 ≤ p ≤ ∞` (`Rd.compAffineLp`), with
   two-sided inverse the composition with `A⁻¹ y = -(L⁻¹ a) + L⁻¹ y`
@@ -106,23 +106,23 @@ and measure preserving from `μ` to `ν`. Then for every a.e. strongly measurabl
 order `r`, exponent `p` and scale `t`, `ω_r(f ∘ e, t)_{L_p(μ)} ≤ ω_r(f, ‖e‖ t)_{L_p(ν)}`: for
 `‖h‖ ≤ t`, `‖Δ_h^r (f ∘ e)‖_{L_p(μ)} = ‖Δ_{e h}^r f‖_{L_p(ν)}` (`Rd.higherDiff_comp_addHom`,
 Mathlib's `MeasureTheory.eLpNorm_comp_measurePreserving`) and `‖e h‖ ≤ ‖e‖ t`. -/
-theorem modulus_comp_le (e : V →L[ℝ] W) (he : MeasurePreserving e μ ν) {f : W → ℂ}
+theorem smoothnessModulus_comp_le (e : V →L[ℝ] W) (he : MeasurePreserving e μ ν) {f : W → ℂ}
     (hf : AEStronglyMeasurable f ν) (r : ℕ) (p : ℝ≥0∞) (t : ℝ) :
-    modulus μ r p (f ∘ e) t ≤ modulus ν r p f (‖e‖ * t) := by
+    smoothnessModulus μ r p (f ∘ e) t ≤ smoothnessModulus ν r p f (‖e‖ * t) := by
   refine iSup₂_le fun h hh => ?_
   rw [higherDiff_comp_addHom,
     eLpNorm_comp_measurePreserving (aestronglyMeasurable_higherDiff hf r (e h)) he]
-  exact eLpNorm_higherDiff_le_modulus
+  exact eLpNorm_higherDiff_le_smoothnessModulus
     ((e.le_opNorm h).trans (mul_le_mul_of_nonneg_left hh (norm_nonneg _)))
 
 omit [MeasurableSpace V] [BorelSpace V] [MeasurableSpace W] [BorelSpace W] in
 /-- **Step sets under linear maps**: `(e⁻¹(U))_{rh} = e⁻¹(U_{r(eh)})` for every continuous
 linear `e : V → W`, every set `U ⊆ W`, order `r` and step `h ∈ V`, since
 `e (x + l h) = e x + l (e h)`. -/
-theorem stepSet_preimage (e : V →L[ℝ] W) (U : Set W) (r : ℕ) (h : V) :
-    stepSet (e ⁻¹' U) r h = e ⁻¹' stepSet U r (e h) := by
+theorem diffStepSet_preimage (e : V →L[ℝ] W) (U : Set W) (r : ℕ) (h : V) :
+    diffStepSet (e ⁻¹' U) r h = e ⁻¹' diffStepSet U r (e h) := by
   ext x
-  simp only [stepSet, Set.mem_preimage, Set.mem_ofPred_eq, map_add, map_smul]
+  simp only [diffStepSet, Set.mem_preimage, Set.mem_ofPred_eq, map_add, map_smul]
 
 omit [BorelSpace V] [μ.IsAddHaarMeasure] in
 /-- **The modulus on a set under a linear change of variables**: let `e : V → W` be continuous,
@@ -130,17 +130,17 @@ linear and measure preserving from `μ` to `ν`, and `U ⊆ W` measurable. Then 
 a.e. strongly measurable `f` on `W`, every order `r`, exponent `p` and scale `t`,
 `ω_r(f ∘ e, t, e⁻¹(U))_{L_p(μ)} ≤ ω_r(f, ‖e‖ t, U)_{L_p(ν)}`: for `‖h‖ ≤ t` the restricted
 difference of `f ∘ e` with step `h` is that of `f` with step `e h`, composed with `e`
-(`Rd.stepSet_preimage`, `Rd.higherDiff_comp_addHom`), and `‖e h‖ ≤ ‖e‖ t`. -/
+(`Rd.diffStepSet_preimage`, `Rd.higherDiff_comp_addHom`), and `‖e h‖ ≤ ‖e‖ t`. -/
 theorem modulusOn_comp_le (e : V →L[ℝ] W) (he : MeasurePreserving e μ ν) {U : Set W}
     (hU : MeasurableSet U) {f : W → ℂ} (hf : AEStronglyMeasurable f ν) (r : ℕ) (p : ℝ≥0∞)
     (t : ℝ) : modulusOn μ (e ⁻¹' U) r p (f ∘ e) t ≤ modulusOn ν U r p f (‖e‖ * t) := by
   refine iSup₂_le fun h hh => ?_
-  have hfun : (stepSet (e ⁻¹' U) r h).indicator ((fwdDiff h)^[r] (f ∘ e)) =
-      (stepSet U r (e h)).indicator ((fwdDiff (e h))^[r] f) ∘ e := by
+  have hfun : (diffStepSet (e ⁻¹' U) r h).indicator ((fwdDiff h)^[r] (f ∘ e)) =
+      (diffStepSet U r (e h)).indicator ((fwdDiff (e h))^[r] f) ∘ e := by
     funext x
-    rw [stepSet_preimage, higherDiff_comp_addHom, Function.comp_apply, Set.indicator_comp_right]
+    rw [diffStepSet_preimage, higherDiff_comp_addHom, Function.comp_apply, Set.indicator_comp_right]
   rw [hfun, eLpNorm_comp_measurePreserving ((aestronglyMeasurable_higherDiff hf r (e h)).indicator
-    (measurableSet_stepSet hU r (e h))) he]
+    (measurableSet_diffStepSet hU r (e h))) he]
   exact eLpNorm_indicator_higherDiff_le_modulusOn
     ((e.le_opNorm h).trans (mul_le_mul_of_nonneg_left hh (norm_nonneg _)))
 
@@ -196,10 +196,11 @@ theorem memLp_comp_affine {E : Type*} [NormedAddCommGroup E] {p : ℝ≥0∞} (a
 omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- **Step sets under affine maps**: for `A x = a + L x`,
 `(A⁻¹(U))_{rh} = A⁻¹(U_{r(Lh)})`, since `A (x + l h) = A x + l (L h)`. -/
-theorem stepSet_preimage_affine (a : V) (L : ℝ) (U : Set V) (r : ℕ) (h : V) :
-    stepSet ((fun x => a + L • x) ⁻¹' U) r h = (fun x => a + L • x) ⁻¹' stepSet U r (L • h) := by
+theorem diffStepSet_preimage_affine (a : V) (L : ℝ) (U : Set V) (r : ℕ) (h : V) :
+    diffStepSet ((fun x => a + L • x) ⁻¹' U) r h =
+      (fun x => a + L • x) ⁻¹' diffStepSet U r (L • h) := by
   ext x
-  simp only [stepSet, Set.mem_preimage, Set.mem_ofPred_eq, smul_add, smul_comm L, add_assoc]
+  simp only [diffStepSet, Set.mem_preimage, Set.mem_ofPred_eq, smul_add, smul_comm L, add_assoc]
 
 omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- **Differences under affine maps**: `Δ_h^r (f ∘ A) = (Δ_{Lh}^r f) ∘ A` for `A x = a + L x`,
@@ -216,21 +217,21 @@ theorem higherDiff_comp_affine (a : V) (L : ℝ) (r : ℕ) (h : V) (f : V → �
 `A x = a + L x`, a measurable `U`, an a.e. strongly measurable `f`, every order `r` and scale
 `t`, `ω_r(f ∘ A, t, A⁻¹(U))_p ≤ L^(-n/p) ω_r(f, L t, U)_p`, `n = dim V`: the restricted difference
 of `f ∘ A` with step `h` is that of `f` with step `L h`, composed with `A`
-(`Rd.stepSet_preimage_affine`, `Rd.higherDiff_comp_affine`, `Rd.eLpNorm_comp_affine`), and
+(`Rd.diffStepSet_preimage_affine`, `Rd.higherDiff_comp_affine`, `Rd.eLpNorm_comp_affine`), and
 `‖L h‖ ≤ L t`. -/
 theorem modulusOn_comp_affine_le {p : ℝ≥0∞} (a : V) {L : ℝ} (hL : 0 < L) {U : Set V}
     (hU : MeasurableSet U) {f : V → ℂ} (hf : AEStronglyMeasurable f μ) (r : ℕ) (t : ℝ) :
     modulusOn μ ((fun x => a + L • x) ⁻¹' U) r p (fun x => f (a + L • x)) t ≤
       ENNReal.ofReal (L ^ finrank ℝ V)⁻¹ ^ (1 / p).toReal * modulusOn μ U r p f (L * t) := by
   refine iSup₂_le fun h hh => ?_
-  have hfun : (stepSet ((fun x => a + L • x) ⁻¹' U) r h).indicator
+  have hfun : (diffStepSet ((fun x => a + L • x) ⁻¹' U) r h).indicator
       ((fwdDiff h)^[r] (fun x => f (a + L • x))) =
-      fun x => (stepSet U r (L • h)).indicator ((fwdDiff (L • h))^[r] f) (a + L • x) := by
+      fun x => (diffStepSet U r (L • h)).indicator ((fwdDiff (L • h))^[r] f) (a + L • x) := by
     funext x
-    rw [stepSet_preimage_affine, higherDiff_comp_affine]
+    rw [diffStepSet_preimage_affine, higherDiff_comp_affine]
     exact Set.indicator_comp_right (fun x => a + L • x)
   rw [hfun, eLpNorm_comp_affine a hL ((aestronglyMeasurable_higherDiff hf r (L • h)).indicator
-    (measurableSet_stepSet hU r (L • h)))]
+    (measurableSet_diffStepSet hU r (L • h)))]
   refine mul_le_mul' le_rfl (eLpNorm_indicator_higherDiff_le_modulusOn ?_)
   rw [norm_smul, Real.norm_of_nonneg hL.le]
   exact mul_le_mul_of_nonneg_left hh hL.le
@@ -243,15 +244,16 @@ variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 linear and measure preserving from `μ` to `ν`, and `1 ≤ p`. Then for every `F ∈ L_p(ν)`, every
 order `r` and every `k`, the composition `F ∘ e ∈ L_p(μ)` (Mathlib's
 `MeasureTheory.Lp.compMeasurePreserving`) satisfies
-`ω_r(F ∘ e, 2^(-k))_p ≤ (1 + ‖e‖)^r ω_r(F, 2^(-k))_p`: `Rd.modulus_comp_le` and the dilation of
-the scale by `‖e‖` (`Rd.modulus_mul_le`). -/
+`ω_r(F ∘ e, 2^(-k))_p ≤ (1 + ‖e‖)^r ω_r(F, 2^(-k))_p`: `Rd.smoothnessModulus_comp_le` and the
+dilation of the scale by `‖e‖` (`Rd.smoothnessModulus_mul_le`). -/
 theorem lpModulus_compMeasurePreserving_le (e : V →L[ℝ] W) (he : MeasurePreserving e μ ν)
     (r : ℕ) (F : Lp ℂ p ν) (k : ℕ) :
     lpModulus p r (Lp.compMeasurePreserving e he F) k ≤
       ENNReal.ofReal (1 + ‖e‖) ^ r * lpModulus p r F k := by
-  rw [lpModulus, modulus_congr_ae (Lp.coeFn_compMeasurePreserving F he)]
-  exact (modulus_comp_le e he (Lp.aestronglyMeasurable F) r p _).trans
-    (modulus_mul_le (Lp.aestronglyMeasurable F) Fact.out r (norm_nonneg _) (by positivity))
+  rw [lpModulus, smoothnessModulus_congr_ae (Lp.coeFn_compMeasurePreserving F he)]
+  exact (smoothnessModulus_comp_le e he (Lp.aestronglyMeasurable F) r p _).trans
+    (smoothnessModulus_mul_le (Lp.aestronglyMeasurable F) Fact.out r (norm_nonneg _)
+      (by positivity))
 
 /-- **Besov quasi-norms under a linear change of variables**: let `e : V → W` be continuous,
 linear and measure preserving from `μ` to `ν`, and `1 ≤ p`. Then for every `F ∈ L_p(ν)`, every

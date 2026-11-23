@@ -52,8 +52,8 @@ wavelets of all levels form a Hilbert basis of `L_2(ℝ^d)`, in which `H^s` is a
   `P(ξ) = P_N(sin²(πξ))` (`Daubechies.transfer`). If `T^n 1 ≤ C λ^n` for all `n` (the
   hypothesis `Daubechies.TransferGrowth`), then `∫ (1 + |ξ|)^(2s) |Φ(ξ)|² dξ < ∞` for every
   `s < N - log₄ λ` (`Daubechies.integrable_rpow_mul_normSq`), and for `p ≤ 2`, `0 ≤ s ≤ r` and
-  `0 < t ≤ 1`, `ω_r(φ, t)_p ≤ K t^s` (`Daubechies.modulus_scalingFun_le_two`). For `N = 2`,
-  `T 1 = 4`, and for `N = 3`, `T^n 1 ≤ 2 · 9^n` (`Daubechies.transferGrowth_two`,
+  `0 < t ≤ 1`, `ω_r(φ, t)_p ≤ K t^s` (`Daubechies.smoothnessModulus_scalingFun_le_two`). For
+  `N = 2`, `T 1 = 4`, and for `N = 3`, `T^n 1 ≤ 2 · 9^n` (`Daubechies.transferGrowth_two`,
   `Daubechies.transferGrowth_three`): the scaling functions lie in `H^s` for `s < 1` and for
   `s < 3 - log₂ 3 ≈ 1.415`, the Sobolev exponents of Eirola and Villemoes.
 * **Hölder regularity.** Under the same growth bound, `|φ(x) - φ(y)| ≤ K |x - y|^a` for
@@ -112,7 +112,7 @@ wavelets of all levels form a Hilbert basis of `L_2(ℝ^d)`, in which `H^s` is a
   (`Daubechies.lqNorm_le_eLpNorm_tensorExpand`). If a measurable `f` is almost everywhere the
   expansion of its own coefficients of level `j` and `2^j t ≤ 1`, then
   `ω_r(f, t)_p ≤ C sup_{ν, ‖H‖ ≤ 2^j t} ‖Δ_H^r G_ν‖_p ‖f‖_p` with `C = L_r^(1 - 1/p) C'` and
-  `L_r = |I| (⌈b - a + 2r⌉ + 1)^d` (`Daubechies.modulus_tensorExpand_le`,
+  `L_r = |I| (⌈b - a + 2r⌉ + 1)^d` (`Daubechies.smoothnessModulus_tensorExpand_le`,
   `Daubechies.tensorBernsteinConst`).
 * **The multiresolution analysis on `ℝ^d`.** Let `N ≥ 2`, `Φ = Ψ^∅`,
   `P_j f = ∑_k ⟨f, Φ_{j,k}⟩ Φ_{j,k}` and `Q_j f = ∑_{e ≠ ∅} ∑_k ⟨f, Ψ^e_{j,k}⟩ Ψ^e_{j,k}` with
@@ -138,9 +138,9 @@ wavelets of all levels form a Hilbert basis of `L_2(ℝ^d)`, in which `H^s` is a
   (`Daubechies.foldSliceProj`). For continuous `f`, `R_j f = ∑_k c_k Φ_{j,k}` with constants
   `c_k` (`Daubechies.foldSliceProj_eq_tensorExpand`) and
   `‖f - R_j f‖_p ≤ (1 + C)^d d C_J ω_N(f, 2^(-j))_p`
-  (`Daubechies.eLpNorm_sub_foldSliceProj_le_modulus`). Hence, for `N ≥ 2`, `1 ≤ p < ∞` and every
-  `f ∈ L_p(ℝ^d)`, `E_{2^j}(f)_p ≤ C_{J,d} ω_N(f, 2^(-j))_p` for the best approximation from `V_j`
-  (`Daubechies.approxError_tensorScheme_le`), `‖f - P_j f‖_p ≤ C ω_N(f, 2^(-j))_p`
+  (`Daubechies.eLpNorm_sub_foldSliceProj_le_smoothnessModulus`). Hence, for `N ≥ 2`, `1 ≤ p < ∞` and
+  every `f ∈ L_p(ℝ^d)`, `E_{2^j}(f)_p ≤ C_{J,d} ω_N(f, 2^(-j))_p` for the best approximation from
+  `V_j` (`Daubechies.approxError_tensorScheme_le`), `‖f - P_j f‖_p ≤ C ω_N(f, 2^(-j))_p`
   (`Daubechies.enorm_sub_tensorProj_le`), and `P_j f → f` (`Daubechies.tendsto_tensorProj`).
 * **Besov spaces by tensor wavelet coefficients.** Let `N ≥ 2`, `1 ≤ p < ∞`, `1 ≤ q ≤ ∞`, let
   `ω_N(φ, t)_p ≤ K t^θ` for `0 < t ≤ 1` and `0 < s < min(θ, N)`. Then `f ∈ L_p(ℝ^d)` satisfies

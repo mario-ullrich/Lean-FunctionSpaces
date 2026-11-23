@@ -695,7 +695,7 @@ theorem lpModulus_rpow_le_average (hp : p ≠ ∞) (f : Lp ℂ p (volume : Measu
         eLpNorm (fwdDiff z (f : V → ℂ)) p volume ^ p.toReal := by
   have hP : 0 < p.toReal := ENNReal.toReal_pos (zero_lt_one.trans_le Fact.out).ne' hp
   rw [← ENNReal.le_rpow_inv_iff hP]
-  show modulus volume 1 p (f : V → ℂ) (1 / 2 ^ k) ≤ _
+  show smoothnessModulus volume 1 p (f : V → ℂ) (1 / 2 ^ k) ≤ _
   refine iSup₂_le fun h hh => ?_
   rw [ENNReal.le_rpow_inv_iff hP]
   exact eLpNorm_fwdDiff_rpow_le_average Fact.out hp (Lp.aestronglyMeasurable f) hh
@@ -863,7 +863,7 @@ theorem setLIntegral_dyadicAnnulus_le_lpModulus {s : ℝ} (hs : 0 ≤ s)
     intro z hz
     have h1 : eLpNorm (fwdDiff z (f : V → ℂ)) p volume ^ p.toReal ≤
         lpModulus p 1 f i ^ p.toReal :=
-      ENNReal.rpow_le_rpow (eLpNorm_higherDiff_le_modulus (μ := volume) (r := 1) hz.2) hP0
+      ENNReal.rpow_le_rpow (eLpNorm_higherDiff_le_smoothnessModulus (μ := volume) (r := 1) hz.2) hP0
     have h2 : (‖z‖ₑ ^ ((finrank ℝ V : ℝ) + s * p.toReal))⁻¹ ≤
         dyadicWeight ((finrank ℝ V : ℝ) + s * p.toReal) (i + 1) := by
       rw [← inv_inv (dyadicWeight _ (i + 1)), ← ENNReal.dyadicWeight_neg, ENNReal.inv_le_inv]
@@ -914,7 +914,7 @@ theorem setLIntegral_compl_ball_le_enorm {s : ℝ} (hs : 0 < s) (hp : p ≠ ∞)
         (2 * ‖f‖ₑ) ^ p.toReal * ‖z‖ₑ ^ (-((finrank ℝ V : ℝ) + s * p.toReal)) := fun z => by
     rw [div_eq_mul_inv, ← ENNReal.rpow_neg]
     gcongr
-    have h := eLpNorm_higherDiff_le (Lp.aestronglyMeasurable f) (Fact.out : 1 ≤ p) 1 z
+    have h := eLpNorm_higherDiff_le_two_pow_mul (Lp.aestronglyMeasurable f) (Fact.out : 1 ≤ p) 1 z
     rw [pow_one, ← Lp.enorm_def] at h
     exact h
   have hlt : (finrank ℝ V : ℝ) < (finrank ℝ V : ℝ) + s * p.toReal :=

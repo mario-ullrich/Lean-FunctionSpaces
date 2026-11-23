@@ -28,8 +28,8 @@ bound both by the coordinate differences with steps `0 ≤ h ≤ rδ`, for every
 (`Cube.eLpNorm_sub_cubeSmooth_le_of_cubeDiff_le`). On the cube this is the coordinate modulus,
 with the supremum over the steps outside the integral over the cube
 (`Cube.eLpNorm_sub_cubeSmooth_le`, `Cube.eLpNorm_cubeSmoothDeriv_le`); on `ℝ^d` it is the
-isotropic modulus of smoothness (`Cube.eLpNorm_sub_cubeSmooth_le_modulus`,
-`Cube.eLpNorm_cubeSmoothDeriv_le_modulus`). With `δ = L / r²`
+isotropic modulus of smoothness (`Cube.eLpNorm_sub_cubeSmooth_le_smoothnessModulus`,
+`Cube.eLpNorm_cubeSmoothDeriv_le_smoothnessModulus`). With `δ = L / r²`
 this gives smoothings on the regions `{x_i ≤ w}` and, by the reflection `x_i ↦ 1 - x_i`
 (`Cube.coordModulus_reflect`), `{x_i ≥ 1 - w}`, `w + L ≤ 1`, whose slices have Taylor polynomials
 on all intervals (`Cube.exists_left_cubeSmoothing`, `Cube.exists_right_cubeSmoothing`), with the
@@ -219,25 +219,27 @@ theorem eLpNorm_cubeSmoothDeriv_le {f : (Fin d → ℝ) → ℂ} (hf : Continuou
 `f : ℝ^d → ℂ`, `r ∈ ℕ`, `δ > 0`, `1 ≤ p < ∞` and every coordinate `i`,
 `‖f - S^{(i)}_δ f‖_{L_p(ℝ^d)} ≤ ω_r(f, rδ)_p` with the isotropic modulus of smoothness of `ℝ^d`
 (sup norm): `Cube.eLpNorm_sub_cubeSmooth_le_of_cubeDiff_le` for Lebesgue measure, with
-`Cube.eLpNorm_cubeDiff_le_modulus` for the coordinate differences. -/
-theorem eLpNorm_sub_cubeSmooth_le_modulus {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) (r : ℕ)
-    {δ : ℝ} (hδ : 0 < δ) {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p ≠ ∞) (i : Fin d) :
-    eLpNorm (fun x => f x - cubeSmooth r δ i f x) p volume ≤ Rd.modulus volume r p f (r * δ) :=
+`Cube.eLpNorm_cubeDiff_le_smoothnessModulus` for the coordinate differences. -/
+theorem eLpNorm_sub_cubeSmooth_le_smoothnessModulus {f : (Fin d → ℝ) → ℂ} (hf : Continuous f)
+    (r : ℕ) {δ : ℝ} (hδ : 0 < δ) {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p ≠ ∞) (i : Fin d) :
+    eLpNorm (fun x => f x - cubeSmooth r δ i f x) p volume ≤
+      Rd.smoothnessModulus volume r p f (r * δ) :=
   eLpNorm_sub_cubeSmooth_le_of_cubeDiff_le hf r hδ hp hp' i volume fun _ h0 hh =>
-    eLpNorm_cubeDiff_le_modulus (by rw [abs_of_nonneg h0]; exact hh)
+    eLpNorm_cubeDiff_le_smoothnessModulus (by rw [abs_of_nonneg h0]; exact hh)
 
 /-- **The derivative of the smoothing in one coordinate on `ℝ^d`**: for continuous
 `f : ℝ^d → ℂ`, `r ∈ ℕ`, `δ > 0`, `1 ≤ p ≤ ∞` and every coordinate `i`,
 `‖∂_i^r S^{(i)}_δ f‖_{L_p(ℝ^d)} ≤ 2^r δ^(-r) ω_r(f, rδ)_p`: the derivative is the combination
-`∑_{k=1}^r (-1)^(k+1) C(r,k) (kδ)^(-r) Δ^r_{kδ e_i} f` (`Cube.cubeSmoothDeriv_eq_sum_smul`), and
-`Interval.eLpNorm_sum_smoothCoeff_smul_le` with `Cube.eLpNorm_cubeDiff_le_modulus` bounds it. -/
-theorem eLpNorm_cubeSmoothDeriv_le_modulus {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) (r : ℕ)
-    {δ : ℝ} (hδ : 0 < δ) {p : ℝ≥0∞} (hp : 1 ≤ p) (i : Fin d) :
+`∑_{k=1}^r (-1)^(k+1) C(r,k) (kδ)^(-r) Δ^r_{kδ e_i} f` (`Cube.cubeSmoothDeriv_eq_sum_smul`),
+and `Interval.eLpNorm_sum_smoothCoeff_smul_le` with `Cube.eLpNorm_cubeDiff_le_smoothnessModulus`
+bounds it. -/
+theorem eLpNorm_cubeSmoothDeriv_le_smoothnessModulus {f : (Fin d → ℝ) → ℂ} (hf : Continuous f)
+    (r : ℕ) {δ : ℝ} (hδ : 0 < δ) {p : ℝ≥0∞} (hp : 1 ≤ p) (i : Fin d) :
     eLpNorm (cubeSmoothDeriv r δ i f) p volume ≤
-      2 ^ r * (ENNReal.ofReal δ)⁻¹ ^ r * Rd.modulus volume r p f (r * δ) := by
+      2 ^ r * (ENNReal.ofReal δ)⁻¹ ^ r * Rd.smoothnessModulus volume r p f (r * δ) := by
   rw [cubeSmoothDeriv_eq_sum_smul hf r δ i]
   exact eLpNorm_sum_smoothCoeff_smul_le (D := fun h => cubeDiff r h i f) hδ hp
-    fun h h0 hh => eLpNorm_cubeDiff_le_modulus (by rw [abs_of_nonneg h0]; exact hh)
+    fun h h0 hh => eLpNorm_cubeDiff_le_smoothnessModulus (by rw [abs_of_nonneg h0]; exact hh)
 
 /-! ### Smoothings on the two ends of a coordinate -/
 

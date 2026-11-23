@@ -15,17 +15,17 @@ public import FunctionSpaces.Wavelets.Examples.Daubechies.TransferExamples
 
 For a Daubechies mask of order `N ≥ 2` with symbol product `Φ` (`Daubechies.symbolProduct`) and
 scaling function `φ = 𝓕⁻ Φ` (`Daubechies.scalingFun`), this file bounds the moduli of smoothness
-`ω_r(φ, t)_p = sup_{|h| ≤ t} ‖Δ_h^r φ‖_p` (`Rd.modulus`) for `p ≤ 2`. Here
+`ω_r(φ, t)_p = sup_{|h| ≤ t} ‖Δ_h^r φ‖_p` (`Rd.smoothnessModulus`) for `p ≤ 2`. Here
 `Δ_h f(x) = f(x + h) - f(x)` is the forward difference (Mathlib's `fwdDiff h f`) and `Δ_h^r` its
 `r`-fold iterate, written `(fwdDiff h)^[r]`. Under a growth bound `T^n 1 ≤ C λ^n` for the transfer
 operator `T` (`Daubechies.TransferGrowth N λ C`), for every real `s` with `0 ≤ s < N - log₄ λ` and
 every order `r ∈ ℕ` with `r ≥ s` there is a finite constant `K` with
 
-`ω_r(φ, t)_2 ≤ K t^s` for `0 < t ≤ 1` (`Daubechies.modulus_scalingFun_two_le`),
+`ω_r(φ, t)_2 ≤ K t^s` for `0 < t ≤ 1` (`Daubechies.smoothnessModulus_scalingFun_two_le`),
 
-and the same holds in `L_p` for every `p ≤ 2` (`Daubechies.modulus_scalingFun_le_two`). As `s` may
-be any number in `[0, N - log₄ λ)`, these bounds express the Sobolev regularity `φ ∈ H^s` for every
-`s < N - log₄ λ` by moduli of smoothness (the bound for `s` says `φ ∈ B^s_{2,∞}`, and
+and the same holds in `L_p` for every `p ≤ 2` (`Daubechies.smoothnessModulus_scalingFun_le_two`). As
+`s` may be any number in `[0, N - log₄ λ)`, these bounds express the Sobolev regularity `φ ∈ H^s`
+for every `s < N - log₄ λ` by moduli of smoothness (the bound for `s` says `φ ∈ B^s_{2,∞}`, and
 `B^s_{2,∞} ⊂ H^(s')` for `s' < s`).
 
 * **The Fourier transform of a difference.** For integrable `f : ℝ → ℂ`,
@@ -50,21 +50,21 @@ be any number in `[0, N - log₄ λ)`, these bounds express the Sobolev regulari
   `‖Δ_h^r φ‖_2 ≤ (2π)^r (∫ (1 + |ξ|)^(2s) |Φ(ξ)|² dξ)^(1/2) |h|^s`
   (`Daubechies.eLpNorm_two_higherDiff_scalingFun_le`), where the integral is finite for
   `s < N - log₄ λ` (`Daubechies.integrable_rpow_mul_normSq`). The supremum over `|h| ≤ t` bounds
-  `ω_r(φ, t)_2` (`Daubechies.modulus_scalingFun_two_le_mul_rpow`).
+  `ω_r(φ, t)_2` (`Daubechies.smoothnessModulus_scalingFun_two_le_mul_rpow`).
 * **Exponents `p ≤ 2`.** For `|h| ≤ 1` the difference `Δ_h^r φ` vanishes outside
   `[-r, 2N - 1 + r]` (`Daubechies.higherDiff_scalingFun_eq_zero`), since `φ` vanishes outside
   `[0, 2N - 1]`. Hölder's inequality on this interval of length `2N - 1 + 2r`
   (`Daubechies.eLpNorm_le_eLpNorm_mul_of_eq_zero`) gives
   `ω_r(φ, t)_p ≤ (2N - 1 + 2r)^(1/p - 1/2) ω_r(φ, t)_2` for `t ≤ 1`
-  (`Daubechies.modulus_scalingFun_le_modulus_two`).
+  (`Daubechies.smoothnessModulus_scalingFun_le_smoothnessModulus_two`).
 * **Orders two and three.** The growth bounds `T^n 1 ≤ 4^n` for `N = 2` and `T^n 1 ≤ 2 · 9^n` for
   `N = 3` (`Daubechies.transferGrowth_two`, `Daubechies.transferGrowth_three`) have the exponents
   `2 - log₄ 4 = 1` and `3 - log₄ 9 = 3 - log₂ 3 ≈ 1.415`. Hence `ω_r(φ, t)_p ≤ K t^s` for
   `p ≤ 2` and `0 < t ≤ 1`, for every `0 ≤ s < 1` if `N = 2`
-  (`Daubechies.modulus_scalingFun_two_le_order_two`,
-  `Daubechies.modulus_scalingFun_le_two_order_two`) and for every `0 ≤ s < 3 - log₂ 3` if
-  `N = 3` (`Daubechies.modulus_scalingFun_two_le_order_three`,
-  `Daubechies.modulus_scalingFun_le_two_order_three`).
+  (`Daubechies.smoothnessModulus_scalingFun_two_le_order_two`,
+  `Daubechies.smoothnessModulus_scalingFun_le_two_order_two`) and for every `0 ≤ s < 3 - log₂ 3` if
+  `N = 3` (`Daubechies.smoothnessModulus_scalingFun_two_le_order_three`,
+  `Daubechies.smoothnessModulus_scalingFun_le_two_order_three`).
 -/
 
 @[expose] public section
@@ -210,10 +210,11 @@ theorem continuous_iterate_fwdDiff {f : ℝ → ℂ} (hf : Continuous f) (r : �
     exact (ih.comp (continuous_id.add continuous_const)).sub ih
 
 /-- The differences of a function in `L_p(ℝ)`, `p ≥ 1`, lie in `L_p(ℝ)`: `Δ_h^r f ∈ L_p` for
-every `r ∈ ℕ` and every `h ∈ ℝ`, since `‖Δ_h^r f‖_p ≤ 2^r ‖f‖_p` (`Rd.eLpNorm_higherDiff_le`). -/
+every `r ∈ ℕ` and every `h ∈ ℝ`, since `‖Δ_h^r f‖_p ≤ 2^r ‖f‖_p`
+(`Rd.eLpNorm_higherDiff_le_two_pow_mul`). -/
 theorem memLp_iterate_fwdDiff {f : ℝ → ℂ} {p : ℝ≥0∞} (hf : MemLp f p) (hp : 1 ≤ p) (r : ℕ)
     (h : ℝ) : MemLp ((fwdDiff h)^[r] f) p :=
-  (Rd.eLpNorm_higherDiff_le hf.aestronglyMeasurable hp r h).trans_lt
+  (Rd.eLpNorm_higherDiff_le_two_pow_mul hf.aestronglyMeasurable hp r h).trans_lt
     (ENNReal.mul_lt_top (by simp) hf)
 
 /-- **The `L²` norm as an integral**: `‖g‖_2 = (∫ ‖g(x)‖² dμ(x))^(1/2)` for every `g ∈ L²(μ)`
@@ -336,10 +337,10 @@ of `Daubechies.integral_norm_sq_higherDiff_scalingFun_le`, for every `t ∈ ℝ`
 `ω_r(φ, t)_2 ≤ (2π)^r (∫ (1 + |ξ|)^(2s) |Φ(ξ)|² dξ)^(1/2) t^s`. This is the supremum over
 `|h| ≤ t` of `Daubechies.eLpNorm_two_higherDiff_scalingFun_le`, with `|h|^s ≤ t^s` since
 `s ≥ 0`. -/
-theorem modulus_scalingFun_two_le_mul_rpow (hN : 2 ≤ N) {lam C s : ℝ} {r : ℕ}
+theorem smoothnessModulus_scalingFun_two_le_mul_rpow (hN : 2 ≤ N) {lam C s : ℝ} {r : ℕ}
     (hg : TransferGrowth N lam C) (hs0 : 0 ≤ s) (hs : s < N - Real.logb 4 lam) (hsr : s ≤ r)
     (t : ℝ) :
-    Rd.modulus volume r 2 (scalingFun m) t ≤
+    Rd.smoothnessModulus volume r 2 (scalingFun m) t ≤
       ENNReal.ofReal ((2 * π) ^ r * √(∫ ξ, (1 + |ξ|) ^ (2 * s) * ‖symbolProduct m ξ‖ ^ 2)) *
         ENNReal.ofReal (t ^ s) := by
   refine iSup₂_le fun h hh => (eLpNorm_two_higherDiff_scalingFun_le m hN hg hs0 hs hsr h).trans ?_
@@ -350,13 +351,14 @@ theorem modulus_scalingFun_two_le_mul_rpow (hN : 2 ≤ N) {lam C s : ℝ} {r : �
 `T^n 1 ≤ C λ^n` be a growth bound for the transfer operator (`Daubechies.TransferGrowth`). For
 every real `s` with `0 ≤ s < N - log₄ λ` and every order `r ∈ ℕ` with `r ≥ s` there is a finite
 constant `K` with `ω_r(φ, t)_2 ≤ K t^s` for all `0 < t ≤ 1`
-(`Daubechies.modulus_scalingFun_two_le_mul_rpow`). Over all such `s`, this is the Sobolev
+(`Daubechies.smoothnessModulus_scalingFun_two_le_mul_rpow`). Over all such `s`, this is the Sobolev
 regularity `φ ∈ H^s` for every `s < N - log₄ λ`, in terms of moduli of smoothness. -/
-theorem modulus_scalingFun_two_le (hN : 2 ≤ N) {lam C s : ℝ} {r : ℕ}
+theorem smoothnessModulus_scalingFun_two_le (hN : 2 ≤ N) {lam C s : ℝ} {r : ℕ}
     (hg : TransferGrowth N lam C) (hs0 : 0 ≤ s) (hs : s < N - Real.logb 4 lam) (hsr : s ≤ r) :
     ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ t ∈ Set.Ioc (0 : ℝ) 1,
-      Rd.modulus volume r 2 (scalingFun m) t ≤ K * ENNReal.ofReal (t ^ s) :=
-  ⟨_, ENNReal.ofReal_ne_top, fun t _ => modulus_scalingFun_two_le_mul_rpow m hN hg hs0 hs hsr t⟩
+      Rd.smoothnessModulus volume r 2 (scalingFun m) t ≤ K * ENNReal.ofReal (t ^ s) :=
+  ⟨_, ENNReal.ofReal_ne_top, fun t _ =>
+    smoothnessModulus_scalingFun_two_le_mul_rpow m hN hg hs0 hs hsr t⟩
 
 /-! ### Exponents `p ≤ 2` -/
 
@@ -428,28 +430,30 @@ theorem eLpNorm_higherDiff_scalingFun_le_two (hN : 2 ≤ N) {p : ℝ≥0∞} (hp
 /-- **The `L_p` modulus by the `L²` modulus**: for `N ≥ 2`, `p ≤ 2`, `r ∈ ℕ` and `t ≤ 1`,
 `ω_r(φ, t)_p ≤ (2N - 1 + 2r)^(1/p - 1/2) ω_r(φ, t)_2`, the supremum over `|h| ≤ t` of
 `Daubechies.eLpNorm_higherDiff_scalingFun_le_two`. -/
-theorem modulus_scalingFun_le_modulus_two (hN : 2 ≤ N) {p : ℝ≥0∞} (hp2 : p ≤ 2) (r : ℕ) {t : ℝ}
-    (ht : t ≤ 1) :
-    Rd.modulus volume r p (scalingFun m) t ≤
+theorem smoothnessModulus_scalingFun_le_smoothnessModulus_two (hN : 2 ≤ N) {p : ℝ≥0∞} (hp2 : p ≤ 2)
+    (r : ℕ) {t : ℝ} (ht : t ≤ 1) :
+    Rd.smoothnessModulus volume r p (scalingFun m) t ≤
       ENNReal.ofReal (2 * N - 1 + 2 * r) ^ (1 / p.toReal - 1 / 2) *
-        Rd.modulus volume r 2 (scalingFun m) t := by
+        Rd.smoothnessModulus volume r 2 (scalingFun m) t := by
   refine iSup₂_le fun h hh => ?_
   rw [mul_comm]
   exact (eLpNorm_higherDiff_scalingFun_le_two m hN hp2 r (hh.trans ht)).trans
-    (mul_le_mul_left (Rd.eLpNorm_higherDiff_le_modulus hh) _)
+    (mul_le_mul_left (Rd.eLpNorm_higherDiff_le_smoothnessModulus hh) _)
 
 /-- **The `L_p` modulus of smoothness of the scaling function, `p ≤ 2`**: let `N ≥ 2`, let
 `T^n 1 ≤ C λ^n` be a growth bound for the transfer operator (`Daubechies.TransferGrowth`), and
 let `p ≤ 2`. For every real `s` with `0 ≤ s < N - log₄ λ` and every order `r ∈ ℕ` with `r ≥ s`
 there is a finite constant `K` with `ω_r(φ, t)_p ≤ K t^s` for all `0 < t ≤ 1`, namely
 `K = (2N - 1 + 2r)^(1/p - 1/2) K₂` with the constant `K₂` of the `L²` bound
-`Daubechies.modulus_scalingFun_two_le` (`Daubechies.modulus_scalingFun_le_modulus_two`). The
-exponent may be any `p ≤ 2`, including `p < 1`. -/
-theorem modulus_scalingFun_le_two (hN : 2 ≤ N) {p : ℝ≥0∞} (hp2 : p ≤ 2) {lam C s : ℝ} {r : ℕ}
-    (hg : TransferGrowth N lam C) (hs0 : 0 ≤ s) (hs : s < N - Real.logb 4 lam) (hsr : s ≤ r) :
+`Daubechies.smoothnessModulus_scalingFun_two_le`
+(`Daubechies.smoothnessModulus_scalingFun_le_smoothnessModulus_two`). The exponent may be any
+`p ≤ 2`, including `p < 1`. -/
+theorem smoothnessModulus_scalingFun_le_two (hN : 2 ≤ N) {p : ℝ≥0∞} (hp2 : p ≤ 2) {lam C s : ℝ}
+    {r : ℕ} (hg : TransferGrowth N lam C) (hs0 : 0 ≤ s) (hs : s < N - Real.logb 4 lam)
+    (hsr : s ≤ r) :
     ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ t ∈ Set.Ioc (0 : ℝ) 1,
-      Rd.modulus volume r p (scalingFun m) t ≤ K * ENNReal.ofReal (t ^ s) := by
-  obtain ⟨K, hK, hmod⟩ := modulus_scalingFun_two_le m hN hg hs0 hs hsr
+      Rd.smoothnessModulus volume r p (scalingFun m) t ≤ K * ENNReal.ofReal (t ^ s) := by
+  obtain ⟨K, hK, hmod⟩ := smoothnessModulus_scalingFun_two_le m hN hg hs0 hs hsr
   have hL : (0 : ℝ) < 2 * N - 1 + 2 * r := by
     have : (2 : ℝ) ≤ N := by exact_mod_cast hN
     linarith [r.cast_nonneg (α := ℝ)]
@@ -457,7 +461,8 @@ theorem modulus_scalingFun_le_two (hN : 2 ≤ N) {p : ℝ≥0∞} (hp2 : p ≤ 2
     ENNReal.mul_ne_top (ENNReal.rpow_ne_top_of_ne_zero (ENNReal.ofReal_pos.2 hL).ne'
       ENNReal.ofReal_ne_top) hK, fun t ht => ?_⟩
   rw [mul_assoc]
-  exact (modulus_scalingFun_le_modulus_two m hN hp2 r ht.2).trans (mul_le_mul_right (hmod t ht) _)
+  exact (smoothnessModulus_scalingFun_le_smoothnessModulus_two m hN hp2 r ht.2).trans
+    (mul_le_mul_right (hmod t ht) _)
 
 /-! ### Orders two and three -/
 
@@ -465,23 +470,25 @@ theorem modulus_scalingFun_le_two (hN : 2 ≤ N) {p : ℝ≥0∞} (hp2 : p ≤ 2
 `N = 2`, every real `s` with `0 ≤ s < 1` and every order `r ∈ ℕ` with `r ≥ s` there is a finite
 constant `K` with `ω_r(φ, t)_2 ≤ K t^s` for all `0 < t ≤ 1`. The growth bound `T^n 1 ≤ 4^n`
 (`Daubechies.transferGrowth_two`) has the exponent `2 - log₄ 4 = 1`
-(`Daubechies.two_sub_logb_four_four`), so `Daubechies.modulus_scalingFun_two_le` applies. -/
-theorem modulus_scalingFun_two_le_order_two (m : Mask 2) {s : ℝ} {r : ℕ} (hs0 : 0 ≤ s)
+(`Daubechies.two_sub_logb_four_four`), so `Daubechies.smoothnessModulus_scalingFun_two_le`
+applies. -/
+theorem smoothnessModulus_scalingFun_two_le_order_two (m : Mask 2) {s : ℝ} {r : ℕ} (hs0 : 0 ≤ s)
     (hs : s < 1) (hsr : s ≤ r) :
     ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ t ∈ Set.Ioc (0 : ℝ) 1,
-      Rd.modulus volume r 2 (scalingFun m) t ≤ K * ENNReal.ofReal (t ^ s) :=
-  modulus_scalingFun_two_le m le_rfl transferGrowth_two hs0
+      Rd.smoothnessModulus volume r 2 (scalingFun m) t ≤ K * ENNReal.ofReal (t ^ s) :=
+  smoothnessModulus_scalingFun_two_le m le_rfl transferGrowth_two hs0
     (by rw [Nat.cast_ofNat, two_sub_logb_four_four]; exact hs) hsr
 
 /-- **The `L_p` modulus of the scaling function of order two, `p ≤ 2`**: for every Daubechies
 mask of order `N = 2`, every `p ≤ 2`, every real `s` with `0 ≤ s < 1` and every order `r ∈ ℕ`
 with `r ≥ s` there is a finite constant `K` with `ω_r(φ, t)_p ≤ K t^s` for all `0 < t ≤ 1`
-(`Daubechies.modulus_scalingFun_le_two` with the growth bound `Daubechies.transferGrowth_two`). -/
-theorem modulus_scalingFun_le_two_order_two (m : Mask 2) {p : ℝ≥0∞} (hp2 : p ≤ 2) {s : ℝ}
+(`Daubechies.smoothnessModulus_scalingFun_le_two` with the growth bound
+`Daubechies.transferGrowth_two`). -/
+theorem smoothnessModulus_scalingFun_le_two_order_two (m : Mask 2) {p : ℝ≥0∞} (hp2 : p ≤ 2) {s : ℝ}
     {r : ℕ} (hs0 : 0 ≤ s) (hs : s < 1) (hsr : s ≤ r) :
     ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ t ∈ Set.Ioc (0 : ℝ) 1,
-      Rd.modulus volume r p (scalingFun m) t ≤ K * ENNReal.ofReal (t ^ s) :=
-  modulus_scalingFun_le_two m le_rfl hp2 transferGrowth_two hs0
+      Rd.smoothnessModulus volume r p (scalingFun m) t ≤ K * ENNReal.ofReal (t ^ s) :=
+  smoothnessModulus_scalingFun_le_two m le_rfl hp2 transferGrowth_two hs0
     (by rw [Nat.cast_ofNat, two_sub_logb_four_four]; exact hs) hsr
 
 /-- **The `L²` modulus of the scaling function of order three**: for every Daubechies mask of
@@ -489,24 +496,24 @@ order `N = 3`, every real `s` with `0 ≤ s < 3 - log₂ 3 ≈ 1.415` and every 
 `r ≥ s` there is a finite constant `K` with `ω_r(φ, t)_2 ≤ K t^s` for all `0 < t ≤ 1`. The
 growth bound `T^n 1 ≤ 2 · 9^n` (`Daubechies.transferGrowth_three`) has the exponent
 `3 - log₄ 9 = 3 - log₂ 3` (`Daubechies.three_sub_logb_four_nine`), so
-`Daubechies.modulus_scalingFun_two_le` applies. -/
-theorem modulus_scalingFun_two_le_order_three (m : Mask 3) {s : ℝ} {r : ℕ} (hs0 : 0 ≤ s)
+`Daubechies.smoothnessModulus_scalingFun_two_le` applies. -/
+theorem smoothnessModulus_scalingFun_two_le_order_three (m : Mask 3) {s : ℝ} {r : ℕ} (hs0 : 0 ≤ s)
     (hs : s < 3 - Real.logb 2 3) (hsr : s ≤ r) :
     ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ t ∈ Set.Ioc (0 : ℝ) 1,
-      Rd.modulus volume r 2 (scalingFun m) t ≤ K * ENNReal.ofReal (t ^ s) :=
-  modulus_scalingFun_two_le m (by norm_num) transferGrowth_three hs0
+      Rd.smoothnessModulus volume r 2 (scalingFun m) t ≤ K * ENNReal.ofReal (t ^ s) :=
+  smoothnessModulus_scalingFun_two_le m (by norm_num) transferGrowth_three hs0
     (by rw [Nat.cast_ofNat, three_sub_logb_four_nine]; exact hs) hsr
 
 /-- **The `L_p` modulus of the scaling function of order three, `p ≤ 2`**: for every Daubechies
 mask of order `N = 3`, every `p ≤ 2`, every real `s` with `0 ≤ s < 3 - log₂ 3` and every order
 `r ∈ ℕ` with `r ≥ s` there is a finite constant `K` with `ω_r(φ, t)_p ≤ K t^s` for all
-`0 < t ≤ 1` (`Daubechies.modulus_scalingFun_le_two` with the growth bound
+`0 < t ≤ 1` (`Daubechies.smoothnessModulus_scalingFun_le_two` with the growth bound
 `Daubechies.transferGrowth_three`). -/
-theorem modulus_scalingFun_le_two_order_three (m : Mask 3) {p : ℝ≥0∞} (hp2 : p ≤ 2) {s : ℝ}
-    {r : ℕ} (hs0 : 0 ≤ s) (hs : s < 3 - Real.logb 2 3) (hsr : s ≤ r) :
+theorem smoothnessModulus_scalingFun_le_two_order_three (m : Mask 3) {p : ℝ≥0∞} (hp2 : p ≤ 2)
+    {s : ℝ} {r : ℕ} (hs0 : 0 ≤ s) (hs : s < 3 - Real.logb 2 3) (hsr : s ≤ r) :
     ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ t ∈ Set.Ioc (0 : ℝ) 1,
-      Rd.modulus volume r p (scalingFun m) t ≤ K * ENNReal.ofReal (t ^ s) :=
-  modulus_scalingFun_le_two m (by norm_num) hp2 transferGrowth_three hs0
+      Rd.smoothnessModulus volume r p (scalingFun m) t ≤ K * ENNReal.ofReal (t ^ s) :=
+  smoothnessModulus_scalingFun_le_two m (by norm_num) hp2 transferGrowth_three hs0
     (by rw [Nat.cast_ofNat, three_sub_logb_four_nine]; exact hs) hsr
 
 end Daubechies

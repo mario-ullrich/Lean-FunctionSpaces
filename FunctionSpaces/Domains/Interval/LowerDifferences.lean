@@ -80,12 +80,13 @@ theorem stepRegion_of_neg (m : ℕ) {t : ℝ} (ht : t < 0) : stepRegion m t = Ic
   have hmt : (m : ℝ) * t ≤ 0 := mul_nonpos_of_nonneg_of_nonpos (Nat.cast_nonneg m) ht.le
   rw [stepRegion, max_eq_right (by linarith), min_eq_left (by linarith)]
 
-/-- **The step region is a step set**: `J(m, t) = [0, 1]_{mt}` (`Rd.stepSet`), since `x + lt`,
+/-- **The step region is a step set**: `J(m, t) = [0, 1]_{mt}` (`Rd.diffStepSet`), since `x + lt`,
 `l ≤ m`, lies between `x` and `x + mt`. -/
-theorem stepRegion_eq_stepSet (m : ℕ) (t : ℝ) : stepRegion m t = Rd.stepSet (Icc 0 1) m t := by
+theorem stepRegion_eq_diffStepSet (m : ℕ) (t : ℝ) :
+    stepRegion m t = Rd.diffStepSet (Icc 0 1) m t := by
   ext x
   rw [mem_stepRegion]
-  simp only [Rd.stepSet, mem_ofPred_eq, smul_eq_mul]
+  simp only [Rd.diffStepSet, mem_ofPred_eq, smul_eq_mul]
   constructor
   · rintro ⟨⟨h0, h1⟩, h2, h3⟩ l hl
     have hl' : (l : ℝ) ≤ m := by exact_mod_cast hl
@@ -99,17 +100,17 @@ theorem stepRegion_eq_stepSet (m : ℕ) (t : ℝ) : stepRegion m t = Rd.stepSet 
 
 /-- **The norm of a difference depends only on the size of the step**:
 `‖Δ_t^m u‖_{L_p(step region)} = ‖Δ_{|t|}^m u‖_{L_p[0, 1 - m|t|]}`
-(`Rd.eLpNorm_indicator_stepSet_neg`). -/
+(`Rd.eLpNorm_indicator_diffStepSet_neg`). -/
 theorem eLpNorm_higherDiff_stepRegion_eq (u : ℝ → ℂ) (p : ℝ≥0∞) (m : ℕ) (t : ℝ) :
     eLpNorm (higherDiff m t u) p (volume.restrict (stepRegion m t)) =
       eLpNorm (higherDiff m |t| u) p (volume.restrict (Icc 0 (1 - m * |t|))) := by
-  rw [stepRegion_eq_stepSet, ← eLpNorm_indicator_eq_eLpNorm_restrict
-      (Rd.measurableSet_stepSet measurableSet_Icc m t).nullMeasurableSet,
-    ← eLpNorm_indicator_stepSet_Icc m (abs_nonneg t)]
+  rw [stepRegion_eq_diffStepSet, ← eLpNorm_indicator_eq_eLpNorm_restrict
+      (Rd.measurableSet_diffStepSet measurableSet_Icc m t).nullMeasurableSet,
+    ← eLpNorm_indicator_diffStepSet_Icc m (abs_nonneg t)]
   rcases le_or_gt 0 t with ht | ht
   · rw [abs_of_nonneg ht]
     rfl
-  · rw [abs_of_neg ht, ← Rd.eLpNorm_indicator_stepSet_neg, neg_neg]
+  · rw [abs_of_neg ht, ← Rd.eLpNorm_indicator_diffStepSet_neg, neg_neg]
     rfl
 
 /-! ### Tools for the local estimates -/

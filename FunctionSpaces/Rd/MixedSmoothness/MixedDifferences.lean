@@ -126,7 +126,7 @@ theorem eLpNorm_mixedDiff_le {f : (Fin d → ℝ) → ℂ} (hf : AEStronglyMeasu
     rw [mixedDiff_insert L hi, Finset.card_insert_of_notMem hi]
     calc eLpNorm ((fwdDiff (Pi.single i (h i)))^[L] (mixedDiff L e h f)) p volume
         ≤ 2 ^ L * eLpNorm (mixedDiff L e h f) p volume :=
-          eLpNorm_higherDiff_le (aestronglyMeasurable_mixedDiff hf L e h) hp L _
+          eLpNorm_higherDiff_le_two_pow_mul (aestronglyMeasurable_mixedDiff hf L e h) hp L _
       _ ≤ 2 ^ L * (2 ^ (L * e.card) * eLpNorm f p volume) := mul_le_mul' le_rfl ih
       _ = 2 ^ (L * (e.card + 1)) * eLpNorm f p volume := by
           rw [← mul_assoc, ← pow_add]

@@ -70,7 +70,7 @@ the tensor product of the one-dimensional ones (`Daubechies.tensorScaled_tensorK
   `f` that is a.e. the expansion of its own coefficients of level `j` and for `2^j t ≤ 1`,
   `ω_r(f, t)_p ≤ C_B sup_{ν, ‖H‖ ≤ 2^j t} ‖Δ_H^r G_ν‖_p ‖f‖_p` with `C_B = L_r^(1 - 1/p) C'`,
   `L_r = |ι| (⌈b - a + 2r⌉ + 1)^d`, independent of `j`, `t` and `f`
-  (`Daubechies.modulus_tensorExpand_le`, `Daubechies.tensorBernsteinConst`).
+  (`Daubechies.smoothnessModulus_tensorExpand_le`, `Daubechies.tensorBernsteinConst`).
 
 The norm on `ℝ^d` is the sup norm, so `‖H‖ ≤ 1` bounds every coordinate `|H_i|`.
 -/
@@ -1004,11 +1004,11 @@ and every `t` with `2^j t ≤ 1`,
 vanish outside `[a - r, b + r]^d`, and the upper estimate (`Daubechies.eLpNorm_tensorExpand_le`)
 and the coefficient estimate (`Daubechies.dyadicWeight_mul_lqNorm_tensorCoeff_le`) give the bound,
 with cancelling dyadic weights. -/
-theorem modulus_tensorExpand_le (hG : ∀ ν, AEStronglyMeasurable (G ν) volume)
+theorem smoothnessModulus_tensorExpand_le (hG : ∀ ν, AEStronglyMeasurable (G ν) volume)
     (hsupp : ∀ ν x, (∃ i, x i ∉ Set.Icc a b) → G ν x = 0) {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞)
     (r : ℕ) {j : ℕ} {f : (Fin d → ℝ) → ℂ} (hf : AEStronglyMeasurable f volume)
     (hfe : f =ᵐ[volume] tensorExpand G j (tensorCoeff G j f)) {t : ℝ} (ht : 2 ^ j * t ≤ 1) :
-    Rd.modulus volume r p f t ≤
+    Rd.smoothnessModulus volume r p f t ≤
       tensorBernsteinConst G a b p r *
         (⨆ (ν : ι) (H : Fin d → ℝ) (_ : ‖H‖ ≤ 2 ^ j * t),
           eLpNorm ((fwdDiff H)^[r] (G ν)) p volume) * eLpNorm f p volume := by
@@ -1016,7 +1016,7 @@ theorem modulus_tensorExpand_le (hG : ∀ ν, AEStronglyMeasurable (G ν) volume
   have : MeasurableSingletonClass ι := ⟨fun _ => MeasurableSpace.measurableSet_top⟩
   set S := ⨆ (ν : ι) (H : Fin d → ℝ) (_ : ‖H‖ ≤ 2 ^ j * t),
     eLpNorm ((fwdDiff H)^[r] (G ν)) p volume
-  rw [Rd.modulus_congr_ae hfe]
+  rw [Rd.smoothnessModulus_congr_ae hfe]
   refine iSup₂_le fun h hh => ?_
   have h2 : (0 : ℝ) < 2 ^ j := by positivity
   have hH : ‖(2 : ℝ) ^ j • h‖ ≤ 2 ^ j * t := by

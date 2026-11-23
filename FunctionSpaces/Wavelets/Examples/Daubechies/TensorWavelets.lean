@@ -90,7 +90,7 @@ end Cube
 
 namespace Rd
 
-open TranslationAlgebra (count shiftVec sum_count)
+open TranslationAlgebra (letterCount shiftVec sum_letterCount)
 
 variable {d : ℕ}
 
@@ -139,7 +139,7 @@ theorem eLpNorm_higherDiff_tensorKernel_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp 
     eLpNorm ((fwdDiff h)^[r] (tensorKernel K)) p volume ≤
       (d : ℝ≥0∞) ^ r * A ^ d * ENNReal.ofReal (‖h‖ ^ Θ) := by
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one hp1).ne'
-  set G : (Fin r → Fin d) → Fin d → ℝ → ℂ := fun α i => (fwdDiff (h i))^[count α i] (K i)
+  set G : (Fin r → Fin d) → Fin d → ℝ → ℂ := fun α i => (fwdDiff (h i))^[letterCount α i] (K i)
   have hG : ∀ α, AEStronglyMeasurable (tensorKernel (G α)) := fun α =>
     aestronglyMeasurable_tensorKernel fun i => aestronglyMeasurable_higherDiff (hK i) _ _
   have hsum : (fwdDiff h)^[r] (tensorKernel K) =
@@ -156,8 +156,8 @@ theorem eLpNorm_higherDiff_tensorKernel_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp 
     rw [eLpNorm_comp_add_right (hG α), eLpNorm_tensorKernel hp0 hp fun i =>
       aestronglyMeasurable_higherDiff (hK i) _ _,
       ← ENNReal.ofReal_rpow_of_nonneg (norm_nonneg h) hΘ0]
-    exact (prod_eLpNorm_higherDiff_le hθ hb hh (Cube.count_le α)).trans (mul_le_mul_right
-      (ENNReal.rpow_le_rpow_of_exponent_ge hA1 (hΘ _ (sum_count α))) _)
+    exact (prod_eLpNorm_higherDiff_le hθ hb hh (Cube.letterCount_le α)).trans (mul_le_mul_right
+      (ENNReal.rpow_le_rpow_of_exponent_ge hA1 (hΘ _ (sum_letterCount α))) _)
   rw [hsum]
   refine (eLpNorm_sum_le hp1).trans ((Finset.sum_le_sum fun α _ => hword α).trans_eq ?_)
   rw [Finset.sum_const, Finset.card_univ, Fintype.card_fun, Fintype.card_fin, Fintype.card_fin,
@@ -283,7 +283,7 @@ theorem integral_tensorGen_translate_mul_conj_translate (hN : 2 ≤ N) (e e' : F
 the scaling function this is a Bernstein bound (`Daubechies.bernsteinBound_iff_modulusBound`). -/
 def ModulusBound (g : ℝ → ℂ) (p : ℝ≥0∞) (θ : ℝ) (r : ℕ) : Prop :=
   ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ t ∈ Set.Ioc (0 : ℝ) 1,
-    Rd.modulus volume r p g t ≤ K * ENNReal.ofReal (t ^ θ)
+    Rd.smoothnessModulus volume r p g t ≤ K * ENNReal.ofReal (t ^ θ)
 
 /-- A Bernstein bound (`Daubechies.BernsteinBound`) is a modulus bound for the scaling
 function. -/
@@ -292,11 +292,11 @@ theorem bernsteinBound_iff_modulusBound {p : ℝ≥0∞} {θ : ℝ} {r : ℕ} :
 
 /-- **From dyadic scales to all scales**: if `θ ≥ 0` and `ω_r(g, 2^(-k))_p ≤ B 2^(-kθ)` for every
 `k ∈ ℕ` with `B < ∞`, then `g` has a modulus bound of order `θ` with differences of order `r`:
-for `2^(-k-1) < t ≤ 2^(-k)` the modulus increases in `t` (`Rd.modulus_mono`) and
+for `2^(-k-1) < t ≤ 2^(-k)` the modulus increases in `t` (`Rd.smoothnessModulus_mono`) and
 `2^(-kθ) ≤ 2^θ t^θ`. -/
 theorem modulusBound_of_dyadic {g : ℝ → ℂ} {p : ℝ≥0∞} {θ : ℝ} (hθ : 0 ≤ θ) {r : ℕ}
     {B : ℝ≥0∞} (hB : B ≠ ∞)
-    (h : ∀ k : ℕ, Rd.modulus volume r p g (1 / 2 ^ k) ≤ B * dyadicWeight (-θ) k) :
+    (h : ∀ k : ℕ, Rd.smoothnessModulus volume r p g (1 / 2 ^ k) ≤ B * dyadicWeight (-θ) k) :
     ModulusBound g p θ r := by
   refine ⟨ENNReal.ofReal (2 ^ θ) * B, ENNReal.mul_ne_top ENNReal.ofReal_ne_top hB,
     fun t ht => ?_⟩
@@ -309,8 +309,8 @@ theorem modulusBound_of_dyadic {g : ℝ → ℂ} {p : ℝ≥0∞} {θ : ℝ} (h�
     rw [div_lt_iff₀ ht.1, pow_succ] at hk2
     rw [div_le_iff₀ h2k]
     linarith
-  calc Rd.modulus volume r p g t ≤ Rd.modulus volume r p g (1 / 2 ^ k) :=
-        Rd.modulus_mono r p g htk
+  calc Rd.smoothnessModulus volume r p g t ≤ Rd.smoothnessModulus volume r p g (1 / 2 ^ k) :=
+        Rd.smoothnessModulus_mono r p g htk
     _ ≤ B * ENNReal.ofReal ((1 / 2 ^ k) ^ θ) := by
         rw [ENNReal.ofReal_one_div_two_pow_rpow]
         exact h k
@@ -332,8 +332,8 @@ theorem ModulusBound.of_order {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞)
   obtain ⟨K, hK, hmod⟩ := hB
   obtain ⟨C, hC, hle⟩ := Rd.modNorm_le_modNorm_of_lt (V := ℝ) hp r hθ'0 hθ'r (q := ∞) le_top
   set F := hg.toLp g
-  have hF : ∀ n k, Rd.lpModulus p n F k = Rd.modulus volume n p g (1 / 2 ^ k) := fun n k =>
-    Rd.modulus_congr_ae hg.coeFn_toLp n p _
+  have hF : ∀ n k, Rd.lpModulus p n F k = Rd.smoothnessModulus volume n p g (1 / 2 ^ k) :=
+    fun n k => Rd.smoothnessModulus_congr_ae hg.coeFn_toLp n p _
   have hsup : lqNorm ∞ (fun k => dyadicWeight θ' k * Rd.lpModulus p r F k) ≤ K := by
     rw [ENNReal.lqNorm_top]
     refine iSup_le fun k => ?_
@@ -354,7 +354,7 @@ theorem ModulusBound.of_order {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞)
   have h1 : dyadicWeight θ' k * Rd.lpModulus p r' F k ≤ C * (‖F‖ₑ + K) :=
     ((ENNReal.le_lqNorm ENNReal.top_ne_zero _ k).trans le_add_self).trans
       ((hle F).trans (by gcongr))
-  calc Rd.modulus volume r' p g (1 / 2 ^ k)
+  calc Rd.smoothnessModulus volume r' p g (1 / 2 ^ k)
       = dyadicWeight (-θ') k * (dyadicWeight θ' k * Rd.lpModulus p r' F k) := by
         rw [← mul_assoc, ENNReal.dyadicWeight_neg_mul_self, one_mul, hF]
     _ ≤ dyadicWeight (-θ') k * (C * (‖F‖ₑ + K)) := by gcongr
@@ -363,7 +363,7 @@ theorem ModulusBound.of_order {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞)
 /-- **Steps from a modulus bound**: if `g` has a modulus bound of order `θ` with differences of
 order `r ≥ 1`, there is a constant `K < ∞` with `‖Δ_t^r g‖_p ≤ K |t|^θ` for every `|t| ≤ 1`:
 for `t ≠ 0` the step `t` is admissible for the modulus at `|t| ∈ (0, 1]`
-(`Rd.eLpNorm_higherDiff_le_modulus`), and `Δ_0^r g = 0`. -/
+(`Rd.eLpNorm_higherDiff_le_smoothnessModulus`), and `Δ_0^r g = 0`. -/
 theorem ModulusBound.exists_eLpNorm_le {g : ℝ → ℂ} {p : ℝ≥0∞} {θ : ℝ} {r : ℕ}
     (hB : ModulusBound g p θ r) (hr : r ≠ 0) :
     ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ t : ℝ, |t| ≤ 1 →
@@ -375,7 +375,7 @@ theorem ModulusBound.exists_eLpNorm_le {g : ℝ → ℂ} {p : ℝ≥0∞} {θ : 
     rw [Function.iterate_succ_apply', show fwdDiff (0 : ℝ) ((fwdDiff 0)^[n] g) = 0 from
       funext fun x => by simp [fwdDiff], eLpNorm_zero]
     exact zero_le
-  · exact (Rd.eLpNorm_higherDiff_le_modulus (by rw [Real.norm_eq_abs])).trans
+  · exact (Rd.eLpNorm_higherDiff_le_smoothnessModulus (by rw [Real.norm_eq_abs])).trans
       (hmod |t| ⟨abs_pos.2 ht0, ht⟩)
 
 /-- **Steps of every order from a modulus bound**: let `1 ≤ p < ∞`, `g ∈ L_p(ℝ)` with a modulus
@@ -428,28 +428,28 @@ theorem toLp_wavelet_mem_scalingSpace (hN : 2 ≤ N) {p : ℝ≥0∞} [Fact (1 �
 Bernstein bound of order `θ` with differences of order `r` (`Daubechies.BernsteinBound`). Then
 the wavelet `ψ` has a modulus bound of order `θ` with differences of order `r`. Since `ψ ∈ V_1`
 (`Daubechies.toLp_wavelet_mem_scalingSpace`), Bernstein's inequality
-(`Daubechies.modulus_mem_scalingSpace_le` with `j = 1`) gives
+(`Daubechies.smoothnessModulus_mem_scalingSpace_le` with `j = 1`) gives
 `ω_r(ψ, t)_p ≤ C ω_r(φ, 2t)_p ‖ψ‖_p ≤ C K (2t)^θ ‖ψ‖_p` for `t ≤ 1/2`, and
-`ω_r(ψ, t)_p ≤ 2^r ‖ψ‖_p ≤ 2^r (2t)^θ ‖ψ‖_p` for `1/2 < t ≤ 1` (`Rd.modulus_le`). -/
+`ω_r(ψ, t)_p ≤ 2^r ‖ψ‖_p ≤ 2^r (2t)^θ ‖ψ‖_p` for `1/2 < t ≤ 1` (`Rd.smoothnessModulus_le`). -/
 theorem modulusBound_wavelet (hN : 2 ≤ N) {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞) {θ : ℝ}
     {r : ℕ} (hθ : 0 ≤ θ) (hB : BernsteinBound m p θ r) : ModulusBound (wavelet m) p θ r := by
   obtain ⟨K, hK, hmod⟩ := hB
   set a := (memLp_wavelet m hN p).toLp _
   refine ⟨ENNReal.ofReal (2 ^ θ) * (bernsteinConst m p r * K + 2 ^ r) * ‖a‖ₑ,
     by finiteness [bernsteinConst_ne_top m hN p r], fun t ht => ?_⟩
-  rw [← Rd.modulus_congr_ae (MemLp.coeFn_toLp (memLp_wavelet m hN p)) r p t]
+  rw [← Rd.smoothnessModulus_congr_ae (MemLp.coeFn_toLp (memLp_wavelet m hN p)) r p t]
   have h2t : ENNReal.ofReal ((2 * t) ^ θ) = ENNReal.ofReal (2 ^ θ) * ENNReal.ofReal (t ^ θ) := by
     rw [Real.mul_rpow zero_le_two ht.1.le, ENNReal.ofReal_mul (by positivity)]
-  suffices h : Rd.modulus volume r p (a : ℝ → ℂ) t ≤
+  suffices h : Rd.smoothnessModulus volume r p (a : ℝ → ℂ) t ≤
       (bernsteinConst m p r * K + 2 ^ r) * ENNReal.ofReal ((2 * t) ^ θ) * ‖a‖ₑ by
     refine h.trans_eq ?_
     rw [h2t]
     ring
   rcases le_or_gt (2 * t) 1 with h2 | h2
-  · refine (modulus_mem_scalingSpace_le m hN hp r (toLp_wavelet_mem_scalingSpace m hN hp)
+  · refine (smoothnessModulus_mem_scalingSpace_le m hN hp r (toLp_wavelet_mem_scalingSpace m hN hp)
       (by rwa [pow_one])).trans ?_
     rw [pow_one]
-    calc bernsteinConst m p r * Rd.modulus volume r p (scalingFun m) (2 * t) * ‖a‖ₑ
+    calc bernsteinConst m p r * Rd.smoothnessModulus volume r p (scalingFun m) (2 * t) * ‖a‖ₑ
         ≤ bernsteinConst m p r * (K * ENNReal.ofReal ((2 * t) ^ θ)) * ‖a‖ₑ := by
           gcongr
           exact hmod _ ⟨by linarith [ht.1], h2⟩
@@ -460,9 +460,9 @@ theorem modulusBound_wavelet (hN : 2 ≤ N) {p : ℝ≥0∞} [Fact (1 ≤ p)] (h
   · have h1 : 1 ≤ ENNReal.ofReal ((2 * t) ^ θ) := by
       rw [← ENNReal.ofReal_one]
       exact ENNReal.ofReal_le_ofReal (Real.one_le_rpow h2.le hθ)
-    calc Rd.modulus volume r p (a : ℝ → ℂ) t ≤ 2 ^ r * ‖a‖ₑ := by
+    calc Rd.smoothnessModulus volume r p (a : ℝ → ℂ) t ≤ 2 ^ r * ‖a‖ₑ := by
           rw [Lp.enorm_def]
-          exact Rd.modulus_le (Lp.aestronglyMeasurable a) Fact.out r t
+          exact Rd.smoothnessModulus_le (Lp.aestronglyMeasurable a) Fact.out r t
       _ ≤ (bernsteinConst m p r * K + 2 ^ r) * ENNReal.ofReal ((2 * t) ^ θ) * ‖a‖ₑ := by
           gcongr
           calc (2 : ℝ≥0∞) ^ r ≤ bernsteinConst m p r * K + 2 ^ r := le_add_self

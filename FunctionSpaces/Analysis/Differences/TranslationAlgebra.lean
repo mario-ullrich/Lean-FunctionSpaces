@@ -22,8 +22,8 @@ On `ℝ^d = Fin d → ℝ`, with `δ_i = δ_{h_i e_i}`, `δ_h = ∏_i δ_i` and
 `δ_h - 1 = ∑_i (δ_i - 1) ∏_{j<i} δ_j` (`TranslationAlgebra.single_sub_one_eq_sum`, from Mathlib's
 `Finset.prod_add_ordered`). The `r`-th power is a sum over the words `α : Fin r → Fin d`,
 `(δ_h - 1)^r = ∑_α δ_{s_α} ∏_i (δ_i - 1)^{m_i(α)}` (`TranslationAlgebra.single_sub_one_pow_eq_sum`),
-with the multiplicities `m_i(α) = #α⁻¹(i)` of total `r` (`TranslationAlgebra.count`,
-`TranslationAlgebra.sum_count`) and the shifts `(s_α)_i = h_i #{l : i < α_l}`
+with the multiplicities `m_i(α) = #α⁻¹(i)` of total `r` (`TranslationAlgebra.letterCount`,
+`TranslationAlgebra.sum_letterCount`) and the shifts `(s_α)_i = h_i #{l : i < α_l}`
 (`TranslationAlgebra.shiftVec`, `TranslationAlgebra.shiftVec_apply`).
 -/
 
@@ -103,12 +103,12 @@ noncomputable def coordElem (h : Fin d → ℝ) (i : Fin d) : AddMonoidAlgebra �
   AddMonoidAlgebra.single (Pi.single i (h i)) 1 - 1
 
 /-- The multiplicities `m_i(α) = #{l : α_l = i}` of a word `α : Fin r → Fin d`. -/
-def count {r : ℕ} (α : Fin r → Fin d) (i : Fin d) : ℕ :=
+def letterCount {r : ℕ} (α : Fin r → Fin d) (i : Fin d) : ℕ :=
   (Finset.univ.filter fun l => α l = i).card
 
 /-- The multiplicities of a word add up to its length. -/
-theorem sum_count {r : ℕ} (α : Fin r → Fin d) : ∑ i, count α i = r := by
-  simp only [count]
+theorem sum_letterCount {r : ℕ} (α : Fin r → Fin d) : ∑ i, letterCount α i = r := by
+  simp only [letterCount]
   rw [← Finset.card_eq_sum_card_fiberwise (fun l _ => Finset.mem_univ (α l)), Finset.card_univ,
     Fintype.card_fin]
 
@@ -126,9 +126,9 @@ theorem shiftVec_apply {r : ℕ} (h : Fin d → ℝ) (α : Fin r → Fin d) (c :
 
 /-- The shift and the multiplicity of a coordinate add up to at most the length of the word:
 `#{l : c < α_l} + #{l : α_l = c} ≤ r`. -/
-theorem card_lt_add_count_le {r : ℕ} (α : Fin r → Fin d) (c : Fin d) :
-    (Finset.univ.filter fun l => c < α l).card + count α c ≤ r := by
-  rw [count, ← Finset.card_union_of_disjoint]
+theorem card_lt_add_letterCount_le {r : ℕ} (α : Fin r → Fin d) (c : Fin d) :
+    (Finset.univ.filter fun l => c < α l).card + letterCount α c ≤ r := by
+  rw [letterCount, ← Finset.card_union_of_disjoint]
   · calc _ ≤ (Finset.univ : Finset (Fin r)).card := Finset.card_le_univ _
       _ = r := by rw [Finset.card_univ, Fintype.card_fin]
   · rw [Finset.disjoint_filter]
@@ -169,7 +169,7 @@ theorem single_sub_one_eq_sum (h : Fin d → ℝ) :
 `α : Fin r → Fin d`. -/
 theorem single_sub_one_pow_eq_sum (r : ℕ) (h : Fin d → ℝ) :
     (AddMonoidAlgebra.single h (1 : ℂ) - 1) ^ r = ∑ α : Fin r → Fin d,
-      AddMonoidAlgebra.single (shiftVec h α) 1 * ∏ i, coordElem h i ^ count α i := by
+      AddMonoidAlgebra.single (shiftVec h α) 1 * ∏ i, coordElem h i ^ letterCount α i := by
   classical
   rw [single_sub_one_eq_sum, ← Fin.prod_const, Finset.prod_univ_sum, Fintype.piFinset_univ]
   refine Finset.sum_congr rfl fun α _ => ?_
@@ -179,7 +179,7 @@ theorem single_sub_one_pow_eq_sum (r : ℕ) (h : Fin d → ℝ) :
   · rw [← Finset.prod_fiberwise Finset.univ α fun l => coordElem h (α l)]
     refine Finset.prod_congr rfl fun i _ => ?_
     rw [Finset.prod_congr rfl fun l hl => by rw [(Finset.mem_filter.1 hl).2],
-      Finset.prod_const, count]
+      Finset.prod_const, letterCount]
 
 end Coordinates
 

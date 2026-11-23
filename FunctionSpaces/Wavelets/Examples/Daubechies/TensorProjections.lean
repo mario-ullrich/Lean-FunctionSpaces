@@ -65,8 +65,8 @@ and the **wavelet part of level `j`** is `Q_j f = ∑_{e ≠ ∅} ∑_k ⟨f, Ψ
 * **The inverse inequality.** If `‖Δ_h^N Φ‖_p ≤ K ‖h‖^θ` for `‖h‖ ≤ 1`, then
   `ω_N(a, 2^(-k))_p ≤ C K 2^(-(k-j)θ) ‖a‖_p` for every `a ∈ V_j` and `k ≥ j`
   (`Daubechies.lpModulus_le_of_mem_tensorScalingSpace`), from Bernstein's inequality for
-  expansions (`Daubechies.modulus_tensorExpand_le`). If `φ` has a Bernstein bound of order `θ`
-  with differences of order `N` and `0 ≤ θ' ≤ θ`, `θ' < N`, the moduli of the generators give
+  expansions (`Daubechies.smoothnessModulus_tensorExpand_le`). If `φ` has a Bernstein bound of order
+  `θ` with differences of order `N` and `0 ≤ θ' ≤ θ`, `θ' < N`, the moduli of the generators give
   such a bound with `θ'` (`Daubechies.eLpNorm_higherDiff_tensorGen_le`), hence the inverse
   inequality of the scheme (`Daubechies.tensor_inverse_scheme`).
 
@@ -854,7 +854,7 @@ all levels `j ≤ k` and every `a ∈ V_j`, `ω_N(a, 2^(-k))_p ≤ C K 2^(-(k-j)
 constant `C` of Bernstein's inequality for the scaling family
 (`Daubechies.tensorBernsteinConst`). The element `a` is almost everywhere the expansion of its
 own coefficients of level `j` (`Daubechies.tensorProj_eq_self_of_mem`), so Bernstein's inequality
-for expansions (`Daubechies.modulus_tensorExpand_le`) applies at `t = 2^(-k)`, where
+for expansions (`Daubechies.smoothnessModulus_tensorExpand_le`) applies at `t = 2^(-k)`, where
 `2^j t = 2^(-(k-j)) ≤ 1` bounds the steps `H`. -/
 theorem lpModulus_le_of_mem_tensorScalingSpace (hN : 2 ≤ N) (hp : p ≠ ∞) {θ : ℝ} (hθ : 0 ≤ θ)
     {K : ℝ≥0∞} (hK : ∀ h : Fin d → ℝ, ‖h‖ ≤ 1 →
@@ -876,12 +876,14 @@ theorem lpModulus_le_of_mem_tensorScalingSpace (hN : 2 ≤ N) (hp : p ≠ ∞) {
     refine iSup_le fun _ => iSup₂_le fun H hH => (hK H (hH.trans ht1)).trans ?_
     rw [← ENNReal.ofReal_one_div_two_pow_rpow, ← ht]
     gcongr
-  calc Rd.lpModulus p N a k = Rd.modulus volume N p (a : (Fin d → ℝ) → ℂ) (1 / 2 ^ k) := rfl
+  calc Rd.lpModulus p N a k
+    _ = Rd.smoothnessModulus volume N p (a : (Fin d → ℝ) → ℂ) (1 / 2 ^ k) := rfl
     _ ≤ tensorBernsteinConst (tensorScalingFamily m d) (1 - N) (2 * N - 1) p N *
           (⨆ (ν : Unit) (H : Fin d → ℝ) (_ : ‖H‖ ≤ 2 ^ j * (1 / 2 ^ k)),
             eLpNorm ((fwdDiff H)^[N] (tensorScalingFamily m d ν)) p volume) * ‖a‖ₑ := by
         rw [Lp.enorm_def]
-        exact modulus_tensorExpand_le (fun _ => (continuous_tensorGen m hN ∅).aestronglyMeasurable)
+        exact smoothnessModulus_tensorExpand_le
+          (fun _ => (continuous_tensorGen m hN ∅).aestronglyMeasurable)
           (fun _ _ hx => tensorGen_eq_zero m hN ∅ hx) Fact.out hp N (Lp.aestronglyMeasurable a)
           hae ht1
     _ ≤ tensorBernsteinConst (tensorScalingFamily m d) (1 - N) (2 * N - 1) p N *

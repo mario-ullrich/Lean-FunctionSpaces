@@ -2592,7 +2592,8 @@ where the integrand on the right is integrable by \Cref{thm:daub-decay-l2}. Take
 
 \begin{proposition}[The $L_2$ modulus of the scaling function]
 \label{prop:daub-modulus-l2}
-\lean{Daubechies.modulus_scalingFun_two_le_mul_rpow, Daubechies.modulus_scalingFun_two_le}
+\lean{Daubechies.smoothnessModulus_scalingFun_two_le_mul_rpow,
+  Daubechies.smoothnessModulus_scalingFun_two_le}
 \leanok
 \uses{def:daub-scaling-function, def:daub-transfer-growth, def:rd-modulus}
 Let $\lambda, C$ be a growth bound for the transfer operator of order $N \geq 2$, and let
@@ -2645,7 +2646,7 @@ bound.
 \begin{lemma}[The $L_p$ modulus by the $L_2$ modulus]
 \label{lem:daub-modulus-lp-l2}
 \lean{Daubechies.higherDiff_scalingFun_eq_zero, Daubechies.eLpNorm_higherDiff_scalingFun_le_two,
-  Daubechies.modulus_scalingFun_le_modulus_two}
+  Daubechies.smoothnessModulus_scalingFun_le_smoothnessModulus_two}
 \leanok
 \uses{def:daub-scaling-function, def:rd-modulus}
 For every Daubechies mask of order $N \geq 2$, every $r \in \N$ and every $h \in \R$ with
@@ -2672,7 +2673,7 @@ supremum over $|h| \leq t$, with $\|\Delta_h^r \varphi\|_2 \leq \omega_r(\varphi
 
 \begin{theorem}[The $L_p$ modulus of the scaling function, $p \leq 2$]
 \label{thm:daub-modulus-lp}
-\lean{Daubechies.modulus_scalingFun_le_two}
+\lean{Daubechies.smoothnessModulus_scalingFun_le_two}
 \leanok
 \uses{def:daub-scaling-function, def:daub-transfer-growth, def:rd-modulus}
 Let $\lambda, C$ be a growth bound for the transfer operator of order $N \geq 2$, let
@@ -2690,10 +2691,10 @@ $K = (2N - 1 + 2r)^{1/p - 1/2} K_2$ with the constant $K_2$ of the $L_2$ bound.
 
 \begin{corollary}[Orders two and three]
 \label{cor:daub-modulus-orders-two-three}
-\lean{Daubechies.modulus_scalingFun_two_le_order_two,
-  Daubechies.modulus_scalingFun_le_two_order_two,
-  Daubechies.modulus_scalingFun_two_le_order_three,
-  Daubechies.modulus_scalingFun_le_two_order_three}
+\lean{Daubechies.smoothnessModulus_scalingFun_two_le_order_two,
+  Daubechies.smoothnessModulus_scalingFun_le_two_order_two,
+  Daubechies.smoothnessModulus_scalingFun_two_le_order_three,
+  Daubechies.smoothnessModulus_scalingFun_le_two_order_three}
 \leanok
 \uses{def:daub-scaling-function, def:rd-modulus}
 Let $0 < p \leq 2$, and let $s \in \R$ and $r \in \N$ with $0 \leq s \leq r$. For every
@@ -2856,7 +2857,7 @@ $\theta = (2/p) s + (1 - 2/p) a$.
 
 \begin{lemma}[The uniform modulus from a pointwise bound]
 \label{lem:daub-modulus-top-pointwise}
-\lean{Daubechies.eLpNorm_top_le_of_norm_le, Daubechies.modulus_top_le_of_norm_le}
+\lean{Daubechies.eLpNorm_top_le_of_norm_le, Daubechies.smoothnessModulus_top_le_of_norm_le}
 \leanok
 \uses{def:rd-modulus}
 On every measure space, for every $B \in \R$, every measurable function $g$ with values in a
@@ -2876,7 +2877,7 @@ $K |h|^a \leq K t^a$, since $a \geq 0$.
 
 \begin{proposition}[The uniform modulus of the scaling function]
 \label{prop:daub-modulus-top}
-\lean{Daubechies.modulus_scalingFun_top_le}
+\lean{Daubechies.smoothnessModulus_scalingFun_top_le}
 \leanok
 \uses{def:daub-scaling-function, def:daub-transfer-growth, def:rd-modulus}
 Let $\lambda, C$ be a growth bound for the transfer operator of order $N$, and let $a \in \R$ and
@@ -2919,8 +2920,9 @@ from the rules for powers in $[0, \infty]$ with nonnegative exponents.
 
 \begin{theorem}[The $L_p$ modulus of the scaling function, $p \geq 2$]
 \label{thm:daub-modulus-interp}
-\lean{Daubechies.modulus_le_of_norm_le_of_eLpNorm_two_le,
-  Daubechies.modulus_scalingFun_interp_of_norm_le, Daubechies.modulus_scalingFun_interp}
+\lean{Daubechies.smoothnessModulus_le_of_norm_le_of_eLpNorm_two_le,
+  Daubechies.smoothnessModulus_scalingFun_interp_of_norm_le,
+  Daubechies.smoothnessModulus_scalingFun_interp}
 \leanok
 \uses{def:daub-scaling-function, def:daub-transfer-growth, def:rd-modulus}
 Let $\lambda, C$ be a growth bound for the transfer operator of order $N \geq 2$, let
@@ -2972,8 +2974,8 @@ in every $L_p$, $0 < p \leq \infty$.
 
 \begin{corollary}[Orders two and three, $p \geq 2$]
 \label{cor:daub-modulus-interp-orders-two-three}
-\lean{Daubechies.modulus_scalingFun_interp_order_two,
-  Daubechies.modulus_scalingFun_interp_order_three}
+\lean{Daubechies.smoothnessModulus_scalingFun_interp_order_two,
+  Daubechies.smoothnessModulus_scalingFun_interp_order_three}
 \leanok
 \uses{def:daub-scaling-function, def:rd-modulus}
 Let $2 \leq p \leq \infty$, let $s, a \in \R$ and $r \in \N$ with $0 \leq s \leq r$ and
@@ -2997,7 +2999,8 @@ method enters the interpolation as well.
 
 \begin{corollary}[The $L_p$ modulus from a H\"older estimate]
 \label{cor:daub-modulus-interp-holder}
-\lean{Daubechies.norm_iterate_fwdDiff_le_of_holder, Daubechies.modulus_scalingFun_interp_of_holder}
+\lean{Daubechies.norm_iterate_fwdDiff_le_of_holder,
+  Daubechies.smoothnessModulus_scalingFun_interp_of_holder}
 \leanok
 \uses{def:daub-scaling-function, def:daub-transfer-growth, def:rd-modulus}
 Let $\lambda, C$ be a growth bound for the transfer operator of order $N \geq 2$, let
@@ -4693,7 +4696,7 @@ every point of $\R$, and its bounds hold on the whole line with the modulus of $
 
 \begin{proposition}[Steklov smoothing on the line]
 \label{prop:daub-steklov-line}
-\lean{Daubechies.eLpNorm_higherDiff_le_modulus_of_nonneg,
+\lean{Daubechies.eLpNorm_higherDiff_le_smoothnessModulus_of_nonneg,
   Daubechies.eLpNorm_sub_smooth_le_modulus, Daubechies.eLpNorm_iteratedDeriv_smooth_le_modulus,
   Daubechies.memLp_smooth, Daubechies.memLp_iteratedDeriv_smooth}
 \leanok
@@ -4820,7 +4823,7 @@ constant $C_I$ is finite (\Cref{prop:daub-proj-cell-bound}).
 \lean{Daubechies.eLpNorm_sub_smooth_le_dyadic, Daubechies.ofReal_one_div_mul_two_pow_inv_pow,
   Daubechies.eLpNorm_iteratedDeriv_smooth_le_dyadic, Daubechies.eLpNorm_sub_projFun_le_add,
   Daubechies.jacksonConst, Daubechies.jacksonConst_ne_top, Daubechies.add_le_jacksonConst_mul,
-  Daubechies.eLpNorm_sub_projFun_le_modulus, Daubechies.enorm_sub_proj_le_of_continuous}
+  Daubechies.eLpNorm_sub_projFun_le_smoothnessModulus, Daubechies.enorm_sub_proj_le_of_continuous}
 \leanok
 \uses{def:daub-proj-fun, def:daub-proj, def:rd-modulus}
 Let $N \geq 2$ and $1 \leq p < \infty$, and let $C_J = 1 + C_P + 2^N N^N C_S$. Then
@@ -4917,7 +4920,7 @@ term.
 \begin{theorem}[Bernstein's inequality]
 \label{thm:daub-bernstein}
 \lean{Daubechies.natCeil_higherDiff_support_add_one, Daubechies.bernsteinConst,
-  Daubechies.bernsteinConst_ne_top, Daubechies.modulus_mem_scalingSpace_le}
+  Daubechies.bernsteinConst_ne_top, Daubechies.smoothnessModulus_mem_scalingSpace_le}
 \leanok
 \uses{def:daub-scaling-space, def:rd-modulus}
 Let $N \geq 2$, $1 \leq p < \infty$ and $r \in \N$, and let
@@ -5413,8 +5416,8 @@ $3 - \log_4 9 = 3 - \log_2 3$ (\Cref{prop:daub-transfer-three}).
 \begin{proposition}[Besov seminorms of the scaling function of order three]
 \label{prop:daub-besov-seminorm-order-three}
 \lean{Daubechies.lqNorm_dyadicWeight_mul_lt_top_of_le_rpow,
-  Daubechies.BernsteinBound.lqNorm_modulus_lt_top,
-  Daubechies.lqNorm_modulus_scalingFun_lt_top_order_three}
+  Daubechies.BernsteinBound.lqNorm_smoothnessModulus_lt_top,
+  Daubechies.lqNorm_smoothnessModulus_scalingFun_lt_top_order_three}
 \leanok
 \uses{def:daub-scaling-function, def:rd-modulus, def:lq-norm}
 Let $\varphi$ be the scaling function of a Daubechies mask of order $3$, let $0 < p \leq 2$,
@@ -6609,7 +6612,7 @@ $\Delta_{2^j h}^i G_\nu$ vanishes outside a cube, so the differences may be take
 \begin{theorem}[Bernstein's inequality for expansions on \texorpdfstring{$\R^d$}{R\^{}d}]
 \label{thm:daub-rd-expansion-moduli}
 \lean{Daubechies.tensorBernsteinConst, Daubechies.tensorBernsteinConst_ne_top,
-  Daubechies.modulus_tensorExpand_le}
+  Daubechies.smoothnessModulus_tensorExpand_le}
 \leanok
 \uses{def:daub-rd-expansions, def:rd-modulus}
 Let $1 \leq p < \infty$ and $r \in \N$, and let the generators $G_\nu$, $\nu \in I$, be
@@ -7176,8 +7179,8 @@ norm $\|x\| = \max_i |x_i|$, and $f_{x,i}$ is the slice of $f$ through $x$ in co
 
 \begin{lemma}[Smoothing in one coordinate on \texorpdfstring{$\R^d$}{R\^{}d}]
 \label{lem:rd-coordinate-smoothing}
-\lean{Cube.eLpNorm_cubeDiff_le_modulus, Cube.eLpNorm_sub_cubeSmooth_le_modulus,
-  Cube.eLpNorm_cubeSmoothDeriv_le_modulus}
+\lean{Cube.eLpNorm_cubeDiff_le_smoothnessModulus, Cube.eLpNorm_sub_cubeSmooth_le_smoothnessModulus,
+  Cube.eLpNorm_cubeSmoothDeriv_le_smoothnessModulus}
 \leanok
 \uses{lem:cube-smoothing, def:rd-modulus}
 Let $f : \R^d \to \C$, $r \in \N$ and $i$ a coordinate. For every $p$ and all $h, t \in \R$ with
@@ -7346,7 +7349,7 @@ and both $1$ and $C_P$ are at most $1 + C_P$.
 \begin{proposition}[Jackson's inequality in all coordinates]
 \label{prop:daub-rd-fold-direct}
 \lean{Daubechies.tensorJacksonConst, Daubechies.tensorJacksonConst_ne_top,
-  Daubechies.eLpNorm_sub_foldSliceProj_le_modulus}
+  Daubechies.eLpNorm_sub_foldSliceProj_le_smoothnessModulus}
 \leanok
 \uses{def:daub-rd-fold-proj, def:rd-modulus, thm:daub-proj-bound, prop:daub-jackson-continuous}
 Let $1 \leq p < \infty$ and $C_{J,d} = (1 + C_P)^d \, d \, C_J$ with the constants $C_P$ of

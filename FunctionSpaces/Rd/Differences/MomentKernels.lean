@@ -267,7 +267,7 @@ and the weighted Jensen inequality. -/
 theorem eLpNorm_indicator_sub_convLp_momentKernel_le {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞)
     {g : V → ℂ} (hg : Integrable g μ) (h1 : ∫ x, g x ∂μ = 1) {R : ℝ}
     (hgR : ∀ z, R < ‖z‖ → g z = 0) (L : ℕ) {c : ℝ} (hc : 0 < c) {U : Set V}
-    (hU : MeasurableSet U) {T : Set V} (hstep : ∀ z, g z ≠ 0 → U ⊆ stepSet T L (-c⁻¹ • z))
+    (hU : MeasurableSet U) {T : Set V} (hstep : ∀ z, g z ≠ 0 → U ⊆ diffStepSet T L (-c⁻¹ • z))
     (f : Lp ℂ p μ) :
     eLpNorm (U.indicator
         ⇑(f - convLp hp (integrable_dilate (integrable_momentKernel hg L) hc.ne') f)) p μ ≤
@@ -323,7 +323,7 @@ theorem eLpNorm_indicator_sub_convLp_momentKernel_le {p : ℝ≥0∞} [Fact (1 �
       · simp [G, Set.indicator_of_notMem hx]
     calc eLpNorm (fun x => G x z) p μ
         = eLpNorm (U.indicator ((fwdDiff (-c⁻¹ • z))^[L] (f : V → ℂ))) p μ := heq
-      _ ≤ eLpNorm ((stepSet T L (-c⁻¹ • z)).indicator
+      _ ≤ eLpNorm ((diffStepSet T L (-c⁻¹ • z)).indicator
             ((fwdDiff (-c⁻¹ • z))^[L] (f : V → ℂ))) p μ :=
           eLpNorm_mono hD fun x => norm_indicator_le_of_subset (hstep z hz) _ x
       _ ≤ ω := eLpNorm_indicator_higherDiff_le_modulusOn hnorm
@@ -338,9 +338,9 @@ theorem enorm_sub_convLp_momentKernel_le {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp :
     (hg : Integrable g μ) (h1 : ∫ x, g x ∂μ = 1) {R : ℝ} (hgR : ∀ z, R < ‖z‖ → g z = 0)
     (L : ℕ) {c : ℝ} (hc : 0 < c) (f : Lp ℂ p μ) :
     ‖f - convLp hp (integrable_dilate (integrable_momentKernel hg L) hc.ne') f‖ₑ ≤
-      (∫⁻ z, ‖g z‖ₑ ∂μ) * modulus μ L p (f : V → ℂ) (R / c) := by
+      (∫⁻ z, ‖g z‖ₑ ∂μ) * smoothnessModulus μ L p (f : V → ℂ) (R / c) := by
   have h := eLpNorm_indicator_sub_convLp_momentKernel_le hp hg h1 hgR L hc MeasurableSet.univ
-    (T := Set.univ) (fun _ _ => by rw [stepSet_univ]) f
+    (T := Set.univ) (fun _ _ => by rw [diffStepSet_univ]) f
   rwa [Set.indicator_univ, modulusOn_univ, ← Lp.enorm_def] at h
 
 end Rd

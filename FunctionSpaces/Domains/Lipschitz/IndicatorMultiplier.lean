@@ -122,7 +122,7 @@ theorem IsSmoothAtom.enorm_sub_le_indicator {d A : ℝ} {j : ℕ} {c : V}
   by_cases hx : x ∈ closedBall c (d / 2 ^ j) ∪ closedBall (c - h) (d / 2 ^ j)
   · rw [indicator_of_mem hx]
     have h1 := ha.enorm_higherDiff_le convex_univ (by simp) ha.const_nonneg le_rfl le_rfl
-      (show x ∈ stepSet univ 1 h by rw [stepSet_univ]; trivial)
+      (show x ∈ diffStepSet univ 1 h by rw [diffStepSet_univ]; trivial)
     refine h1.trans_eq ?_
     rw [Nat.cast_one, ENNReal.rpow_one]
     norm_num
@@ -286,7 +286,7 @@ theorem exists_isRegularAtom_indicator {p : ℝ≥0∞} (hp1 : 1 ≤ p) :
     calc volume (ball (0 : V) 1) ^ (1 / p.toReal)
         ≤ 4 * volume (ball (0 : V) 1) ^ (1 / p.toReal) := le_mul_of_one_le_left' (by norm_num)
       _ ≤ _ := le_self_add
-  · rw [stepSet_univ, indicator_univ, Function.iterate_one]
+  · rw [diffStepSet_univ, indicator_univ, Function.iterate_one]
     exact ha.eLpNorm_fwdDiff_indicator_le hp1 Ω.measurableSet hd (hlayer c h hd j)
 
 /-- **The indicator of a bounded Lipschitz domain is a pointwise multiplier of `B^s_{p,q}(V)` for

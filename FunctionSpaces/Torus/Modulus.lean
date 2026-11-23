@@ -16,11 +16,11 @@ The **modulus of smoothness** (of first order) of `f ∈ L_2(𝕋^d)` is
 
 `ω(f, t)_2 = sup_{‖h‖ ≤ t} ‖f(· + h) - f‖_2`   (`Torus.modulus`, `Torus.modulus_eq_iSup`),
 
-the modulus of order `1` in `L_2` of `Rd.modulus` for the Haar measure on `𝕋^d`, with the sup
-norm `‖h‖ = max_i ‖h_i‖` on `𝕋^d`.  For every order `r` and `1 ≤ p` the modulus
-`ω_r(f, t)_p` of `Rd.modulus` on the torus satisfies `ω_r(f, c t)_p ≤ (1 + c)^r ω_r(f, t)_p`
-(`Torus.modulus_mul_le`).  This file proves
-**Jackson's theorem**
+the modulus of order `1` in `L_2` of `Rd.smoothnessModulus` for the Haar measure on `𝕋^d`, with the
+sup norm `‖h‖ = max_i ‖h_i‖` on `𝕋^d`.  For every order `r` and `1 ≤ p` the modulus
+`ω_r(f, t)_p` of `Rd.smoothnessModulus` on the torus satisfies
+`ω_r(f, c t)_p ≤ (1 + c)^r ω_r(f, t)_p` (`Torus.periodic_smoothnessModulus_mul_le`).  This file
+proves **Jackson's theorem**
 
 `E_n(f)_2² ≤ d · ω(f, 1/n)_2²`   (`Torus.approxError_sq_le_card_mul_modulus_sq`),
 
@@ -42,9 +42,9 @@ namespace Torus
 variable {d : Type*} [Fintype d]
 
 /-- The **modulus of smoothness** `ω(f, t)_2 = sup_{‖h‖ ≤ t} ‖f(· + h) - f‖_2`, the modulus of
-order `1` in `L_2` of `Rd.modulus` for the Haar measure on `𝕋^d`. -/
+order `1` in `L_2` of `Rd.smoothnessModulus` for the Haar measure on `𝕋^d`. -/
 noncomputable def modulus (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) (t : ℝ) : ℝ≥0∞ :=
-  Rd.modulus volume 1 2 (f : UnitAddTorus d → ℂ) t
+  Rd.smoothnessModulus volume 1 2 (f : UnitAddTorus d → ℂ) t
 
 /-- `‖τ_h f - f‖_2 = ‖Δ_h f‖_2` for the representative of `f`. -/
 theorem enorm_translate_sub_eq (h : UnitAddTorus d)
@@ -68,11 +68,11 @@ variable {f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))}
 theorem enorm_translate_sub_le_modulus {t : ℝ} {h : UnitAddTorus d} (hh : ‖h‖ ≤ t) :
     ‖translate h f - f‖ₑ ≤ modulus f t := by
   rw [enorm_translate_sub_eq]
-  exact Rd.eLpNorm_higherDiff_le_modulus hh
+  exact Rd.eLpNorm_higherDiff_le_smoothnessModulus hh
 
 /-- The modulus of smoothness increases in `t`. -/
 theorem modulus_mono (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) : Monotone (modulus f) :=
-  Rd.modulus_mono 1 2 _
+  Rd.smoothnessModulus_mono 1 2 _
 
 /-- The norm on the circle is at most the absolute value of a representative. -/
 theorem norm_coe_le_abs (u : ℝ) : ‖(u : UnitAddCircle)‖ ≤ |u| := by
@@ -121,11 +121,13 @@ theorem exists_coe_eq_abs_eq_norm (u : UnitAddCircle) :
 
 /-- **Scaling the modulus of order `r`**: `ω_r(f, m t)_p ≤ m^r ω_r(f, t)_p` on the torus for
 `m ≥ 1` and `1 ≤ p`, since every `h` with `‖h‖ ≤ m t` is `m h'` with `‖h'‖ ≤ t`
-(`Torus.exists_coe_eq_abs_eq_norm`, `Rd.modulus_nat_mul_le_of_forall_exists_nsmul`). -/
-theorem modulus_nat_mul_le {f : UnitAddTorus d → ℂ} (hf : AEStronglyMeasurable f volume)
-    {p : ℝ≥0∞} (hp : 1 ≤ p) (r : ℕ) {m : ℕ} (hm : 1 ≤ m) {t : ℝ} (ht : 0 ≤ t) :
-    Rd.modulus volume r p f (m * t) ≤ (m : ℝ≥0∞) ^ r * Rd.modulus volume r p f t := by
-  refine Rd.modulus_nat_mul_le_of_forall_exists_nsmul hf hp r fun h hh => ?_
+(`Torus.exists_coe_eq_abs_eq_norm`, `Rd.smoothnessModulus_nat_mul_le_of_forall_exists_nsmul`). -/
+theorem periodic_smoothnessModulus_nat_mul_le {f : UnitAddTorus d → ℂ}
+    (hf : AEStronglyMeasurable f volume) {p : ℝ≥0∞} (hp : 1 ≤ p) (r : ℕ) {m : ℕ} (hm : 1 ≤ m)
+    {t : ℝ} (ht : 0 ≤ t) :
+    Rd.smoothnessModulus volume r p f (m * t) ≤
+      (m : ℝ≥0∞) ^ r * Rd.smoothnessModulus volume r p f t := by
+  refine Rd.smoothnessModulus_nat_mul_le_of_forall_exists_nsmul hf hp r fun h hh => ?_
   have hm' : (0 : ℝ) < m := by exact_mod_cast hm
   choose x hx1 hx2 using fun i => exists_coe_eq_abs_eq_norm (h i)
   refine ⟨fun i => ((x i / m : ℝ) : UnitAddCircle), (pi_norm_le_iff_of_nonneg ht).2 fun i =>
@@ -135,11 +137,15 @@ theorem modulus_nat_mul_le {f : UnitAddTorus d → ℂ} (hf : AEStronglyMeasurab
   · rw [Pi.smul_apply, ← hx1 i, ← AddCircle.coe_nsmul, nsmul_eq_mul, mul_div_cancel₀ _ hm'.ne']
 
 /-- **The modulus of order `r` grows polynomially**: `ω_r(f, c t)_p ≤ (1 + c)^r ω_r(f, t)_p` on the
-torus for `c, t ≥ 0` (`Torus.modulus_nat_mul_le`, `Rd.modulus_mul_le_of_nat_mul_le`). -/
-theorem modulus_mul_le {f : UnitAddTorus d → ℂ} (hf : AEStronglyMeasurable f volume)
-    {p : ℝ≥0∞} (hp : 1 ≤ p) (r : ℕ) {c t : ℝ} (hc : 0 ≤ c) (ht : 0 ≤ t) :
-    Rd.modulus volume r p f (c * t) ≤ ENNReal.ofReal (1 + c) ^ r * Rd.modulus volume r p f t :=
-  Rd.modulus_mul_le_of_nat_mul_le hc ht fun _ hm => modulus_nat_mul_le hf hp r hm ht
+torus for `c, t ≥ 0` (`Torus.periodic_smoothnessModulus_nat_mul_le`,
+`Rd.smoothnessModulus_mul_le_of_nat_mul_le`). -/
+theorem periodic_smoothnessModulus_mul_le {f : UnitAddTorus d → ℂ}
+    (hf : AEStronglyMeasurable f volume) {p : ℝ≥0∞} (hp : 1 ≤ p) (r : ℕ) {c t : ℝ} (hc : 0 ≤ c)
+    (ht : 0 ≤ t) :
+    Rd.smoothnessModulus volume r p f (c * t) ≤
+      ENNReal.ofReal (1 + c) ^ r * Rd.smoothnessModulus volume r p f t :=
+  Rd.smoothnessModulus_mul_le_of_nat_mul_le hc ht fun _ hm =>
+    periodic_smoothnessModulus_nat_mul_le hf hp r hm ht
 
 /-- `|e^(ix) - 1|² = 2 - 2 cos x`. -/
 theorem norm_exp_I_mul_sub_one_sq (x : ℝ) :

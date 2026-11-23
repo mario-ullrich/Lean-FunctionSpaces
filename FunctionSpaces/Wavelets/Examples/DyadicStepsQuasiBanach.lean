@@ -189,12 +189,12 @@ restricted difference of `Rd.modulusOn`. -/
 theorem lintegral_indicator_add_eq_eLpNorm (hp0 : p ≠ 0) (hp : p ≠ ∞) {F : ℝ → ℂ}
     (hF : Measurable F) (h : ℝ) :
     ∫⁻ y in Icc 0 1, (Icc (0 : ℝ) 1).indicator (fun x => ‖F x - F y‖ₑ ^ p.toReal) (y + h) =
-      eLpNorm ((Rd.stepSet (Icc (0 : ℝ) 1) 1 h).indicator ((fwdDiff h)^[1] F)) p volume ^
+      eLpNorm ((Rd.diffStepSet (Icc (0 : ℝ) 1) 1 h).indicator ((fwdDiff h)^[1] F)) p volume ^
         p.toReal := by
   have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
-  have hmem : ∀ y : ℝ, y ∈ Rd.stepSet (Icc (0 : ℝ) 1) 1 h ↔
+  have hmem : ∀ y : ℝ, y ∈ Rd.diffStepSet (Icc (0 : ℝ) 1) 1 h ↔
       y ∈ Icc (0 : ℝ) 1 ∧ y + h ∈ Icc (0 : ℝ) 1 := fun y => by
-    simp only [Rd.stepSet, Set.mem_ofPred_eq]
+    simp only [Rd.diffStepSet, Set.mem_ofPred_eq]
     constructor
     · intro H
       exact ⟨by simpa using H 0 (Nat.zero_le 1), by simpa using H 1 le_rfl⟩
@@ -202,9 +202,9 @@ theorem lintegral_indicator_add_eq_eLpNorm (hp0 : p ≠ 0) (hp : p ≠ ∞) {F :
       rcases Nat.le_one_iff_eq_zero_or_eq_one.1 hl with rfl | rfl
       · simpa using h0
       · simpa using h1
-  rw [eLpNorm_rpow_eq (g := (Rd.stepSet (Icc (0 : ℝ) 1) 1 h).indicator ((fwdDiff h)^[1] F))
+  rw [eLpNorm_rpow_eq (g := (Rd.diffStepSet (Icc (0 : ℝ) 1) 1 h).indicator ((fwdDiff h)^[1] F))
     ((measurable_higherDiff hF 1 h).indicator
-      (Rd.measurableSet_stepSet measurableSet_Icc 1 h)).aestronglyMeasurable hp0 hp,
+      (Rd.measurableSet_diffStepSet measurableSet_Icc 1 h)).aestronglyMeasurable hp0 hp,
     ← lintegral_indicator measurableSet_Icc]
   refine lintegral_congr fun y => ?_
   by_cases hy : y ∈ Icc (0 : ℝ) 1 ∧ y + h ∈ Icc (0 : ℝ) 1

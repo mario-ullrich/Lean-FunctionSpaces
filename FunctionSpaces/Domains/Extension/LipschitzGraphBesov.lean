@@ -11,8 +11,8 @@ public import FunctionSpaces.Domains.Extension.RychkovExtension
 # Besov spaces on Lipschitz graph domains by intrinsic differences
 
 Let `Ω` be a Lipschitz graph domain with cone `K`. **Steps in the cone stay in `Ω`**: for `h ∈ K`
-and `x ∈ Ω`, all points `x + l h`, `l ∈ ℕ`, lie in `Ω` (`Rd.LipschitzGraph.subset_stepSet`), so for
-such steps the differences on `Ω` (`Rd.modulusOn`) are the differences on `V`. The cone bump `g`
+and `x ∈ Ω`, all points `x + l h`, `l ∈ ℕ`, lie in `Ω` (`Rd.LipschitzGraph.subset_diffStepSet`), so
+for such steps the differences on `Ω` (`Rd.modulusOn`) are the differences on `V`. The cone bump `g`
 vanishes outside `-K ∩ B(0, 1/2)`, so the steps `-c^(-1) z`, `g(z) ≠ 0`, of the averaged
 differences lie in `K` and have length at most `1/(2c)`, and
 
@@ -62,7 +62,7 @@ variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDim
 `‖1_W (f - m_{2^j} ⋆ f)‖_p ≤ ‖g‖_1 ω_L(f, R 2^(-j), T)_p`. -/
 theorem enorm_indicatorLp_sub_convLp_scaled_le (hp : p ≠ ∞) {W T : Set V}
     (hW : MeasurableSet W) (L j : ℕ)
-    (hstep : ∀ c : ℝ, 1 ≤ c → ∀ z, b.toFun z ≠ 0 → W ⊆ stepSet T L (-c⁻¹ • z))
+    (hstep : ∀ c : ℝ, 1 ≤ c → ∀ z, b.toFun z ≠ 0 → W ⊆ diffStepSet T L (-c⁻¹ • z))
     (f : Lp ℂ p (volume : Measure V)) :
     ‖indicatorLp hW (f - convLp hp (b.integrable_scaled L j) f)‖ₑ ≤
       (∫⁻ z, ‖b.toFun z‖ₑ) * modulusOn volume T L p (f : V → ℂ) (b.radius / 2 ^ j) := by
@@ -73,7 +73,7 @@ theorem enorm_indicatorLp_sub_convLp_scaled_le (hp : p ≠ ∞) {W T : Set V}
 /-- **Local means are bounded by the modulus on `T`**: for a bump of radius `R ≤ 1/2` whose steps
 take `W` into `T`, `‖1_W (k_{j+1} ⋆ f)‖_p ≤ 2 ‖g‖_1 ω_L(f, 2^(-(j+1)), T)_p`. -/
 theorem enorm_indicatorLp_localMean_succ_le (hp : p ≠ ∞) {W T : Set V} (hW : MeasurableSet W)
-    (L j : ℕ) (hstep : ∀ c : ℝ, 1 ≤ c → ∀ z, b.toFun z ≠ 0 → W ⊆ stepSet T L (-c⁻¹ • z))
+    (L j : ℕ) (hstep : ∀ c : ℝ, 1 ≤ c → ∀ z, b.toFun z ≠ 0 → W ⊆ diffStepSet T L (-c⁻¹ • z))
     (hR : b.radius ≤ 1 / 2) (f : Lp ℂ p (volume : Measure V)) :
     ‖indicatorLp hW (b.localMean hp L (j + 1) f)‖ₑ ≤
       2 * (∫⁻ z, ‖b.toFun z‖ₑ) * lpModulusOn p T L f (j + 1) := by
@@ -125,15 +125,16 @@ variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] (Ω : Lips
 /-! ### Steps in the cone -/
 
 /-- **Steps in the cone stay in `Ω`**: `Ω ⊆ Ω_{rh}` for `h ∈ K`. -/
-theorem subset_stepSet {h : V} (hh : h ∈ Ω.cone) (r : ℕ) : Ω.domain ⊆ stepSet Ω.domain r h :=
+theorem subset_diffStepSet {h : V} (hh : h ∈ Ω.cone) (r : ℕ) :
+    Ω.domain ⊆ diffStepSet Ω.domain r h :=
   fun _ hx l _ => Ω.add_nsmul_mem hx hh l
 
 /-- The steps of the averaged differences of a kernel supported in `-K` lie in the cone:
 `Ω ⊆ Ω_{r h}` for `h = -c^(-1) z`, `c > 0` and `g(z) ≠ 0`. -/
-theorem subset_stepSet_of_coneSupported {g : V → ℂ} (hg : Ω.ConeSupported g) {c : ℝ}
-    (hc : 0 < c) (r : ℕ) {z : V} (hz : g z ≠ 0) : Ω.domain ⊆ stepSet Ω.domain r (-c⁻¹ • z) := by
+theorem subset_diffStepSet_of_coneSupported {g : V → ℂ} (hg : Ω.ConeSupported g) {c : ℝ}
+    (hc : 0 < c) (r : ℕ) {z : V} (hz : g z ≠ 0) : Ω.domain ⊆ diffStepSet Ω.domain r (-c⁻¹ • z) := by
   rw [neg_smul, ← smul_neg]
-  exact Ω.subset_stepSet (Ω.smul_mem_cone (inv_pos.2 hc) (hg z hz)) r
+  exact Ω.subset_diffStepSet (Ω.smul_mem_cone (inv_pos.2 hc) (hg z hz)) r
 
 variable [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] {p : ℝ≥0∞} [Fact (1 ≤ p)]
 
@@ -150,7 +151,7 @@ theorem enorm_cutoff_sub_convLp_scaled_le (hp : p ≠ ∞) (L j : ℕ)
     ring
   rw [lpModulusOn, ← hR]
   exact Ω.coneBump.enorm_indicatorLp_sub_convLp_scaled_le hp Ω.measurableSet_domain L j
-    (fun _ hc _ hz => Ω.subset_stepSet_of_coneSupported Ω.coneSupported_coneBump
+    (fun _ hc _ hz => Ω.subset_diffStepSet_of_coneSupported Ω.coneSupported_coneBump
       (lt_of_lt_of_le one_pos hc) L hz) f
 
 /-- `‖1_Ω (k_0 ⋆ f)‖_p ≤ ‖m‖_1 ‖f‖_{L_p(Ω)}`, by the support principle. -/
@@ -173,7 +174,7 @@ theorem enorm_cutoff_localMean_succ_le (hp : p ≠ ∞) (L j : ℕ)
     ‖Ω.cutoff (Ω.coneBump.localMean hp L (j + 1) f)‖ₑ ≤
       2 * (∫⁻ z, ‖Ω.coneBump.toFun z‖ₑ) * lpModulusOn p Ω.domain L f (j + 1) :=
   Ω.coneBump.enorm_indicatorLp_localMean_succ_le hp Ω.measurableSet_domain L j
-    (fun _ hc _ hz => Ω.subset_stepSet_of_coneSupported Ω.coneSupported_coneBump
+    (fun _ hc _ hz => Ω.subset_diffStepSet_of_coneSupported Ω.coneSupported_coneBump
       (lt_of_lt_of_le one_pos hc) L hz) Ω.coneBump_radius.le f
 
 /-- The constant `‖m‖_1 + 2 ‖g‖_1` of the intrinsic upper bound. -/

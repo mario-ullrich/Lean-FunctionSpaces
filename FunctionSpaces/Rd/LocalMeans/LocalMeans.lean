@@ -258,7 +258,7 @@ theorem eLpNorm_higherDiff_scaled_le' (L j : ℕ) (v : V) :
     eLpNorm ((fwdDiff v)^[L] (b.scaled L j)) 1 volume ≤
       2 ^ L * eLpNorm (momentKernel b.toFun L) 1 volume := by
   rw [← b.eLpNorm_scaled_one L j]
-  exact eLpNorm_higherDiff_le (b.integrable_scaled L j).aestronglyMeasurable le_rfl L v
+  exact eLpNorm_higherDiff_le_two_pow_mul (b.integrable_scaled L j).aestronglyMeasurable le_rfl L v
 
 /-- The constant `2 (‖D^L m‖_1 + 2^L ‖m‖_1)` of the differences of the dual kernels. -/
 noncomputable def dualConst (L : ℕ) : ℝ≥0∞ :=
@@ -420,24 +420,25 @@ theorem enorm_localMean_succ_le (hp : p ≠ ∞) (L j : ℕ) (f : Lp ℂ p (volu
       convLp_sub_kernel hp (b.integrable_scaled L (j + 1)) (b.integrable_scaled L j) f]
     abel
   have hω : ∀ i, ‖f - convLp hp (b.integrable_scaled L i) f‖ₑ ≤
-      A * modulus volume L p (f : V → ℂ) (b.radius / 2 ^ i) := fun i =>
+      A * smoothnessModulus volume L p (f : V → ℂ) (b.radius / 2 ^ i) := fun i =>
     enorm_sub_convLp_momentKernel_le hp b.integrable b.integral_eq_one b.eq_zero L
       (by positivity) f
-  have hmono : modulus volume L p (f : V → ℂ) (b.radius / 2 ^ (j + 1)) ≤
-      modulus volume L p (f : V → ℂ) (b.radius / 2 ^ j) :=
-    modulus_mono L p _ (div_le_div_of_nonneg_left b.radius_nonneg (by positivity)
+  have hmono : smoothnessModulus volume L p (f : V → ℂ) (b.radius / 2 ^ (j + 1)) ≤
+      smoothnessModulus volume L p (f : V → ℂ) (b.radius / 2 ^ j) :=
+    smoothnessModulus_mono L p _ (div_le_div_of_nonneg_left b.radius_nonneg (by positivity)
       (pow_le_pow_right₀ one_le_two (Nat.le_succ j)))
-  have hdil : modulus volume L p (f : V → ℂ) (b.radius / 2 ^ j) ≤
+  have hdil : smoothnessModulus volume L p (f : V → ℂ) (b.radius / 2 ^ j) ≤
       ENNReal.ofReal (1 + b.radius) ^ L * lpModulus p L f j := by
     rw [lpModulus, show b.radius / 2 ^ j = b.radius * (1 / 2 ^ j) by ring]
-    exact modulus_mul_le (Lp.aestronglyMeasurable f) Fact.out L b.radius_nonneg (by positivity)
+    exact smoothnessModulus_mul_le (Lp.aestronglyMeasurable f) Fact.out L b.radius_nonneg
+      (by positivity)
   calc ‖b.localMean hp L (j + 1) f‖ₑ
       ≤ ‖f - convLp hp (b.integrable_scaled L j) f‖ₑ +
           ‖f - convLp hp (b.integrable_scaled L (j + 1)) f‖ₑ := by
         rw [hk]
         exact enorm_sub_le
-    _ ≤ A * modulus volume L p (f : V → ℂ) (b.radius / 2 ^ j) +
-          A * modulus volume L p (f : V → ℂ) (b.radius / 2 ^ j) :=
+    _ ≤ A * smoothnessModulus volume L p (f : V → ℂ) (b.radius / 2 ^ j) +
+          A * smoothnessModulus volume L p (f : V → ℂ) (b.radius / 2 ^ j) :=
         add_le_add (hω j) ((hω (j + 1)).trans (by gcongr))
     _ ≤ A * (ENNReal.ofReal (1 + b.radius) ^ L * lpModulus p L f j) +
           A * (ENNReal.ofReal (1 + b.radius) ^ L * lpModulus p L f j) := by gcongr

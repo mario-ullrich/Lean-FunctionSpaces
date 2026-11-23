@@ -222,10 +222,10 @@ theorem enorm_sub_jacksonApprox_le (hp : p ≠ ∞) (r k : ℕ) (f : Lp ℂ p (v
           refine eLpNorm_congr_norm_ae ((hG.comp measurable_prodMk_right).aestronglyMeasurable)
             hD (Eventually.of_forall fun x => ?_)
           simp [G]
-      _ ≤ modulus volume r p (f : V → ℂ) (‖z‖ * (1 / 2 ^ k)) :=
-          eLpNorm_higherDiff_le_modulus hnorm
-      _ ≤ ENNReal.ofReal (1 + ‖z‖) ^ r * modulus volume r p (f : V → ℂ) (1 / 2 ^ k) :=
-          modulus_mul_le (Lp.aestronglyMeasurable f) hp1 r (norm_nonneg z) (by positivity)
+      _ ≤ smoothnessModulus volume r p (f : V → ℂ) (‖z‖ * (1 / 2 ^ k)) :=
+          eLpNorm_higherDiff_le_smoothnessModulus hnorm
+      _ ≤ ENNReal.ofReal (1 + ‖z‖) ^ r * smoothnessModulus volume r p (f : V → ℂ) (1 / 2 ^ k) :=
+          smoothnessModulus_mul_le (Lp.aestronglyMeasurable f) hp1 r (norm_nonneg z) (by positivity)
   have hlhs : ‖f - jacksonApprox hp r k f‖ₑ =
       eLpNorm (fun x => ∫ z, lpKernel z * G x z) p volume := by
     rw [Lp.enorm_def]

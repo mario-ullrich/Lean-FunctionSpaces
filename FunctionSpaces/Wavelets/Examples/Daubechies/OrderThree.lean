@@ -22,10 +22,10 @@ exist (`Daubechies.exists_mask`), so every statement below applies to at least o
 * **Sobolev regularity.** `∫ (1 + |ξ|)^(2s) |𝓕 φ(ξ)|² dξ < ∞`, that is `φ ∈ H^s`, for every
   `s < 3 - log₂ 3` (`Daubechies.sobolev_scalingFun_order_three`). In terms of moduli of
   smoothness, `ω_r(φ, t)_p ≤ K t^s` for `p ≤ 2`, `0 < t ≤ 1` and `0 ≤ s < 3 - log₂ 3`, `s ≤ r`
-  (`Daubechies.modulus_scalingFun_le_two_order_three`), and hence
+  (`Daubechies.smoothnessModulus_scalingFun_le_two_order_three`), and hence
   `‖(2^(ks) ω_r(φ, 2^(-k))_p)_k‖_{ℓ_q} < ∞` for every `q ≥ 1` and `0 ≤ s < min(r, 3 - log₂ 3)`
-  (`Daubechies.lqNorm_modulus_scalingFun_lt_top_order_three`), which for `p = q = 2` is the
-  Besov description `H^s = B^s_{2,2}`.
+  (`Daubechies.lqNorm_smoothnessModulus_scalingFun_lt_top_order_three`), which for `p = q = 2` is
+  the Besov description `H^s = B^s_{2,2}`.
 * **Hölder regularity.** `|φ(x) - φ(y)| ≤ K |x - y|^a` for every `0 ≤ a < 5/2 - log₂ 3 ≈ 0.915`
   (`Daubechies.holder_scalingFun_order_three`), in particular for `a = 9/10`
   (`Daubechies.holder_scalingFun_order_three_nine_tenths`), since `log₂ 3 < 8/5`.
@@ -145,10 +145,10 @@ theorem lqNorm_dyadicWeight_mul_lt_top_of_le_rpow {F : ℝ → ℝ≥0∞} {K : 
 Daubechies mask has a Bernstein bound `ω_r(φ, t)_p ≤ K t^θ` for `0 < t ≤ 1`
 (`Daubechies.BernsteinBound`), then `‖(2^(ks) ω_r(φ, 2^(-k))_p)_k‖_{ℓ_q} < ∞` for every `s < θ`
 and `1 ≤ q ≤ ∞` (`Daubechies.lqNorm_dyadicWeight_mul_lt_top_of_le_rpow`). -/
-theorem BernsteinBound.lqNorm_modulus_lt_top {N : ℕ} {m : Mask N} {p : ℝ≥0∞} {θ : ℝ} {r : ℕ}
-    (hB : BernsteinBound m p θ r) {s : ℝ} (hsθ : s < θ) {q : ℝ≥0∞} (hq : 1 ≤ q) :
-    ENNReal.lqNorm q
-      (fun k : ℕ => dyadicWeight s k * Rd.modulus volume r p (scalingFun m) (1 / 2 ^ k)) < ∞ :=
+theorem BernsteinBound.lqNorm_smoothnessModulus_lt_top {N : ℕ} {m : Mask N} {p : ℝ≥0∞} {θ : ℝ}
+    {r : ℕ} (hB : BernsteinBound m p θ r) {s : ℝ} (hsθ : s < θ) {q : ℝ≥0∞} (hq : 1 ≤ q) :
+    ENNReal.lqNorm q (fun k : ℕ =>
+      dyadicWeight s k * Rd.smoothnessModulus volume r p (scalingFun m) (1 / 2 ^ k)) < ∞ :=
   let ⟨_, hK, hmod⟩ := hB
   lqNorm_dyadicWeight_mul_lt_top_of_le_rpow hK hmod hsθ hq
 
@@ -159,17 +159,17 @@ real `s` with `0 ≤ s < r` and `s < 3 - log₂ 3`,
 `φ ∈ H^s` in the Besov form `H^s = B^s_{2,2}`. The order `θ = (s + min(r, 3 - log₂ 3))/2` lies in
 `(s, min(r, 3 - log₂ 3))`, so `φ` has a Bernstein bound of order `θ`
 (`Daubechies.bernsteinBound_order_three`) and
-`Daubechies.BernsteinBound.lqNorm_modulus_lt_top` applies. -/
-theorem lqNorm_modulus_scalingFun_lt_top_order_three (m : Mask 3) {p : ℝ≥0∞} (hp2 : p ≤ 2)
+`Daubechies.BernsteinBound.lqNorm_smoothnessModulus_lt_top` applies. -/
+theorem lqNorm_smoothnessModulus_scalingFun_lt_top_order_three (m : Mask 3) {p : ℝ≥0∞} (hp2 : p ≤ 2)
     {q : ℝ≥0∞} (hq : 1 ≤ q) {r : ℕ} {s : ℝ} (hs0 : 0 ≤ s) (hsr : s < r)
     (hs : s < 3 - Real.logb 2 3) :
-    ENNReal.lqNorm q
-      (fun k : ℕ => dyadicWeight s k * Rd.modulus volume r p (scalingFun m) (1 / 2 ^ k)) < ∞ := by
+    ENNReal.lqNorm q (fun k : ℕ =>
+      dyadicWeight s k * Rd.smoothnessModulus volume r p (scalingFun m) (1 / 2 ^ k)) < ∞ := by
   have h1 : min (r : ℝ) (3 - Real.logb 2 3) ≤ r := min_le_left _ _
   have h2 : min (r : ℝ) (3 - Real.logb 2 3) ≤ 3 - Real.logb 2 3 := min_le_right _ _
   have h3 : s < min (r : ℝ) (3 - Real.logb 2 3) := lt_min hsr hs
   exact (bernsteinBound_order_three m hp2 (s := (s + min (r : ℝ) (3 - Real.logb 2 3)) / 2)
-    (by linarith) (by linarith) (by linarith)).lqNorm_modulus_lt_top (by linarith) hq
+    (by linarith) (by linarith) (by linarith)).lqNorm_smoothnessModulus_lt_top (by linarith) hq
 
 /-! ### Hölder regularity -/
 

@@ -160,7 +160,7 @@ theorem ballMeanDiff_rpow_le {f : V → ℂ} (hf : Measurable f) (L j : ℕ) {P 
 /-- **Ball means are bounded in `L_p`**: `‖d_j f‖_p ≤ 2^L ‖f‖_p` for measurable `f` and
 `1 ≤ p < ∞`. By `Rd.ballMeanDiff_rpow_le` and Tonelli's theorem,
 `∫ (d_j f)^p ≤ |B|⁻¹ ∫_B ‖Δ^L_h f‖_p^p dh`, and `‖Δ^L_h f‖_p ≤ 2^L ‖f‖_p`
-(`Rd.eLpNorm_higherDiff_le`). -/
+(`Rd.eLpNorm_higherDiff_le_two_pow_mul`). -/
 theorem eLpNorm_ballMeanDiff_le_of_measurable {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞)
     {f : V → ℂ} (hf : Measurable f) (L j : ℕ) :
     eLpNorm (ballMeanDiff L j f) p volume ≤ 2 ^ L * eLpNorm f p volume := by
@@ -174,7 +174,8 @@ theorem eLpNorm_ballMeanDiff_le_of_measurable {p : ℝ≥0∞} (hp1 : 1 ≤ p) (
   have hD := measurable_enorm_higherDiff_uncurry hf L
   have hstep : ∀ v : V, ∫⁻ x, ‖(fwdDiff v)^[L] f x‖ₑ ^ p.toReal ≤ X ^ p.toReal := fun v => by
     rw [← eLpNorm_rpow_eq (aestronglyMeasurable_higherDiff hf.aestronglyMeasurable L v) hp0 hp]
-    exact ENNReal.rpow_le_rpow (eLpNorm_higherDiff_le hf.aestronglyMeasurable hp1 L v) hP.le
+    exact ENNReal.rpow_le_rpow
+      (eLpNorm_higherDiff_le_two_pow_mul hf.aestronglyMeasurable hp1 L v) hP.le
   have hint : ∫⁻ x, ballMeanDiff L j f x ^ p.toReal ≤ X ^ p.toReal :=
     calc ∫⁻ x, ballMeanDiff L j f x ^ p.toReal
         ≤ ∫⁻ x, ∫⁻ v in B, (volume B)⁻¹ * ‖(fwdDiff v)^[L] f x‖ₑ ^ p.toReal :=

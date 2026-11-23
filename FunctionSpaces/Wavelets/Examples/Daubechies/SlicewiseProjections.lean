@@ -40,7 +40,8 @@ so `P_j^{(i)} f` is continuous (measurable) as well (`Daubechies.continuous_slic
   (`Daubechies.eLpNorm_slice_sub_sliceProj_le`), the slices pass the bound to `ℝ^d`
   (`Rd.eLpNorm_le_add_of_slice_le`), and on `ℝ^d` the smoothing satisfies
   `‖f - S^{(i)}_δ f‖_p ≤ ω_r(f, rδ)_p` and `‖∂_i^r S^{(i)}_δ f‖_p ≤ 2^r δ^(-r) ω_r(f, rδ)_p`
-  (`Cube.eLpNorm_sub_cubeSmooth_le_modulus`, `Cube.eLpNorm_cubeSmoothDeriv_le_modulus`).
+  (`Cube.eLpNorm_sub_cubeSmooth_le_smoothnessModulus`,
+  `Cube.eLpNorm_cubeSmoothDeriv_le_smoothnessModulus`).
 
 The norm on `ℝ^d` is the sup norm.
 -/
@@ -190,18 +191,19 @@ of one variable and the isotropic modulus of smoothness of `ℝ^d` (sup norm). W
 `Daubechies.eLpNorm_slice_sub_sliceProj_le`, which passes to `ℝ^d`
 (`Rd.eLpNorm_le_add_of_slice_le`); there `‖f - S^{(i)}_δ f‖_p ≤ ω_N(f, 2^(-j))_p` and
 `‖∂_i^N S^{(i)}_δ f‖_p ≤ 2^N N^N 2^(jN) ω_N(f, 2^(-j))_p`
-(`Cube.eLpNorm_sub_cubeSmooth_le_modulus`, `Cube.eLpNorm_cubeSmoothDeriv_le_modulus`,
+(`Cube.eLpNorm_sub_cubeSmooth_le_smoothnessModulus`,
+`Cube.eLpNorm_cubeSmoothDeriv_le_smoothnessModulus`,
 `Daubechies.ofReal_one_div_mul_two_pow_inv_pow`), and the two bounds combine as in one variable
 (`Daubechies.add_le_jacksonConst_mul`). The inequality holds in `[0, ∞]`. -/
 theorem eLpNorm_sub_sliceProj_le (hN : 2 ≤ N) {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞)
     {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) (j : ℕ) (i : Fin d) :
     eLpNorm (fun x => f x - sliceProj m j i f x) p volume ≤
-      jacksonConst m p * Rd.modulus volume N p f (1 / 2 ^ j) := by
+      jacksonConst m p * Rd.smoothnessModulus volume N p f (1 / 2 ^ j) := by
   have hN' : (0 : ℝ) < N := by exact_mod_cast (by omega : 0 < N)
   have hδ : (0 : ℝ) < 1 / (N * 2 ^ j) := by positivity
   have hNδ : (N : ℝ) * (1 / (N * 2 ^ j)) = 1 / 2 ^ j := by field_simp
-  have hB := Cube.eLpNorm_sub_cubeSmooth_le_modulus hf N hδ hp1 hp i
-  have hD := Cube.eLpNorm_cubeSmoothDeriv_le_modulus hf N hδ hp1 i
+  have hB := Cube.eLpNorm_sub_cubeSmooth_le_smoothnessModulus hf N hδ hp1 hp i
+  have hD := Cube.eLpNorm_cubeSmoothDeriv_le_smoothnessModulus hf N hδ hp1 i
   rw [hNδ] at hB hD
   rw [ofReal_one_div_mul_two_pow_inv_pow (by omega) j, ← mul_assoc] at hD
   refine (Rd.eLpNorm_le_add_of_slice_le hp1 hp

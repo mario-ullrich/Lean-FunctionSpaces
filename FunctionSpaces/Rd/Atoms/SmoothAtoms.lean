@@ -267,7 +267,7 @@ theorem IsSmoothAtom.const_nonneg {K : ℕ} {d A : ℝ} {j : ℕ} {c : V} {a : V
 theorem IsSmoothAtom.enorm_higherDiff_le {Ω : Set V} (hΩ : Convex ℝ Ω)
     (hint : (interior Ω).Nonempty) {K : ℕ} {d A : ℝ} (hA : 0 ≤ A) {j : ℕ} {c : V} {a : V → ℂ}
     (ha : IsSmoothAtom Ω K d A j c a) {r : ℕ} (hr : 1 ≤ r) (hrK : r ≤ K) {h x : V}
-    (hx : x ∈ stepSet Ω r h) :
+    (hx : x ∈ diffStepSet Ω r h) :
     ‖(fwdDiff h)^[r] a x‖ₑ ≤ ENNReal.ofReal (2 ^ r * (r : ℝ) ^ (r + 1) * A) *
       min 1 (ENNReal.ofReal (2 ^ j * ‖h‖) ^ (r : ℝ)) := by
   have hK1 : (1 : ℝ) ≤ 2 ^ r * (r : ℝ) ^ (r + 1) :=

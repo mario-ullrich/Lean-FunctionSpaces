@@ -15,7 +15,8 @@ For a continuous `f : ℝ → ℂ`, an order `r ∈ ℕ` and a step `δ > 0`, th
 `S_δ f = ∑_{k=1}^r (-1)^(k+1) C(r, k) M_{kδ}^r f` (`Interval.smooth`, defined pointwise on all of
 `ℝ` from the Steklov averages `M_η g(x) = η^(-1) ∫_0^η g(x + τ) dτ`) is `r` times continuously
 differentiable (`Interval.contDiff_smooth`). On all of `ℝ` it is controlled by the modulus of
-smoothness of the line, `ω_r(f, t)_p = sup_{|h| ≤ t} ‖Δ_h^r f‖_{L_p(ℝ)}` (`Rd.modulus volume`):
+smoothness of the line, `ω_r(f, t)_p = sup_{|h| ≤ t} ‖Δ_h^r f‖_{L_p(ℝ)}`
+(`Rd.smoothnessModulus volume`):
 
 * `‖f - S_δ f‖_{L_p(ℝ)} ≤ ω_r(f, rδ)_p` for `1 ≤ p < ∞`
   (`Daubechies.eLpNorm_sub_smooth_le_modulus`);
@@ -51,11 +52,11 @@ namespace Daubechies
 
 /-- **Differences with a nonnegative step are bounded by the modulus**: for `0 ≤ h ≤ t`,
 `‖Δ_h^r f‖_{L_p(ℝ)} ≤ ω_r(f, t)_p`, where `ω_r(f, t)_p = sup_{|h| ≤ t} ‖Δ_h^r f‖_{L_p(ℝ)}` is the
-modulus of smoothness of the line (`Rd.modulus volume`). -/
-theorem eLpNorm_higherDiff_le_modulus_of_nonneg {r : ℕ} {p : ℝ≥0∞} {f : ℝ → ℂ} {h t : ℝ}
+modulus of smoothness of the line (`Rd.smoothnessModulus volume`). -/
+theorem eLpNorm_higherDiff_le_smoothnessModulus_of_nonneg {r : ℕ} {p : ℝ≥0∞} {f : ℝ → ℂ} {h t : ℝ}
     (h0 : 0 ≤ h) (ht : h ≤ t) :
-    eLpNorm (Rd.higherDiff r h f) p volume ≤ Rd.modulus volume r p f t :=
-  Rd.eLpNorm_higherDiff_le_modulus (by rwa [Real.norm_of_nonneg h0])
+    eLpNorm (Rd.higherDiff r h f) p volume ≤ Rd.smoothnessModulus volume r p f t :=
+  Rd.eLpNorm_higherDiff_le_smoothnessModulus (by rwa [Real.norm_of_nonneg h0])
 
 /-- **The smoothing is close to `f` on the whole line**: for continuous `f : ℝ → ℂ`, `r ∈ ℕ`,
 `δ > 0` and `1 ≤ p < ∞`,
@@ -66,7 +67,7 @@ and Minkowski's inequality for averages (`Interval.eLpNorm_avgStepIter_le`, stat
 theorem eLpNorm_sub_smooth_le_modulus {f : ℝ → ℂ} (hf : Continuous f) (r : ℕ) {δ : ℝ}
     (hδ : 0 < δ) {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p ≠ ∞) :
     eLpNorm (fun x => f x - Interval.smooth r δ f x) p volume ≤
-      Rd.modulus volume r p f (r * δ) := by
+      Rd.smoothnessModulus volume r p f (r * δ) := by
   have heq : (fun x => f x - Interval.smooth r δ f x) = ((-1 : ℂ) ^ r) •
       Interval.avgStepIter r δ (fun h y => Rd.higherDiff r h f y) 0 := by
     funext x
@@ -76,7 +77,7 @@ theorem eLpNorm_sub_smooth_le_modulus {f : ℝ → ℂ} (hf : Continuous f) (r :
   refine (Interval.eLpNorm_avgStepIter_le (Interval.continuous_higherDiff_uncurry hf r) hδ hp
     hp' volume r 0).trans (iSup₂_le fun h hh => ?_)
   rw [zero_add] at hh
-  exact eLpNorm_higherDiff_le_modulus_of_nonneg hh.1 hh.2
+  exact eLpNorm_higherDiff_le_smoothnessModulus_of_nonneg hh.1 hh.2
 
 /-- **The derivative of order `r` of the smoothing on the whole line**: for continuous
 `f : ℝ → ℂ`, `r ∈ ℕ`, `δ > 0` and `1 ≤ p ≤ ∞`,
@@ -87,10 +88,10 @@ and `∑_{k=1}^r C(r, k) ≤ 2^r` (`Interval.eLpNorm_sum_smoothCoeff_smul_le` fo
 theorem eLpNorm_iteratedDeriv_smooth_le_modulus {f : ℝ → ℂ} (hf : Continuous f) (r : ℕ)
     {δ : ℝ} (hδ : 0 < δ) {p : ℝ≥0∞} (hp : 1 ≤ p) :
     eLpNorm (iteratedDeriv r (Interval.smooth r δ f)) p volume ≤
-      2 ^ r * (ENNReal.ofReal δ)⁻¹ ^ r * Rd.modulus volume r p f (r * δ) := by
+      2 ^ r * (ENNReal.ofReal δ)⁻¹ ^ r * Rd.smoothnessModulus volume r p f (r * δ) := by
   rw [Interval.iteratedDeriv_smooth_eq_sum_smul hf r δ]
   exact Interval.eLpNorm_sum_smoothCoeff_smul_le (D := fun h => Rd.higherDiff r h f) hδ hp
-    fun h h0 hh => eLpNorm_higherDiff_le_modulus_of_nonneg h0 hh
+    fun h h0 hh => eLpNorm_higherDiff_le_smoothnessModulus_of_nonneg h0 hh
 
 /-! ### The dyadic step `δ = 1/(N 2^j)` -/
 
@@ -101,7 +102,7 @@ This is `eLpNorm_sub_smooth_le_modulus` with `r = N`, since `Nδ = 2^(-j)`. -/
 theorem eLpNorm_sub_smooth_le_dyadic {f : ℝ → ℂ} (hf : Continuous f) {N : ℕ} (hN : 0 < N)
     (j : ℕ) {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p ≠ ∞) :
     eLpNorm (fun x => f x - Interval.smooth N (1 / (N * 2 ^ j)) f x) p volume ≤
-      Rd.modulus volume N p f (1 / 2 ^ j) := by
+      Rd.smoothnessModulus volume N p f (1 / 2 ^ j) := by
   have hN' : (0 : ℝ) < N := by exact_mod_cast hN
   have hδ : (0 : ℝ) < 1 / (N * 2 ^ j) := div_pos one_pos (mul_pos hN' (pow_pos two_pos j))
   have hNδ : (N : ℝ) * (1 / (N * 2 ^ j)) = 1 / 2 ^ j := by field_simp
@@ -123,7 +124,7 @@ This is `eLpNorm_iteratedDeriv_smooth_le_modulus` with `r = N`, since `δ^(-N) =
 theorem eLpNorm_iteratedDeriv_smooth_le_dyadic {f : ℝ → ℂ} (hf : Continuous f) {N : ℕ}
     (hN : 0 < N) (j : ℕ) {p : ℝ≥0∞} (hp : 1 ≤ p) :
     eLpNorm (iteratedDeriv N (Interval.smooth N (1 / (N * 2 ^ j)) f)) p volume ≤
-      2 ^ N * (N : ℝ≥0∞) ^ N * 2 ^ (j * N) * Rd.modulus volume N p f (1 / 2 ^ j) := by
+      2 ^ N * (N : ℝ≥0∞) ^ N * 2 ^ (j * N) * Rd.smoothnessModulus volume N p f (1 / 2 ^ j) := by
   have hN' : (0 : ℝ) < N := by exact_mod_cast hN
   have hδ : (0 : ℝ) < 1 / (N * 2 ^ j) := div_pos one_pos (mul_pos hN' (pow_pos two_pos j))
   have hNδ : (N : ℝ) * (1 / (N * 2 ^ j)) = 1 / 2 ^ j := by field_simp
@@ -134,14 +135,14 @@ theorem eLpNorm_iteratedDeriv_smooth_le_dyadic {f : ℝ → ℂ} (hf : Continuou
 
 /-- **The smoothing of an `L_p` function lies in `L_p`**: for continuous `f ∈ L_p(ℝ)`, `r ∈ ℕ`,
 `δ > 0` and `1 ≤ p < ∞`, also `S_δ f ∈ L_p(ℝ)`, because
-`‖f - S_δ f‖_p ≤ ω_r(f, rδ)_p ≤ 2^r ‖f‖_p` (`Rd.modulus_le`). -/
+`‖f - S_δ f‖_p ≤ ω_r(f, rδ)_p ≤ 2^r ‖f‖_p` (`Rd.smoothnessModulus_le`). -/
 theorem memLp_smooth {f : ℝ → ℂ} {p : ℝ≥0∞} (hf : Continuous f) (hfp : MemLp f p volume)
     (r : ℕ) {δ : ℝ} (hδ : 0 < δ) (hp : 1 ≤ p) (hp' : p ≠ ∞) :
     MemLp (Interval.smooth r δ f) p volume := by
   have hsub : MemLp (fun x => f x - Interval.smooth r δ f x) p volume := memLp_iff.2 <|
     calc eLpNorm (fun x => f x - Interval.smooth r δ f x) p volume
-        ≤ Rd.modulus volume r p f (r * δ) := eLpNorm_sub_smooth_le_modulus hf r hδ hp hp'
-      _ ≤ 2 ^ r * eLpNorm f p volume := Rd.modulus_le hf.aestronglyMeasurable hp r _
+        ≤ Rd.smoothnessModulus volume r p f (r * δ) := eLpNorm_sub_smooth_le_modulus hf r hδ hp hp'
+      _ ≤ 2 ^ r * eLpNorm f p volume := Rd.smoothnessModulus_le hf.aestronglyMeasurable hp r _
       _ < ∞ := ENNReal.mul_lt_top (ENNReal.pow_lt_top ENNReal.ofNat_lt_top) hfp.eLpNorm_lt_top
   have heq : Interval.smooth r δ f = f - fun x => f x - Interval.smooth r δ f x := by
     funext x
@@ -159,11 +160,11 @@ theorem memLp_iteratedDeriv_smooth {f : ℝ → ℂ} {p : ℝ≥0∞} (hf : Cont
   have hinv : (ENNReal.ofReal δ)⁻¹ < ∞ := ENNReal.inv_lt_top.2 (ENNReal.ofReal_pos.2 hδ)
   refine memLp_iff.2 ?_
   calc eLpNorm (iteratedDeriv r (Interval.smooth r δ f)) p volume
-      ≤ 2 ^ r * (ENNReal.ofReal δ)⁻¹ ^ r * Rd.modulus volume r p f (r * δ) :=
+      ≤ 2 ^ r * (ENNReal.ofReal δ)⁻¹ ^ r * Rd.smoothnessModulus volume r p f (r * δ) :=
         eLpNorm_iteratedDeriv_smooth_le_modulus hf r hδ hp
     _ ≤ 2 ^ r * (ENNReal.ofReal δ)⁻¹ ^ r * (2 ^ r * eLpNorm f p volume) := by
         gcongr
-        exact Rd.modulus_le hf.aestronglyMeasurable hp r _
+        exact Rd.smoothnessModulus_le hf.aestronglyMeasurable hp r _
     _ < ∞ := ENNReal.mul_lt_top (ENNReal.mul_lt_top h2 (ENNReal.pow_lt_top hinv))
         (ENNReal.mul_lt_top h2 hfp.eLpNorm_lt_top)
 

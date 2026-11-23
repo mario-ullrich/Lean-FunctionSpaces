@@ -178,10 +178,10 @@ theorem eLpNorm_higherDiff_le_of_le_one {f : ℝ → ℂ} (hf : Measurable f) {p
     eLpNorm_comp_add_mul_le hf p (Nat.lt_succ_iff.1 (Finset.mem_range.1 hk)) hh a b
 
 /-- For `h ≥ 0`, the points `x` with `x, x + h, …, x + rh ∈ [a, b]` form `[a, b - rh]`. -/
-theorem stepSet_Icc_of_nonneg (r : ℕ) {h : ℝ} (hh : 0 ≤ h) (a b : ℝ) :
-    Rd.stepSet (Icc a b) r h = Icc a (b - r * h) := by
+theorem diffStepSet_Icc_of_nonneg (r : ℕ) {h : ℝ} (hh : 0 ≤ h) (a b : ℝ) :
+    Rd.diffStepSet (Icc a b) r h = Icc a (b - r * h) := by
   ext x
-  simp only [Rd.stepSet, mem_ofPred_eq, mem_Icc, smul_eq_mul]
+  simp only [Rd.diffStepSet, mem_ofPred_eq, mem_Icc, smul_eq_mul]
   constructor
   · intro hx
     exact ⟨by simpa using (hx 0 (Nat.zero_le r)).1, by linarith [(hx r le_rfl).2]⟩
@@ -191,11 +191,11 @@ theorem stepSet_Icc_of_nonneg (r : ℕ) {h : ℝ} (hh : 0 ≤ h) (a b : ℝ) :
 
 /-- For `h ≥ 0`, the restricted difference on `[a, b]` has the norm of `Δ_h^r f` on
 `[a, b - rh]`. -/
-theorem eLpNorm_indicator_stepSet_Icc (r : ℕ) {h : ℝ} (hh : 0 ≤ h) (p : ℝ≥0∞) (a b : ℝ)
+theorem eLpNorm_indicator_diffStepSet_Icc (r : ℕ) {h : ℝ} (hh : 0 ≤ h) (p : ℝ≥0∞) (a b : ℝ)
     (f : ℝ → ℂ) :
-    eLpNorm ((Rd.stepSet (Icc a b) r h).indicator ((fwdDiff h)^[r] f)) p volume =
+    eLpNorm ((Rd.diffStepSet (Icc a b) r h).indicator ((fwdDiff h)^[r] f)) p volume =
       eLpNorm (higherDiff r h f) p (volume.restrict (Icc a (b - r * h))) := by
-  rw [stepSet_Icc_of_nonneg r hh,
+  rw [diffStepSet_Icc_of_nonneg r hh,
     eLpNorm_indicator_eq_eLpNorm_restrict measurableSet_Icc.nullMeasurableSet]
   rfl
 
@@ -209,23 +209,23 @@ noncomputable def modulus (r : ℕ) (p : ℝ≥0∞) (a b : ℝ) (f : ℝ → �
 theorem eLpNorm_higherDiff_le_modulus {r : ℕ} {p : ℝ≥0∞} {a b : ℝ} {f : ℝ → ℂ} {t h : ℝ}
     (hh : h ∈ Icc 0 t) :
     eLpNorm (higherDiff r h f) p (volume.restrict (Icc a (b - r * h))) ≤ modulus r p a b f t := by
-  rw [← eLpNorm_indicator_stepSet_Icc r hh.1]
+  rw [← eLpNorm_indicator_diffStepSet_Icc r hh.1]
   exact Rd.eLpNorm_indicator_higherDiff_le_modulusOn (by rw [Real.norm_of_nonneg hh.1]; exact hh.2)
 
 /-- **The modulus on an interval through steps `h ≥ 0`**:
 `ω_r(f, t, [a, b])_p = sup_{0 ≤ h ≤ t} ‖Δ_h^r f‖_{L_p[a, b - rh]}`, since the step `-h` gives the
-norm of the step `h` (`Rd.eLpNorm_indicator_stepSet_neg`). -/
+norm of the step `h` (`Rd.eLpNorm_indicator_diffStepSet_neg`). -/
 theorem modulus_eq_iSup_nonneg (r : ℕ) (p : ℝ≥0∞) (a b : ℝ) (f : ℝ → ℂ) (t : ℝ) :
     modulus r p a b f t = ⨆ (h : ℝ) (_ : h ∈ Icc 0 t),
       eLpNorm (higherDiff r h f) p (volume.restrict (Icc a (b - r * h))) := by
   refine le_antisymm (iSup₂_le fun h hh => ?_)
     (iSup₂_le fun h hh => eLpNorm_higherDiff_le_modulus hh)
   rcases le_or_gt 0 h with h0 | h0
-  · rw [eLpNorm_indicator_stepSet_Icc r h0]
+  · rw [eLpNorm_indicator_diffStepSet_Icc r h0]
     exact le_iSup₂_of_le h ⟨h0, by rwa [Real.norm_of_nonneg h0] at hh⟩ le_rfl
   · obtain ⟨s, rfl⟩ : ∃ s, h = -s := ⟨-h, (neg_neg h).symm⟩
     have hs : 0 ≤ s := by linarith
-    rw [Rd.eLpNorm_indicator_stepSet_neg, eLpNorm_indicator_stepSet_Icc r hs]
+    rw [Rd.eLpNorm_indicator_diffStepSet_neg, eLpNorm_indicator_diffStepSet_Icc r hs]
     exact le_iSup₂_of_le s ⟨hs, by rwa [norm_neg, Real.norm_of_nonneg hs] at hh⟩ le_rfl
 
 /-- The modulus increases in `t`. -/
@@ -299,19 +299,21 @@ theorem modulus_two_id (p : ℝ≥0∞) (t : ℝ) : modulus 2 p 0 1 (fun x => (x
 /-- **Differences depend only on the class in `L_p[a, b]`**: for `h ≥ 0`, functions that agree
 almost everywhere on `[a, b]` have differences of step `h` with the same `L_p` norm on
 `[a, b - rh]`: the norm is that of `Δ_h^r (1_{[a,b]} f)` on the step set
-(`Interval.eLpNorm_indicator_stepSet_Icc`, `Rd.indicator_stepSet_higherDiff_indicator`), and the
-differences of `1_{[a,b]} f = 1_{[a,b]} g` agree almost everywhere (`Rd.higherDiff_congr_ae`). -/
+(`Interval.eLpNorm_indicator_diffStepSet_Icc`, `Rd.indicator_diffStepSet_higherDiff_indicator`), and
+the differences of `1_{[a,b]} f = 1_{[a,b]} g` agree almost everywhere
+(`Rd.higherDiff_congr_ae`). -/
 theorem eLpNorm_higherDiff_congr_ae {f g : ℝ → ℂ} {a b : ℝ}
     (hfg : f =ᵐ[volume.restrict (Icc a b)] g) (r : ℕ) (p : ℝ≥0∞) {h : ℝ} (hh : 0 ≤ h) :
     eLpNorm (higherDiff r h f) p (volume.restrict (Icc a (b - r * h))) =
       eLpNorm (higherDiff r h g) p (volume.restrict (Icc a (b - r * h))) := by
-  rw [← eLpNorm_indicator_stepSet_Icc r hh p a b f, ← eLpNorm_indicator_stepSet_Icc r hh p a b g,
-    ← Rd.indicator_stepSet_higherDiff_indicator (Icc a b) r h f,
-    ← Rd.indicator_stepSet_higherDiff_indicator (Icc a b) r h g]
+  rw [← eLpNorm_indicator_diffStepSet_Icc r hh p a b f,
+    ← eLpNorm_indicator_diffStepSet_Icc r hh p a b g,
+    ← Rd.indicator_diffStepSet_higherDiff_indicator (Icc a b) r h f,
+    ← Rd.indicator_diffStepSet_higherDiff_indicator (Icc a b) r h g]
   rw [ae_eq_restrict_iff_indicator_ae_eq measurableSet_Icc] at hfg
   refine eLpNorm_congr_ae ?_
   filter_upwards [Rd.higherDiff_congr_ae hfg r h] with x hx
-  by_cases hxU : x ∈ Rd.stepSet (Icc a b) r h
+  by_cases hxU : x ∈ Rd.diffStepSet (Icc a b) r h
   · rw [Set.indicator_of_mem hxU, Set.indicator_of_mem hxU, hx]
   · rw [Set.indicator_of_notMem hxU, Set.indicator_of_notMem hxU]
 

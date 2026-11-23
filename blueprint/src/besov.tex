@@ -985,8 +985,8 @@ $\|\tau_h f - f\|_2 = \|\Delta_h f\|_2$, this is the modulus of order $1$ in $L_
 \label{lem:modulus-linear}
 \lean{Torus.enorm_translate, Torus.translate_zero, Torus.translate_add,
   Torus.enorm_translate_nsmul_sub_le, Torus.exists_coe_eq_abs_eq_norm,
-  Torus.modulus_nat_mul_le, Torus.modulus_mul_le, Torus.norm_exp_I_mul_sub_one_sq,
-  Torus.fourier_coe_eq_exp, Torus.norm_fourier_sub_one_sq}
+  Torus.periodic_smoothnessModulus_nat_mul_le, Torus.periodic_smoothnessModulus_mul_le,
+  Torus.norm_exp_I_mul_sub_one_sq, Torus.fourier_coe_eq_exp, Torus.norm_fourier_sub_one_sq}
 \leanok
 \uses{def:modulus, lem:rd-modulus}
 For $f \in L_2(\T^d)$, $h \in \T^d$ and $n \in \N$,
@@ -2071,9 +2071,10 @@ its differences with step $1$ at $0$ are those of $P$ with step $h$ at $x$.
 
 \begin{definition}[Modulus of smoothness on an interval]
 \label{def:interval-modulus}
-\lean{Interval.modulus, Interval.stepSet_Icc_of_nonneg, Interval.eLpNorm_indicator_stepSet_Icc,
-  Interval.modulus_eq_iSup_nonneg, Interval.eLpNorm_higherDiff_le_modulus, Interval.modulus_mono,
-  Interval.eLpNorm_comp_add_Icc, Interval.eLpNorm_comp_sub_Icc, Interval.eLpNorm_Icc_mono}
+\lean{Interval.modulus, Interval.diffStepSet_Icc_of_nonneg,
+  Interval.eLpNorm_indicator_diffStepSet_Icc, Interval.modulus_eq_iSup_nonneg,
+  Interval.eLpNorm_higherDiff_le_modulus, Interval.modulus_mono, Interval.eLpNorm_comp_add_Icc,
+  Interval.eLpNorm_comp_sub_Icc, Interval.eLpNorm_Icc_mono}
 \leanok
 \uses{def:iter-diff, def:rd-modulus-on}
 For $1 \leq p \leq \infty$, $r \in \N$ and $t \geq 0$ the modulus of smoothness of $f$ on
@@ -4272,7 +4273,7 @@ $y, y + m\sigma \in [0, 1]$; the substitution $x = u + 2Ly$ rescales.
 \begin{lemma}[Steps of either sign]
 \label{lem:step-regions}
 \lean{Interval.higherDiff_neg, Interval.stepRegion, Interval.mem_stepRegion,
-  Interval.stepRegion_of_nonneg, Interval.stepRegion_of_neg, Interval.stepRegion_eq_stepSet,
+  Interval.stepRegion_of_nonneg, Interval.stepRegion_of_neg, Interval.stepRegion_eq_diffStepSet,
   Interval.eLpNorm_higherDiff_stepRegion_eq}
 \leanok
 \uses{def:iter-diff, lem:rd-modulus-on}
@@ -5052,9 +5053,9 @@ $\Delta^r_{t e_i}$ in coordinate $i$ of \Cref{def:cube-modulus}.
 \label{lem:iso-expansion}
 \lean{Cube.mixedDiff, Cube.mixedDiff_nil, Cube.mixedDiff_cons, Cube.measurable_mixedDiff,
   TranslationAlgebra.coordElem, Cube.diffAct_coordElem_pow, Cube.diffAct_list_prod,
-  TranslationAlgebra.count, TranslationAlgebra.sum_count, Cube.count_le,
+  TranslationAlgebra.letterCount, TranslationAlgebra.sum_letterCount, Cube.letterCount_le,
   TranslationAlgebra.lowerVec, TranslationAlgebra.shiftVec, TranslationAlgebra.shiftVec_apply,
-  TranslationAlgebra.card_lt_add_count_le, TranslationAlgebra.prod_lt_single,
+  TranslationAlgebra.card_lt_add_letterCount_le, TranslationAlgebra.prod_lt_single,
   TranslationAlgebra.single_sub_one_eq_sum, TranslationAlgebra.single_sub_one_pow_eq_sum,
   Cube.higherDiff_eq_sum, Cube.slice_cubeDiff_of_ne, Cube.slice_mixedDiff_mem}
 \leanok
@@ -5495,7 +5496,7 @@ With the Besov space $\Besov{s}{p}{q}(V)$ defined through Littlewood--Paley bloc
 
 \begin{definition}[Differences and the modulus of smoothness]
 \label{def:rd-modulus}
-\lean{Rd.fwdDiff_eq_sub, Rd.higherDiff_apply, Rd.modulus, Rd.lpModulus}
+\lean{Rd.fwdDiff_eq_sub, Rd.higherDiff_apply, Rd.smoothnessModulus, Rd.lpModulus}
 \leanok
 For $f : V \to \C$, $h \in V$ and $r \in \N$ let $\Delta_h f = f(\cdot + h) - f$ and
 $\Delta_h^r = (\Delta_h)^r$, so that
@@ -5508,8 +5509,8 @@ $\omega_r(f, t)_p = \sup_{\|h\| \leq t} \|\Delta_h^r f\|_p$.
 \label{lem:rd-differences}
 \lean{Rd.higherDiff_comp_add, Rd.fwdDiff_nsmul, Rd.aestronglyMeasurable_comp_add,
   Rd.eLpNorm_comp_add_right, Rd.ae_comp_add_right, Rd.aestronglyMeasurable_higherDiff,
-  Rd.higherDiff_congr_ae, Rd.eLpNorm_higherDiff_le, Rd.integrable_higherDiff, Rd.conv_comp_add,
-  Rd.higherDiff_conv_ae, Rd.higherDiff_dilate, Rd.higherDiff_neg,
+  Rd.higherDiff_congr_ae, Rd.eLpNorm_higherDiff_le_two_pow_mul, Rd.integrable_higherDiff,
+  Rd.conv_comp_add, Rd.higherDiff_conv_ae, Rd.higherDiff_dilate, Rd.higherDiff_neg,
   Rd.measurable_enorm_higherDiff_uncurry}
 \leanok
 \uses{def:rd-modulus, lem:conv-assoc, lem:dilate}
@@ -5539,12 +5540,12 @@ sum is a finite sum of measurable functions of $(x, v)$.
 
 \begin{lemma}[Properties of the modulus]
 \label{lem:rd-modulus}
-\lean{Rd.eLpNorm_higherDiff_nsmul_higherDiff_le, Rd.eLpNorm_higherDiff_le_modulus, Rd.modulus_mono,
-  Rd.modulus_add_le, Rd.modulus_le, Rd.modulus_congr_ae,
-  Rd.modulus_nat_mul_le_of_forall_exists_nsmul, Rd.modulus_nat_mul_le,
-  Rd.modulus_mul_le_of_nat_mul_le, Rd.modulus_mul_le, Rd.lpModulus_add_le, Rd.lpModulus_le,
-  Rd.lpModulus_zero,
-  Rd.modulus_const_smul, Rd.lpModulus_const_smul}
+\lean{Rd.eLpNorm_higherDiff_nsmul_higherDiff_le, Rd.eLpNorm_higherDiff_le_smoothnessModulus,
+  Rd.smoothnessModulus_mono, Rd.smoothnessModulus_add_le, Rd.smoothnessModulus_le,
+  Rd.smoothnessModulus_congr_ae, Rd.smoothnessModulus_nat_mul_le_of_forall_exists_nsmul,
+  Rd.smoothnessModulus_nat_mul_le, Rd.smoothnessModulus_mul_le_of_nat_mul_le,
+  Rd.smoothnessModulus_mul_le, Rd.lpModulus_add_le, Rd.lpModulus_le, Rd.lpModulus_zero,
+  Rd.smoothnessModulus_const_smul, Rd.lpModulus_const_smul}
 \leanok
 \uses{def:rd-modulus, lem:rd-differences}
 Let $1 \leq p < \infty$, $r \in \N$ and $f, g \in L_p$. The modulus $\omega_r(f, t)_p$ increases
@@ -5590,7 +5591,7 @@ Young's inequality gives $\|\Delta_v^r (K * h)\|_p \leq \|\Delta_v^r K\|_1 \|h\|
 
 \begin{lemma}[The modulus at small scales]
 \label{lem:modulus-to-zero}
-\lean{Rd.tendsto_modulus, Rd.tendsto_lpModulus}
+\lean{Rd.tendsto_smoothnessModulus, Rd.tendsto_lpModulus}
 \leanok
 \uses{def:rd-modulus}
 Let $1 \leq p < \infty$, $r \geq 1$, let $\mu$ be an additive Haar measure on $V$ and
@@ -5610,9 +5611,9 @@ $\omega_r(f, t)_p \leq \varepsilon$ for $|t| < \delta$.
 
 \begin{lemma}[Moduli under linear changes of variables]
 \label{lem:modulus-linear-equiv}
-\lean{Rd.higherDiff_comp_addHom, Rd.modulus_comp_le, Rd.lpModulus_compMeasurePreserving_le,
-  MeasureTheory.Lp.enorm_compMeasurePreserving, Rd.modNorm_compMeasurePreserving_le,
-  Rd.modNorm_compMeasurePreserving_lt_top_iff}
+\lean{Rd.higherDiff_comp_addHom, Rd.smoothnessModulus_comp_le,
+  Rd.lpModulus_compMeasurePreserving_le, MeasureTheory.Lp.enorm_compMeasurePreserving,
+  Rd.modNorm_compMeasurePreserving_le, Rd.modNorm_compMeasurePreserving_lt_top_iff}
 \leanok
 \uses{def:rd-modulus}
 Let $V$ and $W$ be finite-dimensional real normed spaces with additive Haar measures $\mu$ and
@@ -5647,7 +5648,7 @@ $(F \circ e) \circ e^{-1} = F$, so the bound for $e^{-1}$ gives the converse.
 
 \begin{definition}[The modulus of smoothness on a subset]
 \label{def:rd-modulus-on}
-\lean{Rd.stepSet, Rd.stepSet_subset, Rd.stepSet_univ, Rd.modulusOn, Rd.lpModulusOn}
+\lean{Rd.diffStepSet, Rd.diffStepSet_subset, Rd.diffStepSet_univ, Rd.modulusOn, Rd.lpModulusOn}
 \leanok
 \uses{def:rd-modulus}
 For $U \subseteq V$, $h \in V$ and $r \in \N$ let
@@ -5664,11 +5665,11 @@ $\Delta_h^r(f, x, U) = \Delta_h^r f(x)$ for $x \in U_{rh}$ and $\Delta_h^r(f, x,
 
 \begin{lemma}[Properties of the modulus on a subset]
 \label{lem:rd-modulus-on}
-\lean{Rd.indicator_stepSet_higherDiff_indicator, Rd.mem_stepSet_neg, Rd.indicator_stepSet_neg,
-  Rd.eLpNorm_indicator_stepSet_neg, Rd.measurableSet_stepSet, Rd.stepSet_mono,
-  Rd.eLpNorm_indicator_higherDiff_le_modulusOn, Rd.modulusOn_mono, Rd.modulusOn_univ,
-  Rd.modulusOn_indicator, Rd.modulusOn_add_le, Rd.modulusOn_le_modulus, Rd.modulusOn_le,
-  Rd.modulusOn_congr_ae, Rd.modulusOn_mono_set, Rd.lpModulusOn_succ_le,
+\lean{Rd.indicator_diffStepSet_higherDiff_indicator, Rd.mem_diffStepSet_neg,
+  Rd.indicator_diffStepSet_neg, Rd.eLpNorm_indicator_diffStepSet_neg, Rd.measurableSet_diffStepSet,
+  Rd.diffStepSet_mono, Rd.eLpNorm_indicator_higherDiff_le_modulusOn, Rd.modulusOn_mono,
+  Rd.modulusOn_univ, Rd.modulusOn_indicator, Rd.modulusOn_add_le, Rd.modulusOn_le_smoothnessModulus,
+  Rd.modulusOn_le, Rd.modulusOn_congr_ae, Rd.modulusOn_mono_set, Rd.lpModulusOn_succ_le,
   Rd.lpModulusOn_le_lpModulus, Rd.lpModulusOn_mono_set, Rd.lpModulusOn_congr,
   Rd.lpModulusOn_add_le, Rd.lpModulusOn_le, Rd.modulusOn_const_smul, Rd.lpModulusOn_const_smul}
 \leanok
@@ -5736,8 +5737,8 @@ $L_p$ and $\ell_q$ norms.
 
 \begin{lemma}[Null sets do not matter]
 \label{lem:null-set-domains}
-\lean{Rd.stepSet_ae_eq, Rd.modulusOn_congr_set, Rd.lpModulusOn_congr_set, Rd.indicatorLp_congr_set,
-  Rd.modNormOn_congr_set}
+\lean{Rd.diffStepSet_ae_eq, Rd.modulusOn_congr_set, Rd.lpModulusOn_congr_set,
+  Rd.indicatorLp_congr_set, Rd.modNormOn_congr_set}
 \leanok
 \uses{def:rd-modulus-on, lem:modnorm-on}
 If $U$ and $U'$ agree up to a null set, so do their step sets $U_{rh}$ and $U'_{rh}$, and
@@ -5752,7 +5753,7 @@ The step sets are intersections of translates, and translations preserve the Leb
 
 \begin{lemma}[Moduli on subsets under linear changes of variables]
 \label{lem:modulus-on-linear-equiv}
-\lean{Rd.stepSet_preimage, Rd.modulusOn_comp_le, PiLp.norm_continuousLinearEquiv_le,
+\lean{Rd.diffStepSet_preimage, Rd.modulusOn_comp_le, PiLp.norm_continuousLinearEquiv_le,
   PiLp.norm_continuousLinearEquiv_symm_le}
 \leanok
 \uses{def:rd-modulus-on, lem:modulus-linear-equiv}
@@ -5780,7 +5781,7 @@ bounds are $\max_i \|x_i\| \leq \|x\|_p \leq (\# I)^{1/p} \max_i \|x_i\|$.
 \begin{lemma}[Moduli on subsets under affine maps]
 \label{lem:modulus-on-affine}
 \lean{Rd.measurePreserving_affine, Rd.eLpNorm_comp_affine, Rd.ae_eq_comp_affine,
-  Rd.memLp_comp_affine, Rd.stepSet_preimage_affine, Rd.higherDiff_comp_affine,
+  Rd.memLp_comp_affine, Rd.diffStepSet_preimage_affine, Rd.higherDiff_comp_affine,
   Rd.modulusOn_comp_affine_le, Rd.compAffineLp, Rd.compAffineLp_ae, Rd.enorm_compAffineLp,
   Rd.compAffineLp_inv_compAffineLp, Rd.compAffineLp_compAffineLp_inv,
   Rd.lpModulusOn_compAffineLp_le, Rd.enorm_indicatorLp_compAffineLp,
@@ -6704,9 +6705,9 @@ Pascal's rule.
 
 \begin{lemma}[The modulus of a product]
 \label{lem:product-modulus}
-\lean{Rd.eLpNorm_higherDiff_mul_le, Rd.modulus_mul_smooth_le, ENNReal.ofReal_one_div_two_pow_pow,
-  Rd.memLp_mul_of_bound, Rd.mulLp, Rd.mulLp_apply_ae, Rd.mulLp_sub, Rd.mulLp_add,
-  Rd.mulLp_smul, Rd.enorm_mulLp_le, Rd.mulLpL, Rd.mulLpL_apply}
+\lean{Rd.eLpNorm_higherDiff_mul_le, Rd.smoothnessModulus_mul_smooth_le,
+  ENNReal.ofReal_one_div_two_pow_pow, Rd.memLp_mul_of_bound, Rd.mulLp, Rd.mulLp_apply_ae,
+  Rd.mulLp_sub, Rd.mulLp_add, Rd.mulLp_smul, Rd.enorm_mulLp_le, Rd.mulLpL, Rd.mulLpL_apply}
 \leanok
 \uses{lem:smooth-differences, lem:leibniz-differences, lem:rd-differences}
 Let $1 \leq p < \infty$, $r \in \N$, $C \geq 0$ and $\psi : V \to \C$ smooth with
@@ -6874,7 +6875,7 @@ $|a(x) - a(y)| \leq 2^j |x - y|$, are regular atoms with $\sigma = r = 1$, and t
 \label{lem:level-sums}
 \lean{Rd.higherDiff_tsum_apply, Rd.le_of_rpow_le_overlap, Rd.one_sub_one_div_toReal_nonneg,
   Rd.summable_levelSum, Rd.eLpNorm_levelSum_le, Rd.card_le_of_higherDiff_ne_zero,
-  Rd.modulus_levelSum_le, Rd.eLpNorm_indicator_levelSum_le, Rd.modulusOn_levelSum_le}
+  Rd.smoothnessModulus_levelSum_le, Rd.eLpNorm_indicator_levelSum_le, Rd.modulusOn_levelSum_le}
 \leanok
 \uses{lem:bounded-overlap, def:regular-atoms, lem:rd-modulus, lem:rd-modulus-on}
 Let $1 \leq p < \infty$, and let $a_m$ be regular atoms of level $j$ with centres $c_m$ and
@@ -7192,7 +7193,7 @@ form under smooth changes of variables, which is how Besov spaces move between c
 \label{lem:convex-differences}
 \lean{Rd.fwdDiff_iter_comp_ofReal, Rd.fwdDiff_iter_taylorWithinEval_eq_zero,
   Rd.norm_fwdDiff_iter_le_of_iteratedDerivWithin, Rd.norm_iteratedFDeriv_line_le,
-  Rd.add_smul_mem_of_mem_stepSet, Rd.norm_higherDiff_le_of_iteratedFDerivWithin}
+  Rd.add_smul_mem_of_mem_diffStepSet, Rd.norm_higherDiff_le_of_iteratedFDerivWithin}
 \leanok
 \uses{def:rd-modulus-on, lem:rd-differences}
 Let $\Omega \subseteq V$ be convex with nonempty interior, $r \geq 1$, and let $a$ be $r$ times

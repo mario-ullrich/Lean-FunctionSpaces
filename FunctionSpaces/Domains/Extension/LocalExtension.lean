@@ -165,7 +165,7 @@ theorem patch_support {b : LocalMeansBump V} (hb : Ω.ConeSupported b.toFun) {L 
 theorem patch_step {b : LocalMeansBump V} (hb : Ω.ConeSupported b.toFun) {L : ℕ} {ε ρ : ℝ}
     {c : V} (hLR : L * b.radius ≤ ε) :
     ∀ c' : ℝ, 1 ≤ c' → ∀ z, b.toFun z ≠ 0 →
-      Ω.domain ∩ ball c (ρ - ε) ⊆ stepSet (Ω.domain ∩ ball c ρ) L (-c'⁻¹ • z) := by
+      Ω.domain ∩ ball c (ρ - ε) ⊆ diffStepSet (Ω.domain ∩ ball c ρ) L (-c'⁻¹ • z) := by
   intro c' hc' z hz x ⟨hxΩ, hxc⟩ l hl
   have hc0 : 0 < c' := zero_lt_one.trans_le hc'
   have hzK : -z ∈ Ω.cone := hb z hz
@@ -227,7 +227,7 @@ omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- **Interior patches, the step condition**: steps of length at most `δ / L` take
 `{infDist(·, Oᶜ) > δ}` into `O_{L h}`. -/
 theorem interior_patch_step (O : Set V) {L : ℕ} {δ : ℝ} {h : V} (hh : L * ‖h‖ ≤ δ) :
-    {x : V | δ < infDist x Oᶜ} ⊆ stepSet O L h := by
+    {x : V | δ < infDist x Oᶜ} ⊆ diffStepSet O L h := by
   intro x hx l hl
   by_contra hmem
   have h1 : infDist x Oᶜ ≤ dist x (x + (l : ℝ) • h) := infDist_le_dist_of_mem hmem
@@ -264,7 +264,7 @@ theorem enorm_indicatorLp_localMean_zero_le (hp : p ≠ ∞) {W : Set V} (hW : M
 (`ENNReal.lqNorm_dyadicWeight_le_of_head_of_succ_le`). -/
 theorem localNormOn_le (hp : p ≠ ∞) {W T : Set V} (hW : MeasurableSet W) (L : ℕ) (s : ℝ)
     {q : ℝ≥0∞} (hq : 1 ≤ q)
-    (hstep : ∀ c : ℝ, 1 ≤ c → ∀ z, b.toFun z ≠ 0 → W ⊆ stepSet T L (-c⁻¹ • z))
+    (hstep : ∀ c : ℝ, 1 ≤ c → ∀ z, b.toFun z ≠ 0 → W ⊆ diffStepSet T L (-c⁻¹ • z))
     (hR : b.radius ≤ 1 / 2) (f : Lp ℂ p (volume : Measure V)) :
     b.localNormOn hp hW L s q f ≤
       (eLpNorm (momentKernel b.toFun L) 1 volume + 2 * ∫⁻ z, ‖b.toFun z‖ₑ) *
@@ -299,7 +299,7 @@ theorem exists_local_extension_le (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s :
     {q : ℝ≥0∞} (hq : 1 ≤ q) {U W T : Set V} (hU : MeasurableSet U)
     (hW : MeasurableSet W) (hT : MeasurableSet T) (hUT : U ⊆ T)
     (hUW : ∀ x ∈ U, ∀ j y, b.dual L j y ≠ 0 → x - y ∈ W)
-    (hstep : ∀ c : ℝ, 1 ≤ c → ∀ z, b.toFun z ≠ 0 → W ⊆ stepSet T L (-c⁻¹ • z))
+    (hstep : ∀ c : ℝ, 1 ≤ c → ∀ z, b.toFun z ≠ 0 → W ⊆ diffStepSet T L (-c⁻¹ • z))
     (hR : b.radius ≤ 1 / 2) (f : Lp ℂ p (volume : Measure V))
     (hf : modNormOn hT L s q f < ∞) :
     ∃ F : Lp ℂ p (volume : Measure V),
@@ -345,7 +345,7 @@ theorem exists_local_extension (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s : �
     (hsL : s < L) {q : ℝ≥0∞} (hq : 1 ≤ q) {U W T : Set V} (hU : MeasurableSet U)
     (hW : MeasurableSet W) (hT : MeasurableSet T) (hUT : U ⊆ T)
     (hUW : ∀ x ∈ U, ∀ j y, b.dual L j y ≠ 0 → x - y ∈ W)
-    (hstep : ∀ c : ℝ, 1 ≤ c → ∀ z, b.toFun z ≠ 0 → W ⊆ stepSet T L (-c⁻¹ • z))
+    (hstep : ∀ c : ℝ, 1 ≤ c → ∀ z, b.toFun z ≠ 0 → W ⊆ diffStepSet T L (-c⁻¹ • z))
     (hR : b.radius ≤ 1 / 2) (f : Lp ℂ p (volume : Measure V))
     (hf : modNormOn hT L s q f < ∞) :
     ∃ F : Lp ℂ p (volume : Measure V),

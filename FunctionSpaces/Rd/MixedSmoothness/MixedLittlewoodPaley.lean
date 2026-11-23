@@ -179,7 +179,7 @@ theorem exists_eLpNorm_conv_psi_dual_le (L : ℕ) :
       rw [← hmem, convLp_convLp]
       exact convLp_of_eq_zero h1 _ (conv_psi_Theta (by omega)) P
     have hmod : lpModulus 1 L η (m - 3) ≤ b.dualConst L * almostDiagCoeff L (m - 3) k := by
-      rw [lpModulus, modulus_congr_ae (MemLp.coeFn_toLp _)]
+      rw [lpModulus, smoothnessModulus_congr_ae (MemLp.coeFn_toLp _)]
       exact iSup₂_le fun v hv => b.eLpNorm_higherDiff_dual_le L hv
     have hc : almostDiagCoeff L (m - 3) k = almostDiagCoeff L m k * dyadicWeight L 3 := by
       have hk : k ≤ m - 3 := by omega
@@ -235,7 +235,7 @@ theorem exists_eLpNorm_conv_kernel_Theta_le (L : ℕ) :
     set Θ : Lp ℂ 1 (volume : Measure ℝ) :=
       (memLp_one_iff_integrable.2 (integrable_Theta (V := ℝ) k)).toLp _
     have hmod : lpModulus 1 L Θ j ≤ dyadicWeight (-(L : ℝ)) (j - k) * D := by
-      rw [lpModulus, modulus_congr_ae (MemLp.coeFn_toLp _)]
+      rw [lpModulus, smoothnessModulus_congr_ae (MemLp.coeFn_toLp _)]
       refine iSup₂_le fun v hv => ?_
       refine (eLpNorm_higherDiff_Theta_le L k v).trans (mul_le_mul' ?_ le_rfl)
       rw [← ENNReal.rpow_natCast]

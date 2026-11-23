@@ -133,8 +133,8 @@ theorem norm_iteratedFDeriv_line_le (x h : E) {i : ℕ} (hi : 1 ≤ i) (t : ℝ)
 
 /-- **Steps in a convex set**: if `x` and `x + r h` lie in the convex set `Ω`, so does `x + t h`
 for `0 ≤ t ≤ r`. -/
-theorem add_smul_mem_of_mem_stepSet {Ω : Set E} (hΩ : Convex ℝ Ω) {r : ℕ} {h x : E}
-    (hx : x ∈ stepSet Ω r h) {t : ℝ} (ht : t ∈ Icc (0 : ℝ) r) : x + t • h ∈ Ω := by
+theorem add_smul_mem_of_mem_diffStepSet {Ω : Set E} (hΩ : Convex ℝ Ω) {r : ℕ} {h x : E}
+    (hx : x ∈ diffStepSet Ω r h) {t : ℝ} (ht : t ∈ Icc (0 : ℝ) r) : x + t • h ∈ Ω := by
   have hx0 : x ∈ Ω := by simpa using hx 0 (Nat.zero_le r)
   rcases Nat.eq_zero_or_pos r with rfl | hr
   · have : t = 0 := le_antisymm (by simpa using ht.2) ht.1
@@ -152,7 +152,7 @@ theorem norm_higherDiff_le_of_iteratedFDerivWithin {Ω : Set E} (hΩ : Convex �
     (hint : (interior Ω).Nonempty) {a : E → ℂ} {r : ℕ} (hr : 1 ≤ r)
     (ha : ContDiffOn ℝ r a Ω) {C : ℝ}
     (hC : ∀ i ≤ r, ∀ y ∈ Ω, ‖iteratedFDerivWithin ℝ i a Ω y‖ ≤ C) {h x : E}
-    (hx : x ∈ stepSet Ω r h) :
+    (hx : x ∈ diffStepSet Ω r h) :
     ‖(fwdDiff h)^[r] a x‖ ≤ 2 ^ r * (r : ℝ) ^ (r + 1) * C * ‖h‖ ^ r := by
   obtain ⟨n, rfl⟩ := Nat.exists_eq_add_of_le' hr
   set γ : ℝ → E := fun t => x + t • h
@@ -162,7 +162,7 @@ theorem norm_higherDiff_le_of_iteratedFDerivWithin {Ω : Set E} (hΩ : Convex �
   have hγ' : ContDiff ℝ ⊤ γ := contDiff_const.add (contDiff_id.smul contDiff_const)
   have hγ : ContDiff ℝ (n + 1) γ := hγ'.of_le le_top
   have hmaps : MapsTo γ I Ω := fun t ht =>
-    add_smul_mem_of_mem_stepSet hΩ hx ⟨ht.1, by push_cast; exact ht.2⟩
+    add_smul_mem_of_mem_diffStepSet hΩ hx ⟨ht.1, by push_cast; exact ht.2⟩
   have ha' : ContDiffOn ℝ ((n + 1 : ℕ) : WithTop ℕ∞) a Ω := by exact_mod_cast ha
   have hg : ContDiffOn ℝ (n + 1) (a ∘ γ) I := ha'.comp hγ.contDiffOn hmaps
   -- the differences of `a` along `h` are those of `a ∘ γ` along `1`

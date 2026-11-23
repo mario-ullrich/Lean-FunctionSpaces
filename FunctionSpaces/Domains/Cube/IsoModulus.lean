@@ -151,9 +151,9 @@ theorem add_smul_mem_cubeSet {r : ℕ} {h x : Fin d → ℝ} (hx : x ∈ isoRegi
   exact add_mul_mem_Icc (hx.2 i (mem_univ i)) (hx.1 i) hn hnr
 
 /-- **The isotropic region on the cube is a step set**: `{x ∈ Q : x + rh ∈ Q}` is the set `Q_{rh}`
-of the points `x` with `x, x + h, …, x + rh ∈ Q` (`Rd.stepSet`). -/
+of the points `x` with `x, x + h, …, x + rh ∈ Q` (`Rd.diffStepSet`). -/
 theorem isoRegion_inter_cubeSet (r : ℕ) (h : Fin d → ℝ) :
-    isoRegion r h ∩ cubeSet d = Rd.stepSet (cubeSet d) r h := by
+    isoRegion r h ∩ cubeSet d = Rd.diffStepSet (cubeSet d) r h := by
   ext x
   constructor
   · intro hx l hl
@@ -167,10 +167,10 @@ theorem isoRegion_inter_cubeSet (r : ℕ) (h : Fin d → ℝ) :
 theorem eLpNorm_higherDiff_isoRegion_eq (r : ℕ) (p : ℝ≥0∞) (f : (Fin d → ℝ) → ℂ)
     (h : Fin d → ℝ) :
     eLpNorm (higherDiff r h f) p ((cubeVol d).restrict (isoRegion r h)) =
-      eLpNorm ((Rd.stepSet (cubeSet d) r h).indicator ((fwdDiff h)^[r] f)) p volume := by
+      eLpNorm ((Rd.diffStepSet (cubeSet d) r h).indicator ((fwdDiff h)^[r] f)) p volume := by
   rw [cubeVol_eq_restrict, Measure.restrict_restrict (measurableSet_isoRegion r h),
     isoRegion_inter_cubeSet, eLpNorm_indicator_eq_eLpNorm_restrict
-      (Rd.measurableSet_stepSet (measurableSet_cubeSet d) r h).nullMeasurableSet]
+      (Rd.measurableSet_diffStepSet (measurableSet_cubeSet d) r h).nullMeasurableSet]
   rfl
 
 /-- The **isotropic modulus of smoothness** on the cube, the modulus on the set `Q` of
