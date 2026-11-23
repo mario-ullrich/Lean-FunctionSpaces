@@ -77,6 +77,7 @@ and how they differ.
 | differences (moduli of smoothness) | [`ℝ^d`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-rd-besov-differences.html#thm:rd-besov), [`𝕋^d`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-torus-lp-moduli.html#thm:torus-lp-moduli) (`0 < s < r`); [`[0, 1]`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-spline-jackson-coincidence.html#thm:spline-besov), [`[0, 1]^d`, isotropic or coordinate differences](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-iso-modulus.html#thm:iso-besov) (`0 ≤ s < r - 1 + 1/p`) |
 | intrinsic differences | [Lipschitz graph domains](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-graph-intrinsic-differences.html#thm:graph-besov), [bounded Lipschitz domains](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-bounded-lipschitz-domains.html#thm:bounded-lipschitz-besov), [bounded smooth domains](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-smooth-domain-charts.html#thm:smooth-domain-besov) (`0 < s < r`) |
 | restrictions of `B^s_{p,q}(ℝ^d)` | [Lipschitz graph domains](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-graph-intrinsic-differences.html#thm:graph-besov), [bounded Lipschitz domains](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-bounded-lipschitz-domains.html#thm:bounded-lipschitz-besov) (`0 < s < r`) |
+| restrictions of tensor splines on a cube | [`[0, 1]^d`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-domain-splines.html#thm:cube-splines-restriction), [bounded Lipschitz domains in a cube `a + L [0, 1]^d`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-domain-splines.html#thm:domain-splines) (`0 < s < r - 1 + 1/p`) |
 | Littlewood–Paley blocks | [`ℝ^d`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-rd-besov-differences.html#thm:rd-besov), [`𝕋^d`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-torus-lp-blocks.html#thm:torus-lp-besov) |
 | dyadic blocks of Fourier coefficients | [`𝕋^d`](https://mario-ullrich.github.io/Lean-FunctionSpaces/ch-torus.html#thm:torus-coefficients) (`p = 2`) |
 | local means | [`ℝ^d`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-rd-local-means.html#thm:local-means) (`0 < s < L`) |
@@ -233,6 +234,19 @@ For a general scheme the project describes `A^s_q`
   `F ∈ W^m_p(V)` (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev_order`); for
   `m = 1`, `d ≥ 1` and `1 ≤ p ≤ ∞` a bounded linear operator does this
   (`Rd.BoundedLipschitzDomain.sobolevExtensionL`).
+* **Splines on bounded Lipschitz domains.** Let `Ω` be a bounded Lipschitz domain in a cube
+  `Q = a + L [0, 1]^d`, `1 ≤ p < ∞`, `1 ≤ q ≤ ∞`, `r ≥ 1` and `0 < s < r - 1 + 1/p`, and let the
+  tensor splines of order `r` on `Q` be those of `[0, 1]^d` moved by `x ↦ a + L x`. Then
+  `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞` iff `f` agrees on `Ω` with a
+  function in the approximation space `A^s_q` of these splines
+  (`Rd.BoundedLipschitzDomain.exists_memApprox_cubeSplineSchemeAt_iff`), iff `f = ∑_k b_k` on `Ω`
+  with tensor splines `b_k` of level `k` on `Q` and `‖(2^(ks) ‖b_k‖_{L_p(Q)})_k‖_{ℓ_q} < ∞`
+  (`Rd.HasBesovExtension.exists_cubeSplineBlocksAt_iff`). The best approximations `E_k(f)` of `f`
+  in `L_p(Ω)` by the restrictions of the splines of level `k` then satisfy
+  `‖(2^(ks) E_k(f))_k‖_{ℓ_q} ≤ C (‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q})`
+  (`Rd.HasBesovExtension.exists_approxNormDyadic_domainSplineScheme_le`). On `[0, 1]^d` itself the
+  tensor splines describe the restrictions of `B^s_{p,q}(ℝ^d)`
+  (`Cube.memApprox_cubeSplineScheme_iff_exists_besov`).
 * **Compact manifolds.** Let `M` be a compact Hausdorff smooth manifold of dimension `d ≥ 1`,
   without boundary, with boundary or with corners, with a smooth measure `μ`. For `1 ≤ p < ∞`,
   `s > 0` and `1 ≤ q ≤ ∞`, `B^s_{p,q}(M)`, defined by the chart pieces of a Besov atlas, is the
@@ -308,8 +322,8 @@ block documents state every result with its Lean name and list the files:
   singular integrals.
 * [Sobolev spaces on `ℝ^d`](docs/SobolevRd.md): weak derivatives, `W^m_p = F^m_{p,2} = H^{m,p}`,
   embeddings.
-* [Lipschitz domains and traces](docs/DomainsTraces.md): extension, traces, `H^1(Ω)`, Green's
-  formula.
+* [Lipschitz domains and traces](docs/DomainsTraces.md): extension, splines on domains, traces,
+  `H^1(Ω)`, Green's formula.
 * [Fractional Sobolev spaces on Lipschitz domains](docs/FractionalSobolev.md): `H̃^s(Ω)` and
   `H^s_0(Ω)`, the zero extension bound.
 * [Manifolds and eigenbases](docs/Manifolds.md): compact manifolds, Dirichlet and Neumann
@@ -332,7 +346,8 @@ block documents state every result with its Lean name and list the files:
 * Sobolev spaces: Jawerth–Franke with Besov targets, Hardy–Littlewood–Sobolev, Trudinger, Mihlin
   multipliers with finitely many derivatives (Riesz transforms).
 * Manifolds with corners: the cube as an example, traces on faces, products of models.
-* Higher smoothness: Marchaud's inequality, splines on domains, sharp Daubechies exponents.
+* Higher smoothness: Marchaud's inequality, sharp Daubechies exponents, and spline
+  approximation on domains described intrinsically.
 * Extension operators for `W^m_p` of every order, and Stein's universal operator.
 * Eigenbases: elliptic regularity, the local Weyl law, spectral `B^s_{p,q}` for `p ≠ 2` or
   `s ≥ 1`, the two-sided description of the Dirichlet approximation spaces, and the

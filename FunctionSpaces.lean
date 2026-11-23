@@ -120,6 +120,7 @@ public import FunctionSpaces.Domains.Lipschitz.LocalLipschitzGraphs
 public import FunctionSpaces.Domains.Lipschitz.ConvexDomains
 public import FunctionSpaces.Domains.Lipschitz.BesovDomains
 public import FunctionSpaces.Domains.Lipschitz.BesovDomainLocalisation
+public import FunctionSpaces.Domains.Lipschitz.SplinesOnDomains
 public import FunctionSpaces.Domains.Extension.RychkovExtension
 public import FunctionSpaces.Domains.Extension.LipschitzGraphBesov
 public import FunctionSpaces.Domains.Extension.LocalExtension

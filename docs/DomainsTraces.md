@@ -13,7 +13,10 @@ for every `s > 0`. On a bounded Lipschitz domain, `B^s_{p,q}(Ω)` and `B^t_{p,q}
 spaces, and the trace is a bounded linear operator from `B^s_{p,q}(Ω)` onto `B^{s-1/p}_{p,q}(Γ)`,
 `1/p < s < 1 + 1/p`, with a bounded linear right inverse. In finite dimension the bounded
 Lipschitz domains are the sets of the usual definition by local Lipschitz graphs, the open balls
-and the bounded open convex sets among them.
+and the bounded open convex sets among them. On a bounded Lipschitz domain inside a cube the Besov
+spaces are the restrictions of the approximation spaces of tensor splines on the cube, also in
+block form, and the splines restricted to the domain approximate at the corresponding rate in
+`L_p` of the domain.
 The Besov spaces on compact manifolds, the smooth bounded domains and the eigenbases of the
 Laplacian are in [Manifolds and eigenbases](Manifolds.md).
 
@@ -175,6 +178,27 @@ isometric to the trace space of `H^1(Ω)`, by its definition as the orthogonal c
   `g ∈ L_2(V)` has weak derivatives `∂_{e_j} g ∈ L_2(O)` on `O` iff
   `‖g‖_{L_2(Ω)} + ‖(2^k ω_r(g, 2^(-k), Ω)_2)_k‖_{ℓ_2} < ∞` for every order `r ≥ 2`
   (`Rd.BesovDomain.exists_hasWeakLineDeriv_iff_modNormOn_lt_top`).
+* **Splines on bounded Lipschitz domains.** Let `Ω` be a bounded Lipschitz domain in a cube
+  `Q = a + L [0, 1]^d` of the Euclidean space `ℝ^d` (`Cube.euclideanCubeAt`), `1 ≤ p < ∞`,
+  `1 ≤ q ≤ ∞`, `r ≥ 1` and `0 < s < r - 1 + 1/p`, and let the tensor splines of order `r` on `Q`
+  be those of `[0, 1]^d` moved by `x ↦ a + L x` (`Cube.cubeSplineSchemeAt`). Then
+  `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞` iff `f` agrees on `Ω` with a
+  function in the approximation space `A^s_q` of these splines
+  (`Rd.BoundedLipschitzDomain.exists_memApprox_cubeSplineSchemeAt_iff`), iff `f = ∑_k b_k` on `Ω`
+  with tensor splines `b_k` of level `k` on `Q` and `‖(2^(ks) ‖b_k‖_{L_p(Q)})_k‖_{ℓ_q} < ∞`
+  (`Rd.HasBesovExtension.exists_cubeSplineBlocksAt_iff`). Both hold for every measurable `Ω ⊆ Q`
+  with the extension property, where the function `G` in `A^s_q` can be chosen with
+  `‖G‖_{A^s_q} ≤ C (‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q})` for one `C < ∞`
+  (`Rd.HasBesovExtension.exists_cubeSplineAt_le`) and the modulus may have any order `r' > s`
+  (`Rd.HasBesovExtension.exists_memApprox_cubeSplineSchemeAt_iff_of_order`), and one direction
+  holds for every measurable `Ω ⊆ Q` and `0 ≤ s < r - 1 + 1/p`
+  (`Rd.modNormOn_lt_top_of_memApprox_cubeSplineSchemeAt`). The best approximations `E_k(f)` of
+  `f` in `L_p(Ω)` by the restrictions of the splines of level `k` (`Rd.domainSplineScheme`) then
+  satisfy
+  `‖(2^(ks) E_k(f))_k‖_{ℓ_q} ≤ C (‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q})`
+  (`Rd.HasBesovExtension.exists_approxNormDyadic_domainSplineScheme_le`). On `[0, 1]^d` itself the
+  tensor splines describe the restrictions of `B^s_{p,q}(ℝ^d)`
+  (`Cube.memApprox_cubeSplineScheme_iff_exists_besov`).
 * **Traces on bounded Lipschitz domains.** Let `Ω` be a bounded Lipschitz domain with boundary `Γ`,
   boundary balls `B_j` and graph domains `Ω_j` as above, and `(ψ_j)` a smooth resolution of unity on
   `Γ` with `tsupport ψ_j ⊆ B_j` (`Rd.BoundedLipschitzDomain.BoundaryPartition`). A property holds
@@ -615,6 +639,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Bounded open convex sets as bounded Lipschitz domains: the ray length, its cone estimate, open convex sets, bounded or not, near a frontier point as regions above a Lipschitz graph, and the open unit cube with its closure | ✅ | ✗ | `Domains/Lipschitz/ConvexDomains` |
 | Lipschitz graph domains with null graphs and boundaries, closures of convex Lipschitz graph domains as Besov domains, the quadrant as a Lipschitz graph domain and the quadrant model of manifolds with corners as a Besov domain, bounded Lipschitz domains with the extension property, closures of nonempty convex bounded Lipschitz domains and of nonempty bounded open convex sets, closed balls of positive radius and the closed unit cube as Besov domains | ✅ | ✗ | `Domains/Lipschitz/BesovDomains` |
 | Functions vanishing outside a ball on a Besov domain: the interior up to a null set, the bounded convex pieces `interior Ω ∩ B(0, R)`, the cutoff identity, the intrinsic quasi-norm through the pieces, and `W^1_2 = B^1_{2,2}` on the interior | ✅ | ✗ | `Domains/Lipschitz/BesovDomainLocalisation` |
+| Splines on domains through restriction: agreement of cut-offs on subsets and under affine maps; the cube `a + L [0, 1]^d` with its transported tensor splines and their approximation spaces; functions of finite intrinsic quasi-norm on a measurable subset of a cube with the extension property as restrictions of the tensor spline space of the cube, with a bound, for every order of the differences and in block form; bounded Lipschitz domains; the unit cube (restrictions of `B^s_{p,q}(ℝ^d)`); the restricted tensor splines on `Ω` and their Jackson estimate | ✅ | ✗ | `Domains/Lipschitz/SplinesOnDomains` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

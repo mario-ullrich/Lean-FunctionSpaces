@@ -315,6 +315,10 @@ declarations.
 * **Extension by zero on `L_p`** (`FunctionSpaces/Analysis/Lp/IndicatorOperator.lean`): for
   measurable `T ⊆ O`, `g ↦ 1_T g` from `Lp ℂ p (μ.restrict O)` to `Lp ℂ p μ` as a continuous
   linear operator of norm at most `1` (`Rd.indicatorExtendLp`; TauCeti has `extendByZeroLpₗᵢ`).
+  With Mathlib's restriction `LpToLpRestrictCLM`: the restriction of the extension by zero is the
+  identity, and two restrictions agree iff the cut-offs agree
+  (`Rd.LpToLpRestrictCLM_indicatorExtendLp`, `Rd.LpToLpRestrictCLM_eq_iff_indicatorLp_eq`,
+  `FunctionSpaces/Domains/Lipschitz/SplinesOnDomains.lean`).
 * **Differences of Schwartz functions in `L_p`**
   (`FunctionSpaces/Rd/Approximation/BandInverse.lean`): for a Schwartz function `G` on a
   finite-dimensional real inner product space and `1 ≤ p < ∞`, `‖G(· + v) - G‖_p ≤ ‖∂_v G‖_p`

@@ -47,7 +47,9 @@ the sets of the usual definition by local Lipschitz graphs, with the open balls 
 domain has the extension property of Besov domains, and that the closures of convex Lipschitz
 graph domains, the quadrant (the model of manifolds with corners) and the closures of nonempty
 bounded open convex sets, among them closed balls of positive radius and the closed unit cube,
-are Besov domains.
+are Besov domains. \Cref{sec:domain-splines} describes the Besov spaces of a bounded Lipschitz
+domain inside a cube by the tensor splines of the cube: as restrictions of their approximation
+spaces, also in block form, with Jackson's inequality for the splines restricted to the domain.
 
 \section{Lipschitz graph domains}
 
@@ -2369,6 +2371,292 @@ $B(c, R)$ (Mathlib's \texttt{closure\_\allowbreak ball}), and the closed unit cu
 the open unit cube (\Cref{lem:unit-cube}), a bounded Lipschitz domain
 (\Cref{cor:unit-cube-lipschitz}).
 \end{proof}
+
+\section{Splines on bounded Lipschitz domains}
+\label{sec:domain-splines}
+
+The tensor splines of order $r$ describe the Besov spaces of the unit cube with the modulus for
+the Euclidean norm (\Cref{thm:cube-splines-euclidean}). Through an extension this passes to every
+measurable set with the extension property inside a cube $Q$, in particular to every bounded
+Lipschitz domain in $Q$: a function of finite intrinsic quasi-norm agrees on the set with an
+element of the approximation space of the tensor splines on $Q$, and conversely. This is the
+restriction form of DeVore \cite[\S 7.7]{DeVore1998} and of DeVore and Sharpley
+\cite[\S 6]{DeVoreSharpley}: extend the function to $\R^d$, approximate on the cube, and restrict.
+For $p \geq 1$ and minimally smooth domains an extension $\mathcal{E}$ with
+$\omega_r(\mathcal{E} f, t)_p \leq C \omega_r(f, t)_p$ exists, after Johnen and Scherer
+\cite{JohnenScherer1977} (see the introduction of \cite{DeVoreSharpley}), and
+\cite[Theorem~6.6]{DeVoreSharpley} bounds the moduli of the extension of DeVore and Sharpley by
+Hardy sums of averaged moduli of $f$; here the extension property
+(\Cref{def:besov-extension-property}) takes their place. The splines of $Q$ restricted to
+the set approximate at the corresponding rate (\Cref{thm:domain-splines-direct}); the remark after
+that theorem names what the converse needs.
+
+In this section $\R^d$ is the Euclidean space of dimension $d$, $1 \leq p < \infty$,
+$1 \leq q \leq \infty$ and $r \geq 1$ unless a statement says otherwise, $a \in \R^d$, $L > 0$,
+\[
+  Q = a + L [0, 1]^d = \{x \in \R^d : a_i \leq x_i \leq a_i + L \text{ for every } i\} ,
+  \qquad A x = a + L x ,
+\]
+and $N_\Omega(f) = \|f\|_{L_p(\Omega)} + \|(2^{ks} \omega_r(f, 2^{-k}, \Omega)_p)_k\|_{\ell_q}$ is
+the intrinsic quasi-norm on a measurable set $\Omega \subseteq \R^d$ (\Cref{lem:modnorm-on}).
+$Q_E = [0, 1]^d \subseteq \R^d$, the restriction $R$ and the extension by zero $E$ are those of
+\Cref{def:euclidean-cube}.
+
+\begin{lemma}[Agreement on subsets and under affine maps]
+\label{lem:agreement-subsets}
+\lean{Rd.indicatorLp_eq_of_subset, Rd.LpToLpRestrictCLM_eq_iff_indicatorLp_eq,
+  Rd.LpToLpRestrictCLM_indicatorExtendLp, Rd.restrictSubsetLp_eq_of_indicatorLp_eq,
+  Rd.indicatorLp_compAffineLp_eq_of_indicatorLp_eq}
+\leanok
+\uses{lem:indicator-lp, lem:zero-extension-lp, lem:restriction-smaller-set,
+  lem:modulus-on-affine}
+Let $\mu$ be a measure on $X$ and $1 \leq p \leq \infty$.
+\begin{enumerate}
+  \item For measurable $S \subseteq T$ and $F, f \in L_p(\mu)$, $1_T F = 1_T f$ implies
+    $1_S F = 1_S f$.
+  \item For measurable $S$ and $F, G \in L_p(\mu)$, $F|_S = G|_S$ in $L_p(\mu|_S)$ if and only if
+    $1_S F = 1_S G$; and $(1_S G)|_S = G$ for every $G \in L_p(\mu|_S)$.
+  \item For measurable $D \subseteq O$, $G \in L_p(\mu|_O)$ and $f \in L_p(\mu)$ with
+    $1_D (1_O G) = 1_D f$, the restriction of $G$ to $D$ is $f|_D$.
+  \item Let $V$, $\mu$ and $A$ be as in \Cref{lem:modulus-on-affine}, $U \subseteq V$ measurable
+    and $G_1, G_2 \in L_p(\mu)$. If $1_U G_1 = 1_U G_2$, then
+    $1_{A^{-1} U} (G_1 \circ A) = 1_{A^{-1} U} (G_2 \circ A)$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:indicator-lp-eq-iff}
+Each statement says that two functions agree almost everywhere on a set
+(\Cref{lem:indicator-lp-eq-iff}). For (4), $A$ carries $\mu$ to a multiple of $\mu$, so almost
+everywhere equalities move along $A$, and $A x \in U$ for $x \in A^{-1} U$.
+\end{proof}
+
+\begin{definition}[Tensor splines on a cube]
+\label{def:euclidean-cube-at}
+\lean{Cube.euclideanCubeAt, Cube.measurableSet_euclideanCubeAt,
+  Cube.preimage_affine_euclideanCubeAt, Cube.preimage_affine_inv_euclideanCube,
+  Cube.restrictEuclideanAt, Cube.extendEuclideanAt, Cube.cubeSplineSchemeAt,
+  Cube.mem_cubeSplineSchemeAt_two_pow}
+\leanok
+\uses{def:euclidean-cube, lem:modulus-on-affine, def:cube-spline, def:comap}
+The cube $Q$ is measurable, $A^{-1}(Q) = Q_E$, and the inverse map $A^{-1} y = -L^{-1} a +
+L^{-1} y$ satisfies $(A^{-1})^{-1}(Q_E) = Q$. For $1 \leq p \leq \infty$,
+\[
+  R_Q F = R(F \circ A) , \qquad E_Q g = (E g) \circ A^{-1}
+\]
+define bounded linear operators $R_Q : L_p(\R^d) \to L_p([0, 1]^d)$ and
+$E_Q : L_p([0, 1]^d) \to L_p(\R^d)$. The \emph{tensor splines of order $r$ on $Q$} form the image
+scheme in $L_p(Q)$ of the tensor splines of order $r$ on $[0, 1]^d$ (\Cref{def:cube-spline})
+under $g \mapsto (E_Q g)|_Q$ (\Cref{def:comap}). Their approximants of complexity $2^k$ are the
+functions $(E_Q g)|_Q$ for the splines $g$ of level $k$, the \emph{splines of level $k$ on $Q$}.
+\end{definition}
+
+\begin{proposition}[Transport to the unit cube]
+\label{prop:cube-spline-scheme-at}
+\lean{Cube.restrictEuclideanAt_extendEuclideanAt, Cube.restrictEuclideanAt_eq_of_indicatorLp_eq,
+  Cube.indicatorLp_extendEuclideanAt_restrictEuclideanAt, Cube.memApprox_cubeSplineSchemeAt_iff}
+\leanok
+\uses{def:euclidean-cube-at, def:approx-space}
+Let $1 \leq p \leq \infty$, $g \in L_p([0, 1]^d)$ and $F, G \in L_p(\R^d)$. Then
+$R_Q(E_Q g) = g$ and $1_Q E_Q(R_Q F) = 1_Q F$, and $1_Q F = 1_Q G$ implies $R_Q F = R_Q G$. For
+all $s \in \R$ and $0 < q \leq \infty$, an element $G \in L_p(Q)$ lies in the approximation space
+$A^s_q$ of the tensor splines on $Q$ if and only if $R_Q(1_Q G)$ lies in the approximation space
+$A^s_q$ of the tensor splines of $[0, 1]^d$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{lem:modulus-on-affine, lem:euclidean-cube-transport, lem:agreement-subsets,
+  lem:approx-functorial}
+The compositions with $A$ and $A^{-1}$ undo each other (\Cref{lem:modulus-on-affine}), and $A$
+carries $Q_E$ onto $Q$, so the first three statements are those of
+\Cref{lem:euclidean-cube-transport} moved along $A$ (\Cref{lem:agreement-subsets}). Hence
+$T g = (E_Q g)|_Q$ and $S G = R_Q(1_Q G)$ are bounded linear maps inverse to each other
+(\Cref{lem:agreement-subsets}). $T$ maps the splines of $[0, 1]^d$ to the splines on $Q$ by
+definition, and $S$ maps $T g$ to $g$, so \Cref{lem:approx-functorial} applies in both
+directions.
+\end{proof}
+
+\begin{proposition}[Restrictions of spline space elements]
+\label{prop:domain-splines-finite}
+\lean{Rd.modNormOn_lt_top_of_memApprox_cubeSplineSchemeAt}
+\leanok
+\uses{def:euclidean-cube-at, lem:modnorm-on}
+Let $\Omega \subseteq Q$ be measurable and $0 \leq s < r - 1 + 1/p$, let $G \in L_p(Q)$ lie in
+the approximation space $A^s_q$ of the tensor splines of order $r$ on $Q$, and let
+$f \in L_p(\R^d)$ agree with $G$ on $\Omega$. Then $N_\Omega(f) < \infty$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{prop:cube-spline-scheme-at, thm:cube-splines-euclidean, lem:modulus-on-affine,
+  lem:euclidean-cube-transport, lem:null-set-domains, lem:agreement-subsets,
+  lem:restriction-moduli}
+By \Cref{prop:cube-spline-scheme-at}, $g = R_Q(1_Q G)$ lies in the approximation space of the
+tensor splines of $[0, 1]^d$, and $g = R(E g)$, so $N_{Q_E}(E g) < \infty$
+(\Cref{thm:cube-splines-euclidean}, \Cref{lem:euclidean-cube-transport}). Composition with
+$A^{-1}$ carries this to
+$N_Q(E_Q g) < \infty$ (\Cref{lem:modulus-on-affine}; $(A^{-1})^{-1}(Q_E) = Q$, and equal sets give
+equal quasi-norms, \Cref{lem:null-set-domains}). The function $E_Q g = E_Q(R_Q(1_Q G))$ agrees with
+$G$ on $Q$ (\Cref{prop:cube-spline-scheme-at}), hence with $f$ on $\Omega$
+(\Cref{lem:agreement-subsets}), and $N_\Omega(f) \leq N_Q(E_Q g)$
+(\Cref{lem:restriction-moduli}).
+\end{proof}
+
+\begin{theorem}[Splines on domains through restriction]
+\label{thm:domain-splines}
+\lean{Rd.HasBesovExtension.exists_cubeSplineAt_le,
+  Rd.HasBesovExtension.exists_memApprox_cubeSplineSchemeAt_iff,
+  Rd.HasBesovExtension.exists_memApprox_cubeSplineSchemeAt_iff_of_order,
+  Rd.BoundedLipschitzDomain.exists_memApprox_cubeSplineSchemeAt_iff,
+  Rd.BoundedLipschitzDomain.exists_memApprox_cubeSplineSchemeAt_iff_of_order,
+  Rd.BoundedLipschitzDomain.exists_memApprox_cubeSplineSchemeAt_iff_exists_besov}
+\leanok
+\uses{def:euclidean-cube-at, lem:modnorm-on, def:besov-extension-property,
+  def:bounded-lipschitz, def:dyadic-norm}
+Let $0 < s < r - 1 + 1/p$.
+\begin{enumerate}
+  \item Let $\Omega \subseteq Q$ be a measurable set with the extension property. There is
+    $C < \infty$ such that every $f \in L_p(\R^d)$ with $N_\Omega(f) < \infty$ agrees on
+    $\Omega$ with some $G \in L_p(Q)$ with $\|G\|^{\mathrm{dy}}_{A^s_q} \leq C N_\Omega(f)$ in the
+    approximation space of the tensor splines of order $r$ on $Q$. Hence $f \in L_p(\R^d)$
+    agrees on $\Omega$ with an element of this approximation space if and only if
+    $N_\Omega(f) < \infty$, if and only if
+    $\|f\|_{L_p(\Omega)} + \|(2^{ks} \omega_{r'}(f, 2^{-k}, \Omega)_p)_k\|_{\ell_q} < \infty$
+    for every order $r' > s$.
+  \item Let $\Omega \subseteq Q$ be a bounded Lipschitz domain and $f \in L_p(\R^d)$. Then the
+    equivalences of (1) hold for $\Omega$, and $f$ agrees on $\Omega$ with an element of the
+    approximation space $A^s_q$ of the tensor splines of order $r$ on $Q$ if and only if $f$
+    agrees on $\Omega$ with some $F \in L_p(\R^d)$ with
+    $\|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q} < \infty$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{prop:domain-splines-finite, thm:cube-splines-euclidean, lem:modulus-on-affine,
+  lem:null-set-domains, prop:cube-spline-scheme-at, lem:approx-functorial,
+  lem:agreement-subsets, lem:restriction-moduli, thm:dyadic-norm, cor:besov-extension-order,
+  thm:bounded-lipschitz-besov-domain, thm:bounded-lipschitz-besov}
+(1) Since $1/p \leq 1$, $s < r$, and the extension property gives $C_1$ and $F \in L_p(\R^d)$
+that agrees with $f$ on $\Omega$, with $\|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q}
+\leq C_1 N_\Omega(f)$. The intrinsic quasi-norm $N_Q(F)$ is at most this quasi-norm
+(\Cref{lem:restriction-moduli}), $N_{Q_E}(F \circ A) \leq C_3 N_Q(F)$
+(\Cref{lem:modulus-on-affine}; $A^{-1}(Q) = Q_E$, and equal sets give equal quasi-norms,
+\Cref{lem:null-set-domains}), and Jackson's direction on the unit cube gives
+$\|R_Q F\|^{\mathrm{dy}}_{A^s_q} \leq C_2 N_{Q_E}(F \circ A)$
+(\Cref{thm:cube-splines-euclidean}); the constants do not depend on $f$. The map
+$T g = (E_Q g)|_Q$ carries the splines of $[0, 1]^d$ to those on $Q$, so $G = T(R_Q F)$ has
+$\|G\|^{\mathrm{dy}}_{A^s_q} \leq \|T\| C_2 C_3 C_1 N_\Omega(f)$ (\Cref{lem:approx-functorial}).
+$G$ agrees with $F$ on $Q$ (\Cref{prop:cube-spline-scheme-at}), hence with $f$ on $\Omega$
+(\Cref{lem:agreement-subsets}), and $G$ lies in the approximation space since its dyadic
+quasi-norm is finite (\Cref{thm:dyadic-norm}). The converse is
+\Cref{prop:domain-splines-finite}. On a set with the extension property the order of the
+differences does not matter (\Cref{cor:besov-extension-order}).
+
+(2) Bounded Lipschitz domains have the extension property
+(\Cref{thm:bounded-lipschitz-besov-domain}), so (1) applies, and $N_\Omega(f) < \infty$
+describes the restrictions of the Besov space of $\R^d$ (\Cref{thm:bounded-lipschitz-besov}).
+\end{proof}
+
+For a bounded Lipschitz domain $\Omega$ and $0 < s < r - 1 + 1/p$, the functions of the Banach
+space $B^s_{p,q}(\Omega)$ of \Cref{def:domain-besov-space} are therefore, on $\Omega$, the
+restrictions of the approximation space of the tensor splines on any cube that contains
+$\Omega$.
+
+\begin{theorem}[Tensor splines and restrictions to the unit cube]
+\label{thm:cube-splines-restriction}
+\lean{Cube.memApprox_cubeSplineScheme_iff_exists_besov}
+\leanok
+\uses{def:euclidean-cube, def:cube-spline, def:approx-space}
+Let $0 < s < r - 1 + 1/p$. Then $g \in L_p([0, 1]^d)$ lies in the approximation space $A^s_q$
+of the tensor splines of order $r$ if and only if $g = R F$ for some $F \in L_p(\R^d)$ with
+$\|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q} < \infty$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{thm:cube-splines-euclidean, cor:convex-besov-domain, lem:euclidean-cube-transport,
+  lem:restriction-moduli}
+If $g$ lies in the approximation space, then $g = R(E g)$ and $N_{Q_E}(E g) < \infty$
+(\Cref{thm:cube-splines-euclidean}). The closed unit cube is a Besov domain
+(\Cref{cor:convex-besov-domain}), so $E g$ agrees on $Q_E$ with some $F$ of finite Besov
+quasi-norm, and $R F = R(E g) = g$ (\Cref{lem:euclidean-cube-transport}). Conversely,
+$N_{Q_E}(F) \leq \|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q}$
+(\Cref{lem:restriction-moduli}), and \Cref{thm:cube-splines-euclidean} applies to $g = R F$.
+\end{proof}
+
+\begin{corollary}[Spline blocks on domains]
+\label{cor:domain-spline-blocks}
+\lean{Rd.HasBesovExtension.exists_cubeSplineBlocksAt_iff}
+\leanok
+\uses{def:euclidean-cube-at, lem:modnorm-on, def:besov-extension-property}
+Let $\Omega \subseteq Q$ be a measurable set with the extension property, for example a bounded
+Lipschitz domain, and $0 < s < r - 1 + 1/p$. Then $f \in L_p(\R^d)$ has $N_\Omega(f) < \infty$ if
+and only if $f$ agrees on $\Omega$ with a sum $\sum_k b_k$, convergent in $L_p(Q)$, of splines
+$b_k$ of order $r$ and level $k$ on $Q$ with $\|(2^{ks} \|b_k\|_{L_p(Q)})_k\|_{\ell_q} < \infty$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+\uses{thm:domain-splines, thm:block-decomposition}
+$L_p(Q)$ is a Banach space, so an element of $L_p(Q)$ lies in the approximation space of the
+tensor splines on $Q$ if and only if it has such a block decomposition
+(\Cref{thm:block-decomposition}); \Cref{thm:domain-splines} gives the rest.
+\end{proof}
+
+On the cube this is the norm $N_3$ of DeVore and Popov \cite[Theorem~5.1]{DeVorePopovTAMS},
+whose blocks are the differences $T_k f - T_{k-1} f$ of their dyadic spline approximations $T_k$
+\cite[(4.20)]{DeVorePopovTAMS}.
+
+\begin{definition}[Restricted splines]
+\label{def:domain-spline-scheme}
+\lean{Rd.domainSplineScheme}
+\leanok
+\uses{def:euclidean-cube-at, def:comap, lem:restriction-smaller-set}
+Let $1 \leq p \leq \infty$ and $\Omega \subseteq Q$ measurable. The \emph{tensor splines of order
+$r$ on $Q$ restricted to $\Omega$} form the image scheme in $L_p(\Omega)$ of the tensor splines of
+order $r$ on $Q$ under the restriction $L_p(Q) \to L_p(\Omega)$. Its error at complexity $2^k$ is
+$E_k(f) = \inf_S \|f - S\|_{L_p(\Omega)}$ over the restrictions $S$ of the splines of level $k$
+on $Q$.
+\end{definition}
+
+\begin{theorem}[Jackson's inequality for the restricted splines]
+\label{thm:domain-splines-direct}
+\lean{Rd.HasBesovExtension.exists_approxNormDyadic_domainSplineScheme_le,
+  Rd.HasBesovExtension.memApprox_domainSplineScheme}
+\leanok
+\uses{def:domain-spline-scheme, lem:modnorm-on, def:besov-extension-property, def:dyadic-norm}
+Let $\Omega \subseteq Q$ be a measurable set with the extension property and
+$0 < s < r - 1 + 1/p$. There is $C < \infty$ with
+\[
+  \|f\|_{L_p(\Omega)} + \bigl\|\bigl(2^{ks} E_k(f)\bigr)_k\bigr\|_{\ell_q} \leq C N_\Omega(f)
+\]
+for every $f \in L_p(\R^d)$ with $N_\Omega(f) < \infty$; in particular $f|_\Omega$ lies in the
+approximation space $A^s_q$ of the restricted splines.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{thm:domain-splines, lem:agreement-subsets, lem:approx-functorial, thm:retract,
+  thm:dyadic-norm}
+Take $G$ and $C$ of \Cref{thm:domain-splines} for $f$. The restriction $T$ of $L_p(Q)$ to
+$L_p(\Omega)$ maps $G$ to $f|_\Omega$ (\Cref{lem:agreement-subsets}) and the splines on $Q$ to
+the restricted splines, so $\|f|_\Omega\|^{\mathrm{dy}}_{A^s_q} \leq \|T\| \,
+\|G\|^{\mathrm{dy}}_{A^s_q} \leq \|T\| C N_\Omega(f)$ (\Cref{lem:approx-functorial}; this is the
+first inequality of \Cref{thm:retract}, which needs no extension). A finite dyadic quasi-norm
+puts $f|_\Omega$ in the approximation space (\Cref{thm:dyadic-norm}).
+\end{proof}
+
+The converse, a bound of $N_\Omega(f)$ by the approximation quasi-norm of the restricted
+splines, would follow from a Bernstein inequality for the restricted splines in $L_p(\Omega)$,
+whose constants degenerate on cells that meet $\Omega$ in thin pieces. By \Cref{thm:retract} it
+would also follow from an approximation-preserving extension (\Cref{def:approx-extension}) for
+the restriction $L_p(Q) \to L_p(\Omega)$ and the restricted splines, which turns near-best
+restricted splines into near-best splines on $Q$ level by level. The weighted extended B-splines
+of H\"ollig, Reif and Wipper \cite{HolligReifWipper2001} are the standard stabilisation of
+splines on domains.
 
 \chapter{Traces on Lipschitz domains}
 \label{ch:traces-lipschitz}
