@@ -236,8 +236,8 @@ declarations.
   iff `ι` is (`ContinuousLinearMap.norm_pivotDual`, `ContinuousLinearMap.ker_pivotDual`,
   `ContinuousLinearMap.pivotDual_injective_iff`,
   `ContinuousLinearMap.pivotDual_comp_injective_iff`), and `J g v = ∫ conj (g) ι v dμ` for
-  `H = L_2(μ)` (`MeasureTheory.L2.pivotDual_apply_apply`); a continuous linear map into a Hilbert
-  space has dense range iff `(range T)^⊥ = ⊥`
+  `H = L_2(μ)` (`MeasureTheory.L2.pivotDual_apply_apply_eq_integral`); a continuous linear map
+  into a Hilbert space has dense range iff `(range T)^⊥ = ⊥`
   (`ContinuousLinearMap.denseRange_iff_orthogonal_range_eq_bot`, next to
   `ContinuousLinearMap.orthogonal_range` in `Mathlib/Analysis/InnerProductSpace/Adjoint.lean`);
   a function of `L_p(μ)`, `p ≥ 1`, that integrates to zero against the smooth real functions with

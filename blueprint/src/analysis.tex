@@ -2797,8 +2797,11 @@ $H^s(\R^d) \subseteq L_2(\R^d) \subseteq H^{-s}(\R^d)$ (\Cref{thm:rd-gelfand-tri
 $\tilde H^s(\Omega) \subseteq L_2(\Omega) \subseteq H^{-s}(\Omega)$ on open sets
 $\Omega \subseteq \R^d$ (\Cref{thm:domain-gelfand-triple}) and
 $H^t(\Gamma) \subseteq L_2(\Gamma) \subseteq H^{-t}(\Gamma)$ on the boundary of a bounded
-Lipschitz domain (\Cref{thm:boundary-gelfand-triple}). The last section treats the finite $L_2$
-sums $E^m$ of a Hilbert space $E$: operators act componentwise with the same norm bound,
+Lipschitz domain (\Cref{thm:boundary-gelfand-triple}). Each of them follows from
+\Cref{thm:pivot-dual}: the space contributes its embedding into $L_2$, the dense range of the
+embedding, and the identification of the pivot dual with the pairing of the space of negative
+order. The last section treats the finite $L_2$ sums $E^m$ of a Hilbert space $E$: operators act
+componentwise with the same norm bound,
 $(K^m)^\perp = (K^\perp)^m$ for every subspace $K$, and the dual of $E^m$ is $(E^*)^m$
 (\Cref{sec:pi-lp-sums}); the vector-valued Sobolev spaces are such sums.
 
@@ -2837,7 +2840,7 @@ and \texttt{InnerProductSpace.\allowbreak toDual}). It is conjugate-linear and b
   ContinuousLinearMap.norm_pivotDual_apply, ContinuousLinearMap.norm_pivotDual,
   ContinuousLinearMap.norm_pivotDual_apply_le, ContinuousLinearMap.ker_pivotDual,
   ContinuousLinearMap.pivotDual_injective_iff, ContinuousLinearMap.pivotDual_comp_injective_iff,
-  MeasureTheory.L2.pivotDual_apply_apply}
+  MeasureTheory.L2.pivotDual_apply_apply_eq_integral}
 \leanok
 \uses{def:pivot-dual, lem:dense-range-orthogonal}
 For all $g \in H$ and $v, w \in V$,

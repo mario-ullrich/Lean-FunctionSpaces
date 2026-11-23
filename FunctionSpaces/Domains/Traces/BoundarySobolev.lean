@@ -40,9 +40,9 @@ charts `γ_j : H_j → V` and a resolution of unity `(ψ_j)` on `Γ`.
   range, since the restrictions to `Γ` of smooth functions with compact support lie in `H^t(Γ)`
   (`Rd.BoundedLipschitzDomain.exists_boundarySobolev_toLp_ae_eq`,
   `Rd.BoundedLipschitzDomain.denseRange_boundarySobolevToL2`). Its pivot dual
-  `L_2(Γ) → H^{-t}(Γ)`, `g ↦ (h ↦ ∫_Γ conj (g) h dσ)`
-  (`Rd.BoundedLipschitzDomain.boundaryPivotDual`), is injective
-  (`Rd.BoundedLipschitzDomain.boundaryPivotDual_injective`): `L_2(Γ)` is the pivot space, and the
+  `L_2(Γ) → H^{-t}(Γ)` is `g ↦ (h ↦ ∫_Γ conj (g) h dσ)`
+  (`Rd.BoundedLipschitzDomain.pivotDual_boundarySobolevToL2_apply_apply`) and is injective by the
+  dense range (`ContinuousLinearMap.pivotDual_injective_iff`): `L_2(Γ)` is the pivot space, and the
   pairing of `H^{-t}(Γ)` with `H^t(Γ)` extends the inner product of `L_2(Γ)`.
 
 The constants depend on `Ω`, `t` and `s` and are fixed before the functions. The results
@@ -628,7 +628,10 @@ theorem toLp_sobolevTrace_eq_besovTrace (s : ℝ) (u : RestrictionSpace s Ω.toO
 `B^t_{2,2}(Γ) → L_2(Γ)` (`Rd.BoundedLipschitzDomain.BoundaryBesov.toLpL`). It sends `g` to its
 function in `L_2(Γ)`, it is injective, and for `t < 1` it has dense range
 (`Rd.BoundedLipschitzDomain.boundarySobolevToL2_injective`,
-`Rd.BoundedLipschitzDomain.denseRange_boundarySobolevToL2`). -/
+`Rd.BoundedLipschitzDomain.denseRange_boundarySobolevToL2`), so its pivot dual
+`L_2(Γ) → H^{-t}(Γ)` (`ContinuousLinearMap.pivotDual`) is injective
+(`ContinuousLinearMap.pivotDual_injective_iff`): `H^t(Γ) ⊂ L_2(Γ) ⊂ H^{-t}(Γ)` is a Gelfand triple
+(`Rd.BoundedLipschitzDomain.pivotDual_boundarySobolevToL2_apply_apply`). -/
 noncomputable def boundarySobolevToL2 (t : ℝ) (ht : 0 < t) :
     Ω.BoundarySobolev t →L[ℂ] Ω.BoundaryL2 :=
   BoundaryBesov.toLpL ∘L
@@ -684,33 +687,21 @@ theorem denseRange_boundarySobolevToL2 {t : ℝ} (ht : 0 < t) (ht1 : t < 1) :
   L2.denseRange_of_forall_contDiff _ isOpen_univ (ae_of_all _ fun _ => mem_univ _)
     fun _ hψ hc _ => Ω.exists_boundarySobolev_toLp_ae_eq ht ht1 hψ hc
 
-/-- **The inclusion `L_2(Γ) → H^{-t}(Γ)`**, `t > 0`: `g ↦ (h ↦ ⟪g, h⟫_{L_2(Γ)})`, the pivot dual
-(`ContinuousLinearMap.pivotDual`) of the embedding `H^t(Γ) → L_2(Γ)`, conjugate-linear and
-bounded. For `0 < t < 1` it is injective
-(`Rd.BoundedLipschitzDomain.boundaryPivotDual_injective`), and `H^t(Γ) ⊂ L_2(Γ) ⊂ H^{-t}(Γ)` is a
-Gelfand triple with pivot space `L_2(Γ)`: the pairing of `H^{-t}(Γ)` with `H^t(Γ)` extends the
-inner product of `L_2(Γ)`. -/
-noncomputable def boundaryPivotDual (t : ℝ) (ht : 0 < t) :
-    Ω.BoundaryL2 →L⋆[ℂ] Ω.DualBoundarySobolev t :=
-  haveI : Fact (0 < t) := ⟨ht⟩
-  (Ω.boundarySobolevToL2 t ht).pivotDual
-
-/-- **The pairing extends the inner product of `L_2(Γ)`**: for `g ∈ L_2(Γ)` and `h ∈ H^t(Γ)`,
-`(J g)(h) = ∫_Γ conj (g) h dσ` (`MeasureTheory.L2.pivotDual_apply_apply`). -/
-theorem boundaryPivotDual_apply_apply {t : ℝ} (ht : 0 < t) (g : Ω.BoundaryL2)
+/-- **The pivot dual of `H^t(Γ) → L_2(Γ)` is the `L_2(Γ)` pairing**, `t > 0`: the pivot dual
+`J : L_2(Γ) → H^{-t}(Γ)` of the embedding `H^t(Γ) → L_2(Γ)` (`ContinuousLinearMap.pivotDual`)
+sends `g` to `h ↦ ∫_Γ conj (g) h dσ` (`MeasureTheory.L2.pivotDual_apply_apply_eq_integral`,
+`Rd.BoundedLipschitzDomain.boundarySobolevToL2_apply`): the pairing of `H^{-t}(Γ)` with `H^t(Γ)`
+extends the inner product of `L_2(Γ)`. For `0 < t < 1` the embedding has dense range
+(`Rd.BoundedLipschitzDomain.denseRange_boundarySobolevToL2`), so `J` is injective
+(`ContinuousLinearMap.pivotDual_injective_iff`) and `L_2(Γ)` is the pivot space of the triple
+`H^t(Γ) ⊂ L_2(Γ) ⊂ H^{-t}(Γ)`. The hypothesis `t > 0` enters as the instance `Fact (0 < t)`, which
+makes `H^t(Γ)` complete (`Rd.BoundedLipschitzDomain.completeSpace_boundarySobolev`), as the pivot
+dual needs, and which supplies the hypothesis of the embedding. -/
+theorem pivotDual_boundarySobolevToL2_apply_apply {t : ℝ} [Fact (0 < t)] (g : Ω.BoundaryL2)
     (h : Ω.BoundarySobolev t) :
-    Ω.boundaryPivotDual t ht g h = ∫ y, conj (g y) * h.toLp y ∂Ω.surfaceMeasure := by
-  have : Fact (0 < t) := ⟨ht⟩
-  rw [boundaryPivotDual, L2.pivotDual_apply_apply, boundarySobolevToL2_apply]
-
-/-- **`L_2(Γ) → H^{-t}(Γ)` is injective**, `0 < t < 1`: `H^t(Γ)` is dense in `L_2(Γ)`
-(`Rd.BoundedLipschitzDomain.denseRange_boundarySobolevToL2`,
-`ContinuousLinearMap.pivotDual_injective_iff`). -/
-theorem boundaryPivotDual_injective {t : ℝ} (ht : 0 < t) (ht1 : t < 1) :
-    Function.Injective (Ω.boundaryPivotDual t ht) :=
-  have : Fact (0 < t) := ⟨ht⟩
-  ((Ω.boundarySobolevToL2 t ht).pivotDual_injective_iff).2
-    (Ω.denseRange_boundarySobolevToL2 ht ht1)
+    (Ω.boundarySobolevToL2 t Fact.out).pivotDual g h =
+      ∫ y, conj (g y) * h.toLp y ∂Ω.surfaceMeasure :=
+  L2.pivotDual_apply_apply_eq_integral _ g h
 
 end BoundedLipschitzDomain
 

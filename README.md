@@ -323,14 +323,14 @@ For a general scheme the project describes `A^s_q`
   for `0 < t < 1` the embedding `H^t(Γ) → L_2(Γ)`, are injective with dense range
   (`Rd.sobolevToL2_injective`, `Rd.denseRange_sobolevToL2`, `Rd.tildeToL2_injective`,
   `Rd.denseRange_tildeToL2`, `Rd.BoundedLipschitzDomain.boundarySobolevToL2_injective`,
-  `Rd.BoundedLipschitzDomain.denseRange_boundarySobolevToL2`). `L_2(V)` maps injectively into
-  `(H^s(V))^*`, and `g` goes to the pairing with the element of `H^{-s}(V)` whose distribution is
-  `g` (`Rd.pivotDual_sobolevToL2_injective`, `Rd.pivotDual_sobolevToL2_apply_apply`). `L_2(Ω)`
-  maps injectively into `H^{-s}(Ω)` and `L_2(Γ)` into `H^{-t}(Γ)`, and the pairing of the dual
-  space with the smaller space extends the inner product of `L_2`
-  (`Rd.dualEquiv_tildePivotDual_injective`, `Rd.pairing_dualEquiv_tildePivotDual`,
-  `Rd.BoundedLipschitzDomain.boundaryPivotDual_injective`,
-  `Rd.BoundedLipschitzDomain.boundaryPivotDual_apply_apply`).
+  `Rd.BoundedLipschitzDomain.denseRange_boundarySobolevToL2`), so their pivot duals
+  `g ↦ ⟪g, ι ·⟫_{L_2}` map `L_2` injectively into the dual spaces
+  (`ContinuousLinearMap.pivotDual_injective_iff`). On `ℝ^d`, `g` goes to the pairing with the
+  element of `H^{-s}(V)` whose distribution is `g` (`Rd.pivotDual_sobolevToL2_apply_apply`); on
+  `Ω` and on `Γ` the pairing of the dual space with the smaller space extends the inner product
+  of `L_2`, as `U ↦ ∫_Ω conj (g) ι_s U`, with `ι_s U` the `L_2` function of `U`, and
+  `h ↦ ∫_Γ conj (g) h dσ` (`Rd.pairing_dualEquiv_pivotDual_tildeToL2`,
+  `Rd.BoundedLipschitzDomain.pivotDual_boundarySobolevToL2_apply_apply`).
 * **Eigenfunction expansions.** For an orthonormal basis of weak eigenfunctions `e_i` with
   eigenvalues `λ_i`, let `A_k` be the span of the `e_i` with `⌊√(1 + λ_i)⌋ < k`, and let
   `0 < θ < 1`, `1 ≤ q ≤ ∞`. On a bounded Lipschitz domain `Ω`, `d ≥ 1`, with the Neumann

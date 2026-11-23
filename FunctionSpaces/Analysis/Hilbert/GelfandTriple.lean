@@ -35,7 +35,7 @@ Hilbert space; for separable `V` an evolution triple in Zeidler's sense) with **
 inner product of `H`.
 
 * **Pivot space `L_2(μ)`**: for `ι : V → L_2(μ)`, `J g v = ∫ conj (g) ι v dμ`
-  (`MeasureTheory.L2.pivotDual_apply_apply`).
+  (`MeasureTheory.L2.pivotDual_apply_apply_eq_integral`).
 * **Dense range in `L_2`**: let `μ` be a locally finite measure on a finite-dimensional real
   space that is carried by an open set `U`. A function of `L_p(μ)`, `p ≥ 1`, that integrates to
   zero against every smooth real function with compact support in `U` is zero
@@ -43,6 +43,13 @@ inner product of `H`.
   `IsOpen.ae_eq_zero_of_integral_contDiff_smul_eq_zero`), so a continuous linear map into
   `L_2(μ)` whose range contains these functions has dense range
   (`MeasureTheory.L2.denseRange_of_forall_contDiff`).
+
+The Sobolev spaces on `ℝ^d`, on open sets and on the boundary of a bounded Lipschitz domain give
+their Gelfand triples with pivot space `L_2` through `ContinuousLinearMap.pivotDual_injective_iff`:
+each contributes its embedding into `L_2`, the dense range of that embedding (on open sets and on
+the boundary by `MeasureTheory.L2.denseRange_of_forall_contDiff`, on `ℝ^d` by the density of the
+Schwartz functions) and the identification of the pivot dual with the pairing of the space of
+negative order.
 -/
 
 @[expose] public section
@@ -173,7 +180,7 @@ variable {𝕜 : Type*} [RCLike 𝕜] {α : Type*} [MeasurableSpace α] {μ : Me
 `L_2(μ)` with values in `𝕜 = ℝ` or `ℂ`, the pivot dual of `g ∈ L_2(μ)` is
 `J g v = ∫ conj (g) ι v dμ` for `v ∈ X` (`ContinuousLinearMap.pivotDual_apply_apply`, Mathlib's
 `MeasureTheory.L2.inner_def`, `RCLike.inner_apply'`). -/
-theorem pivotDual_apply_apply (ι : X →L[𝕜] Lp 𝕜 2 μ) (g : Lp 𝕜 2 μ) (v : X) :
+theorem pivotDual_apply_apply_eq_integral (ι : X →L[𝕜] Lp 𝕜 2 μ) (g : Lp 𝕜 2 μ) (v : X) :
     ι.pivotDual g v = ∫ x, conj (g x) * ι v x ∂μ := by
   rw [ContinuousLinearMap.pivotDual_apply_apply, inner_def]
   simp only [RCLike.inner_apply']

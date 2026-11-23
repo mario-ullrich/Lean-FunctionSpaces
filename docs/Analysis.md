@@ -83,13 +83,20 @@ ranges, orthogonal complements and duals, on which the vector-valued Sobolev spa
   is `(range ι)^⊥`, so `J` is injective iff `ι` has dense range
   (`ContinuousLinearMap.ker_pivotDual`, `ContinuousLinearMap.pivotDual_injective_iff`), and
   `J ∘ ι` is injective iff `ι` is (`ContinuousLinearMap.pivotDual_comp_injective_iff`). For
-  `H = L_2(μ)`, `J g v = ∫ conj (g) ι v dμ` (`MeasureTheory.L2.pivotDual_apply_apply`). For a
-  locally finite measure `μ` on a finite-dimensional real space carried by an open set `U`, a
-  function of `L_p(μ)`, `p ≥ 1`, that integrates to zero against the smooth real functions with
-  compact support in `U` vanishes, by the fundamental lemma of the calculus of variations
+  `H = L_2(μ)`, `J g v = ∫ conj (g) ι v dμ`
+  (`MeasureTheory.L2.pivotDual_apply_apply_eq_integral`). For a locally finite measure `μ` on a
+  finite-dimensional real space carried by an open set `U`, a function of `L_p(μ)`, `p ≥ 1`, that
+  integrates to zero against the smooth real functions with compact support in `U` vanishes, by
+  the fundamental lemma of the calculus of variations
   (`MeasureTheory.Lp.eq_zero_of_forall_integral_contDiff_smul_eq_zero`), so a continuous linear
   map into `L_2(μ)` whose range contains these functions has dense range
-  (`MeasureTheory.L2.denseRange_of_forall_contDiff`).
+  (`MeasureTheory.L2.denseRange_of_forall_contDiff`). The Sobolev spaces on `ℝ^d`, on open sets
+  and on the boundary of a bounded Lipschitz domain give their Gelfand triples through
+  `ContinuousLinearMap.pivotDual_injective_iff`: each contributes its embedding into `L_2`, the
+  dense range of that embedding (on open sets and on the boundary by
+  `MeasureTheory.L2.denseRange_of_forall_contDiff`, on `ℝ^d` by the density of the Schwartz
+  functions) and the identification of the pivot dual with the pairing of the space of negative
+  order (see [Lipschitz domains and traces](DomainsTraces.md)).
 * **Finite `L_2` sums.** Let `X`, `Y` be complex normed spaces, `m ∈ ℕ` and
   `X^m = WithLp 2 (Fin m → X)` with `‖x‖² = ∑_i ‖x_i‖²`. A bounded operator `f : X → Y` acts
   componentwise on `X^m` with norm at most `‖f‖`, kernel `(ker f)^m` and range `(range f)^m`,
