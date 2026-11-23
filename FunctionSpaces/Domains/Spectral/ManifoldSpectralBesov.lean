@@ -67,7 +67,7 @@ omit [Nontrivial E] [IsManifold I ∞ M] in
 `(L_2(μ), H^1_A(M))_{θ,q}`, then `(P_k f)|_{D_k}` lies in `(L_2(D_k), W^1_2(D_k))_{θ,q}`. The
 operators `f ↦ (P_k f)|_{D_k}` on `L_2(μ)` and `T_k` (`Manifold.BesovAtlas.toNeumann`) on
 `H^1_A(M)` are compatible with the embeddings (`Manifold.BesovAtlas.neumannEmbedding_toNeumann`),
-so the interpolation property applies (`ApproximationScheme.MemKMethod.map`). -/
+so the interpolation property applies (`ApproximationScheme.MemInclKMethod.map`). -/
 theorem memKMethod_neumann_pieceLp_of_memKMethod {f : Lp ℂ 2 μ}
     (hf : (InterpCouple.ofMap ((A.chartSobolevEmbedding μ).restrictScalars ℝ)).MemKMethod θ q f)
     (k : Fin A.n) :
@@ -75,7 +75,7 @@ theorem memKMethod_neumann_pieceLp_of_memKMethod {f : Lp ℂ 2 μ}
       ((Rd.neumannEmbedding (A.pieceDomain k).toOpens).restrictScalars ℝ)).MemKMethod θ q
       (LpToLpRestrictCLM E ℂ ℂ volume 2 ((A.pieceDomain k).toOpens : Set E)
         (A.pieceLp μ Rd.two_ne_top k f)) := by
-  refine InterpCouple.memKMethod_ofMap_iff.2 (ApproximationScheme.MemKMethod.map
+  refine InterpCouple.memKMethod_ofMap_iff.2 (ApproximationScheme.MemInclKMethod.map
     ((LpToLpRestrictCLM E ℂ ℂ volume 2 ((A.pieceDomain k).toOpens : Set E) ∘L
       A.pieceCLM μ Rd.two_ne_top k).restrictScalars ℝ)
     ((A.toNeumann μ k).restrictScalars ℝ) ?_ (InterpCouple.memKMethod_ofMap_iff.1 hf))
@@ -163,14 +163,14 @@ omit [Nontrivial E] in
 /-- **Lifts map the whole-space couple into the chart couple**: for every chart index `k` and every
 `F ∈ (L_2(E), H^1(E))_{θ,q}`, the lift `L_k F` lies in `(L_2(μ), H^1_A(M))_{θ,q}`. The bounded
 operators `L_k` and `S_k` (`Manifold.BesovAtlas.chartLiftSobolev`) satisfy `L_k ι = J S_k`, so the
-interpolation property applies (`ApproximationScheme.MemKMethod.map`). -/
+interpolation property applies (`ApproximationScheme.MemInclKMethod.map`). -/
 theorem memKMethod_chartLiftLp {F : Lp ℂ 2 (volume : Measure E)}
     (hF : (InterpCouple.ofMap
       ((Rd.toL2 : H^{1}(E) →L[ℂ] Lp ℂ 2 (volume : Measure E)).restrictScalars ℝ)).MemKMethod
         θ q F) (k : Fin A.n) :
     (InterpCouple.ofMap ((A.chartSobolevEmbedding μ).restrictScalars ℝ)).MemKMethod θ q
       (A.chartLiftLp μ Rd.two_ne_top k F) := by
-  refine InterpCouple.memKMethod_ofMap_iff.2 (ApproximationScheme.MemKMethod.map
+  refine InterpCouple.memKMethod_ofMap_iff.2 (ApproximationScheme.MemInclKMethod.map
     ((A.chartLiftCLM μ Rd.two_ne_top k).restrictScalars ℝ)
     ((A.chartLiftSobolev μ k).restrictScalars ℝ) ?_ (InterpCouple.memKMethod_ofMap_iff.1 hF))
   ext1 U
@@ -216,7 +216,7 @@ theorem memKMethod_chartSobolev_iff (hθ : 0 < θ) (hθ' : θ < 1) (hq : 1 ≤ q
         (A.pieceLp μ Rd.two_ne_top k f) < ⊤ := by
   refine ⟨fun hf k => A.modNormOn_pieceLp_lt_top_of_memKMethod hθ hθ' hq hr hf k, fun hf => ?_⟩
   have hsum := (InterpCouple.kMethodSpace InterpCouple.isQuasiNormed_ofMap
-    InterpCouple.isHomogeneous_ofMap θ q).sum_mem fun k (_ : k ∈ Finset.univ) =>
+    InterpCouple.isHomogeneousCouple_ofMap θ q).sum_mem fun k (_ : k ∈ Finset.univ) =>
       A.memKMethod_chartLiftLp_pieceLp hθ hθ' hq (hθ'.trans_le (Nat.one_le_cast.2 hr)) k (hf k)
   rwa [A.sum_chartLiftLp_pieceLp] at hsum
 

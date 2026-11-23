@@ -21,8 +21,8 @@ and `1 ≤ q ≤ ∞`, every `f ∈ A^s_q(X)` is `f = ι y` for some `y ∈ B^{s
 
 `‖y‖_{B^{s-α}_q} ≤ K ‖f‖_{A^s_q}`,   `K = nikolskiiConst C α s`
 
-in the dyadic quasi-norms (`exists_preimage_of_nikolskii`).  The typical case is
-`X = L_p ⊇ Y = L_r` with `p < r` and `α = d (1/p - 1/r)`: a function in the Besov space
+in the dyadic quasi-norms (`exists_preimage_approxNormDyadic_le_of_nikolskii`).  The typical
+case is `X = L_p ⊇ Y = L_r` with `p < r` and `α = d (1/p - 1/r)`: a function in the Besov space
 `B^s_{p,q}` with `s > d(1/p - 1/r)` is in `L_r` and belongs to `B^{s - d(1/p-1/r)}_{r,q}`.
 `ι` is the inclusion `L_r → L_p`, which is not surjective, so `f` is *a priori* only an
 element of `L_p`; the theorem constructs its `L_r` version.
@@ -71,7 +71,7 @@ theorem nikolskiiConst_ne_top (C : ℝ) (h : α < s) : nikolskiiConst C α s ≠
 quasi-norms.  The constant is finite for `α < s` (`ENNReal.one_sub_two_rpow_neg_inv_ne_top`),
 the case of both transfer theorems.  Hardy's inequality for tails (`ENNReal.hardy_tail_le`)
 turns the tail bound into the bound of the `ℓ_q` part.  The Nikolskii transfer theorem and the
-trace transfer theorem (`TraceBound.approxNormDyadic_ext_le`) both end with this estimate. -/
+trace transfer theorem (`TraceBound.approxNormDyadic_limitTrace_le`) both end with this estimate. -/
 theorem approxNormDyadic_le_of_tail {B : ApproximationScheme Y} {c K : ℝ≥0∞} (hαs : α ≤ s)
     (hq : 1 ≤ q) (f : X) {y : Y}
     (hy : ‖y‖ₑ ≤ c * (2 * ‖f‖ₑ + ‖f‖ₑ) +
@@ -124,16 +124,17 @@ theorem approxNormDyadic_le_of_tail {B : ApproximationScheme Y} {c K : ℝ≥0�
 inequality of exponent `α` for `A`, `0 ≤ α < s` and `1 ≤ q ≤ ∞`, every `f ∈ A^s_q(X)` is
 `ι y` for some `y ∈ Y` with `‖y‖_{B^{s-α}_q} ≤ K ‖f‖_{A^s_q}` (dyadic quasi-norms), where `B`
 is the scheme `ι⁻¹(A n)` in `Y`. -/
-theorem exists_preimage_of_nikolskii [CompleteSpace Y] (hι : Function.Injective ι)
-    (hN : LiftBound ι A α C) (hC : 0 ≤ C) (hα : 0 ≤ α) (hαs : α < s) (hq : 1 ≤ q) {f : X}
-    (hf : A.MemApprox s q f) :
+theorem exists_preimage_approxNormDyadic_le_of_nikolskii [CompleteSpace Y]
+    (hι : Function.Injective ι) (hN : LiftBound ι A α C) (hC : 0 ≤ C) (hα : 0 ≤ α) (hαs : α < s)
+    (hq : 1 ≤ q) {f : X} (hf : A.MemApprox s q f) :
     ∃ y : Y, ι y = f ∧ (A.comap ι.toLinearMap hι).approxNormDyadic (s - α) q y ≤
       nikolskiiConst C α s * A.approxNormDyadic s q f := by
   rcases eq_or_ne f 0 with rfl | hf0
   · exact ⟨0, map_zero ι, by simp⟩
   obtain ⟨D⟩ := exists_dyadicApprox A f (tolerance_ne_zero hf0 s)
-  obtain ⟨y, hy, hyle, htail⟩ := D.exists_preimage (tolerance_anti f (hα.trans hαs.le)) hN hC
-    hα (tsum_dyadicWeight_mul_add_tolerance_ne_top hαs.le (hf.lqNorm_one_lt_top hq hα hαs).ne)
+  obtain ⟨y, hy, hyle, htail⟩ := D.exists_preimage_of_tsum_ne_top
+    (tolerance_anti f (hα.trans hαs.le)) hN hC hα
+    (tsum_dyadicWeight_mul_add_tolerance_ne_top hαs.le (hf.lqNorm_one_lt_top hq hα hαs).ne)
   rw [tolerance_zero] at hyle
   refine ⟨y, hy, approxNormDyadic_le_of_tail hαs.le hq f hyle fun k => ?_⟩
   obtain ⟨z, hz, hzle⟩ := htail k
@@ -145,7 +146,8 @@ theorem MemApprox.exists_preimage_of_nikolskii [CompleteSpace Y] (hι : Function
     (hN : LiftBound ι A α C) (hC : 0 ≤ C) (hα : 0 ≤ α) (hαs : α < s) (hq : 1 ≤ q) {f : X}
     (hf : A.MemApprox s q f) :
     ∃ y : Y, ι y = f ∧ (A.comap ι.toLinearMap hι).MemApprox (s - α) q y := by
-  obtain ⟨y, hy, hle⟩ := ApproximationScheme.exists_preimage_of_nikolskii hι hN hC hα hαs hq hf
+  obtain ⟨y, hy, hle⟩ :=
+    ApproximationScheme.exists_preimage_approxNormDyadic_le_of_nikolskii hι hN hC hα hαs hq hf
   refine ⟨y, hy, (memApprox_iff_approxNormDyadic_lt_top hq (sub_nonneg.2 hαs.le)).2 ?_⟩
   exact hle.trans_lt (ENNReal.mul_lt_top (nikolskiiConst_ne_top C hαs).lt_top
     ((memApprox_iff_approxNormDyadic_lt_top hq (hα.trans hαs.le)).1 hf))

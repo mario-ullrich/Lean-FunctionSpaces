@@ -35,16 +35,17 @@ declarations.
   `MeasureTheory.le_lintegral_of_le_on_pieces`, `MeasureTheory.eLpNorm_le_of_le_on_pieces`,
   `MeasureTheory.le_eLpNorm_of_le_on_pieces`).
 * **The K-method** (`ApproximationSpaces/Interpolation/KMethod.lean`): the change of scale
-  `K(c t, f) ≤ max(1, c) K(t, f)` (`ApproximationScheme.kFunctional_mul_le`); for every increasing
-  `φ` and `θ ≥ 0`, the comparison of the functional `Φ_{θ,q}(φ)` with its discrete version on the
-  grid `2^(nρ)`, `n ∈ ℤ` (`ApproximationScheme.phiFunctional_le_lqNorm_discretePhiSeq`,
+  `K(c t, f) ≤ max(1, c) K(t, f)` (`ApproximationScheme.inclKFunctional_mul_le`); for every
+  increasing `φ` and `θ ≥ 0`, the comparison of the functional `Φ_{θ,q}(φ)` with its discrete
+  version on the grid `2^(nρ)`, `n ∈ ℤ`
+  (`ApproximationScheme.phiFunctional_le_lqNorm_discretePhiSeq`,
   `ApproximationScheme.lqNorm_discretePhiSeq_le_phiFunctional`), which for `ρ = 1` gives the two
   inequalities of `discreteKMethod_equiv_kmethod` in the Bonn project *MultilinearInterpolation*;
   and, for the couple given by a bounded linear map, the analogue of that equivalence with the
-  grid on `ℕ` and the term `‖f‖` (`ApproximationScheme.kMethodNorm_le_interpNorm`,
-  `ApproximationScheme.interpNorm_le_kMethodNorm`, `ApproximationScheme.memInterp_iff_memKMethod`).
-  Upstreamed, these would take the shape of the definitions `kMethod` and `discreteKMethod` of
-  that project.
+  grid on `ℕ` and the term `‖f‖` (`ApproximationScheme.inclKMethodNorm_le_inclInterpNorm`,
+  `ApproximationScheme.inclInterpNorm_le_inclKMethodNorm`,
+  `ApproximationScheme.memInterp_iff_memInclKMethod`). Upstreamed, these would take the shape of
+  the definitions `kMethod` and `discreteKMethod` of that project.
 * **Couples and their K-method** (`ApproximationSpaces/Interpolation/Couple.lean`): couples
   `InterpCouple` of two functions `U → [0, ∞]` on an abelian group with the axioms
   `InterpCouple.IsQuasiNormed`, the quasi-triangle inequality of the K-functional

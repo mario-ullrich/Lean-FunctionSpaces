@@ -200,8 +200,8 @@ theorem mem_perSplineScheme_two_pow {r k : ℕ} {g : Lp ℂ p unitVol} :
   ApproximationScheme.mem_ofMonotoneSubmodules_two_pow
 
 /-- The periodic spline scheme is linear. -/
-theorem perSplineScheme_isLinear (r : ℕ) : (perSplineScheme p r).IsLinear :=
-  ApproximationScheme.isLinear_ofMonotoneSubmodules _ _
+theorem perSplineScheme_isLinearScheme (r : ℕ) : (perSplineScheme p r).IsLinearScheme :=
+  ApproximationScheme.isLinearScheme_ofMonotoneSubmodules _ _
 
 /-! ### The inverse inequality -/
 

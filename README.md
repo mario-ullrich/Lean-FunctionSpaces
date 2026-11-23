@@ -169,7 +169,7 @@ For a general scheme the project describes `A^s_q`
 
 * by a [modulus of smoothness](https://mario-ullrich.github.io/Lean-FunctionSpaces/ch-moduli-abstract.html#thm:modulus-coincidence), under Jackson's and an inverse
   inequality of order `θ` (`0 ≤ s < θ`), also in quasi-normed groups, through the E-functional
-  (`InterpCouple.ModulusData.eNormDyadic_lt_top_iff`);
+  (`InterpCouple.CoupleModulusData.eNormDyadic_lt_top_iff`);
 * by [block decompositions](https://mario-ullrich.github.io/Lean-FunctionSpaces/ch-decompositions.html#thm:block-decomposition), in a Banach space (`s > 0`);
 * by [dyadic blocks of coefficients](https://mario-ullrich.github.io/Lean-FunctionSpaces/ch-spectral.html#thm:spectral-coefficients), for a Hilbert basis with
   levels (`s > 0`);
@@ -344,7 +344,7 @@ For a general scheme the project describes `A^s_q`
   `E_n(ι y) ≤ C n^(-r) ‖y‖` and Bernstein's inequality (every `a ∈ A_n` is `ι y` with
   `‖y‖ ≤ C n^r ‖a‖`), `n ≥ 1`. For `0 < s < r` and `1 ≤ q ≤ ∞`, `A^s_q = (X, Y)_{s/r,q}` for the
   continuous K-method with `K(t, f) = inf_y (‖f - ι y‖ + t ‖y‖)`
-  (`ApproximationScheme.memApprox_iff_memKMethod`).
+  (`ApproximationScheme.memApprox_iff_memInclKMethod_of_jacksonBound_of_liftBound`).
 * **Nonlinear approximation from an orthonormal basis.** Let `(e_i)_{i ∈ I}` be a Hilbert basis
   of a complex Hilbert space `H`, and let `A_n` be the set of linear combinations of at most `n`
   of the vectors `e_i`. For `0 < τ < 2` and `θ = 1/τ - 1/2`, `f ∈ H` lies in the approximation

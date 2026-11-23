@@ -161,7 +161,7 @@ theorem memApprox_iff_martingale (hd : closure (⋃ n, ℱ.scheme p μ n) = Set.
     (ℱ.scheme p μ).MemApprox s q f ↔
       ‖Lp.condExpLp (ℱ 0) f‖ₑ + ENNReal.lqNorm q (fun k => ENNReal.dyadicWeight s k *
         ‖Lp.condExpLp (ℱ (k + 1)) f - Lp.condExpLp (ℱ k) f‖ₑ) < ∞ := by
-  rw [(ℱ.projectionScheme (p := p) (μ := μ)).memApprox_iff_blockNorm_lt_top hd hs hq]
+  rw [(ℱ.projectionScheme (p := p) (μ := μ)).memApprox_iff_blockNorm_lt_top_of_dense hd hs hq]
   have h2 : ∀ k, (ℱ.projectionScheme (p := p) (μ := μ)).P (2 ^ k) = Lp.condExpLp (ℱ k) :=
     fun k => ApproximationScheme.ProjectionScheme.ofMonotone_two_pow k
   have h1 : (ℱ.projectionScheme (p := p) (μ := μ)).P 1 = Lp.condExpLp (ℱ 0) := by

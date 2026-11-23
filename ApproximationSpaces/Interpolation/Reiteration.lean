@@ -23,7 +23,7 @@ and they form the **couple of K-spaces**
 (`InterpCouple.memKMethod_kCouple_iff`), also for the continuous K-norms
 (`InterpCouple.memKMethod_kMethodCouple_iff`), the endpoint couples
 (`InterpCouple.memKMethod_leftKCouple_iff`, `InterpCouple.memKMethod_rightKCouple_iff`) and the
-couples of bounded linear maps (`ApproximationScheme.memKMethod_reiteration`).
+couples of bounded linear maps (`ApproximationScheme.memInclKMethod_reiteration`).
 
 The inclusion `⊆` is the class `C_K` (Bergh–Löfström, Definition 3.5.1):
 `K(2^n, a) ≤ 2^(nθ_i) ‖a‖_{θ_i,q_i}` gives `‖u‖_{θ,q} ≤ C ‖u‖_{η,q}` termwise
@@ -759,15 +759,15 @@ variable {X Y : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X] [NormedAddComm
 `0 < η < 1` and `q₀, q₁, q ≥ 1`, `((X, Y)_{θ₀,q₀}, (X, Y)_{θ₁,q₁})_{η,q} = (X, Y)_{θ,q}` with
 `θ = (1 - η) θ₀ + η θ₁`, for the continuous K-norms of
 `ApproximationSpaces.Interpolation.KMethod`. -/
-theorem memKMethod_reiteration (hθ₀ : 0 < θ₀) (hθ : θ₀ < θ₁) (hθ₁ : θ₁ < 1) (hη : 0 < η)
+theorem memInclKMethod_reiteration (hθ₀ : 0 < θ₀) (hθ : θ₀ < θ₁) (hθ₁ : θ₁ < 1) (hη : 0 < η)
     (hη' : η < 1) (hq₀ : 1 ≤ q₀) (hq₁ : 1 ≤ q₁) (hq : 1 ≤ q) {f : X} :
-    (⟨kMethodNorm ι θ₀ q₀, kMethodNorm ι θ₁ q₁⟩ : InterpCouple X).MemKMethod η q f ↔
-      MemKMethod ι ((1 - η) * θ₀ + η * θ₁) q f := by
-  have e : (⟨kMethodNorm ι θ₀ q₀, kMethodNorm ι θ₁ q₁⟩ : InterpCouple X) =
+    (⟨inclKMethodNorm ι θ₀ q₀, inclKMethodNorm ι θ₁ q₁⟩ : InterpCouple X).MemKMethod η q f ↔
+      MemInclKMethod ι ((1 - η) * θ₀ + η * θ₁) q f := by
+  have e : (⟨inclKMethodNorm ι θ₀ q₀, inclKMethodNorm ι θ₁ q₁⟩ : InterpCouple X) =
       (InterpCouple.ofMap ι).kMethodCouple θ₀ q₀ θ₁ q₁ := by
-    have h₀ : kMethodNorm ι θ₀ q₀ = (InterpCouple.ofMap ι).kMethodNorm θ₀ q₀ :=
+    have h₀ : inclKMethodNorm ι θ₀ q₀ = (InterpCouple.ofMap ι).kMethodNorm θ₀ q₀ :=
       funext fun f => (InterpCouple.kMethodNorm_ofMap f).symm
-    have h₁ : kMethodNorm ι θ₁ q₁ = (InterpCouple.ofMap ι).kMethodNorm θ₁ q₁ :=
+    have h₁ : inclKMethodNorm ι θ₁ q₁ = (InterpCouple.ofMap ι).kMethodNorm θ₁ q₁ :=
       funext fun f => (InterpCouple.kMethodNorm_ofMap f).symm
     rw [h₀, h₁]
     rfl

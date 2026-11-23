@@ -2368,7 +2368,7 @@ are the polynomials of degree $< r$.
   Interval.dyadicIco_subset, Interval.ppFun_eq_zero, Interval.exists_norm_ppFun_le,
   Interval.integrableOn_ppFun, Interval.ppFun_refine_eq, Interval.ppFun_refine,
   Interval.ppSpace, Interval.ppSpace_mono, Interval.ppScheme, Interval.mem_ppScheme_zero,
-  Interval.mem_ppScheme, Interval.mem_ppScheme_two_pow, Interval.ppScheme_isLinear}
+  Interval.mem_ppScheme, Interval.mem_ppScheme_two_pow, Interval.ppScheme_isLinearScheme}
 \leanok
 \uses{def:comap}
 Let $r \geq 1$ and $1 \leq p < \infty$. For $k, n \in \N$ the dyadic interval of level $k$ is
@@ -3767,7 +3767,8 @@ divides $P$, and the quotient has degree $0$.
   Interval.SplineJoins.const_mul, Interval.SplineJoins.sum, Interval.SplineJoins.refine,
   Interval.splineSpace, Interval.splineSpace_le_ppSpace, Interval.splineSpace_zero,
   Interval.splineSpace_mono, Interval.splineScheme, Interval.mem_splineScheme_zero,
-  Interval.mem_splineScheme, Interval.mem_splineScheme_two_pow, Interval.splineScheme_isLinear}
+  Interval.mem_splineScheme, Interval.mem_splineScheme_two_pow,
+  Interval.splineScheme_isLinearScheme}
 \leanok
 \uses{def:pp-scheme, lem:spline-joins}
 Let $r \geq 1$. The space $S_k \subseteq V_k$ of splines of order $r$ and level $k$ consists of
@@ -4092,7 +4093,7 @@ smoothness above $1$, for example $s < \tfrac32$ for continuous piecewise linear
   Interval.PerJoin.refine, Interval.perSplineSpace, Interval.perSplineSpace_le_splineSpace,
   Interval.perSplineSpace_mono, Interval.perSplineScheme, Interval.mem_perSplineScheme_zero,
   Interval.mem_perSplineScheme, Interval.mem_perSplineScheme_two_pow,
-  Interval.perSplineScheme_isLinear}
+  Interval.perSplineScheme_isLinearScheme}
 \leanok
 \uses{def:spline-space, def:per-modulus}
 Let $r \geq 1$ and $k \in \N$. A spline $u \in S_k$ with pieces $Q_0, \dots, Q_{2^k - 1}$ is
@@ -4695,7 +4696,7 @@ $u - P_k u = (u - S) - P_k (u - S)$.
 \label{def:cube-pp}
 \lean{Cube.IsCubePP, Cube.IsCubePP.succ, Cube.IsCubePP.add, Cube.IsCubePP.const_mul,
   Cube.isCubePP_zero, Cube.IsCubePP.exists_slice_eq_ppFun, Cube.cubePPSpace, Cube.cubePPSpace_mono,
-  Cube.cubePPScheme, Cube.mem_cubePPScheme_two_pow, Cube.cubePPScheme_isLinear, Cube.cubeProj,
+  Cube.cubePPScheme, Cube.mem_cubePPScheme_two_pow, Cube.cubePPScheme_isLinearScheme, Cube.cubeProj,
   Cube.isCubePP_cubeProj}
 \leanok
 \uses{lem:pp-kernel, lem:kernel-forms}
@@ -4902,7 +4903,7 @@ bound is \Cref{lem:qi-taylor} when $u \in L_p[0,1]$, and trivial otherwise.
   Cube.IsCubeSpline.const_mul, Cube.isCubeSpline_zero, Cube.IsCubePP.isCubeSpline_zero,
   Cube.isCubeSpline_of_isForm, Cube.cubeQI, Cube.isCubeSpline_cubeQI, Cube.cubeSplineSpace,
   Cube.cubeSplineSpace_mono,
-  Cube.cubeSplineScheme, Cube.mem_cubeSplineScheme_two_pow, Cube.cubeSplineScheme_isLinear,
+  Cube.cubeSplineScheme, Cube.mem_cubeSplineScheme_two_pow, Cube.cubeSplineScheme_isLinearScheme,
   Cube.approxError_cubeSplineScheme_one_le}
 \leanok
 \uses{def:spline-space, lem:qi-kernel, lem:kernel-forms, def:cube-pp}

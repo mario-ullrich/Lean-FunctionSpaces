@@ -18,7 +18,7 @@ quasi-norm is subadditive, and DeVore–Popov (Trans. Amer. Math. Soc. 305 (1988
 with `‖∑ f_j‖_p^μ ≤ ∑ ‖f_j‖_p^μ`, `μ ≤ min(1, p)`. This file states the coincidence theorem in
 that form, for a couple `A = (N₀, N₁)` (`InterpCouple`) with an exponent `ρ > 0`.
 
-An `InterpCouple.ModulusData A ρ θ` bundles
+An `InterpCouple.CoupleModulusData A ρ θ` bundles
 
 * the couple axioms: `N₀(0) = 0`, `N₀` even, `N₀(a + b)^ρ ≤ N₀(a)^ρ + N₀(b)^ρ`, and a
   subadditive even complexity `N₁` with `N₁(0) = 0`;
@@ -30,14 +30,14 @@ An `InterpCouple.ModulusData A ρ θ` bundles
   (with `k - j` truncated at `0`).
 
 With the classical quasi-norm `‖f‖^ω_{s,q} = N₀(f) + ‖(2^(ks) ω(f, k))_k‖_{ℓ_q}`
-(`InterpCouple.ModulusData.modNorm`) and the dyadic norm of the E-method
+(`InterpCouple.CoupleModulusData.coupleModNorm`) and the dyadic norm of the E-method
 `N₀(f) + ‖(2^(ks) E(2^k, f))_k‖_{ℓ_q}` (`InterpCouple.eNormDyadic`):
 
 * `‖f‖_E ≤ max(1, C_J) ‖f‖^ω_{s,q}` for every `s` and `q`
-  (`InterpCouple.ModulusData.eNormDyadic_le_modNorm`);
+  (`InterpCouple.CoupleModulusData.eNormDyadic_le_coupleModNorm`);
 * `‖f‖^ω_{s,q} ≤ K ‖f‖_E` for `0 ≤ s < θ` and every `q`
-  (`InterpCouple.ModulusData.modNorm_le_eNormDyadic`). The proof follows DeVore–Popov, proof of
-  Theorem 4.8: near-best `b_k` with `N₁(b_k) ≤ 2^k`, the telescoping
+  (`InterpCouple.CoupleModulusData.coupleModNorm_le_eNormDyadic`). The proof follows
+  DeVore–Popov, proof of Theorem 4.8: near-best `b_k` with `N₁(b_k) ≤ 2^k`, the telescoping
   `f = (f - b_k) + b_0 + ∑_{j<k} (b_{j+1} - b_j)`, the inverse inequality for each block in
   `ρ`-th powers, and Hardy's inequality in `ℓ_{q/ρ}` with the exponent `(θ - s)ρ`
   (`ENNReal.hardy_sum_le'`), since `‖(a_k^ρ)_k‖_{ℓ_{q/ρ}} = ‖a‖_{ℓ_q}^ρ`
@@ -45,10 +45,11 @@ With the classical quasi-norm `‖f‖^ω_{s,q} = N₀(f) + ‖(2^(ks) ω(f, k))
 
 So, if only `0` has complexity below `1`, then for `0 < s < θ` and `q ≠ 0` the approximation
 space `E_{s,q}` of the couple is the classical space
-(`InterpCouple.ModulusData.memEMethod_iff_modNorm_lt_top`). For `p < 1` the K-functional of
-`(L_p, W^r_p)` on an interval vanishes identically (Ditzian–Hristov–Ivanov, Constr. Approx. 11
-(1995)), so the representation of the classical spaces as interpolation spaces has no analogue
-there, and the theorem goes through the Jackson and inverse inequalities directly.
+(`InterpCouple.CoupleModulusData.memEMethod_iff_coupleModNorm_lt_top`). For `p < 1` the
+K-functional of `(L_p, W^r_p)` on an interval vanishes identically (Ditzian–Hristov–Ivanov,
+Constr. Approx. 11 (1995)), so the representation of the classical spaces as interpolation
+spaces has no analogue there, and the theorem goes through the Jackson and inverse inequalities
+directly.
 -/
 
 @[expose] public section
@@ -114,7 +115,7 @@ order `θ`: the couple axioms with `ρ`-subadditivity of `N₀` and subadditivit
 subadditive and which is bounded by `C₀ N₀(f)`, a Jackson inequality `E(2^k, f) ≤ C_J ω(f, k)`
 for the E-functional, and an inverse inequality `ω(a, k) ≤ C_B 2^(-(k-j)θ) N₀(a)` for
 `N₁(a) ≤ 2^j`. -/
-structure ModulusData (A : InterpCouple U) (ρ θ : ℝ) where
+structure CoupleModulusData (A : InterpCouple U) (ρ θ : ℝ) where
   /-- The exponent `ρ` is positive. -/
   rho_pos : 0 < ρ
   /-- `N₀(0) = 0`. -/
@@ -153,7 +154,7 @@ structure ModulusData (A : InterpCouple U) (ρ θ : ℝ) where
   inverse : ∀ j k a, A.norm1 a ≤ ((2 ^ j : ℕ) : ℝ≥0∞) →
     modulus a k ≤ CB * dyadicWeight (-θ) (k - j) * A.norm0 a
 
-namespace ModulusData
+namespace CoupleModulusData
 
 variable {A : InterpCouple U} {ρ θ : ℝ}
 
@@ -173,7 +174,7 @@ noncomputable def ofExists (rho_pos : 0 < ρ) (norm0_zero : A.norm0 0 = 0)
       ∀ f k, A.eFunctional ((2 ^ k : ℕ) : ℝ≥0∞) f ≤ CJ * modulus f k)
     (hB : ∃ CB : ℝ≥0∞, CB ≠ ∞ ∧ ∀ j k a, A.norm1 a ≤ ((2 ^ j : ℕ) : ℝ≥0∞) →
       modulus a k ≤ CB * dyadicWeight (-θ) (k - j) * A.norm0 a) :
-    A.ModulusData ρ θ where
+    A.CoupleModulusData ρ θ where
   rho_pos := rho_pos
   norm0_zero := norm0_zero
   norm0_neg := norm0_neg
@@ -193,10 +194,10 @@ noncomputable def ofExists (rho_pos : 0 < ρ) (norm0_zero : A.norm0 0 = 0)
   CB_ne_top := hB.choose_spec.1
   inverse := hB.choose_spec.2
 
-variable (M : A.ModulusData ρ θ)
+variable (M : A.CoupleModulusData ρ θ)
 
 /-- The **classical quasi-norm** `‖f‖^ω_{s,q} = N₀(f) + ‖(2^(ks) ω(f, k))_k‖_{ℓ_q}`. -/
-noncomputable def modNorm (s : ℝ) (q : ℝ≥0∞) (f : U) : ℝ≥0∞ :=
+noncomputable def coupleModNorm (s : ℝ) (q : ℝ≥0∞) (f : U) : ℝ≥0∞ :=
   A.norm0 f + lqNorm q (fun k => dyadicWeight s k * M.modulus f k)
 
 variable {s : ℝ} {q : ℝ≥0∞}
@@ -312,7 +313,7 @@ theorem modulus_rpow_le (hθ : 0 ≤ θ) {f : U} {b : ℕ → U} {e : ℕ → �
           2 * M.CB ^ ρ * dyadicWeight (θ * ρ) 2 * (dyadicWeight (-(θ * ρ)) (k - j) * e j ^ ρ)) k)
 
 /-- **The weighted modulus at one scale**: with `α = (θ - s)ρ` and `x_j = (2^(js) e_j)^ρ`,
-`ModulusData.modulus_rpow_le` multiplied by `2^(ksρ)` reads
+`CoupleModulusData.modulus_rpow_le` multiplied by `2^(ksρ)` reads
 `(2^(ks) ω(f, k))^ρ ≤ C₀^ρ x_k + 4 C_B^ρ 4^(θρ) 2^(-kα) ∑_{j ≤ k} 2^(jα) x_j`. -/
 theorem dyadicWeight_mul_modulus_rpow_le (hθ : 0 ≤ θ) {f : U} {b : ℕ → U} {e : ℕ → ℝ≥0∞}
     (hb1 : ∀ j, A.norm1 (b j) ≤ ((2 ^ j : ℕ) : ℝ≥0∞)) (hb0 : ∀ j, A.norm0 (f - b j) ≤ e j)
@@ -347,7 +348,7 @@ theorem dyadicWeight_mul_modulus_rpow_le (hθ : 0 ≤ θ) {f : U} {b : ℕ → U
         congr 1
         exact Finset.sum_congr rfl fun j hj => by rw [hw j hj]; ring
 
-/-- **The weighted modulus in `ℓ_r`**: under the hypotheses of `ModulusData.modulus_rpow_le`,
+/-- **The weighted modulus in `ℓ_r`**: under the hypotheses of `CoupleModulusData.modulus_rpow_le`,
 for every exponent `r`,
 `‖((2^(ks) ω(f, k))^ρ)_k‖_{ℓ_r} ≤ C_r (C₀^ρ + 4 C_B^ρ 4^(θρ) H) ‖((2^(ks) e_k)^ρ)_k‖_{ℓ_r}`, with
 Mathlib's constant `C_r = LpAddConst r` and the constant `H = hardyConst ((θ - s)ρ) r` of
@@ -382,13 +383,13 @@ theorem lqNorm_rpow_le (hθ : 0 ≤ θ) {f : U} {b : ℕ → U} {e : ℕ → ℝ
 `1 + (C_r (C₀^ρ + 4 C_B^ρ 4^(θρ) H))^(1/ρ) C_q (1 + γ_{1,q})` with `r = q/ρ`, Mathlib's constants
 `C_r = LpAddConst r`, `C_q = LpAddConst q`, the constant `H = hardyConst ((θ - s)ρ) r` of Hardy's
 inequality and `γ_{1,q} = dyadicGeomConst 1 q`. -/
-noncomputable def inverseConst (s : ℝ) (q : ℝ≥0∞) : ℝ≥0∞ :=
+noncomputable def coupleInverseConst (s : ℝ) (q : ℝ≥0∞) : ℝ≥0∞ :=
   1 + (LpAddConst (q / ENNReal.ofReal ρ) * (M.C0 ^ ρ + 4 * M.CB ^ ρ * dyadicWeight (θ * ρ) 2 *
     hardyConst ((θ - s) * ρ) (q / ENNReal.ofReal ρ))) ^ ρ⁻¹ *
       (LpAddConst q * (1 + dyadicGeomConst 1 q))
 
 /-- The constant of the inverse direction is finite for `s < θ`. -/
-theorem inverseConst_ne_top (hsθ : s < θ) (q : ℝ≥0∞) : M.inverseConst s q ≠ ∞ := by
+theorem coupleInverseConst_ne_top (hsθ : s < θ) (q : ℝ≥0∞) : M.coupleInverseConst s q ≠ ∞ := by
   have hρ := M.rho_pos
   have hα : 0 < (θ - s) * ρ := mul_pos (by linarith) hρ
   refine ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top, ENNReal.mul_ne_top
@@ -403,7 +404,8 @@ theorem inverseConst_ne_top (hsθ : s < θ) (q : ℝ≥0∞) : M.inverseConst s 
 
 /-- **Jackson's direction**: `N₀(f) + ‖(2^(ks) E(2^k, f))_k‖_{ℓ_q} ≤ max(1, C_J) ‖f‖^ω_{s,q}`
 for every `s` and `q`. -/
-theorem eNormDyadic_le_modNorm (f : U) : A.eNormDyadic s q f ≤ max 1 M.CJ * M.modNorm s q f := by
+theorem eNormDyadic_le_coupleModNorm (f : U) :
+    A.eNormDyadic s q f ≤ max 1 M.CJ * M.coupleModNorm s q f := by
   have hL : lqNorm q (fun k : ℕ => dyadicWeight s k * A.eFunctional ((2 ^ k : ℕ) : ℝ≥0∞) f) ≤
       M.CJ * lqNorm q (fun k => dyadicWeight s k * M.modulus f k) := by
     rw [← ENNReal.lqNorm_const_mul]
@@ -419,16 +421,16 @@ theorem eNormDyadic_le_modNorm (f : U) : A.eNormDyadic s q f ≤ max 1 M.CJ * M.
         gcongr
         · exact le_mul_of_one_le_left' (le_max_left _ _)
         · exact le_max_right _ _
-    _ = max 1 M.CJ * M.modNorm s q f := by rw [modNorm, mul_add]
+    _ = max 1 M.CJ * M.coupleModNorm s q f := by rw [coupleModNorm, mul_add]
 
 /-- **The inverse direction**: for `0 ≤ s < θ` and every `q`,
-`‖f‖^ω_{s,q} ≤ K (N₀(f) + ‖(2^(ks) E(2^k, f))_k‖_{ℓ_q})` with `K = M.inverseConst s q`. The
+`‖f‖^ω_{s,q} ≤ K (N₀(f) + ‖(2^(ks) E(2^k, f))_k‖_{ℓ_q})` with `K = M.coupleInverseConst s q`. The
 near-best elements `b_k` have the tolerances `N₀(f) 2^(-k(s+1))`. -/
-theorem modNorm_le_eNormDyadic (hs : 0 ≤ s) (hsθ : s < θ) (f : U) :
-    M.modNorm s q f ≤ M.inverseConst s q * A.eNormDyadic s q f := by
+theorem coupleModNorm_le_eNormDyadic (hs : 0 ≤ s) (hsθ : s < θ) (f : U) :
+    M.coupleModNorm s q f ≤ M.coupleInverseConst s q * A.eNormDyadic s q f := by
   have hθ : 0 ≤ θ := hs.trans hsθ.le
   have hρ := M.rho_pos
-  have hone : 1 ≤ M.inverseConst s q := le_self_add
+  have hone : 1 ≤ M.coupleInverseConst s q := le_self_add
   have hfN : A.norm0 f ≤ A.eNormDyadic s q f := le_self_add
   rcases eq_or_ne (A.norm0 f) ∞ with hf | hf
   · rw [hf, top_le_iff] at hfN
@@ -437,7 +439,7 @@ theorem modNorm_le_eNormDyadic (hs : 0 ≤ s) (hsθ : s < θ) (f : U) :
   rcases eq_or_ne (A.norm0 f) 0 with hf0 | hf0
   · have hω : ∀ k, M.modulus f k = 0 := fun k =>
       le_antisymm ((M.le_norm0 f k).trans_eq (by rw [hf0, mul_zero])) bot_le
-    simp [modNorm, hf0, hω]
+    simp [coupleModNorm, hf0, hω]
   have hE : ∀ k, A.eFunctional ((2 ^ k : ℕ) : ℝ≥0∞) f ≠ ∞ := fun k =>
     ne_top_of_le_ne_top hf (eFunctional_le_norm0 M.norm1_zero f)
   choose b hb1 hb0 using fun k => exists_norm0_sub_le_eFunctional_add (hE k)
@@ -472,28 +474,29 @@ theorem modNorm_le_eNormDyadic (hs : 0 ≤ s) (hsθ : s < θ) (f : U) :
           gcongr
       _ = K ^ ρ⁻¹ * (P * N) := by
           rw [ENNReal.mul_rpow_of_nonneg _ _ (inv_nonneg.2 hρ.le), ENNReal.rpow_rpow_inv hρ.ne']
-  calc M.modNorm s q f = A.norm0 f + lqNorm q (fun k => dyadicWeight s k * M.modulus f k) := rfl
+  calc M.coupleModNorm s q f
+      = A.norm0 f + lqNorm q (fun k => dyadicWeight s k * M.modulus f k) := rfl
     _ ≤ N + K ^ ρ⁻¹ * (P * N) := add_le_add hfN h2
     _ = (1 + K ^ ρ⁻¹ * P) * N := by ring
-    _ = M.inverseConst s q * N := rfl
+    _ = M.coupleInverseConst s q * N := rfl
 
 /-- For `0 ≤ s < θ` and every `q`, the dyadic norm of the E-method is finite iff the classical
 quasi-norm `N₀(f) + ‖(2^(ks) ω(f, k))_k‖_{ℓ_q}` is. -/
 theorem eNormDyadic_lt_top_iff (hs : 0 ≤ s) (hsθ : s < θ) (f : U) :
-    A.eNormDyadic s q f < ∞ ↔ M.modNorm s q f < ∞ :=
-  ⟨fun h => (M.modNorm_le_eNormDyadic hs hsθ f).trans_lt
-      (ENNReal.mul_lt_top (M.inverseConst_ne_top hsθ q).lt_top h),
-    fun h => (M.eNormDyadic_le_modNorm f).trans_lt
+    A.eNormDyadic s q f < ∞ ↔ M.coupleModNorm s q f < ∞ :=
+  ⟨fun h => (M.coupleModNorm_le_eNormDyadic hs hsθ f).trans_lt
+      (ENNReal.mul_lt_top (M.coupleInverseConst_ne_top hsθ q).lt_top h),
+    fun h => (M.eNormDyadic_le_coupleModNorm f).trans_lt
       (ENNReal.mul_lt_top (max_lt ENNReal.one_lt_top M.CJ_ne_top.lt_top) h)⟩
 
 /-- **The coincidence theorem for `ρ`-normed couples**: if every `b` with `N₁(b) < 1` is `0`,
 then for `0 < s < θ` and `q ≠ 0`, `f ∈ E_{s,q}` iff the classical quasi-norm
 `N₀(f) + ‖(2^(ks) ω(f, k))_k‖_{ℓ_q}` is finite. -/
-theorem memEMethod_iff_modNorm_lt_top (hdisc : ∀ b, A.norm1 b < 1 → b = 0) (hq0 : q ≠ 0)
-    (hs : 0 < s) (hsθ : s < θ) (f : U) : A.MemEMethod s q f ↔ M.modNorm s q f < ∞ := by
+theorem memEMethod_iff_coupleModNorm_lt_top (hdisc : ∀ b, A.norm1 b < 1 → b = 0) (hq0 : q ≠ 0)
+    (hs : 0 < s) (hsθ : s < θ) (f : U) : A.MemEMethod s q f ↔ M.coupleModNorm s q f < ∞ := by
   rw [memEMethod_iff_eNormDyadic_lt_top M.norm1_zero hdisc hs.le (Or.inl hs) hq0]
   exact M.eNormDyadic_lt_top_iff hs.le hsθ f
 
-end ModulusData
+end CoupleModulusData
 
 end InterpCouple

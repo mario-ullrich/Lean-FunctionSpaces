@@ -62,8 +62,8 @@ theorem memApprox_ppScheme_iff_block (hp : p ≠ ∞) {r : ℕ} (hr : 1 ≤ r) {
     {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Lp ℂ p unitVol) :
     (ppScheme p r).MemApprox s q f ↔ ‖ppProj p hp r 0 f‖ₑ + ENNReal.lqNorm q (fun k =>
       dyadicWeight s k * ‖ppProj p hp r (k + 1) f - ppProj p hp r k f‖ₑ) < ∞ := by
-  rw [(ppProjectionScheme hp r).memApprox_iff_blockNorm_lt_top (closure_iUnion_ppScheme hp hr) hs
-    hq]
+  rw [(ppProjectionScheme hp r).memApprox_iff_blockNorm_lt_top_of_dense
+    (closure_iUnion_ppScheme hp hr) hs hq]
   have h1 : (ppProjectionScheme hp r).P 1 = ppProj p hp r 0 := by
     simpa using ppProjectionScheme_two_pow hp r 0
   simp only [ApproximationScheme.ProjectionScheme.blockNorm,

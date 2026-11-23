@@ -43,7 +43,7 @@ it with the steps:
   the strip integral of the piecewise polynomials, `Interval.eLpNorm_le_of_strip`, adds these up
   (`Interval.eLpNorm_higherDiff_one_le_of_step`).
 
-With the coincidence theorem for `ρ`-normed couples (`InterpCouple.ModulusData`, here
+With the coincidence theorem for `ρ`-normed couples (`InterpCouple.CoupleModulusData`, here
 `Haar.stepModulusData` with `ρ = p` and `θ = 1/p`) this gives, for `0 < p ≤ 1`, `q ≠ 0` and
 `0 < s < 1/p` (`Haar.memEMethod_stepCouple_iff_modulus`),
 
@@ -546,7 +546,7 @@ exponent `ρ = p` (the `p`-th power of the quasi-norm is subadditive) and invers
 inequality `ω_1(a, 2^(-k))_p ≤ 2^(1/p) 2^(-(k-j)/p) ‖a‖_p` for steps `a` of level `j`
 (`Haar.lpModulus_le_of_mem_lpMeas`). -/
 noncomputable def stepModulusData (hp0 : p ≠ 0) (hp1 : p ≤ 1) :
-    (stepCouple p).ModulusData p.toReal (1 / p.toReal) where
+    (stepCouple p).CoupleModulusData p.toReal (1 / p.toReal) where
   rho_pos := ENNReal.toReal_pos hp0 (ne_top_of_le_ne_top ENNReal.one_ne_top hp1)
   norm0_zero := Lp.enorm_zero
   norm0_neg := Lp.enorm_neg
@@ -590,7 +590,7 @@ theorem memEMethod_stepCouple_iff_modulus (hp0 : p ≠ 0) (hp1 : p ≤ 1) (hq0 :
     (hs : 0 < s) (hsp : s < 1 / p.toReal) (f : Lp ℂ p vol) :
     (stepCouple p).MemEMethod s q f ↔
       ‖f‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p 1 f k) < ∞ :=
-  (stepModulusData hp0 hp1).memEMethod_iff_modNorm_lt_top
+  (stepModulusData hp0 hp1).memEMethod_iff_coupleModNorm_lt_top
     (fun _ hb => InterpCouple.eq_zero_of_ofMonotoneSubgroups_norm1_lt_one hb) hq0 hs hsp f
 
 /-! ### The line `x ↦ x` -/

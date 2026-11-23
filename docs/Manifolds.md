@@ -143,7 +143,7 @@ approximation spaces are `B^θ_{2,q}(M)`, `0 < θ < 1`.
   approximation space `A^θ_q` of the Dirichlet eigenbasis lies in `B^θ_{2,q}(V)`
   (`Rd.memApprox_bandScheme_extendByZero_of_memApprox_dirichletScheme`).
   The proof bounds the modulus on `Ω` by the K-functional of `(L_2(Ω), W^1_2(Ω))`
-  (`Rd.BoundedLipschitzDomain.exists_lpModulusOn_le_kFunctional`), with
+  (`Rd.BoundedLipschitzDomain.exists_lpModulusOn_le_inclKFunctional`), with
   `ω_r(ι U, 2^(-k))_2 ≤ 2^(r-1) 2π 2^(-k) ‖U‖` for `U ∈ H^1(V)` (`Rd.lpModulus_toL2_le`), and
   restricts `(L_2(V), H^1(V))_{θ,q} = B^θ_{2,q}(V)` to `Ω`
   (`Rd.memKMethod_neumann_restrict_of_memKMethod`).

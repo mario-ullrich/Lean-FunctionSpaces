@@ -38,8 +38,8 @@ Bernstein bound `ω_N(φ, t)_p ≤ K t^θ` for `0 < t ≤ 1` (`Daubechies.Bernst
 * **Approximation and coefficients.** The projections `P_j` form a projection scheme with dense
   union (`Daubechies.projectionScheme`, `Daubechies.closure_iUnion_scheme`), so `f ∈ A^s_q` iff
   `‖P_0 f‖_p + ‖(2^(js) ‖P_{j+1} f - P_j f‖_p)_j‖_{ℓ_q} < ∞` for `s > 0`
-  (`ApproximationScheme.ProjectionScheme.memApprox_iff_blockNorm_lt_top`). The blocks are the
-  wavelet expansions of level `j` (`Daubechies.proj_succ_sub_proj`), and their norms are
+  (`ApproximationScheme.ProjectionScheme.memApprox_iff_blockNorm_lt_top_of_dense`). The blocks
+  are the wavelet expansions of level `j` (`Daubechies.proj_succ_sub_proj`), and their norms are
   comparable with `2^(j(1/2 - 1/p)) ‖(⟨f, ψ_{j,k}⟩)_k‖_{ℓ_p}` (`Daubechies.enorm_block_equiv`);
   likewise `‖P_0 f‖_p` with `‖(⟨f, φ(· - k)⟩)_k‖_{ℓ_p}` (`Daubechies.enorm_proj_zero_equiv`).
   Hence `f ∈ A^s_q ⟺ ‖f‖_coef < ∞` for `s > 0` (`Daubechies.memApprox_scheme_iff_coeff`).
@@ -186,7 +186,7 @@ of the Daubechies scheme iff its coefficient quasi-norm
 
 The projections form a projection scheme with dense union, so `f ∈ A^s_q` iff
 `‖P_0 f‖_p + ‖(2^(js) ‖P_{j+1} f - P_j f‖_p)_j‖_{ℓ_q} < ∞`
-(`ApproximationScheme.ProjectionScheme.memApprox_iff_blockNorm_lt_top`). The first summand
+(`ApproximationScheme.ProjectionScheme.memApprox_iff_blockNorm_lt_top_of_dense`). The first summand
 `‖P_0 f‖_p` and `‖(⟨f, φ(· - k)⟩)_k‖_{ℓ_p}` are both finite (`Daubechies.enorm_proj_zero_equiv`),
 and
 `2^(js) ‖P_{j+1} f - P_j f‖_p` is comparable with
@@ -197,7 +197,7 @@ theorem memApprox_scheme_iff_coeff (hN : 2 ≤ N) (hp : p ≠ ∞) {s : ℝ} (hs
     (scheme m p hN hp).MemApprox s q f ↔ coeffNorm m p s q f < ∞ := by
   obtain ⟨K₀, _, hK₀, _, hKM₀⟩ := enorm_proj_zero_equiv m hN hp
   obtain ⟨K, M, hK, hM, hKM⟩ := enorm_block_equiv m hN hp
-  rw [(projectionScheme m p hN hp).memApprox_iff_blockNorm_lt_top
+  rw [(projectionScheme m p hN hp).memApprox_iff_blockNorm_lt_top_of_dense
     (closure_iUnion_scheme m hN hp) hs hq, ApproximationScheme.ProjectionScheme.blockNorm,
     projectionScheme_one, coeffNorm]
   simp only [projectionScheme_block, ENNReal.add_lt_top]

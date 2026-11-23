@@ -67,7 +67,8 @@ noncomputable def blockDecompNorm (s : ℝ) (q : ℝ≥0∞) (f : X) : ℝ≥0�
 
 /-- Every block decomposition `f = ∑ g_k` with `g_k ∈ A_{2^k}` bounds the block decomposition
 quasi-norm. -/
-theorem blockDecompNorm_le {f : X} {g : ℕ → X} (hg : ∀ k, g k ∈ A (2 ^ k)) (hf : HasSum g f) :
+theorem blockDecompNorm_le_of_hasSum {f : X} {g : ℕ → X} (hg : ∀ k, g k ∈ A (2 ^ k))
+    (hf : HasSum g f) :
     A.blockDecompNorm s q f ≤ lqNorm q (fun k => dyadicWeight s k * ‖g k‖ₑ) :=
   iInf₂_le_of_le g hg (iInf_le_of_le hf le_rfl)
 
@@ -120,94 +121,95 @@ theorem approxNormDyadic_le_blockDecompNorm (hs : 0 < s) (hq : 1 ≤ q) (f : X) 
 
 /-- The block decomposition built from near-best approximants: `g 0 = 0`, `g 1 = a 0` and
 `g (k + 2) = a (k + 1) - a k`. -/
-noncomputable def DyadicApprox.blocks {f : X} {t : ℕ → ℝ≥0∞} (D : A.DyadicApprox f t) : ℕ → X
+noncomputable def DyadicApprox.blockSeq {f : X} {t : ℕ → ℝ≥0∞} (D : A.DyadicApprox f t) : ℕ → X
   | 0 => 0
   | 1 => D.a 0
   | k + 2 => D.a (k + 1) - D.a k
 
 /-- The blocks of a dyadic approximation lie in the right sets: `g_k ∈ A_{2^k}`. -/
-theorem DyadicApprox.blocks_mem {f : X} {t : ℕ → ℝ≥0∞} (D : A.DyadicApprox f t) (k : ℕ) :
-    D.blocks k ∈ A (2 ^ k) := by
+theorem DyadicApprox.blockSeq_mem {f : X} {t : ℕ → ℝ≥0∞} (D : A.DyadicApprox f t) (k : ℕ) :
+    D.blockSeq k ∈ A (2 ^ k) := by
   match k with
   | 0 => exact A.zero_mem _
   | 1 => exact A.mem_of_le (by norm_num) (D.mem 0)
   | k + 2 => exact D.sub_mem k
 
 /-- The partial sums of the blocks are the approximants: `∑_{j < K+2} g_j = a_K`. -/
-theorem DyadicApprox.sum_range_blocks {f : X} {t : ℕ → ℝ≥0∞} (D : A.DyadicApprox f t) (K : ℕ) :
-    ∑ j ∈ range (K + 2), D.blocks j = D.a K := by
+theorem DyadicApprox.sum_range_blockSeq {f : X} {t : ℕ → ℝ≥0∞} (D : A.DyadicApprox f t) (K : ℕ) :
+    ∑ j ∈ range (K + 2), D.blockSeq j = D.a K := by
   induction K with
-  | zero => simp [Finset.sum_range_succ, DyadicApprox.blocks]
+  | zero => simp [Finset.sum_range_succ, DyadicApprox.blockSeq]
   | succ K ih =>
     rw [Finset.sum_range_succ, ih]
-    simp only [DyadicApprox.blocks]
+    simp only [DyadicApprox.blockSeq]
     abel
 
 /-- The blocks of near-best approximants are summable in norm: for `f ∈ A^s_q` with `s > 0`
 and tolerances with `∑ t_k ≤ 2 ‖f‖`, `∑_k ‖g_k‖ < ∞`. -/
-theorem DyadicApprox.tsum_enorm_blocks_ne_top (hs : 0 < s) (hq : 1 ≤ q) {f : X}
+theorem DyadicApprox.tsum_enorm_blockSeq_ne_top (hs : 0 < s) (hq : 1 ≤ q) {f : X}
     (hf : A.MemApprox s q f) {t : ℕ → ℝ≥0∞} (D : A.DyadicApprox f t) (ht : Antitone t)
-    (htsum : ∑' k, t k ≤ 2 * ‖f‖ₑ) : ∑' k, ‖D.blocks k‖ₑ ≠ ∞ := by
-  have hg : ∀ k, ‖D.blocks (k + 2)‖ₑ ≤ 2 * (A.approxError f (2 ^ k) + t k) := fun k =>
+    (htsum : ∑' k, t k ≤ 2 * ‖f‖ₑ) : ∑' k, ‖D.blockSeq k‖ₑ ≠ ∞ := by
+  have hg : ∀ k, ‖D.blockSeq (k + 2)‖ₑ ≤ 2 * (A.approxError f (2 ^ k) + t k) := fun k =>
     D.enorm_sub_succ_le ht k
   have hE1 : lqNorm 1 (A.approxSeqDyadic 0 f) < ∞ := hf.lqNorm_one_lt_top hq le_rfl hs
-  have htail : ∑' k, ‖D.blocks (k + 2)‖ₑ ≠ ∞ := by
+  have htail : ∑' k, ‖D.blockSeq (k + 2)‖ₑ ≠ ∞ := by
     have hfin : 2 * (lqNorm 1 (A.approxSeqDyadic 0 f) + 2 * ‖f‖ₑ) ≠ ∞ :=
       ENNReal.mul_ne_top (by norm_num) (ENNReal.add_ne_top.2
         ⟨hE1.ne, ENNReal.mul_ne_top (by norm_num) enorm_ne_top⟩)
     refine ne_top_of_le_ne_top hfin ?_
-    calc ∑' k, ‖D.blocks (k + 2)‖ₑ ≤ ∑' k, 2 * (A.approxError f (2 ^ k) + t k) :=
+    calc ∑' k, ‖D.blockSeq (k + 2)‖ₑ ≤ ∑' k, 2 * (A.approxError f (2 ^ k) + t k) :=
           ENNReal.tsum_le_tsum hg
       _ = 2 * (∑' k, A.approxSeqDyadic 0 f k + ∑' k, t k) := by
           rw [ENNReal.tsum_mul_left, ENNReal.tsum_add]; simp [approxSeqDyadic]
       _ ≤ 2 * (lqNorm 1 (A.approxSeqDyadic 0 f) + 2 * ‖f‖ₑ) := by
           rw [ENNReal.lqNorm_one]; gcongr
-  rw [← Summable.sum_add_tsum_nat_add' (f := fun k => ‖D.blocks k‖ₑ) (k := 2) ENNReal.summable]
+  rw [← Summable.sum_add_tsum_nat_add' (f := fun k => ‖D.blockSeq k‖ₑ) (k := 2) ENNReal.summable]
   exact ENNReal.add_ne_top.2 ⟨ENNReal.sum_ne_top.2 fun j _ => enorm_ne_top, htail⟩
 
 /-- **The blocks of near-best approximants add up to `f`**: in a Banach space, for
 `f ∈ A^s_q` with `s > 0` and tolerances that decrease, tend to `0` and satisfy
 `∑ t_k ≤ 2 ‖f‖`. -/
-theorem DyadicApprox.hasSum_blocks [CompleteSpace X] (hs : 0 < s) (hq : 1 ≤ q) {f : X}
+theorem DyadicApprox.hasSum_blockSeq [CompleteSpace X] (hs : 0 < s) (hq : 1 ≤ q) {f : X}
     (hf : A.MemApprox s q f) {t : ℕ → ℝ≥0∞} (D : A.DyadicApprox f t) (ht : Antitone t)
     (htend : Tendsto t atTop (𝓝 0)) (htsum : ∑' k, t k ≤ 2 * ‖f‖ₑ) :
-    HasSum D.blocks f := by
-  have hsum : Summable D.blocks := Summable.of_enorm (D.tsum_enorm_blocks_ne_top hs hq hf ht htsum)
+    HasSum D.blockSeq f := by
+  have hsum : Summable D.blockSeq :=
+    Summable.of_enorm (D.tsum_enorm_blockSeq_ne_top hs hq hf ht htsum)
   have he := tendsto_approxError_pow_zero_of_memApprox hq hs hf
-  have h2 : Tendsto (fun K => ∑ j ∈ range (K + 2), D.blocks j) atTop (𝓝 (∑' k, D.blocks k)) :=
+  have h2 : Tendsto (fun K => ∑ j ∈ range (K + 2), D.blockSeq j) atTop (𝓝 (∑' k, D.blockSeq k)) :=
     hsum.hasSum.tendsto_sum_nat.comp (tendsto_add_atTop_nat 2)
-  simp_rw [D.sum_range_blocks] at h2
-  have hfeq : f = ∑' k, D.blocks k := tendsto_nhds_unique (D.tendsto he htend) h2
-  exact (congrArg (HasSum D.blocks) hfeq).mpr hsum.hasSum
+  simp_rw [D.sum_range_blockSeq] at h2
+  have hfeq : f = ∑' k, D.blockSeq k := tendsto_nhds_unique (D.tendsto he htend) h2
+  exact (congrArg (HasSum D.blockSeq) hfeq).mpr hsum.hasSum
 
 /-- **The weighted blocks of near-best approximants**: for decreasing tolerances with
 `t_0 ≤ ‖f‖` and `‖(2^(ks) t_k)_k‖_q ≤ 2 ‖f‖`,
 `‖(2^(ks) ‖g_k‖)_k‖_q ≤ 3·2^s ‖f‖ + 2·4^s (‖(2^(ks) E_{2^k}(f))_k‖_q + 2 ‖f‖)`. -/
-theorem DyadicApprox.lqNorm_blocks_le (hq : 1 ≤ q) {f : X} {t : ℕ → ℝ≥0∞}
+theorem DyadicApprox.lqNorm_blockSeq_le (hq : 1 ≤ q) {f : X} {t : ℕ → ℝ≥0∞}
     (D : A.DyadicApprox f t) (ht : Antitone t) (ht0 : t 0 ≤ ‖f‖ₑ)
     (htq : lqNorm q (fun k => dyadicWeight s k * t k) ≤ 2 * ‖f‖ₑ) :
-    lqNorm q (fun k => dyadicWeight s k * ‖D.blocks k‖ₑ) ≤ 2 ^ s * (3 * ‖f‖ₑ) +
+    lqNorm q (fun k => dyadicWeight s k * ‖D.blockSeq k‖ₑ) ≤ 2 ^ s * (3 * ‖f‖ₑ) +
       2 * dyadicWeight s 2 * (lqNorm q (A.approxSeqDyadic s f) + 2 * ‖f‖ₑ) := by
-  have hg : ∀ k, ‖D.blocks (k + 2)‖ₑ ≤ 2 * (A.approxError f (2 ^ k) + t k) := fun k =>
+  have hg : ∀ k, ‖D.blockSeq (k + 2)‖ₑ ≤ 2 * (A.approxError f (2 ^ k) + t k) := fun k =>
     D.enorm_sub_succ_le ht k
-  have hg1 : ‖D.blocks 1‖ₑ ≤ 3 * ‖f‖ₑ :=
-    calc ‖D.blocks 1‖ₑ = ‖D.a 0‖ₑ := rfl
+  have hg1 : ‖D.blockSeq 1‖ₑ ≤ 3 * ‖f‖ₑ :=
+    calc ‖D.blockSeq 1‖ₑ = ‖D.a 0‖ₑ := rfl
       _ ≤ 2 * ‖f‖ₑ + t 0 := D.enorm_zero_le
       _ ≤ 2 * ‖f‖ₑ + ‖f‖ₑ := by gcongr
       _ = 3 * ‖f‖ₑ := by ring
   refine ((ENNReal.lqNorm_le_head_add_shift hq _).trans (add_le_add le_rfl
     (ENNReal.lqNorm_le_head_add_shift hq _))).trans ?_
-  have h0 : dyadicWeight s 0 * ‖D.blocks 0‖ₑ = 0 := by simp [DyadicApprox.blocks]
-  have h1 : dyadicWeight s (0 + 1) * ‖D.blocks (0 + 1)‖ₑ ≤ 2 ^ s * (3 * ‖f‖ₑ) := by
+  have h0 : dyadicWeight s 0 * ‖D.blockSeq 0‖ₑ = 0 := by simp [DyadicApprox.blockSeq]
+  have h1 : dyadicWeight s (0 + 1) * ‖D.blockSeq (0 + 1)‖ₑ ≤ 2 ^ s * (3 * ‖f‖ₑ) := by
     rw [zero_add, ENNReal.dyadicWeight_succ, ENNReal.dyadicWeight_zero_right, mul_one]
     gcongr
-  have h2 : lqNorm q (fun k => dyadicWeight s (k + 1 + 1) * ‖D.blocks (k + 1 + 1)‖ₑ) ≤
+  have h2 : lqNorm q (fun k => dyadicWeight s (k + 1 + 1) * ‖D.blockSeq (k + 1 + 1)‖ₑ) ≤
       2 * dyadicWeight s 2 * (lqNorm q (A.approxSeqDyadic s f) + 2 * ‖f‖ₑ) := by
-    calc lqNorm q (fun k => dyadicWeight s (k + 1 + 1) * ‖D.blocks (k + 1 + 1)‖ₑ)
+    calc lqNorm q (fun k => dyadicWeight s (k + 1 + 1) * ‖D.blockSeq (k + 1 + 1)‖ₑ)
         ≤ lqNorm q (fun k => 2 * dyadicWeight s 2 *
             (A.approxSeqDyadic s f k + dyadicWeight s k * t k)) :=
           ENNReal.lqNorm_mono fun k => by
-            calc dyadicWeight s (k + 1 + 1) * ‖D.blocks (k + 2)‖ₑ
+            calc dyadicWeight s (k + 1 + 1) * ‖D.blockSeq (k + 2)‖ₑ
                 ≤ dyadicWeight s (k + 2) * (2 * (A.approxError f (2 ^ k) + t k)) := by
                   gcongr; exact hg k
               _ = _ := by rw [ENNReal.dyadicWeight_add_nat, approxSeqDyadic]; ring
@@ -230,8 +232,8 @@ theorem DyadicApprox.blockDecompNorm_le [CompleteSpace X] (hs : 0 < s) (hq : 1 �
     (htq : lqNorm q (fun k => dyadicWeight s k * t k) ≤ 2 * ‖f‖ₑ) :
     A.blockDecompNorm s q f ≤ 2 ^ s * (3 * ‖f‖ₑ) +
       2 * dyadicWeight s 2 * (lqNorm q (A.approxSeqDyadic s f) + 2 * ‖f‖ₑ) :=
-  (ApproximationScheme.blockDecompNorm_le D.blocks_mem
-    (D.hasSum_blocks hs hq hf ht htend htsum)).trans (D.lqNorm_blocks_le hq ht ht0 htq)
+  (ApproximationScheme.blockDecompNorm_le_of_hasSum D.blockSeq_mem
+    (D.hasSum_blockSeq hs hq hf ht htend htsum)).trans (D.lqNorm_blockSeq_le hq ht ht0 htq)
 
 /-- **Existence of a block decomposition with bounds**: in a Banach space, for `s > 0` and
 `f ∈ A^s_q`, there are blocks `g_k ∈ A (2^k)` with `f = ∑ g_k`, `∑_k ‖g_k‖ < ∞` and
@@ -246,9 +248,10 @@ theorem exists_blocks [CompleteSpace X] (hs : 0 < s) (hq : 1 ≤ q) {f : X}
   obtain ⟨D⟩ := exists_dyadicApprox A f (tolerance_ne_zero hf0 s)
   have ht := tolerance_anti f hs.le
   have htsum := tsum_tolerance_le f hs.le
-  refine ⟨D.blocks, D.blocks_mem, D.hasSum_blocks hs hq hf ht (tendsto_tolerance f (by linarith))
-    htsum, D.tsum_enorm_blocks_ne_top hs hq hf ht htsum, ?_⟩
-  refine (D.lqNorm_blocks_le hq ht (tolerance_zero f s).le
+  refine ⟨D.blockSeq, D.blockSeq_mem,
+    D.hasSum_blockSeq hs hq hf ht (tendsto_tolerance f (by linarith)) htsum,
+    D.tsum_enorm_blockSeq_ne_top hs hq hf ht htsum, ?_⟩
+  refine (D.lqNorm_blockSeq_le hq ht (tolerance_zero f s).le
     (lqNorm_dyadicWeight_mul_tolerance_le hq f le_rfl)).trans ?_
   have hfN : ‖f‖ₑ ≤ A.approxNormDyadic s q f := enorm_le_approxNormDyadic f
   have hDN : lqNorm q (A.approxSeqDyadic s f) + ‖f‖ₑ = A.approxNormDyadic s q f := by
@@ -267,7 +270,7 @@ theorem blockDecompNorm_le_approxNormDyadic [CompleteSpace X] (hs : 0 < s) (hq :
     A.blockDecompNorm s q f ≤ (3 * 2 ^ s + 4 * dyadicWeight s 2) * A.approxNormDyadic s q f := by
   by_cases hf : A.MemApprox s q f
   · obtain ⟨g, hg, hgf, -, hle⟩ := exists_blocks hs hq hf
-    exact (blockDecompNorm_le hg hgf).trans hle
+    exact (blockDecompNorm_le_of_hasSum hg hgf).trans hle
   · rw [memApprox_iff_approxNormDyadic_lt_top hq hs.le, not_lt, top_le_iff] at hf
     rw [hf, ENNReal.mul_top (by positivity)]; exact le_top
 

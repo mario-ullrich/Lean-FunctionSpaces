@@ -13,7 +13,7 @@ public import ApproximationSpaces.Interpolation.KMethod
 A **couple** on an additive commutative group `U` is a pair of functions `N₀, N₁ : U → [0, ∞]`
 (`InterpCouple`); its two spaces are `X_i = {N_i < ∞}`, and their sum and intersection stay
 implicit.  The axioms of extended quasi-norms (`InterpCouple.IsQuasiNormed`) and homogeneity
-(`InterpCouple.IsHomogeneous`) are separate propositions, assumed only where they are used.
+(`InterpCouple.IsHomogeneousCouple`) are separate propositions, assumed only where they are used.
 This is the setting of quasi-normed abelian groups in Bergh–Löfström, Sections 3.10 and 3.11.
 
 The **K-functional** is `K(t, u) = inf_b (N₀(u - b) + t N₁(b))` (`InterpCouple.kFunctional`), the
@@ -34,9 +34,9 @@ a real subspace (`InterpCouple.kMethodSpace`).  For an ordered quasi-normed coup
 (`InterpCouple.kMethodNorm_le_interpNorm`, `InterpCouple.interpNorm_le_kMethodNorm`).
 
 A bounded linear map `ι : Y → X` gives the couple `(X, ι(Y))` (`InterpCouple.ofMap`), whose
-K-functional is `ApproximationScheme.kFunctional ι` for `0 < t < ∞`.  Hence its continuous
-K-method and its norm on the grid `t = 2^(-kρ)` are `ApproximationScheme.kMethodNorm` and
-`ApproximationScheme.interpNorm` (`InterpCouple.kMethodNorm_ofMap`,
+K-functional is `ApproximationScheme.inclKFunctional ι` for `0 < t < ∞`.  Hence its continuous
+K-method and its norm on the grid `t = 2^(-kρ)` are `ApproximationScheme.inclKMethodNorm` and
+`ApproximationScheme.inclInterpNorm` (`InterpCouple.kMethodNorm_ofMap`,
 `InterpCouple.interpNorm_ofMap`).
 
 The encoding is that of `EQuasinorm.Couple` in the project *MultilinearInterpolation* (Bonn;
@@ -55,7 +55,7 @@ open ENNReal (lqNorm dyadicWeight LpAddConst dyadicGeomConst)
 whose spaces are `X_i = {u : N_i(u) < ∞}`.  This is a couple of quasi-normed abelian groups of
 Bergh–Löfström, Section 3.10, with the compatibility of Section 2.3 built in, since both spaces
 lie in `U`; the axioms are the separate propositions `InterpCouple.IsQuasiNormed` and
-`InterpCouple.IsHomogeneous`.  `EQuasinorm.Couple` of the project *MultilinearInterpolation*
+`InterpCouple.IsHomogeneousCouple`.  `EQuasinorm.Couple` of the project *MultilinearInterpolation*
 (Bonn, Apache 2.0) carries the axioms in its data. -/
 structure InterpCouple (U : Type*) [AddCommGroup U] where
   /-- The first extended quasi-norm `N₀`. -/
@@ -113,20 +113,20 @@ theorem IsQuasiNormed.swap {A : InterpCouple U} {C : ℝ≥0∞} (hA : A.IsQuasi
 
 /-- The couple is **homogeneous** on a real vector space: `N_i(c a) ≤ |c| N_i(a)` for every real
 `c` (hence equality for `c ≠ 0`). -/
-structure IsHomogeneous [Module ℝ U] (A : InterpCouple U) : Prop where
+structure IsHomogeneousCouple [Module ℝ U] (A : InterpCouple U) : Prop where
   /-- Homogeneity of `N₀`. -/
   norm0_smul_le (c : ℝ) (a : U) : A.norm0 (c • a) ≤ ‖c‖ₑ * A.norm0 a
   /-- Homogeneity of `N₁`. -/
   norm1_smul_le (c : ℝ) (a : U) : A.norm1 (c • a) ≤ ‖c‖ₑ * A.norm1 a
 
 /-- A homogeneous couple has `N₀(0) = 0`, from `c = 0`. -/
-theorem IsHomogeneous.norm0_zero [Module ℝ U] {A : InterpCouple U} (hH : A.IsHomogeneous) :
-    A.norm0 0 = 0 := by
+theorem IsHomogeneousCouple.norm0_zero [Module ℝ U] {A : InterpCouple U}
+    (hH : A.IsHomogeneousCouple) : A.norm0 0 = 0 := by
   simpa using hH.norm0_smul_le 0 0
 
 /-- A homogeneous couple has `N₁(0) = 0`, from `c = 0`. -/
-theorem IsHomogeneous.norm1_zero [Module ℝ U] {A : InterpCouple U} (hH : A.IsHomogeneous) :
-    A.norm1 0 = 0 := by
+theorem IsHomogeneousCouple.norm1_zero [Module ℝ U] {A : InterpCouple U}
+    (hH : A.IsHomogeneousCouple) : A.norm1 0 = 0 := by
   simpa using hH.norm1_smul_le 0 0
 
 /-! ### The K-functional -/
@@ -227,7 +227,7 @@ theorem kFunctional_neg (h0 : ∀ a, A.norm0 (-a) = A.norm0 a) (h1 : ∀ a, A.no
   rw [Equiv.neg_apply, h1, ← h0 (-u - b), show -(-u - b) = u - -b by abel]
 
 /-- **Homogeneity of the K-functional**: `K(t, c u) ≤ |c| K(t, u)` for a homogeneous couple. -/
-theorem kFunctional_smul_le [Module ℝ U] (hH : A.IsHomogeneous) (c : ℝ) (u : U) :
+theorem kFunctional_smul_le [Module ℝ U] (hH : A.IsHomogeneousCouple) (c : ℝ) (u : U) :
     A.kFunctional t (c • u) ≤ ‖c‖ₑ * A.kFunctional t u := by
   rcases eq_or_ne c 0 with rfl | hc
   · rw [zero_smul, kFunctional_zero_right hH.norm0_zero hH.norm1_zero]
@@ -463,7 +463,7 @@ theorem kMethodNorm_add_le (hA : A.IsQuasiNormed C) (u v : U) :
 
 /-- **Homogeneity of the continuous K-norm**: `‖c u‖_{K,θ,q} ≤ |c| ‖u‖_{K,θ,q}` for a
 homogeneous couple. -/
-theorem kMethodNorm_smul_le [Module ℝ U] (hH : A.IsHomogeneous) (c : ℝ) (u : U) :
+theorem kMethodNorm_smul_le [Module ℝ U] (hH : A.IsHomogeneousCouple) (c : ℝ) (u : U) :
     A.kMethodNorm θ q (c • u) ≤ ‖c‖ₑ * A.kMethodNorm θ q u := by
   rw [kMethodNorm, kMethodNorm, ApproximationScheme.phiFunctional_eq,
     ApproximationScheme.phiFunctional_eq]
@@ -514,7 +514,7 @@ theorem discreteKMethodNorm_add_le (hA : A.IsQuasiNormed C) (hq : 1 ≤ q) (u v 
 
 /-- The **real interpolation space** `(X₀, X₁)_{θ,q}` of a quasi-normed homogeneous couple, as a
 real subspace of `U` (Bergh–Löfström, Sections 3.1 and 3.11). -/
-def kMethodSpace [Module ℝ U] (hA : A.IsQuasiNormed C) (hH : A.IsHomogeneous) (θ : ℝ)
+def kMethodSpace [Module ℝ U] (hA : A.IsQuasiNormed C) (hH : A.IsHomogeneousCouple) (θ : ℝ)
     (q : ℝ≥0∞) : Submodule ℝ U where
   carrier := {u | A.MemKMethod θ q u}
   zero_mem' := by
@@ -528,13 +528,13 @@ def kMethodSpace [Module ℝ U] (hA : A.IsQuasiNormed C) (hH : A.IsHomogeneous) 
 
 /-- Membership in the real interpolation space as a submodule. -/
 @[simp]
-theorem mem_kMethodSpace [Module ℝ U] {hA : A.IsQuasiNormed C} {hH : A.IsHomogeneous} {u : U} :
-    u ∈ kMethodSpace hA hH θ q ↔ A.MemKMethod θ q u := Iff.rfl
+theorem mem_kMethodSpace [Module ℝ U] {hA : A.IsQuasiNormed C} {hH : A.IsHomogeneousCouple}
+    {u : U} : u ∈ kMethodSpace hA hH θ q ↔ A.MemKMethod θ q u := Iff.rfl
 
 /-! ### The grid on `ℕ` with the term `N₀` -/
 
 /-- The norm `N₀(u) + ‖(2^(kρθ) K(2^(-kρ), u))_{k ∈ ℕ}‖_{ℓ_q}` of the discrete K-method on the
-grid `t = 2^(-kρ)`, `k ∈ ℕ`, as in `ApproximationScheme.interpNorm`. -/
+grid `t = 2^(-kρ)`, `k ∈ ℕ`, as in `ApproximationScheme.inclInterpNorm`. -/
 noncomputable def interpNorm (A : InterpCouple U) (θ ρ : ℝ) (q : ℝ≥0∞) (u : U) : ℝ≥0∞ :=
   A.norm0 u + lqNorm q fun k : ℕ => dyadicWeight (ρ * θ) k * A.kFunctional (dyadicWeight (-ρ) k) u
 
@@ -670,7 +670,7 @@ theorem isQuasiNormed_ofMap : (ofMap ι).IsQuasiNormed 1 where
       (norm1_ofMap_le (by rw [map_add, y.2, z.2])).trans (enorm_add_le _ _)
 
 /-- The couple of a bounded linear map is homogeneous. -/
-theorem isHomogeneous_ofMap : (ofMap ι).IsHomogeneous where
+theorem isHomogeneousCouple_ofMap : (ofMap ι).IsHomogeneousCouple where
   norm0_smul_le c f := (enorm_smul c f).le
   norm1_smul_le c f := by
     rcases eq_or_ne c 0 with rfl | hc
@@ -697,43 +697,44 @@ theorem norm0_ofMap_le (f : X) : (ofMap ι).norm0 f ≤ max 1 ‖ι‖ₑ * (ofM
 /-- **The K-functional of `ofMap ι`** is the K-functional `inf_y (‖f - ι y‖ + t ‖y‖)` of
 `ApproximationSpaces.Interpolation.KFunctional`, for `0 < t < ∞`. -/
 theorem kFunctional_ofMap (ht0 : t ≠ 0) (ht : t ≠ ∞) (f : X) :
-    (ofMap ι).kFunctional t f = ApproximationScheme.kFunctional ι t f := by
+    (ofMap ι).kFunctional t f = ApproximationScheme.inclKFunctional ι t f := by
   refine le_antisymm (le_iInf fun y => ?_) (le_iInf fun b => ?_)
   · exact (kFunctional_le (A := ofMap ι) (ι y) f).trans
       (add_le_add le_rfl (mul_le_mul_right (norm1_ofMap_le (ι := ι) rfl) t))
   · change _ ≤ ‖f - b‖ₑ + t * ⨅ y : {y : Y // ι y = b}, ‖(y : Y)‖ₑ
     rw [ENNReal.mul_iInf_of_ne ht0 ht, ENNReal.add_iInf]
     exact le_iInf fun y =>
-      (ApproximationScheme.kFunctional_le (y : Y) f).trans_eq (by rw [y.2])
+      (ApproximationScheme.inclKFunctional_le (y : Y) f).trans_eq (by rw [y.2])
 
-/-- The continuous K-norm of `ofMap ι` is `ApproximationScheme.kMethodNorm ι`. -/
+/-- The continuous K-norm of `ofMap ι` is `ApproximationScheme.inclKMethodNorm ι`. -/
 theorem kMethodNorm_ofMap (f : X) :
-    (ofMap ι).kMethodNorm θ q f = ApproximationScheme.kMethodNorm ι θ q f :=
+    (ofMap ι).kMethodNorm θ q f = ApproximationScheme.inclKMethodNorm ι θ q f :=
   ApproximationScheme.phiFunctional_congr fun _ ht0 ht => kFunctional_ofMap ht0 ht f
 
 /-- The real interpolation space of `ofMap ι` is that of
 `ApproximationSpaces.Interpolation.KMethod`. -/
 theorem memKMethod_ofMap_iff {f : X} :
-    (ofMap ι).MemKMethod θ q f ↔ ApproximationScheme.MemKMethod ι θ q f := by
+    (ofMap ι).MemKMethod θ q f ↔ ApproximationScheme.MemInclKMethod ι θ q f := by
   rw [MemKMethod, kMethodNorm_ofMap]
   rfl
 
 /-- The discrete K-norm of `ofMap ι` on the grid `2^(nρ)`, `n ∈ ℤ`, is
-`ApproximationScheme.discreteKMethodNorm ι`. -/
+`ApproximationScheme.inclDiscreteKMethodNorm ι`. -/
 theorem discreteKMethodNorm_ofMap (f : X) :
-    (ofMap ι).discreteKMethodNorm θ ρ q f = ApproximationScheme.discreteKMethodNorm ι θ ρ q f := by
-  rw [discreteKMethodNorm, ApproximationScheme.discreteKMethodNorm]
+    (ofMap ι).discreteKMethodNorm θ ρ q f =
+      ApproximationScheme.inclDiscreteKMethodNorm ι θ ρ q f := by
+  rw [discreteKMethodNorm, ApproximationScheme.inclDiscreteKMethodNorm]
   congr 1
   funext n
-  rw [discreteKSeq, ApproximationScheme.discreteKSeq,
+  rw [discreteKSeq, ApproximationScheme.inclDiscreteKSeq,
     kFunctional_ofMap (ENNReal.rpow_pos two_pos ENNReal.ofNat_ne_top).ne'
       (ENNReal.two_rpow_ne_top _)]
 
 /-- The norm of `ofMap ι` on the grid `2^(-kρ)`, `k ∈ ℕ`, is
-`ApproximationScheme.interpNorm ι`. -/
+`ApproximationScheme.inclInterpNorm ι`. -/
 theorem interpNorm_ofMap (f : X) :
-    (ofMap ι).interpNorm θ ρ q f = ApproximationScheme.interpNorm ι θ ρ q f := by
-  rw [interpNorm, ApproximationScheme.interpNorm, ofMap_norm0]
+    (ofMap ι).interpNorm θ ρ q f = ApproximationScheme.inclInterpNorm ι θ ρ q f := by
+  rw [interpNorm, ApproximationScheme.inclInterpNorm, ofMap_norm0]
   congr 2
   funext k
   rw [ApproximationScheme.interpSeq,

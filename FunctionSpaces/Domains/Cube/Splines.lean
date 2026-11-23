@@ -302,8 +302,8 @@ theorem mem_cubeSplineScheme_two_pow {r k : ℕ} {g : Lp ℂ p (cubeVol d)} :
   ApproximationScheme.mem_ofMonotoneSubmodules_two_pow
 
 /-- The scheme of tensor splines is linear. -/
-theorem cubeSplineScheme_isLinear (r : ℕ) : (cubeSplineScheme p d r).IsLinear :=
-  ApproximationScheme.isLinear_ofMonotoneSubmodules _ _
+theorem cubeSplineScheme_isLinearScheme (r : ℕ) : (cubeSplineScheme p d r).IsLinearScheme :=
+  ApproximationScheme.isLinearScheme_ofMonotoneSubmodules _ _
 
 /-- At complexity `1` the tensor splines contain the polynomials of degree `< r` in each
 variable, so their error is at most that of the piecewise polynomials. -/

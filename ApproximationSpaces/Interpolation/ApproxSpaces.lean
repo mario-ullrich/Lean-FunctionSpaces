@@ -84,7 +84,7 @@ theorem isQuasiNormed_leftApproxCouple (hs : 0 ≤ s) (hq : 1 ≤ q) :
   norm1_add_le := approxNormDyadic_add_le hq hs
 
 /-- The couple `(X, A^s_q)` is homogeneous (`approxNormDyadic_smul`). -/
-theorem isHomogeneous_leftApproxCouple : (A.leftApproxCouple s q).IsHomogeneous where
+theorem isHomogeneousCouple_leftApproxCouple : (A.leftApproxCouple s q).IsHomogeneousCouple where
   norm0_smul_le c a := (enorm_smul c a).le
   norm1_smul_le c a := (approxNormDyadic_smul c a).le
 
@@ -108,8 +108,8 @@ theorem isQuasiNormed_reprCouple (hr : 0 ≤ r) : (A.reprCouple r).IsQuasiNormed
   isQuasiNormed_leftApproxCouple hr le_top
 
 /-- The couple `(X, A^r_∞)` is homogeneous. -/
-theorem isHomogeneous_reprCouple : (A.reprCouple r).IsHomogeneous :=
-  isHomogeneous_leftApproxCouple
+theorem isHomogeneousCouple_reprCouple : (A.reprCouple r).IsHomogeneousCouple :=
+  isHomogeneousCouple_leftApproxCouple
 
 /-- The couple `(X, A^r_∞)` is ordered: `‖f‖ ≤ 1 · ‖f‖_{A^r_∞}`. -/
 theorem norm0_reprCouple_le (f : X) : (A.reprCouple r).norm0 f ≤ 1 * (A.reprCouple r).norm1 f := by
@@ -268,7 +268,7 @@ theorem memApprox_iff_memKMethod_reprCouple (hs : 0 < s) (hsr : s < r) (hq : 1 �
 `0 < s < r` and `1 ≤ q ≤ ∞`, the real interpolation space `(X, A^r_∞)_{s/r,q}` is `A^s_q`. -/
 theorem kMethodSpace_reprCouple (hs : 0 < s) (hsr : s < r) (hq : 1 ≤ q) :
     InterpCouple.kMethodSpace (isQuasiNormed_reprCouple (A := A) (hs.trans hsr).le)
-      isHomogeneous_reprCouple (s / r) q = A.approxSpace s q hs.le hq :=
+      isHomogeneousCouple_reprCouple (s / r) q = A.approxSpace s q hs.le hq :=
   Submodule.ext fun _ => (memApprox_iff_memKMethod_reprCouple hs hsr hq).symm
 
 /-- The constant `2 · 2^s (1 + 2 · 2^r) 2^s (r log 2)^(-1/q)` of the bound of the dyadic
@@ -377,7 +377,7 @@ theorem isQuasiNormed_approxCouple (hs₀ : 0 ≤ s₀) (hs₁ : 0 ≤ s₁) (hq
     (mul_le_mul_right (ENNReal.rpow_le_rpow_of_exponent_le one_le_two (le_max_right _ _)) _) _)
 
 /-- The couple `(A^{s₀}_{q₀}, A^{s₁}_{q₁})` is homogeneous (`approxNormDyadic_smul`). -/
-theorem isHomogeneous_approxCouple : (A.approxCouple s₀ q₀ s₁ q₁).IsHomogeneous where
+theorem isHomogeneousCouple_approxCouple : (A.approxCouple s₀ q₀ s₁ q₁).IsHomogeneousCouple where
   norm0_smul_le c a := (approxNormDyadic_smul c a).le
   norm1_smul_le c a := (approxNormDyadic_smul c a).le
 
@@ -458,7 +458,7 @@ theorem memKMethod_approxCouple_zero_iff (hs₁ : 0 < s₁) (hη : 0 < η) (hη'
 theorem kMethodSpace_approxCouple (hs₀ : 0 < s₀) (hs : s₀ < s₁) (hη : 0 < η) (hη' : η < 1)
     (hq₀ : 1 ≤ q₀) (hq₁ : 1 ≤ q₁) (hq : 1 ≤ q) :
     InterpCouple.kMethodSpace (isQuasiNormed_approxCouple (A := A) hs₀.le (hs₀.trans hs).le hq₀ hq₁)
-      isHomogeneous_approxCouple η q =
+      isHomogeneousCouple_approxCouple η q =
       A.approxSpace ((1 - η) * s₀ + η * s₁) q (reiterationExponent_pos hs₀ hs hη hη').le hq :=
   Submodule.ext fun _ => memKMethod_approxCouple_iff hs₀ hs hη hη' hq₀ hq₁ hq
 
@@ -468,7 +468,7 @@ subspaces: for `s₁ > 0`, `0 < η < 1` and `1 ≤ q₁, q ≤ ∞`, the real in
 theorem kMethodSpace_approxCouple_zero (hs₁ : 0 < s₁) (hη : 0 < η) (hη' : η < 1)
     (hq₁ : 1 ≤ q₁) (hq : 1 ≤ q) :
     InterpCouple.kMethodSpace (isQuasiNormed_leftApproxCouple (A := A) hs₁.le hq₁)
-      isHomogeneous_leftApproxCouple η q = A.approxSpace (η * s₁) q (mul_pos hη hs₁).le hq :=
+      isHomogeneousCouple_leftApproxCouple η q = A.approxSpace (η * s₁) q (mul_pos hη hs₁).le hq :=
   Submodule.ext fun _ => memKMethod_approxCouple_zero_iff hs₁ hη hη' hq₁ hq
 
 /-! ### Sandwiches -/
@@ -549,7 +549,8 @@ theorem norm1_ofMap_le_approxNormDyadic_one [CompleteSpace Y] (hB : LiftBound ι
 satisfies Jackson's inequality and a lifting bound of order `r > 0`, then for `0 < θ < 1` and
 `1 ≤ q ≤ ∞`, `(X, ι(Y))_{θ,q} = A^{θr}_q` for the couple `InterpCouple.ofMap ι`, since
 `A^r_1 ⊆ ι(Y) ⊆ A^r_∞` with norms.  This is the representation theorem
-`memApprox_iff_memKMethod` again, which holds for every normed space `Y`. -/
+`memApprox_iff_memInclKMethod_of_jacksonBound_of_liftBound` again, which holds for every normed
+space `Y`. -/
 theorem memKMethod_ofMap_iff_memApprox [CompleteSpace Y] (hJ : JacksonBound ι A r C₁)
     (hC₁ : 0 ≤ C₁) (hB : LiftBound ι A r C₂) (hC₂ : 0 ≤ C₂) (hr : 0 < r) (hθ : 0 < θ)
     (hθ' : θ < 1) (hq : 1 ≤ q) {f : X} :

@@ -78,7 +78,7 @@ theorem kMethodSpace_besovCouple (hs₀ : 0 < s₀) (hs : s₀ < s₁) (hη : 0 
     InterpCouple.kMethodSpace
         (ApproximationScheme.isQuasiNormed_approxCouple (A := S.toLp μ p) hs₀.le
           (hs₀.trans hs).le hq₀ hq₁)
-        ApproximationScheme.isHomogeneous_approxCouple η q =
+        ApproximationScheme.isHomogeneousCouple_approxCouple η q =
       S.besovSpace μ p ((1 - η) * s₀ + η * s₁) q
         (ApproximationScheme.reiterationExponent_pos hs₀ hs hη hη').le hq :=
   ApproximationScheme.kMethodSpace_approxCouple hs₀ hs hη hη' hq₀ hq₁ hq
@@ -90,7 +90,7 @@ theorem kMethodSpace_lpBesovCouple (hs₁ : 0 < s₁) (hη : 0 < η) (hη' : η 
     (hq : 1 ≤ q) :
     InterpCouple.kMethodSpace
         (ApproximationScheme.isQuasiNormed_leftApproxCouple (A := S.toLp μ p) hs₁.le hq₁)
-        ApproximationScheme.isHomogeneous_leftApproxCouple η q =
+        ApproximationScheme.isHomogeneousCouple_leftApproxCouple η q =
       S.besovSpace μ p (η * s₁) q (mul_pos hη hs₁).le hq :=
   ApproximationScheme.kMethodSpace_approxCouple_zero hs₁ hη hη' hq₁ hq
 

@@ -25,7 +25,7 @@ Given `f ∈ X`, choose near-best approximants `a_k ∈ A (2^k)` (`DyadicApprox`
 `f = a_0 + ∑_k (a_{k+1} - a_k)` with blocks `a_{k+1} - a_k ∈ A (2^(k+2))` of size
 `≲ E_{2^k}(f)`.  Lift every block to `Y`: the lifted blocks have size `≲ 2^(kβ) E_{2^k}(f)`, so
 if `∑_k 2^(kβ) E_{2^k}(f) < ∞` their series converges in the Banach space `Y` to some `y` with
-`ι y = f` (`DyadicApprox.exists_preimage`).  The partial sums of that series lift the
+`ι y = f` (`DyadicApprox.exists_preimage_of_tsum_ne_top`).  The partial sums of that series lift the
 approximants `a_k`, and the tails bound how well `y` is approximated in `Y`.
 
 This single construction yields three theorems: Bernstein implies `A^β_1 ↪ Y`
@@ -189,7 +189,7 @@ theorem tendsto (he : Tendsto (fun k => A.approxError f (2 ^ k)) atTop (𝓝 0))
 
 /-- **Lifting the blocks**: `a_0 = ι y_0` and `a_{k+1} - a_k = ι d_k` with
 `‖y_0‖ ≤ C ‖a_0‖` and `‖d_k‖ ≤ C 2^((k+2)β) ‖a_{k+1} - a_k‖`. -/
-theorem exists_lift (hB : LiftBound ι A β C) (hC : 0 ≤ C) :
+theorem exists_lift_of_liftBound (hB : LiftBound ι A β C) (hC : 0 ≤ C) :
     ∃ y0 : Y, ∃ d : ℕ → Y, ι y0 = D.a 0 ∧ (∀ k, ι (d k) = D.a (k + 1) - D.a k) ∧
       ‖y0‖ₑ ≤ ENNReal.ofReal C * ‖D.a 0‖ₑ ∧
       ∀ k, ‖d k‖ₑ ≤ ENNReal.ofReal C * dyadicWeight β (k + 2) * ‖D.a (k + 1) - D.a k‖ₑ := by
@@ -211,7 +211,7 @@ theorem exists_lift_partial (ht : Antitone t) (hB : LiftBound ι A β C) (hC : 0
     ∃ y0 : Y, ∃ d : ℕ → Y, (∀ n, ι (y0 + ∑ j ∈ range n, d j) = D.a n) ∧
       ‖y0‖ₑ ≤ ENNReal.ofReal C * (2 * ‖f‖ₑ + t 0) ∧
       ∀ k, ‖d k‖ₑ ≤ liftConst C β * (dyadicWeight β k * (A.approxError f (2 ^ k) + t k)) := by
-  obtain ⟨y0, d, hy0, hd, hy0le, hdle⟩ := D.exists_lift hB hC
+  obtain ⟨y0, d, hy0, hd, hy0le, hdle⟩ := D.exists_lift_of_liftBound hB hC
   refine ⟨y0, d, fun n => ?_, hy0le.trans (by gcongr; exact D.enorm_zero_le), fun k => ?_⟩
   · rw [map_add, map_sum, hy0]
     simp_rw [hd]
@@ -231,7 +231,7 @@ include D in
   `‖y - z‖ ≤ K ∑_{i ≥ 0} 2^((k+i)β) (E_{2^(k+i)}(f) + t_{k+i})`,
 
 where `K = liftConst C β`. -/
-theorem exists_preimage [CompleteSpace Y] (ht : Antitone t) (hB : LiftBound ι A β C)
+theorem exists_preimage_of_tsum_ne_top [CompleteSpace Y] (ht : Antitone t) (hB : LiftBound ι A β C)
     (hC : 0 ≤ C) (hβ : 0 ≤ β)
     (hsum : ∑' k, dyadicWeight β k * (A.approxError f (2 ^ k) + t k) ≠ ∞) :
     ∃ y : Y, ι y = f ∧
@@ -402,7 +402,7 @@ theorem exists_preimage_of_liftBound [CompleteSpace Y] (hB : LiftBound ι A β C
   rcases eq_or_ne f 0 with rfl | hf0
   · exact ⟨0, map_zero ι, by simp⟩
   obtain ⟨D⟩ := exists_dyadicApprox A f (tolerance_ne_zero hf0 β)
-  obtain ⟨y, hy, hyle, -⟩ := D.exists_preimage (tolerance_anti f hβ) hB hC hβ
+  obtain ⟨y, hy, hyle, -⟩ := D.exists_preimage_of_tsum_ne_top (tolerance_anti f hβ) hB hC hβ
     (tsum_dyadicWeight_mul_add_tolerance_ne_top le_rfl hf.ne)
   rw [tolerance_zero] at hyle
   exact ⟨y, hy, hyle.trans (mul_add_mul_tsum_tolerance_le _ _ f β)⟩

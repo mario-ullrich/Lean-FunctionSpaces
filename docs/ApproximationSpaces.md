@@ -68,27 +68,27 @@ theory.
   `a ∈ A_n` is `ι y` with `‖y‖ ≤ C n^α ‖a‖` (a Nikolskii inequality), then every
   `f ∈ A^s_q(X)` is `ι y` for some `y` in the approximation space `B^{s-α}_q(Y)` of the
   pulled-back scheme `B_n = ι⁻¹(A_n)`, with `‖y‖_{B^{s-α}_q} ≤ K ‖f‖_{A^s_q}`
-  (`ApproximationScheme.exists_preimage_of_nikolskii`).
+  (`ApproximationScheme.exists_preimage_approxNormDyadic_le_of_nikolskii`).
 * **The representation theorem.** Let `ι : Y → X` satisfy Jackson's inequality
   `E_n(ι y) ≤ C n^(-r) ‖y‖` and Bernstein's inequality (every `a ∈ A_n` is `ι y` with
   `‖y‖ ≤ C n^r ‖a‖`) of order `r`. Then for `0 < s < r` and `1 ≤ q ≤ ∞`, `A^s_q` is the real
   interpolation space `(X, Y)_{s/r, q}` of the discrete K-method on the grid `t = 2^(-kr)`, the `f`
   with `‖f‖ + ‖(2^(ks) K(2^(-kr), f))_k‖_{ℓ_q} < ∞` (`ApproximationScheme.MemInterp`), with
-  equivalent norms (`ApproximationScheme.memApprox_iff_memInterp`,
-  `.approxNormDyadic_le_interpNorm_of_jackson`, `.interpNorm_le_approxNormDyadic_of_bernstein`). In
-  particular two schemes with Jackson and Bernstein inequalities of the same order
-  for the same `ι` have the same approximation spaces
+  equivalent norms (`ApproximationScheme.memApprox_iff_memInterp_of_jacksonBound_of_liftBound`,
+  `.approxNormDyadic_le_inclInterpNorm_of_jackson`,
+  `.inclInterpNorm_le_approxNormDyadic_of_bernstein`). In particular two schemes with Jackson
+  and Bernstein inequalities of the same order for the same `ι` have the same approximation spaces
   (`ApproximationScheme.approxSpace_eq_of_jackson_bernstein`).
 * **The discrete and the continuous K-method.** For `θ > 0`, `0 < q ≤ ∞` and every grid
   `t = 2^(-kρ)`, `ρ > 0`, the discrete K-norm `‖f‖ + ‖(2^(kρθ) K(2^(-kρ), f))_k‖_{ℓ_q}` and the
   continuous K-norm `(∫_0^∞ (t^(-θ) K(t, f))^q dt/t)^(1/q)` (the essential supremum of
   `t^(-θ) K(t, f)` for `q = ∞`) are equivalent, with explicit
-  constants (Bergh–Löfström, Lemma 3.1.3; `ApproximationScheme.kMethodNorm_le_interpNorm`,
-  `ApproximationScheme.interpNorm_le_kMethodNorm`,
-  `ApproximationScheme.memInterp_iff_memKMethod`). Hence the grid does not matter
+  constants (Bergh–Löfström, Lemma 3.1.3; `ApproximationScheme.inclKMethodNorm_le_inclInterpNorm`,
+  `ApproximationScheme.inclInterpNorm_le_inclKMethodNorm`,
+  `ApproximationScheme.memInterp_iff_memInclKMethod`). Hence the grid does not matter
   (`ApproximationScheme.memInterp_iff_memInterp_of_pos`), and the representation theorem reads
   `A^s_q = (X, Y)_{s/r, q}` for the continuous K-method
-  (`ApproximationScheme.memApprox_iff_memKMethod`).
+  (`ApproximationScheme.memApprox_iff_memInclKMethod_of_jacksonBound_of_liftBound`).
 * **Couples and their K-method.** For a couple `(N₀, N₁)` of functions `U → [0, ∞]` on an
   abelian group, with `K(t, u) = inf_b (N₀(u - b) + t N₁(b))`, every `θ ≥ 0`, `ρ > 0` and
   `0 < q ≤ ∞`, the continuous K-norm `(∫_0^∞ (t^(-θ) K(t, u))^q dt/t)^(1/q)` is finite if and
@@ -100,7 +100,8 @@ theory.
   homogeneous couple on a real vector space the K-method gives a linear subspace
   (`InterpCouple.kMethodSpace`). The couple of a bounded
   linear map `ι : Y → X` has the K-method of the previous item
-  (`InterpCouple.kMethodNorm_ofMap`).
+  (`InterpCouple.kMethodNorm_ofMap`); the prefix `incl` in `ApproximationScheme.inclKFunctional`,
+  `.inclKMethodNorm`, `.MemInclKMethod` and their relatives marks this couple `(X, ι(Y))`.
 * **The interpolation property.** If an additive map `T` between two couples satisfies
   `N_i'(T a) ≤ M_i N_i(a)` with `0 < M_i < ∞`, then `‖T u‖_{K,θ,q} ≤ M₀^(1-θ) M₁^θ ‖u‖_{K,θ,q}`
   for every `θ` and `q` (Bergh–Löfström, Theorems 3.1.2 and 3.11.2;
@@ -112,7 +113,7 @@ theory.
   retract is the image of the space (Bergh–Löfström, Theorem 6.4.2;
   `InterpCouple.memKMethod_iff_of_retract`, `InterpCouple.memKMethod_iff_exists_map_eq`), and
   bounded linear maps `T : X → X'`, `S : Y → Y'` with `T ι = ι' S` map `(X, Y)_{θ,q}` into
-  `(X', Y')_{θ,q}` (`ApproximationScheme.kMethodNorm_map_le_of_comp_eq`,
+  `(X', Y')_{θ,q}` (`ApproximationScheme.inclKMethodNorm_map_le_of_comp_eq`,
   `ApproximationScheme.MemInterp.map`).
 * **The reiteration theorem.** For a couple quasi-normed with constant `C` (`N_i(0) = 0`,
   `N_i(-a) = N_i(a)`, `N_i(a + b) ≤ C (N_i(a) + N_i(b))`, `C < ∞`), `0 < θ₀ < θ₁ < 1`,
@@ -129,7 +130,7 @@ theory.
   `((X₀, X₁)_{θ₀,q₀}, X₁)_{η,q} = (X₀, X₁)_{(1-η)θ₀+η,q}`
   (`InterpCouple.memKMethod_leftKCouple_iff`, `InterpCouple.memKMethod_rightKCouple_iff`), and
   for a bounded linear map `ι : Y → X`, `((X, Y)_{θ₀,q₀}, (X, Y)_{θ₁,q₁})_{η,q} = (X, Y)_{θ,q}`
-  (`ApproximationScheme.memKMethod_reiteration`). The proof uses the upper bound of Holmstedt's
+  (`ApproximationScheme.memInclKMethod_reiteration`). The proof uses the upper bound of Holmstedt's
   formula in discrete form with `ℓ_1` sums,
   `K̄(2^(m(θ₁-θ₀)), u) ≤ c (∑_{n<m} 2^(-nθ₀) K(2^n, u) + 2^(m(θ₁-θ₀)) ∑_{n≥m} 2^(-nθ₁)
   K(2^n, u))`
@@ -187,8 +188,8 @@ theory.
   `1`, then for `0 < s < θ` and `0 < q ≤ ∞`, `f ∈ E_{s,q}` iff
   `N₀(f) + ‖(2^(ks) ω(f, 2^(-k)))_k‖_{ℓ_q} < ∞`, with equivalent quasi-norms (DeVore–Popov,
   Trans. Amer. Math. Soc. 305 (1988), proof of Theorem 4.8;
-  `InterpCouple.ModulusData.memEMethod_iff_modNorm_lt_top`). The telescoping sums are estimated
-  in the `ρ`-th power, with Hardy's inequality in `ℓ_{q/ρ}`.
+  `InterpCouple.CoupleModulusData.memEMethod_iff_coupleModNorm_lt_top`). The telescoping sums
+  are estimated in the `ρ`-th power, with Hardy's inequality in `ℓ_{q/ρ}`.
 * **Block decompositions.** In a Banach space, for `s > 0` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q` iff
   `f = ∑_k g_k` with blocks `g_k ∈ A_{2^k}` and `(2^(ks) ‖g_k‖)_k ∈ ℓ_q`; the infimum over
   such decompositions is an equivalent quasi-norm
@@ -205,10 +206,11 @@ theory.
 * **The trace theorem.** Let `T` be linear with `T(A_n) ⊆ B_n` and `‖T a‖ ≤ C n^β ‖a‖` for
   `a ∈ A_n`, `n ≥ 1`, as for the restriction of functions to a hyperplane. Then `T` extends to
   `A^β_1`, and for `0 ≤ β < s` it maps `A^s_q` into `B^{s-β}_q` with
-  `‖Tr f‖_{B^{s-β}_q} ≲ ‖f‖_{A^s_q}` (`ApproximationScheme.TraceBound.approxNormDyadic_ext_le`).
-  If every `b ∈ B_{2^k}` is `T a` with `a ∈ A_{2^(k+γ)}` and `‖a‖ ≤ C' 2^(-kβ) ‖b‖`, then every
-  `g ∈ B^s_q`, `s > 0`, is the trace of some `f ∈ A^{s+β}_q` with `‖f‖ ≲ ‖g‖`
-  (`ApproximationScheme.TraceBound.exists_ext_eq`).
+  `‖Tr f‖_{B^{s-β}_q} ≲ ‖f‖_{A^s_q}`
+  (`ApproximationScheme.TraceBound.approxNormDyadic_limitTrace_le`). If every `b ∈ B_{2^k}` is
+  `T a` with `a ∈ A_{2^(k+γ)}` and `‖a‖ ≤ C' 2^(-kβ) ‖b‖`, then every `g ∈ B^s_q`, `s > 0`, is
+  the trace of some `f ∈ A^{s+β}_q` with `‖f‖ ≲ ‖g‖`
+  (`ApproximationScheme.TraceBound.exists_limitTrace_eq`).
 * **Intrinsic norms.** Let `R` be bounded linear with `R(A_n) ⊆ B_n`, as for the restriction
   to a domain, and let `E` be a possibly nonlinear map with `R(E g) = g`, `‖E g‖ ≤ C ‖g‖` and
   `E^A_{2^(k+γ)}(E g) ≤ C E^B_{2^k}(g)`. Then the intrinsic quasi-norm of `B^s_q` and the
@@ -218,7 +220,7 @@ theory.
 * **Dyadic blocks.** If the scheme has projections `P_n` onto `A_n` with `‖P_n‖ ≤ M` and
   `⋃ A_n` is dense, then for `s > 0`, `f ∈ A^s_q` iff
   `‖P_1 f‖ + ‖(2^(ks) ‖P_{2^(k+1)} f - P_{2^k} f‖)_k‖_{ℓ_q} < ∞`
-  (`ApproximationScheme.ProjectionScheme.memApprox_iff_blockNorm_lt_top`).
+  (`ApproximationScheme.ProjectionScheme.memApprox_iff_blockNorm_lt_top_of_dense`).
 * **Sequence spaces.** For `0 < q ≤ r ≤ ∞` and every sequence `a` in `[0, ∞]`,
   `‖a‖_{ℓ_r} ≤ ‖a‖_{ℓ_q}` (`ENNReal.lqNorm_le_lqNorm_of_le`), and for `q ≥ 1` the norm of a
   series of sequences is at most the series of the norms (`ENNReal.lqNorm_tsum_le`). For

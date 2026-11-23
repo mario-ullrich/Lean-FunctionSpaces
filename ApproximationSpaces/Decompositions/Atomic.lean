@@ -99,7 +99,7 @@ theorem synthConst_ne_top (hs : 0 < s) (hsσ : s < σ) : AS.synthConst s ≠ ∞
 `f = ∑_j ∑_m λ_{j,m} a_{j,m}` (series over `j` converging in `X`) satisfies
 `‖f‖_{A^s_q} ≤ K ‖λ‖_{b^s_{p,q}}` in the dyadic quasi-norm, `K = synthConst s`, finite for
 `0 < s < σ`. -/
-theorem approxNormDyadic_le_bNorm (hA : A.IsLinear) (hq : 1 ≤ q) {a : ∀ j, M j → X}
+theorem approxNormDyadic_le_bNorm (hA : A.IsLinearScheme) (hq : 1 ≤ q) {a : ∀ j, M j → X}
     (ha : ∀ j m, a j m ∈ AS.adm j m) {c : ∀ j, M j → ℝ} {f : X}
     (hf : HasSum (fun j => ∑ m, c j m • a j m) f) :
     A.approxNormDyadic s q f ≤ AS.synthConst s * bNorm M s δ p q c := by
@@ -117,7 +117,7 @@ theorem approxNormDyadic_le_bNorm (hA : A.IsLinear) (hq : 1 ≤ q) {a : ∀ j, M
 
 /-- **Atomic synthesis**, membership form: atomic sums with `‖λ‖_{b^s_{p,q}} < ∞` lie in
 `A^s_q`, for `0 < s < σ`. -/
-theorem memApprox_of_bNorm_lt_top (hA : A.IsLinear) (hs : 0 < s) (hsσ : s < σ) (hq : 1 ≤ q)
+theorem memApprox_of_bNorm_lt_top (hA : A.IsLinearScheme) (hs : 0 < s) (hsσ : s < σ) (hq : 1 ≤ q)
     {a : ∀ j, M j → X} (ha : ∀ j m, a j m ∈ AS.adm j m) {c : ∀ j, M j → ℝ} {f : X}
     (hf : HasSum (fun j => ∑ m, c j m • a j m) f) (hc : bNorm M s δ p q c < ∞) :
     A.MemApprox s q f :=
@@ -161,7 +161,7 @@ theorem exists_atomic_decomposition [CompleteSpace X] {C' : ℝ≥0∞}
 /-- **The atomic characterisation of `A^s_q`**: for a linear scheme in a Banach space with a
 stable expansion, `0 < s < σ` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q` iff `f` is an atomic sum with
 coefficients in `b^s_{p,q}`. -/
-theorem memApprox_iff_exists_atomic [CompleteSpace X] (hA : A.IsLinear) {C' : ℝ≥0∞}
+theorem memApprox_iff_exists_atomic [CompleteSpace X] (hA : A.IsLinearScheme) {C' : ℝ≥0∞}
     (hC' : C' ≠ ∞) (hstab : AS.StableExpansion C') (hs : 0 < s) (hsσ : s < σ) (hq : 1 ≤ q)
     {f : X} :
     A.MemApprox s q f ↔ ∃ (a : ∀ j, M j → X) (c : ∀ j, M j → ℝ), (∀ j m, a j m ∈ AS.adm j m) ∧

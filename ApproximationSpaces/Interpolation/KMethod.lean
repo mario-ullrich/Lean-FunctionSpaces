@@ -15,16 +15,17 @@ public import Mathlib.Order.SuccPred.IntervalSucc
 For a bounded linear map `ι : Y → X`, `0 < θ` and `0 < q ≤ ∞`, the **continuous K-method**
 measures `f ∈ X` by
 
-`‖f‖_{K,θ,q} = (∫_0^∞ (t^(-θ) K(t, f))^q dt/t)^(1/q)`   (`ApproximationScheme.kMethodNorm`),
+`‖f‖_{K,θ,q} = (∫_0^∞ (t^(-θ) K(t, f))^q dt/t)^(1/q)`   (`ApproximationScheme.inclKMethodNorm`),
 
 the essential supremum of `t^(-θ) K(t, f)` for `q = ∞`, and `(X, Y)_{θ,q}` is the space of the
-`f` with `‖f‖_{K,θ,q} < ∞` (`ApproximationScheme.MemKMethod`), as in Bergh–Löfström,
-Section 3.1.  The main theorem (`ApproximationScheme.memInterp_iff_memKMethod`, Bergh–Löfström,
+`f` with `‖f‖_{K,θ,q} < ∞` (`ApproximationScheme.MemInclKMethod`), as in Bergh–Löfström,
+Section 3.1.  The main theorem (`ApproximationScheme.memInterp_iff_memInclKMethod`, Bergh–Löfström,
 Lemma 3.1.3) says that the discrete K-method on every dyadic grid `t = 2^(-kρ)`, `ρ > 0`, gives
 the same space, with equivalent norms and explicit constants
-(`ApproximationScheme.kMethodNorm_le_interpNorm`, `ApproximationScheme.interpNorm_le_kMethodNorm`).
-Hence the grid does not matter, and the representation theorem reads `A^s_q = (X, Y)_{s/r,q}`
-for the continuous K-method (`ApproximationScheme.memApprox_iff_memKMethod`).
+(`ApproximationScheme.inclKMethodNorm_le_inclInterpNorm`,
+`ApproximationScheme.inclInterpNorm_le_inclKMethodNorm`).  Hence the grid does not matter, and
+the representation theorem reads `A^s_q = (X, Y)_{s/r,q}` for the continuous K-method
+(`ApproximationScheme.memApprox_iff_memInclKMethod_of_jacksonBound_of_liftBound`).
 
 The proof passes through the grid `t = 2^(nρ)`, `n ∈ ℤ`, for every increasing
 `φ : [0, ∞] → [0, ∞]` in place of `K(·, f)` (`ApproximationScheme.discretePhiSeq`).  On the
@@ -33,13 +34,13 @@ lies between `2^(-ρθ)` times the `n`-th and `2^(ρθ)` times the `(n+1)`-th te
 `(2^(-nρθ) φ(2^(nρ)))_n`; the general comparison of an `L_q` norm with step functions on disjoint
 pieces of equal measure is `MeasureTheory.eLpNorm_le_of_le_on_pieces` and
 `MeasureTheory.le_eLpNorm_of_le_on_pieces`.  For `φ = K(·, f)`, the terms with `n ≤ 0` are the
-sequence of `ApproximationScheme.interpNorm`, the term with `n = k + 1 > 0` is at most
+sequence of `ApproximationScheme.inclInterpNorm`, the term with `n = k + 1 > 0` is at most
 `2^(-kρθ) ‖f‖`, and `‖f‖ ≤ max(1, ‖ι‖) K(1, f)`; the comparison of the two grids holds for every
 `φ`, with an upper bound `M` of `φ` in place of `‖f‖`
 (`ApproximationScheme.lqNorm_le_lqNorm_discretePhiSeq`,
 `ApproximationScheme.lqNorm_discretePhiSeq_le`).  Under a change of scale,
-`K(c t, f) ≤ max(1, c) K(t, f)` (`ApproximationScheme.kFunctional_mul_le`), and `‖f‖ ≤ K(t, f)`
-for `t ≥ ‖ι‖` (`ApproximationScheme.enorm_le_kFunctional`).
+`K(c t, f) ≤ max(1, c) K(t, f)` (`ApproximationScheme.inclKFunctional_mul_le`), and `‖f‖ ≤ K(t, f)`
+for `t ≥ ‖ι‖` (`ApproximationScheme.enorm_le_inclKFunctional`).
 
 The functional `ApproximationScheme.phiFunctional` is the formula of `EQuasinorm.phiFunctional`
 in the project *MultilinearInterpolation* (Bonn; van Doorn, Portegies, Rothgang, Viana Reis;
@@ -49,7 +50,7 @@ Apache 2.0).  That project states the equivalence `discreteKMethod_equiv_kmethod
 for increasing `φ` (`ApproximationScheme.phiFunctional_le_lqNorm_discretePhiSeq`,
 `ApproximationScheme.lqNorm_discretePhiSeq_le_phiFunctional`) gives the two inequalities of that
 equivalence for every couple whose K-functional is increasing in `t`.  This file applies it to
-the couple given by a bounded linear map `ι`; `memInterp_iff_memKMethod` is its form with the
+the couple given by a bounded linear map `ι`; `memInterp_iff_memInclKMethod` is its form with the
 grid on `ℕ` and the term `‖f‖`.
 -/
 
@@ -69,11 +70,11 @@ variable {X Y : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X]
 
 /-- **The K-functional under a finite change of scale**: `K(c t, f) ≤ max(1, c) K(t, f)` for
 `c < ∞`, since `‖f - ι y‖ + c t ‖y‖ ≤ max(1, c) (‖f - ι y‖ + t ‖y‖)` for every `y`. -/
-theorem kFunctional_mul_le_of_ne_top {c : ℝ≥0∞} (hc : c ≠ ∞) (t : ℝ≥0∞) (f : X) :
-    kFunctional ι (c * t) f ≤ max 1 c * kFunctional ι t f := by
+theorem inclKFunctional_mul_le_of_ne_top {c : ℝ≥0∞} (hc : c ≠ ∞) (t : ℝ≥0∞) (f : X) :
+    inclKFunctional ι (c * t) f ≤ max 1 c * inclKFunctional ι t f := by
   have hM0 : max 1 c ≠ 0 := (zero_lt_one.trans_le (le_max_left _ _)).ne'
   have hMt : max 1 c ≠ ∞ := max_ne_top ENNReal.one_ne_top hc
-  rw [kFunctional, kFunctional, ENNReal.mul_iInf_of_ne hM0 hMt]
+  rw [inclKFunctional, inclKFunctional, ENNReal.mul_iInf_of_ne hM0 hMt]
   refine iInf_mono fun y => ?_
   rw [mul_add, mul_assoc c]
   gcongr
@@ -82,7 +83,8 @@ theorem kFunctional_mul_le_of_ne_top {c : ℝ≥0∞} (hc : c ≠ ∞) (t : ℝ�
 
 /-- **The K-functional at large scales bounds the norm**: `‖f‖ ≤ K(t, f)` for `t ≥ ‖ι‖`, since
 `‖f‖ ≤ ‖f - ι y‖ + ‖ι‖ ‖y‖`. -/
-theorem enorm_le_kFunctional {t : ℝ≥0∞} (ht : ‖ι‖ₑ ≤ t) (f : X) : ‖f‖ₑ ≤ kFunctional ι t f :=
+theorem enorm_le_inclKFunctional {t : ℝ≥0∞} (ht : ‖ι‖ₑ ≤ t) (f : X) :
+    ‖f‖ₑ ≤ inclKFunctional ι t f :=
   le_iInf fun y => calc
     ‖f‖ₑ = ‖(f - ι y) + ι y‖ₑ := by rw [sub_add_cancel]
     _ ≤ ‖f - ι y‖ₑ + ‖ι y‖ₑ := enorm_add_le _ _
@@ -91,41 +93,42 @@ theorem enorm_le_kFunctional {t : ℝ≥0∞} (ht : ‖ι‖ₑ ≤ t) (f : X) :
         exact (ι.le_opENorm y).trans (by gcongr)
 
 /-- **The norm by the K-functional at scale one**: `‖f‖ ≤ max(1, ‖ι‖) K(1, f)`. -/
-theorem enorm_le_max_mul_kFunctional_one (f : X) : ‖f‖ₑ ≤ max 1 ‖ι‖ₑ * kFunctional ι 1 f := by
-  have h := kFunctional_mul_le_of_ne_top (ι := ι) (enorm_ne_top : ‖ι‖ₑ ≠ ∞) 1 f
+theorem enorm_le_max_mul_inclKFunctional_one (f : X) :
+    ‖f‖ₑ ≤ max 1 ‖ι‖ₑ * inclKFunctional ι 1 f := by
+  have h := inclKFunctional_mul_le_of_ne_top (ι := ι) (enorm_ne_top : ‖ι‖ₑ ≠ ∞) 1 f
   rw [mul_one] at h
-  exact (enorm_le_kFunctional le_rfl f).trans h
+  exact (enorm_le_inclKFunctional le_rfl f).trans h
 
 /-- **The K-functional vanishes only at `0`**: if `K(t, f) = 0` for some `t > 0`, then `f = 0`.
 With `s = min(t, 1)`, `‖f‖ ≤ K(‖ι‖, f) ≤ max(1, ‖ι‖/s) K(s, f) ≤ max(1, ‖ι‖/s) K(t, f)`. -/
-theorem eq_zero_of_kFunctional_eq_zero {t : ℝ≥0∞} (ht : t ≠ 0) {f : X}
-    (h : kFunctional ι t f = 0) : f = 0 := by
+theorem eq_zero_of_inclKFunctional_eq_zero {t : ℝ≥0∞} (ht : t ≠ 0) {f : X}
+    (h : inclKFunctional ι t f = 0) : f = 0 := by
   have hs0 : min t 1 ≠ 0 := (lt_min (pos_iff_ne_zero.2 ht) zero_lt_one).ne'
   have hsT : min t 1 ≠ ∞ := (min_le_right t 1).trans_lt ENNReal.one_lt_top |>.ne
   have hc : ‖ι‖ₑ / min t 1 ≠ ∞ := ENNReal.div_ne_top enorm_ne_top hs0
   have hf : ‖f‖ₑ ≤ 0 := calc
-    ‖f‖ₑ ≤ kFunctional ι (‖ι‖ₑ / min t 1 * min t 1) f :=
-        enorm_le_kFunctional (ENNReal.div_mul_cancel hs0 hsT).ge f
-    _ ≤ max 1 (‖ι‖ₑ / min t 1) * kFunctional ι (min t 1) f :=
-        kFunctional_mul_le_of_ne_top hc _ f
-    _ ≤ max 1 (‖ι‖ₑ / min t 1) * kFunctional ι t f := by
+    ‖f‖ₑ ≤ inclKFunctional ι (‖ι‖ₑ / min t 1 * min t 1) f :=
+        enorm_le_inclKFunctional (ENNReal.div_mul_cancel hs0 hsT).ge f
+    _ ≤ max 1 (‖ι‖ₑ / min t 1) * inclKFunctional ι (min t 1) f :=
+        inclKFunctional_mul_le_of_ne_top hc _ f
+    _ ≤ max 1 (‖ι‖ₑ / min t 1) * inclKFunctional ι t f := by
         gcongr
-        exact kFunctional_mono (min_le_left t 1) f
+        exact inclKFunctional_mono (min_le_left t 1) f
     _ = 0 := by rw [h, mul_zero]
   exact enorm_eq_zero.1 (nonpos_iff_eq_zero.1 hf)
 
 /-- **The K-functional under a change of scale**: `K(c t, f) ≤ max(1, c) K(t, f)` for every
 `c, t ∈ [0, ∞]`.  For `c = ∞` and `t > 0` the right side is `∞` unless `K(t, f) = 0`, and then
 `f = 0`. -/
-theorem kFunctional_mul_le (c t : ℝ≥0∞) (f : X) :
-    kFunctional ι (c * t) f ≤ max 1 c * kFunctional ι t f := by
+theorem inclKFunctional_mul_le (c t : ℝ≥0∞) (f : X) :
+    inclKFunctional ι (c * t) f ≤ max 1 c * inclKFunctional ι t f := by
   rcases ne_or_eq c ∞ with hc | rfl
-  · exact kFunctional_mul_le_of_ne_top hc t f
+  · exact inclKFunctional_mul_le_of_ne_top hc t f
   rcases eq_or_ne t 0 with rfl | ht
   · rw [mul_zero]
     exact le_mul_of_one_le_left' (le_max_left _ _)
-  rcases eq_or_ne (kFunctional ι t f) 0 with h | h
-  · rw [eq_zero_of_kFunctional_eq_zero ht h, kFunctional_zero_right]
+  rcases eq_or_ne (inclKFunctional ι t f) 0 with h | h
+  · rw [eq_zero_of_inclKFunctional_eq_zero ht h, inclKFunctional_zero_right]
     exact zero_le
   · rw [max_eq_right le_top, ENNReal.top_mul h]
     exact le_top
@@ -176,26 +179,26 @@ variable (ι) in
 /-- The norm of the **continuous K-method**, `‖f‖_{K,θ,q} = Φ_{θ,q}(K(·, f))`, that is
 `(∫_0^∞ (t^(-θ) K(t, f))^q dt/t)^(1/q)` for `0 < q < ∞`, the essential supremum of
 `t^(-θ) K(t, f)` for `q = ∞`, and `0` for `q = 0` (Bergh–Löfström, Section 3.1). -/
-noncomputable def kMethodNorm (θ : ℝ) (q : ℝ≥0∞) (f : X) : ℝ≥0∞ :=
-  phiFunctional θ q fun t => kFunctional ι t f
+noncomputable def inclKMethodNorm (θ : ℝ) (q : ℝ≥0∞) (f : X) : ℝ≥0∞ :=
+  phiFunctional θ q fun t => inclKFunctional ι t f
 
 variable (ι) in
 /-- `f` belongs to the **real interpolation space** `(X, Y)_{θ,q}` of the continuous
 K-method: `‖f‖_{K,θ,q} < ∞`. -/
-def MemKMethod (θ : ℝ) (q : ℝ≥0∞) (f : X) : Prop := kMethodNorm ι θ q f < ∞
+def MemInclKMethod (θ : ℝ) (q : ℝ≥0∞) (f : X) : Prop := inclKMethodNorm ι θ q f < ∞
 
 variable (ι) in
 /-- The integrand `t ↦ t^(-θ) K(t, f)` of the continuous K-method, for `t : ℝ`. -/
 noncomputable def kMethodIntegrand (θ : ℝ) (f : X) (t : ℝ) : ℝ≥0∞ :=
-  ENNReal.ofReal t ^ (-θ) * kFunctional ι (ENNReal.ofReal t) f
+  ENNReal.ofReal t ^ (-θ) * inclKFunctional ι (ENNReal.ofReal t) f
 
 /-- The continuous K-norm is the `L_q(dt/t)` norm of `t ↦ t^(-θ) K(t, f)`. -/
-theorem kMethodNorm_eq (f : X) :
-    kMethodNorm ι θ q f = eLpNorm (kMethodIntegrand ι θ f) q kMethodMeasure := rfl
+theorem inclKMethodNorm_eq (f : X) :
+    inclKMethodNorm ι θ q f = eLpNorm (kMethodIntegrand ι θ f) q kMethodMeasure := rfl
 
 /-- The integrand of the continuous K-method is measurable (`K(·, f)` is monotone). -/
 theorem measurable_kMethodIntegrand (f : X) : Measurable (kMethodIntegrand ι θ f) :=
-  measurable_phiIntegrand (monotone_kFunctional f)
+  measurable_phiIntegrand (monotone_inclKFunctional f)
 
 /-! ### The dyadic pieces of `(0, ∞)` -/
 
@@ -348,49 +351,49 @@ theorem lqNorm_discretePhiSeq_le_phiFunctional (hφ : Monotone φ) (hθ : 0 ≤ 
 variable (ι) in
 /-- The sequence `(2^(-nρθ) K(2^(nρ), f))_{n ∈ ℤ}` of the discrete K-method on the grid
 `t = 2^(nρ)`: `discretePhiSeq θ ρ` for `φ = K(·, f)`. -/
-noncomputable def discreteKSeq (θ ρ : ℝ) (f : X) (n : ℤ) : ℝ≥0∞ :=
-  (2 : ℝ≥0∞) ^ (-((n : ℝ) * ρ * θ)) * kFunctional ι ((2 : ℝ≥0∞) ^ ((n : ℝ) * ρ)) f
+noncomputable def inclDiscreteKSeq (θ ρ : ℝ) (f : X) (n : ℤ) : ℝ≥0∞ :=
+  (2 : ℝ≥0∞) ^ (-((n : ℝ) * ρ * θ)) * inclKFunctional ι ((2 : ℝ≥0∞) ^ ((n : ℝ) * ρ)) f
 
 variable (ι) in
 /-- The norm of the **discrete K-method** on the grid `t = 2^(nρ)`, `n ∈ ℤ`:
 `‖(2^(-nρθ) K(2^(nρ), f))_{n ∈ ℤ}‖_{ℓ_q}`.  For `ρ = 1` this is the formula of
 `discreteKMethod` in the project *MultilinearInterpolation*. -/
-noncomputable def discreteKMethodNorm (θ ρ : ℝ) (q : ℝ≥0∞) (f : X) : ℝ≥0∞ :=
-  lqNorm q (discreteKSeq ι θ ρ f)
+noncomputable def inclDiscreteKMethodNorm (θ ρ : ℝ) (q : ℝ≥0∞) (f : X) : ℝ≥0∞ :=
+  lqNorm q (inclDiscreteKSeq ι θ ρ f)
 
 /-- The discrete K-norm on `ℤ` is the `ℓ_q` norm of `discretePhiSeq θ ρ` for `φ = K(·, f)`. -/
-theorem discreteKMethodNorm_eq (f : X) : discreteKMethodNorm ι θ ρ q f =
-    lqNorm q (discretePhiSeq θ ρ fun t => kFunctional ι t f) := rfl
+theorem inclDiscreteKMethodNorm_eq (f : X) : inclDiscreteKMethodNorm ι θ ρ q f =
+    lqNorm q (discretePhiSeq θ ρ fun t => inclKFunctional ι t f) := rfl
 
 /-- **Upper bound on a piece**: for `t ∈ [2^(nρ), 2^((n+1)ρ))` and `θ ≥ 0`,
 `t^(-θ) K(t, f) ≤ 2^(ρθ) · 2^(-(n+1)ρθ) K(2^((n+1)ρ), f)`. -/
-theorem kMethodIntegrand_le_discreteKSeq (hθ : 0 ≤ θ) {n : ℤ} {t : ℝ}
+theorem kMethodIntegrand_le_inclDiscreteKSeq (hθ : 0 ≤ θ) {n : ℤ} {t : ℝ}
     (ht : t ∈ dyadicPiece ρ n) (f : X) :
-    kMethodIntegrand ι θ f t ≤ 2 ^ (ρ * θ) * discreteKSeq ι θ ρ f (n + 1) :=
-  phiIntegrand_le_discretePhiSeq (monotone_kFunctional f) hθ ht
+    kMethodIntegrand ι θ f t ≤ 2 ^ (ρ * θ) * inclDiscreteKSeq ι θ ρ f (n + 1) :=
+  phiIntegrand_le_discretePhiSeq (monotone_inclKFunctional f) hθ ht
 
 /-- **Lower bound on a piece**: for `t ∈ [2^(nρ), 2^((n+1)ρ))` and `θ ≥ 0`,
 `2^(-ρθ) · 2^(-nρθ) K(2^(nρ), f) ≤ t^(-θ) K(t, f)`. -/
-theorem discreteKSeq_le_kMethodIntegrand (hθ : 0 ≤ θ) {n : ℤ} {t : ℝ}
+theorem inclDiscreteKSeq_le_kMethodIntegrand (hθ : 0 ≤ θ) {n : ℤ} {t : ℝ}
     (ht : t ∈ dyadicPiece ρ n) (f : X) :
-    2 ^ (-(ρ * θ)) * discreteKSeq ι θ ρ f n ≤ kMethodIntegrand ι θ f t :=
-  discretePhiSeq_le_phiIntegrand (monotone_kFunctional f) hθ ht
+    2 ^ (-(ρ * θ)) * inclDiscreteKSeq ι θ ρ f n ≤ kMethodIntegrand ι θ f t :=
+  discretePhiSeq_le_phiIntegrand (monotone_inclKFunctional f) hθ ht
 
 /-- **The continuous K-norm by the discrete one on `ℤ`**: for `θ ≥ 0` and `ρ > 0`,
 `‖f‖_{K,θ,q} ≤ (ρ log 2)^(1/q) 2^(ρθ) ‖(2^(-nρθ) K(2^(nρ), f))_{n ∈ ℤ}‖_{ℓ_q}`. -/
-theorem kMethodNorm_le_discreteKMethodNorm (hθ : 0 ≤ θ) (hρ : 0 < ρ) (f : X) :
-    kMethodNorm ι θ q f ≤ ENNReal.ofReal (ρ * Real.log 2) ^ (1 / q.toReal) *
-      (2 ^ (ρ * θ) * discreteKMethodNorm ι θ ρ q f) := by
-  rw [discreteKMethodNorm_eq]
-  exact phiFunctional_le_lqNorm_discretePhiSeq (monotone_kFunctional f) hθ hρ
+theorem inclKMethodNorm_le_inclDiscreteKMethodNorm (hθ : 0 ≤ θ) (hρ : 0 < ρ) (f : X) :
+    inclKMethodNorm ι θ q f ≤ ENNReal.ofReal (ρ * Real.log 2) ^ (1 / q.toReal) *
+      (2 ^ (ρ * θ) * inclDiscreteKMethodNorm ι θ ρ q f) := by
+  rw [inclDiscreteKMethodNorm_eq]
+  exact phiFunctional_le_lqNorm_discretePhiSeq (monotone_inclKFunctional f) hθ hρ
 
 /-- **The discrete K-norm on `ℤ` by the continuous one**: for `θ ≥ 0` and `ρ > 0`,
 `(ρ log 2)^(1/q) 2^(-ρθ) ‖(2^(-nρθ) K(2^(nρ), f))_{n ∈ ℤ}‖_{ℓ_q} ≤ ‖f‖_{K,θ,q}`. -/
-theorem discreteKMethodNorm_le_kMethodNorm (hθ : 0 ≤ θ) (hρ : 0 < ρ) (f : X) :
+theorem inclDiscreteKMethodNorm_le_inclKMethodNorm (hθ : 0 ≤ θ) (hρ : 0 < ρ) (f : X) :
     ENNReal.ofReal (ρ * Real.log 2) ^ (1 / q.toReal) *
-      (2 ^ (-(ρ * θ)) * discreteKMethodNorm ι θ ρ q f) ≤ kMethodNorm ι θ q f := by
-  rw [discreteKMethodNorm_eq]
-  exact lqNorm_discretePhiSeq_le_phiFunctional (monotone_kFunctional f) hθ hρ
+      (2 ^ (-(ρ * θ)) * inclDiscreteKMethodNorm ι θ ρ q f) ≤ inclKMethodNorm ι θ q f := by
+  rw [inclDiscreteKMethodNorm_eq]
+  exact lqNorm_discretePhiSeq_le_phiFunctional (monotone_inclKFunctional f) hθ hρ
 
 /-! ### The grid on `ℤ` and the grid on `ℕ` -/
 
@@ -484,53 +487,55 @@ theorem lqNorm_le_lqNorm_discretePhiSeq :
 
 /-- The terms with `n = -k ≤ 0` are the sequence of the interpolation norm:
 `2^(kρθ) K(2^(-kρ), f)`. -/
-theorem discreteKSeq_neg_natCast (f : X) (k : ℕ) :
-    discreteKSeq ι θ ρ f (-k) = interpSeq ι θ ρ f k :=
-  discretePhiSeq_neg_natCast (fun t => kFunctional ι t f) k
+theorem inclDiscreteKSeq_neg_natCast (f : X) (k : ℕ) :
+    inclDiscreteKSeq ι θ ρ f (-k) = interpSeq ι θ ρ f k :=
+  discretePhiSeq_neg_natCast (fun t => inclKFunctional ι t f) k
 
 /-- The term with `n = 0` is `K(1, f)`. -/
-theorem discreteKSeq_zero (f : X) : discreteKSeq ι θ ρ f 0 = kFunctional ι 1 f :=
-  discretePhiSeq_zero (fun t => kFunctional ι t f)
+theorem inclDiscreteKSeq_zero (f : X) : inclDiscreteKSeq ι θ ρ f 0 = inclKFunctional ι 1 f :=
+  discretePhiSeq_zero (fun t => inclKFunctional ι t f)
 
 /-- The terms with `n = k + 1 > 0` are at most `2^(-kρθ) ‖f‖`, for `ρθ ≥ 0`. -/
-theorem discreteKSeq_natCast_add_one_le (hρθ : 0 ≤ ρ * θ) (f : X) (k : ℕ) :
-    discreteKSeq ι θ ρ f ((k : ℤ) + 1) ≤ ‖f‖ₑ * dyadicWeight (-(ρ * θ)) k :=
-  discretePhiSeq_natCast_add_one_le (φ := fun t => kFunctional ι t f) hρθ
-    (fun _ => kFunctional_le_enorm f) k
+theorem inclDiscreteKSeq_natCast_add_one_le (hρθ : 0 ≤ ρ * θ) (f : X) (k : ℕ) :
+    inclDiscreteKSeq ι θ ρ f ((k : ℤ) + 1) ≤ ‖f‖ₑ * dyadicWeight (-(ρ * θ)) k :=
+  discretePhiSeq_natCast_add_one_le (φ := fun t => inclKFunctional ι t f) hρθ
+    (fun _ => inclKFunctional_le_enorm f) k
 
 /-- **Splitting the grid on `ℤ`**: the sequence on `ℤ` is at most the interpolation sequence
 placed at `n = -k ≤ 0` plus the sequence `2^(-kρθ) ‖f‖` placed at `n = k + 1 > 0`. -/
-theorem discreteKSeq_le_extend (hρθ : 0 ≤ ρ * θ) (f : X) (n : ℤ) :
-    discreteKSeq ι θ ρ f n ≤
+theorem inclDiscreteKSeq_le_extend (hρθ : 0 ≤ ρ * θ) (f : X) (n : ℤ) :
+    inclDiscreteKSeq ι θ ρ f n ≤
       extend (fun k : ℕ => -(k : ℤ)) (interpSeq ι θ ρ f) 0 n +
         extend (fun k : ℕ => (k : ℤ) + 1) (fun k => ‖f‖ₑ * dyadicWeight (-(ρ * θ)) k) 0 n :=
-  discretePhiSeq_le_extend (φ := fun t => kFunctional ι t f) hρθ (fun _ => kFunctional_le_enorm f) n
+  discretePhiSeq_le_extend (φ := fun t => inclKFunctional ι t f) hρθ
+    (fun _ => inclKFunctional_le_enorm f) n
 
 /-- **The discrete K-norm on `ℤ` by the interpolation norm**: for `ρθ ≥ 0`,
 `‖(2^(-nρθ) K(2^(nρ), f))_{n ∈ ℤ}‖_{ℓ_q} ≤ C_q γ ‖f‖_{θ,q}` with
 `γ = dyadicGeomConst (ρθ) q`, where `C_q` is Mathlib's constant `LpAddConst q` of the
 quasi-triangle inequality (`1` for `q ≥ 1`). -/
-theorem discreteKMethodNorm_le_interpNorm (hρθ : 0 ≤ ρ * θ) (f : X) :
-    discreteKMethodNorm ι θ ρ q f ≤
-      LpAddConst q * dyadicGeomConst (ρ * θ) q * interpNorm ι θ ρ q f :=
-  lqNorm_discretePhiSeq_le (φ := fun t => kFunctional ι t f) hρθ fun _ => kFunctional_le_enorm f
+theorem inclDiscreteKMethodNorm_le_inclInterpNorm (hρθ : 0 ≤ ρ * θ) (f : X) :
+    inclDiscreteKMethodNorm ι θ ρ q f ≤
+      LpAddConst q * dyadicGeomConst (ρ * θ) q * inclInterpNorm ι θ ρ q f :=
+  lqNorm_discretePhiSeq_le (φ := fun t => inclKFunctional ι t f) hρθ fun _ =>
+    inclKFunctional_le_enorm f
 
 /-- **The interpolation norm by the discrete K-norm on `ℤ`**: for `q ≠ 0`,
 `‖f‖_{θ,q} ≤ (1 + max(1, ‖ι‖)) ‖(2^(-nρθ) K(2^(nρ), f))_{n ∈ ℤ}‖_{ℓ_q}`; the term `‖f‖` is
 controlled by `‖f‖ ≤ max(1, ‖ι‖) K(1, f)`. -/
-theorem interpNorm_le_discreteKMethodNorm (hq : q ≠ 0) (f : X) :
-    interpNorm ι θ ρ q f ≤ (1 + max 1 ‖ι‖ₑ) * discreteKMethodNorm ι θ ρ q f := by
-  have h1 : ‖f‖ₑ ≤ max 1 ‖ι‖ₑ * discreteKMethodNorm ι θ ρ q f := by
-    refine (enorm_le_max_mul_kFunctional_one (ι := ι) f).trans ?_
+theorem inclInterpNorm_le_inclDiscreteKMethodNorm (hq : q ≠ 0) (f : X) :
+    inclInterpNorm ι θ ρ q f ≤ (1 + max 1 ‖ι‖ₑ) * inclDiscreteKMethodNorm ι θ ρ q f := by
+  have h1 : ‖f‖ₑ ≤ max 1 ‖ι‖ₑ * inclDiscreteKMethodNorm ι θ ρ q f := by
+    refine (enorm_le_max_mul_inclKFunctional_one (ι := ι) f).trans ?_
     gcongr
-    rw [← discreteKSeq_zero (θ := θ) (ρ := ρ)]
+    rw [← inclDiscreteKSeq_zero (θ := θ) (ρ := ρ)]
     exact ENNReal.le_lqNorm hq _ 0
-  have h2 : lqNorm q (interpSeq ι θ ρ f) ≤ discreteKMethodNorm ι θ ρ q f :=
-    lqNorm_le_lqNorm_discretePhiSeq (φ := fun t => kFunctional ι t f)
-  calc interpNorm ι θ ρ q f = ‖f‖ₑ + lqNorm q (interpSeq ι θ ρ f) := rfl
-    _ ≤ max 1 ‖ι‖ₑ * discreteKMethodNorm ι θ ρ q f + discreteKMethodNorm ι θ ρ q f :=
+  have h2 : lqNorm q (interpSeq ι θ ρ f) ≤ inclDiscreteKMethodNorm ι θ ρ q f :=
+    lqNorm_le_lqNorm_discretePhiSeq (φ := fun t => inclKFunctional ι t f)
+  calc inclInterpNorm ι θ ρ q f = ‖f‖ₑ + lqNorm q (interpSeq ι θ ρ f) := rfl
+    _ ≤ max 1 ‖ι‖ₑ * inclDiscreteKMethodNorm ι θ ρ q f + inclDiscreteKMethodNorm ι θ ρ q f :=
         add_le_add h1 h2
-    _ = (1 + max 1 ‖ι‖ₑ) * discreteKMethodNorm ι θ ρ q f := by ring
+    _ = (1 + max 1 ‖ι‖ₑ) * inclDiscreteKMethodNorm ι θ ρ q f := by ring
 
 /-! ### The discrete and the continuous K-method agree -/
 
@@ -553,17 +558,17 @@ theorem kMethodUpperConst_ne_top (hθ : 0 < θ) (hρ : 0 < ρ) (q : ℝ≥0∞) 
 and `ρ > 0`, `‖f‖_{K,θ,q} ≤ kMethodUpperConst θ ρ q · ‖f‖_{θ,q}`, where `‖f‖_{θ,q}` is the
 discrete K-method on the grid `2^(-kρ)`.  The constant is finite for `θ > 0`
 (`kMethodUpperConst_ne_top`). -/
-theorem kMethodNorm_le_interpNorm (hθ : 0 ≤ θ) (hρ : 0 < ρ) (f : X) :
-    kMethodNorm ι θ q f ≤ kMethodUpperConst θ ρ q * interpNorm ι θ ρ q f := by
-  calc kMethodNorm ι θ q f
+theorem inclKMethodNorm_le_inclInterpNorm (hθ : 0 ≤ θ) (hρ : 0 < ρ) (f : X) :
+    inclKMethodNorm ι θ q f ≤ kMethodUpperConst θ ρ q * inclInterpNorm ι θ ρ q f := by
+  calc inclKMethodNorm ι θ q f
       ≤ ENNReal.ofReal (ρ * Real.log 2) ^ (1 / q.toReal) *
-          (2 ^ (ρ * θ) * discreteKMethodNorm ι θ ρ q f) :=
-        kMethodNorm_le_discreteKMethodNorm hθ hρ f
+          (2 ^ (ρ * θ) * inclDiscreteKMethodNorm ι θ ρ q f) :=
+        inclKMethodNorm_le_inclDiscreteKMethodNorm hθ hρ f
     _ ≤ ENNReal.ofReal (ρ * Real.log 2) ^ (1 / q.toReal) * (2 ^ (ρ * θ) *
-          (LpAddConst q * dyadicGeomConst (ρ * θ) q * interpNorm ι θ ρ q f)) := by
+          (LpAddConst q * dyadicGeomConst (ρ * θ) q * inclInterpNorm ι θ ρ q f)) := by
         gcongr
-        exact discreteKMethodNorm_le_interpNorm (mul_nonneg hρ.le hθ) f
-    _ = kMethodUpperConst θ ρ q * interpNorm ι θ ρ q f := by
+        exact inclDiscreteKMethodNorm_le_inclInterpNorm (mul_nonneg hρ.le hθ) f
+    _ = kMethodUpperConst θ ρ q * inclInterpNorm ι θ ρ q f := by
         rw [kMethodUpperConst]
         ring
 
@@ -626,34 +631,34 @@ theorem kMethodLowerConst_ne_top (hρ : 0 < ρ) (q : ℝ≥0∞) : kMethodLowerC
 /-- **The discrete K-norm by the continuous one** (Bergh–Löfström, Lemma 3.1.3): for `θ ≥ 0`,
 `ρ > 0` and `q ≠ 0`, `‖f‖_{θ,q} ≤ kMethodLowerConst ι θ ρ q · ‖f‖_{K,θ,q}`, where `‖f‖_{θ,q}`
 is the discrete K-method on the grid `2^(-kρ)`. -/
-theorem interpNorm_le_kMethodNorm (hθ : 0 ≤ θ) (hρ : 0 < ρ) (hq : q ≠ 0) (f : X) :
-    interpNorm ι θ ρ q f ≤ kMethodLowerConst ι θ ρ q * kMethodNorm ι θ q f := by
+theorem inclInterpNorm_le_inclKMethodNorm (hθ : 0 ≤ θ) (hρ : 0 < ρ) (hq : q ≠ 0) (f : X) :
+    inclInterpNorm ι θ ρ q f ≤ kMethodLowerConst ι θ ρ q * inclKMethodNorm ι θ q f := by
   have hc0 := ofReal_mul_log_two_rpow_ne_zero hρ q
   have hct : ENNReal.ofReal (ρ * Real.log 2) ^ (1 / q.toReal) ≠ ∞ :=
     ENNReal.rpow_ne_top_of_nonneg (by positivity) ENNReal.ofReal_ne_top
-  have hD : discreteKMethodNorm ι θ ρ q f ≤ 2 ^ (ρ * θ) *
-      (ENNReal.ofReal (ρ * Real.log 2) ^ (1 / q.toReal))⁻¹ * kMethodNorm ι θ q f := by
-    rw [discreteKMethodNorm_eq, kMethodNorm]
-    refine (lqNorm_discretePhiSeq_le_inv_mul_phiFunctional (monotone_kFunctional f) hθ
+  have hD : inclDiscreteKMethodNorm ι θ ρ q f ≤ 2 ^ (ρ * θ) *
+      (ENNReal.ofReal (ρ * Real.log 2) ^ (1 / q.toReal))⁻¹ * inclKMethodNorm ι θ q f := by
+    rw [inclDiscreteKMethodNorm_eq, inclKMethodNorm]
+    refine (lqNorm_discretePhiSeq_le_inv_mul_phiFunctional (monotone_inclKFunctional f) hθ
       hρ).trans_eq ?_
     rw [ENNReal.mul_inv (Or.inl hc0) (Or.inl hct), ENNReal.rpow_neg, inv_inv,
       mul_comm _ (2 ^ (ρ * θ))]
-  calc interpNorm ι θ ρ q f ≤ (1 + max 1 ‖ι‖ₑ) * discreteKMethodNorm ι θ ρ q f :=
-        interpNorm_le_discreteKMethodNorm hq f
+  calc inclInterpNorm ι θ ρ q f ≤ (1 + max 1 ‖ι‖ₑ) * inclDiscreteKMethodNorm ι θ ρ q f :=
+        inclInterpNorm_le_inclDiscreteKMethodNorm hq f
     _ ≤ (1 + max 1 ‖ι‖ₑ) * (2 ^ (ρ * θ) *
-          (ENNReal.ofReal (ρ * Real.log 2) ^ (1 / q.toReal))⁻¹ * kMethodNorm ι θ q f) := by
+          (ENNReal.ofReal (ρ * Real.log 2) ^ (1 / q.toReal))⁻¹ * inclKMethodNorm ι θ q f) := by
         gcongr
-    _ = kMethodLowerConst ι θ ρ q * kMethodNorm ι θ q f := by
+    _ = kMethodLowerConst ι θ ρ q * inclKMethodNorm ι θ q f := by
         rw [kMethodLowerConst]
         ring
 
 /-- For the degenerate exponent `q = 0` every `f` lies in both spaces: `‖f‖_{θ,0} = ‖f‖` and
 `‖f‖_{K,θ,0} = 0`. -/
-theorem memInterp_zero_and_memKMethod_zero (f : X) :
-    MemInterp ι θ ρ 0 f ∧ MemKMethod ι θ 0 f := by
+theorem memInterp_zero_and_memInclKMethod_zero (f : X) :
+    MemInterp ι θ ρ 0 f ∧ MemInclKMethod ι θ 0 f := by
   refine ⟨?_, ?_⟩
-  · simp [MemInterp, interpNorm, ENNReal.lqNorm_zero_left]
-  · simp [MemKMethod, kMethodNorm_eq,
+  · simp [MemInterp, inclInterpNorm, ENNReal.lqNorm_zero_left]
+  · simp [MemInclKMethod, inclKMethodNorm_eq,
       eLpNorm_exponent_zero (measurable_kMethodIntegrand (ι := ι) (θ := θ) f).aestronglyMeasurable]
 
 /-- **The discrete and the continuous K-method agree** (Bergh–Löfström, Lemma 3.1.3): for
@@ -663,40 +668,40 @@ the grid `t = 2^(-kρ)` if and only if `‖f‖_{K,θ,q} < ∞`, that is
 for `q = ∞`.  This is, for the couple given by a bounded linear map `ι`, the analogue of the
 equivalence `discreteKMethod_equiv_kmethod` stated in the project *MultilinearInterpolation*,
 with the grid on `ℕ` and the term `‖f‖`. -/
-theorem memInterp_iff_memKMethod (hθ : 0 < θ) (hρ : 0 < ρ) {f : X} :
-    MemInterp ι θ ρ q f ↔ MemKMethod ι θ q f := by
+theorem memInterp_iff_memInclKMethod (hθ : 0 < θ) (hρ : 0 < ρ) {f : X} :
+    MemInterp ι θ ρ q f ↔ MemInclKMethod ι θ q f := by
   rcases eq_or_ne q 0 with rfl | hq
-  · exact iff_of_true (memInterp_zero_and_memKMethod_zero f).1
-      (memInterp_zero_and_memKMethod_zero (ρ := ρ) f).2
-  exact ⟨fun h => (kMethodNorm_le_interpNorm hθ.le hρ f).trans_lt
+  · exact iff_of_true (memInterp_zero_and_memInclKMethod_zero f).1
+      (memInterp_zero_and_memInclKMethod_zero (ρ := ρ) f).2
+  exact ⟨fun h => (inclKMethodNorm_le_inclInterpNorm hθ.le hρ f).trans_lt
       (ENNReal.mul_lt_top (kMethodUpperConst_ne_top hθ hρ q).lt_top h),
-    fun h => (interpNorm_le_kMethodNorm hθ.le hρ hq f).trans_lt
+    fun h => (inclInterpNorm_le_inclKMethodNorm hθ.le hρ hq f).trans_lt
       (ENNReal.mul_lt_top (kMethodLowerConst_ne_top hρ q).lt_top h)⟩
 
 /-- **The grid does not matter**: for `θ > 0` and every `q`, the discrete K-methods on the grids
 `t = 2^(-kρ)` and `t = 2^(-kρ')`, `ρ, ρ' > 0`, give the same space. -/
 theorem memInterp_iff_memInterp_of_pos {ρ' : ℝ} (hθ : 0 < θ) (hρ : 0 < ρ) (hρ' : 0 < ρ')
     {f : X} : MemInterp ι θ ρ q f ↔ MemInterp ι θ ρ' q f :=
-  (memInterp_iff_memKMethod hθ hρ).trans (memInterp_iff_memKMethod hθ hρ').symm
+  (memInterp_iff_memInclKMethod hθ hρ).trans (memInterp_iff_memInclKMethod hθ hρ').symm
 
 /-- **The representation theorem for the continuous K-method**: under Jackson's and Bernstein's
 inequalities of order `r` and for `0 < s < r`, `1 ≤ q ≤ ∞`, `A^s_q = (X, Y)_{s/r,q}`, where
 `(X, Y)_{s/r,q}` consists of the `f` with `‖f‖_{K,s/r,q} < ∞` (the integral
 `∫_0^∞ (t^(-s/r) K(t, f))^q dt/t` for `q < ∞`, the essential supremum of `t^(-s/r) K(t, f)` for
 `q = ∞`). -/
-theorem memApprox_iff_memKMethod {A : ApproximationScheme X} {r s C₁ C₂ : ℝ}
-    (hJ : JacksonBound ι A r C₁) (hC₁ : 0 ≤ C₁) (hB : LiftBound ι A r C₂) (hC₂ : 0 ≤ C₂)
-    (hs : 0 < s) (hsr : s < r) (hq : 1 ≤ q) {f : X} :
-    A.MemApprox s q f ↔ MemKMethod ι (s / r) q f :=
-  (memApprox_iff_memInterp hJ hC₁ hB hC₂ hs hsr hq).trans
-    (memInterp_iff_memKMethod (div_pos hs (hs.trans hsr)) (hs.trans hsr))
+theorem memApprox_iff_memInclKMethod_of_jacksonBound_of_liftBound {A : ApproximationScheme X}
+    {r s C₁ C₂ : ℝ} (hJ : JacksonBound ι A r C₁) (hC₁ : 0 ≤ C₁) (hB : LiftBound ι A r C₂)
+    (hC₂ : 0 ≤ C₂) (hs : 0 < s) (hsr : s < r) (hq : 1 ≤ q) {f : X} :
+    A.MemApprox s q f ↔ MemInclKMethod ι (s / r) q f :=
+  (memApprox_iff_memInterp_of_jacksonBound_of_liftBound hJ hC₁ hB hC₂ hs hsr hq).trans
+    (memInterp_iff_memInclKMethod (div_pos hs (hs.trans hsr)) (hs.trans hsr))
 
 /-- **The representation theorem for a smoothness space** `W` of order `r` and the continuous
 K-method: for `0 < s < r` and `1 ≤ q ≤ ∞`, `A^s_q = (X, W)_{s/r,q}`. -/
-theorem SmoothnessSpace.memApprox_iff_memKMethod {A : ApproximationScheme X} {s : ℝ}
+theorem SmoothnessSpace.memApprox_iff_memInclKMethod {A : ApproximationScheme X} {s : ℝ}
     (W : SmoothnessSpace A Y) (hs : 0 < s) (hsr : s < W.order) (hq : 1 ≤ q) {f : X} :
-    A.MemApprox s q f ↔ MemKMethod W.incl (s / W.order) q f :=
-  ApproximationScheme.memApprox_iff_memKMethod W.jackson W.jacksonConst_nonneg W.bernstein
-    W.bernsteinConst_nonneg hs hsr hq
+    A.MemApprox s q f ↔ MemInclKMethod W.incl (s / W.order) q f :=
+  ApproximationScheme.memApprox_iff_memInclKMethod_of_jacksonBound_of_liftBound W.jackson
+    W.jacksonConst_nonneg W.bernstein W.bernsteinConst_nonneg hs hsr hq
 
 end ApproximationScheme

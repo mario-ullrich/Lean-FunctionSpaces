@@ -177,8 +177,8 @@ of the tensor Daubechies scheme iff its coefficient quasi-norm
 (`Daubechies.tensorCoeffNorm`) is finite. The projections form a projection scheme with dense
 union (`Daubechies.closure_iUnion_tensorScheme`), so `f ∈ A^s_q` iff
 `‖P_0 f‖_p + ‖(2^(js) ‖P_{j+1} f - P_j f‖_p)_j‖_{ℓ_q} < ∞`
-(`ApproximationScheme.ProjectionScheme.memApprox_iff_blockNorm_lt_top`); `‖P_0 f‖_p` and the
-scaling coefficients are finite together (`Daubechies.enorm_tensorProj_zero_equiv`), and
+(`ApproximationScheme.ProjectionScheme.memApprox_iff_blockNorm_lt_top_of_dense`); `‖P_0 f‖_p`
+and the scaling coefficients are finite together (`Daubechies.enorm_tensorProj_zero_equiv`), and
 `2^(js) ‖P_{j+1} f - P_j f‖_p` is comparable with `2^(j(s + d/2 - d/p))` times the `ℓ_p` norm of
 the wavelet coefficients of level `j`, uniformly in `j` (`Daubechies.enorm_tensorBlock_equiv`,
 `ENNReal.lqNorm_lt_top_iff_of_le_mul`). -/
@@ -187,7 +187,7 @@ theorem memApprox_tensorScheme_iff_coeff (hN : 2 ≤ N) (hp : p ≠ ∞) {s : �
     (tensorScheme m p d hN hp).MemApprox s q f ↔ tensorCoeffNorm m p s q f < ∞ := by
   obtain ⟨K₀, _, hK₀, _, hKM₀⟩ := enorm_tensorProj_zero_equiv m (d := d) hN hp
   obtain ⟨K, M, hK, hM, hKM⟩ := enorm_tensorBlock_equiv m (d := d) hN hp
-  rw [(tensorProjectionScheme m p d hN hp).memApprox_iff_blockNorm_lt_top
+  rw [(tensorProjectionScheme m p d hN hp).memApprox_iff_blockNorm_lt_top_of_dense
     (closure_iUnion_tensorScheme m hN hp) hs hq, ApproximationScheme.ProjectionScheme.blockNorm,
     tensorProjectionScheme_one, tensorCoeffNorm]
   simp only [tensorProjectionScheme_block, ENNReal.add_lt_top]

@@ -23,8 +23,8 @@ finite measure `μ`, and write `α = D (1/p - 1/r)` for `1 ≤ p ≤ r ≤ ∞`.
   continuous representative.
 
 All three are the abstract Nikolskii transfer theorem
-(`ApproximationScheme.exists_preimage_of_nikolskii`) for `X = L_p`, `Y = L_r` and the
-inclusion `L_r ↪ L_p`; the pulled-back scheme is again `S` in `L_r`
+(`ApproximationScheme.exists_preimage_approxNormDyadic_le_of_nikolskii`) for `X = L_p`,
+`Y = L_r` and the inclusion `L_r ↪ L_p`; the pulled-back scheme is again `S` in `L_r`
 (`FunctionScheme.comap_toLp_of_le`).  For the last one, `f` in `L_∞` with positive smoothness
 is a limit of approximants, which are continuous, and the continuous functions are closed in
 `L_∞`.
@@ -56,7 +56,7 @@ theorem exists_inclusion_eq_of_nikolskii (h : S.HasNikolskii μ D) (hD : 0 ≤ D
   have hα := nikolskiiExponent_nonneg hD (Fact.out : 1 ≤ p) hpr
   refine ⟨ApproximationScheme.nikolskiiConst C (nikolskiiExponent D p r) s,
     ApproximationScheme.nikolskiiConst_ne_top C hs, fun f hf => ?_⟩
-  obtain ⟨g, hg, hle⟩ := ApproximationScheme.exists_preimage_of_nikolskii
+  obtain ⟨g, hg, hle⟩ := ApproximationScheme.exists_preimage_approxNormDyadic_le_of_nikolskii
     (Lp.inclusionOfExponentLe_injective hpr) hN hC hα hs hq hf
   refine ⟨g, hg, ?_⟩
   rwa [comap_toLp_of_le hpr] at hle

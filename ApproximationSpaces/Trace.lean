@@ -23,17 +23,17 @@ the bound with `β = 1/p`.  The values of `T` away from the approximants play no
 map given only on `⋃ n, A n` extends to `X` by `LinearMap.exists_extend`
 (`TraceBound.ofSubmodule`).
 
-For `f ∈ A^β_1` the **trace** `TraceBound.ext f` is the limit of `T a_k` for near-best
+For `f ∈ A^β_1` the **trace** `TraceBound.limitTrace f` is the limit of `T a_k` for near-best
 approximants `a_k ∈ A (2^k)`.  It does not depend on the approximants
-(`TraceBound.tendsto_ext`), agrees with `T` on the approximants (`TraceBound.ext_eq_of_mem`),
-is linear (`TraceBound.extLinear`) and is bounded by the dyadic norm of `A^β_1`
-(`TraceBound.enorm_ext_le`).
+(`TraceBound.tendsto_limitTrace`), agrees with `T` on the approximants
+(`TraceBound.limitTrace_eq_of_mem`), is linear (`TraceBound.limitTraceLinear`) and is bounded by
+the dyadic norm of `A^β_1` (`TraceBound.enorm_limitTrace_le`).
 
-* **Transfer** (`TraceBound.approxNormDyadic_ext_le`): for `0 ≤ β < s` and `1 ≤ q ≤ ∞` the
+* **Transfer** (`TraceBound.approxNormDyadic_limitTrace_le`): for `0 ≤ β < s` and `1 ≤ q ≤ ∞` the
   trace maps `A^s_q(X)` into `B^{s-β}_q(Y)`.  The proof ends with the transfer estimate
   (`approxNormDyadic_le_of_tail`) of the Nikolskii transfer theorem, which is the case
   `T = ι⁻¹` on the approximants.
-* **Surjectivity** (`TraceBound.exists_ext_eq`): if every `b ∈ B (2^k)` is `T a` for some
+* **Surjectivity** (`TraceBound.exists_limitTrace_eq`): if every `b ∈ B (2^k)` is `T a` for some
   `a ∈ A (2^(k+γ))` with `‖a‖ ≤ C' 2^(-kβ) ‖b‖`, then every `g ∈ B^s_q(Y)`, `s > 0`, is the
   trace of some `f ∈ A^{s+β}_q(X)` with `‖f‖ ≲ ‖g‖`.  The proof lifts the blocks of the block
   decomposition of `g` (`ApproximationSpaces.Decompositions.Blocks`).
@@ -244,20 +244,21 @@ theorem tendsto_edist_apply {f : X} {γ γ' : ℕ} {c c' : ℕ → X}
   exact tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds hlim (fun _ => bot_le) hle
 
 /-- The **trace** of `f`: the limit of `T a_k` for the canonical near-best approximants. -/
-noncomputable def ext (f : X) : Y := limUnder atTop fun k => TB.T ((canonicalApprox A β f).a k)
+noncomputable def limitTrace (f : X) : Y :=
+  limUnder atTop fun k => TB.T ((canonicalApprox A β f).a k)
 
 /-- For `f ∈ A^β_1` the traces of the canonical approximants converge to the trace of `f`. -/
 theorem tendsto_canonical [CompleteSpace Y] (hβ : 0 ≤ β) {f : X} (hf : A.MemApprox β 1 f) :
-    Tendsto (fun k => TB.T ((canonicalApprox A β f).a k)) atTop (𝓝 (TB.ext f)) :=
+    Tendsto (fun k => TB.T ((canonicalApprox A β f).a k)) atTop (𝓝 (TB.limitTrace f)) :=
   (TB.cauchySeq_apply _ (ENNReal.dyadicWeight_anti (by linarith))
     (tsum_canonical_ne_top hβ hf)).tendsto_limUnder
 
 /-- **The trace is the limit for all approximants**: for `f ∈ A^β_1`, `c_k ∈ A (2^(k+γ))` and
 `2^(kβ) ‖f - c_k‖ → 0`, the traces `T c_k` converge to the trace of `f`. -/
-theorem tendsto_ext [CompleteSpace Y] (hβ : 0 ≤ β) {f : X} (hf : A.MemApprox β 1 f) {γ : ℕ}
+theorem tendsto_limitTrace [CompleteSpace Y] (hβ : 0 ≤ β) {f : X} (hf : A.MemApprox β 1 f) {γ : ℕ}
     {c : ℕ → X} (hc : ∀ k, c k ∈ A (2 ^ (k + γ)))
     (hcf : Tendsto (fun k => dyadicWeight β k * ‖f - c k‖ₑ) atTop (𝓝 0)) :
-    Tendsto (fun k => TB.T (c k)) atTop (𝓝 (TB.ext f)) := by
+    Tendsto (fun k => TB.T (c k)) atTop (𝓝 (TB.limitTrace f)) := by
   set D := canonicalApprox A β f
   have hD := TB.tendsto_canonical hβ hf
   have hD0 := D.tendsto_dyadicWeight_mul_enorm_sub (tsum_canonical_ne_top hβ hf)
@@ -269,21 +270,21 @@ theorem tendsto_ext [CompleteSpace Y] (hβ : 0 ≤ β) {f : X} (hf : A.MemApprox
     fun k => edist_triangle _ _ _
 
 /-- **The trace extends `T`**: on approximants the trace is `T`. -/
-theorem ext_eq_of_mem [CompleteSpace Y] (hβ : 0 ≤ β) {m : ℕ} {a : X} (ha : a ∈ A m) :
-    TB.ext a = TB.T a := by
+theorem limitTrace_eq_of_mem [CompleteSpace Y] (hβ : 0 ≤ β) {m : ℕ} {a : X} (ha : a ∈ A m) :
+    TB.limitTrace a = TB.T a := by
   have hc : ∀ k, a ∈ A (2 ^ (k + m)) := fun k =>
     A.mem_of_le ((Nat.lt_two_pow_self).le.trans
       (Nat.pow_le_pow_right two_pos (Nat.le_add_left m k))) ha
-  have h := TB.tendsto_ext hβ (memApprox_of_mem le_rfl hβ ha) hc (by simp)
+  have h := TB.tendsto_limitTrace hβ (memApprox_of_mem le_rfl hβ ha) hc (by simp)
   exact tendsto_nhds_unique h tendsto_const_nhds
 
 /-- The trace of `0` is `0`. -/
-theorem ext_zero [CompleteSpace Y] (hβ : 0 ≤ β) : TB.ext 0 = 0 := by
-  rw [TB.ext_eq_of_mem hβ (A.zero_mem 0), map_zero]
+theorem limitTrace_zero [CompleteSpace Y] (hβ : 0 ≤ β) : TB.limitTrace 0 = 0 := by
+  rw [TB.limitTrace_eq_of_mem hβ (A.zero_mem 0), map_zero]
 
 /-- The trace is additive on `A^β_1`. -/
-theorem ext_add [CompleteSpace Y] (hβ : 0 ≤ β) {f g : X} (hf : A.MemApprox β 1 f)
-    (hg : A.MemApprox β 1 g) : TB.ext (f + g) = TB.ext f + TB.ext g := by
+theorem limitTrace_add [CompleteSpace Y] (hβ : 0 ≤ β) {f g : X} (hf : A.MemApprox β 1 f)
+    (hg : A.MemApprox β 1 g) : TB.limitTrace (f + g) = TB.limitTrace f + TB.limitTrace g := by
   set Df := canonicalApprox A β f
   set Dg := canonicalApprox A β g
   have hcf := Df.tendsto_dyadicWeight_mul_enorm_sub (tsum_canonical_ne_top hβ hf)
@@ -301,15 +302,16 @@ theorem ext_add [CompleteSpace Y] (hβ : 0 ≤ β) {f g : X} (hf : A.MemApprox �
       _ ≤ dyadicWeight β k * (‖f - Df.a k‖ₑ + ‖g - Dg.a k‖ₑ) := by
           gcongr; exact enorm_add_le _ _
       _ = _ := mul_add _ _ _
-  have h1 := TB.tendsto_ext hβ (MemApprox.add le_rfl hβ hf hg) hc hlim
-  have h2 : Tendsto (fun k => TB.T (Df.a k + Dg.a k)) atTop (𝓝 (TB.ext f + TB.ext g)) := by
+  have h1 := TB.tendsto_limitTrace hβ (MemApprox.add le_rfl hβ hf hg) hc hlim
+  have h2 : Tendsto (fun k => TB.T (Df.a k + Dg.a k)) atTop
+      (𝓝 (TB.limitTrace f + TB.limitTrace g)) := by
     simp_rw [map_add]
     exact (TB.tendsto_canonical hβ hf).add (TB.tendsto_canonical hβ hg)
   exact tendsto_nhds_unique h1 h2
 
 /-- The trace is homogeneous on `A^β_1`. -/
-theorem ext_smul [CompleteSpace Y] (hβ : 0 ≤ β) {f : X} (hf : A.MemApprox β 1 f) (r : ℝ) :
-    TB.ext (r • f) = r • TB.ext f := by
+theorem limitTrace_smul [CompleteSpace Y] (hβ : 0 ≤ β) {f : X} (hf : A.MemApprox β 1 f) (r : ℝ) :
+    TB.limitTrace (r • f) = r • TB.limitTrace f := by
   set D := canonicalApprox A β f
   have hcf := D.tendsto_dyadicWeight_mul_enorm_sub (tsum_canonical_ne_top hβ hf)
   have hc : ∀ k, r • D.a k ∈ A (2 ^ (k + 0)) := fun k => A.smul_mem r (D.mem k)
@@ -318,96 +320,96 @@ theorem ext_smul [CompleteSpace Y] (hβ : 0 ≤ β) {f : X} (hf : A.MemApprox β
     rw [mul_zero] at this
     refine this.congr fun k => ?_
     rw [← smul_sub, enorm_smul]; ring
-  have h1 := TB.tendsto_ext hβ (hf.smul r) hc hlim
-  have h2 : Tendsto (fun k => TB.T (r • D.a k)) atTop (𝓝 (r • TB.ext f)) := by
+  have h1 := TB.tendsto_limitTrace hβ (hf.smul r) hc hlim
+  have h2 : Tendsto (fun k => TB.T (r • D.a k)) atTop (𝓝 (r • TB.limitTrace f)) := by
     simp_rw [map_smul]
     exact (TB.tendsto_canonical hβ hf).const_smul r
   exact tendsto_nhds_unique h1 h2
 
 /-- The trace as a linear map on `A^β_1`. -/
-noncomputable def extLinear [CompleteSpace Y] (hβ : 0 ≤ β) :
+noncomputable def limitTraceLinear [CompleteSpace Y] (hβ : 0 ≤ β) :
     A.approxSpace β 1 hβ le_rfl →ₗ[ℝ] Y where
-  toFun f := TB.ext f
-  map_add' f g := TB.ext_add hβ (mem_approxSpace.1 f.2) (mem_approxSpace.1 g.2)
-  map_smul' r f := TB.ext_smul hβ (mem_approxSpace.1 f.2) r
+  toFun f := TB.limitTrace f
+  map_add' f g := TB.limitTrace_add hβ (mem_approxSpace.1 f.2) (mem_approxSpace.1 g.2)
+  map_smul' r f := TB.limitTrace_smul hβ (mem_approxSpace.1 f.2) r
 
 /-- **The distance of a traced approximant to the trace**: for near-best approximants with
 decreasing tolerances and `∑_k 2^(kβ) (E_{2^k}(f) + t_k) < ∞`,
-`edist (T a_k) (ext f) ≤ 2 C 4^β ∑_{i ≥ 0} 2^((k+i)β) (E_{2^(k+i)}(f) + t_{k+i})`. -/
-theorem edist_apply_ext_le [CompleteSpace Y] (hβ : 0 ≤ β) {f : X} {t : ℕ → ℝ≥0∞}
+`edist (T a_k) (limitTrace f) ≤ 2 C 4^β ∑_{i ≥ 0} 2^((k+i)β) (E_{2^(k+i)}(f) + t_{k+i})`. -/
+theorem edist_apply_limitTrace_le [CompleteSpace Y] (hβ : 0 ≤ β) {f : X} {t : ℕ → ℝ≥0∞}
     (D : A.DyadicApprox f t) (ht : Antitone t)
     (hsum : ∑' k, dyadicWeight β k * (A.approxError f (2 ^ k) + t k) ≠ ∞) (k : ℕ) :
-    edist (TB.T (D.a k)) (TB.ext f) ≤ traceConst TB.C β *
+    edist (TB.T (D.a k)) (TB.limitTrace f) ≤ traceConst TB.C β *
       ∑' i, dyadicWeight β (k + i) * (A.approxError f (2 ^ (k + i)) + t (k + i)) := by
   have hf : A.MemApprox β 1 f := by
     refine (memApprox_iff_lqNorm_dyadic_lt_top le_rfl hβ).2 (lt_of_le_of_lt ?_ hsum.lt_top)
     rw [ENNReal.lqNorm_one]
     exact ENNReal.tsum_le_tsum fun k => by rw [approxSeqDyadic]; gcongr; exact le_self_add
-  have hlim := TB.tendsto_ext hβ hf (γ := 0) (fun k => by simpa using D.mem k)
+  have hlim := TB.tendsto_limitTrace hβ hf (γ := 0) (fun k => by simpa using D.mem k)
     (D.tendsto_dyadicWeight_mul_enorm_sub hsum)
-  calc edist (TB.T (D.a k)) (TB.ext f) ≤ ∑' m, traceConst TB.C β *
+  calc edist (TB.T (D.a k)) (TB.limitTrace f) ≤ ∑' m, traceConst TB.C β *
         (dyadicWeight β (k + m) * (A.approxError f (2 ^ (k + m)) + t (k + m))) :=
         edist_le_tsum_of_edist_le_of_tendsto _ (TB.edist_apply_succ_le D ht) hlim k
     _ = _ := ENNReal.tsum_mul_left
 
 /-- The norm of the trace through any near-best approximants:
-`‖ext f‖ ≤ C (2 ‖f‖ + t_0) + 2 C 4^β ∑_k 2^(kβ) (E_{2^k}(f) + t_k)`. -/
-theorem enorm_ext_le_of_dyadicApprox [CompleteSpace Y] (hβ : 0 ≤ β) {f : X} {t : ℕ → ℝ≥0∞}
+`‖limitTrace f‖ ≤ C (2 ‖f‖ + t_0) + 2 C 4^β ∑_k 2^(kβ) (E_{2^k}(f) + t_k)`. -/
+theorem enorm_limitTrace_le_of_dyadicApprox [CompleteSpace Y] (hβ : 0 ≤ β) {f : X} {t : ℕ → ℝ≥0∞}
     (D : A.DyadicApprox f t) (ht : Antitone t)
     (hsum : ∑' k, dyadicWeight β k * (A.approxError f (2 ^ k) + t k) ≠ ∞) :
-    ‖TB.ext f‖ₑ ≤ TB.C * (2 * ‖f‖ₑ + t 0) +
+    ‖TB.limitTrace f‖ₑ ≤ TB.C * (2 * ‖f‖ₑ + t 0) +
       traceConst TB.C β * ∑' k, dyadicWeight β k * (A.approxError f (2 ^ k) + t k) := by
-  have h0 := TB.edist_apply_ext_le hβ D ht hsum 0
+  have h0 := TB.edist_apply_limitTrace_le hβ D ht hsum 0
   simp only [zero_add] at h0
   have hT0 : ‖TB.T (D.a 0)‖ₑ ≤ TB.C * (2 * ‖f‖ₑ + t 0) := by
     calc ‖TB.T (D.a 0)‖ₑ ≤ TB.C * dyadicWeight β 0 * ‖D.a 0‖ₑ := TB.enorm_apply_le (D.mem 0)
       _ ≤ TB.C * (2 * ‖f‖ₑ + t 0) := by
           rw [ENNReal.dyadicWeight_zero_right, mul_one]; gcongr; exact D.enorm_zero_le
-  calc ‖TB.ext f‖ₑ = ‖TB.T (D.a 0) + (TB.ext f - TB.T (D.a 0))‖ₑ := by congr 1; abel
-    _ ≤ ‖TB.T (D.a 0)‖ₑ + ‖TB.ext f - TB.T (D.a 0)‖ₑ := enorm_add_le _ _
+  calc ‖TB.limitTrace f‖ₑ = ‖TB.T (D.a 0) + (TB.limitTrace f - TB.T (D.a 0))‖ₑ := by congr 1; abel
+    _ ≤ ‖TB.T (D.a 0)‖ₑ + ‖TB.limitTrace f - TB.T (D.a 0)‖ₑ := enorm_add_le _ _
     _ ≤ _ := by
         gcongr
         rw [← edist_eq_enorm_sub, edist_comm]
         exact h0
 
 /-- **The trace is bounded on `A^β_1`**:
-`‖ext f‖ ≤ (3 C + 3·2 C 4^β) (‖f‖ + ∑_k 2^(kβ) E_{2^k}(f))`. -/
-theorem enorm_ext_le [CompleteSpace Y] (hβ : 0 ≤ β) {f : X} (hf : A.MemApprox β 1 f) :
-    ‖TB.ext f‖ₑ ≤ (3 * TB.C + 3 * traceConst TB.C β) * A.approxNormDyadic β 1 f := by
+`‖limitTrace f‖ ≤ (3 C + 3·2 C 4^β) (‖f‖ + ∑_k 2^(kβ) E_{2^k}(f))`. -/
+theorem enorm_limitTrace_le [CompleteSpace Y] (hβ : 0 ≤ β) {f : X} (hf : A.MemApprox β 1 f) :
+    ‖TB.limitTrace f‖ₑ ≤ (3 * TB.C + 3 * traceConst TB.C β) * A.approxNormDyadic β 1 f := by
   rcases eq_or_ne f 0 with rfl | hf0
-  · rw [TB.ext_zero hβ, enorm_zero]; exact bot_le
+  · rw [TB.limitTrace_zero hβ, enorm_zero]; exact bot_le
   obtain ⟨D⟩ := exists_dyadicApprox A f (tolerance_ne_zero hf0 β)
-  have h := TB.enorm_ext_le_of_dyadicApprox hβ D (tolerance_anti f hβ)
+  have h := TB.enorm_limitTrace_le_of_dyadicApprox hβ D (tolerance_anti f hβ)
     (tsum_dyadicWeight_mul_add_tolerance_ne_top le_rfl
       ((memApprox_iff_lqNorm_dyadic_lt_top le_rfl hβ).1 hf).ne)
   rw [tolerance_zero] at h
   exact h.trans (mul_add_mul_tsum_tolerance_le _ _ f β)
 
 /-- **The trace transfer theorem**: for `0 ≤ β < s` and `1 ≤ q ≤ ∞` the trace maps `A^s_q(X)`
-into `B^{s-β}_q(Y)`, with `‖ext f‖_{B^{s-β}_q} ≤ K ‖f‖_{A^s_q}` in the dyadic quasi-norms,
-`K = traceTransferConst C β s`. -/
-theorem approxNormDyadic_ext_le [CompleteSpace Y] (hβ : 0 ≤ β) {s : ℝ} (hβs : β < s)
+into `B^{s-β}_q(Y)`, with `‖limitTrace f‖_{B^{s-β}_q} ≤ K ‖f‖_{A^s_q}` in the dyadic
+quasi-norms, `K = traceTransferConst C β s`. -/
+theorem approxNormDyadic_limitTrace_le [CompleteSpace Y] (hβ : 0 ≤ β) {s : ℝ} (hβs : β < s)
     {q : ℝ≥0∞} (hq : 1 ≤ q) {f : X} (hf : A.MemApprox s q f) :
-    B.approxNormDyadic (s - β) q (TB.ext f) ≤
+    B.approxNormDyadic (s - β) q (TB.limitTrace f) ≤
       traceTransferConst TB.C β s * A.approxNormDyadic s q f := by
   rcases eq_or_ne f 0 with rfl | hf0
-  · rw [TB.ext_zero hβ, approxNormDyadic_zero]; exact bot_le
+  · rw [TB.limitTrace_zero hβ, approxNormDyadic_zero]; exact bot_le
   obtain ⟨D⟩ := exists_dyadicApprox A f (tolerance_ne_zero hf0 s)
   have ht := tolerance_anti f (hβ.trans hβs.le)
   have hsum := tsum_dyadicWeight_mul_add_tolerance_ne_top hβs.le (hf.lqNorm_one_lt_top hq hβ hβs).ne
-  have hy := TB.enorm_ext_le_of_dyadicApprox hβ D ht hsum
+  have hy := TB.enorm_limitTrace_le_of_dyadicApprox hβ D ht hsum
   rw [tolerance_zero] at hy
   refine approxNormDyadic_le_of_tail hβs.le hq f hy fun k => ?_
   refine (approxError_le_of_mem (TB.mapsTo _ _ (D.mem k)) _).trans ?_
   rw [← edist_eq_enorm_sub, edist_comm]
-  exact TB.edist_apply_ext_le hβ D ht hsum k
+  exact TB.edist_apply_limitTrace_le hβ D ht hsum k
 
 /-- **The trace transfer theorem**, membership form: `f ∈ A^s_q(X)` gives
-`ext f ∈ B^{s-β}_q(Y)` for `0 ≤ β < s`. -/
-theorem memApprox_ext [CompleteSpace Y] (hβ : 0 ≤ β) {s : ℝ} (hβs : β < s) {q : ℝ≥0∞}
-    (hq : 1 ≤ q) {f : X} (hf : A.MemApprox s q f) : B.MemApprox (s - β) q (TB.ext f) := by
+`limitTrace f ∈ B^{s-β}_q(Y)` for `0 ≤ β < s`. -/
+theorem memApprox_limitTrace [CompleteSpace Y] (hβ : 0 ≤ β) {s : ℝ} (hβs : β < s) {q : ℝ≥0∞}
+    (hq : 1 ≤ q) {f : X} (hf : A.MemApprox s q f) : B.MemApprox (s - β) q (TB.limitTrace f) := by
   refine (memApprox_iff_approxNormDyadic_lt_top hq (sub_nonneg.2 hβs.le)).2 ?_
-  exact (TB.approxNormDyadic_ext_le hβ hβs hq hf).trans_lt (ENNReal.mul_lt_top
+  exact (TB.approxNormDyadic_limitTrace_le hβ hβs hq hf).trans_lt (ENNReal.mul_lt_top
     (traceTransferConst_ne_top TB.C_ne_top hβs).lt_top
     ((memApprox_iff_approxNormDyadic_lt_top hq (hβ.trans hβs.le)).1 hf))
 
@@ -421,12 +423,13 @@ def RightInverseBound (γ : ℕ) (C' : ℝ≥0∞) : Prop :=
 /-- **The trace of a lifted series**: if `a_j ∈ A_{2^(j+γ)}` lift `b_j = T a_j` with
 `‖a_j‖ ≤ C' 2^(-jβ) ‖b_j‖`, `∑ ‖b_j‖ < ∞` and `∑ b_j = g`, and `f = ∑ a_j` lies in `A^β_1`, then
 the trace of `f` is `g`. The partial sums of the moved series approximate `f` with
-`2^(Kβ) ‖f - ∑_{i < K+γ} G_i‖ ≤ C' ∑_m ‖b_{m+K}‖ → 0`, and `TraceBound.tendsto_ext` applies. -/
-theorem ext_eq_of_hasSum_lift [CompleteSpace Y] (hβ : 0 ≤ β) {γ : ℕ} {C' : ℝ≥0∞} (hC' : C' ≠ ∞)
-    {a : ℕ → X} {b : ℕ → Y} (ha : ∀ j, a j ∈ A (2 ^ (j + γ))) (hTa : ∀ j, TB.T (a j) = b j)
-    (hale : ∀ j, ‖a j‖ₑ ≤ C' * dyadicWeight (-β) j * ‖b j‖ₑ) (hb_fin : ∑' j, ‖b j‖ₑ ≠ ∞)
-    {g : Y} (hb_sum : HasSum b g) {f : X} (hfa : HasSum a f) (hfβ : A.MemApprox β 1 f) :
-    TB.ext f = g := by
+`2^(Kβ) ‖f - ∑_{i < K+γ} G_i‖ ≤ C' ∑_m ‖b_{m+K}‖ → 0`, and `TraceBound.tendsto_limitTrace`
+applies. -/
+theorem limitTrace_eq_of_hasSum_lift [CompleteSpace Y] (hβ : 0 ≤ β) {γ : ℕ} {C' : ℝ≥0∞}
+    (hC' : C' ≠ ∞) {a : ℕ → X} {b : ℕ → Y} (ha : ∀ j, a j ∈ A (2 ^ (j + γ)))
+    (hTa : ∀ j, TB.T (a j) = b j) (hale : ∀ j, ‖a j‖ₑ ≤ C' * dyadicWeight (-β) j * ‖b j‖ₑ)
+    (hb_fin : ∑' j, ‖b j‖ₑ ≠ ∞) {g : Y} (hb_sum : HasSum b g) {f : X} (hfa : HasSum a f)
+    (hfβ : A.MemApprox β 1 f) : TB.limitTrace f = g := by
   have hw1 : ∀ j, dyadicWeight (-β) j ≤ 1 := fun j =>
     (ENNReal.dyadicWeight_le_of_le (by linarith) j).trans_eq (ENNReal.dyadicWeight_zero_left j)
   have hG : HasSum (shiftSeq γ a) f := hasSum_shiftSeq hfa
@@ -459,7 +462,7 @@ theorem ext_eq_of_hasSum_lift [CompleteSpace Y] (hβ : 0 ≤ β) {γ : ℕ} {C' 
       (ENNReal.tendsto_sum_nat_add (fun j => ‖b j‖ₑ) hb_fin) (Or.inr hC')
     rw [mul_zero] at h0
     exact tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds h0 (fun _ => bot_le) hdecay
-  have h1 := TB.tendsto_ext hβ hfβ (c := fun K => ∑ i ∈ range (K + γ), shiftSeq γ a i)
+  have h1 := TB.tendsto_limitTrace hβ hfβ (c := fun K => ∑ i ∈ range (K + γ), shiftSeq γ a i)
     (fun K => sum_range_mem (shiftSeq_mem ha) (K + γ)) hcf
   have hTG : HasSum (fun i => TB.T (shiftSeq γ a i)) g := by
     refine (hasSum_nat_add_iff' γ).1 ?_
@@ -478,10 +481,10 @@ theorem ext_eq_of_hasSum_lift [CompleteSpace Y] (hβ : 0 ≤ β) {γ : ℕ} {C' 
 `‖f‖_{A^{s+β}_q} ≤ K ‖g‖_{B^s_q}` in the dyadic quasi-norms, `K = traceSurjConst C' β s γ`.
 The proof lifts the blocks `b_j ∈ B (2^j)` of a block decomposition of `g`
 (`ApproximationScheme.exists_blocks`) to `a_j` with `T a_j = b_j` and takes `f = ∑ a_j`. -/
-theorem exists_ext_eq [CompleteSpace X] [CompleteSpace Y] (hβ : 0 ≤ β) {γ : ℕ} {C' : ℝ≥0∞}
+theorem exists_limitTrace_eq [CompleteSpace X] [CompleteSpace Y] (hβ : 0 ≤ β) {γ : ℕ} {C' : ℝ≥0∞}
     (hC' : C' ≠ ∞) (hR : TB.RightInverseBound γ C') {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞}
     (hq : 1 ≤ q) {g : Y} (hg : B.MemApprox s q g) :
-    ∃ f : X, A.MemApprox (s + β) q f ∧ TB.ext f = g ∧
+    ∃ f : X, A.MemApprox (s + β) q f ∧ TB.limitTrace f = g ∧
       A.approxNormDyadic (s + β) q f ≤ traceSurjConst C' β s γ * B.approxNormDyadic s q g := by
   have hsβ : 0 < s + β := by linarith
   have hw1 : ∀ j, dyadicWeight (-β) j ≤ 1 := fun j =>
@@ -530,7 +533,7 @@ theorem exists_ext_eq [CompleteSpace X] [CompleteSpace Y] (hβ : 0 ≤ β) {γ :
     (hnorm.trans_lt (ENNReal.mul_lt_top (traceSurjConst_ne_top hC' hsβ γ).lt_top
       ((memApprox_iff_approxNormDyadic_lt_top hq hs.le).1 hg)))
   -- the trace of `f` is `g`
-  exact ⟨f, hfmem, TB.ext_eq_of_hasSum_lift hβ hC' ha hTa hale hb_fin hb_sum hfa
+  exact ⟨f, hfmem, TB.limitTrace_eq_of_hasSum_lift hβ hC' ha hTa hale hb_fin hb_sum hfa
     (hfmem.mono hq le_rfl hβ (Or.inl (by linarith))), hnorm⟩
 
 end TraceBound

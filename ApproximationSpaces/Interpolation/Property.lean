@@ -31,7 +31,7 @@ interpolation space (`InterpCouple.memKMethod_iff_of_retract`,
 `InterpCouple.memKMethod_iff_exists_map_eq`, Bergh–Löfström, Theorem 6.4.2);
 and for bounded linear maps `T : X → X'`, `S : Y → Y'` with `T ι = ι' S`, the map `T` is bounded
 between the spaces of `ApproximationSpaces.Interpolation.KMethod`
-(`ApproximationScheme.kMethodNorm_map_le_of_comp_eq`, `ApproximationScheme.MemInterp.map`).
+(`ApproximationScheme.inclKMethodNorm_map_le_of_comp_eq`, `ApproximationScheme.MemInterp.map`).
 -/
 
 @[expose] public section
@@ -420,41 +420,42 @@ variable {X Y X' Y' : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X]
 /-- **The interpolation property for the couples `(X, ι(Y))`**: if `T : X → X'` and
 `S : Y → Y'` are bounded linear maps with `T ι = ι' S`, `‖T‖ ≤ M₀`, `‖S‖ ≤ M₁` and
 `0 < M₀, M₁ < ∞`, then `‖T f‖_{K,θ,q} ≤ M₀^(1-θ) M₁^θ ‖f‖_{K,θ,q}`. -/
-theorem kMethodNorm_map_le_of_comp_eq (T : X →L[ℝ] X') (S : Y →L[ℝ] Y')
+theorem inclKMethodNorm_map_le_of_comp_eq (T : X →L[ℝ] X') (S : Y →L[ℝ] Y')
     (hTS : T.comp ι = ι'.comp S) (h₀ : ‖T‖ₑ ≤ M₀) (h₁ : ‖S‖ₑ ≤ M₁) (hM₀ : M₀ ≠ 0)
     (hM₀' : M₀ ≠ ∞) (hM₁ : M₁ ≠ 0) (hM₁' : M₁ ≠ ∞) (f : X) :
-    kMethodNorm ι' θ q (T f) ≤ M₀ ^ (1 - θ) * M₁ ^ θ * kMethodNorm ι θ q f := by
+    inclKMethodNorm ι' θ q (T f) ≤ M₀ ^ (1 - θ) * M₁ ^ θ * inclKMethodNorm ι θ q f := by
   rw [← InterpCouple.kMethodNorm_ofMap, ← InterpCouple.kMethodNorm_ofMap]
   exact InterpCouple.kMethodNorm_map_le (T : X →+ X') hM₀ hM₀' hM₁ hM₁'
     (fun a => (InterpCouple.norm0_ofMap_apply_le T a).trans (by gcongr))
     (InterpCouple.norm1_ofMap_apply_le hTS hM₁ hM₁' h₁) f
 
 /-- **The interpolation property on the grid `2^(-kρ)`**: under the hypotheses of
-`kMethodNorm_map_le_of_comp_eq`, for `θ ≥ 0`, `ρ > 0` and `q ≠ 0`,
+`inclKMethodNorm_map_le_of_comp_eq`, for `θ ≥ 0`, `ρ > 0` and `q ≠ 0`,
 `‖T f‖_{θ,q} ≤ c' M₀^(1-θ) M₁^θ c ‖f‖_{θ,q}` with `c = kMethodUpperConst θ ρ q`, finite for
 `θ > 0` (`kMethodUpperConst_ne_top`), and `c' = kMethodLowerConst ι' θ ρ q`, finite for `ρ > 0`
 (`kMethodLowerConst_ne_top`). -/
-theorem interpNorm_map_le_of_comp_eq (T : X →L[ℝ] X') (S : Y →L[ℝ] Y')
+theorem inclInterpNorm_map_le_of_comp_eq (T : X →L[ℝ] X') (S : Y →L[ℝ] Y')
     (hTS : T.comp ι = ι'.comp S) (h₀ : ‖T‖ₑ ≤ M₀) (h₁ : ‖S‖ₑ ≤ M₁) (hM₀ : M₀ ≠ 0)
     (hM₀' : M₀ ≠ ∞) (hM₁ : M₁ ≠ 0) (hM₁' : M₁ ≠ ∞) (hθ : 0 ≤ θ) (hρ : 0 < ρ) (hq : q ≠ 0)
-    (f : X) : interpNorm ι' θ ρ q (T f) ≤ kMethodLowerConst ι' θ ρ q *
-      (M₀ ^ (1 - θ) * M₁ ^ θ) * kMethodUpperConst θ ρ q * interpNorm ι θ ρ q f :=
-  calc interpNorm ι' θ ρ q (T f) ≤ kMethodLowerConst ι' θ ρ q * kMethodNorm ι' θ q (T f) :=
-        interpNorm_le_kMethodNorm hθ hρ hq (T f)
+    (f : X) : inclInterpNorm ι' θ ρ q (T f) ≤ kMethodLowerConst ι' θ ρ q *
+      (M₀ ^ (1 - θ) * M₁ ^ θ) * kMethodUpperConst θ ρ q * inclInterpNorm ι θ ρ q f :=
+  calc inclInterpNorm ι' θ ρ q (T f) ≤ kMethodLowerConst ι' θ ρ q * inclKMethodNorm ι' θ q (T f) :=
+        inclInterpNorm_le_inclKMethodNorm hθ hρ hq (T f)
     _ ≤ kMethodLowerConst ι' θ ρ q * (M₀ ^ (1 - θ) * M₁ ^ θ *
-          (kMethodUpperConst θ ρ q * interpNorm ι θ ρ q f)) := by
+          (kMethodUpperConst θ ρ q * inclInterpNorm ι θ ρ q f)) := by
         gcongr
-        exact (kMethodNorm_map_le_of_comp_eq T S hTS h₀ h₁ hM₀ hM₀' hM₁ hM₁' f).trans
-          (by gcongr; exact kMethodNorm_le_interpNorm hθ hρ f)
+        exact (inclKMethodNorm_map_le_of_comp_eq T S hTS h₀ h₁ hM₀ hM₀' hM₁ hM₁' f).trans
+          (by gcongr; exact inclKMethodNorm_le_inclInterpNorm hθ hρ f)
     _ = _ := by ring
 
 /-- **The spaces of the continuous K-method under compatible maps**: if `T : X → X'` and
 `S : Y → Y'` are bounded linear maps with `T ι = ι' S`, then `T` maps `(X, Y)_{θ,q}` into
 `(X', Y')_{θ,q}`. -/
-theorem MemKMethod.map (T : X →L[ℝ] X') (S : Y →L[ℝ] Y') (hTS : T.comp ι = ι'.comp S) {f : X}
-    (hf : MemKMethod ι θ q f) : MemKMethod ι' θ q (T f) :=
-  InterpCouple.memKMethod_ofMap_iff.1 ((InterpCouple.memKMethod_ofMap_iff.2 hf).map (T : X →+ X')
-    enorm_ne_top (max_ne_top ENNReal.one_ne_top enorm_ne_top) (InterpCouple.norm0_ofMap_apply_le T)
+theorem MemInclKMethod.map (T : X →L[ℝ] X') (S : Y →L[ℝ] Y') (hTS : T.comp ι = ι'.comp S) {f : X}
+    (hf : MemInclKMethod ι θ q f) : MemInclKMethod ι' θ q (T f) :=
+  InterpCouple.memKMethod_ofMap_iff.1 ((InterpCouple.memKMethod_ofMap_iff.2 hf).map
+    (T : X →+ X') enorm_ne_top (max_ne_top ENNReal.one_ne_top enorm_ne_top)
+    (InterpCouple.norm0_ofMap_apply_le T)
     (InterpCouple.norm1_ofMap_apply_le hTS (zero_lt_one.trans_le (le_max_left _ _)).ne'
       (max_ne_top ENNReal.one_ne_top enorm_ne_top) (le_max_right _ _)))
 
@@ -463,6 +464,6 @@ theorem MemKMethod.map (T : X →L[ℝ] X') (S : Y →L[ℝ] Y') (hTS : T.comp �
 sends the space of the discrete K-method on the grid `2^(-kρ)` for `ι` into that for `ι'`. -/
 theorem MemInterp.map (T : X →L[ℝ] X') (S : Y →L[ℝ] Y') (hTS : T.comp ι = ι'.comp S)
     (hθ : 0 < θ) (hρ : 0 < ρ) {f : X} (hf : MemInterp ι θ ρ q f) : MemInterp ι' θ ρ q (T f) :=
-  (memInterp_iff_memKMethod hθ hρ).2 (((memInterp_iff_memKMethod hθ hρ).1 hf).map T S hTS)
+  (memInterp_iff_memInclKMethod hθ hρ).2 (((memInterp_iff_memInclKMethod hθ hρ).1 hf).map T S hTS)
 
 end ApproximationScheme

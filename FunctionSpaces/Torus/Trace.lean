@@ -508,8 +508,9 @@ theorem traceBound_T_toLp (hp : p ≠ ∞) {m : ℕ} {a : UnitAddTorus (Fin (n +
 /-- **The trace of a trigonometric polynomial** is its restriction to the face. -/
 theorem traceBound_ext_toLp (hp : p ≠ ∞) {m : ℕ} {a : UnitAddTorus (Fin (n + 1)) →ᵇ ℂ}
     (ha : a ∈ trigPoly (Fin (n + 1)) m) :
-    (traceBound p n hp).ext (toLpR p (Fin (n + 1)) a) = toLpR p (Fin n) (restrictFace n a) := by
-  exact ((traceBound p n hp).ext_eq_of_mem (by positivity)
+    (traceBound p n hp).limitTrace (toLpR p (Fin (n + 1)) a) =
+      toLpR p (Fin n) (restrictFace n a) := by
+  exact ((traceBound p n hp).limitTrace_eq_of_mem (by positivity)
     (FunctionScheme.toLp_mem_toLp (n := m) ha)).trans (traceBound_T_toLp p hp ha)
 
 /-- **The extension is a right inverse on approximants**: every polynomial of degree `< 2^k` on
@@ -533,15 +534,15 @@ restriction to the face `{x_0 = 0}` extends from trigonometric polynomials to a 
 of some `f ∈ B^{s+1/p}_{p,q}(𝕋^(n+1))`. -/
 theorem trace_besov (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞} (hq : 1 ≤ q) :
     (∀ f, (trigScheme (Fin (n + 1))).MemBesov volume p (s + p.toReal⁻¹) q f →
-      (trigScheme (Fin n)).MemBesov volume p s q ((traceBound p n hp).ext f)) ∧
+      (trigScheme (Fin n)).MemBesov volume p s q ((traceBound p n hp).limitTrace f)) ∧
     (∀ g, (trigScheme (Fin n)).MemBesov volume p s q g →
       ∃ f, (trigScheme (Fin (n + 1))).MemBesov volume p (s + p.toReal⁻¹) q f ∧
-        (traceBound p n hp).ext f = g) := by
+        (traceBound p n hp).limitTrace f = g) := by
   have hβ : 0 ≤ p.toReal⁻¹ := by positivity
   refine ⟨fun f hf => ?_, fun g hg => ?_⟩
-  · have := (traceBound p n hp).memApprox_ext hβ (by linarith) hq hf
+  · have := (traceBound p n hp).memApprox_limitTrace hβ (by linarith) hq hf
     rwa [add_sub_cancel_right] at this
-  · obtain ⟨f, hf, hfg, -⟩ := (traceBound p n hp).exists_ext_eq hβ ENNReal.one_ne_top
+  · obtain ⟨f, hf, hfg, -⟩ := (traceBound p n hp).exists_limitTrace_eq hβ ENNReal.one_ne_top
       (traceBound_rightInverse p hp) hs hq hg
     exact ⟨f, hf, hfg⟩
 

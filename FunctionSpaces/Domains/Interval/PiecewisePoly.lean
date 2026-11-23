@@ -259,8 +259,8 @@ theorem mem_ppScheme_two_pow {r k : ℕ} {g : Lp ℂ p unitVol} :
   ApproximationScheme.mem_ofMonotoneSubmodules_two_pow
 
 /-- The piecewise polynomial scheme is linear. -/
-theorem ppScheme_isLinear (r : ℕ) : (ppScheme p r).IsLinear :=
-  ApproximationScheme.isLinear_ofMonotoneSubmodules _ _
+theorem ppScheme_isLinearScheme (r : ℕ) : (ppScheme p r).IsLinearScheme :=
+  ApproximationScheme.isLinearScheme_ofMonotoneSubmodules _ _
 
 /-- **Integrals over a union of intervals**: `∫_{[u, u + mL]} G ≤ ∑_{n < m} ∫_{[u + nL, u + (n+1)L]} G`
 for `L ≥ 0`. -/

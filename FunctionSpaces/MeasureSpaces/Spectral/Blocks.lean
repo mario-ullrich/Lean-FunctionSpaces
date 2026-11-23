@@ -136,7 +136,7 @@ theorem enorm_block_sq (k : ℕ) (f : H) :
 `‖Δ_k f‖² = ∑_{2^k ≤ lvl i < 2^(k+1)} |⟨e_i, f⟩|²` (`enorm_block_sq`). -/
 theorem memApprox_iff_blockNorm_lt_top [CompleteSpace H] {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞}
     (hq : 1 ≤ q) {f : H} : S.toScheme.MemApprox s q f ↔ S.projectionScheme.blockNorm s q f < ∞ :=
-  S.projectionScheme.memApprox_iff_blockNorm_lt_top S.closure_iUnion_toScheme hs hq
+  S.projectionScheme.memApprox_iff_blockNorm_lt_top_of_dense S.closure_iUnion_toScheme hs hq
 
 /-- Membership in `ℓ²` through the series of squares in `ℝ≥0∞`. -/
 theorem mem_l2_iff (g : ι → ℂ) : Memℓp g 2 ↔ ∑' i, ‖g i‖ₑ ^ 2 ≠ ∞ := by

@@ -264,8 +264,8 @@ theorem mem_cubePPScheme_two_pow {r k : ℕ} {g : Lp ℂ p (cubeVol d)} :
   ApproximationScheme.mem_ofMonotoneSubmodules_two_pow
 
 /-- The scheme of piecewise polynomials on the cube is linear. -/
-theorem cubePPScheme_isLinear (r : ℕ) : (cubePPScheme p d r).IsLinear :=
-  ApproximationScheme.isLinear_ofMonotoneSubmodules _ _
+theorem cubePPScheme_isLinearScheme (r : ℕ) : (cubePPScheme p d r).IsLinearScheme :=
+  ApproximationScheme.isLinearScheme_ofMonotoneSubmodules _ _
 
 /-! ### The tensor projection -/
 

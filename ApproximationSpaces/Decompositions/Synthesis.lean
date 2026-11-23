@@ -22,7 +22,7 @@ Then for `0 < s < σ` and `1 ≤ q ≤ ∞` (`ApproximationScheme.approxNormDyad
 `‖f‖_{A^s_q} ≤ (2 (1 - 2^(-s))⁻¹ + C (1 - 2^(-(σ-s)))⁻¹) ‖(2^(js) ε_j)_j‖_{ℓ_q}`
 
 in the dyadic quasi-norm.  The levels `j ≤ k` are approximated together, which needs a
-**linear** scheme (`ApproximationScheme.IsLinear`: each `A n` closed under addition), so that
+**linear** scheme (`ApproximationScheme.IsLinearScheme`: each `A n` closed under addition), so that
 `E_n(f + g) ≤ E_n(f) + E_n(g)`; the levels `j > k` are estimated by their size.  The two parts
 are the two Hardy inequalities, with exponents `σ - s` and `s`.
 -/
@@ -41,37 +41,37 @@ variable {X : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X]
 
 /-- A scheme is **linear** if every set of approximants is closed under addition, so that it is
 a linear subspace. -/
-def IsLinear (A : ApproximationScheme X) : Prop := ∀ n, ∀ a ∈ A n, ∀ b ∈ A n, a + b ∈ A n
+def IsLinearScheme (A : ApproximationScheme X) : Prop := ∀ n, ∀ a ∈ A n, ∀ b ∈ A n, a + b ∈ A n
 
 /-- The scheme of an increasing sequence of subspaces is linear. -/
-theorem isLinear_ofSubmodules (V : ℕ → Submodule ℝ X) (h0 : V 0 = ⊥) (hV : Monotone V) :
-    (ofSubmodules V h0 hV).IsLinear := fun n a ha b hb => by
+theorem isLinearScheme_ofSubmodules (V : ℕ → Submodule ℝ X) (h0 : V 0 = ⊥) (hV : Monotone V) :
+    (ofSubmodules V h0 hV).IsLinearScheme := fun n a ha b hb => by
   rw [mem_ofSubmodules] at ha hb ⊢
   exact (V n).add_mem ha hb
 
 /-- The dyadic scheme of an increasing sequence of subspaces is linear. -/
-theorem isLinear_ofMonotoneSubmodules (V : ℕ → Submodule ℝ X) (hV : Monotone V) :
-    (ofMonotoneSubmodules V hV).IsLinear :=
-  isLinear_ofSubmodules _ _ _
+theorem isLinearScheme_ofMonotoneSubmodules (V : ℕ → Submodule ℝ X) (hV : Monotone V) :
+    (ofMonotoneSubmodules V hV).IsLinearScheme :=
+  isLinearScheme_ofSubmodules _ _ _
 
 /-- The image of a linear scheme under a linear map is linear. -/
-theorem IsLinear.map {Y : Type*} [NormedAddCommGroup Y] [NormedSpace ℝ Y] (hA : A.IsLinear)
-    (T : X →ₗ[ℝ] Y) : (A.map T).IsLinear := fun n a ha b hb => by
+theorem IsLinearScheme.map {Y : Type*} [NormedAddCommGroup Y] [NormedSpace ℝ Y]
+    (hA : A.IsLinearScheme) (T : X →ₗ[ℝ] Y) : (A.map T).IsLinearScheme := fun n a ha b hb => by
   obtain ⟨a', ha', rfl⟩ := A.mem_map.1 ha
   obtain ⟨b', hb', rfl⟩ := A.mem_map.1 hb
   exact A.mem_map.2 ⟨a' + b', hA n a' ha' b' hb', map_add T a' b'⟩
 
 /-- For a linear scheme the error is subadditive at a fixed complexity:
 `E_n(f + g) ≤ E_n(f) + E_n(g)`. -/
-theorem approxError_add_le_of_isLinear (hA : A.IsLinear) (n : ℕ) (f g : X) :
+theorem approxError_add_le_of_isLinearScheme (hA : A.IsLinearScheme) (n : ℕ) (f g : X) :
     A.approxError (f + g) n ≤ A.approxError f n + A.approxError g n :=
   approxError_add_le_of_add_mem (hA n) f g
 
 /-- `E_n(∑ g_j) ≤ ∑ E_n(g_j)` for a linear scheme (Mathlib's `Finset.le_sum_of_subadditive`). -/
-theorem approxError_sum_le_of_isLinear (hA : A.IsLinear) (n : ℕ) {ι : Type*} (t : Finset ι)
-    (g : ι → X) : A.approxError (∑ j ∈ t, g j) n ≤ ∑ j ∈ t, A.approxError (g j) n :=
+theorem approxError_sum_le_of_isLinearScheme (hA : A.IsLinearScheme) (n : ℕ) {ι : Type*}
+    (t : Finset ι) (g : ι → X) : A.approxError (∑ j ∈ t, g j) n ≤ ∑ j ∈ t, A.approxError (g j) n :=
   Finset.le_sum_of_subadditive (A.approxError · n) (approxError_zero_left n).le
-    (approxError_add_le_of_isLinear hA n) t g
+    (approxError_add_le_of_isLinearScheme hA n) t g
 
 /-- The algebra of the weights: `2^(ks) 2^(-(k-j)σ) = 2^(-k(σ-s)) 2^(jσ)` for `j ≤ k`
 (`ENNReal.dyadicWeight_mul_dyadicWeight_neg_sub`). -/
@@ -86,7 +86,7 @@ theorem dyadicWeight_mul_dyadicWeight_sub {σ : ℝ} {j k : ℕ} (hjk : j ≤ k)
 `E_{2^k}(g_j) ≤ C 2^(-(k-j)σ) ε_j` for `k ≥ j` satisfies
 `‖f‖_{A^s_q} ≤ (2 (1 - 2^(-s))⁻¹ + C (1 - 2^(-(σ-s)))⁻¹) ‖(2^(js) ε_j)_j‖_{ℓ_q}` (dyadic
 quasi-norm).  The constant is finite for `0 < s < σ`. -/
-theorem approxNormDyadic_le_of_hasSum_decay (hA : A.IsLinear) (hq : 1 ≤ q) {σ : ℝ}
+theorem approxNormDyadic_le_of_hasSum_decay (hA : A.IsLinearScheme) (hq : 1 ≤ q) {σ : ℝ}
     {C : ℝ≥0∞} {f : X} {g : ℕ → X} (hf : HasSum g f) {ε : ℕ → ℝ≥0∞}
     (hsize : ∀ j, ‖g j‖ₑ ≤ ε j)
     (hdecay : ∀ j k, j ≤ k → A.approxError (g j) (2 ^ k) ≤ C * dyadicWeight (-σ) (k - j) * ε j) :
@@ -109,7 +109,7 @@ theorem approxNormDyadic_le_of_hasSum_decay (hA : A.IsLinear) (hq : 1 ≤ q) {σ
         dyadicWeight s k * ∑' i, ε (k + i) := fun k => by
     have h1 : A.approxError (∑ j ∈ range (k + 1), g j) (2 ^ k) ≤
         ∑ j ∈ range (k + 1), C * dyadicWeight (-σ) (k - j) * ε j :=
-      (approxError_sum_le_of_isLinear hA _ _ _).trans (Finset.sum_le_sum fun j hj =>
+      (approxError_sum_le_of_isLinearScheme hA _ _ _).trans (Finset.sum_le_sum fun j hj =>
         hdecay j k (Nat.lt_succ_iff.1 (Finset.mem_range.1 hj)))
     calc A.approxSeqDyadic s f k = dyadicWeight s k * A.approxError f (2 ^ k) := rfl
       _ ≤ dyadicWeight s k * (∑ j ∈ range (k + 1), C * dyadicWeight (-σ) (k - j) * ε j +

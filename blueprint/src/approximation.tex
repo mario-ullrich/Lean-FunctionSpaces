@@ -1342,7 +1342,8 @@ of the norms.
 \begin{theorem}[Lifting theorem]
 \label{thm:lift}
 \lean{ApproximationScheme.exists_preimage_of_liftBound, ApproximationScheme.liftConst,
-  ApproximationScheme.DyadicApprox.exists_lift, ApproximationScheme.DyadicApprox.exists_preimage,
+  ApproximationScheme.DyadicApprox.exists_lift_of_liftBound,
+  ApproximationScheme.DyadicApprox.exists_preimage_of_tsum_ne_top,
   ApproximationScheme.tolerance, ApproximationScheme.liftConst_ne_top,
   ApproximationScheme.DyadicApprox.exists_lift_partial, ApproximationScheme.tolerance_ne_zero,
   ApproximationScheme.tolerance_ne_top, ApproximationScheme.tolerance_anti,
@@ -1411,7 +1412,7 @@ $(1 - 2^{-(s-\alpha)})^{-1} \|f\|^{\mathrm{dy}}_{A^s_q}$ by \Cref{thm:approx-emb
 
 \begin{theorem}[Nikolskii transfer theorem]
 \label{thm:nikolskii-transfer}
-\lean{ApproximationScheme.exists_preimage_of_nikolskii,
+\lean{ApproximationScheme.exists_preimage_approxNormDyadic_le_of_nikolskii,
   ApproximationScheme.MemApprox.exists_preimage_of_nikolskii, ApproximationScheme.nikolskiiConst,
   ApproximationScheme.nikolskiiConst_ne_top}
 \leanok
@@ -1509,7 +1510,7 @@ interpolation spaces are defined from it~\cite{BerghLofstrom}.
 
 \begin{definition}[$K$-functional]
 \label{def:k-functional}
-\lean{ApproximationScheme.kFunctional, ApproximationScheme.kFunctional_le}
+\lean{ApproximationScheme.inclKFunctional, ApproximationScheme.inclKFunctional_le}
 \leanok
 For $t \in [0, \infty]$ and $f \in X$,
 \[
@@ -1519,9 +1520,9 @@ For $t \in [0, \infty]$ and $f \in X$,
 
 \begin{lemma}[Properties of the $K$-functional]
 \label{lem:k-functional}
-\lean{ApproximationScheme.kFunctional_le_enorm, ApproximationScheme.kFunctional_mono,
-  ApproximationScheme.monotone_kFunctional, ApproximationScheme.kFunctional_add_le,
-  ApproximationScheme.kFunctional_smul_le, ApproximationScheme.kFunctional_zero_right}
+\lean{ApproximationScheme.inclKFunctional_le_enorm, ApproximationScheme.inclKFunctional_mono,
+  ApproximationScheme.monotone_inclKFunctional, ApproximationScheme.inclKFunctional_add_le,
+  ApproximationScheme.inclKFunctional_smul_le, ApproximationScheme.inclKFunctional_zero_right}
 \leanok
 \uses{def:k-functional}
 For all $t \leq u$ in $[0, \infty]$, $f, g \in X$ and $c \in \R$: $K(t, f) \leq \|f\|$,
@@ -1536,9 +1537,10 @@ Take $y = 0$ for the first bound; the others hold for each $y$ before the infimu
 
 \begin{definition}[Real interpolation space]
 \label{def:interpolation}
-\lean{ApproximationScheme.interpSeq, ApproximationScheme.interpNorm, ApproximationScheme.MemInterp,
-  ApproximationScheme.interpSpace, ApproximationScheme.interpNorm_add_le,
-  ApproximationScheme.enorm_le_interpNorm, ApproximationScheme.interpNorm_smul_le,
+\lean{ApproximationScheme.interpSeq, ApproximationScheme.inclInterpNorm,
+  ApproximationScheme.MemInterp,
+  ApproximationScheme.interpSpace, ApproximationScheme.inclInterpNorm_add_le,
+  ApproximationScheme.enorm_le_inclInterpNorm, ApproximationScheme.inclInterpNorm_smul_le,
   ApproximationScheme.mem_interpSpace}
 \leanok
 \uses{def:k-functional, def:lq-norm, lem:k-functional}
@@ -1562,7 +1564,7 @@ $k < 0$ of the textbook definition.
 
 \begin{lemma}[Errors and the $K$-functional]
 \label{lem:error-k-functional}
-\lean{ApproximationScheme.approxError_le_kFunctional_of_jackson}
+\lean{ApproximationScheme.approxError_le_inclKFunctional_of_jackson}
 \leanok
 \uses{def:k-functional, def:jackson}
 Let $A$ be an approximation scheme in $X$, and let $\iota$ satisfy Jackson's inequality of
@@ -1582,11 +1584,13 @@ DeVore and Lorentz~\cite[Chapter~7]{DeVoreLorentz}.
 
 \begin{theorem}[Representation theorem]
 \label{thm:representation}
-\lean{ApproximationScheme.approxNormDyadic_le_interpNorm_of_jackson,
+\lean{ApproximationScheme.approxNormDyadic_le_inclInterpNorm_of_jackson,
   ApproximationScheme.interpSeq_le_of_lift, ApproximationScheme.lqNorm_le_of_le_partialSums,
   ApproximationScheme.enorm_add_le_mul_approxNormDyadic,
-  ApproximationScheme.interpNorm_le_approxNormDyadic_of_bernstein, ApproximationScheme.reprConst,
-  ApproximationScheme.memApprox_iff_memInterp, ApproximationScheme.approxSpace_eq_interpSpace,
+  ApproximationScheme.inclInterpNorm_le_approxNormDyadic_of_bernstein,
+  ApproximationScheme.reprConst,
+  ApproximationScheme.memApprox_iff_memInterp_of_jacksonBound_of_liftBound,
+  ApproximationScheme.approxSpace_eq_interpSpace,
   ApproximationScheme.SmoothnessSpace.memApprox_iff_memInterp, ApproximationScheme.reprConst_ne_top}
 \leanok
 \uses{lem:error-k-functional, def:interpolation, lem:near-best, lem:hardy,
@@ -1684,9 +1688,11 @@ $S_n$, a set of positive measure, so the essential supremum is at least $a_n$.
 
 \begin{lemma}[The $K$-functional across scales]
 \label{lem:k-functional-scales}
-\lean{ApproximationScheme.kFunctional_mul_le_of_ne_top, ApproximationScheme.kFunctional_mul_le,
-  ApproximationScheme.enorm_le_kFunctional, ApproximationScheme.enorm_le_max_mul_kFunctional_one,
-  ApproximationScheme.eq_zero_of_kFunctional_eq_zero}
+\lean{ApproximationScheme.inclKFunctional_mul_le_of_ne_top,
+  ApproximationScheme.inclKFunctional_mul_le,
+  ApproximationScheme.enorm_le_inclKFunctional,
+  ApproximationScheme.enorm_le_max_mul_inclKFunctional_one,
+  ApproximationScheme.eq_zero_of_inclKFunctional_eq_zero}
 \leanok
 \uses{def:k-functional, lem:k-functional}
 For all $c, t \in [0, \infty]$ and every $f \in X$:
@@ -1717,8 +1723,8 @@ by (4).
   ApproximationScheme.phiIntegrand, ApproximationScheme.phiFunctional_eq,
   ApproximationScheme.measurable_phiIntegrand_of_measurable,
   ApproximationScheme.measurable_phiIntegrand, ApproximationScheme.phiFunctional_congr,
-  ApproximationScheme.kMethodNorm, ApproximationScheme.MemKMethod,
-  ApproximationScheme.kMethodIntegrand, ApproximationScheme.kMethodNorm_eq,
+  ApproximationScheme.inclKMethodNorm, ApproximationScheme.MemInclKMethod,
+  ApproximationScheme.kMethodIntegrand, ApproximationScheme.inclKMethodNorm_eq,
   ApproximationScheme.measurable_kMethodIntegrand}
 \leanok
 \uses{def:k-functional}
@@ -1762,8 +1768,8 @@ $\int_{I_n} dt/t = \log 2^{(n+1)\rho} - \log 2^{n\rho} = \rho \log 2$.
 
 \begin{definition}[Discrete $K$-method on the integers]
 \label{def:discrete-k-method-integers}
-\lean{ApproximationScheme.discretePhiSeq, ApproximationScheme.discreteKSeq,
-  ApproximationScheme.discreteKMethodNorm, ApproximationScheme.discreteKMethodNorm_eq}
+\lean{ApproximationScheme.discretePhiSeq, ApproximationScheme.inclDiscreteKSeq,
+  ApproximationScheme.inclDiscreteKMethodNorm, ApproximationScheme.inclDiscreteKMethodNorm_eq}
 \leanok
 \uses{def:k-functional, def:lq-norm}
 Let $\theta, \rho \in \R$ and $q \in (0, \infty]$. For $\varphi : [0, \infty] \to [0, \infty]$,
@@ -1787,10 +1793,10 @@ $\|\varphi^{\Z}_{\theta, 1}\|_{\ell_q}$ is the discrete functional of
   ApproximationScheme.phiFunctional_le_lqNorm_discretePhiSeq,
   ApproximationScheme.lqNorm_discretePhiSeq_le_phiFunctional,
   ApproximationScheme.lqNorm_discretePhiSeq_le_inv_mul_phiFunctional,
-  ApproximationScheme.kMethodIntegrand_le_discreteKSeq,
-  ApproximationScheme.discreteKSeq_le_kMethodIntegrand,
-  ApproximationScheme.kMethodNorm_le_discreteKMethodNorm,
-  ApproximationScheme.discreteKMethodNorm_le_kMethodNorm}
+  ApproximationScheme.kMethodIntegrand_le_inclDiscreteKSeq,
+  ApproximationScheme.inclDiscreteKSeq_le_kMethodIntegrand,
+  ApproximationScheme.inclKMethodNorm_le_inclDiscreteKMethodNorm,
+  ApproximationScheme.inclDiscreteKMethodNorm_le_inclKMethodNorm}
 \leanok
 \uses{def:continuous-k-method, def:discrete-k-method-integers, lem:bounded-on-pieces,
   lem:dyadic-pieces, lem:k-functional, lem:lq-reindex}
@@ -1826,10 +1832,11 @@ $K$-functional is increasing in $t$ (\Cref{lem:k-functional}), which gives the s
   ApproximationScheme.discretePhiSeq_natCast_add_one_le,
   ApproximationScheme.discretePhiSeq_le_extend, ApproximationScheme.lqNorm_discretePhiSeq_le,
   ApproximationScheme.lqNorm_le_lqNorm_discretePhiSeq,
-  ApproximationScheme.discreteKSeq_neg_natCast, ApproximationScheme.discreteKSeq_zero,
-  ApproximationScheme.discreteKSeq_natCast_add_one_le, ApproximationScheme.discreteKSeq_le_extend,
-  ApproximationScheme.discreteKMethodNorm_le_interpNorm,
-  ApproximationScheme.interpNorm_le_discreteKMethodNorm}
+  ApproximationScheme.inclDiscreteKSeq_neg_natCast, ApproximationScheme.inclDiscreteKSeq_zero,
+  ApproximationScheme.inclDiscreteKSeq_natCast_add_one_le,
+  ApproximationScheme.inclDiscreteKSeq_le_extend,
+  ApproximationScheme.inclDiscreteKMethodNorm_le_inclInterpNorm,
+  ApproximationScheme.inclInterpNorm_le_inclDiscreteKMethodNorm}
 \leanok
 \uses{def:interpolation, def:discrete-k-method-integers, lem:k-functional-scales, lem:lq-reindex}
 Let $\theta, \rho \in \R$ and $q \in (0, \infty]$, and let $\|f\|_{\theta, q}$ be the
@@ -1879,10 +1886,12 @@ $n \leq 0$ form a part of the sequence on $\Z$.
 \lean{ApproximationScheme.kMethodUpperConst, ApproximationScheme.kMethodUpperConst_ne_top,
   ApproximationScheme.kMethodLowerConst, ApproximationScheme.ofReal_mul_log_two_rpow_ne_zero,
   ApproximationScheme.ofReal_log_two_rpow_ne_zero,
-  ApproximationScheme.kMethodLowerConst_ne_top, ApproximationScheme.kMethodNorm_le_interpNorm,
-  ApproximationScheme.interpNorm_le_kMethodNorm,
-  ApproximationScheme.memInterp_zero_and_memKMethod_zero,
-  ApproximationScheme.memInterp_iff_memKMethod, ApproximationScheme.memInterp_iff_memInterp_of_pos}
+  ApproximationScheme.kMethodLowerConst_ne_top,
+  ApproximationScheme.inclKMethodNorm_le_inclInterpNorm,
+  ApproximationScheme.inclInterpNorm_le_inclKMethodNorm,
+  ApproximationScheme.memInterp_zero_and_memInclKMethod_zero,
+  ApproximationScheme.memInterp_iff_memInclKMethod,
+  ApproximationScheme.memInterp_iff_memInterp_of_pos}
 \leanok
 \uses{lem:continuous-k-method-integer-grid, lem:integer-grid-natural-grid}
 Let $\theta \geq 0$, $\rho > 0$ and $q \in (0, \infty]$, and let $\|f\|_{\theta, q}$ be the
@@ -1920,8 +1929,8 @@ spaces are all of $X$.
 
 \begin{corollary}[Representation theorem for the continuous $K$-method]
 \label{cor:representation-continuous-k-method}
-\lean{ApproximationScheme.memApprox_iff_memKMethod,
-  ApproximationScheme.SmoothnessSpace.memApprox_iff_memKMethod}
+\lean{ApproximationScheme.memApprox_iff_memInclKMethod_of_jacksonBound_of_liftBound,
+  ApproximationScheme.SmoothnessSpace.memApprox_iff_memInclKMethod}
 \leanok
 \uses{thm:representation, thm:discrete-continuous-k-method, def:smoothness}
 Let $A$, $r$, $C_1, C_2 \geq 0$ and $\iota$ be as in \Cref{thm:representation}, and let
@@ -1964,8 +1973,8 @@ so they serve quasi-normed spaces such as $L_p$ with $p < 1$.
 \label{def:couple}
 \lean{InterpCouple, InterpCouple.swap, InterpCouple.swap_norm0, InterpCouple.swap_norm1,
   InterpCouple.swap_swap, InterpCouple.IsQuasiNormed, InterpCouple.IsQuasiNormed.swap,
-  InterpCouple.IsHomogeneous, InterpCouple.IsHomogeneous.norm0_zero,
-  InterpCouple.IsHomogeneous.norm1_zero}
+  InterpCouple.IsHomogeneousCouple, InterpCouple.IsHomogeneousCouple.norm0_zero,
+  InterpCouple.IsHomogeneousCouple.norm1_zero}
 \leanok
 Let $U$ be an abelian group. A \emph{couple} on $U$ is a pair $A = (N_0, N_1)$ of functions
 $N_0, N_1 : U \to [0, \infty]$; its \emph{swap} is $(N_1, N_0)$. For $C \in [0, \infty]$, the
@@ -2292,7 +2301,7 @@ The map $\iota$ need not be injective; $N_1$ is the quotient norm of $\iota(Y)$.
 
 \begin{lemma}[The couple of a bounded linear map is quasi-normed]
 \label{lem:map-couple}
-\lean{InterpCouple.isQuasiNormed_ofMap, InterpCouple.isHomogeneous_ofMap,
+\lean{InterpCouple.isQuasiNormed_ofMap, InterpCouple.isHomogeneousCouple_ofMap,
   InterpCouple.norm0_ofMap_le}
 \leanok
 \uses{def:map-couple}
@@ -2568,8 +2577,8 @@ the map to respect the approximation scheme.
 \begin{proposition}[Interpolation property for the couples of bounded linear maps]
 \label{prop:interpolation-property-map-couples}
 \lean{InterpCouple.norm0_ofMap_apply_le, InterpCouple.norm1_ofMap_apply_le,
-  ApproximationScheme.kMethodNorm_map_le_of_comp_eq,
-  ApproximationScheme.interpNorm_map_le_of_comp_eq, ApproximationScheme.MemKMethod.map,
+  ApproximationScheme.inclKMethodNorm_map_le_of_comp_eq,
+  ApproximationScheme.inclInterpNorm_map_le_of_comp_eq, ApproximationScheme.MemInclKMethod.map,
   ApproximationScheme.MemInterp.map}
 \leanok
 \uses{thm:interpolation-property, prop:map-couple-k-method, thm:discrete-continuous-k-method}
@@ -2995,7 +3004,7 @@ $\theta_0 < \theta_1$; for $\theta_0 > \theta_1$ swap the couple
 
 \begin{corollary}[Reiteration for the couple of a bounded linear map]
 \label{cor:reiteration-map-couples}
-\lean{ApproximationScheme.memKMethod_reiteration}
+\lean{ApproximationScheme.memInclKMethod_reiteration}
 \leanok
 \uses{thm:reiteration, prop:map-couple-k-method, lem:map-couple}
 Let $\iota : Y \to X$ be a bounded linear map between real normed spaces, let
@@ -3043,9 +3052,11 @@ $(\|\cdot\|^{\mathrm{dy}}_{A^{s_0}_{q_0}}, \|\cdot\|^{\mathrm{dy}}_{A^{s_1}_{q_1
 \begin{lemma}[Couples of approximation spaces are quasi-normed]
 \label{lem:approximation-space-couples}
 \lean{ApproximationScheme.isQuasiNormed_leftApproxCouple,
-  ApproximationScheme.isHomogeneous_leftApproxCouple, ApproximationScheme.isQuasiNormed_reprCouple,
-  ApproximationScheme.isHomogeneous_reprCouple, ApproximationScheme.norm0_reprCouple_le,
-  ApproximationScheme.isQuasiNormed_approxCouple, ApproximationScheme.isHomogeneous_approxCouple}
+  ApproximationScheme.isHomogeneousCouple_leftApproxCouple,
+  ApproximationScheme.isQuasiNormed_reprCouple,
+  ApproximationScheme.isHomogeneousCouple_reprCouple, ApproximationScheme.norm0_reprCouple_le,
+  ApproximationScheme.isQuasiNormed_approxCouple,
+  ApproximationScheme.isHomogeneousCouple_approxCouple}
 \leanok
 \uses{def:approximation-space-couples, prop:approx-linear, def:dyadic-norm}
 For every $s \geq 0$ and $q \in [1, \infty]$, the couple $(X, A^s_q)$ is quasi-normed with
@@ -3627,7 +3638,7 @@ coefficients, and wavelet decompositions expand them in a basis.
 
 \begin{definition}[Block decomposition norm]
 \label{def:block-decomposition}
-\lean{ApproximationScheme.blockDecompNorm, ApproximationScheme.blockDecompNorm_le,
+\lean{ApproximationScheme.blockDecompNorm, ApproximationScheme.blockDecompNorm_le_of_hasSum,
   ApproximationScheme.sum_range_mem}
 \leanok
 \uses{def:scheme, def:lq-norm}
@@ -3642,7 +3653,7 @@ $g_k \in A_{2^k}$ for every $k$ and $\sum_k g_k = f$, the series converging in $
   ApproximationScheme.approxNormDyadic_le_blockDecompNorm,
   ApproximationScheme.blockDecompNorm_le_approxNormDyadic,
   ApproximationScheme.memApprox_iff_blockDecompNorm_lt_top,
-  ApproximationScheme.DyadicApprox.blocks}
+  ApproximationScheme.DyadicApprox.blockSeq}
 \leanok
 \uses{def:block-decomposition, def:dyadic-norm, lem:hardy, lem:near-best, lem:approx-closure}
 Let $s > 0$ and $1 \leq q \leq \infty$. For every $f \in X$,
@@ -3787,7 +3798,7 @@ $\Delta_k f = P_{2^{k+1}} f - P_{2^k} f$. For $s \in \R$ and $1 \leq q \leq \inf
   ApproximationScheme.ProjectionScheme.blockNorm_le_approxNormDyadic,
   ApproximationScheme.ProjectionScheme.enorm_sub_le_tsum_block,
   ApproximationScheme.ProjectionScheme.approxNormDyadic_le_blockNorm,
-  ApproximationScheme.ProjectionScheme.memApprox_iff_blockNorm_lt_top,
+  ApproximationScheme.ProjectionScheme.memApprox_iff_blockNorm_lt_top_of_dense,
   ApproximationScheme.ProjectionScheme.sum_block}
 \leanok
 \uses{def:blocks, lem:lebesgue, lem:hardy, def:dyadic-norm}
@@ -3821,10 +3832,10 @@ condition: they are small and approximable at a rate $\sigma$ from their own lev
 
 \begin{definition}[Linear scheme]
 \label{def:linear-scheme}
-\lean{ApproximationScheme.IsLinear, ApproximationScheme.isLinear_ofSubmodules,
-  ApproximationScheme.isLinear_ofMonotoneSubmodules,
-  ApproximationScheme.approxError_add_le_of_isLinear,
-  ApproximationScheme.approxError_sum_le_of_isLinear, ApproximationScheme.IsLinear.map}
+\lean{ApproximationScheme.IsLinearScheme, ApproximationScheme.isLinearScheme_ofSubmodules,
+  ApproximationScheme.isLinearScheme_ofMonotoneSubmodules,
+  ApproximationScheme.approxError_add_le_of_isLinearScheme,
+  ApproximationScheme.approxError_sum_le_of_isLinearScheme, ApproximationScheme.IsLinearScheme.map}
 \leanok
 \uses{def:scheme, def:error}
 An approximation scheme is \emph{linear} if $a + b \in A_n$ for all $n \in \N$ and
@@ -3913,10 +3924,11 @@ $2^{js} \varepsilon_j = C \, 2^{j(s - \delta)} \|\lambda_{j,\cdot}\|_{\ell_p}$.
 
 \begin{lemma}[Block decompositions with bounds]
 \label{lem:exists-blocks}
-\lean{ApproximationScheme.exists_blocks, ApproximationScheme.DyadicApprox.hasSum_blocks,
-  ApproximationScheme.DyadicApprox.lqNorm_blocks_le,
-  ApproximationScheme.DyadicApprox.tsum_enorm_blocks_ne_top,
-  ApproximationScheme.DyadicApprox.blocks_mem, ApproximationScheme.DyadicApprox.sum_range_blocks,
+\lean{ApproximationScheme.exists_blocks, ApproximationScheme.DyadicApprox.hasSum_blockSeq,
+  ApproximationScheme.DyadicApprox.lqNorm_blockSeq_le,
+  ApproximationScheme.DyadicApprox.tsum_enorm_blockSeq_ne_top,
+  ApproximationScheme.DyadicApprox.blockSeq_mem,
+  ApproximationScheme.DyadicApprox.sum_range_blockSeq,
   ApproximationScheme.DyadicApprox.blockDecompNorm_le}
 \leanok
 \uses{thm:block-decomposition}
@@ -3988,15 +4000,18 @@ hyperplane, defined on continuous functions and unbounded on $L_p$, with $\beta 
 
 \begin{lemma}[The trace]
 \label{lem:trace-ext}
-\lean{ApproximationScheme.TraceBound.ext, ApproximationScheme.canonicalApprox,
-  ApproximationScheme.TraceBound.tendsto_ext, ApproximationScheme.TraceBound.tendsto_edist_apply,
-  ApproximationScheme.TraceBound.cauchySeq_apply, ApproximationScheme.TraceBound.ext_eq_of_mem,
-  ApproximationScheme.TraceBound.ext_add, ApproximationScheme.TraceBound.ext_smul,
-  ApproximationScheme.TraceBound.extLinear, ApproximationScheme.TraceBound.enorm_ext_le,
+\lean{ApproximationScheme.TraceBound.limitTrace, ApproximationScheme.canonicalApprox,
+  ApproximationScheme.TraceBound.tendsto_limitTrace,
+  ApproximationScheme.TraceBound.tendsto_edist_apply,
+  ApproximationScheme.TraceBound.cauchySeq_apply,
+  ApproximationScheme.TraceBound.limitTrace_eq_of_mem,
+  ApproximationScheme.TraceBound.limitTrace_add, ApproximationScheme.TraceBound.limitTrace_smul,
+  ApproximationScheme.TraceBound.limitTraceLinear,
+  ApproximationScheme.TraceBound.enorm_limitTrace_le,
   ApproximationScheme.mem_iUnionSubmodule,
   ApproximationScheme.DyadicApprox.tendsto_dyadicWeight_mul_enorm_sub,
   ApproximationScheme.tsum_canonical_ne_top, ApproximationScheme.TraceBound.tendsto_canonical,
-  ApproximationScheme.TraceBound.ext_zero}
+  ApproximationScheme.TraceBound.limitTrace_zero}
 \leanok
 \uses{def:trace-bound, lem:near-best, def:dyadic-norm}
 Let $T$ be a trace bound of exponent $\beta \geq 0$ and let $Y$ be a Banach space. For every
@@ -4019,10 +4034,11 @@ telescoping sum, as in \Cref{thm:lift}.
 
 \begin{theorem}[Trace transfer]
 \label{thm:trace-transfer}
-\lean{ApproximationScheme.TraceBound.approxNormDyadic_ext_le,
-  ApproximationScheme.TraceBound.memApprox_ext, ApproximationScheme.traceTransferConst,
-  ApproximationScheme.TraceBound.edist_apply_ext_le, ApproximationScheme.traceTransferConst_ne_top,
-  ApproximationScheme.TraceBound.enorm_ext_le_of_dyadicApprox}
+\lean{ApproximationScheme.TraceBound.approxNormDyadic_limitTrace_le,
+  ApproximationScheme.TraceBound.memApprox_limitTrace, ApproximationScheme.traceTransferConst,
+  ApproximationScheme.TraceBound.edist_apply_limitTrace_le,
+  ApproximationScheme.traceTransferConst_ne_top,
+  ApproximationScheme.TraceBound.enorm_limitTrace_le_of_dyadicApprox}
 \leanok
 \uses{lem:trace-ext, lem:hardy}
 Let $T$ be a trace bound of exponent $\beta$ with constant $C$, let $Y$ be a Banach space, and
@@ -4046,8 +4062,8 @@ Since $T a_k \in B_{2^k}$, $E^B_{2^k}(\operatorname{Tr} f) \leq \sum_{i \geq 0}
 \begin{theorem}[Surjectivity of the trace]
 \label{thm:trace-surjective}
 \lean{ApproximationScheme.TraceBound.RightInverseBound,
-  ApproximationScheme.TraceBound.ext_eq_of_hasSum_lift,
-  ApproximationScheme.TraceBound.exists_ext_eq, ApproximationScheme.traceSurjConst,
+  ApproximationScheme.TraceBound.limitTrace_eq_of_hasSum_lift,
+  ApproximationScheme.TraceBound.exists_limitTrace_eq, ApproximationScheme.traceSurjConst,
   ApproximationScheme.traceSurjConst_ne_top}
 \leanok
 \uses{thm:trace-transfer, lem:exists-blocks, thm:block-decomposition, lem:shifted-blocks}
@@ -4262,9 +4278,9 @@ for the $E$-functional of a couple (\Cref{sec:e-functional}).
 
 \begin{definition}[Modulus compatible with a $\rho$-normed couple]
 \label{def:couple-modulus-data}
-\lean{InterpCouple.ModulusData, InterpCouple.ModulusData.ofExists,
-  InterpCouple.ModulusData.modNorm, InterpCouple.ModulusData.modulus_zero,
-  InterpCouple.ModulusData.modulus_sum_rpow_le, InterpCouple.norm0_sub_rpow_le,
+\lean{InterpCouple.CoupleModulusData, InterpCouple.CoupleModulusData.ofExists,
+  InterpCouple.CoupleModulusData.coupleModNorm, InterpCouple.CoupleModulusData.modulus_zero,
+  InterpCouple.CoupleModulusData.modulus_sum_rpow_le, InterpCouple.norm0_sub_rpow_le,
   InterpCouple.norm1_sub_le}
 \leanok
 \uses{def:couple, def:e-functional}
@@ -4297,10 +4313,11 @@ $N_0(a - b)^\rho \leq N_0(a)^\rho + N_0(b)^\rho$ and $N_1(a - b) \leq N_1(a) + N
 
 \begin{lemma}[The modulus from near-best elements]
 \label{lem:couple-modulus-telescoping}
-\lean{InterpCouple.ModulusData.modulus_rpow_le_of_norm1_le,
-  InterpCouple.ModulusData.modulus_sub_rpow_le, InterpCouple.ModulusData.modulus_rpow_le,
-  InterpCouple.ModulusData.dyadicWeight_mul_modulus_rpow_le,
-  InterpCouple.ModulusData.lqNorm_rpow_le}
+\lean{InterpCouple.CoupleModulusData.modulus_rpow_le_of_norm1_le,
+  InterpCouple.CoupleModulusData.modulus_sub_rpow_le,
+  InterpCouple.CoupleModulusData.modulus_rpow_le,
+  InterpCouple.CoupleModulusData.dyadicWeight_mul_modulus_rpow_le,
+  InterpCouple.CoupleModulusData.lqNorm_rpow_le}
 \leanok
 \uses{def:couple-modulus-data, lem:hardy-every-exponent, lem:lq-quasi-triangle,
   lem:sum-of-products-le-product-of-sums, def:lq-norm}
@@ -4345,11 +4362,12 @@ terms.
 \begin{theorem}[Coincidence for $\rho$-normed couples]
 \label{thm:couple-modulus-coincidence}
 \lean{InterpCouple.lqNorm_dyadicWeight_mul_eFunctional_add_le,
-  InterpCouple.ModulusData.inverseConst, InterpCouple.ModulusData.inverseConst_ne_top,
-  InterpCouple.ModulusData.eNormDyadic_le_modNorm,
-  InterpCouple.ModulusData.modNorm_le_eNormDyadic,
-  InterpCouple.ModulusData.eNormDyadic_lt_top_iff,
-  InterpCouple.ModulusData.memEMethod_iff_modNorm_lt_top}
+  InterpCouple.CoupleModulusData.coupleInverseConst,
+  InterpCouple.CoupleModulusData.coupleInverseConst_ne_top,
+  InterpCouple.CoupleModulusData.eNormDyadic_le_coupleModNorm,
+  InterpCouple.CoupleModulusData.coupleModNorm_le_eNormDyadic,
+  InterpCouple.CoupleModulusData.eNormDyadic_lt_top_iff,
+  InterpCouple.CoupleModulusData.memEMethod_iff_coupleModNorm_lt_top}
 \leanok
 \uses{def:couple-modulus-data, lem:couple-modulus-telescoping, lem:e-functional,
   lem:e-method-dyadic, lem:lp-rho-triangle, lem:lq-quasi-triangle, lem:lq-reindex,

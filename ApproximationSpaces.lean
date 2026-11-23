@@ -161,7 +161,7 @@ in the root namespace.
   inequalities), dyadic near-best approximants `DyadicApprox`, and the telescoping construction.
   A lifting bound of exponent `β` gives `A^β_1 ↪ Y` (`exists_preimage_of_liftBound`).
 * `ApproximationSpaces.Nikolskii`: the Nikolskii transfer theorem `A^s_q(X) ↪ B^{s-α}_q(Y)` for
-  `0 ≤ α < s` (`exists_preimage_of_nikolskii`).
+  `0 ≤ α < s` (`exists_preimage_approxNormDyadic_le_of_nikolskii`).
 
 ### Jackson inequalities and smoothness spaces
 
@@ -170,15 +170,15 @@ in the root namespace.
 
 ### Real interpolation (`Interpolation/`)
 
-* `ApproximationSpaces.Interpolation.KFunctional`: the K-functional `kFunctional` of a bounded
-  linear map `ι : Y → X` and the spaces `(X, Y)_{θ,q}` of the discrete K-method (`interpNorm`,
-  `MemInterp`).
+* `ApproximationSpaces.Interpolation.KFunctional`: the K-functional `inclKFunctional` of a
+  bounded linear map `ι : Y → X` and the spaces `(X, Y)_{θ,q}` of the discrete K-method
+  (`inclInterpNorm`, `MemInterp`).
 * `ApproximationSpaces.Interpolation.Representation`: the representation theorem
   `A^s_q = (X, Y)_{s/r,q}` under Jackson's and Bernstein's inequalities of order `r`
   (`approxSpace_eq_interpSpace`).
-* `ApproximationSpaces.Interpolation.KMethod`: the continuous K-method `kMethodNorm` and its
+* `ApproximationSpaces.Interpolation.KMethod`: the continuous K-method `inclKMethodNorm` and its
   equivalence with the discrete K-method on every dyadic grid (Bergh–Löfström, Lemma 3.1.3;
-  `memInterp_iff_memKMethod`).
+  `memInterp_iff_memInclKMethod`).
 * `ApproximationSpaces.Interpolation.Couple`: couples `InterpCouple` of two extended quasi-norms
   on an abelian group, their K-functional and K-methods, and the couple `InterpCouple.ofMap ι`
   of a bounded linear map.
@@ -198,9 +198,10 @@ in the root namespace.
   `E_{s,q} = A^s_q` for the complexity couple of a scheme
   (`memEMethod_complexityCouple_iff`).
 * `ApproximationSpaces.Interpolation.EFunctionalModuli`: moduli of smoothness compatible with a
-  couple whose first norm has a subadditive `ρ`-th power (`InterpCouple.ModulusData`), and the
-  coincidence of `E_{s,q}` with the classical space for `0 < s < θ`
-  (`InterpCouple.ModulusData.memEMethod_iff_modNorm_lt_top`), as for `L_p`, `0 < p < 1`.
+  couple whose first norm has a subadditive `ρ`-th power (`InterpCouple.CoupleModulusData`),
+  and the coincidence of `E_{s,q}` with the classical space for `0 < s < θ`
+  (`InterpCouple.CoupleModulusData.memEMethod_iff_coupleModNorm_lt_top`), as for `L_p`,
+  `0 < p < 1`.
 
 ### Decompositions (`Decompositions/`)
 
@@ -208,7 +209,7 @@ in the root namespace.
   `ProjectionScheme` and the characterisation of `A^s_q` by dyadic blocks.
 * `ApproximationSpaces.Decompositions.Blocks`: the characterisation of `A^s_q` by block
   decompositions `f = ∑ g_k` with `g_k ∈ A (2^k)` (`memApprox_iff_blockDecompNorm_lt_top`).
-* `ApproximationSpaces.Decompositions.Synthesis`: linear schemes `IsLinear` and synthesis from
+* `ApproximationSpaces.Decompositions.Synthesis`: linear schemes `IsLinearScheme` and synthesis from
   blocks that are approximable at rate `σ` (`approxNormDyadic_le_of_hasSum_decay`).
 * `ApproximationSpaces.Decompositions.Atomic`: atomic systems `AtomicSystem`, the sequence
   spaces `b^s_{p,q}` and the atomic characterisation of `A^s_q`

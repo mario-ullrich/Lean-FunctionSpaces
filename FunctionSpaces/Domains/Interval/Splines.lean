@@ -243,8 +243,8 @@ theorem mem_splineScheme_two_pow {r k : ℕ} {g : Lp ℂ p unitVol} :
   ApproximationScheme.mem_ofMonotoneSubmodules_two_pow
 
 /-- The spline scheme is linear. -/
-theorem splineScheme_isLinear (r : ℕ) : (splineScheme p r).IsLinear :=
-  ApproximationScheme.isLinear_ofMonotoneSubmodules _ _
+theorem splineScheme_isLinearScheme (r : ℕ) : (splineScheme p r).IsLinearScheme :=
+  ApproximationScheme.isLinearScheme_ofMonotoneSubmodules _ _
 
 /-! ### B-splines on the dyadic grid -/
 

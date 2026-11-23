@@ -22,9 +22,9 @@ one inclusion.
 * **The modulus on `Ω` by the K-functional** of `(L_2(Ω), W^1_2(Ω))`:
   `ω_r(f, 2^(-k), Ω)_2 ≤ C K(2^(-k), f|_Ω)`, since every element of `W^1_2(Ω)` extends to
   `H^1(V)` with a bound and `ω_r(ι U, 2^(-k))_2 ≤ 2^(r-1) 2π 2^(-k) ‖U‖` for `U ∈ H^1(V)`
-  (`Rd.lpModulus_toL2_le`, `Rd.BoundedLipschitzDomain.exists_lpModulusOn_le_kFunctional`); so the
-  intrinsic quasi-norm is at most `C` times the interpolation norm
-  (`Rd.BoundedLipschitzDomain.exists_modNormOn_le_interpNorm`).
+  (`Rd.lpModulus_toL2_le`, `Rd.BoundedLipschitzDomain.exists_lpModulusOn_le_inclKFunctional`); so
+  the intrinsic quasi-norm is at most `C` times the interpolation norm
+  (`Rd.BoundedLipschitzDomain.exists_modNormOn_le_inclInterpNorm`).
 * **The restriction** maps `(L_2(V), H^1(V))_{θ,q} = B^θ_{2,q}(V)` into
   `(L_2(Ω), W^1_2(Ω))_{θ,q}` (`Rd.memKMethod_neumann_restrict_of_memKMethod`), and the Besov
   extension theorem extends `f|_Ω` to `V`.
@@ -68,10 +68,10 @@ take `u ∈ H^1(Ω)` with `u|_Ω = J w` and `‖u‖ ≤ C₀ ‖w‖`
 (`Rd.BoundedLipschitzDomain.exists_restrictionSpace_of_neumannSpace`); as an element of `H^1(V)`
 it extends `J w`, so `Rd.lpModulusOn_le_add_lpModulus` and `Rd.lpModulus_toL2_le` give
 `ω_r(f, 2^(-k), Ω)_2 ≤ 2^r ‖f|_Ω - J w‖ + 2^(r-1) 2π C₀ 2^(-k) ‖w‖`. -/
-theorem exists_lpModulusOn_le_kFunctional {r : ℕ} (hr : 1 ≤ r) :
+theorem exists_lpModulusOn_le_inclKFunctional {r : ℕ} (hr : 1 ≤ r) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ (f : Lp ℂ 2 (volume : Measure V)) (k : ℕ),
       lpModulusOn 2 Ω.carrier r f k ≤
-        C * ApproximationScheme.kFunctional ((neumannEmbedding Ω.toOpens).restrictScalars ℝ)
+        C * ApproximationScheme.inclKFunctional ((neumannEmbedding Ω.toOpens).restrictScalars ℝ)
           (dyadicWeight (-1) k) (LpToLpRestrictCLM V ℂ ℂ volume 2 (Ω.toOpens : Set V) f) := by
   obtain ⟨C₀, hC₀, hN⟩ := Ω.exists_restrictionSpace_of_neumannSpace
   have hM : max (2 ^ r) (2 ^ (r - 1) * ENNReal.ofReal (2 * π) * ENNReal.ofReal C₀) ≠ ∞ :=
@@ -79,7 +79,7 @@ theorem exists_lpModulusOn_le_kFunctional {r : ℕ} (hr : 1 ≤ r) :
   have hM0 : max (2 ^ r) (2 ^ (r - 1) * ENNReal.ofReal (2 * π) * ENNReal.ofReal C₀) ≠ 0 :=
     (lt_max_of_lt_left (by positivity)).ne'
   refine ⟨_, hM, fun f k => ?_⟩
-  rw [ApproximationScheme.kFunctional, ENNReal.mul_iInf_of_ne hM0 hM]
+  rw [ApproximationScheme.inclKFunctional, ENNReal.mul_iInf_of_ne hM0 hM]
   refine le_iInf fun w => ?_
   obtain ⟨u, hu, hnorm⟩ := hN w
   have h1 := lpModulusOn_le_add_lpModulus Ω.measurableSet r f (toL2 (u : H^{1}(V))) k
@@ -108,15 +108,16 @@ Lipschitz domain `Ω` in dimension `n ≥ 1`, every order `r ≥ 1` and all `θ`
 `C` such that every `f ∈ L_2(V)` satisfies
 `N_Ω(f) ≤ C (‖f|_Ω‖_2 + ‖(2^(kθ) K(2^(-k), f|_Ω))_k‖_{ℓ_q})`, where `N_Ω` is the intrinsic Besov
 quasi-norm with moduli of order `r` (`Rd.modNormOn`) and `K` the K-functional of
-`(L_2(Ω), W^1_2(Ω))` (`Rd.BoundedLipschitzDomain.exists_lpModulusOn_le_kFunctional`). -/
-theorem exists_modNormOn_le_interpNorm {r : ℕ} (hr : 1 ≤ r) (θ : ℝ) (q : ℝ≥0∞) :
+`(L_2(Ω), W^1_2(Ω))` (`Rd.BoundedLipschitzDomain.exists_lpModulusOn_le_inclKFunctional`). -/
+theorem exists_modNormOn_le_inclInterpNorm {r : ℕ} (hr : 1 ≤ r) (θ : ℝ) (q : ℝ≥0∞) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ f : Lp ℂ 2 (volume : Measure V),
       modNormOn Ω.measurableSet r θ q f ≤
-        C * ApproximationScheme.interpNorm ((neumannEmbedding Ω.toOpens).restrictScalars ℝ) θ 1 q
+        C * ApproximationScheme.inclInterpNorm
+          ((neumannEmbedding Ω.toOpens).restrictScalars ℝ) θ 1 q
           (LpToLpRestrictCLM V ℂ ℂ volume 2 (Ω.toOpens : Set V) f) := by
-  obtain ⟨C, hC, h⟩ := Ω.exists_lpModulusOn_le_kFunctional hr
+  obtain ⟨C, hC, h⟩ := Ω.exists_lpModulusOn_le_inclKFunctional hr
   refine ⟨max 1 C, max_ne_top ENNReal.one_ne_top hC, fun f => ?_⟩
-  rw [modNormOn, ApproximationScheme.interpNorm, mul_add, enorm_indicatorLp_eq]
+  rw [modNormOn, ApproximationScheme.inclInterpNorm, mul_add, enorm_indicatorLp_eq]
   refine add_le_add (le_mul_of_one_le_left' (le_max_left _ _)) ?_
   rw [← ENNReal.lqNorm_const_mul]
   refine ENNReal.lqNorm_mono fun k => ?_
@@ -129,7 +130,7 @@ lies in the approximation space `A^θ_q` of the Neumann scheme, then the intrins
 `N_Ω(f)` with moduli of order `r` is finite. `A^θ_q` is `(L_2(Ω), W^1_2(Ω))_{θ,q}`
 (`Rd.BoundedLipschitzDomain.memKMethod_neumann_iff`), whose discrete norm on the grid `2^(-k)`
 is finite (`InterpCouple.memKMethod_iff_interpNorm_lt_top`) and bounds `N_Ω(f)`
-(`Rd.BoundedLipschitzDomain.exists_modNormOn_le_interpNorm`). -/
+(`Rd.BoundedLipschitzDomain.exists_modNormOn_le_inclInterpNorm`). -/
 theorem modNormOn_lt_top_of_memApprox_neumannScheme {θ : ℝ} {q : ℝ≥0∞} (hθ : 0 < θ)
     (hθ' : θ < 1) (hq : 1 ≤ q) {r : ℕ} (hr : 1 ≤ r) {f : Lp ℂ 2 (volume : Measure V)}
     (hf : Ω.neumannScheme.toScheme.MemApprox θ q
@@ -140,7 +141,7 @@ theorem modNormOn_lt_top_of_memApprox_neumannScheme {θ : ℝ} {q : ℝ≥0∞} 
     (max_ne_top ENNReal.one_ne_top enorm_ne_top) InterpCouple.norm0_ofMap_le hθ one_pos
     (zero_lt_one.trans_le hq).ne').1 hK
   rw [InterpCouple.interpNorm_ofMap] at hI
-  obtain ⟨C, hC, h⟩ := Ω.exists_modNormOn_le_interpNorm hr θ q
+  obtain ⟨C, hC, h⟩ := Ω.exists_modNormOn_le_inclInterpNorm hr θ q
   exact (h f).trans_lt (ENNReal.mul_lt_top hC.lt_top hI)
 
 end BoundedLipschitzDomain
@@ -181,13 +182,13 @@ the Bessel potential norm (`Rd.lpBesselPotentialCouple 1`), then `f|_O` lies in
 `(L_2(O), W^1_2(O))_{θ,q}`. The couple is that of the embedding `H^1(V) → L_2(V)`
 (`Rd.ofMap_toL2_eq_lpBesselPotentialCouple`), and the restriction maps `ι U` to the value of
 `Rd.restrictNeumann O U`, so the interpolation property for compatible maps applies
-(`ApproximationScheme.MemKMethod.map`). -/
+(`ApproximationScheme.MemInclKMethod.map`). -/
 theorem memKMethod_neumann_restrict_of_memKMethod {θ : ℝ} {q : ℝ≥0∞}
     {f : Lp ℂ 2 (volume : Measure V)} (hf : (lpBesselPotentialCouple (p := 2) 1).MemKMethod θ q f) :
     (InterpCouple.ofMap ((neumannEmbedding O).restrictScalars ℝ)).MemKMethod θ q
       (LpToLpRestrictCLM V ℂ ℂ volume 2 (O : Set V) f) := by
   rw [← ofMap_toL2_eq_lpBesselPotentialCouple, InterpCouple.memKMethod_ofMap_iff] at hf
-  refine InterpCouple.memKMethod_ofMap_iff.2 (ApproximationScheme.MemKMethod.map
+  refine InterpCouple.memKMethod_ofMap_iff.2 (ApproximationScheme.MemInclKMethod.map
     ((LpToLpRestrictCLM V ℂ ℂ volume 2 (O : Set V)).restrictScalars ℝ)
     ((restrictNeumann O).restrictScalars ℝ) ?_ hf)
   ext1 U
@@ -303,14 +304,14 @@ interpolation space `(L_2(V), H^1(V))_{θ,q}` of the `L_2` norm and the Bessel p
 (`Rd.lpBesselPotentialCouple 1`). The couple is that of the embedding `H^1(V) → L_2(V)`
 (`Rd.ofMap_toL2_eq_lpBesselPotentialCouple`), and the zero extension maps `J w` to `ι w` for
 `w ∈ H^1_0(Ω)` (`Rd.indicatorExtendLp_dirichletEmbedding`), so the interpolation property for
-compatible maps applies (`ApproximationScheme.MemKMethod.map`). -/
+compatible maps applies (`ApproximationScheme.MemInclKMethod.map`). -/
 theorem memKMethod_indicatorExtendLp_of_memKMethod_dirichlet {θ : ℝ} {q : ℝ≥0∞}
     {g : Lp ℂ 2 (volume.restrict (Ω : Set V))}
     (hg : (InterpCouple.ofMap ((dirichletEmbedding Ω).restrictScalars ℝ)).MemKMethod θ q g) :
     (lpBesselPotentialCouple (p := 2) 1).MemKMethod θ q
       (indicatorExtendLp Ω.isOpen.measurableSet subset_rfl g) := by
   rw [← ofMap_toL2_eq_lpBesselPotentialCouple]
-  refine InterpCouple.memKMethod_ofMap_iff.2 (ApproximationScheme.MemKMethod.map
+  refine InterpCouple.memKMethod_ofMap_iff.2 (ApproximationScheme.MemInclKMethod.map
     ((indicatorExtendLp (p := 2) (μ := volume) Ω.isOpen.measurableSet subset_rfl).restrictScalars ℝ)
     ((((vanishOn 1 Ω)ᗮ.subtypeL).comp (zeroBoundarySpace 1 Ω).subtypeL).restrictScalars ℝ)
     ?_ (InterpCouple.memKMethod_ofMap_iff.1 hg))

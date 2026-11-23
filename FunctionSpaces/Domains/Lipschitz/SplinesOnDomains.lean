@@ -514,7 +514,7 @@ theorem exists_cubeSplineBlocksAt_iff (h : HasBesovExtension hΩ) (hp : p ≠ �
   constructor
   · rintro ⟨b, G, hb, hbG, hlq, hGf⟩
     exact ⟨G, hGf, (ApproximationScheme.memApprox_iff_blockDecompNorm_lt_top hs hq).2
-      ((ApproximationScheme.blockDecompNorm_le hb hbG).trans_lt hlq)⟩
+      ((ApproximationScheme.blockDecompNorm_le_of_hasSum hb hbG).trans_lt hlq)⟩
   · rintro ⟨G, hGf, hG⟩
     have hlt := (ApproximationScheme.memApprox_iff_blockDecompNorm_lt_top hs hq).1 hG
     simp only [ApproximationScheme.blockDecompNorm, iInf_lt_iff] at hlt

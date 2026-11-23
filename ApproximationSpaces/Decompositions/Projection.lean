@@ -228,7 +228,7 @@ theorem tendsto_of_dense (hd : closure (⋃ n, A n) = Set.univ) (f : X) :
 /-- **Characterisation of `A^s_q` by dyadic blocks**: for a projection scheme with dense
 `⋃ A n`, `s > 0` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q` iff
 `‖P 1 f‖ + ‖(2^(ks) ‖Δ_k f‖)_k‖_q < ∞`. -/
-theorem memApprox_iff_blockNorm_lt_top (hd : closure (⋃ n, A n) = Set.univ) (hs : 0 < s)
+theorem memApprox_iff_blockNorm_lt_top_of_dense (hd : closure (⋃ n, A n) = Set.univ) (hs : 0 < s)
     (hq : 1 ≤ q) {f : X} : A.MemApprox s q f ↔ PS.blockNorm s q f < ∞ := by
   rw [memApprox_iff_approxNormDyadic_lt_top hq hs.le]
   constructor
