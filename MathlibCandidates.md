@@ -113,6 +113,10 @@ declarations.
   `∑_k 2^k b_{2^k} ≤ 2 ∑_n b_n` (`ENNReal.tsum_two_pow_mul_le_two_mul`), where Mathlib's
   `ENNReal.tsum_condensed_le` has `b_1 + 2 ∑_n b_n`; and
   `ENNReal.rpow_le_rpow_of_nonpos`, which exists for `ℝ` and `ℝ≥0` but not for `ℝ≥0∞`.
+* **`x^z ≤ x` in `[0, ∞]`** (`FunctionSpaces/Domains/Lipschitz/IndicatorMultiplier.lean`):
+  `x^z ≤ x` for `x ≥ 1` and `z ≤ 1` (`ENNReal.rpow_le_self_of_one_le`), the companion of
+  Mathlib's `ENNReal.rpow_le_self_of_le_one`; Mathlib has it for `ℝ`
+  (`Real.rpow_le_self_of_one_le`).
 * **Products and sums in canonically ordered semirings**
   (`ApproximationSpaces/Sequences/Lq.lean`): `a x + b y ≤ (a + b)(x + y)`
   (`ENNReal.mul_add_mul_le_add_mul_add`) and `∑_{i ∈ s} a_i b_i ≤ (∑_{i ∈ s} a_i)(∑_{i ∈ s} b_i)`
@@ -291,12 +295,14 @@ declarations.
   (`Rd.slobodeckijForm`), its form `∫ ‖Δ_h f‖_p^p / |h|^(n+sp) dh` by Tonelli's theorem
   (`Rd.slobodeckijForm_eq_lintegral_eLpNorm`), its two-sided bounds by the first-difference
   Besov norm (`Rd.lqNorm_modulus_rpow_le_slobodeckijForm`, `Rd.slobodeckijForm_le`) and
-  `W^{s,p} = B^s_{p,p}` for `0 < s < 1` (`Rd.slobodeckijForm_lt_top_iff_memApprox`); the radial
-  integrals `∫_{|z| ≥ R} |z|^(-a)` for `a > n` and `∫_{|z| < R} |z|^(-a)` for `a < n` with
-  explicit constants (`Rd.lintegral_compl_ball_norm_rpow_neg_le`,
-  `Rd.lintegral_ball_norm_rpow_neg_le`) belong next to Mathlib's
-  `integrableOn_ball_of_norm_le_rpow`. The Lean project *quadratic-forms-sobolev-lean* has the
-  form for `p = 2` (`formHs`); *grunweg/SobolevSlobodeckij* has integer orders only.
+  `W^{s,p} = B^s_{p,p}` for `0 < s < 1` (`Rd.slobodeckijForm_lt_top_iff_memApprox`); for `p = 2`
+  the form is the square of the `L_2` norm of `(x, y) ↦ f(y) - f(x)` for the measure
+  `|y - x|^(-(n+2s)) dx dy` (`Rd.gagliardoMeasure`, `Rd.eLpNorm_sub_sq_gagliardoMeasure`), which
+  gives `W^{s,2}` an inner product; the radial integrals `∫_{|z| ≥ R} |z|^(-a)` for `a > n` and
+  `∫_{|z| < R} |z|^(-a)` for `a < n` with explicit constants
+  (`Rd.lintegral_compl_ball_norm_rpow_neg_le`, `Rd.lintegral_ball_norm_rpow_neg_le`) belong next
+  to Mathlib's `integrableOn_ball_of_norm_le_rpow`. The Lean project *quadratic-forms-sobolev-lean*
+  has the form for `p = 2` (`formHs`); *grunweg/SobolevSlobodeckij* has integer orders only.
 * **Leibniz's rule for iterated forward differences**
   (`FunctionSpaces/Rd/Differences/PointwiseMultipliers.lean`):
   `Δ_h^r(u v)(x) = ∑_{l ≤ r} C(r, l) Δ_h^l u(x) Δ_h^(r-l) v(x + l h)` (`Rd.higherDiff_mul`); Mathlib
@@ -717,6 +723,13 @@ declarations.
   In Mathlib it would follow from the finiteness of `μHE[n-1]` on the graph of a Lipschitz
   function over a bounded subset of a hyperplane, a consequence of
   `LipschitzOnWith.euclideanHausdorffMeasure_image_le`.
+* **Preconnected sets cross the frontier** (`FunctionSpaces/Domains/Lipschitz/BoundaryLayers.lean`):
+  a preconnected set that meets `U` and its complement meets `frontier U`
+  (`Rd.inter_frontier_nonempty_of_isPreconnected`), from Mathlib's
+  `IsPreconnected.subset_or_subset`; the segment form for a step `x ↦ x + h` that leaves or enters
+  `U` is `Rd.exists_mem_frontier_of_mem_switchSet`. Mathlib states the case of a preconnected
+  whole space (`nonempty_frontier_iff`). In Mathlib the statement would read
+  `IsPreconnected.inter_frontier_nonempty (hS : IsPreconnected S) …`.
 * **Bounded Lipschitz domains from local graphs**
   (`FunctionSpaces/Domains/Lipschitz/LocalLipschitzGraphs.lean`): the set-level definition
   (`Rd.IsLipschitzDomainAt`, `Rd.IsBoundedLipschitzDomain`), the ball
@@ -786,7 +799,9 @@ declarations.
   function `η` (`Rd.hasWeakLineDeriv_convLp`); hence the mollified `η_c ⋆ U` converge to `U` in
   `H^{1,2}(V, ℂ)` as `c → ∞` for `∫ η = 1` (`Rd.tendsto_of_toL2_eq_convLp`), and the elements of
   `H^{1,2}(V, ℂ)` vanishing outside a compact subset of an open set `Ω` lie in the closure of the
-  test functions of `Ω` (`Rd.mem_tildeSpace_of_isCompact`). Mathlib's convolution files cover the
+  test functions of `Ω` (`Rd.mem_tildeSpace_of_isCompact`), the case `s = 1` of the same statement
+  for `H^{s,2}(V, ℂ)`, `s ≥ 0` (`Rd.mem_tildeSpace_of_isCompact_of_nonneg`,
+  `FunctionSpaces/Domains/Sobolev/TildeSpaceSupport.lean`). Mathlib's convolution files cover the
   smoothness of `η ⋆ f`; these statements add its weak derivatives.
 * **The Gagliardo–Nirenberg–Sobolev inequality for weak derivatives**
   (`FunctionSpaces/Rd/Sobolev/GagliardoNirenbergSobolev.lean`): Mathlib's inequality

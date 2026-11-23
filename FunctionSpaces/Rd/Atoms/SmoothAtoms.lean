@@ -14,7 +14,9 @@ public import Mathlib.Analysis.Calculus.ContDiff.Convolution
 
 A **smooth atom on `Ω`** of level `j` and order `K` (`Rd.IsSmoothAtom`) vanishes outside
 `B(c, d 2^(-j))`, is of class `C^K` within `Ω`, and satisfies `‖D^l a‖ ≤ A 2^(jl)` within `Ω` for
-`l ≤ K` (Triebel's `K`-atoms, Schneider–Vybíral, Definition 1.3, on a set). On a convex set `Ω`
+`l ≤ K` (Triebel's `K`-atoms, Schneider–Vybíral, Definition 1.3, on a set). It is bounded by its
+constant `A` on `Ω` (`Rd.IsSmoothAtom.norm_le`), and `A ≥ 0` for an atom on `V`
+(`Rd.IsSmoothAtom.const_nonneg`). On a convex set `Ω`
 with nonempty interior, smooth atoms of order `K` are regular atoms on `Ω` of order and exponent
 `r` for every `1 ≤ r ≤ K` (`Rd.isRegularAtomOn_of_isSmoothAtom`), by the bound of differences
 through derivatives within `Ω` (`Rd.norm_higherDiff_le_of_iteratedFDerivWithin`).
@@ -248,6 +250,17 @@ structure IsSmoothAtom (Ω : Set V) (K : ℕ) (d A : ℝ) (j : ℕ) (c : V) (a :
   contDiffOn : ContDiffOn ℝ K a Ω
   norm_iteratedFDerivWithin_le :
     ∀ l ≤ K, ∀ y ∈ Ω, ‖iteratedFDerivWithin ℝ l a Ω y‖ ≤ A * 2 ^ (j * l)
+
+/-- A smooth atom on `Ω` is bounded by its constant on `Ω`: `|a(y)| ≤ A`. -/
+theorem IsSmoothAtom.norm_le {Ω : Set V} {K : ℕ} {d A : ℝ} {j : ℕ} {c : V} {a : V → ℂ}
+    (ha : IsSmoothAtom Ω K d A j c a) {y : V} (hy : y ∈ Ω) : ‖a y‖ ≤ A := by
+  simpa [norm_iteratedFDerivWithin_zero] using
+    ha.norm_iteratedFDerivWithin_le 0 (Nat.zero_le K) y hy
+
+/-- The constant of a smooth atom on `V` is nonnegative: `0 ≤ |a(0)| ≤ A`. -/
+theorem IsSmoothAtom.const_nonneg {K : ℕ} {d A : ℝ} {j : ℕ} {c : V} {a : V → ℂ}
+    (ha : IsSmoothAtom univ K d A j c a) : 0 ≤ A :=
+  (norm_nonneg _).trans (ha.norm_le (mem_univ 0))
 
 /-- **Differences of smooth atoms**: for a smooth atom on the convex set `Ω` of order `K ≥ r ≥ 1`,
 `|Δ_h^r a(x)| ≤ 2^r r^(r+1) A min(1, (2^j ‖h‖)^r)` at the points whose steps stay in `Ω`. -/

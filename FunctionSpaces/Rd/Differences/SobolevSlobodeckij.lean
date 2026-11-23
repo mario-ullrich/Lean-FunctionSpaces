@@ -17,7 +17,10 @@ On a finite-dimensional real inner product space `V` of dimension `n` with Lebes
 `∫∫ |f(y) - f(x)|^p / |y - x|^(n + sp) dy dx` (`Rd.slobodeckijForm`), the `p`-th power of the
 Gagliardo seminorm of the Sobolev–Slobodeckij space `W^{s,p}(V)` (Gagliardo 1957). The
 substitution `y = x + h` and Tonelli's theorem turn it into
-`∫ ‖Δ_h f‖_p^p / |h|^(n + sp) dh` (`Rd.slobodeckijForm_eq_lintegral_eLpNorm`).
+`∫ ‖Δ_h f‖_p^p / |h|^(n + sp) dh` (`Rd.slobodeckijForm_eq_lintegral_eLpNorm`). For `p = 2` the
+form is the square of the `L_2` norm of `(x, y) ↦ f(y) - f(x)` for the Gagliardo measure
+`|y - x|^(-(n + 2s)) dx dy` on `V × V` (`Rd.gagliardoMeasure`,
+`Rd.eLpNorm_sub_sq_gagliardoMeasure`).
 
 For `1 ≤ p < ∞` and `s > 0` the form is equivalent to the first-difference Besov norm:
 * `‖(2^(ks) ω_1(f, 2^(-k))_p)_k‖_{ℓ_p}^p ≤ C_1 ∫∫ …` (`Rd.lqNorm_modulus_rpow_le_slobodeckijForm`),
@@ -169,6 +172,55 @@ theorem slobodeckijForm_eq_lintegral_eLpNorm {p : ℝ≥0∞} (hp0 : p ≠ 0) (h
     slobodeckijForm_eq_lintegral_of_measurable hp0 hp s hf.stronglyMeasurable_mk.measurable]
   refine lintegral_congr fun h => ?_
   rw [eLpNorm_congr_ae (fwdDiff_congr_ae hf.ae_eq_mk h)]
+
+/-! ### The Gagliardo measure -/
+
+variable (V) in
+/-- **The Gagliardo measure** `μ_s = |y - x|^(-(n + 2s)) dx dy` on `V × V`, `n = dim V`: the
+Lebesgue measure of `V × V` with this density. For `p = 2` the Gagliardo form `E_{s,2}(f)` is the
+square of the `L_2(μ_s)` norm of `(x, y) ↦ f(y) - f(x)` (`Rd.eLpNorm_sub_sq_gagliardoMeasure`), so
+that `f ↦ (f, (x, y) ↦ f(y) - f(x))` maps `W^{s,2}(V)` with the norm
+`(‖f‖_2² + E_{s,2}(f))^(1/2)` isometrically into `L_2(V) × L_2(μ_s)` with the `L_2` norm on the
+product. -/
+noncomputable def gagliardoMeasure (s : ℝ) : Measure (V × V) :=
+  ((volume : Measure V).prod volume).withDensity fun z =>
+    ‖z.2 - z.1‖ₑ ^ (-((finrank ℝ V : ℝ) + s * 2))
+
+/-- **Integrals for the Gagliardo measure** are double integrals with the density: for measurable
+`F : V × V → [0, ∞]`, `∫ F d(gagliardoMeasure) = ∫∫ F(x, y) |y - x|^(-(n + 2s)) dy dx`
+(Mathlib's `lintegral_withDensity_eq_lintegral_mul` and Tonelli's `lintegral_prod`). -/
+theorem lintegral_gagliardoMeasure (s : ℝ) {F : V × V → ℝ≥0∞} (hF : Measurable F) :
+    ∫⁻ z, F z ∂gagliardoMeasure V s =
+      ∫⁻ x, ∫⁻ y, F (x, y) * ‖y - x‖ₑ ^ (-((finrank ℝ V : ℝ) + s * 2)) := by
+  have hρ : Measurable fun z : V × V => ‖z.2 - z.1‖ₑ ^ (-((finrank ℝ V : ℝ) + s * 2)) :=
+    (measurable_snd.sub measurable_fst).enorm.pow_const _
+  rw [gagliardoMeasure, lintegral_withDensity_eq_lintegral_mul _ hρ hF,
+    lintegral_prod _ (hρ.mul hF).aemeasurable]
+  simp only [Pi.mul_apply, mul_comm]
+
+/-- **Null sets of `V` in each coordinate are null for the Gagliardo measure**: a property that
+holds almost everywhere on `V` holds for both coordinates of almost every pair, since the Gagliardo
+measure has a density with respect to the product measure (Mathlib's
+`Measure.quasiMeasurePreserving_fst`, `Measure.quasiMeasurePreserving_snd`). -/
+theorem ae_gagliardoMeasure (s : ℝ) {P : V → Prop} (h : ∀ᵐ x, P x) :
+    ∀ᵐ z ∂gagliardoMeasure V s, P z.1 ∧ P z.2 :=
+  (withDensity_absolutelyContinuous _ _).ae_le
+    ((Measure.quasiMeasurePreserving_fst.ae h).and (Measure.quasiMeasurePreserving_snd.ae h))
+
+/-- **The Gagliardo form for `p = 2` as an `L_2` norm**: for measurable `f : V → ℂ`,
+`‖(x, y) ↦ f(y) - f(x)‖²_{L_2(gagliardoMeasure)} = ∫∫ |f(y) - f(x)|² / |y - x|^(n + 2s) dy dx`,
+the Gagliardo form `Rd.slobodeckijForm 2 s f`
+(`Rd.lintegral_gagliardoMeasure`, `MeasureTheory.eLpNorm_rpow_eq`). -/
+theorem eLpNorm_sub_sq_gagliardoMeasure (s : ℝ) {f : V → ℂ} (hf : Measurable f) :
+    eLpNorm (fun z : V × V => f z.2 - f z.1) 2 (gagliardoMeasure V s) ^ 2 =
+      slobodeckijForm 2 s f := by
+  have hm : Measurable fun z : V × V => f z.2 - f z.1 :=
+    (hf.comp measurable_snd).sub (hf.comp measurable_fst)
+  have h := eLpNorm_rpow_eq hm.aestronglyMeasurable (μ := gagliardoMeasure V s) two_ne_zero
+    ENNReal.ofNat_ne_top
+  rw [ENNReal.toReal_ofNat, ENNReal.rpow_two] at h
+  rw [h, lintegral_gagliardoMeasure s (hm.enorm.pow_const _), slobodeckijForm]
+  simp only [ENNReal.toReal_ofNat, div_eq_mul_inv, ← ENNReal.rpow_neg]
 
 /-! ### Dyadic annuli -/
 

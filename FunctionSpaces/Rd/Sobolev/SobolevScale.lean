@@ -27,11 +27,14 @@ and `‖u‖_{H^s} = ‖J_s u‖_2`. This file builds the maps between these spa
 * **Inclusions**: for `t ≤ s`, `H^s(V) ⊆ H^t(V)` as a bounded operator `ι_{t,s}` of norm at most
   `1`, `U ↦ J_{-t} 𝓕⁻(⟨ξ⟩^{t-s} 𝓕(J_s U))` (`Rd.sobolevInclusion`), which keeps the distribution
   (`Rd.toDistr_sobolevInclusion`), is injective and composes (`Rd.sobolevInclusion_injective`,
-  `Rd.sobolevInclusion_sobolevInclusion`). The inclusion is an explicit Fourier multiplier.
+  `Rd.sobolevInclusion_sobolevInclusion`), with `ι_{s,s}` the identity
+  (`Rd.sobolevInclusion_self`). The inclusion is an explicit Fourier multiplier.
 * **`L_2` functions**: for `s ≥ 0`, every `U ∈ H^s(V)` is the `L_2` function
   `ι_s U = Rd.sobolevToL2 hs U`, whose distribution is `U`
   (`Rd.toTemperedDistribution_sobolevToL2`), with `‖ι_s U‖_2 ≤ ‖U‖`
-  (`Rd.norm_sobolevToL2_apply_le`); at `s = 1` this is `Rd.toL2` (`Rd.sobolevToL2_one`).
+  (`Rd.norm_sobolevToL2_apply_le`); at `s = 1` this is `Rd.toL2` (`Rd.sobolevToL2_one`), and at
+  `s = 0` it is an isometry onto `L_2(V)` (`Rd.norm_sobolevToL2_zero`,
+  `Rd.sobolevToL2_zero_surjective`).
 * **Derivatives**: `∂_v : H^{s+1}(V) → H^s(V)` as a bounded operator of norm at most `2π ‖v‖`
   (`Rd.sobolevLineDeriv`, `Rd.toDistr_sobolevLineDeriv`, `Rd.norm_sobolevLineDeriv_apply_le`),
   the Fourier multiplier with the symbol `2πi ⟪ξ, v⟫ ⟨ξ⟩^{-1}` of `J_{-1} ∂_v` after `J_{s+1}`
@@ -39,6 +42,12 @@ and `‖u‖_{H^s} = ‖J_s u‖_2`. This file builds the maps between these spa
 * **The norm recursion**: for every orthonormal basis `(e_i)` of `V` and `U ∈ H^{s+1}(V)`,
   `(2π)² ‖U‖²_{H^{s+1}} = (2π)² ‖ι_{s,s+1} U‖²_{H^s} + ∑_i ‖∂_{e_i} U‖²_{H^s}`
   (`Rd.sq_norm_eq_add_sum_sobolevLineDeriv`), from `⟨ξ⟩² = 1 + ∑_i ⟪ξ, e_i⟫²` on the Fourier side.
+* **Convolution and mollification**: for an integrable `K`, convolution `U ↦ K ⋆ U` is a bounded
+  operator on `H^s(V)`, acting on the `L_2` function `J_s U` (`Rd.sobolevConv`,
+  `Rd.toLp_sobolevConv`), the Fourier multiplier with the symbol `𝓕K`
+  (`Rd.fourier_toLp_sobolevConv_ae`); for `s ≥ 0` it acts on `ι_s U` as well
+  (`Rd.sobolevToL2_sobolevConv`), and for an integrable `η` with `∫ η = 1` the dilates `η_c ⋆ U`
+  converge to `U` in `H^s(V)` as `c → ∞` (`Rd.tendsto_sobolevConv_dilate`).
 -/
 
 @[expose] public section
@@ -220,6 +229,12 @@ theorem sobolevInclusion_sobolevInclusion {u : ℝ} (hut : u ≤ t) (hts : t ≤
     sobolevInclusion hut (sobolevInclusion hts U) = sobolevInclusion (hut.trans hts) U :=
   BesselPotentialSpace.ext (by simp only [toDistr_sobolevInclusion])
 
+/-- **The inclusion `ι_{s,s}` is the identity** of `H^s(V)`: it keeps the tempered distribution
+(`Rd.toDistr_sobolevInclusion`), which determines an element of `H^s(V)` (Mathlib's
+`BesselPotentialSpace.ext`). -/
+theorem sobolevInclusion_self (U : H^{s}(V)) : sobolevInclusion le_rfl U = U :=
+  BesselPotentialSpace.ext (toDistr_sobolevInclusion le_rfl U)
+
 /-! ### `L_2` functions -/
 
 /-- **The `L_2` function `ι_s U` of an element `U` of `H^s(V)`, `s ≥ 0`**: the inclusion
@@ -285,6 +300,21 @@ theorem sobolevToL2_sobolevInclusion (ht : 0 ≤ t) (hts : t ≤ s) (U : H^{s}(V
     sobolevToL2 ht (sobolevInclusion hts U) = sobolevToL2 (ht.trans hts) U :=
   sobolevToL2_eq_of_toDistr_eq ht _ (by
     rw [toTemperedDistribution_sobolevToL2, toDistr_sobolevInclusion])
+
+/-- **The `L_2` function of `H^0(V)` has the same norm**: `‖ι_0 U‖_2 = ‖U‖_{H^0}`, since
+`ι_0 U = J_0 (ι_{0,0} U)` (`Rd.sobolevToL2_apply`), `‖J_0 U‖_2 = ‖U‖_{H^0}` (Mathlib's
+`BesselPotentialSpace.norm_toLp_eq`) and `ι_{0,0}` is the identity (`Rd.sobolevInclusion_self`). -/
+theorem norm_sobolevToL2_zero (U : H^{0}(V)) : ‖sobolevToL2 le_rfl U‖ = ‖U‖ := by
+  rw [sobolevToL2_apply, BesselPotentialSpace.norm_toLp_eq, sobolevInclusion_self]
+
+/-- **Every `L_2` function is the `L_2` function of an element of `H^0(V)`**: for `F ∈ L_2(V)`,
+the element `U = J_0⁻¹ F` of `H^0(V)` (Mathlib's isometry `BesselPotentialSpace.toLpₗᵢ` onto
+`L_2(V)`) has `ι_0 U = J_0 (ι_{0,0} U) = J_0 U = F` (`Rd.sobolevInclusion_self`). -/
+theorem sobolevToL2_zero_surjective : Function.Surjective (sobolevToL2 (V := V) le_rfl) := by
+  intro F
+  refine ⟨(BesselPotentialSpace.toLpₗᵢ V ℂ 0 2).symm F, ?_⟩
+  rw [sobolevToL2_apply, sobolevInclusion_self, ← BesselPotentialSpace.toLpₗᵢ_apply,
+    LinearIsometryEquiv.apply_symm_apply]
 
 /-! ### Derivatives -/
 
@@ -495,5 +525,73 @@ theorem sq_norm_eq_add_sum_sobolevLineDeriv {ι : Type*} [Fintype ι]
     ← ENNReal.ofReal_sum_of_nonneg (fun i _ => by positivity),
     ← ENNReal.ofReal_add (by positivity) (by positivity)] at he
   exact (ENNReal.ofReal_eq_ofReal_iff (by positivity) (by positivity)).1 he
+
+/-! ### Convolution and mollification -/
+
+/-- **Convolution in `H^s(V)`**: for an integrable `K` and every real `s`, `U ↦ K ⋆ U`, the
+element of `H^s(V)` whose `L_2` function `J_s (K ⋆ U)` is `K ⋆ J_s U`
+(`Rd.toLp_sobolevConv`). It is a bounded operator, built from Mathlib's isometry
+`U ↦ J_s U` of `H^s(V)` onto `L_2(V)` (`BesselPotentialSpace.toLpₗᵢ`) and Young's inequality
+`‖K ⋆ g‖_2 ≤ ‖K‖_1 ‖g‖_2` (`Rd.convLp`). -/
+noncomputable def sobolevConv {K : V → ℂ} (hK : Integrable K) (s : ℝ) :
+    H^{s}(V) →L[ℂ] H^{s}(V) :=
+  (BesselPotentialSpace.toLpₗᵢ V ℂ s 2).symm.toLinearIsometry.toContinuousLinearMap ∘L
+    convLp two_ne_top hK ∘L
+    (BesselPotentialSpace.toLpₗᵢ V ℂ s 2).toLinearIsometry.toContinuousLinearMap
+
+/-- The `L_2` function `J_s (K ⋆ U)` of the convolution is `K ⋆ J_s U`. -/
+theorem toLp_sobolevConv {K : V → ℂ} (hK : Integrable K) (U : H^{s}(V)) :
+    (sobolevConv hK s U).toLp = convLp two_ne_top hK U.toLp := by
+  rw [← BesselPotentialSpace.toLpₗᵢ_apply (sobolevConv hK s U), sobolevConv]
+  simp only [ContinuousLinearMap.coe_comp, Function.comp_apply,
+    LinearIsometry.coe_toContinuousLinearMap, LinearIsometryEquiv.coe_toLinearIsometry,
+    LinearIsometryEquiv.apply_symm_apply]
+  rw [BesselPotentialSpace.toLpₗᵢ_apply]
+
+/-- The Fourier transform of `J_s (K ⋆ U)` is `𝓕K · 𝓕(J_s U)` almost everywhere, by the
+convolution theorem on `L_2` (`Rd.fourier_convLp`). -/
+theorem fourier_toLp_sobolevConv_ae {K : V → ℂ} (hK : Integrable K) (U : H^{s}(V)) :
+    (𝓕 (sobolevConv hK s U).toLp : Lp ℂ 2 (volume : Measure V)) =ᵐ[volume]
+      fun ξ => 𝓕 K ξ * (𝓕 U.toLp : Lp ℂ 2 (volume : Measure V)) ξ := by
+  rw [toLp_sobolevConv]
+  exact fourier_convLp hK U.toLp
+
+/-- **Convolution acts on the `L_2` functions**: for `s ≥ 0`, an integrable `K` and
+`U ∈ H^s(V)`, `ι_s (K ⋆ U) = K ⋆ ι_s U`. Both sides have the Fourier transform
+`𝓕K ⟨ξ⟩^{-s} 𝓕(J_s U)` almost everywhere (`Rd.fourier_toLp_sobolevInclusion_ae`,
+`Rd.fourier_toLp_sobolevConv_ae`, `Rd.fourier_convLp`), and the Fourier transform of `L_2(V)` is
+injective (Mathlib's `FourierTransform.fourierInv_fourier_eq`). -/
+theorem sobolevToL2_sobolevConv (hs : 0 ≤ s) {K : V → ℂ} (hK : Integrable K) (U : H^{s}(V)) :
+    sobolevToL2 hs (sobolevConv hK s U) = convLp two_ne_top hK (sobolevToL2 hs U) := by
+  have h : (𝓕 (sobolevToL2 hs (sobolevConv hK s U)) : Lp ℂ 2 (volume : Measure V)) =
+      𝓕 (convLp two_ne_top hK (sobolevToL2 hs U)) := by
+    refine Lp.ext ?_
+    rw [sobolevToL2_apply, sobolevToL2_apply]
+    filter_upwards [fourier_toLp_sobolevInclusion_ae hs (sobolevConv hK s U),
+      fourier_convLp hK (sobolevInclusion hs U).toLp, fourier_toLp_sobolevInclusion_ae hs U,
+      fourier_toLp_sobolevConv_ae hK U] with ξ h1 h2 h3 h4
+    rw [h1, h2, h3, h4]
+    ring
+  calc sobolevToL2 hs (sobolevConv hK s U)
+      = (𝓕⁻ (𝓕 (sobolevToL2 hs (sobolevConv hK s U)) : Lp ℂ 2 (volume : Measure V)) :
+          Lp ℂ 2 (volume : Measure V)) := (FourierTransform.fourierInv_fourier_eq _).symm
+    _ = convLp two_ne_top hK (sobolevToL2 hs U) := by
+        rw [h, FourierTransform.fourierInv_fourier_eq]
+
+open Filter Topology in
+/-- **Mollification converges in `H^s(V)`**, for every real `s`: let `η` be integrable with
+`∫ η = 1`, `c_i ≠ 0` dilation factors with `c_i → ∞` and `η_c(x) = c^n η(c x)`. Then
+`η_{c_i} ⋆ U → U` in `H^s(V)` for every `U ∈ H^s(V)`, since `‖η_c ⋆ U - U‖_{H^s}` is the `L_2`
+norm of `η_c ⋆ J_s U - J_s U` (`Rd.toLp_sobolevConv`, Mathlib's
+`BesselPotentialSpace.norm_toLp_eq`) and approximate identities converge in `L_2(V)`
+(`Rd.tendsto_convLp_dilate`). -/
+theorem tendsto_sobolevConv_dilate {η : V → ℂ} (hη : Integrable η) (h1 : ∫ x, η x = 1)
+    {ι : Type*} {l : Filter ι} {c : ι → ℝ} (hc : ∀ i, c i ≠ 0) (hcl : Tendsto c l atTop)
+    (U : H^{s}(V)) : Tendsto (fun i => sobolevConv (integrable_dilate hη (hc i)) s U) l (𝓝 U) := by
+  rw [tendsto_iff_norm_sub_tendsto_zero]
+  refine (tendsto_iff_norm_sub_tendsto_zero.1
+    (tendsto_convLp_dilate two_ne_top hη h1 hc hcl U.toLp)).congr fun i => ?_
+  rw [← BesselPotentialSpace.norm_toLp_eq (sobolevConv (integrable_dilate hη (hc i)) s U - U),
+    BesselPotentialSpace.toLp_sub, toLp_sobolevConv]
 
 end Rd
