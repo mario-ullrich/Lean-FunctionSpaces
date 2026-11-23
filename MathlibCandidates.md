@@ -317,6 +317,25 @@ declarations.
   `‖toLp‖ ≤ (#ι)^(1/p)` (`PiLp.norm_continuousLinearEquiv_le`,
   `PiLp.norm_continuousLinearEquiv_symm_le`); Mathlib has the Lipschitz constants
   (`PiLp.lipschitzWith_ofLp`, `PiLp.lipschitzWith_toLp`) but no operator-norm form.
+* **Componentwise maps and orthogonal complements in finite `L_2` sums**
+  (`FunctionSpaces/Domains/Sobolev/VectorSobolevSpaces.lean`): on `WithLp 2 (Fin m → X)`, a
+  continuous linear map acting componentwise with operator norm at most `‖f‖`, isometric if `f`
+  is, onto if `f` is, with kernel `(ker f)^m` and range `(range f)^m` (`Rd.piLpMapL`,
+  `Rd.norm_piLpMapL_le`, `Rd.norm_piLpMapL_apply`, `Rd.piLpMapL_surjective`, `Rd.ker_piLpMapL`,
+  `Rd.range_piLpMapL`, `Rd.range_piLpMapL_subtypeL`), continuous linear equivalences and
+  semilinear isometric equivalences acting componentwise (`Rd.piLpMapEquivL`,
+  `Rd.piLpCongrRightSL`), `⟪single i a, x⟫ = ⟪a, x i⟫` for a general inner product space
+  (`Rd.inner_piLp_single_left`, `Rd.inner_piLp_single_right`), the orthogonal complement
+  `(K^m)ᗮ = (Kᗮ)^m` of `Submodule.pi` for every submodule `K` (`Rd.orthogonal_piLpSubmodule`),
+  and the linear isometric equivalence of the dual of `WithLp 2 (Fin m → E)` with
+  `WithLp 2 (Fin m → StrongDual ℂ E)` (`Rd.piLpStrongDualEquiv`), stated over `ℂ`; the upstream
+  form would take any `RCLike` field and any finite index type. Mathlib has the linear maps
+  `LinearMap.withLpMap` and `LinearEquiv.withLpCongr` without continuity or norm bounds,
+  `ContinuousLinearMap.piMap` on the plain product with its surjectivity, kernel and range
+  (`Function.Surjective.piMap`, `LinearMap.ker_compLeft`, `LinearMap.range_compLeft`), the
+  linear isometric case `LinearIsometryEquiv.piLpCongrRight`, and `inner_single_left` only for
+  `lp` and `EuclideanSpace`. These belong in `Mathlib/Analysis/Normed/Lp/PiLp.lean` and
+  `Mathlib/Analysis/InnerProductSpace/PiL2.lean`, in the namespace `PiLp`.
 * **Sobolev–Slobodeckij norms** (`FunctionSpaces/Rd/Differences/SobolevSlobodeckij.lean`):
   Mathlib has no fractional Sobolev spaces. The Gagliardo form
   `∫∫ |f(y) - f(x)|^p / |y - x|^(n+sp) dy dx` on a finite-dimensional inner product space

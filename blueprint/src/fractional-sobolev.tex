@@ -27,6 +27,8 @@ $1/2 < s < 1$. \Cref{sec:tilde-zero-boundary} lifts the two cases to
 $\tilde H^s(\Omega) \cong H^s_0(\Omega)$ for every $s \geq 0$ with $s - 1/2 \notin \N_0$, and
 \Cref{sec:sobolev-trace-kernel} shows that the kernel of the trace of $H^s(\Omega)$ is
 $H^s_0(\Omega)$ for $1/2 < s < 3/2$, through the zero extension for $1 \leq s < 3/2$.
+\Cref{sec:vector-sobolev} carries the spaces, traces, isomorphisms and duals to $\C^m$-valued
+functions, componentwise in Hilbert direct sums.
 
 \section{Inclusions of restriction spaces}
 \label{sec:restriction-inclusions}
@@ -1607,3 +1609,237 @@ quotient norm, is equivalent to the Sobolev--Slobodeckij norm of $H^{s-1/2}(\Gam
 (\Cref{thm:trace-space-slobodeckij}). For $s = 1$ the quotient $H^1(\Omega) / H^1_0(\Omega)$ is
 the trace space of Hiptmair, Pauly and Schulz \cite{HiptmairPaulySchulz} at $k = 0$, and
 $H^{s-1/2}(\Gamma)$ is the classical $H^{1/2}(\Gamma)$.
+
+\section{Vector-valued spaces}
+\label{sec:vector-sobolev}
+
+Systems of equations and differential forms need $\C^m$-valued functions. As in McLean
+\cite[Chapter 4]{McLean}, their spaces are taken componentwise: for a normed space $X$ and
+$m \in \N$, $X^m$ is the space of the tuples $x = (x_1, \dots, x_m)$ with
+$\|x\|^2 = \sum_i \|x_i\|^2$, and for an inner product space $X$ it carries the inner product
+$\langle x, y \rangle = \sum_i \langle x_i, y_i \rangle$, the Hilbert direct sum of $m$ copies of
+$X$. The spaces $H^s\Lambda^k$ of differential $k$-forms are such sums in the basis $dx_I$. In
+this section $X$ and $Y$ are complex normed spaces, $E$ is a complex inner product space,
+$\Omega' \subseteq V$ is open, and $\Omega$ is a bounded Lipschitz domain with boundary $\Gamma$;
+$N^s_\Gamma$, $\gamma_s$, $E_s$ and $\gamma^H_s$ are as in \Cref{sec:sobolev-trace-kernel}, and
+$\tau_s$ and $E^H_s$ as in \Cref{thm:trace-space-boundary-sobolev}.
+
+\begin{definition}[Componentwise maps]
+\label{def:pi-lp-maps}
+\lean{Rd.piLpMapL, Rd.piLpMapL_apply, Rd.piLpMapEquivL, Rd.piLpMapEquivL_apply,
+  Rd.piLpMapEquivL_symm_apply, Rd.piLpCongrRightSL, Rd.piLpCongrRightSL_apply, Rd.piLpSubmodule,
+  Rd.mem_piLpSubmodule}
+\leanok
+For a bounded linear operator $f \colon X \to Y$, $f^m \colon X^m \to Y^m$ is the linear map
+$(x_1, \dots, x_m) \mapsto (f x_1, \dots, f x_m)$. The same formula defines $e^m$ for an
+isomorphism $e$ of normed spaces, which is again an isomorphism of normed spaces with inverse
+$(e^{-1})^m$, and for a linear or conjugate-linear isometric isomorphism $e$, which is again an
+isometric isomorphism of the same kind. For a subspace $K \subseteq X$, $K^m \subseteq X^m$ is the
+subspace of the tuples whose components all lie in $K$.
+\end{definition}
+
+For an isometric $e$, $\|e^m x\|^2 = \sum_i \|e x_i\|^2 = \sum_i \|x_i\|^2 = \|x\|^2$. In Lean
+$f^m$ and, for an isomorphism $e$, $e^m$ are Mathlib's
+\texttt{ContinuousLinearMap.\allowbreak piMap} and
+\texttt{ContinuousLinearEquiv.\allowbreak piCongrRight} on the product, transported to $X^m$.
+Mathlib's \texttt{LinearIsometryEquiv.\allowbreak piLpCongrRight} is the linear isometric case;
+the semilinear isometric case, such as the conjugate-linear Riesz maps, is built directly
+(\texttt{Rd.\allowbreak piLpCongrRightSL}).
+
+\begin{lemma}[Norm, range and kernel of componentwise maps]
+\label{lem:pi-lp-map-properties}
+\lean{Rd.norm_piLpMapL_le, Rd.norm_piLpMapL_apply, Rd.piLpMapL_surjective, Rd.ker_piLpMapL,
+  Rd.range_piLpMapL, Rd.range_piLpMapL_subtypeL}
+\leanok
+\uses{def:pi-lp-maps}
+Let $f \colon X \to Y$ be a bounded linear operator and $K \subseteq X$ a subspace with the
+inclusion $j_K \colon K \to X$. Then $f^m$ is a bounded linear operator with
+$\|f^m\| \leq \|f\|$, it is isometric if $f$ is isometric, it is onto if $f$ is onto,
+$\ker f^m = (\ker f)^m$, and the range of $f^m$ is $(\operatorname{ran} f)^m$. In particular the
+range of $j_K^m$ is $K^m$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\|f^m x\|^2 = \sum_i \|f x_i\|^2 \leq \|f\|^2 \sum_i \|x_i\|^2 = \|f\|^2 \|x\|^2$, and
+$\|f^m x\|^2 = \sum_i \|x_i\|^2 = \|x\|^2$ if $f$ is isometric. The equation $f^m x = 0$ holds if
+and only if $f x_i = 0$ for every $i$, and a tuple of preimages of the components is a preimage,
+so $y$ lies in the range of $f^m$ if and only if $y_i$ lies in the range of $f$ for every $i$.
+\end{proof}
+
+On the product $X \times \dots \times X$ without a norm, Mathlib has the surjectivity, the kernel
+and the range (\texttt{Function.\allowbreak Surjective.\allowbreak piMap},
+\texttt{LinearMap.\allowbreak ker\_\allowbreak compLeft},
+\texttt{LinearMap.\allowbreak range\_\allowbreak compLeft}).
+
+\begin{lemma}[Orthogonal complements and duals of $E^m$]
+\label{lem:pi-lp-orthogonal}
+\lean{Rd.inner_piLp_single_left, Rd.inner_piLp_single_right, Rd.orthogonal_piLpSubmodule,
+  Rd.piLpStrongDualEquiv, Rd.piLpStrongDualEquiv_apply}
+\leanok
+\uses{def:pi-lp-maps}
+For $i \in \{1, \dots, m\}$ and $a \in E$ let $\iota_i a \in E^m$ be the tuple with $a$ at $i$ and
+$0$ elsewhere. Then $\langle \iota_i a, x \rangle = \langle a, x_i \rangle$ and
+$\langle x, \iota_i a \rangle = \langle x_i, a \rangle$ for every $x \in E^m$. For every subspace
+$K \subseteq E$, closed or not, $(K^m)^\perp = (K^\perp)^m$. If $E$ is complete, then
+$\ell \mapsto (\ell \circ \iota_i)_i$ is a linear isometric isomorphism of the dual of $E^m$ onto
+$(E^*)^m$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+In $\langle \iota_i a, x \rangle = \sum_j \langle (\iota_i a)_j, x_j \rangle$ only $j = i$
+contributes, and likewise on the right. If $x \perp K^m$ and $k \in K$, then $\iota_i k \in K^m$,
+so $\langle k, x_i \rangle = \langle \iota_i k, x \rangle = 0$. If $x_i \in K^\perp$ for every
+$i$, then $\langle y, x \rangle = \sum_i \langle y_i, x_i \rangle = 0$ for every $y \in K^m$. For
+the dual, let $R_m \colon E^m \to (E^m)^*$ and $R \colon E \to E^*$ be the Riesz isomorphisms
+(Mathlib's \texttt{InnerProductSpace.\allowbreak toDual}), both conjugate-linear and isometric.
+Then $R^m \circ R_m^{-1}$ is linear and isometric (\Cref{def:pi-lp-maps}), and for
+$y = R_m^{-1} \ell$, $(R^m y)_i(a) = \langle y_i, a \rangle = \langle y, \iota_i a \rangle =
+\ell(\iota_i a)$.
+\end{proof}
+
+Mathlib has the first identity for \texttt{EuclideanSpace}
+(\texttt{EuclideanSpace.\allowbreak inner\_\allowbreak single\_\allowbreak left}) and for $\ell_2$
+sums (\texttt{lp.\allowbreak inner\_\allowbreak single\_\allowbreak left}), but not for $E^m$ in
+its Lean form \texttt{WithLp 2 (Fin m $\to$ E)}, and it has neither the orthogonal complement of
+$K^m$ nor the dual of $E^m$.
+
+\begin{definition}[Vector-valued Sobolev spaces]
+\label{def:vector-sobolev-spaces}
+\lean{Rd.VecRestrictionSpace, Rd.VecTildeSpace, Rd.VecZeroBoundarySpace,
+  Rd.BoundedLipschitzDomain.VecTraceSpace, Rd.BoundedLipschitzDomain.vecTraceKer,
+  Rd.BoundedLipschitzDomain.vecTrace, Rd.BoundedLipschitzDomain.vecExtend,
+  Rd.BoundedLipschitzDomain.VecBoundarySobolev,
+  Rd.BoundedLipschitzDomain.inner_vecBoundarySobolev}
+\leanok
+\uses{def:sobolev-tilde-zero-boundary, def:trace-space, def:boundary-sobolev, def:pi-lp-maps}
+Let $m \in \N$ and $s \in \R$. The Hilbert spaces $H^s(\Omega')^m$, $\tilde H^s(\Omega')^m$ and
+$H^s_0(\Omega')^m$ are the Hilbert direct sums of $m$ copies of $H^s(\Omega')$,
+$\tilde H^s(\Omega')$ and $H^s_0(\Omega')$. Let $1/2 < s < 3/2$. The vector trace kernel is
+$(N^s_\Gamma)^m \subseteq H^s(\Omega)^m$, the trace space of $H^s(\Omega)^m$ is the Hilbert
+direct sum $((N^s_\Gamma)^\perp)^m$, the vector trace is $\gamma_s^m$ and the vector extension is
+$E_s^m$. For $0 < t < 1$, $H^t(\Gamma)^m$ is the Hilbert direct sum of $m$ copies of
+$H^t(\Gamma)$, with $\langle g, h \rangle = \sum_i \langle \Phi g_i, \Phi h_i \rangle$ for the
+Gagliardo embedding $\Phi$ of \Cref{def:boundary-sobolev}.
+\end{definition}
+
+\begin{theorem}[Traces of vector functions]
+\label{thm:vector-sobolev-trace}
+\lean{Rd.BoundedLipschitzDomain.vecTrace_vecExtend,
+  Rd.BoundedLipschitzDomain.norm_vecExtend_apply, Rd.BoundedLipschitzDomain.ker_vecTrace,
+  Rd.BoundedLipschitzDomain.orthogonal_vecTraceKer, Rd.BoundedLipschitzDomain.range_vecExtend,
+  Rd.BoundedLipschitzDomain.vecSobolevTrace, Rd.BoundedLipschitzDomain.vecSobolevExtend,
+  Rd.BoundedLipschitzDomain.vecSobolevTrace_vecSobolevExtend,
+  Rd.BoundedLipschitzDomain.vecSobolevTrace_surjective,
+  Rd.BoundedLipschitzDomain.ker_vecSobolevTrace,
+  Rd.BoundedLipschitzDomain.vecTraceSpaceEquivBoundarySobolev,
+  Rd.BoundedLipschitzDomain.vecTraceSpaceEquivBoundarySobolev_vecTrace}
+\leanok
+\uses{def:vector-sobolev-spaces, lem:pi-lp-map-properties, lem:pi-lp-orthogonal,
+  thm:trace-space-operators, thm:trace-space-boundary-sobolev, thm:sobolev-trace-kernel}
+Let $1/2 < s < 3/2$ and $m \in \N$. Then $\gamma_s^m E_s^m w = w$ and $\|E_s^m w\| = \|w\|$ for
+every $w$ in the trace space of $H^s(\Omega)^m$, and the kernel of $\gamma_s^m$ is
+$(N^s_\Gamma)^m$, whose orthogonal
+complement in $H^s(\Omega)^m$ is $((N^s_\Gamma)^\perp)^m$, the range of $E_s^m$. The vector trace
+$(\gamma^H_s)^m \colon H^s(\Omega)^m \to H^{s-1/2}(\Gamma)^m$ is a bounded linear operator onto
+$H^{s-1/2}(\Gamma)^m$ with kernel $H^s_0(\Omega)^m$ and the bounded linear right inverse
+$(E^H_s)^m$, and $\tau_s^m$ is an isomorphism of normed spaces of the trace space of
+$H^s(\Omega)^m$ onto $H^{s-1/2}(\Gamma)^m$ with $(\gamma^H_s)^m = \tau_s^m \circ \gamma_s^m$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\Cref{thm:trace-space-operators}, \Cref{thm:trace-space-boundary-sobolev} and
+\Cref{thm:sobolev-trace-kernel} in each component. The kernels, the norm of $E_s^m w$ and the
+range of the componentwise inclusion $E_s^m$ of $(N^s_\Gamma)^\perp$ are given by
+\Cref{lem:pi-lp-map-properties}, the
+orthogonal complement by \Cref{lem:pi-lp-orthogonal}, and $\tau_s^m$ is an isomorphism by
+\Cref{def:pi-lp-maps}.
+\end{proof}
+
+So the trace space of $H^s(\Omega)^m$, the orthogonal complement of the kernel of the vector
+trace, is isomorphic to $H^{s-1/2}(\Gamma)^m$, the trace theorem for systems in McLean's
+componentwise convention.
+
+\begin{theorem}[Besov traces of vector functions]
+\label{thm:vector-besov-trace}
+\lean{Rd.BoundedLipschitzDomain.vecBesovTrace, Rd.BoundedLipschitzDomain.vecBesovExtend,
+  Rd.BoundedLipschitzDomain.vecBesovTrace_surjective,
+  Rd.BoundedLipschitzDomain.toLp_vecBesovTrace_vecBesovExtend}
+\leanok
+\uses{def:pi-lp-maps, lem:pi-lp-map-properties, thm:besov-trace-operator,
+  thm:besov-trace-right-inverse}
+Let $1 \leq p < \infty$, $1 \leq q \leq \infty$ and $m \in \N$, and let $B^s_{p,q}(\Omega)$ and
+$B^t_{p,q}(\Gamma)$ be the Banach spaces of \Cref{thm:besov-trace-operator}. For
+$1/p < s < 1 + 1/p$ the componentwise Besov trace
+$B^s_{p,q}(\Omega)^m \to B^{s-1/p}_{p,q}(\Gamma)^m$ is a bounded linear operator onto
+$B^{s-1/p}_{p,q}(\Gamma)^m$. For $0 < t < 1$ the componentwise extension
+$B^t_{p,q}(\Gamma)^m \to B^{t+1/p}_{p,q}(\Omega)^m$ of \Cref{thm:besov-trace-right-inverse} is a
+bounded linear operator, and the componentwise trace of the extension of $g$ is $g$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\Cref{thm:besov-trace-operator} and \Cref{thm:besov-trace-right-inverse} in each component, with
+\Cref{lem:pi-lp-map-properties} for the bounds and the surjectivity.
+\end{proof}
+
+Every norm on $X^m$ for which the inclusions and the projections of the components are bounded is
+equivalent to the norm of $X^m$; for $\sum_i \|x_i\|$ and $\max_i \|x_i\|$ the constants depend
+only on $m$. So the choice of $\|x\|^2 = \sum_i \|x_i\|^2$ for the Besov spaces is one of
+convenience.
+
+\begin{theorem}[$\tilde H^s(\Omega)^m \cong H^s_0(\Omega)^m$]
+\label{thm:vector-tilde-zero-boundary}
+\lean{Rd.vecTildeEquivZeroBoundaryNat, Rd.coe_vecTildeEquivZeroBoundaryNat_apply,
+  Rd.BoundedLipschitzDomain.vecTildeEquivZeroBoundaryOfNeHalf,
+  Rd.BoundedLipschitzDomain.coe_vecTildeEquivZeroBoundaryOfNeHalf_apply}
+\leanok
+\uses{def:vector-sobolev-spaces, thm:tilde-zero-boundary, thm:tilde-zero-boundary-integer}
+Let $m \in \N$. For every $l \in \N_0$, $U \mapsto (r_{\Omega'} U_i)_i$ is an isometric
+isomorphism of $\tilde H^l(\Omega')^m$ onto $H^l_0(\Omega')^m$. For every $s \geq 0$ with
+$s \neq k + 1/2$ for all $k \in \N_0$, $U \mapsto (r_\Omega U_i)_i$ is an isomorphism of normed
+spaces of $\tilde H^s(\Omega)^m$ onto $H^s_0(\Omega)^m$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\Cref{thm:tilde-zero-boundary-integer} and \Cref{thm:tilde-zero-boundary} in each component
+(\Cref{def:pi-lp-maps}).
+\end{proof}
+
+\begin{theorem}[Duals of vector spaces]
+\label{thm:vector-sobolev-duality}
+\lean{Rd.vecDualEquiv, Rd.vecDualEquiv_apply,
+  Rd.BoundedLipschitzDomain.vecDualBoundarySobolevEquiv,
+  Rd.BoundedLipschitzDomain.vecDualBoundarySobolevEquiv_apply}
+\leanok
+\uses{def:vector-sobolev-spaces, lem:pi-lp-orthogonal, thm:sobolev-duality,
+  thm:tilde-restriction-shift, prop:sobolev-pairing, def:dual-boundary-sobolev,
+  thm:dual-boundary-sobolev, thm:boundary-sobolev-norm}
+Let $m \in \N$ and $s \in \R$. For every bounded linear functional $\ell$ on
+$\tilde H^s(\Omega')^m$ there is exactly one $W \in H^{-s}(\Omega')^m$ with
+$\ell(U) = \sum_i [W_i, U_i]$ for every $U \in \tilde H^s(\Omega')^m$, and $\ell \mapsto W$ is a
+conjugate-linear isometric isomorphism of the dual of $\tilde H^s(\Omega')^m$ onto
+$H^{-s}(\Omega')^m$. Let $0 < t < 1$. For every bounded linear functional $\ell$ on
+$H^t(\Gamma)^m$ there is exactly one $g_\ell \in H^t(\Gamma)^m$ with
+$\ell(g) = \sum_i \langle (g_\ell)_i, g_i \rangle_{H^t(\Gamma)}$ for every $g \in H^t(\Gamma)^m$,
+and $\ell \mapsto g_\ell$ is a conjugate-linear isometric isomorphism of the dual of
+$H^t(\Gamma)^m$ onto $H^t(\Gamma)^m$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Riesz's representation theorem in the Hilbert space $\tilde H^s(\Omega')^m$ (Mathlib's
+\texttt{InnerProductSpace.\allowbreak toDual}) gives exactly one $y$ with
+$\ell(U) = \sum_i \langle y_i, U_i \rangle$ for every $U$, and $\|y\| = \|\ell\|$. The isometry
+$\Theta_s$ of $\tilde H^s(\Omega')$ onto $H^{-s}(\Omega')$ (\Cref{thm:tilde-restriction-shift}) in
+each component gives $W = (\Theta_s y_i)_i$ with $\|W\| = \|y\|$, and
+$[\Theta_s y_i, U_i] = \langle y_i, U_i \rangle$ (\Cref{prop:sobolev-pairing}), as in
+\Cref{thm:sobolev-duality}. The space $H^t(\Gamma)^m$ is a Hilbert space
+(\Cref{thm:boundary-sobolev-norm}), and Riesz's theorem applies to it.
+\end{proof}
+
+By \Cref{lem:pi-lp-orthogonal} the dual of $H^t(\Gamma)^m$ is also isometric to
+$H^{-t}(\Gamma)^m$, the sum of $m$ copies of the dual space of \Cref{def:dual-boundary-sobolev}.
