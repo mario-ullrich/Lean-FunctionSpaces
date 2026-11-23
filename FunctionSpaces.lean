@@ -142,6 +142,7 @@ public import FunctionSpaces.Domains.Traces.BoundaryBesovNorm
 public import FunctionSpaces.Domains.Traces.BoundaryTraceSpace
 public import FunctionSpaces.Domains.Traces.TraceSpaceNorm
 public import FunctionSpaces.Domains.Traces.BoundaryGagliardo
+public import FunctionSpaces.Domains.Traces.BoundarySobolev
 public import FunctionSpaces.Domains.Traces.TraceKernel
 public import FunctionSpaces.Domains.Traces.TildeSpaceSupport
 public import FunctionSpaces.Domains.Sobolev.LipschitzDomainH1

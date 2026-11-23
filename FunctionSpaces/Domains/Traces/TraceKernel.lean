@@ -6,7 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Domains.Traces.TildeSpaceSupport
-public import FunctionSpaces.Domains.Traces.BoundaryGagliardo
+public import FunctionSpaces.Domains.Traces.BoundarySobolev
 public import FunctionSpaces.Domains.Sobolev.SobolevDuality
 
 /-!
