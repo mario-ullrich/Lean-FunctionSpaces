@@ -1,10 +1,11 @@
 # Tools from analysis
 
 Part of [Characterizations of Function Spaces](../README.md). Blueprint: part *Tools from analysis*,
-chapters *Convolution and the Fourier transform on `ℝ^d`*, *Maximal functions* and *Interpolation of
-operators*; the other tools are cited where they are used, in *Besov spaces and their embeddings*,
-*Polynomial approximation on intervals*, *Approximation on the cube*, *Besov spaces on `ℝ^d`*,
-*Tensor Daubechies wavelets on `ℝ^d`*, *Lipschitz domains* and *Traces on Lipschitz domains*.
+chapters *Convolution and the Fourier transform on `ℝ^d`*, *Maximal functions*, *Interpolation of
+operators* and *Gelfand triples*; the other tools are cited where they are used, in *Besov spaces
+and their embeddings*, *Polynomial approximation on intervals*, *Approximation on the cube*,
+*Besov spaces on `ℝ^d`*, *Tensor Daubechies wavelets on `ℝ^d`*, *Lipschitz domains* and *Traces
+on Lipschitz domains*.
 
 This block holds the folder `FunctionSpaces/Analysis/`, whose files import only Mathlib,
 `ApproximationSpaces` and each other: `L_p` norms, the inclusion `L_r ↪ L_p` and bounded
@@ -15,8 +16,10 @@ one coordinate; differences on additive monoids, the translation algebra, moduli
 smoothness on subsets and under linear and affine changes of variables; convolution, approximate
 identities, the Littlewood–Paley kernels and test functions on `ℝ^d`; dyadic cubes and cells,
 the Hardy–Littlewood maximal function, the Calderón–Zygmund decomposition, also for functions
-with values in a normed space, and the Fefferman–Stein inequality. The `L_p` norms are handled
-through integrals of powers (`MeasureTheory.eLpNorm_rpow_eq`).
+with values in a normed space, and the Fefferman–Stein inequality; the pivot dual of a bounded
+operator between Hilbert spaces, which makes `L_2` the pivot space of the Gelfand triples of
+Sobolev spaces, and a test for dense range in `L_2(μ)`. The `L_p` norms are handled through
+integrals of powers (`MeasureTheory.eLpNorm_rpow_eq`).
 
 ## Main results
 
@@ -71,6 +74,20 @@ through integrals of powers (`MeasureTheory.eLpNorm_rpow_eq`).
   `ν{T x > t} ≤ C₁ t⁻¹ ∫ G x dμ` and `∫ (T x)² dν ≤ C₂ ∫ (G x)² dμ`, the bound is
   `‖T x‖_{L_p(ν)} ≤ (p (2 C₁/(p - 1) + 4 C₂/(2 - p)))^(1/p) ‖G x‖_{L_p(μ)}`
   (`MeasureTheory.eLpNorm_le_of_weak_one_strong_two`).
+* **Gelfand triples.** Let `V`, `H` be Hilbert spaces over `ℝ` or `ℂ` and `ι : V → H` bounded
+  and linear. The pivot dual `J : H → V*`, `J g = ⟪g, ι ·⟫_H`, is the adjoint of `ι` followed by
+  Riesz's isometry, conjugate-linear with `‖J‖ = ‖ι‖` (`ContinuousLinearMap.pivotDual`,
+  `ContinuousLinearMap.pivotDual_apply_apply`, `ContinuousLinearMap.norm_pivotDual`); its kernel
+  is `(range ι)^⊥`, so `J` is injective iff `ι` has dense range
+  (`ContinuousLinearMap.ker_pivotDual`, `ContinuousLinearMap.pivotDual_injective_iff`), and
+  `J ∘ ι` is injective iff `ι` is (`ContinuousLinearMap.pivotDual_comp_injective_iff`). For
+  `H = L_2(μ)`, `J g v = ∫ conj (g) ι v dμ` (`MeasureTheory.L2.pivotDual_apply_apply`). For a
+  locally finite measure `μ` on a finite-dimensional real space carried by an open set `U`, a
+  function of `L_p(μ)`, `p ≥ 1`, that integrates to zero against the smooth real functions with
+  compact support in `U` vanishes, by the fundamental lemma of the calculus of variations
+  (`MeasureTheory.Lp.eq_zero_of_forall_integral_contDiff_smul_eq_zero`), so a continuous linear
+  map into `L_2(μ)` whose range contains these functions has dense range
+  (`MeasureTheory.L2.denseRange_of_forall_contDiff`).
 
 ## What is formalised
 
@@ -103,6 +120,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The Calderón–Zygmund decomposition on dyadic cubes, norms of means of vector-valued functions | ✅ | ✗ | `Analysis/Maximal/CalderonZygmund` |
 | The signed Calderón–Zygmund decomposition of functions with values in a normed space and of families: good parts bounded by `2^n t` with `∫ ‖·‖² ≤ 2^n t ∫ ‖f‖`, bad pieces with mean zero on their cubes and total mass at most `2 ∫ ‖f‖` | ✅ | ✗ | `Analysis/Maximal/CalderonZygmundSigned` |
 | The Fefferman–Stein inequality | ✅ | ✗ | `Analysis/Maximal/FeffermanStein` |
+| The pivot dual `H → V*` of a bounded operator `V → H` between Hilbert spaces: the inner product of `H`, the integral form for `H = L_2(μ)`, its norm, its kernel `(range ι)^⊥`, injectivity iff dense range, dense range by orthogonal complements, smooth functions with compact support separating `L_p(μ)`, `p ≥ 1`, and dense range in `L_2(μ)` from them | ✅ | ✗ | `Analysis/Hilbert/GelfandTriple` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

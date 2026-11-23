@@ -274,6 +274,19 @@ For a general scheme the project describes `A^s_q`
   `g ∈ L_2(Γ)` is a trace iff `∫_Γ ∫_Γ |g(x) - g(y)|² / |x - y|^(d+2s-2) dσ(x) dσ(y) < ∞`
   (`Rd.BoundedLipschitzDomain.mem_range_traceL2_iff_slobodeckij`); the kernel of the trace is
   `H^s_0(Ω)` for `s ≤ 1` (`Rd.BoundedLipschitzDomain.traceKer_eq_zeroBoundarySpace_of_le_one`).
+* **Gelfand triples.** `L_2` is the pivot space between `H^s` and `H^{-s}` on `ℝ^d`, on open
+  sets `Ω` and on `Γ`. For `s ≥ 0` the embeddings `H^s(V) → L_2(V)` and `H̃^s(Ω) → L_2(Ω)`, and
+  for `0 < t < 1` the embedding `H^t(Γ) → L_2(Γ)`, are injective with dense range
+  (`Rd.sobolevToL2_injective`, `Rd.denseRange_sobolevToL2`, `Rd.tildeToL2_injective`,
+  `Rd.denseRange_tildeToL2`, `Rd.BoundedLipschitzDomain.boundarySobolevToL2_injective`,
+  `Rd.BoundedLipschitzDomain.denseRange_boundarySobolevToL2`). `L_2(V)` maps injectively into
+  `(H^s(V))^*`, and `g` goes to the pairing with the element of `H^{-s}(V)` whose distribution is
+  `g` (`Rd.pivotDual_sobolevToL2_injective`, `Rd.pivotDual_sobolevToL2_apply_apply`). `L_2(Ω)`
+  maps injectively into `H^{-s}(Ω)` and `L_2(Γ)` into `H^{-t}(Γ)`, and the pairing of the dual
+  space with the smaller space extends the inner product of `L_2`
+  (`Rd.dualEquiv_tildePivotDual_injective`, `Rd.pairing_dualEquiv_tildePivotDual`,
+  `Rd.BoundedLipschitzDomain.boundaryPivotDual_injective`,
+  `Rd.BoundedLipschitzDomain.boundaryPivotDual_apply_apply`).
 * **Eigenfunction expansions.** For an orthonormal basis of weak eigenfunctions `e_i` with
   eigenvalues `λ_i`, let `A_k` be the span of the `e_i` with `⌊√(1 + λ_i)⌋ < k`, and let
   `0 < θ < 1`, `1 ≤ q ≤ ∞`. On a bounded Lipschitz domain `Ω`, `d ≥ 1`, with the Neumann
@@ -346,7 +359,8 @@ block documents state every result with its Lean name and list the files:
   embeddings.
 * [Approximation spaces](docs/ApproximationSpaces.md): schemes, `A^s_q`, interpolation,
   decompositions.
-* [Tools from analysis](docs/Analysis.md): `L_p` tools, convolution, maximal functions.
+* [Tools from analysis](docs/Analysis.md): `L_p` tools, convolution, maximal functions,
+  Gelfand triples.
 
 [MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed.
 

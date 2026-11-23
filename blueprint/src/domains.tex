@@ -4468,7 +4468,9 @@ identifies their boundary traces with $B^{1/2}_{2,2}(\Gamma)$.
 \Cref{sec:sobolev-restriction-spaces} builds the Hilbert spaces $H^s(\Omega)$,
 $\tilde H^s(\Omega)$ and $H^s_0(\Omega)$ inside $H^s(V)$, for every open $\Omega$ and every real
 $s$, and \Cref{sec:sobolev-duality} proves the duality of $\tilde H^s(\Omega)$ and
-$H^{-s}(\Omega)$. \Cref{sec:boundary-trace-space} defines the trace space of $H^s(\Omega)$,
+$H^{-s}(\Omega)$ and gives the Gelfand triples $H^s(V) \subseteq L_2(V) \subseteq H^{-s}(V)$ and
+$\tilde H^s(\Omega) \subseteq L_2(\Omega) \subseteq H^{-s}(\Omega)$, $s \geq 0$.
+\Cref{sec:boundary-trace-space} defines the trace space of $H^s(\Omega)$,
 $1/2 < s < 3/2$, on a bounded Lipschitz domain as the orthogonal complement of the trace kernel
 in $H^s(\Omega)$, whose boundary traces are the functions of $B^{s-1/2}_{2,2}(\Gamma)$;
 \Cref{sec:trace-space-norm} shows that the norm of the trace space of $H^s(\Omega)$ is the
@@ -4477,7 +4479,8 @@ of $B^{s-1/2}_{2,2}(\Gamma)$, and
 \Cref{sec:boundary-slobodeckij} identifies $\Besov{s}{p}{p}(\Gamma)$, $0 < s < 1$, with the
 Sobolev--Slobodeckij space of $\Gamma$, which gives this norm in Gagliardo's form, makes
 $B^t_{2,2}(\Gamma)$ the Hilbert space $H^t(\Gamma)$ with the Gagliardo norm of the chart pieces,
-and identifies the trace space of $H^s(\Omega)$ with $H^{s-1/2}(\Gamma)$.
+identifies the trace space of $H^s(\Omega)$ with $H^{s-1/2}(\Gamma)$, and gives the Gelfand
+triple $H^t(\Gamma) \subseteq L_2(\Gamma) \subseteq H^{-t}(\Gamma)$.
 \Cref{sec:sobolev-extension} proves the extension theorem for $\Sob{1}{p}$ on bounded
 Lipschitz domains, $1 < p < \infty$, with a bounded linear extension operator on the jets of
 \Cref{def:sobolev-jets}, from the divergence kernels of \Cref{sec:divergence-kernels};
@@ -5274,7 +5277,12 @@ $\tilde H^s(\Omega)$ and $H^{-s}(\Omega)$ are dual to each other, as in Chandler
 and Moiola \cite[Theorem 3.3]{ChandlerWildeHewettMoiola}, for every open set and every real $s$.
 The tool is the isometry $J_{2s} : H^s(V) \to H^{-s}(V)$: it carries the orthogonal complement
 of $\tilde H^s(\Omega)$ onto $N^{-s}(\Omega)$, hence $\tilde H^s(\Omega)$ onto $H^{-s}(\Omega)$,
-and Riesz's representation theorem does the rest.
+and Riesz's representation theorem does the rest. For $s \geq 0$ the pivot dual of
+\Cref{thm:pivot-dual} makes $L_2$ the pivot space of the Gelfand triples
+$H^s(V) \subseteq L_2(V) \subseteq H^{-s}(V)$, whose duality is the pairing of $H^{-s}(V)$ with
+$H^s(V)$ (\Cref{thm:rd-gelfand-triple}), and
+$\tilde H^s(\Omega) \subseteq L_2(\Omega) \subseteq H^{-s}(\Omega)$
+(\Cref{thm:domain-gelfand-triple}).
 
 \begin{lemma}[$J_t$ keeps real functions real]
 \label{lem:bessel-schwartz-real}
@@ -5562,6 +5570,88 @@ isometry preserves inner products, and inside $H^1(V)$ it is the identity
 $\tilde H^1(\Omega)$ and $H^1_0(\Omega)$ are the same subspace of $H^1(V)$
 (\Cref{lem:sobolev-tilde-in-restriction}), so in \Cref{cor:sobolev-duality-zero-boundary} $W$ is
 paired with $u$ itself.
+
+\begin{theorem}[The Gelfand triple $H^s(V) \subseteq L_2(V) \subseteq H^{-s}(V)$]
+\label{thm:rd-gelfand-triple}
+\lean{Rd.toDistr_sobolevInclusion_ofLp, Rd.denseRange_sobolevToL2,
+  Rd.pivotDual_sobolevToL2_apply_apply, Rd.pivotDual_sobolevToL2_injective}
+\leanok
+\uses{thm:pivot-dual, def:sobolev-pairing, def:sobolev-to-l2, lem:sobolev-to-l2,
+  lem:sobolev-inclusion, lem:sobolev-of-schwartz, lem:sobolev-inclusion-tests, lem:plancherel-l2}
+Let $s \geq 0$. For every $g \in L_2(V)$, read as an element of $H^0(V)$,
+$\iota_{-s,0} g \in H^{-s}(V)$ has the tempered distribution $g$. The operator
+$\iota_s : H^s(V) \to L_2(V)$ has dense range. Let $J$ be the pivot dual of $\iota_s$. For every
+$g \in L_2(V)$, every $W \in H^{-s}(V)$ whose tempered distribution is $g$ and every
+$U \in H^s(V)$,
+\[
+  (J g)(U) = \langle g, \iota_s U \rangle_{L_2} = [W, U] ,
+\]
+and $J$ is injective. Thus $H^s(V) \subseteq L_2(V) \subseteq H^{-s}(V)$ is a Gelfand triple with
+pivot space $L_2(V)$, and its duality is the pairing of \Cref{def:sobolev-pairing}.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The tempered distribution of $\iota_{-s,0} g$ is that of $g \in H^0(V)$
+(\Cref{lem:sobolev-inclusion}), which is $J_0 g = g$ (Mathlib's
+\texttt{BesselPotentialSpace.\allowbreak ofLp} and \texttt{TemperedDistribution.\allowbreak
+besselPotential\_\allowbreak zero}). The range of $\iota_s$ contains the Schwartz functions
+(\Cref{lem:sobolev-of-schwartz}, \Cref{lem:sobolev-inclusion-tests}), which are dense in $L_2(V)$
+(Mathlib's \texttt{SchwartzMap.\allowbreak denseRange\_\allowbreak toLpCLM}). An element of
+$H^{-s}(V)$ is determined by its distribution, so $W = \iota_{-s,0} g$. By Plancherel
+(\Cref{lem:plancherel-l2}) and \Cref{lem:sobolev-inclusion},
+$\langle g, \iota_s U \rangle_{L_2} = \int \overline{\widehat g} \, \langle \xi \rangle^{-s}
+\widehat{J_s U} \, d\xi$ and $[W, U] = \langle J_{-s} W, J_s U \rangle_{L_2} =
+\int \overline{\langle \xi \rangle^{-s} \widehat g} \, \widehat{J_s U} \, d\xi$, which agree since
+the weight is real. \Cref{thm:pivot-dual} gives $(J g)(U) = \langle g, \iota_s U \rangle_{L_2}$
+and the injectivity of $J$.
+\end{proof}
+
+\begin{theorem}[The Gelfand triple
+  $\tilde H^s(\Omega) \subseteq L_2(\Omega) \subseteq H^{-s}(\Omega)$]
+\label{thm:domain-gelfand-triple}
+\lean{Rd.tildeToL2, Rd.tildeToL2_apply_ae, Rd.tildeToL2_injective, Rd.denseRange_tildeToL2,
+  Rd.tildePivotDual, Rd.tildePivotDual_apply_apply, Rd.tildePivotDual_injective,
+  Rd.pairing_dualEquiv_tildePivotDual, Rd.dualEquiv_tildePivotDual_injective}
+\leanok
+\uses{thm:pivot-dual, lem:l2-dense-smooth, thm:sobolev-duality, def:sobolev-tilde-zero-boundary,
+  lem:tilde-space-vanishes-outside-nonneg, lem:sobolev-to-l2, def:test-schwartz,
+  lem:sobolev-of-schwartz, lem:sobolev-inclusion-tests}
+Let $\Omega \subseteq V$ be open and $s \geq 0$. The operator
+$\iota^\Omega_s : \tilde H^s(\Omega) \to L_2(\Omega)$, $U \mapsto (\iota_s U)|_\Omega$, is a
+bounded injective linear operator with dense range. Its pivot dual
+$J_\Omega : L_2(\Omega) \to \tilde H^s(\Omega)^*$,
+\[
+  (J_\Omega g)(U) = \int_\Omega \overline{g} \, \iota_s U \, dx
+  \qquad (g \in L_2(\Omega), \ U \in \tilde H^s(\Omega)) ,
+\]
+is conjugate-linear, bounded and injective. Let $W_g \in H^{-s}(\Omega)$ represent $J_\Omega g$ as
+in \Cref{thm:sobolev-duality}. Then $g \mapsto W_g$ is injective and
+$[W_g, U] = \int_\Omega \overline{g} \, \iota_s U \, dx$ for every $U \in \tilde H^s(\Omega)$.
+Thus $\tilde H^s(\Omega) \subseteq L_2(\Omega) \subseteq H^{-s}(\Omega)$ is a Gelfand triple with
+pivot space $L_2(\Omega)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+$\iota_s U$ vanishes almost everywhere outside $\Omega$
+(\Cref{lem:tilde-space-vanishes-outside-nonneg}), so $(\iota_s U)|_\Omega = 0$ forces
+$\iota_s U = 0$, and $U = 0$ (\Cref{lem:sobolev-to-l2}). A smooth $\psi : V \to \R$ with compact
+support in $\Omega$ is a test function $\varphi$ of $\Omega$; it lies in
+$T^s(\Omega) \subseteq \tilde H^s(\Omega)$ (\Cref{def:sobolev-tilde-zero-boundary}), and
+$\iota_s \varphi = \varphi$ (\Cref{def:test-schwartz}, \Cref{lem:sobolev-of-schwartz},
+\Cref{lem:sobolev-inclusion-tests}).
+\Cref{lem:l2-dense-smooth} for Lebesgue measure on $\Omega$, with $U = \Omega$, gives the dense
+range, and \Cref{thm:pivot-dual} the formula for $J_\Omega$ and its injectivity. By
+\Cref{thm:sobolev-duality}, $[W_g, U] = (J_\Omega g)(U)$, and $\ell \mapsto W_\ell$ is injective.
+\end{proof}
+
+For $s = 1$, restriction maps $\tilde H^1(\Omega)$ isometrically onto $H^1_0(\Omega)$
+(\Cref{thm:sobolev-tilde-zero-boundary}), and the triple is
+$H^1_0(\Omega) \subseteq L_2(\Omega) \subseteq H^{-1}(\Omega)$. On a Lipschitz domain, for
+$s \geq 0$ with $s - \frac12 \notin \Z$, restriction is an isomorphism of $\tilde H^s(\Omega)$
+onto $H^s_0(\Omega)$ with equivalent norms \cite[Theorem 3.33]{McLean}, and up to equivalent
+norms the triple is $H^s_0(\Omega) \subseteq L_2(\Omega) \subseteq H^{-s}(\Omega)$.
 
 \section{The trace spaces of a bounded Lipschitz domain}
 \label{sec:boundary-trace-space}
@@ -6280,7 +6370,10 @@ charts, the Gagliardo form of $\Gamma$ is compared with the Gagliardo form of th
 (\Cref{sec:sobolev-slobodeckij}). The Gagliardo forms of the chart pieces give
 $B^t_{2,2}(\Gamma)$, $0 < t < 1$, an equivalent Hilbert norm; with it $B^t_{2,2}(\Gamma)$ is the
 Sobolev space $H^t(\Gamma)$, and the trace space of $H^s(\Omega)$, $1/2 < s < 3/2$, is
-$H^{s-1/2}(\Gamma)$. The results hold in every dimension $n \geq 1$; for $n = 1$ the hyperplanes
+$H^{s-1/2}(\Gamma)$. $H^t(\Gamma)$ is dense in $L_2(\Gamma)$, and the pivot dual of
+\Cref{thm:pivot-dual} gives the Gelfand triple
+$H^t(\Gamma) \subseteq L_2(\Gamma) \subseteq H^{-t}(\Gamma)$ (\Cref{thm:boundary-gelfand-triple}).
+The results hold in every dimension $n \geq 1$; for $n = 1$ the hyperplanes
 are points and $\Gamma$ is finite.
 
 \paragraph{The form and double integrals in the charts.}
@@ -6974,6 +7067,53 @@ right side for $F = \iota_s U$. The function $\iota_s u$ is an extension of
 $\mathbf 1_\Omega \iota_s u$ with a finite norm, so the Besov trace is
 $\operatorname{Tr}_\Gamma \iota_s u$ (\Cref{thm:besov-trace-operator}), which is
 $\gamma^s_{L_2} u$ (\Cref{thm:trace-l2}).
+\end{proof}
+
+\begin{theorem}[The Gelfand triple $H^t(\Gamma) \subseteq L_2(\Gamma) \subseteq H^{-t}(\Gamma)$]
+\label{thm:boundary-gelfand-triple}
+\lean{Rd.BoundedLipschitzDomain.boundarySobolevToL2,
+  Rd.BoundedLipschitzDomain.boundarySobolevToL2_apply,
+  Rd.BoundedLipschitzDomain.boundarySobolevToL2_injective,
+  Rd.BoundedLipschitzDomain.exists_boundarySobolev_toLp_ae_eq,
+  Rd.BoundedLipschitzDomain.denseRange_boundarySobolevToL2,
+  Rd.BoundedLipschitzDomain.boundaryPivotDual,
+  Rd.BoundedLipschitzDomain.boundaryPivotDual_apply_apply,
+  Rd.BoundedLipschitzDomain.boundaryPivotDual_injective}
+\leanok
+\uses{thm:pivot-dual, lem:l2-dense-smooth, def:dual-boundary-sobolev, thm:boundary-sobolev-norm,
+  def:boundary-besov-space, def:boundary-l2, thm:ambient-trace-l2, thm:boundary-trace-charts,
+  thm:trace-space-functions, lem:sobolev-of-schwartz, lem:sobolev-inclusion-tests}
+Let $0 < t < 1$. The map $\iota_\Gamma : H^t(\Gamma) \to L_2(\Gamma)$ that sends $g$ to its
+function in $L_2(\Gamma)$ is a bounded injective linear operator. For every smooth
+$\psi : V \to \R$ with compact support there is $g \in H^t(\Gamma)$ with $g = \psi$
+$\sigma$-almost everywhere, and $\iota_\Gamma$ has dense range. Its pivot dual
+$J_\Gamma : L_2(\Gamma) \to H^{-t}(\Gamma)$,
+\[
+  (J_\Gamma g)(h) = \int_\Gamma \overline{g} \, h \, d\sigma
+  \qquad (g \in L_2(\Gamma), \ h \in H^t(\Gamma)) ,
+\]
+is conjugate-linear, bounded and injective. Thus $H^t(\Gamma) \subseteq L_2(\Gamma) \subseteq
+H^{-t}(\Gamma)$ is a Gelfand triple with pivot space $L_2(\Gamma)$: the pairing of
+$H^{-t}(\Gamma)$ with $H^t(\Gamma)$ extends the inner product of $L_2(\Gamma)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+$\iota_\Gamma$ is the identity of $H^t(\Gamma)$ onto $B^t_{2,2}(\Gamma)$
+(\Cref{thm:boundary-sobolev-norm}) followed by the inclusion of $B^t_{2,2}(\Gamma)$ into
+$L_2(\Gamma)$ (\Cref{def:boundary-besov-space}), and an element of $B^t_{2,2}(\Gamma)$ is
+determined by its function. Let $\psi$ be smooth with compact support and
+$s = t + 1/2 \in (1/2, 3/2)$. Then $\psi$ is a Schwartz function, an element of $H^s(V)$ with
+$\iota_s \psi = \psi$ (\Cref{lem:sobolev-of-schwartz}, \Cref{lem:sobolev-inclusion-tests}). Its
+trace
+$T^s_\Gamma \psi \in L_2(\Gamma)$ is $\operatorname{Tr}_\Gamma \psi$ $\sigma$-almost everywhere
+(\Cref{thm:ambient-trace-l2}), which is $\psi$ on $\Gamma$ since $\psi$ is continuous
+(\Cref{thm:boundary-trace-charts}), and it lies in $B^{s-1/2}_{2,2}(\Gamma) = B^t_{2,2}(\Gamma)$
+(\Cref{thm:trace-space-functions}); so $g = T^s_\Gamma \psi$ lies in $H^t(\Gamma)$. The surface
+measure is finite, hence locally finite, and \Cref{lem:l2-dense-smooth} with $U = V$ gives the
+dense range. \Cref{thm:pivot-dual} gives
+$(J_\Gamma g)(h) = \langle g, h \rangle_{L_2(\Gamma)}$ and the injectivity of $J_\Gamma$
+(\Cref{def:boundary-l2}, \Cref{def:dual-boundary-sobolev}).
 \end{proof}
 
 \section{The extension theorem for Sobolev spaces}

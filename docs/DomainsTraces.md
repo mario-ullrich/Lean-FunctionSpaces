@@ -24,30 +24,31 @@ Laplacian are in [Manifolds and eigenbases](Manifolds.md), and the comparison of
 On a bounded Lipschitz domain, `H^1` is the space of restrictions of `H^1(ℝ^d)`, with weak
 derivatives in `L_2` of the domain and boundary traces in `B^{1/2}_{2,2}` of the boundary. On every
 open set the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)` and `H^s_0(Ω)`, for real `s`, are built inside
-Mathlib's `H^s(ℝ^d)`, with the duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`. On a bounded Lipschitz domain the
+Mathlib's `H^s(ℝ^d)`, with the duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`; for `s ≥ 0`, `L_2(Ω)` is the
+pivot space of the Gelfand triple `H̃^s(Ω) ⊂ L_2(Ω) ⊂ H^{-s}(Ω)`. On a bounded Lipschitz domain the
 trace space of `H^s(Ω)`, `1/2 < s < 3/2`, is defined as the orthogonal complement of the trace
 kernel in `H^s(Ω)`, a Hilbert space whose trace and extension operators have norm at most `1` by
 this definition, and its dual is identified with it by Riesz; the boundary traces of its elements
 are the functions of
 `B^{s-1/2}_{2,2}(Γ)`. Its norm is the least `H^s` norm of an extension and is equivalent to the
 norm of `B^{s-1/2}_{2,2}(Γ)` by chart pieces. With the Gagliardo norm of its chart pieces,
-`B^t_{2,2}(Γ)`, `0 < t < 1`, is the Hilbert space `H^t(Γ)`, and the trace space of `H^s(Ω)` is
-isomorphic to `H^{s-1/2}(Γ)`. On a Lipschitz graph domain the area
-formula expresses Mathlib's Euclidean Hausdorff measure of the boundary in the chart, with the Gram
-density `√(1 + ‖∇φ‖²)`. On a bounded Lipschitz domain the surface measure is this Hausdorff measure
-on the boundary `Γ`; it gives the space `L_2(Γ)`, into which `H^s(Ω)` and its trace space have
-bounded trace operators. The outward unit normal field is pasted from the chart normals. On a
-bounded Lipschitz domain, every function of `W^1_p(Ω)`, `1 < p < ∞`, is the restriction of a
-function of `W^1_p(ℝ^d)` under a bounded linear extension operator, built from Rychkov's local
-extension with the local means of the gradient: the local means kernels of order two are divergences
-of dilated kernels with mean zero, which form Calderón–Zygmund families. For `p = 2` this identifies
-`H^1(Ω)` with `W^1_2(Ω)`. For every `1 ≤ p ≤ ∞` every function of `W^1_p(Ω)` is the restriction of a
-function of `W^1_p(ℝ^d)` under a bounded linear extension operator, by reflection across the
-boundary in the flattened coordinates of the graph domains. For `1 < p < ∞` and every order `m`
-every function of `W^m_p(Ω)` is the restriction of a function of `W^m_p(ℝ^d)` with a bound, by
-Rychkov's local extension with the local means of the derivatives of order `m`, pasted with the
-Leibniz rule. On a Lipschitz graph domain, the Gauss–Green theorem `∫_Ω ∂_v g = ∫_Γ g ⟪v, ν⟫ dσ`
-holds for compactly supported `C^1` functions, and Green's formula
+`B^t_{2,2}(Γ)`, `0 < t < 1`, is the Hilbert space `H^t(Γ)`, the trace space of `H^s(Ω)` is
+isomorphic to `H^{s-1/2}(Γ)`, and `H^t(Γ) ⊂ L_2(Γ) ⊂ H^{-t}(Γ)` is a Gelfand triple. On a
+Lipschitz graph domain the area formula expresses Mathlib's Euclidean Hausdorff measure of the
+boundary in the chart, with the Gram density `√(1 + ‖∇φ‖²)`. On a bounded Lipschitz domain the
+surface measure is this Hausdorff measure on the boundary `Γ`; it gives the space `L_2(Γ)`, into
+which `H^s(Ω)` and its trace space have bounded trace operators. The outward unit normal field is
+pasted from the chart normals. On a bounded Lipschitz domain, every function of `W^1_p(Ω)`,
+`1 < p < ∞`, is the restriction of a function of `W^1_p(ℝ^d)` under a bounded linear extension
+operator, built from Rychkov's local extension with the local means of the gradient: the local means
+kernels of order two are divergences of dilated kernels with mean zero, which form Calderón–Zygmund
+families. For `p = 2` this identifies `H^1(Ω)` with `W^1_2(Ω)`. For every `1 ≤ p ≤ ∞` every function
+of `W^1_p(Ω)` is the restriction of a function of `W^1_p(ℝ^d)` under a bounded linear extension
+operator, by reflection across the boundary in the flattened coordinates of the graph domains. For
+`1 < p < ∞` and every order `m` every function of `W^m_p(Ω)` is the restriction of a function of
+`W^m_p(ℝ^d)` with a bound, by Rychkov's local extension with the local means of the derivatives of
+order `m`, pasted with the Leibniz rule. On a Lipschitz graph domain, the Gauss–Green theorem
+`∫_Ω ∂_v g = ∫_Γ g ⟪v, ν⟫ dσ` holds for compactly supported `C^1` functions, and Green's formula
 `∫_Ω (∂_v f) g + f ∂_v g = ∫_Γ Tr f · Tr g ⟪v, ν⟫ dσ` for `f, g ∈ W^1_2(ℝ^d)`, by the density of the
 compactly supported Schwartz functions in every `H^s(ℝ^d)`. On a bounded Lipschitz domain, Green's
 formula `∫_Ω (∂_v u) w + u ∂_v w = ∫_Γ γ_{L_2} u · γ_{L_2} w ⟪v, ν⟫ dσ` holds for `u, w ∈ H^1(Ω)`,
@@ -338,6 +339,17 @@ extension from the boundary, one operator for every smoothness, so that the corr
   `Rd.dualZeroBoundaryEquiv`). On the way, the Bessel potential `J_t` of a real Schwartz
   function is real (`Rd.conj_besselSchwartz_apply`), from `conj (𝓕 f) = 𝓕⁻(conj f)` on `V`
   (`Rd.conj_fourier_apply`).
+* **Gelfand triples on `ℝ^d` and on open sets.** Let `s ≥ 0`. `ι_s : H^s(V) → L_2(V)` is
+  injective with dense range (`Rd.denseRange_sobolevToL2`), and its pivot dual
+  `L_2(V) → (H^s(V))^*`, `g ↦ ⟪g, ι_s ·⟫_{L_2}` (`ContinuousLinearMap.pivotDual`), is the
+  pairing `[W, ·]` with the element `W ∈ H^{-s}(V)` whose distribution is `g`
+  (`Rd.pivotDual_sobolevToL2_apply_apply`): `L_2(V)` is the pivot space of
+  `H^s(V) ⊂ L_2(V) ⊂ H^{-s}(V)`. For open `Ω`, `U ↦ (ι_s U)|_Ω` is injective with dense range
+  from `H̃^s(Ω)` into `L_2(Ω)` (`Rd.tildeToL2`, `Rd.tildeToL2_injective`,
+  `Rd.denseRange_tildeToL2`), and `g ∈ L_2(Ω)` goes injectively to the `W_g ∈ H^{-s}(Ω)` with
+  `[W_g, U] = ∫_Ω conj (g) ι_s U` for every `U ∈ H̃^s(Ω)` (`Rd.tildePivotDual`,
+  `Rd.pairing_dualEquiv_tildePivotDual`, `Rd.dualEquiv_tildePivotDual_injective`): the triple
+  `H̃^s(Ω) ⊂ L_2(Ω) ⊂ H^{-s}(Ω)`, for `s = 1` the triple `H^1_0(Ω) ⊂ L_2(Ω) ⊂ H^{-1}(Ω)`.
 * **The trace spaces of a bounded Lipschitz domain.** For every `U ∈ H^1(V)` with `L_2` function
   `ι U` (`Rd.toL2`), `‖ι U‖_2 + ‖(2^k ω_2(ι U, 2^(-k))_2)_k‖_{ℓ_2} ≤ C ‖U‖` with an explicit
   constant (`Rd.modNorm_two_le_norm`, `Rd.sobolevOneBesovConst`). Conversely
@@ -462,7 +474,13 @@ extension from the boundary, one operator for every smoothness, so that the corr
   `(‖g‖²_{L_2(Γ)} + ∫_Γ ∫_Γ |g(y) - g(x)|² / |y - x|^(n-1+2t) dσ dσ)^(1/2)`
   (`Rd.BoundedLipschitzDomain.exists_boundarySobolev_norm_equiv_slobodeckij`); its dual
   `H^{-t}(Γ)` is conjugate-linearly isometric to it by Riesz
-  (`Rd.BoundedLipschitzDomain.dualBoundarySobolevEquiv`). For `1/2 < s < 3/2` the trace space of
+  (`Rd.BoundedLipschitzDomain.dualBoundarySobolevEquiv`). `H^t(Γ)` is dense in `L_2(Γ)`, since it
+  contains the restrictions to `Γ` of the smooth functions with compact support
+  (`Rd.BoundedLipschitzDomain.denseRange_boundarySobolevToL2`), so
+  `g ↦ (h ↦ ∫_Γ conj (g) h dσ)` maps `L_2(Γ)` injectively into `H^{-t}(Γ)`
+  (`Rd.BoundedLipschitzDomain.boundaryPivotDual`,
+  `Rd.BoundedLipschitzDomain.boundaryPivotDual_injective`): `H^t(Γ) ⊂ L_2(Γ) ⊂ H^{-t}(Γ)` is a
+  Gelfand triple with pivot space `L_2(Γ)`. For `1/2 < s < 3/2` the trace space of
   `H^s(Ω)` is isomorphic to `H^{s-1/2}(Γ)` (McLean, Theorem 3.38;
   `Rd.BoundedLipschitzDomain.traceSpaceEquivBoundarySobolev`; for `s = 1` with values in
   `H^{1/2}(Γ)`, `Rd.BoundedLipschitzDomain.traceSpaceOneEquivBoundarySobolevHalf`); the trace
@@ -659,13 +677,13 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Flattening of graph domains, the Lipschitz bounds of the flattening and its inverse, the graph in the image of the hyperplane, product and graph coordinates, preservation of the Lebesgue measure for every Lipschitz graph | ✅ | ✗ | `Domains/Lipschitz/GraphStraightening` |
 | `H^1` on bounded Lipschitz domains defined as restrictions of `H^1(ℝ^d)`, by intrinsic differences, the identification with the restriction space, the weak gradient, and the boundary traces, which form `B^{1/2}_{2,2}(Γ)` | ✅ | ✗ | `Domains/Sobolev/LipschitzDomainH1` |
 | The Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)` and `H^s_0(Ω)` on open sets inside Mathlib's `H^s(ℝ^d)`, `H^s(Ω)` as a quotient, Rellich's theorem for `H^1(Ω)`, the restriction of an element agreeing with `u ∈ H^1(Ω)` on `Ω`, the bound of the `H^1` norm by the `W^1_2` norm, the weak derivatives as bounded operators on `H^1(ℝ^d)`, differences and moduli of `H^1(ℝ^d)` functions by the gradient, the density of compactly supported Schwartz functions in `H^s(ℝ^d)`, Schwartz functions with compact support in `Ω` in the span of the test functions, vanishing on `Ω` by the `L_2` function for every `s ≥ 0`, `H̃^s(ℝ^d) = H^s(ℝ^d)`, the isometry `H̃^1(Ω) ≅ H^1_0(Ω)`, and the vanishing of `H̃^s(Ω)` outside `Ω` for `s ≥ 0` | ✅ | ✗ | `Domains/Sobolev/SobolevRestrictionSpaces` |
-| The Bessel potential of real Schwartz functions as a real function, the isometry `J_{2s} : H^s(ℝ^d) → H^{-s}(ℝ^d)`, the pairing of `H^{-s}` and `H^s`, and the duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, `(H^s(Ω))^* ≅ H̃^{-s}(Ω)`, `(H^1_0(Ω))^* ≅ H^{-1}(Ω)` on open sets | ✅ | ✗ | `Domains/Sobolev/SobolevDuality` |
+| The Bessel potential of real Schwartz functions as a real function, the isometry `J_{2s} : H^s(ℝ^d) → H^{-s}(ℝ^d)`, the pairing of `H^{-s}` and `H^s`, and the duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, `(H^s(Ω))^* ≅ H̃^{-s}(Ω)`, `(H^1_0(Ω))^* ≅ H^{-1}(Ω)` on open sets; the Gelfand triples `H^s(ℝ^d) ⊂ L_2(ℝ^d) ⊂ H^{-s}(ℝ^d)` and `H̃^s(Ω) ⊂ L_2(Ω) ⊂ H^{-s}(Ω)`, `s ≥ 0`, with dense range of `ι_s` and of its restriction to `Ω` | ✅ | ✗ | `Domains/Sobolev/SobolevDuality` |
 | `H^1(ℝ^d) ⊆ B^{1/2}_{2,1}(ℝ^d)` and its converse `B^1_{2,2}(ℝ^d) ⊆ H^1(ℝ^d)` with explicit constants, the traces of `H^1(ℝ^d)` and `H^s(ℝ^d)`, `1/2 < s < 2`, on a Lipschitz graph, and for `1/2 < s < 3/2` the chart traces of `H^s(Ω)` on a bounded Lipschitz domain as bounded operators, the trace kernel, the restriction keeping the boundary trace, the trace space of `H^s(Ω)` defined as the orthogonal complement of the trace kernel, with trace and extension operators, `H^s(Ω) ⧸ ker γ_s` isometric to it, its boundary traces in `B^{s-1/2}_{2,2}(Γ)`, and its dual | ✅ | ✗ | `Domains/Traces/BoundaryTraceSpace` |
 | The area formula for Lipschitz graphs: Lipschitz maps and Mathlib's Euclidean Hausdorff measure, the linear case by Mathlib's norm determinant, stretches and tilts, the gradient and the Gram density, good pieces, `μHE[n-1](γ(A)) = ∫_A √(1 + ‖∇φ‖²)` with `n = dim V` in set, measure and integral form; the outward unit normal | ✅ | ✗ | `Domains/Lipschitz/LipschitzGraphArea` |
 | The surface measure of a bounded Lipschitz domain as `μHE[n-1]` on the boundary, its chart form, finiteness and null sets, the boundary `Γ` as a Lebesgue null set, the boundary trace in `L_p(Γ)`, `L_2(Γ)` with the traces of `H^s(Ω)` and of its trace space for `1/2 < s < 3/2`, and the outward unit normal field | ✅ | ✗ | `Domains/Lipschitz/SurfaceMeasure` |
 | The norm of the trace space of `H^s(Ω)`, `1/2 < s < 3/2`: least extension norm, equivalence with the norm of `B^{s-1/2}_{2,2}(Γ)`, bounded preimages, the range of its trace in `L_2(Γ)`, the isomorphism with the Banach space `B^{s-1/2}_{2,2}(Γ)`, and the bounded linear right inverse of the trace | ✅ | ✗ | `Domains/Traces/TraceSpaceNorm` |
 | The Sobolev–Slobodeckij norm on the boundary: Gagliardo's double integral for the surface measure, double integrals in the charts, the bounds by the chart-wise norm of `B^s_{p,p}(Γ)` in both directions, `W^{s,p}(Γ) = B^s_{p,p}(Γ)` for `0 < s < 1`, the norm of the trace space of `H^s(Ω)` as the Sobolev–Slobodeckij norm of `W^{s-1/2,2}(Γ)` | ✅ | ✗ | `Domains/Traces/BoundaryGagliardo` |
-| The Hilbert space `H^t(Γ)` as `B^t_{2,2}(Γ)` with the chart-wise Gagliardo norm, its dual, the trace space of `H^s(Ω)` isomorphic to `H^{s-1/2}(Γ)`, the trace onto `H^{s-1/2}(Γ)` with a bounded linear right inverse, and its agreement with the Besov trace | ✅ | ✗ | `Domains/Traces/BoundarySobolev` |
+| The Hilbert space `H^t(Γ)` as `B^t_{2,2}(Γ)` with the chart-wise Gagliardo norm, its dual, the trace space of `H^s(Ω)` isomorphic to `H^{s-1/2}(Γ)`, the trace onto `H^{s-1/2}(Γ)` with a bounded linear right inverse, and its agreement with the Besov trace; the Gelfand triple `H^t(Γ) ⊂ L_2(Γ) ⊂ H^{-t}(Γ)`, `0 < t < 1`, with `H^t(Γ)` dense in `L_2(Γ)` | ✅ | ✗ | `Domains/Traces/BoundarySobolev` |
 | Convolutions with sums of derivatives of dilated kernels, the local means of order two by the gradient, local means of Triebel–Lizorkin type on a set, the bounds of the local extension from one patch, bounded extensions from `L_p` bounds, pasting in `W^1_p(ℝ^d)`, the supports of the divergence kernels in the patches, the smooth cutoffs of the patches, dimension zero | ✅ | ✗ | `Domains/Extension/SobolevExtension` |
 | Rychkov's extension operator for `W^1_p`, `1 < p < ∞`, on value–derivative jets with a finite constant, and from it the extension from one patch and the extension theorem for `1 < p < ∞` with a bound | ✅ | ✗ | `Domains/Extension/SobolevExtensionOperator` |
 | The half-space and the reflection across a hyperplane, cutoffs near the hyperplane, integration by parts on the half-space, the linearity, weak derivatives and `L_p` bounds of the even reflection | ✅ | ✗ | `Domains/Extension/HalfSpaceReflection` |

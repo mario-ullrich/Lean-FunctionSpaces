@@ -218,6 +218,23 @@ declarations.
   for linear maps `T`, `S_i` between inner product spaces over `ℝ` or `ℂ` and a real `c` with
   `‖x‖² = ‖T x‖² + c ∑_i ‖S_i x‖²`, the inner products satisfy
   `⟨x, y⟩ = ⟨T x, T y⟩ + c ∑_i ⟨S_i x, S_i y⟩` (`inner_eq_of_forall_sq_norm_eq`).
+* **Gelfand triples** (`FunctionSpaces/Analysis/Hilbert/GelfandTriple.lean`): for a bounded
+  linear `ι : V → H` between Hilbert spaces, the pivot dual `J : H → V*`, `J g = ⟪g, ι ·⟫`, the
+  adjoint followed by `InnerProductSpace.toDual` (`ContinuousLinearMap.pivotDual`), with
+  `‖J‖ = ‖ι‖`, `ker J = (range ι)^⊥`, `J` injective iff `ι` has dense range, and `J ∘ ι` injective
+  iff `ι` is (`ContinuousLinearMap.norm_pivotDual`, `ContinuousLinearMap.ker_pivotDual`,
+  `ContinuousLinearMap.pivotDual_injective_iff`,
+  `ContinuousLinearMap.pivotDual_comp_injective_iff`), and `J g v = ∫ conj (g) ι v dμ` for
+  `H = L_2(μ)` (`MeasureTheory.L2.pivotDual_apply_apply`); a continuous linear map into a Hilbert
+  space has dense range iff `(range T)^⊥ = ⊥`
+  (`ContinuousLinearMap.denseRange_iff_orthogonal_range_eq_bot`, next to
+  `ContinuousLinearMap.orthogonal_range` in `Mathlib/Analysis/InnerProductSpace/Adjoint.lean`);
+  a function of `L_p(μ)`, `p ≥ 1`, that integrates to zero against the smooth real functions with
+  compact support in an open set carrying `μ` vanishes
+  (`MeasureTheory.Lp.eq_zero_of_forall_integral_contDiff_smul_eq_zero`, from
+  `IsOpen.ae_eq_zero_of_integral_contDiff_smul_eq_zero`); and dense range in `L_2(μ)` of a map
+  whose range contains these functions (`MeasureTheory.L2.denseRange_of_forall_contDiff`).
+  Mathlib `v4.35.0` has adjoints and Riesz's representation but no pivot dual or Gelfand triple.
 * **Fourier analysis on the torus** (`FunctionSpaces/Torus/Translation.lean`): the Fourier
   coefficients of a translate, `(τ_h f)^(k) = e_k(h) f̂(k)`
   (`Torus.mFourierCoeff_translate`), and `|∏ aᵢ - 1| ≤ ∑ |aᵢ - 1|` for unimodular `aᵢ`

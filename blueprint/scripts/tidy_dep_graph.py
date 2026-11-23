@@ -78,6 +78,7 @@ BLOCKS: list[tuple[str, list]] = [
         r"Convolution and the Fourier transform on \texorpdfstring{$\R^d$}{R\^{}d}"]),
     ("Maximal functions and the Fefferman–Stein inequality", ["Maximal functions"]),
     ("Interpolation of operators", ["Interpolation of operators"]),
+    ("Gelfand triples", ["Gelfand triples"]),
     ("The torus", ["The torus", "Classical definitions on the torus"]),
     ("The Haar system and multiwavelets", [
         "Filtrations and martingale differences",
@@ -157,6 +158,7 @@ COLUMNS: list[list[str]] = [
      "Vector-valued singular integrals", "Sobolev spaces W^m_p", "Sobolev spaces on the torus",
      "Bessel potential spaces", "Fourier multipliers"],
     ["Traces", "Sobolev spaces on domains and boundaries", "Eigenbases of the Laplacian"],
+    ["Interpolation of operators", "Gelfand triples"],
     ["Approximation spaces: general theory", "Real interpolation of couples"],
 ]
 GAP = 2

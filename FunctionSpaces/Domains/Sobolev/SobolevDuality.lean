@@ -5,11 +5,12 @@ Authors: Mario Ullrich
 -/
 module
 
-public import FunctionSpaces.Domains.Sobolev.SobolevRestrictionSpaces
+public import FunctionSpaces.Domains.Sobolev.SobolevRestrictionInclusions
+public import FunctionSpaces.Analysis.Hilbert.GelfandTriple
 public import Mathlib.Analysis.InnerProductSpace.Dual
 
 /-!
-# Duality of Sobolev spaces on open sets
+# Duality of Sobolev spaces on open sets and Gelfand triples
 
 Let `V` be a finite-dimensional real inner product space, such as `ℝ^d`, with Lebesgue measure,
 `Ω ⊆ V` open and `s` real. The Hilbert spaces `H̃^s(Ω)` and `H^{-s}(Ω)` of
@@ -37,6 +38,14 @@ Chandler-Wilde, Hewett and Moiola (Theorem 3.3), for every open set and every re
   through the pairing, conjugate-linear and isometric; the pairing may use every extension of the
   representing element (`Rd.dualEquiv_apply_of_restrictProj_eq`,
   `Rd.dualRestrictionEquiv_apply_restrictProj`).
+* **Gelfand triples**, `s ≥ 0`: `ι_s : H^s(V) → L_2(V)` and its restriction
+  `H̃^s(Ω) → L_2(Ω)` (`Rd.tildeToL2`) are injective with dense range (`Rd.denseRange_sobolevToL2`,
+  `Rd.tildeToL2_injective`, `Rd.denseRange_tildeToL2`), so `L_2` is the pivot space of
+  `H^s(V) ⊂ L_2(V) ⊂ H^{-s}(V)` and of `H̃^s(Ω) ⊂ L_2(Ω) ⊂ H^{-s}(Ω)`. The pivot dual of `ι_s`
+  is the pairing with the element of `H^{-s}(V)` of an `L_2` function
+  (`Rd.pivotDual_sobolevToL2_apply_apply`); `g ∈ L_2(Ω)` goes injectively to the element of
+  `H^{-s}(Ω)` whose pairing with `H̃^s(Ω)` is `U ↦ ∫_Ω conj (g) ι_s U` (`Rd.tildePivotDual`,
+  `Rd.pairing_dualEquiv_tildePivotDual`, `Rd.dualEquiv_tildePivotDual_injective`).
 -/
 
 @[expose] public section
@@ -565,5 +574,154 @@ theorem dualZeroBoundaryEquiv_eq_iff (ℓ : StrongDual ℂ (zeroBoundarySpace 1 
       ℓ u = pairing 1 (W : H^{-1}(V)) ((u : RestrictionSpace 1 Ω) : H^{1}(V)) := by
   rw [← LinearIsometryEquiv.eq_symm_apply, ContinuousLinearMap.ext_iff]
   simp only [dualZeroBoundaryEquiv_symm_apply]
+
+/-! ### Gelfand triples on `ℝ^d` -/
+
+/-- **The `L_2` functions in `H^{-s}(V)`**, `s ≥ 0`: for `g ∈ L_2(V)`, the element
+`ι_{-s,0} g ∈ H^{-s}(V)` of `g ∈ H^0(V)` (Mathlib's `BesselPotentialSpace.ofLp`) has the
+distribution `g` (`Rd.toDistr_sobolevInclusion`, `TemperedDistribution.besselPotential_zero`). -/
+theorem toDistr_sobolevInclusion_ofLp (hs : 0 ≤ s) (g : Lp ℂ 2 (volume : Measure V)) :
+    (sobolevInclusion (neg_nonpos.2 hs) (BesselPotentialSpace.ofLp 0 g) : H^{-s}(V)).toDistr =
+      (g : 𝓢'(V, ℂ)) := by
+  rw [toDistr_sobolevInclusion, BesselPotentialSpace.toDistr_ofLp, neg_zero,
+    TemperedDistribution.besselPotential_zero, ContinuousLinearMap.id_apply]
+
+/-- **`H^s(V)` is dense in `L_2(V)`**, `s ≥ 0`: the range of `ι_s` contains the Schwartz functions
+(`Rd.sobolevToL2_ofSchwartz`), which are dense in `L_2(V)` (Mathlib's
+`SchwartzMap.denseRange_toLpCLM`). -/
+theorem denseRange_sobolevToL2 (hs : 0 ≤ s) : DenseRange (sobolevToL2 (V := V) hs) :=
+  (SchwartzMap.denseRange_toLpCLM (F := ℂ) (μ := (volume : Measure V)) two_ne_top).mono (by
+    rintro _ ⟨w, rfl⟩
+    exact ⟨ofSchwartz s w, sobolevToL2_ofSchwartz hs w⟩)
+
+/-- **The Gelfand triple `H^s(V) ⊂ L_2(V) ⊂ H^{-s}(V)` is the Bessel duality**, `s ≥ 0`: the pivot
+dual of `ι_s : H^s(V) → L_2(V)` (`ContinuousLinearMap.pivotDual`) sends `g ∈ L_2(V)` to the
+pairing with the element `W ∈ H^{-s}(V)` whose distribution is `g`:
+`⟪g, ι_s U⟫_{L_2} = [W, U]` for every `U ∈ H^s(V)` (`Rd.pairing`). Such `W` exists
+(`Rd.toDistr_sobolevInclusion_ofLp`). By Plancherel both sides are
+`∫ conj (𝓕 g) ⟨ξ⟩^{-s} 𝓕(J_s U) dξ` (Mathlib's `MeasureTheory.Lp.inner_fourier_eq`,
+`Rd.fourier_toLp_sobolevInclusion_ae`). -/
+theorem pivotDual_sobolevToL2_apply_apply (hs : 0 ≤ s) (g : Lp ℂ 2 (volume : Measure V))
+    {W : H^{-s}(V)} (hW : W.toDistr = (g : 𝓢'(V, ℂ))) (U : H^{s}(V)) :
+    (sobolevToL2 hs).pivotDual g U = pairing s W U := by
+  have hW' : W = sobolevInclusion (neg_nonpos.2 hs) (BesselPotentialSpace.ofLp 0 g) :=
+    BesselPotentialSpace.ext (by rw [hW, toDistr_sobolevInclusion_ofLp hs])
+  rw [ContinuousLinearMap.pivotDual_apply_apply, hW', pairing, sobolevToL2_apply hs]
+  conv_lhs => rw [← Lp.inner_fourier_eq]
+  conv_rhs => rw [← Lp.inner_fourier_eq]
+  rw [MeasureTheory.L2.inner_def, MeasureTheory.L2.inner_def]
+  refine integral_congr_ae ?_
+  filter_upwards [fourier_toLp_sobolevInclusion_ae (neg_nonpos.2 hs)
+      (BesselPotentialSpace.ofLp 0 g), fourier_toLp_sobolevInclusion_ae hs U] with ξ h1 h2
+  rw [h1, h2, BesselPotentialSpace.toLp_ofLp, RCLike.inner_apply', RCLike.inner_apply', map_mul,
+    Complex.conj_ofReal, sub_zero, zero_sub]
+  ring
+
+/-- **`L_2(V) → (H^s(V))^*` is injective**, `s ≥ 0`: `ι_s` has dense range
+(`Rd.denseRange_sobolevToL2`, `ContinuousLinearMap.pivotDual_injective_iff`). -/
+theorem pivotDual_sobolevToL2_injective (hs : 0 ≤ s) :
+    Function.Injective (sobolevToL2 (V := V) hs).pivotDual :=
+  ((sobolevToL2 hs).pivotDual_injective_iff).2 (denseRange_sobolevToL2 hs)
+
+/-! ### Gelfand triples on open sets -/
+
+variable (Ω) in
+/-- **The embedding `H̃^s(Ω) → L_2(Ω)`**, `s ≥ 0`: `U ↦ (ι_s U)|_Ω`, the `L_2` function of
+`U ∈ H̃^s(Ω) ⊆ H^s(V)` (`Rd.sobolevToL2`) restricted to `Ω` (Mathlib's `LpToLpRestrictCLM`). It
+is injective, since the elements of `H̃^s(Ω)` vanish outside `Ω`, and it has dense range
+(`Rd.tildeToL2_injective`, `Rd.denseRange_tildeToL2`). -/
+noncomputable def tildeToL2 (hs : 0 ≤ s) :
+    tildeSpace s Ω →L[ℂ] Lp ℂ 2 (volume.restrict (Ω : Set V)) :=
+  LpToLpRestrictCLM V ℂ ℂ volume 2 (Ω : Set V) ∘L sobolevToL2 hs ∘L (tildeSpace s Ω).subtypeL
+
+/-- `tildeToL2 Ω hs U` is `ι_s U` almost everywhere on `Ω`. -/
+theorem tildeToL2_apply_ae (hs : 0 ≤ s) (U : tildeSpace s Ω) :
+    (tildeToL2 Ω hs U : V → ℂ) =ᵐ[volume.restrict (Ω : Set V)] sobolevToL2 hs (U : H^{s}(V)) :=
+  LpToLpRestrictCLM_coeFn ℂ _ _
+
+/-- **`H̃^s(Ω) → L_2(Ω)` is injective**, `s ≥ 0`: if `ι_s U = 0` on `Ω`, then `ι_s U = 0` on `V`,
+since `ι_s U` vanishes outside `Ω` (`Rd.sobolevToL2_ae_eq_zero_of_mem_tildeSpace`), and `ι_s` is
+injective (`Rd.sobolevToL2_injective`). -/
+theorem tildeToL2_injective (hs : 0 ≤ s) : Function.Injective (tildeToL2 Ω hs) := by
+  refine (injective_iff_map_eq_zero _).2 fun U hU => ?_
+  have h1 := tildeToL2_apply_ae hs U
+  rw [hU] at h1
+  replace h1 := h1.symm.trans (Lp.coeFn_zero (E := ℂ) (p := 2) (μ := volume.restrict (Ω : Set V)))
+  rw [EventuallyEq, ae_restrict_iff' Ω.isOpen.measurableSet] at h1
+  have h0 : sobolevToL2 hs (U : H^{s}(V)) = 0 := by
+    rw [Lp.eq_zero_iff_ae_eq_zero]
+    filter_upwards [h1, sobolevToL2_ae_eq_zero_of_mem_tildeSpace hs U.2] with x hx hx'
+    by_cases hxΩ : x ∈ (Ω : Set V)
+    · exact hx hxΩ
+    · exact hx' hxΩ
+  exact Subtype.ext (sobolevToL2_injective hs (h0.trans (map_zero _).symm))
+
+open scoped ContDiff in
+/-- **`H̃^s(Ω)` is dense in `L_2(Ω)`**, `s ≥ 0`: a smooth real function `ψ` with compact support in
+`Ω` is a test function `φ` of `Ω`, `ofTest s φ ∈ H̃^s(Ω)` has `ι_s φ = φ`
+(`Rd.ofTest_eq_ofSchwartz`, `Rd.sobolevToL2_ofSchwartz`), and these functions are dense in
+`L_2(Ω)` (`MeasureTheory.L2.denseRange_of_forall_contDiff`). -/
+theorem denseRange_tildeToL2 (hs : 0 ≤ s) : DenseRange (tildeToL2 Ω hs) := by
+  refine L2.denseRange_of_forall_contDiff _ Ω.isOpen (ae_restrict_mem Ω.isOpen.measurableSet)
+    fun ψ hψ hc hsupp => ?_
+  let φ : 𝓓(Ω, ℝ) := ⟨ψ, hψ.of_le (mod_cast le_top), hc, hsupp⟩
+  have hφ : sobolevToL2 hs (ofTest s φ) = (testSchwartz φ).toLp 2 := by
+    rw [ofTest_eq_ofSchwartz, sobolevToL2_ofSchwartz]
+  let U : tildeSpace s Ω :=
+    ⟨ofTest s φ, Submodule.le_topologicalClosure _ (Submodule.subset_span ⟨φ, rfl⟩)⟩
+  refine ⟨U, ?_⟩
+  filter_upwards [tildeToL2_apply_ae hs U,
+    ae_restrict_of_ae ((testSchwartz φ).coeFn_toLp 2 volume)] with x h1 h2
+  rw [h1, hφ, h2, testSchwartz_apply]
+  rfl
+
+variable (Ω) in
+/-- **The inclusion `L_2(Ω) → (H̃^s(Ω))^*`**, `s ≥ 0`: `g ↦ (U ↦ ∫_Ω conj (g) ι_s U)`, the pivot
+dual (`ContinuousLinearMap.pivotDual`) of the embedding `H̃^s(Ω) → L_2(Ω)`, conjugate-linear,
+bounded and injective (`Rd.tildePivotDual_apply_apply`, `Rd.tildePivotDual_injective`). With
+`(H̃^s(Ω))^* ≅ H^{-s}(Ω)` (`Rd.dualEquiv`) it gives the Gelfand triple
+`H̃^s(Ω) ⊂ L_2(Ω) ⊂ H^{-s}(Ω)` with pivot space `L_2(Ω)`: the pairing of `H^{-s}(Ω)` with
+`H̃^s(Ω)` extends the inner product of `L_2(Ω)` (`Rd.pairing_dualEquiv_tildePivotDual`). For
+`s = 1`, restriction maps `H̃^1(Ω)` isometrically onto `H^1_0(Ω)` (`Rd.tildeEquivZeroBoundary`),
+and the triple is `H^1_0(Ω) ⊂ L_2(Ω) ⊂ H^{-1}(Ω)`. On a Lipschitz domain, for `s ≥ 0` with
+`s - 1/2 ∉ ℤ`, restriction is an isomorphism of `H̃^s(Ω)` onto `H^s_0(Ω)` with equivalent norms
+(McLean, Theorem 3.33), and up to equivalent norms the triple is
+`H^s_0(Ω) ⊂ L_2(Ω) ⊂ H^{-s}(Ω)`. -/
+noncomputable def tildePivotDual (hs : 0 ≤ s) :
+    Lp ℂ 2 (volume.restrict (Ω : Set V)) →L⋆[ℂ] StrongDual ℂ (tildeSpace s Ω) :=
+  (tildeToL2 Ω hs).pivotDual
+
+/-- **The functional of `g ∈ L_2(Ω)`** on `H̃^s(Ω)` is `U ↦ ∫_Ω conj (g) ι_s U`
+(`MeasureTheory.L2.pivotDual_apply_apply`, `Rd.tildeToL2_apply_ae`). -/
+theorem tildePivotDual_apply_apply (hs : 0 ≤ s) (g : Lp ℂ 2 (volume.restrict (Ω : Set V)))
+    (U : tildeSpace s Ω) :
+    tildePivotDual Ω hs g U = ∫ x in (Ω : Set V), conj (g x) * sobolevToL2 hs (U : H^{s}(V)) x := by
+  rw [tildePivotDual, L2.pivotDual_apply_apply]
+  refine integral_congr_ae ?_
+  filter_upwards [tildeToL2_apply_ae hs U] with x hx
+  rw [hx]
+
+/-- **`L_2(Ω) → (H̃^s(Ω))^*` is injective**, `s ≥ 0`: `H̃^s(Ω)` is dense in `L_2(Ω)`
+(`Rd.denseRange_tildeToL2`, `ContinuousLinearMap.pivotDual_injective_iff`). -/
+theorem tildePivotDual_injective (hs : 0 ≤ s) : Function.Injective (tildePivotDual Ω hs) :=
+  ((tildeToL2 Ω hs).pivotDual_injective_iff).2 (denseRange_tildeToL2 hs)
+
+/-- **The pairing of `H^{-s}(Ω)` with `H̃^s(Ω)` extends the inner product of `L_2(Ω)`**, `s ≥ 0`:
+for `g ∈ L_2(Ω)`, the element `W = dualEquiv s Ω (J g)` of `H^{-s}(Ω)` has
+`[W, U] = ∫_Ω conj (g) ι_s U` for every `U ∈ H̃^s(Ω)` (`Rd.dualEquiv_apply`,
+`Rd.tildePivotDual_apply_apply`). -/
+theorem pairing_dualEquiv_tildePivotDual (hs : 0 ≤ s) (g : Lp ℂ 2 (volume.restrict (Ω : Set V)))
+    (U : tildeSpace s Ω) :
+    pairing s (dualEquiv s Ω (tildePivotDual Ω hs g) : H^{-s}(V)) (U : H^{s}(V)) =
+      ∫ x in (Ω : Set V), conj (g x) * sobolevToL2 hs (U : H^{s}(V)) x := by
+  rw [← dualEquiv_apply, tildePivotDual_apply_apply]
+
+/-- **`L_2(Ω) → H^{-s}(Ω)` is injective**, `s ≥ 0`: `g ↦ dualEquiv s Ω (J g)` is the injective
+pivot dual (`Rd.tildePivotDual_injective`) followed by the isometric isomorphism
+`(H̃^s(Ω))^* ≅ H^{-s}(Ω)` (`Rd.dualEquiv`). -/
+theorem dualEquiv_tildePivotDual_injective (hs : 0 ≤ s) :
+    Function.Injective fun g : Lp ℂ 2 (volume.restrict (Ω : Set V)) =>
+      dualEquiv s Ω (tildePivotDual Ω hs g) :=
+  (dualEquiv s Ω).injective.comp (tildePivotDual_injective hs)
 
 end Rd

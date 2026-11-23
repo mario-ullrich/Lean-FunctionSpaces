@@ -6,9 +6,11 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Domains.Traces.BoundaryGagliardo
+public import FunctionSpaces.Domains.Sobolev.SobolevRestrictionInclusions
+public import FunctionSpaces.Analysis.Hilbert.GelfandTriple
 
 /-!
-# The Hilbert space `H^t(Γ)` and the trace onto `H^{s-1/2}(Γ)`
+# The Hilbert space `H^t(Γ)`, the trace onto `H^{s-1/2}(Γ)` and the Gelfand triple on `Γ`
 
 Let `Ω` be a bounded Lipschitz domain in `V`, `dim V = n`, with boundary `Γ`, surface measure `σ`,
 charts `γ_j : H_j → V` and a resolution of unity `(ψ_j)` on `Γ`.
@@ -33,6 +35,15 @@ charts `γ_j : H_j → V` and a resolution of unity `(ψ_j)` on `Γ`.
   `ker γ_s` and the bounded linear right inverse `Rd.BoundedLipschitzDomain.sobolevExtend`, and it
   is the Besov trace of `B^s_{2,2}(Ω)` at `p = q = 2`
   (`Rd.BoundedLipschitzDomain.toLp_sobolevTrace_eq_besovTrace`).
+* **The Gelfand triple `H^t(Γ) ⊂ L_2(Γ) ⊂ H^{-t}(Γ)`**, `0 < t < 1`: the embedding
+  `H^t(Γ) → L_2(Γ)` (`Rd.BoundedLipschitzDomain.boundarySobolevToL2`) is injective with dense
+  range, since the restrictions to `Γ` of smooth functions with compact support lie in `H^t(Γ)`
+  (`Rd.BoundedLipschitzDomain.exists_boundarySobolev_toLp_ae_eq`,
+  `Rd.BoundedLipschitzDomain.denseRange_boundarySobolevToL2`). Its pivot dual
+  `L_2(Γ) → H^{-t}(Γ)`, `g ↦ (h ↦ ∫_Γ conj (g) h dσ)`
+  (`Rd.BoundedLipschitzDomain.boundaryPivotDual`), is injective
+  (`Rd.BoundedLipschitzDomain.boundaryPivotDual_injective`): `L_2(Γ)` is the pivot space, and the
+  pairing of `H^{-t}(Γ)` with `H^t(Γ)` extends the inner product of `L_2(Γ)`.
 
 The constants depend on `Ω`, `t` and `s` and are fixed before the functions. The results
 hold in every dimension `n ≥ 1`.
@@ -41,7 +52,7 @@ hold in every dimension `n ≥ 1`.
 @[expose] public section
 
 open MeasureTheory Filter Metric Module Set
-open scoped ENNReal InnerProductSpace BesselPotentialSpace
+open scoped ENNReal InnerProductSpace BesselPotentialSpace ComplexConjugate SchwartzMap
 
 open ENNReal (lqNorm dyadicWeight)
 
@@ -609,6 +620,97 @@ theorem toLp_sobolevTrace_eq_besovTrace (s : ℝ) (u : RestrictionSpace s Ω.toO
     ((modNorm_sobolevToL2_le hs0 (r := 2) (by norm_num; linarith) _).trans_lt
       (ENNReal.mul_lt_top (sobolevBesovConst_ne_top hs0 (r := 2)
         (by norm_num; linarith)).lt_top enorm_lt_top))).symm
+
+/-! ### The Gelfand triple `H^t(Γ) ⊂ L_2(Γ) ⊂ H^{-t}(Γ)` -/
+
+/-- **The embedding `H^t(Γ) → L_2(Γ)`**, `t > 0`: the identity of `H^t(Γ)` onto `B^t_{2,2}(Γ)`
+(`Rd.BoundedLipschitzDomain.boundarySobolevEquivBoundaryBesov`) followed by the inclusion
+`B^t_{2,2}(Γ) → L_2(Γ)` (`Rd.BoundedLipschitzDomain.BoundaryBesov.toLpL`). It sends `g` to its
+function in `L_2(Γ)`, it is injective, and for `t < 1` it has dense range
+(`Rd.BoundedLipschitzDomain.boundarySobolevToL2_injective`,
+`Rd.BoundedLipschitzDomain.denseRange_boundarySobolevToL2`). -/
+noncomputable def boundarySobolevToL2 (t : ℝ) (ht : 0 < t) :
+    Ω.BoundarySobolev t →L[ℂ] Ω.BoundaryL2 :=
+  BoundaryBesov.toLpL ∘L
+    (Ω.boundarySobolevEquivBoundaryBesov t ht : Ω.BoundarySobolev t →L[ℂ] Ω.BoundaryBesov 2 t 2)
+
+/-- The embedding `H^t(Γ) → L_2(Γ)` sends `g` to its function in `L_2(Γ)`. -/
+theorem boundarySobolevToL2_apply {t : ℝ} (ht : 0 < t) (g : Ω.BoundarySobolev t) :
+    Ω.boundarySobolevToL2 t ht g = g.toLp :=
+  rfl
+
+/-- **`H^t(Γ) → L_2(Γ)` is injective**: an element of `B^t_{2,2}(Γ)` is determined by its function
+in `L_2(Γ)` (`Rd.BoundedLipschitzDomain.BoundaryBesov.toLp_injective`). -/
+theorem boundarySobolevToL2_injective {t : ℝ} (ht : 0 < t) :
+    Function.Injective (Ω.boundarySobolevToL2 t ht) :=
+  fun _ _ h => BoundaryBesov.toLp_injective h
+
+open scoped ContDiff in
+/-- **Smooth functions restricted to `Γ` lie in `H^t(Γ)`**, `0 < t < 1`: for a smooth real `ψ` with
+compact support on `V` some `g ∈ H^t(Γ)` has `ψ` as its function in `L_2(Γ)`, up to a `σ`-null
+set. With `s = t + 1/2 ∈ (1/2, 3/2)`, `ψ` is a Schwartz function and lies in `H^s(V)`
+(`Rd.ofSchwartz`, `Rd.sobolevToL2_ofSchwartz`); its trace `T^s_Γ ψ ∈ L_2(Γ)` is the boundary
+trace of the continuous function `ψ`, that is `ψ` on `Γ`
+(`Rd.BoundedLipschitzDomain.ambientTraceL2_apply_ae`,
+`Rd.BoundedLipschitzDomain.boundaryTrace_eventuallyEq_of_continuous`), and it lies in
+`B^{s-1/2}_{2,2}(Γ) = B^t_{2,2}(Γ)` (`Rd.BoundedLipschitzDomain.memBoundaryBesov_sobolevToL2`). -/
+theorem exists_boundarySobolev_toLp_ae_eq {t : ℝ} (ht : 0 < t) (ht1 : t < 1) {ψ : V → ℝ}
+    (hψ : ContDiff ℝ ∞ ψ) (hc : HasCompactSupport ψ) :
+    ∃ g : Ω.BoundarySobolev t, (g.toLp : V → ℂ) =ᵐ[Ω.surfaceMeasure] fun y => (ψ y : ℂ) := by
+  have hs : 1 / 2 < t + 1 / 2 := by linarith
+  have hs' : t + 1 / 2 < 3 / 2 := by linarith
+  let w : 𝓢(V, ℂ) := HasCompactSupport.toSchwartzMap (f := fun x => (ψ x : ℂ))
+    (hc.comp_left Complex.ofReal_zero) (Complex.ofRealCLM.contDiff.comp hψ)
+  have hU := sobolevToL2_ofSchwartz (one_half_pos.trans hs).le w
+  have hT := Ω.ambientTraceL2_apply_ae Ω.boundaryPartition _ (ofSchwartz (t + 1 / 2) w) hs hs'
+  have hmem := Ω.memBoundaryBesov_sobolevToL2 Ω.boundaryPartition _ (ofSchwartz (t + 1 / 2) w)
+    hs hs'
+  rw [add_sub_cancel_right] at hmem
+  refine ⟨(⟨Ω.ambientTraceL2 (t + 1 / 2) hs hs' (ofSchwartz (t + 1 / 2) w),
+    hmem.congr (Ω.ae_surfaceMeasure_iff_aeBoundary.1 hT.symm)⟩ : Ω.BoundaryBesov 2 t 2),
+    hT.trans (Ω.ae_surfaceMeasure_iff_aeBoundary.2 ?_)⟩
+  refine Ω.boundaryTrace_eventuallyEq_of_continuous Ω.boundaryPartition two_ne_top one_le_two
+    (sub_pos.2 hs) (by norm_num; linarith) one_le_two
+    (modNorm_sobolevToL2_lt_top hs (by linarith) _) w.continuous ?_
+  rw [hU]
+  exact w.coeFn_toLp 2 volume
+
+/-- **`H^t(Γ)` is dense in `L_2(Γ)`**, `0 < t < 1`: the range of the embedding contains the smooth
+functions with compact support restricted to `Γ`
+(`Rd.BoundedLipschitzDomain.exists_boundarySobolev_toLp_ae_eq`), and these are dense in `L_2(σ)`
+for the finite measure `σ` (`MeasureTheory.L2.denseRange_of_forall_contDiff`). -/
+theorem denseRange_boundarySobolevToL2 {t : ℝ} (ht : 0 < t) (ht1 : t < 1) :
+    DenseRange (Ω.boundarySobolevToL2 t ht) :=
+  L2.denseRange_of_forall_contDiff _ isOpen_univ (ae_of_all _ fun _ => mem_univ _)
+    fun _ hψ hc _ => Ω.exists_boundarySobolev_toLp_ae_eq ht ht1 hψ hc
+
+/-- **The inclusion `L_2(Γ) → H^{-t}(Γ)`**, `t > 0`: `g ↦ (h ↦ ⟪g, h⟫_{L_2(Γ)})`, the pivot dual
+(`ContinuousLinearMap.pivotDual`) of the embedding `H^t(Γ) → L_2(Γ)`, conjugate-linear and
+bounded. For `0 < t < 1` it is injective
+(`Rd.BoundedLipschitzDomain.boundaryPivotDual_injective`), and `H^t(Γ) ⊂ L_2(Γ) ⊂ H^{-t}(Γ)` is a
+Gelfand triple with pivot space `L_2(Γ)`: the pairing of `H^{-t}(Γ)` with `H^t(Γ)` extends the
+inner product of `L_2(Γ)`. -/
+noncomputable def boundaryPivotDual (t : ℝ) (ht : 0 < t) :
+    Ω.BoundaryL2 →L⋆[ℂ] Ω.DualBoundarySobolev t :=
+  haveI : Fact (0 < t) := ⟨ht⟩
+  (Ω.boundarySobolevToL2 t ht).pivotDual
+
+/-- **The pairing extends the inner product of `L_2(Γ)`**: for `g ∈ L_2(Γ)` and `h ∈ H^t(Γ)`,
+`(J g)(h) = ∫_Γ conj (g) h dσ` (`MeasureTheory.L2.pivotDual_apply_apply`). -/
+theorem boundaryPivotDual_apply_apply {t : ℝ} (ht : 0 < t) (g : Ω.BoundaryL2)
+    (h : Ω.BoundarySobolev t) :
+    Ω.boundaryPivotDual t ht g h = ∫ y, conj (g y) * h.toLp y ∂Ω.surfaceMeasure := by
+  have : Fact (0 < t) := ⟨ht⟩
+  rw [boundaryPivotDual, L2.pivotDual_apply_apply, boundarySobolevToL2_apply]
+
+/-- **`L_2(Γ) → H^{-t}(Γ)` is injective**, `0 < t < 1`: `H^t(Γ)` is dense in `L_2(Γ)`
+(`Rd.BoundedLipschitzDomain.denseRange_boundarySobolevToL2`,
+`ContinuousLinearMap.pivotDual_injective_iff`). -/
+theorem boundaryPivotDual_injective {t : ℝ} (ht : 0 < t) (ht1 : t < 1) :
+    Function.Injective (Ω.boundaryPivotDual t ht) :=
+  have : Fact (0 < t) := ⟨ht⟩
+  ((Ω.boundarySobolevToL2 t ht).pivotDual_injective_iff).2
+    (Ω.denseRange_boundarySobolevToL2 ht ht1)
 
 end BoundedLipschitzDomain
 
