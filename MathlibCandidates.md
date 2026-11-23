@@ -318,24 +318,33 @@ declarations.
   `PiLp.norm_continuousLinearEquiv_symm_le`); Mathlib has the Lipschitz constants
   (`PiLp.lipschitzWith_ofLp`, `PiLp.lipschitzWith_toLp`) but no operator-norm form.
 * **Componentwise maps and orthogonal complements in finite `L_2` sums**
-  (`FunctionSpaces/Domains/Sobolev/VectorSobolevSpaces.lean`): on `WithLp 2 (Fin m → X)`, a
-  continuous linear map acting componentwise with operator norm at most `‖f‖`, isometric if `f`
-  is, onto if `f` is, with kernel `(ker f)^m` and range `(range f)^m` (`Rd.piLpMapL`,
-  `Rd.norm_piLpMapL_le`, `Rd.norm_piLpMapL_apply`, `Rd.piLpMapL_surjective`, `Rd.ker_piLpMapL`,
-  `Rd.range_piLpMapL`, `Rd.range_piLpMapL_subtypeL`), continuous linear equivalences and
-  semilinear isometric equivalences acting componentwise (`Rd.piLpMapEquivL`,
-  `Rd.piLpCongrRightSL`), `⟪single i a, x⟫ = ⟪a, x i⟫` for a general inner product space
-  (`Rd.inner_piLp_single_left`, `Rd.inner_piLp_single_right`), the orthogonal complement
-  `(K^m)ᗮ = (Kᗮ)^m` of `Submodule.pi` for every submodule `K` (`Rd.orthogonal_piLpSubmodule`),
-  and the linear isometric equivalence of the dual of `WithLp 2 (Fin m → E)` with
-  `WithLp 2 (Fin m → StrongDual ℂ E)` (`Rd.piLpStrongDualEquiv`), stated over `ℂ`; the upstream
-  form would take any `RCLike` field and any finite index type. Mathlib has the linear maps
-  `LinearMap.withLpMap` and `LinearEquiv.withLpCongr` without continuity or norm bounds,
-  `ContinuousLinearMap.piMap` on the plain product with its surjectivity, kernel and range
-  (`Function.Surjective.piMap`, `LinearMap.ker_compLeft`, `LinearMap.range_compLeft`), the
-  linear isometric case `LinearIsometryEquiv.piLpCongrRight`, and `inner_single_left` only for
-  `lp` and `EuclideanSpace`. These belong in `Mathlib/Analysis/Normed/Lp/PiLp.lean` and
-  `Mathlib/Analysis/InnerProductSpace/PiL2.lean`, in the namespace `PiLp`.
+  (`FunctionSpaces/Analysis/Hilbert/PiLpMaps.lean`): on `WithLp 2 (Fin m → X)`, a continuous
+  linear map acting componentwise with operator norm at most `‖f‖`, isometric if `f` is, onto if
+  `f` is, with kernel `(ker f)^m` and range `(range f)^m` (`PiLp.compLeftL`,
+  `PiLp.norm_compLeftL_le`, `PiLp.norm_compLeftL_apply`, `PiLp.compLeftL_surjective`,
+  `PiLp.ker_compLeftL`, `PiLp.range_compLeftL`, `PiLp.range_compLeftL_subtypeL`), continuous
+  linear equivalences and semilinear isometric equivalences acting componentwise
+  (`PiLp.congrRightL`, `PiLp.congrRightSL`), `⟪single i a, x⟫ = ⟪a, x i⟫` for a general inner
+  product space (`PiLp.inner_single_left_eq_inner`, `PiLp.inner_single_right_eq_inner`), the
+  orthogonal complement `(K^m)ᗮ = (Kᗮ)^m` of `Submodule.pi` for every submodule `K`
+  (`PiLp.orthogonal_piSubmodule`, with `K^m = PiLp.piSubmodule m K`), and for a Hilbert space
+  `E` the linear isometric equivalence of the dual of `WithLp 2 (Fin m → E)` with
+  `WithLp 2 (Fin m → StrongDual ℂ E)`, `ℓ ↦ (ℓ ∘ PiLp.single 2 i)_i`, built from Riesz's maps
+  (`PiLp.strongDualEquiv`), stated over `ℂ`. The upstream form would take any `RCLike` field and
+  any finite index type, and the two inner product identities would become
+  `PiLp.inner_single_left` and `PiLp.inner_single_right`. Upstream, the identification of the
+  dual needs neither completeness nor an inner product: for every normed space `X` and conjugate
+  exponents `p`, `q`, the same map identifies the dual of `WithLp p (ι → X)` isometrically with
+  `WithLp q (ι → StrongDual 𝕜 X)` (Hölder duality of `ℓ_p^m(X)`), and that is the form Mathlib
+  would want. Mathlib has the linear maps `LinearMap.withLpMap` and `LinearEquiv.withLpCongr`
+  without continuity or norm bounds, `ContinuousLinearMap.piMap` on the plain product with its
+  surjectivity, kernel and range (`Function.Surjective.piMap`, `LinearMap.ker_compLeft`,
+  `LinearMap.range_compLeft`), the linear isometric case `LinearIsometryEquiv.piLpCongrRight`,
+  and the inner product identities for `lp`, `EuclideanSpace` and the Hilbert `C⋆`-module
+  `C⋆ᵐᵒᵈ(A, Π i, E i)` (`lp.inner_single_left`, `EuclideanSpace.inner_single_left`,
+  `WithCStarModule.inner_single_left`), the last one the closest analogue. These belong in
+  `Mathlib/Analysis/Normed/Lp/PiLp.lean` and `Mathlib/Analysis/InnerProductSpace/PiL2.lean`, in
+  the namespace `PiLp`.
 * **Sobolev–Slobodeckij norms** (`FunctionSpaces/Rd/Differences/SobolevSlobodeckij.lean`):
   Mathlib has no fractional Sobolev spaces. The Gagliardo form
   `∫∫ |f(y) - f(x)|^p / |y - x|^(n+sp) dy dx` on a finite-dimensional inner product space

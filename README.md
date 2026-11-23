@@ -406,7 +406,7 @@ block documents state every result with its Lean name and list the files:
 * [Approximation spaces](docs/ApproximationSpaces.md): schemes, `A^s_q`, interpolation,
   decompositions.
 * [Tools from analysis](docs/Analysis.md): `L_p` tools, convolution, maximal functions,
-  Gelfand triples.
+  Gelfand triples, finite `L_2` sums.
 
 [MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed.
 

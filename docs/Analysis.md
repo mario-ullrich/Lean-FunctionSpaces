@@ -18,7 +18,9 @@ variables; convolution, approximate identities, the Littlewood–Paley kernels a
 `ℝ^d`; dyadic cubes and cells, the Hardy–Littlewood maximal function, the Calderón–Zygmund
 decomposition, also for functions with values in a normed space, and the Fefferman–Stein
 inequality; the pivot dual of a bounded operator between Hilbert spaces, which makes `L_2` the
-pivot space of the Gelfand triples of Sobolev spaces, and a test for dense range in `L_2(μ)`. The
+pivot space of the Gelfand triples of Sobolev spaces, and a test for dense range in `L_2(μ)`;
+componentwise operators on finite `L_2` sums of normed and Hilbert spaces, with their kernels,
+ranges, orthogonal complements and duals, on which the vector-valued Sobolev spaces rest. The
 `L_p` norms are handled through integrals of powers (`MeasureTheory.eLpNorm_rpow_eq`).
 
 ## Main results
@@ -88,6 +90,17 @@ pivot space of the Gelfand triples of Sobolev spaces, and a test for dense range
   (`MeasureTheory.Lp.eq_zero_of_forall_integral_contDiff_smul_eq_zero`), so a continuous linear
   map into `L_2(μ)` whose range contains these functions has dense range
   (`MeasureTheory.L2.denseRange_of_forall_contDiff`).
+* **Finite `L_2` sums.** Let `X`, `Y` be complex normed spaces, `m ∈ ℕ` and
+  `X^m = WithLp 2 (Fin m → X)` with `‖x‖² = ∑_i ‖x_i‖²`. A bounded operator `f : X → Y` acts
+  componentwise on `X^m` with norm at most `‖f‖`, kernel `(ker f)^m` and range `(range f)^m`,
+  isometrically if `f` is isometric and onto if `f` is (`PiLp.compLeftL`,
+  `PiLp.norm_compLeftL_le`, `PiLp.ker_compLeftL`, `PiLp.range_compLeftL`,
+  `PiLp.norm_compLeftL_apply`, `PiLp.compLeftL_surjective`), and isomorphisms and semilinear
+  isometric isomorphisms act as such (`PiLp.congrRightL`, `PiLp.congrRightSL`). For a complex
+  inner product space `E`, `(K^m)ᗮ = (Kᗮ)^m` for every subspace `K ⊆ E`
+  (`PiLp.orthogonal_piSubmodule`), and for a Hilbert space `E` the dual of `E^m` is `(E^*)^m`
+  isometrically, `ℓ ↦ (ℓ ∘ ι_i)_i` for the inclusions `ι_i` of the components
+  (`PiLp.strongDualEquiv`, `PiLp.strongDualEquiv_apply`).
 
 ## What is formalised
 
@@ -122,6 +135,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The signed Calderón–Zygmund decomposition of functions with values in a normed space and of families: good parts bounded by `2^n t` with `∫ ‖·‖² ≤ 2^n t ∫ ‖f‖`, bad pieces with mean zero on their cubes and total mass at most `2 ∫ ‖f‖` | ✅ | ✗ | `Analysis/Maximal/CalderonZygmundSigned` |
 | The Fefferman–Stein inequality | ✅ | ✗ | `Analysis/Maximal/FeffermanStein` |
 | The pivot dual `H → V*` of a bounded operator `V → H` between Hilbert spaces: the inner product of `H`, the integral form for `H = L_2(μ)`, its norm, its kernel `(range ι)^⊥`, injectivity iff dense range, dense range by orthogonal complements, smooth functions with compact support separating `L_p(μ)`, `p ≥ 1`, and dense range in `L_2(μ)` from them | ✅ | ✗ | `Analysis/Hilbert/GelfandTriple` |
+| Componentwise operators, isomorphisms and semilinear isometric isomorphisms on finite `L_2` sums `X^m` with their norms, kernels and ranges, inner products with a single component, orthogonal complements `(K^m)ᗮ = (Kᗮ)^m` and the dual of `E^m` | ✅ | ✗ | `Analysis/Hilbert/PiLpMaps` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

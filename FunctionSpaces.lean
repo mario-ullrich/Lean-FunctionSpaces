@@ -34,6 +34,7 @@ public import FunctionSpaces.Analysis.Maximal.CalderonZygmund
 public import FunctionSpaces.Analysis.Maximal.FeffermanStein
 public import FunctionSpaces.Analysis.Maximal.CalderonZygmundSigned
 public import FunctionSpaces.Analysis.Hilbert.GelfandTriple
+public import FunctionSpaces.Analysis.Hilbert.PiLpMaps
 public import FunctionSpaces.MeasureSpaces.Scheme
 public import FunctionSpaces.MeasureSpaces.Besov.Basic
 public import FunctionSpaces.MeasureSpaces.Besov.ElementaryEmbeddings

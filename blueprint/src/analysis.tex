@@ -9,7 +9,8 @@ test functions (\Cref{ch:fourier-rd}); mixed norms, the Hardy--Littlewood maxima
 Calder\'on--Zygmund decomposition and the Fefferman--Stein inequality
 (\Cref{ch:maximal-functions}); operators of weak and strong type, Marcinkiewicz interpolation
 and $L_p$ norms by duality (\Cref{ch:operator-interpolation}); and Gelfand triples of Hilbert
-spaces with a pivot space such as $L_2$ (\Cref{ch:gelfand-triples}).
+spaces with a pivot space such as $L_2$, and finite $L_2$ sums of Hilbert spaces
+(\Cref{ch:gelfand-triples}).
 
 \chapter{Convolution and the Fourier transform on \texorpdfstring{$\R^d$}{R\^{}d}}
 \label{ch:fourier-rd}
@@ -2782,21 +2783,24 @@ $|g_0| \leq \|(g_j)_j\|_{\ell_2}$ and $\|(v(x), 0, 0, \dots)\|_{\ell_2} = |v(x)|
 \chapter{Gelfand triples}
 \label{ch:gelfand-triples}
 
-Throughout this chapter $V$ and $H$ are Hilbert spaces over $\R$ or $\C$, $V^*$ is the space of
-bounded linear functionals on $V$, inner products are linear in the second argument, as in
-Mathlib, and $\iota : V \to H$ is a bounded linear operator. If $\iota$ is injective with dense
-range, $V \subseteq H \subseteq V^*$ is a Gelfand triple, often called a rigged Hilbert space,
-with pivot space $H$ \cite{Brezis2011}; for separable $V$ it is an evolution triple in Zeidler's
-sense \cite{ZeidlerIIA}. Riesz's representation theorem identifies $H$ with its dual, and the
-duality of $V^*$ and $V$ extends the inner product of $H$. The chapter defines the map
-$H \to V^*$ of the triple (\Cref{def:pivot-dual}), shows that it is injective exactly when
-$\iota$ has dense range (\Cref{thm:pivot-dual}), and gives a test for dense range in $L_2$
-(\Cref{lem:l2-dense-smooth}). The function spaces give the triples
+Throughout this chapter inner products are linear in the second argument, as in Mathlib. In the
+first two sections $V$ and $H$ are Hilbert spaces over $\R$ or $\C$, $V^*$ is the space of
+bounded linear functionals on $V$, and $\iota : V \to H$ is a bounded linear operator. If $\iota$
+is injective with dense range, $V \subseteq H \subseteq V^*$ is a Gelfand triple, often called a
+rigged Hilbert space, with pivot space $H$ \cite{Brezis2011}; for separable $V$ it is an
+evolution triple in Zeidler's sense \cite{ZeidlerIIA}. Riesz's representation theorem identifies
+$H$ with its dual, and the duality of $V^*$ and $V$ extends the inner product of $H$. The chapter
+defines the map $H \to V^*$ of the triple (\Cref{def:pivot-dual}), shows that it is injective
+exactly when $\iota$ has dense range (\Cref{thm:pivot-dual}), and gives a test for dense range
+in $L_2$ (\Cref{lem:l2-dense-smooth}). The function spaces give the triples
 $H^s(\R^d) \subseteq L_2(\R^d) \subseteq H^{-s}(\R^d)$ (\Cref{thm:rd-gelfand-triple}),
 $\tilde H^s(\Omega) \subseteq L_2(\Omega) \subseteq H^{-s}(\Omega)$ on open sets
 $\Omega \subseteq \R^d$ (\Cref{thm:domain-gelfand-triple}) and
 $H^t(\Gamma) \subseteq L_2(\Gamma) \subseteq H^{-t}(\Gamma)$ on the boundary of a bounded
-Lipschitz domain (\Cref{thm:boundary-gelfand-triple}).
+Lipschitz domain (\Cref{thm:boundary-gelfand-triple}). The last section treats the finite $L_2$
+sums $E^m$ of a Hilbert space $E$: operators act componentwise with the same norm bound,
+$(K^m)^\perp = (K^\perp)^m$ for every subspace $K$, and the dual of $E^m$ is $(E^*)^m$
+(\Cref{sec:pi-lp-sums}); the vector-valued Sobolev spaces are such sums.
 
 \section{The pivot dual}
 \label{sec:gelfand-triples}
@@ -2901,3 +2905,100 @@ $\int \psi f \, d\mu = \langle \psi, f \rangle_{L_2(\mu)} = 0$ for every such $\
 is real, so $f = 0$ by the first part with $p = 2$ and $F = \C$, and
 \Cref{lem:dense-range-orthogonal} applies.
 \end{proof}
+
+\section{Finite \texorpdfstring{$L_2$}{L\_2} sums of Hilbert spaces}
+\label{sec:pi-lp-sums}
+
+For a normed space $X$ and $m \in \N$, $X^m$ is the space of the tuples
+$x = (x_1, \dots, x_m)$ with $\|x\|^2 = \sum_i \|x_i\|^2$, and for an inner product space $X$ it
+carries the inner product $\langle x, y \rangle = \sum_i \langle x_i, y_i \rangle$ (the Hilbert
+direct sum of $m$ copies of $X$ when $X$ is a Hilbert space); in Lean it is
+\texttt{WithLp 2 (Fin m $\to$ X)}. In this section $X$ and $Y$ are complex normed spaces and $E$
+is a complex inner product space. The vector-valued Sobolev spaces on domains and boundaries are
+such sums of scalar Sobolev spaces, and their traces, extensions and isomorphisms act
+componentwise (\Cref{sec:vector-sobolev}).
+
+\begin{definition}[Componentwise maps]
+\label{def:pi-lp-maps}
+\lean{PiLp.compLeftL, PiLp.compLeftL_apply, PiLp.congrRightL, PiLp.congrRightL_apply,
+  PiLp.congrRightL_symm_apply, PiLp.congrRightSL, PiLp.congrRightSL_apply, PiLp.piSubmodule,
+  PiLp.mem_piSubmodule}
+\leanok
+For a bounded linear operator $f \colon X \to Y$, $f^m \colon X^m \to Y^m$ is the linear map
+$(x_1, \dots, x_m) \mapsto (f x_1, \dots, f x_m)$. The same formula defines $e^m$ for an
+isomorphism $e$ of normed spaces, which is again an isomorphism of normed spaces with inverse
+$(e^{-1})^m$, and for a linear or conjugate-linear isometric isomorphism $e$, which is again an
+isometric isomorphism of the same kind. For a subspace $K \subseteq X$, $K^m \subseteq X^m$ is the
+subspace of the tuples whose components all lie in $K$.
+\end{definition}
+
+For an isometric $e$, $\|e^m x\|^2 = \sum_i \|e x_i\|^2 = \sum_i \|x_i\|^2 = \|x\|^2$. In Lean
+$f^m$ and, for an isomorphism $e$, $e^m$ are Mathlib's
+\texttt{ContinuousLinearMap.\allowbreak piMap} and
+\texttt{ContinuousLinearEquiv.\allowbreak piCongrRight} on the product, transported to $X^m$.
+Mathlib's \texttt{LinearIsometryEquiv.\allowbreak piLpCongrRight} is the linear isometric case;
+the semilinear isometric case, such as the conjugate-linear Riesz maps, is built directly
+(\texttt{PiLp.\allowbreak congrRightSL}).
+
+\begin{lemma}[Norm, range and kernel of componentwise maps]
+\label{lem:pi-lp-map-properties}
+\lean{PiLp.norm_compLeftL_le, PiLp.norm_compLeftL_apply, PiLp.compLeftL_surjective,
+  PiLp.ker_compLeftL, PiLp.range_compLeftL, PiLp.range_compLeftL_subtypeL}
+\leanok
+\uses{def:pi-lp-maps}
+Let $f \colon X \to Y$ be a bounded linear operator and $K \subseteq X$ a subspace with the
+inclusion $j_K \colon K \to X$. Then $f^m$ is a bounded linear operator with
+$\|f^m\| \leq \|f\|$, it is isometric if $f$ is isometric, it is onto if $f$ is onto,
+$\ker f^m = (\ker f)^m$, and the range of $f^m$ is $(\operatorname{ran} f)^m$. In particular the
+range of $j_K^m$ is $K^m$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\|f^m x\|^2 = \sum_i \|f x_i\|^2 \leq \|f\|^2 \sum_i \|x_i\|^2 = \|f\|^2 \|x\|^2$, and
+$\|f^m x\|^2 = \sum_i \|x_i\|^2 = \|x\|^2$ if $f$ is isometric. The equation $f^m x = 0$ holds if
+and only if $f x_i = 0$ for every $i$, and a tuple of preimages of the components is a preimage,
+so $y$ lies in the range of $f^m$ if and only if $y_i$ lies in the range of $f$ for every $i$.
+\end{proof}
+
+On the product $X \times \dots \times X$ without a norm, Mathlib has the map, the surjectivity,
+the kernel and the range (\texttt{LinearMap.\allowbreak compLeft},
+\texttt{Function.\allowbreak Surjective.\allowbreak piMap},
+\texttt{LinearMap.\allowbreak ker\_\allowbreak compLeft},
+\texttt{LinearMap.\allowbreak range\_\allowbreak compLeft}).
+
+\begin{lemma}[Orthogonal complements and duals of $E^m$]
+\label{lem:pi-lp-orthogonal}
+\lean{PiLp.inner_single_left_eq_inner, PiLp.inner_single_right_eq_inner,
+  PiLp.orthogonal_piSubmodule, PiLp.strongDualEquiv, PiLp.strongDualEquiv_apply}
+\leanok
+\uses{def:pi-lp-maps}
+For $i \in \{1, \dots, m\}$ and $a \in E$ let $\iota_i a \in E^m$ be the tuple with $a$ at $i$ and
+$0$ elsewhere. Then $\langle \iota_i a, x \rangle = \langle a, x_i \rangle$ and
+$\langle x, \iota_i a \rangle = \langle x_i, a \rangle$ for every $x \in E^m$. For every subspace
+$K \subseteq E$, closed or not, $(K^m)^\perp = (K^\perp)^m$. If $E$ is complete, then
+$\ell \mapsto (\ell \circ \iota_i)_i$ is a linear isometric isomorphism of the dual of $E^m$ onto
+$(E^*)^m$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+In $\langle \iota_i a, x \rangle = \sum_j \langle (\iota_i a)_j, x_j \rangle$ only $j = i$
+contributes, and likewise on the right. If $x \perp K^m$ and $k \in K$, then $\iota_i k \in K^m$,
+so $\langle k, x_i \rangle = \langle \iota_i k, x \rangle = 0$. If $x_i \in K^\perp$ for every
+$i$, then $\langle y, x \rangle = \sum_i \langle y_i, x_i \rangle = 0$ for every $y \in K^m$. For
+the dual, let $R_m \colon E^m \to (E^m)^*$ and $R \colon E \to E^*$ be the Riesz isomorphisms
+(Mathlib's \texttt{InnerProductSpace.\allowbreak toDual}), both conjugate-linear and isometric.
+Then $R^m \circ R_m^{-1}$ is linear and isometric (\Cref{def:pi-lp-maps}), and for
+$y = R_m^{-1} \ell$, $(R^m y)_i(a) = \langle y_i, a \rangle = \langle y, \iota_i a \rangle =
+\ell(\iota_i a)$.
+\end{proof}
+
+Mathlib has the first identity for \texttt{EuclideanSpace}
+(\texttt{EuclideanSpace.\allowbreak inner\_\allowbreak single\_\allowbreak left}), for $\ell_2$
+sums (\texttt{lp.\allowbreak inner\_\allowbreak single\_\allowbreak left}) and for finite sums of
+Hilbert $C^*$-modules (\texttt{WithCStarModule.\allowbreak inner\_\allowbreak single\_\allowbreak
+left}), but not for $E^m$ in its Lean form \texttt{WithLp 2 (Fin m $\to$ E)}, and it has neither
+the orthogonal complement of $K^m$ nor the dual of $E^m$. The dual of $X^m$ is $(X^*)^m$
+isometrically, by the same map $\ell \mapsto (\ell \circ \iota_i)_i$, for every normed space $X$;
+completeness and the inner product are needed only for the proof by Riesz's representation.

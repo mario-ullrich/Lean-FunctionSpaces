@@ -8,6 +8,7 @@ module
 public import FunctionSpaces.Domains.Traces.TraceKernelGeneral
 public import FunctionSpaces.Domains.Sobolev.TildeZeroBoundaryEquiv
 public import FunctionSpaces.Domains.Traces.BoundarySobolev
+public import FunctionSpaces.Analysis.Hilbert.PiLpMaps
 
 /-!
 # Vector-valued Sobolev spaces on domains and boundaries
@@ -16,20 +17,15 @@ For a normed space `X` and `m ∈ ℕ`, `X^m = WithLp 2 (Fin m → X)` is the sp
 `x = (x_1, …, x_m)` with the norm `‖x‖² = ∑_i ‖x_i‖²`; for a Hilbert space `X` it is the Hilbert
 direct sum with `⟪x, y⟫ = ∑_i ⟪x_i, y_i⟫` (Mathlib's `PiLp.innerProductSpace`). The spaces of
 `ℂ^m`-valued functions are taken componentwise in this form, as in McLean, Chapter 4, and the
-spaces `H^s Λ^k` of differential forms of finite element exterior calculus are such sums in the
-basis `dx_I`.
+spaces `H^s Λ^k` of differential forms are such sums in the basis `dx_I`. The maps act
+componentwise through the general maps of `FunctionSpaces.Analysis.Hilbert.PiLpMaps`:
+`PiLp.compLeftL` for bounded operators `f` and `PiLp.congrRightL` for isomorphisms, with the
+kernel `(ker f)^m` (`PiLp.ker_compLeftL`) and, for a subspace `K ⊆ X`, the range
+`K^m = PiLp.piSubmodule m K` of the componentwise inclusion (`PiLp.range_compLeftL_subtypeL`).
+For an inner product space `X` the orthogonal complement of `K^m` is `(Kᗮ)^m`
+(`PiLp.orthogonal_piSubmodule`), and for a Hilbert space `X` the dual of `X^m` is `(X^*)^m`
+isometrically (`PiLp.strongDualEquiv`).
 
-* **Componentwise maps** (any normed spaces): a bounded operator `f : X → Y` acts on `X^m` with
-  norm at most `‖f‖`, isometrically if `f` is isometric (`Rd.piLpMapL`, `Rd.norm_piLpMapL_le`,
-  `Rd.norm_piLpMapL_apply`), an isomorphism acts as an isomorphism (`Rd.piLpMapEquivL`), and a
-  semilinear isometric isomorphism as a semilinear isometric isomorphism
-  (`Rd.piLpCongrRightSL`; Mathlib's `LinearIsometryEquiv.piLpCongrRight` covers the linear
-  case). The kernel and the range of `f` acting on `X^m` are `(ker f)^m` and `(range f)^m`
-  (`Rd.ker_piLpMapL`, `Rd.range_piLpMapL`, with `K^m = Rd.piLpSubmodule m K`).
-* **Orthogonal complements and duals** (Hilbert spaces): `(K^m)ᗮ = (Kᗮ)^m` for every subspace
-  `K` (`Rd.orthogonal_piLpSubmodule`), and the dual of `X^m` is `(X^*)^m` isometrically, the
-  functional `ℓ` going to `(ℓ ∘ ι_i)_i` for the inclusions `ι_i` of the components
-  (`Rd.piLpStrongDualEquiv`).
 * **The vector spaces** of an open set `Ω`: `H^s(Ω)^m`, `H̃^s(Ω)^m`, `H^s_0(Ω)^m`
   (`Rd.VecRestrictionSpace`, `Rd.VecTildeSpace`, `Rd.VecZeroBoundarySpace`); of a bounded
   Lipschitz domain with boundary `Γ`: the trace space of `H^s(Ω)^m`, `1/2 < s < 3/2`
@@ -62,212 +58,6 @@ open scoped ENNReal InnerProductSpace BesselPotentialSpace
 
 namespace Rd
 
-/-! ### Componentwise maps on finite `L_2` sums -/
-
-section PiLpMaps
-
-variable {X Y : Type*} [NormedAddCommGroup X] [NormedSpace ℂ X] [NormedAddCommGroup Y]
-  [NormedSpace ℂ Y]
-
-/-- **A bounded operator acting componentwise** on the finite `L_2` sums `X^m → Y^m`,
-`(x_1, …, x_m) ↦ (f x_1, …, f x_m)`: Mathlib's `ContinuousLinearMap.piMap` on `Fin m → X`,
-transported to `WithLp 2` by `PiLp.continuousLinearEquiv`. Its norm is at most `‖f‖`
-(`Rd.norm_piLpMapL_le`). -/
-noncomputable def piLpMapL (m : ℕ) (f : X →L[ℂ] Y) :
-    WithLp 2 (Fin m → X) →L[ℂ] WithLp 2 (Fin m → Y) :=
-  ((PiLp.continuousLinearEquiv 2 ℂ fun _ : Fin m => Y).symm :
-      (Fin m → Y) →L[ℂ] WithLp 2 (Fin m → Y)) ∘L
-    ContinuousLinearMap.piMap (fun _ : Fin m => f) ∘L
-      (PiLp.continuousLinearEquiv 2 ℂ fun _ : Fin m => X :
-        WithLp 2 (Fin m → X) →L[ℂ] (Fin m → X))
-
-/-- The `i`-th component of `F x` is `f x_i`. -/
-@[simp]
-theorem piLpMapL_apply (m : ℕ) (f : X →L[ℂ] Y) (x : WithLp 2 (Fin m → X)) (i : Fin m) :
-    piLpMapL m f x i = f (x i) :=
-  rfl
-
-/-- **The componentwise operator has norm at most `‖f‖`**:
-`‖F x‖² = ∑_i ‖f x_i‖² ≤ ‖f‖² ∑_i ‖x_i‖² = ‖f‖² ‖x‖²` (Mathlib's `PiLp.norm_sq_eq_of_L2`,
-`ContinuousLinearMap.opNorm_le_bound`). -/
-theorem norm_piLpMapL_le (m : ℕ) (f : X →L[ℂ] Y) : ‖piLpMapL m f‖ ≤ ‖f‖ := by
-  refine ContinuousLinearMap.opNorm_le_bound _ (norm_nonneg f) fun x => ?_
-  have h : ‖piLpMapL m f x‖ ^ 2 ≤ (‖f‖ * ‖x‖) ^ 2 := by
-    rw [PiLp.norm_sq_eq_of_L2, mul_pow, PiLp.norm_sq_eq_of_L2, Finset.mul_sum]
-    refine Finset.sum_le_sum fun i _ => ?_
-    rw [piLpMapL_apply, ← mul_pow]
-    exact pow_le_pow_left₀ (norm_nonneg _) (f.le_opNorm (x i)) 2
-  exact (pow_le_pow_iff_left₀ (norm_nonneg _) (by positivity) two_ne_zero).1 h
-
-/-- **A componentwise isometry is an isometry**: if `‖f x‖ = ‖x‖` for every `x ∈ X`, then
-`‖F x‖² = ∑_i ‖f x_i‖² = ∑_i ‖x_i‖² = ‖x‖²` (Mathlib's `PiLp.norm_eq_of_L2`). -/
-theorem norm_piLpMapL_apply (m : ℕ) {f : X →L[ℂ] Y} (hf : ∀ x, ‖f x‖ = ‖x‖)
-    (x : WithLp 2 (Fin m → X)) : ‖piLpMapL m f x‖ = ‖x‖ := by
-  simp only [PiLp.norm_eq_of_L2, piLpMapL_apply, hf]
-
-/-- **A componentwise operator is onto if `f` is**: a preimage of `y` is a tuple of preimages of
-the components. On the plain product `Fin m → X` this is Mathlib's
-`Function.Surjective.piMap`. -/
-theorem piLpMapL_surjective (m : ℕ) {f : X →L[ℂ] Y} (hf : Function.Surjective f) :
-    Function.Surjective (piLpMapL m f) := fun y =>
-  ⟨WithLp.toLp 2 fun i => (hf (y i)).choose, PiLp.ext fun i => (hf (y i)).choose_spec⟩
-
-/-- **An isomorphism acting componentwise** on the finite `L_2` sums, `X^m ≅ Y^m`: Mathlib's
-`ContinuousLinearEquiv.piCongrRight` on `Fin m → X`, transported to `WithLp 2` by
-`PiLp.continuousLinearEquiv`. -/
-noncomputable def piLpMapEquivL (m : ℕ) (e : X ≃L[ℂ] Y) :
-    WithLp 2 (Fin m → X) ≃L[ℂ] WithLp 2 (Fin m → Y) :=
-  (PiLp.continuousLinearEquiv 2 ℂ fun _ : Fin m => X).trans
-    ((ContinuousLinearEquiv.piCongrRight fun _ : Fin m => e).trans
-      (PiLp.continuousLinearEquiv 2 ℂ fun _ : Fin m => Y).symm)
-
-/-- The `i`-th component of `E x` is `e x_i`. -/
-@[simp]
-theorem piLpMapEquivL_apply (m : ℕ) (e : X ≃L[ℂ] Y) (x : WithLp 2 (Fin m → X)) (i : Fin m) :
-    piLpMapEquivL m e x i = e (x i) :=
-  rfl
-
-/-- The `i`-th component of `E⁻¹ y` is `e⁻¹ y_i`. -/
-@[simp]
-theorem piLpMapEquivL_symm_apply (m : ℕ) (e : X ≃L[ℂ] Y) (y : WithLp 2 (Fin m → Y))
-    (i : Fin m) : (piLpMapEquivL m e).symm y i = e.symm (y i) :=
-  rfl
-
-/-- **A semilinear isometric isomorphism acting componentwise** on the finite `L_2` sums,
-`X^m ≅ Y^m`, for a ring automorphism `σ` of `ℂ` such as complex conjugation: the norm is kept since
-`‖x‖² = ∑_i ‖x_i‖²` (Mathlib's `PiLp.norm_eq_of_L2`). Mathlib's
-`LinearIsometryEquiv.piLpCongrRight` is the linear case. -/
-noncomputable def piLpCongrRightSL {σ σ' : ℂ →+* ℂ} [RingHomInvPair σ σ'] [RingHomInvPair σ' σ]
-    (m : ℕ) (e : X ≃ₛₗᵢ[σ] Y) : WithLp 2 (Fin m → X) ≃ₛₗᵢ[σ] WithLp 2 (Fin m → Y) where
-  toFun x := WithLp.toLp 2 fun i => e (x i)
-  invFun y := WithLp.toLp 2 fun i => e.symm (y i)
-  map_add' x y := PiLp.ext fun i => e.map_add (x i) (y i)
-  map_smul' c x := PiLp.ext fun i => e.map_smulₛₗ c (x i)
-  left_inv x := PiLp.ext fun i => e.symm_apply_apply (x i)
-  right_inv y := PiLp.ext fun i => e.apply_symm_apply (y i)
-  norm_map' x := by
-    simp only [PiLp.norm_eq_of_L2, LinearEquiv.coe_mk, LinearMap.coe_mk, AddHom.coe_mk,
-      LinearIsometryEquiv.norm_map]
-
-/-- The `i`-th component of `E x` is `e x_i`. -/
-@[simp]
-theorem piLpCongrRightSL_apply {σ σ' : ℂ →+* ℂ} [RingHomInvPair σ σ'] [RingHomInvPair σ' σ]
-    (m : ℕ) (e : X ≃ₛₗᵢ[σ] Y) (x : WithLp 2 (Fin m → X)) (i : Fin m) :
-    piLpCongrRightSL m e x i = e (x i) :=
-  rfl
-
-/-- **The subspace `K^m`** of the finite `L_2` sum `X^m`: the tuples whose components all lie in
-`K` (`Rd.mem_piLpSubmodule`), Mathlib's `Submodule.pi` transported to `WithLp 2`. -/
-noncomputable def piLpSubmodule (m : ℕ) (K : Submodule ℂ X) :
-    Submodule ℂ (WithLp 2 (Fin m → X)) :=
-  (Submodule.pi Set.univ fun _ : Fin m => K).comap
-    (WithLp.linearEquiv 2 ℂ (Fin m → X)).toLinearMap
-
-/-- `x ∈ K^m` iff every component `x_i` lies in `K`, the `WithLp 2` form of Mathlib's
-`Submodule.mem_pi`. -/
-@[simp]
-theorem mem_piLpSubmodule {m : ℕ} {K : Submodule ℂ X} {x : WithLp 2 (Fin m → X)} :
-    x ∈ piLpSubmodule m K ↔ ∀ i, x i ∈ K := by
-  simp only [piLpSubmodule, Submodule.mem_comap, Submodule.mem_pi, Set.mem_univ, true_imp_iff]
-  rfl
-
-/-- **The kernel of a componentwise operator** is `(ker f)^m`: `F x = 0` iff `f x_i = 0` for
-every `i`. On the plain product `Fin m → X` this is Mathlib's `LinearMap.ker_compLeft`. -/
-theorem ker_piLpMapL (m : ℕ) (f : X →L[ℂ] Y) : (piLpMapL m f).ker = piLpSubmodule m f.ker := by
-  ext x
-  rw [LinearMap.mem_ker, mem_piLpSubmodule]
-  refine ⟨fun h i => ?_, fun h => PiLp.ext fun i => ?_⟩
-  · exact congrArg (fun y : WithLp 2 (Fin m → Y) => y i) h
-  · exact h i
-
-/-- **The range of a componentwise operator** is `(range f)^m`: a tuple lies in the range iff each
-component lies in the range of `f`, a preimage being a tuple of preimages of the components. On the
-plain product `Fin m → X` this is Mathlib's `LinearMap.range_compLeft`. -/
-theorem range_piLpMapL (m : ℕ) (f : X →L[ℂ] Y) :
-    (piLpMapL m f).range = piLpSubmodule m f.range := by
-  ext y
-  rw [LinearMap.mem_range, mem_piLpSubmodule]
-  refine ⟨fun ⟨x, hx⟩ i => ⟨x i, ?_⟩, fun h => ?_⟩
-  · rw [← hx]
-    rfl
-  · choose x hx using fun i => LinearMap.mem_range.1 (h i)
-    exact ⟨WithLp.toLp 2 x, PiLp.ext fun i => hx i⟩
-
-/-- **The range of the componentwise inclusion of a subspace** `K ⊆ X` is `K^m`
-(`Rd.range_piLpMapL` and Mathlib's `Submodule.range_subtype`). -/
-theorem range_piLpMapL_subtypeL (m : ℕ) (K : Submodule ℂ X) :
-    (piLpMapL m K.subtypeL).range = piLpSubmodule m K := by
-  rw [range_piLpMapL]
-  exact congrArg (piLpSubmodule m) K.range_subtype
-
-end PiLpMaps
-
-/-! ### Orthogonal complements and duals of finite `L_2` sums -/
-
-section PiLpHilbert
-
-variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
-
-/-- **Inner products with a single component**: in the Hilbert direct sum `E^m`,
-`⟪ι_i a, x⟫ = ⟪a, x_i⟫` for the tuple `ι_i a` with `a` at `i` and `0` elsewhere (Mathlib's
-`PiLp.inner_apply`; Mathlib has the identity for `EuclideanSpace` as
-`EuclideanSpace.inner_single_left` and for `ℓ_2` sums as `lp.inner_single_left`). -/
-theorem inner_piLp_single_left (m : ℕ) (i : Fin m) (a : E) (x : WithLp 2 (Fin m → E)) :
-    ⟪(PiLp.single 2 i a : WithLp 2 (Fin m → E)), x⟫_ℂ = ⟪a, x i⟫_ℂ := by
-  rw [PiLp.inner_apply, Finset.sum_eq_single i
-    (fun j _ hj => by rw [PiLp.single_eq_of_ne (p := 2) hj, inner_zero_left])
-    (fun hi => absurd (Finset.mem_univ i) hi), PiLp.single_eq_same]
-
-/-- **Inner products with a single component, on the right**: `⟪x, ι_i a⟫ = ⟪x_i, a⟫`. -/
-theorem inner_piLp_single_right (m : ℕ) (i : Fin m) (a : E) (x : WithLp 2 (Fin m → E)) :
-    ⟪x, (PiLp.single 2 i a : WithLp 2 (Fin m → E))⟫_ℂ = ⟪x i, a⟫_ℂ := by
-  rw [PiLp.inner_apply, Finset.sum_eq_single i
-    (fun j _ hj => by rw [PiLp.single_eq_of_ne (p := 2) hj, inner_zero_right])
-    (fun hi => absurd (Finset.mem_univ i) hi), PiLp.single_eq_same]
-
-/-- **`(K^m)ᗮ = (Kᗮ)^m`** in the Hilbert direct sum `E^m`, for every subspace `K ⊆ E`, closed or
-not: `x ⊥ K^m` forces `x_i ⊥ k` by testing against the tuple `ι_i k ∈ K^m`
-(`Rd.inner_piLp_single_left`), and conversely `⟪y, x⟫ = ∑_i ⟪y_i, x_i⟫ = 0` for `y ∈ K^m` if every
-`x_i ⊥ K` (Mathlib's `PiLp.inner_apply`). -/
-theorem orthogonal_piLpSubmodule (m : ℕ) (K : Submodule ℂ E) :
-    (piLpSubmodule m K)ᗮ = piLpSubmodule m Kᗮ := by
-  ext x
-  rw [mem_piLpSubmodule, Submodule.mem_orthogonal]
-  refine ⟨fun h i => (Submodule.mem_orthogonal _ _).2 fun k hk => ?_, fun h y hy => ?_⟩
-  · rw [← inner_piLp_single_left m i k x]
-    refine h _ (mem_piLpSubmodule.2 fun j => ?_)
-    by_cases hj : j = i
-    · subst hj
-      rwa [PiLp.single_eq_same]
-    · rw [PiLp.single_eq_of_ne (p := 2) hj]
-      exact K.zero_mem
-  · rw [PiLp.inner_apply]
-    exact Finset.sum_eq_zero fun i _ =>
-      Submodule.inner_right_of_mem_orthogonal (mem_piLpSubmodule.1 hy i) (h i)
-
-variable (E) in
-/-- **The dual of a finite `L_2` sum**: for a Hilbert space `E`, the dual of `E^m` is isometrically
-isomorphic to `(E^*)^m`, the functional `ℓ` going to `(ℓ ∘ ι_i)_i`
-(`Rd.piLpStrongDualEquiv_apply`). It is Riesz's representation on `E^m` (Mathlib's
-`InnerProductSpace.toDual`) followed by Riesz's representation on each component
-(`Rd.piLpCongrRightSL`); both are conjugate-linear, so the composite is linear. The space `E` is
-an explicit argument, as in `InnerProductSpace.toDual`. -/
-noncomputable def piLpStrongDualEquiv [CompleteSpace E] (m : ℕ) :
-    StrongDual ℂ (WithLp 2 (Fin m → E)) ≃ₗᵢ[ℂ] WithLp 2 (Fin m → StrongDual ℂ E) :=
-  (InnerProductSpace.toDual ℂ (WithLp 2 (Fin m → E))).symm.trans
-    (piLpCongrRightSL m (InnerProductSpace.toDual ℂ E))
-
-/-- The `i`-th component of the image of `ℓ` is `a ↦ ℓ(ι_i a)`, with Riesz's representation
-(Mathlib's `InnerProductSpace.toDual_symm_apply`) and `Rd.inner_piLp_single_right`. -/
-theorem piLpStrongDualEquiv_apply (m : ℕ) [CompleteSpace E]
-    (ℓ : StrongDual ℂ (WithLp 2 (Fin m → E))) (i : Fin m) (a : E) :
-    piLpStrongDualEquiv E m ℓ i a = ℓ (PiLp.single 2 i a : WithLp 2 (Fin m → E)) := by
-  rw [piLpStrongDualEquiv, LinearIsometryEquiv.trans_apply, piLpCongrRightSL_apply,
-    InnerProductSpace.toDual_apply_apply, ← inner_piLp_single_right,
-    InnerProductSpace.toDual_symm_apply]
-
-end PiLpHilbert
-
 /-! ### The vector spaces of an open set -/
 
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
@@ -286,7 +76,7 @@ abbrev VecTildeSpace (m : ℕ) (s : ℝ) (Ω : Opens V) :=
 
 /-- **The space `H^s_0(Ω)^m`**, the Hilbert direct sum of `m` copies of `H^s_0(Ω)`, the closure of
 the restricted test functions in `H^s(Ω)`. Inside `H^s(Ω)^m` the corresponding subspace is
-`Rd.piLpSubmodule m (Rd.zeroBoundarySpace s Ω)` (the kernel in
+`PiLp.piSubmodule m (Rd.zeroBoundarySpace s Ω)` (the kernel in
 `Rd.BoundedLipschitzDomain.ker_vecSobolevTrace`). -/
 abbrev VecZeroBoundarySpace (m : ℕ) (s : ℝ) (Ω : Opens V) :=
   WithLp 2 (Fin m → ↥(zeroBoundarySpace s Ω))
@@ -347,21 +137,21 @@ abbrev VecTraceSpace (m : ℕ) (s : ℝ) (hs : 1 / 2 < s := by norm_num)
 components all lie in the trace kernel. -/
 noncomputable def vecTraceKer (m : ℕ) (s : ℝ) (hs : 1 / 2 < s := by norm_num)
     (hs' : s < 3 / 2 := by norm_num) : Submodule ℂ (VecRestrictionSpace m s Ω.toOpens) :=
-  piLpSubmodule m (Ω.traceKer s hs hs')
+  PiLp.piSubmodule m (Ω.traceKer s hs hs')
 
 /-- **The vector trace** `H^s(Ω)^m → Ω.VecTraceSpace m s`, `1/2 < s < 3/2`: the trace `γ_s` in
 each component. -/
 noncomputable def vecTrace (m : ℕ) (s : ℝ) (hs : 1 / 2 < s := by norm_num)
     (hs' : s < 3 / 2 := by norm_num) :
     VecRestrictionSpace m s Ω.toOpens →L[ℂ] Ω.VecTraceSpace m s hs hs' :=
-  piLpMapL m (Ω.trace s hs hs')
+  PiLp.compLeftL m (Ω.trace s hs hs')
 
 /-- **The vector extension** `Ω.VecTraceSpace m s → H^s(Ω)^m`, `1/2 < s < 3/2`: the extension
 `E_s` in each component, an isometry (`Rd.BoundedLipschitzDomain.norm_vecExtend_apply`). -/
 noncomputable def vecExtend (m : ℕ) (s : ℝ) (hs : 1 / 2 < s := by norm_num)
     (hs' : s < 3 / 2 := by norm_num) :
     Ω.VecTraceSpace m s hs hs' →L[ℂ] VecRestrictionSpace m s Ω.toOpens :=
-  piLpMapL m (Ω.extend s hs hs')
+  PiLp.compLeftL m (Ω.extend s hs hs')
 
 /-- **The vector extension is a right inverse of the vector trace**
 (`Rd.BoundedLipschitzDomain.trace_extend` in each component). -/
@@ -371,33 +161,33 @@ theorem vecTrace_vecExtend {m : ℕ} {s : ℝ} {hs : 1 / 2 < s} {hs' : s < 3 / 2
   PiLp.ext fun i => Ω.trace_extend (w i)
 
 /-- **The vector extension is an isometry**: `‖E_s^m w‖ = ‖w‖`
-(`Rd.BoundedLipschitzDomain.norm_extend_apply` in each component, `Rd.norm_piLpMapL_apply`). -/
+(`Rd.BoundedLipschitzDomain.norm_extend_apply` in each component, `PiLp.norm_compLeftL_apply`). -/
 theorem norm_vecExtend_apply {m : ℕ} {s : ℝ} {hs : 1 / 2 < s} {hs' : s < 3 / 2}
     (w : Ω.VecTraceSpace m s hs hs') : ‖Ω.vecExtend m s hs hs' w‖ = ‖w‖ :=
-  norm_piLpMapL_apply m (fun t => Ω.norm_extend_apply t) w
+  PiLp.norm_compLeftL_apply m (fun t => Ω.norm_extend_apply t) w
 
-/-- **The kernel of the vector trace is the vector trace kernel** (`Rd.ker_piLpMapL`,
+/-- **The kernel of the vector trace is the vector trace kernel** (`PiLp.ker_compLeftL`,
 `Rd.BoundedLipschitzDomain.ker_trace`). -/
 theorem ker_vecTrace (m : ℕ) (s : ℝ) (hs : 1 / 2 < s := by norm_num)
     (hs' : s < 3 / 2 := by norm_num) :
     (Ω.vecTrace m s hs hs').ker = Ω.vecTraceKer m s hs hs' := by
-  rw [vecTrace, ker_piLpMapL, Ω.ker_trace s hs hs', vecTraceKer]
+  rw [vecTrace, PiLp.ker_compLeftL, Ω.ker_trace s hs hs', vecTraceKer]
 
 /-- **The orthogonal complement of the vector trace kernel** is `((ker γ_s)ᗮ)^m`, the tuples of
-elements of the trace space (`Rd.orthogonal_piLpSubmodule`). -/
+elements of the trace space (`PiLp.orthogonal_piSubmodule`). -/
 theorem orthogonal_vecTraceKer (m : ℕ) (s : ℝ) (hs : 1 / 2 < s := by norm_num)
     (hs' : s < 3 / 2 := by norm_num) :
-    (Ω.vecTraceKer m s hs hs')ᗮ = piLpSubmodule m (Ω.traceKer s hs hs')ᗮ :=
-  orthogonal_piLpSubmodule m _
+    (Ω.vecTraceKer m s hs hs')ᗮ = PiLp.piSubmodule m (Ω.traceKer s hs hs')ᗮ :=
+  PiLp.orthogonal_piSubmodule m _
 
 /-- **The trace space of `H^s(Ω)^m` is the orthogonal complement of the vector trace kernel**:
-the range of the vector extension is `((ker γ_s)^m)ᗮ` (`Rd.range_piLpMapL_subtypeL`,
+the range of the vector extension is `((ker γ_s)^m)ᗮ` (`PiLp.range_compLeftL_subtypeL`,
 `Rd.BoundedLipschitzDomain.orthogonal_vecTraceKer`). -/
 theorem range_vecExtend (m : ℕ) (s : ℝ) (hs : 1 / 2 < s := by norm_num)
     (hs' : s < 3 / 2 := by norm_num) :
     (Ω.vecExtend m s hs hs').range = (Ω.vecTraceKer m s hs hs')ᗮ := by
   rw [Ω.orthogonal_vecTraceKer m s hs hs']
-  exact range_piLpMapL_subtypeL m _
+  exact PiLp.range_compLeftL_subtypeL m _
 
 /-- **The space `H^t(Γ)^m`**, the Hilbert direct sum of `m` copies of `H^t(Γ)`, `0 < t < 1`, with
 the componentwise chart-wise Gagliardo inner product
@@ -416,7 +206,7 @@ theorem inner_vecBoundarySobolev {m : ℕ} {t : ℝ} (g h : Ω.VecBoundarySobole
 /-- **Riesz for the dual of `H^t(Γ)^m`**, `t > 0`: the conjugate-linear isometric isomorphism of
 the dual of the Hilbert space `H^t(Γ)^m` onto it (Mathlib's `InnerProductSpace.toDual`), the
 vector form of `Rd.BoundedLipschitzDomain.dualBoundarySobolevEquiv`. The componentwise
-identification of this dual with `H^{-t}(Γ)^m` is `Rd.piLpStrongDualEquiv`. -/
+identification of this dual with `H^{-t}(Γ)^m` is `PiLp.strongDualEquiv`. -/
 noncomputable def vecDualBoundarySobolevEquiv (m : ℕ) (t : ℝ) (ht : 0 < t) :
     StrongDual ℂ (Ω.VecBoundarySobolev m t) ≃ₗᵢ⋆[ℂ] Ω.VecBoundarySobolev m t :=
   haveI : Fact (0 < t) := ⟨ht⟩
@@ -435,7 +225,7 @@ theorem vecDualBoundarySobolevEquiv_apply {m : ℕ} {t : ℝ} (ht : 0 < t)
 noncomputable def vecSobolevTrace (m : ℕ) (s : ℝ) (hs : 1 / 2 < s := by norm_num)
     (hs' : s < 3 / 2 := by norm_num) :
     VecRestrictionSpace m s Ω.toOpens →L[ℂ] Ω.VecBoundarySobolev m (s - 1 / 2) :=
-  piLpMapL m (Ω.sobolevTrace s hs hs')
+  PiLp.compLeftL m (Ω.sobolevTrace s hs hs')
 
 /-- **The vector extension `H^{s-1/2}(Γ)^m → H^s(Ω)^m`**, `1/2 < s < 3/2`: the extension
 `Rd.BoundedLipschitzDomain.sobolevExtend` in each component, a bounded linear right inverse of the
@@ -443,7 +233,7 @@ vector trace (`Rd.BoundedLipschitzDomain.vecSobolevTrace_vecSobolevExtend`). -/
 noncomputable def vecSobolevExtend (m : ℕ) (s : ℝ) (hs : 1 / 2 < s := by norm_num)
     (hs' : s < 3 / 2 := by norm_num) :
     Ω.VecBoundarySobolev m (s - 1 / 2) →L[ℂ] VecRestrictionSpace m s Ω.toOpens :=
-  piLpMapL m (Ω.sobolevExtend s hs hs')
+  PiLp.compLeftL m (Ω.sobolevExtend s hs hs')
 
 /-- **The vector extension is a right inverse of the vector trace**
 (`Rd.BoundedLipschitzDomain.sobolevTrace_sobolevExtend` in each component). -/
@@ -458,20 +248,20 @@ theorem vecSobolevTrace_surjective (m : ℕ) (s : ℝ) (hs : 1 / 2 < s := by nor
   fun g => ⟨_, Ω.vecSobolevTrace_vecSobolevExtend m s g hs hs'⟩
 
 /-- **The kernel of the vector trace is `H^s_0(Ω)^m`**, `1/2 < s < 3/2` (McLean, Theorem 3.40, in
-each component): `Rd.ker_piLpMapL` and
+each component): `PiLp.ker_compLeftL` and
 `Rd.BoundedLipschitzDomain.ker_sobolevTrace_eq_zeroBoundarySpace`. -/
 theorem ker_vecSobolevTrace (m : ℕ) (s : ℝ) (hs : 1 / 2 < s := by norm_num)
     (hs' : s < 3 / 2 := by norm_num) :
-    (Ω.vecSobolevTrace m s hs hs').ker = piLpSubmodule m (zeroBoundarySpace s Ω.toOpens) := by
-  rw [vecSobolevTrace, ker_piLpMapL, Ω.ker_sobolevTrace_eq_zeroBoundarySpace s hs hs']
+    (Ω.vecSobolevTrace m s hs hs').ker = PiLp.piSubmodule m (zeroBoundarySpace s Ω.toOpens) := by
+  rw [vecSobolevTrace, PiLp.ker_compLeftL, Ω.ker_sobolevTrace_eq_zeroBoundarySpace s hs hs']
 
 /-- **The trace space of `H^s(Ω)^m` is isomorphic to `H^{s-1/2}(Γ)^m`**, `1/2 < s < 3/2`: the
 isomorphism `Rd.BoundedLipschitzDomain.traceSpaceEquivBoundarySobolev` in each component
-(`Rd.piLpMapEquivL`). -/
+(`PiLp.congrRightL`). -/
 noncomputable def vecTraceSpaceEquivBoundarySobolev (m : ℕ) (s : ℝ)
     (hs : 1 / 2 < s := by norm_num) (hs' : s < 3 / 2 := by norm_num) :
     Ω.VecTraceSpace m s hs hs' ≃L[ℂ] Ω.VecBoundarySobolev m (s - 1 / 2) :=
-  piLpMapEquivL m (Ω.traceSpaceEquivBoundarySobolev s hs hs')
+  PiLp.congrRightL m (Ω.traceSpaceEquivBoundarySobolev s hs hs')
 
 /-- The vector trace into `H^{s-1/2}(Γ)^m` is the vector trace into the trace space followed by the
 isomorphism `Rd.BoundedLipschitzDomain.vecTraceSpaceEquivBoundarySobolev`. -/
@@ -496,7 +286,7 @@ noncomputable def vecBesovTrace (m : ℕ) (hp : p ≠ ∞) (s : ℝ) (q : ℝ≥
     (hs : 1 / p.toReal < s) (hs' : s < 1 + 1 / p.toReal) :
     WithLp 2 (Fin m → Ω.DomainBesov p 2 s q) →L[ℂ]
       WithLp 2 (Fin m → Ω.BoundaryBesov p (s - 1 / p.toReal) q) :=
-  piLpMapL m (Ω.besovTrace hp s q hs hs')
+  PiLp.compLeftL m (Ω.besovTrace hp s q hs hs')
 
 /-- **The vector Besov extension** `B^t_{p,q}(Γ)^m → B^{t+1/p}_{p,q}(Ω)^m`, `1 ≤ p < ∞`,
 `1 ≤ q ≤ ∞`, `0 < t < 1`: the extension `Rd.BoundedLipschitzDomain.besovExtend` in each
@@ -506,14 +296,14 @@ noncomputable def vecBesovExtend (m : ℕ) (hp : p ≠ ∞) (t : ℝ) (q : ℝ�
     (ht : 0 < t) (ht1 : t < 1) :
     WithLp 2 (Fin m → Ω.BoundaryBesov p t q) →L[ℂ]
       WithLp 2 (Fin m → Ω.DomainBesov p 2 (t + 1 / p.toReal) q) :=
-  piLpMapL m (Ω.besovExtend hp t q ht ht1)
+  PiLp.compLeftL m (Ω.besovExtend hp t q ht ht1)
 
 /-- **The vector Besov trace is onto** (`Rd.BoundedLipschitzDomain.besovTrace_surjective` in each
-component, `Rd.piLpMapL_surjective`). -/
+component, `PiLp.compLeftL_surjective`). -/
 theorem vecBesovTrace_surjective (m : ℕ) (hp : p ≠ ∞) {s : ℝ} {q : ℝ≥0∞} [Fact (1 ≤ q)]
     (hs : 1 / p.toReal < s) (hs' : s < 1 + 1 / p.toReal) :
     Function.Surjective (Ω.vecBesovTrace m hp s q hs hs') :=
-  piLpMapL_surjective m (Ω.besovTrace_surjective hp hs hs')
+  PiLp.compLeftL_surjective m (Ω.besovTrace_surjective hp hs hs')
 
 /-- **The vector Besov trace inverts the vector extension**: each component of the trace of
 `vecBesovExtend g` has the function `g_i` in `L_p(Γ)`
@@ -533,11 +323,11 @@ end Besov
 /-- **`H̃^s(Ω)^m ≅ H^s_0(Ω)^m`** on a bounded Lipschitz domain, for `s ≥ 0` with
 `s - 1/2 ∉ ℕ_0` (McLean, Theorem 3.33, in each component): the isomorphism
 `Rd.BoundedLipschitzDomain.tildeEquivZeroBoundaryOfNeHalf` acting componentwise
-(`Rd.piLpMapEquivL`). -/
+(`PiLp.congrRightL`). -/
 noncomputable def vecTildeEquivZeroBoundaryOfNeHalf (m : ℕ) {s : ℝ} (hs0 : 0 ≤ s)
     (hs : ∀ k : ℕ, s ≠ k + 1 / 2) :
     VecTildeSpace m s Ω.toOpens ≃L[ℂ] VecZeroBoundarySpace m s Ω.toOpens :=
-  piLpMapEquivL m (Ω.tildeEquivZeroBoundaryOfNeHalf hs0 hs)
+  PiLp.congrRightL m (Ω.tildeEquivZeroBoundaryOfNeHalf hs0 hs)
 
 /-- The `i`-th component of the image of `U` is the restriction of `U_i` to `Ω`. -/
 theorem coe_vecTildeEquivZeroBoundaryOfNeHalf_apply (m : ℕ) {s : ℝ} (hs0 : 0 ≤ s)

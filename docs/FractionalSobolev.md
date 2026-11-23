@@ -156,30 +156,24 @@ span of the test functions of `Ω` in `H^s(V)` (`Rd.testSpan`), and `U ↦ U|_Ω
   derivatives of tempered distributions (`Rd.toTemperedDistribution_weakDerivL2`).
 * **Vector-valued spaces.** For a normed space `X` and `m ∈ ℕ` let `X^m = WithLp 2 (Fin m → X)`
   with `‖x‖² = ∑_i ‖x_i‖²`, the Hilbert direct sum if `X` is a Hilbert space (McLean, Chapter 4,
-  for the componentwise convention). A bounded operator `f : X → Y` acts componentwise with norm
-  at most `‖f‖`, kernel `(ker f)^m` and range `(range f)^m`, isometrically if `f` is isometric and
-  onto if `f` is (`Rd.piLpMapL`, `Rd.norm_piLpMapL_le`, `Rd.ker_piLpMapL`, `Rd.range_piLpMapL`,
-  `Rd.norm_piLpMapL_apply`, `Rd.piLpMapL_surjective`), and isomorphisms and semilinear isometric
-  isomorphisms act as such (`Rd.piLpMapEquivL`, `Rd.piLpCongrRightSL`). For an inner product
-  space `E`, `(K^m)ᗮ = (Kᗮ)^m` for every subspace `K ⊆ E` (`Rd.orthogonal_piLpSubmodule`), and
-  for a Hilbert space the dual of `E^m` is `(E^*)^m`, `ℓ ↦ (ℓ ∘ ι_i)_i`
-  (`Rd.piLpStrongDualEquiv`). Let `Ω` be a bounded Lipschitz domain with boundary `Γ` and
-  `1/2 < s < 3/2`. The trace space of `H^s(Ω)^m`, the sum of `m` copies of the trace space of
-  `H^s(Ω)`, is mapped by the componentwise extension isometrically onto the orthogonal complement
+  for the componentwise convention). Operators, isomorphisms and subspaces act componentwise
+  through the maps on finite `L_2` sums of [Tools from analysis](Analysis.md) (`PiLp.compLeftL`,
+  `PiLp.congrRightL`, `PiLp.piSubmodule`). Let `Ω` be a bounded Lipschitz domain with boundary
+  `Γ` and `1/2 < s < 3/2`. The trace space of `H^s(Ω)^m`, the sum of `m` copies of the trace space
+  of `H^s(Ω)`, is mapped by the componentwise extension isometrically onto the orthogonal complement
   of `(ker γ_s)^m` in `H^s(Ω)^m` (`Rd.BoundedLipschitzDomain.norm_vecExtend_apply`,
   `Rd.BoundedLipschitzDomain.range_vecExtend`, `Rd.BoundedLipschitzDomain.ker_vecTrace`) and is
   isomorphic to `H^{s-1/2}(Γ)^m` (`Rd.BoundedLipschitzDomain.vecTraceSpaceEquivBoundarySobolev`),
-  and the trace maps `H^s(Ω)^m` onto `H^{s-1/2}(Γ)^m` with a bounded linear right inverse and
-  kernel `H^s_0(Ω)^m` (`Rd.BoundedLipschitzDomain.vecSobolevTrace`,
+  and the trace maps `H^s(Ω)^m` onto `H^{s-1/2}(Γ)^m` with a bounded linear right inverse and kernel
+  `H^s_0(Ω)^m` (`Rd.BoundedLipschitzDomain.vecSobolevTrace`,
   `Rd.BoundedLipschitzDomain.vecSobolevTrace_vecSobolevExtend`,
   `Rd.BoundedLipschitzDomain.ker_vecSobolevTrace`). For `1 ≤ p < ∞`, `1 ≤ q ≤ ∞` and
   `1/p < s < 1 + 1/p` the Besov trace maps `B^s_{p,q}(Ω)^m` onto `B^{s-1/p}_{p,q}(Γ)^m` with a
   bounded linear right inverse (`Rd.BoundedLipschitzDomain.vecBesovTrace`,
-  `Rd.BoundedLipschitzDomain.vecBesovTrace_surjective`,
-  `Rd.BoundedLipschitzDomain.vecBesovExtend`). Restriction is an isometric isomorphism of
-  `H̃^l(Ω')^m` onto `H^l_0(Ω')^m` for every open `Ω'` and `l ∈ ℕ_0`
-  (`Rd.vecTildeEquivZeroBoundaryNat`) and an isomorphism of `H̃^s(Ω)^m` onto `H^s_0(Ω)^m` for
-  `s ≥ 0`, `s - 1/2 ∉ ℕ_0` (`Rd.BoundedLipschitzDomain.vecTildeEquivZeroBoundaryOfNeHalf`). The
+  `Rd.BoundedLipschitzDomain.vecBesovTrace_surjective`, `Rd.BoundedLipschitzDomain.vecBesovExtend`).
+  Restriction is an isometric isomorphism of `H̃^l(Ω')^m` onto `H^l_0(Ω')^m` for every open `Ω'` and
+  `l ∈ ℕ_0` (`Rd.vecTildeEquivZeroBoundaryNat`) and an isomorphism of `H̃^s(Ω)^m` onto `H^s_0(Ω)^m`
+  for `s ≥ 0`, `s - 1/2 ∉ ℕ_0` (`Rd.BoundedLipschitzDomain.vecTildeEquivZeroBoundaryOfNeHalf`). The
   dual of `H̃^s(Ω')^m` is `H^{-s}(Ω')^m`, with `ℓ(U) = ∑_i [W_i, U_i]` (`Rd.vecDualEquiv`,
   `Rd.vecDualEquiv_apply`), and Riesz identifies the dual of `H^t(Γ)^m`, `0 < t < 1`, with
   `H^t(Γ)^m`, whose inner product is the sum of the chart-wise Gagliardo inner products of the
@@ -201,7 +195,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Integrals in graph coordinates, vertical forms and vertical difference quotients, the Hardy inequality `∫_{Ω'} \|G\|² / min(η, 1)^(2s) ≤ (1 + K_s 2^(2s+2)) N_{s,Ω'}(G)²` on a Lipschitz graph domain for `s > 1/2` and `G` vanishing near the graph, differences of the extension by zero, and the extension by zero from a graph domain | ✅ | ✗ | `Domains/Lipschitz/GraphHardy` |
 | The cut-off by the charts, extensions of test functions that vanish on `Ω` outside a compact set, localised functions that vanish near the graphs, the zero extension bound for `1/2 < s < 1` on a bounded Lipschitz domain, the bound for every `s ≥ 0` with `s - 1/2 ∉ ℕ_0`, and the isomorphism `H̃^s(Ω) ≅ H^s_0(Ω)` for these `s` | ✅ | ✗ | `Domains/Sobolev/TildeZeroBoundaryEquiv` |
 | Zero extensions of the trace kernel of `H^s(Ω)` for `1 ≤ s < 3/2`, `ker γ_s = H^s_0(Ω)` for `1/2 < s < 3/2`, vanishing trace as a zero extension in `H^s(ℝ^d)`, and `H^s(Ω) ⧸ H^s_0(Ω)` isometric to the trace space of `H^s(Ω)` and isomorphic to `H^{s-1/2}(Γ)` | ✅ | ✗ | `Domains/Traces/TraceKernelGeneral` |
-| Componentwise operators, isomorphisms and semilinear isometries on finite `L_2` sums `X^m` with their norms, kernels and ranges, orthogonal complements `(K^m)ᗮ = (Kᗮ)^m` and the dual of `E^m`, the spaces `H^s(Ω)^m`, `H̃^s(Ω)^m`, `H^s_0(Ω)^m`, the trace space of `H^s(Ω)^m` and `H^t(Γ)^m`, the vector traces into the trace space, onto `H^{s-1/2}(Γ)^m` and onto `B^{s-1/p}_{p,q}(Γ)^m` with their right inverses, the kernels of the traces of `H^s(Ω)^m`, `H̃^s(Ω)^m ≅ H^s_0(Ω)^m`, and the duals of `H̃^s(Ω)^m` and `H^t(Γ)^m` | ✅ | ✗ | `Domains/Sobolev/VectorSobolevSpaces` |
+| The spaces `H^s(Ω)^m`, `H̃^s(Ω)^m`, `H^s_0(Ω)^m`, the trace space of `H^s(Ω)^m` and `H^t(Γ)^m`, the vector traces into the trace space, onto `H^{s-1/2}(Γ)^m` and onto `B^{s-1/p}_{p,q}(Γ)^m` with their right inverses, the kernels of the traces of `H^s(Ω)^m`, `H̃^s(Ω)^m ≅ H^s_0(Ω)^m`, and the duals of `H̃^s(Ω)^m` and `H^t(Γ)^m` | ✅ | ✗ | `Domains/Sobolev/VectorSobolevSpaces` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

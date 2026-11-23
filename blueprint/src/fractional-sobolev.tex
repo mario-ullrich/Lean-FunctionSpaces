@@ -1606,96 +1606,16 @@ $H^{s-1/2}(\Gamma)$ is the classical $H^{1/2}(\Gamma)$.
 \label{sec:vector-sobolev}
 
 Systems of equations and differential forms need $\C^m$-valued functions. As in McLean
-\cite[Chapter 4]{McLean}, their spaces are taken componentwise: for a normed space $X$ and
-$m \in \N$, $X^m$ is the space of the tuples $x = (x_1, \dots, x_m)$ with
-$\|x\|^2 = \sum_i \|x_i\|^2$, and for an inner product space $X$ it carries the inner product
-$\langle x, y \rangle = \sum_i \langle x_i, y_i \rangle$, the Hilbert direct sum of $m$ copies of
-$X$. The spaces $H^s\Lambda^k$ of differential $k$-forms are such sums in the basis $dx_I$. In
-this section $X$ and $Y$ are complex normed spaces, $E$ is a complex inner product space,
-$\Omega' \subseteq V$ is open, and $\Omega$ is a bounded Lipschitz domain with boundary $\Gamma$;
-$N^s_\Gamma$, $\gamma_s$, $E_s$ and $\gamma^H_s$ are as in \Cref{sec:sobolev-trace-kernel}, and
-$\tau_s$ and $E^H_s$ as in \Cref{thm:trace-space-boundary-sobolev}.
-
-\begin{definition}[Componentwise maps]
-\label{def:pi-lp-maps}
-\lean{Rd.piLpMapL, Rd.piLpMapL_apply, Rd.piLpMapEquivL, Rd.piLpMapEquivL_apply,
-  Rd.piLpMapEquivL_symm_apply, Rd.piLpCongrRightSL, Rd.piLpCongrRightSL_apply, Rd.piLpSubmodule,
-  Rd.mem_piLpSubmodule}
-\leanok
-For a bounded linear operator $f \colon X \to Y$, $f^m \colon X^m \to Y^m$ is the linear map
-$(x_1, \dots, x_m) \mapsto (f x_1, \dots, f x_m)$. The same formula defines $e^m$ for an
-isomorphism $e$ of normed spaces, which is again an isomorphism of normed spaces with inverse
-$(e^{-1})^m$, and for a linear or conjugate-linear isometric isomorphism $e$, which is again an
-isometric isomorphism of the same kind. For a subspace $K \subseteq X$, $K^m \subseteq X^m$ is the
-subspace of the tuples whose components all lie in $K$.
-\end{definition}
-
-For an isometric $e$, $\|e^m x\|^2 = \sum_i \|e x_i\|^2 = \sum_i \|x_i\|^2 = \|x\|^2$. In Lean
-$f^m$ and, for an isomorphism $e$, $e^m$ are Mathlib's
-\texttt{ContinuousLinearMap.\allowbreak piMap} and
-\texttt{ContinuousLinearEquiv.\allowbreak piCongrRight} on the product, transported to $X^m$.
-Mathlib's \texttt{LinearIsometryEquiv.\allowbreak piLpCongrRight} is the linear isometric case;
-the semilinear isometric case, such as the conjugate-linear Riesz maps, is built directly
-(\texttt{Rd.\allowbreak piLpCongrRightSL}).
-
-\begin{lemma}[Norm, range and kernel of componentwise maps]
-\label{lem:pi-lp-map-properties}
-\lean{Rd.norm_piLpMapL_le, Rd.norm_piLpMapL_apply, Rd.piLpMapL_surjective, Rd.ker_piLpMapL,
-  Rd.range_piLpMapL, Rd.range_piLpMapL_subtypeL}
-\leanok
-\uses{def:pi-lp-maps}
-Let $f \colon X \to Y$ be a bounded linear operator and $K \subseteq X$ a subspace with the
-inclusion $j_K \colon K \to X$. Then $f^m$ is a bounded linear operator with
-$\|f^m\| \leq \|f\|$, it is isometric if $f$ is isometric, it is onto if $f$ is onto,
-$\ker f^m = (\ker f)^m$, and the range of $f^m$ is $(\operatorname{ran} f)^m$. In particular the
-range of $j_K^m$ is $K^m$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-$\|f^m x\|^2 = \sum_i \|f x_i\|^2 \leq \|f\|^2 \sum_i \|x_i\|^2 = \|f\|^2 \|x\|^2$, and
-$\|f^m x\|^2 = \sum_i \|x_i\|^2 = \|x\|^2$ if $f$ is isometric. The equation $f^m x = 0$ holds if
-and only if $f x_i = 0$ for every $i$, and a tuple of preimages of the components is a preimage,
-so $y$ lies in the range of $f^m$ if and only if $y_i$ lies in the range of $f$ for every $i$.
-\end{proof}
-
-On the product $X \times \dots \times X$ without a norm, Mathlib has the surjectivity, the kernel
-and the range (\texttt{Function.\allowbreak Surjective.\allowbreak piMap},
-\texttt{LinearMap.\allowbreak ker\_\allowbreak compLeft},
-\texttt{LinearMap.\allowbreak range\_\allowbreak compLeft}).
-
-\begin{lemma}[Orthogonal complements and duals of $E^m$]
-\label{lem:pi-lp-orthogonal}
-\lean{Rd.inner_piLp_single_left, Rd.inner_piLp_single_right, Rd.orthogonal_piLpSubmodule,
-  Rd.piLpStrongDualEquiv, Rd.piLpStrongDualEquiv_apply}
-\leanok
-\uses{def:pi-lp-maps}
-For $i \in \{1, \dots, m\}$ and $a \in E$ let $\iota_i a \in E^m$ be the tuple with $a$ at $i$ and
-$0$ elsewhere. Then $\langle \iota_i a, x \rangle = \langle a, x_i \rangle$ and
-$\langle x, \iota_i a \rangle = \langle x_i, a \rangle$ for every $x \in E^m$. For every subspace
-$K \subseteq E$, closed or not, $(K^m)^\perp = (K^\perp)^m$. If $E$ is complete, then
-$\ell \mapsto (\ell \circ \iota_i)_i$ is a linear isometric isomorphism of the dual of $E^m$ onto
-$(E^*)^m$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-In $\langle \iota_i a, x \rangle = \sum_j \langle (\iota_i a)_j, x_j \rangle$ only $j = i$
-contributes, and likewise on the right. If $x \perp K^m$ and $k \in K$, then $\iota_i k \in K^m$,
-so $\langle k, x_i \rangle = \langle \iota_i k, x \rangle = 0$. If $x_i \in K^\perp$ for every
-$i$, then $\langle y, x \rangle = \sum_i \langle y_i, x_i \rangle = 0$ for every $y \in K^m$. For
-the dual, let $R_m \colon E^m \to (E^m)^*$ and $R \colon E \to E^*$ be the Riesz isomorphisms
-(Mathlib's \texttt{InnerProductSpace.\allowbreak toDual}), both conjugate-linear and isometric.
-Then $R^m \circ R_m^{-1}$ is linear and isometric (\Cref{def:pi-lp-maps}), and for
-$y = R_m^{-1} \ell$, $(R^m y)_i(a) = \langle y_i, a \rangle = \langle y, \iota_i a \rangle =
-\ell(\iota_i a)$.
-\end{proof}
-
-Mathlib has the first identity for \texttt{EuclideanSpace}
-(\texttt{EuclideanSpace.\allowbreak inner\_\allowbreak single\_\allowbreak left}) and for $\ell_2$
-sums (\texttt{lp.\allowbreak inner\_\allowbreak single\_\allowbreak left}), but not for $E^m$ in
-its Lean form \texttt{WithLp 2 (Fin m $\to$ E)}, and it has neither the orthogonal complement of
-$K^m$ nor the dual of $E^m$.
+\cite[Chapter 4]{McLean}, their spaces are taken componentwise, as the finite $L_2$ sums of
+\Cref{sec:pi-lp-sums}: for a normed space $X$ and $m \in \N$, $X^m$ is the space of the tuples
+$x = (x_1, \dots, x_m)$ with $\|x\|^2 = \sum_i \|x_i\|^2$, and for a Hilbert space $X$ it is the
+Hilbert direct sum of $m$ copies of $X$ with
+$\langle x, y \rangle = \sum_i \langle x_i, y_i \rangle$; operators, isomorphisms and subspaces
+act componentwise (\Cref{def:pi-lp-maps}). The spaces $H^s\Lambda^k$ of differential $k$-forms
+are such sums in the basis $dx_I$. In this section $\Omega' \subseteq V$ is open, and $\Omega$ is
+a bounded Lipschitz domain with boundary $\Gamma$; $N^s_\Gamma$, $\gamma_s$, $E_s$ and
+$\gamma^H_s$ are as in \Cref{sec:sobolev-trace-kernel}, and $\tau_s$ and $E^H_s$ as in
+\Cref{thm:trace-space-boundary-sobolev}.
 
 \begin{definition}[Vector-valued Sobolev spaces]
 \label{def:vector-sobolev-spaces}
