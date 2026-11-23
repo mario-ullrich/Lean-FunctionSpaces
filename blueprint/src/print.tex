@@ -77,6 +77,13 @@
 % margin; long typewriter identifiers and inline formulas make this necessary.
 \emergencystretch=3em
 
+% The document has more than 999 pages, so the page numbers in the table of contents need room
+% for four digits; `report` reserves 1.55em for them and 2.55em for the right margin.
+\makeatletter
+\renewcommand{\@pnumwidth}{2.2em}
+\renewcommand{\@tocrmarg}{3.2em}
+\makeatother
+
 % --- references ------------------------------------------------------------
 % `report`'s thebibliography opens with \chapter*{\bibname}, so the heading is
 % already there; it just needs a name and a line in the table of contents. The
