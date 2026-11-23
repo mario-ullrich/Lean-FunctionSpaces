@@ -30,9 +30,9 @@ spaces. Every constant is explicit.
   bounded and of small support (`Rd.LocalMeansBump.norm_kernel_le`,
   `Rd.LocalMeansBump.kernel_eq_zero_of_lt`).
 * **The cross kernel `ψ_j ⋆ η_i`** of the Littlewood–Paley blocks and the dual kernels
-  (`Rd.LocalMeansBump.enorm_conv_psi_dual_le`): for `i ≤ j` and `j ≥ 2` the block `ψ_j`
-  annihilates the moment kernel `μ_{2^(j-2)}` of `Φ` (`Rd.conv_psi_lpMomentScaled`, through the
-  Fourier transforms `Rd.fourier_dilate_momentKernel`), so
+  (`Rd.LocalMeansBump.enorm_conv_lpBlockKernel_dualKernel_le`): for `i ≤ j` and `j ≥ 2` the block
+  `ψ_j` annihilates the moment kernel `μ_{2^(j-2)}` of `Φ` (`Rd.conv_lpBlockKernel_lpMomentScaled`,
+  through the Fourier transforms `Rd.fourier_dilate_momentKernel`), so
   `ψ_j ⋆ η_i = ψ_j ⋆ (η_i - μ_{2^(j-2)} ⋆ η_i)`, and `η_i - μ_{2^(j-2)} ⋆ η_i` averages
   differences of `η_i` with short steps; the remaining cases use the small support of `η_i`.
 
@@ -943,17 +943,17 @@ theorem fourier_lpMomentScaled_eq_zero (L : ℕ) {j : ℕ} {ξ : V} (h : 2 ^ (j 
 
 /-- **High blocks annihilate the moment kernels of `Φ`**: `ψ_{j+2} ⋆ μ_{2^j} = 0`, since
 `𝓕ψ_{j+2}` vanishes on the ball of radius `2^(j+1)` and `𝓕μ_{2^j}` outside it. -/
-theorem conv_psi_lpMomentScaled (L j : ℕ) :
-    conv (psi (V := V) (j + 2)) (lpMomentScaled L j) volume = 0 := by
+theorem conv_lpBlockKernel_lpMomentScaled (L j : ℕ) :
+    conv (lpBlockKernel (V := V) (j + 2)) (lpMomentScaled L j) volume = 0 := by
   have h0 : 𝓕 (0 : V → ℂ) = 0 := funext fun ξ => by simp [Real.fourier_eq]
-  refine conv_eq_of_fourier (integrable_psi _) (integrable_lpMomentScaled L j)
+  refine conv_eq_of_fourier (integrable_lpBlockKernel _) (integrable_lpMomentScaled L j)
     (continuous_lpMomentScaled L j) (bddAbove_lpMomentScaled L j) (integrable_zero _ _ _)
     continuous_zero ?_ fun ξ => ?_
   · rw [h0]
     exact integrable_zero _ _ _
   · rw [h0, Pi.zero_apply]
     by_cases hξ : ‖ξ‖ ≤ 2 ^ (j + 1)
-    · rw [show j + 2 = j + 1 + 1 from rfl, fourier_psi_succ_eq_zero hξ, zero_mul]
+    · rw [show j + 2 = j + 1 + 1 from rfl, fourier_lpBlockKernel_succ_eq_zero hξ, zero_mul]
     · rw [fourier_lpMomentScaled_eq_zero L (not_le.1 hξ).le, mul_zero]
 
 /-! ### Decay of the Littlewood–Paley blocks -/
@@ -972,9 +972,10 @@ theorem psiDecayConst_ne_top (N : ℕ) : psiDecayConst V N ≠ ∞ :=
 /-- **Decay of the Littlewood–Paley blocks**:
 `|ψ_j(y)| ≤ C 2^(jn) (1 + 2^j ‖y‖)^(-N)` with `C = Rd.psiDecayConst V N`; `ψ_j` is the
 difference of the dilations of `Φ` at the scales `2^j` and `2^(j-1)`. -/
-theorem enorm_psi_le (j N : ℕ) (y : V) :
-    ‖psi j y‖ₑ ≤ psiDecayConst V N * 2 ^ (j * finrank ℝ V) * ((1 + 2 ^ j * ‖y‖ₑ) ^ N)⁻¹ := by
-  have hPhi : ∀ k, ‖Phi (V := V) k y‖ₑ ≤ schwartzDecayConst (lpKernelS (V := V)) 0 N *
+theorem enorm_lpBlockKernel_le (j N : ℕ) (y : V) :
+    ‖lpBlockKernel j y‖ₑ ≤
+      psiDecayConst V N * 2 ^ (j * finrank ℝ V) * ((1 + 2 ^ j * ‖y‖ₑ) ^ N)⁻¹ := by
+  have hPhi : ∀ k, ‖dilatedLpKernel (V := V) k y‖ₑ ≤ schwartzDecayConst (lpKernelS (V := V)) 0 N *
       2 ^ (k * finrank ℝ V) * ((1 + 2 ^ k * ‖y‖ₑ) ^ N)⁻¹ := fun k =>
     enorm_dilate_schwartz_le (lpKernelS (V := V)) N k y
   have hS : schwartzDecayConst (lpKernelS (V := V)) 0 N ≤ psiDecayConst V N :=
@@ -984,13 +985,14 @@ theorem enorm_psi_le (j N : ℕ) (y : V) :
     refine (hPhi 0).trans ?_
     gcongr
   | succ j =>
-    show ‖Phi (V := V) (j + 1) y - Phi j y‖ₑ ≤ _
+    show ‖dilatedLpKernel (V := V) (j + 1) y - dilatedLpKernel j y‖ₑ ≤ _
     have hW : ((1 + 2 ^ j * ‖y‖ₑ) ^ N)⁻¹ ≤ 2 ^ N * ((1 + 2 ^ (j + 1) * ‖y‖ₑ) ^ N)⁻¹ := by
       have h := ENNReal.inv_one_add_mul_pow_le_two_pow (2 ^ j) ‖y‖ₑ N
       rwa [← pow_succ'] at h
     have hX : (2 : ℝ≥0∞) ^ (j * finrank ℝ V) ≤ 2 ^ ((j + 1) * finrank ℝ V) :=
       pow_le_pow_right₀ one_le_two (Nat.mul_le_mul_right _ (Nat.le_succ j))
-    calc ‖Phi (V := V) (j + 1) y - Phi j y‖ₑ ≤ ‖Phi (V := V) (j + 1) y‖ₑ + ‖Phi (V := V) j y‖ₑ :=
+    calc ‖dilatedLpKernel (V := V) (j + 1) y - dilatedLpKernel j y‖ₑ
+        ≤ ‖dilatedLpKernel (V := V) (j + 1) y‖ₑ + ‖dilatedLpKernel (V := V) j y‖ₑ :=
           enorm_sub_le
       _ ≤ schwartzDecayConst (lpKernelS (V := V)) 0 N * 2 ^ ((j + 1) * finrank ℝ V) *
             ((1 + 2 ^ (j + 1) * ‖y‖ₑ) ^ N)⁻¹ +
@@ -1057,8 +1059,8 @@ theorem lintegral_enorm_dual_le (L i : ℕ) :
 /-- **The case `i > j`**: `|(ψ_j ⋆ η_i)(y)| ≤ C 2^(jn) (1 + 2^j ‖y‖)^(-N)` with
 `C = Rd.LocalMeansBump.psiDualSupportConst L N`: `η_i` is supported in `B̄(0, 2LR 2^(-i))`, where
 the Peetre weight at the scale `2^j` changes by at most `(1 + 2LR)^N`. -/
-theorem enorm_conv_psi_dual_le_of_lt (L N : ℕ) {i j : ℕ} (hji : j < i) (y : V) :
-    ‖conv (psi j) (b.dual L i) volume y‖ₑ ≤
+theorem enorm_conv_lpBlockKernel_dualKernel_le_of_lt (L N : ℕ) {i j : ℕ} (hji : j < i) (y : V) :
+    ‖conv (lpBlockKernel j) (b.dual L i) volume y‖ₑ ≤
       b.psiDualSupportConst L N * 2 ^ (j * finrank ℝ V) * ((1 + 2 ^ j * ‖y‖ₑ) ^ N)⁻¹ := by
   rw [conv_comm]
   refine (enorm_conv_le_lintegral _ _ y).trans ?_
@@ -1067,7 +1069,7 @@ theorem enorm_conv_psi_dual_le_of_lt (L N : ℕ) {i j : ℕ} (hji : j < i) (y : 
     b.dual_eq_zero_of_lt L i (lt_of_le_of_lt (div_le_div_of_nonneg_left hρ (by positivity)
       (pow_le_pow_right₀ one_le_two hji.le)) hw)
   refine (lintegral_mul_peetre_le_of_support (b.continuous_dual L i).aestronglyMeasurable hρ hs
-    (fun z => enorm_psi_le j N z) y).trans ?_
+    (fun z => enorm_lpBlockKernel_le j N z) y).trans ?_
   calc (∫⁻ w, ‖b.dual L i w‖ₑ) * (psiDecayConst V N *
         ENNReal.ofReal ((1 + 2 * L * b.radius) ^ N) * 2 ^ (j * finrank ℝ V) *
           ((1 + 2 ^ j * ‖y‖ₑ) ^ N)⁻¹)
@@ -1079,9 +1081,9 @@ theorem enorm_conv_psi_dual_le_of_lt (L N : ℕ) {i j : ℕ} (hji : j < i) (y : 
 /-- **The case `i ≤ j ≤ 1`**: `|(ψ_j ⋆ η_i)(y)| ≤ 2^(n+L') C 2^(-(j-i)L') 2^(in)
 (1 + 2^i ‖y‖)^(-N)` with `C = Rd.LocalMeansBump.psiDualSupportConst L N`, as in the case `i > j`
 with the Peetre weight at the scale `2^i`. -/
-theorem enorm_conv_psi_dual_le_of_le_one (L N L' : ℕ) {i j : ℕ} (hij : i ≤ j) (hj : j ≤ 1)
-    (y : V) :
-    ‖conv (psi j) (b.dual L i) volume y‖ₑ ≤
+theorem enorm_conv_lpBlockKernel_dualKernel_le_of_le_one (L N L' : ℕ) {i j : ℕ} (hij : i ≤ j)
+    (hj : j ≤ 1) (y : V) :
+    ‖conv (lpBlockKernel j) (b.dual L i) volume y‖ₑ ≤
       2 ^ (finrank ℝ V + L') * b.psiDualSupportConst L N * dyadicWeight (-(L' : ℝ)) (j - i) *
         2 ^ (i * finrank ℝ V) * ((1 + 2 ^ i * ‖y‖ₑ) ^ N)⁻¹ := by
   rw [conv_comm]
@@ -1089,12 +1091,13 @@ theorem enorm_conv_psi_dual_le_of_le_one (L N L' : ℕ) {i j : ℕ} (hij : i ≤
   have hρ : 0 ≤ 2 * (L : ℝ) * b.radius := by have := b.radius_nonneg; positivity
   have hs : ∀ w, 2 * L * b.radius / 2 ^ i < ‖w‖ → b.dual L i w = 0 := fun w hw =>
     b.dual_eq_zero_of_lt L i hw
-  have hψ : ∀ z : V, ‖psi j z‖ₑ ≤ 2 ^ finrank ℝ V * psiDecayConst V N * 2 ^ (i * finrank ℝ V) *
-      ((1 + 2 ^ i * ‖z‖ₑ) ^ N)⁻¹ := fun z => by
+  have hψ : ∀ z : V, ‖lpBlockKernel j z‖ₑ ≤
+      2 ^ finrank ℝ V * psiDecayConst V N * 2 ^ (i * finrank ℝ V) *
+        ((1 + 2 ^ i * ‖z‖ₑ) ^ N)⁻¹ := fun z => by
     have h2 : (2 : ℝ≥0∞) ^ (j * finrank ℝ V) ≤ 2 ^ finrank ℝ V * 2 ^ (i * finrank ℝ V) := by
       rw [← pow_add]
       exact pow_le_pow_right₀ one_le_two (by nlinarith)
-    refine (enorm_psi_le j N z).trans ?_
+    refine (enorm_lpBlockKernel_le j N z).trans ?_
     calc psiDecayConst V N * 2 ^ (j * finrank ℝ V) * ((1 + 2 ^ j * ‖z‖ₑ) ^ N)⁻¹
         ≤ psiDecayConst V N * (2 ^ finrank ℝ V * 2 ^ (i * finrank ℝ V)) *
             ((1 + 2 ^ i * ‖z‖ₑ) ^ N)⁻¹ :=
@@ -1321,24 +1324,24 @@ theorem ae_enorm_dual_sub_conv_lpMomentScaled_le (L N : ℕ) {L' : ℕ} (hL' : 1
 /-- **The moment identity of `Φ` in the blocks**:
 `ψ_{j'+2} ⋆ η_i = ψ_{j'+2} ⋆ (η_i - μ_{2^j'} ⋆ η_i)` almost everywhere, since
 `ψ_{j'+2} ⋆ μ_{2^j'} = 0`. -/
-theorem conv_psi_dual_ae_eq (L L' i j' : ℕ) :
-    conv (psi (V := V) (j' + 2)) (b.dual L i) volume =ᵐ[volume]
-      conv (psi (j' + 2)) (b.dual L i - conv (lpMomentScaled L' j') (b.dual L i) volume)
+theorem conv_lpBlockKernel_dualKernel_ae_eq (L L' i j' : ℕ) :
+    conv (lpBlockKernel (V := V) (j' + 2)) (b.dual L i) volume =ᵐ[volume]
+      conv (lpBlockKernel (j' + 2)) (b.dual L i - conv (lpMomentScaled L' j') (b.dual L i) volume)
         volume := by
   have hη : MemLp (b.dual L i) 1 volume := memLp_one_iff_integrable.2 (b.integrable_dual L i)
   have hμη : MemLp (conv (lpMomentScaled L' j') (b.dual L i) volume) 1 volume :=
     memLp_one_iff_integrable.2 (integrable_conv (integrable_lpMomentScaled L' j')
       (b.integrable_dual L i))
-  have h0 : conv (psi (V := V) (j' + 2)) (conv (lpMomentScaled L' j') (b.dual L i) volume)
+  have h0 : conv (lpBlockKernel (V := V) (j' + 2)) (conv (lpMomentScaled L' j') (b.dual L i) volume)
       volume =ᵐ[volume] 0 := by
-    have h := conv_conv_ae le_rfl ENNReal.one_ne_top (integrable_psi (V := V) (j' + 2))
+    have h := conv_conv_ae le_rfl ENNReal.one_ne_top (integrable_lpBlockKernel (V := V) (j' + 2))
       (integrable_lpMomentScaled L' j') hη
-    rw [conv_psi_lpMomentScaled] at h
+    rw [conv_lpBlockKernel_lpMomentScaled] at h
     filter_upwards [h] with w hw
     rw [← hw]
     simp [conv_apply]
-  filter_upwards [conv_sub_ae le_rfl ENNReal.one_ne_top (integrable_psi (V := V) (j' + 2)) hη
-    hμη, h0] with y h1 h2
+  filter_upwards [conv_sub_ae le_rfl ENNReal.one_ne_top
+    (integrable_lpBlockKernel (V := V) (j' + 2)) hη hμη, h0] with y h1 h2
   rw [h1, Pi.sub_apply, h2, Pi.zero_apply, sub_zero]
 
 /-- **The case `i ≤ j`, `j ≥ 2`**: for `L' ≥ 1` and almost every `y`,
@@ -1346,9 +1349,9 @@ theorem conv_psi_dual_ae_eq (L L' i j' : ℕ) :
 `C = Rd.LocalMeansBump.dualTailConst L L' N`, `P = Rd.psiDecayConst V (2N)` and
 `I = Rd.peetreIntegral V N`: by the moment identity of `Φ`, the averaged differences of `η_i`
 and the convolution of two Peetre bumps. -/
-theorem ae_enorm_conv_psi_dual_le_of_two_le (L N : ℕ) {L' : ℕ} (hL' : 1 ≤ L') {i j : ℕ}
-    (hij : i ≤ j) (hj : 2 ≤ j) :
-    ∀ᵐ y ∂volume, ‖conv (psi j) (b.dual L i) volume y‖ₑ ≤
+theorem ae_enorm_conv_lpBlockKernel_dualKernel_le_of_two_le (L N : ℕ) {L' : ℕ} (hL' : 1 ≤ L')
+    {i j : ℕ} (hij : i ≤ j) (hj : 2 ≤ j) :
+    ∀ᵐ y ∂volume, ‖conv (lpBlockKernel j) (b.dual L i) volume y‖ₑ ≤
       b.dualTailConst L L' N * psiDecayConst V (2 * N) * peetreIntegral V N *
         dyadicWeight (-(L' : ℝ)) (j - i) * 2 ^ (i * finrank ℝ V) *
           ((1 + 2 ^ i * ‖y‖ₑ) ^ N)⁻¹ := by
@@ -1358,23 +1361,23 @@ theorem ae_enorm_conv_psi_dual_le_of_two_le (L N : ℕ) {L' : ℕ} (hL' : 1 ≤ 
       psiDecayConst V (2 * N) ≠ ∞ :=
     ENNReal.mul_ne_top (ENNReal.mul_ne_top (b.dualTailConst_ne_top L L' N)
       (ENNReal.dyadicWeight_ne_top _ _)) (psiDecayConst_ne_top _)
-  filter_upwards [b.conv_psi_dual_ae_eq L L' i j'] with y hy
+  filter_upwards [b.conv_lpBlockKernel_dualKernel_ae_eq L L' i j'] with y hy
   rw [hy, conv_comm]
   refine (enorm_conv_le_lintegral _ _ y).trans ?_
   calc ∫⁻ w, ‖(b.dual L i - conv (lpMomentScaled L' j') (b.dual L i) volume) w‖ₑ *
-        ‖psi (j' + 2) (y - w)‖ₑ
+        ‖lpBlockKernel (j' + 2) (y - w)‖ₑ
       ≤ ∫⁻ w, b.dualTailConst L L' N * dyadicWeight (-(L' : ℝ)) (j' + 2 - i) *
           psiDecayConst V (2 * N) * (2 ^ ((j' + 2) * finrank ℝ V) *
             ((1 + 2 ^ (j' + 2) * ‖y - w‖ₑ) ^ (2 * N))⁻¹ *
               (2 ^ (i * finrank ℝ V) * ((1 + 2 ^ i * ‖w‖ₑ) ^ N)⁻¹)) := by
         refine lintegral_mono_ae (hD.mono fun w hw => ?_)
         calc ‖(b.dual L i - conv (lpMomentScaled L' j') (b.dual L i) volume) w‖ₑ *
-              ‖psi (j' + 2) (y - w)‖ₑ
+              ‖lpBlockKernel (j' + 2) (y - w)‖ₑ
             ≤ (b.dualTailConst L L' N * dyadicWeight (-(L' : ℝ)) (j' + 2 - i) *
                 2 ^ (i * finrank ℝ V) * ((1 + 2 ^ i * ‖w‖ₑ) ^ N)⁻¹) *
               (psiDecayConst V (2 * N) * 2 ^ ((j' + 2) * finrank ℝ V) *
                 ((1 + 2 ^ (j' + 2) * ‖y - w‖ₑ) ^ (2 * N))⁻¹) :=
-              mul_le_mul' hw (enorm_psi_le _ _ _)
+              mul_le_mul' hw (enorm_lpBlockKernel_le _ _ _)
           _ = _ := by ring
     _ = b.dualTailConst L L' N * dyadicWeight (-(L' : ℝ)) (j' + 2 - i) *
           psiDecayConst V (2 * N) * ∫⁻ w, 2 ^ ((j' + 2) * finrank ℝ V) *
@@ -1408,8 +1411,8 @@ theorem psiDualConst_ne_top (L L' : ℕ) {N : ℕ} (hN : finrank ℝ V < N) :
 almost every `y`, `|(ψ_j ⋆ η_i)(y)| ≤ C c_{ji} 2^(min(i,j) n) (1 + 2^min(i,j) ‖y‖)^(-N)` with
 `c_{ji} = 2^(-(j-i)L')` for `i ≤ j`, `c_{ji} = 1` for `i > j`, and
 `C = Rd.LocalMeansBump.psiDualConst L L' N`. -/
-theorem enorm_conv_psi_dual_le (L : ℕ) {L' : ℕ} (hL' : 1 ≤ L') (N i j : ℕ) :
-    ∀ᵐ y ∂volume, ‖conv (psi j) (b.dual L i) volume y‖ₑ ≤
+theorem enorm_conv_lpBlockKernel_dualKernel_le (L : ℕ) {L' : ℕ} (hL' : 1 ≤ L') (N i j : ℕ) :
+    ∀ᵐ y ∂volume, ‖conv (lpBlockKernel j) (b.dual L i) volume y‖ₑ ≤
       b.psiDualConst L L' N * (if i ≤ j then dyadicWeight (-(L' : ℝ)) (j - i) else 1) *
         2 ^ (min i j * finrank ℝ V) * ((1 + 2 ^ (min i j) * ‖y‖ₑ) ^ N)⁻¹ := by
   have h1 : b.psiDualSupportConst L N ≤ b.psiDualConst L L' N :=
@@ -1419,15 +1422,17 @@ theorem enorm_conv_psi_dual_le (L : ℕ) {L' : ℕ} (hL' : 1 ≤ L') (N i j : �
   have h3 : b.dualTailConst L L' N * psiDecayConst V (2 * N) * peetreIntegral V N ≤
       b.psiDualConst L L' N := le_add_self
   rcases lt_or_ge j i with hji | hij
-  · refine Filter.Eventually.of_forall fun y => (b.enorm_conv_psi_dual_le_of_lt L N hji y).trans ?_
+  · refine Filter.Eventually.of_forall fun y =>
+      (b.enorm_conv_lpBlockKernel_dualKernel_le_of_lt L N hji y).trans ?_
     simp only [not_le.2 hji, ↓reduceIte, min_eq_right hji.le, mul_one]
     gcongr
   · simp only [hij, ↓reduceIte, min_eq_left hij]
     rcases le_or_gt j 1 with hj | hj
     · refine Filter.Eventually.of_forall fun y =>
-        (b.enorm_conv_psi_dual_le_of_le_one L N L' hij hj y).trans ?_
+        (b.enorm_conv_lpBlockKernel_dualKernel_le_of_le_one L N L' hij hj y).trans ?_
       gcongr
-    · filter_upwards [b.ae_enorm_conv_psi_dual_le_of_two_le L N hL' hij hj] with y hy
+    · filter_upwards [b.ae_enorm_conv_lpBlockKernel_dualKernel_le_of_two_le L N hL' hij hj]
+        with y hy
       refine hy.trans ?_
       gcongr
 

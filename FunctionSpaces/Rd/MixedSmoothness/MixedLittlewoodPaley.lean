@@ -13,7 +13,7 @@ public import FunctionSpaces.Rd.Approximation.BandInverse
 # Tensor Littlewood–Paley blocks
 
 On `ℝ^d = Fin d → ℝ` the **tensor Littlewood–Paley blocks** of `f ∈ L_p` are `δ_k ⋆ f` with the
-tensor kernels `δ_k = ⊗_i ψ_{k_i}` of the one-dimensional blocks `ψ_j` (`Rd.psi` on `ℝ`),
+tensor kernels `δ_k = ⊗_i ψ_{k_i}` of the one-dimensional blocks `ψ_j` (`Rd.lpBlockKernel` on `ℝ`),
 `k ∈ ℕ^d` (`Rd.mixedPsi`, `Rd.mixedBlock`). In Fourier terms `δ_k ⋆ f = 𝓕⁻¹(φ_k 𝓕f)` for the
 tensor product `φ_k = ⊗_i 𝓕ψ_{k_i}` of the one-dimensional dyadic decomposition of unity, and
 **Vybíral's quasi-norm** of the Besov spaces of dominating mixed smoothness is
@@ -27,8 +27,8 @@ comparisons with the mixed local means use a reproducing formula, a one-dimensio
 `L_1` in each coordinate, and the almost diagonal lemma on `ℕ^d`:
 
 * `‖ψ_m ⋆ η_k‖_1 ≤ C 2^(-(m-k)L)` for `k ≤ m`
-  (`Rd.LocalMeansBump.exists_eLpNorm_conv_psi_dual_le`): `ψ_m` annihilates the band-limited
-  Jackson approximant `J_{m-3} η_k` (`Rd.conv_psi_Theta`), and
+  (`Rd.LocalMeansBump.exists_eLpNorm_conv_lpBlockKernel_dualKernel_le`): `ψ_m` annihilates the
+  band-limited Jackson approximant `J_{m-3} η_k` (`Rd.conv_lpBlockKernel_Theta`), and
   `‖η_k - J_{m-3} η_k‖_1 ≤ C ω_L(η_k, 2^(-(m-3)))_1` (`Rd.enorm_sub_jacksonApprox_le`);
 * `‖k_m ⋆ Θ_k‖_1 ≤ C 2^(-(m-k)L)` for `k < m`
   (`Rd.LocalMeansBump.exists_eLpNorm_conv_kernel_Theta_le`): local means are bounded by the
@@ -51,7 +51,7 @@ variable {d : ℕ}
 
 /-- The **tensor Littlewood–Paley kernels** `δ_k = ⊗_i ψ_{k_i}`. -/
 noncomputable def mixedPsi (k : Fin d → ℕ) : (Fin d → ℝ) → ℂ :=
-  tensorKernel fun i => psi (V := ℝ) (k i)
+  tensorKernel fun i => lpBlockKernel (V := ℝ) (k i)
 
 /-- The **tensor band-limiting kernels** `⊗_i Θ_{k_i}`. -/
 noncomputable def mixedTheta (k : Fin d → ℕ) : (Fin d → ℝ) → ℂ :=
@@ -59,20 +59,20 @@ noncomputable def mixedTheta (k : Fin d → ℕ) : (Fin d → ℝ) → ℂ :=
 
 /-- The tensor Littlewood–Paley kernels are integrable. -/
 theorem integrable_mixedPsi (k : Fin d → ℕ) : Integrable (mixedPsi k) :=
-  integrable_tensorKernel fun i => integrable_psi (k i)
+  integrable_tensorKernel fun i => integrable_lpBlockKernel (k i)
 
 /-- The tensor band-limiting kernels are integrable. -/
 theorem integrable_mixedTheta (k : Fin d → ℕ) : Integrable (mixedTheta k) :=
   integrable_tensorKernel fun i => integrable_Theta (k i)
 
-/-- **The blocks are band-limited**: `(⊗Θ_{k_i}) ⋆ δ_k = δ_k` (`Rd.conv_Theta_psi` in every
-coordinate). -/
+/-- **The blocks are band-limited**: `(⊗Θ_{k_i}) ⋆ δ_k = δ_k` (`Rd.conv_Theta_lpBlockKernel` in
+every coordinate). -/
 theorem conv_mixedTheta_mixedPsi (k : Fin d → ℕ) :
     conv (mixedTheta k) (mixedPsi k) volume = mixedPsi k := by
   rw [mixedTheta, mixedPsi, conv_tensorKernel]
   congr 1
   funext i
-  exact conv_Theta_psi (k i)
+  exact conv_Theta_lpBlockKernel (k i)
 
 /-- **The blocks sum to an approximate identity**: over the boxes `{k : k_i ≤ J}`,
 `∑_k δ_k = (⊗Φ)_{2^J}`. -/
@@ -80,14 +80,14 @@ theorem sum_mixedPsi (J : ℕ) :
     (fun x => ∑ k ∈ Fintype.piFinset (fun _ : Fin d => Finset.range (J + 1)), mixedPsi k x) =
       dilate ((2 : ℝ) ^ J) (tensorKernel fun _ : Fin d => lpKernel (V := ℝ)) := by
   have h := sum_tensorKernel_piFinset (fun _ : Fin d => Finset.range (J + 1))
-    (fun _ j => psi (V := ℝ) j)
+    (fun _ j => lpBlockKernel (V := ℝ) j)
   rw [dilate_tensorKernel]
   funext x
   rw [← Finset.sum_apply]
   change (∑ k ∈ Fintype.piFinset (fun _ : Fin d => Finset.range (J + 1)),
-    tensorKernel fun i => psi (V := ℝ) (k i)) x = _
+    tensorKernel fun i => lpBlockKernel (V := ℝ) (k i)) x = _
   rw [h]
-  simp only [sum_psi]
+  simp only [sum_lpBlockKernel]
   rfl
 
 variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
@@ -150,9 +150,9 @@ variable (b : LocalMeansBump ℝ)
 `‖ψ_m ⋆ η_k‖_1 ≤ C c(m, k)`, `c(m, k) = 2^(-(m-k)L)` for `k ≤ m` and `1` for `k > m`. For
 `k + 3 ≤ m`, `ψ_m` annihilates the band-limited Jackson approximant `J_{m-3} η_k`, and
 `‖η_k - J_{m-3} η_k‖_1 ≤ C ω_L(η_k, 2^(-(m-3)))_1 ≤ C 2^(-(m-3-k)L)`. -/
-theorem exists_eLpNorm_conv_psi_dual_le (L : ℕ) :
+theorem exists_eLpNorm_conv_lpBlockKernel_dualKernel_le (L : ℕ) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ m k : ℕ,
-      eLpNorm (conv (psi (V := ℝ) m) (b.dual L k) volume) 1 volume ≤
+      eLpNorm (conv (lpBlockKernel (V := ℝ) m) (b.dual L k) volume) 1 volume ≤
         C * almostDiagCoeff L m k := by
   have h1 : (1 : ℝ≥0∞) ≠ ∞ := ENNReal.one_ne_top
   set Φ₁ := 2 * eLpNorm (lpKernel (V := ℝ)) 1 volume
@@ -165,19 +165,19 @@ theorem exists_eLpNorm_conv_psi_dual_le (L : ℕ) :
     (jacksonConst_ne_top le_rfl h1 L) (b.dualConst_ne_top L))
   refine ⟨(C₀ + C₁) * dyadicWeight L 3, ENNReal.mul_ne_top (ENNReal.add_ne_top.2 ⟨hC₀, hC₁⟩)
     (ENNReal.dyadicWeight_ne_top _ _), fun m k => ?_⟩
-  have htriv : eLpNorm (conv (psi (V := ℝ) m) (b.dual L k) volume) 1 volume ≤ C₀ :=
-    (eLpNorm_conv_le le_rfl h1 (integrable_psi m).aestronglyMeasurable
+  have htriv : eLpNorm (conv (lpBlockKernel (V := ℝ) m) (b.dual L k) volume) 1 volume ≤ C₀ :=
+    (eLpNorm_conv_le le_rfl h1 (integrable_lpBlockKernel m).aestronglyMeasurable
       (b.integrable_dual L k).aestronglyMeasurable).trans
-      (mul_le_mul' (eLpNorm_psi_one_le m) (b.eLpNorm_dual_one_le L k))
+      (mul_le_mul' (eLpNorm_lpBlockKernel_one_le m) (b.eLpNorm_dual_one_le L k))
   by_cases hkm : k + 3 ≤ m
   · -- the Jackson approximant of `η_k` at the level `m - 3`
     set η : Lp ℂ 1 (volume : Measure ℝ) := (memLp_one_iff_integrable.2 (b.integrable_dual L k)).toLp _
     set P := jacksonApprox h1 L (m - 3) η
-    have hP : convLp h1 (integrable_psi (V := ℝ) m) P = 0 := by
+    have hP : convLp h1 (integrable_lpBlockKernel (V := ℝ) m) P = 0 := by
       have hmem : convLp h1 (integrable_Theta (V := ℝ) (m - 3)) P = P :=
         mem_bandSpace.1 (jacksonApprox_mem_bandSpace h1 L (m - 3) η)
       rw [← hmem, convLp_convLp]
-      exact convLp_of_eq_zero h1 _ (conv_psi_Theta (by omega)) P
+      exact convLp_of_eq_zero h1 _ (conv_lpBlockKernel_Theta (by omega)) P
     have hmod : lpModulus 1 L η (m - 3) ≤ b.dualConst L * almostDiagCoeff L (m - 3) k := by
       rw [lpModulus, smoothnessModulus_congr_ae (MemLp.coeFn_toLp _)]
       exact iSup₂_le fun v hv => b.eLpNorm_higherDiff_dual_le L hv
@@ -187,22 +187,22 @@ theorem exists_eLpNorm_conv_psi_dual_le (L : ℕ) :
       simp only [almostDiagCoeff, hk, hk', ↓reduceIte]
       rw [show m - k = (m - 3 - k) + 3 by omega, ENNReal.dyadicWeight_add_nat, mul_assoc,
         ENNReal.dyadicWeight_neg_mul_self, mul_one]
-    rw [eLpNorm_conv_eq_enorm_convLp (integrable_psi m) (b.integrable_dual L k)]
-    have hsplit : convLp h1 (integrable_psi (V := ℝ) m) η =
-        convLp h1 (integrable_psi (V := ℝ) m) (η - P) := by
+    rw [eLpNorm_conv_eq_enorm_convLp (integrable_lpBlockKernel m) (b.integrable_dual L k)]
+    have hsplit : convLp h1 (integrable_lpBlockKernel (V := ℝ) m) η =
+        convLp h1 (integrable_lpBlockKernel (V := ℝ) m) (η - P) := by
       rw [map_sub, hP, sub_zero]
     rw [hsplit]
-    calc ‖convLp h1 (integrable_psi (V := ℝ) m) (η - P)‖ₑ
-        ≤ eLpNorm (psi (V := ℝ) m) 1 volume * ‖η - P‖ₑ := enorm_convLp_le h1 _ _
+    calc ‖convLp h1 (integrable_lpBlockKernel (V := ℝ) m) (η - P)‖ₑ
+        ≤ eLpNorm (lpBlockKernel (V := ℝ) m) 1 volume * ‖η - P‖ₑ := enorm_convLp_le h1 _ _
       _ ≤ Φ₁ * (jacksonConst ℝ L 1 * lpModulus 1 L η (m - 3)) :=
-          mul_le_mul' (eLpNorm_psi_one_le m) (enorm_sub_jacksonApprox_le h1 L (m - 3) η)
+          mul_le_mul' (eLpNorm_lpBlockKernel_one_le m) (enorm_sub_jacksonApprox_le h1 L (m - 3) η)
       _ ≤ Φ₁ * (jacksonConst ℝ L 1 * (b.dualConst L * almostDiagCoeff L (m - 3) k)) := by
           gcongr
       _ = C₁ * (almostDiagCoeff L m k * dyadicWeight L 3) := by rw [hc]; ring
       _ ≤ (C₀ + C₁) * dyadicWeight L 3 * almostDiagCoeff L m k := by
           rw [mul_comm (almostDiagCoeff _ _ _), ← mul_assoc]
           exact mul_le_mul' (mul_le_mul' le_add_self le_rfl) le_rfl
-  · calc eLpNorm (conv (psi (V := ℝ) m) (b.dual L k) volume) 1 volume
+  · calc eLpNorm (conv (lpBlockKernel (V := ℝ) m) (b.dual L k) volume) 1 volume
         ≤ C₀ * (dyadicWeight L 3 * almostDiagCoeff L m k) :=
           htriv.trans (le_mul_of_one_le_right' (one_le_dyadicWeight_mul_almostDiagCoeff L
             (by omega)))
@@ -275,7 +275,7 @@ variable (b : LocalMeansBump ℝ)
 /-- One term of the comparison: `‖δ_m ⋆ η_k ⋆ h‖_p ≤ C^d ∏_i c(m_i, k_i) ‖h‖_p` if
 `‖ψ_m ⋆ η_k‖_1 ≤ C c(m, k)` in one variable. -/
 theorem enorm_mixedBlock_convLp_mixedDual_le (hp : p ≠ ∞) (L : ℕ) {C : ℝ≥0∞}
-    (hC : ∀ m k : ℕ, eLpNorm (conv (psi (V := ℝ) m) (b.dual L k) volume) 1 volume ≤
+    (hC : ∀ m k : ℕ, eLpNorm (conv (lpBlockKernel (V := ℝ) m) (b.dual L k) volume) 1 volume ≤
       C * almostDiagCoeff L m k)
     (m k : Fin d → ℕ) (h : Lp ℂ p (volume : Measure (Fin d → ℝ))) :
     ‖mixedBlock hp m (convLp hp (b.integrable_mixedDual L k) h)‖ₑ ≤
@@ -283,7 +283,8 @@ theorem enorm_mixedBlock_convLp_mixedDual_le (hp : p ≠ ∞) (L : ℕ) {C : ℝ
   rw [mixedBlock, convLp_convLp]
   refine (enorm_convLp_le hp _ h).trans (mul_le_mul' ?_ le_rfl)
   rw [mixedPsi, mixedDual, conv_tensorKernel,
-    eLpNorm_tensorKernel_one fun i => integrable_conv (integrable_psi _) (b.integrable_dual L _),
+    eLpNorm_tensorKernel_one fun i =>
+      integrable_conv (integrable_lpBlockKernel _) (b.integrable_dual L _),
     ← Fin.prod_const d C, ← Finset.prod_mul_distrib]
   exact Finset.prod_le_prod fun i _ => hC (m i) (k i)
 
@@ -313,7 +314,7 @@ theorem exists_mixedLPNorm_le (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) :
       ∀ f : Lp ℂ p (volume : Measure (Fin d → ℝ)),
         mixedLPNorm hp s q f ≤
           (C * ENNReal.almostDiagonalConst s L) ^ d * b.mixedLocalMeansNorm hp L s q f := by
-  obtain ⟨C, hC, hE⟩ := b.exists_eLpNorm_conv_psi_dual_le L
+  obtain ⟨C, hC, hE⟩ := b.exists_eLpNorm_conv_lpBlockKernel_dualKernel_le L
   refine ⟨C, hC, fun {s} hs {q} hq f => ?_⟩
   set h : (Fin d → ℕ) → Lp ℂ p (volume : Measure (Fin d → ℝ)) := fun k => b.mixedLocalMean hp L k f
   have hblock : ∀ m, ‖mixedBlock hp m f‖ₑ ≤

@@ -17,7 +17,7 @@ public import Mathlib.Analysis.Calculus.BumpFunction.InnerProduct
 On a finite-dimensional real inner product space `V` with Lebesgue measure, the Fourier transform
 is `𝓕 f(ξ) = ∫ e^(-2πi⟪x, ξ⟫) f(x) dx` (Mathlib's `Real.fourier_eq`). For integrable `K`, the
 transforms `𝓕K` and `𝓕⁻K` are continuous and bounded by `‖K‖_1`
-(`Rd.continuous_fourier_of_integrable`, `Rd.norm_fourier_le_integral_norm`,
+(`Rd.continuous_fourier_of_integrable`, Mathlib's `Real.norm_fourier_le_integral_norm`,
 `Rd.enorm_fourier_le_lintegral`, `Rd.continuous_fourierInv_of_integrable`,
 `Rd.norm_fourierInv_le_integral_norm`),
 `𝓕K ∈ L_∞` (`Rd.memLp_top_fourier`), the transform respects sums and differences
@@ -41,25 +41,26 @@ The kernels of the Littlewood–Paley decomposition are inverse transforms of sm
   `1 ≤ ‖lpKernel‖_1 < ∞` (`Rd.one_le_eLpNorm_lpKernel`, `Rd.eLpNorm_lpKernel_ne_top`,
   `Rd.eLpNorm_lpKernel_lt_top`), and
   `Rd.bandKernel = 𝓕⁻¹ χ_{2,4}`;
-* their dilations `Φ_k = Rd.Phi k` and `Θ_k = Rd.Theta k` by `2^k`, whose transforms are the
-  cut-offs at scale `2^k` (`Rd.fourier_dilate`: `𝓕(Φ_c)(ξ) = 𝓕Φ(c^(-1) ξ)`), and the blocks
-  `ψ_0 = Φ_0`, `ψ_j = Φ_j - Φ_{j-1}` (`Rd.psi`), with `∑_{j ≤ J} ψ_j = Φ_J` (`Rd.sum_psi`).
+* their dilations `Φ_k = Rd.dilatedLpKernel k` and `Θ_k = Rd.Theta k` by `2^k`, whose transforms are
+  the cut-offs at scale `2^k` (`Rd.fourier_dilate`: `𝓕(Φ_c)(ξ) = 𝓕Φ(c^(-1) ξ)`), and the blocks
+  `ψ_0 = Φ_0`, `ψ_j = Φ_j - Φ_{j-1}` (`Rd.lpBlockKernel`), with `∑_{j ≤ J} ψ_j = Φ_J`
+  (`Rd.sum_lpBlockKernel`).
 
 On the frequency side `𝓕Φ_k` lives in the ball of radius `2^(k+1)`, `𝓕Θ_k` in the ball of radius
 `2^(k+2)` and equals `1` on the ball of radius `2^(k+1)`, and `𝓕ψ_{j+1}` lives in the annulus
 `2^j ≤ |ξ| ≤ 2^(j+2)`. The transforms of the blocks satisfy `|𝓕ψ_j| ≤ 1`
-(`Rd.norm_fourier_psi_le_one`, `Rd.enorm_fourier_psi_le_one`) and telescope,
-`∑_{j ≤ J} 𝓕ψ_j = 𝓕Φ_J` (`Rd.sum_range_fourier_psi`); at every frequency `ξ` at most the two
-blocks `a`, `a + 1` are nonzero, and their transforms add up to `1`
-(`Rd.exists_fourier_psi_window`); and where `𝓕ψ_j(ξ) ≠ 0`, `4^j ≤ 4(1 + |ξ|²)`
-(`Rd.four_pow_le_of_fourier_psi_ne_zero`). The **kernel identities** follow by comparing Fourier
-transforms (`Rd.conv_eq_of_fourier`: if `𝓕K · 𝓕L = 𝓕M`, then `K ⋆ L = M`, by `Rd.fourier_conv`
-and the inversion theorem `Continuous.fourierInv_fourier_eq`):
+(`Rd.norm_fourier_lpBlockKernel_le_one`, `Rd.enorm_fourier_lpBlockKernel_le_one`) and telescope,
+`∑_{j ≤ J} 𝓕ψ_j = 𝓕Φ_J` (`Rd.sum_range_fourier_lpBlockKernel`); at every frequency `ξ` at most the
+two blocks `a`, `a + 1` are nonzero, and their transforms add up to `1`
+(`Rd.exists_fourier_lpBlockKernel_window`); and where `𝓕ψ_j(ξ) ≠ 0`, `4^j ≤ 4(1 + |ξ|²)`
+(`Rd.four_pow_le_of_fourier_lpBlockKernel_ne_zero`). The **kernel identities** follow by comparing
+Fourier transforms (`Rd.conv_eq_of_fourier`: if `𝓕K · 𝓕L = 𝓕M`, then `K ⋆ L = M`, by
+`Rd.fourier_conv` and the inversion theorem `Continuous.fourierInv_fourier_eq`):
 
 * `Θ_{k+1} ⋆ Θ_k = Θ_k` (`Rd.conv_Theta_succ`): the band-limited classes increase;
-* `Θ_j ⋆ ψ_j = ψ_j` (`Rd.conv_Theta_psi`): the blocks are band-limited;
-* `ψ_j ⋆ Θ_k = 0` for `j ≥ k + 3` (`Rd.conv_psi_Theta`): high blocks of band-limited functions
-  vanish.
+* `Θ_j ⋆ ψ_j = ψ_j` (`Rd.conv_Theta_lpBlockKernel`): the blocks are band-limited;
+* `ψ_j ⋆ Θ_k = 0` for `j ≥ k + 3` (`Rd.conv_lpBlockKernel_Theta`): high blocks of band-limited
+  functions vanish.
 -/
 
 @[expose] public section
@@ -197,12 +198,6 @@ theorem integral_fourier_smul_eq_of_integrable (u : 𝓢(V, ℂ)) {g : V → ℂ
     ∫ ξ, 𝓕 u ξ • g ξ = ∫ x, u x • 𝓕 g x := by
   simpa [SchwartzMap.fourier_coe] using integral_fourier_mul u.integrable hg
 
-/-- The Fourier transform of a function is bounded by its `L_1` norm:
-`|𝓕K(ξ)| ≤ ∫ |K|` for every `ξ` (Mathlib's `VectorFourier.norm_fourierIntegral_le_integral_norm`).
--/
-theorem norm_fourier_le_integral_norm (K : V → ℂ) (ξ : V) : ‖𝓕 K ξ‖ ≤ ∫ x, ‖K x‖ :=
-  VectorFourier.norm_fourierIntegral_le_integral_norm 𝐞 volume (innerₗ V) K ξ
-
 /-- The Fourier transform of a function is bounded by its `L_1` norm, in `ℝ≥0∞`:
 `|𝓕K(ξ)| ≤ ∫ |K|` for every `K` and `ξ` (Mathlib's `enorm_integral_le_lintegral_enorm`, with
 `|e^(-2πi⟪x, ξ⟫)| = 1`). -/
@@ -214,7 +209,7 @@ theorem enorm_fourier_le_lintegral (K : V → ℂ) (ξ : V) : ‖𝓕 K ξ‖ₑ
 (`Rd.continuous_fourier_of_integrable`) and bounded by `‖K‖_1`. -/
 theorem memLp_top_fourier {K : V → ℂ} (hK : Integrable K) : MemLp (𝓕 K) ∞ volume :=
   memLp_top_of_bound (continuous_fourier_of_integrable hK).aestronglyMeasurable _
-    (ae_of_all _ (norm_fourier_le_integral_norm K))
+    (ae_of_all _ (Real.norm_fourier_le_integral_norm K))
 
 /-- The inverse Fourier transform `𝓕⁻g(x) = ∫ e^(2πi⟪ξ, x⟫) g(ξ) dξ` of an integrable function is
 continuous, since `𝓕⁻g(x) = 𝓕g(-x)` (Mathlib's `Real.fourierInv_eq_fourier_neg`). -/
@@ -227,7 +222,7 @@ theorem continuous_fourierInv_of_integrable {g : V → ℂ} (hg : Integrable g) 
 `x`. -/
 theorem norm_fourierInv_le_integral_norm (g : V → ℂ) (x : V) : ‖𝓕⁻ g x‖ ≤ ∫ ξ, ‖g ξ‖ := by
   rw [Real.fourierInv_eq_fourier_neg]
-  exact norm_fourier_le_integral_norm g (-x)
+  exact Real.norm_fourier_le_integral_norm g (-x)
 
 /-- **Duality for the inverse Fourier transform** (the multiplication formula),
 `∫ 𝓕⁻u · g = ∫ u · 𝓕⁻g`, for a Schwartz function `u` and an integrable function `g`
@@ -399,24 +394,25 @@ theorem integral_lpKernel : ∫ x, lpKernel (V := V) x = 1 := by
 /-! ### Dilated kernels and blocks -/
 
 /-- The dilated Littlewood–Paley kernel `Φ_k = 2^(kn) Φ(2^k ·)`. -/
-noncomputable def Phi (k : ℕ) : V → ℂ := dilate (2 ^ k) lpKernel
+noncomputable def dilatedLpKernel (k : ℕ) : V → ℂ := dilate (2 ^ k) lpKernel
 
 /-- The dilated band-limiting kernel `Θ_k = 2^(kn) Θ(2^k ·)`. -/
 noncomputable def Theta (k : ℕ) : V → ℂ := dilate (2 ^ k) bandKernel
 
 /-- The **Littlewood–Paley blocks** `ψ_0 = Φ_0`, `ψ_j = Φ_j - Φ_{j-1}`. -/
-noncomputable def psi : ℕ → V → ℂ
-  | 0 => Phi 0
-  | j + 1 => Phi (j + 1) - Phi j
+noncomputable def lpBlockKernel : ℕ → V → ℂ
+  | 0 => dilatedLpKernel 0
+  | j + 1 => dilatedLpKernel (j + 1) - dilatedLpKernel j
 
 /-- **The blocks add up to the dilated kernel**: `∑_{j ≤ J} ψ_j = Φ_J`. -/
-theorem sum_psi (J : ℕ) : ∑ j ∈ Finset.range (J + 1), psi (V := V) j = Phi J := by
+theorem sum_lpBlockKernel (J : ℕ) :
+    ∑ j ∈ Finset.range (J + 1), lpBlockKernel (V := V) j = dilatedLpKernel J := by
   induction J with
-  | zero => simp [psi]
-  | succ J ih => rw [Finset.sum_range_succ, ih, psi, add_sub_cancel]
+  | zero => simp [lpBlockKernel]
+  | succ J ih => rw [Finset.sum_range_succ, ih, lpBlockKernel, add_sub_cancel]
 
 /-- The dilated kernels are integrable. -/
-theorem integrable_Phi (k : ℕ) : Integrable (Phi (V := V) k) :=
+theorem integrable_dilatedLpKernel (k : ℕ) : Integrable (dilatedLpKernel (V := V) k) :=
   integrable_dilate integrable_lpKernel (by positivity)
 
 /-- The dilated kernels are integrable. -/
@@ -424,13 +420,13 @@ theorem integrable_Theta (k : ℕ) : Integrable (Theta (V := V) k) :=
   integrable_dilate integrable_bandKernel (by positivity)
 
 /-- The blocks are integrable. -/
-theorem integrable_psi (j : ℕ) : Integrable (psi (V := V) j) := by
+theorem integrable_lpBlockKernel (j : ℕ) : Integrable (lpBlockKernel (V := V) j) := by
   cases j with
-  | zero => exact integrable_Phi 0
-  | succ j => exact (integrable_Phi (j + 1)).sub (integrable_Phi j)
+  | zero => exact integrable_dilatedLpKernel 0
+  | succ j => exact (integrable_dilatedLpKernel (j + 1)).sub (integrable_dilatedLpKernel j)
 
 /-- The dilated kernels are continuous. -/
-theorem continuous_Phi (k : ℕ) : Continuous (Phi (V := V) k) :=
+theorem continuous_dilatedLpKernel (k : ℕ) : Continuous (dilatedLpKernel (V := V) k) :=
   continuous_dilate continuous_lpKernel _
 
 /-- The dilated kernels are continuous. -/
@@ -438,13 +434,14 @@ theorem continuous_Theta (k : ℕ) : Continuous (Theta (V := V) k) :=
   continuous_dilate continuous_bandKernel _
 
 /-- The blocks are continuous. -/
-theorem continuous_psi (j : ℕ) : Continuous (psi (V := V) j) := by
+theorem continuous_lpBlockKernel (j : ℕ) : Continuous (lpBlockKernel (V := V) j) := by
   cases j with
-  | zero => exact continuous_Phi 0
-  | succ j => exact (continuous_Phi (j + 1)).sub (continuous_Phi j)
+  | zero => exact continuous_dilatedLpKernel 0
+  | succ j => exact (continuous_dilatedLpKernel (j + 1)).sub (continuous_dilatedLpKernel j)
 
 /-- The dilated kernels are bounded. -/
-theorem bddAbove_Phi (k : ℕ) : BddAbove (Set.range fun x => ‖Phi (V := V) k x‖) :=
+theorem bddAbove_dilatedLpKernel (k : ℕ) :
+    BddAbove (Set.range fun x => ‖dilatedLpKernel (V := V) k x‖) :=
   bddAbove_dilate bddAbove_lpKernel _
 
 /-- The dilated kernels are bounded. -/
@@ -452,19 +449,20 @@ theorem bddAbove_Theta (k : ℕ) : BddAbove (Set.range fun x => ‖Theta (V := V
   bddAbove_dilate bddAbove_bandKernel _
 
 /-- The blocks are bounded. -/
-theorem bddAbove_psi (j : ℕ) : BddAbove (Set.range fun x => ‖psi (V := V) j x‖) := by
+theorem bddAbove_lpBlockKernel (j : ℕ) :
+    BddAbove (Set.range fun x => ‖lpBlockKernel (V := V) j x‖) := by
   cases j with
-  | zero => exact bddAbove_Phi 0
+  | zero => exact bddAbove_dilatedLpKernel 0
   | succ j =>
-    obtain ⟨A, hA⟩ := bddAbove_Phi (V := V) (j + 1)
-    obtain ⟨B, hB⟩ := bddAbove_Phi (V := V) j
-    show BddAbove (Set.range fun x => ‖Phi (j + 1) x - Phi j x‖)
+    obtain ⟨A, hA⟩ := bddAbove_dilatedLpKernel (V := V) (j + 1)
+    obtain ⟨B, hB⟩ := bddAbove_dilatedLpKernel (V := V) j
+    show BddAbove (Set.range fun x => ‖dilatedLpKernel (j + 1) x - dilatedLpKernel j x‖)
     exact ⟨A + B, Set.forall_mem_range.2 fun x => (norm_sub_le _ _).trans
       (add_le_add (hA (Set.mem_range_self x)) (hB (Set.mem_range_self x)))⟩
 
 /-- `‖Φ_k‖_1 = ‖Φ‖_1`. -/
-theorem eLpNorm_Phi_one (k : ℕ) :
-    eLpNorm (Phi (V := V) k) 1 volume = eLpNorm (lpKernel (V := V)) 1 volume :=
+theorem eLpNorm_dilatedLpKernel_one (k : ℕ) :
+    eLpNorm (dilatedLpKernel (V := V) k) 1 volume = eLpNorm (lpKernel (V := V)) 1 volume :=
   eLpNorm_dilate_one integrable_lpKernel (by positivity)
 
 /-- `‖Θ_k‖_1 = ‖Θ‖_1`. -/
@@ -500,23 +498,24 @@ theorem lintegral_enorm_Theta (k : ℕ) :
     eLpNorm_Theta_one]
 
 /-- `‖ψ_j‖_1 ≤ 2 ‖Φ‖_1`. -/
-theorem eLpNorm_psi_one_le (j : ℕ) :
-    eLpNorm (psi (V := V) j) 1 volume ≤ 2 * eLpNorm (lpKernel (V := V)) 1 volume := by
+theorem eLpNorm_lpBlockKernel_one_le (j : ℕ) :
+    eLpNorm (lpBlockKernel (V := V) j) 1 volume ≤ 2 * eLpNorm (lpKernel (V := V)) 1 volume := by
   cases j with
   | zero =>
     rw [two_mul]
-    exact (eLpNorm_Phi_one 0).le.trans le_self_add
+    exact (eLpNorm_dilatedLpKernel_one 0).le.trans le_self_add
   | succ j =>
-    show eLpNorm (Phi (j + 1) - Phi j) 1 volume ≤ _
-    calc eLpNorm (Phi (V := V) (j + 1) - Phi j) 1 volume
-        ≤ eLpNorm (Phi (V := V) (j + 1)) 1 volume + eLpNorm (Phi (V := V) j) 1 volume :=
+    show eLpNorm (dilatedLpKernel (j + 1) - dilatedLpKernel j) 1 volume ≤ _
+    calc eLpNorm (dilatedLpKernel (V := V) (j + 1) - dilatedLpKernel j) 1 volume
+        ≤ eLpNorm (dilatedLpKernel (V := V) (j + 1)) 1 volume +
+            eLpNorm (dilatedLpKernel (V := V) j) 1 volume :=
           eLpNorm_sub_le le_rfl
       _ = 2 * eLpNorm (lpKernel (V := V)) 1 volume := by
-          rw [eLpNorm_Phi_one, eLpNorm_Phi_one, two_mul]
+          rw [eLpNorm_dilatedLpKernel_one, eLpNorm_dilatedLpKernel_one, two_mul]
 
 /-- `∫ Φ_k = 1`. -/
-theorem integral_Phi (k : ℕ) : ∫ x, Phi (V := V) k x = 1 := by
-  rw [Phi, integral_dilate _ (by positivity), integral_lpKernel]
+theorem integral_dilatedLpKernel (k : ℕ) : ∫ x, dilatedLpKernel (V := V) k x = 1 := by
+  rw [dilatedLpKernel, integral_dilate _ (by positivity), integral_lpKernel]
 
 /-! ### The kernels on the frequency side -/
 
@@ -526,9 +525,9 @@ theorem norm_two_pow_inv_smul (k : ℕ) (ξ : V) : ‖((2 : ℝ) ^ k)⁻¹ • �
   rw [norm_smul, norm_inv, Real.norm_of_nonneg (by positivity), inv_mul_eq_div]
 
 /-- `𝓕Φ_k(ξ) = χ_{1,2}(2^(-k) ξ)`. -/
-theorem fourier_Phi (k : ℕ) (ξ : V) :
-    𝓕 (Phi (V := V) k) ξ = cutoff 1 2 one_pos one_lt_two (((2 : ℝ) ^ k)⁻¹ • ξ) := by
-  rw [Phi, fourier_dilate _ (by positivity), fourier_lpKernel]
+theorem fourier_dilatedLpKernel (k : ℕ) (ξ : V) :
+    𝓕 (dilatedLpKernel (V := V) k) ξ = cutoff 1 2 one_pos one_lt_two (((2 : ℝ) ^ k)⁻¹ • ξ) := by
+  rw [dilatedLpKernel, fourier_dilate _ (by positivity), fourier_lpKernel]
 
 /-- `𝓕Θ_k(ξ) = χ_{2,4}(2^(-k) ξ)`. -/
 theorem fourier_Theta (k : ℕ) (ξ : V) :
@@ -536,12 +535,13 @@ theorem fourier_Theta (k : ℕ) (ξ : V) :
   rw [Theta, fourier_dilate _ (by positivity), fourier_bandKernel]
 
 /-- `𝓕ψ_{j+1} = 𝓕Φ_{j+1} - 𝓕Φ_j`. -/
-theorem fourier_psi_succ (j : ℕ) (ξ : V) :
-    𝓕 (psi (V := V) (j + 1)) ξ = 𝓕 (Phi (V := V) (j + 1)) ξ - 𝓕 (Phi (V := V) j) ξ :=
-  fourier_sub_apply (integrable_Phi _) (integrable_Phi _) ξ
+theorem fourier_lpBlockKernel_succ (j : ℕ) (ξ : V) :
+    𝓕 (lpBlockKernel (V := V) (j + 1)) ξ =
+      𝓕 (dilatedLpKernel (V := V) (j + 1)) ξ - 𝓕 (dilatedLpKernel (V := V) j) ξ :=
+  fourier_sub_apply (integrable_dilatedLpKernel _) (integrable_dilatedLpKernel _) ξ
 
 /-- The Fourier transforms of the dilated kernels are integrable. -/
-theorem integrable_fourier_Phi (k : ℕ) : Integrable (𝓕 (Phi (V := V) k)) :=
+theorem integrable_fourier_dilatedLpKernel (k : ℕ) : Integrable (𝓕 (dilatedLpKernel (V := V) k)) :=
   integrable_fourier_dilate integrable_fourier_lpKernel (by positivity)
 
 /-- The Fourier transforms of the dilated kernels are integrable. -/
@@ -549,18 +549,19 @@ theorem integrable_fourier_Theta (k : ℕ) : Integrable (𝓕 (Theta (V := V) k)
   integrable_fourier_dilate integrable_fourier_bandKernel (by positivity)
 
 /-- The Fourier transforms of the blocks are integrable. -/
-theorem integrable_fourier_psi (j : ℕ) : Integrable (𝓕 (psi (V := V) j)) := by
+theorem integrable_fourier_lpBlockKernel (j : ℕ) : Integrable (𝓕 (lpBlockKernel (V := V) j)) := by
   cases j with
-  | zero => exact integrable_fourier_Phi 0
+  | zero => exact integrable_fourier_dilatedLpKernel 0
   | succ j =>
-    rw [show 𝓕 (psi (V := V) (j + 1)) = 𝓕 (Phi (V := V) (j + 1)) - 𝓕 (Phi (V := V) j) from
-      funext (fourier_psi_succ j)]
-    exact (integrable_fourier_Phi _).sub (integrable_fourier_Phi _)
+    rw [show 𝓕 (lpBlockKernel (V := V) (j + 1)) =
+        𝓕 (dilatedLpKernel (V := V) (j + 1)) - 𝓕 (dilatedLpKernel (V := V) j) from
+      funext (fourier_lpBlockKernel_succ j)]
+    exact (integrable_fourier_dilatedLpKernel _).sub (integrable_fourier_dilatedLpKernel _)
 
 /-- `𝓕Φ_k` vanishes outside the ball of radius `2^(k+1)`. -/
-theorem norm_lt_of_fourier_Phi_ne_zero {k : ℕ} {ξ : V} (h : 𝓕 (Phi (V := V) k) ξ ≠ 0) :
-    ‖ξ‖ < 2 ^ (k + 1) := by
-  rw [fourier_Phi] at h
+theorem norm_lt_of_fourier_dilatedLpKernel_ne_zero {k : ℕ} {ξ : V}
+    (h : 𝓕 (dilatedLpKernel (V := V) k) ξ ≠ 0) : ‖ξ‖ < 2 ^ (k + 1) := by
+  rw [fourier_dilatedLpKernel] at h
   have h1 := norm_lt_of_cutoff_ne_zero _ _ h
   rw [norm_two_pow_inv_smul, div_lt_iff₀ (by positivity)] at h1
   rw [pow_succ]
@@ -585,33 +586,35 @@ theorem fourier_Theta_eq_one {k : ℕ} {ξ : V} (h : ‖ξ‖ ≤ 2 ^ (k + 1)) :
   linarith
 
 /-- `𝓕ψ_j` vanishes outside the ball of radius `2^(j+1)`. -/
-theorem norm_lt_of_fourier_psi_ne_zero {j : ℕ} {ξ : V} (h : 𝓕 (psi (V := V) j) ξ ≠ 0) :
-    ‖ξ‖ < 2 ^ (j + 1) := by
+theorem norm_lt_of_fourier_lpBlockKernel_ne_zero {j : ℕ} {ξ : V}
+    (h : 𝓕 (lpBlockKernel (V := V) j) ξ ≠ 0) : ‖ξ‖ < 2 ^ (j + 1) := by
   cases j with
-  | zero => exact norm_lt_of_fourier_Phi_ne_zero h
+  | zero => exact norm_lt_of_fourier_dilatedLpKernel_ne_zero h
   | succ j =>
-    rw [fourier_psi_succ] at h
-    by_cases h1 : 𝓕 (Phi (V := V) (j + 1)) ξ = 0
+    rw [fourier_lpBlockKernel_succ] at h
+    by_cases h1 : 𝓕 (dilatedLpKernel (V := V) (j + 1)) ξ = 0
     · rw [h1, zero_sub, neg_ne_zero] at h
-      have h2 := norm_lt_of_fourier_Phi_ne_zero h
+      have h2 := norm_lt_of_fourier_dilatedLpKernel_ne_zero h
       rw [pow_succ (2 : ℝ) (j + 1)]
       linarith [pow_pos (two_pos : (0 : ℝ) < 2) (j + 1)]
-    · exact norm_lt_of_fourier_Phi_ne_zero h1
+    · exact norm_lt_of_fourier_dilatedLpKernel_ne_zero h1
 
 /-- `𝓕ψ_{i+1}` vanishes on the closed ball of radius `2^i`. -/
-theorem fourier_psi_succ_eq_zero {i : ℕ} {ξ : V} (h : ‖ξ‖ ≤ 2 ^ i) :
-    𝓕 (psi (V := V) (i + 1)) ξ = 0 := by
-  rw [fourier_psi_succ, fourier_Phi, fourier_Phi, cutoff_eq_one, cutoff_eq_one, sub_self]
+theorem fourier_lpBlockKernel_succ_eq_zero {i : ℕ} {ξ : V} (h : ‖ξ‖ ≤ 2 ^ i) :
+    𝓕 (lpBlockKernel (V := V) (i + 1)) ξ = 0 := by
+  rw [fourier_lpBlockKernel_succ, fourier_dilatedLpKernel, fourier_dilatedLpKernel, cutoff_eq_one,
+    cutoff_eq_one, sub_self]
   all_goals
     rw [norm_two_pow_inv_smul, div_le_iff₀ (by positivity), one_mul]
     first
       | exact h
       | exact h.trans (pow_le_pow_right₀ one_le_two (Nat.le_succ i))
 
-/-- Where `𝓕ψ_{i+1}(ξ) ≠ 0`, `‖ξ‖ > 2^i`: the contrapositive of `Rd.fourier_psi_succ_eq_zero`. -/
-theorem lt_norm_of_fourier_psi_succ_ne_zero {i : ℕ} {ξ : V}
-    (h : 𝓕 (psi (V := V) (i + 1)) ξ ≠ 0) : 2 ^ i < ‖ξ‖ :=
-  not_le.1 fun h' => h (fourier_psi_succ_eq_zero h')
+/-- Where `𝓕ψ_{i+1}(ξ) ≠ 0`, `‖ξ‖ > 2^i`: the contrapositive of
+`Rd.fourier_lpBlockKernel_succ_eq_zero`. -/
+theorem lt_norm_of_fourier_lpBlockKernel_succ_ne_zero {i : ℕ} {ξ : V}
+    (h : 𝓕 (lpBlockKernel (V := V) (i + 1)) ξ ≠ 0) : 2 ^ i < ‖ξ‖ :=
+  not_le.1 fun h' => h (fourier_lpBlockKernel_succ_eq_zero h')
 
 /-- `𝓕Θ_{k+1} · 𝓕Θ_k = 𝓕Θ_k`. -/
 theorem fourier_Theta_succ_mul (k : ℕ) (ξ : V) :
@@ -621,82 +624,85 @@ theorem fourier_Theta_succ_mul (k : ℕ) (ξ : V) :
   · rw [fourier_Theta_eq_one (k := k + 1) (norm_lt_of_fourier_Theta_ne_zero h).le, one_mul]
 
 /-- `𝓕Θ_j · 𝓕ψ_j = 𝓕ψ_j`. -/
-theorem fourier_Theta_mul_psi (j : ℕ) (ξ : V) :
-    𝓕 (Theta (V := V) j) ξ * 𝓕 (psi (V := V) j) ξ = 𝓕 (psi (V := V) j) ξ := by
-  by_cases h : 𝓕 (psi (V := V) j) ξ = 0
+theorem fourier_Theta_mul_lpBlockKernel (j : ℕ) (ξ : V) :
+    𝓕 (Theta (V := V) j) ξ * 𝓕 (lpBlockKernel (V := V) j) ξ = 𝓕 (lpBlockKernel (V := V) j) ξ := by
+  by_cases h : 𝓕 (lpBlockKernel (V := V) j) ξ = 0
   · rw [h, mul_zero]
-  · rw [fourier_Theta_eq_one (norm_lt_of_fourier_psi_ne_zero h).le, one_mul]
+  · rw [fourier_Theta_eq_one (norm_lt_of_fourier_lpBlockKernel_ne_zero h).le, one_mul]
 
 /-- `𝓕ψ_j · 𝓕Θ_k = 0` for `j ≥ k + 3`. -/
-theorem fourier_psi_mul_Theta {j k : ℕ} (hjk : k + 3 ≤ j) (ξ : V) :
-    𝓕 (psi (V := V) j) ξ * 𝓕 (Theta (V := V) k) ξ = 0 := by
+theorem fourier_lpBlockKernel_mul_Theta {j k : ℕ} (hjk : k + 3 ≤ j) (ξ : V) :
+    𝓕 (lpBlockKernel (V := V) j) ξ * 𝓕 (Theta (V := V) k) ξ = 0 := by
   by_cases h : 𝓕 (Theta (V := V) k) ξ = 0
   · rw [h, mul_zero]
   · obtain ⟨i, rfl⟩ : ∃ i, j = i + 1 := ⟨j - 1, by omega⟩
-    rw [fourier_psi_succ_eq_zero, zero_mul]
+    rw [fourier_lpBlockKernel_succ_eq_zero, zero_mul]
     exact (norm_lt_of_fourier_Theta_ne_zero h).le.trans
       (pow_le_pow_right₀ one_le_two (by omega))
 
 /-- **The Fourier transforms of the blocks are bounded by `1`**: `|𝓕ψ_j(ξ)| ≤ 1`, since
 `𝓕ψ_0 = χ(ξ)` and `𝓕ψ_{j+1} = χ(2^(-j-1) ξ) - χ(2^(-j) ξ)` with a cut-off `χ` with values in
 `[0, 1]`. -/
-theorem norm_fourier_psi_le_one (j : ℕ) (ξ : V) : ‖𝓕 (psi (V := V) j) ξ‖ ≤ 1 := by
+theorem norm_fourier_lpBlockKernel_le_one (j : ℕ) (ξ : V) :
+    ‖𝓕 (lpBlockKernel (V := V) j) ξ‖ ≤ 1 := by
   set b : ContDiffBump (0 : V) := ⟨1, 2, one_pos, one_lt_two⟩
   have h : ∀ x : V, cutoff 1 2 one_pos one_lt_two x = ((b x : ℝ) : ℂ) := fun x => rfl
   cases j with
   | zero =>
-    rw [show psi (V := V) 0 = Phi 0 from rfl, fourier_Phi, h, Complex.norm_real,
-      Real.norm_of_nonneg b.nonneg]
+    rw [show lpBlockKernel (V := V) 0 = dilatedLpKernel 0 from rfl, fourier_dilatedLpKernel, h,
+      Complex.norm_real, Real.norm_of_nonneg b.nonneg]
     exact b.le_one
   | succ j =>
-    rw [fourier_psi_succ, fourier_Phi, fourier_Phi, h, h, ← Complex.ofReal_sub,
-      Complex.norm_real, Real.norm_eq_abs, abs_sub_le_iff]
+    rw [fourier_lpBlockKernel_succ, fourier_dilatedLpKernel, fourier_dilatedLpKernel, h, h,
+      ← Complex.ofReal_sub, Complex.norm_real, Real.norm_eq_abs, abs_sub_le_iff]
     constructor <;> linarith [b.nonneg' (((2 : ℝ) ^ (j + 1))⁻¹ • ξ),
       b.nonneg' (((2 : ℝ) ^ j)⁻¹ • ξ), b.le_one (x := ((2 : ℝ) ^ (j + 1))⁻¹ • ξ),
       b.le_one (x := ((2 : ℝ) ^ j)⁻¹ • ξ)]
 
 /-- `|𝓕ψ_j(ξ)| ≤ 1` in `ℝ≥0∞`. -/
-theorem enorm_fourier_psi_le_one (j : ℕ) (ξ : V) : ‖𝓕 (psi (V := V) j) ξ‖ₑ ≤ 1 := by
+theorem enorm_fourier_lpBlockKernel_le_one (j : ℕ) (ξ : V) :
+    ‖𝓕 (lpBlockKernel (V := V) j) ξ‖ₑ ≤ 1 := by
   rw [← ofReal_norm, ← ENNReal.ofReal_one]
-  exact ENNReal.ofReal_le_ofReal (norm_fourier_psi_le_one j ξ)
+  exact ENNReal.ofReal_le_ofReal (norm_fourier_lpBlockKernel_le_one j ξ)
 
 /-- **The Fourier transforms of the blocks telescope**:
 `∑_{j ≤ J} 𝓕ψ_j(ξ) = 𝓕Φ_J(ξ)`. -/
-theorem sum_range_fourier_psi (J : ℕ) (ξ : V) :
-    ∑ j ∈ Finset.range (J + 1), 𝓕 (psi (V := V) j) ξ = 𝓕 (Phi (V := V) J) ξ := by
+theorem sum_range_fourier_lpBlockKernel (J : ℕ) (ξ : V) :
+    ∑ j ∈ Finset.range (J + 1), 𝓕 (lpBlockKernel (V := V) j) ξ =
+      𝓕 (dilatedLpKernel (V := V) J) ξ := by
   induction J with
-  | zero => simp [psi]
-  | succ J ih => rw [Finset.sum_range_succ, ih, fourier_psi_succ]; ring
+  | zero => simp [lpBlockKernel]
+  | succ J ih => rw [Finset.sum_range_succ, ih, fourier_lpBlockKernel_succ]; ring
 
 /-- **At most two blocks see a frequency**: for every `ξ ∈ V` there is `a ∈ ℕ` with
 `‖ξ‖ < 2^(a+1)` such that `𝓕ψ_j(ξ) = 0` for `j ∉ {a, a+1}` and
 `𝓕ψ_a(ξ) + 𝓕ψ_{a+1}(ξ) = 1`. Here `a` is the least index with `‖ξ‖ < 2^(a+1)`: the blocks below
 `a` vanish at `ξ` since `𝓕ψ_j` lives on `‖ξ‖ < 2^(j+1)`, those above `a + 1` since `𝓕ψ_{i+1}`
 vanishes on `‖ξ‖ ≤ 2^i`, and the sum of all blocks up to `a + 1` is `𝓕Φ_{a+1}(ξ) = 1`. -/
-theorem exists_fourier_psi_window (ξ : V) : ∃ a : ℕ, ‖ξ‖ < 2 ^ (a + 1) ∧
-    (∀ j, 𝓕 (psi (V := V) j) ξ ≠ 0 → j = a ∨ j = a + 1) ∧
-    𝓕 (psi (V := V) a) ξ + 𝓕 (psi (V := V) (a + 1)) ξ = 1 := by
+theorem exists_fourier_lpBlockKernel_window (ξ : V) : ∃ a : ℕ, ‖ξ‖ < 2 ^ (a + 1) ∧
+    (∀ j, 𝓕 (lpBlockKernel (V := V) j) ξ ≠ 0 → j = a ∨ j = a + 1) ∧
+    𝓕 (lpBlockKernel (V := V) a) ξ + 𝓕 (lpBlockKernel (V := V) (a + 1)) ξ = 1 := by
   classical
   have hex : ∃ a : ℕ, ‖ξ‖ < 2 ^ (a + 1) := by
     obtain ⟨n, hn⟩ := pow_unbounded_of_one_lt ‖ξ‖ (one_lt_two : (1 : ℝ) < 2)
     exact ⟨n, hn.trans (pow_lt_pow_right₀ one_lt_two n.lt_succ_self)⟩
   obtain ⟨a, ha, hmin⟩ : ∃ a : ℕ, ‖ξ‖ < 2 ^ (a + 1) ∧ ∀ j < a, ¬ ‖ξ‖ < 2 ^ (j + 1) :=
     ⟨Nat.find hex, Nat.find_spec hex, fun j hj => Nat.find_min hex hj⟩
-  have hlow : ∀ j < a, 𝓕 (psi (V := V) j) ξ = 0 := fun j hj => by
+  have hlow : ∀ j < a, 𝓕 (lpBlockKernel (V := V) j) ξ = 0 := fun j hj => by
     by_contra h
-    exact hmin j hj (norm_lt_of_fourier_psi_ne_zero h)
-  have hhigh : ∀ j, a + 1 < j → 𝓕 (psi (V := V) j) ξ = 0 := by
+    exact hmin j hj (norm_lt_of_fourier_lpBlockKernel_ne_zero h)
+  have hhigh : ∀ j, a + 1 < j → 𝓕 (lpBlockKernel (V := V) j) ξ = 0 := by
     intro j hj
     obtain ⟨i, rfl⟩ : ∃ i, j = i + 1 := ⟨j - 1, by omega⟩
-    exact fourier_psi_succ_eq_zero (ha.le.trans (pow_le_pow_right₀ one_le_two (by omega)))
+    exact fourier_lpBlockKernel_succ_eq_zero (ha.le.trans (pow_le_pow_right₀ one_le_two (by omega)))
   refine ⟨a, ha, fun j hj => ?_, ?_⟩
   · by_contra hne
     push Not at hne
     rcases lt_or_gt_of_ne hne.1 with h | h
     · exact hj (hlow j h)
     · exact hj (hhigh j (by omega))
-  · have hsum := sum_range_fourier_psi (V := V) (a + 1) ξ
-    rw [fourier_Phi, cutoff_eq_one _ _ (by
+  · have hsum := sum_range_fourier_lpBlockKernel (V := V) (a + 1) ξ
+    rw [fourier_dilatedLpKernel, cutoff_eq_one _ _ (by
       rw [norm_two_pow_inv_smul, div_le_one (by positivity)]; exact ha.le)] at hsum
     rw [Finset.sum_range_succ, Finset.sum_range_succ, Finset.sum_eq_zero
       (fun j hj => hlow j (Finset.mem_range.1 hj)), zero_add] at hsum
@@ -704,12 +710,12 @@ theorem exists_fourier_psi_window (ξ : V) : ∃ a : ℕ, ‖ξ‖ < 2 ^ (a + 1)
 
 /-- Where the block `ψ_j` sees the frequency `ξ`, its scale is at most that of `ξ`: if
 `𝓕ψ_j(ξ) ≠ 0`, then `4^j ≤ 4(1 + ‖ξ‖²)` (for `j ≥ 1`, `‖ξ‖ > 2^(j-1)`). -/
-theorem four_pow_le_of_fourier_psi_ne_zero {j : ℕ} {ξ : V} (h : 𝓕 (psi (V := V) j) ξ ≠ 0) :
-    (4 : ℝ) ^ j ≤ 4 * (1 + ‖ξ‖ ^ 2) := by
+theorem four_pow_le_of_fourier_lpBlockKernel_ne_zero {j : ℕ} {ξ : V}
+    (h : 𝓕 (lpBlockKernel (V := V) j) ξ ≠ 0) : (4 : ℝ) ^ j ≤ 4 * (1 + ‖ξ‖ ^ 2) := by
   cases j with
   | zero => nlinarith [sq_nonneg ‖ξ‖]
   | succ i =>
-    have hi : (2 : ℝ) ^ i < ‖ξ‖ := not_le.1 fun h' => h (fourier_psi_succ_eq_zero h')
+    have hi : (2 : ℝ) ^ i < ‖ξ‖ := not_le.1 fun h' => h (fourier_lpBlockKernel_succ_eq_zero h')
     have h4 : (4 : ℝ) ^ (i + 1) = 4 * ((2 : ℝ) ^ i) ^ 2 := by
       rw [← pow_mul, pow_succ, mul_comm i 2, pow_mul]
       norm_num
@@ -746,20 +752,21 @@ theorem conv_Theta_succ (k : ℕ) :
     (fourier_Theta_succ_mul k)
 
 /-- **The blocks are band-limited**: `Θ_j ⋆ ψ_j = ψ_j`. -/
-theorem conv_Theta_psi (j : ℕ) : conv (Theta (V := V) j) (psi j) volume = psi j :=
-  conv_eq_of_fourier (integrable_Theta _) (integrable_psi _) (continuous_psi _)
-    (bddAbove_psi _) (integrable_psi _) (continuous_psi _) (integrable_fourier_psi _)
-    (fourier_Theta_mul_psi j)
+theorem conv_Theta_lpBlockKernel (j : ℕ) :
+    conv (Theta (V := V) j) (lpBlockKernel j) volume = lpBlockKernel j :=
+  conv_eq_of_fourier (integrable_Theta _) (integrable_lpBlockKernel _) (continuous_lpBlockKernel _)
+    (bddAbove_lpBlockKernel _) (integrable_lpBlockKernel _) (continuous_lpBlockKernel _)
+    (integrable_fourier_lpBlockKernel _) (fourier_Theta_mul_lpBlockKernel j)
 
 /-- **High blocks annihilate band-limited kernels**: `ψ_j ⋆ Θ_k = 0` for `j ≥ k + 3`. -/
-theorem conv_psi_Theta {j k : ℕ} (hjk : k + 3 ≤ j) :
-    conv (psi (V := V) j) (Theta k) volume = 0 := by
+theorem conv_lpBlockKernel_Theta {j k : ℕ} (hjk : k + 3 ≤ j) :
+    conv (lpBlockKernel (V := V) j) (Theta k) volume = 0 := by
   have h0 : 𝓕 (0 : V → ℂ) = 0 := funext fun ξ => by simp [Real.fourier_eq]
-  refine conv_eq_of_fourier (integrable_psi _) (integrable_Theta _) (continuous_Theta _)
+  refine conv_eq_of_fourier (integrable_lpBlockKernel _) (integrable_Theta _) (continuous_Theta _)
     (bddAbove_Theta _) (integrable_zero _ _ _) continuous_zero ?_ fun ξ => ?_
   · rw [h0]
     exact integrable_zero _ _ _
-  · rw [h0, fourier_psi_mul_Theta hjk]
+  · rw [h0, fourier_lpBlockKernel_mul_Theta hjk]
     rfl
 
 end Rd

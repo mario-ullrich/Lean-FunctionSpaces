@@ -25,7 +25,8 @@ Fourier transform `𝓕η_i(ξ) = ∏_k ⟪ξ, e_{i_k}⟫ / ((2πi)^m ‖ξ‖^{
 * **The dilated identity**: with the chain rule `∂^w (G_c) = c^k (∂^w G)_c`
   (`Rd.iteratedLineDerivOp_schwartzDilate`),
   `2^{jm} ψ_{j+1} = ∑_i ∂_{e_{i_0}} ⋯ ∂_{e_{i_{m-1}}} ((η_i)_{2^j})`
-  (`Rd.two_pow_smul_psi_succ_eq_sum`), with the factor `‖2^n‖ = 2^n` (`Rd.enorm_two_pow_complex`).
+  (`Rd.two_pow_smul_lpBlockKernel_succ_eq_sum`), with the factor `‖2^n‖ = 2^n`
+  (`Rd.enorm_two_pow_complex`).
 * **The derivative families** `((η_i)_{2^j})_j` are Calderón–Zygmund families with overlap `2`
   (`Rd.isCZFamily_derivFamily`).
 * **The dual derivative families**: for every `w ∈ V^k` the synthesis kernels satisfy
@@ -152,39 +153,42 @@ theorem contDiffOn_derivSymbol {m : ℕ} (i : Fin m → Fin (finrank ℝ V)) :
 noncomputable def psiOneS : 𝓢(V, ℂ) := schwartzDilate 2 two_ne_zero (psiBase 1)
 
 /-- The Schwartz function `Rd.psiOneS` is the block `ψ_1`. -/
-theorem coe_psiOneS : (psiOneS : V → ℂ) = psi (V := V) 1 := by
+theorem coe_psiOneS : (psiOneS : V → ℂ) = lpBlockKernel (V := V) 1 := by
   have h := dilate_psiBase (V := V) 1
   rw [pow_one] at h
   rw [psiOneS, coe_schwartzDilate, h]
 
 /-- **The blocks are dilates of `ψ_1`**: `ψ_{j+1} = (ψ_1)_{2^j}`. -/
-theorem dilate_psi_one (j : ℕ) : dilate (2 ^ j) (psi (V := V) 1) = psi (j + 1) := by
+theorem dilate_lpBlockKernel_one (j : ℕ) :
+    dilate (2 ^ j) (lpBlockKernel (V := V) 1) = lpBlockKernel (j + 1) := by
   rw [← coe_psiOneS, psiOneS, coe_schwartzDilate, dilate_dilate, ← pow_succ,
     ← dilate_psiBase (j + 1)]
   rfl
 
 /-- The Fourier transform of the Schwartz function `Rd.psiOneS` is `𝓕ψ_1`. -/
-theorem fourier_psiOneS_apply (ξ : V) : 𝓕 (psiOneS (V := V)) ξ = 𝓕 (psi (V := V) 1) ξ := by
+theorem fourier_psiOneS_apply (ξ : V) :
+    𝓕 (psiOneS (V := V)) ξ = 𝓕 (lpBlockKernel (V := V) 1) ξ := by
   rw [SchwartzMap.fourier_coe, coe_psiOneS]
 
 /-- `𝓕ψ_{j+1}(ξ) = 𝓕ψ_1(2^{-j} ξ)`. -/
-theorem fourier_psi_succ_eq_fourier_psi_one (j : ℕ) (ξ : V) :
-    𝓕 (psi (V := V) (j + 1)) ξ = 𝓕 (psi (V := V) 1) (((2 : ℝ) ^ j)⁻¹ • ξ) := by
-  rw [← dilate_psi_one, fourier_dilate _ (by positivity)]
+theorem fourier_lpBlockKernel_succ_eq_fourier_lpBlockKernel_one (j : ℕ) (ξ : V) :
+    𝓕 (lpBlockKernel (V := V) (j + 1)) ξ = 𝓕 (lpBlockKernel (V := V) 1) (((2 : ℝ) ^ j)⁻¹ • ξ) := by
+  rw [← dilate_lpBlockKernel_one, fourier_dilate _ (by positivity)]
 
 /-- Where `𝓕ψ_1(ξ) ≠ 0`, `‖ξ‖ > 1`: the case `i = 0` of
-`Rd.lt_norm_of_fourier_psi_succ_ne_zero`. -/
-theorem one_lt_norm_of_fourier_psi_one_ne_zero {ξ : V} (h : 𝓕 (psi (V := V) 1) ξ ≠ 0) :
-    1 < ‖ξ‖ := by
-  simpa using lt_norm_of_fourier_psi_succ_ne_zero (i := 0) h
+`Rd.lt_norm_of_fourier_lpBlockKernel_succ_ne_zero`. -/
+theorem one_lt_norm_of_fourier_lpBlockKernel_one_ne_zero {ξ : V}
+    (h : 𝓕 (lpBlockKernel (V := V) 1) ξ ≠ 0) : 1 < ‖ξ‖ := by
+  simpa using lt_norm_of_fourier_lpBlockKernel_succ_ne_zero (i := 0) h
 
 /-! ### The derivative kernels -/
 
 /-- The function `ξ ↦ σ_i(ξ) 𝓕ψ_1(ξ)` is smooth: `𝓕ψ_1` is smooth and vanishes on the unit ball,
 and `σ_i` is smooth away from `0` (`Rd.contDiffOn_derivSymbol`). -/
-theorem contDiff_derivSymbol_mul_fourier_psi_one {m : ℕ} (i : Fin m → Fin (finrank ℝ V)) :
-    ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun ξ : V => derivSymbol i ξ * 𝓕 (psi (V := V) 1) ξ) := by
-  have hF : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (𝓕 (psi (V := V) 1)) := by
+theorem contDiff_derivSymbol_mul_fourier_lpBlockKernel_one {m : ℕ} (i : Fin m → Fin (finrank ℝ V)) :
+    ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞)
+      (fun ξ : V => derivSymbol i ξ * 𝓕 (lpBlockKernel (V := V) 1) ξ) := by
+  have hF : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (𝓕 (lpBlockKernel (V := V) 1)) := by
     rw [← coe_psiOneS, ← SchwartzMap.fourier_coe]
     exact SchwartzMap.smooth (𝓕 (psiOneS (V := V))) ⊤
   refine contDiff_iff_contDiffAt.2 fun ξ => ?_
@@ -193,19 +197,19 @@ theorem contDiff_derivSymbol_mul_fourier_psi_one {m : ℕ} (i : Fin m → Fin (f
     refine (contDiffAt_const (c := (0 : ℂ))).congr_of_eventuallyEq ?_
     filter_upwards [ball_mem_nhds (0 : V) one_pos] with ζ hζ
     rw [mem_ball_zero_iff] at hζ
-    rw [fourier_psi_succ_eq_zero (i := 0) (by rw [pow_zero]; exact hζ.le), mul_zero]
+    rw [fourier_lpBlockKernel_succ_eq_zero (i := 0) (by rw [pow_zero]; exact hζ.le), mul_zero]
   · exact ((contDiffOn_derivSymbol i).contDiffAt (isOpen_ne.mem_nhds hξ)).mul hF.contDiffAt
 
 /-- The function `ξ ↦ σ_i(ξ) 𝓕ψ_1(ξ)` has compact support: it vanishes outside the closed ball
 of radius `4`. -/
-theorem hasCompactSupport_derivSymbol_mul_fourier_psi_one {m : ℕ}
+theorem hasCompactSupport_derivSymbol_mul_fourier_lpBlockKernel_one {m : ℕ}
     (i : Fin m → Fin (finrank ℝ V)) :
-    HasCompactSupport (fun ξ : V => derivSymbol i ξ * 𝓕 (psi (V := V) 1) ξ) := by
+    HasCompactSupport (fun ξ : V => derivSymbol i ξ * 𝓕 (lpBlockKernel (V := V) 1) ξ) := by
   refine HasCompactSupport.intro (isCompact_closedBall (0 : V) 4) fun ξ hξ => ?_
   rw [mem_closedBall_zero_iff, not_le] at hξ
-  have h : 𝓕 (psi (V := V) 1) ξ = 0 := by
+  have h : 𝓕 (lpBlockKernel (V := V) 1) ξ = 0 := by
     by_contra h
-    have h4 := norm_lt_of_fourier_psi_ne_zero h
+    have h4 := norm_lt_of_fourier_lpBlockKernel_ne_zero h
     norm_num at h4
     linarith
   rw [h, mul_zero]
@@ -213,8 +217,8 @@ theorem hasCompactSupport_derivSymbol_mul_fourier_psi_one {m : ℕ}
 /-- The Fourier transform `ξ ↦ σ_i(ξ) 𝓕ψ_1(ξ)` of the derivative kernel `η_i`, a Schwartz
 function. -/
 noncomputable def derivKernelHat {m : ℕ} (i : Fin m → Fin (finrank ℝ V)) : 𝓢(V, ℂ) :=
-  (hasCompactSupport_derivSymbol_mul_fourier_psi_one i).toSchwartzMap
-    (contDiff_derivSymbol_mul_fourier_psi_one i)
+  (hasCompactSupport_derivSymbol_mul_fourier_lpBlockKernel_one i).toSchwartzMap
+    (contDiff_derivSymbol_mul_fourier_lpBlockKernel_one i)
 
 /-- The **derivative kernel** `η_i = 𝓕⁻¹(σ_i 𝓕ψ_1)` of the multi-index `i : Fin m → Fin n`. -/
 noncomputable def derivKernel {m : ℕ} (i : Fin m → Fin (finrank ℝ V)) : 𝓢(V, ℂ) :=
@@ -222,7 +226,7 @@ noncomputable def derivKernel {m : ℕ} (i : Fin m → Fin (finrank ℝ V)) : �
 
 /-- `𝓕η_i(ξ) = σ_i(ξ) 𝓕ψ_1(ξ)`. -/
 theorem fourier_derivKernel {m : ℕ} (i : Fin m → Fin (finrank ℝ V)) (ξ : V) :
-    𝓕 (derivKernel i : V → ℂ) ξ = derivSymbol i ξ * 𝓕 (psi (V := V) 1) ξ := by
+    𝓕 (derivKernel i : V → ℂ) ξ = derivSymbol i ξ * 𝓕 (lpBlockKernel (V := V) 1) ξ := by
   rw [← SchwartzMap.fourier_coe, derivKernel, FourierInvPair.fourier_fourierInv_eq]
   rfl
 
@@ -242,15 +246,15 @@ theorem sum_iteratedLineDerivOp_derivKernel (m : ℕ) :
   rw [← Finset.sum_mul]
   by_cases hξ : ξ = 0
   · subst hξ
-    rw [fourier_psi_succ_eq_zero (i := 0) (by simp), mul_zero]
+    rw [fourier_lpBlockKernel_succ_eq_zero (i := 0) (by simp), mul_zero]
   · rw [sum_prod_mul_derivSymbol hξ, one_mul]
 
 /-- **The dilated identity**: for all `m, j ∈ ℕ`,
 `2^{jm} ψ_{j+1} = ∑_{i : Fin m → Fin n} ∂_{e_{i_0}} ⋯ ∂_{e_{i_{m-1}}} ((η_i)_{2^j})`, from
 `Rd.sum_iteratedLineDerivOp_derivKernel`, the chain rule for dilations
 (`Rd.iteratedLineDerivOp_schwartzDilate`) and `(ψ_1)_{2^j} = ψ_{j+1}`. -/
-theorem two_pow_smul_psi_succ_eq_sum (m j : ℕ) :
-    ((2 : ℂ) ^ (j * m)) • psi (V := V) (j + 1) =
+theorem two_pow_smul_lpBlockKernel_succ_eq_sum (m j : ℕ) :
+    ((2 : ℂ) ^ (j * m)) • lpBlockKernel (V := V) (j + 1) =
       ∑ i : Fin m → Fin (finrank ℝ V), ⇑(∂^{fun k => gridBasis V (i k)}
         (schwartzDilate (2 ^ j) (pow_ne_zero j two_ne_zero) (derivKernel i))) := by
   have h : ∑ i : Fin m → Fin (finrank ℝ V), ∂^{fun k => gridBasis V (i k)}
@@ -263,7 +267,8 @@ theorem two_pow_smul_psi_succ_eq_sum (m j : ℕ) :
   funext x
   have hx := congrArg (fun S : 𝓢(V, ℂ) => S x) h
   simp only [sum_apply, smul_apply] at hx
-  rw [Finset.sum_apply, hx, Pi.smul_apply, coe_schwartzDilate, coe_psiOneS, dilate_psi_one]
+  rw [Finset.sum_apply, hx, Pi.smul_apply, coe_schwartzDilate, coe_psiOneS,
+    dilate_lpBlockKernel_one]
 
 /-- The complex number `2^n` has absolute value `2^n`, by Mathlib's `enorm_pow` and
 `Complex.norm_two`; this is the size of the factor `2^{jm}` of the dilated identity. -/
@@ -278,37 +283,38 @@ noncomputable def derivFamily {m : ℕ} (i : Fin m → Fin (finrank ℝ V)) (j :
 
 /-- `𝓕(η_i)_{2^j}(ξ) = σ_i(2^{-j} ξ) 𝓕ψ_{j+1}(ξ)`. -/
 theorem fourier_derivFamily {m : ℕ} (i : Fin m → Fin (finrank ℝ V)) (j : ℕ) (ξ : V) :
-    𝓕 (derivFamily i j) ξ = derivSymbol i (((2 : ℝ) ^ j)⁻¹ • ξ) * 𝓕 (psi (V := V) (j + 1)) ξ := by
+    𝓕 (derivFamily i j) ξ =
+      derivSymbol i (((2 : ℝ) ^ j)⁻¹ • ξ) * 𝓕 (lpBlockKernel (V := V) (j + 1)) ξ := by
   rw [derivFamily, fourier_dilate _ (by positivity), fourier_derivKernel,
-    fourier_psi_succ_eq_fourier_psi_one j ξ]
+    fourier_lpBlockKernel_succ_eq_fourier_lpBlockKernel_one j ξ]
 
 /-- `|𝓕(η_i)_{2^j}(ξ)| ≤ |𝓕ψ_{j+1}(ξ)|`: where `𝓕ψ_{j+1}(ξ) ≠ 0`, `‖2^{-j} ξ‖ > 1` and
 `|σ_i| ≤ 1` there (`Rd.norm_derivSymbol_le`). -/
 theorem enorm_fourier_derivFamily_le {m : ℕ} (i : Fin m → Fin (finrank ℝ V)) (j : ℕ) (ξ : V) :
-    ‖𝓕 (derivFamily i j) ξ‖ₑ ≤ ‖𝓕 (psi (V := V) (j + 1)) ξ‖ₑ := by
+    ‖𝓕 (derivFamily i j) ξ‖ₑ ≤ ‖𝓕 (lpBlockKernel (V := V) (j + 1)) ξ‖ₑ := by
   rw [fourier_derivFamily, enorm_mul]
-  by_cases h : 𝓕 (psi (V := V) (j + 1)) ξ = 0
+  by_cases h : 𝓕 (lpBlockKernel (V := V) (j + 1)) ξ = 0
   · rw [h, enorm_zero, mul_zero]
-  · rw [fourier_psi_succ_eq_fourier_psi_one j ξ] at h
-    have h1 := (one_lt_norm_of_fourier_psi_one_ne_zero h).le
-    calc ‖derivSymbol i (((2 : ℝ) ^ j)⁻¹ • ξ)‖ₑ * ‖𝓕 (psi (V := V) (j + 1)) ξ‖ₑ
-        ≤ 1 * ‖𝓕 (psi (V := V) (j + 1)) ξ‖ₑ := by
+  · rw [fourier_lpBlockKernel_succ_eq_fourier_lpBlockKernel_one j ξ] at h
+    have h1 := (one_lt_norm_of_fourier_lpBlockKernel_one_ne_zero h).le
+    calc ‖derivSymbol i (((2 : ℝ) ^ j)⁻¹ • ξ)‖ₑ * ‖𝓕 (lpBlockKernel (V := V) (j + 1)) ξ‖ₑ
+        ≤ 1 * ‖𝓕 (lpBlockKernel (V := V) (j + 1)) ξ‖ₑ := by
           gcongr
           rw [← ofReal_norm, ← ENNReal.ofReal_one]
           exact ENNReal.ofReal_le_ofReal (norm_derivSymbol_le i h1)
-      _ = ‖𝓕 (psi (V := V) (j + 1)) ξ‖ₑ := one_mul _
+      _ = ‖𝓕 (lpBlockKernel (V := V) (j + 1)) ξ‖ₑ := one_mul _
 
 /-- **Overlap of a derivative family**: `∑_j |𝓕(η_i)_{2^j}(ξ)|² ≤ 2` for every `ξ`, by comparison
-with the blocks (`Rd.enorm_fourier_derivFamily_le`, `Rd.tsum_fourier_psi_sq_le`). -/
+with the blocks (`Rd.enorm_fourier_derivFamily_le`, `Rd.tsum_fourier_lpBlockKernel_sq_le`). -/
 theorem tsum_fourier_derivFamily_sq_le {m : ℕ} (i : Fin m → Fin (finrank ℝ V)) (ξ : V) :
     ∑' j, ‖𝓕 (derivFamily i j) ξ‖ₑ ^ 2 ≤ 2 :=
   calc ∑' j, ‖𝓕 (derivFamily i j) ξ‖ₑ ^ 2
-      ≤ ∑' j, ‖𝓕 (psi (V := V) (j + 1)) ξ‖ₑ ^ 2 :=
+      ≤ ∑' j, ‖𝓕 (lpBlockKernel (V := V) (j + 1)) ξ‖ₑ ^ 2 :=
         ENNReal.tsum_le_tsum fun j => by gcongr; exact enorm_fourier_derivFamily_le i j ξ
-    _ ≤ ∑' j, ‖𝓕 (psi (V := V) j) ξ‖ₑ ^ 2 :=
+    _ ≤ ∑' j, ‖𝓕 (lpBlockKernel (V := V) j) ξ‖ₑ ^ 2 :=
         ENNReal.tsum_comp_le_tsum_of_injective (add_left_injective 1)
-          fun j => ‖𝓕 (psi (V := V) j) ξ‖ₑ ^ 2
-    _ ≤ 2 := tsum_fourier_psi_sq_le ξ
+          fun j => ‖𝓕 (lpBlockKernel (V := V) j) ξ‖ₑ ^ 2
+    _ ≤ 2 := tsum_fourier_lpBlockKernel_sq_le ξ
 
 /-- The seminorm bounds `A^{η_i}_{k,l} = sup_x ‖x‖^k ‖D^l η_i(x)‖` of the derivative kernel
 `η_i`. -/

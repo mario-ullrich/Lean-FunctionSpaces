@@ -99,9 +99,9 @@ $\|f\|^{\mathrm{LP}}_{s,q}$ an $\ell_q(L_p)$ norm of the same family.
 
 \begin{lemma}[The pointwise blocks]
 \label{lem:tl-pointwise-blocks}
-\lean{Rd.iSup_enorm_psi_lt_top, Rd.eLpNorm_psi_mul_iSup_psi_ne_top, Rd.enorm_blockFun_le,
-  Rd.blockFun_add_ae, Rd.blockFun_smul, Rd.blockFun_eq_of_ae_eq, Rd.memLp_blockFun,
-  Rd.eLpNorm_blockFun_zero_le}
+\lean{Rd.iSup_enorm_lpBlockKernel_lt_top, Rd.eLpNorm_lpBlockKernel_mul_iSup_lpBlockKernel_ne_top,
+  Rd.enorm_blockFun_le, Rd.blockFun_add_ae, Rd.blockFun_smul, Rd.blockFun_eq_of_ae_eq,
+  Rd.memLp_blockFun, Rd.eLpNorm_blockFun_zero_le}
 \leanok
 \uses{def:triebel-lizorkin, lem:conv-pointwise-bound, lem:lp-kernels-basic, lem:conv-assoc,
   thm:young, def:conv}
@@ -943,7 +943,8 @@ for every bump $g$ and every order $L$.
 \label{lem:lp-moment-kernels}
 \lean{Rd.fourier_dilate_momentKernel, Rd.continuous_momentKernel, Rd.bddAbove_momentKernel,
   Rd.lpMoment, Rd.lpMomentScaled, Rd.integrable_lpMomentScaled, Rd.continuous_lpMomentScaled,
-  Rd.bddAbove_lpMomentScaled, Rd.fourier_lpMomentScaled_eq_zero, Rd.conv_psi_lpMomentScaled}
+  Rd.bddAbove_lpMomentScaled, Rd.fourier_lpMomentScaled_eq_zero,
+  Rd.conv_lpBlockKernel_lpMomentScaled}
 \leanok
 \uses{def:moment-kernel, lem:fourier-dilate, lem:lp-kernels-basic, lem:lp-kernels-frequency,
   lem:conv-of-fourier}
@@ -967,7 +968,7 @@ and \Cref{lem:conv-of-fourier} applies to the bounded continuous kernel $\mu_{2^
 
 \begin{lemma}[Decay of the Littlewood--Paley blocks]
 \label{lem:lp-blocks-decay}
-\lean{Rd.psiDecayConst, Rd.psiDecayConst_ne_top, Rd.enorm_psi_le}
+\lean{Rd.psiDecayConst, Rd.psiDecayConst_ne_top, Rd.enorm_lpBlockKernel_le}
 \leanok
 \uses{lem:schwartz-decay, lem:peetre-weights, def:lp-kernels}
 For every $N \in \N$ let $P_N = (1 + 2^N) C_{\Phi,0,N} < \infty$. For every $j \in \N$ and every
@@ -1041,10 +1042,12 @@ $2^{iL'} 2^{-j'L'} = 4^{L'} 2^{-(j'+2-i)L'}$ (\Cref{lem:dyadic-weights-integer})
 \label{thm:cross-kernel-dual}
 \lean{Rd.LocalMeansBump.psiDualSupportConst, Rd.LocalMeansBump.psiDualSupportConst_ne_top,
   Rd.LocalMeansBump.lintegral_enorm_dual_le,
-  Rd.LocalMeansBump.enorm_conv_psi_dual_le_of_lt,
-  Rd.LocalMeansBump.enorm_conv_psi_dual_le_of_le_one, Rd.LocalMeansBump.conv_psi_dual_ae_eq,
-  Rd.LocalMeansBump.ae_enorm_conv_psi_dual_le_of_two_le, Rd.LocalMeansBump.psiDualConst,
-  Rd.LocalMeansBump.psiDualConst_ne_top, Rd.LocalMeansBump.enorm_conv_psi_dual_le}
+  Rd.LocalMeansBump.enorm_conv_lpBlockKernel_dualKernel_le_of_lt,
+  Rd.LocalMeansBump.enorm_conv_lpBlockKernel_dualKernel_le_of_le_one,
+  Rd.LocalMeansBump.conv_lpBlockKernel_dualKernel_ae_eq,
+  Rd.LocalMeansBump.ae_enorm_conv_lpBlockKernel_dualKernel_le_of_two_le,
+  Rd.LocalMeansBump.psiDualConst, Rd.LocalMeansBump.psiDualConst_ne_top,
+  Rd.LocalMeansBump.enorm_conv_lpBlockKernel_dualKernel_le}
 \leanok
 \uses{lem:lp-blocks-decay, lem:small-support-decay, lem:dual-averaged-differences,
   lem:lp-moment-kernels, lem:two-decay-bumps, lem:dual-kernel-bounds, lem:dual-kernel-moduli,
@@ -1189,9 +1192,9 @@ Monotonicity and homogeneity of the $L_p$ norm, then \Cref{thm:fefferman-stein}.
 \begin{theorem}[Blocks by local means]
 \label{thm:blocks-by-local-means}
 \lean{Rd.LocalMeansBump.blockByLocalMeansConst, Rd.LocalMeansBump.blockByLocalMeansConst_ne_top,
-  Rd.LocalMeansBump.enorm_conv_conv_psi_dual_le, Rd.LocalMeansBump.lpBlock_sum_dual_localMean_ae,
-  Rd.LocalMeansBump.ae_enorm_lpBlock_sum_dual_le, Rd.LocalMeansBump.maximal_enorm_localMean,
-  Rd.LocalMeansBump.enorm_blockFun_le_tsum_maximal}
+  Rd.LocalMeansBump.enorm_conv_conv_lpBlockKernel_dualKernel_le,
+  Rd.LocalMeansBump.lpBlock_sum_dual_localMean_ae, Rd.LocalMeansBump.ae_enorm_lpBlock_sum_dual_le,
+  Rd.LocalMeansBump.maximal_enorm_localMean, Rd.LocalMeansBump.enorm_blockFun_le_tsum_maximal}
 \leanok
 \uses{thm:cross-kernel-dual, thm:decay-kernels-maximal, lem:maximal-function-kernels,
   lem:reproducing-formula, lem:lp-limits-pointwise, lem:conv-op, lem:almost-diagonal-pointwise,
@@ -3129,8 +3132,9 @@ first claim and \Cref{lem:tsum-changed-terms} bound its overlap, and
 
 \begin{lemma}[Values of the dilated cut-offs]
 \label{lem:fourier-phi-values}
-\lean{Rd.fourier_Phi_eq_one, Rd.fourier_Phi_eq_zero, Rd.exists_fourier_Phi_eq_ofReal,
-  Rd.norm_fourier_Phi_le_one, Rd.norm_fourier_Phi_sub_le_one}
+\lean{Rd.fourier_dilatedLpKernel_eq_one, Rd.fourier_dilatedLpKernel_eq_zero,
+  Rd.exists_fourier_dilatedLpKernel_eq_ofReal, Rd.norm_fourier_dilatedLpKernel_le_one,
+  Rd.norm_fourier_dilatedLpKernel_sub_le_one}
 \leanok
 \uses{def:lp-kernels, lem:lp-kernels-frequency, lem:lp-kernels-basic}
 For all $k, l \in \N$ and every $\xi \in V$: $\widehat{\Phi_k}(\xi) = 1$ if
@@ -3176,7 +3180,7 @@ $\Phi - \delta_{1/2} \Phi$ (\Cref{lem:uniform-schwartz-constants}).
 
 \begin{theorem}[The blocks form a Calder\'on--Zygmund family]
 \label{thm:cz-family-psi}
-\lean{Rd.tsum_fourier_psi_sq_le, Rd.isCZFamily_psi}
+\lean{Rd.tsum_fourier_lpBlockKernel_sq_le, Rd.isCZFamily_lpBlockKernel}
 \leanok
 \uses{lem:psi-base, prop:bessel-lp-weights, thm:cz-family-dilation}
 For every $\xi \in V$, $\sum_j |\widehat{\psi_j}(\xi)|^2 \leq 2$, and $(\psi_j)$ is a
@@ -3229,7 +3233,7 @@ $\|\Phi_k\|_1 = \|\Phi\|_1$ (\Cref{lem:lp-kernels-basic}).
 
 \begin{lemma}[The synthesis kernels reproduce the blocks]
 \label{lem:psi-dual-reproduces}
-\lean{Rd.fourier_psiDual_mul_psi, Rd.conv_psiDual_psi}
+\lean{Rd.fourier_psiDual_mul_lpBlockKernel, Rd.conv_psiDual_lpBlockKernel}
 \leanok
 \uses{lem:psi-dual-basic, lem:fourier-phi-values, lem:lp-kernels-frequency,
   lem:conv-of-fourier}
@@ -4312,7 +4316,7 @@ measurable $G$.
 
 \begin{lemma}[The far mass of dilation families]
 \label{lem:torus-far-mass-dilate}
-\lean{Rd.inv_one_add_ofReal_two_pow_le, Torus.farMass_dilate_le, Torus.farMass_psi_le,
+\lean{Rd.inv_one_add_ofReal_two_pow_le, Torus.farMass_dilate_le, Torus.farMass_lpBlockKernel_le,
   Torus.farMass_psiDual_le}
 \leanok
 \uses{def:torus-far-mass, def:uniform-schwartz, lem:schwartz-tails,

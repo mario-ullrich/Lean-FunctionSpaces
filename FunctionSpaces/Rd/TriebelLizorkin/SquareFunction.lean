@@ -51,7 +51,7 @@ variable (V) in
 /-- The constant `Q_{V,p}` of the **upper square function bound**
 `‖f‖_{F^0_{p,2}} ≤ Q_{V,p} ‖f‖_p`: the strong type constant `Rd.czConst` of the
 Calderón–Zygmund family of the blocks `ψ_j`, with overlap `2` and Hörmander constant
-`4 H_{A^ψ}`, where `A^ψ = Rd.psiBaseBound V` (`Rd.isCZFamily_psi`). -/
+`4 H_{A^ψ}`, where `A^ψ = Rd.psiBaseBound V` (`Rd.isCZFamily_lpBlockKernel`). -/
 noncomputable def squareFunctionConst (p : ℝ≥0∞) : ℝ≥0∞ :=
   czConst V p 2 (4 * familyHormanderConst V (psiBaseBound V))
 
@@ -84,7 +84,7 @@ theorem triebelLizorkinNorm_zero_two_le [Nontrivial V] (hp1 : 1 < p) (hp : p ≠
     (f : Lp ℂ p (volume : Measure V)) :
     triebelLizorkinNorm 0 2 f ≤ squareFunctionConst V p * ‖f‖ₑ := by
   rw [triebelLizorkinNorm_zero_left, Lp.enorm_def]
-  exact isCZFamily_psi.eLpNorm_lqNorm_conv_le hp1 hp (Lp.memLp f)
+  exact isCZFamily_lpBlockKernel.eLpNorm_lqNorm_conv_le hp1 hp (Lp.memLp f)
 
 /-- **`L_p ⊆ F^0_{p,2}`**: in dimension `n ≥ 1`, for `1 < p < ∞`, every `f ∈ L_p(V)` has a
 finite Triebel–Lizorkin norm `‖f‖_{F^0_{p,2}}`. -/
@@ -97,11 +97,12 @@ theorem memTriebelLizorkin_zero_two [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞
 
 /-- **The synthesis kernels reproduce the blocks**: for `1 ≤ p < ∞` and `f ∈ L_p(V)`,
 `psiDual_j ⋆ (ψ_j ⋆ f) = ψ_j ⋆ f` almost everywhere, by associativity of convolution and
-`psiDual_j ⋆ ψ_j = ψ_j` (`Rd.conv_psiDual_psi`). -/
+`psiDual_j ⋆ ψ_j = ψ_j` (`Rd.conv_psiDual_lpBlockKernel`). -/
 theorem conv_psiDual_blockFun_ae (hp : p ≠ ∞) (j : ℕ) (f : Lp ℂ p (volume : Measure V)) :
     conv (psiDual j) (blockFun j f) volume =ᵐ[volume] blockFun j f := by
-  have h := conv_conv_ae Fact.out hp (integrable_psiDual j) (integrable_psi j) (Lp.memLp f)
-  rw [conv_psiDual_psi] at h
+  have h :=
+    conv_conv_ae Fact.out hp (integrable_psiDual j) (integrable_lpBlockKernel j) (Lp.memLp f)
+  rw [conv_psiDual_lpBlockKernel] at h
   exact h.symm
 
 /-- **The reproducing sums**: for `1 ≤ p < ∞`, `f ∈ L_p(V)` and every finite set `s ⊆ ℕ`,

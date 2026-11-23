@@ -120,7 +120,7 @@ theorem fourierMultiplierCLM_fourier_toLp_eq_conv {r : ℝ≥0∞} [Fact (1 ≤ 
 
 /-- `𝓕(psiS j)` is the Fourier transform `𝓕ψ_j` of the block. -/
 theorem fourier_psiS_apply (j : ℕ) (ξ : V) :
-    (𝓕 (psiS (V := V) j) : 𝓢(V, ℂ)) ξ = 𝓕 (psi (V := V) j) ξ := by
+    (𝓕 (psiS (V := V) j) : 𝓢(V, ℂ)) ξ = 𝓕 (lpBlockKernel (V := V) j) ξ := by
   rw [SchwartzMap.fourier_coe, coe_psiS]
 
 /-- The **Littlewood–Paley block of a tempered distribution**, `Δ_j u = (𝓕ψ_j)(D) u`, Mathlib's
@@ -143,13 +143,13 @@ theorem distribBlock_toTemperedDistribution {r : ℝ≥0∞} [Fact (1 ≤ r)] (h
 /-! ### The decomposition of tempered distributions -/
 
 /-- **The Fourier transforms of the blocks add up to a cut-off**:
-`∑_{j ≤ J} 𝓕ψ_j(ξ) = χ(2^{-J} ξ)` with `χ = Rd.cutoff 1 2` (`Rd.sum_range_fourier_psi`,
-`Rd.fourier_Phi`). -/
+`∑_{j ≤ J} 𝓕ψ_j(ξ) = χ(2^{-J} ξ)` with `χ = Rd.cutoff 1 2` (`Rd.sum_range_fourier_lpBlockKernel`,
+`Rd.fourier_dilatedLpKernel`). -/
 theorem sum_fourier_psiS_apply (J : ℕ) (ξ : V) :
     ∑ j ∈ Finset.range (J + 1), (𝓕 (psiS (V := V) j) : 𝓢(V, ℂ)) ξ =
       cutoff 1 2 one_pos one_lt_two (((2 : ℝ) ^ J)⁻¹ • ξ) := by
   simp_rw [fourier_psiS_apply]
-  rw [sum_range_fourier_psi, fourier_Phi]
+  rw [sum_range_fourier_lpBlockKernel, fourier_dilatedLpKernel]
 
 /-- **Partial sums of the blocks as one multiplier**: `∑_{j ≤ J} Δ_j u` is the Fourier multiplier
 with `χ(2^{-J} ·)` (Mathlib's `TemperedDistribution.fourierMultiplierCLM_sum`,

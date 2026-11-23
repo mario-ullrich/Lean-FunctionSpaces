@@ -1465,7 +1465,7 @@ on $\R^d$ give the same operator on $L_p(\T^d)$.
 \begin{theorem}[Approximate identities on the torus]
 \label{thm:torus-approx-identity}
 \lean{Torus.norm_econvLp_le, Torus.tendsto_econvLp_of_fourier, Torus.tendsto_econvLp_dilate,
-  Torus.tendsto_econvLp_Phi}
+  Torus.tendsto_econvLp_dilatedLpKernel}
 \leanok
 \uses{lem:torus-econv-young, thm:torus-econv-fourier, lem:fourier-conv, lem:fourier-dilate,
   lem:dilate, lem:lp-kernels-basic}
@@ -8085,7 +8085,7 @@ $(\otimes \Phi)_{2^J}$, and $\sum_k \delta_k * f = f$ in $L_p$.
 \begin{lemma}[One-dimensional estimates in $L_1$]
 \label{lem:mixed-lp-kernels}
 \lean{Rd.eLpNorm_conv_eq_enorm_convLp, Rd.one_le_dyadicWeight_mul_almostDiagCoeff,
-  Rd.LocalMeansBump.exists_eLpNorm_conv_psi_dual_le,
+  Rd.LocalMeansBump.exists_eLpNorm_conv_lpBlockKernel_dualKernel_le,
   Rd.LocalMeansBump.exists_eLpNorm_conv_kernel_Theta_le}
 \leanok
 \uses{thm:band-jackson, thm:kernel-identities, lem:local-means-upper, thm:band-inverse,

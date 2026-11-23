@@ -34,7 +34,7 @@ bounded `L_1` norms whose Fourier transforms tend to `1` at every lattice point 
 uniformly bounded (`Torus.norm_econvLp_le`), so the set where it holds is a closed subspace.
 This applies to the dilations `K_c ⋆ f → f` of a kernel with `∫ K = 1`
 (`Torus.tendsto_econvLp_dilate`) and to the Littlewood–Paley kernels `Φ_J`
-(`Torus.tendsto_econvLp_Phi`).
+(`Torus.tendsto_econvLp_dilatedLpKernel`).
 -/
 
 @[expose] public section
@@ -219,9 +219,10 @@ theorem tendsto_econvLp_dilate (hp : p ≠ ∞) {K : EuclideanSpace ℝ d → �
 
 /-- **The Littlewood–Paley kernels are an approximate identity on the torus**: `Φ_J ⋆ f → f`
 in `L_p(𝕋^d)` as `J → ∞`, for `1 ≤ p < ∞`. -/
-theorem tendsto_econvLp_Phi (hp : p ≠ ∞) (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
-    Tendsto (fun J => econvLp hp (Rd.integrable_Phi (V := EuclideanSpace ℝ d) J) f) atTop
-      (𝓝 f) :=
+theorem tendsto_econvLp_dilatedLpKernel (hp : p ≠ ∞)
+    (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
+    Tendsto (fun J => econvLp hp (Rd.integrable_dilatedLpKernel (V := EuclideanSpace ℝ d) J) f)
+      atTop (𝓝 f) :=
   tendsto_econvLp_dilate hp Rd.integrable_lpKernel Rd.integral_lpKernel
     (c := fun J : ℕ => (2 : ℝ) ^ J) (fun J => by positivity)
     (tendsto_pow_atTop_atTop_of_one_lt one_lt_two) f

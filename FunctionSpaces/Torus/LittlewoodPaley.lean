@@ -12,8 +12,8 @@ public import ApproximationSpaces.Decompositions.Blocks
 # Littlewood–Paley blocks on the torus
 
 For `f ∈ L_p(𝕋^d)`, `1 ≤ p < ∞`, the **Littlewood–Paley blocks** are `Δ_j f = ψ_j ⋆ f`
-(`Torus.lpBlock`), with the kernels `ψ_j` of `Rd.psi` on `ℝ^d` acting by `Torus.econvLp`. They
-are bounded uniformly, `‖Δ_j f‖_p ≤ 2 ‖Φ‖_1 ‖f‖_p` (`Torus.enorm_lpBlock_le`), their partial
+(`Torus.lpBlock`), with the kernels `ψ_j` of `Rd.lpBlockKernel` on `ℝ^d` acting by `Torus.econvLp`.
+They are bounded uniformly, `‖Δ_j f‖_p ≤ 2 ‖Φ‖_1 ‖f‖_p` (`Torus.enorm_lpBlock_le`), their partial
 sums are `Φ_J ⋆ f` (`Torus.sum_lpBlock`), and these converge to `f`
 (`Torus.tendsto_sum_lpBlock`). The **Littlewood–Paley quasi-norm** is
 `‖(2^(js) ‖Δ_j f‖_p)_j‖_{ℓ_q}` (`Torus.littlewoodPaleyNorm`).
@@ -46,30 +46,30 @@ variable {d : Type*} [Fintype d] {p : ℝ≥0∞} [Fact (1 ≤ p)]
 /-! ### The blocks -/
 
 /-- The **Littlewood–Paley block** `Δ_j f = ψ_j ⋆ f` of `f ∈ L_p(𝕋^d)`, with the kernel `ψ_j` of
-`Rd.psi` on `ℝ^d`. -/
+`Rd.lpBlockKernel` on `ℝ^d`. -/
 noncomputable def lpBlock (hp : p ≠ ∞) (j : ℕ) :
     Lp ℂ p (volume : Measure (UnitAddTorus d)) →L[ℂ] Lp ℂ p (volume : Measure (UnitAddTorus d)) :=
-  econvLp hp (Rd.integrable_psi (V := EuclideanSpace ℝ d) j)
+  econvLp hp (Rd.integrable_lpBlockKernel (V := EuclideanSpace ℝ d) j)
 
 /-- **The blocks are bounded uniformly**: `‖Δ_j f‖_p ≤ 2 ‖Φ‖_1 ‖f‖_p`. -/
 theorem enorm_lpBlock_le (hp : p ≠ ∞) (j : ℕ) (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     ‖lpBlock hp j f‖ₑ ≤ 2 * eLpNorm (Rd.lpKernel (V := EuclideanSpace ℝ d)) 1 volume * ‖f‖ₑ := by
   refine (enorm_econvLp_le hp _ f).trans ?_
-  rw [← eLpNorm_one_eq_lintegral_enorm (Rd.integrable_psi j).1]
+  rw [← eLpNorm_one_eq_lintegral_enorm (Rd.integrable_lpBlockKernel j).1]
   gcongr
-  exact Rd.eLpNorm_psi_one_le j
+  exact Rd.eLpNorm_lpBlockKernel_one_le j
 
 /-- `Δ_{j+1} f = Φ_{j+1} ⋆ f - Φ_j ⋆ f`. -/
 theorem lpBlock_succ (hp : p ≠ ∞) (j : ℕ) (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     lpBlock hp (j + 1) f =
-      econvLp hp (Rd.integrable_Phi (V := EuclideanSpace ℝ d) (j + 1)) f -
-        econvLp hp (Rd.integrable_Phi (V := EuclideanSpace ℝ d) j) f :=
-  econvLp_sub_kernel hp (Rd.integrable_Phi (j + 1)) (Rd.integrable_Phi j) f
+      econvLp hp (Rd.integrable_dilatedLpKernel (V := EuclideanSpace ℝ d) (j + 1)) f -
+        econvLp hp (Rd.integrable_dilatedLpKernel (V := EuclideanSpace ℝ d) j) f :=
+  econvLp_sub_kernel hp (Rd.integrable_dilatedLpKernel (j + 1)) (Rd.integrable_dilatedLpKernel j) f
 
 /-- **The blocks telescope**: `∑_{j ≤ J} Δ_j f = Φ_J ⋆ f`. -/
 theorem sum_lpBlock (hp : p ≠ ∞) (J : ℕ) (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     ∑ j ∈ Finset.range (J + 1), lpBlock hp j f =
-      econvLp hp (Rd.integrable_Phi (V := EuclideanSpace ℝ d) J) f := by
+      econvLp hp (Rd.integrable_dilatedLpKernel (V := EuclideanSpace ℝ d) J) f := by
   induction J with
   | zero =>
     rw [Finset.sum_range_one]
@@ -77,11 +77,11 @@ theorem sum_lpBlock (hp : p ≠ ∞) (J : ℕ) (f : Lp ℂ p (volume : Measure (
   | succ J ih => rw [Finset.sum_range_succ, ih, lpBlock_succ, add_sub_cancel]
 
 /-- **Reconstruction**: the partial sums of the blocks converge to `f` in `L_p(𝕋^d)`, since
-`Φ_J ⋆ f → f` (`Torus.tendsto_econvLp_Phi`). -/
+`Φ_J ⋆ f → f` (`Torus.tendsto_econvLp_dilatedLpKernel`). -/
 theorem tendsto_sum_lpBlock (hp : p ≠ ∞) (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     Tendsto (fun J => ∑ j ∈ Finset.range J, lpBlock hp j f) atTop (𝓝 f) := by
   rw [← tendsto_add_atTop_iff_nat 1]
-  simpa only [sum_lpBlock] using tendsto_econvLp_Phi hp f
+  simpa only [sum_lpBlock] using tendsto_econvLp_dilatedLpKernel hp f
 
 /-! ### Blocks and trigonometric polynomials -/
 
@@ -92,7 +92,7 @@ theorem lpBlock_mem_trigPolyLp (hp : p ≠ ∞) (j : ℕ)
     lpBlock hp j f ∈ trigPolyLp p (2 ^ (j + 1)) := by
   refine econvLp_mem_trigPolyLp hp _ (fun m hm => ?_) f
   by_contra h
-  have h1 := Rd.norm_lt_of_fourier_psi_ne_zero h
+  have h1 := Rd.norm_lt_of_fourier_lpBlockKernel_ne_zero h
   have h2 := deg_le_norm_latticeVec m
   have h3 : ((2 : ℝ) ^ (j + 1)) ≤ deg m := by exact_mod_cast hm
   linarith
@@ -104,7 +104,7 @@ theorem lpBlock_eq_zero_of_mem (hp : p ≠ ∞) {i j : ℕ} (hij : i + Fintype.c
     {a : Lp ℂ p (volume : Measure (UnitAddTorus d))} (ha : a ∈ trigPolyLp p (2 ^ i)) :
     lpBlock hp j a = 0 := by
   obtain ⟨k, rfl⟩ : ∃ k, j = k + 1 := ⟨j - 1, by omega⟩
-  refine econvLp_eq_zero_of_mem hp _ (fun m hm => Rd.fourier_psi_succ_eq_zero ?_) ha
+  refine econvLp_eq_zero_of_mem hp _ (fun m hm => Rd.fourier_lpBlockKernel_succ_eq_zero ?_) ha
   have hcard : (Fintype.card d : ℝ) ≤ 2 ^ Fintype.card d := by
     exact_mod_cast (Fintype.card d).lt_two_pow_self.le
   have hdeg : (deg m : ℝ) ≤ 2 ^ i := by exact_mod_cast hm.le

@@ -486,9 +486,9 @@ to match the hypothesis of `Rd.exists_isCZFamily_besselKernelFamily` with `a = 1
 theorem mem_annulus_of_fourier_psiOneS_ne_zero {ζ : V} (h : 𝓕 (psiOneS (V := V)) ζ ≠ 0) :
     1 ≤ ‖ζ‖ ∧ ‖ζ‖ ≤ 2 ^ 2 * 1 := by
   rw [fourier_psiOneS_apply] at h
-  have h4 := norm_lt_of_fourier_psi_ne_zero h
+  have h4 := norm_lt_of_fourier_lpBlockKernel_ne_zero h
   norm_num at h4 ⊢
-  exact ⟨(one_lt_norm_of_fourier_psi_one_ne_zero h).le, h4.le⟩
+  exact ⟨(one_lt_norm_of_fourier_lpBlockKernel_one_ne_zero h).le, h4.le⟩
 
 /-- `𝓕(psiBase (j+1)) = 𝓕(Φ - δ_{1/2} Φ)` vanishes outside the annulus
 `{1/2 ≤ ‖ζ‖ ≤ 2^2 · 1/2}`: `psiBase (j+1) = psiBase 1` and `ψ_1 = (psiBase 1)_2`, so

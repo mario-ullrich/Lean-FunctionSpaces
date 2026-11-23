@@ -61,19 +61,19 @@ with a representative of `f ∈ L_p(𝕋^d)`. Its class in `L_p` is the block `T
 (`Torus.lpBlock_ae_eq_blockFun`). -/
 noncomputable def blockFun (j : ℕ) (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     UnitAddTorus d → ℂ :=
-  econv (Rd.psi (V := EuclideanSpace ℝ d) j) f
+  econv (Rd.lpBlockKernel (V := EuclideanSpace ℝ d) j) f
 
 /-- The block `Δ_j f ∈ L_p(𝕋^d)` is represented by the pointwise convolution `ψ_j ⋆ f`. -/
 theorem lpBlock_ae_eq_blockFun (hp : p ≠ ∞) (j : ℕ)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     lpBlock hp j f =ᵐ[volume] blockFun j f :=
-  econvLp_apply_ae hp (Rd.integrable_psi j) f
+  econvLp_apply_ae hp (Rd.integrable_lpBlockKernel j) f
 
 omit [Fact (1 ≤ p)] in
 /-- The pointwise blocks are measurable. -/
 theorem aestronglyMeasurable_blockFun (j : ℕ) (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     AEStronglyMeasurable (blockFun j f) volume :=
-  aestronglyMeasurable_econv (Rd.integrable_psi j).aestronglyMeasurable
+  aestronglyMeasurable_econv (Rd.integrable_lpBlockKernel j).aestronglyMeasurable
     (Lp.stronglyMeasurable f).measurable
 
 /-- `‖Δ_j f‖_p` is the `L_p` norm of the pointwise block `ψ_j ⋆ f`. -/
@@ -88,8 +88,10 @@ theorem enorm_lpBlock_eq_eLpNorm_blockFun (hp : p ≠ ∞) (j : ℕ)
 theorem eLpNorm_blockFun_zero_le (hp : p ≠ ∞) (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     eLpNorm (blockFun 0 f) p volume ≤
       eLpNorm (Rd.lpKernel (V := EuclideanSpace ℝ d)) 1 volume * ‖f‖ₑ := by
-  rw [Lp.enorm_def, ← Rd.eLpNorm_Phi_one 0, eLpNorm_one_eq_lintegral_enorm (Rd.integrable_Phi 0).1]
-  exact eLpNorm_econv_le Fact.out hp (Rd.integrable_psi 0) (Lp.stronglyMeasurable f).measurable
+  rw [Lp.enorm_def, ← Rd.eLpNorm_dilatedLpKernel_one 0,
+    eLpNorm_one_eq_lintegral_enorm (Rd.integrable_dilatedLpKernel 0).1]
+  exact eLpNorm_econv_le Fact.out hp (Rd.integrable_lpBlockKernel 0)
+    (Lp.stronglyMeasurable f).measurable
 
 /-- The block of a sum is the sum of the blocks, almost everywhere and for all levels at once.
 On the torus `L_p ⊆ L_1`, so the convolution integrals converge absolutely almost everywhere
@@ -99,9 +101,9 @@ theorem blockFun_add_ae (f g : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
   refine ae_all_iff.2 fun j => ?_
   have hfm := (Lp.stronglyMeasurable f).measurable
   have hgm := (Lp.stronglyMeasurable g).measurable
-  filter_upwards [econv_congr_ae (Rd.psi j) (Lp.stronglyMeasurable (f + g)).measurable
+  filter_upwards [econv_congr_ae (Rd.lpBlockKernel j) (Lp.stronglyMeasurable (f + g)).measurable
       (hfm.add hgm) (Lp.coeFn_add f g),
-    econv_add_ae (Rd.integrable_psi j) hfm hgm ((Lp.memLp f).integrable Fact.out)
+    econv_add_ae (Rd.integrable_lpBlockKernel j) hfm hgm ((Lp.memLp f).integrable Fact.out)
       ((Lp.memLp g).integrable Fact.out)] with t h1 h2
   rw [blockFun, blockFun, blockFun, h1, h2, Pi.add_apply]
 
@@ -111,7 +113,7 @@ levels at once. -/
 theorem blockFun_smul_ae (c : ℂ) (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     ∀ᵐ t ∂volume, ∀ j, blockFun j (c • f) t = c * blockFun j f t := by
   refine ae_all_iff.2 fun j => ?_
-  filter_upwards [econv_congr_ae (Rd.psi j) (Lp.stronglyMeasurable (c • f)).measurable
+  filter_upwards [econv_congr_ae (Rd.lpBlockKernel j) (Lp.stronglyMeasurable (c • f)).measurable
     ((Lp.stronglyMeasurable f).measurable.const_smul c) (Lp.coeFn_smul c f)] with t h
   rw [blockFun, blockFun, h, econv_smul, Pi.smul_apply, smul_eq_mul]
 

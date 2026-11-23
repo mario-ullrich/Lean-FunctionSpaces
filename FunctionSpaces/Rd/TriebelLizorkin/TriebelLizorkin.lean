@@ -21,9 +21,9 @@ before the `L_p` norm, the reverse of the order in the Littlewood–Paley quasi-
 spaces (`Rd.littlewoodPaleyNorm`). The blocks are the pointwise convolutions `ψ_j ⋆ f`
 (`Rd.blockFun`), bounded at every point by the weighted Jensen inequality
 (`Rd.enorm_conv_le_of_enorm_le`, `Rd.enorm_blockFun_le`) with a finite constant
-(`Rd.eLpNorm_psi_mul_iSup_psi_ne_top`), and they lie in `L_p` by Young's inequality
-(`Rd.memLp_blockFun`, `Rd.eLpNorm_blockFun_zero_le`). The space `F^s_{p,q}` consists of the
-`f` with a finite quasi-norm (`Rd.MemTriebelLizorkin`); it is a subspace of `L_p` for
+(`Rd.eLpNorm_lpBlockKernel_mul_iSup_lpBlockKernel_ne_top`), and they lie in `L_p` by Young's
+inequality (`Rd.memLp_blockFun`, `Rd.eLpNorm_blockFun_zero_le`). The space `F^s_{p,q}` consists of
+the `f` with a finite quasi-norm (`Rd.MemTriebelLizorkin`); it is a subspace of `L_p` for
 `1 ≤ q ≤ ∞` (`Rd.triebelLizorkinSpace`), increasing in `q` and decreasing in `s`. Setting
 terms of the weighted blocks to zero keeps them below the quasi-norm, and for `q < ∞` and
 `f ∈ F^s_{p,q}` their tails `‖ x ↦ ‖(2^(js) |ψ_j ⋆ f(x)|)_{j ≥ N}‖_{ℓ_q} ‖_p` tend to zero
@@ -119,31 +119,32 @@ theorem enorm_conv_le_of_enorm_le (hp1 : 1 ≤ p) (hp : p ≠ ∞) {K f : V → 
 of the kernel `ψ_j` with a representative of `f ∈ L_p`. Its class in `L_p` is the block
 `Rd.lpBlock` (`Rd.lpBlock_ae_eq_blockFun`). -/
 noncomputable def blockFun (j : ℕ) (f : Lp ℂ p (volume : Measure V)) : V → ℂ :=
-  conv (psi j) f volume
+  conv (lpBlockKernel j) f volume
 
 /-- The block `Δ_j f ∈ L_p` is represented by the pointwise convolution `ψ_j ⋆ f`. -/
 theorem lpBlock_ae_eq_blockFun (hp : p ≠ ∞) (j : ℕ) (f : Lp ℂ p (volume : Measure V)) :
     lpBlock hp j f =ᵐ[volume] blockFun j f :=
-  convLp_apply_ae hp (integrable_psi j) f
+  convLp_apply_ae hp (integrable_lpBlockKernel j) f
 
 omit [Fact (1 ≤ p)] in
 /-- The pointwise blocks are measurable. -/
 theorem aestronglyMeasurable_blockFun (j : ℕ) (f : Lp ℂ p (volume : Measure V)) :
     AEStronglyMeasurable (blockFun j f) volume :=
-  aestronglyMeasurable_conv (integrable_psi j).aestronglyMeasurable (Lp.aestronglyMeasurable f)
+  aestronglyMeasurable_conv (integrable_lpBlockKernel j).aestronglyMeasurable
+    (Lp.aestronglyMeasurable f)
 
 /-- The pointwise blocks `ψ_j ⋆ f` of `f ∈ L_p(V)` lie in `L_p(V)`, for `1 ≤ p < ∞`, by Young's
 inequality (`Rd.memLp_conv`). -/
 theorem memLp_blockFun (hp : p ≠ ∞) (j : ℕ) (f : Lp ℂ p (volume : Measure V)) :
     MemLp (blockFun j f) p volume :=
-  memLp_conv Fact.out hp (integrable_psi j) (Lp.memLp f)
+  memLp_conv Fact.out hp (integrable_lpBlockKernel j) (Lp.memLp f)
 
 /-- **The first block**: `‖ψ_0 ⋆ f‖_p ≤ ‖Φ‖_1 ‖f‖_p` for `1 ≤ p < ∞`, by Young's inequality,
 since `ψ_0 = Φ_0` and `‖Φ_0‖_1 = ‖Φ‖_1`. -/
 theorem eLpNorm_blockFun_zero_le (hp : p ≠ ∞) (f : Lp ℂ p (volume : Measure V)) :
     eLpNorm (blockFun 0 f) p volume ≤ eLpNorm (lpKernel (V := V)) 1 volume * ‖f‖ₑ := by
-  rw [Lp.enorm_def, ← eLpNorm_Phi_one 0]
-  exact eLpNorm_conv_le Fact.out hp (integrable_Phi 0).aestronglyMeasurable
+  rw [Lp.enorm_def, ← eLpNorm_dilatedLpKernel_one 0]
+  exact eLpNorm_conv_le Fact.out hp (integrable_dilatedLpKernel 0).aestronglyMeasurable
     (Lp.aestronglyMeasurable f)
 
 /-- `‖Δ_j f‖_p` is the `L_p` norm of the pointwise block `ψ_j ⋆ f`. -/
@@ -153,49 +154,51 @@ theorem enorm_lpBlock_eq_eLpNorm_blockFun (hp : p ≠ ∞) (j : ℕ)
   exact eLpNorm_congr_ae (lpBlock_ae_eq_blockFun hp j f)
 
 /-- The supremum `sup |ψ_j|` of the Littlewood–Paley kernel `ψ_j` is finite, since `ψ_j` is
-bounded (`Rd.bddAbove_psi`). -/
-theorem iSup_enorm_psi_lt_top (j : ℕ) : (⨆ y, ‖psi (V := V) j y‖ₑ) < ∞ :=
-  iSup_enorm_lt_top_of_bddAbove (bddAbove_psi j)
+bounded (`Rd.bddAbove_lpBlockKernel`). -/
+theorem iSup_enorm_lpBlockKernel_lt_top (j : ℕ) : (⨆ y, ‖lpBlockKernel (V := V) j y‖ₑ) < ∞ :=
+  iSup_enorm_lt_top_of_bddAbove (bddAbove_lpBlockKernel j)
 
 /-- The constant `‖ψ_j‖_1^(1-1/p) (sup |ψ_j|)^(1/p)` of the pointwise bound of the blocks is
-finite for `1 ≤ p < ∞`, since `ψ_j` is integrable (`Rd.integrable_psi`) and bounded
-(`Rd.iSup_enorm_psi_lt_top`). -/
-theorem eLpNorm_psi_mul_iSup_psi_ne_top (hp : p ≠ ∞) (j : ℕ) :
-    eLpNorm (psi (V := V) j) 1 volume ^ (1 - 1 / p.toReal) *
-      (⨆ y, ‖psi (V := V) j y‖ₑ) ^ (1 / p.toReal) ≠ ∞ := by
+finite for `1 ≤ p < ∞`, since `ψ_j` is integrable (`Rd.integrable_lpBlockKernel`) and bounded
+(`Rd.iSup_enorm_lpBlockKernel_lt_top`). -/
+theorem eLpNorm_lpBlockKernel_mul_iSup_lpBlockKernel_ne_top (hp : p ≠ ∞) (j : ℕ) :
+    eLpNorm (lpBlockKernel (V := V) j) 1 volume ^ (1 - 1 / p.toReal) *
+      (⨆ y, ‖lpBlockKernel (V := V) j y‖ₑ) ^ (1 / p.toReal) ≠ ∞ := by
   have hr : 1 ≤ p.toReal := ENNReal.one_le_toReal_of_one_le Fact.out hp
   have h1r : 0 ≤ 1 / p.toReal := one_div_nonneg.2 (zero_le_one.trans hr)
   have h1r' : 0 ≤ 1 - 1 / p.toReal :=
     sub_nonneg.2 ((one_div_le_one_div_of_le zero_lt_one hr).trans_eq one_div_one)
   exact ENNReal.mul_ne_top
     (ENNReal.rpow_ne_top_of_nonneg h1r'
-      (memLp_one_iff_integrable.2 (integrable_psi j)).eLpNorm_lt_top.ne)
-    (ENNReal.rpow_ne_top_of_nonneg h1r (iSup_enorm_psi_lt_top j).ne)
+      (memLp_one_iff_integrable.2 (integrable_lpBlockKernel j)).eLpNorm_lt_top.ne)
+    (ENNReal.rpow_ne_top_of_nonneg h1r (iSup_enorm_lpBlockKernel_lt_top j).ne)
 
 /-- **The blocks are bounded at every point**: for `1 ≤ p < ∞`,
 `|(ψ_j ⋆ f)(x)| ≤ ‖ψ_j‖_1^(1-1/p) (sup |ψ_j|)^(1/p) ‖f‖_p`, with a finite constant
-(`Rd.eLpNorm_psi_mul_iSup_psi_ne_top`). -/
+(`Rd.eLpNorm_lpBlockKernel_mul_iSup_lpBlockKernel_ne_top`). -/
 theorem enorm_blockFun_le (hp : p ≠ ∞) (j : ℕ) (f : Lp ℂ p (volume : Measure V)) (x : V) :
-    ‖blockFun j f x‖ₑ ≤ eLpNorm (psi (V := V) j) 1 volume ^ (1 - 1 / p.toReal) *
-      (⨆ y, ‖psi (V := V) j y‖ₑ) ^ (1 / p.toReal) * ‖f‖ₑ := by
+    ‖blockFun j f x‖ₑ ≤ eLpNorm (lpBlockKernel (V := V) j) 1 volume ^ (1 - 1 / p.toReal) *
+      (⨆ y, ‖lpBlockKernel (V := V) j y‖ₑ) ^ (1 / p.toReal) * ‖f‖ₑ := by
   rw [Lp.enorm_def]
-  exact enorm_conv_le_of_enorm_le Fact.out hp (integrable_psi j).aestronglyMeasurable
-    (fun y => le_iSup (fun y => ‖psi (V := V) j y‖ₑ) y) (Lp.aestronglyMeasurable f) x
+  exact enorm_conv_le_of_enorm_le Fact.out hp (integrable_lpBlockKernel j).aestronglyMeasurable
+    (fun y => le_iSup (fun y => ‖lpBlockKernel (V := V) j y‖ₑ) y) (Lp.aestronglyMeasurable f) x
 
 /-- The block of a sum is the sum of the blocks, almost everywhere and for all levels at once. -/
 theorem blockFun_add_ae (hp : p ≠ ∞) (f g : Lp ℂ p (volume : Measure V)) :
     ∀ᵐ x ∂volume, ∀ j, blockFun j (f + g) x = blockFun j f x + blockFun j g x := by
   rw [ae_all_iff]
   intro j
-  have h : blockFun j (f + g) = conv (psi j) (⇑f + ⇑g) volume := conv_congr_ae (Lp.coeFn_add f g)
+  have h : blockFun j (f + g) = conv (lpBlockKernel j) (⇑f + ⇑g) volume :=
+    conv_congr_ae (Lp.coeFn_add f g)
   rw [h]
-  exact conv_add_ae Fact.out hp (integrable_psi j) (Lp.memLp f) (Lp.memLp g)
+  exact conv_add_ae Fact.out hp (integrable_lpBlockKernel j) (Lp.memLp f) (Lp.memLp g)
 
 omit [Fact (1 ≤ p)] in
 /-- The block of a complex multiple is the multiple of the block, at every point. -/
 theorem blockFun_smul (j : ℕ) (c : ℂ) (f : Lp ℂ p (volume : Measure V)) (x : V) :
     blockFun j (c • f) x = c * blockFun j f x := by
-  have h : blockFun j (c • f) = conv (psi j) (c • ⇑f) volume := conv_congr_ae (Lp.coeFn_smul c f)
+  have h : blockFun j (c • f) = conv (lpBlockKernel j) (c • ⇑f) volume :=
+    conv_congr_ae (Lp.coeFn_smul c f)
   rw [h, conv_smul]
   rfl
 

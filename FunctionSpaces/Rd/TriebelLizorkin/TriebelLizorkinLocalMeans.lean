@@ -148,9 +148,9 @@ theorem blockByLocalMeansConst_ne_top (L L' : ℕ) : b.blockByLocalMeansConst L 
 function `h` and every `x`, `|((ψ_j ⋆ η_i) ⋆ h)(x)| ≤ C c_{ji} M|h|(x)` with
 `c_{ji} = 2^(-(j-i)L')` for `i ≤ j`, `c_{ji} = 1` for `i > j`, and
 `C = Rd.LocalMeansBump.blockByLocalMeansConst L L'`. -/
-theorem enorm_conv_conv_psi_dual_le (L : ℕ) {L' : ℕ} (hL' : 1 ≤ L') (i j : ℕ) (h : V → ℂ)
-    (x : V) :
-    ‖conv (conv (psi j) (b.dual L i) volume) h volume x‖ₑ ≤
+theorem enorm_conv_conv_lpBlockKernel_dualKernel_le (L : ℕ) {L' : ℕ} (hL' : 1 ≤ L') (i j : ℕ)
+    (h : V → ℂ) (x : V) :
+    ‖conv (conv (lpBlockKernel j) (b.dual L i) volume) h volume x‖ₑ ≤
       b.blockByLocalMeansConst L L' * ((if i ≤ j then dyadicWeight (-(L' : ℝ)) (j - i) else 1) *
         maximal (fun y => ‖h y‖ₑ) x) := by
   have hC : b.psiDualConst L L' (finrank ℝ V + 1) *
@@ -158,7 +158,7 @@ theorem enorm_conv_conv_psi_dual_le (L : ℕ) {L' : ℕ} (hL' : 1 ≤ L') (i j :
     ENNReal.mul_ne_top (b.psiDualConst_ne_top L L' (Nat.lt_succ_self _))
       (ite_dyadicWeight_ne_top _ i j)
   refine (enorm_conv_le_maximal_of_decay (Nat.lt_succ_self _) hC
-    (b.enorm_conv_psi_dual_le L hL' (finrank ℝ V + 1) i j) h x).trans (le_of_eq ?_)
+    (b.enorm_conv_lpBlockKernel_dualKernel_le L hL' (finrank ℝ V + 1) i j) h x).trans (le_of_eq ?_)
   rw [blockByLocalMeansConst]
   ring
 
@@ -170,12 +170,13 @@ right. -/
 theorem lpBlock_sum_dual_ae (hp : p ≠ ∞) (L J j : ℕ) (h : ℕ → Lp ℂ p (volume : Measure V)) :
     ∀ᵐ x ∂volume, lpBlock hp j (∑ i ∈ Finset.range (J + 1),
         convLp hp (b.integrable_dual L i) (h i)) x =
-      ∑ i ∈ Finset.range (J + 1), conv (conv (psi j) (b.dual L i) volume) (h i) volume x := by
+      ∑ i ∈ Finset.range (J + 1),
+        conv (conv (lpBlockKernel j) (b.dual L i) volume) (h i) volume x := by
   simp only [map_sum, lpBlock, convLp_convLp]
   have hall := ae_all_iff.2 fun i => convLp_apply_ae hp
-    (integrable_conv (integrable_psi j) (b.integrable_dual L i)) (h i)
+    (integrable_conv (integrable_lpBlockKernel j) (b.integrable_dual L i)) (h i)
   filter_upwards [Lp.coeFn_fun_finsetSum (Finset.range (J + 1)) fun i => convLp hp
-    (integrable_conv (integrable_psi j) (b.integrable_dual L i)) (h i), hall] with x hx hi
+    (integrable_conv (integrable_lpBlockKernel j) (b.integrable_dual L i)) (h i), hall] with x hx hi
   rw [hx]
   exact Finset.sum_congr rfl fun i _ => hi i
 
@@ -192,7 +193,7 @@ theorem ae_enorm_lpBlock_sum_dual_le_tsum_maximal (hp : p ≠ ∞) (L : ℕ) {L'
   filter_upwards [b.lpBlock_sum_dual_ae hp L J j h] with x hx
   rw [hx]
   refine (enorm_sum_le _ _).trans ((Finset.sum_le_sum fun i _ =>
-    b.enorm_conv_conv_psi_dual_le L hL' i j _ x).trans ?_)
+    b.enorm_conv_conv_lpBlockKernel_dualKernel_le L hL' i j _ x).trans ?_)
   rw [← Finset.mul_sum]
   gcongr
   exact ENNReal.sum_le_tsum _
@@ -223,7 +224,8 @@ theorem lpBlock_sum_dual_localMean_ae (hp : p ≠ ∞) (L J j : ℕ)
     ∀ᵐ x ∂volume, lpBlock hp j (∑ i ∈ Finset.range (J + 1),
         convLp hp (b.integrable_dual L i) (b.localMean hp L i f)) x =
       ∑ i ∈ Finset.range (J + 1),
-        conv (conv (psi j) (b.dual L i) volume) (conv (b.kernel L i) f volume) volume x := by
+        conv (conv (lpBlockKernel j) (b.dual L i) volume)
+          (conv (b.kernel L i) f volume) volume x := by
   filter_upwards [b.lpBlock_sum_dual_ae hp L J j fun i => b.localMean hp L i f] with x hx
   rw [hx]
   exact Finset.sum_congr rfl fun i _ => by rw [conv_congr_ae (b.localMean_ae_eq hp L i f)]
@@ -299,8 +301,8 @@ theorem localMean_lpBlock (hp : p ≠ ∞) (L i j : ℕ) (f : Lp ℂ p (volume :
       convLp hp (integrable_conv (b.integrable_kernel L j) (integrable_Theta i))
         (lpBlock hp i f) := by
   have hT : convLp hp (integrable_Theta i) (lpBlock hp i f) = lpBlock hp i f :=
-    convLp_convLp_of_eq hp (integrable_Theta i) (integrable_psi i) (integrable_psi i)
-      (conv_Theta_psi i) f
+    convLp_convLp_of_eq hp (integrable_Theta i) (integrable_lpBlockKernel i)
+      (integrable_lpBlockKernel i) (conv_Theta_lpBlockKernel i) f
   calc b.localMean hp L j (lpBlock hp i f)
       = convLp hp (b.integrable_kernel L j)
           (convLp hp (integrable_Theta i) (lpBlock hp i f)) := by rw [hT]; rfl

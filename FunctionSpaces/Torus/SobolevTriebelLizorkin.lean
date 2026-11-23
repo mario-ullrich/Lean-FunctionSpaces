@@ -25,7 +25,7 @@ Calderón–Zygmund families of `FunctionSpaces.Rd.Sobolev.DerivativeKernels`.
   `e = Rd.gridBasis` of `ℝ^d`, `‖f‖_{F^m_{p,2}} ≤ ‖Φ‖_1 ‖f‖_p + 2^m ∑_α K_α ‖g_α‖_p`. The dilated
   derivative kernels give `2^{jm} ψ_{j+1} ⋆ f = ∑_α (η_α)_{2^j} ⋆ g_α`
   (`Torus.two_pow_mul_blockFun_succ_ae`; on the Fourier side,
-  `Torus.fourier_two_pow_smul_psi_succ`), and the analysis bound on the torus
+  `Torus.fourier_two_pow_smul_lpBlockKernel_succ`), and the analysis bound on the torus
   (`Torus.eLpNorm_lqNorm_econv_le`) bounds each sum.
 * **`F^m_{p,2} ⊆ W^m_p`** (`Torus.exists_hasWeakLineDeriv_of_memTriebelLizorkin`): for
   `f ∈ F^k_{p,2}(𝕋^d)` and directions `w ∈ (ℝ^d)^k`, the partial sums
@@ -55,17 +55,17 @@ variable {d : Type*} [Fintype d]
 
 /-- **The dilated derivative identity on the Fourier side**: for all `m, j ∈ ℕ` and `ξ ∈ ℝ^d`,
 `2^{jm} 𝓕ψ_{j+1}(ξ) = ∑_α (∏_l 2πi ⟪ξ, e_{α_l}⟫) 𝓕(η_α)_{2^j}(ξ)`, the Fourier transform of
-`Rd.two_pow_smul_psi_succ_eq_sum`. -/
-theorem fourier_two_pow_smul_psi_succ (m j : ℕ) (ξ : EuclideanSpace ℝ d) :
-    (2 : ℂ) ^ (j * m) * 𝓕 (Rd.psi (V := EuclideanSpace ℝ d) (j + 1)) ξ =
+`Rd.two_pow_smul_lpBlockKernel_succ_eq_sum`. -/
+theorem fourier_two_pow_smul_lpBlockKernel_succ (m j : ℕ) (ξ : EuclideanSpace ℝ d) :
+    (2 : ℂ) ^ (j * m) * 𝓕 (Rd.lpBlockKernel (V := EuclideanSpace ℝ d) (j + 1)) ξ =
       ∑ i : Fin m → Fin (finrank ℝ (EuclideanSpace ℝ d)),
         (∏ l, 2 * Real.pi * Complex.I *
           (inner ℝ ξ (Rd.gridBasis (EuclideanSpace ℝ d) (i l)) : ℂ)) *
           𝓕 (Rd.derivFamily i j) ξ := by
   have h := congrFun (congrArg 𝓕
-    (Rd.two_pow_smul_psi_succ_eq_sum (V := EuclideanSpace ℝ d) m j)) ξ
-  have hs : 𝓕 ((2 : ℂ) ^ (j * m) • Rd.psi (V := EuclideanSpace ℝ d) (j + 1)) ξ =
-      (2 : ℂ) ^ (j * m) * 𝓕 (Rd.psi (V := EuclideanSpace ℝ d) (j + 1)) ξ :=
+    (Rd.two_pow_smul_lpBlockKernel_succ_eq_sum (V := EuclideanSpace ℝ d) m j)) ξ
+  have hs : 𝓕 ((2 : ℂ) ^ (j * m) • Rd.lpBlockKernel (V := EuclideanSpace ℝ d) (j + 1)) ξ =
+      (2 : ℂ) ^ (j * m) * 𝓕 (Rd.lpBlockKernel (V := EuclideanSpace ℝ d) (j + 1)) ξ :=
     congrFun (VectorFourier.fourierIntegral_const_smul _ _ _ _ _) ξ
   rw [hs] at h
   set K : (Fin m → Fin (finrank ℝ (EuclideanSpace ℝ d))) → 𝓢(EuclideanSpace ℝ d, ℂ) :=
@@ -84,7 +84,7 @@ variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 /-- **The blocks of `f` through its derivatives, in `L_p(𝕋^d)`**: for `1 ≤ p < ∞`, if
 `g_α ∈ L_p(𝕋^d)` is the weak derivative `∂_{e_{α_0}} ⋯ ∂_{e_{α_{m-1}}} f` for every multi-index
 `α`, then `2^{jm} Δ_{j+1} f = ∑_α (η_α)_{2^j} ⋆ g_α` for every `j`. Both sides have the Fourier
-coefficients `2^{jm} 𝓕ψ_{j+1}(k) f̂(k)` (`Torus.fourier_two_pow_smul_psi_succ`). -/
+coefficients `2^{jm} 𝓕ψ_{j+1}(k) f̂(k)` (`Torus.fourier_two_pow_smul_lpBlockKernel_succ`). -/
 theorem two_pow_smul_lpBlock_succ (hp : p ≠ ∞) {m : ℕ}
     {f : Lp ℂ p (volume : Measure (UnitAddTorus d))}
     {g : (Fin m → Fin (finrank ℝ (EuclideanSpace ℝ d))) →
@@ -95,7 +95,7 @@ theorem two_pow_smul_lpBlock_succ (hp : p ≠ ∞) {m : ℕ}
       ∑ i, econvLp hp ((Rd.isCZFamily_derivFamily i).integrable j) (g i) :=
   eq_of_mFourierCoeff_eq fun n => by
     rw [mFourierCoeff_smul, lpBlock, mFourierCoeff_econvLp, mFourierCoeff_sum, ← mul_assoc,
-      fourier_two_pow_smul_psi_succ, Finset.sum_mul]
+      fourier_two_pow_smul_lpBlockKernel_succ, Finset.sum_mul]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [mFourierCoeff_econvLp, hg i n, lineSymbol]
     ring

@@ -46,8 +46,9 @@ Littlewood–Paley kernels are `Φ_k = δ_{2^k} Φ`.
 * **Adjoints**: `θ_j^*(x) = conj θ_j(-x)` has the same overlap and Hörmander constants
   (`Rd.IsCZFamily.adjoint`).
 * **The Littlewood–Paley families**: the blocks `ψ_j = (psiBase j)_{2^j}`, Schwartz functions
-  (`Rd.psiS`), with overlap `2` (`Rd.isCZFamily_psi`), and the synthesis kernels `Rd.psiDual`
-  with `psiDual_j ⋆ ψ_j = ψ_j` (`Rd.conv_psiDual_psi`, `Rd.isCZFamily_psiDual`, overlap `4`).
+  (`Rd.psiS`), with overlap `2` (`Rd.isCZFamily_lpBlockKernel`), and the synthesis kernels
+  `Rd.psiDual` with `psiDual_j ⋆ ψ_j = ψ_j` (`Rd.conv_psiDual_lpBlockKernel`,
+  `Rd.isCZFamily_psiDual`, overlap `4`).
 -/
 
 @[expose] public section
@@ -606,39 +607,41 @@ theorem IsCZFamily.of_dilation_of_forall_ge_eq {G G' : ℕ → 𝓢(V, ℂ)} {A 
 /-! ### The Littlewood–Paley kernels as dilation families -/
 
 /-- `𝓕Φ_k = 1` on the closed ball of radius `2^k`. -/
-theorem fourier_Phi_eq_one {k : ℕ} {ξ : V} (h : ‖ξ‖ ≤ 2 ^ k) : 𝓕 (Phi (V := V) k) ξ = 1 := by
-  rw [fourier_Phi]
+theorem fourier_dilatedLpKernel_eq_one {k : ℕ} {ξ : V} (h : ‖ξ‖ ≤ 2 ^ k) :
+    𝓕 (dilatedLpKernel (V := V) k) ξ = 1 := by
+  rw [fourier_dilatedLpKernel]
   refine cutoff_eq_one _ _ ?_
   rw [norm_two_pow_inv_smul, div_le_one (by positivity)]
   exact h
 
 /-- `𝓕Φ_k = 0` outside the ball of radius `2^(k+1)`. -/
-theorem fourier_Phi_eq_zero {k : ℕ} {ξ : V} (h : 2 ^ (k + 1) ≤ ‖ξ‖) :
-    𝓕 (Phi (V := V) k) ξ = 0 := by
-  rw [fourier_Phi]
+theorem fourier_dilatedLpKernel_eq_zero {k : ℕ} {ξ : V} (h : 2 ^ (k + 1) ≤ ‖ξ‖) :
+    𝓕 (dilatedLpKernel (V := V) k) ξ = 0 := by
+  rw [fourier_dilatedLpKernel]
   refine cutoff_eq_zero _ _ ?_
   rw [norm_two_pow_inv_smul, le_div_iff₀ (by positivity)]
   rw [pow_succ] at h
   linarith
 
 /-- `𝓕Φ_k(ξ)` is a real number in `[0, 1]`: it is a value of the cut-off `χ_{1,2}`
-(`Rd.fourier_Phi`), a smooth bump with values in `[0, 1]` (Mathlib's `ContDiffBump`). -/
-theorem exists_fourier_Phi_eq_ofReal (k : ℕ) (ξ : V) :
-    ∃ t : ℝ, 0 ≤ t ∧ t ≤ 1 ∧ 𝓕 (Phi (V := V) k) ξ = t := by
+(`Rd.fourier_dilatedLpKernel`), a smooth bump with values in `[0, 1]` (Mathlib's `ContDiffBump`). -/
+theorem exists_fourier_dilatedLpKernel_eq_ofReal (k : ℕ) (ξ : V) :
+    ∃ t : ℝ, 0 ≤ t ∧ t ≤ 1 ∧ 𝓕 (dilatedLpKernel (V := V) k) ξ = t := by
   let b : ContDiffBump (0 : V) := ⟨1, 2, one_pos, one_lt_two⟩
-  exact ⟨b (((2 : ℝ) ^ k)⁻¹ • ξ), b.nonneg, b.le_one, fourier_Phi k ξ⟩
+  exact ⟨b (((2 : ℝ) ^ k)⁻¹ • ξ), b.nonneg, b.le_one, fourier_dilatedLpKernel k ξ⟩
 
 /-- `|𝓕Φ_k(ξ)| ≤ 1`. -/
-theorem norm_fourier_Phi_le_one (k : ℕ) (ξ : V) : ‖𝓕 (Phi (V := V) k) ξ‖ ≤ 1 := by
-  obtain ⟨t, ht0, ht1, ht⟩ := exists_fourier_Phi_eq_ofReal (V := V) k ξ
+theorem norm_fourier_dilatedLpKernel_le_one (k : ℕ) (ξ : V) :
+    ‖𝓕 (dilatedLpKernel (V := V) k) ξ‖ ≤ 1 := by
+  obtain ⟨t, ht0, ht1, ht⟩ := exists_fourier_dilatedLpKernel_eq_ofReal (V := V) k ξ
   rw [ht, Complex.norm_real, Real.norm_of_nonneg ht0]
   exact ht1
 
 /-- `|𝓕Φ_k(ξ) - 𝓕Φ_l(ξ)| ≤ 1`, since both values lie in `[0, 1]`. -/
-theorem norm_fourier_Phi_sub_le_one (k l : ℕ) (ξ : V) :
-    ‖𝓕 (Phi (V := V) k) ξ - 𝓕 (Phi (V := V) l) ξ‖ ≤ 1 := by
-  obtain ⟨t, ht0, ht1, ht⟩ := exists_fourier_Phi_eq_ofReal (V := V) k ξ
-  obtain ⟨u, hu0, hu1, hu⟩ := exists_fourier_Phi_eq_ofReal (V := V) l ξ
+theorem norm_fourier_dilatedLpKernel_sub_le_one (k l : ℕ) (ξ : V) :
+    ‖𝓕 (dilatedLpKernel (V := V) k) ξ - 𝓕 (dilatedLpKernel (V := V) l) ξ‖ ≤ 1 := by
+  obtain ⟨t, ht0, ht1, ht⟩ := exists_fourier_dilatedLpKernel_eq_ofReal (V := V) k ξ
+  obtain ⟨u, hu0, hu1, hu⟩ := exists_fourier_dilatedLpKernel_eq_ofReal (V := V) l ξ
   rw [ht, hu, ← Complex.ofReal_sub, Complex.norm_real, Real.norm_eq_abs, abs_sub_le_iff]
   constructor <;> linarith
 
@@ -650,13 +653,14 @@ noncomputable def psiBase : ℕ → 𝓢(V, ℂ)
   | _ + 1 => lpKernelS - schwartzDilate (1 / 2) (by norm_num) lpKernelS
 
 /-- **The blocks are dilates**: `ψ_j = (psiBase j)_{2^j}`. -/
-theorem dilate_psiBase (j : ℕ) : dilate (2 ^ j) (psiBase (V := V) j : V → ℂ) = psi j := by
+theorem dilate_psiBase (j : ℕ) : dilate (2 ^ j) (psiBase (V := V) j : V → ℂ) = lpBlockKernel j := by
   cases j with
   | zero => rfl
   | succ j =>
     have hcoe : ∀ F H : 𝓢(V, ℂ), ((F - H : 𝓢(V, ℂ)) : V → ℂ) = F - H := fun _ _ => rfl
     rw [psiBase, hcoe, coe_schwartzDilate, dilate_sub, dilate_dilate]
-    show dilate (2 ^ (j + 1)) lpKernel - dilate (2 ^ (j + 1) * (1 / 2)) lpKernel = psi (j + 1)
+    show dilate (2 ^ (j + 1)) lpKernel - dilate (2 ^ (j + 1) * (1 / 2)) lpKernel =
+      lpBlockKernel (j + 1)
     rw [show (2 : ℝ) ^ (j + 1) * (1 / 2) = 2 ^ j by ring]
     rfl
 
@@ -665,7 +669,7 @@ noncomputable def psiS (j : ℕ) : 𝓢(V, ℂ) :=
   schwartzDilate (2 ^ j) (pow_ne_zero j two_ne_zero) (psiBase j)
 
 /-- The Schwartz function `Rd.psiS j` is the block `ψ_j` (`Rd.dilate_psiBase`). -/
-theorem coe_psiS (j : ℕ) : (psiS j : V → ℂ) = psi j := by
+theorem coe_psiS (j : ℕ) : (psiS j : V → ℂ) = lpBlockKernel j := by
   rw [psiS, coe_schwartzDilate, dilate_psiBase]
 
 variable (V) in
@@ -688,27 +692,28 @@ theorem isUniformSchwartz_psiBase : IsUniformSchwartz (psiBase (V := V)) (psiBas
     | succ j => exact Or.inr rfl
 
 /-- **Overlap of the blocks**: `∑_j |𝓕ψ_j(ξ)|² ≤ 2` for every `ξ`, the case `s = 0` of
-`Rd.tsum_dyadicWeight_fourier_psi_sq_le`. -/
-theorem tsum_fourier_psi_sq_le (ξ : V) : ∑' j, ‖𝓕 (psi (V := V) j) ξ‖ₑ ^ 2 ≤ 2 := by
-  simpa [besselWeight] using tsum_dyadicWeight_fourier_psi_sq_le (V := V) le_rfl ξ
+`Rd.tsum_dyadicWeight_fourier_lpBlockKernel_sq_le`. -/
+theorem tsum_fourier_lpBlockKernel_sq_le (ξ : V) :
+    ∑' j, ‖𝓕 (lpBlockKernel (V := V) j) ξ‖ₑ ^ 2 ≤ 2 := by
+  simpa [besselWeight] using tsum_dyadicWeight_fourier_lpBlockKernel_sq_le (V := V) le_rfl ξ
 
 /-- **The blocks form a Calderón–Zygmund family** with overlap `2` and Hörmander constant
 `4 H_{A^ψ}`, `H_{A^ψ} = Rd.familyHormanderConst V (Rd.psiBaseBound V)`. -/
-theorem isCZFamily_psi :
-    IsCZFamily (psi (V := V)) 2 (4 * familyHormanderConst V (psiBaseBound V)) := by
+theorem isCZFamily_lpBlockKernel :
+    IsCZFamily (lpBlockKernel (V := V)) 2 (4 * familyHormanderConst V (psiBaseBound V)) := by
   have h := IsCZFamily.of_dilation (G := psiBase (V := V)) (A := psiBaseBound V) (B := 2)
     isUniformSchwartz_psiBase fun ξ => by
     simp_rw [dilate_psiBase]
-    exact tsum_fourier_psi_sq_le ξ
-  rwa [show (fun j => dilate (2 ^ j) (psiBase (V := V) j : V → ℂ)) = psi from
+    exact tsum_fourier_lpBlockKernel_sq_le ξ
+  rwa [show (fun j => dilate (2 ^ j) (psiBase (V := V) j : V → ℂ)) = lpBlockKernel from
     funext dilate_psiBase] at h
 
 /-- The **synthesis kernels** `psiDual 0 = Φ_1`, `psiDual 1 = Φ_2`,
-`psiDual (j+2) = Φ_{j+3} - Φ_j`, with `psiDual_j ⋆ ψ_j = ψ_j` (`Rd.conv_psiDual_psi`). -/
+`psiDual (j+2) = Φ_{j+3} - Φ_j`, with `psiDual_j ⋆ ψ_j = ψ_j` (`Rd.conv_psiDual_lpBlockKernel`). -/
 noncomputable def psiDual : ℕ → V → ℂ
-  | 0 => Phi 1
-  | 1 => Phi 2
-  | j + 2 => Phi (j + 3) - Phi j
+  | 0 => dilatedLpKernel 1
+  | 1 => dilatedLpKernel 2
+  | j + 2 => dilatedLpKernel (j + 3) - dilatedLpKernel j
 
 /-- The Schwartz functions behind the synthesis kernels: `psiDualBase 0 = psiDualBase 1 = δ_2 Φ`
 and `psiDualBase (j+2) = δ_2 Φ - δ_{1/4} Φ`, with the dilation `δ_c F(x) = c^n F(c x)`, so that
@@ -788,73 +793,79 @@ theorem eLpNorm_psiDual_one_le (j : ℕ) :
     eLpNorm (psiDual (V := V) j) 1 volume ≤ 2 * eLpNorm (lpKernel (V := V)) 1 volume := by
   match j with
   | 0 =>
-    show eLpNorm (Phi (V := V) 1) 1 volume ≤ _
-    rw [eLpNorm_Phi_one, two_mul]
+    show eLpNorm (dilatedLpKernel (V := V) 1) 1 volume ≤ _
+    rw [eLpNorm_dilatedLpKernel_one, two_mul]
     exact le_self_add
   | 1 =>
-    show eLpNorm (Phi (V := V) 2) 1 volume ≤ _
-    rw [eLpNorm_Phi_one, two_mul]
+    show eLpNorm (dilatedLpKernel (V := V) 2) 1 volume ≤ _
+    rw [eLpNorm_dilatedLpKernel_one, two_mul]
     exact le_self_add
   | j + 2 =>
-    show eLpNorm (Phi (V := V) (j + 3) - Phi j) 1 volume ≤ _
-    calc eLpNorm (Phi (V := V) (j + 3) - Phi j) 1 volume
-        ≤ eLpNorm (Phi (V := V) (j + 3)) 1 volume + eLpNorm (Phi (V := V) j) 1 volume :=
+    show eLpNorm (dilatedLpKernel (V := V) (j + 3) - dilatedLpKernel j) 1 volume ≤ _
+    calc eLpNorm (dilatedLpKernel (V := V) (j + 3) - dilatedLpKernel j) 1 volume
+        ≤ eLpNorm (dilatedLpKernel (V := V) (j + 3)) 1 volume +
+            eLpNorm (dilatedLpKernel (V := V) j) 1 volume :=
           eLpNorm_sub_le le_rfl
       _ = 2 * eLpNorm (lpKernel (V := V)) 1 volume := by
-          rw [eLpNorm_Phi_one, eLpNorm_Phi_one, two_mul]
+          rw [eLpNorm_dilatedLpKernel_one, eLpNorm_dilatedLpKernel_one, two_mul]
 
 /-- `𝓕 psiDual_{j+2} = 𝓕Φ_{j+3} - 𝓕Φ_j`. -/
 theorem fourier_psiDual_add_two (j : ℕ) (ξ : V) :
-    𝓕 (psiDual (V := V) (j + 2)) ξ = 𝓕 (Phi (V := V) (j + 3)) ξ - 𝓕 (Phi (V := V) j) ξ :=
-  fourier_sub_apply (integrable_Phi _) (integrable_Phi _) ξ
+    𝓕 (psiDual (V := V) (j + 2)) ξ =
+      𝓕 (dilatedLpKernel (V := V) (j + 3)) ξ - 𝓕 (dilatedLpKernel (V := V) j) ξ :=
+  fourier_sub_apply (integrable_dilatedLpKernel _) (integrable_dilatedLpKernel _) ξ
 
 /-- `𝓕 psiDual_j · 𝓕ψ_j = 𝓕ψ_j`: wherever `𝓕ψ_j(ξ) ≠ 0`, `‖ξ‖ < 2^(j+1)`, so
 `𝓕Φ_{j+1}(ξ) = 1`, and for `j ≥ 2` also `‖ξ‖ > 2^(j-1)`, so `𝓕Φ_{j-2}(ξ) = 0`; hence
 `𝓕 psiDual_j(ξ) = 1` there. -/
-theorem fourier_psiDual_mul_psi (j : ℕ) (ξ : V) :
-    𝓕 (psiDual (V := V) j) ξ * 𝓕 (psi (V := V) j) ξ = 𝓕 (psi (V := V) j) ξ := by
-  by_cases h : 𝓕 (psi (V := V) j) ξ = 0
+theorem fourier_psiDual_mul_lpBlockKernel (j : ℕ) (ξ : V) :
+    𝓕 (psiDual (V := V) j) ξ * 𝓕 (lpBlockKernel (V := V) j) ξ = 𝓕 (lpBlockKernel (V := V) j) ξ := by
+  by_cases h : 𝓕 (lpBlockKernel (V := V) j) ξ = 0
   · rw [h, mul_zero]
-  have hlt := norm_lt_of_fourier_psi_ne_zero h
+  have hlt := norm_lt_of_fourier_lpBlockKernel_ne_zero h
   suffices 𝓕 (psiDual (V := V) j) ξ = 1 by rw [this, one_mul]
   match j with
-  | 0 => exact fourier_Phi_eq_one hlt.le
-  | 1 => exact fourier_Phi_eq_one (hlt.le.trans (pow_le_pow_right₀ one_le_two (by omega)))
+  | 0 => exact fourier_dilatedLpKernel_eq_one hlt.le
+  | 1 =>
+    exact fourier_dilatedLpKernel_eq_one (hlt.le.trans (pow_le_pow_right₀ one_le_two (by omega)))
   | m + 2 =>
-    have hgt : 2 ^ (m + 1) < ‖ξ‖ := not_le.1 fun h' => h (fourier_psi_succ_eq_zero h')
-    rw [fourier_psiDual_add_two, fourier_Phi_eq_one hlt.le, fourier_Phi_eq_zero hgt.le, sub_zero]
+    have hgt : 2 ^ (m + 1) < ‖ξ‖ := not_le.1 fun h' => h (fourier_lpBlockKernel_succ_eq_zero h')
+    rw [fourier_psiDual_add_two, fourier_dilatedLpKernel_eq_one hlt.le,
+      fourier_dilatedLpKernel_eq_zero hgt.le, sub_zero]
 
 /-- **The synthesis kernels reproduce the blocks**: `psiDual_j ⋆ ψ_j = ψ_j`, by comparing
 Fourier transforms (`Rd.conv_eq_of_fourier`). -/
-theorem conv_psiDual_psi (j : ℕ) : conv (psiDual (V := V) j) (psi j) volume = psi j :=
-  conv_eq_of_fourier (integrable_psiDual _) (integrable_psi _) (continuous_psi _)
-    (bddAbove_psi _) (integrable_psi _) (continuous_psi _) (integrable_fourier_psi _)
-    (fourier_psiDual_mul_psi j)
+theorem conv_psiDual_lpBlockKernel (j : ℕ) :
+    conv (psiDual (V := V) j) (lpBlockKernel j) volume = lpBlockKernel j :=
+  conv_eq_of_fourier (integrable_psiDual _) (integrable_lpBlockKernel _)
+    (continuous_lpBlockKernel _) (bddAbove_lpBlockKernel _) (integrable_lpBlockKernel _)
+    (continuous_lpBlockKernel _) (integrable_fourier_lpBlockKernel _)
+    (fourier_psiDual_mul_lpBlockKernel j)
 
 /-- `|𝓕 psiDual_j(ξ)| ≤ 1`. -/
 theorem enorm_fourier_psiDual_le_one (j : ℕ) (ξ : V) : ‖𝓕 (psiDual (V := V) j) ξ‖ₑ ≤ 1 := by
   rw [← ofReal_norm, ← ENNReal.ofReal_one]
   refine ENNReal.ofReal_le_ofReal ?_
   match j with
-  | 0 => exact norm_fourier_Phi_le_one 1 ξ
-  | 1 => exact norm_fourier_Phi_le_one 2 ξ
+  | 0 => exact norm_fourier_dilatedLpKernel_le_one 1 ξ
+  | 1 => exact norm_fourier_dilatedLpKernel_le_one 2 ξ
   | m + 2 =>
     rw [fourier_psiDual_add_two]
-    exact norm_fourier_Phi_sub_le_one (m + 3) m ξ
+    exact norm_fourier_dilatedLpKernel_sub_le_one (m + 3) m ξ
 
 /-- `𝓕 psiDual_j` vanishes outside the ball of radius `2^(j+2)`. -/
 theorem norm_lt_of_fourier_psiDual_ne_zero {j : ℕ} {ξ : V}
     (h : 𝓕 (psiDual (V := V) j) ξ ≠ 0) : ‖ξ‖ < 2 ^ (j + 2) := by
   match j with
-  | 0 => exact norm_lt_of_fourier_Phi_ne_zero h
-  | 1 => exact norm_lt_of_fourier_Phi_ne_zero h
+  | 0 => exact norm_lt_of_fourier_dilatedLpKernel_ne_zero h
+  | 1 => exact norm_lt_of_fourier_dilatedLpKernel_ne_zero h
   | m + 2 =>
     rw [fourier_psiDual_add_two] at h
-    by_cases h3 : 𝓕 (Phi (V := V) (m + 3)) ξ = 0
+    by_cases h3 : 𝓕 (dilatedLpKernel (V := V) (m + 3)) ξ = 0
     · rw [h3, zero_sub, neg_ne_zero] at h
-      exact (norm_lt_of_fourier_Phi_ne_zero h).trans
+      exact (norm_lt_of_fourier_dilatedLpKernel_ne_zero h).trans
         (pow_lt_pow_right₀ one_lt_two (by omega))
-    · exact norm_lt_of_fourier_Phi_ne_zero h3
+    · exact norm_lt_of_fourier_dilatedLpKernel_ne_zero h3
 
 /-- `𝓕 psiDual_{m+2}` vanishes on the closed ball of radius `2^m`. -/
 theorem lt_norm_of_fourier_psiDual_ne_zero {m : ℕ} {ξ : V}
@@ -862,8 +873,8 @@ theorem lt_norm_of_fourier_psiDual_ne_zero {m : ℕ} {ξ : V}
   by_contra hle
   push Not at hle
   apply h
-  rw [fourier_psiDual_add_two, fourier_Phi_eq_one hle,
-    fourier_Phi_eq_one (hle.trans (pow_le_pow_right₀ one_le_two (by omega))), sub_self]
+  rw [fourier_psiDual_add_two, fourier_dilatedLpKernel_eq_one hle,
+    fourier_dilatedLpKernel_eq_one (hle.trans (pow_le_pow_right₀ one_le_two (by omega))), sub_self]
 
 /-- **At most four synthesis kernels see a frequency**: with `a` the least index such that
 `‖ξ‖ < 2^(a+1)`, `𝓕 psiDual_j(ξ) ≠ 0` forces `a - 1 ≤ j ≤ a + 2`. -/

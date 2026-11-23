@@ -12,8 +12,8 @@ public import ApproximationSpaces.Decompositions.Blocks
 # The Littlewood–Paley decomposition and band-limited approximation
 
 For `f ∈ L_p(V)`, `1 ≤ p < ∞`, the **Littlewood–Paley blocks** are `Δ_j f = ψ_j ⋆ f`
-(`Rd.lpBlock`), with `ψ_0 = Φ_0` and `ψ_j = Φ_j - Φ_{j-1}` (`Rd.psi`). They are bounded uniformly,
-`‖Δ_j f‖_p ≤ 2 ‖Φ‖_1 ‖f‖_p` (`Rd.enorm_lpBlock_le`), their partial sums are `Φ_J ⋆ f`
+(`Rd.lpBlock`), with `ψ_0 = Φ_0` and `ψ_j = Φ_j - Φ_{j-1}` (`Rd.lpBlockKernel`). They are bounded
+uniformly, `‖Δ_j f‖_p ≤ 2 ‖Φ‖_1 ‖f‖_p` (`Rd.enorm_lpBlock_le`), their partial sums are `Φ_J ⋆ f`
 (`Rd.sum_lpBlock`), and these converge to `f` in `L_p` (`Rd.tendsto_sum_lpBlock`, an approximate
 identity). The **Littlewood–Paley quasi-norm** is `‖(2^(js) ‖Δ_j f‖_p)_j‖_{ℓ_q}`
 (`Rd.littlewoodPaleyNorm`).
@@ -49,22 +49,24 @@ variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDim
 /-- The **Littlewood–Paley block** `Δ_j f = ψ_j ⋆ f` of `f ∈ L_p`. -/
 noncomputable def lpBlock (hp : p ≠ ∞) (j : ℕ) :
     Lp ℂ p (volume : Measure V) →L[ℂ] Lp ℂ p (volume : Measure V) :=
-  convLp hp (integrable_psi j)
+  convLp hp (integrable_lpBlockKernel j)
 
 /-- **The blocks are bounded uniformly**: `‖Δ_j f‖_p ≤ 2 ‖Φ‖_1 ‖f‖_p`. -/
 theorem enorm_lpBlock_le (hp : p ≠ ∞) (j : ℕ) (f : Lp ℂ p (volume : Measure V)) :
     ‖lpBlock hp j f‖ₑ ≤ 2 * eLpNorm (lpKernel (V := V)) 1 volume * ‖f‖ₑ :=
-  (enorm_convLp_le hp (integrable_psi j) f).trans (by gcongr; exact eLpNorm_psi_one_le j)
+  (enorm_convLp_le hp (integrable_lpBlockKernel j) f).trans
+    (by gcongr; exact eLpNorm_lpBlockKernel_one_le j)
 
 /-- `Δ_{j+1} f = Φ_{j+1} ⋆ f - Φ_j ⋆ f`. -/
 theorem lpBlock_succ (hp : p ≠ ∞) (j : ℕ) (f : Lp ℂ p (volume : Measure V)) :
     lpBlock hp (j + 1) f =
-      convLp hp (integrable_Phi (j + 1)) f - convLp hp (integrable_Phi j) f :=
-  convLp_sub_kernel hp (integrable_Phi (j + 1)) (integrable_Phi j) f
+      convLp hp (integrable_dilatedLpKernel (j + 1)) f -
+        convLp hp (integrable_dilatedLpKernel j) f :=
+  convLp_sub_kernel hp (integrable_dilatedLpKernel (j + 1)) (integrable_dilatedLpKernel j) f
 
 /-- **The blocks telescope**: `∑_{j ≤ J} Δ_j f = Φ_J ⋆ f`. -/
 theorem sum_lpBlock (hp : p ≠ ∞) (J : ℕ) (f : Lp ℂ p (volume : Measure V)) :
-    ∑ j ∈ Finset.range (J + 1), lpBlock hp j f = convLp hp (integrable_Phi J) f := by
+    ∑ j ∈ Finset.range (J + 1), lpBlock hp j f = convLp hp (integrable_dilatedLpKernel J) f := by
   induction J with
   | zero =>
     rw [Finset.sum_range_one]
@@ -75,7 +77,7 @@ theorem sum_lpBlock (hp : p ≠ ∞) (J : ℕ) (f : Lp ℂ p (volume : Measure V
 `Φ_J ⋆ f → f` (`Rd.tendsto_convLp_dilate` with `∫ Φ = 1`). -/
 theorem tendsto_sum_lpBlock (hp : p ≠ ∞) (f : Lp ℂ p (volume : Measure V)) :
     Tendsto (fun J => ∑ j ∈ Finset.range J, lpBlock hp j f) atTop (𝓝 f) := by
-  have h : Tendsto (fun J => convLp hp (integrable_Phi (V := V) J) f) atTop (𝓝 f) :=
+  have h : Tendsto (fun J => convLp hp (integrable_dilatedLpKernel (V := V) J) f) atTop (𝓝 f) :=
     tendsto_convLp_dilate hp integrable_lpKernel integral_lpKernel
       (c := fun J : ℕ => (2 : ℝ) ^ J) (fun J => pow_ne_zero J two_ne_zero)
       (tendsto_pow_atTop_atTop_of_one_lt one_lt_two) f
@@ -88,14 +90,15 @@ theorem tendsto_sum_lpBlock (hp : p ≠ ∞) (f : Lp ℂ p (volume : Measure V))
 theorem lpBlock_mem_bandSpace (hp : p ≠ ∞) (j : ℕ) (f : Lp ℂ p (volume : Measure V)) :
     lpBlock hp j f ∈ bandSpace hp j := by
   rw [mem_bandSpace, lpBlock]
-  exact convLp_convLp_of_eq hp _ _ _ (conv_Theta_psi j) f
+  exact convLp_convLp_of_eq hp _ _ _ (conv_Theta_lpBlockKernel j) f
 
 /-- **High blocks of band-limited functions vanish**: `Δ_j g = 0` for `g ∈ E_i` and `j ≥ i + 3`,
 since `ψ_j ⋆ Θ_i = 0`. -/
 theorem lpBlock_eq_zero_of_mem (hp : p ≠ ∞) {i j : ℕ} (hij : i + 3 ≤ j)
     {g : Lp ℂ p (volume : Measure V)} (hg : g ∈ bandSpace hp i) : lpBlock hp j g = 0 := by
   rw [mem_bandSpace] at hg
-  rw [lpBlock, ← hg, convLp_convLp_of_eq hp _ _ (integrable_zero _ _ _) (conv_psi_Theta hij) g]
+  rw [lpBlock, ← hg,
+    convLp_convLp_of_eq hp _ _ (integrable_zero _ _ _) (conv_lpBlockKernel_Theta hij) g]
   exact convLp_of_eq_zero hp _ rfl g
 
 /-- **Blocks see only the error of band-limited approximation**: for `j ≥ i + 3`,

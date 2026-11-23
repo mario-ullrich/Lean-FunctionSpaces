@@ -81,12 +81,12 @@ theorem farMass_dilate_le {G : ℕ → 𝓢(EuclideanSpace ℝ d, ℂ)} {A : ℕ
 
 /-- The far mass of the Littlewood–Paley blocks `ψ_j = (psiBase j)_{2^j}` is at most `2 T_{A^ψ}`,
 with the seminorm bounds `A^ψ = Rd.psiBaseBound`. -/
-theorem farMass_psi_le :
-    farMass (Rd.psi (V := EuclideanSpace ℝ d)) ≤
+theorem farMass_lpBlockKernel_le :
+    farMass (Rd.lpBlockKernel (V := EuclideanSpace ℝ d)) ≤
       2 * Rd.familyTailConst (EuclideanSpace ℝ d) (Rd.psiBaseBound (EuclideanSpace ℝ d)) 0 1 := by
   have h := farMass_dilate_le (Rd.isUniformSchwartz_psiBase (V := EuclideanSpace ℝ d))
   rwa [show (fun j => Rd.dilate (2 ^ j) (Rd.psiBase (V := EuclideanSpace ℝ d) j :
-    EuclideanSpace ℝ d → ℂ)) = Rd.psi from funext Rd.dilate_psiBase] at h
+    EuclideanSpace ℝ d → ℂ)) = Rd.lpBlockKernel from funext Rd.dilate_psiBase] at h
 
 /-- The far mass of the synthesis kernels `psiDual_j = (psiDualBase j)_{2^j}` is at most
 `2 T_{Ã}`, with the seminorm bounds `Ã = Rd.psiDualBaseBound`. -/

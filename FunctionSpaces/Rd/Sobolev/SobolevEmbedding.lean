@@ -137,7 +137,7 @@ theorem continuous_conv_schwartz {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ �
 /-- The Littlewood–Paley kernel `ψ_j` is the Schwartz function `(psiBase j)_{2^j}`
 (`Rd.dilate_psiBase`). -/
 theorem coe_schwartzDilate_psiBase (j : ℕ) :
-    (schwartzDilate ((2 : ℝ) ^ j) (by positivity) (psiBase (V := V) j) : V → ℂ) = psi j :=
+    (schwartzDilate ((2 : ℝ) ^ j) (by positivity) (psiBase (V := V) j) : V → ℂ) = lpBlockKernel j :=
   (coe_schwartzDilate _ _ _).trans (dilate_psiBase j)
 
 /-- The band-limiting kernel `Θ_j` is the Schwartz function `Θ_{2^j}`. -/
@@ -182,15 +182,15 @@ theorem enorm_Theta_le (j : ℕ) (y : V) :
 
 /-- **The blocks are band-limited at every point**: `Θ_j ⋆ (ψ_j ⋆ f) = ψ_j ⋆ f` for
 `1 ≤ p < ∞` and `f ∈ L_p(V)`. Almost everywhere this is associativity and `Θ_j ⋆ ψ_j = ψ_j`
-(`Rd.conv_conv_ae`, `Rd.conv_Theta_psi`); both sides are continuous
+(`Rd.conv_conv_ae`, `Rd.conv_Theta_lpBlockKernel`); both sides are continuous
 (`Rd.continuous_conv_schwartz`), so they agree everywhere (Mathlib's
 `Continuous.ae_eq_iff_eq`). -/
 theorem conv_Theta_blockFun (hp : p ≠ ∞) (j : ℕ) (f : Lp ℂ p (volume : Measure V)) :
     conv (Theta j) (blockFun j f) volume = blockFun j f := by
   have hae : conv (Theta j) (blockFun j f) volume =ᵐ[volume] blockFun j f := by
-    have h := conv_conv_ae Fact.out hp (integrable_Theta (V := V) j) (integrable_psi j)
+    have h := conv_conv_ae Fact.out hp (integrable_Theta (V := V) j) (integrable_lpBlockKernel j)
       (Lp.memLp f)
-    rw [conv_Theta_psi] at h
+    rw [conv_Theta_lpBlockKernel] at h
     exact h.symm
   refine (Continuous.ae_eq_iff_eq volume ?_ (continuous_blockFun hp j f)).1 hae
   rw [← coe_schwartzDilate_bandKernelS]

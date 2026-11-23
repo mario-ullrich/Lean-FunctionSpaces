@@ -169,10 +169,10 @@ and of `L_p` and one of them, are Besov spaces.
   for every `y`; uniform dilation families with overlap `B` are such families with
   `H = 4 H_A` (`Rd.IsCZFamily.of_dilation`), and so are the adjoint kernels
   `θ_j^*(x) = conj θ_j(-x)` with the same `B` and `H` (`Rd.IsCZFamily.adjoint`). The
-  Littlewood–Paley blocks `ψ_j` form such a family with overlap `2` (`Rd.isCZFamily_psi`), and so
-  do the synthesis kernels `ψ̃_0 = Φ_1`, `ψ̃_1 = Φ_2`, `ψ̃_j = Φ_{j+1} - Φ_{j-2}` with overlap `4`
-  (`Rd.psiDual`, `Rd.isCZFamily_psiDual`), which reproduce the blocks: `ψ̃_j ⋆ ψ_j = ψ_j`
-  (`Rd.conv_psiDual_psi`).
+  Littlewood–Paley blocks `ψ_j` form such a family with overlap `2` (`Rd.isCZFamily_lpBlockKernel`),
+  and so do the synthesis kernels `ψ̃_0 = Φ_1`, `ψ̃_1 = Φ_2`, `ψ̃_j = Φ_{j+1} - Φ_{j-2}` with
+  overlap `4` (`Rd.psiDual`, `Rd.isCZFamily_psiDual`), which reproduce the blocks:
+  `ψ̃_j ⋆ ψ_j = ψ_j` (`Rd.conv_psiDual_lpBlockKernel`).
 * **The adjoint of a convolution.** For `K ∈ L_1(V)`, `f ∈ L_p(V)` and `g ∈ L_q(V)` with
   `1/p + 1/q = 1`, `p < ∞`, and the reflection `K^∨(x) = K(-x)` (`Rd.reflect`),
   `∫ (K ⋆ f) g = ∫ f (K^∨ ⋆ g)` (`Rd.integral_conv_mul`). For Schwartz functions `η`, `u`,

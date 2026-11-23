@@ -118,9 +118,9 @@ theorem are in [Triebel–Lizorkin spaces](TriebelLizorkin.md).
   `‖f‖_{F^s_{2,2}} ≤ (2 · 4^s)^{1/2} ‖F‖` (`Rd.exists_eq_toDistr_two`). The proof is
   Plancherel's theorem: the convolution theorem `𝓕(K ⋆ f) = 𝓕K · 𝓕f` on `L_2(V)` for integrable
   `K` (`Rd.fourier_convLp`), and, at every frequency, at most two Littlewood–Paley blocks whose
-  Fourier transforms add up to `1` (`Rd.exists_fourier_psi_window`), so that
+  Fourier transforms add up to `1` (`Rd.exists_fourier_lpBlockKernel_window`), so that
   `∑_j 2^(2js) |𝓕ψ_j(ξ)|² ≤ 2 · 4^s ⟨ξ⟩^{2s}` and `⟨ξ⟩^{2s} ≤ 2 · 5^s ∑_j 2^(2js) |𝓕ψ_j(ξ)|²`
-  (`Rd.tsum_dyadicWeight_fourier_psi_sq_le`, `Rd.ofReal_besselWeight_sq_le_tsum`).
+  (`Rd.tsum_dyadicWeight_fourier_lpBlockKernel_sq_le`, `Rd.ofReal_besselWeight_sq_le_tsum`).
 * **`W^1_2 = H^1`.** For `f ∈ L_2(V)`, `f ∈ W^1_2(V)` iff `f ∈ H^1(V)` (`Rd.memSobolev_one_iff`).
   If `g ∈ L_2(V)` is the weak derivative `∂_v f` and `J_1 f = h`, then `‖g‖_2 ≤ 2π ‖v‖ ‖h‖_2`
   (`Rd.enorm_le_of_hasWeakLineDeriv`); for the weak derivatives `g_i = ∂_{e_i} f` along any
@@ -177,7 +177,7 @@ theorem are in [Triebel–Lizorkin spaces](TriebelLizorkin.md).
   `ψ_1 = ∑_α ∂_{e_{α_0}} ⋯ ∂_{e_{α_{m-1}}} η_α` (`Rd.sum_iteratedLineDerivOp_derivKernel`), by
   `‖ξ‖^{2m} = ∑_α ∏_k ⟪ξ, e_{α_k}⟫²` (`Rd.norm_pow_eq_sum_prod_inner`). Dilated,
   `2^{jm} ψ_{j+1} = ∑_α ∂_{e_{α_0}} ⋯ ∂_{e_{α_{m-1}}} ((η_α)_{2^j})` for every `j`
-  (`Rd.two_pow_smul_psi_succ_eq_sum`), and the dilates `((η_α)_{2^j})_j` form a
+  (`Rd.two_pow_smul_lpBlockKernel_succ_eq_sum`), and the dilates `((η_α)_{2^j})_j` form a
   Calderón–Zygmund family with overlap `2` (`Rd.isCZFamily_derivFamily`). For directions
   `w ∈ V^k`, `∂^w ψ̃_j = 2^{jk} (∂^w G̃_j)_{2^j}` with the Schwartz functions `G̃_j` behind the
   synthesis kernels (`Rd.iteratedLineDerivOp_psiDualS`), and the dilates `((∂^w G̃_j)_{2^j})_j`

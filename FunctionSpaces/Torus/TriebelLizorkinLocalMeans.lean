@@ -132,7 +132,8 @@ theorem econvLp_kernel_lpBlock (hp : p ≠ ∞) (L i j : ℕ)
       econvLp hp (Rd.integrable_conv (b.integrable_kernel L j) (Rd.integrable_Theta i))
         (lpBlock hp i f) := by
   have hT : econvLp hp (Rd.integrable_Theta i) (lpBlock hp i f) = lpBlock hp i f :=
-    econvLp_comp_econvLp_of_eq hp _ _ (Rd.integrable_psi i) (Rd.conv_Theta_psi i) f
+    econvLp_comp_econvLp_of_eq hp _ _ (Rd.integrable_lpBlockKernel i)
+      (Rd.conv_Theta_lpBlockKernel i) f
   calc econvLp hp (b.integrable_kernel L j) (lpBlock hp i f)
       = econvLp hp (b.integrable_kernel L j)
           (econvLp hp (Rd.integrable_Theta i) (lpBlock hp i f)) := by rw [hT]
@@ -171,12 +172,12 @@ theorem lpBlock_sum_econvLp_dual_ae (hp : p ≠ ∞) (L J j : ℕ)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     ∀ᵐ t ∂volume, lpBlock hp j (∑ i ∈ Finset.range (J + 1),
         econvLp hp (b.integrable_dual L i) (econvLp hp (b.integrable_kernel L i) f)) t =
-      ∑ i ∈ Finset.range (J + 1), econv (Rd.conv (Rd.psi j) (b.dual L i) volume)
+      ∑ i ∈ Finset.range (J + 1), econv (Rd.conv (Rd.lpBlockKernel j) (b.dual L i) volume)
         (econvLp hp (b.integrable_kernel L i) f) t := by
   have hsum : lpBlock hp j (∑ i ∈ Finset.range (J + 1),
       econvLp hp (b.integrable_dual L i) (econvLp hp (b.integrable_kernel L i) f)) =
       ∑ i ∈ Finset.range (J + 1),
-        econvLp hp (Rd.integrable_conv (Rd.integrable_psi j) (b.integrable_dual L i))
+        econvLp hp (Rd.integrable_conv (Rd.integrable_lpBlockKernel j) (b.integrable_dual L i))
           (econvLp hp (b.integrable_kernel L i) f) := by
     rw [map_sum]
     exact Finset.sum_congr rfl fun i _ => econvLp_comp_econvLp hp _ _ _
@@ -203,12 +204,12 @@ theorem ae_enorm_lpBlock_sum_proj_le (hp : p ≠ ∞) (L : ℕ) {L' : ℕ} (hL' 
       b.blockByLocalMeansConst L L' * ∑' i, (if i ≤ j then dyadicWeight (-(L' : ℝ)) (j - i)
         else 1) * Rd.maximal (fun y => ‖econv (b.kernel L i) f (proj y)‖ₑ) x := by
   filter_upwards [ae_comp_proj (lpBlock_sum_econvLp_dual_ae b hp L J j f)] with x hx
-  have hterm : ∀ i, ‖econv (Rd.conv (Rd.psi j) (b.dual L i) volume)
+  have hterm : ∀ i, ‖econv (Rd.conv (Rd.lpBlockKernel j) (b.dual L i) volume)
       (econvLp hp (b.integrable_kernel L i) f) (proj x)‖ₑ ≤
         b.blockByLocalMeansConst L L' * ((if i ≤ j then dyadicWeight (-(L' : ℝ)) (j - i)
           else 1) * Rd.maximal (fun y => ‖econv (b.kernel L i) f (proj y)‖ₑ) x) := fun i => by
     rw [econv_proj, ← maximal_econvLp_kernel_proj b hp L i f]
-    exact b.enorm_conv_conv_psi_dual_le L hL' i j _ x
+    exact b.enorm_conv_conv_lpBlockKernel_dualKernel_le L hL' i j _ x
   rw [hx]
   refine (enorm_sum_le _ _).trans ((Finset.sum_le_sum fun i _ => hterm i).trans ?_)
   rw [← Finset.mul_sum]

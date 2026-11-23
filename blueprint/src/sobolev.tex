@@ -1139,8 +1139,9 @@ $1 \leq |x| + |y|$ by the triangle inequality, and $(|x| + |y|)^2 \leq 2(|x|^2 +
 
 \begin{proposition}[The Bessel weight and the Littlewood--Paley weights]
 \label{prop:bessel-lp-weights}
-\lean{Rd.dyadicWeight_sq_le_of_fourier_psi_ne_zero, Rd.ofReal_besselWeight_sq_le_of_norm_lt,
-  Rd.tsum_dyadicWeight_fourier_psi_sq_le, Rd.ofReal_besselWeight_sq_le_tsum}
+\lean{Rd.dyadicWeight_sq_le_of_fourier_lpBlockKernel_ne_zero,
+  Rd.ofReal_besselWeight_sq_le_of_norm_lt, Rd.tsum_dyadicWeight_fourier_lpBlockKernel_sq_le,
+  Rd.ofReal_besselWeight_sq_le_tsum}
 \leanok
 \uses{lem:bessel-weight-basic, lem:elementary-square-inequalities, lem:fourier-psi-window}
 For every $s \geq 0$, every $j \in \N$ and every $\xi \in V$: if $\widehat{\psi_j}(\xi) \neq 0$,
@@ -2493,8 +2494,9 @@ vanishes only at $0$.
 
 \begin{lemma}[The block $\psi_1$]
 \label{lem:psi-one}
-\lean{Rd.psiOneS, Rd.coe_psiOneS, Rd.fourier_psiOneS_apply, Rd.dilate_psi_one,
-  Rd.fourier_psi_succ_eq_fourier_psi_one, Rd.one_lt_norm_of_fourier_psi_one_ne_zero}
+\lean{Rd.psiOneS, Rd.coe_psiOneS, Rd.fourier_psiOneS_apply, Rd.dilate_lpBlockKernel_one,
+  Rd.fourier_lpBlockKernel_succ_eq_fourier_lpBlockKernel_one,
+  Rd.one_lt_norm_of_fourier_lpBlockKernel_one_ne_zero}
 \leanok
 \uses{def:psi-base, lem:psi-base, def:moment-kernel, lem:fourier-dilate,
   lem:lp-kernels-frequency}
@@ -2515,8 +2517,8 @@ is \Cref{lem:fourier-dilate}, and the last is the case $j = 0$ of
 
 \begin{lemma}[Derivative kernels]
 \label{lem:derivative-kernel}
-\lean{Rd.contDiff_derivSymbol_mul_fourier_psi_one,
-  Rd.hasCompactSupport_derivSymbol_mul_fourier_psi_one, Rd.derivKernelHat, Rd.derivKernel,
+\lean{Rd.contDiff_derivSymbol_mul_fourier_lpBlockKernel_one,
+  Rd.hasCompactSupport_derivSymbol_mul_fourier_lpBlockKernel_one, Rd.derivKernelHat, Rd.derivKernel,
   Rd.fourier_derivKernel}
 \leanok
 \uses{lem:derivative-symbol, lem:psi-one, lem:lp-kernels-frequency, def:lp-kernels}
@@ -2563,7 +2565,7 @@ Schwartz functions.
 
 \begin{corollary}[The dilated identity]
 \label{cor:psi-derivatives-dilated}
-\lean{Rd.two_pow_smul_psi_succ_eq_sum}
+\lean{Rd.two_pow_smul_lpBlockKernel_succ_eq_sum}
 \leanok
 \uses{thm:psi-one-derivatives, lem:derivative-dilate, lem:psi-one}
 For all $m, j \in \N$,
@@ -4939,7 +4941,7 @@ it to the coordinate basis.
 
 \begin{lemma}[The blocks on the torus as convolutions with the derivatives]
 \label{lem:torus-blocks-as-derivative-convolutions}
-\lean{Torus.fourier_two_pow_smul_psi_succ, Torus.two_pow_smul_lpBlock_succ,
+\lean{Torus.fourier_two_pow_smul_lpBlockKernel_succ, Torus.two_pow_smul_lpBlock_succ,
   Torus.two_pow_mul_blockFun_succ_ae, Torus.lqNorm_blockFun_succ_le_sum_ae}
 \leanok
 \uses{cor:psi-derivatives-dilated, lem:fourier-iterated-derivative,

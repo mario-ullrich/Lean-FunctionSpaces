@@ -84,7 +84,7 @@ theorem sobolevToTLConst_ne_top {p : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ ∞) 
 `α`, then for almost every `x` and every `j`,
 `2^{jm} (ψ_{j+1} ⋆ f)(x) = ∑_α ((η_α)_{2^j} ⋆ g_α)(x)`.
 This is the dilated identity `2^{jm} ψ_{j+1} = ∑_α ∂^α ((η_α)_{2^j})`
-(`Rd.two_pow_smul_psi_succ_eq_sum`) with each derivative moved from the kernel to `f`
+(`Rd.two_pow_smul_lpBlockKernel_succ_eq_sum`) with each derivative moved from the kernel to `f`
 (`Rd.conv_eq_conv_iteratedLineDerivOp`). -/
 theorem two_pow_mul_blockFun_succ_ae (hp : p ≠ ∞) {m : ℕ} {f : Lp ℂ p (volume : Measure V)}
     {g : (Fin m → Fin (finrank ℝ V)) → Lp ℂ p (volume : Measure V)}
@@ -95,8 +95,9 @@ theorem two_pow_mul_blockFun_succ_ae (hp : p ≠ ∞) {m : ℕ} {f : Lp ℂ p (v
   set K : (Fin m → Fin (finrank ℝ V)) → 𝓢(V, ℂ) := fun i =>
     ∂^{fun k => gridBasis V (i k)} (schwartzDilate (2 ^ j) (pow_ne_zero j two_ne_zero)
       (derivKernel i)) with hKdef
-  have hsum : (fun y => ∑ i, (1 : ℂ) * K i y) = (2 : ℂ) ^ (j * m) • psi (V := V) (j + 1) := by
-    rw [two_pow_smul_psi_succ_eq_sum]
+  have hsum : (fun y => ∑ i, (1 : ℂ) * K i y) =
+      (2 : ℂ) ^ (j * m) • lpBlockKernel (V := V) (j + 1) := by
+    rw [two_pow_smul_lpBlockKernel_succ_eq_sum]
     funext y
     simp [K, Finset.sum_apply]
   have h := conv_finsetSum_kernel_ae Fact.out hp Finset.univ (fun _ => (1 : ℂ))

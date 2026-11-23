@@ -36,10 +36,10 @@ explicit constants, and proves `W^1_2(V) = H^1(V) = B^1_{2,2}(V)`.
   the even Bessel weight this is `(J_t T)(u) = T(J_t u)` (`Rd.besselPotential_apply_apply`), so
   `J_t` is symmetric on Schwartz functions (`Rd.integral_besselSchwartz_mul`).
 * **The weight comparison**: at every frequency at most two blocks are nonzero, and their
-  Fourier transforms add up to `1` (`Rd.exists_fourier_psi_window`, in
+  Fourier transforms add up to `1` (`Rd.exists_fourier_lpBlockKernel_window`, in
   `FunctionSpaces.Analysis.Fourier.LittlewoodPaleyKernels`); hence, for `s ≥ 0`,
   `∑_j 2^{2js} |𝓕ψ_j(ξ)|² ≤ 2 · 4^s ⟨ξ⟩^{2s}` and `⟨ξ⟩^{2s} ≤ 2 · 5^s ∑_j 2^{2js} |𝓕ψ_j(ξ)|²`
-  (`Rd.tsum_dyadicWeight_fourier_psi_sq_le`, `Rd.ofReal_besselWeight_sq_le_tsum`).
+  (`Rd.tsum_dyadicWeight_fourier_lpBlockKernel_sq_le`, `Rd.ofReal_besselWeight_sq_le_tsum`).
 * **`H^s = F^s_{2,2}`** (`Rd.memSobolev_two_iff_memTriebelLizorkin`): if `J_s f = h` with
   `f, h ∈ L_2(V)`, then `‖f‖_{F^s_{2,2}} ≤ (2 · 4^s)^{1/2} ‖h‖_2` and
   `‖h‖_2 ≤ (2 · 5^s)^{1/2} ‖f‖_{F^s_{2,2}}`; the Besov form
@@ -180,8 +180,8 @@ theorem fourier_convLp {K : V → ℂ} (hK : Integrable K) (f : Lp ℂ 2 (volume
 everywhere. -/
 theorem fourier_lpBlock (f : Lp ℂ 2 (volume : Measure V)) (j : ℕ) :
     ((𝓕 (lpBlock two_ne_top j f) : Lp ℂ 2 (volume : Measure V)) : V → ℂ) =ᵐ[volume]
-      fun ξ => 𝓕 (psi (V := V) j) ξ * (𝓕 f : Lp ℂ 2 (volume : Measure V)) ξ :=
-  fourier_convLp (integrable_psi j) f
+      fun ξ => 𝓕 (lpBlockKernel (V := V) j) ξ * (𝓕 f : Lp ℂ 2 (volume : Measure V)) ξ :=
+  fourier_convLp (integrable_lpBlockKernel j) f
 
 /-- **Plancherel's theorem** in `ℝ≥0∞`: `‖𝓕F‖_2 = ‖F‖_2` for `F ∈ L_2(V)` (Mathlib's
 `Lp.norm_fourier_eq`). -/
@@ -219,8 +219,8 @@ theorem enorm_convLp_sq {K : V → ℂ} (hK : Integrable K) (f : Lp ℂ 2 (volum
 `‖Δ_j f‖_2² = ∫ |𝓕ψ_j(ξ)|² |𝓕f(ξ)|² dξ`, the case `K = ψ_j` of `Rd.enorm_convLp_sq`. -/
 theorem enorm_lpBlock_sq (f : Lp ℂ 2 (volume : Measure V)) (j : ℕ) :
     ‖lpBlock two_ne_top j f‖ₑ ^ 2 =
-      ∫⁻ ξ, ‖𝓕 (psi (V := V) j) ξ‖ₑ ^ 2 * ‖(𝓕 f : Lp ℂ 2 (volume : Measure V)) ξ‖ₑ ^ 2 :=
-  enorm_convLp_sq (integrable_psi j) f
+      ∫⁻ ξ, ‖𝓕 (lpBlockKernel (V := V) j) ξ‖ₑ ^ 2 * ‖(𝓕 f : Lp ℂ 2 (volume : Measure V)) ξ‖ₑ ^ 2 :=
+  enorm_convLp_sq (integrable_lpBlockKernel j) f
 
 /-! ### The Bessel weight and the Littlewood–Paley weights -/
 
@@ -387,14 +387,14 @@ theorem one_add_norm_sq_le_of_norm_lt {j : ℕ} {ξ : V} (h : ‖ξ‖ < 2 ^ (j 
 
 /-- **Upper weight bound**: for `s ≥ 0`, if `𝓕ψ_j(ξ) ≠ 0`, then
 `2^(2js) ≤ 4^s ⟨ξ⟩^{2s}`. -/
-theorem dyadicWeight_sq_le_of_fourier_psi_ne_zero {s : ℝ} (hs : 0 ≤ s) {j : ℕ} {ξ : V}
-    (h : 𝓕 (psi (V := V) j) ξ ≠ 0) :
+theorem dyadicWeight_sq_le_of_fourier_lpBlockKernel_ne_zero {s : ℝ} (hs : 0 ≤ s) {j : ℕ} {ξ : V}
+    (h : 𝓕 (lpBlockKernel (V := V) j) ξ ≠ 0) :
     dyadicWeight s j ^ 2 ≤ 4 ^ s * ENNReal.ofReal (besselWeight s ξ) ^ 2 := by
   rw [ENNReal.dyadicWeight_sq, ofReal_besselWeight_sq, ← ENNReal.mul_rpow_of_nonneg _ _ hs]
   refine ENNReal.rpow_le_rpow ?_ hs
   rw [show (4 : ℝ≥0∞) = ENNReal.ofReal 4 by norm_num, ← ENNReal.ofReal_pow (by norm_num),
     ← ENNReal.ofReal_mul (by norm_num)]
-  exact ENNReal.ofReal_le_ofReal (four_pow_le_of_fourier_psi_ne_zero h)
+  exact ENNReal.ofReal_le_ofReal (four_pow_le_of_fourier_lpBlockKernel_ne_zero h)
 
 omit [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- **Lower weight bound**: for `s ≥ 0`, if `‖ξ‖ < 2^(j+1)`, then
@@ -411,26 +411,26 @@ theorem ofReal_besselWeight_sq_le_of_norm_lt {s : ℝ} (hs : 0 ≤ s) {j : ℕ} 
 
 /-- **The Littlewood–Paley symbol is at most the Bessel weight**: for `s ≥ 0` and every `ξ ∈ V`,
 `∑_j 2^(2js) |𝓕ψ_j(ξ)|² ≤ 2 · 4^s ⟨ξ⟩^{2s}`. At most two terms are nonzero
-(`Rd.exists_fourier_psi_window`), each at most `4^s ⟨ξ⟩^{2s}`. -/
-theorem tsum_dyadicWeight_fourier_psi_sq_le {s : ℝ} (hs : 0 ≤ s) (ξ : V) :
-    ∑' j, dyadicWeight s j ^ 2 * ‖𝓕 (psi (V := V) j) ξ‖ₑ ^ 2 ≤
+(`Rd.exists_fourier_lpBlockKernel_window`), each at most `4^s ⟨ξ⟩^{2s}`. -/
+theorem tsum_dyadicWeight_fourier_lpBlockKernel_sq_le {s : ℝ} (hs : 0 ≤ s) (ξ : V) :
+    ∑' j, dyadicWeight s j ^ 2 * ‖𝓕 (lpBlockKernel (V := V) j) ξ‖ₑ ^ 2 ≤
       2 * 4 ^ s * ENNReal.ofReal (besselWeight s ξ) ^ 2 := by
-  obtain ⟨a, -, hwin, -⟩ := exists_fourier_psi_window ξ
-  have hterm : ∀ j, dyadicWeight s j ^ 2 * ‖𝓕 (psi (V := V) j) ξ‖ₑ ^ 2 ≤
+  obtain ⟨a, -, hwin, -⟩ := exists_fourier_lpBlockKernel_window ξ
+  have hterm : ∀ j, dyadicWeight s j ^ 2 * ‖𝓕 (lpBlockKernel (V := V) j) ξ‖ₑ ^ 2 ≤
       4 ^ s * ENNReal.ofReal (besselWeight s ξ) ^ 2 := by
     intro j
-    by_cases h : 𝓕 (psi (V := V) j) ξ = 0
+    by_cases h : 𝓕 (lpBlockKernel (V := V) j) ξ = 0
     · simp [h]
     · calc _ ≤ (4 ^ s * ENNReal.ofReal (besselWeight s ξ) ^ 2) * 1 := by
             gcongr
-            · exact dyadicWeight_sq_le_of_fourier_psi_ne_zero hs h
-            · exact pow_le_one₀ (by positivity) (enorm_fourier_psi_le_one j ξ)
+            · exact dyadicWeight_sq_le_of_fourier_lpBlockKernel_ne_zero hs h
+            · exact pow_le_one₀ (by positivity) (enorm_fourier_lpBlockKernel_le_one j ξ)
         _ = _ := mul_one _
   rw [tsum_eq_sum (s := {a, a + 1}) (fun j hj => ?_), Finset.sum_pair (by omega)]
   · calc _ ≤ 4 ^ s * ENNReal.ofReal (besselWeight s ξ) ^ 2 +
           4 ^ s * ENNReal.ofReal (besselWeight s ξ) ^ 2 := add_le_add (hterm a) (hterm (a + 1))
       _ = _ := by ring
-  · have : 𝓕 (psi (V := V) j) ξ = 0 := by
+  · have : 𝓕 (lpBlockKernel (V := V) j) ξ = 0 := by
       by_contra h
       rcases hwin j h with rfl | rfl <;> simp at hj
     simp [this]
@@ -448,25 +448,28 @@ theorem one_le_two_mul_enorm_sq_add {x y : ℂ} (h : x + y = 1) :
 
 /-- **The Bessel weight is at most the Littlewood–Paley symbol**: for `s ≥ 0` and every `ξ ∈ V`,
 `⟨ξ⟩^{2s} ≤ 2 · 5^s ∑_j 2^(2js) |𝓕ψ_j(ξ)|²`. The two blocks `a`, `a + 1` of
-`Rd.exists_fourier_psi_window` have `|𝓕ψ_a(ξ)|² + |𝓕ψ_{a+1}(ξ)|² ≥ 1/2`, and
+`Rd.exists_fourier_lpBlockKernel_window` have `|𝓕ψ_a(ξ)|² + |𝓕ψ_{a+1}(ξ)|² ≥ 1/2`, and
 `⟨ξ⟩^{2s} ≤ 5^s 2^(2js)` for both. -/
 theorem ofReal_besselWeight_sq_le_tsum {s : ℝ} (hs : 0 ≤ s) (ξ : V) :
     ENNReal.ofReal (besselWeight s ξ) ^ 2 ≤
-      2 * 5 ^ s * ∑' j, dyadicWeight s j ^ 2 * ‖𝓕 (psi (V := V) j) ξ‖ₑ ^ 2 := by
-  obtain ⟨a, ha, -, hsum⟩ := exists_fourier_psi_window ξ
+      2 * 5 ^ s * ∑' j, dyadicWeight s j ^ 2 * ‖𝓕 (lpBlockKernel (V := V) j) ξ‖ₑ ^ 2 := by
+  obtain ⟨a, ha, -, hsum⟩ := exists_fourier_lpBlockKernel_window ξ
   have h1 := ofReal_besselWeight_sq_le_of_norm_lt hs (j := a) ha
   have h2 := ofReal_besselWeight_sq_le_of_norm_lt hs (j := a + 1)
     (ha.trans (pow_lt_pow_right₀ one_lt_two (by omega)))
   calc ENNReal.ofReal (besselWeight s ξ) ^ 2
       ≤ ENNReal.ofReal (besselWeight s ξ) ^ 2 *
-          (2 * (‖𝓕 (psi (V := V) a) ξ‖ₑ ^ 2 + ‖𝓕 (psi (V := V) (a + 1)) ξ‖ₑ ^ 2)) :=
+          (2 * (‖𝓕 (lpBlockKernel (V := V) a) ξ‖ₑ ^ 2 +
+            ‖𝓕 (lpBlockKernel (V := V) (a + 1)) ξ‖ₑ ^ 2)) :=
         le_mul_of_one_le_right' (one_le_two_mul_enorm_sq_add hsum)
-    _ = 2 * (ENNReal.ofReal (besselWeight s ξ) ^ 2 * ‖𝓕 (psi (V := V) a) ξ‖ₑ ^ 2 +
-          ENNReal.ofReal (besselWeight s ξ) ^ 2 * ‖𝓕 (psi (V := V) (a + 1)) ξ‖ₑ ^ 2) := by ring
-    _ ≤ 2 * (5 ^ s * dyadicWeight s a ^ 2 * ‖𝓕 (psi (V := V) a) ξ‖ₑ ^ 2 +
-          5 ^ s * dyadicWeight s (a + 1) ^ 2 * ‖𝓕 (psi (V := V) (a + 1)) ξ‖ₑ ^ 2) := by
+    _ = 2 * (ENNReal.ofReal (besselWeight s ξ) ^ 2 * ‖𝓕 (lpBlockKernel (V := V) a) ξ‖ₑ ^ 2 +
+          ENNReal.ofReal (besselWeight s ξ) ^ 2 * ‖𝓕 (lpBlockKernel (V := V) (a + 1)) ξ‖ₑ ^ 2) := by
+        ring
+    _ ≤ 2 * (5 ^ s * dyadicWeight s a ^ 2 * ‖𝓕 (lpBlockKernel (V := V) a) ξ‖ₑ ^ 2 +
+          5 ^ s * dyadicWeight s (a + 1) ^ 2 * ‖𝓕 (lpBlockKernel (V := V) (a + 1)) ξ‖ₑ ^ 2) := by
         gcongr
-    _ = 2 * 5 ^ s * ∑ j ∈ {a, a + 1}, dyadicWeight s j ^ 2 * ‖𝓕 (psi (V := V) j) ξ‖ₑ ^ 2 := by
+    _ = 2 * 5 ^ s *
+          ∑ j ∈ {a, a + 1}, dyadicWeight s j ^ 2 * ‖𝓕 (lpBlockKernel (V := V) j) ξ‖ₑ ^ 2 := by
         rw [Finset.sum_pair (by omega)]
         ring
     _ ≤ _ := by
@@ -580,15 +583,16 @@ theorem exists_toTemperedDistribution_eq_of_besselPotential_eq {s : ℝ} (hs : 0
 `‖f‖_{F^s_{2,2}} = ‖(2^(js) ‖Δ_j f‖_2)_j‖_{ℓ_2}`, Plancherel for each block and Tonelli. -/
 theorem triebelLizorkinNorm_two_sq (s : ℝ) (f : Lp ℂ 2 (volume : Measure V)) :
     triebelLizorkinNorm s 2 f ^ 2 = ∫⁻ ξ, (∑' j, dyadicWeight s j ^ 2 *
-      ‖𝓕 (psi (V := V) j) ξ‖ₑ ^ 2) * ‖(𝓕 f : Lp ℂ 2 (volume : Measure V)) ξ‖ₑ ^ 2 := by
+      ‖𝓕 (lpBlockKernel (V := V) j) ξ‖ₑ ^ 2) * ‖(𝓕 f : Lp ℂ 2 (volume : Measure V)) ξ‖ₑ ^ 2 := by
   have hl := ENNReal.lqNorm_two_sq (fun j => dyadicWeight s j * ‖lpBlock two_ne_top j f‖ₑ)
-  have hm : ∀ j, AEMeasurable (fun ξ => dyadicWeight s j ^ 2 * ‖𝓕 (psi (V := V) j) ξ‖ₑ ^ 2 *
-      ‖(𝓕 f : Lp ℂ 2 (volume : Measure V)) ξ‖ₑ ^ 2) volume := fun j =>
-    ((((continuous_fourier_of_integrable (integrable_psi j)).measurable.enorm.pow_const
+  have hm : ∀ j, AEMeasurable (fun ξ =>
+      dyadicWeight s j ^ 2 * ‖𝓕 (lpBlockKernel (V := V) j) ξ‖ₑ ^ 2 *
+        ‖(𝓕 f : Lp ℂ 2 (volume : Measure V)) ξ‖ₑ ^ 2) volume := fun j =>
+    ((((continuous_fourier_of_integrable (integrable_lpBlockKernel j)).measurable.enorm.pow_const
       2).aemeasurable.const_mul _).mul ((Lp.aestronglyMeasurable _).enorm.pow_const 2))
   rw [triebelLizorkinNorm_eq_littlewoodPaleyNorm two_ne_top, littlewoodPaleyNorm, hl]
   calc ∑' j, (dyadicWeight s j * ‖lpBlock two_ne_top j f‖ₑ) ^ 2
-      = ∑' j, ∫⁻ ξ, dyadicWeight s j ^ 2 * ‖𝓕 (psi (V := V) j) ξ‖ₑ ^ 2 *
+      = ∑' j, ∫⁻ ξ, dyadicWeight s j ^ 2 * ‖𝓕 (lpBlockKernel (V := V) j) ξ‖ₑ ^ 2 *
           ‖(𝓕 f : Lp ℂ 2 (volume : Measure V)) ξ‖ₑ ^ 2 := by
         congr 1
         ext j
@@ -610,7 +614,7 @@ theorem triebelLizorkinNorm_two_sq_le {s : ℝ} (hs : 0 ≤ s) (f : Lp ℂ 2 (vo
   refine lintegral_mono fun ξ => ?_
   rw [← mul_assoc]
   gcongr
-  exact tsum_dyadicWeight_fourier_psi_sq_le hs ξ
+  exact tsum_dyadicWeight_fourier_lpBlockKernel_sq_le hs ξ
 
 /-- For `s ≥ 0` and `f ∈ L_2(V)`,
 `∫ ⟨ξ⟩^{2s} |𝓕f(ξ)|² dξ ≤ 2 · 5^s ‖f‖_{F^s_{2,2}}²`. -/

@@ -48,7 +48,7 @@ variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDim
 distribution `u`, `Δ_j(m(D) u) = 𝓕(m(D) ψ̃_j)(D) Δ_j u`. Both sides are Fourier multipliers of
 `u` (Mathlib's `TemperedDistribution.fourierMultiplierCLM_fourierMultiplierCLM_apply`), with the
 symbols `m 𝓕ψ_j` and `𝓕ψ_j m 𝓕ψ̃_j`, equal since `𝓕ψ̃_j 𝓕ψ_j = 𝓕ψ_j`
-(`Rd.fourier_psiDual_mul_psi`). -/
+(`Rd.fourier_psiDual_mul_lpBlockKernel`). -/
 theorem distribBlock_fourierMultiplierCLM (hm : m.HasTemperateGrowth) (u : 𝓢'(V, ℂ)) (j : ℕ) :
     distribBlock j (TemperedDistribution.fourierMultiplierCLM ℂ m u) =
       TemperedDistribution.fourierMultiplierCLM ℂ
@@ -62,7 +62,7 @@ theorem distribBlock_fourierMultiplierCLM (hm : m.HasTemperateGrowth) (u : 𝓢'
   refine congrArg (fun f => TemperedDistribution.fourierMultiplierCLM ℂ f u) (funext fun ξ => ?_)
   rw [Pi.mul_apply, Pi.mul_apply, fourier_fourierMultiplierCLM_apply hm, fourier_psiS_apply,
     SchwartzMap.fourier_coe, coe_psiDualS]
-  linear_combination (-(m ξ)) * fourier_psiDual_mul_psi (V := V) j ξ
+  linear_combination (-(m ξ)) * fourier_psiDual_mul_lpBlockKernel (V := V) j ξ
 
 /-- **The blocks of a Fourier multiplier as convolutions**: if `m` has temperate growth,
 `1 ≤ p < ∞` and the block `Δ_j u` of a tempered distribution is an `L_p` function `g`, then

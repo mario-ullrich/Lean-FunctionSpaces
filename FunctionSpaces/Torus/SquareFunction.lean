@@ -49,7 +49,7 @@ variable (d) in
 /-- The constant `Q^𝕋_p` of the **upper square function bound on the torus**: the constant
 `Torus.periodicCZConst` of the Calderón–Zygmund family of the blocks `ψ_j`, with overlap `2`,
 Hörmander constant `4 H_{A^ψ}` and far mass bound `2 T_{A^ψ}`, where `A^ψ = Rd.psiBaseBound`
-(`Rd.isCZFamily_psi`, `Torus.farMass_psi_le`). -/
+(`Rd.isCZFamily_lpBlockKernel`, `Torus.farMass_lpBlockKernel_le`). -/
 noncomputable def squareFunctionConst (p : ℝ≥0∞) : ℝ≥0∞ :=
   periodicCZConst d p 2
     (4 * Rd.familyHormanderConst (EuclideanSpace ℝ d) (Rd.psiBaseBound (EuclideanSpace ℝ d)))
@@ -89,7 +89,7 @@ theorem triebelLizorkinNorm_zero_two_le [Nonempty d] (hp1 : 1 < p) (hp : p ≠ �
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     triebelLizorkinNorm 0 2 f ≤ squareFunctionConst d p * ‖f‖ₑ := by
   rw [triebelLizorkinNorm_zero_left]
-  exact eLpNorm_lqNorm_econv_le Rd.isCZFamily_psi farMass_psi_le hp1 hp f
+  exact eLpNorm_lqNorm_econv_le Rd.isCZFamily_lpBlockKernel farMass_lpBlockKernel_le hp1 hp f
 
 /-- **`L_p(𝕋^d) ⊆ F^0_{p,2}(𝕋^d)`**: for `d ≥ 1` and `1 < p < ∞`, every `f ∈ L_p(𝕋^d)` has a
 finite Triebel–Lizorkin norm `‖f‖_{F^0_{p,2}(𝕋^d)}`. -/
@@ -101,12 +101,13 @@ theorem memTriebelLizorkin_zero_two [Nonempty d] (hp1 : 1 < p) (hp : p ≠ ∞)
 /-! ### The reproducing formula -/
 
 /-- **The synthesis kernels reproduce the blocks**: for `1 ≤ p < ∞` and `f ∈ L_p(𝕋^d)`,
-`psiDual_j ⋆ Δ_j f = Δ_j f`, since `psiDual_j ⋆ ψ_j = ψ_j` on `ℝ^d` (`Rd.conv_psiDual_psi`). -/
+`psiDual_j ⋆ Δ_j f = Δ_j f`, since `psiDual_j ⋆ ψ_j = ψ_j` on `ℝ^d`
+(`Rd.conv_psiDual_lpBlockKernel`). -/
 theorem econvLp_psiDual_lpBlock (hp : p ≠ ∞) (j : ℕ)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     econvLp hp (Rd.integrable_psiDual j) (lpBlock hp j f) = lpBlock hp j f :=
-  econvLp_comp_econvLp_of_eq hp (Rd.integrable_psiDual j) (Rd.integrable_psi j)
-    (Rd.integrable_psi j) (Rd.conv_psiDual_psi j) f
+  econvLp_comp_econvLp_of_eq hp (Rd.integrable_psiDual j) (Rd.integrable_lpBlockKernel j)
+    (Rd.integrable_lpBlockKernel j) (Rd.conv_psiDual_lpBlockKernel j) f
 
 /-- **The reproducing sums**: for `1 ≤ p < ∞`, `f ∈ L_p(𝕋^d)` and every finite set `s ⊆ ℕ`,
 `∑_{j ∈ s} psiDual_j ⋆ Δ_j f = ∑_{j ∈ s} Δ_j f` almost everywhere, with the pointwise

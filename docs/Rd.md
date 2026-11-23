@@ -30,7 +30,7 @@ the approximate identities and the Littlewood–Paley kernels in [Tools from ana
   `Rd.littlewoodPaleyNorm_le_approxNormDyadic`). The ingredients are Young's inequality
   `‖K ⋆ f‖_p ≤ ‖K‖_1 ‖f‖_p` (`Rd.eLpNorm_conv_le`), approximate identities in `L_p`
   (`Rd.tendsto_convLp_dilate`), and identities between the kernels such as `ψ_j ⋆ Θ_k = 0`
-  for `j ≥ k + 3`, proved by Fourier inversion (`Rd.conv_psi_Theta`).
+  for `j ≥ k + 3`, proved by Fourier inversion (`Rd.conv_lpBlockKernel_Theta`).
 * **Besov spaces on `ℝ^d` by differences.** With `V`, `p`, `E_k` and `ψ_j` as above, let
   `ω_r(f, t)_p = sup_{|h| ≤ t} ‖Δ_h^r f‖_p` be the modulus of smoothness of order `r ≥ 1`. For
   `0 < s < r` and `1 ≤ q ≤ ∞`, the following are equivalent for `f ∈ L_p(V)`:
