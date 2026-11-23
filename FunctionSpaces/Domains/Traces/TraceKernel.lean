@@ -5,7 +5,7 @@ Authors: Mario Ullrich
 -/
 module
 
-public import FunctionSpaces.Domains.Traces.TildeSpaceSupport
+public import FunctionSpaces.Domains.Sobolev.TildeSpaceSupport
 public import FunctionSpaces.Domains.Traces.BoundarySobolev
 public import FunctionSpaces.Domains.Sobolev.SobolevDuality
 
@@ -21,7 +21,7 @@ closure of their restrictions in `H^s(Ω)`, and `ker γ_s = Ω.traceKer s` the t
 * **Mollification in `H^1(V)`**: convergence of the `L_2` functions and of their weak
   derivatives gives convergence in `H^1(V)` (`Rd.tendsto_of_tendsto_toL2`), so the mollified
   `η_c ⋆ U` converge to `U` in `H^1(V)` as `c → ∞` (`Rd.tendsto_of_toL2_eq_convLp`).
-* **`H̃^1(Ω)` by supports**: the cases `s = 1` of `FunctionSpaces.Domains.Traces.TildeSpaceSupport`
+* **`H̃^1(Ω)` by supports**: the cases `s = 1` of `FunctionSpaces.Domains.Sobolev.TildeSpaceSupport`
   with the `L_2` function `Rd.toL2` (`Rd.sobolevToL2_one`). Mollified functions supported in `Ω`
   lie in `H̃^1(Ω)` (`Rd.mem_tildeSpace_of_dilate`, `Rd.mem_tildeSpace_of_isCompact`), and on a
   bounded Lipschitz domain `U ∈ H^1(V)` lies in `H̃^1(Ω)` iff it vanishes outside `Ω`

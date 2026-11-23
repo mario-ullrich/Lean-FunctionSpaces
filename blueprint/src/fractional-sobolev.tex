@@ -314,13 +314,12 @@ $W$ have disjoint supports.
 
 For $s \geq 0$ the elements of $\tilde H^s(\Omega)$ vanish outside $\Omega$
 (\Cref{lem:tilde-space-vanishes-outside-nonneg}). On a bounded Lipschitz domain the converse
-holds; \Cref{sec:trace-kernel} proves it for $s = 1$ through weak derivatives, and this section
-carries the proof to every $s \geq 0$ with mollification in $H^s(V)$, which converges for every
-real $s$ (\Cref{thm:sobolev-mollification}), and smooth cut-offs, which keep $H^s(V)$ for
-$s \geq 0$ (\Cref{lem:sobolev-cutoff}). In this section $\Phi_c(x) = c^n \Phi(c x)$, $n = \dim V$
-(\Cref{lem:dilate}), $\Omega' \subseteq V$ is open, and $\Omega$ is a bounded Lipschitz domain
-with boundary $\Gamma$, boundary balls $B_j$ and graph domains $\Omega_j$ with cones $K_j$
-(\Cref{def:bounded-lipschitz}, \Cref{lem:graph-cone}).
+holds, by mollification in $H^s(V)$, which converges for every real $s$
+(\Cref{thm:sobolev-mollification}), and smooth cut-offs, which keep $H^s(V)$ for $s \geq 0$
+(\Cref{lem:sobolev-cutoff}); its case $s = 1$ is \Cref{thm:tilde-space-supports}. In this
+section $\Phi_c(x) = c^n \Phi(c x)$, $n = \dim V$ (\Cref{lem:dilate}), $\Omega' \subseteq V$ is
+open, and $\Omega$ is a bounded Lipschitz domain with boundary $\Gamma$, boundary balls $B_j$ and
+graph domains $\Omega_j$ with cones $K_j$ (\Cref{def:bounded-lipschitz}, \Cref{lem:graph-cone}).
 
 \begin{lemma}[Localised functions in $H^s(V)$]
 \label{lem:sobolev-localize}
@@ -339,6 +338,36 @@ The $\psi_j$ are smooth, with closed support in the bounded balls $B_j$
 \end{proof}
 
 At $s = 1$ this is part of \Cref{lem:sobolev-one-products}.
+
+\begin{lemma}[Smoothing with compact support]
+\label{lem:smoothing-compact-support}
+\lean{Rd.exists_schwartz_eq_conv}
+\leanok
+\uses{lem:conv-derivatives, def:conv}
+For every smooth $K \colon V \to \C$ with compact support, every compact $S \subseteq V$ and
+every locally integrable $f$ vanishing outside $S$, $K * f$ is a Schwartz function with compact
+support in $\operatorname{supp} K + S$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$K * f$ is smooth (\Cref{lem:conv-derivatives}), and its support lies in
+$\operatorname{supp} K + S$, which is compact, hence closed.
+\end{proof}
+
+\begin{definition}[The cone mollifier]
+\label{def:cone-mollifier}
+\lean{Rd.LipschitzGraph.coneMollifierBase, Rd.LipschitzGraph.coneMollifier,
+  Rd.LipschitzGraph.tsupport_coneMollifier_subset}
+\leanok
+\uses{def:bump-mollifier, lem:graph-cone}
+For every Lipschitz graph domain with cone $K$, unit vector $e$ and $\rho = 1/(8(M + 1))$, the cone
+mollifier is the bump mollifier of the smooth bump around $e/4$ with radii $\rho/4$ and $\rho/2$.
+Its support lies in $K \cap \bar B(0, 1/2)$.
+\end{definition}
+
+The support is $\bar B(e/4, \rho/2) \subseteq B(e/4, \rho) \subseteq K$ (\Cref{lem:graph-cone}),
+and $\|e/4\| + \rho/2 \leq 1/2$.
 
 \begin{theorem}[Mollified functions in $\tilde H^s$]
 \label{thm:tilde-space-mollified-general}

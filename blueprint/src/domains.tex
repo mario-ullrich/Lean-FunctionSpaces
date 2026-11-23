@@ -9919,22 +9919,6 @@ $\eta_{c_i} * \iota U \to \iota U$ and $\eta_{c_i} * \partial_v U \to \partial_v
 
 \paragraph{Smooth functions supported in $\Omega$.}
 
-\begin{lemma}[Smoothing with compact support]
-\label{lem:smoothing-compact-support}
-\lean{Rd.exists_schwartz_eq_conv}
-\leanok
-\uses{lem:conv-derivatives, def:conv}
-For every smooth $K \colon V \to \C$ with compact support, every compact $S \subseteq V$ and
-every locally integrable $f$ vanishing outside $S$, $K * f$ is a Schwartz function with compact
-support in $\operatorname{supp} K + S$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-$K * f$ is smooth (\Cref{lem:conv-derivatives}), and its support lies in
-$\operatorname{supp} K + S$, which is compact, hence closed.
-\end{proof}
-
 \begin{theorem}[Mollified functions in $\tilde H^1$]
 \label{thm:tilde-space-mollified}
 \lean{Rd.mem_tildeSpace_of_dilate, Rd.mem_tildeSpace_of_isCompact}
@@ -9953,22 +9937,6 @@ $U \in \tilde H^1(\Omega')$.
 The case $s = 1$ of \Cref{thm:tilde-space-mollified-general}, with $\iota_1 = \iota$
 (\Cref{lem:sobolev-to-l2}).
 \end{proof}
-
-\paragraph{Cone mollifiers.}
-
-\begin{definition}[The cone mollifier]
-\label{def:cone-mollifier}
-\lean{Rd.LipschitzGraph.coneMollifierBase, Rd.LipschitzGraph.coneMollifier,
-  Rd.LipschitzGraph.tsupport_coneMollifier_subset}
-\leanok
-\uses{def:bump-mollifier, lem:graph-cone}
-For every Lipschitz graph domain with cone $K$, unit vector $e$ and $\rho = 1/(8(M + 1))$, the cone
-mollifier is the bump mollifier of the smooth bump around $e/4$ with radii $\rho/4$ and $\rho/2$.
-Its support lies in $K \cap \bar B(0, 1/2)$.
-\end{definition}
-
-The support is $\bar B(e/4, \rho/2) \subseteq B(e/4, \rho) \subseteq K$ (\Cref{lem:graph-cone}),
-and $\|e/4\| + \rho/2 \leq 1/2$.
 
 \paragraph{$\tilde H^1(\Omega)$ by supports.}
 

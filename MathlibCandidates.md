@@ -785,7 +785,7 @@ declarations.
   `H^{1,2}(V, ℂ)` vanishing outside a compact subset of an open set `Ω` lie in the closure of the
   test functions of `Ω` (`Rd.mem_tildeSpace_of_isCompact`), the case `s = 1` of the same statement
   for `H^{s,2}(V, ℂ)`, `s ≥ 0` (`Rd.mem_tildeSpace_of_isCompact_of_nonneg`,
-  `FunctionSpaces/Domains/Traces/TildeSpaceSupport.lean`). Mathlib's convolution files cover the
+  `FunctionSpaces/Domains/Sobolev/TildeSpaceSupport.lean`). Mathlib's convolution files cover the
   smoothness of `η ⋆ f`; these statements add its weak derivatives.
 * **The Gagliardo–Nirenberg–Sobolev inequality for weak derivatives**
   (`FunctionSpaces/Rd/Sobolev/GagliardoNirenbergSobolev.lean`): Mathlib's inequality

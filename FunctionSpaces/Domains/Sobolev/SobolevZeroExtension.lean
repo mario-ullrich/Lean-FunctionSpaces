@@ -6,7 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Domains.Lipschitz.IndicatorMultiplier
-public import FunctionSpaces.Domains.Traces.TildeSpaceSupport
+public import FunctionSpaces.Domains.Sobolev.TildeSpaceSupport
 public import FunctionSpaces.Domains.Sobolev.ZeroExtensionBound
 
 /-!
