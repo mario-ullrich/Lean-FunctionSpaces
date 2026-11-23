@@ -34,7 +34,9 @@ and `‖u‖_{H^s} = ‖J_s u‖_2`. This file builds the maps between these spa
   (`Rd.toTemperedDistribution_sobolevToL2`), with `‖ι_s U‖_2 ≤ ‖U‖`
   (`Rd.norm_sobolevToL2_apply_le`); at `s = 1` this is `Rd.toL2` (`Rd.sobolevToL2_one`), and at
   `s = 0` it is an isometry onto `L_2(V)` (`Rd.norm_sobolevToL2_zero`,
-  `Rd.sobolevToL2_zero_surjective`).
+  `Rd.sobolevToL2_zero_surjective`). An `L_2` function lies in Mathlib's `H^s(V)` as a tempered
+  distribution iff it is `ι_s U` for some `U ∈ H^s(V)`
+  (`Rd.memSobolev_bessel_iff_exists_sobolevToL2_eq`).
 * **Derivatives**: `∂_v : H^{s+1}(V) → H^s(V)` as a bounded operator of norm at most `2π ‖v‖`
   (`Rd.sobolevLineDeriv`, `Rd.toDistr_sobolevLineDeriv`, `Rd.norm_sobolevLineDeriv_apply_le`),
   the Fourier multiplier with the symbol `2πi ⟪ξ, v⟫ ⟨ξ⟩^{-1}` of `J_{-1} ∂_v` after `J_{s+1}`
@@ -276,6 +278,20 @@ theorem sobolevToL2_eq_of_toDistr_eq (hs : 0 ≤ s) (U : H^{s}(V))
     {f : Lp ℂ 2 (volume : Measure V)} (hf : (f : 𝓢'(V, ℂ)) = U.toDistr) :
     sobolevToL2 hs U = f :=
   eq_of_toTemperedDistribution_eq ((toTemperedDistribution_sobolevToL2 hs U).trans hf.symm)
+
+/-- **`L_2` functions in `H^s(V)`**: for `s ≥ 0`, the tempered distribution of `f ∈ L_2(V)` lies in
+Mathlib's `H^s(V)` iff `f = ι_s U` for some `U ∈ H^s(V)`. Mathlib's
+`TemperedDistribution.MemSobolev.toBesselPotentialSpace` bundles the distribution, whose `L_2`
+function is `f` (`Rd.sobolevToL2_eq_of_toDistr_eq`); conversely the distribution of `ι_s U` is `U`
+(`Rd.toTemperedDistribution_sobolevToL2`). -/
+theorem memSobolev_bessel_iff_exists_sobolevToL2_eq (hs : 0 ≤ s)
+    (f : Lp ℂ 2 (volume : Measure V)) :
+    TemperedDistribution.MemSobolev s 2 (f : 𝓢'(V, ℂ)) ↔ ∃ U : H^{s}(V), sobolevToL2 hs U = f := by
+  refine ⟨fun hf => ⟨hf.toBesselPotentialSpace, sobolevToL2_eq_of_toDistr_eq hs _
+    hf.toBesselPotentialSpace_toDistr.symm⟩, ?_⟩
+  rintro ⟨U, rfl⟩
+  rw [toTemperedDistribution_sobolevToL2]
+  exact U.memSobolev_toDistr
 
 /-- **`H^s(V)`, `s ≥ 0`, is determined by its `L_2` functions**: `U ↦ ι_s U` is injective
 (`Rd.toTemperedDistribution_sobolevToL2`, Mathlib's `BesselPotentialSpace.ext`). -/

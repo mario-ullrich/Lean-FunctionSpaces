@@ -15,7 +15,9 @@ public import Mathlib.Geometry.Manifold.PartitionOfUnity
 A **bounded Lipschitz domain** (Stein; Schneider–Vybíral, Remark 3.2) is a bounded open
 set `Ω ⊆ V` whose boundary `Γ` is covered by finitely many open balls `B_j`, centred on `Γ`, with
 `B_j ∩ Ω = B_j ∩ Ω_j` for Lipschitz graph domains `Ω_j` (`Rd.BoundedLipschitzDomain`); the free
-direction of each graph domain replaces the rotations of the usual definition.
+direction of each graph domain replaces the rotations of the usual definition. Inside each ball
+`B_j`, `Ω` agrees with the graph domain `Ω_j` (`Rd.BoundedLipschitzDomain.inter_ball_eq`,
+`Rd.BoundedLipschitzDomain.mem_carrier_iff_of_mem_ball`).
 
 **Restrictions by intrinsic differences**
 (`Rd.BoundedLipschitzDomain.exists_besov_extension_iff_modulusOn`): for `1 ≤ p < ∞`,
@@ -339,6 +341,12 @@ theorem inter_ball_eq (j : Fin Ω.N) {ρ : ℝ} (hρ : ρ ≤ Ω.radius j) :
       ⟨ball_subset_ball hρ hxb, hx⟩
     rw [← Ω.ball_inter j] at h
     exact ⟨h.2, hxb⟩
+
+/-- In a boundary ball `B_i`, membership in `Ω` is membership in the graph domain `Ω_i`, since
+`B_i ∩ Ω = B_i ∩ Ω_i`. -/
+theorem mem_carrier_iff_of_mem_ball {i : Fin Ω.N} {x : V}
+    (hx : x ∈ ball (Ω.center i) (Ω.radius i)) : x ∈ Ω.carrier ↔ x ∈ (Ω.graph i).domain := by
+  simpa only [Set.mem_inter_iff, hx, true_and] using Set.ext_iff.1 (Ω.ball_inter i) x
 
 variable [FiniteDimensional ℝ V]
 

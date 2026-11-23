@@ -24,11 +24,15 @@ of `B^s_{2,2}` (`Rd.BoundedLipschitzDomain.exists_modNorm_indicatorLp_le`), and
   vanishing on `Ω`, `ι_s U = 1_Ω ι_s(U + W)` (`Rd.sobolevToL2_eq_indicatorLp_add`), so
   `‖U‖ ≤ C ‖U + W‖`. Restriction is an isomorphism of `H̃^s(Ω)` onto `H^s_0(Ω)`.
 * **Zero extensions**: for every `U ∈ H^s(V)` there is `U' ∈ H^s(V)` with `ι_s U' = 1_Ω ι_s U`
-  (`Rd.BoundedLipschitzDomain.exists_sobolevToL2_eq_indicatorLp`); it lies in `H̃^s(Ω)` and has the
-  same restriction to `Ω` (`Rd.BoundedLipschitzDomain.mem_tildeSpace_of_sobolevToL2_eq_indicatorLp`,
-  `Rd.BoundedLipschitzDomain.restrictProj_eq_of_sobolevToL2_eq_indicatorLp`). Restrictions are
-  determined by the `L_2` functions on `Ω` (`Rd.restrictProj_eq_restrictProj_of_ae_eq`,
-  `Rd.restrictProj_eq_of_sobolevToL2_ae_eq`).
+  (`Rd.BoundedLipschitzDomain.exists_sobolevToL2_eq_indicatorLp`). For every `s ≥ 0`, such a `U'`
+  lies in `H̃^s(Ω)`, since `ι_s U'` vanishes outside `Ω`
+  (`Rd.BoundedLipschitzDomain.mem_tildeSpace_of_sobolevToL2_eq_indicatorLp`, from
+  `Rd.BoundedLipschitzDomain.mem_tildeSpace_iff_of_nonneg`), and has the same restriction to `Ω`
+  as `U`, since restrictions are determined by the `L_2` functions on `Ω`
+  (`Rd.BoundedLipschitzDomain.restrictProj_eq_of_sobolevToL2_eq_indicatorLp`,
+  `Rd.restrictProj_eq_restrictProj_of_ae_eq`); so a function of `H^s(Ω)` whose zero extension
+  lies in `H^s(V)` lies in `H^s_0(Ω)`
+  (`Rd.BoundedLipschitzDomain.mem_zeroBoundarySpace_of_sobolevToL2_eq_indicatorLp`).
 * **`H̃^s(Ω) = H^s_0(Ω) = H^s(Ω)`**: `H^s_0(Ω)` is all of `H^s(Ω)`
   (`Rd.BoundedLipschitzDomain.zeroBoundarySpace_eq_top_of_lt_half`; Grisvard, Theorem 1.4.2.4;
   McLean, Theorem 3.40), and restriction is an isomorphism of `H̃^s(Ω)` onto `H^s(Ω)`
@@ -49,52 +53,6 @@ variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDim
   [MeasurableSpace V] [BorelSpace V]
 
 variable {s : ℝ}
-
-/-! ### Restrictions through the `L_2` functions -/
-
-/-- **Restrictions are determined by the `L_2` functions on `Ω`**: for `s ≥ 0`, an open `Ω` and
-`U, U' ∈ H^s(V)` with `ι_s U = ι_s U'` almost everywhere on `Ω`, `U|_Ω = U'|_Ω`, since `U - U'`
-vanishes on `Ω` (`Rd.mem_vanishOn_iff_sobolevToL2`), the kernel of the restriction
-(`Rd.restrictProj_eq_zero_iff`). -/
-theorem restrictProj_eq_restrictProj_of_ae_eq (hs : 0 ≤ s) {Ω : Opens V} {U U' : H^{s}(V)}
-    (h : (sobolevToL2 hs U : V → ℂ) =ᵐ[volume.restrict (Ω : Set V)] sobolevToL2 hs U') :
-    restrictProj s Ω U = restrictProj s Ω U' := by
-  have hmem : U - U' ∈ vanishOn s Ω := by
-    rw [mem_vanishOn_iff_sobolevToL2 hs, map_sub]
-    filter_upwards [ae_restrict_of_ae (Lp.coeFn_sub (sobolevToL2 hs U) (sobolevToL2 hs U')), h]
-      with x h1 h2
-    rw [h1, Pi.sub_apply, h2, sub_self, Pi.zero_apply]
-  have h0 := (restrictProj_eq_zero_iff (Ω := Ω) (U - U')).2 hmem
-  rwa [map_sub, sub_eq_zero] at h0
-
-/-- **An element of `H^s(Ω)` is the restriction of every element with the same `L_2` function on
-`Ω`**: for `s ≥ 0`, `U ∈ H^s(V)` and `u ∈ H^s(Ω)` with `ι_s U = ι_s u` almost everywhere on `Ω`,
-`U|_Ω = u` (`Rd.restrictProj_eq_restrictProj_of_ae_eq`, `Rd.restrictProj_coe`). At `s = 1` this is
-`Rd.restrictProj_eq_of_ae_eq`. -/
-theorem restrictProj_eq_of_sobolevToL2_ae_eq (hs : 0 ≤ s) {Ω : Opens V} {U : H^{s}(V)}
-    {u : RestrictionSpace s Ω}
-    (h : (sobolevToL2 hs U : V → ℂ) =ᵐ[volume.restrict (Ω : Set V)]
-      sobolevToL2 hs (u : H^{s}(V))) :
-    restrictProj s Ω U = u :=
-  (restrictProj_eq_restrictProj_of_ae_eq hs h).trans (restrictProj_coe u)
-
-/-- **Test functions as cut-offs of their extensions**: for `s ≥ 0`, an open `Ω`, `U ∈ H̃^s(Ω)`
-and `W` vanishing on `Ω`, `ι_s U = 1_Ω ι_s(U + W)`, since `ι_s U = 0` almost everywhere outside `Ω`
-(`Rd.sobolevToL2_ae_eq_zero_of_mem_tildeSpace`) and `ι_s W = 0` almost everywhere on `Ω`
-(`Rd.mem_vanishOn_iff_sobolevToL2`). -/
-theorem sobolevToL2_eq_indicatorLp_add (hs : 0 ≤ s) {Ω : Opens V} {U W : H^{s}(V)}
-    (hU : U ∈ tildeSpace s Ω) (hW : W ∈ vanishOn s Ω) :
-    sobolevToL2 hs U = indicatorLp Ω.isOpen.measurableSet (sobolevToL2 hs (U + W)) := by
-  refine Lp.ext ?_
-  have hU0 := sobolevToL2_ae_eq_zero_of_mem_tildeSpace hs hU
-  have hW0 := (ae_restrict_iff' Ω.isOpen.measurableSet).1
-    ((mem_vanishOn_iff_sobolevToL2 hs W).1 hW)
-  filter_upwards [indicatorLp_apply_ae Ω.isOpen.measurableSet (sobolevToL2 hs (U + W)),
-    Lp.coeFn_add (sobolevToL2 hs U) (sobolevToL2 hs W), hU0, hW0] with x h1 h2 h3 h4
-  rw [h1]
-  by_cases hx : x ∈ (Ω : Set V)
-  · rw [indicator_of_mem hx, map_add, h2, Pi.add_apply, h4 hx, Pi.zero_apply, add_zero]
-  · rw [indicator_of_notMem hx, h3 hx]
 
 namespace BoundedLipschitzDomain
 
@@ -183,19 +141,30 @@ theorem restrictProj_eq_of_sobolevToL2_eq_indicatorLp (hs0 : 0 ≤ s) {U U' : H^
     ae_restrict_mem Ω.measurableSet] with x hx hxΩ
   rw [hx, indicator_of_mem (show x ∈ Ω.carrier from hxΩ)]
 
+/-- **A function whose zero extension lies in `H^s(V)` lies in `H^s_0(Ω)`**: for `s ≥ 0`,
+`u ∈ H^s(Ω)` and
+`U' ∈ H^s(V)` with `ι_s U' = 1_Ω ι_s u`, `U'` lies in `H̃^s(Ω)`
+(`Rd.BoundedLipschitzDomain.mem_tildeSpace_of_sobolevToL2_eq_indicatorLp`) and restricts to `u`
+(`Rd.BoundedLipschitzDomain.restrictProj_eq_of_sobolevToL2_eq_indicatorLp`), and restrictions of
+`H̃^s(Ω)` lie in `H^s_0(Ω)` (`Rd.range_tildeToRestrictionL_le`). -/
+theorem mem_zeroBoundarySpace_of_sobolevToL2_eq_indicatorLp (hs0 : 0 ≤ s)
+    {u : RestrictionSpace s Ω.toOpens} {U' : H^{s}(V)}
+    (h : sobolevToL2 hs0 U' = indicatorLp Ω.measurableSet (sobolevToL2 hs0 (u : H^{s}(V)))) :
+    u ∈ zeroBoundarySpace s Ω.toOpens := by
+  have hmem := Ω.mem_tildeSpace_of_sobolevToL2_eq_indicatorLp hs0 h
+  have hres := Ω.restrictProj_eq_of_sobolevToL2_eq_indicatorLp hs0 h
+  rw [restrictProj_coe] at hres
+  exact range_tildeToRestrictionL_le (LinearMap.mem_range.2 ⟨⟨U', hmem⟩, hres⟩)
+
 /-- **`H^s_0(Ω) = H^s(Ω)` for `0 ≤ s < 1/2`** (Grisvard, Theorem 1.4.2.4; McLean, Theorem 3.40;
-Chandler-Wilde, Hewett and Moiola, Corollary 3.29(ix)): every `u ∈ H^s(Ω)` is the restriction of
-the zero extension `U'` of `u` (`Rd.BoundedLipschitzDomain.exists_sobolevToL2_eq_indicatorLp`),
-an element of `H̃^s(Ω)`, and restrictions of `H̃^s(Ω)` lie in `H^s_0(Ω)`
-(`Rd.range_tildeToRestrictionL_le`). -/
+Chandler-Wilde, Hewett and Moiola, Corollary 3.29(ix)): the zero extension of every
+`u ∈ H^s(Ω)` lies in `H^s(V)` (`Rd.BoundedLipschitzDomain.exists_sobolevToL2_eq_indicatorLp`), so
+`u ∈ H^s_0(Ω)` (`Rd.BoundedLipschitzDomain.mem_zeroBoundarySpace_of_sobolevToL2_eq_indicatorLp`). -/
 theorem zeroBoundarySpace_eq_top_of_lt_half (hs0 : 0 ≤ s) (hs : s < 1 / 2) :
     zeroBoundarySpace s Ω.toOpens = ⊤ := by
   refine eq_top_iff.2 fun u _ => ?_
   obtain ⟨U', hU'⟩ := Ω.exists_sobolevToL2_eq_indicatorLp hs0 hs (u : H^{s}(V))
-  have hmem := Ω.mem_tildeSpace_of_sobolevToL2_eq_indicatorLp hs0 hU'
-  have hres := Ω.restrictProj_eq_of_sobolevToL2_eq_indicatorLp hs0 hU'
-  rw [restrictProj_coe] at hres
-  exact range_tildeToRestrictionL_le (LinearMap.mem_range.2 ⟨⟨U', hmem⟩, hres⟩)
+  exact Ω.mem_zeroBoundarySpace_of_sobolevToL2_eq_indicatorLp hs0 hU'
 
 /-- **`H̃^s(Ω) ≅ H^s(Ω)` for `0 ≤ s < 1/2`** (Hewett–Moiola, Lemma 2.1 with `H^s_0(Ω) = H^s(Ω)`
 for `s ≤ 1/2`, p. 3, cf. Remark 2.6; McLean, Theorem 3.33):

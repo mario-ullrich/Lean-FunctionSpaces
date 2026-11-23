@@ -21,30 +21,25 @@ of their restrictions in `H^s(Ω)`, `ι_s U` the `L_2` function of `U ∈ H^s(V)
 `t ≤ s` (`Rd.sobolevInclusion`, `Rd.restrictionInclusion`), and `ker γ_s = Ω.traceKer s` the
 trace kernel of `H^s(Ω)`, `1/2 < s < 3/2`.
 
-* **`L_2` functions and distributions**: for `s ≥ 0`, `f ∈ L_2(V)` lies in Mathlib's `H^s(V)` as
-  a tempered distribution iff `f = ι_s U` for some `U ∈ H^s(V)`
-  (`Rd.memSobolev_bessel_iff_exists_sobolevToL2_eq`), and the weak derivatives of `H^1(V)` are
-  the derivatives of tempered distributions (`Rd.toTemperedDistribution_weakDerivL2`). So for
-  `s ≥ 1` and `U ∈ H^s(V)`, `∂_v(ι_{1,s} U) ∈ H^{s-1}(V)`
-  (`Rd.memSobolev_bessel_weakDerivL2_sobolevInclusion`). On an open set `Ω`, `U|_Ω` has the same
-  `L_2` function and the same weak derivatives as `U` (`Rd.sobolevToL2_restrictProj_ae_eq`,
-  `Rd.weakDerivL2_restrictProj_ae_eq`).
 * **Zero extensions of `ker γ_s`, `1 ≤ s < 3/2`**: for `u ∈ ker γ_s`, `ι^Ω_{1,s} u ∈ ker γ_1`, so
   `∂_v(1_Ω ι_s u) = 1_Ω ∂_v(ι_{1,s} u)`
   (`Rd.BoundedLipschitzDomain.lineDerivOp_indicatorLp_of_mem_traceKer`, from Green's formula
-  `Rd.BoundedLipschitzDomain.hasWeakLineDeriv_indicatorLp_of_mem_traceKer`).
+  `Rd.BoundedLipschitzDomain.hasWeakLineDeriv_indicatorLp_of_mem_traceKer`, since on `Ω` a
+  restriction has the same `L_2` function and weak derivatives, `Rd.sobolevToL2_restrictProj_ae_eq`,
+  `Rd.weakDerivL2_restrictProj_ae_eq`).
   As `s - 1 < 1/2`, the indicator of `Ω` keeps `H^{s-1}(V)`
   (`Rd.BoundedLipschitzDomain.exists_sobolevToL2_eq_indicatorLp`), so `1_Ω ι_s u` and its first
-  derivatives lie in `H^{s-1}(V)`, and `1_Ω ι_s u` lies in `H^s(V)`
+  derivatives lie in `H^{s-1}(V)` (`Rd.memSobolev_bessel_iff_exists_sobolevToL2_eq`,
+  `Rd.memSobolev_bessel_weakDerivL2_sobolevInclusion`), and `1_Ω ι_s u` lies in `H^s(V)`
   (`TemperedDistribution.memSobolev_add_one_iff`,
-  `Rd.BoundedLipschitzDomain.exists_sobolevToL2_eq_indicatorLp_of_mem_traceKer`). A function of
-  `H^s(Ω)` whose zero extension lies in `H^s(V)` lies in `H^s_0(Ω)`
-  (`Rd.BoundedLipschitzDomain.mem_zeroBoundarySpace_of_sobolevToL2_eq_indicatorLp`).
+  `Rd.BoundedLipschitzDomain.exists_sobolevToL2_eq_indicatorLp_of_mem_traceKer`).
 * **`ker γ_s = H^s_0(Ω)` for `1/2 < s < 3/2`**
   (`Rd.BoundedLipschitzDomain.traceKer_eq_zeroBoundarySpace`; McLean, Theorem 3.40): for
   `1/2 < s ≤ 1` by approximation from the level `1`
   (`Rd.BoundedLipschitzDomain.traceKer_eq_zeroBoundarySpace_of_le_one`), for `1 ≤ s < 3/2` by
-  zero extension (`Rd.BoundedLipschitzDomain.traceKer_le_zeroBoundarySpace_of_one_le`). So the
+  zero extension (`Rd.BoundedLipschitzDomain.traceKer_le_zeroBoundarySpace_of_one_le`), since a
+  function of `H^s(Ω)` whose zero extension lies in `H^s(V)` lies in `H^s_0(Ω)`
+  (`Rd.BoundedLipschitzDomain.mem_zeroBoundarySpace_of_sobolevToL2_eq_indicatorLp`). So the
   kernel of the trace `H^s(Ω) → H^{s-1/2}(Γ)` is `H^s_0(Ω)`
   (`Rd.BoundedLipschitzDomain.ker_sobolevTrace_eq_zeroBoundarySpace`), and `u ∈ ker γ_s` iff
   `1_Ω ι_s u = ι_s U'` for some `U' ∈ H^s(V)`
@@ -68,86 +63,11 @@ namespace Rd
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
   [MeasurableSpace V] [BorelSpace V]
 
-variable {s : ℝ}
-
-/-! ### `L_2` functions, weak derivatives and distributions -/
-
-/-- **`L_2` functions in `H^s(V)`**: for `s ≥ 0`, the tempered distribution of `f ∈ L_2(V)` lies in
-Mathlib's `H^s(V)` iff `f = ι_s U` for some `U ∈ H^s(V)`. Mathlib's
-`TemperedDistribution.MemSobolev.toBesselPotentialSpace` bundles the distribution, whose `L_2`
-function is `f` (`Rd.sobolevToL2_eq_of_toDistr_eq`); conversely the distribution of `ι_s U` is `U`
-(`Rd.toTemperedDistribution_sobolevToL2`). -/
-theorem memSobolev_bessel_iff_exists_sobolevToL2_eq (hs : 0 ≤ s)
-    (f : Lp ℂ 2 (volume : Measure V)) :
-    TemperedDistribution.MemSobolev s 2 (f : 𝓢'(V, ℂ)) ↔ ∃ U : H^{s}(V), sobolevToL2 hs U = f := by
-  refine ⟨fun hf => ⟨hf.toBesselPotentialSpace, sobolevToL2_eq_of_toDistr_eq hs _
-    hf.toBesselPotentialSpace_toDistr.symm⟩, ?_⟩
-  rintro ⟨U, rfl⟩
-  rw [toTemperedDistribution_sobolevToL2]
-  exact U.memSobolev_toDistr
-
-/-- **Weak derivatives of `H^1(V)` are distributional derivatives**: for `U ∈ H^1(V)` and every
-direction `v`, the tempered distribution of the weak derivative `∂_v U ∈ L_2(V)` is the derivative
-`∂_v` of the distribution `U` (`Rd.hasWeakLineDeriv_top_iff`, `Rd.toTemperedDistribution_toL2`). -/
-theorem toTemperedDistribution_weakDerivL2 (v : V) (U : H^{1}(V)) :
-    ((weakDerivL2 v U : Lp ℂ 2 (volume : Measure V)) : 𝓢'(V, ℂ)) = ∂_{v} U.toDistr := by
-  have h := hasWeakLineDeriv_top_iff.1 (hasWeakLineDeriv_weakDerivL2 v U)
-  rw [LineDeriv.iteratedLineDerivOp_one, toTemperedDistribution_toL2] at h
-  exact h.symm
-
-/-- **The weak derivatives of `H^s(V)`, `s ≥ 1`, lie in `H^{s-1}(V)`**: for `U ∈ H^s(V)` and every
-direction `v`, the weak derivative `∂_v(ι_{1,s} U) ∈ L_2(V)` is, as a tempered distribution, the
-derivative `∂_v U` (`Rd.toTemperedDistribution_weakDerivL2`, `Rd.toDistr_sobolevInclusion`), which
-lies in `H^{s-1}(V)` (Mathlib's `TemperedDistribution.MemSobolev.lineDerivOp`). -/
-theorem memSobolev_bessel_weakDerivL2_sobolevInclusion (hs1 : 1 ≤ s) (U : H^{s}(V)) (v : V) :
-    TemperedDistribution.MemSobolev (s - 1) 2
-      ((weakDerivL2 v (sobolevInclusion hs1 U) : Lp ℂ 2 (volume : Measure V)) : 𝓢'(V, ℂ)) := by
-  rw [toTemperedDistribution_weakDerivL2, toDistr_sobolevInclusion]
-  exact U.memSobolev_toDistr.lineDerivOp
-
-/-- **A restriction has the same `L_2` function on `Ω`**: for `s ≥ 0`, an open `Ω` and
-`U ∈ H^s(V)`, `ι_s(U|_Ω) = ι_s U` almost everywhere on `Ω`, since `U - U|_Ω` vanishes on `Ω`
-(`Rd.sub_restrictProj_mem`, `Rd.mem_vanishOn_iff_sobolevToL2`). -/
-theorem sobolevToL2_restrictProj_ae_eq (hs : 0 ≤ s) {Ω : Opens V} (U : H^{s}(V)) :
-    (sobolevToL2 hs (restrictProj s Ω U : H^{s}(V)) : V → ℂ) =ᵐ[volume.restrict (Ω : Set V)]
-      sobolevToL2 hs U := by
-  have h := (mem_vanishOn_iff_sobolevToL2 hs _).1 (sub_restrictProj_mem (Ω := Ω) U)
-  rw [map_sub] at h
-  filter_upwards [h, ae_restrict_of_ae (Lp.coeFn_sub (sobolevToL2 hs U)
-    (sobolevToL2 hs (restrictProj s Ω U : H^{s}(V))))] with x h1 h2
-  rw [h2, Pi.sub_apply, Pi.zero_apply, sub_eq_zero] at h1
-  exact h1.symm
-
-/-- **A restriction has the same weak derivatives on `Ω`**: for an open `Ω`, `U ∈ H^1(V)` and every
-direction `v`, `∂_v(U|_Ω) = ∂_v U` almost everywhere on `Ω`, since `U|_Ω` and `U` have the same
-`L_2` function on `Ω` (`Rd.sobolevToL2_restrictProj_ae_eq`) and weak derivatives of `H^1(V)` are
-local (`Rd.weakDerivL2_ae_eq_of_ae_eq`). -/
-theorem weakDerivL2_restrictProj_ae_eq {Ω : Opens V} (v : V) (U : H^{1}(V)) :
-    (weakDerivL2 v (restrictProj 1 Ω U : H^{1}(V)) : V → ℂ) =ᵐ[volume.restrict (Ω : Set V)]
-      weakDerivL2 v U := by
-  have h := sobolevToL2_restrictProj_ae_eq zero_le_one (Ω := Ω) U
-  rw [sobolevToL2_one] at h
-  exact weakDerivL2_ae_eq_of_ae_eq Ω.isOpen v h
-
 namespace BoundedLipschitzDomain
 
 variable (Ω : BoundedLipschitzDomain V)
 
 /-! ### Zero extensions of `ker γ_s`, `1 ≤ s < 3/2` -/
-
-/-- **Zero extensions in `H^s(V)` lie in `H^s_0(Ω)`**: for `s ≥ 0`, `u ∈ H^s(Ω)` and
-`U' ∈ H^s(V)` with `ι_s U' = 1_Ω ι_s u`, `U'` lies in `H̃^s(Ω)`
-(`Rd.BoundedLipschitzDomain.mem_tildeSpace_of_sobolevToL2_eq_indicatorLp`) and restricts to `u`
-(`Rd.BoundedLipschitzDomain.restrictProj_eq_of_sobolevToL2_eq_indicatorLp`), and restrictions of
-`H̃^s(Ω)` lie in `H^s_0(Ω)` (`Rd.range_tildeToRestrictionL_le`). -/
-theorem mem_zeroBoundarySpace_of_sobolevToL2_eq_indicatorLp (hs0 : 0 ≤ s)
-    {u : RestrictionSpace s Ω.toOpens} {U' : H^{s}(V)}
-    (h : sobolevToL2 hs0 U' = indicatorLp Ω.measurableSet (sobolevToL2 hs0 (u : H^{s}(V)))) :
-    u ∈ zeroBoundarySpace s Ω.toOpens := by
-  have hmem := Ω.mem_tildeSpace_of_sobolevToL2_eq_indicatorLp hs0 h
-  have hres := Ω.restrictProj_eq_of_sobolevToL2_eq_indicatorLp hs0 h
-  rw [restrictProj_coe] at hres
-  exact range_tildeToRestrictionL_le (LinearMap.mem_range.2 ⟨⟨U', hmem⟩, hres⟩)
 
 /-- **The derivatives of the zero extension of `u ∈ ker γ_s`**, `1 ≤ s < 3/2`: for every direction
 `v`, `∂_v(1_Ω ι_s u) = 1_Ω ∂_v(ι_{1,s} u)` as tempered distributions, with `u` read in `H^s(V)`.

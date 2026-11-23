@@ -654,10 +654,9 @@ declarations.
   every `H^{s,2}(V, ℂ)` (`Rd.sobolevConv`), and convolution with the dilates of a kernel of
   integral `1` converges to the identity in `H^{s,2}(V, ℂ)` (`Rd.tendsto_sobolevConv_dilate`).
   For `s ≥ 0` an `L_2` function lies in `H^{s,2}(V, ℂ)` as a tempered distribution iff it is the
-  `L_2` function of an element (`Rd.memSobolev_bessel_iff_exists_sobolevToL2_eq`, in
-  `FunctionSpaces/Domains/Traces/TraceKernelGeneral.lean`). Mathlib has `BesselPotentialSpace`
-  and the unbundled `TemperedDistribution.MemSobolev.mono` and `MemSobolev.lineDerivOp`, but no
-  maps between the bundled spaces; each map here is an explicit
+  `L_2` function of an element (`Rd.memSobolev_bessel_iff_exists_sobolevToL2_eq`). Mathlib has
+  `BesselPotentialSpace` and the unbundled `TemperedDistribution.MemSobolev.mono` and
+  `MemSobolev.lineDerivOp`, but no maps between the bundled spaces; each map here is an explicit
   Fourier multiplier on the `L_2` functions, with the identification of `𝓕⁻(w 𝓕g)` with
   Mathlib's `w(D) g` (`Rd.fourierMultiplierCLM_toTemperedDistribution_eq`). These belong in
   `Mathlib/Analysis/FunctionalSpaces/BesselPotentialSpace.lean`.
@@ -842,7 +841,9 @@ declarations.
 * **Integration by parts in `H^1`** (`FunctionSpaces/Domains/Sobolev/LipschitzDomainGreen.lean`):
   for `U, W ∈ H^{1,2}(V, ℂ)` and every direction `v`, `∫ (∂_v U) W + U ∂_v W = 0`
   (`Rd.integral_weakDeriv_mul_add_eq_zero`), and the weak derivatives of `H^1(V)` are local
-  (`Rd.weakDerivL2_ae_eq_of_ae_eq`); both belong next to the density of the Schwartz functions in
+  (`Rd.weakDerivL2_ae_eq_of_ae_eq`,
+  `FunctionSpaces/Domains/Sobolev/SobolevRestrictionSpaces.lean`); both belong next to the
+  density of the Schwartz functions in
   `Mathlib/Analysis/FunctionalSpaces/BesselPotentialSpace.lean`. Two general facts are short:
   integrals over two sets that agree inside a set `B` agree for functions vanishing outside `B`
   (`Rd.setIntegral_eq_of_inter_eq`), and line derivatives vanish outside the closed support

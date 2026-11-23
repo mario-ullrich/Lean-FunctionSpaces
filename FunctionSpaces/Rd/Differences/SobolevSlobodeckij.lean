@@ -39,7 +39,9 @@ over balls, `∫_{|z| < R} |z|^(-a) dz ≤ c R^(n-a)` for `a < n`, is
 bounds, after translation, the tail `∫∫ u(x) 1_{|y - x| ≥ η} |y - x|^(-a) dy dx`
 (`Rd.lintegral_lintegral_mul_indicator_le`). Double integrals split over sums and take out finite
 constants (`Rd.lintegral_lintegral_add_right`, `Rd.lintegral_lintegral_le_add_two_mul`,
-`Rd.lintegral_lintegral_const_mul'`).
+`Rd.lintegral_lintegral_const_mul'`). On the line, a function `F ≥ 0` that vanishes at `0` and
+outside `[-1, 1]` and is at most `c_k` on the shell `2^(-k-1) < |r| ≤ 2^(-k)` has
+`∫ F ≤ 2 ∑_k 2^(-k) c_k` (`Rd.lintegral_real_le_tsum_dyadicAnnulus`).
 -/
 
 @[expose] public section
@@ -305,6 +307,34 @@ theorem volume_dyadicAnnulus_le {ρ : ℝ} (hρ : 0 < ρ) (j : ℕ) :
   (measure_mono fun z hz => mem_closedBall_zero_iff.2 hz.2).trans_eq <| by
     rw [volume_closedBall_div_two_pow hρ.le, ENNReal.ofReal_pow hρ.le, ← ENNReal.rpow_natCast]
     ring
+
+/-- **An integral over the line by dyadic shells**: if `F : ℝ → [0, ∞]` vanishes at `0` and
+outside `[-1, 1]`, and `F ≤ c_k` on the shell `2^(-k-1) < |r| ≤ 2^(-k)` (`Rd.dyadicAnnulus`),
+then `∫ F ≤ 2 ∑_k 2^(-k) c_k`, since the shells cover `[-1, 1] \ {0}`
+(`Rd.setLIntegral_closedBall_le_tsum_dyadicAnnulus_of_zero`) and the shell `k` has length at most
+`2^(-k) |(-1, 1)|` (`Rd.volume_dyadicAnnulus_le`). -/
+theorem lintegral_real_le_tsum_dyadicAnnulus {F : ℝ → ℝ≥0∞} (hF0 : F 0 = 0)
+    (hF1 : ∀ r, 1 < |r| → F r = 0) {c : ℕ → ℝ≥0∞}
+    (hc : ∀ k, ∀ r ∈ dyadicAnnulus (1 : ℝ) k, F r ≤ c k) :
+    ∫⁻ r, F r ≤ 2 * ∑' k, dyadicWeight (-1) k * c k := by
+  have hsupp : Function.support F ⊆ closedBall (0 : ℝ) (1 / 2 ^ 0) := fun r hr => by
+    rw [pow_zero, div_one, mem_closedBall_zero_iff, Real.norm_eq_abs]
+    by_contra h
+    exact hr (hF1 r (not_le.1 h))
+  rw [← setLIntegral_eq_of_support_subset hsupp]
+  refine (setLIntegral_closedBall_le_tsum_dyadicAnnulus_of_zero hF0 1 0).trans ?_
+  rw [← ENNReal.tsum_mul_left]
+  refine ENNReal.tsum_le_tsum fun k => ?_
+  rw [zero_add]
+  calc ∫⁻ r in dyadicAnnulus 1 k, F r ≤ ∫⁻ _ in dyadicAnnulus (1 : ℝ) k, c k :=
+        setLIntegral_mono' (measurableSet_dyadicAnnulus 1 k) (hc k)
+    _ = c k * volume (dyadicAnnulus (1 : ℝ) k) := setLIntegral_const _ _
+    _ ≤ c k * (ENNReal.ofReal 1 ^ (finrank ℝ ℝ : ℝ) * dyadicWeight (-(finrank ℝ ℝ : ℝ)) k *
+          volume (ball (0 : ℝ) 1)) := mul_le_mul' le_rfl (volume_dyadicAnnulus_le one_pos k)
+    _ = 2 * (dyadicWeight (-1) k * c k) := by
+        rw [finrank_self, Real.volume_ball, ENNReal.ofReal_one, ENNReal.one_rpow, Nat.cast_one,
+          mul_one, ENNReal.ofReal_ofNat]
+        ring
 
 /-! ### Radial integrals of powers -/
 

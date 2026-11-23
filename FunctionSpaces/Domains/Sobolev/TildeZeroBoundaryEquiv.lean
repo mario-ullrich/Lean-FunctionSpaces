@@ -9,7 +9,7 @@ public import FunctionSpaces.Domains.Lipschitz.GraphHardy
 public import FunctionSpaces.Domains.Sobolev.SobolevZeroExtension
 
 /-!
-# `H̃^s(Ω) = H^s_0(Ω)` for `s ≥ 0`, `s ∉ 1/2 + ℕ_0`
+# `H̃^s(Ω) ≅ H^s_0(Ω)` for `s ≥ 0`, `s ∉ 1/2 + ℕ_0`
 
 Let `V` be a finite-dimensional real inner product space, such as `ℝ^d`, with Lebesgue measure,
 and `Ω ⊆ V` a bounded Lipschitz domain. The first part treats `1/2 < s < 1`. Write `ι_s U` for
@@ -62,17 +62,6 @@ variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDim
   [MeasurableSpace V] [BorelSpace V]
 
 variable {s : ℝ}
-
-/-- **Lifting the zero extension bound by `m ∈ ℕ`, with the same constant**: for every open `Ω`
-and every real `C`, the zero extension bound at `s` gives the bound at `s + m`
-(`Rd.HasZeroExtensionBound.add_one`, applied `m` times). -/
-theorem HasZeroExtensionBound.add_natCast {Ω : Opens V} {C : ℝ}
-    (h : HasZeroExtensionBound s Ω C) (m : ℕ) : HasZeroExtensionBound (s + m) Ω C := by
-  induction m with
-  | zero => rwa [Nat.cast_zero, add_zero]
-  | succ m ih =>
-    rw [Nat.cast_succ, ← add_assoc]
-    exact ih.add_one
 
 namespace BoundedLipschitzDomain
 
@@ -258,7 +247,7 @@ theorem exists_hasZeroExtensionBound_of_half_lt (hs : 1 / 2 < s) (hs1 : s < 1) :
   have h' := ENNReal.toReal_mono (ENNReal.mul_ne_top hK enorm_ne_top) h
   rwa [toReal_enorm, ENNReal.toReal_mul, toReal_enorm] at h'
 
-/-! ### `H̃^s(Ω) = H^s_0(Ω)` for `s ≥ 0`, `s ∉ 1/2 + ℕ_0` -/
+/-! ### `H̃^s(Ω) ≅ H^s_0(Ω)` for `s ≥ 0`, `s ∉ 1/2 + ℕ_0` -/
 
 /-- **The zero extension bound for `0 ≤ s < 1`, `s ≠ 1/2`**: a bounded Lipschitz domain has the
 zero extension bound at `s` with some constant, for `s < 1/2` by the indicator of `Ω` as a
@@ -295,7 +284,19 @@ is an isomorphism of `H̃^s(Ω)` onto `H^s_0(Ω)`, the isomorphism of the zero e
 (`Rd.BoundedLipschitzDomain.exists_hasZeroExtensionBound`,
 `Rd.HasZeroExtensionBound.tildeEquivZeroBoundary`), with `‖U|_Ω‖ ≤ ‖U‖ ≤ C ‖U|_Ω‖`. With the
 Gelfand triple `H̃^s(Ω) ⊂ L_2(Ω) ⊂ H^{-s}(Ω)` of `Rd.tildePivotDual` it gives the triple
-`H^s_0(Ω) ⊂ L_2(Ω) ⊂ H^{-s}(Ω)` up to equivalent norms. -/
+`H^s_0(Ω) ⊂ L_2(Ω) ⊂ H^{-s}(Ω)` up to equivalent norms.
+
+The two spaces sit in different ambient spaces: `H̃^s(Ω)` (`Rd.tildeSpace`) is the closure of the
+test functions of `Ω` in `H^s(V)`, and `H^s_0(Ω)` (`Rd.zeroBoundarySpace`) is the closure of their
+restrictions in `H^s(Ω)`. For `s ≥ 0` and every open `Ω`, restriction maps `H̃^s(Ω)` into
+`H^s_0(Ω)` injectively, with dense range and norm at most `1` (`Rd.tildeToRestrictionL_injective`,
+`Rd.closure_range_tildeToRestrictionL`, `Rd.norm_restrictProj_apply_le`; Hewett–Moiola,
+Lemma 2.2(iii)). It is onto exactly when extending by zero is bounded, `‖U‖ ≤ C ‖U|_Ω‖` on
+`H̃^s(Ω)` (Hewett–Moiola, the list after Lemma 2.9). At `s ∈ 1/2 + ℕ_0` this fails on smooth
+bounded domains (Hewett–Moiola, Remark 2.5). At `s = 1/2` the constant `1` lies in
+`H^{1/2}_0(Ω) = H^{1/2}(Ω)`, but its zero extension `1_Ω` does not lie in `H^{1/2}(V)`, so `1` is
+the restriction of no element of `H̃^{1/2}(Ω)`; this holds for every bounded Lipschitz domain
+(Chandler-Wilde–Hewett–Moiola, Remark 3.32). -/
 noncomputable def tildeEquivZeroBoundaryOfNeHalf (hs0 : 0 ≤ s) (hs : ∀ k : ℕ, s ≠ k + 1 / 2) :
     tildeSpace s Ω.toOpens ≃L[ℂ] zeroBoundarySpace s Ω.toOpens :=
   (Ω.exists_hasZeroExtensionBound hs0 hs).choose_spec.tildeEquivZeroBoundary

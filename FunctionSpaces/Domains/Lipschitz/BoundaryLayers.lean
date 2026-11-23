@@ -26,7 +26,8 @@ Lipschitz domain is a layer of width `≲ ‖h‖` along the boundary.
   (`Rd.measurableSet_switchSet`, `Rd.volume_switchSet_le`), from Mathlib's
   `MeasurableSet.symmDiff` and `Set.symmDiff_subset_union`.
 * **The height above a graph.** For a Lipschitz graph domain `{x : φ(x) < ⟪x, e⟫}` the height
-  `η(x) = ⟪x, e⟫ - φ(x)` (`Rd.LipschitzGraph.height`) is positive exactly on the domain
+  `η(x) = ⟪x, e⟫ - φ(x)` (`Rd.LipschitzGraph.height`) is continuous
+  (`Rd.LipschitzGraph.continuous_height`), positive exactly on the domain
   (`Rd.LipschitzGraph.mem_domain_iff_height_pos`), grows by `r` along `r e`
   (`Rd.LipschitzGraph.height_add_smul`), is the last coordinate of the graph coordinates
   `(x', t) ↦ γ(x') + t e` (`Rd.LipschitzGraph.height_graphEquiv`), and is `(1 + M)`-Lipschitz
@@ -139,6 +140,10 @@ variable (Ω : LipschitzGraph V)
 /-- The **height** `η(x) = ⟪x, e⟫ - φ(x)` of `x` above the graph of `Ω`; it is positive exactly on
 the domain (`Rd.LipschitzGraph.mem_domain_iff_height_pos`). -/
 def height (x : V) : ℝ := inner ℝ x Ω.e - Ω.phi x
+
+/-- The height `η(x) = ⟪x, e⟫ - φ(x)` is continuous. -/
+theorem continuous_height : Continuous Ω.height :=
+  (continuous_id.inner continuous_const).sub Ω.continuous_phi
 
 /-- `x` lies in the graph domain iff its height is positive. -/
 theorem mem_domain_iff_height_pos (x : V) : x ∈ Ω.domain ↔ 0 < Ω.height x := by
@@ -255,12 +260,6 @@ theorem mul_div_two_pow_pow_sub_one_le {t d : ℝ} (ht : 0 ≤ t) (hd : 1 ≤ d)
 namespace BoundedLipschitzDomain
 
 variable (Ω : BoundedLipschitzDomain V)
-
-/-- In a boundary ball `B_i`, membership in `Ω` is membership in the graph domain `Ω_i`, since
-`B_i ∩ Ω = B_i ∩ Ω_i`. -/
-theorem mem_carrier_iff_of_mem_ball {i : Fin Ω.N} {x : V}
-    (hx : x ∈ ball (Ω.center i) (Ω.radius i)) : x ∈ Ω.carrier ↔ x ∈ (Ω.graph i).domain := by
-  simpa only [mem_inter_iff, hx, true_and] using Set.ext_iff.1 (Ω.ball_inter i) x
 
 /-- **Short steps switch only near a chart graph**: if the shrunk balls `B(c_i, ρ_i - 2ε)` cover
 the boundary and `‖h‖ ≤ ε`, every switch point `x` of `Ω` has `|η_i(x)| ≤ (1 + M_i) ‖h‖` for some

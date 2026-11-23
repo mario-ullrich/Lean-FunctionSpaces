@@ -29,13 +29,24 @@ and McLean (Chapter 3), and are Hilbert spaces as well.
 * **`H^1(Ω)` in `L_2(Ω)`**: `Rd.restrictL2` is injective, has norm at most `1`, and is compact
   for bounded `Ω` (Rellich's theorem, `Rd.isCompactOperator_restrictL2`); `U|_Ω = u` whenever
   `U ∈ H^1(V)` agrees with `u ∈ H^1(Ω)` on `Ω` (`Rd.restrictProj_eq_of_ae_eq`).
+* **Restrictions through the `L_2` functions**: for `s ≥ 0`, `U|_Ω` is determined by the `L_2`
+  function `ι_s U` (`Rd.sobolevToL2`) on `Ω` (`Rd.restrictProj_eq_restrictProj_of_ae_eq`,
+  `Rd.restrictProj_eq_of_sobolevToL2_ae_eq`), and `ι_s(U|_Ω) = ι_s U` almost everywhere on `Ω`
+  (`Rd.sobolevToL2_restrictProj_ae_eq`).
 * **Weak derivatives**: the `L_2` function of `U ∈ H^1(V)` lies in `W^1_2(V)` and in `W^1_2(Ω)`
   for every open `Ω` (`Rd.memSobolev_toL2`, `Rd.memWeakSobolev_toL2`), every function of
   `W^1_2(V)` is one (`Rd.exists_toL2_eq_of_memSobolev`), with
   `‖U‖² = ‖U‖_2² + (2π)⁻² ∑_i ‖∂_{e_i} U‖_2²` (`Rd.sq_norm_eq_of_hasWeakLineDeriv`), so
   `‖U‖ ≤ ‖U‖_2 + ∑_i ‖∂_{e_i} U‖_2` (`Rd.norm_le_norm_toL2_add_sum`); the weak derivative
   `∂_v` is a bounded operator `H^1(V) → L_2(V)` of norm at most `2π ‖v‖` (`Rd.weakDerivL2`,
-  `Rd.norm_weakDerivL2_le`); the weak derivatives of an element vanishing on `Ω` vanish on `Ω`.
+  `Rd.norm_weakDerivL2_le`), whose tempered distribution is the derivative `∂_v U`
+  (`Rd.toTemperedDistribution_weakDerivL2`), so `∂_v(ι_{1,s} U) ∈ H^{s-1}(V)` for `U ∈ H^s(V)`,
+  `s ≥ 1`, with the inclusion `ι_{1,s}` (`Rd.sobolevInclusion`,
+  `Rd.memSobolev_bessel_weakDerivL2_sobolevInclusion`). The weak derivatives are local: where
+  the `L_2` functions of `U, W ∈ H^1(V)` agree on an open set, so do `∂_v U` and `∂_v W`
+  (`Rd.weakDerivL2_ae_eq_zero_of_ae_eq_zero`, `Rd.weakDerivL2_ae_eq_of_ae_eq`); hence
+  `∂_v(U|_Ω) = ∂_v U` on `Ω` (`Rd.weakDerivL2_restrictProj_ae_eq`), and the weak derivatives of
+  an element vanishing on `Ω` vanish on `Ω`.
   For `u ∈ H^1(Ω)`, the `L_2(Ω)` norm of `u` and `(2π)⁻¹` times the `L_2(Ω)` norm of its weak
   gradient are bounded by the norm of `H^1(Ω)`:
   `‖u|_Ω‖_2² + (2π)⁻² ∑_i ‖(∂_{e_i} u)|_Ω‖_2² ≤ ‖u‖²` (`Rd.sq_norm_restr_add_sum_le`,
@@ -55,8 +66,9 @@ and McLean (Chapter 3), and are Hilbert spaces as well.
   and inside `H^1(V)` the two are the same subspace (`Rd.tildeSpace_one_le_orthogonal`,
   `Rd.coe_tildeEquivZeroBoundary_symm_apply`). For `s ≥ 0` the `L_2` functions of the elements
   of `H̃^s(Ω)` vanish outside `Ω` (`Rd.sobolevToL2_ae_eq_zero_of_mem_tildeSpace`, and
-  `Rd.toL2_ae_eq_zero_of_mem_tildeSpace` for `s = 1`). On the whole space, `H̃^s(V) = H^s(V)`
-  (`Rd.tildeSpace_top`).
+  `Rd.toL2_ae_eq_zero_of_mem_tildeSpace` for `s = 1`), so `ι_s U = 1_Ω ι_s(U + W)` for
+  `U ∈ H̃^s(Ω)` and `W` vanishing on `Ω` (`Rd.sobolevToL2_eq_indicatorLp_add`). On the whole
+  space, `H̃^s(V) = H^s(V)` (`Rd.tildeSpace_top`).
 -/
 
 @[expose] public section
@@ -334,6 +346,47 @@ theorem isCompactOperator_restrictL2 (hΩ : Bornology.IsBounded (Ω : Set V)) :
     IsCompactOperator (restrictL2 Ω) :=
   (isCompactOperator_restr_toL2 hΩ).comp_clm _
 
+/-! ### Restrictions through the `L_2` functions -/
+
+/-- **Restrictions are determined by the `L_2` functions on `Ω`**: for `s ≥ 0`, an open `Ω` and
+`U, U' ∈ H^s(V)` with `ι_s U = ι_s U'` almost everywhere on `Ω`, `U|_Ω = U'|_Ω`, since `U - U'`
+vanishes on `Ω` (`Rd.mem_vanishOn_iff_sobolevToL2`), the kernel of the restriction
+(`Rd.restrictProj_eq_zero_iff`). -/
+theorem restrictProj_eq_restrictProj_of_ae_eq (hs : 0 ≤ s) {U U' : H^{s}(V)}
+    (h : (sobolevToL2 hs U : V → ℂ) =ᵐ[volume.restrict (Ω : Set V)] sobolevToL2 hs U') :
+    restrictProj s Ω U = restrictProj s Ω U' := by
+  have hmem : U - U' ∈ vanishOn s Ω := by
+    rw [mem_vanishOn_iff_sobolevToL2 hs, map_sub]
+    filter_upwards [ae_restrict_of_ae (Lp.coeFn_sub (sobolevToL2 hs U) (sobolevToL2 hs U')), h]
+      with x h1 h2
+    rw [h1, Pi.sub_apply, h2, sub_self, Pi.zero_apply]
+  have h0 := (restrictProj_eq_zero_iff (Ω := Ω) (U - U')).2 hmem
+  rwa [map_sub, sub_eq_zero] at h0
+
+/-- **An element of `H^s(Ω)` is the restriction of every element with the same `L_2` function on
+`Ω`**: for `s ≥ 0`, `U ∈ H^s(V)` and `u ∈ H^s(Ω)` with `ι_s U = ι_s u` almost everywhere on `Ω`,
+`U|_Ω = u` (`Rd.restrictProj_eq_restrictProj_of_ae_eq`, `Rd.restrictProj_coe`). At `s = 1` this is
+`Rd.restrictProj_eq_of_ae_eq`. -/
+theorem restrictProj_eq_of_sobolevToL2_ae_eq (hs : 0 ≤ s) {U : H^{s}(V)}
+    {u : RestrictionSpace s Ω}
+    (h : (sobolevToL2 hs U : V → ℂ) =ᵐ[volume.restrict (Ω : Set V)]
+      sobolevToL2 hs (u : H^{s}(V))) :
+    restrictProj s Ω U = u :=
+  (restrictProj_eq_restrictProj_of_ae_eq hs h).trans (restrictProj_coe u)
+
+/-- **A restriction has the same `L_2` function on `Ω`**: for `s ≥ 0`, an open `Ω` and
+`U ∈ H^s(V)`, `ι_s(U|_Ω) = ι_s U` almost everywhere on `Ω`, since `U - U|_Ω` vanishes on `Ω`
+(`Rd.sub_restrictProj_mem`, `Rd.mem_vanishOn_iff_sobolevToL2`). -/
+theorem sobolevToL2_restrictProj_ae_eq (hs : 0 ≤ s) (U : H^{s}(V)) :
+    (sobolevToL2 hs (restrictProj s Ω U : H^{s}(V)) : V → ℂ) =ᵐ[volume.restrict (Ω : Set V)]
+      sobolevToL2 hs U := by
+  have h := (mem_vanishOn_iff_sobolevToL2 hs _).1 (sub_restrictProj_mem (Ω := Ω) U)
+  rw [map_sub] at h
+  filter_upwards [h, ae_restrict_of_ae (Lp.coeFn_sub (sobolevToL2 hs U)
+    (sobolevToL2 hs (restrictProj s Ω U : H^{s}(V))))] with x h1 h2
+  rw [h2, Pi.sub_apply, Pi.zero_apply, sub_eq_zero] at h1
+  exact h1.symm
+
 /-! ### Weak derivatives of `H^1(V)` functions -/
 
 /-- **`H^1(V) ⊆ W^1_2(V)`**: the `L_2` function of every `U ∈ H^1(V)` lies in the Sobolev space
@@ -427,6 +480,25 @@ theorem weakDerivL2_eq {v : V} {U : H^{1}(V)} {g : Lp ℂ 2 (volume : Measure V)
     (h : HasWeakLineDeriv ⊤ (fun _ : Fin 1 => v) (toL2 U) g) : weakDerivL2 v U = g :=
   (hasWeakLineDeriv_weakDerivL2 v U).eq_of_top h
 
+/-- **Weak derivatives of `H^1(V)` are distributional derivatives**: for `U ∈ H^1(V)` and every
+direction `v`, the tempered distribution of the weak derivative `∂_v U ∈ L_2(V)` is the derivative
+`∂_v` of the distribution `U` (`Rd.hasWeakLineDeriv_top_iff`, `Rd.toTemperedDistribution_toL2`). -/
+theorem toTemperedDistribution_weakDerivL2 (v : V) (U : H^{1}(V)) :
+    ((weakDerivL2 v U : Lp ℂ 2 (volume : Measure V)) : 𝓢'(V, ℂ)) = ∂_{v} U.toDistr := by
+  have h := hasWeakLineDeriv_top_iff.1 (hasWeakLineDeriv_weakDerivL2 v U)
+  rw [LineDeriv.iteratedLineDerivOp_one, toTemperedDistribution_toL2] at h
+  exact h.symm
+
+/-- **The weak derivatives of `H^s(V)`, `s ≥ 1`, lie in `H^{s-1}(V)`**: for `U ∈ H^s(V)` and every
+direction `v`, the weak derivative `∂_v(ι_{1,s} U) ∈ L_2(V)` is, as a tempered distribution, the
+derivative `∂_v U` (`Rd.toTemperedDistribution_weakDerivL2`, `Rd.toDistr_sobolevInclusion`), which
+lies in `H^{s-1}(V)` (Mathlib's `TemperedDistribution.MemSobolev.lineDerivOp`). -/
+theorem memSobolev_bessel_weakDerivL2_sobolevInclusion (hs1 : 1 ≤ s) (U : H^{s}(V)) (v : V) :
+    TemperedDistribution.MemSobolev (s - 1) 2
+      ((weakDerivL2 v (sobolevInclusion hs1 U) : Lp ℂ 2 (volume : Measure V)) : 𝓢'(V, ℂ)) := by
+  rw [toTemperedDistribution_weakDerivL2, toDistr_sobolevInclusion]
+  exact U.memSobolev_toDistr.lineDerivOp
+
 /-- **The `H^1(V)` norm by the weak gradient, in `ℝ`**: let `(e_i)` be an orthonormal basis of
 `V`, `f` the `L_2` function of `U ∈ H^1(V)`, and `g_i ∈ L_2(V)` the weak derivatives
 `∂_{e_i} f` on `V`. Then `‖U‖² = ‖f‖_2² + (2π)⁻² ∑_i ‖g_i‖_2²`
@@ -499,6 +571,39 @@ theorem weakDeriv_ae_zero_of_mem_vanishOn {W : H^{1}(V)} (hW : W ∈ vanishOn 1 
     {v : Fin k → V} {g : V → ℂ} (hg : HasWeakLineDeriv ⊤ v (toL2 W) g) :
     g =ᵐ[volume.restrict (Ω : Set V)] 0 :=
   hg.ae_eq_zero_of_ae_eq_zero le_top ((mem_vanishOn_one_iff W).1 hW)
+
+/-- **The weak derivatives of `H^1(V)` are local**: if the `L_2` function of `U ∈ H^1(V)`
+vanishes almost everywhere on an open set `O`, so does its weak derivative `∂_v U`
+(`Rd.HasWeakLineDeriv.ae_eq_zero_of_ae_eq_zero`). -/
+theorem weakDerivL2_ae_eq_zero_of_ae_eq_zero {O : Set V} (hO : IsOpen O) (v : V)
+    {U : H^{1}(V)} (hU : (toL2 U : V → ℂ) =ᵐ[volume.restrict O] 0) :
+    (weakDerivL2 v U : V → ℂ) =ᵐ[volume.restrict O] 0 :=
+  (hasWeakLineDeriv_weakDerivL2 v U).ae_eq_zero_of_ae_eq_zero (O := ⟨O, hO⟩) le_top hU
+
+/-- **Weak derivatives of functions that agree on an open set agree there**: if the `L_2`
+functions of `U, W ∈ H^1(V)` agree almost everywhere on an open set `O`, so do `∂_v U` and
+`∂_v W` (`Rd.weakDerivL2_ae_eq_zero_of_ae_eq_zero` for `U - W`). -/
+theorem weakDerivL2_ae_eq_of_ae_eq {O : Set V} (hO : IsOpen O) (v : V) {U W : H^{1}(V)}
+    (h : (toL2 U : V → ℂ) =ᵐ[volume.restrict O] toL2 W) :
+    (weakDerivL2 v U : V → ℂ) =ᵐ[volume.restrict O] weakDerivL2 v W := by
+  have h0 := weakDerivL2_ae_eq_zero_of_ae_eq_zero hO v (U := U - W) (by
+    filter_upwards [h, ae_restrict_of_ae (Lp.coeFn_sub (toL2 U) (toL2 W))] with x hx hs
+    rw [map_sub, hs, Pi.sub_apply, hx, sub_self, Pi.zero_apply])
+  filter_upwards [h0, ae_restrict_of_ae (Lp.coeFn_sub (weakDerivL2 v U) (weakDerivL2 v W))]
+    with x hx hs
+  rw [map_sub, hs, Pi.sub_apply, Pi.zero_apply, sub_eq_zero] at hx
+  exact hx
+
+/-- **A restriction has the same weak derivatives on `Ω`**: for an open `Ω`, `U ∈ H^1(V)` and every
+direction `v`, `∂_v(U|_Ω) = ∂_v U` almost everywhere on `Ω`, since `U|_Ω` and `U` have the same
+`L_2` function on `Ω` (`Rd.sobolevToL2_restrictProj_ae_eq`) and weak derivatives of `H^1(V)` are
+local (`Rd.weakDerivL2_ae_eq_of_ae_eq`). -/
+theorem weakDerivL2_restrictProj_ae_eq (v : V) (U : H^{1}(V)) :
+    (weakDerivL2 v (restrictProj 1 Ω U : H^{1}(V)) : V → ℂ) =ᵐ[volume.restrict (Ω : Set V)]
+      weakDerivL2 v U := by
+  have h := sobolevToL2_restrictProj_ae_eq zero_le_one (Ω := Ω) U
+  rw [sobolevToL2_one] at h
+  exact weakDerivL2_ae_eq_of_ae_eq Ω.isOpen v h
 
 /-! ### Test functions, `H̃^s(Ω)` and `H^s_0(Ω)` -/
 
@@ -801,6 +906,25 @@ theorem sobolevToL2_ae_eq_zero_of_mem_tildeSpace (hs : 0 ≤ s) {U : H^{s}(V)}
   have h' := (LpToLpRestrictCLM_coeFn ℂ _ _).symm.trans h
   rw [EventuallyEq, ae_restrict_iff' Ω.isOpen.measurableSet.compl] at h'
   exact h'
+
+open Set in
+/-- **Test functions as cut-offs of their extensions**: for `s ≥ 0`, an open `Ω`, `U ∈ H̃^s(Ω)`
+and `W` vanishing on `Ω`, `ι_s U = 1_Ω ι_s(U + W)`, since `ι_s U = 0` almost everywhere outside `Ω`
+(`Rd.sobolevToL2_ae_eq_zero_of_mem_tildeSpace`) and `ι_s W = 0` almost everywhere on `Ω`
+(`Rd.mem_vanishOn_iff_sobolevToL2`). -/
+theorem sobolevToL2_eq_indicatorLp_add (hs : 0 ≤ s) {U W : H^{s}(V)}
+    (hU : U ∈ tildeSpace s Ω) (hW : W ∈ vanishOn s Ω) :
+    sobolevToL2 hs U = indicatorLp Ω.isOpen.measurableSet (sobolevToL2 hs (U + W)) := by
+  refine Lp.ext ?_
+  have hU0 := sobolevToL2_ae_eq_zero_of_mem_tildeSpace hs hU
+  have hW0 := (ae_restrict_iff' Ω.isOpen.measurableSet).1
+    ((mem_vanishOn_iff_sobolevToL2 hs W).1 hW)
+  filter_upwards [indicatorLp_apply_ae Ω.isOpen.measurableSet (sobolevToL2 hs (U + W)),
+    Lp.coeFn_add (sobolevToL2 hs U) (sobolevToL2 hs W), hU0, hW0] with x h1 h2 h3 h4
+  rw [h1]
+  by_cases hx : x ∈ (Ω : Set V)
+  · rw [indicator_of_mem hx, map_add, h2, Pi.add_apply, h4 hx, Pi.zero_apply, add_zero]
+  · rw [indicator_of_notMem hx, h3 hx]
 
 /-- **Elements of the span of the test functions vanish near the complement of `Ω`**: for
 `U ∈ testSpan 1 Ω`, the `L_2` function of `U` vanishes almost everywhere on an open set

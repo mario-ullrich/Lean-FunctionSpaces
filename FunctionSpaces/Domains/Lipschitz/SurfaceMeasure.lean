@@ -31,11 +31,13 @@ graphs `γ_j(x') = x' + φ_j(x') e_j` over the hyperplanes `H_j`.
   set of the volume (`Rd.BoundedLipschitzDomain.volume_frontier`).
 * **The traces in `L_2(Γ)`**: the boundary trace of the trace theorem lies in `L_p(σ)`
   (`Rd.BoundedLipschitzDomain.memLp_boundaryTrace`); for `p = 2` and `1/2 < s < 3/2` it gives
-  bounded operators `T^s_Γ : H^s(V) → L_2(Γ)` (`Rd.BoundedLipschitzDomain.ambientTraceL2`), the
+  bounded operators `T^s_Γ : H^s(V) → L_2(Γ)` (`Rd.BoundedLipschitzDomain.ambientTraceL2`) with
+  values in `B^{s-1/2}_{2,2}(Γ)` (`Rd.BoundedLipschitzDomain.memBoundaryBesov_ambientTraceL2`), the
   injective trace of the trace space of `H^s(Ω)` in `L_2(Γ)` (`Rd.BoundedLipschitzDomain.traceL2`)
   and `γ^s_{L_2} : H^s(Ω) → L_2(Γ)` (`Rd.BoundedLipschitzDomain.boundaryTraceL2`), which is
   `T^s_Γ` on `H^s(Ω)` (`Rd.BoundedLipschitzDomain.boundaryTraceL2_eq_ambientTraceL2`) and whose
-  kernel is the trace kernel (`Rd.BoundedLipschitzDomain.ker_boundaryTraceL2`);
+  kernel is the trace kernel (`Rd.BoundedLipschitzDomain.ker_boundaryTraceL2`), so `T^s_Γ`
+  vanishes on the trace kernel (`Rd.BoundedLipschitzDomain.ambientTraceL2_eq_zero_of_mem_traceKer`);
   `B^{s-1/2}_{2,2}(Γ) ⊆ L_2(Γ)` (`Rd.BoundedLipschitzDomain.memLp_of_memBoundaryBesov`). For
   `s = 1` the statements with the `L_2` function `Rd.toL2` are
   `Rd.BoundedLipschitzDomain.ambientTraceL2_one_apply_ae`,
@@ -499,6 +501,16 @@ theorem ambientTraceL2_one_apply_ae (ψ : Ω.BoundaryPartition) (U : H^{1}(V)) :
   have h := Ω.ambientTraceL2_apply_ae ψ 1 U
   rwa [sobolevToL2_one] at h
 
+/-- **The trace of `H^s(V)` in `L_2(Γ)` lies in `B^{s-1/2}_{2,2}(Γ)`**, `1/2 < s < 3/2`: for every
+resolution of unity `ψ` and `U ∈ H^s(V)`, `T^s_Γ U` is the boundary trace `Tr_Γ ι_s U` almost
+everywhere on `Γ` (`Rd.BoundedLipschitzDomain.ambientTraceL2_apply_ae`), which lies in
+`B^{s-1/2}_{2,2}(Γ)` (`Rd.BoundedLipschitzDomain.memBoundaryBesov_sobolevToL2`). -/
+theorem memBoundaryBesov_ambientTraceL2 (ψ : Ω.BoundaryPartition) (s : ℝ) (U : H^{s}(V))
+    (hs : 1 / 2 < s := by norm_num) (hs' : s < 3 / 2 := by norm_num) :
+    Ω.MemBoundaryBesov 2 ψ (s - 1 / 2) 2 (Ω.ambientTraceL2 s hs hs' U) :=
+  (Ω.memBoundaryBesov_sobolevToL2 ψ s U hs hs').congr (EventuallyEq.symm
+    (Ω.ae_surfaceMeasure_iff_aeBoundary.1 (Ω.ambientTraceL2_apply_ae ψ s U hs hs')))
+
 /-- **The trace of the trace space in `L_2(Γ)`**, `1/2 < s < 3/2`: an element `t` of the trace
 space of `H^s(Ω)` goes to the boundary trace of its extension `E_s t ∈ H^s(Ω)`. It is injective
 (`Rd.BoundedLipschitzDomain.traceL2_injective`). -/
@@ -581,6 +593,19 @@ theorem ker_boundaryTraceL2 (s : ℝ) (hs : 1 / 2 < s := by norm_num)
   have h := Ω.boundaryTraceL2_apply_ae Ω.boundaryPartition s u hs hs'
   exact ⟨fun h0 => Ω.ae_surfaceMeasure_iff_aeBoundary.1 (h.symm.trans h0),
     fun h0 => h.trans (Ω.ae_surfaceMeasure_iff_aeBoundary.2 h0)⟩
+
+/-- **Elements of the trace kernel have zero trace in `L_2(Γ)`**, `1/2 < s < 3/2`: for
+`u ∈ ker γ_s`, read in `H^s(V)`, `T^s_Γ u = 0`
+(`Rd.BoundedLipschitzDomain.boundaryTraceL2_eq_ambientTraceL2`,
+`Rd.BoundedLipschitzDomain.ker_boundaryTraceL2`). -/
+theorem ambientTraceL2_eq_zero_of_mem_traceKer (s : ℝ) (hs : 1 / 2 < s) (hs' : s < 3 / 2)
+    {u : RestrictionSpace s Ω.toOpens} (hu : u ∈ Ω.traceKer s hs hs') :
+    Ω.ambientTraceL2 s hs hs' (u : H^{s}(V)) = 0 := by
+  have h : u ∈ (Ω.boundaryTraceL2 s hs hs').ker := by
+    rw [Ω.ker_boundaryTraceL2 s hs hs']
+    exact hu
+  rw [← Ω.boundaryTraceL2_eq_ambientTraceL2 s u hs hs']
+  exact LinearMap.mem_ker.1 h
 
 /-- **The functions of `B^{s-1/2}_{2,2}(Γ)` are traces in `L_2(Γ)`**, `1/2 < s < 3/2`: for every
 resolution of unity `ψ` and `g ∈ B^{s-1/2}_{2,2}(Γ)` there is `t` in the trace space of `H^s(Ω)`

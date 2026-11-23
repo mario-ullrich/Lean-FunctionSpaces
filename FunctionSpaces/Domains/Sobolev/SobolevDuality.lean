@@ -683,10 +683,10 @@ bounded and injective (`Rd.tildePivotDual_apply_apply`, `Rd.tildePivotDual_injec
 `H̃^s(Ω) ⊂ L_2(Ω) ⊂ H^{-s}(Ω)` with pivot space `L_2(Ω)`: the pairing of `H^{-s}(Ω)` with
 `H̃^s(Ω)` extends the inner product of `L_2(Ω)` (`Rd.pairing_dualEquiv_tildePivotDual`). For
 `s = 1`, restriction maps `H̃^1(Ω)` isometrically onto `H^1_0(Ω)` (`Rd.tildeEquivZeroBoundary`),
-and the triple is `H^1_0(Ω) ⊂ L_2(Ω) ⊂ H^{-1}(Ω)`. On a Lipschitz domain, for `s ≥ 0` with
-`s - 1/2 ∉ ℤ`, restriction is an isomorphism of `H̃^s(Ω)` onto `H^s_0(Ω)` with equivalent norms
-(McLean, Theorem 3.33), and up to equivalent norms the triple is
-`H^s_0(Ω) ⊂ L_2(Ω) ⊂ H^{-s}(Ω)`. -/
+and the triple is `H^1_0(Ω) ⊂ L_2(Ω) ⊂ H^{-1}(Ω)`. On a bounded Lipschitz domain, for `s ≥ 0`
+with `s - 1/2 ∉ ℕ_0`, restriction is an isomorphism of `H̃^s(Ω)` onto `H^s_0(Ω)` with equivalent
+norms (`Rd.BoundedLipschitzDomain.tildeEquivZeroBoundaryOfNeHalf`; McLean, Theorem 3.33), and up
+to equivalent norms the triple is `H^s_0(Ω) ⊂ L_2(Ω) ⊂ H^{-s}(Ω)`. -/
 noncomputable def tildePivotDual (hs : 0 ≤ s) :
     Lp ℂ 2 (volume.restrict (Ω : Set V)) →L⋆[ℂ] StrongDual ℂ (tildeSpace s Ω) :=
   (tildeToL2 Ω hs).pivotDual

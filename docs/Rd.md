@@ -128,7 +128,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Jackson's inequality for band-limited approximation | ✅ | ✗ | `Rd/Approximation/BandJackson` |
 | Differences of Schwartz functions in `L_p`, the difference operator on `L_2`, inverse inequality for band-limited functions | ✅ | ✗ | `Rd/Approximation/BandInverse` |
 | Besov spaces on `ℝ^d`: approximation, Littlewood–Paley blocks and differences agree for `0 < s < r` | ✅ | ✗ | `Rd/Differences/BesovDifferences` |
-| Sobolev–Slobodeckij norms: the Gagliardo form, its two-sided bounds by first differences with explicit constants, radial integrals of powers, double integrals of sums, `W^{s,p} = B^s_{p,p}` for `0 < s < 1`, the Gagliardo measure, under which the form for `p = 2` is a square `L_2` norm | ✅ | ✗ | `Rd/Differences/SobolevSlobodeckij` |
+| Sobolev–Slobodeckij norms: the Gagliardo form, its two-sided bounds by first differences with explicit constants, radial integrals of powers, double integrals of sums, `W^{s,p} = B^s_{p,p}` for `0 < s < 1`, the Gagliardo measure, under which the form for `p = 2` is a square `L_2` norm, and integrals over the line by dyadic shells | ✅ | ✗ | `Rd/Differences/SobolevSlobodeckij` |
 | Besov spaces on `ℝ^d` as interpolation spaces, by approximation, differences and Littlewood–Paley blocks | ✅ | ✗ | `Rd/Interpolation/BesovInterpolation` |
 | Moment kernels: finite `L_1` norm, the vanishing moments of their coefficients, averaged differences, approximation with the modulus, also on subsets, vanishing first moments of the moment kernels of order two | ✅ | ✗ | `Rd/Differences/MomentKernels` |
 | Local means on `ℝ^d`: reproducing formula, agreement with differences for `0 < s < L`, bumps from smooth bump functions | ✅ | ✗ | `Rd/LocalMeans/LocalMeans` |

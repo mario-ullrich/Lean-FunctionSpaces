@@ -53,9 +53,9 @@ quantity of first differences on `Ω` (`Rd.modNormOn`).
   of the heights (`MeasureTheory.setLIntegral_preimage_Ioc_le_tsum`) and Hardy's inequality for
   tails (`MeasureTheory.tsum_dyadicWeight_mul_setLIntegral_le`).
 
-The height is continuous (`Rd.LipschitzGraph.continuous_height`), and the vertical form and the
-vertical difference quotient of a measurable function are measurable
-(`Rd.LipschitzGraph.measurable_verticalForm`, `Rd.LipschitzGraph.measurable_verticalQuotient`).
+The vertical form and the vertical difference quotient of a measurable function are measurable
+(`Rd.LipschitzGraph.measurable_verticalForm`, `Rd.LipschitzGraph.measurable_verticalQuotient`),
+since the height is continuous (`Rd.LipschitzGraph.continuous_height`).
 -/
 
 @[expose] public section
@@ -67,47 +67,12 @@ open ENNReal (lqNorm dyadicWeight)
 
 namespace Rd
 
-/-! ### Integrals over the line by dyadic shells -/
-
-/-- **An integral over the line by dyadic shells**: if `F : ℝ → [0, ∞]` vanishes at `0` and
-outside `[-1, 1]`, and `F ≤ c_k` on the shell `2^(-k-1) < |r| ≤ 2^(-k)` (`Rd.dyadicAnnulus`),
-then `∫ F ≤ 2 ∑_k 2^(-k) c_k`, since the shells cover `[-1, 1] \ {0}`
-(`Rd.setLIntegral_closedBall_le_tsum_dyadicAnnulus_of_zero`) and the shell `k` has length at most
-`2^(-k) |(-1, 1)|` (`Rd.volume_dyadicAnnulus_le`). -/
-theorem lintegral_real_le_tsum_dyadicAnnulus {F : ℝ → ℝ≥0∞} (hF0 : F 0 = 0)
-    (hF1 : ∀ r, 1 < |r| → F r = 0) {c : ℕ → ℝ≥0∞}
-    (hc : ∀ k, ∀ r ∈ dyadicAnnulus (1 : ℝ) k, F r ≤ c k) :
-    ∫⁻ r, F r ≤ 2 * ∑' k, dyadicWeight (-1) k * c k := by
-  have hsupp : Function.support F ⊆ closedBall (0 : ℝ) (1 / 2 ^ 0) := fun r hr => by
-    rw [pow_zero, div_one, mem_closedBall_zero_iff, Real.norm_eq_abs]
-    by_contra h
-    exact hr (hF1 r (not_le.1 h))
-  rw [← setLIntegral_eq_of_support_subset hsupp]
-  refine (setLIntegral_closedBall_le_tsum_dyadicAnnulus_of_zero hF0 1 0).trans ?_
-  rw [← ENNReal.tsum_mul_left]
-  refine ENNReal.tsum_le_tsum fun k => ?_
-  rw [zero_add]
-  calc ∫⁻ r in dyadicAnnulus 1 k, F r ≤ ∫⁻ _ in dyadicAnnulus (1 : ℝ) k, c k :=
-        setLIntegral_mono' (measurableSet_dyadicAnnulus 1 k) (hc k)
-    _ = c k * volume (dyadicAnnulus (1 : ℝ) k) := setLIntegral_const _ _
-    _ ≤ c k * (ENNReal.ofReal 1 ^ (finrank ℝ ℝ : ℝ) * dyadicWeight (-(finrank ℝ ℝ : ℝ)) k *
-          volume (ball (0 : ℝ) 1)) := mul_le_mul' le_rfl (volume_dyadicAnnulus_le one_pos k)
-    _ = 2 * (dyadicWeight (-1) k * c k) := by
-        rw [finrank_self, Real.volume_ball, ENNReal.ofReal_one, ENNReal.one_rpow, Nat.cast_one,
-          mul_one, ENNReal.ofReal_ofNat]
-        ring
-
 namespace LipschitzGraph
 
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
   [MeasurableSpace V] [BorelSpace V] (Ω : LipschitzGraph V)
 
-/-! ### Graph coordinates and the height -/
-
-omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
-/-- The height `η(x) = ⟪x, e⟫ - φ(x)` is continuous. -/
-theorem continuous_height : Continuous Ω.height :=
-  (continuous_id.inner continuous_const).sub Ω.continuous_phi
+/-! ### Graph coordinates -/
 
 /-- **Integrals in graph coordinates**: for measurable `F : V → [0, ∞]`,
 `∫_V F = ∫_H ∫_ℝ F(γ(x') + t e) dt dx'`, since the graph coordinates preserve the Lebesgue

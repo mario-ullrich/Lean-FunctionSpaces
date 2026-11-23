@@ -1854,7 +1854,7 @@ operator.
 \lean{Rd.toTemperedDistribution_sobolevToL2, Rd.besselPotential_sobolevToL2,
   Rd.sobolevToL2_eq_of_toDistr_eq, Rd.sobolevToL2_injective, Rd.norm_sobolevToL2_apply_le,
   Rd.sobolevToL2_one, Rd.sobolevToL2_sobolevInclusion, Rd.norm_sobolevToL2_zero,
-  Rd.sobolevToL2_zero_surjective}
+  Rd.sobolevToL2_zero_surjective, Rd.memSobolev_bessel_iff_exists_sobolevToL2_eq}
 \leanok
 \uses{def:sobolev-to-l2, lem:sobolev-inclusion, lem:lp-distribution-determined,
   def:sobolev-one-to-l2, lem:sobolev-one-to-l2}
@@ -1863,7 +1863,8 @@ $J_s \iota_s U = J_s U$ and $\|\iota_s U\|_2 \leq \|U\|_{H^s}$. For every $U \in
 every $f \in L_2(V)$ whose tempered distribution is $U$, $\iota_s U = f$. The operator
 $\iota_s$ is injective, $\iota_1$ is the operator $\iota$ of \Cref{def:sobolev-one-to-l2}, and
 for every $0 \leq t \leq s$ and every $U \in H^s(V)$, $\iota_t \iota_{t,s} U = \iota_s U$. The
-operator $\iota_0$ is an isometry of $H^0(V)$ onto $L_2(V)$.
+operator $\iota_0$ is an isometry of $H^0(V)$ onto $L_2(V)$. A function $f \in L_2(V)$ lies in
+$H^s(V)$ as a tempered distribution if and only if $f = \iota_s U$ for some $U \in H^s(V)$.
 \end{lemma}
 
 \begin{proof}
@@ -1874,7 +1875,11 @@ $J_0$ is the identity, so the tempered distribution of $\iota_s U$ is $\iota_{0,
 (\Cref{lem:lp-distribution-determined}), and an element of $H^s(V)$ by its distribution; this
 gives the next statements, with \Cref{lem:sobolev-one-to-l2} for $\iota_1 = \iota$. Since
 $\iota_{0,0}$ is the identity (\Cref{lem:sobolev-inclusion}), $\iota_0 U = J_0 U$, and
-$U \mapsto J_0 U$ is an isometry of $H^0(V)$ onto $L_2(V)$.
+$U \mapsto J_0 U$ is an isometry of $H^0(V)$ onto $L_2(V)$. A tempered distribution in $H^s(V)$
+is an element $U$ of $H^s(V)$ (Mathlib's
+\texttt{TemperedDistribution.\allowbreak MemSobolev.\allowbreak toBesselPotentialSpace}), and the
+$L_2$ function with the distribution $U$ is $\iota_s U$; conversely the distribution of
+$\iota_s U$ is $U$.
 \end{proof}
 
 \begin{lemma}[The symbol of $J_{-1} \partial_v$]

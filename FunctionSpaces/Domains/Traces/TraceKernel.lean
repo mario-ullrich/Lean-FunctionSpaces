@@ -364,16 +364,6 @@ theorem restrictionInclusion_mem_traceKer {s t : ℝ} (ht : 1 / 2 < t) (hts : t 
   rw [sobolevToL2_sobolevInclusion]
   exact hu
 
-/-- **The trace of `H^s(V)` in `L_2(Γ)` lies in `B^{s-1/2}_{2,2}(Γ)`**, `1/2 < s < 3/2`: for every
-resolution of unity `ψ` and `U ∈ H^s(V)`, `T^s_Γ U` is the boundary trace `Tr_Γ ι_s U` almost
-everywhere on `Γ` (`Rd.BoundedLipschitzDomain.ambientTraceL2_apply_ae`), which lies in
-`B^{s-1/2}_{2,2}(Γ)` (`Rd.BoundedLipschitzDomain.memBoundaryBesov_sobolevToL2`). -/
-theorem memBoundaryBesov_ambientTraceL2 (ψ : Ω.BoundaryPartition) (s : ℝ) (U : H^{s}(V))
-    (hs : 1 / 2 < s := by norm_num) (hs' : s < 3 / 2 := by norm_num) :
-    Ω.MemBoundaryBesov 2 ψ (s - 1 / 2) 2 (Ω.ambientTraceL2 s hs hs' U) :=
-  (Ω.memBoundaryBesov_sobolevToL2 ψ s U hs hs').congr (EventuallyEq.symm
-    (Ω.ae_surfaceMeasure_iff_aeBoundary.1 (Ω.ambientTraceL2_apply_ae ψ s U hs hs')))
-
 /-- **The extension from the boundary maps `B^{s-1/2}_{2,2}(Γ)` into `H^s(V)`**, `1/2 < s < 3/2`:
 for every `g ∈ L_2(Γ)` in `B^{s-1/2}_{2,2}(Γ)`, the extension `E_Γ g`
 (`Rd.BoundedLipschitzDomain.besovExtendLp`) is `ι_s W` for some `W ∈ H^s(V)`. Its quasi-norm with
@@ -433,19 +423,6 @@ theorem restrictProj_sub_mem_traceKer (s : ℝ) (hs : 1 / 2 < s) (hs' : s < 3 / 
   filter_upwards [Ω.boundaryTrace_restrictProj Ω.boundaryPartition s (U - W) hs hs',
     Ω.boundaryTrace_sobolevToL2_sub Ω.boundaryPartition s U W hs hs', hU, hE] with y h1 h2 h3 h4
   rw [h1, h2, Pi.sub_apply, ← h3, h4, sub_self, Pi.zero_apply]
-
-/-- **Elements of the trace kernel have zero trace in `L_2(Γ)`**, `1/2 < s < 3/2`: for
-`u ∈ ker γ_s`, read in `H^s(V)`, `T^s_Γ u = 0`
-(`Rd.BoundedLipschitzDomain.boundaryTraceL2_eq_ambientTraceL2`,
-`Rd.BoundedLipschitzDomain.ker_boundaryTraceL2`). -/
-theorem ambientTraceL2_eq_zero_of_mem_traceKer (s : ℝ) (hs : 1 / 2 < s) (hs' : s < 3 / 2)
-    {u : RestrictionSpace s Ω.toOpens} (hu : u ∈ Ω.traceKer s hs hs') :
-    Ω.ambientTraceL2 s hs hs' (u : H^{s}(V)) = 0 := by
-  have h : u ∈ (Ω.boundaryTraceL2 s hs hs').ker := by
-    rw [Ω.ker_boundaryTraceL2 s hs hs']
-    exact hu
-  rw [← Ω.boundaryTraceL2_eq_ambientTraceL2 s u hs hs']
-  exact LinearMap.mem_ker.1 h
 
 /-- **Approximation of `ker γ_s` by `H^s_0(Ω)` with a bound**, `1/2 < s ≤ 1`: there is `K < ∞`
 such that for every `u ∈ ker γ_s` and every `W' ∈ H^1(V)` some `y ∈ H^s_0(Ω)` has

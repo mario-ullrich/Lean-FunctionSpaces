@@ -32,7 +32,8 @@ inequality on test functions, and proves that inequality for every integer `s �
   `(2π)² ‖U‖²_{s+1} = (2π)² ‖ι_{s,s+1} U‖²_s + ∑_i ‖∂_{e_i} U‖²_s`
   (`Rd.sq_norm_eq_add_sum_sobolevLineDeriv`) and derivatives that keep test functions and
   vanishing (`Rd.sobolevLineDeriv_mem_testSpan`, `Rd.sobolevLineDeriv_mem_vanishOn`) carry the
-  bound from `s` to `s + 1` with the same constant (`Rd.HasZeroExtensionBound.add_one`).
+  bound from `s` to `s + 1` with the same constant (`Rd.HasZeroExtensionBound.add_one`), and so
+  from `s` to `s + m` for every `m ∈ ℕ` (`Rd.HasZeroExtensionBound.add_natCast`).
 * **Integer `s`**: at `s = 0` the bound holds with `C = 1` on every open set, since the `L_2`
   functions of `U` and `W` have disjoint supports (`Rd.hasZeroExtensionBound_zero`); by lifting,
   for every `m ∈ ℕ` (`Rd.hasZeroExtensionBound_natCast`), so restriction is an isometry of
@@ -248,18 +249,23 @@ theorem HasZeroExtensionBound.add_one (h : HasZeroExtensionBound s Ω C) :
   have h4 : ‖U‖ ^ 2 ≤ (C * ‖U + W‖) ^ 2 := le_of_mul_le_mul_left h3 (by positivity)
   exact (pow_le_pow_iff_left₀ (norm_nonneg _) (by positivity) two_ne_zero).1 h4
 
+/-- **Lifting the zero extension bound by `m ∈ ℕ`, with the same constant**: for every open `Ω`
+and every real `C`, the zero extension bound at `s` gives the bound at `s + m`
+(`Rd.HasZeroExtensionBound.add_one`, applied `m` times). -/
+theorem HasZeroExtensionBound.add_natCast (h : HasZeroExtensionBound s Ω C) (m : ℕ) :
+    HasZeroExtensionBound (s + m) Ω C := by
+  induction m with
+  | zero => rwa [Nat.cast_zero, add_zero]
+  | succ m ih =>
+    rw [Nat.cast_succ, ← add_assoc]
+    exact ih.add_one
+
 variable (Ω) in
 /-- **The zero extension bound for integer smoothness, with `C = 1`, on every open set**: the
-bound at `s = 0` (`Rd.hasZeroExtensionBound_zero`) lifted `m` times
-(`Rd.HasZeroExtensionBound.add_one`). -/
+bound at `s = 0` (`Rd.hasZeroExtensionBound_zero`) lifted by `m`
+(`Rd.HasZeroExtensionBound.add_natCast`). -/
 theorem hasZeroExtensionBound_natCast (m : ℕ) : HasZeroExtensionBound m Ω 1 := by
-  induction m with
-  | zero =>
-    rw [Nat.cast_zero]
-    exact hasZeroExtensionBound_zero Ω
-  | succ m ih =>
-    rw [Nat.cast_succ]
-    exact ih.add_one
+  simpa using (hasZeroExtensionBound_zero Ω).add_natCast m
 
 /-- **`H̃^m(Ω) ≅ H^m_0(Ω)` isometrically, for every open `Ω` and `m ∈ ℕ`** (Hewett and Moiola,
 Lemma 2.2(iii); Chandler-Wilde, Hewett and Moiola, Lemma 3.31(vi)): restriction is an isometric

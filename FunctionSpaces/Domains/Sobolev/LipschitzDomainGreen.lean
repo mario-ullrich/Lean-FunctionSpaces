@@ -57,28 +57,6 @@ variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDim
 
 /-! ### Integration by parts in `H^1(V)` -/
 
-/-- **The weak derivatives of `H^1(V)` are local**: if the `L_2` function of `U ∈ H^1(V)`
-vanishes almost everywhere on an open set `O`, so does its weak derivative `∂_v U`
-(`Rd.HasWeakLineDeriv.ae_eq_zero_of_ae_eq_zero`). -/
-theorem weakDerivL2_ae_eq_zero_of_ae_eq_zero {O : Set V} (hO : IsOpen O) (v : V)
-    {U : H^{1}(V)} (hU : (toL2 U : V → ℂ) =ᵐ[volume.restrict O] 0) :
-    (weakDerivL2 v U : V → ℂ) =ᵐ[volume.restrict O] 0 :=
-  (hasWeakLineDeriv_weakDerivL2 v U).ae_eq_zero_of_ae_eq_zero (O := ⟨O, hO⟩) le_top hU
-
-/-- **Weak derivatives of functions that agree on an open set agree there**: if the `L_2`
-functions of `U, W ∈ H^1(V)` agree almost everywhere on an open set `O`, so do `∂_v U` and
-`∂_v W` (`Rd.weakDerivL2_ae_eq_zero_of_ae_eq_zero` for `U - W`). -/
-theorem weakDerivL2_ae_eq_of_ae_eq {O : Set V} (hO : IsOpen O) (v : V) {U W : H^{1}(V)}
-    (h : (toL2 U : V → ℂ) =ᵐ[volume.restrict O] toL2 W) :
-    (weakDerivL2 v U : V → ℂ) =ᵐ[volume.restrict O] weakDerivL2 v W := by
-  have h0 := weakDerivL2_ae_eq_zero_of_ae_eq_zero hO v (U := U - W) (by
-    filter_upwards [h, ae_restrict_of_ae (Lp.coeFn_sub (toL2 U) (toL2 W))] with x hx hs
-    rw [map_sub, hs, Pi.sub_apply, hx, sub_self, Pi.zero_apply])
-  filter_upwards [h0, ae_restrict_of_ae (Lp.coeFn_sub (weakDerivL2 v U) (weakDerivL2 v W))]
-    with x hx hs
-  rw [map_sub, hs, Pi.sub_apply, Pi.zero_apply, sub_eq_zero] at hx
-  exact hx
-
 /-- The integrand `(∂_v U) W + U ∂_v W` of Green's formula is integrable for `U, W ∈ H^1(V)`, a
 sum of products of `L_2` functions. -/
 theorem integrable_weakDeriv_mul_add (v : V) (U W : H^{1}(V)) :
