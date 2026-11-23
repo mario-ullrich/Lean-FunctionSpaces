@@ -18,6 +18,7 @@ public import FunctionSpaces.Analysis.Lp.LayerCake
 public import FunctionSpaces.Analysis.Lp.Marcinkiewicz
 public import FunctionSpaces.Analysis.Lp.NormingFamily
 public import FunctionSpaces.Analysis.Lp.CoordinateSlices
+public import FunctionSpaces.Analysis.Lp.HalfLineHardy
 public import FunctionSpaces.Analysis.Differences.TranslationAlgebra
 public import FunctionSpaces.Analysis.Differences.Differences
 public import FunctionSpaces.Analysis.Differences.DomainModuli
@@ -122,6 +123,7 @@ public import FunctionSpaces.Domains.Lipschitz.BesovDomains
 public import FunctionSpaces.Domains.Lipschitz.BesovDomainLocalisation
 public import FunctionSpaces.Domains.Lipschitz.BoundaryLayers
 public import FunctionSpaces.Domains.Lipschitz.IndicatorMultiplier
+public import FunctionSpaces.Domains.Lipschitz.GraphHardy
 public import FunctionSpaces.Domains.Extension.RychkovExtension
 public import FunctionSpaces.Domains.Extension.LipschitzGraphBesov
 public import FunctionSpaces.Domains.Extension.LocalExtension
@@ -151,6 +153,7 @@ public import FunctionSpaces.Domains.Sobolev.SobolevRestrictionInclusions
 public import FunctionSpaces.Domains.Sobolev.ZeroExtensionBound
 public import FunctionSpaces.Domains.Sobolev.TildeSpaceSupport
 public import FunctionSpaces.Domains.Sobolev.SobolevZeroExtension
+public import FunctionSpaces.Domains.Sobolev.TildeZeroBoundaryEquiv
 public import FunctionSpaces.Domains.Sobolev.LipschitzDomainW1p
 public import FunctionSpaces.Domains.Sobolev.LipschitzGraphGreen
 public import FunctionSpaces.Domains.Sobolev.LipschitzDomainGreen

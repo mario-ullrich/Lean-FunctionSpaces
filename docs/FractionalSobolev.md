@@ -26,7 +26,12 @@ converges in `H^s(ℝ^d)` and smooth cut-offs keep `H^s(ℝ^d)` ([Sobolev spaces
 `B^s_{p,q}(ℝ^d)` for `0 < s < 1/p`: the steps `h` that cross the boundary start in a layer of
 width `≲ ‖h‖` along it, so `1_Ω` turns smooth atoms into atoms of smoothness `1/p`. At
 `p = q = 2` this gives the zero extension bound and `H̃^s(Ω) = H^s_0(Ω) = H^s(Ω)` for
-`0 ≤ s < 1/2`.
+`0 ≤ s < 1/2`. For `1/2 < s < 1` a Hardy inequality takes its place: a function that vanishes
+near the boundary of a Lipschitz graph domain, divided by the `s`-th power of its height above
+the graph, is controlled by its first differences in the domain, through a dyadic Hardy
+inequality on the vertical lines. Extension by zero from a graph domain is then bounded on such
+functions, with a constant independent of how close to the boundary they vanish, and the charts
+of a bounded Lipschitz domain give the zero extension bound.
 
 ## Main results
 
@@ -99,6 +104,21 @@ span of the test functions of `Ω` in `H^s(V)` (`Rd.testSpan`), and `U ↦ U|_Ω
   Theorem 1.4.2.4; McLean, Theorem 3.40), and restriction is an isomorphism of `H̃^s(Ω)` onto
   `H^s(Ω)` (`Rd.BoundedLipschitzDomain.tildeEquivRestrictionSpaceOfLtHalf`; Hewett–Moiola,
   Lemma 2.1; Chandler-Wilde–Hewett–Moiola, Corollary 3.29(ix)).
+* **A Hardy inequality and the zero extension bound for `1/2 < s < 1`.** For `s > 1/2` and a
+  measurable `u : ℝ → ℂ` that vanishes almost everywhere on some `(0, ε)`,
+  `∫_0^1 |u(t)|² t^(-2s) dt ≤ K_s ∫_0^1 ∫_0^1 |u(t) - u(τ)|² / |t - τ|^(1+2s) dτ dt` with
+  `K_s = 2^(2s+2) (1 - 2^(-(s-1/2)))^(-2)` (`Rd.lintegral_div_rpow_le_halfLineForm`). Let `Ω'` be
+  a Lipschitz graph domain with height `η` above its graph and
+  `N_{s,Ω'}(G) = ‖G‖_{L_2(Ω')} + ‖(2^(ks) ω_1(G, 2^(-k), Ω')_2)_k‖_{ℓ_2}`. Every `G ∈ L_2(V)`
+  that vanishes almost everywhere on `{x ∈ Ω' : η(x) < ε}` for some `ε > 0` satisfies
+  `∫_{Ω'} |G|² / min(η, 1)^(2s) ≤ (1 + K_s 2^(2s+2)) N_{s,Ω'}(G)²`
+  (`Rd.LipschitzGraph.lintegral_div_min_height_le_modNormOn`; for `1/2 < s < 1` a weaker,
+  directional form of Dyda 2004, Theorem 1.1), and there is `C < ∞`, independent of `ε`, with
+  `‖1_{Ω'} G‖_2 + ‖(2^(ks) ω_1(1_{Ω'} G, 2^(-k))_2)_k‖_{ℓ_2} ≤ C N_{s,Ω'}(G)`
+  (`Rd.LipschitzGraph.exists_modNorm_indicatorLp_le_of_vanish`). On a bounded Lipschitz domain
+  the zero extension bound holds at every `1/2 < s < 1`
+  (`Rd.BoundedLipschitzDomain.exists_hasZeroExtensionBound_of_half_lt`; McLean, Theorem 3.33;
+  Hewett–Moiola, Lemma 2.1), so restriction is an isomorphism of `H̃^s(Ω)` onto `H^s_0(Ω)`.
 
 ## What is formalised
 
@@ -112,6 +132,8 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Switch sets of a step and crossing points on the boundary, the height above a Lipschitz graph, slabs along a graph, and the boundary layer `\|S_h(Ω) ∩ B̄(c, ρ)\| ≤ C ‖h‖ ρ^(d-1)` of a bounded Lipschitz domain, also at the scales of atoms | ✅ | ✗ | `Domains/Lipschitz/BoundaryLayers` |
 | Differences of cut-off functions, indicators of smooth atoms as regular atoms of exponent `1/p`, and the indicator of a bounded Lipschitz domain as a pointwise multiplier of `B^s_{p,q}(ℝ^d)` for `0 < s < 1/p`, `1 ≤ p < ∞`, `1 ≤ q ≤ ∞` | ✅ | ✗ | `Domains/Lipschitz/IndicatorMultiplier` |
 | Restrictions determined by the `L_2` functions on `Ω`, the zero extension bound for `0 ≤ s < 1/2`, zero extensions in `H^s(ℝ^d)`, `H^s_0(Ω) = H^s(Ω)` and the isomorphism `H̃^s(Ω) ≅ H^s(Ω)` for `0 ≤ s < 1/2` | ✅ | ✗ | `Domains/Sobolev/SobolevZeroExtension` |
+| Integrals over the line by dyadic shells, integrals in graph coordinates, vertical forms and vertical difference quotients, the Hardy inequality `∫_{Ω'} \|G\|² / min(η, 1)^(2s) ≤ (1 + K_s 2^(2s+2)) N_{s,Ω'}(G)²` on a Lipschitz graph domain for `s > 1/2` and `G` vanishing near the graph, differences of the extension by zero, and the extension by zero from a graph domain | ✅ | ✗ | `Domains/Lipschitz/GraphHardy` |
+| The cut-off by the charts, extensions of test functions that vanish on `Ω` outside a compact set, localised functions that vanish near the graphs, and the zero extension bound for `1/2 < s < 1` on a bounded Lipschitz domain | ✅ | ✗ | `Domains/Sobolev/TildeZeroBoundaryEquiv` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

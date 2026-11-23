@@ -4,19 +4,21 @@ Part of [Characterizations of Function Spaces](../README.md). Blueprint: part *T
 chapters *Convolution and the Fourier transform on `ℝ^d`*, *Maximal functions* and *Interpolation of
 operators*; the other tools are cited where they are used, in *Besov spaces and their embeddings*,
 *Polynomial approximation on intervals*, *Approximation on the cube*, *Besov spaces on `ℝ^d`*,
-*Tensor Daubechies wavelets on `ℝ^d`*, *Lipschitz domains* and *Traces on Lipschitz domains*.
+*Tensor Daubechies wavelets on `ℝ^d`*, *Lipschitz domains*, *Traces on Lipschitz domains* and
+*Fractional Sobolev spaces on Lipschitz domains*.
 
 This block holds the folder `FunctionSpaces/Analysis/`, whose files import only Mathlib,
 `ApproximationSpaces` and each other: `L_p` norms, the inclusion `L_r ↪ L_p` and bounded
 continuous functions on finite measure spaces, Young's inequality on measurable groups, mixed
 norms `L_p(ℓ_q)` and `ℓ_q(L_p)` on every measure space, weak type, the layer cake formula,
-Marcinkiewicz interpolation, `L_p` norms by duality and `L_p` norms on `ℝ^d` through slices in
-one coordinate; differences on additive monoids, the translation algebra, moduli of
-smoothness on subsets and under linear changes of variables; convolution, approximate
-identities, the Littlewood–Paley kernels and test functions on `ℝ^d`; dyadic cubes and cells,
-the Hardy–Littlewood maximal function, the Calderón–Zygmund decomposition, also for functions
-with values in a normed space, and the Fefferman–Stein inequality. The `L_p` norms are handled
-through integrals of powers (`MeasureTheory.eLpNorm_rpow_eq`).
+Marcinkiewicz interpolation, `L_p` norms by duality, `L_p` norms on `ℝ^d` through slices in one
+coordinate and a fractional Hardy inequality on `(0, 1]`; differences on additive monoids,
+the translation algebra, moduli of smoothness on subsets and under linear changes of variables;
+convolution, approximate identities, the Littlewood–Paley kernels and test functions on `ℝ^d`;
+dyadic cubes and cells, the Hardy–Littlewood maximal function, the Calderón–Zygmund
+decomposition, also for functions with values in a normed space, and the Fefferman–Stein
+inequality. The `L_p` norms are handled through integrals of powers
+(`MeasureTheory.eLpNorm_rpow_eq`).
 
 ## Main results
 
@@ -89,6 +91,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Chebyshev's inequality with a power and at half height, the level sets of a split function, the parts of a function above and below a level, two Tonelli steps on s-finite measure spaces, integrals of powers from bounds at every level, and Marcinkiewicz interpolation between weak type `(1,1)` and strong type `(2,2)` with an explicit constant, for operators on an abstract input type and in the terms of the Carleson project | ✅ | ✗ | `Analysis/Lp/Marcinkiewicz` |
 | `L_p` and `L_p(ℓ_2)` norms by duality for `1 < p < ∞` through the norming family, Hölder's inequality for `[0, ∞]`-valued functions in `L_p` norms, and families in `L_p` vanishing outside a finite set | ✅ | ✗ | `Analysis/Lp/NormingFamily` |
 | `L_p` norms on `ℝ^d` through slices in one coordinate: integrating out a coordinate, `L_p` norms as mixed norms of slices, bounds through slices | ✅ | ✗ | `Analysis/Lp/CoordinateSlices` |
+| A fractional Hardy inequality on `(0, 1]`, `∫_0^1 \|u(t)\|² t^(-2s) dt ≤ K_s ∫_0^1 ∫_0^1 \|u(t) - u(τ)\|² / \|t - τ\|^(1+2s) dτ dt` for `s > 1/2` and measurable `u` vanishing near `0`, with two Minkowski steps between sets, Hardy's inequality for telescoping sequences, the scaled dyadic intervals `(c 2^(-k-1), c 2^(-k)]` and weighted layers of a height function | ✅ | ✗ | `Analysis/Lp/HalfLineHardy` |
 | Differences `higherDiff` on any additive monoid, steps of either sign, under additive maps; the modulus of smoothness on `ℝ^d`, its homogeneity, dilation of the scale | ✅ | ✗ | `Analysis/Differences/Differences` |
 | Translation algebra of an additive monoid, differences as its powers | ✅ | ✗ | `Analysis/Differences/TranslationAlgebra` |
 | Moduli of smoothness on subsets of `ℝ^d`, restrictions by intrinsic differences, sets equal up to null sets, the intrinsic quasi-norm, its lower semicontinuity along `L_p` limits, and the convergence of its Cauchy sequences | ✅ | ✗ | `Analysis/Differences/DomainModuli` |

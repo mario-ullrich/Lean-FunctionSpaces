@@ -21,6 +21,9 @@ the indicator of a bounded Lipschitz domain is a pointwise multiplier of $B^s_{p
 $1 \leq p < \infty$, $1 \leq q \leq \infty$ and $0 < s < 1/p$, and
 \Cref{sec:zero-extension-small} derives from it the zero extension bound and
 $\tilde H^s(\Omega) = H^s_0(\Omega) = H^s(\Omega)$ for $0 \leq s < 1/2$.
+\Cref{sec:fractional-hardy} proves a Hardy inequality on Lipschitz graph domains, from a
+fractional Hardy inequality on $(0, 1]$, and derives from it the zero extension bound for
+$1/2 < s < 1$.
 
 \section{Inclusions of restriction spaces}
 \label{sec:restriction-inclusions}
@@ -527,11 +530,12 @@ preserve the Lebesgue measure.
 
 \begin{definition}[The height above a graph]
 \label{def:graph-height}
-\lean{Rd.LipschitzGraph.height}
+\lean{Rd.LipschitzGraph.height, Rd.LipschitzGraph.continuous_height}
 \leanok
 \uses{def:lipschitz-graph}
 For a Lipschitz graph domain $\Omega' = \{x : \varphi(x) < \langle x, e \rangle\}$, the height of
-$x \in V$ above its graph is $\eta(x) = \langle x, e \rangle - \varphi(x)$.
+$x \in V$ above its graph is $\eta(x) = \langle x, e \rangle - \varphi(x)$. It is continuous, as
+the difference of a continuous linear form and the Lipschitz function $\varphi$.
 \end{definition}
 
 \begin{lemma}[Properties of the height]
@@ -887,3 +891,484 @@ This is the case $0 \leq s < 1/2$ of Hewett and Moiola
 \cite[Lemma 2.1 and Remark 2.6]{HewettMoiola}; the isomorphism
 $\tilde H^s(\Omega) \cong H^s_0(\Omega)$ for $s \geq 0$, $s \notin 1/2 + \N_0$, is classical
 \cite[Theorem 3.33]{McLean}.
+
+\section{A Hardy inequality on Lipschitz domains}
+\label{sec:fractional-hardy}
+
+For $1/2 < s < 1$ the zero extension bound rests on a Hardy inequality: a function that vanishes
+near the boundary of a Lipschitz graph domain, divided by the $s$-th power of its height above
+the graph, is controlled by its first differences in the domain (\Cref{thm:graph-hardy}). Along
+the vertical lines of the graph this reduces to the interval $(0, 1]$, where a dyadic argument
+and Hardy's inequality for tails give the one-dimensional inequality (\Cref{lem:half-line-hardy}).
+Extension by zero from a graph domain then costs a constant on such functions
+(\Cref{thm:graph-indicator-hardy}), and the charts of a bounded Lipschitz domain give the zero
+extension bound (\Cref{thm:zero-extension-hardy}). The resulting isomorphism
+$\tilde H^s(\Omega) \cong H^s_0(\Omega)$ is classical \cite[Theorem 3.33]{McLean}; the proof here
+follows the standard route through a Hardy inequality, with moduli of smoothness in place of the
+Gagliardo form. In this section all integrals of functions with values in $[0, \infty]$ are
+taken in $[0, \infty]$, $I_k = (2^{-k-1}, 2^{-k}]$ for $k \in \N_0$, and for a measurable
+$U \subseteq V$ and $G \in L_2(V)$,
+$N_{s,U}(G) = \|G\|_{L_2(U)} + \|(2^{ks} \omega_1(G, 2^{-k}, U)_2)_k\|_{\ell_2}$ is the
+intrinsic quantity of \Cref{lem:modnorm-on} and $N_s = N_{s,V}$. For a Lipschitz graph
+domain $\Omega' = \{x : \varphi(x) < \langle x, e \rangle\}$ with Lipschitz constant $M$, $\eta$
+is its height (\Cref{def:graph-height}), $H = e^\perp$ its hyperplane and $\gamma$ its graph map
+(\Cref{def:graph-map}).
+
+\begin{lemma}[Two Minkowski steps]
+\label{lem:two-set-l2-comparison}
+\lean{MeasureTheory.rpow_mul_lintegral_rpow_le}
+\leanok
+Let $\mu$ be an s-finite measure on a measurable space $X$, $u \colon X \to \C$ measurable and
+$A, B \subseteq X$. Then
+\begin{align*}
+  \mu(B)^{1/2} \Bigl(\int_A |u|^2 \, d\mu\Bigr)^{1/2}
+  &\leq \Bigl(\int_A \int_B |u(t) - u(\tau)|^2 \, d\mu(\tau) \, d\mu(t)\Bigr)^{1/2} \\
+  &\quad + \mu(A)^{1/2} \Bigl(\int_B |u|^2 \, d\mu\Bigr)^{1/2} .
+\end{align*}
+\end{lemma}
+
+\begin{proof}
+\leanok
+Fix $t \in A$. As a function of $\tau \in B$, the constant $u(t)$ is the sum of
+$u(t) - u(\tau)$ and $u(\tau)$, so Minkowski's inequality in $L_2(B)$ gives
+$\mu(B)^{1/2} |u(t)| \leq e(t) + a_B$ with $e(t) = (\int_B |u(t) - u(\tau)|^2 \, d\mu(\tau))^{1/2}$
+and $a_B = (\int_B |u|^2 \, d\mu)^{1/2}$; the function $e$ is measurable by Tonelli's theorem.
+Minkowski's inequality in $L_2(A)$ for this bound gives
+$\mu(B)^{1/2} (\int_A |u|^2 \, d\mu)^{1/2} \leq (\int_A e^2 \, d\mu)^{1/2} + \mu(A)^{1/2} a_B$.
+\end{proof}
+
+\begin{lemma}[Hardy's inequality for telescoping sequences]
+\label{lem:telescoping-hardy}
+\lean{ENNReal.le_tsum_of_le_add_of_eq_zero, ENNReal.tsum_sq_le_of_le_add_of_eq_zero}
+\leanok
+\uses{def:lq-norm}
+Let $m, b \colon \N_0 \to [0, \infty]$ and $K \in \N_0$ with $m_k \leq m_{k+1} + b_k$ for all $k$
+and $m_k = 0$ for all $k \geq K$. Then $m_k \leq \sum_{i \geq 0} b_{k+i}$ for every $k$, and for
+every real $\alpha$
+\[
+  \sum_k (2^{k\alpha} m_k)^2 \leq \bigl((1 - 2^{-\alpha})^{-1}\bigr)^2 \sum_k (2^{k\alpha} b_k)^2 ,
+\]
+where $(1 - 2^{-\alpha})^{-1} = \infty$ for $\alpha \leq 0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:hardy, lem:lq-basic}
+By induction on $j$, $m_k \leq m_{k+j} + \sum_{i < j} b_{k+i}$, and $m_{k+K} = 0$. Hardy's
+inequality for tails with $q = 2$ (\Cref{lem:hardy}) bounds the $\ell_2$ norm of the weighted
+tail sums.
+\end{proof}
+
+\begin{lemma}[Scaled dyadic intervals]
+\label{lem:scaled-dyadic-intervals}
+\lean{Real.pairwise_disjoint_Ioc_div_two_pow, Real.iUnion_Ioc_div_two_pow}
+\leanok
+For $c \geq 0$ the intervals $(c 2^{-k-1}, c 2^{-k}]$, $k \in \N_0$, are pairwise disjoint, and
+for $c > 0$ they cover $(0, c]$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+They are the intervals between consecutive terms of the decreasing sequence $c 2^{-k}$. For
+$0 < t \leq c$ some $k$ has $2^{-k-1} < t/c \leq 2^{-k}$, since $0 < t/c \leq 1$.
+\end{proof}
+
+\begin{definition}[{The Gagliardo form on $(0, 1]$}]
+\label{def:half-line-form}
+\lean{Rd.halfLineBlock, Rd.measurableSet_halfLineBlock, Rd.pairwise_disjoint_halfLineBlock,
+  Rd.halfLineBlock_subset_Ioc, Rd.iUnion_halfLineBlock, Rd.volume_halfLineBlock,
+  Rd.halfLineForm, Rd.halfLineHardyConst, Rd.halfLineHardyConst_ne_top}
+\leanok
+\uses{lem:scaled-dyadic-intervals}
+For $u \colon \R \to \C$ and real $s$,
+\[
+  \Phi_s(u) = \int_0^1 \int_0^1 \frac{|u(t) - u(\tau)|^2}{|t - \tau|^{1+2s}} \, d\tau \, dt ,
+\]
+and $K_s = 2^{2s+2} (1 - 2^{-(s-1/2)})^{-2}$, which is finite for $s > 1/2$. The dyadic intervals
+$I_k$ are measurable and pairwise disjoint, have length $2^{-k-1}$ and cover $(0, 1]$
+(\Cref{lem:scaled-dyadic-intervals} with $c = 1$).
+\end{definition}
+
+\begin{lemma}[{The interval $(0, 1]$ by dyadic blocks}]
+\label{lem:half-line-blocks}
+\lean{Rd.lintegral_Ioc_div_rpow_le_tsum_halfLineBlock,
+  Rd.tsum_dyadicWeight_mul_lintegral_le_halfLineForm,
+  Rd.dyadicWeight_mul_lintegral_halfLineBlock_le_add}
+\leanok
+\uses{def:half-line-form}
+Let $u \colon \R \to \C$, $a_k = (\int_{I_k} |u|^2)^{1/2}$ and
+$\delta_k = (\int_{I_k} \int_{I_{k+1}} |u(t) - u(\tau)|^2 \, d\tau \, dt)^{1/2}$.
+\begin{enumerate}
+  \item For $s \geq 0$, $\int_0^1 |u(t)|^2 t^{-2s} \, dt \leq \sum_k 2^{2s(k+1)} a_k^2$.
+  \item For $s \geq -1/2$, $\sum_k 2^{k(1+2s)} \delta_k^2 \leq \Phi_s(u)$.
+  \item If $u$ is measurable, then
+  $2^{(k+1)/2} a_k \leq 2^{(k+2)/2} a_{k+1} + 2^{(k+2)/2} 2^{(k+1)/2} \delta_k$ for every $k$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:two-set-l2-comparison}
+(1) On $I_k$, $t > 2^{-k-1}$, so $t^{-2s} \leq 2^{2s(k+1)}$, and the $I_k$ cover $(0, 1]$.
+(2) For $t \in I_k$ and $\tau \in I_{k+1}$, $0 < t - \tau \leq 2^{-k}$, so
+$2^{k(1+2s)} \leq |t - \tau|^{-1-2s}$; the $I_{k+1}$ lie in $(0, 1]$ and the $I_k$ are disjoint.
+(3) \Cref{lem:two-set-l2-comparison} with $A = I_k$, $B = I_{k+1}$, $|I_k| = 2^{-k-1}$ and
+$|I_{k+1}| = 2^{-k-2}$, multiplied by $2^{(k+2)/2} 2^{(k+1)/2}$.
+\end{proof}
+
+\begin{lemma}[{A fractional Hardy inequality on $(0, 1]$}]
+\label{lem:half-line-hardy}
+\lean{Rd.lintegral_div_rpow_le_halfLineForm}
+\leanok
+\uses{def:half-line-form}
+Let $s > 1/2$, $u \colon \R \to \C$ measurable and $\varepsilon > 0$ with $u = 0$ almost
+everywhere on $(0, \varepsilon)$. Then
+\[
+  \int_0^1 \frac{|u(t)|^2}{t^{2s}} \, dt \leq K_s \, \Phi_s(u) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:half-line-blocks, lem:telescoping-hardy}
+With the notation of \Cref{lem:half-line-blocks}, let $m_k = 2^{(k+1)/2} a_k$ and
+$b_k = 2^{(k+2)/2} 2^{(k+1)/2} \delta_k$. Then $m_k \leq m_{k+1} + b_k$, and $m_k = 0$ once
+$2^{-k} < \varepsilon$, since then $I_k \subseteq (0, \varepsilon)$. With $\alpha = s - 1/2 > 0$,
+\Cref{lem:telescoping-hardy} gives
+$\sum_k 2^{2\alpha k} m_k^2 \leq (1 - 2^{-\alpha})^{-2} \sum_k 2^{2\alpha k} b_k^2$. Since
+$2^{2s(k+1)} a_k^2 = 2^{2\alpha} 2^{2\alpha k} m_k^2$ and
+$2^{2\alpha k} b_k^2 = 8 \cdot 2^{k(1+2s)} \delta_k^2$, \Cref{lem:half-line-blocks} gives
+\[
+  \int_0^1 \frac{|u(t)|^2}{t^{2s}} \, dt \leq 2^{2\alpha} (1 - 2^{-\alpha})^{-2} \cdot 8 \,
+  \Phi_s(u) = K_s \Phi_s(u) .
+\]
+\end{proof}
+
+The constant does not depend on $\varepsilon$, and $s > 1/2$ enters only through $\alpha > 0$ in
+Hardy's inequality. The proof follows no single source; it is the standard dyadic argument, with
+Minkowski's inequality between neighbouring blocks in place of averages, so that no
+integrability of $u$ is needed.
+
+\begin{lemma}[Integrals over the line by dyadic shells]
+\label{lem:dyadic-shells-line}
+\lean{Rd.lintegral_real_le_tsum_dyadicAnnulus}
+\leanok
+\uses{lem:dyadic-annuli}
+Let $F \colon \R \to [0, \infty]$ with $F(0) = 0$ and $F(r) = 0$ for $|r| > 1$, and let
+$c_k \in [0, \infty]$ with $F(r) \leq c_k$ whenever $2^{-k-1} < |r| \leq 2^{-k}$. Then
+$\int_\R F \leq 2 \sum_k 2^{-k} c_k$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The shells $2^{-k-1} < |r| \leq 2^{-k}$ cover $[-1, 1] \setminus \{0\}$, and the shell $k$ has
+length at most $2^{-k} |(-1, 1)| = 2 \cdot 2^{-k}$ (\Cref{lem:dyadic-annuli}).
+\end{proof}
+
+\begin{lemma}[Weighted layers]
+\label{lem:height-layers}
+\lean{MeasureTheory.setLIntegral_preimage_Ioc_le_tsum,
+  MeasureTheory.tsum_dyadicWeight_mul_setLIntegral_le}
+\leanok
+\uses{def:lq-norm}
+Let $\mu$ be a measure on a measurable space $X$, $\eta \colon X \to \R$ measurable,
+$g \colon X \to [0, \infty]$, $c > 0$ and $s > 0$. For every $k$,
+$\int_{\{0 < \eta \leq c 2^{-k}\}} g \, d\mu \leq \sum_{i \geq 0} \int_{A_{k+i}} g \, d\mu$ with
+$A_j = \{c 2^{-j-1} < \eta \leq c 2^{-j}\}$, and
+\[
+  \sum_k 2^{2ks} \int_{\{0 < \eta \leq c 2^{-k}\}} g \, d\mu
+  \leq (1 - 2^{-2s})^{-1} c^{2s} \int_{\{\eta > 0\}} \frac{g}{\min(\eta, 1)^{2s}} \, d\mu .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:hardy, lem:scaled-dyadic-intervals}
+Every height in $(0, c 2^{-k}]$ lies in one of the intervals $(c 2^{-j-1}, c 2^{-j}]$, $j \geq k$
+(\Cref{lem:scaled-dyadic-intervals} for $c 2^{-k}$). Hardy's inequality for tails with $q = 1$
+(\Cref{lem:hardy}) bounds the left side by $(1 - 2^{-2s})^{-1} \sum_j 2^{2js} \int_{A_j} g$. On
+$A_j$, $2^j \min(\eta, 1) \leq 2^j \eta \leq c$, so $2^{2js} \leq c^{2s} \min(\eta, 1)^{-2s}$, and
+the $A_j$ are disjoint subsets of $\{\eta > 0\}$ (\Cref{lem:scaled-dyadic-intervals}).
+\end{proof}
+
+\begin{lemma}[Graph coordinates]
+\label{lem:graph-coordinates-integrals}
+\lean{Rd.LipschitzGraph.lintegral_eq_lintegral_graphEquiv, Rd.LipschitzGraph.ae_ae_graphEquiv}
+\leanok
+\uses{def:graph-map}
+For every measurable $F \colon V \to [0, \infty]$,
+$\int_V F = \int_H \int_\R F(\gamma(x') + t e) \, dt \, dx'$, and a property that holds almost
+everywhere on $V$ holds, for almost every $x' \in H$, at $\gamma(x') + t e$ for almost every
+$t \in \R$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:flattening}
+The graph coordinates $(x', t) \mapsto \gamma(x') + t e$ carry the product of the Lebesgue
+measures of $H$ and $\R$ to the Lebesgue measure of $V$ (\Cref{lem:flattening}); Tonelli's
+theorem, and for null sets Mathlib's \texttt{Measure.\allowbreak ae\_\allowbreak ae\_\allowbreak
+of\_\allowbreak ae\_\allowbreak prod}, finish the proof.
+\end{proof}
+
+\begin{definition}[Vertical forms]
+\label{def:vertical-form}
+\lean{Rd.LipschitzGraph.verticalForm, Rd.LipschitzGraph.measurable_verticalForm,
+  Rd.LipschitzGraph.heightPairs, Rd.LipschitzGraph.verticalQuotient,
+  Rd.LipschitzGraph.measurable_verticalQuotient}
+\leanok
+\uses{def:graph-height}
+For $G \colon V \to \C$, real $s$ and $x \in V$, the vertical form of $G$ at $x$ is
+\[
+  \Psi_s G(x) = \int_0^1 \frac{|G(x) - G(x + (\tau - \eta(x)) e)|^2}{|\eta(x) - \tau|^{1+2s}}
+  \, d\tau ,
+\]
+and the vertical difference quotient is
+$q_s G(x, r) = |G(x + r e) - G(x)|^2 |r|^{-1-2s}$ on the pairs of heights
+$\{(x, r) : \eta(x) \in (0, 1], \eta(x) + r \in (0, 1]\}$ and $0$ elsewhere. Both are measurable
+if $G$ is.
+\end{definition}
+
+For $x = \gamma(x') + t e$ the points $x + (\tau - \eta(x)) e = \gamma(x') + \tau e$ run through
+the vertical line of $x'$, so $\Psi_s G$ is the inner integral of the form $\Phi_s$ of
+$t \mapsto G(\gamma(x') + t e)$.
+
+\begin{lemma}[{The Hardy inequality on $(0, 1]$ along the vertical lines}]
+\label{lem:vertical-hardy}
+\lean{Rd.LipschitzGraph.halfLineForm_graphEquiv, Rd.LipschitzGraph.lintegral_Ioc_height_le}
+\leanok
+\uses{def:vertical-form, def:half-line-form}
+For $G \colon V \to \C$, $x' \in H$ and real $s$,
+$\Phi_s(t \mapsto G(\gamma(x') + t e)) = \int_0^1 \Psi_s G(\gamma(x') + t e) \, dt$. If
+$s > 1/2$, $G$ is measurable and $G = 0$ almost everywhere on $\{x \in \Omega' : \eta(x) <
+\varepsilon\}$ for some $\varepsilon > 0$, then
+\[
+  \int_{\{0 < \eta \leq 1\}} \frac{|G|^2}{\eta^{2s}} \leq K_s \int_{\{0 < \eta \leq 1\}} \Psi_s G .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:graph-coordinates-integrals, lem:graph-height, lem:half-line-hardy}
+The identity holds since $\eta(\gamma(x') + t e) = t$ (\Cref{lem:graph-height}). In graph
+coordinates (\Cref{lem:graph-coordinates-integrals}) both sides of the inequality are integrals
+over $x' \in H$ of integrals over $t \in (0, 1]$. For almost every $x'$ the function
+$u(t) = G(\gamma(x') + t e)$ vanishes almost everywhere on $(0, \varepsilon)$, since
+$\gamma(x') + t e \in \Omega'$ exactly for $t > 0$, and \Cref{lem:half-line-hardy} applies to it.
+\end{proof}
+
+\begin{lemma}[Vertical forms by the moduli on the domain]
+\label{lem:vertical-form-moduli}
+\lean{Rd.LipschitzGraph.lintegral_verticalForm_eq, Rd.LipschitzGraph.lintegral_verticalQuotient_le,
+  Rd.LipschitzGraph.lintegral_verticalForm_le}
+\leanok
+\uses{def:vertical-form, def:rd-modulus-on}
+Let $s \geq -1/2$ and $G \in L_2(V)$. Then
+$\int_{\{0 < \eta \leq 1\}} \Psi_s G = \int_V \int_\R q_s G(x, r) \, dr \, dx$, for
+$2^{-k-1} < |r| \leq 2^{-k}$
+$\int_V q_s G(x, r) \, dx \leq 2^{(k+1)(1+2s)} \omega_1(G, 2^{-k}, \Omega')_2^2$, and
+\[
+  \int_{\{0 < \eta \leq 1\}} \Psi_s G
+  \leq 2^{2s+2} \sum_k \bigl(2^{ks} \omega_1(G, 2^{-k}, \Omega')_2\bigr)^2 .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:graph-height, lem:rd-modulus-on, lem:dyadic-shells-line, lem:lp-norm-from-power-integrals}
+The substitution $\tau = \eta(x) + r$ in $\Psi_s G(x)$ gives the identity. If
+$(x, r)$ is a pair of heights, then $x \in \Omega'$ and $\eta(x + r e) = \eta(x) + r > 0$
+(\Cref{lem:graph-height}), so $x$ lies in the step set $\Omega'_{re}$; for
+$2^{-k-1} < |r| \leq 2^{-k}$, $|r|^{-1-2s} \leq 2^{(k+1)(1+2s)}$ and $\|r e\| = |r| \leq 2^{-k}$,
+so $\int_V q_s G(x, r) \, dx \leq 2^{(k+1)(1+2s)} \|\mathbf 1_{\Omega'_{re}} \Delta_{re} G\|_2^2
+\leq 2^{(k+1)(1+2s)} \omega_1(G, 2^{-k}, \Omega')_2^2$ (\Cref{lem:rd-modulus-on}). By Tonelli's
+theorem the double integral is $\int_\R Q(r) \, dr$ with $Q(r) = \int_V q_s G(x, r) \, dx$, which
+vanishes at $r = 0$ and for $|r| > 1$, since $\eta(x), \eta(x) + r \in (0, 1]$ forces $|r| < 1$.
+\Cref{lem:dyadic-shells-line} gives
+$\int_\R Q \leq 2 \sum_k 2^{-k} 2^{(k+1)(1+2s)} \omega_1(G, 2^{-k}, \Omega')_2^2$, and
+$2 \cdot 2^{-k} 2^{(k+1)(1+2s)} = 2^{2s+2} 2^{2ks}$.
+\end{proof}
+
+\begin{theorem}[A Hardy inequality on Lipschitz graph domains]
+\label{thm:graph-hardy}
+\lean{Rd.LipschitzGraph.lintegral_div_min_height_le,
+  Rd.LipschitzGraph.lintegral_div_min_height_le_modNormOn,
+  Rd.LipschitzGraph.exists_lintegral_div_height_le}
+\leanok
+\uses{def:graph-height, lem:modnorm-on, def:half-line-form}
+Let $s > 1/2$, $G \in L_2(V)$ and $\varepsilon > 0$ with $G = 0$ almost everywhere on
+$\{x \in \Omega' : \eta(x) < \varepsilon\}$. Then
+\begin{align*}
+  \int_{\Omega'} \frac{|G|^2}{\min(\eta, 1)^{2s}} &\leq \int_{\Omega'} |G|^2
+  + K_s 2^{2s+2} \sum_k \bigl(2^{ks} \omega_1(G, 2^{-k}, \Omega')_2\bigr)^2 \\
+  &\leq (1 + K_s 2^{2s+2}) N_{s,\Omega'}(G)^2 .
+\end{align*}
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{lem:vertical-hardy, lem:vertical-form-moduli, lem:graph-height,
+  lem:lp-norm-from-power-integrals, lem:indicator-lp}
+Split $\Omega'$ into $\{0 < \eta \leq 1\}$ and $\{\eta > 1\}$. On the second set the integrand is
+$|G|^2$; on the first, \Cref{lem:vertical-hardy} and \Cref{lem:vertical-form-moduli} give the
+bound. The last inequality holds since $\int_{\Omega'} |G|^2 = \|G\|_{L_2(\Omega')}^2$ and the
+sum is the square of the $\ell_2$ norm in $N_{s,\Omega'}(G)$.
+\end{proof}
+
+The constants depend only on $s$, neither on $\varepsilon$ nor on $\Omega'$. For $0 < s < 1$ and
+$p > 0$, Dyda proved the regional inequality
+\[
+  \int_D \frac{|u(x)|^p}{\operatorname{dist}(x, \partial D)^{sp}} \, dx
+  \leq c \int_D \int_D \frac{|u(x) - u(y)|^p}{|x - y|^{n+sp}} \, dy \, dx
+\]
+for $u \in C_c(D)$ on domains $D$ above Lipschitz graphs for $sp \neq 1$, and on bounded
+Lipschitz domains for $sp > 1$ \cite[Theorem 1.1]{Dyda2004}. He also showed that it fails on
+bounded Lipschitz domains for $sp \leq 1$ \cite{Dyda2004}. Both results are recorded by Edmunds,
+Hurri-Syrjänen and Vähäkangas \cite[Section 1]{EdmundsHurriSyrjanenVahakangas2014}. For
+$1/2 < s < 1$, \Cref{thm:graph-hardy} is a weaker form of the case $p = 2$ of graph domains: it
+uses only vertical differences, the moduli in place of the Gagliardo form, the height in place of
+the distance to the boundary, and an additional $L_2$ term. For $s \geq 1$ the right side is finite
+only if $G = 0$ almost everywhere on $\Omega'$: then $\omega_1(G, t, \Omega')_2 = o(t)$ as
+$t \to 0$, so $G$ is constant on the connected set $\Omega'$, and it vanishes near the graph. The
+content of \Cref{thm:graph-hardy} thus lies in $1/2 < s < 1$.
+
+\begin{lemma}[Differences of the extension by zero]
+\label{lem:graph-zero-extension-differences}
+\lean{Rd.LipschitzGraph.enorm_fwdDiff_indicator_le, Rd.LipschitzGraph.eLpNorm_fwdDiff_indicator_le,
+  Rd.LipschitzGraph.lpModulus_indicatorLp_le, Rd.LipschitzGraph.tsum_sq_eLpNorm_layer_le}
+\leanok
+\uses{def:graph-height, def:rd-modulus, def:rd-modulus-on, lem:indicator-lp}
+For $\rho \in \R$ let $L(\rho) = \{x : 0 < \eta(x) \leq \rho\}$. For every measurable
+$G \colon V \to \C$ and $y, x \in V$,
+\[
+  |\Delta_y(\mathbf 1_{\Omega'} G)(x)| \leq |\mathbf 1_{\Omega'_y} \Delta_y G(x)|
+  + |\mathbf 1_{L((1+M)\|y\|)} G(x)| + |\mathbf 1_{L((1+M)\|y\|)} G(x + y)| ,
+\]
+hence $\|\Delta_y(\mathbf 1_{\Omega'} G)\|_2 \leq \|\mathbf 1_{\Omega'_y} \Delta_y G\|_2
++ 2 \|\mathbf 1_{L((1+M)\|y\|)} G\|_2$. For $G \in L_2(V)$, $k \in \N_0$ and $s > 0$, with
+$\lambda_k = \|\mathbf 1_{L((1+M) 2^{-k})} G\|_2$,
+$\omega_1(\mathbf 1_{\Omega'} G, 2^{-k})_2 \leq \omega_1(G, 2^{-k}, \Omega')_2 + 2 \lambda_k$ and
+\[
+  \sum_k (2^{ks} \lambda_k)^2 \leq (1 - 2^{-2s})^{-1} (1 + M)^{2s}
+  \int_{\Omega'} \frac{|G|^2}{\min(\eta, 1)^{2s}} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:graph-height, lem:switch-set-crossing, lem:rd-modulus-on, lem:height-layers,
+  lem:lp-norm-from-power-integrals, lem:rd-modulus}
+If $x, x + y \in \Omega'$, then $x \in \Omega'_y$. If exactly one of $x$ and $x + y$ lies in
+$\Omega'$, then $\eta$ changes sign between them and is $(1 + M)$-Lipschitz
+(\Cref{lem:graph-height}), so that point lies in $L((1 + M) \|y\|)$; this gives the pointwise
+bound. Minkowski's inequality and the translation invariance of the $L_2$ norm give the $L_2$
+bound. For $\|y\| \leq 2^{-k}$, $\|\mathbf 1_{\Omega'_y} \Delta_y G\|_2 \leq \omega_1(G, 2^{-k},
+\Omega')_2$ (\Cref{lem:rd-modulus-on}) and $L((1 + M) \|y\|) \subseteq L((1 + M) 2^{-k})$. The
+last bound is \Cref{lem:height-layers} for the height, $c = 1 + M$ and $g = |G|^2$, with
+$\{\eta > 0\} = \Omega'$.
+\end{proof}
+
+\begin{theorem}[Extension by zero from Lipschitz graph domains]
+\label{thm:graph-indicator-hardy}
+\lean{Rd.LipschitzGraph.exists_modNorm_indicatorLp_le_of_vanish}
+\leanok
+\uses{def:graph-height, lem:modnorm-on, def:rd-modulus, lem:indicator-lp}
+Let $s > 1/2$. There is $C < \infty$ such that for every $G \in L_2(V)$ that vanishes almost
+everywhere on $\{x \in \Omega' : \eta(x) < \varepsilon\}$ for some $\varepsilon > 0$,
+\[
+  \|\mathbf 1_{\Omega'} G\|_2
+  + \bigl\|\bigl(2^{ks} \omega_1(\mathbf 1_{\Omega'} G, 2^{-k})_2\bigr)_k\bigr\|_{\ell_2}
+  \leq C \, N_{s,\Omega'}(G) .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{lem:graph-zero-extension-differences, thm:graph-hardy, lem:lq-basic}
+By \Cref{lem:graph-zero-extension-differences} and \Cref{thm:graph-hardy},
+$\sum_k (2^{ks} \lambda_k)^2 \leq K N_{s,\Omega'}(G)^2$ with
+$K = (1 - 2^{-2s})^{-1} (1 + M)^{2s} (1 + K_s 2^{2s+2})$, so
+$\|(2^{ks} \lambda_k)_k\|_{\ell_2} \leq \max(K, 1) N_{s,\Omega'}(G)$. Minkowski's inequality in
+$\ell_2$ and $\omega_1(\mathbf 1_{\Omega'} G, 2^{-k})_2 \leq \omega_1(G, 2^{-k}, \Omega')_2 +
+2 \lambda_k$ give the bound with $C = 1 + 2 \max(K, 1)$.
+\end{proof}
+
+Since $N_{s,\Omega'}(G) \leq N_s(G)$ (\Cref{lem:restriction-moduli}), the zero extension is also
+bounded by the quantity of $G$ on $V$. On a bounded Lipschitz domain the charts reduce the zero
+extension bound to \Cref{thm:graph-indicator-hardy}. In the rest of the section $\Omega$ is a
+bounded Lipschitz domain with boundary balls $B_j$ and graph domains $\Omega_j$ of heights
+$\eta_j$ (\Cref{def:bounded-lipschitz}).
+
+\begin{lemma}[The charts and the vanishing near the graphs]
+\label{lem:zero-extension-charts}
+\lean{Rd.BoundedLipschitzDomain.indicatorLp_eq_sum_add,
+  Rd.BoundedLipschitzDomain.exists_isCompact_sobolevToL2_add_eq_zero,
+  Rd.BoundedLipschitzDomain.exists_mul_eq_zero_of_height_lt}
+\leanok
+\uses{def:bounded-lipschitz, def:boundary-partition, lem:indicator-lp, def:graph-height,
+  def:sobolev-tilde-zero-boundary, def:sobolev-vanishing, def:sobolev-to-l2}
+\begin{enumerate}
+  \item Let $\psi$ be a resolution of unity on $\Gamma$ and $\chi$ a real function with $\chi = 0$
+  outside $\Omega$ and $\chi + \sum_j \psi_j = 1$ on $\Omega$. For $\Phi \in L_2(V)$ and
+  $G_j, G_0 \in L_2(V)$ with $G_j = \psi_j \Phi$ and $G_0 = \chi \Phi$ almost everywhere,
+  $\mathbf 1_\Omega \Phi = \sum_j \mathbf 1_{\Omega_j} G_j + G_0$.
+  \item For $s \geq 0$, $U \in T^s(\Omega)$ and $W \in N^s(\Omega)$ there is a compact
+  $K \subseteq \Omega$ with $\iota_s(U + W) = 0$ almost everywhere on $\Omega \setminus K$.
+  \item If $K \subseteq \Omega$ is compact and $\Phi = 0$ almost everywhere on $\Omega \setminus K$,
+  then for every chart $j$ there is $\varepsilon > 0$ with $\psi_j \Phi = 0$ almost everywhere on
+  $\{x \in \Omega_j : \eta_j(x) < \varepsilon\}$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:graph-height, lem:sobolev-test-span-schwartz, lem:sobolev-to-l2,
+  lem:restriction-l2-functions, lem:boundary-layer-volume}
+(1) Where $\psi_j \neq 0$ the point lies in $B_j$, where $\Omega$ and $\Omega_j$ agree
+(\Cref{def:bounded-lipschitz}); on $\Omega$ the factors add up to $1$, and outside $\Omega$ both
+sides vanish. (2) $U$ is a Schwartz function $w$ with closed support $K$ in $\Omega$
+(\Cref{lem:sobolev-test-span-schwartz}, \Cref{lem:sobolev-to-l2}), compact since $\Omega$ is
+bounded, and $\iota_s(U + W) = \iota_s U$ on $\Omega$ (\Cref{lem:restriction-l2-functions}).
+(3) Choose $\varepsilon > 0$ with the $\varepsilon$-neighbourhood of $K$ inside $\Omega$ and the
+$\varepsilon$-neighbourhood of $\operatorname{supp} \psi_j$ inside $B_j$. Let $\psi_j(x) \neq 0$,
+$x \in \Omega_j$ and $\eta_j(x) < \varepsilon$. Then $x \in B_j \cap \Omega_j \subseteq \Omega$.
+The point $z = x - \eta_j(x) e_j$ has $\|z - x\| = \eta_j(x) < \varepsilon$ and $\eta_j(z) = 0$
+(\Cref{lem:graph-height}), so $z \in B_j \setminus \Omega_j$, hence $z \notin \Omega$, and
+$x \notin K$; so $\Phi(x) = 0$ for almost all such $x$.
+\end{proof}
+
+\begin{theorem}[The zero extension bound for $1/2 < s < 1$]
+\label{thm:zero-extension-hardy}
+\lean{Rd.BoundedLipschitzDomain.exists_hasZeroExtensionBound_of_half_lt}
+\leanok
+\uses{def:zero-extension-bound, def:bounded-lipschitz}
+For every $1/2 < s < 1$ there is $C \in \R$ such that $\Omega$ has the zero extension bound with
+constant $C$ at $s$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{lem:zero-extension-charts, thm:graph-indicator-hardy, lem:besov-multiplier,
+  lem:boundary-partition-nhds, lem:restriction-l2-functions, lem:pasting,
+  lem:restriction-moduli, thm:sobolev-besov-constants}
+Take a resolution of unity $\psi$ equal to $1$ near $\Gamma$ and the interior cut-off $\chi$
+(\Cref{lem:boundary-partition-nhds}). Let $U \in T^s(\Omega)$, $W \in N^s(\Omega)$ and
+$\Phi = \iota_s(U + W)$. Then $\iota_s U = \mathbf 1_\Omega \Phi$
+(\Cref{lem:restriction-l2-functions}) $= \sum_j \mathbf 1_{\Omega_j} G_j + G_0$ with
+$G_j = \psi_j \Phi$ and $G_0 = \chi \Phi$ (\Cref{lem:zero-extension-charts}), and each $G_j$
+vanishes near the graph of $\Omega_j$. With the constants $C_j$ of
+\Cref{thm:graph-indicator-hardy} for $\Omega_j$ and $P_j$, $P_\chi$ of \Cref{lem:besov-multiplier}
+for $\psi_j$ and $\chi$ with first differences, $s < 1$,
+\begin{align*}
+  N_s(\iota_s U) &\leq \sum_j C_j N_{s,\Omega_j}(G_j) + N_s(G_0)
+  \leq \sum_j C_j N_s(G_j) + N_s(G_0) \\
+  &\leq \Bigl(\sum_j C_j P_j + P_\chi\Bigr) N_s(\Phi)
+\end{align*}
+(\Cref{lem:pasting}, \Cref{lem:restriction-moduli}). With the constants $c_I$ and $c_B$ of
+\Cref{thm:sobolev-besov-constants} for the first modulus,
+$\|U\| \leq c_I N_s(\iota_s U) \leq c_I (\sum_j C_j P_j + P_\chi) c_B \|U + W\|$.
+\end{proof}
+
+By \Cref{thm:zero-extension-bound-iso}, restriction is then an isomorphism of
+$\tilde H^s(\Omega)$ onto $H^s_0(\Omega)$ for $1/2 < s < 1$, the case $1/2 < s < 1$ of McLean's
+\cite[Theorem 3.33]{McLean} and Hewett and Moiola's \cite[Lemma 2.1]{HewettMoiola}.

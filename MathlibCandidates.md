@@ -142,6 +142,17 @@ declarations.
   both (`ENNReal.lqNorm_almostDiagonal_le`), with its constant `ENNReal.almostDiagonalConst`, and
   their forms for `0 < q ≤ 1` (`ENNReal.hardy_tail_le_of_le_one`,
   `ENNReal.hardy_sum_le_of_le_one`, `ENNReal.lqNorm_almostDiagonal_le_of_le_one`).
+* **A fractional Hardy inequality on `(0, 1]`**
+  (`FunctionSpaces/Analysis/Lp/HalfLineHardy.lean`): for `s > 1/2` and a measurable `u : ℝ → ℂ`
+  that vanishes almost everywhere on some `(0, ε)`,
+  `∫_0^1 |u(t)|² t^(-2s) dt ≤ K_s ∫_0^1 ∫_0^1 |u(t) - u(τ)|² / |t - τ|^(1+2s) dτ dt` with
+  `K_s = 2^(2s+2) (1 - 2^(-(s-1/2)))^(-2)` (`Rd.lintegral_div_rpow_le_halfLineForm`,
+  `Rd.halfLineForm`, `Rd.halfLineHardyConst`). Mathlib has no fractional Hardy inequality. Two
+  general steps of the proof are candidates on their own: Minkowski's inequality twice,
+  `μ(B)^(1/2) ‖u‖_{L_2(A)} ≤ (∫_A ∫_B |u(t) - u(τ)|²)^(1/2) + μ(A)^(1/2) ‖u‖_{L_2(B)}` on every
+  s-finite measure space (`MeasureTheory.rpow_mul_lintegral_rpow_le`), and telescoping in
+  `[0, ∞]`, `m_k ≤ ∑_{i ≥ 0} b_{k+i}` for `m_k ≤ m_{k+1} + b_k` with `m` eventually `0`
+  (`ENNReal.le_tsum_of_le_add_of_eq_zero`).
 * **Decreasing rearrangements and the layer cake formula for sums**
   (`ApproximationSpaces/Sequences/Rearrangement.lean`): for a nonnegative family `g` on any
   index set and `p > 0`, `∑_a g(a)^p = p ∫_0^∞ #{a : t < g(a)} t^(p-1) dt`
@@ -585,11 +596,15 @@ declarations.
   `∂_v : H^{s+1,2}(V, ℂ) → H^{s,2}(V, ℂ)` as a continuous linear map of norm at most `2π ‖v‖`
   (`Rd.sobolevLineDeriv`), and the identity
   `(2π)² ‖U‖²_{s+1} = (2π)² ‖U‖²_s + ∑_i ‖∂_{e_i} U‖²_s` for an orthonormal basis `(e_i)`
-  (`Rd.sq_norm_eq_add_sum_sobolevLineDeriv`). Mathlib has `BesselPotentialSpace` and the
-  unbundled `TemperedDistribution.MemSobolev.mono` and `MemSobolev.lineDerivOp`, but no maps between
-  the bundled spaces; each map here is an explicit Fourier multiplier on the `L_2` functions, with
-  the identification of `𝓕⁻(w 𝓕g)` with Mathlib's `w(D) g`
-  (`Rd.fourierMultiplierCLM_toTemperedDistribution_eq`). These belong in
+  (`Rd.sq_norm_eq_add_sum_sobolevLineDeriv`); the inclusion of `H^{s,2}` into itself is the
+  identity (`Rd.sobolevInclusion_self`), the `L_2` functions of `H^{0,2}(V, ℂ)` are all of
+  `L_2(V)` (`Rd.sobolevToL2_zero_surjective`), convolution with an integrable kernel acts on
+  every `H^{s,2}(V, ℂ)` (`Rd.sobolevConv`), and convolution with the dilates of a kernel of
+  integral `1` converges to the identity in `H^{s,2}(V, ℂ)` (`Rd.tendsto_sobolevConv_dilate`).
+  Mathlib has `BesselPotentialSpace` and the unbundled `TemperedDistribution.MemSobolev.mono` and
+  `MemSobolev.lineDerivOp`, but no maps between the bundled spaces; each map here is an explicit
+  Fourier multiplier on the `L_2` functions, with the identification of `𝓕⁻(w 𝓕g)` with
+  Mathlib's `w(D) g` (`Rd.fourierMultiplierCLM_toTemperedDistribution_eq`). These belong in
   `Mathlib/Analysis/FunctionalSpaces/BesselPotentialSpace.lean`.
 * **Evaluation on `H^s` and Sobolev spaces on open sets**
   (`FunctionSpaces/Domains/Sobolev/SobolevRestrictionSpaces.lean`): for every Schwartz function `φ`,
