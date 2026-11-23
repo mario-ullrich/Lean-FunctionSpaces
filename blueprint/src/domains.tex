@@ -5576,7 +5576,7 @@ paired with $u$ itself.
 \begin{theorem}[The Gelfand triple $H^s(V) \subseteq L_2(V) \subseteq H^{-s}(V)$]
 \label{thm:rd-gelfand-triple}
 \lean{Rd.toDistr_sobolevInclusion_ofLp, Rd.denseRange_sobolevToL2,
-  Rd.pivotDual_sobolevToL2_apply_apply, Rd.pivotDual_sobolevToL2_injective}
+  Rd.pivotDual_sobolevToL2_apply_apply}
 \leanok
 \uses{thm:pivot-dual, def:sobolev-pairing, def:sobolev-to-l2, lem:sobolev-to-l2,
   lem:sobolev-inclusion, lem:sobolev-of-schwartz, lem:sobolev-inclusion-tests, lem:plancherel-l2}
@@ -5586,10 +5586,11 @@ $\iota_s : H^s(V) \to L_2(V)$ has dense range. Let $J$ be the pivot dual of $\io
 $g \in L_2(V)$, every $W \in H^{-s}(V)$ whose tempered distribution is $g$ and every
 $U \in H^s(V)$,
 \[
-  (J g)(U) = \langle g, \iota_s U \rangle_{L_2} = [W, U] ,
+  (J g)(U) = \langle g, \iota_s U \rangle_{L_2} = [W, U] .
 \]
-and $J$ is injective. Thus $H^s(V) \subseteq L_2(V) \subseteq H^{-s}(V)$ is a Gelfand triple with
-pivot space $L_2(V)$, and its duality is the pairing of \Cref{def:sobolev-pairing}.
+Consequently $J$ is injective (\Cref{thm:pivot-dual}), and
+$H^s(V) \subseteq L_2(V) \subseteq H^{-s}(V)$ is a Gelfand triple with pivot space $L_2(V)$ whose
+duality is the pairing of \Cref{def:sobolev-pairing}.
 \end{theorem}
 
 \begin{proof}
@@ -5609,30 +5610,17 @@ the weight is real. \Cref{thm:pivot-dual} gives $(J g)(U) = \langle g, \iota_s U
 and the injectivity of $J$.
 \end{proof}
 
-\begin{theorem}[The Gelfand triple
-  $\tilde H^s(\Omega) \subseteq L_2(\Omega) \subseteq H^{-s}(\Omega)$]
-\label{thm:domain-gelfand-triple}
-\lean{Rd.tildeToL2, Rd.tildeToL2_apply_ae, Rd.tildeToL2_injective, Rd.denseRange_tildeToL2,
-  Rd.tildePivotDual, Rd.tildePivotDual_apply_apply, Rd.tildePivotDual_injective,
-  Rd.pairing_dualEquiv_tildePivotDual, Rd.dualEquiv_tildePivotDual_injective}
+\begin{lemma}[$\tilde H^s(\Omega)$ is dense in $L_2(\Omega)$]
+\label{lem:tilde-dense-l2}
+\lean{Rd.tildeToL2, Rd.tildeToL2_apply_ae, Rd.tildeToL2_injective, Rd.denseRange_tildeToL2}
 \leanok
-\uses{thm:pivot-dual, lem:l2-dense-smooth, thm:sobolev-duality, def:sobolev-tilde-zero-boundary,
+\uses{lem:l2-dense-smooth, def:sobolev-tilde-zero-boundary,
   lem:tilde-space-vanishes-outside-nonneg, lem:sobolev-to-l2, def:test-schwartz,
   lem:sobolev-of-schwartz, lem:sobolev-inclusion-tests}
 Let $\Omega \subseteq V$ be open and $s \geq 0$. The operator
 $\iota^\Omega_s : \tilde H^s(\Omega) \to L_2(\Omega)$, $U \mapsto (\iota_s U)|_\Omega$, is a
-bounded injective linear operator with dense range. Its pivot dual
-$J_\Omega : L_2(\Omega) \to \tilde H^s(\Omega)^*$,
-\[
-  (J_\Omega g)(U) = \int_\Omega \overline{g} \, \iota_s U \, dx
-  \qquad (g \in L_2(\Omega), \ U \in \tilde H^s(\Omega)) ,
-\]
-is conjugate-linear, bounded and injective. Let $W_g \in H^{-s}(\Omega)$ represent $J_\Omega g$ as
-in \Cref{thm:sobolev-duality}. Then $g \mapsto W_g$ is injective and
-$[W_g, U] = \int_\Omega \overline{g} \, \iota_s U \, dx$ for every $U \in \tilde H^s(\Omega)$.
-Thus $\tilde H^s(\Omega) \subseteq L_2(\Omega) \subseteq H^{-s}(\Omega)$ is a Gelfand triple with
-pivot space $L_2(\Omega)$.
-\end{theorem}
+bounded injective linear operator with dense range.
+\end{lemma}
 
 \begin{proof}
 \leanok
@@ -5644,8 +5632,34 @@ $T^s(\Omega) \subseteq \tilde H^s(\Omega)$ (\Cref{def:sobolev-tilde-zero-boundar
 $\iota_s \varphi = \varphi$ (\Cref{def:test-schwartz}, \Cref{lem:sobolev-of-schwartz},
 \Cref{lem:sobolev-inclusion-tests}).
 \Cref{lem:l2-dense-smooth} for Lebesgue measure on $\Omega$, with $U = \Omega$, gives the dense
-range, and \Cref{thm:pivot-dual} the formula for $J_\Omega$ and its injectivity. By
-\Cref{thm:sobolev-duality}, $[W_g, U] = (J_\Omega g)(U)$, and $\ell \mapsto W_\ell$ is injective.
+range.
+\end{proof}
+
+\begin{theorem}[The Gelfand triple
+  $\tilde H^s(\Omega) \subseteq L_2(\Omega) \subseteq H^{-s}(\Omega)$]
+\label{thm:domain-gelfand-triple}
+\lean{Rd.pivotDual_tildeToL2_apply_apply, Rd.pairing_dualEquiv_pivotDual_tildeToL2}
+\leanok
+\uses{thm:pivot-dual, lem:tilde-dense-l2, thm:sobolev-duality}
+Let $\Omega \subseteq V$ be open, $s \geq 0$, and $J_\Omega : L_2(\Omega) \to
+\tilde H^s(\Omega)^*$ the conjugate-linear bounded pivot dual of $\iota^\Omega_s$
+(\Cref{lem:tilde-dense-l2}). For every $g \in L_2(\Omega)$ let $W_g \in H^{-s}(\Omega)$
+represent $J_\Omega g$ as in \Cref{thm:sobolev-duality}. Then for all $g \in L_2(\Omega)$ and
+$U \in \tilde H^s(\Omega)$,
+\[
+  (J_\Omega g)(U) = [W_g, U] = \int_\Omega \overline{g} \, \iota_s U \, dx .
+\]
+Consequently $J_\Omega$ and $g \mapsto W_g$ are injective (\Cref{thm:pivot-dual},
+\Cref{lem:tilde-dense-l2}), and $\tilde H^s(\Omega) \subseteq L_2(\Omega) \subseteq
+H^{-s}(\Omega)$ is a Gelfand triple with pivot space $L_2(\Omega)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\Cref{thm:pivot-dual} for $H = L_2(\Omega)$ gives the formula for $J_\Omega$, since
+$\iota^\Omega_s U = \iota_s U$ almost everywhere on $\Omega$, and, with the dense range of
+\Cref{lem:tilde-dense-l2}, the injectivity of $J_\Omega$. By \Cref{thm:sobolev-duality},
+$[W_g, U] = (J_\Omega g)(U)$, and $\ell \mapsto W_\ell$ is injective.
 \end{proof}
 
 For $s = 1$, restriction maps $\tilde H^1(\Omega)$ isometrically onto $H^1_0(\Omega)$
@@ -7072,33 +7086,22 @@ $\operatorname{Tr}_\Gamma \iota_s u$ (\Cref{thm:besov-trace-operator}), which is
 $\gamma^s_{L_2} u$ (\Cref{thm:trace-l2}).
 \end{proof}
 
-\begin{theorem}[The Gelfand triple $H^t(\Gamma) \subseteq L_2(\Gamma) \subseteq H^{-t}(\Gamma)$]
-\label{thm:boundary-gelfand-triple}
+\begin{lemma}[$H^t(\Gamma)$ is dense in $L_2(\Gamma)$]
+\label{lem:boundary-sobolev-dense-l2}
 \lean{Rd.BoundedLipschitzDomain.boundarySobolevToL2,
   Rd.BoundedLipschitzDomain.boundarySobolevToL2_apply,
   Rd.BoundedLipschitzDomain.boundarySobolevToL2_injective,
   Rd.BoundedLipschitzDomain.exists_boundarySobolev_toLp_ae_eq,
-  Rd.BoundedLipschitzDomain.denseRange_boundarySobolevToL2,
-  Rd.BoundedLipschitzDomain.boundaryPivotDual,
-  Rd.BoundedLipschitzDomain.boundaryPivotDual_apply_apply,
-  Rd.BoundedLipschitzDomain.boundaryPivotDual_injective}
+  Rd.BoundedLipschitzDomain.denseRange_boundarySobolevToL2}
 \leanok
-\uses{thm:pivot-dual, lem:l2-dense-smooth, def:dual-boundary-sobolev, thm:boundary-sobolev-norm,
-  def:boundary-besov-space, def:boundary-l2, thm:ambient-trace-l2, thm:boundary-trace-charts,
-  thm:trace-space-functions, lem:sobolev-of-schwartz, lem:sobolev-inclusion-tests}
+\uses{lem:l2-dense-smooth, thm:boundary-sobolev-norm, def:boundary-besov-space, def:boundary-l2,
+  thm:ambient-trace-l2, thm:boundary-trace-charts, thm:trace-space-functions,
+  lem:sobolev-of-schwartz, lem:sobolev-inclusion-tests}
 Let $0 < t < 1$. The map $\iota_\Gamma : H^t(\Gamma) \to L_2(\Gamma)$ that sends $g$ to its
 function in $L_2(\Gamma)$ is a bounded injective linear operator. For every smooth
 $\psi : V \to \R$ with compact support there is $g \in H^t(\Gamma)$ with $g = \psi$
-$\sigma$-almost everywhere, and $\iota_\Gamma$ has dense range. Its pivot dual
-$J_\Gamma : L_2(\Gamma) \to H^{-t}(\Gamma)$,
-\[
-  (J_\Gamma g)(h) = \int_\Gamma \overline{g} \, h \, d\sigma
-  \qquad (g \in L_2(\Gamma), \ h \in H^t(\Gamma)) ,
-\]
-is conjugate-linear, bounded and injective. Thus $H^t(\Gamma) \subseteq L_2(\Gamma) \subseteq
-H^{-t}(\Gamma)$ is a Gelfand triple with pivot space $L_2(\Gamma)$: the pairing of
-$H^{-t}(\Gamma)$ with $H^t(\Gamma)$ extends the inner product of $L_2(\Gamma)$.
-\end{theorem}
+$\sigma$-almost everywhere, and $\iota_\Gamma$ has dense range.
+\end{lemma}
 
 \begin{proof}
 \leanok
@@ -7114,9 +7117,33 @@ $T^s_\Gamma \psi \in L_2(\Gamma)$ is $\operatorname{Tr}_\Gamma \psi$ $\sigma$-al
 (\Cref{thm:boundary-trace-charts}), and it lies in $B^{s-1/2}_{2,2}(\Gamma) = B^t_{2,2}(\Gamma)$
 (\Cref{thm:trace-space-functions}); so $g = T^s_\Gamma \psi$ lies in $H^t(\Gamma)$. The surface
 measure is finite, hence locally finite, and \Cref{lem:l2-dense-smooth} with $U = V$ gives the
-dense range. \Cref{thm:pivot-dual} gives
-$(J_\Gamma g)(h) = \langle g, h \rangle_{L_2(\Gamma)}$ and the injectivity of $J_\Gamma$
-(\Cref{def:boundary-l2}, \Cref{def:dual-boundary-sobolev}).
+dense range.
+\end{proof}
+
+\begin{theorem}[The Gelfand triple $H^t(\Gamma) \subseteq L_2(\Gamma) \subseteq H^{-t}(\Gamma)$]
+\label{thm:boundary-gelfand-triple}
+\lean{Rd.BoundedLipschitzDomain.pivotDual_boundarySobolevToL2_apply_apply}
+\leanok
+\uses{thm:pivot-dual, lem:boundary-sobolev-dense-l2, def:boundary-l2, def:dual-boundary-sobolev}
+Let $0 < t < 1$ and $J_\Gamma : L_2(\Gamma) \to H^{-t}(\Gamma)$ the conjugate-linear bounded
+pivot dual of $\iota_\Gamma$ (\Cref{lem:boundary-sobolev-dense-l2}). Then for all
+$g \in L_2(\Gamma)$ and $h \in H^t(\Gamma)$,
+\[
+  (J_\Gamma g)(h) = \int_\Gamma \overline{g} \, h \, d\sigma .
+\]
+Consequently $J_\Gamma$ is injective (\Cref{thm:pivot-dual},
+\Cref{lem:boundary-sobolev-dense-l2}), and $H^t(\Gamma) \subseteq L_2(\Gamma) \subseteq
+H^{-t}(\Gamma)$ is a Gelfand triple with pivot space $L_2(\Gamma)$: the pairing of
+$H^{-t}(\Gamma)$ with $H^t(\Gamma)$ extends the inner product of $L_2(\Gamma)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\Cref{thm:pivot-dual} for $H = L_2(\Gamma)$ (\Cref{def:boundary-l2}) gives
+$(J_\Gamma g)(h) = \langle g, \iota_\Gamma h \rangle_{L_2(\Gamma)}$, where $\iota_\Gamma h$ is the
+function of $h$, and, with the dense range of \Cref{lem:boundary-sobolev-dense-l2}, the
+injectivity of $J_\Gamma$; $H^{-t}(\Gamma)$ is the dual of $H^t(\Gamma)$
+(\Cref{def:dual-boundary-sobolev}).
 \end{proof}
 
 \section{The extension theorem for Sobolev spaces}

@@ -340,16 +340,20 @@ extension from the boundary, one operator for every smoothness, so that the corr
   `Rd.dualZeroBoundaryEquiv`). On the way, the Bessel potential `J_t` of a real Schwartz
   function is real (`Rd.conj_besselSchwartz_apply`), from `conj (𝓕 f) = 𝓕⁻(conj f)` on `V`
   (`Rd.conj_fourier_apply`).
-* **Gelfand triples on `ℝ^d` and on open sets.** Let `s ≥ 0`. `ι_s : H^s(V) → L_2(V)` is
-  injective with dense range (`Rd.denseRange_sobolevToL2`), and its pivot dual
-  `L_2(V) → (H^s(V))^*`, `g ↦ ⟪g, ι_s ·⟫_{L_2}` (`ContinuousLinearMap.pivotDual`), is the
-  pairing `[W, ·]` with the element `W ∈ H^{-s}(V)` whose distribution is `g`
-  (`Rd.pivotDual_sobolevToL2_apply_apply`): `L_2(V)` is the pivot space of
+* **Gelfand triples on `ℝ^d` and on open sets.** Each triple follows from the general theorem
+  on the pivot dual (`ContinuousLinearMap.pivotDual_injective_iff`): the space contributes its
+  embedding into `L_2`, the dense range of the embedding and the identification of the pivot
+  dual. Let `s ≥ 0`. `ι_s : H^s(V) → L_2(V)` is injective with dense range
+  (`Rd.denseRange_sobolevToL2`), and its pivot dual `L_2(V) → (H^s(V))^*`,
+  `g ↦ ⟪g, ι_s ·⟫_{L_2}` (`ContinuousLinearMap.pivotDual`), is the pairing `[W, ·]` with the
+  element `W ∈ H^{-s}(V)` whose distribution is `g` (`Rd.toDistr_sobolevInclusion_ofLp`,
+  `Rd.pivotDual_sobolevToL2_apply_apply`): `L_2(V)` is the pivot space of
   `H^s(V) ⊂ L_2(V) ⊂ H^{-s}(V)`. For open `Ω`, `U ↦ (ι_s U)|_Ω` is injective with dense range
   from `H̃^s(Ω)` into `L_2(Ω)` (`Rd.tildeToL2`, `Rd.tildeToL2_injective`,
-  `Rd.denseRange_tildeToL2`), and `g ∈ L_2(Ω)` goes injectively to the `W_g ∈ H^{-s}(Ω)` with
-  `[W_g, U] = ∫_Ω conj (g) ι_s U` for every `U ∈ H̃^s(Ω)` (`Rd.tildePivotDual`,
-  `Rd.pairing_dualEquiv_tildePivotDual`, `Rd.dualEquiv_tildePivotDual_injective`): the triple
+  `Rd.denseRange_tildeToL2`), and its pivot dual followed by the duality
+  `(H̃^s(Ω))^* ≅ H^{-s}(Ω)` (`Rd.dualEquiv`) sends `g ∈ L_2(Ω)` to the `W_g ∈ H^{-s}(Ω)` with
+  `[W_g, U] = ∫_Ω conj (g) ι_s U` for every `U ∈ H̃^s(Ω)`
+  (`Rd.pivotDual_tildeToL2_apply_apply`, `Rd.pairing_dualEquiv_pivotDual_tildeToL2`): the triple
   `H̃^s(Ω) ⊂ L_2(Ω) ⊂ H^{-s}(Ω)`, for `s = 1` the triple `H^1_0(Ω) ⊂ L_2(Ω) ⊂ H^{-1}(Ω)`.
 * **The trace spaces of a bounded Lipschitz domain.** For every `U ∈ H^1(V)` with `L_2` function
   `ι U` (`Rd.toL2`), `‖ι U‖_2 + ‖(2^k ω_2(ι U, 2^(-k))_2)_k‖_{ℓ_2} ≤ C ‖U‖` with an explicit
@@ -477,11 +481,12 @@ extension from the boundary, one operator for every smoothness, so that the corr
   `H^{-t}(Γ)` is conjugate-linearly isometric to it by Riesz
   (`Rd.BoundedLipschitzDomain.dualBoundarySobolevEquiv`). `H^t(Γ)` is dense in `L_2(Γ)`, since it
   contains the restrictions to `Γ` of the smooth functions with compact support
-  (`Rd.BoundedLipschitzDomain.denseRange_boundarySobolevToL2`), so
+  (`Rd.BoundedLipschitzDomain.boundarySobolevToL2`,
+  `Rd.BoundedLipschitzDomain.denseRange_boundarySobolevToL2`), so its pivot dual
   `g ↦ (h ↦ ∫_Γ conj (g) h dσ)` maps `L_2(Γ)` injectively into `H^{-t}(Γ)`
-  (`Rd.BoundedLipschitzDomain.boundaryPivotDual`,
-  `Rd.BoundedLipschitzDomain.boundaryPivotDual_injective`): `H^t(Γ) ⊂ L_2(Γ) ⊂ H^{-t}(Γ)` is a
-  Gelfand triple with pivot space `L_2(Γ)`. For `1/2 < s < 3/2` the trace space of
+  (`Rd.BoundedLipschitzDomain.pivotDual_boundarySobolevToL2_apply_apply`,
+  `ContinuousLinearMap.pivotDual_injective_iff`): `H^t(Γ) ⊂ L_2(Γ) ⊂ H^{-t}(Γ)` is a Gelfand
+  triple with pivot space `L_2(Γ)`. For `1/2 < s < 3/2` the trace space of
   `H^s(Ω)` is isomorphic to `H^{s-1/2}(Γ)` (McLean, Theorem 3.38;
   `Rd.BoundedLipschitzDomain.traceSpaceEquivBoundarySobolev`; for `s = 1` with values in
   `H^{1/2}(Γ)`, `Rd.BoundedLipschitzDomain.traceSpaceOneEquivBoundarySobolevHalf`); the trace

@@ -283,8 +283,8 @@ bounded `Ω` and `s ≥ 0` of Hewett–Moiola, Lemma 2.1): on a bounded Lipschit
 is an isomorphism of `H̃^s(Ω)` onto `H^s_0(Ω)`, the isomorphism of the zero extension bound
 (`Rd.BoundedLipschitzDomain.exists_hasZeroExtensionBound`,
 `Rd.HasZeroExtensionBound.tildeEquivZeroBoundary`), with `‖U|_Ω‖ ≤ ‖U‖ ≤ C ‖U|_Ω‖`. With the
-Gelfand triple `H̃^s(Ω) ⊂ L_2(Ω) ⊂ H^{-s}(Ω)` of `Rd.tildePivotDual` it gives the triple
-`H^s_0(Ω) ⊂ L_2(Ω) ⊂ H^{-s}(Ω)` up to equivalent norms.
+Gelfand triple `H̃^s(Ω) ⊂ L_2(Ω) ⊂ H^{-s}(Ω)` (`Rd.pairing_dualEquiv_pivotDual_tildeToL2`) it
+gives the triple `H^s_0(Ω) ⊂ L_2(Ω) ⊂ H^{-s}(Ω)` up to equivalent norms.
 
 The two spaces sit in different ambient spaces: `H̃^s(Ω)` (`Rd.tildeSpace`) is the closure of the
 test functions of `Ω` in `H^s(V)`, and `H^s_0(Ω)` (`Rd.zeroBoundarySpace`) is the closure of their
