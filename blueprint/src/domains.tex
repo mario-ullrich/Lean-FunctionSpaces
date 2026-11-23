@@ -48,7 +48,9 @@ the sets of the usual definition by local Lipschitz graphs, with the open balls 
 domain has the extension property of Besov domains, and that the closures of convex Lipschitz
 graph domains, the quadrant (the model of manifolds with corners) and the closures of nonempty
 bounded open convex sets, among them closed balls of positive radius and the closed unit cube,
-are Besov domains.
+are Besov domains. \Cref{sec:domain-splines} describes the Besov spaces of a bounded Lipschitz
+domain inside a cube by the tensor splines of the cube: as restrictions of their approximation
+spaces, also in block form, with Jackson's inequality for the splines restricted to the domain.
 
 \section{Lipschitz graph domains}
 
@@ -2371,6 +2373,292 @@ the open unit cube (\Cref{lem:unit-cube}), a bounded Lipschitz domain
 (\Cref{cor:unit-cube-lipschitz}).
 \end{proof}
 
+\section{Splines on bounded Lipschitz domains}
+\label{sec:domain-splines}
+
+The tensor splines of order $r$ describe the Besov spaces of the unit cube with the modulus for
+the Euclidean norm (\Cref{thm:cube-splines-euclidean}). Through an extension this passes to every
+measurable set with the extension property inside a cube $Q$, in particular to every bounded
+Lipschitz domain in $Q$: a function of finite intrinsic quasi-norm agrees on the set with an
+element of the approximation space of the tensor splines on $Q$, and conversely. This is the
+restriction form of DeVore \cite[\S 7.7]{DeVore1998} and of DeVore and Sharpley
+\cite[\S 6]{DeVoreSharpley}: extend the function to $\R^d$, approximate on the cube, and restrict.
+For $p \geq 1$ and minimally smooth domains an extension $\mathcal{E}$ with
+$\omega_r(\mathcal{E} f, t)_p \leq C \omega_r(f, t)_p$ exists, after Johnen and Scherer
+\cite{JohnenScherer1977} (see the introduction of \cite{DeVoreSharpley}), and
+\cite[Theorem~6.6]{DeVoreSharpley} bounds the moduli of the extension of DeVore and Sharpley by
+Hardy sums of averaged moduli of $f$; here the extension property
+(\Cref{def:besov-extension-property}) takes their place. The splines of $Q$ restricted to
+the set approximate at the corresponding rate (\Cref{thm:domain-splines-direct}); the remark after
+that theorem names what the converse needs.
+
+In this section $\R^d$ is the Euclidean space of dimension $d$, $1 \leq p < \infty$,
+$1 \leq q \leq \infty$ and $r \geq 1$ unless a statement says otherwise, $a \in \R^d$, $L > 0$,
+\[
+  Q = a + L [0, 1]^d = \{x \in \R^d : a_i \leq x_i \leq a_i + L \text{ for every } i\} ,
+  \qquad A x = a + L x ,
+\]
+and $N_\Omega(f) = \|f\|_{L_p(\Omega)} + \|(2^{ks} \omega_r(f, 2^{-k}, \Omega)_p)_k\|_{\ell_q}$ is
+the intrinsic quasi-norm on a measurable set $\Omega \subseteq \R^d$ (\Cref{lem:modnorm-on}).
+$Q_E = [0, 1]^d \subseteq \R^d$, the restriction $R$ and the extension by zero $E$ are those of
+\Cref{def:euclidean-cube}.
+
+\begin{lemma}[Agreement on subsets and under affine maps]
+\label{lem:agreement-subsets}
+\lean{Rd.indicatorLp_eq_of_subset, Rd.LpToLpRestrictCLM_eq_iff_indicatorLp_eq,
+  Rd.LpToLpRestrictCLM_indicatorExtendLp, Rd.restrictSubsetLp_eq_of_indicatorLp_eq,
+  Rd.indicatorLp_compAffineLp_eq_of_indicatorLp_eq}
+\leanok
+\uses{lem:indicator-lp, lem:zero-extension-lp, lem:restriction-smaller-set,
+  lem:modulus-on-affine}
+Let $\mu$ be a measure on $X$ and $1 \leq p \leq \infty$.
+\begin{enumerate}
+  \item For measurable $S \subseteq T$ and $F, f \in L_p(\mu)$, $1_T F = 1_T f$ implies
+    $1_S F = 1_S f$.
+  \item For measurable $S$ and $F, G \in L_p(\mu)$, $F|_S = G|_S$ in $L_p(\mu|_S)$ if and only if
+    $1_S F = 1_S G$; and $(1_S G)|_S = G$ for every $G \in L_p(\mu|_S)$.
+  \item For measurable $D \subseteq O$, $G \in L_p(\mu|_O)$ and $f \in L_p(\mu)$ with
+    $1_D (1_O G) = 1_D f$, the restriction of $G$ to $D$ is $f|_D$.
+  \item Let $V$, $\mu$ and $A$ be as in \Cref{lem:modulus-on-affine}, $U \subseteq V$ measurable
+    and $G_1, G_2 \in L_p(\mu)$. If $1_U G_1 = 1_U G_2$, then
+    $1_{A^{-1} U} (G_1 \circ A) = 1_{A^{-1} U} (G_2 \circ A)$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:indicator-lp-eq-iff}
+Each statement says that two functions agree almost everywhere on a set
+(\Cref{lem:indicator-lp-eq-iff}). For (4), $A$ carries $\mu$ to a multiple of $\mu$, so almost
+everywhere equalities move along $A$, and $A x \in U$ for $x \in A^{-1} U$.
+\end{proof}
+
+\begin{definition}[Tensor splines on a cube]
+\label{def:euclidean-cube-at}
+\lean{Cube.euclideanCubeAt, Cube.measurableSet_euclideanCubeAt,
+  Cube.preimage_affine_euclideanCubeAt, Cube.preimage_affine_inv_euclideanCube,
+  Cube.restrictEuclideanAt, Cube.extendEuclideanAt, Cube.cubeSplineSchemeAt,
+  Cube.mem_cubeSplineSchemeAt_two_pow}
+\leanok
+\uses{def:euclidean-cube, lem:modulus-on-affine, def:cube-spline, def:comap}
+The cube $Q$ is measurable, $A^{-1}(Q) = Q_E$, and the inverse map $A^{-1} y = -L^{-1} a +
+L^{-1} y$ satisfies $(A^{-1})^{-1}(Q_E) = Q$. For $1 \leq p \leq \infty$,
+\[
+  R_Q F = R(F \circ A) , \qquad E_Q g = (E g) \circ A^{-1}
+\]
+define bounded linear operators $R_Q : L_p(\R^d) \to L_p([0, 1]^d)$ and
+$E_Q : L_p([0, 1]^d) \to L_p(\R^d)$. The \emph{tensor splines of order $r$ on $Q$} form the image
+scheme in $L_p(Q)$ of the tensor splines of order $r$ on $[0, 1]^d$ (\Cref{def:cube-spline})
+under $g \mapsto (E_Q g)|_Q$ (\Cref{def:comap}). Their approximants of complexity $2^k$ are the
+functions $(E_Q g)|_Q$ for the splines $g$ of level $k$, the \emph{splines of level $k$ on $Q$}.
+\end{definition}
+
+\begin{proposition}[Transport to the unit cube]
+\label{prop:cube-spline-scheme-at}
+\lean{Cube.restrictEuclideanAt_extendEuclideanAt, Cube.restrictEuclideanAt_eq_of_indicatorLp_eq,
+  Cube.indicatorLp_extendEuclideanAt_restrictEuclideanAt, Cube.memApprox_cubeSplineSchemeAt_iff}
+\leanok
+\uses{def:euclidean-cube-at, def:approx-space}
+Let $1 \leq p \leq \infty$, $g \in L_p([0, 1]^d)$ and $F, G \in L_p(\R^d)$. Then
+$R_Q(E_Q g) = g$ and $1_Q E_Q(R_Q F) = 1_Q F$, and $1_Q F = 1_Q G$ implies $R_Q F = R_Q G$. For
+all $s \in \R$ and $0 < q \leq \infty$, an element $G \in L_p(Q)$ lies in the approximation space
+$A^s_q$ of the tensor splines on $Q$ if and only if $R_Q(1_Q G)$ lies in the approximation space
+$A^s_q$ of the tensor splines of $[0, 1]^d$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{lem:modulus-on-affine, lem:euclidean-cube-transport, lem:agreement-subsets,
+  lem:approx-functorial}
+The compositions with $A$ and $A^{-1}$ undo each other (\Cref{lem:modulus-on-affine}), and $A$
+carries $Q_E$ onto $Q$, so the first three statements are those of
+\Cref{lem:euclidean-cube-transport} moved along $A$ (\Cref{lem:agreement-subsets}). Hence
+$T g = (E_Q g)|_Q$ and $S G = R_Q(1_Q G)$ are bounded linear maps inverse to each other
+(\Cref{lem:agreement-subsets}). $T$ maps the splines of $[0, 1]^d$ to the splines on $Q$ by
+definition, and $S$ maps $T g$ to $g$, so \Cref{lem:approx-functorial} applies in both
+directions.
+\end{proof}
+
+\begin{proposition}[Restrictions of spline space elements]
+\label{prop:domain-splines-finite}
+\lean{Rd.modNormOn_lt_top_of_memApprox_cubeSplineSchemeAt}
+\leanok
+\uses{def:euclidean-cube-at, lem:modnorm-on}
+Let $\Omega \subseteq Q$ be measurable and $0 \leq s < r - 1 + 1/p$, let $G \in L_p(Q)$ lie in
+the approximation space $A^s_q$ of the tensor splines of order $r$ on $Q$, and let
+$f \in L_p(\R^d)$ agree with $G$ on $\Omega$. Then $N_\Omega(f) < \infty$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{prop:cube-spline-scheme-at, thm:cube-splines-euclidean, lem:modulus-on-affine,
+  lem:euclidean-cube-transport, lem:null-set-domains, lem:agreement-subsets,
+  lem:restriction-moduli}
+By \Cref{prop:cube-spline-scheme-at}, $g = R_Q(1_Q G)$ lies in the approximation space of the
+tensor splines of $[0, 1]^d$, and $g = R(E g)$, so $N_{Q_E}(E g) < \infty$
+(\Cref{thm:cube-splines-euclidean}, \Cref{lem:euclidean-cube-transport}). Composition with
+$A^{-1}$ carries this to
+$N_Q(E_Q g) < \infty$ (\Cref{lem:modulus-on-affine}; $(A^{-1})^{-1}(Q_E) = Q$, and equal sets give
+equal quasi-norms, \Cref{lem:null-set-domains}). The function $E_Q g = E_Q(R_Q(1_Q G))$ agrees with
+$G$ on $Q$ (\Cref{prop:cube-spline-scheme-at}), hence with $f$ on $\Omega$
+(\Cref{lem:agreement-subsets}), and $N_\Omega(f) \leq N_Q(E_Q g)$
+(\Cref{lem:restriction-moduli}).
+\end{proof}
+
+\begin{theorem}[Splines on domains through restriction]
+\label{thm:domain-splines}
+\lean{Rd.HasBesovExtension.exists_cubeSplineAt_le,
+  Rd.HasBesovExtension.exists_memApprox_cubeSplineSchemeAt_iff,
+  Rd.HasBesovExtension.exists_memApprox_cubeSplineSchemeAt_iff_of_order,
+  Rd.BoundedLipschitzDomain.exists_memApprox_cubeSplineSchemeAt_iff,
+  Rd.BoundedLipschitzDomain.exists_memApprox_cubeSplineSchemeAt_iff_of_order,
+  Rd.BoundedLipschitzDomain.exists_memApprox_cubeSplineSchemeAt_iff_exists_besov}
+\leanok
+\uses{def:euclidean-cube-at, lem:modnorm-on, def:besov-extension-property,
+  def:bounded-lipschitz, def:dyadic-norm}
+Let $0 < s < r - 1 + 1/p$.
+\begin{enumerate}
+  \item Let $\Omega \subseteq Q$ be a measurable set with the extension property. There is
+    $C < \infty$ such that every $f \in L_p(\R^d)$ with $N_\Omega(f) < \infty$ agrees on
+    $\Omega$ with some $G \in L_p(Q)$ with $\|G\|^{\mathrm{dy}}_{A^s_q} \leq C N_\Omega(f)$ in the
+    approximation space of the tensor splines of order $r$ on $Q$. Hence $f \in L_p(\R^d)$
+    agrees on $\Omega$ with an element of this approximation space if and only if
+    $N_\Omega(f) < \infty$, if and only if
+    $\|f\|_{L_p(\Omega)} + \|(2^{ks} \omega_{r'}(f, 2^{-k}, \Omega)_p)_k\|_{\ell_q} < \infty$
+    for every order $r' > s$.
+  \item Let $\Omega \subseteq Q$ be a bounded Lipschitz domain and $f \in L_p(\R^d)$. Then the
+    equivalences of (1) hold for $\Omega$, and $f$ agrees on $\Omega$ with an element of the
+    approximation space $A^s_q$ of the tensor splines of order $r$ on $Q$ if and only if $f$
+    agrees on $\Omega$ with some $F \in L_p(\R^d)$ with
+    $\|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q} < \infty$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{prop:domain-splines-finite, thm:cube-splines-euclidean, lem:modulus-on-affine,
+  lem:null-set-domains, prop:cube-spline-scheme-at, lem:approx-functorial,
+  lem:agreement-subsets, lem:restriction-moduli, thm:dyadic-norm, cor:besov-extension-order,
+  thm:bounded-lipschitz-besov-domain, thm:bounded-lipschitz-besov}
+(1) Since $1/p \leq 1$, $s < r$, and the extension property gives $C_1$ and $F \in L_p(\R^d)$
+that agrees with $f$ on $\Omega$, with $\|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q}
+\leq C_1 N_\Omega(f)$. The intrinsic quasi-norm $N_Q(F)$ is at most this quasi-norm
+(\Cref{lem:restriction-moduli}), $N_{Q_E}(F \circ A) \leq C_3 N_Q(F)$
+(\Cref{lem:modulus-on-affine}; $A^{-1}(Q) = Q_E$, and equal sets give equal quasi-norms,
+\Cref{lem:null-set-domains}), and Jackson's direction on the unit cube gives
+$\|R_Q F\|^{\mathrm{dy}}_{A^s_q} \leq C_2 N_{Q_E}(F \circ A)$
+(\Cref{thm:cube-splines-euclidean}); the constants do not depend on $f$. The map
+$T g = (E_Q g)|_Q$ carries the splines of $[0, 1]^d$ to those on $Q$, so $G = T(R_Q F)$ has
+$\|G\|^{\mathrm{dy}}_{A^s_q} \leq \|T\| C_2 C_3 C_1 N_\Omega(f)$ (\Cref{lem:approx-functorial}).
+$G$ agrees with $F$ on $Q$ (\Cref{prop:cube-spline-scheme-at}), hence with $f$ on $\Omega$
+(\Cref{lem:agreement-subsets}), and $G$ lies in the approximation space since its dyadic
+quasi-norm is finite (\Cref{thm:dyadic-norm}). The converse is
+\Cref{prop:domain-splines-finite}. On a set with the extension property the order of the
+differences does not matter (\Cref{cor:besov-extension-order}).
+
+(2) Bounded Lipschitz domains have the extension property
+(\Cref{thm:bounded-lipschitz-besov-domain}), so (1) applies, and $N_\Omega(f) < \infty$
+describes the restrictions of the Besov space of $\R^d$ (\Cref{thm:bounded-lipschitz-besov}).
+\end{proof}
+
+For a bounded Lipschitz domain $\Omega$ and $0 < s < r - 1 + 1/p$, the functions of the Banach
+space $B^s_{p,q}(\Omega)$ of \Cref{def:domain-besov-space} are therefore, on $\Omega$, the
+restrictions of the approximation space of the tensor splines on any cube that contains
+$\Omega$.
+
+\begin{theorem}[Tensor splines and restrictions to the unit cube]
+\label{thm:cube-splines-restriction}
+\lean{Cube.memApprox_cubeSplineScheme_iff_exists_besov}
+\leanok
+\uses{def:euclidean-cube, def:cube-spline, def:approx-space}
+Let $0 < s < r - 1 + 1/p$. Then $g \in L_p([0, 1]^d)$ lies in the approximation space $A^s_q$
+of the tensor splines of order $r$ if and only if $g = R F$ for some $F \in L_p(\R^d)$ with
+$\|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q} < \infty$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{thm:cube-splines-euclidean, cor:convex-besov-domain, lem:euclidean-cube-transport,
+  lem:restriction-moduli}
+If $g$ lies in the approximation space, then $g = R(E g)$ and $N_{Q_E}(E g) < \infty$
+(\Cref{thm:cube-splines-euclidean}). The closed unit cube is a Besov domain
+(\Cref{cor:convex-besov-domain}), so $E g$ agrees on $Q_E$ with some $F$ of finite Besov
+quasi-norm, and $R F = R(E g) = g$ (\Cref{lem:euclidean-cube-transport}). Conversely,
+$N_{Q_E}(F) \leq \|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q}$
+(\Cref{lem:restriction-moduli}), and \Cref{thm:cube-splines-euclidean} applies to $g = R F$.
+\end{proof}
+
+\begin{corollary}[Spline blocks on domains]
+\label{cor:domain-spline-blocks}
+\lean{Rd.HasBesovExtension.exists_cubeSplineBlocksAt_iff}
+\leanok
+\uses{def:euclidean-cube-at, lem:modnorm-on, def:besov-extension-property}
+Let $\Omega \subseteq Q$ be a measurable set with the extension property, for example a bounded
+Lipschitz domain, and $0 < s < r - 1 + 1/p$. Then $f \in L_p(\R^d)$ has $N_\Omega(f) < \infty$ if
+and only if $f$ agrees on $\Omega$ with a sum $\sum_k b_k$, convergent in $L_p(Q)$, of splines
+$b_k$ of order $r$ and level $k$ on $Q$ with $\|(2^{ks} \|b_k\|_{L_p(Q)})_k\|_{\ell_q} < \infty$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+\uses{thm:domain-splines, thm:block-decomposition}
+$L_p(Q)$ is a Banach space, so an element of $L_p(Q)$ lies in the approximation space of the
+tensor splines on $Q$ if and only if it has such a block decomposition
+(\Cref{thm:block-decomposition}); \Cref{thm:domain-splines} gives the rest.
+\end{proof}
+
+On the cube this is the norm $N_3$ of DeVore and Popov \cite[Theorem~5.1]{DeVorePopovTAMS},
+whose blocks are the differences $T_k f - T_{k-1} f$ of their dyadic spline approximations $T_k$
+\cite[(4.20)]{DeVorePopovTAMS}.
+
+\begin{definition}[Restricted splines]
+\label{def:domain-spline-scheme}
+\lean{Rd.domainSplineScheme}
+\leanok
+\uses{def:euclidean-cube-at, def:comap, lem:restriction-smaller-set}
+Let $1 \leq p \leq \infty$ and $\Omega \subseteq Q$ measurable. The \emph{tensor splines of order
+$r$ on $Q$ restricted to $\Omega$} form the image scheme in $L_p(\Omega)$ of the tensor splines of
+order $r$ on $Q$ under the restriction $L_p(Q) \to L_p(\Omega)$. Its error at complexity $2^k$ is
+$E_k(f) = \inf_S \|f - S\|_{L_p(\Omega)}$ over the restrictions $S$ of the splines of level $k$
+on $Q$.
+\end{definition}
+
+\begin{theorem}[Jackson's inequality for the restricted splines]
+\label{thm:domain-splines-direct}
+\lean{Rd.HasBesovExtension.exists_approxNormDyadic_domainSplineScheme_le,
+  Rd.HasBesovExtension.memApprox_domainSplineScheme}
+\leanok
+\uses{def:domain-spline-scheme, lem:modnorm-on, def:besov-extension-property, def:dyadic-norm}
+Let $\Omega \subseteq Q$ be a measurable set with the extension property and
+$0 < s < r - 1 + 1/p$. There is $C < \infty$ with
+\[
+  \|f\|_{L_p(\Omega)} + \bigl\|\bigl(2^{ks} E_k(f)\bigr)_k\bigr\|_{\ell_q} \leq C N_\Omega(f)
+\]
+for every $f \in L_p(\R^d)$ with $N_\Omega(f) < \infty$; in particular $f|_\Omega$ lies in the
+approximation space $A^s_q$ of the restricted splines.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{thm:domain-splines, lem:agreement-subsets, lem:approx-functorial, thm:retract,
+  thm:dyadic-norm}
+Take $G$ and $C$ of \Cref{thm:domain-splines} for $f$. The restriction $T$ of $L_p(Q)$ to
+$L_p(\Omega)$ maps $G$ to $f|_\Omega$ (\Cref{lem:agreement-subsets}) and the splines on $Q$ to
+the restricted splines, so $\|f|_\Omega\|^{\mathrm{dy}}_{A^s_q} \leq \|T\| \,
+\|G\|^{\mathrm{dy}}_{A^s_q} \leq \|T\| C N_\Omega(f)$ (\Cref{lem:approx-functorial}; this is the
+first inequality of \Cref{thm:retract}, which needs no extension). A finite dyadic quasi-norm
+puts $f|_\Omega$ in the approximation space (\Cref{thm:dyadic-norm}).
+\end{proof}
+
+The converse, a bound of $N_\Omega(f)$ by the approximation quasi-norm of the restricted
+splines, would follow from a Bernstein inequality for the restricted splines in $L_p(\Omega)$,
+whose constants degenerate on cells that meet $\Omega$ in thin pieces. By \Cref{thm:retract} it
+would also follow from an approximation-preserving extension (\Cref{def:approx-extension}) for
+the restriction $L_p(Q) \to L_p(\Omega)$ and the restricted splines, which turns near-best
+restricted splines into near-best splines on $Q$ level by level. The weighted extended B-splines
+of H\"ollig, Reif and Wipper \cite{HolligReifWipper2001} are the standard stabilisation of
+splines on domains.
+
 \chapter{Traces on Lipschitz domains}
 \label{ch:traces-lipschitz}
 
@@ -4180,7 +4468,9 @@ identifies their boundary traces with $B^{1/2}_{2,2}(\Gamma)$.
 \Cref{sec:sobolev-restriction-spaces} builds the Hilbert spaces $H^s(\Omega)$,
 $\tilde H^s(\Omega)$ and $H^s_0(\Omega)$ inside $H^s(V)$, for every open $\Omega$ and every real
 $s$, and \Cref{sec:sobolev-duality} proves the duality of $\tilde H^s(\Omega)$ and
-$H^{-s}(\Omega)$. \Cref{sec:boundary-trace-space} defines the trace space of $H^s(\Omega)$,
+$H^{-s}(\Omega)$ and gives the Gelfand triples $H^s(V) \subseteq L_2(V) \subseteq H^{-s}(V)$ and
+$\tilde H^s(\Omega) \subseteq L_2(\Omega) \subseteq H^{-s}(\Omega)$, $s \geq 0$.
+\Cref{sec:boundary-trace-space} defines the trace space of $H^s(\Omega)$,
 $1/2 < s < 3/2$, on a bounded Lipschitz domain as the orthogonal complement of the trace kernel
 in $H^s(\Omega)$, whose boundary traces are the functions of $B^{s-1/2}_{2,2}(\Gamma)$;
 \Cref{sec:trace-space-norm} shows that the norm of the trace space of $H^s(\Omega)$ is the
@@ -4189,7 +4479,8 @@ of $B^{s-1/2}_{2,2}(\Gamma)$, and
 \Cref{sec:boundary-slobodeckij} identifies $\Besov{s}{p}{p}(\Gamma)$, $0 < s < 1$, with the
 Sobolev--Slobodeckij space of $\Gamma$, which gives this norm in Gagliardo's form, makes
 $B^t_{2,2}(\Gamma)$ the Hilbert space $H^t(\Gamma)$ with the Gagliardo norm of the chart pieces,
-and identifies the trace space of $H^s(\Omega)$ with $H^{s-1/2}(\Gamma)$.
+identifies the trace space of $H^s(\Omega)$ with $H^{s-1/2}(\Gamma)$, and gives the Gelfand
+triple $H^t(\Gamma) \subseteq L_2(\Gamma) \subseteq H^{-t}(\Gamma)$.
 \Cref{sec:sobolev-extension} proves the extension theorem for $\Sob{1}{p}$ on bounded
 Lipschitz domains, $1 < p < \infty$, with a bounded linear extension operator on the jets of
 \Cref{def:sobolev-jets}, from the divergence kernels of \Cref{sec:divergence-kernels};
@@ -4986,7 +5277,12 @@ $\tilde H^s(\Omega)$ and $H^{-s}(\Omega)$ are dual to each other, as in Chandler
 and Moiola \cite[Theorem 3.3]{ChandlerWildeHewettMoiola}, for every open set and every real $s$.
 The tool is the isometry $J_{2s} : H^s(V) \to H^{-s}(V)$: it carries the orthogonal complement
 of $\tilde H^s(\Omega)$ onto $N^{-s}(\Omega)$, hence $\tilde H^s(\Omega)$ onto $H^{-s}(\Omega)$,
-and Riesz's representation theorem does the rest.
+and Riesz's representation theorem does the rest. For $s \geq 0$ the pivot dual of
+\Cref{thm:pivot-dual} makes $L_2$ the pivot space of the Gelfand triples
+$H^s(V) \subseteq L_2(V) \subseteq H^{-s}(V)$, whose duality is the pairing of $H^{-s}(V)$ with
+$H^s(V)$ (\Cref{thm:rd-gelfand-triple}), and
+$\tilde H^s(\Omega) \subseteq L_2(\Omega) \subseteq H^{-s}(\Omega)$
+(\Cref{thm:domain-gelfand-triple}).
 
 \begin{lemma}[$J_t$ keeps real functions real]
 \label{lem:bessel-schwartz-real}
@@ -5274,6 +5570,88 @@ isometry preserves inner products, and inside $H^1(V)$ it is the identity
 $\tilde H^1(\Omega)$ and $H^1_0(\Omega)$ are the same subspace of $H^1(V)$
 (\Cref{lem:sobolev-tilde-in-restriction}), so in \Cref{cor:sobolev-duality-zero-boundary} $W$ is
 paired with $u$ itself.
+
+\begin{theorem}[The Gelfand triple $H^s(V) \subseteq L_2(V) \subseteq H^{-s}(V)$]
+\label{thm:rd-gelfand-triple}
+\lean{Rd.toDistr_sobolevInclusion_ofLp, Rd.denseRange_sobolevToL2,
+  Rd.pivotDual_sobolevToL2_apply_apply, Rd.pivotDual_sobolevToL2_injective}
+\leanok
+\uses{thm:pivot-dual, def:sobolev-pairing, def:sobolev-to-l2, lem:sobolev-to-l2,
+  lem:sobolev-inclusion, lem:sobolev-of-schwartz, lem:sobolev-inclusion-tests, lem:plancherel-l2}
+Let $s \geq 0$. For every $g \in L_2(V)$, read as an element of $H^0(V)$,
+$\iota_{-s,0} g \in H^{-s}(V)$ has the tempered distribution $g$. The operator
+$\iota_s : H^s(V) \to L_2(V)$ has dense range. Let $J$ be the pivot dual of $\iota_s$. For every
+$g \in L_2(V)$, every $W \in H^{-s}(V)$ whose tempered distribution is $g$ and every
+$U \in H^s(V)$,
+\[
+  (J g)(U) = \langle g, \iota_s U \rangle_{L_2} = [W, U] ,
+\]
+and $J$ is injective. Thus $H^s(V) \subseteq L_2(V) \subseteq H^{-s}(V)$ is a Gelfand triple with
+pivot space $L_2(V)$, and its duality is the pairing of \Cref{def:sobolev-pairing}.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The tempered distribution of $\iota_{-s,0} g$ is that of $g \in H^0(V)$
+(\Cref{lem:sobolev-inclusion}), which is $J_0 g = g$ (Mathlib's
+\texttt{BesselPotentialSpace.\allowbreak ofLp} and \texttt{TemperedDistribution.\allowbreak
+besselPotential\_\allowbreak zero}). The range of $\iota_s$ contains the Schwartz functions
+(\Cref{lem:sobolev-of-schwartz}, \Cref{lem:sobolev-inclusion-tests}), which are dense in $L_2(V)$
+(Mathlib's \texttt{SchwartzMap.\allowbreak denseRange\_\allowbreak toLpCLM}). An element of
+$H^{-s}(V)$ is determined by its distribution, so $W = \iota_{-s,0} g$. By Plancherel
+(\Cref{lem:plancherel-l2}) and \Cref{lem:sobolev-inclusion},
+$\langle g, \iota_s U \rangle_{L_2} = \int \overline{\widehat g} \, \langle \xi \rangle^{-s}
+\widehat{J_s U} \, d\xi$ and $[W, U] = \langle J_{-s} W, J_s U \rangle_{L_2} =
+\int \overline{\langle \xi \rangle^{-s} \widehat g} \, \widehat{J_s U} \, d\xi$, which agree since
+the weight is real. \Cref{thm:pivot-dual} gives $(J g)(U) = \langle g, \iota_s U \rangle_{L_2}$
+and the injectivity of $J$.
+\end{proof}
+
+\begin{theorem}[The Gelfand triple
+  $\tilde H^s(\Omega) \subseteq L_2(\Omega) \subseteq H^{-s}(\Omega)$]
+\label{thm:domain-gelfand-triple}
+\lean{Rd.tildeToL2, Rd.tildeToL2_apply_ae, Rd.tildeToL2_injective, Rd.denseRange_tildeToL2,
+  Rd.tildePivotDual, Rd.tildePivotDual_apply_apply, Rd.tildePivotDual_injective,
+  Rd.pairing_dualEquiv_tildePivotDual, Rd.dualEquiv_tildePivotDual_injective}
+\leanok
+\uses{thm:pivot-dual, lem:l2-dense-smooth, thm:sobolev-duality, def:sobolev-tilde-zero-boundary,
+  lem:tilde-space-vanishes-outside-nonneg, lem:sobolev-to-l2, def:test-schwartz,
+  lem:sobolev-of-schwartz, lem:sobolev-inclusion-tests}
+Let $\Omega \subseteq V$ be open and $s \geq 0$. The operator
+$\iota^\Omega_s : \tilde H^s(\Omega) \to L_2(\Omega)$, $U \mapsto (\iota_s U)|_\Omega$, is a
+bounded injective linear operator with dense range. Its pivot dual
+$J_\Omega : L_2(\Omega) \to \tilde H^s(\Omega)^*$,
+\[
+  (J_\Omega g)(U) = \int_\Omega \overline{g} \, \iota_s U \, dx
+  \qquad (g \in L_2(\Omega), \ U \in \tilde H^s(\Omega)) ,
+\]
+is conjugate-linear, bounded and injective. Let $W_g \in H^{-s}(\Omega)$ represent $J_\Omega g$ as
+in \Cref{thm:sobolev-duality}. Then $g \mapsto W_g$ is injective and
+$[W_g, U] = \int_\Omega \overline{g} \, \iota_s U \, dx$ for every $U \in \tilde H^s(\Omega)$.
+Thus $\tilde H^s(\Omega) \subseteq L_2(\Omega) \subseteq H^{-s}(\Omega)$ is a Gelfand triple with
+pivot space $L_2(\Omega)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+$\iota_s U$ vanishes almost everywhere outside $\Omega$
+(\Cref{lem:tilde-space-vanishes-outside-nonneg}), so $(\iota_s U)|_\Omega = 0$ forces
+$\iota_s U = 0$, and $U = 0$ (\Cref{lem:sobolev-to-l2}). A smooth $\psi : V \to \R$ with compact
+support in $\Omega$ is a test function $\varphi$ of $\Omega$; it lies in
+$T^s(\Omega) \subseteq \tilde H^s(\Omega)$ (\Cref{def:sobolev-tilde-zero-boundary}), and
+$\iota_s \varphi = \varphi$ (\Cref{def:test-schwartz}, \Cref{lem:sobolev-of-schwartz},
+\Cref{lem:sobolev-inclusion-tests}).
+\Cref{lem:l2-dense-smooth} for Lebesgue measure on $\Omega$, with $U = \Omega$, gives the dense
+range, and \Cref{thm:pivot-dual} the formula for $J_\Omega$ and its injectivity. By
+\Cref{thm:sobolev-duality}, $[W_g, U] = (J_\Omega g)(U)$, and $\ell \mapsto W_\ell$ is injective.
+\end{proof}
+
+For $s = 1$, restriction maps $\tilde H^1(\Omega)$ isometrically onto $H^1_0(\Omega)$
+(\Cref{thm:sobolev-tilde-zero-boundary}), and the triple is
+$H^1_0(\Omega) \subseteq L_2(\Omega) \subseteq H^{-1}(\Omega)$. On a Lipschitz domain, for
+$s \geq 0$ with $s - \frac12 \notin \Z$, restriction is an isomorphism of $\tilde H^s(\Omega)$
+onto $H^s_0(\Omega)$ with equivalent norms \cite[Theorem 3.33]{McLean}, and up to equivalent
+norms the triple is $H^s_0(\Omega) \subseteq L_2(\Omega) \subseteq H^{-s}(\Omega)$.
 
 \section{The trace spaces of a bounded Lipschitz domain}
 \label{sec:boundary-trace-space}
@@ -5992,7 +6370,10 @@ charts, the Gagliardo form of $\Gamma$ is compared with the Gagliardo form of th
 (\Cref{sec:sobolev-slobodeckij}). The Gagliardo forms of the chart pieces give
 $B^t_{2,2}(\Gamma)$, $0 < t < 1$, an equivalent Hilbert norm; with it $B^t_{2,2}(\Gamma)$ is the
 Sobolev space $H^t(\Gamma)$, and the trace space of $H^s(\Omega)$, $1/2 < s < 3/2$, is
-$H^{s-1/2}(\Gamma)$. The results hold in every dimension $n \geq 1$; for $n = 1$ the hyperplanes
+$H^{s-1/2}(\Gamma)$. $H^t(\Gamma)$ is dense in $L_2(\Gamma)$, and the pivot dual of
+\Cref{thm:pivot-dual} gives the Gelfand triple
+$H^t(\Gamma) \subseteq L_2(\Gamma) \subseteq H^{-t}(\Gamma)$ (\Cref{thm:boundary-gelfand-triple}).
+The results hold in every dimension $n \geq 1$; for $n = 1$ the hyperplanes
 are points and $\Gamma$ is finite.
 
 \paragraph{The form and double integrals in the charts.}
@@ -6686,6 +7067,53 @@ right side for $F = \iota_s U$. The function $\iota_s u$ is an extension of
 $\mathbf 1_\Omega \iota_s u$ with a finite norm, so the Besov trace is
 $\operatorname{Tr}_\Gamma \iota_s u$ (\Cref{thm:besov-trace-operator}), which is
 $\gamma^s_{L_2} u$ (\Cref{thm:trace-l2}).
+\end{proof}
+
+\begin{theorem}[The Gelfand triple $H^t(\Gamma) \subseteq L_2(\Gamma) \subseteq H^{-t}(\Gamma)$]
+\label{thm:boundary-gelfand-triple}
+\lean{Rd.BoundedLipschitzDomain.boundarySobolevToL2,
+  Rd.BoundedLipschitzDomain.boundarySobolevToL2_apply,
+  Rd.BoundedLipschitzDomain.boundarySobolevToL2_injective,
+  Rd.BoundedLipschitzDomain.exists_boundarySobolev_toLp_ae_eq,
+  Rd.BoundedLipschitzDomain.denseRange_boundarySobolevToL2,
+  Rd.BoundedLipschitzDomain.boundaryPivotDual,
+  Rd.BoundedLipschitzDomain.boundaryPivotDual_apply_apply,
+  Rd.BoundedLipschitzDomain.boundaryPivotDual_injective}
+\leanok
+\uses{thm:pivot-dual, lem:l2-dense-smooth, def:dual-boundary-sobolev, thm:boundary-sobolev-norm,
+  def:boundary-besov-space, def:boundary-l2, thm:ambient-trace-l2, thm:boundary-trace-charts,
+  thm:trace-space-functions, lem:sobolev-of-schwartz, lem:sobolev-inclusion-tests}
+Let $0 < t < 1$. The map $\iota_\Gamma : H^t(\Gamma) \to L_2(\Gamma)$ that sends $g$ to its
+function in $L_2(\Gamma)$ is a bounded injective linear operator. For every smooth
+$\psi : V \to \R$ with compact support there is $g \in H^t(\Gamma)$ with $g = \psi$
+$\sigma$-almost everywhere, and $\iota_\Gamma$ has dense range. Its pivot dual
+$J_\Gamma : L_2(\Gamma) \to H^{-t}(\Gamma)$,
+\[
+  (J_\Gamma g)(h) = \int_\Gamma \overline{g} \, h \, d\sigma
+  \qquad (g \in L_2(\Gamma), \ h \in H^t(\Gamma)) ,
+\]
+is conjugate-linear, bounded and injective. Thus $H^t(\Gamma) \subseteq L_2(\Gamma) \subseteq
+H^{-t}(\Gamma)$ is a Gelfand triple with pivot space $L_2(\Gamma)$: the pairing of
+$H^{-t}(\Gamma)$ with $H^t(\Gamma)$ extends the inner product of $L_2(\Gamma)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+$\iota_\Gamma$ is the identity of $H^t(\Gamma)$ onto $B^t_{2,2}(\Gamma)$
+(\Cref{thm:boundary-sobolev-norm}) followed by the inclusion of $B^t_{2,2}(\Gamma)$ into
+$L_2(\Gamma)$ (\Cref{def:boundary-besov-space}), and an element of $B^t_{2,2}(\Gamma)$ is
+determined by its function. Let $\psi$ be smooth with compact support and
+$s = t + 1/2 \in (1/2, 3/2)$. Then $\psi$ is a Schwartz function, an element of $H^s(V)$ with
+$\iota_s \psi = \psi$ (\Cref{lem:sobolev-of-schwartz}, \Cref{lem:sobolev-inclusion-tests}). Its
+trace
+$T^s_\Gamma \psi \in L_2(\Gamma)$ is $\operatorname{Tr}_\Gamma \psi$ $\sigma$-almost everywhere
+(\Cref{thm:ambient-trace-l2}), which is $\psi$ on $\Gamma$ since $\psi$ is continuous
+(\Cref{thm:boundary-trace-charts}), and it lies in $B^{s-1/2}_{2,2}(\Gamma) = B^t_{2,2}(\Gamma)$
+(\Cref{thm:trace-space-functions}); so $g = T^s_\Gamma \psi$ lies in $H^t(\Gamma)$. The surface
+measure is finite, hence locally finite, and \Cref{lem:l2-dense-smooth} with $U = V$ gives the
+dense range. \Cref{thm:pivot-dual} gives
+$(J_\Gamma g)(h) = \langle g, h \rangle_{L_2(\Gamma)}$ and the injectivity of $J_\Gamma$
+(\Cref{def:boundary-l2}, \Cref{def:dual-boundary-sobolev}).
 \end{proof}
 
 \section{The extension theorem for Sobolev spaces}

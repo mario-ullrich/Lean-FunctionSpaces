@@ -117,7 +117,12 @@ the quasi-Banach space `L_τ`.
   coordinate differences in the translation algebra `ℂ[ℝ^d]` (`Cube.higherDiff_eq_sum`) and bounds
   them by differences of every order in one variable
   (`Interval.exists_eLpNorm_higherDiff_ppFun_le`,
-  `Interval.exists_eLpNorm_higherDiff_spline_le_of_lt`).
+  `Interval.exists_eLpNorm_higherDiff_spline_le_of_lt`). With the Euclidean norm, the modulus on
+  `Q` gives the same condition for the tensor splines: for `0 ≤ s < r - 1 + 1/p` and
+  `F ∈ L_p(ℝ^d)`, `F|_Q ∈ A^s_q` of the tensor splines of order `r` iff
+  `‖F‖_{L_p(Q)} + ‖(2^(ks) ω_r(F, 2^(-k), Q)_p)_k‖_{ℓ_q} < ∞`
+  (`Cube.memApprox_cubeSplineScheme_restrictEuclidean_iff`), since
+  `‖h‖_∞ ≤ ‖h‖_2 ≤ √d ‖h‖_∞`.
 * **The Haar system.** Let `h_{k,m} = 2^(k/2) (1_{[2m, 2m+1) 2^(-k-1)} - 1_{[2m+1, 2m+2) 2^(-k-1)})`
   be the Haar functions on `[0, 1)` and `A_n` the step functions on the dyadic intervals of
   length `2^(-⌊log₂ n⌋)`. For `1 ≤ p < ∞`, `s > 0` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q(L_p[0, 1])` iff
@@ -191,8 +196,8 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Tensor splines on the cube: quasi-interpolant as a kernel operator, tensor-product description, Jackson and inverse inequalities, `A^s_q = B^s_{p,q}([0, 1]^d)` for `0 < s < r - 1 + 1/p` | ✅ | ✗ | `Domains/Cube/Splines`, `Domains/Cube/SplineJackson`, `Domains/Cube/SplineInverse` |
 | Differences of every order: difference bound for polynomials, piecewise polynomials (gain `1/p`), splines (gain `m` below order `r`), steps of either sign | ✅ | ✗ | `Domains/Interval/PolyDifferences`, `Domains/Interval/LowerDifferences` |
 | Isotropic differences and their expansion into mixed coordinate differences | ✅ | ✗ | `Domains/Cube/IsoDifferences` |
-| Isotropic modulus on the cube, comparison with the moduli in the coordinates | ✅ | ✗ | `Domains/Cube/IsoModulus` |
-| Isotropic inverse inequalities, `A^s_q` with the isotropic modulus, coordinate and isotropic Besov conditions agree for `0 < s < r - 1 + 1/p` | ✅ | ✗ | `Domains/Cube/IsoInverse`, `Domains/Cube/IsoCoincidence` |
+| Isotropic modulus on the cube, comparison with the moduli in the coordinates; the cube in the Euclidean space: restriction and extension by zero, the Euclidean modulus on the cube against the isotropic one | ✅ | ✗ | `Domains/Cube/IsoModulus` |
+| Isotropic inverse inequalities, `A^s_q` with the isotropic modulus, coordinate and isotropic Besov conditions agree for `0 < s < r - 1 + 1/p`, and with the Euclidean modulus on the cube | ✅ | ✗ | `Domains/Cube/IsoInverse`, `Domains/Cube/IsoCoincidence` |
 | The normalising factor `2^(j/2)` of dyadic dilations: its square and its extended norm, also for its `d`-th power | ✅ | ✗ | `Wavelets/DyadicNormalisation` |
 | Haar system on `[0, 1]`: dyadic conditional expectations, density, Haar coefficient characterisation | ✅ | ✗ | `Wavelets/Examples/Haar` |
 | Haar coefficients and Besov spaces on the interval and the circle for `0 < s < 1/p` | ✅ | ✗ | `Wavelets/Examples/HaarBesov` |

@@ -348,7 +348,8 @@ smoothness, and a finite set for the coefficients of one level of atoms and wave
   ENNReal.lqNorm_shift_le, ENNReal.lqNorm_eq_sum, ENNReal.lqNorm_le_card_rpow_mul,
   ENNReal.lqNorm_prod_rpow, ENNReal.lqNorm_lqNorm_rpow, ENNReal.lqNorm_le_sum_of_eq_zero,
   ENNReal.lqNorm_ite_eq, ENNReal.lqNorm_ite_le_eq,
-  ENNReal.lqNorm_dyadicWeight_le_of_head_of_succ_le}
+  ENNReal.lqNorm_dyadicWeight_le_of_head_of_succ_le, ENNReal.lqNorm_dyadicWeight_le_of_shift,
+  ENNReal.one_add_dyadicWeight_mul_ne_top}
 \leanok
 \uses{def:lq-norm}
 Let $1 \leq q \leq r \leq \infty$. For all sequences $a, b$ in $[0, \infty]$, all
@@ -369,7 +370,12 @@ $c, \rho \in [0, \infty]$ and all $n \in \N$:
   \item for every $\sigma \in \R$, all sequences $x, w$ in $[0, \infty]$ and all
     $c, K_0, K_1 \in [0, \infty]$ with $x_0 \leq K_0 c$ and $x_{k+1} \leq K_1 w_{k+1}$ for every
     $k$, $\|(2^{k\sigma} x_k)_k\|_{\ell_q} \leq (K_0 + K_1)
-    \bigl( c + \|(2^{k\sigma} w_k)_k\|_{\ell_q} \bigr)$.
+    \bigl( c + \|(2^{k\sigma} w_k)_k\|_{\ell_q} \bigr)$;
+  \item for every $\sigma \geq 0$, $m \in \N$, $B \in [0, \infty]$ and all sequences $x, w$ in
+    $[0, \infty]$ with $x_k \leq B$ for $k < m$ and $x_{k+m} \leq w_k$ for every $k$,
+    $\|(2^{k\sigma} x_k)_k\|_{\ell_q} \leq 2^{m\sigma}
+    \bigl( m B + \|(2^{k\sigma} w_k)_k\|_{\ell_q} \bigr)$, and
+    $1 + 2^{m\sigma} (m \, 2^r + 1) < \infty$ for every $r \in \N$.
 \end{enumerate}
 For every $p \in (0, \infty]$, every finite set $I$, every $B \in [0, \infty]$ and every family
 $(a_i)_{i \in I}$ in $[0, \infty]$ with $a_i \leq B$ for every $i$,
@@ -395,8 +401,10 @@ $\|a\|_{\ell_r} \leq \|a\|_{\ell_q}$ is the series form of the second claim of
 \Cref{lem:rpow-sum-le}. The fifth is the third applied to $a_0 \delta_0$ and the rest,
 and induction on $m$. The sixth is the fourth and the geometric series, the seventh is the
 fourth for a sequence with finitely many nonzero terms, the eighth compares the series of the
-$q$-th powers term by term; the last splits off the first term by the fifth, bounds the others
-by the first two, and drops the first term of $(2^{k\sigma} w_k)_k$. For a finite set $I$ the
+$q$-th powers term by term; the ninth splits off the first term by the fifth, bounds the others
+by the first two, and drops the first term of $(2^{k\sigma} w_k)_k$; the tenth splits off the
+first $m$ terms by the fifth, each at most $2^{m\sigma} B$, and uses
+$2^{(k+m)\sigma} = 2^{m\sigma} 2^{k\sigma}$ on the rest. For a finite set $I$ the
 counting measure of $I$ is $\# I$, so the
 bound by $B$ is Mathlib's \texttt{eLpNorm\_\allowbreak le\_\allowbreak of\_\allowbreak
 ae\_\allowbreak enorm\_\allowbreak bound}; the two identities for finite sets are the series of
@@ -4111,10 +4119,11 @@ $2^{ks} E^A_{2^k}(E g) \leq 2^{\gamma s} C \, 2^{js} E^B_{2^j}(g)$.
 
 For a domain $\Omega \subseteq \R^d$, $X = L_p(\R^d)$, $Y = L_p(\Omega)$ and $R$ the restriction,
 the quasi-norm of $B^s_q$ uses only $g$ on $\Omega$: it is intrinsic. The theorem reduces the
-existence of an intrinsic norm to an approximation-preserving extension, which DeVore and
-Sharpley~\cite{DeVoreSharpley} construct on Lipschitz domains from near-best local
-polynomials. The extension may be
-nonlinear on purpose: in parts of the quasi-Banach range no linear extension exists.
+intrinsic description to an approximation-preserving extension, which controls the errors of
+the scheme on $Y$ level by level. The extensions of DeVore and Sharpley~\cite{DeVoreSharpley}
+control moduli of smoothness, which describes the Besov spaces of a domain as restrictions. The
+extension may be nonlinear on purpose: in parts of the quasi-Banach range no linear extension
+exists.
 
 \chapter{Moduli of smoothness and approximation}
 \label{ch:moduli-abstract}

@@ -56,9 +56,11 @@ inclusion `lp.monotone`, without the norm bound), **Fatou's lemma** for termwise
 `a_m → b` termwise and `‖a_m‖_q ≤ d_m → D` give `‖b‖_q ≤ D` (`ENNReal.lqNorm_le_of_tendsto`), the
 Cauchy–Schwarz inequality `∑_k a_k b_k ≤ ‖a‖_{ℓ_2} ‖b‖_{ℓ_2}` for series and for finite sums
 (`ENNReal.lqNorm_one_mul_le`, `ENNReal.sum_mul_le_lqNorm_two_mul`), the splitting off of the
-first term, also with dyadic weights (`ENNReal.lqNorm_dyadicWeight_le_of_head_of_succ_le`), tails
-of sequences (`ENNReal.lqNorm_ite_le_eq`), which tend to `0` for `q < ∞`
-(`ENNReal.tendsto_lqNorm_ite_le`), sequences with one nonzero term
+first term, also with dyadic weights (`ENNReal.lqNorm_dyadicWeight_le_of_head_of_succ_le`), the
+shift of a weighted sequence by `m` levels at the cost `2^(ms)`, with the finite constant
+`1 + 2^(ms) (m 2^r + 1)` of its applications (`ENNReal.lqNorm_dyadicWeight_le_of_shift`,
+`ENNReal.one_add_dyadicWeight_mul_ne_top`), tails of sequences (`ENNReal.lqNorm_ite_le_eq`),
+which tend to `0` for `q < ∞` (`ENNReal.tendsto_lqNorm_ite_le`), sequences with one nonzero term
 (`ENNReal.lqNorm_ite_eq`), reindexing along bijections and injections
 (`ENNReal.lqNorm_comp_equiv`, `ENNReal.lqNorm_extend_zero`), the `ℓ_q` norm of the geometric
 sequence for every `q` (`ENNReal.dyadicGeomConst`, which is `1` for `q = ∞`,
@@ -757,6 +759,41 @@ theorem lqNorm_dyadicWeight_le_of_head_of_succ_le {q : ℝ≥0∞} (hq : 1 ≤ q
         · exact le_self_add
         · exact le_add_self
     _ = (M + A) * (a + Λ) := by ring
+
+/-- **A weighted `ℓ_q` norm under a shift of the levels**: for `1 ≤ q ≤ ∞`, `s ≥ 0` and `m ∈ ℕ`,
+if `a_k ≤ B` for `k < m` and `a_{k+m} ≤ b_k` for every `k`, then
+`‖(2^(ks) a_k)_k‖_{ℓ_q} ≤ 2^(ms) (m B + ‖(2^(ks) b_k)_k‖_{ℓ_q})`. The first `m` terms split off
+(`ENNReal.lqNorm_le_sum_range_add_shift`) and are at most `2^(ms) B` each; on the rest
+`2^((k+m)s) = 2^(ms) 2^(ks)`. This is the form in which a comparison of moduli at the scales
+`2^(-(k+m))` and `2^(-k)` passes to the Besov quasi-norms. -/
+theorem lqNorm_dyadicWeight_le_of_shift {q : ℝ≥0∞} (hq : 1 ≤ q) {s : ℝ} (hs : 0 ≤ s) (m : ℕ)
+    {a b : ℕ → ℝ≥0∞} {B : ℝ≥0∞} (hB : ∀ k < m, a k ≤ B) (hab : ∀ k, a (k + m) ≤ b k) :
+    lqNorm q (fun k => dyadicWeight s k * a k) ≤
+      dyadicWeight s m * (m * B + lqNorm q (fun k => dyadicWeight s k * b k)) := by
+  calc lqNorm q (fun k => dyadicWeight s k * a k)
+      ≤ ∑ j ∈ Finset.range m, dyadicWeight s j * a j +
+          lqNorm q (fun k => dyadicWeight s (k + m) * a (k + m)) :=
+        lqNorm_le_sum_range_add_shift hq _ m
+    _ ≤ ∑ _j ∈ Finset.range m, dyadicWeight s m * B +
+          lqNorm q (fun k => dyadicWeight s m * (dyadicWeight s k * b k)) := by
+        refine add_le_add (Finset.sum_le_sum fun j hj => ?_) (lqNorm_mono fun k => ?_)
+        · exact mul_le_mul' (dyadicWeight_mono hs (Finset.mem_range.1 hj).le)
+            (hB j (Finset.mem_range.1 hj))
+        · rw [dyadicWeight_add_nat, mul_comm (dyadicWeight s k), mul_assoc]
+          exact mul_le_mul' le_rfl (mul_le_mul' le_rfl (hab k))
+    _ = dyadicWeight s m * (m * B + lqNorm q (fun k => dyadicWeight s k * b k)) := by
+        rw [Finset.sum_const, Finset.card_range, nsmul_eq_mul, lqNorm_const_mul]
+        ring
+
+/-- **The constant of a shift of levels is finite**: `1 + 2^(ms) (m 2^r + 1) < ∞` for every
+`s ∈ ℝ` and `m, r ∈ ℕ`. This is the constant with which `ENNReal.lqNorm_dyadicWeight_le_of_shift`
+compares two Besov quasi-norms whose moduli of order `r` are `m` levels apart, the first `m`
+levels bounded by `2^r` times the norm. -/
+theorem one_add_dyadicWeight_mul_ne_top (s : ℝ) (m r : ℕ) :
+    1 + dyadicWeight s m * (m * 2 ^ r + 1) ≠ ∞ :=
+  ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top, ENNReal.mul_ne_top (dyadicWeight_ne_top s m)
+    (ENNReal.add_ne_top.2 ⟨ENNReal.mul_ne_top (ENNReal.natCast_ne_top m)
+      (ENNReal.pow_ne_top ENNReal.ofNat_ne_top), ENNReal.one_ne_top⟩)⟩
 
 /-! ### Dyadic weights of integer order -/
 

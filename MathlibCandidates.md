@@ -229,6 +229,23 @@ declarations.
   for linear maps `T`, `S_i` between inner product spaces over `ℝ` or `ℂ` and a real `c` with
   `‖x‖² = ‖T x‖² + c ∑_i ‖S_i x‖²`, the inner products satisfy
   `⟨x, y⟩ = ⟨T x, T y⟩ + c ∑_i ⟨S_i x, S_i y⟩` (`inner_eq_of_forall_sq_norm_eq`).
+* **Gelfand triples** (`FunctionSpaces/Analysis/Hilbert/GelfandTriple.lean`): for a bounded
+  linear `ι : V → H` between Hilbert spaces, the pivot dual `J : H → V*`, `J g = ⟪g, ι ·⟫`, the
+  adjoint followed by `InnerProductSpace.toDual` (`ContinuousLinearMap.pivotDual`), with
+  `‖J‖ = ‖ι‖`, `ker J = (range ι)^⊥`, `J` injective iff `ι` has dense range, and `J ∘ ι` injective
+  iff `ι` is (`ContinuousLinearMap.norm_pivotDual`, `ContinuousLinearMap.ker_pivotDual`,
+  `ContinuousLinearMap.pivotDual_injective_iff`,
+  `ContinuousLinearMap.pivotDual_comp_injective_iff`), and `J g v = ∫ conj (g) ι v dμ` for
+  `H = L_2(μ)` (`MeasureTheory.L2.pivotDual_apply_apply`); a continuous linear map into a Hilbert
+  space has dense range iff `(range T)^⊥ = ⊥`
+  (`ContinuousLinearMap.denseRange_iff_orthogonal_range_eq_bot`, next to
+  `ContinuousLinearMap.orthogonal_range` in `Mathlib/Analysis/InnerProductSpace/Adjoint.lean`);
+  a function of `L_p(μ)`, `p ≥ 1`, that integrates to zero against the smooth real functions with
+  compact support in an open set carrying `μ` vanishes
+  (`MeasureTheory.Lp.eq_zero_of_forall_integral_contDiff_smul_eq_zero`, from
+  `IsOpen.ae_eq_zero_of_integral_contDiff_smul_eq_zero`); and dense range in `L_2(μ)` of a map
+  whose range contains these functions (`MeasureTheory.L2.denseRange_of_forall_contDiff`).
+  Mathlib `v4.35.0` has adjoints and Riesz's representation but no pivot dual or Gelfand triple.
 * **Fourier analysis on the torus** (`FunctionSpaces/Torus/Translation.lean`): the Fourier
   coefficients of a translate, `(τ_h f)^(k) = e_k(h) f̂(k)`
   (`Torus.mFourierCoeff_translate`), and `|∏ aᵢ - 1| ≤ ∑ |aᵢ - 1|` for unimodular `aᵢ`
@@ -283,11 +300,23 @@ declarations.
   `FunctionSpaces/Rd/Differences/DilatedDifferences.lean`); `Δ_h^r (f ∘ e) = (Δ_{e h}^r f) ∘ e`
   for every additive map `e` (`Rd.higherDiff_comp_addHom`, `Differences.lean`) and
   `ω_r(f ∘ e, t)_p ≤ ω_r(f, ‖e‖ t)_p` for a measure preserving continuous linear map `e`
-  (`Rd.modulus_comp_le`, `FunctionSpaces/Analysis/Differences/LinearEquivModuli.lean`).
+  (`Rd.modulus_comp_le`, `FunctionSpaces/Analysis/Differences/LinearEquivModuli.lean`), also for
+  the modulus on a set, `ω_r(f ∘ e, t, e⁻¹(U))_p ≤ ω_r(f, ‖e‖ t, U)_p` (`Rd.modulusOn_comp_le`),
+  and for affine maps `A x = a + L x`,
+  `ω_r(f ∘ A, t, A⁻¹(U))_p ≤ L^(-n/p) ω_r(f, L t, U)_p` (`Rd.modulusOn_comp_affine_le`).
 * **Composition with measure preserving maps in `L_p`**
   (`FunctionSpaces/Analysis/Differences/LinearEquivModuli.lean`): `‖g ∘ f‖_p = ‖g‖_p` in
   `[0, ∞]` for a measure preserving `f` (`MeasureTheory.Lp.enorm_compMeasurePreserving`). Mathlib
-  has only the real-valued form `MeasureTheory.Lp.norm_compMeasurePreserving`.
+  has only the real-valued form `MeasureTheory.Lp.norm_compMeasurePreserving`. For affine maps
+  `x ↦ a + L x`, `L > 0`, on a space of dimension `n` with an additive Haar measure:
+  `x ↦ a + L x` carries `μ` to `L^(-n) μ` and `‖G(a + L ·)‖_p = L^(-n/p) ‖G‖_p` for every `p`
+  (`Rd.measurePreserving_affine`, `Rd.eLpNorm_comp_affine`); Mathlib has
+  `MeasureTheory.Measure.map_addHaar_smul` but no `L_p` form.
+* **Operator norms of `PiLp.continuousLinearEquiv`**
+  (`FunctionSpaces/Analysis/Differences/LinearEquivModuli.lean`): `‖ofLp‖ ≤ 1` and
+  `‖toLp‖ ≤ (#ι)^(1/p)` (`PiLp.norm_continuousLinearEquiv_le`,
+  `PiLp.norm_continuousLinearEquiv_symm_le`); Mathlib has the Lipschitz constants
+  (`PiLp.lipschitzWith_ofLp`, `PiLp.lipschitzWith_toLp`) but no operator-norm form.
 * **Sobolev–Slobodeckij norms** (`FunctionSpaces/Rd/Differences/SobolevSlobodeckij.lean`):
   Mathlib has no fractional Sobolev spaces. The Gagliardo form
   `∫∫ |f(y) - f(x)|^p / |y - x|^(n+sp) dy dx` on a finite-dimensional inner product space
@@ -320,6 +349,10 @@ declarations.
 * **Extension by zero on `L_p`** (`FunctionSpaces/Analysis/Lp/IndicatorOperator.lean`): for
   measurable `T ⊆ O`, `g ↦ 1_T g` from `Lp ℂ p (μ.restrict O)` to `Lp ℂ p μ` as a continuous
   linear operator of norm at most `1` (`Rd.indicatorExtendLp`; TauCeti has `extendByZeroLpₗᵢ`).
+  With Mathlib's restriction `LpToLpRestrictCLM`: the restriction of the extension by zero is the
+  identity, and two restrictions agree iff the cut-offs agree
+  (`Rd.LpToLpRestrictCLM_indicatorExtendLp`, `Rd.LpToLpRestrictCLM_eq_iff_indicatorLp_eq`,
+  `FunctionSpaces/Domains/Lipschitz/SplinesOnDomains.lean`).
 * **Differences of Schwartz functions in `L_p`**
   (`FunctionSpaces/Rd/Approximation/BandInverse.lean`): for a Schwartz function `G` on a
   finite-dimensional real inner product space and `1 ≤ p < ∞`, `‖G(· + v) - G‖_p ≤ ‖∂_v G‖_p`

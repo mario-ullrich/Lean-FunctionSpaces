@@ -33,6 +33,12 @@ the slices (`Cube.ppSubmodule`, `Cube.splineSubmodule`):
 As a consequence, the Besov conditions with the coordinate moduli and with the isotropic modulus
 agree for `0 ≤ s < r - 1 + 1/p` (`Cube.lqNorm_cubeModulus_lt_top_iff_iso`): both describe the
 approximation space of the tensor splines of order `r`.
+
+The same holds with the modulus for the Euclidean norm on the cube `Q_E = [0, 1]^d` in the
+Euclidean space `ℝ^d`: for `F ∈ L_p(ℝ^d)`, the restriction `F|_Q` lies in that approximation space
+iff `‖F‖_{L_p(Q_E)} + ‖(2^(ks) ω_r(F, 2^(-k), Q_E)_p)_k‖_{ℓ_q} < ∞`
+(`Cube.memApprox_cubeSplineScheme_restrictEuclidean_iff`), and Jackson's direction holds with a
+constant for every `s ≥ 0` (`Cube.exists_approxNormDyadic_restrictEuclidean_le`).
 -/
 
 @[expose] public section
@@ -336,5 +342,49 @@ theorem lqNorm_cubeModulus_lt_top_iff_iso {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ �
       ‖f‖ₑ + ENNReal.lqNorm q (fun k => dyadicWeight s k * lpIsoModulus p r f k) < ∞ :=
   (memApprox_cubeSplineScheme_iff hr hp hq hs hsr f).symm.trans
     (memApprox_cubeSplineScheme_iff_iso hr hp hq hs hsr f)
+
+/-! ### Tensor splines and the Euclidean modulus on the cube -/
+
+/-- **Tensor splines on the cube and the Euclidean modulus on the cube.** For `1 ≤ p < ∞`,
+`1 ≤ q ≤ ∞`, `r ≥ 1`, `0 ≤ s < r - 1 + 1/p` and `F ∈ L_p(ℝ^d)` on the Euclidean space, the
+restriction `F|_Q` lies in the approximation space `A^s_q` of the tensor splines of order `r` iff
+`‖F‖_{L_p(Q_E)} + ‖(2^(ks) ω_r(F, 2^(-k), Q_E)_p)_k‖_{ℓ_q} < ∞`, with the modulus on the cube
+`Q_E = [0, 1]^d ⊆ ℝ^d` for the Euclidean norm (`Rd.modNormOn`): the isotropic description
+(`Cube.memApprox_cubeSplineScheme_iff_iso`) and the equivalence of the two quasi-norms
+(`Cube.modNormOn_euclideanCube_le_isoNorm`, `Cube.isoNorm_restrictEuclidean_le_modNormOn`). -/
+theorem memApprox_cubeSplineScheme_restrictEuclidean_iff {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞)
+    {s : ℝ} {q : ℝ≥0∞} (hq : 1 ≤ q) (hs : 0 ≤ s) (hsr : s < (r : ℝ) - 1 + 1 / p.toReal)
+    (F : Lp ℂ p (volume : Measure (EuclideanSpace ℝ (Fin d)))) :
+    (cubeSplineScheme p d r).MemApprox s q (restrictEuclidean p d F) ↔
+      Rd.modNormOn (measurableSet_euclideanCube d) r s q F < ∞ := by
+  rw [memApprox_cubeSplineScheme_iff_iso hr hp hq hs hsr]
+  constructor
+  · exact fun h => (modNormOn_euclideanCube_le_isoNorm r s q F).trans_lt h
+  · exact fun h => (isoNorm_restrictEuclidean_le_modNormOn r hs hq F).trans_lt
+      (ENNReal.mul_lt_top (ENNReal.one_add_dyadicWeight_mul_ne_top s d r).lt_top h)
+
+/-- **Jackson's direction with the Euclidean modulus, with a constant**: for `1 ≤ p < ∞`,
+`r ≥ 1`, `s ≥ 0` and `1 ≤ q ≤ ∞` there is `C < ∞` with `‖F|_Q‖_{A^s_q} ≤ C N_{Q_E}(F)` for every
+`F ∈ L_p(ℝ^d)`, in the dyadic quasi-norm of the tensor splines of order `r` and with the intrinsic
+quasi-norm `N_{Q_E}` of `Rd.modNormOn`. Jackson's direction for the isotropic modulus
+(`ApproximationScheme.ModulusData.approxNormDyadic_le_modNorm` for
+`Cube.cubeSplineIsoModulusData`) and `Cube.isoNorm_restrictEuclidean_le_modNormOn`; this holds
+for every `s ≥ 0`. -/
+theorem exists_approxNormDyadic_restrictEuclidean_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) {s : ℝ}
+    (hs : 0 ≤ s) {q : ℝ≥0∞} (hq : 1 ≤ q) :
+    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ F : Lp ℂ p (volume : Measure (EuclideanSpace ℝ (Fin d))),
+      (cubeSplineScheme p d r).approxNormDyadic s q (restrictEuclidean p d F) ≤
+        C * Rd.modNormOn (measurableSet_euclideanCube d) r s q F := by
+  set M := cubeSplineIsoModulusData (d := d) hr hp
+  refine ⟨M.directConst s * (1 + dyadicWeight s d * (d * 2 ^ r + 1)),
+    ENNReal.mul_ne_top (M.directConst_ne_top s) (ENNReal.one_add_dyadicWeight_mul_ne_top s d r),
+    fun F => ?_⟩
+  calc (cubeSplineScheme p d r).approxNormDyadic s q (restrictEuclidean p d F)
+      ≤ M.directConst s * M.modNorm s q (restrictEuclidean p d F) :=
+        M.approxNormDyadic_le_modNorm hq _
+    _ ≤ M.directConst s * ((1 + dyadicWeight s d * (d * 2 ^ r + 1)) *
+          Rd.modNormOn (measurableSet_euclideanCube d) r s q F) :=
+        mul_le_mul' le_rfl (isoNorm_restrictEuclidean_le_modNormOn r hs hq F)
+    _ = _ := (mul_assoc _ _ _).symm
 
 end Cube
