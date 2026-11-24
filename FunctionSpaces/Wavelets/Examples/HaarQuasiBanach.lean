@@ -19,6 +19,8 @@ Haar coefficients when `s > 1/p - 1`.
 * **Steps lie in `L_1`**: a step function `a` of level `j` has
   `‖a‖_1 ≤ 2^(j(1/p - 1)) ‖a‖_p` (`Haar.eLpNorm_one_le_of_mem_lpMeas`), and locally on every
   union of dyadic intervals of level `j` (`Haar.setLIntegral_enorm_le_of_dyadicIndex`).
+* **The sup bound of steps**: for every `0 < p ≤ ∞`, a step function `a` of level `j` has
+  `‖a‖_∞ ≤ 2^(j/p) ‖a‖_p` (`Haar.eLpNorm_top_le_of_mem_lpMeas`).
 * **The approximation spaces embed into `L_1` for `s > 1/p - 1`**: near-best steps `b_j` converge
   in measure to `f` (`Haar.tendstoInMeasure_of_nearBest`), and Fatou's lemma for telescoping sums
   (`MeasureTheory.eLpNorm_sub_rpow_le_tsum`) adds their differences in `L_1`, so
@@ -99,13 +101,31 @@ theorem sum_setLIntegral_haarDyadicInterval (F : ℝ → ℝ≥0∞) (k : ℕ) :
   rw [haarDyadicInterval_natCast, Measure.restrict_restrict (Interval.measurableSet_dyadicIco _ _),
     inter_eq_left.2 ((Interval.dyadicIco_subset m.isLt).trans Ico_subset_Icc_self)]
 
-/-! ### Steps of level `j` in `L_1` -/
+/-! ### Steps of level `j` in `L_1` and `L_∞` -/
+
+/-- **A step by its integral around a point**: let `x ∈ [0, 1)`, let `F ≥ 0` be constant on the
+dyadic interval of level `j` containing `x`, and let `S` contain that interval. Then
+`F(x) ≤ 2^j ∫_S F`, since the integral of `F` over that interval is `F(x) 2^(-j)`. -/
+theorem le_dyadicWeight_mul_setLIntegral_of_dyadicIndex {j : ℕ} {F : ℝ → ℝ≥0∞} {S : Set ℝ}
+    {x : ℝ} (hx : x ∈ Ico (0 : ℝ) 1)
+    (hF : ∀ y ∈ haarDyadicInterval j (dyadicIndex j x), F y = F x)
+    (hS : haarDyadicInterval j (dyadicIndex j x) ⊆ S) :
+    F x ≤ dyadicWeight 1 j * ∫⁻ y in S, F y ∂vol := by
+  have hI : ∫⁻ y in haarDyadicInterval j (dyadicIndex j x), F y ∂vol =
+      F x * dyadicWeight (-1) j := by
+    rw [setLIntegral_congr_fun (measurableSet_haarDyadicInterval _ _) hF,
+      setLIntegral_const, vol_haarDyadicInterval (dyadicIndex_nonneg hx) (dyadicIndex_lt hx)]
+  calc F x = dyadicWeight 1 j * (F x * dyadicWeight (-1) j) := by
+        rw [mul_left_comm, ENNReal.dyadicWeight_mul_neg_self, mul_one]
+    _ ≤ dyadicWeight 1 j * ∫⁻ y in S, F y ∂vol := by
+        gcongr
+        exact hI ▸ lintegral_mono_set hS
 
 /-- **Steps in `L_1`, locally**: let `0 < p ≤ 1` and let `G` be constant on the dyadic intervals
 of level `j`. On a measurable set `S` that is a union of such intervals,
 `∫_S |G| ≤ 2^(j(1/p - 1)) (∫_S |G|^p)^(1/p)`. On `[0, 1)`, `|G(x)|^p 2^(-j)` is the integral of
-`|G|^p` over the interval of `x`, so `|G|^p ≤ 2^j ∫_S |G|^p` on `S`, and
-`|G| = |G|^p |G|^(1-p)`. -/
+`|G|^p` over the interval of `x`, so `|G|^p ≤ 2^j ∫_S |G|^p` on `S`
+(`Haar.le_dyadicWeight_mul_setLIntegral_of_dyadicIndex`), and `|G| = |G|^p |G|^(1-p)`. -/
 theorem setLIntegral_enorm_le_of_dyadicIndex (hp0 : p ≠ 0) (hp1 : p ≤ 1) {j : ℕ} {G : ℝ → ℂ}
     (hG : ∀ x y, dyadicIndex j x = dyadicIndex j y → G x = G y) {S : Set ℝ}
     (hSm : MeasurableSet S) (hS : ∀ x ∈ S, haarDyadicInterval j (dyadicIndex j x) ⊆ S) :
@@ -120,17 +140,9 @@ theorem setLIntegral_enorm_le_of_dyadicIndex (hp0 : p ≠ 0) (hp1 : p ≤ 1) {j 
   · rw [hJ, ENNReal.top_rpow_of_pos (by positivity),
       ENNReal.mul_top (ENNReal.dyadicWeight_ne_zero _ _)]
     exact le_top
-  have hpt : ∀ x ∈ S, x ∈ Ico (0 : ℝ) 1 → ‖G x‖ₑ ^ ρ ≤ dyadicWeight 1 j * J := fun x hxS hx => by
-    have hI : ∫⁻ y in haarDyadicInterval j (dyadicIndex j x), ‖G y‖ₑ ^ ρ ∂vol =
-        ‖G x‖ₑ ^ ρ * dyadicWeight (-1) j := by
-      rw [setLIntegral_congr_fun (measurableSet_haarDyadicInterval _ _) fun y hy => by
-          rw [hG y x hy], setLIntegral_const,
-        vol_haarDyadicInterval (dyadicIndex_nonneg hx) (dyadicIndex_lt hx)]
-    have hle : ‖G x‖ₑ ^ ρ * dyadicWeight (-1) j ≤ J := hI ▸ lintegral_mono_set (hS x hxS)
-    calc ‖G x‖ₑ ^ ρ = ‖G x‖ₑ ^ ρ * dyadicWeight (-1) j * dyadicWeight 1 j := by
-          rw [mul_assoc, ENNReal.dyadicWeight_neg_mul_self, mul_one]
-      _ ≤ J * dyadicWeight 1 j := by gcongr
-      _ = dyadicWeight 1 j * J := mul_comm _ _
+  have hpt : ∀ x ∈ S, x ∈ Ico (0 : ℝ) 1 → ‖G x‖ₑ ^ ρ ≤ dyadicWeight 1 j * J := fun x hxS hx =>
+    le_dyadicWeight_mul_setLIntegral_of_dyadicIndex (F := fun y => ‖G y‖ₑ ^ ρ) hx
+      (fun y hy => by simp only [hG y x (mem_haarDyadicInterval.1 hy)]) (hS x hxS)
   set K := (dyadicWeight 1 j * J) ^ ((1 - ρ) / ρ) with hKdef
   have ha0 : 0 ≤ (1 - ρ) / ρ := div_nonneg (by linarith) hρ.le
   have hK : K ≠ ∞ := ENNReal.rpow_ne_top_of_nonneg (div_nonneg (by linarith) hρ.le)
@@ -168,6 +180,36 @@ theorem eLpNorm_one_le_of_mem_lpMeas (hp0 : p ≠ 0) (hp1 : p ≤ 1) {j : ℕ} {
   rw [eLpNorm_congr_ae hag, Lp.enorm_def, eLpNorm_congr_ae hag, eLpNorm_one_eq_lintegral_enorm hgm,
     eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hgm]
   exact h
+
+/-- **The sup norm of a step of level `j`**: for `0 < p ≤ ∞` and an `ℱ_j`-measurable
+`a ∈ L_t[0, 1]`, `‖a‖_∞ ≤ 2^(j/p) ‖a‖_p`, with `1/∞ = 0`. For `p < ∞`, the representative of `a`
+that is constant on the dyadic intervals of level `j` has `|a(x)|^p ≤ 2^j ∫_0^1 |a|^p` for
+`x ∈ [0, 1)` (`Haar.le_dyadicWeight_mul_setLIntegral_of_dyadicIndex`), and with the values `c_n`
+of `a` the bound reads `max_n |c_n| ≤ (∑_n |c_n|^p)^(1/p)`. -/
+theorem eLpNorm_top_le_of_mem_lpMeas (hp0 : p ≠ 0) {t : ℝ≥0∞} {j : ℕ} {a : Lp ℂ t vol}
+    (ha : a ∈ lpMeas ℂ ℝ (dyadicFiltration j) t vol) :
+    eLpNorm a ∞ vol ≤ dyadicWeight (1 / p.toReal) j * eLpNorm a p vol := by
+  rcases eq_or_ne p ∞ with rfl | hp
+  · rw [ENNReal.toReal_top, div_zero, ENNReal.dyadicWeight_zero_left, one_mul]
+  obtain ⟨g, hg, hag⟩ := mem_lpMeas_iff_aestronglyMeasurable.1 ha
+  have hgm : AEStronglyMeasurable g vol := (hg.mono (dyadicFiltration.le j)).aestronglyMeasurable
+  have hρ : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
+  rw [eLpNorm_congr_ae hag, eLpNorm_congr_ae hag, eLpNorm_exponent_top hgm,
+    eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hgm]
+  refine eLpNormEssSup_le_of_ae_enorm_bound ?_
+  filter_upwards [Interval.ae_mem_Ico_unitVol] with x hx
+  have h : ‖g x‖ₑ ^ p.toReal ≤ dyadicWeight 1 j * ∫⁻ y, ‖g y‖ₑ ^ p.toReal ∂vol := by
+    simpa only [Measure.restrict_univ] using
+      le_dyadicWeight_mul_setLIntegral_of_dyadicIndex (j := j) (S := univ)
+        (F := fun y => ‖g y‖ₑ ^ p.toReal) hx
+        (fun y hy => by simp only [eq_of_dyadicIndex_eq hg (mem_haarDyadicInterval.1 hy)])
+        (subset_univ _)
+  calc ‖g x‖ₑ = (‖g x‖ₑ ^ p.toReal) ^ (1 / p.toReal) := by
+        rw [← ENNReal.rpow_mul, mul_one_div_cancel hρ.ne', ENNReal.rpow_one]
+    _ ≤ (dyadicWeight 1 j * ∫⁻ y, ‖g y‖ₑ ^ p.toReal ∂vol) ^ (1 / p.toReal) :=
+        ENNReal.rpow_le_rpow h (by positivity)
+    _ = dyadicWeight (1 / p.toReal) j * (∫⁻ y, ‖g y‖ₑ ^ p.toReal ∂vol) ^ (1 / p.toReal) := by
+        rw [ENNReal.mul_rpow_of_nonneg _ _ (by positivity), ENNReal.dyadicWeight_rpow, one_mul]
 
 /-! ### Haar coefficients -/
 

@@ -204,7 +204,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Haar coefficients and Besov spaces on the interval and the circle for `0 < s < 1/p` | ✅ | ✗ | `Wavelets/Examples/HaarBesov` |
 | The Haar basis of `L_2[0, 1]`, `n`-term approximation | ✅ | ✗ | `Wavelets/Examples/HaarBasis` |
 | Dyadic step functions in `L_p[0, 1]`, `0 < p ≤ 1`: the step couple, Jackson's inequality by averaging, inverse inequality of order `1/p`, `A^s_q = B^s_{p,q,1}[0, 1]` for `0 < s < 1/p` | ✅ | ✗ | `Wavelets/Examples/DyadicStepsQuasiBanach` |
-| The Haar system for `0 < p ≤ 1`: steps in `L_1`, level norms, embedding of `A^s_q(L_p, steps)` into `L_1` for `s > 1/p - 1`, martingale convergence in `L_1`, Haar coefficient characterisation, `B^s_{p,q,1}[0, 1]` by Haar coefficients for `1/p - 1 < s < 1/p` | ✅ | ✗ | `Wavelets/Examples/HaarQuasiBanach` |
+| The Haar system for `0 < p ≤ 1`: steps in `L_1`, sup bound of steps for `0 < p ≤ ∞`, level norms, embedding of `A^s_q(L_p, steps)` into `L_1` for `s > 1/p - 1`, martingale convergence in `L_1`, Haar coefficient characterisation, `B^s_{p,q,1}[0, 1]` by Haar coefficients for `1/p - 1 < s < 1/p` | ✅ | ✗ | `Wavelets/Examples/HaarQuasiBanach` |
 | Haar partial sums for `0 < p ≤ 1`: convergence in `A^s_q(L_p, steps)` for `s > 1/p - 1` and `q < ∞`, uniqueness of the coefficients (Schauder basis) | ✅ | ✗ | `Wavelets/Examples/HaarSchauderBasis` |
 | `n`-term Haar approximation in `L_2` for every `0 < τ < 2`: approximation by steps in `L_τ`, `τ ≤ 1`, and the Besov space of the first modulus | ✅ | ✗ | `Wavelets/Examples/HaarNTermBesov` |
 
