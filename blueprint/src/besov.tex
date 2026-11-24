@@ -522,21 +522,24 @@ a local instance of one file; the project re-declares it as a scoped instance.
 \begin{definition}[Trigonometric polynomials]
 \label{def:trig-poly}
 \lean{Torus.trigDeg, Torus.boxLt, Torus.card_boxLt_le, Torus.trigMonomial, Torus.trigPoly,
-  Torus.trigScheme, TorusHaar.volume_eq_haarAddCircle, TorusHaar.isAddHaarMeasure,
-  TorusHaar.isProbabilityMeasure, Torus.natAbs_le_trigDeg, Torus.trigDeg_le_iff,
-  Torus.trigDeg_add_le, Torus.trigDeg_zero, Torus.mem_boxLt, Torus.boxLt_zero, Torus.boxLt_mono,
-  Torus.trigMonomial_apply, Torus.trigPoly_zero, Torus.trigPoly_mono,
-  Torus.trigMonomial_mem_trigPoly, Torus.mem_trigScheme, Torus.map_mem_trigPoly}
+  Torus.uniformTrigScheme, Torus.trigScheme, TorusHaar.volume_eq_haarAddCircle,
+  TorusHaar.isAddHaarMeasure, TorusHaar.isProbabilityMeasure, Torus.natAbs_le_trigDeg,
+  Torus.trigDeg_le_iff, Torus.trigDeg_add_le, Torus.trigDeg_zero, Torus.mem_boxLt,
+  Torus.boxLt_zero, Torus.boxLt_mono, Torus.trigMonomial_apply, Torus.trigPoly_zero,
+  Torus.trigPoly_mono, Torus.trigMonomial_mem_trigPoly, Torus.mem_uniformTrigScheme,
+  Torus.mem_trigScheme, Torus.map_mem_trigPoly}
 \leanok
-\uses{def:function-scheme}
+\uses{def:scheme, def:function-scheme}
 The degree of $k \in \Z^d$ is $\deg k = \max_j |k_j|$, with $\deg k = 0$ for $d = \emptyset$.
 The space $\mathcal{T}_n$ of trigonometric polynomials of degree $< n$ is the span of
 $\{e_k : \deg k < n\}$ in $C(\T^d)$, a space of dimension at most $(2n)^d$. The spaces
-$\mathcal{T}_n$ form a scheme of functions on $\T^d$, the \emph{trigonometric scheme}. For all
-finite index sets $\iota, \kappa$, every $m \in \N$ and every linear map $L$ from the bounded
-continuous functions on $\T^\iota$ to those on $\T^\kappa$ with $L e_k \in \mathcal{T}_m$ for all
-$k$ with $\deg k < m$, $L$ maps $\mathcal{T}_m$ on $\T^\iota$ into $\mathcal{T}_m$ on $\T^\kappa$,
-since $\mathcal{T}_m$ is the span of these monomials.
+$\mathcal{T}_n$ form an approximation scheme in $C_b(\T^d) = C(\T^d)$ with the supremum norm,
+the \emph{uniform trigonometric scheme}, and as a scheme of functions on $\T^d$ the
+\emph{trigonometric scheme}. For all finite index sets $\iota, \kappa$, every $m \in \N$ and
+every linear map $L$ from the bounded continuous functions on $\T^\iota$ to those on
+$\T^\kappa$ with $L e_k \in \mathcal{T}_m$ for all $k$ with $\deg k < m$, $L$ maps
+$\mathcal{T}_m$ on $\T^\iota$ into $\mathcal{T}_m$ on $\T^\kappa$, since $\mathcal{T}_m$ is the
+span of these monomials.
 \end{definition}
 
 \begin{lemma}[Products of trigonometric polynomials]
@@ -1239,7 +1242,7 @@ every $e_m$ into it, and the $e_m$ span a dense subspace of $L_p(\T^d)$ (Mathlib
 \begin{lemma}[Uniform density of trigonometric polynomials]
 \label{lem:torus-uniform-density}
 \lean{Torus.map_span_mFourier_le_iSup_trigPoly, Torus.dense_iUnion_trigPoly,
-  Torus.tendsto_approxError_trigScheme}
+  Torus.tendsto_approxError_uniformTrigScheme}
 \leanok
 \uses{def:trig-poly, lem:error-tendsto}
 The trigonometric polynomials are dense in the bounded continuous functions on $\T^d$ for the

@@ -148,9 +148,9 @@ theorem norm_sub_valleePoussinBCF_le {k : ℕ} {a : UnitAddTorus d →ᵇ ℂ}
 every bounded continuous `f`, since `‖f - V_k f‖_∞ ≤ (1 + ‖Θ‖_1) E_{2^k}(f)_∞ → 0`. -/
 theorem tendsto_valleePoussinBCF (f : UnitAddTorus d →ᵇ ℂ) :
     Tendsto (fun k => valleePoussinBCF k f) atTop (𝓝 f) := by
-  have hE : Tendsto (fun k => valleePoussinConst d * (trigScheme d).approxError f (2 ^ k)) atTop
-      (𝓝 0) := by
-    simpa using ENNReal.Tendsto.const_mul ((tendsto_approxError_trigScheme f).comp
+  have hE : Tendsto (fun k => valleePoussinConst d * (uniformTrigScheme d).approxError f (2 ^ k))
+      atTop (𝓝 0) := by
+    simpa using ENNReal.Tendsto.const_mul ((tendsto_approxError_uniformTrigScheme f).comp
       (tendsto_pow_atTop_atTop_of_one_lt (α := ℕ) one_lt_two)) (Or.inr valleePoussinConst_ne_top)
   rw [tendsto_iff_edist_tendsto_0]
   refine tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds hE (fun _ => bot_le)

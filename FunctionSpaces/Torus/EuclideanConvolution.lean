@@ -389,7 +389,7 @@ of `(trigScheme d).toLp volume p` are the trigonometric polynomials of degree `<
 theorem mem_toLp_trigScheme_iff {n : ℕ} {g : Lp ℂ p (volume : Measure (UnitAddTorus d))} :
     g ∈ (trigScheme d).toLp volume p n ↔ g ∈ trigPolyLp p n := by
   rw [FunctionScheme.toLp, ApproximationScheme.mem_map, trigPolyLp, Submodule.mem_map]
-  simp only [mem_trigScheme]
+  simp only [trigScheme, mem_uniformTrigScheme]
   rfl
 
 /-- **Band-limited kernels map `L_p(𝕋)` into trigonometric polynomials**: if `𝓕Φ(m) = 0` for
