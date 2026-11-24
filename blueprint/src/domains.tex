@@ -12,18 +12,18 @@ $s > 0$, and makes the trace a bounded linear operator from $B^s_{p,q}(\Omega)$ 
 space $B^{s - 1/p}_{p,q}(\Gamma)$ with a bounded linear right inverse; \Cref{ch:sobolev-domains}
 builds the Sobolev spaces on open sets as Hilbert spaces, with their duality, the trace space
 of $H^s(\Omega)$ for $1/2 < s < 3/2$, the extension theorems for $\Sob{1}{p}$ and $\Sob{m}{p}$,
-Green's formula and the kernel of the trace; \Cref{ch:laplacian-eigenbases} builds the Dirichlet
+Green's formula and the kernel of the trace; \Cref{ch:fractional-sobolev-domains} compares
+$\tilde H^s(\Omega)$ with $H^s_0(\Omega)$ through the zero extension bound, with the indicator
+of a Lipschitz domain as a multiplier of $B^s_{p,q}$ and a fractional Hardy inequality, proves
+that the kernel of the trace of $H^s(\Omega)$, $1/2 < s < 3/2$, is $H^s_0(\Omega)$, and carries
+the spaces to $\C^m$-valued functions; \Cref{ch:laplacian-eigenbases} builds the Dirichlet
 eigenbasis of the Laplacian on bounded open sets and the Neumann eigenbasis on bounded Lipschitz
 domains as spectral schemes and describes $\Besov{\theta}{2}{q}(\Omega)$, $0 < \theta < 1$, by
 Neumann eigenfunction expansions; \Cref{ch:manifolds} defines Besov spaces on compact manifolds by
 charts, shows that every compact Hausdorff manifold carries a smooth measure, treats smooth
 bounded domains as manifolds with boundary and proves the trace theorem on the boundary; and
 \Cref{ch:manifold-eigenbases} describes $\Besov{\theta}{2}{q}(M)$, $0 < \theta < 1$, by expansions
-in the eigenbasis of a chart form. \Cref{ch:fractional-sobolev-domains} compares
-$\tilde H^s(\Omega)$ with $H^s_0(\Omega)$ through the zero extension bound, with the indicator
-of a Lipschitz domain as a multiplier of $B^s_{p,q}$ and a fractional Hardy inequality, proves
-that the kernel of the trace of $H^s(\Omega)$, $1/2 < s < 3/2$, is $H^s_0(\Omega)$, and carries
-the spaces to $\C^m$-valued functions.
+in the eigenbasis of a chart form.
 
 \chapter{Lipschitz domains}
 \label{ch:lipschitz-domains}
@@ -10787,6 +10787,8 @@ $D = D_{R+1}$, $g \in \Sob{1}{2}(D)$ (\Cref{lem:weak-derivative-basic},
 (\Cref{thm:sobolev-lipschitz-domain-intrinsic}) and $N_\Omega(g) < \infty$
 (\Cref{lem:besov-domain-localisation}). The converse is (1).
 \end{proof}
+
+\input{fractional-sobolev}
 
 \chapter{Eigenbases of the Laplacian}
 \label{ch:laplacian-eigenbases}
