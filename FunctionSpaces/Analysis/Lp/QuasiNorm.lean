@@ -46,17 +46,26 @@ arbitrary measure space.
   (2016), Theorem 2.1). So a Nikolskii inequality at one exponent gives it at every smaller one.
 * **The first moment method.** Some value `F(y)` approximates `F` on a set at least as well as
   the mean of all values (`MeasureTheory.exists_setLIntegral_enorm_sub_rpow_le`).
+* **Near-best sequences.** Two functions `g, h` within `e` of `f` in `L_p` satisfy
+  `‖g - h‖_p^ρ ≤ 2 e^ρ` (`MeasureTheory.eLpNorm_sub_rpow_min_le_two_mul`), so they lie within
+  `2^(1/ρ) e` of each other (`MeasureTheory.eLpNorm_sub_le_two_rpow_mul`), and
+  `‖f - b_k‖_p ≤ e_k → 0` makes `b_k → f` in measure
+  (`MeasureTheory.tendstoInMeasure_of_eLpNorm_sub_le`). If moreover `e` decreases and the blocks
+  satisfy `‖b_{k+1} - b_k‖_r ≤ C 2^(kβ) ‖b_{k+1} - b_k‖_p`, then
+  `‖f - b_k‖_r^(ρ_r) ≤ (C 2^(1/ρ_p))^(ρ_r) ∑_{i ≥ 0} (2^((k+i)β) e_{k+i})^(ρ_r)` for every
+  `0 < p, r ≤ ∞` (`MeasureTheory.eLpNorm_sub_rpow_min_le_tsum_of_nearBest`): the step from `L_p`
+  to `L_r` in the proofs of embedding theorems.
 
 On `[0, 1]` with Lebesgue measure and for `p < 1`, the only continuous linear functional on
 `L_p` is `0` (M. M. Day, *The spaces `L^p` with `0 < p < 1`*, Bull. Amer. Math. Soc. 46 (1940)),
 so `L_p` has no bounded linear projections onto nonzero finite-dimensional subspaces; near-best
-approximants take their place in the files that use this one.
+approximants take their place.
 -/
 
 @[expose] public section
 
 open Filter
-open scoped ENNReal
+open scoped ENNReal Topology
 
 /-! ### The exponent `ρ = min(1, p)` -/
 
@@ -114,6 +123,28 @@ theorem eLpNorm_add_rpow_min_le {ε : Type*} [TopologicalSpace ε] [ESeminormedA
     ← inhmgELpNorm_eq_eLpNorm_rpow_min hp0]
   exact inhmgELpNorm_add_le
 
+/-- **Two approximants of one function are close, in the `ρ`-th power**: with `ρ = min(1, p)`,
+if `‖f - g‖_p ≤ e` and `‖f - h‖_p ≤ e`, then `‖g - h‖_p^ρ ≤ 2 e^ρ`, for functions with values in
+a normed group. Indeed `g - h = (f - h) - (f - g)`, and the `ρ`-triangle inequality
+(`MeasureTheory.eLpNorm_add_rpow_min_le`) applies. At `p = 0` the exponent is `ρ = 0` and the
+inequality reads `1 ≤ 2`. -/
+theorem eLpNorm_sub_rpow_min_le_two_mul {E : Type*} [NormedAddCommGroup E] {f g h : α → E}
+    {e : ℝ≥0∞} (hg : eLpNorm (f - g) p μ ≤ e) (hh : eLpNorm (f - h) p μ ≤ e) :
+    eLpNorm (g - h) p μ ^ (min 1 p).toReal ≤ 2 * e ^ (min 1 p).toReal := by
+  rcases eq_or_ne p 0 with rfl | hp0
+  · simp only [min_eq_right zero_le_one, ENNReal.toReal_zero, ENNReal.rpow_zero, mul_one]
+    exact one_le_two
+  have hρ : 0 ≤ (min 1 p).toReal := ENNReal.toReal_nonneg
+  calc eLpNorm (g - h) p μ ^ (min 1 p).toReal
+      = eLpNorm ((f - h) + -(f - g)) p μ ^ (min 1 p).toReal := by
+        rw [show (f - h) + -(f - g) = g - h by abel]
+    _ ≤ eLpNorm (f - h) p μ ^ (min 1 p).toReal + eLpNorm (-(f - g)) p μ ^ (min 1 p).toReal :=
+        eLpNorm_add_rpow_min_le hp0 _ _
+    _ ≤ e ^ (min 1 p).toReal + e ^ (min 1 p).toReal := by
+        rw [eLpNorm_neg]
+        exact add_le_add (ENNReal.rpow_le_rpow hh hρ) (ENNReal.rpow_le_rpow hg hρ)
+    _ = 2 * e ^ (min 1 p).toReal := (two_mul _).symm
+
 /-! ### The quasi-norm of `Lp` -/
 
 /-- The quasi-norm of `L_p(μ)` vanishes at `0`, for every `p`. -/
@@ -139,19 +170,16 @@ theorem Lp.enorm_add_rpow_le_of_le_one {E : Type*} [NormedAddCommGroup E] (hp1 :
   exact eLpNorm_add_rpow_le_of_le_one hp0 hp1 _ _
 
 /-- **Two approximants of one element are close**, `p ≤ 1`: if `‖f - g‖_p ≤ e` and
-`‖f - h‖_p ≤ e` in `L_p(μ)`, then `‖g - h‖_p^p ≤ 2 e^p`, since `g - h = (f - h) - (f - g)`
-(`MeasureTheory.Lp.enorm_add_rpow_le_of_le_one`, `MeasureTheory.Lp.enorm_neg`). -/
+`‖f - h‖_p ≤ e` in `L_p(μ)`, then `‖g - h‖_p^p ≤ 2 e^p`. This is the same inequality for
+representatives (`MeasureTheory.eLpNorm_sub_rpow_min_le_two_mul`), where `ρ = min(1, p) = p`. -/
 theorem Lp.enorm_sub_rpow_le_two_mul {E : Type*} [NormedAddCommGroup E] (hp1 : p ≤ 1)
     {f g h : Lp E p μ} {e : ℝ≥0∞} (hg : ‖f - g‖ₑ ≤ e) (hh : ‖f - h‖ₑ ≤ e) :
-    ‖g - h‖ₑ ^ p.toReal ≤ 2 * e ^ p.toReal :=
-  calc ‖g - h‖ₑ ^ p.toReal = ‖(f - h) + -(f - g)‖ₑ ^ p.toReal := by
-        rw [show (f - h) + -(f - g) = g - h by abel]
-    _ ≤ ‖f - h‖ₑ ^ p.toReal + ‖-(f - g)‖ₑ ^ p.toReal := Lp.enorm_add_rpow_le_of_le_one hp1 _ _
-    _ ≤ e ^ p.toReal + e ^ p.toReal := by
-        rw [Lp.enorm_neg]
-        exact add_le_add (ENNReal.rpow_le_rpow hh ENNReal.toReal_nonneg)
-          (ENNReal.rpow_le_rpow hg ENNReal.toReal_nonneg)
-    _ = 2 * e ^ p.toReal := (two_mul _).symm
+    ‖g - h‖ₑ ^ p.toReal ≤ 2 * e ^ p.toReal := by
+  have hsub : ∀ u v : Lp E p μ, ‖u - v‖ₑ = eLpNorm (⇑u - ⇑v) p μ := fun u v => by
+    rw [Lp.enorm_def, eLpNorm_congr_ae (Lp.coeFn_sub u v)]
+  rw [hsub, ← ENNReal.toReal_min_one_of_le_one hp1]
+  exact eLpNorm_sub_rpow_min_le_two_mul ((hsub f g).symm.trans_le hg)
+    ((hsub f h).symm.trans_le hh)
 
 /-! ### Fatou's lemma for telescoping sums in every `L_r` -/
 
@@ -391,5 +419,76 @@ theorem exists_setLIntegral_enorm_sub_rpow_le [SFinite μ] {F : α → ℂ} (hF 
       (((hF.comp measurable_fst).sub (hF.comp measurable_snd)).enorm.pow_const r)
   obtain ⟨y, hy, hle⟩ := exists_le_setLAverage hμ0 hμ hG.aemeasurable
   exact ⟨y, hy, hle.trans_eq (by rw [setLAverage_eq, ENNReal.div_eq_inv_mul])⟩
+
+/-! ### Near-best sequences -/
+
+section NearBest
+
+variable {E : Type*} [NormedAddCommGroup E]
+
+/-- **Two approximants of one function are close, `0 < p ≤ ∞`**: with `ρ = min(1, p)`, if
+`‖f - g‖_p ≤ e` and `‖f - h‖_p ≤ e`, then `‖g - h‖_p ≤ 2^(1/ρ) e`, the `ρ`-th root of
+`‖g - h‖_p^ρ ≤ 2 e^ρ` (`MeasureTheory.eLpNorm_sub_rpow_min_le_two_mul`). For `p ≥ 1` the factor
+is `2`, for `p ≤ 1` it is `2^(1/p)`. For elements of `L_p(μ)` with `p ≤ 1` the same bound, in
+the `p`-th power, is `MeasureTheory.Lp.enorm_sub_rpow_le_two_mul`. -/
+theorem eLpNorm_sub_le_two_rpow_mul (hp0 : p ≠ 0) {f g h : α → E} {e : ℝ≥0∞}
+    (hg : eLpNorm (f - g) p μ ≤ e) (hh : eLpNorm (f - h) p μ ≤ e) :
+    eLpNorm (g - h) p μ ≤ 2 ^ (1 / (min 1 p).toReal) * e := by
+  obtain ⟨h0, htop⟩ := ENNReal.toReal_pos_iff.1 (ENNReal.toReal_min_one_pos hp0)
+  exact ENNReal.le_two_rpow_mul_of_rpow_le h0.ne' htop.ne (eLpNorm_sub_rpow_min_le_two_mul hg hh)
+
+/-- **Near-best sequences converge in measure, `0 < p ≤ ∞`**: if `e_k → 0` along a filter and
+`‖f - b_k‖_p ≤ e_k` eventually along it, then `b_k → f` in measure along it (Mathlib's
+`tendstoInMeasure_of_tendsto_eLpNorm`, valid for every exponent `p ≠ 0`). -/
+theorem tendstoInMeasure_of_eLpNorm_sub_le {ι : Type*} {l : Filter ι} (hp0 : p ≠ 0)
+    {f : α → E} {b : ι → α → E} {e : ι → ℝ≥0∞} (hbe : ∀ᶠ k in l, eLpNorm (f - b k) p μ ≤ e k)
+    (he0 : Tendsto e l (𝓝 0)) : TendstoInMeasure μ b l f :=
+  tendstoInMeasure_of_tendsto_eLpNorm hp0 (tendsto_of_tendsto_of_tendsto_of_le_of_le'
+    tendsto_const_nhds he0 (Eventually.of_forall fun _ => zero_le)
+    (hbe.mono fun k hk => by rwa [eLpNorm_sub_comm]))
+
+/-- **Transfer of near-best sequences from `L_p` to `L_r`, `0 < p, r ≤ ∞`**: let
+`ρ_p = min(1, p)`, `ρ_r = min(1, r)`, and let `b_k` be almost everywhere strongly measurable
+functions with `‖f - b_k‖_p ≤ e_k`, where `e` decreases to `0`. If the blocks satisfy the
+Nikolskii-type inequality `‖b_{k+1} - b_k‖_r ≤ C 2^(kβ) ‖b_{k+1} - b_k‖_p`, with the dyadic
+weight `2^(kβ) = ENNReal.dyadicWeight β k`, then for every `k`
+`‖f - b_k‖_r^(ρ_r) ≤ (C 2^(1/ρ_p))^(ρ_r) ∑_{i ≥ 0} (2^((k+i)β) e_{k+i})^(ρ_r)`.
+The blocks satisfy `‖b_{k+1} - b_k‖_p ≤ 2^(1/ρ_p) e_k`
+(`MeasureTheory.eLpNorm_sub_le_two_rpow_mul`), the `b_k` converge to `f` in measure
+(`MeasureTheory.tendstoInMeasure_of_eLpNorm_sub_le`), and Fatou's lemma for telescoping sums in
+`L_r` (`MeasureTheory.eLpNorm_sub_rpow_min_le_tsum`) bounds `‖f - b_k‖_r`. Here `‖f‖_r` may be
+infinite, and so may the measure. -/
+theorem eLpNorm_sub_rpow_min_le_tsum_of_nearBest (hp0 : p ≠ 0) (hr0 : r ≠ 0) {f : α → E}
+    {b : ℕ → α → E} {e : ℕ → ℝ≥0∞} {β : ℝ} {C : ℝ≥0∞}
+    (hb : ∀ k, AEStronglyMeasurable (b k) μ) (hbe : ∀ k, eLpNorm (f - b k) p μ ≤ e k)
+    (he : Antitone e) (he0 : Tendsto e atTop (𝓝 0))
+    (hN : ∀ k, eLpNorm (b (k + 1) - b k) r μ ≤
+      C * ENNReal.dyadicWeight β k * eLpNorm (b (k + 1) - b k) p μ) (k : ℕ) :
+    eLpNorm (f - b k) r μ ^ (min 1 r).toReal ≤
+      (C * 2 ^ (1 / (min 1 p).toReal)) ^ (min 1 r).toReal *
+        ∑' i, (ENNReal.dyadicWeight β (k + i) * e (k + i)) ^ (min 1 r).toReal := by
+  have hρ : 0 ≤ (min 1 r).toReal := ENNReal.toReal_nonneg
+  have hblock : ∀ j, eLpNorm (b (j + 1) - b j) r μ ≤
+      C * 2 ^ (1 / (min 1 p).toReal) * (ENNReal.dyadicWeight β j * e j) := fun j =>
+    calc eLpNorm (b (j + 1) - b j) r μ
+        ≤ C * ENNReal.dyadicWeight β j * eLpNorm (b (j + 1) - b j) p μ := hN j
+      _ ≤ C * ENNReal.dyadicWeight β j * (2 ^ (1 / (min 1 p).toReal) * e j) := by
+          gcongr
+          exact eLpNorm_sub_le_two_rpow_mul hp0 ((hbe (j + 1)).trans (he j.le_succ)) (hbe j)
+      _ = C * 2 ^ (1 / (min 1 p).toReal) * (ENNReal.dyadicWeight β j * e j) := by ring
+  have hlim : TendstoInMeasure μ b atTop f :=
+    tendstoInMeasure_of_eLpNorm_sub_le hp0 (Eventually.of_forall hbe) he0
+  calc eLpNorm (f - b k) r μ ^ (min 1 r).toReal
+      ≤ ∑' i, eLpNorm (b (k + i + 1) - b (k + i)) r μ ^ (min 1 r).toReal :=
+        eLpNorm_sub_rpow_min_le_tsum hr0 hlim hb k
+    _ ≤ ∑' i, (C * 2 ^ (1 / (min 1 p).toReal) *
+          (ENNReal.dyadicWeight β (k + i) * e (k + i))) ^ (min 1 r).toReal :=
+        ENNReal.tsum_le_tsum fun i => ENNReal.rpow_le_rpow (hblock (k + i)) hρ
+    _ = ∑' i, (C * 2 ^ (1 / (min 1 p).toReal)) ^ (min 1 r).toReal *
+          (ENNReal.dyadicWeight β (k + i) * e (k + i)) ^ (min 1 r).toReal :=
+        tsum_congr fun i => ENNReal.mul_rpow_of_nonneg _ _ hρ
+    _ = _ := ENNReal.tsum_mul_left
+
+end NearBest
 
 end MeasureTheory
