@@ -4832,6 +4832,107 @@ The map $\iota_{r,p}$ sends the class of $a$ in $L_r$ to its class in $L_p$, and
 injective.
 \end{proof}
 
+A scheme of essentially bounded functions defines a couple on $L_p$ for every exponent
+$0 < p \leq \infty$, through the quasi-norm of $L_p$ alone; for $p \geq 1$ it is the complexity
+couple of a scheme in the normed space $L_p$.
+
+\begin{definition}[The couple of a scheme in $L_p$]
+\label{def:scheme-lp-couple}
+\lean{FunctionScheme.lpSets, FunctionScheme.mem_lpSets, FunctionScheme.topInclusion_mem_lpSets,
+  FunctionScheme.lpCouple, FunctionScheme.lpCouple_norm0}
+\leanok
+\uses{def:scheme, def:complexity-couple, lem:inclusion-linear}
+Let $S$ be an approximation scheme in $L_\infty$ and $0 < p \leq \infty$. The
+\emph{approximants of $S$ in $L_p$} are the sets $S^{(p)}_n = \iota_{\infty,p}(S_n) \subseteq
+L_p$, $n \in \N$, with the inclusion $\iota_{\infty,p}$ of \Cref{lem:inclusion-linear}. The
+\emph{couple of $S$ in $L_p$} is the complexity couple of the quasi-norm $\|\cdot\|_p$ and the
+sets $S^{(p)}_n$ (\Cref{def:complexity-couple}):
+\[
+  N_0(f) = \|f\|_p , \qquad N_1(f) = \inf \{ n \in \N : f \in S^{(p)}_n \} , \qquad f \in L_p .
+\]
+\end{definition}
+
+\begin{lemma}[Properties of the couple of a scheme in $L_p$]
+\label{lem:scheme-lp-couple}
+\lean{FunctionScheme.lpSets_zero, FunctionScheme.monotone_lpSets,
+  FunctionScheme.smul_mem_lpSets, FunctionScheme.neg_mem_lpSets,
+  FunctionScheme.lpSets_add_subset, FunctionScheme.inclusion_mem_lpSets,
+  FunctionScheme.lpCouple_norm0_add_rpow_le, FunctionScheme.lpCouple_norm0_smul,
+  FunctionScheme.lpCouple_norm1_le_of_mem, FunctionScheme.mem_lpSets_of_lpCouple_norm1_le,
+  FunctionScheme.lpCouple_norm1_zero, FunctionScheme.lpCouple_norm1_neg,
+  FunctionScheme.lpCouple_norm1_add_le, FunctionScheme.lpCouple_norm1_smul_le,
+  FunctionScheme.eq_zero_of_lpCouple_norm1_lt_one, FunctionScheme.isQuasiNormed_lpCouple,
+  MeasureTheory.Lp.eLpNorm_sub_topInclusion, FunctionScheme.eFunctional_lpCouple_natCast,
+  FunctionScheme.exists_nearBest_lpCouple, FunctionScheme.lpCouple_norm1_inclusion_le}
+\leanok
+\uses{def:scheme-lp-couple, def:couple, def:e-functional, lem:lq-quasi-triangle,
+  lem:inclusion-linear}
+Let $S$ be an approximation scheme in $L_\infty$, let $0 < p \leq \infty$ and
+$\rho = \min(1, p)$, let $C_p$ be the constant of \Cref{lem:lq-quasi-triangle}, and let
+$(N_0, N_1)$ be the couple of $S$ in $L_p$, with $E$-functional $E$.
+\begin{enumerate}
+  \item The sets $S^{(p)}_n$ increase, $S^{(p)}_0 = \{0\}$, $c \, S^{(p)}_n \subseteq S^{(p)}_n$
+    for every $c \in \R$ and $n \in \N$, and $S^{(p)}_m + S^{(p)}_n \subseteq S^{(p)}_{m+n}$ for
+    all $m, n \in \N$. For $p \leq r \leq \infty$ and every $n \in \N$,
+    $\iota_{r,p}(S^{(r)}_n) \subseteq S^{(p)}_n$.
+  \item The couple is quasi-normed with constant $C_p$, and for all $f, g \in L_p$ and
+    $c \in \R$,
+    \[
+      N_0(f + g)^\rho \leq N_0(f)^\rho + N_0(g)^\rho , \qquad N_0(cf) = |c| \, N_0(f) .
+    \]
+    Moreover, for all $f \in L_p$, $c \in \R$ and $n \in \N$, $N_1(cf) \leq N_1(f)$;
+    $N_1(f) \leq n$ if and only if $f \in S^{(p)}_n$; and $N_1(f) < 1$ implies $f = 0$.
+  \item For all $f \in L_p$, $a \in L_\infty$ and every exponent $t$,
+    $\|f - \iota_{\infty,p} a\|_t = \|f - a\|_t$. For all $n \in \N$ and $f \in L_p$,
+    $E(n, f) = \inf_{a \in S_n} \|f - a\|_p$.
+  \item For all $f \in L_p$ and $s \in \R$ there are $b_k \in S_{2^k}$, $k \in \N$, with
+    $\|f - b_k\|_p \leq E(2^k, f) + \|f\|_p \, 2^{-k(s+1)}$ for every $k$.
+  \item Let $p \leq r \leq \infty$, and let $N_1^{(p)}$ and $N_1^{(r)}$ be the complexities of the
+    couples of $S$ in $L_p$ and in $L_r$. Then $N_1^{(p)}(\iota_{r,p} f) \leq N_1^{(r)}(f)$ for
+    every $f \in L_r$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:complexity-couple, lem:lp-quasi-triangle, lem:e-near-best}
+(1) The inclusion $\iota_{\infty,p}$ is linear and maps $S_n$ onto $S^{(p)}_n$, so the axioms of
+$S$ pass to the sets $S^{(p)}_n$; and $\iota_{r,p} \circ \iota_{\infty,r} = \iota_{\infty,p}$
+(\Cref{lem:inclusion-linear}). (2) The quasi-triangle inequality of $\|\cdot\|_p$ with the
+constant $C_p$ is Mathlib's \texttt{eLpNorm\_\allowbreak add\_\allowbreak le'}, the
+$\rho$-triangle inequality is \Cref{lem:lp-quasi-triangle}, and $\|cf\|_p = |c| \, \|f\|_p$. The
+properties of $N_1$ follow from (1) by \Cref{lem:complexity-couple}, which gives subadditivity,
+so the quasi-triangle inequality for $N_1$ holds with $C_p \geq 1$; for $N_1(cf) \leq N_1(f)$
+apply its part (4) to $f \mapsto cf$. (3) The first identity holds since
+$\iota_{\infty,p} a = a$ almost everywhere. By \Cref{lem:complexity-couple},
+$E(n, f) = \inf_{b \in S^{(p)}_n} \|f - b\|_p$, and the first identity for $t = p$ gives the
+second.
+(4) Part (1) of \Cref{lem:e-near-best} gives $b_k' \in L_p$ with $N_1(b_k') \leq 2^k$ and this
+bound; by (2) $b_k' \in S^{(p)}_{2^k}$, so $b_k' = \iota_{\infty,p} b_k$ for some
+$b_k \in S_{2^k}$. (5) Part (4) of \Cref{lem:complexity-couple} for $T = \iota_{r,p}$ and (1).
+\end{proof}
+
+\begin{lemma}[The couple of a scheme for $p \geq 1$]
+\label{lem:scheme-lp-couple-bridge}
+\lean{FunctionScheme.lpCouple_eq_complexityCouple}
+\leanok
+\uses{def:scheme-lp-couple, def:comap, def:complexity-couple}
+Let $S$ be an approximation scheme in $L_\infty$ and $1 \leq p \leq \infty$. The couple of $S$ in
+$L_p$ is the complexity couple of the image scheme $\iota_{\infty,p}(S)$ in the normed space
+$L_p$, whose sets are the $S^{(p)}_n$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Both couples are complexity couples of the sets $S^{(p)}_n$, and for $p \geq 1$ the quasi-norm
+$\|\cdot\|_p$ is the norm of $L_p$.
+\end{proof}
+
+By \Cref{lem:scheme-lp-couple-bridge} and \Cref{thm:complexity-couple-approx}, for $p \geq 1$ the
+$E$-functional of the couple of $S$ in $L_p$ at $t = n$ is the error of best approximation from
+$S^{(p)}_n$, and its dyadic norm and Pietsch's form are the two quasi-norms of
+$A^s_q(L_p, \iota_{\infty,p}(S))$.
+
 \begin{definition}[Besov space]
 \label{def:besov}
 \lean{FunctionScheme.besovNorm, FunctionScheme.MemBesov, FunctionScheme.besovSpace,
