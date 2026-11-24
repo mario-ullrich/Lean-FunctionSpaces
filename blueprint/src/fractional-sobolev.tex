@@ -9,10 +9,12 @@ $\tilde H^s(\Omega)$ and $H^s_0(\Omega)$, for real $s$, following Hewett and Moi
 Lebesgue measure and $\Omega \subseteq V$ is open. $N^s(\Omega)$, $H^s(\Omega)$, the restriction
 $r_\Omega$, $T^s(\Omega)$, $\tilde H^s(\Omega)$ and $H^s_0(\Omega)$ are those of
 \Cref{sec:sobolev-restriction-spaces}; $\iota_{t,s}$, $\iota_s$ and $\partial_v$ are the
-inclusions, the $L_2$ functions and the derivatives of \Cref{sec:sobolev-scale}.
+inclusions, the $L_2$ functions and the derivatives of \Cref{sec:sobolev-scale}. We write
+$\tilde H^s(\Omega) \cong H^s_0(\Omega)$ when $U \mapsto r_\Omega U$ is an isomorphism of
+$\tilde H^s(\Omega)$ onto $H^s_0(\Omega)$; Hewett and Moiola write $=$ for this identification.
 \Cref{sec:restriction-inclusions} carries the inclusions $H^s(V) \subseteq H^t(V)$, $t \leq s$,
-to these spaces. \Cref{sec:zero-extension-bound} reduces the identity
-$\tilde H^s(\Omega) = H^s_0(\Omega)$ to one inequality on test functions, the zero extension
+to these spaces. \Cref{sec:zero-extension-bound} reduces the isomorphism
+$\tilde H^s(\Omega) \cong H^s_0(\Omega)$ to one inequality on test functions, the zero extension
 bound, lifts the bound from $s$ to $s + 1$ with the same constant, and proves it with the
 constant $1$ for every integer $s \geq 0$ on every open set. \Cref{sec:tilde-space-support}
 describes $\tilde H^s(\Omega)$, $s \geq 0$, on a bounded Lipschitz domain as the space of the
@@ -20,11 +22,11 @@ elements of $H^s(V)$ that vanish outside $\Omega$. \Cref{sec:indicator-multiplie
 the indicator of a bounded Lipschitz domain is a pointwise multiplier of $B^s_{p,q}(V)$ for
 $1 \leq p < \infty$, $1 \leq q \leq \infty$ and $0 < s < 1/p$, and
 \Cref{sec:zero-extension-small} derives from it the zero extension bound and
-$\tilde H^s(\Omega) = H^s_0(\Omega) = H^s(\Omega)$ for $0 \leq s < 1/2$.
+$\tilde H^s(\Omega) \cong H^s_0(\Omega) = H^s(\Omega)$ for $0 \leq s < 1/2$.
 \Cref{sec:fractional-hardy} proves a Hardy inequality on Lipschitz graph domains, from a
 fractional Hardy inequality on $(0, 1]$, and derives from it the zero extension bound for
 $1/2 < s < 1$. \Cref{sec:tilde-zero-boundary} lifts the two cases to
-$\tilde H^s(\Omega) \cong H^s_0(\Omega)$ for every $s \geq 0$ with $s - 1/2 \notin \N_0$, and
+$\tilde H^s(\Omega) \cong H^s_0(\Omega)$ for every $s \geq 0$ with $s \notin 1/2 + \N$, and
 \Cref{sec:sobolev-trace-kernel} shows that the kernel of the trace of $H^s(\Omega)$ is
 $H^s_0(\Omega)$ for $1/2 < s < 3/2$, through the zero extension for $1 \leq s < 3/2$.
 \Cref{sec:vector-sobolev} carries the spaces, traces, isomorphisms and duals to $\C^m$-valued
@@ -58,7 +60,7 @@ An element of $H^t(V)$ is determined by its tempered distribution (Mathlib's
 are dense in $H^t(V)$ (\Cref{thm:sobolev-schwartz-dense}).
 \end{proof}
 
-\begin{lemma}[The inclusions keep vanishing and test functions]
+\begin{lemma}[The inclusions preserve $T(\Omega)$ and $N(\Omega)$]
 \label{lem:sobolev-inclusion-vanishing}
 \lean{Rd.sobolevInclusion_mem_vanishOn_iff, Rd.sobolevInclusion_mem_vanishOn,
   Rd.apply_mem_testSpan_of_forall, Rd.sobolevInclusion_mem_testSpan}
@@ -136,7 +138,7 @@ $\varphi$ of $\Omega$ and every $\Phi \in H^s(V)$ that agrees with $\varphi$ on 
 section takes that bound as the hypothesis, derives the isomorphism from it, and lifts it from
 $s$ to $s + 1$ through derivatives.
 
-\begin{lemma}[Derivatives keep test functions and vanishing]
+\begin{lemma}[Derivatives preserve $\mathcal D(\Omega)$, $T(\Omega)$ and $N(\Omega)$]
 \label{lem:derivative-tests}
 \lean{Rd.sobolevLineDeriv_ofTest, Rd.sobolevLineDeriv_mem_testSpan,
   Rd.sobolevLineDeriv_mem_vanishOn}
@@ -182,6 +184,8 @@ a closed subspace that contains $T^s(\Omega)$, hence $\tilde H^s(\Omega)$. At $s
 \Cref{lem:tilde-space-vanishes-outside}.
 \end{proof}
 
+The next lemma is part of \cite[Lemma 2.2(iii)]{HewettMoiola}.
+
 \begin{lemma}[Restriction is injective on $\tilde H^s(\Omega)$ for $s \geq 0$]
 \label{lem:tilde-restriction-injective}
 \lean{Rd.eq_zero_of_mem_tildeSpace_of_restrictProj_eq_zero,
@@ -202,8 +206,6 @@ $\iota_s U = 0$ almost everywhere outside $\Omega$
 (\Cref{lem:sobolev-to-l2}).
 \end{proof}
 
-This is part of \cite[Lemma 2.2(iii)]{HewettMoiola}.
-
 \begin{definition}[The zero extension bound]
 \label{def:zero-extension-bound}
 \lean{Rd.HasZeroExtensionBound}
@@ -220,7 +222,8 @@ bound with constant $C$ at $s$ if
 Since $U + W$ runs through all extensions of $r_\Omega U$, the bound says
 $\|U\| \leq C \|r_\Omega U\|$ on $T^s(\Omega)$: extending $r_\Omega U$ by zero outside $\Omega$
 costs at most the factor $C$. It is condition (iv) of Hewett and Moiola
-\cite[list after Lemma 2.9]{HewettMoiola}.
+\cite[list after Lemma 2.9]{HewettMoiola}, and the next theorem is their implication
+(iv) $\Rightarrow$ (i).
 
 \begin{theorem}[The zero extension bound gives $\tilde H^s(\Omega) \cong H^s_0(\Omega)$]
 \label{thm:zero-extension-bound-iso}
@@ -257,9 +260,6 @@ the bijection is an isomorphism (Mathlib's \texttt{LinearEquiv.\allowbreak
 toContinuousLinearEquivOfBounds}).
 \end{proof}
 
-This is the implication (iv) $\Rightarrow$ (i) of Hewett and Moiola
-\cite[list after Lemma 2.9]{HewettMoiola}.
-
 \begin{theorem}[Lifting the zero extension bound]
 \label{thm:zero-extension-bound-lift}
 \lean{Rd.HasZeroExtensionBound.add_one, Rd.HasZeroExtensionBound.add_natCast}
@@ -268,7 +268,7 @@ This is the implication (iv) $\Rightarrow$ (i) of Hewett and Moiola
   lem:sobolev-inclusion-vanishing, lem:sobolev-inclusion}
 Let $s \in \R$, $\Omega \subseteq V$ open and $C \in \R$. If $\Omega$ has the zero extension
 bound with constant $C$ at $s$, then it has the zero extension bound with constant $C$ at $s + 1$,
-and hence at $s + m$ for every $m \in \N_0$.
+and hence at $s + m$ for every $m \in \N$.
 \end{theorem}
 
 \begin{proof}
@@ -289,7 +289,10 @@ squaring and summing gives $(2\pi)^2 \|U\|^2 \leq C^2 (2\pi)^2 \|U + W\|^2$. Ind
 gives the bound at $s + m$.
 \end{proof}
 
-\begin{theorem}[$\tilde H^m(\Omega) = H^m_0(\Omega)$ isometrically for integer $m$]
+For integer smoothness the restriction is isometric on every open set
+\cite[Lemma 2.2(iii)]{HewettMoiola}, \cite[Lemma 3.31(vi)]{ChandlerWildeHewettMoiola}.
+
+\begin{theorem}[$\tilde H^m(\Omega) \cong H^m_0(\Omega)$ isometrically for $m \in \N$]
 \label{thm:tilde-zero-boundary-integer}
 \lean{Rd.hasZeroExtensionBound_zero, Rd.hasZeroExtensionBound_natCast,
   Rd.tildeEquivZeroBoundaryNat, Rd.coe_tildeEquivZeroBoundaryNat_apply}
@@ -313,12 +316,12 @@ $\|U\| = \|\iota_0 U\|_2$ and $\|U + W\| = \|\iota_0 U + \iota_0 W\|_2$
 constant $1$ to every $m$, and \Cref{thm:zero-extension-bound-iso} gives the isometry.
 \end{proof}
 
-This is Hewett and Moiola \cite[Lemma 2.2(iii)]{HewettMoiola} and Chandler-Wilde, Hewett and
-Moiola \cite[Lemma 3.31(vi)]{ChandlerWildeHewettMoiola}. At $m = 1$ it is
-\Cref{thm:sobolev-tilde-zero-boundary}, proved there through weak derivatives. Hewett and Moiola
-prove the integer case from the formula of the $H^m$ inner product as a sum of integrals of
-derivatives; here the norm recursion lifts the case $m = 0$, where the $L_2$ functions of $U$ and
-$W$ have disjoint supports.
+Since $r_\Omega$ is the orthogonal projection onto $H^m(\Omega)$ and isometric on
+$\tilde H^m(\Omega)$, it fixes $\tilde H^m(\Omega)$, so $\tilde H^m(\Omega) = H^m_0(\Omega)$ as
+subspaces of $H^m(V)$. At $m = 1$ the theorem is \Cref{thm:sobolev-tilde-zero-boundary}, proved
+there through weak derivatives. Hewett and Moiola prove the integer case from the formula of the
+$H^m$ inner product as a sum of integrals of derivatives; here the norm recursion lifts the case
+$m = 0$, where the $L_2$ functions of $U$ and $W$ have disjoint supports.
 
 \section{\texorpdfstring{$\tilde H^s(\Omega)$}{Tilde H\^{}s(Omega)} by supports}
 \label{sec:tilde-space-support}
@@ -372,9 +375,9 @@ $\operatorname{supp} K + S$, which is compact, hence closed.
   Rd.LipschitzGraph.tsupport_coneMollifier_subset}
 \leanok
 \uses{def:bump-mollifier, lem:graph-cone}
-For every Lipschitz graph domain with cone $K$, unit vector $e$ and $\rho = 1/(8(M + 1))$, the cone
-mollifier is the bump mollifier of the smooth bump around $e/4$ with radii $\rho/4$ and $\rho/2$.
-Its support lies in $K \cap \bar B(0, 1/2)$.
+For every Lipschitz graph domain with Lipschitz constant $M$, unit vector $e$ and cone $K$, and
+$\rho = 1/(8(M + 1))$, the cone mollifier is the bump mollifier of the smooth bump around $e/4$
+with radii $\rho/4$ and $\rho/2$. Its support lies in $K \cap \bar B(0, 1/2)$.
 \end{definition}
 
 The support is $\bar B(e/4, \rho/2) \subseteq B(e/4, \rho) \subseteq K$ (\Cref{lem:graph-cone}),
@@ -450,6 +453,10 @@ injective (\Cref{lem:sobolev-to-l2}).
 
 At $s = 1$ this is \Cref{lem:tilde-space-chart-pieces}.
 
+The description of $\tilde H^s(\Omega)$ by supports is in Chandler-Wilde, Hewett and Moiola
+\cite[Lemma 3.15]{ChandlerWildeHewettMoiola}, for domains with continuous boundary, in McLean
+\cite[Theorem 3.29]{McLean} and, for $s > 0$, in Grisvard \cite[Theorem 1.4.2.2]{Grisvard}.
+
 \begin{theorem}[$\tilde H^s(\Omega)$ by supports]
 \label{thm:tilde-space-supports-general}
 \lean{Rd.BoundedLipschitzDomain.mem_tildeSpace_of_ae_eq_zero_of_nonneg,
@@ -476,14 +483,11 @@ vanishes outside the compact set $\operatorname{supp} \chi \subseteq \Omega$
 
 Chandler-Wilde, Hewett and Moiola write $\hat H^s(\Omega)$, $s \geq 0$, for the space of the
 elements of $H^s(V)$ that vanish almost everywhere outside $\Omega$; the theorem is their
-identity $\tilde H^s(\Omega) = \hat H^s(\Omega)$ on domains with continuous boundary
-\cite[Lemma 3.15]{ChandlerWildeHewettMoiola}. Since $\Gamma$ is a null set
+identity $\tilde H^s(\Omega) = \hat H^s(\Omega)$. Since $\Gamma$ is a null set
 (\Cref{cor:boundary-null}), $\tilde H^s(\Omega)$ is also the space of the elements of $H^s(V)$
 supported in $\overline\Omega$. This is McLean's identity
-$\tilde H^s(\Omega) = H^s_{\overline\Omega}$ \cite[Theorem 3.29]{McLean} for $s \geq 0$, which
-Chandler-Wilde, Hewett and Moiola state for every real $s$ in the same lemma; for $s > 0$ it is
-also in Grisvard \cite[Theorem 1.4.2.2]{Grisvard}. At $s = 1$ it is
-\Cref{thm:tilde-space-supports}.
+$\tilde H^s(\Omega) = H^s_{\overline\Omega}$ for $s \geq 0$, which Chandler-Wilde, Hewett and
+Moiola state for every real $s$. At $s = 1$ it is \Cref{thm:tilde-space-supports}.
 
 \section{The indicator of a domain as a multiplier}
 \label{sec:indicator-multiplier}
@@ -732,6 +736,9 @@ atoms of \Cref{thm:atomic-decomposition} carry only $L_p$ bounds. The difference
 $L_p$: near $\Gamma$ the differences of $\mathbf 1_\Omega a$ are of size $A$ for short steps, and
 the layer where they live has small measure.
 
+The next theorem is the case of $B$-spaces with $1 \leq p < \infty$ of Triebel's multiplier
+theorem for characteristic functions \cite[Proposition 5.3 and Remark 5.4]{Triebel2002}.
+
 \begin{theorem}[The indicator of a Lipschitz domain as a multiplier]
 \label{thm:indicator-multiplier}
 \lean{Rd.BoundedLipschitzDomain.exists_modNorm_indicatorLp_le}
@@ -766,16 +773,14 @@ means quasi-norm is bounded by the right side (\Cref{lem:local-means-upper}). Al
 independent of $q$.
 \end{proof}
 
-This is the case of $B$-spaces with $1 \leq p < \infty$ of Triebel's multiplier theorem for
-characteristic functions \cite[Proposition 5.3 and Remark 5.4]{Triebel2002}, stated there for
-$0 < q \leq \infty$ and based on the half-space case of Runst and Sickel
-\cite[Proposition 5.1]{Triebel2002}. Schneider and Vybíral obtain it for every $q$ from the same
-atomic mechanism \cite[Theorem 5.4(i) and Remark 5.10]{SchneiderVybiral}, where the self-similar
-quasi-norm of $\mathbf 1_\Omega$ plays the part of \Cref{lem:boundary-layer-volume}. They also
-show that $\mathbf 1_\Omega \notin B^{1/p}_{p,q}(V)$ for the cube when $q < \infty$, so the
-multiplier property fails at $s = 1/p$; the endpoint with $q = \infty$ is left open there
-\cite[p.~31]{SchneiderVybiral}. For $s < 1/p$ the case $q = \infty$ is in both sources, and the
-proof here treats all $q$ alike.
+Triebel states it for $0 < q \leq \infty$, based on the half-space case
+\cite[Proposition 5.1]{Triebel2002}, due to Runst and Sickel. Schneider and Vybíral obtain it for
+every $q$ from the same atomic mechanism \cite[Theorem 5.4(i) and Remark 5.10]{SchneiderVybiral},
+where the self-similar quasi-norm of $\mathbf 1_\Omega$ plays the part of
+\Cref{lem:boundary-layer-volume}. They also show that $\mathbf 1_\Omega \notin B^{1/p}_{p,q}(V)$
+for the cube when $q < \infty$, so the multiplier property fails at $s = 1/p$; the endpoint with
+$q = \infty$ is left open there \cite[p.~31]{SchneiderVybiral}. For $s < 1/p$ the case
+$q = \infty$ is in both sources, and the proof here treats all $q$ alike.
 
 \section{Small smoothness}
 \label{sec:zero-extension-small}
@@ -783,8 +788,8 @@ proof here treats all $q$ alike.
 For $0 \leq s < 1/2$ the multiplier theorem at $p = q = 2$ and the description of $H^s(V)$ by
 differences with constants (\Cref{thm:sobolev-besov-constants}) show that multiplication by
 $\mathbf 1_\Omega$ keeps $H^s(V)$. This gives the zero extension bound and
-$\tilde H^s(\Omega) = H^s_0(\Omega) = H^s(\Omega)$. In this section $\Omega' \subseteq V$ is open,
-$\Omega$ is a bounded Lipschitz domain, and
+$\tilde H^s(\Omega) \cong H^s_0(\Omega) = H^s(\Omega)$. In this section $\Omega' \subseteq V$ is
+open, $\Omega$ is a bounded Lipschitz domain, and
 $N_s(F) = \|F\|_2 + \|(2^{ks} \omega_1(F, 2^{-k})_2)_k\|_{\ell_2}$ for $F \in L_2(V)$.
 
 \begin{lemma}[Restrictions through the $L_2$ functions]
@@ -826,17 +831,19 @@ with constant $C$ at $s$.
 \leanok
 At $s = 0$ this holds with $C = 1$ (\Cref{thm:tilde-zero-boundary-integer}). Let $0 < s < 1/2$,
 $U \in T^s(\Omega)$ and $W \in N^s(\Omega)$. Then $\iota_s U = \mathbf 1_\Omega \iota_s(U + W)$
-(\Cref{lem:restriction-l2-functions}). With the constants $c_I$ and $c_B$ of
+(\Cref{lem:restriction-l2-functions}). With the constants $C_{s,1}$ and $C'_{s,1}$ of
 \Cref{thm:sobolev-besov-constants} for the first modulus, $1 > s$, and $C_\Omega$ of
 \Cref{thm:indicator-multiplier} for $p = q = 2$, $s < 1/2$,
 \begin{align*}
-  \|U\| &\leq c_I N_s(\iota_s U) = c_I N_s(\mathbf 1_\Omega \iota_s(U + W)) \\
-  &\leq c_I C_\Omega N_s(\iota_s(U + W)) \leq c_I C_\Omega c_B \|U + W\| .
+  \|U\| &\leq C'_{s,1} N_s(\iota_s U) = C'_{s,1} N_s(\mathbf 1_\Omega \iota_s(U + W)) \\
+  &\leq C'_{s,1} C_\Omega N_s(\iota_s(U + W)) \leq C'_{s,1} C_\Omega C_{s,1} \|U + W\| .
 \end{align*}
 \end{proof}
 
 By \Cref{thm:zero-extension-bound-iso}, restriction is then an isomorphism of
-$\tilde H^s(\Omega)$ onto $H^s_0(\Omega)$ for $0 \leq s < 1/2$.
+$\tilde H^s(\Omega)$ onto $H^s_0(\Omega)$ for $0 \leq s < 1/2$. For a bounded Lipschitz domain,
+$H^s_0(\Omega) = H^s(\Omega)$ holds for $0 \leq s \leq 1/2$ \cite[Theorem 1.4.2.4]{Grisvard},
+\cite[Theorem 3.40]{McLean}; the next theorem proves it for $0 \leq s < 1/2$.
 
 \begin{theorem}[$H^s_0(\Omega) = H^s(\Omega)$ for small smoothness]
 \label{thm:zero-boundary-small}
@@ -864,22 +871,24 @@ $r_\Omega U' = r_\Omega U$ (\Cref{lem:restriction-l2-functions}). For $u \in H^s
 $U = u$: then $u = r_\Omega u = r_\Omega U'$ with $U' \in \tilde H^s(\Omega)$, so
 $u \in H^s_0(\Omega)$ (\Cref{lem:sobolev-tilde-restriction-range}). Let $s < 1/2$. At $s = 0$,
 $\iota_0$ maps onto $L_2(V)$ (\Cref{lem:sobolev-to-l2}). For $0 < s < 1/2$,
-$N_s(\mathbf 1_\Omega \iota_s U) \leq C_\Omega c_B \|U\| < \infty$
+$N_s(\mathbf 1_\Omega \iota_s U) \leq C_\Omega C_{s,1} \|U\| < \infty$
 (\Cref{thm:indicator-multiplier}, \Cref{thm:sobolev-besov-constants}), so
 $\mathbf 1_\Omega \iota_s U = \iota_s U'$ for some $U' \in H^s(V)$
 (\Cref{lem:sobolev-from-differences}). With $U = u$ for $u \in H^s(\Omega)$, the second statement
 gives $u \in H^s_0(\Omega)$.
 \end{proof}
 
-For a bounded Lipschitz domain, $H^s_0(\Omega) = H^s(\Omega)$ holds for $0 \leq s \leq 1/2$
-\cite[Theorem 1.4.2.4]{Grisvard}, \cite[Theorem 3.40]{McLean}, as quoted by Chandler-Wilde,
-Hewett and Moiola, who show that for Lipschitz $\Omega$ equality holds if and only if
-$s \leq 1/2$ \cite[Corollary 3.29(ix)]{ChandlerWildeHewettMoiola}. With the same multiplier they
-prove $\tilde H^s(\Omega) = H^s_{\overline\Omega}$ for $0 \leq s < 1/2$ on disjoint unions of
-finitely many bounded Lipschitz open sets, whose closures may meet
-\cite[Lemma 3.21]{ChandlerWildeHewettMoiola}. For Besov spaces with $q < \infty$ the zero
-extension is Triebel's \cite[Proposition 3.1(ii)]{Triebel2002} and Mayboroda's
+Chandler-Wilde, Hewett and Moiola quote the results of Grisvard and McLean and show that for
+Lipschitz $\Omega$ equality holds if and only if $s \leq 1/2$
+\cite[Corollary 3.29(ix)]{ChandlerWildeHewettMoiola}. With the same multiplier they prove
+$\tilde H^s(\Omega) = H^s_{\overline\Omega}$ for $0 \leq s < 1/2$ on disjoint unions of finitely
+many bounded Lipschitz open sets, whose closures may meet
+\cite[Lemma 3.21]{ChandlerWildeHewettMoiola}. For Besov spaces with $q < \infty$ the zero extension
+is Triebel's \cite[Proposition 3.1(ii)]{Triebel2002} and Mayboroda's
 \cite[Proposition 3.6.6]{Mayboroda2005}.
+
+The next corollary is the case $0 \leq s < 1/2$ of Hewett and Moiola
+\cite[Lemma 2.1 and Remark 2.6]{HewettMoiola}.
 
 \begin{corollary}[$\tilde H^s(\Omega) \cong H^s(\Omega)$ for small smoothness]
 \label{cor:tilde-restriction-small}
@@ -898,10 +907,8 @@ isomorphism of $\tilde H^s(\Omega)$ onto $H^s_0(\Omega)$, which is $H^s(\Omega)$
 (\Cref{thm:zero-boundary-small}).
 \end{proof}
 
-This is the case $0 \leq s < 1/2$ of Hewett and Moiola
-\cite[Lemma 2.1 and Remark 2.6]{HewettMoiola}; the isomorphism
-$\tilde H^s(\Omega) \cong H^s_0(\Omega)$ for $s \geq 0$, $s \notin 1/2 + \N_0$, is classical
-\cite[Theorem 3.33]{McLean}.
+The isomorphism $\tilde H^s(\Omega) \cong H^s_0(\Omega)$ for $s \geq 0$, $s \notin 1/2 + \N$, is
+classical \cite[Theorem 3.33]{McLean}.
 
 \section{A Hardy inequality on Lipschitz domains}
 \label{sec:fractional-hardy}
@@ -917,7 +924,7 @@ extension bound (\Cref{thm:zero-extension-hardy}). The resulting isomorphism
 $\tilde H^s(\Omega) \cong H^s_0(\Omega)$ is classical \cite[Theorem 3.33]{McLean}; the proof here
 follows the standard route through a Hardy inequality, with moduli of smoothness in place of the
 Gagliardo form. In this section all integrals of functions with values in $[0, \infty]$ are
-taken in $[0, \infty]$, $I_k = (2^{-k-1}, 2^{-k}]$ for $k \in \N_0$, and for a measurable
+taken in $[0, \infty]$, $I_k = (2^{-k-1}, 2^{-k}]$ for $k \in \N$, and for a measurable
 $U \subseteq V$ and $G \in L_2(V)$,
 $N_{s,U}(G) = \|G\|_{L_2(U)} + \|(2^{ks} \omega_1(G, 2^{-k}, U)_2)_k\|_{\ell_2}$ is the
 intrinsic quantity of \Cref{lem:modnorm-on} and $N_s = N_{s,V}$. For a Lipschitz graph
@@ -953,7 +960,7 @@ $\mu(B)^{1/2} (\int_A |u|^2 \, d\mu)^{1/2} \leq (\int_A e^2 \, d\mu)^{1/2} + \mu
 \lean{ENNReal.le_tsum_of_le_add_of_eq_zero, ENNReal.tsum_sq_le_of_le_add_of_eq_zero}
 \leanok
 \uses{def:lq-norm}
-Let $m, b \colon \N_0 \to [0, \infty]$ and $K \in \N_0$ with $m_k \leq m_{k+1} + b_k$ for all $k$
+Let $m, b \colon \N \to [0, \infty]$ and $K \in \N$ with $m_k \leq m_{k+1} + b_k$ for all $k$
 and $m_k = 0$ for all $k \geq K$. Then $m_k \leq \sum_{i \geq 0} b_{k+i}$ for every $k$, and for
 every real $\alpha$
 \[
@@ -974,7 +981,7 @@ tail sums.
 \label{lem:scaled-dyadic-intervals}
 \lean{Real.pairwise_disjoint_Ioc_div_two_pow, Real.iUnion_Ioc_div_two_pow}
 \leanok
-For $c \geq 0$ the intervals $(c 2^{-k-1}, c 2^{-k}]$, $k \in \N_0$, are pairwise disjoint, and
+For $c \geq 0$ the intervals $(c 2^{-k-1}, c 2^{-k}]$, $k \in \N$, are pairwise disjoint, and
 for $c > 0$ they cover $(0, c]$.
 \end{lemma}
 
@@ -1056,9 +1063,8 @@ $2^{2\alpha k} b_k^2 = 8 \cdot 2^{k(1+2s)} \delta_k^2$, \Cref{lem:half-line-bloc
 \end{proof}
 
 The constant does not depend on $\varepsilon$, and $s > 1/2$ enters only through $\alpha > 0$ in
-Hardy's inequality. The proof follows no single source; it is the standard dyadic argument, with
-Minkowski's inequality between neighbouring blocks in place of averages, so that no
-integrability of $u$ is needed.
+Hardy's inequality. The proof is the standard dyadic argument, with Minkowski's inequality
+between neighbouring blocks in place of averages, so that it applies to every measurable $u$.
 
 \begin{lemma}[Integrals over the line by dyadic shells]
 \label{lem:dyadic-shells-line}
@@ -1175,9 +1181,9 @@ $\gamma(x') + t e \in \Omega'$ exactly for $t > 0$, and \Cref{lem:half-line-hard
 \leanok
 \uses{def:vertical-form, def:rd-modulus-on}
 Let $s \geq -1/2$ and $G \in L_2(V)$. Then
-$\int_{\{0 < \eta \leq 1\}} \Psi_s G = \int_V \int_\R q_s G(x, r) \, dr \, dx$, for
-$2^{-k-1} < |r| \leq 2^{-k}$
-$\int_V q_s G(x, r) \, dx \leq 2^{(k+1)(1+2s)} \omega_1(G, 2^{-k}, \Omega')_2^2$, and
+$\int_{\{0 < \eta \leq 1\}} \Psi_s G = \int_V \int_\R q_s G(x, r) \, dr \, dx$; for every
+$k \in \N$ and every $r$ with $2^{-k-1} < |r| \leq 2^{-k}$,
+$\int_V q_s G(x, r) \, dx \leq 2^{(k+1)(1+2s)} \omega_1(G, 2^{-k}, \Omega')_2^2$; and
 \[
   \int_{\{0 < \eta \leq 1\}} \Psi_s G
   \leq 2^{2s+2} \sum_k \bigl(2^{ks} \omega_1(G, 2^{-k}, \Omega')_2\bigr)^2 .
@@ -1256,7 +1262,7 @@ $G \colon V \to \C$ and $y, x \in V$,
   + |\mathbf 1_{L((1+M)\|y\|)} G(x)| + |\mathbf 1_{L((1+M)\|y\|)} G(x + y)| ,
 \]
 hence $\|\Delta_y(\mathbf 1_{\Omega'} G)\|_2 \leq \|\mathbf 1_{\Omega'_y} \Delta_y G\|_2
-+ 2 \|\mathbf 1_{L((1+M)\|y\|)} G\|_2$. For $G \in L_2(V)$, $k \in \N_0$ and $s > 0$, with
++ 2 \|\mathbf 1_{L((1+M)\|y\|)} G\|_2$. For $G \in L_2(V)$, $k \in \N$ and $s > 0$, with
 $\lambda_k = \|\mathbf 1_{L((1+M) 2^{-k})} G\|_2$,
 $\omega_1(\mathbf 1_{\Omega'} G, 2^{-k})_2 \leq \omega_1(G, 2^{-k}, \Omega')_2 + 2 \lambda_k$ and
 \[
@@ -1320,13 +1326,13 @@ $\eta_j$ (\Cref{def:bounded-lipschitz}).
   def:sobolev-tilde-zero-boundary, def:sobolev-vanishing, def:sobolev-to-l2}
 \begin{enumerate}
   \item Let $\psi$ be a resolution of unity on $\Gamma$ and $\chi$ a real function with $\chi = 0$
-  outside $\Omega$ and $\chi + \sum_j \psi_j = 1$ on $\Omega$. For $\Phi \in L_2(V)$ and
-  $G_j, G_0 \in L_2(V)$ with $G_j = \psi_j \Phi$ and $G_0 = \chi \Phi$ almost everywhere,
-  $\mathbf 1_\Omega \Phi = \sum_j \mathbf 1_{\Omega_j} G_j + G_0$.
+  outside $\Omega$ and $\chi + \sum_j \psi_j = 1$ on $\Omega$. For $F \in L_2(V)$ and
+  $G_j, G_0 \in L_2(V)$ with $G_j = \psi_j F$ and $G_0 = \chi F$ almost everywhere,
+  $\mathbf 1_\Omega F = \sum_j \mathbf 1_{\Omega_j} G_j + G_0$.
   \item For $s \geq 0$, $U \in T^s(\Omega)$ and $W \in N^s(\Omega)$ there is a compact
   $K \subseteq \Omega$ with $\iota_s(U + W) = 0$ almost everywhere on $\Omega \setminus K$.
-  \item If $K \subseteq \Omega$ is compact and $\Phi = 0$ almost everywhere on $\Omega \setminus K$,
-  then for every chart $j$ there is $\varepsilon > 0$ with $\psi_j \Phi = 0$ almost everywhere on
+  \item If $K \subseteq \Omega$ is compact and $F = 0$ almost everywhere on $\Omega \setminus K$,
+  then for every chart $j$ there is $\varepsilon > 0$ with $\psi_j F = 0$ almost everywhere on
   $\{x \in \Omega_j : \eta_j(x) < \varepsilon\}$.
 \end{enumerate}
 \end{lemma}
@@ -1345,7 +1351,7 @@ $\varepsilon$-neighbourhood of $\operatorname{supp} \psi_j$ inside $B_j$. Let $\
 $x \in \Omega_j$ and $\eta_j(x) < \varepsilon$. Then $x \in B_j \cap \Omega_j \subseteq \Omega$.
 The point $z = x - \eta_j(x) e_j$ has $\|z - x\| = \eta_j(x) < \varepsilon$ and $\eta_j(z) = 0$
 (\Cref{lem:graph-height}), so $z \in B_j \setminus \Omega_j$, hence $z \notin \Omega$, and
-$x \notin K$; so $\Phi(x) = 0$ for almost all such $x$.
+$x \notin K$; so $F(x) = 0$ for almost all such $x$.
 \end{proof}
 
 \begin{theorem}[The zero extension bound for $1/2 < s < 1$]
@@ -1364,27 +1370,27 @@ constant $C$ at $s$.
   lem:restriction-moduli, thm:sobolev-besov-constants}
 Take a resolution of unity $\psi$ equal to $1$ near $\Gamma$ and the interior cut-off $\chi$
 (\Cref{lem:boundary-partition-nhds}). Let $U \in T^s(\Omega)$, $W \in N^s(\Omega)$ and
-$\Phi = \iota_s(U + W)$. Then $\iota_s U = \mathbf 1_\Omega \Phi$
+$F = \iota_s(U + W)$. Then $\iota_s U = \mathbf 1_\Omega F$
 (\Cref{lem:restriction-l2-functions}) $= \sum_j \mathbf 1_{\Omega_j} G_j + G_0$ with
-$G_j = \psi_j \Phi$ and $G_0 = \chi \Phi$ (\Cref{lem:zero-extension-charts}), and each $G_j$
+$G_j = \psi_j F$ and $G_0 = \chi F$ (\Cref{lem:zero-extension-charts}), and each $G_j$
 vanishes near the graph of $\Omega_j$. With the constants $C_j$ of
 \Cref{thm:graph-indicator-hardy} for $\Omega_j$ and $P_j$, $P_\chi$ of \Cref{lem:besov-multiplier}
 for $\psi_j$ and $\chi$ with first differences, $s < 1$,
 \begin{align*}
   N_s(\iota_s U) &\leq \sum_j C_j N_{s,\Omega_j}(G_j) + N_s(G_0)
   \leq \sum_j C_j N_s(G_j) + N_s(G_0) \\
-  &\leq \Bigl(\sum_j C_j P_j + P_\chi\Bigr) N_s(\Phi)
+  &\leq \Bigl(\sum_j C_j P_j + P_\chi\Bigr) N_s(F)
 \end{align*}
-(\Cref{lem:pasting}, \Cref{lem:restriction-moduli}). With the constants $c_I$ and $c_B$ of
-\Cref{thm:sobolev-besov-constants} for the first modulus,
-$\|U\| \leq c_I N_s(\iota_s U) \leq c_I (\sum_j C_j P_j + P_\chi) c_B \|U + W\|$.
+(\Cref{lem:pasting}, \Cref{lem:restriction-moduli}). With the constants $C_{s,1}$ and $C'_{s,1}$
+of \Cref{thm:sobolev-besov-constants} for the first modulus,
+$\|U\| \leq C'_{s,1} N_s(\iota_s U) \leq C'_{s,1} (\sum_j C_j P_j + P_\chi) C_{s,1} \|U + W\|$.
 \end{proof}
 
 By \Cref{thm:zero-extension-bound-iso}, restriction is then an isomorphism of
 $\tilde H^s(\Omega)$ onto $H^s_0(\Omega)$ for $1/2 < s < 1$, the case $1/2 < s < 1$ of McLean's
 \cite[Theorem 3.33]{McLean} and Hewett and Moiola's \cite[Lemma 2.1]{HewettMoiola}.
 
-\section{\texorpdfstring{$\tilde H^s(\Omega) = H^s_0(\Omega)$}{H̃\^{}s = H\^{}s\_0}}
+\section{\texorpdfstring{$\tilde H^s(\Omega) \cong H^s_0(\Omega)$}{H̃\^{}s ≅ H\^{}s\_0}}
 \label{sec:tilde-zero-boundary}
 
 On a bounded Lipschitz domain the zero extension bound holds for $0 \leq s < 1/2$
@@ -1393,14 +1399,14 @@ Lifting it through derivatives with the same constant (\Cref{thm:zero-extension-
 covers every $s \geq 0$ whose fractional part is not $1/2$. In this section $\Omega$ is a bounded
 Lipschitz domain.
 
-\begin{theorem}[The zero extension bound off $1/2 + \N_0$]
+\begin{theorem}[The zero extension bound off $1/2 + \N$]
 \label{thm:zero-extension-bound-all}
 \lean{Rd.BoundedLipschitzDomain.exists_hasZeroExtensionBound_of_lt_one,
   Rd.BoundedLipschitzDomain.exists_hasZeroExtensionBound}
 \leanok
 \uses{def:zero-extension-bound, thm:zero-extension-bound-lift, thm:zero-extension-small,
   thm:zero-extension-hardy}
-For every $s \geq 0$ with $s \neq k + 1/2$ for all $k \in \N_0$ there is $C \in \R$ such that
+For every $s \geq 0$ with $s \neq k + 1/2$ for all $k \in \N$ there is $C \in \R$ such that
 $\Omega$ has the zero extension bound with constant $C$ at $s$.
 \end{theorem}
 
@@ -1412,13 +1418,16 @@ $s - m < 1/2$ and by \Cref{thm:zero-extension-hardy} if $s - m > 1/2$;
 \Cref{thm:zero-extension-bound-lift} carries it to $s$.
 \end{proof}
 
+The next theorem is McLean's \cite[Theorem 3.33]{McLean} and the case of bounded $\Omega$ and
+$s \geq 0$ of Hewett and Moiola's \cite[Lemma 2.1]{HewettMoiola}.
+
 \begin{theorem}[$\tilde H^s(\Omega) \cong H^s_0(\Omega)$]
 \label{thm:tilde-zero-boundary}
 \lean{Rd.BoundedLipschitzDomain.tildeEquivZeroBoundaryOfNeHalf,
   Rd.BoundedLipschitzDomain.coe_tildeEquivZeroBoundaryOfNeHalf_apply}
 \leanok
 \uses{thm:zero-extension-bound-all, thm:zero-extension-bound-iso}
-Let $s \geq 0$ with $s \neq k + 1/2$ for all $k \in \N_0$. Then $U \mapsto r_\Omega U$ is an
+Let $s \geq 0$ with $s \neq k + 1/2$ for all $k \in \N$. Then $U \mapsto r_\Omega U$ is an
 isomorphism of $\tilde H^s(\Omega)$ onto $H^s_0(\Omega)$, and there is $C \in \R$ with
 $\|r_\Omega U\| \leq \|U\| \leq C \|r_\Omega U\|$ for every $U \in \tilde H^s(\Omega)$.
 \end{theorem}
@@ -1428,14 +1437,11 @@ $\|r_\Omega U\| \leq \|U\| \leq C \|r_\Omega U\|$ for every $U \in \tilde H^s(\O
 \Cref{thm:zero-extension-bound-all} and \Cref{thm:zero-extension-bound-iso}.
 \end{proof}
 
-This is McLean's \cite[Theorem 3.33]{McLean} and the case of bounded $\Omega$ and $s \geq 0$ of
-Hewett and Moiola's \cite[Lemma 2.1]{HewettMoiola}. On a smooth bounded domain restriction does
-not map $\tilde H^s(\Omega)$ onto $H^s_0(\Omega)$ for $s \in 1/2 + \N_0$
-\cite[Remark 2.5]{HewettMoiola}.
-On every open set the isomorphism is isometric for integer $s$
-(\Cref{thm:tilde-zero-boundary-integer}), and $H^s_0(\Omega) = H^s(\Omega)$ for
-$0 \leq s < 1/2$ (\Cref{thm:zero-boundary-small}). With the Gelfand triple
-$\tilde H^s(\Omega) \subseteq L_2(\Omega) \subseteq H^{-s}(\Omega)$
+On a smooth bounded domain the range of the restriction is a proper subspace of
+$H^s_0(\Omega)$ for $s \in 1/2 + \N$ \cite[Remark 2.5]{HewettMoiola}. For integer $s \geq 0$ the
+isomorphism is isometric, on every open set (\Cref{thm:tilde-zero-boundary-integer}). For
+$0 \leq s < 1/2$, moreover, $H^s_0(\Omega) = H^s(\Omega)$ (\Cref{thm:zero-boundary-small}). With
+the Gelfand triple $\tilde H^s(\Omega) \subseteq L_2(\Omega) \subseteq H^{-s}(\Omega)$
 (\Cref{thm:domain-gelfand-triple}) the isomorphism gives the triple
 $H^s_0(\Omega) \subseteq L_2(\Omega) \subseteq H^{-s}(\Omega)$ up to equivalent norms.
 
@@ -1447,7 +1453,7 @@ is open, $N^s_\Gamma$ is the trace kernel of $H^s(\Omega)$ and $(N^s_\Gamma)^\pe
 space with the trace $\gamma_s$ and the extension $E_s$, $1/2 < s < 3/2$
 (\Cref{def:trace-kernel}, \Cref{def:trace-space}),
 $\gamma^H_s \colon H^s(\Omega) \to H^{s-1/2}(\Gamma)$ is the trace of
-\Cref{thm:trace-space-boundary-sobolev}, and $\partial_v \colon H^1(V) \to L_2(V)$ is the weak
+\Cref{thm:trace-space-boundary-sobolev}, and $D_v \colon H^1(V) \to L_2(V)$ is the weak
 derivative of \Cref{lem:sobolev-one-weak-derivative-operator}. For $1/2 < s \leq 1$ the kernel is
 $H^s_0(\Omega)$ by approximation from the level $1$ (\Cref{thm:sobolev-trace-kernel-small}). For
 $1 \leq s < 3/2$ the zero extension of $u \in N^s_\Gamma$ lies in $H^s(V)$: its derivatives are the
@@ -1463,12 +1469,11 @@ $H^{s-1}(V)$, since $s - 1 < 1/2$ and the indicator of $\Omega$ keeps $H^{s-1}(V
   thm:weak-derivative-tempered, lem:sobolev-inclusion, lem:sobolev-restriction-basic,
   prop:sobolev-vanishing-one, lem:sobolev-one-weak-derivative-local}
 For every $U \in H^1(V)$ and every $v \in V$, the tempered distribution of
-$\partial_v U \in L_2(V)$ is the derivative $\partial_v U$ of the distribution $U$. For every
-$s \geq 1$, every $U \in H^s(V)$ and every $v \in V$, $\partial_v \iota_{1,s} U \in L_2(V)$ lies
-in $H^{s-1}(V)$ as a tempered distribution. For every $s \geq 0$ and every $U \in H^s(V)$,
-$\iota_s r_{\Omega'} U = \iota_s U$ almost everywhere on $\Omega'$, and for every
-$U \in H^1(V)$ and every $v \in V$, $\partial_v r_{\Omega'} U = \partial_v U$ almost everywhere on
-$\Omega'$.
+$D_v U \in L_2(V)$ is $\partial_v U$. For every $s \geq 1$, every $U \in H^s(V)$ and every
+$v \in V$, $D_v \iota_{1,s} U \in L_2(V)$ lies in $H^{s-1}(V)$ as a tempered distribution. For
+every $s \geq 0$ and every $U \in H^s(V)$, $\iota_s r_{\Omega'} U = \iota_s U$ almost everywhere
+on $\Omega'$, and for every $U \in H^1(V)$ and every $v \in V$, $D_v r_{\Omega'} U = D_v U$
+almost everywhere on $\Omega'$.
 \end{lemma}
 
 \begin{proof}
@@ -1493,7 +1498,7 @@ $U$ then agree almost everywhere on $\Omega'$ (\Cref{lem:sobolev-one-weak-deriva
   lem:indicator-lp-eq-iff, lem:sobolev-to-l2, thm:zero-boundary-small,
   thm:bessel-potential-derivatives, def:restriction-inclusion}
 Let $1 \leq s < 3/2$ and $u \in N^s_\Gamma$. For every $v \in V$,
-$\partial_v(\mathbf 1_\Omega \iota_s u) = \mathbf 1_\Omega \partial_v \iota_{1,s} u$ as tempered
+$\partial_v(\mathbf 1_\Omega \iota_s u) = \mathbf 1_\Omega D_v \iota_{1,s} u$ as tempered
 distributions, and there is $U' \in H^s(V)$ with $\iota_s U' = \mathbf 1_\Omega \iota_s u$.
 \end{lemma}
 
@@ -1501,22 +1506,24 @@ distributions, and there is $U' \in H^s(V)$ with $\iota_s U' = \mathbf 1_\Omega 
 \leanok
 The function $u_1 = \iota^\Omega_{1,s} u = r_\Omega(\iota_{1,s} u)$
 (\Cref{def:restriction-inclusion}) lies in $N^1_\Gamma$ (\Cref{lem:ambient-trace-inclusion}), so
-$\mathbf 1_\Omega \partial_v u_1$ is the weak derivative of $\mathbf 1_\Omega \iota u_1$ on $V$
+$\mathbf 1_\Omega D_v u_1$ is the weak derivative of $\mathbf 1_\Omega \iota u_1$ on $V$
 (\Cref{lem:green-trace-kernel}). On
 $\Omega$, $\iota u_1 = \iota_1 \iota_{1,s} u = \iota_s u$ and
-$\partial_v u_1 = \partial_v \iota_{1,s} u$ almost everywhere
+$D_v u_1 = D_v \iota_{1,s} u$ almost everywhere
 (\Cref{lem:sobolev-l2-weak-derivatives}, \Cref{lem:sobolev-to-l2}), so the zero extensions agree
 (\Cref{lem:indicator-lp-eq-iff}), and the weak derivative is the derivative of tempered
 distributions (\Cref{thm:weak-derivative-tempered}). Since $0 \leq s - 1 < 1/2$, multiplication
 by $\mathbf 1_\Omega$ keeps $H^{s-1}(V)$ (\Cref{thm:zero-boundary-small}). So
 $\mathbf 1_\Omega \iota_s u = \mathbf 1_\Omega \iota_{s-1} \iota_{s-1,s} u$ lies in $H^{s-1}(V)$,
-and so does $\partial_v(\mathbf 1_\Omega \iota_s u) = \mathbf 1_\Omega \partial_v \iota_{1,s} u$
-for every $v$, as $\partial_v \iota_{1,s} u \in H^{s-1}(V)$
+and so does $\partial_v(\mathbf 1_\Omega \iota_s u) = \mathbf 1_\Omega D_v \iota_{1,s} u$
+for every $v$, as $D_v \iota_{1,s} u \in H^{s-1}(V)$
 (\Cref{lem:sobolev-l2-weak-derivatives}). By the derivative characterisation
 (\Cref{thm:bessel-potential-derivatives} for $p = 2$),
 $\mathbf 1_\Omega \iota_s u \in H^{(s-1)+1}(V) = H^s(V)$, and it is $\iota_s U'$ for some
 $U' \in H^s(V)$ (\Cref{lem:sobolev-to-l2}).
 \end{proof}
+
+The next theorem is McLean's \cite[Theorem 3.40]{McLean} for $1/2 < s < 3/2$.
 
 \begin{theorem}[The kernel of the trace of $H^s(\Omega)$]
 \label{thm:sobolev-trace-kernel}
@@ -1540,11 +1547,11 @@ extension $\mathbf 1_\Omega \iota_s u$ is $\iota_s U'$ for some $U' \in H^s(V)$
 (\Cref{thm:trace-space-boundary-sobolev}).
 \end{proof}
 
-This is McLean's \cite[Theorem 3.40]{McLean} for $1/2 < s < 3/2$. For $s > 1$ the proof follows
-the case $s = 1$ (\Cref{thm:trace-kernel-zero-boundary}): Green's formula gives the derivatives of
-the zero extension, and the multiplier $\mathbf 1_\Omega$ on $H^{s-1}(V)$, together with the
-derivative characterisation of $H^s(V)$ (\Cref{thm:bessel-potential-derivatives}), replaces the
-description of $\Sob{1}{2}(V)$ by weak derivatives.
+For $s > 1$ the proof follows the case $s = 1$ (\Cref{thm:trace-kernel-zero-boundary}): Green's
+formula gives the derivatives of the zero extension, and the multiplier $\mathbf 1_\Omega$ on
+$H^{s-1}(V)$, together with the derivative characterisation of $H^s(V)$
+(\Cref{thm:bessel-potential-derivatives}), replaces the description of $\Sob{1}{2}(V)$ by weak
+derivatives.
 
 \begin{corollary}[Vanishing trace by zero extension]
 \label{cor:sobolev-trace-kernel-zero-extension}
@@ -1562,7 +1569,7 @@ If $\mathbf 1_\Omega \iota_s u = \iota_s U'$, then $u \in H^s_0(\Omega)$
 (\Cref{thm:zero-boundary-small}), and $H^s_0(\Omega) \subseteq N^s_\Gamma$
 (\Cref{lem:zero-boundary-trace-kernel}). Conversely, let $u \in N^s_\Gamma = H^s_0(\Omega)$
 (\Cref{thm:sobolev-trace-kernel}). Since $s \neq 1/2$ and $s < 3/2$, $s \neq k + 1/2$ for all
-$k \in \N_0$, so $u = r_\Omega U$ for some $U \in \tilde H^s(\Omega)$
+$k \in \N$, so $u = r_\Omega U$ for some $U \in \tilde H^s(\Omega)$
 (\Cref{thm:tilde-zero-boundary}). Then $W = r_\Omega U - U \in N^s(\Omega)$
 (\Cref{lem:sobolev-restriction-basic}), and
 $\iota_s U = \mathbf 1_\Omega \iota_s(U + W) = \mathbf 1_\Omega \iota_s u$
@@ -1615,7 +1622,7 @@ $\langle x, y \rangle = \sum_i \langle x_i, y_i \rangle$; operators, isomorphism
 act componentwise (\Cref{def:pi-lp-maps}). The spaces $H^s\Lambda^k$ of differential $k$-forms
 are such sums in the basis $dx_I$. In this section $\Omega' \subseteq V$ is open, and $\Omega$ is
 a bounded Lipschitz domain with boundary $\Gamma$; $N^s_\Gamma$, $\gamma_s$, $E_s$ and
-$\gamma^H_s$ are as in \Cref{sec:sobolev-trace-kernel}, and $\tau_s$ and $E^H_s$ as in
+$\gamma^H_s$ are as in \Cref{sec:sobolev-trace-kernel}, and $\tau^H_s$ and $E^H_s$ as in
 \Cref{thm:trace-space-boundary-sobolev}.
 
 \begin{definition}[Vector-valued Sobolev spaces]
@@ -1657,8 +1664,8 @@ $(N^s_\Gamma)^m$, whose orthogonal
 complement in $H^s(\Omega)^m$ is $((N^s_\Gamma)^\perp)^m$, the range of $E_s^m$. The vector trace
 $(\gamma^H_s)^m \colon H^s(\Omega)^m \to H^{s-1/2}(\Gamma)^m$ is a bounded linear operator onto
 $H^{s-1/2}(\Gamma)^m$ with kernel $H^s_0(\Omega)^m$ and the bounded linear right inverse
-$(E^H_s)^m$, and $\tau_s^m$ is an isomorphism of normed spaces of the trace space of
-$H^s(\Omega)^m$ onto $H^{s-1/2}(\Gamma)^m$ with $(\gamma^H_s)^m = \tau_s^m \circ \gamma_s^m$.
+$(E^H_s)^m$, and $(\tau^H_s)^m$ is an isomorphism of normed spaces of the trace space of
+$H^s(\Omega)^m$ onto $H^{s-1/2}(\Gamma)^m$ with $(\gamma^H_s)^m = (\tau^H_s)^m \circ \gamma_s^m$.
 \end{theorem}
 
 \begin{proof}
@@ -1667,7 +1674,7 @@ $H^s(\Omega)^m$ onto $H^{s-1/2}(\Gamma)^m$ with $(\gamma^H_s)^m = \tau_s^m \circ
 \Cref{thm:sobolev-trace-kernel} in each component. The kernels, the norm of $E_s^m w$ and the
 range of the componentwise inclusion $E_s^m$ of $(N^s_\Gamma)^\perp$ are given by
 \Cref{lem:pi-lp-map-properties}, the
-orthogonal complement by \Cref{lem:pi-lp-orthogonal}, and $\tau_s^m$ is an isomorphism by
+orthogonal complement by \Cref{lem:pi-lp-orthogonal}, and $(\tau^H_s)^m$ is an isomorphism by
 \Cref{def:pi-lp-maps}.
 \end{proof}
 
@@ -1710,9 +1717,9 @@ convenience.
   Rd.BoundedLipschitzDomain.coe_vecTildeEquivZeroBoundaryOfNeHalf_apply}
 \leanok
 \uses{def:vector-sobolev-spaces, thm:tilde-zero-boundary, thm:tilde-zero-boundary-integer}
-Let $m \in \N$. For every $l \in \N_0$, $U \mapsto (r_{\Omega'} U_i)_i$ is an isometric
+Let $m \in \N$. For every $l \in \N$, $U \mapsto (r_{\Omega'} U_i)_i$ is an isometric
 isomorphism of $\tilde H^l(\Omega')^m$ onto $H^l_0(\Omega')^m$. For every $s \geq 0$ with
-$s \neq k + 1/2$ for all $k \in \N_0$, $U \mapsto (r_\Omega U_i)_i$ is an isomorphism of normed
+$s \neq k + 1/2$ for all $k \in \N$, $U \mapsto (r_\Omega U_i)_i$ is an isomorphism of normed
 spaces of $\tilde H^s(\Omega)^m$ onto $H^s_0(\Omega)^m$.
 \end{theorem}
 
@@ -1722,7 +1729,7 @@ spaces of $\tilde H^s(\Omega)^m$ onto $H^s_0(\Omega)^m$.
 (\Cref{def:pi-lp-maps}).
 \end{proof}
 
-\begin{theorem}[Duals of vector spaces]
+\begin{theorem}[Duals of $\tilde H^s(\Omega')^m$ and $H^t(\Gamma)^m$]
 \label{thm:vector-sobolev-duality}
 \lean{Rd.vecDualEquiv, Rd.vecDualEquiv_apply,
   Rd.BoundedLipschitzDomain.vecDualBoundarySobolevEquiv,

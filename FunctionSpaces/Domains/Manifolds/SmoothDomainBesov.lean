@@ -153,7 +153,8 @@ theorem stronglyMeasurable_extendByZero {g : closure Ω.carrier → ℂ} (hg : S
   (MeasurableEmbedding.subtype_coe isClosed_closure.measurableSet).stronglyMeasurable_extend hg
     stronglyMeasurable_const
 
-/-- **The extension preserves `L_p` norms**: `‖ext g‖_{L_p(ℝ^n)} = ‖g‖_{L_p(closure Ω)}`. -/
+/-- **The extension preserves `L_p` norms**:
+`‖Ω.extendByZero g‖_{L_p(ℝ^n)} = ‖g‖_{L_p(closure Ω)}`. -/
 theorem eLpNorm_extendByZero {g : closure Ω.carrier → ℂ} (hg : StronglyMeasurable g) {p : ℝ≥0∞}
     (hp0 : p ≠ 0) (hp : p ≠ ⊤) : eLpNorm (Ω.extendByZero g) p volume = eLpNorm g p Ω.volumeOn := by
   have he : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
@@ -241,7 +242,8 @@ theorem theta_mul_psi (i : Fin G.N) (x : EuclideanSpace ℝ (Fin n)) :
   · rw [G.theta_eq_one i x hx, one_mul]
   · rw [image_eq_zero_of_notMem_tsupport hx, mul_zero]
 
-/-- **The pieces of the global atlas**: `piece_i g = 1_{σ_i(closure Ω ∩ B_i)} (ψ_i ext g) ∘ τ_i`. -/
+/-- **The pieces of the global atlas**:
+`piece_i g = 1_{σ_i(closure Ω ∩ B_i)} (ψ_i * Ω.extendByZero g) ∘ τ_i`. -/
 theorem piece_apply (i : Fin G.N) (g : closure Ω.carrier → ℂ) (y : EuclideanSpace ℝ (Fin n)) :
     G.toBesovAtlas.piece i g y = ((G.S i).sigma '' (closure Ω.carrier ∩ (G.S i).B)).indicator
       (fun y => (G.psi i ((G.S i).tau y) : ℂ) * Ω.extendByZero g ((G.S i).tau y)) y := by
@@ -266,7 +268,8 @@ theorem piece_apply (i : Fin G.N) (g : closure Ω.carrier → ℂ) (y : Euclidea
     rfl
   · rw [indicator_of_notMem hy, indicator_of_notMem hy]
 
-/-- **The pieces on the half-space**: `1_{y_0 ≥ 0} piece_i g = 1_{y_0 ≥ 0} (ψ_i ext g) ∘ τ_i`. -/
+/-- **The pieces on the half-space**:
+`1_{y_0 ≥ 0} piece_i g = 1_{y_0 ≥ 0} (ψ_i * Ω.extendByZero g) ∘ τ_i`. -/
 theorem indicator_piece (i : Fin G.N) (g : closure Ω.carrier → ℂ) :
     (range (𝓡∂ n)).indicator (G.toBesovAtlas.piece i g) = (range (𝓡∂ n)).indicator
       (fun y => (G.psi i ((G.S i).tau y) : ℂ) * Ω.extendByZero g ((G.S i).tau y)) := by

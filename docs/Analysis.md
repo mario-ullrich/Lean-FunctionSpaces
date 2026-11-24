@@ -76,14 +76,14 @@ ranges, orthogonal complements and duals, on which the vector-valued Sobolev spa
   `ν{T x > t} ≤ C₁ t⁻¹ ∫ G x dμ` and `∫ (T x)² dν ≤ C₂ ∫ (G x)² dμ`, the bound is
   `‖T x‖_{L_p(ν)} ≤ (p (2 C₁/(p - 1) + 4 C₂/(2 - p)))^(1/p) ‖G x‖_{L_p(μ)}`
   (`MeasureTheory.eLpNorm_le_of_weak_one_strong_two`).
-* **Gelfand triples.** Let `V`, `H` be Hilbert spaces over `ℝ` or `ℂ` and `ι : V → H` bounded
-  and linear. The pivot dual `J : H → V*`, `J g = ⟪g, ι ·⟫_H`, is the adjoint of `ι` followed by
-  Riesz's isometry, conjugate-linear with `‖J‖ = ‖ι‖` (`ContinuousLinearMap.pivotDual`,
+* **Gelfand triples.** Let `X`, `H` be Hilbert spaces over `ℝ` or `ℂ` and `ι : X → H` bounded
+  and linear. The pivot dual `ι^♭ : H → X*`, `ι^♭ g = ⟪g, ι ·⟫_H`, is the adjoint of `ι` followed
+  by Riesz's isometry, conjugate-linear with `‖ι^♭‖ = ‖ι‖` (`ContinuousLinearMap.pivotDual`,
   `ContinuousLinearMap.pivotDual_apply_apply`, `ContinuousLinearMap.norm_pivotDual`); its kernel
-  is `(range ι)^⊥`, so `J` is injective iff `ι` has dense range
+  is `(range ι)^⊥`, so `ι^♭` is injective iff `ι` has dense range
   (`ContinuousLinearMap.ker_pivotDual`, `ContinuousLinearMap.pivotDual_injective_iff`), and
-  `J ∘ ι` is injective iff `ι` is (`ContinuousLinearMap.pivotDual_comp_injective_iff`). For
-  `H = L_2(μ)`, `J g v = ∫ conj (g) ι v dμ`
+  `ι^♭ ∘ ι` is injective iff `ι` is (`ContinuousLinearMap.pivotDual_comp_injective_iff`). For
+  `H = L_2(μ)`, `ι^♭ g v = ∫ conj (g) ι v dμ`
   (`MeasureTheory.L2.pivotDual_apply_apply_eq_integral`). For a locally finite measure `μ` on a
   finite-dimensional real space carried by an open set `U`, a function of `L_p(μ)`, `p ≥ 1`, that
   integrates to zero against the smooth real functions with compact support in `U` vanishes, by
@@ -141,7 +141,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The Calderón–Zygmund decomposition on dyadic cubes, norms of means of vector-valued functions | ✅ | ✗ | `Analysis/Maximal/CalderonZygmund` |
 | The signed Calderón–Zygmund decomposition of functions with values in a normed space and of families: good parts bounded by `2^n t` with `∫ ‖·‖² ≤ 2^n t ∫ ‖f‖`, bad pieces with mean zero on their cubes and total mass at most `2 ∫ ‖f‖` | ✅ | ✗ | `Analysis/Maximal/CalderonZygmundSigned` |
 | The Fefferman–Stein inequality | ✅ | ✗ | `Analysis/Maximal/FeffermanStein` |
-| The pivot dual `H → V*` of a bounded operator `V → H` between Hilbert spaces: the inner product of `H`, the integral form for `H = L_2(μ)`, its norm, its kernel `(range ι)^⊥`, injectivity iff dense range, dense range by orthogonal complements, smooth functions with compact support separating `L_p(μ)`, `p ≥ 1`, and dense range in `L_2(μ)` from them | ✅ | ✗ | `Analysis/Hilbert/GelfandTriple` |
+| The pivot dual `H → X*` of a bounded operator `X → H` between Hilbert spaces: the inner product of `H`, the integral form for `H = L_2(μ)`, its norm, its kernel `(range ι)^⊥`, injectivity iff dense range, dense range by orthogonal complements, smooth functions with compact support separating `L_p(μ)`, `p ≥ 1`, and dense range in `L_2(μ)` from them | ✅ | ✗ | `Analysis/Hilbert/GelfandTriple` |
 | Componentwise operators, isomorphisms and semilinear isometric isomorphisms on finite `L_2` sums `X^m` with their norms, kernels and ranges, inner products with a single component, orthogonal complements `(K^m)ᗮ = (Kᗮ)^m` and the dual of `E^m` | ✅ | ✗ | `Analysis/Hilbert/PiLpMaps` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.

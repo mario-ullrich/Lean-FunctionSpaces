@@ -27,7 +27,7 @@ where `ω_r(f, t)_p = sup_{|h| ≤ t} ‖Δ_h^r f‖_p`. The Triebel–Lizorkin 
 takes the `ℓ_q` norm of the Littlewood–Paley blocks `ψ_j ⋆ f` at each point before the `L_p`
 norm. The Sobolev space `W^m_p` consists of the functions whose weak derivatives up to order `m`
 lie in `L_p`, and the Bessel potential space `H^{s,p}` is Mathlib's space of the tempered
-distributions `u` with `(1 - Δ)^{s/2} u ∈ L_p`.
+distributions `u` with `(1 - Δ)^{s/2} u ∈ L_p`. Throughout, `ℕ = {0, 1, 2, …}`.
 
 The spaces are studied in these settings:
 
@@ -128,7 +128,7 @@ unless an entry says otherwise.
 | real interpolation: `(H^{s₀,p}, H^{s₁,p})_{η,q} = B^{(1-η)s₀+ηs₁}_{p,q}` | [`ℝ^d`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-bessel-potential-interpolation.html#thm:bessel-potential-interpolate) (`0 < s₀ < s₁`) |
 | tensor Daubechies wavelet coefficients | [`ℝ^d`, `p = 2`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-daub-rd-besov.html#cor:daub-rd-sobolev) (`0 < s < 3 - log₂ 3` for masks of order three) |
 | supports: `H̃^s(Ω)` is the set of `U ∈ H^s(ℝ^d)` vanishing outside `Ω` | [bounded Lipschitz domains](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-tilde-space-support.html#thm:tilde-space-supports-general) (`p = 2`, `s ≥ 0`) |
-| restriction: `H̃^s(Ω) ≅ H^s_0(Ω)` | [open sets, isometric](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-zero-extension-bound.html#thm:tilde-zero-boundary-integer) (`p = 2`, `s ∈ ℕ`), [bounded Lipschitz domains](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-tilde-zero-boundary.html#thm:tilde-zero-boundary) (`p = 2`, `s ≥ 0`, `s - 1/2 ∉ ℕ_0`) |
+| restriction: `H̃^s(Ω) ≅ H^s_0(Ω)` | [open sets, isometric](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-zero-extension-bound.html#thm:tilde-zero-boundary-integer) (`p = 2`, `s ∈ ℕ`), [bounded Lipschitz domains](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-tilde-zero-boundary.html#thm:tilde-zero-boundary) (`p = 2`, `s ≥ 0`, `s - 1/2 ∉ ℕ`) |
 | the kernel of the trace: `H^s_0(Ω) = ker γ_s` | [bounded Lipschitz domains](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-sobolev-trace-kernel.html#thm:sobolev-trace-kernel) (`p = 2`, `1/2 < s < 3/2`) |
 | `H^s_0(Ω) = H^s(Ω)` | [bounded Lipschitz domains](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-zero-extension-small.html#thm:zero-boundary-small) (`p = 2`, `0 ≤ s < 1/2`) |
 
@@ -252,10 +252,11 @@ For a general scheme the project describes `A^s_q`
   tensor splines of order `r` on `Q` be those of `[0, 1]^d` moved by `x ↦ a + L x`. Then
   `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞` iff `f` agrees on `Ω` with a
   function in the approximation space `A^s_q` of these splines
-  (`Rd.BoundedLipschitzDomain.exists_memApprox_cubeSplineSchemeAt_iff`), iff `f = ∑_k b_k` on `Ω`
-  with tensor splines `b_k` of level `k` on `Q` and `‖(2^(ks) ‖b_k‖_{L_p(Q)})_k‖_{ℓ_q} < ∞`
-  (`Rd.HasBesovExtension.exists_cubeSplineBlocksAt_iff`). The best approximations `E_k(f)` of `f`
-  in `L_p(Ω)` by the restrictions of the splines of level `k` then satisfy
+  (`Rd.BoundedLipschitzDomain.exists_memApprox_cubeSplineSchemeAt_iff`), iff `f = ∑_k b_k` on `Ω`,
+  the series converging in `L_p(Q)`, with tensor splines `b_k` of level `k` on `Q` and
+  `‖(2^(ks) ‖b_k‖_{L_p(Q)})_k‖_{ℓ_q} < ∞` (`Rd.HasBesovExtension.exists_cubeSplineBlocksAt_iff`).
+  The errors `E_k(f)` of best approximation of `f` in `L_p(Ω)` by the restrictions of the
+  splines of level `k` then satisfy
   `‖(2^(ks) E_k(f))_k‖_{ℓ_q} ≤ C (‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q})`
   (`Rd.HasBesovExtension.exists_approxNormDyadic_domainSplineScheme_le`). On `[0, 1]^d` itself the
   tensor splines describe the restrictions of `B^s_{p,q}(ℝ^d)`
@@ -297,11 +298,11 @@ For a general scheme the project describes `A^s_q`
   `Rd.BoundedLipschitzDomain.exists_traceL2_norm_equiv_slobodeckij`).
 * **`H̃^s(Ω)` and `H^s_0(Ω)`.** Let `Ω ⊆ V` be open, `H̃^s(Ω)` the closure of the test
   functions of `Ω` in `H^s(V)` and `H^s_0(Ω)` the closure of their restrictions in `H^s(Ω)`.
-  For every `l ∈ ℕ_0`, restriction is an isometric isomorphism of `H̃^l(Ω)` onto `H^l_0(Ω)`
+  For every `l ∈ ℕ`, restriction is an isometric isomorphism of `H̃^l(Ω)` onto `H^l_0(Ω)`
   (`Rd.tildeEquivZeroBoundaryNat`; Hewett–Moiola, Lemma 2.2(iii)). Let `Ω` be a bounded
   Lipschitz domain and `s ≥ 0`. Then `H̃^s(Ω)` consists of the `U ∈ H^s(V)` that vanish almost
   everywhere outside `Ω` (`Rd.BoundedLipschitzDomain.mem_tildeSpace_iff_of_nonneg`); if
-  `s - 1/2 ∉ ℕ_0`, restriction is an isomorphism of `H̃^s(Ω)` onto `H^s_0(Ω)`
+  `s - 1/2 ∉ ℕ`, restriction is an isomorphism of `H̃^s(Ω)` onto `H^s_0(Ω)`
   (`Rd.BoundedLipschitzDomain.tildeEquivZeroBoundaryOfNeHalf`; McLean, Theorem 3.33); and
   `H^s_0(Ω) = H^s(Ω)` for `s < 1/2`
   (`Rd.BoundedLipschitzDomain.zeroBoundarySpace_eq_top_of_lt_half`). Two inequalities carry the
@@ -314,7 +315,7 @@ For a general scheme the project describes `A^s_q`
   bounded Lipschitz domain the traces, the isomorphisms and the duals hold componentwise for
   `ℂ^m`-valued functions, in the Hilbert direct sums `X^m`: the trace maps `H^s(Ω)^m` onto
   `H^{s-1/2}(Γ)^m` with kernel `H^s_0(Ω)^m` for `1/2 < s < 3/2`, restriction maps `H̃^s(Ω)^m`
-  isomorphically onto `H^s_0(Ω)^m` for `s ≥ 0` with `s - 1/2 ∉ ℕ_0`, and the dual of
+  isomorphically onto `H^s_0(Ω)^m` for `s ≥ 0` with `s - 1/2 ∉ ℕ`, and the dual of
   `H̃^s(Ω)^m` is `H^{-s}(Ω)^m` for every real `s`
   (`Rd.BoundedLipschitzDomain.vecSobolevTrace`, `Rd.BoundedLipschitzDomain.ker_vecSobolevTrace`,
   `Rd.BoundedLipschitzDomain.vecTildeEquivZeroBoundaryOfNeHalf`, `Rd.vecDualEquiv`).
@@ -397,7 +398,7 @@ block documents state every result with its Lean name and list the files:
   `B^s_{p,q}(Ω)`, `H^s(Ω)` and their traces, `H^t(Γ)`, Green's formula.
 * [Fractional Sobolev spaces on Lipschitz domains](docs/FractionalSobolev.md): `H̃^s(Ω)` and
   `H^s_0(Ω)`, the zero extension bound, the indicator as a multiplier of `B^s_{p,q}` for
-  `0 < s < 1/p`, `H̃^s = H^s_0 = H^s` for `0 ≤ s < 1/2`, a fractional Hardy inequality, the
+  `0 < s < 1/p`, `H̃^s ≅ H^s_0 = H^s` for `0 ≤ s < 1/2`, a fractional Hardy inequality, the
   kernel of the trace, vector-valued spaces.
 * [Manifolds and eigenbases](docs/Manifolds.md): compact manifolds, Dirichlet and Neumann
   eigenfunctions.
@@ -417,6 +418,7 @@ block documents state every result with its Lean name and list the files:
 * The quasi-Banach range on the torus and on `ℝ^d`, splines of order `r ≥ 2` for `p < 1`, and
   Triebel–Lizorkin spaces with `p < 1`.
 * Triebel–Lizorkin spaces with `p = 1` or `q = 1`, and ball means and atoms on the torus.
+* Triebel–Lizorkin spaces on Lipschitz domains and their traces onto `B^{s-1/p}_{p,p}(Γ)`.
 * Sobolev spaces: Jawerth–Franke with Besov targets, Hardy–Littlewood–Sobolev, Trudinger, Mihlin
   multipliers with finitely many derivatives (Riesz transforms).
 * Manifolds with corners: the cube as an example, traces on faces, products of models.

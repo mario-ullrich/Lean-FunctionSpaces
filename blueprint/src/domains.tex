@@ -20,7 +20,10 @@ charts, shows that every compact Hausdorff manifold carries a smooth measure, tr
 bounded domains as manifolds with boundary and proves the trace theorem on the boundary; and
 \Cref{ch:manifold-eigenbases} describes $\Besov{\theta}{2}{q}(M)$, $0 < \theta < 1$, by expansions
 in the eigenbasis of a chart form. \Cref{ch:fractional-sobolev-domains} compares
-$\tilde H^s(\Omega)$ with $H^s_0(\Omega)$ through the zero extension bound.
+$\tilde H^s(\Omega)$ with $H^s_0(\Omega)$ through the zero extension bound, with the indicator
+of a Lipschitz domain as a multiplier of $B^s_{p,q}$ and a fractional Hardy inequality, proves
+that the kernel of the trace of $H^s(\Omega)$, $1/2 < s < 3/2$, is $H^s_0(\Omega)$, and carries
+the spaces to $\C^m$-valued functions.
 
 \chapter{Lipschitz domains}
 \label{ch:lipschitz-domains}
@@ -775,7 +778,7 @@ extension operator on Lipschitz domains is Stein's
 \leanok
 \uses{lem:rd-modulus-on, lem:modnorm-on}
 Let $V$ carry an additive Haar measure, $U \subseteq V$ be measurable, $1 \leq p \leq \infty$,
-$r \in \N$, $s \in \R$ and $q \in [0, \infty]$, and write
+$r \in \N$, $s \in \R$ and $0 < q \leq \infty$, and write
 $N_U(F) = \|\mathbf 1_U F\|_p + \|(2^{ks} \omega_r(F, 2^{-k}, U)_p)_k\|_{\ell_q}$.
 \begin{enumerate}
   \item For every countable set $I$, all $a_m, b \colon I \to [0, \infty]$ with $a_m(i) \to b(i)$
@@ -783,8 +786,8 @@ $N_U(F) = \|\mathbf 1_U F\|_p + \|(2^{ks} \omega_r(F, 2^{-k}, U)_p)_k\|_{\ell_q}
     large $m$, $\|b\|_{\ell_q} \leq D$.
   \item If $F_m \to G$ in $L_p$, then $\omega_r(F_m, 2^{-k}, U)_p \to \omega_r(G, 2^{-k}, U)_p$
     for every $k$, and $N_U(F_m) \leq C$ for all large $m$ gives $N_U(G) \leq C$.
-  \item If $f_n \to g$ in $L_p$ and for every $\varepsilon > 0$ there is $N$ with
-    $N_U(f_m - f_n) \leq \varepsilon$ for all $m, n \geq N$, then $N_U(g - f_n) \to 0$.
+  \item If $f_l \to g$ in $L_p$ and for every $\varepsilon > 0$ there is $m_0$ with
+    $N_U(f_m - f_l) \leq \varepsilon$ for all $m, l \geq m_0$, then $N_U(g - f_l) \to 0$.
   \item $\mathbf 1_U (\mathbf 1_U f) = \mathbf 1_U f$ for every $f \in L_p$.
 \end{enumerate}
 \end{lemma}
@@ -796,8 +799,8 @@ $\sum_{i \in S} b(i)^q$ is the limit of the finite sums of the $a_m(i)^q$, which
 $d_m^q$, and $\sum_i b(i)^q$ is the supremum of the finite sums. (2) By
 \Cref{lem:rd-modulus-on}, $|\omega_r(F, t, U)_p - \omega_r(G, t, U)_p| \leq 2^r \|F - G\|_p$; the
 cut-off norms converge, and (1) bounds the $\ell_q$ part of $N_U(G)$ by
-$C - \|\mathbf 1_U G\|_p$. (3) For $m, n \geq N$, $f_m - f_n \to g - f_n$ in $L_p$ as
-$m \to \infty$, and (2) gives $N_U(g - f_n) \leq \varepsilon$. (4) Both sides agree almost
+$C - \|\mathbf 1_U G\|_p$. (3) For $m, l \geq m_0$, $f_m - f_l \to g - f_l$ in $L_p$ as
+$m \to \infty$, and (2) gives $N_U(g - f_l) \leq \varepsilon$. (4) Both sides agree almost
 everywhere.
 \end{proof}
 
@@ -839,8 +842,8 @@ with the norm $N_\Omega$. It is a complex normed space, and $\|f\|_p \leq N_\Ome
 \end{definition}
 
 This is the space of \cite[(2.2)]{DeVoreSharpley} in dyadic form, with differences of a fixed
-order $r$. Its elements are stored as functions on $V$ that vanish outside $\Omega$, so the space
-lies inside $L_p(V)$. For $1 \leq p < \infty$ and $0 < s < r$ its elements are the restrictions to
+order $r$. Its elements are functions on $V$ that vanish outside $\Omega$, so the space lies
+inside $L_p(V)$. For $1 \leq p < \infty$ and $0 < s < r$ its elements are the restrictions to
 $\Omega$ of the functions of $B^s_{p,q}(V)$ (\Cref{thm:bounded-lipschitz-besov}). The norm axioms
 are those of $N_\Omega$ (\Cref{lem:modnorm-on}); $N_\Omega(f) = 0$ gives $f = \mathbf 1_\Omega f
 = 0$.
@@ -1109,7 +1112,7 @@ $D x' + c a w = x' + (c - 1) a u + a (u + b e) - c a u = x' + a b e$.
 
 \paragraph{The graph map and the Gram density.}
 
-\begin{lemma}[The graph map]
+\begin{lemma}[The graph map is an embedding]
 \label{lem:graph-map-area}
 \lean{Rd.LipschitzGraph.graphMap_eq_graphOver,
   Rd.LipschitzGraph.graphMap_injective, Rd.LipschitzGraph.lipschitzWith_graphMap,
@@ -1244,7 +1247,7 @@ $|\varphi(u_l) - \varphi(x') - \langle \nabla\varphi(x'), u_l - x' \rangle| \leq
 \varepsilon \|u_l - x'\|$ for every $l$ with $\|u_l - x'\| < 1/(k+1)$.
 \end{definition}
 
-\begin{lemma}[Good sets]
+\begin{lemma}[Properties of the good sets]
 \label{lem:good-set}
 \lean{Rd.LipschitzGraph.abs_taylor_le_of_mem_goodSet,
   Rd.LipschitzGraph.isGoodPiece_goodSet_inter_ball,
@@ -1392,12 +1395,13 @@ is the $d$-dimensional Euclidean Hausdorff measure of \Cref{sec:lipschitz-graph-
 \Cref{sec:boundary-trace-space}, $\psi^0$ is the fixed resolution of unity on $\Gamma$ and
 $\operatorname{Tr}_\Gamma$ the boundary trace; for $1/2 < s < 3/2$, $\iota_s$ reads an element of
 $H^s(V)$ as an $L_2$ function, $N^s_\Gamma$ is the trace kernel, $\gamma_s$ and $E_s$ are the
-trace and the extension of the trace space $(N^s_\Gamma)^\perp$ of $H^s(\Omega)$, with
-$N_\Gamma = N^1_\Gamma$, $\gamma = \gamma_1$, $E = E_1$ and $\iota = \iota_1$, and boundary traces
-of $H^s$ functions are taken with $L = 2$, $p = q = 2$ and smoothness $s - 1/2$. The surface
-measure of $\Gamma$ is
-$\mathcal H^{n-1}$ on $\Gamma$, defined without charts; the area formula for Lipschitz graphs
-(\Cref{thm:lipschitz-graph-area}) gives its form in the charts.
+trace and the extension of the trace space $(N^s_\Gamma)^\perp$ of $H^s(\Omega)$, and boundary
+traces of $H^s$ functions are taken with $L = 2$, $p = q = 2$ and smoothness $s - 1/2$. At
+$s = 1$ we write $N_\Gamma$, $\gamma$, $E$, $T_\Gamma$, $\tau$ and $\gamma_{L_2}$ without the
+index, the last three for the traces into $L_2(\Gamma)$ defined below; $\iota_1$ is the operator
+$\iota$ of \Cref{def:sobolev-one-to-l2} (\Cref{lem:sobolev-to-l2}). The surface measure of
+$\Gamma$ is $\mathcal H^{n-1}$ on $\Gamma$, defined without charts; the area formula for
+Lipschitz graphs (\Cref{thm:lipschitz-graph-area}) gives its form in the charts.
 
 \begin{lemma}[The boundary in a boundary ball]
 \label{lem:boundary-ball-graph}
@@ -1624,9 +1628,7 @@ every $c \in \C$, $\operatorname{Tr}_\Gamma \iota_s (U + W) = \operatorname{Tr}_
 $T^s_\Gamma U = \operatorname{Tr}_\Gamma \iota_s U$, with the boundary trace of $\psi^0$, is a
 bounded linear operator $T^s_\Gamma : H^s(V) \to L_2(\Gamma)$, and
 $T^s_\Gamma U = \operatorname{Tr}_\Gamma \iota_s U$ $\sigma$-almost everywhere for every
-resolution of unity $\psi$ and every $U \in H^s(V)$. In particular $T_\Gamma = T^1_\Gamma$
-satisfies $T_\Gamma U = \operatorname{Tr}_\Gamma \iota U$ $\sigma$-almost everywhere for every
-$U \in H^1(V)$.
+resolution of unity $\psi$ and every $U \in H^s(V)$.
 \end{theorem}
 
 \begin{proof}
@@ -1643,8 +1645,7 @@ for $U + W$ and $W$. Homogeneity is \Cref{lem:boundary-trace-linear}, since $\io
 c \iota_s U$ has a finite norm (\Cref{lem:besov-half-one-general}). Almost everywhere on $\Gamma$
 is $\sigma$-almost everywhere
 (\Cref{thm:surface-measure-null-sets}), and the boundary traces of two resolutions of unity agree
-almost everywhere on $\Gamma$ (\Cref{thm:boundary-trace-charts}). For $s = 1$, $\iota_1 = \iota$
-(\Cref{lem:sobolev-to-l2}).
+almost everywhere on $\Gamma$ (\Cref{thm:boundary-trace-charts}).
 \end{proof}
 
 \begin{definition}[The traces into $L_2(\Gamma)$]
@@ -1653,10 +1654,9 @@ almost everywhere on $\Gamma$ (\Cref{thm:boundary-trace-charts}). For $s = 1$, $
 \leanok
 \uses{thm:ambient-trace-l2, def:trace-space}
 Let $1/2 < s < 3/2$. The trace $\tau_s : (N^s_\Gamma)^\perp \to L_2(\Gamma)$ is
-$\tau_s t = T^s_\Gamma E_s t$, reading $E_s t \in H^s(\Omega)$ as an element of $H^s(V)$, and
+$\tau_s w = T^s_\Gamma E_s w$, reading $E_s w \in H^s(\Omega)$ as an element of $H^s(V)$, and
 the trace $\gamma^s_{L_2} : H^s(\Omega) \to L_2(\Gamma)$ is
-$\gamma^s_{L_2} = \tau_s \circ \gamma_s$. Both are bounded linear operators. For $s = 1$,
-$\tau = \tau_1$ and $\gamma_{L_2} = \gamma^1_{L_2}$.
+$\gamma^s_{L_2} = \tau_s \circ \gamma_s$. Both are bounded linear operators.
 \end{definition}
 
 \begin{theorem}[The traces in $L_2(\Gamma)$]
@@ -1674,29 +1674,28 @@ $\tau = \tau_1$ and $\gamma_{L_2} = \gamma^1_{L_2}$.
   thm:surface-measure-null-sets, lem:sobolev-to-l2}
 Let $1/2 < s < 3/2$ and let $\psi$ be a resolution of unity on $\Gamma$, with
 $B^{s-1/2}_{2,2}(\Gamma)$ and the boundary trace taken with respect to $\psi$. For every
-$t \in (N^s_\Gamma)^\perp$, $\tau_s t = \operatorname{Tr}_\Gamma \iota_s E_s t$ $\sigma$-almost
+$w \in (N^s_\Gamma)^\perp$, $\tau_s w = \operatorname{Tr}_\Gamma \iota_s E_s w$ $\sigma$-almost
 everywhere, and $\tau_s$ is injective. For every $u \in H^s(\Omega)$,
 $\gamma^s_{L_2} u = \operatorname{Tr}_\Gamma \iota_s u$ $\sigma$-almost everywhere,
 $\gamma^s_{L_2} u = T^s_\Gamma u$ with $u$ read as an element of $H^s(V)$, and
-$\gamma^s_{L_2} u = 0$ if and only if $u \in N^s_\Gamma$. For $s = 1$ the two formulas hold
-with $\iota_1 = \iota$. For every $g \in B^{s-1/2}_{2,2}(\Gamma)$ there is
-$t \in (N^s_\Gamma)^\perp$ with $\tau_s t = g$ $\sigma$-almost everywhere; in particular
-$g \in L_2(\Gamma)$.
+$\gamma^s_{L_2} u = 0$ if and only if $u \in N^s_\Gamma$. For every
+$g \in B^{s-1/2}_{2,2}(\Gamma)$ there is $w \in (N^s_\Gamma)^\perp$ with $\tau_s w = g$
+$\sigma$-almost everywhere; in particular $g \in L_2(\Gamma)$.
 \end{theorem}
 
 \begin{proof}
 \leanok
-The first statement is \Cref{thm:ambient-trace-l2}. If $\tau_s t = \tau_s t'$, then
-$\operatorname{Tr}_\Gamma \iota_s E_s t = \operatorname{Tr}_\Gamma \iota_s E_s t'$
+The first statement is \Cref{thm:ambient-trace-l2}. If $\tau_s w = \tau_s w'$, then
+$\operatorname{Tr}_\Gamma \iota_s E_s w = \operatorname{Tr}_\Gamma \iota_s E_s w'$
 $\sigma$-almost everywhere, hence almost everywhere on $\Gamma$
-(\Cref{thm:surface-measure-null-sets}), so $t = t'$ (\Cref{thm:trace-space-functions}). By
+(\Cref{thm:surface-measure-null-sets}), so $w = w'$ (\Cref{thm:trace-space-functions}). By
 \Cref{thm:trace-space-functions}, $\operatorname{Tr}_\Gamma \iota_s E_s \gamma_s u =
 \operatorname{Tr}_\Gamma \iota_s u$ almost everywhere on $\Gamma$, which gives the formula for
 $\gamma^s_{L_2}$; with the formula for $T^s_\Gamma$ (\Cref{thm:ambient-trace-l2}),
 $\gamma^s_{L_2} u = T^s_\Gamma u$. Then $\gamma^s_{L_2} u = 0$ if and only if
 $\operatorname{Tr}_\Gamma \iota_s u = 0$ almost everywhere on $\Gamma$, that is
 $u \in N^s_\Gamma$ (\Cref{thm:trace-kernel-boundary}). The last statement is
-\Cref{thm:trace-space-functions}. For $s = 1$, $\iota_1 = \iota$ (\Cref{lem:sobolev-to-l2}).
+\Cref{thm:trace-space-functions}.
 \end{proof}
 
 So $\gamma^s_{L_2}$ is the trace $H^s(\Omega) \to L_2(\Gamma)$ as a bounded operator, with
@@ -2469,9 +2468,9 @@ functions $(E_Q g)|_Q$ for the splines $g$ of level $k$, the \emph{splines of le
 \uses{def:euclidean-cube-at, def:approx-space}
 Let $1 \leq p \leq \infty$, $g \in L_p([0, 1]^d)$ and $F, G \in L_p(\R^d)$. Then
 $R_Q(E_Q g) = g$ and $1_Q E_Q(R_Q F) = 1_Q F$, and $1_Q F = 1_Q G$ implies $R_Q F = R_Q G$. For
-all $s \in \R$ and $0 < q \leq \infty$, an element $G \in L_p(Q)$ lies in the approximation space
-$A^s_q$ of the tensor splines on $Q$ if and only if $R_Q(1_Q G)$ lies in the approximation space
-$A^s_q$ of the tensor splines of $[0, 1]^d$.
+all $s \in \R$ and $0 < q \leq \infty$, an element $h \in L_p(Q)$ lies in the approximation space
+$A^s_q$ of the tensor splines on $Q$ if and only if $R_Q(1_Q h)$ lies in the approximation space
+$A^s_q$ of the tensor splines on $[0, 1]^d$.
 \end{proposition}
 
 \begin{proof}
@@ -2481,7 +2480,7 @@ $A^s_q$ of the tensor splines of $[0, 1]^d$.
 The compositions with $A$ and $A^{-1}$ undo each other (\Cref{lem:modulus-on-affine}), and $A$
 carries $Q_E$ onto $Q$, so the first three statements are those of
 \Cref{lem:euclidean-cube-transport} moved along $A$ (\Cref{lem:agreement-subsets}). Hence
-$T g = (E_Q g)|_Q$ and $S G = R_Q(1_Q G)$ are bounded linear maps inverse to each other
+$T g = (E_Q g)|_Q$ and $S h = R_Q(1_Q h)$ are bounded linear maps inverse to each other
 (\Cref{lem:agreement-subsets}). $T$ maps the splines of $[0, 1]^d$ to the splines on $Q$ by
 definition, and $S$ maps $T g$ to $g$, so \Cref{lem:approx-functorial} applies in both
 directions.
@@ -2528,12 +2527,12 @@ Let $0 < s < r - 1 + 1/p$.
 \begin{enumerate}
   \item Let $\Omega \subseteq Q$ be a measurable set with the extension property. There is
     $C < \infty$ such that every $f \in L_p(\R^d)$ with $N_\Omega(f) < \infty$ agrees on
-    $\Omega$ with some $G \in L_p(Q)$ with $\|G\|^{\mathrm{dy}}_{A^s_q} \leq C N_\Omega(f)$ in the
-    approximation space of the tensor splines of order $r$ on $Q$. Hence $f \in L_p(\R^d)$
+    $\Omega$ with some $G$ in the approximation space $A^s_q$ of the tensor splines of order $r$
+    on $Q$ with $\|G\|^{\mathrm{dy}}_{A^s_q} \leq C N_\Omega(f)$. Hence $f \in L_p(\R^d)$
     agrees on $\Omega$ with an element of this approximation space if and only if
     $N_\Omega(f) < \infty$, if and only if
     $\|f\|_{L_p(\Omega)} + \|(2^{ks} \omega_{r'}(f, 2^{-k}, \Omega)_p)_k\|_{\ell_q} < \infty$
-    for every order $r' > s$.
+    for some (equivalently, every) order $r' > s$.
   \item Let $\Omega \subseteq Q$ be a bounded Lipschitz domain and $f \in L_p(\R^d)$. Then the
     equivalences of (1) hold for $\Omega$, and $f$ agrees on $\Omega$ with an element of the
     approximation space $A^s_q$ of the tensor splines of order $r$ on $Q$ if and only if $f$
@@ -2596,6 +2595,9 @@ $N_{Q_E}(F) \leq \|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q}$
 (\Cref{lem:restriction-moduli}), and \Cref{thm:cube-splines-euclidean} applies to $g = R F$.
 \end{proof}
 
+On the cube the block description of the next corollary is the norm $N_3$ of DeVore and Popov
+\cite[Theorem~5.1]{DeVorePopovTAMS}.
+
 \begin{corollary}[Spline blocks on domains]
 \label{cor:domain-spline-blocks}
 \lean{Rd.HasBesovExtension.exists_cubeSplineBlocksAt_iff}
@@ -2615,9 +2617,8 @@ tensor splines on $Q$ if and only if it has such a block decomposition
 (\Cref{thm:block-decomposition}); \Cref{thm:domain-splines} gives the rest.
 \end{proof}
 
-On the cube this is the norm $N_3$ of DeVore and Popov \cite[Theorem~5.1]{DeVorePopovTAMS},
-whose blocks are the differences $T_k f - T_{k-1} f$ of their dyadic spline approximations $T_k$
-\cite[(4.20)]{DeVorePopovTAMS}.
+The blocks of DeVore and Popov are the differences $T_k f - T_{k-1} f$ of their dyadic spline
+approximations $T_k$ \cite[(4.20)]{DeVorePopovTAMS}.
 
 \begin{definition}[Restricted splines]
 \label{def:domain-spline-scheme}
@@ -2658,14 +2659,13 @@ first inequality of \Cref{thm:retract}, which needs no extension). A finite dyad
 puts $f|_\Omega$ in the approximation space (\Cref{thm:dyadic-norm}).
 \end{proof}
 
-The converse, a bound of $N_\Omega(f)$ by the approximation quasi-norm of the restricted
-splines, would follow from a Bernstein inequality for the restricted splines in $L_p(\Omega)$,
-whose constants degenerate on cells that meet $\Omega$ in thin pieces. By \Cref{thm:retract} it
-would also follow from an approximation-preserving extension (\Cref{def:approx-extension}) for
-the restriction $L_p(Q) \to L_p(\Omega)$ and the restricted splines, which turns near-best
-restricted splines into near-best splines on $Q$ level by level. The weighted extended B-splines
-of H\"ollig, Reif and Wipper \cite{HolligReifWipper2001} are the standard stabilisation of
-splines on domains.
+The converse, a bound of $N_\Omega(f)$ by the approximation quasi-norm of the restricted splines,
+follows from a Bernstein inequality for the restricted splines in $L_p(\Omega)$, whose constants
+degenerate on cells that meet $\Omega$ in thin pieces. By \Cref{thm:retract} it also follows from an
+approximation-preserving extension (\Cref{def:approx-extension}) for the restriction
+$L_p(Q) \to L_p(\Omega)$ and the restricted splines, which turns near-best restricted splines into
+near-best splines on $Q$ level by level. The weighted extended B-splines of H\"ollig, Reif and
+Wipper \cite{HolligReifWipper2001} are the standard stabilisation of splines on domains.
 
 \chapter{Traces on Lipschitz domains}
 \label{ch:traces-lipschitz}
@@ -3206,7 +3206,7 @@ The cell atoms satisfy $|\Delta_h^l a| \leq A_0 \min(1, (2^j \|h\|)^l)$ for $l \
 \Cref{lem:cells-partition} counts these.
 \end{proof}
 
-\begin{theorem}[The extension from the boundary]
+\begin{theorem}[The extension from the boundary of a graph domain]
 \label{thm:graph-trace-extension}
 \lean{Rd.LipschitzGraph.extLevelH, Rd.LipschitzGraph.continuous_extLevelH,
   Rd.LipschitzGraph.extLevel, Rd.LipschitzGraph.extLevel_eq_tsum,
@@ -3832,7 +3832,7 @@ $\Omega_j$ (\Cref{thm:boundary-trace-charts}), which are linear on these functio
 (\Cref{lem:trace-linear}).
 \end{proof}
 
-\begin{theorem}[The boundary trace is bounded]
+\begin{theorem}[The boundary trace lies in $B^s_{p,q}(\Gamma)$]
 \label{thm:boundary-trace-bounded}
 \lean{Rd.BoundedLipschitzDomain.graphTrace_mulLp_ae_boundaryTrace,
   Rd.BoundedLipschitzDomain.memBoundaryBesov_boundaryTrace}
@@ -3852,7 +3852,7 @@ $(\psi_j \circ \gamma_j) \operatorname{Tr}_j F = \operatorname{Tr}_j (\psi_j F)$
 (\Cref{thm:multipliers}), so \Cref{thm:trace-graph} applies.
 \end{proof}
 
-\begin{theorem}[The extension from the boundary]
+\begin{theorem}[The boundary trace is onto $B^s_{p,q}(\Gamma)$]
 \label{thm:boundary-trace-extension}
 \lean{Rd.BoundedLipschitzDomain.modNorm_extensionSum_lt_top,
   Rd.BoundedLipschitzDomain.boundaryTrace_extensionSum_eventuallyEq,
@@ -4204,7 +4204,7 @@ pieces of $g \colon V \to \C$.
   \item For every $1 \leq p \leq \infty$ and every measurable $g$, $G_j$ is measurable and
     $\|G_j\|_{L_p(H_j)} \leq D_j \|g\|_{L_p(\Gamma)}$; so $g \mapsto G_j$ is a bounded linear
     operator $L_p(\Gamma) \to L_p(H_j)$.
-  \item For $g \in L_p(\Gamma)$, $s \in \R$ and $q \in [0, \infty]$,
+  \item For $g \in L_p(\Gamma)$, $s \in \R$ and $0 < q \leq \infty$,
     \[
       \|g\|_{B^s_{p,q}(\Gamma)} = \sum_j \bigl(\|G_j\|_{L_p(H_j)}
         + \|(2^{ks} \omega_1(G_j, 2^{-k})_p)_k\|_{\ell_q}\bigr) ,
@@ -4237,7 +4237,7 @@ Let $\psi$ be a resolution of unity on $\Gamma$ and $1 \leq p \leq \infty$. For 
 $\sigma$-measurable $g$ and every $G \in L_p(H_j)$ with $G = (\psi_j g) \circ \gamma_j$ almost
 everywhere on $H_j$,
 $\|\psi_j g\|_{L_p(\Gamma)} \leq (1 + M_j^2)^{1/(2p)} \|G\|_{L_p(H_j)}$, with the factor $1$ for
-$p = \infty$. For all $s \in \R$ and $q \in [0, \infty]$ there is $C < \infty$ with
+$p = \infty$. For all $s \in \R$ and $0 < q \leq \infty$ there is $C < \infty$ with
 $\|g\|_{L_p(\Gamma)} \leq C \|g\|_{B^s_{p,q}(\Gamma)}$ for every $\sigma$-measurable $g$.
 \end{lemma}
 
@@ -4300,9 +4300,8 @@ quasi-norm is homogeneous and subadditive (\Cref{lem:boundary-besov-norm-propert
 definite: a vanishing norm makes all chart pieces vanish, so $g = 0$ almost everywhere on
 $\Gamma$ (\Cref{lem:boundary-vanishing-charts}), that is, $\sigma$-almost everywhere
 (\Cref{thm:surface-measure-null-sets}). The inclusion is bounded by \Cref{lem:boundary-besov-lp}.
-In Lean it is a structure around $L_p(\Gamma)$ that carries the norm by chart pieces. It is
-defined for every $t$; for $0 < t < 1$, where first differences suffice, it is the space of
-\cite[Definition 3.3]{SchneiderVybiral}.
+The space is defined for every $t$; for $0 < t < 1$, where first differences suffice, it is the
+space of \cite[Definition 3.3]{SchneiderVybiral}.
 
 \begin{theorem}[$B^t_{p,q}(\Gamma)$ is a Banach space]
 \label{thm:boundary-besov-complete}
@@ -4310,22 +4309,25 @@ defined for every $t$; for $0 < t < 1$, where first differences suffice, it is t
   Rd.BoundedLipschitzDomain.completeSpace_boundaryBesov}
 \leanok
 \uses{def:boundary-besov-space, lem:boundary-chart-pieces-lp, lem:besov-norm-complete}
-Let $\psi$ be a resolution of unity on $\Gamma$, $1 \leq p \leq \infty$, $s \in \R$ and
-$q \in [0, \infty]$. If $g_n \to g$ in $L_p(\Gamma)$ and for every $\varepsilon > 0$ there is $N$
-with $\|g_m - g_n\|_{B^s_{p,q}(\Gamma)} \leq \varepsilon$ for all $m, n \geq N$, then
-$\|g - g_n\|_{B^s_{p,q}(\Gamma)} \to 0$. In particular $B^t_{p,q}(\Gamma)$ is complete for
+Let $\psi$ be a resolution of unity on $\Gamma$, $1 \leq p \leq \infty$, $t \in \R$ and
+$0 < q \leq \infty$. If $g_l \to g$ in $L_p(\Gamma)$ and for every $\varepsilon > 0$ there is
+$m_0$ with $\|g_m - g_l\|_{B^t_{p,q}(\Gamma)} \leq \varepsilon$ for all $m, l \geq m_0$, then
+$\|g - g_l\|_{B^t_{p,q}(\Gamma)} \to 0$. In particular $B^t_{p,q}(\Gamma)$ is complete for
 $1 \leq p \leq \infty$, $t \in \R$ and $1 \leq q \leq \infty$.
 \end{theorem}
 
 \begin{proof}
 \leanok
-In each chart the pieces $G_j(g_n) \to G_j(g)$ in $L_p(H_j)$, since $g \mapsto G_j(g)$ is bounded
-(\Cref{lem:boundary-chart-pieces-lp}), and $(G_j(g_n))$ is a Cauchy sequence for the quasi-norm of
-$H_j$, which the quasi-norm of $g_m - g_n$ bounds; \Cref{lem:besov-norm-complete} on $U = H_j$ gives
+In each chart the pieces $G_j(g_l) \to G_j(g)$ in $L_p(H_j)$, since $g \mapsto G_j(g)$ is bounded
+(\Cref{lem:boundary-chart-pieces-lp}), and $(G_j(g_l))$ is a Cauchy sequence for the quasi-norm of
+$H_j$, which the quasi-norm of $g_m - g_l$ bounds; \Cref{lem:besov-norm-complete} on $U = H_j$ gives
 convergence of each summand of \Cref{lem:boundary-chart-pieces-lp}(3). A Cauchy sequence of
 $B^t_{p,q}(\Gamma)$ converges in $L_p(\Gamma)$ (\Cref{def:boundary-besov-space}); its limit $g$
-has $\|g - g_n\|_{B^t_{p,q}(\Gamma)} \to 0$, so $g \in B^t_{p,q}(\Gamma)$ and $g$ is the limit.
+has $\|g - g_l\|_{B^t_{p,q}(\Gamma)} \to 0$, so $g \in B^t_{p,q}(\Gamma)$ and $g$ is the limit.
 \end{proof}
+
+The next theorem is \cite[Theorem 4.11]{SchneiderVybiral} for $p \geq 1$ and
+\cite[Theorem 1.1.3(i)]{Mayboroda2005} in its range of indices.
 
 \begin{theorem}[The trace operator]
 \label{thm:besov-trace-operator}
@@ -4371,9 +4373,8 @@ $\|F\|_p + \|(2^{ks} \omega_2(F, 2^{-k})_p)_k\|_{\ell_q} \leq C_1 N_\Omega(f)$; 
 $\|\operatorname{Tr} f\|_{B^t_{p,q}(\Gamma)} \leq C_2 C_1 N_\Omega(f)$.
 \end{proof}
 
-This is \cite[Theorem 4.11]{SchneiderVybiral} for $p \geq 1$ and
-\cite[Theorem 1.1.3(i)]{Mayboroda2005} in its range of indices. By the last statement the
-operator is the boundary trace of \Cref{sec:boundary-besov-norm}, read on $B^s_{p,q}(\Omega)$.
+By the last statement the operator is the boundary trace of \Cref{sec:boundary-besov-norm}, read
+on $B^s_{p,q}(\Omega)$.
 
 \begin{definition}[The extension from the boundary]
 \label{def:boundary-extension-operator}
@@ -4400,7 +4401,7 @@ moment order $1$ (\Cref{thm:graph-trace-extension}).
 
 The same operator serves every $B^t_{p,q}(\Gamma)$, $0 < t < 1$.
 
-\begin{theorem}[The bounded linear right inverse of the trace]
+\begin{theorem}[A bounded linear right inverse of the Besov trace]
 \label{thm:besov-trace-right-inverse}
 \lean{Rd.BoundedLipschitzDomain.modNorm_besovExtendLp_lt_top,
   Rd.BoundedLipschitzDomain.exists_modNorm_besovExtendLp_le,
@@ -4459,13 +4460,8 @@ because the extensions $E_j$ of the graph domains are built from the local means
 pieces.
 
 For Triebel--Lizorkin spaces the trace maps $F^s_{p,q}(\Omega)$ onto
-$B^{s - 1/p}_{p,p}(\Gamma)$ for every $q$, with a linear right inverse
-\cite[Theorem 1.1.3(ii)]{Mayboroda2005}. Once Triebel--Lizorkin spaces on
-$\Omega$ are defined, for $q \leq p$ the boundedness of the trace would follow from
-$F^s_{p,q} \subseteq B^s_{p,p}$, and for $q \geq p$ the right inverse from
-$B^s_{p,p} \subseteq F^s_{p,q}$ together with \Cref{thm:besov-trace-right-inverse}; the remaining
-half needs a sharper argument in each case, and both halves hold at $q = p$. This is a later
-goal.
+$B^{s-1/p}_{p,p}(\Gamma)$ for every $q$ and $1/p < s < 1 + 1/p$, with a linear right inverse
+\cite[Theorem 1.1.3(ii)]{Mayboroda2005}.
 
 \chapter{Sobolev spaces on domains}
 \label{ch:sobolev-domains}
@@ -5250,10 +5246,10 @@ complete, since $\tilde H^1(\Omega)$ is complete, hence closed, and its closure 
 $H^1_0(\Omega)$ (\Cref{lem:sobolev-tilde-restriction-range}).
 \end{proof}
 
-McLean proves $\tilde H^s(\Omega) = H^s_0(\Omega)$ on Lipschitz domains for $s \geq 0$ with
-$s - \frac12 \notin \Z$, in particular for $s = 1$, up to equivalence of norms
-\cite[Theorem 3.33]{McLean}. For $s = 1$, \Cref{thm:sobolev-tilde-zero-boundary} holds for every
-open set and with equal norms.
+McLean proves that $U \mapsto r_\Omega U$ is an isomorphism of $\tilde H^s(\Omega)$ onto
+$H^s_0(\Omega)$ on Lipschitz domains for $s \geq 0$ with $s \notin 1/2 + \N$, in particular for
+$s = 1$ \cite[Theorem 3.33]{McLean} (\Cref{thm:tilde-zero-boundary}). For $s = 1$,
+\Cref{thm:sobolev-tilde-zero-boundary} holds for every open set and with equal norms.
 
 \begin{lemma}[$\tilde H^1(\Omega)$ lies in $H^1(\Omega)$]
 \label{lem:sobolev-tilde-in-restriction}
@@ -5594,15 +5590,13 @@ paired with $u$ itself.
   lem:sobolev-inclusion, lem:sobolev-of-schwartz, lem:sobolev-inclusion-tests, lem:plancherel-l2}
 Let $s \geq 0$. For every $g \in L_2(V)$, read as an element of $H^0(V)$,
 $\iota_{-s,0} g \in H^{-s}(V)$ has the tempered distribution $g$. The operator
-$\iota_s : H^s(V) \to L_2(V)$ has dense range. Let $J$ be the pivot dual of $\iota_s$. For every
-$g \in L_2(V)$, every $W \in H^{-s}(V)$ whose tempered distribution is $g$ and every
-$U \in H^s(V)$,
+$\iota_s : H^s(V) \to L_2(V)$ has dense range. Let $\iota_s^\flat$ be the pivot dual of
+$\iota_s$. For every $g \in L_2(V)$, every $W \in H^{-s}(V)$ whose tempered distribution is $g$
+and every $U \in H^s(V)$,
 \[
-  (J g)(U) = \langle g, \iota_s U \rangle_{L_2} = [W, U] .
+  (\iota_s^\flat g)(U) = \langle g, \iota_s U \rangle_{L_2} = [W, U] .
 \]
-Consequently $J$ is injective (\Cref{thm:pivot-dual}), and
-$H^s(V) \subseteq L_2(V) \subseteq H^{-s}(V)$ is a Gelfand triple with pivot space $L_2(V)$ whose
-duality is the pairing of \Cref{def:sobolev-pairing}.
+The pivot dual $\iota_s^\flat$ is injective.
 \end{theorem}
 
 \begin{proof}
@@ -5618,9 +5612,13 @@ $H^{-s}(V)$ is determined by its distribution, so $W = \iota_{-s,0} g$. By Planc
 $\langle g, \iota_s U \rangle_{L_2} = \int \overline{\widehat g} \, \langle \xi \rangle^{-s}
 \widehat{J_s U} \, d\xi$ and $[W, U] = \langle J_{-s} W, J_s U \rangle_{L_2} =
 \int \overline{\langle \xi \rangle^{-s} \widehat g} \, \widehat{J_s U} \, d\xi$, which agree since
-the weight is real. \Cref{thm:pivot-dual} gives $(J g)(U) = \langle g, \iota_s U \rangle_{L_2}$
-and the injectivity of $J$.
+the weight is real. \Cref{thm:pivot-dual} gives
+$(\iota_s^\flat g)(U) = \langle g, \iota_s U \rangle_{L_2}$ and the injectivity of
+$\iota_s^\flat$.
 \end{proof}
+
+So $H^s(V) \subseteq L_2(V) \subseteq H^{-s}(V)$ is a Gelfand triple with pivot space $L_2(V)$
+whose duality is the pairing of \Cref{def:sobolev-pairing}.
 
 \begin{lemma}[$\tilde H^s(\Omega)$ is dense in $L_2(\Omega)$]
 \label{lem:tilde-dense-l2}
@@ -5653,31 +5651,32 @@ range.
 \lean{Rd.pivotDual_tildeToL2_apply_apply, Rd.sobolevPairing_tildeDualEquiv_pivotDual_tildeToL2}
 \leanok
 \uses{thm:pivot-dual, lem:tilde-dense-l2, thm:sobolev-duality}
-Let $\Omega \subseteq V$ be open, $s \geq 0$, and $J_\Omega : L_2(\Omega) \to
-\tilde H^s(\Omega)^*$ the conjugate-linear bounded pivot dual of $\iota^\Omega_s$
-(\Cref{lem:tilde-dense-l2}). For every $g \in L_2(\Omega)$ let $W_g \in H^{-s}(\Omega)$
-represent $J_\Omega g$ as in \Cref{thm:sobolev-duality}. Then for all $g \in L_2(\Omega)$ and
-$U \in \tilde H^s(\Omega)$,
+Let $\Omega \subseteq V$ be open, $s \geq 0$, and
+$(\iota^\Omega_s)^\flat : L_2(\Omega) \to \tilde H^s(\Omega)^*$ the conjugate-linear bounded
+pivot dual of $\iota^\Omega_s$ (\Cref{lem:tilde-dense-l2}). For every $g \in L_2(\Omega)$ let
+$W_g \in H^{-s}(\Omega)$ represent $(\iota^\Omega_s)^\flat g$ as in \Cref{thm:sobolev-duality}.
+Then for all $g \in L_2(\Omega)$ and $U \in \tilde H^s(\Omega)$,
 \[
-  (J_\Omega g)(U) = [W_g, U] = \int_\Omega \overline{g} \, \iota_s U \, dx .
+  ((\iota^\Omega_s)^\flat g)(U) = [W_g, U] = \int_\Omega \overline{g} \, \iota_s U \, dx .
 \]
-Consequently $J_\Omega$ and $g \mapsto W_g$ are injective (\Cref{thm:pivot-dual},
-\Cref{lem:tilde-dense-l2}), and $\tilde H^s(\Omega) \subseteq L_2(\Omega) \subseteq
-H^{-s}(\Omega)$ is a Gelfand triple with pivot space $L_2(\Omega)$.
+The maps $(\iota^\Omega_s)^\flat$ and $g \mapsto W_g$ are injective.
 \end{theorem}
 
 \begin{proof}
 \leanok
-\Cref{thm:pivot-dual} for $H = L_2(\Omega)$ gives the formula for $J_\Omega$, since
+\Cref{thm:pivot-dual} for $H = L_2(\Omega)$ gives the formula for $(\iota^\Omega_s)^\flat$, since
 $\iota^\Omega_s U = \iota_s U$ almost everywhere on $\Omega$, and, with the dense range of
-\Cref{lem:tilde-dense-l2}, the injectivity of $J_\Omega$. By \Cref{thm:sobolev-duality},
-$[W_g, U] = (J_\Omega g)(U)$, and $\ell \mapsto W_\ell$ is injective.
+\Cref{lem:tilde-dense-l2}, the injectivity of $(\iota^\Omega_s)^\flat$. By
+\Cref{thm:sobolev-duality}, $[W_g, U] = ((\iota^\Omega_s)^\flat g)(U)$, and
+$\ell \mapsto W_\ell$ is injective.
 \end{proof}
 
+So $\tilde H^s(\Omega) \subseteq L_2(\Omega) \subseteq H^{-s}(\Omega)$ is a Gelfand triple with
+pivot space $L_2(\Omega)$.
 For $s = 1$, restriction maps $\tilde H^1(\Omega)$ isometrically onto $H^1_0(\Omega)$
 (\Cref{thm:sobolev-tilde-zero-boundary}), and the triple is
 $H^1_0(\Omega) \subseteq L_2(\Omega) \subseteq H^{-1}(\Omega)$. On a bounded Lipschitz domain,
-for $s \geq 0$ with $s - \frac12 \notin \Z$, restriction is an isomorphism of $\tilde H^s(\Omega)$
+for $s \geq 0$ with $s \notin 1/2 + \N$, restriction is an isomorphism of $\tilde H^s(\Omega)$
 onto $H^s_0(\Omega)$ with equivalent norms \cite[Theorem 3.33]{McLean}
 (\Cref{thm:tilde-zero-boundary}), and up to equivalent norms the triple is
 $H^s_0(\Omega) \subseteq L_2(\Omega) \subseteq H^{-s}(\Omega)$.
@@ -5699,8 +5698,8 @@ is a Hilbert space with a trace and an extension of norm at most $1$; by the tra
 Lipschitz boundaries (\Cref{thm:boundary-trace-bounded}, \Cref{thm:boundary-trace-extension}) and
 the description of $H^s(V)$ by differences (\Cref{thm:sobolev-besov-constants},
 \Cref{lem:sobolev-from-differences}), its elements correspond to the functions of
-$B^{s-1/2}_{2,2}(\Gamma)$ modulo null sets of $\Gamma$. The family is indexed by $s$; its case
-$s = 1$ is the trace space of $H^1(\Omega)$. \Cref{sec:trace-space-norm} compares its norm with
+$B^{s-1/2}_{2,2}(\Gamma)$ modulo null sets of $\Gamma$. At $s = 1$ we write $N_\Gamma$, $\gamma$
+and $E$ without the index. \Cref{sec:trace-space-norm} compares the norm of the trace space with
 that of $B^{s-1/2}_{2,2}(\Gamma)$, and \Cref{sec:boundary-slobodeckij} identifies it with the
 Hilbert space $H^{s-1/2}(\Gamma)$. Two subspaces carry the letter $N$: the
 trace kernel $N^s_\Gamma \subseteq H^s(\Omega)$ of the elements with vanishing trace
@@ -5987,7 +5986,6 @@ $\psi_j = 0$ there.
 \uses{thm:chart-traces-bounded}
 Let $1/2 < s < 3/2$. The trace kernel $N^s_\Gamma$ is the set of the $u \in H^s(\Omega)$ with
 $T^s_j u = 0$ for every $j$. It is a closed subspace of $H^s(\Omega)$ and complete.
-$N_\Gamma = N^1_\Gamma$ is the trace kernel of $H^1(\Omega)$.
 \end{definition}
 
 $N^s_\Gamma$ is closed as an intersection of kernels of bounded operators, and complete as a
@@ -6003,8 +6001,8 @@ closed subspace of a Hilbert space.
   lem:sobolev-to-l2}
 Let $1/2 < s < 3/2$. For every resolution of unity $\psi$ on $\Gamma$ and every
 $u \in H^s(\Omega)$, $u \in N^s_\Gamma$ if and only if $\operatorname{Tr}_\Gamma \iota_s u = 0$
-almost everywhere on $\Gamma$, with the boundary trace of $\psi$; for $s = 1$ with
-$\iota_1 = \iota$. For every resolution of unity $\psi$ and all $U, W \in H^s(V)$,
+almost everywhere on $\Gamma$, with the boundary trace of $\psi$. For every resolution of
+unity $\psi$ and all $U, W \in H^s(V)$,
 $\operatorname{Tr}_\Gamma \iota_s(U - W) = \operatorname{Tr}_\Gamma \iota_s U -
 \operatorname{Tr}_\Gamma \iota_s W$ almost everywhere on $\Gamma$.
 \end{theorem}
@@ -6018,7 +6016,7 @@ $\Gamma$ (\Cref{lem:boundary-vanishing-charts}), and the boundary traces of $\ps
 agree almost everywhere on $\Gamma$ (\Cref{thm:boundary-trace-charts}). For the difference,
 $\iota_s(U - W) + \iota_s W = \iota_s U$, the functions of $H^s(V)$ have finite norms
 (\Cref{lem:besov-half-one-general}), and the boundary trace is additive on them
-(\Cref{lem:boundary-trace-linear}). For $s = 1$, $\iota_1 = \iota$ (\Cref{lem:sobolev-to-l2}).
+(\Cref{lem:boundary-trace-linear}).
 \end{proof}
 
 So the trace kernel does not depend on the resolution of unity in its definition.
@@ -6032,7 +6030,7 @@ So the trace kernel does not depend on the resolution of unity in its definition
   lem:besov-half-one-general, lem:sobolev-to-l2}
 Let $1/2 < s < 3/2$. For every resolution of unity $\psi$ on $\Gamma$ and every
 $U \in H^s(V)$, $\operatorname{Tr}_\Gamma \iota_s(r_\Omega U) = \operatorname{Tr}_\Gamma
-\iota_s U$ almost everywhere on $\Gamma$; for $s = 1$ with $\iota_1 = \iota$.
+\iota_s U$ almost everywhere on $\Gamma$.
 \end{lemma}
 
 \begin{proof}
@@ -6041,7 +6039,7 @@ $U - r_\Omega U$ vanishes on $\Omega$ (\Cref{lem:sobolev-restriction-basic}), so
 $\iota_s(U - r_\Omega U) = 0$ almost everywhere on $\Omega$ (\Cref{prop:sobolev-vanishing-one}),
 and the boundary trace depends only on the function on $\Omega$
 (\Cref{lem:boundary-trace-locality}), whose hypothesis both functions satisfy
-(\Cref{lem:besov-half-one-general}). For $s = 1$, $\iota_1 = \iota$ (\Cref{lem:sobolev-to-l2}).
+(\Cref{lem:besov-half-one-general}).
 \end{proof}
 
 \begin{definition}[The trace space of $H^s(\Omega)$]
@@ -6053,9 +6051,7 @@ and the boundary trace depends only on the function on $\Omega$
 Let $1/2 < s < 3/2$. The trace space of $H^s(\Omega)$ is $(N^s_\Gamma)^\perp$, the orthogonal
 complement of the trace kernel in $H^s(\Omega)$, a Hilbert space. The trace
 $\gamma_s : H^s(\Omega) \to (N^s_\Gamma)^\perp$ is the orthogonal projection onto it, and the
-extension $E_s : (N^s_\Gamma)^\perp \to H^s(\Omega)$ is the inclusion. For $s = 1$,
-$N_\Gamma^\perp$ is the trace space of $H^1(\Omega)$, with the trace $\gamma = \gamma_1$ and the
-extension $E = E_1$.
+extension $E_s : (N^s_\Gamma)^\perp \to H^s(\Omega)$ is the inclusion.
 \end{definition}
 
 \begin{theorem}[Trace and extension]
@@ -6069,8 +6065,8 @@ extension $E = E_1$.
   Rd.BoundedLipschitzDomain.quotientEquivTraceSpace_mk}
 \leanok
 \uses{def:trace-space}
-Let $1/2 < s < 3/2$. For every $t \in (N^s_\Gamma)^\perp$, $\gamma_s E_s t = t$ and
-$\|E_s t\| = \|t\|$. For every $u \in H^s(\Omega)$, $\|\gamma_s u\| \leq \|u\|$, $\gamma_s u = 0$
+Let $1/2 < s < 3/2$. For every $w \in (N^s_\Gamma)^\perp$, $\gamma_s E_s w = w$ and
+$\|E_s w\| = \|w\|$. For every $u \in H^s(\Omega)$, $\|\gamma_s u\| \leq \|u\|$, $\gamma_s u = 0$
 if and only if $u \in N^s_\Gamma$, and $u - E_s \gamma_s u \in N^s_\Gamma$. The map
 $[u] \mapsto \gamma_s u$ is an isometric isomorphism of $H^s(\Omega) / N^s_\Gamma$ onto
 $(N^s_\Gamma)^\perp$.
@@ -6106,15 +6102,15 @@ Let $1/2 < s < 3/2$ and let $\psi$ be a resolution of unity on $\Gamma$, with
 $B^{s-1/2}_{2,2}(\Gamma)$ and the boundary trace taken with respect to $\psi$. For all
 $u, u' \in H^s(\Omega)$, $\gamma_s u = \gamma_s u'$ if and only if
 $\operatorname{Tr}_\Gamma \iota_s u = \operatorname{Tr}_\Gamma \iota_s u'$ almost everywhere on
-$\Gamma$ (for $s = 1$ with $\iota_1 = \iota$), and
+$\Gamma$, and
 $\operatorname{Tr}_\Gamma \iota_s E_s \gamma_s u = \operatorname{Tr}_\Gamma \iota_s u$ almost
-everywhere on $\Gamma$. For all $t, t' \in (N^s_\Gamma)^\perp$,
-$\operatorname{Tr}_\Gamma \iota_s E_s t = \operatorname{Tr}_\Gamma \iota_s E_s t'$ almost
-everywhere on $\Gamma$ if and only if $t = t'$. For every $U \in H^s(V)$,
+everywhere on $\Gamma$. For all $w, w' \in (N^s_\Gamma)^\perp$,
+$\operatorname{Tr}_\Gamma \iota_s E_s w = \operatorname{Tr}_\Gamma \iota_s E_s w'$ almost
+everywhere on $\Gamma$ if and only if $w = w'$. For every $U \in H^s(V)$,
 $\operatorname{Tr}_\Gamma \iota_s U \in B^{s-1/2}_{2,2}(\Gamma)$; in particular
-$\operatorname{Tr}_\Gamma \iota_s E_s t \in B^{s-1/2}_{2,2}(\Gamma)$ for every
-$t \in (N^s_\Gamma)^\perp$. For every $g \in B^{s-1/2}_{2,2}(\Gamma)$ there is
-$t \in (N^s_\Gamma)^\perp$ with $\operatorname{Tr}_\Gamma \iota_s E_s t = g$ almost everywhere on
+$\operatorname{Tr}_\Gamma \iota_s E_s w \in B^{s-1/2}_{2,2}(\Gamma)$ for every
+$w \in (N^s_\Gamma)^\perp$. For every $g \in B^{s-1/2}_{2,2}(\Gamma)$ there is
+$w \in (N^s_\Gamma)^\perp$ with $\operatorname{Tr}_\Gamma \iota_s E_s w = g$ almost everywhere on
 $\Gamma$.
 \end{theorem}
 
@@ -6125,17 +6121,17 @@ $\gamma_s u = \gamma_s u'$ if and only if $u - u' \in N^s_\Gamma$
 $\operatorname{Tr}_\Gamma \iota_s (u - u') = 0$ almost everywhere on $\Gamma$, and this is
 $\operatorname{Tr}_\Gamma \iota_s u - \operatorname{Tr}_\Gamma \iota_s u'$ almost everywhere on
 $\Gamma$ (\Cref{thm:trace-kernel-boundary}). The second and third statements follow with
-$\gamma_s E_s t = t$. The boundary trace lies in $B^{s-1/2}_{2,2}(\Gamma)$ by
+$\gamma_s E_s w = w$. The boundary trace lies in $B^{s-1/2}_{2,2}(\Gamma)$ by
 \Cref{thm:boundary-trace-bounded} at smoothness $0 < s - 1/2 < 1$, whose hypothesis holds by
 \Cref{lem:besov-half-one-general}. For $g \in B^{s-1/2}_{2,2}(\Gamma)$ the extension from the
 boundary (\Cref{thm:boundary-trace-extension}) gives $F \in L_2(V)$ with
 $\|F\|_2 + \|(2^{ks} \omega_2(F, 2^{-k})_2)_k\|_{\ell_2} < \infty$ and boundary trace $g$; then
 $F = \iota_s U$ for some $U \in H^s(V)$ (\Cref{lem:sobolev-from-differences}, $2 > s$),
 $\operatorname{Tr}_\Gamma \iota_s(r_\Omega U) = g$ almost everywhere on $\Gamma$
-(\Cref{lem:boundary-trace-restriction-sobolev}), and $t = \gamma_s(r_\Omega U)$.
+(\Cref{lem:boundary-trace-restriction-sobolev}), and $w = \gamma_s(r_\Omega U)$.
 \end{proof}
 
-So $t \mapsto \operatorname{Tr}_\Gamma \iota_s E_s t$ is a bijection of $(N^s_\Gamma)^\perp$ onto
+So $w \mapsto \operatorname{Tr}_\Gamma \iota_s E_s w$ is a bijection of $(N^s_\Gamma)^\perp$ onto
 $B^{s-1/2}_{2,2}(\Gamma)$ modulo null sets of $\Gamma$; \Cref{sec:trace-space-norm} compares the
 norms.
 
@@ -6156,8 +6152,8 @@ the trace space $(N^s_\Gamma)^\perp$.
 \leanok
 \uses{def:dual-trace-space, thm:trace-space-operators}
 Let $1/2 < s < 3/2$. For every $\ell \in ((N^s_\Gamma)^\perp)^*$ there is exactly one
-$t_\ell \in (N^s_\Gamma)^\perp$ with $\ell(t) = \langle t_\ell, t \rangle$ for every
-$t \in (N^s_\Gamma)^\perp$, and $\ell \mapsto t_\ell$ is a conjugate-linear isometric isomorphism
+$w_\ell \in (N^s_\Gamma)^\perp$ with $\ell(w) = \langle w_\ell, w \rangle$ for every
+$w \in (N^s_\Gamma)^\perp$, and $\ell \mapsto w_\ell$ is a conjugate-linear isometric isomorphism
 of $((N^s_\Gamma)^\perp)^*$ onto $(N^s_\Gamma)^\perp$. The adjoint of $\gamma_s$ is $E_s$.
 \end{theorem}
 
@@ -6197,9 +6193,9 @@ $N_\Gamma^\perp$ of $H^1(\Omega)$ and $B^{1/2}_{2,2}(\Gamma)$.
 \uses{lem:sobolev-restriction-basic, lem:boundary-trace-restriction-sobolev,
   thm:trace-space-operators, thm:trace-space-functions}
 For every $U \in H^s(V)$, $\|\gamma_s(r_\Omega U)\| \leq \|U\|$. For every resolution of unity
-$\psi$ on $\Gamma$, every $U \in H^s(V)$ and every $t \in (N^s_\Gamma)^\perp$ with
-$\operatorname{Tr}_\Gamma \iota_s U = \operatorname{Tr}_\Gamma \iota_s E_s t$ almost everywhere
-on $\Gamma$, $\gamma_s(r_\Omega U) = t$ and $\|t\| \leq \|U\|$.
+$\psi$ on $\Gamma$, every $U \in H^s(V)$ and every $w \in (N^s_\Gamma)^\perp$ with
+$\operatorname{Tr}_\Gamma \iota_s U = \operatorname{Tr}_\Gamma \iota_s E_s w$ almost everywhere
+on $\Gamma$, $\gamma_s(r_\Omega U) = w$ and $\|w\| \leq \|U\|$.
 \end{lemma}
 
 \begin{proof}
@@ -6207,7 +6203,7 @@ on $\Gamma$, $\gamma_s(r_\Omega U) = t$ and $\|t\| \leq \|U\|$.
 The restriction and $\gamma_s$ have norm at most $1$ (\Cref{lem:sobolev-restriction-basic},
 \Cref{thm:trace-space-operators}). The restriction keeps the boundary trace
 (\Cref{lem:boundary-trace-restriction-sobolev}), equal boundary traces give equal traces
-(\Cref{thm:trace-space-functions}), and $\gamma_s E_s t = t$.
+(\Cref{thm:trace-space-functions}), and $\gamma_s E_s w = w$.
 \end{proof}
 
 \begin{theorem}[The norm of the trace space is the least extension norm]
@@ -6215,18 +6211,18 @@ The restriction and $\gamma_s$ have norm at most $1$ (\Cref{lem:sobolev-restrict
 \lean{Rd.BoundedLipschitzDomain.enorm_eq_iInf}
 \leanok
 \uses{lem:boundary-trace-restriction, thm:trace-space-operators}
-For every resolution of unity $\psi$ on $\Gamma$ and every $t \in (N^s_\Gamma)^\perp$,
+For every resolution of unity $\psi$ on $\Gamma$ and every $w \in (N^s_\Gamma)^\perp$,
 \[
-  \|t\| = \inf \bigl\{\|U\| : U \in H^s(V),\ \operatorname{Tr}_\Gamma \iota_s U =
-    \operatorname{Tr}_\Gamma \iota_s E_s t\bigr\},
+  \|w\| = \inf \bigl\{\|U\| : U \in H^s(V),\ \operatorname{Tr}_\Gamma \iota_s U =
+    \operatorname{Tr}_\Gamma \iota_s E_s w\bigr\},
 \]
 where the boundary traces agree almost everywhere on $\Gamma$.
 \end{theorem}
 
 \begin{proof}
 \leanok
-Every such $U$ has $\|t\| \leq \|U\|$ (\Cref{lem:boundary-trace-restriction}), and $U = E_s t$ has
-$\|E_s t\| = \|t\|$ (\Cref{thm:trace-space-operators}).
+Every such $U$ has $\|w\| \leq \|U\|$ (\Cref{lem:boundary-trace-restriction}), and $U = E_s w$ has
+$\|E_s w\| = \|w\|$ (\Cref{thm:trace-space-operators}).
 \end{proof}
 
 \begin{lemma}[Bounds of the trace of $H^s(V)$ and of an extension into $H^s(V)$]
@@ -6243,8 +6239,8 @@ For every resolution of unity $\psi$ on $\Gamma$:
   \item there is $C < \infty$ with
     $\|\operatorname{Tr}_\Gamma \iota_s U\|_{B^{s-1/2}_{2,2}(\Gamma)} \leq C \|U\|$ for every
     $U \in H^s(V)$, and hence
-    $\|\operatorname{Tr}_\Gamma \iota_s E_s t\|_{B^{s-1/2}_{2,2}(\Gamma)} \leq C \|t\|$ for every
-    $t \in (N^s_\Gamma)^\perp$;
+    $\|\operatorname{Tr}_\Gamma \iota_s E_s w\|_{B^{s-1/2}_{2,2}(\Gamma)} \leq C \|w\|$ for every
+    $w \in (N^s_\Gamma)^\perp$;
   \item there is $C < \infty$ such that every $g \in B^{s-1/2}_{2,2}(\Gamma)$ is
     $\operatorname{Tr}_\Gamma \iota_s U$ almost everywhere on $\Gamma$ for some $U \in H^s(V)$
     with $\|U\| \leq C \|g\|_{B^{s-1/2}_{2,2}(\Gamma)}$.
@@ -6256,7 +6252,7 @@ For every resolution of unity $\psi$ on $\Gamma$:
 (1) \Cref{thm:boundary-besov-norm-trace} with $p = q = L = 2$ and smoothness $s - 1/2$, where
 $(s - 1/2) + 1/p = s$ and $\iota_s U$ satisfies its hypothesis
 (\Cref{lem:besov-half-one-general}), and the bound $C_{s,2}$ of
-\Cref{thm:sobolev-besov-constants} with differences of order $2 > s$; $\|E_s t\| = \|t\|$. (2)
+\Cref{thm:sobolev-besov-constants} with differences of order $2 > s$; $\|E_s w\| = \|w\|$. (2)
 \Cref{thm:boundary-besov-norm-extension} gives $F$ with
 $\|F\|_2 + \|(2^{ks} \omega_2(F, 2^{-k})_2)_k\|_{\ell_2}
 \leq C' \|g\|_{B^{s-1/2}_{2,2}(\Gamma)} < \infty$
@@ -6272,21 +6268,21 @@ $\|F\|_2 + \|(2^{ks} \omega_2(F, 2^{-k})_2)_k\|_{\ell_2}
 \uses{lem:trace-space-norm-bounds, lem:boundary-trace-restriction, thm:trace-space-functions,
   lem:boundary-trace-restriction-sobolev}
 For every resolution of unity $\psi$ on $\Gamma$ there is $C < \infty$ such that every
-$g \in B^{s-1/2}_{2,2}(\Gamma)$ is $\operatorname{Tr}_\Gamma \iota_s E_s t$ almost everywhere on
-$\Gamma$ for some $t \in (N^s_\Gamma)^\perp$ with $\|t\| \leq C \|g\|_{B^{s-1/2}_{2,2}(\Gamma)}$.
+$g \in B^{s-1/2}_{2,2}(\Gamma)$ is $\operatorname{Tr}_\Gamma \iota_s E_s w$ almost everywhere on
+$\Gamma$ for some $w \in (N^s_\Gamma)^\perp$ with $\|w\| \leq C \|g\|_{B^{s-1/2}_{2,2}(\Gamma)}$.
 \end{theorem}
 
 \begin{proof}
 \leanok
-Take $U$ from \Cref{lem:trace-space-norm-bounds} (2) and $t = \gamma_s(r_\Omega U)$:
+Take $U$ from \Cref{lem:trace-space-norm-bounds} (2) and $w = \gamma_s(r_\Omega U)$:
 $\operatorname{Tr}_\Gamma \iota_s E_s \gamma_s(r_\Omega U) = \operatorname{Tr}_\Gamma
 \iota_s(r_\Omega U) = \operatorname{Tr}_\Gamma \iota_s U = g$ (\Cref{thm:trace-space-functions},
-\Cref{lem:boundary-trace-restriction-sobolev}), and $\|t\| \leq \|U\|$
+\Cref{lem:boundary-trace-restriction-sobolev}), and $\|w\| \leq \|U\|$
 (\Cref{lem:boundary-trace-restriction}).
 \end{proof}
 
-By \Cref{thm:trace-space-functions}, $t$ is determined by $g$; \Cref{thm:trace-right-inverse}
-makes $g \mapsto E_s t$ a bounded linear operator.
+By \Cref{thm:trace-space-functions}, $w$ is determined by $g$; \Cref{thm:trace-right-inverse}
+makes $g \mapsto E_s w$ a bounded linear operator.
 
 \begin{theorem}[$(N^s_\Gamma)^\perp$ and $B^{s-1/2}_{2,2}(\Gamma)$ have equivalent norms]
 \label{thm:trace-space-norm-equiv}
@@ -6296,21 +6292,21 @@ makes $g \mapsto E_s t$ a bounded linear operator.
 \uses{thm:trace-space-right-inverse, lem:trace-space-norm-bounds, thm:trace-space-functions,
   thm:trace-l2, thm:surface-measure-null-sets, lem:boundary-besov-norm-properties}
 For every resolution of unity $\psi$ on $\Gamma$ there is $C < \infty$ such that for every
-$t \in (N^s_\Gamma)^\perp$,
+$w \in (N^s_\Gamma)^\perp$,
 \[
-  \|t\| \leq C \|\tau_s t\|_{B^{s-1/2}_{2,2}(\Gamma)} \quad\text{and}\quad
-  \|\tau_s t\|_{B^{s-1/2}_{2,2}(\Gamma)} \leq C \|t\| .
+  \|w\| \leq C \|\tau_s w\|_{B^{s-1/2}_{2,2}(\Gamma)} \quad\text{and}\quad
+  \|\tau_s w\|_{B^{s-1/2}_{2,2}(\Gamma)} \leq C \|w\| .
 \]
 \end{theorem}
 
 \begin{proof}
 \leanok
-$\tau_s t = \operatorname{Tr}_\Gamma \iota_s E_s t$ almost everywhere on $\Gamma$
+$\tau_s w = \operatorname{Tr}_\Gamma \iota_s E_s w$ almost everywhere on $\Gamma$
 (\Cref{thm:trace-l2}, \Cref{thm:surface-measure-null-sets}), and the quasi-norm sees only this
 class (\Cref{lem:boundary-besov-norm-properties}). The upper bound is
 \Cref{lem:trace-space-norm-bounds} (1). For the lower bound, \Cref{thm:trace-space-right-inverse}
-applied to $g = \operatorname{Tr}_\Gamma \iota_s E_s t$ returns some $t'$ with the boundary trace
-of $t$, and $t' = t$ (\Cref{thm:trace-space-functions}).
+applied to $g = \operatorname{Tr}_\Gamma \iota_s E_s w$ returns some $w'$ with the boundary trace
+of $w$, and $w' = w$ (\Cref{thm:trace-space-functions}).
 \end{proof}
 
 \begin{theorem}[The range of $\tau_s : (N^s_\Gamma)^\perp \to L_2(\Gamma)$]
@@ -6318,15 +6314,15 @@ of $t$, and $t' = t$ (\Cref{thm:trace-space-functions}).
 \lean{Rd.BoundedLipschitzDomain.mem_range_traceL2_iff}
 \leanok
 \uses{thm:trace-l2, thm:trace-space-functions, thm:surface-measure-null-sets}
-For every resolution of unity $\psi$ on $\Gamma$ and every $g \in L_2(\Gamma)$, $g = \tau_s t$
-for some $t \in (N^s_\Gamma)^\perp$ if and only if $g \in B^{s-1/2}_{2,2}(\Gamma)$.
+For every resolution of unity $\psi$ on $\Gamma$ and every $g \in L_2(\Gamma)$, $g = \tau_s w$
+for some $w \in (N^s_\Gamma)^\perp$ if and only if $g \in B^{s-1/2}_{2,2}(\Gamma)$.
 \end{theorem}
 
 \begin{proof}
 \leanok
 \Cref{thm:trace-space-functions} and \Cref{thm:trace-l2}: the boundary traces of the elements of
 $(N^s_\Gamma)^\perp$ lie in $B^{s-1/2}_{2,2}(\Gamma)$, and every
-$g \in B^{s-1/2}_{2,2}(\Gamma)$ is $\tau_s t$ almost everywhere on $\Gamma$ for some $t$.
+$g \in B^{s-1/2}_{2,2}(\Gamma)$ is $\tau_s w$ almost everywhere on $\Gamma$ for some $w$.
 \end{proof}
 
 \paragraph{The isomorphism with $B^{s-1/2}_{2,2}(\Gamma)$.}
@@ -6348,7 +6344,7 @@ identifies it with $(N^s_\Gamma)^\perp$.
   Rd.BoundedLipschitzDomain.toLp_traceSpaceEquivBoundaryBesov}
 \leanok
 \uses{def:boundary-besov-space, thm:trace-space-norm-equiv, thm:trace-l2-range, thm:trace-l2}
-The map $t \mapsto \tau_s t$ is an isomorphism of normed spaces of $(N^s_\Gamma)^\perp$ onto
+The map $w \mapsto \tau_s w$ is an isomorphism of normed spaces of $(N^s_\Gamma)^\perp$ onto
 $B^{s-1/2}_{2,2}(\Gamma)$.
 \end{theorem}
 
@@ -6359,7 +6355,10 @@ and bounded in both directions by \Cref{thm:trace-space-norm-equiv} for $\psi^0$
 \texttt{LinearEquiv.\allowbreak toContinuousLinearEquivOfBounds}).
 \end{proof}
 
-\begin{theorem}[The bounded linear right inverse of the trace]
+The next theorem gives the right inverse of the trace in McLean's trace theorem
+\cite[Theorem 3.38]{McLean}, for the trace space defined by orthogonality.
+
+\begin{theorem}[A bounded linear right inverse of the trace of $H^s(\Omega)$]
 \label{thm:trace-right-inverse}
 \lean{Rd.BoundedLipschitzDomain.traceRightInverse,
   Rd.BoundedLipschitzDomain.domainTrace_traceRightInverse,
@@ -6376,14 +6375,13 @@ $\gamma^s_{L_2} R_s g = g$ in $L_2(\Gamma)$ and $\|R_s g\| \leq C \|g\|_{B^{s-1/
 
 \begin{proof}
 \leanok
-$\gamma_s E_s = \mathrm{id}$ and $\|E_s t\| = \|t\|$ (\Cref{thm:trace-space-operators}),
+$\gamma_s E_s = \mathrm{id}$ and $\|E_s w\| = \|w\|$ (\Cref{thm:trace-space-operators}),
 $\gamma^s_{L_2} = \tau_s \circ \gamma_s$ (\Cref{def:trace-l2}), and
 $\|\tau_s^{-1} g\| \leq C \|g\|$ (\Cref{thm:trace-space-iso}).
 \end{proof}
 
-This is the right inverse of McLean's trace theorem \cite[Theorem 3.38]{McLean} for the trace
-space defined by orthogonality. \Cref{thm:trace-space-boundary-sobolev} replaces
-$B^{s-1/2}_{2,2}(\Gamma)$ by the Hilbert space $H^{s-1/2}(\Gamma)$.
+\Cref{thm:trace-space-boundary-sobolev} replaces $B^{s-1/2}_{2,2}(\Gamma)$ by the Hilbert space
+$H^{s-1/2}(\Gamma)$.
 
 \section{The Sobolev--Slobodeckij norm on the boundary}
 \label{sec:boundary-slobodeckij}
@@ -6493,7 +6491,7 @@ every $F$, measurable or not, and $1 \leq w_j \leq \sqrt{1 + M_j^2}$
 \uses{def:boundary-besov, def:boundary-partition, thm:surface-measure-null-sets,
   def:surface-measure}
 For every $g \colon V \to \C$, $g = \sum_j \psi_j g$ $\sigma$-almost everywhere. For all
-$1 \leq p \leq \infty$, every $s \in \R$, every $q \in [0, \infty]$ and every
+$1 \leq p \leq \infty$, every $s \in \R$, every $0 < q \leq \infty$ and every
 $g \in \Besov{s}{p}{q}(\Gamma)$, $g$ is almost everywhere strongly measurable for $\sigma$.
 \end{lemma}
 
@@ -6825,7 +6823,7 @@ $g \in \Besov{s}{p}{p}(\Gamma)$ if and only if $\|g\|_{\Besov{s}{p}{p}(\Gamma)} 
 \Cref{thm:boundary-slobodeckij-lower}.
 \end{proof}
 
-Thus $W^{s,p}(\Gamma) = \Besov{s}{p}{p}(\Gamma)$ inside $L_p(\Gamma)$ for $0 < s < 1$. For
+Thus $W^{t,p}(\Gamma) = \Besov{t}{p}{p}(\Gamma)$ inside $L_p(\Gamma)$ for $0 < t < 1$. For
 $p = 2$ and $t = s - 1/2$, $1/2 < s < 3/2$, this describes the trace space of $H^s(\Omega)$ with
 equivalent norms.
 
@@ -6914,9 +6912,6 @@ is injective by its first component, and the square of the $L_2$ norm of a produ
 the squares of the norms of the components.
 \end{proof}
 
-In Lean $\delta_j$ is defined for every $t$, as $0$ for $t \leq 0$, so that the norm below is
-defined for every $t$; for $t \leq 0$ it is the norm of $L_2(\Gamma)$.
-
 \begin{theorem}[The Gagliardo norm and the norm of $B^t_{2,2}(\Gamma)$]
 \label{thm:gagliardo-embedding-norm-equiv}
 \lean{Rd.BoundedLipschitzDomain.exists_enorm_gagliardoEmbedding_le,
@@ -6969,13 +6964,8 @@ It is a complex inner product space.
 \end{definition}
 
 The inner product is positive definite, since $\Phi$ is injective, and it is the only inner
-product with this norm, by the polarisation identity. In Lean $H^t(\Gamma)$ is a type synonym of
-$B^t_{2,2}(\Gamma)$ that carries the norm and the inner product of $\Phi$, for every $t \in \R$.
-For $0 < t < 1$ this is $H^t(\Gamma)$. For $t < 0$ the Lean type is $L_2(\Gamma)$ with its norm,
-and for $t \geq 1$ and $n \geq 2$ it is $\{0\}$, since $\omega_1(G, h)_2 = o(h)$ forces $G = 0$ in
-$L_2(H_j)$; the space $H^{-t}(\Gamma)$ is the dual space of \Cref{def:dual-boundary-sobolev}.
-Equal parameters $t = t'$ give the same space, and a linear isometric isomorphism identifies, for
-example, $H^{1 - 1/2}(\Gamma)$ with $H^{1/2}(\Gamma)$.
+product with this norm, by the polarisation identity. $H^t(\Gamma)$ is used for $0 < t < 1$;
+$H^{-t}(\Gamma)$ denotes the dual space of \Cref{def:dual-boundary-sobolev}.
 
 \begin{theorem}[$H^t(\Gamma)$ is a Hilbert space with the norm of $B^t_{2,2}(\Gamma)$]
 \label{thm:boundary-sobolev-norm}
@@ -7040,6 +7030,9 @@ Mathlib's \texttt{InnerProductSpace.\allowbreak toDual}).
 
 The identification depends on the chosen Hilbert norm, that is, on the charts and on $\psi^0$.
 
+The next theorem is McLean's trace theorem \cite[Theorem 3.38]{McLean} for the trace space
+defined by orthogonality.
+
 \begin{theorem}[The trace space of $H^s(\Omega)$ is $H^{s-1/2}(\Gamma)$]
 \label{thm:trace-space-boundary-sobolev}
 \lean{Rd.BoundedLipschitzDomain.traceSpaceEquivBoundarySobolev,
@@ -7052,28 +7045,26 @@ The identification depends on the chosen Hilbert norm, that is, on the charts an
   Rd.BoundedLipschitzDomain.ker_sobolevTrace}
 \leanok
 \uses{thm:trace-space-iso, thm:boundary-sobolev-norm, thm:trace-space-operators, def:trace-l2}
-Let $1/2 < s < 3/2$. The map $w \mapsto \tau_s w$ is an isomorphism of normed spaces of
-$(N^s_\Gamma)^\perp$ onto $H^{s-1/2}(\Gamma)$; for $s = 1$, of $(N^1_\Gamma)^\perp$ onto
-$H^{1/2}(\Gamma)$. The trace
-$\gamma^H_s = \tau_s \circ \gamma_s \colon H^s(\Omega) \to H^{s-1/2}(\Gamma)$ is a bounded linear
-operator with kernel $N^s_\Gamma$, whose value at $u$ is $\gamma^s_{L_2} u$ as a function in
-$L_2(\Gamma)$, and $E^H_s = E_s \circ \tau_s^{-1} \colon H^{s-1/2}(\Gamma) \to H^s(\Omega)$ is a
-bounded linear operator with $\gamma^H_s E^H_s g = g$ for every $g \in H^{s-1/2}(\Gamma)$.
+Let $1/2 < s < 3/2$. The map $w \mapsto \tau^H_s w$, which sends $w$ to $\tau_s w$ read as an
+element of $H^{s-1/2}(\Gamma)$, is an isomorphism of normed spaces of $(N^s_\Gamma)^\perp$ onto
+$H^{s-1/2}(\Gamma)$. The trace
+$\gamma^H_s = \tau^H_s \circ \gamma_s \colon H^s(\Omega) \to H^{s-1/2}(\Gamma)$ is a bounded
+linear operator with kernel $N^s_\Gamma$, whose value at $u$ is $\gamma^s_{L_2} u$ as a function
+in $L_2(\Gamma)$, and $E^H_s = E_s \circ (\tau^H_s)^{-1}$ is a bounded linear operator
+$H^{s-1/2}(\Gamma) \to H^s(\Omega)$ with $\gamma^H_s E^H_s g = g$ for every
+$g \in H^{s-1/2}(\Gamma)$.
 \end{theorem}
 
 \begin{proof}
 \leanok
 Compose the isomorphism of \Cref{thm:trace-space-iso} with the identity
-$B^{s-1/2}_{2,2}(\Gamma) \to H^{s-1/2}(\Gamma)$ (\Cref{thm:boundary-sobolev-norm}); for $s = 1$
-follow it by the identification of $H^{1 - 1/2}(\Gamma)$ with $H^{1/2}(\Gamma)$
-(\Cref{def:boundary-sobolev}). The kernel of
-$\gamma_s$ is $N^s_\Gamma$ and $\gamma_s E_s = \mathrm{id}$ (\Cref{thm:trace-space-operators}), and
-an isomorphism is injective; $\gamma^s_{L_2} = \tau_s \circ \gamma_s$ (\Cref{def:trace-l2}).
+$B^{s-1/2}_{2,2}(\Gamma) \to H^{s-1/2}(\Gamma)$ (\Cref{thm:boundary-sobolev-norm}). The kernel
+of $\gamma_s$ is $N^s_\Gamma$ and $\gamma_s E_s = \mathrm{id}$ (\Cref{thm:trace-space-operators}),
+and an isomorphism is injective; $\gamma^s_{L_2} = \tau_s \circ \gamma_s$ (\Cref{def:trace-l2}).
 \end{proof}
 
-This is McLean's trace theorem \cite[Theorem 3.38]{McLean} for the trace space defined by
-orthogonality: the trace maps $H^s(\Omega)$ onto $H^{s-1/2}(\Gamma)$, $1/2 < s < 3/2$, with a
-bounded linear right inverse, and the trace space is isomorphic to $H^{s-1/2}(\Gamma)$.
+So the trace maps $H^s(\Omega)$ onto $H^{s-1/2}(\Gamma)$, $1/2 < s < 3/2$, with a bounded linear
+right inverse, and the trace space is isomorphic to $H^{s-1/2}(\Gamma)$.
 
 \begin{theorem}[The trace into $H^{s-1/2}(\Gamma)$ is the Besov trace]
 \label{thm:sobolev-trace-besov}
@@ -7142,26 +7133,27 @@ dense range.
 \lean{Rd.BoundedLipschitzDomain.pivotDual_boundarySobolevToL2_apply_apply}
 \leanok
 \uses{thm:pivot-dual, lem:boundary-sobolev-dense-l2, def:boundary-l2, def:dual-boundary-sobolev}
-Let $0 < t < 1$ and $J_\Gamma : L_2(\Gamma) \to H^{-t}(\Gamma)$ the conjugate-linear bounded
-pivot dual of $\iota_\Gamma$ (\Cref{lem:boundary-sobolev-dense-l2}). Then for all
+Let $0 < t < 1$ and $\iota_\Gamma^\flat : L_2(\Gamma) \to H^{-t}(\Gamma)$ the conjugate-linear
+bounded pivot dual of $\iota_\Gamma$ (\Cref{lem:boundary-sobolev-dense-l2}). Then for all
 $g \in L_2(\Gamma)$ and $h \in H^t(\Gamma)$,
 \[
-  (J_\Gamma g)(h) = \int_\Gamma \overline{g} \, h \, d\sigma .
+  (\iota_\Gamma^\flat g)(h) = \int_\Gamma \overline{g} \, h \, d\sigma .
 \]
-Consequently $J_\Gamma$ is injective (\Cref{thm:pivot-dual},
-\Cref{lem:boundary-sobolev-dense-l2}), and $H^t(\Gamma) \subseteq L_2(\Gamma) \subseteq
-H^{-t}(\Gamma)$ is a Gelfand triple with pivot space $L_2(\Gamma)$: the pairing of
-$H^{-t}(\Gamma)$ with $H^t(\Gamma)$ extends the inner product of $L_2(\Gamma)$.
+The pivot dual $\iota_\Gamma^\flat$ is injective.
 \end{theorem}
 
 \begin{proof}
 \leanok
 \Cref{thm:pivot-dual} for $H = L_2(\Gamma)$ (\Cref{def:boundary-l2}) gives
-$(J_\Gamma g)(h) = \langle g, \iota_\Gamma h \rangle_{L_2(\Gamma)}$, where $\iota_\Gamma h$ is the
-function of $h$, and, with the dense range of \Cref{lem:boundary-sobolev-dense-l2}, the
-injectivity of $J_\Gamma$; $H^{-t}(\Gamma)$ is the dual of $H^t(\Gamma)$
-(\Cref{def:dual-boundary-sobolev}).
+$(\iota_\Gamma^\flat g)(h) = \langle g, \iota_\Gamma h \rangle_{L_2(\Gamma)}$, where
+$\iota_\Gamma h$ is the function of $h$, and, with the dense range of
+\Cref{lem:boundary-sobolev-dense-l2}, the injectivity of $\iota_\Gamma^\flat$; $H^{-t}(\Gamma)$
+is the dual of $H^t(\Gamma)$ (\Cref{def:dual-boundary-sobolev}).
 \end{proof}
+
+So $H^t(\Gamma) \subseteq L_2(\Gamma) \subseteq H^{-t}(\Gamma)$ is a Gelfand triple with pivot
+space $L_2(\Gamma)$: the pairing of $H^{-t}(\Gamma)$ with $H^t(\Gamma)$ extends the inner product
+of $L_2(\Gamma)$.
 
 \section{The extension theorem for Sobolev spaces}
 \label{sec:sobolev-extension}
@@ -7271,7 +7263,7 @@ $2^{j+1} 2^{-j} = 2$.
 \lean{Rd.LocalMeansBump.tlLocalNormOn}
 \leanok
 \uses{def:local-means}
-For a bump $g$, a measurable $W \subseteq V$, $L \in \N$, $s \in \R$, $q \in [0, \infty]$ and
+For a bump $g$, a measurable $W \subseteq V$, $L \in \N$, $s \in \R$, $0 < q \leq \infty$ and
 $f \in L_p(V)$, $1 \leq p < \infty$, let
 \[
   \|f\|^{W,L}_{s,q} = \Bigl\| x \mapsto \bigl\| \bigl(2^{js} \, |\mathbf 1_W (k_j * f)(x)|\bigr)_j
@@ -7558,7 +7550,7 @@ $\{x : \dist(x, V \setminus \Omega) \geq 2 \delta\}$ is a closed bounded subset 
 (\Cref{lem:patches}), hence compact; take $\chi$ of \Cref{lem:smooth-cutoff-compact}.
 \end{proof}
 
-\begin{lemma}[The patches of a bounded Lipschitz domain]
+\begin{lemma}[Sobolev extension from the patches]
 \label{lem:sobolev-patches}
 \lean{Rd.BoundedLipschitzDomain.exists_extendsSobolev_boundary,
   Rd.BoundedLipschitzDomain.exists_extendsSobolev_interior}
@@ -8235,7 +8227,7 @@ $H_+ \cap B(0, R)$ and $G \cap B(0, \|F^{-1}(0)\| + (1 + M) R)$, the second cont
 image of the first (\Cref{lem:lipschitz-flattening}).
 \end{proof}
 
-\begin{theorem}[The extension by reflection]
+\begin{theorem}[Weak derivatives of the extension by reflection]
 \label{thm:graph-reflection-extension}
 \lean{Rd.LipschitzGraph.reflectionDeriv, Rd.LipschitzGraph.sum_inner_mul_indicator_flatDeriv,
   Rd.LipschitzGraph.norm_reflectionDeriv_le,
@@ -9813,15 +9805,14 @@ $n^j_v = \langle \nabla\varphi_j, v \rangle - \langle v, e_j \rangle$ (\Cref{def
 and chart normals $\nu_j$ (\Cref{def:graph-normal}); $\sigma$ is the surface measure,
 $T_\Gamma \colon H^1(V) \to L_2(\Gamma)$ and $\gamma_{L_2} \colon H^1(\Omega) \to L_2(\Gamma)$ are
 the traces of \Cref{sec:surface-measure}, $\nu$ is the unit normal field
-(\Cref{def:boundary-normal}) and $N_\Gamma$ the trace kernel (\Cref{def:trace-kernel}). For
-$U \in H^1(V)$, $\partial_v U \in L_2(V)$ is the weak derivative of $\iota U$. Green's formula on
-$\Omega$ (Grisvard \cite[Theorem 1.5.3.1]{Grisvard}) is pasted from Green's formula on the graph
-domains
-(\Cref{thm:graph-green}) with a resolution of unity that equals one near $\Gamma$; the interior
-piece integrates to zero by integration by parts on $V$. The chart normals agree almost
+(\Cref{def:boundary-normal}) and $N_\Gamma = N^1_\Gamma$ the trace kernel (\Cref{def:trace-kernel}).
+For $U \in H^1(V)$, $\partial_v U \in L_2(V)$ is the weak derivative of $\iota U$. Green's formula
+on $\Omega$ (Grisvard \cite[Theorem 1.5.3.1]{Grisvard}) is pasted from Green's formula on the graph
+domains (\Cref{thm:graph-green}) with a resolution of unity that equals one near $\Gamma$; the
+interior piece integrates to zero by integration by parts on $V$. The chart normals agree almost
 everywhere on the overlaps of the balls, by Gauss--Green in two charts, so the boundary term is
-$\int_\Gamma \gamma_{L_2} u \, \gamma_{L_2} w \, \langle v, \nu \rangle \, d\sigma$. For $u$ in
-the trace kernel, Green's formula has no boundary term and gives the weak derivatives
+$\int_\Gamma \gamma_{L_2} u \, \gamma_{L_2} w \, \langle v, \nu \rangle \, d\sigma$. For $u$ in the
+trace kernel, Green's formula has no boundary term and gives the weak derivatives
 $\partial_v(\mathbf 1_\Omega \iota u) = \mathbf 1_\Omega \partial_v u$; the traces from both sides
 of each graph give the converse.
 
@@ -9983,7 +9974,7 @@ constant $M$, the lower graph domain $\Omega_-$ is the Lipschitz graph domain wi
 function $-\varphi$ and Lipschitz constant $M$.
 \end{definition}
 
-\begin{lemma}[The domain below the graph]
+\begin{lemma}[Properties of the domain below the graph]
 \label{lem:lower-graph-domain}
 \lean{Rd.LipschitzGraph.mem_lowerGraph_domain_iff,
   Rd.LipschitzGraph.notMem_domain_of_mem_lowerGraph_domain,
@@ -10436,7 +10427,7 @@ $\iota (r_{\Omega'} U) = \iota U$ almost everywhere on $\Omega'$
 (\Cref{prop:sobolev-vanishing-one}).
 \end{proof}
 
-\begin{lemma}[Chart pieces]
+\begin{lemma}[Chart pieces in $\tilde H^1$]
 \label{lem:tilde-space-chart-pieces}
 \lean{Rd.BoundedLipschitzDomain.mem_tildeSpace_of_mulLp_chart,
   Rd.BoundedLipschitzDomain.eq_sum_add_of_ae_eq_zero}
@@ -10633,6 +10624,9 @@ $\operatorname{Tr}_\Gamma \iota_s (U - W) = \operatorname{Tr}_\Gamma \iota_s U -
 (\Cref{lem:boundary-trace-restriction-sobolev}).
 \end{proof}
 
+The next theorem is McLean \cite[Theorem 3.40]{McLean} for $1/2 < s \leq 1$, which Hewett and
+Moiola \cite[Remark 2.6]{HewettMoiola} cite in this range.
+
 \begin{theorem}[The kernel of the trace of $H^s(\Omega)$, $1/2 < s \leq 1$]
 \label{thm:sobolev-trace-kernel-small}
 \lean{Rd.BoundedLipschitzDomain.exists_mem_zeroBoundarySpace_enorm_sub_le,
@@ -10676,11 +10670,9 @@ $u \in N^s_\Gamma$ lies in the closure of $H^s_0(\Omega)$, which is closed; the 
 is \Cref{lem:zero-boundary-trace-kernel}.
 \end{proof}
 
-This is McLean \cite[Theorem 3.40]{McLean} for $1/2 < s \leq 1$, which Hewett and Moiola
-\cite[Remark 2.6]{HewettMoiola} cite in this range. The proof here reduces the case $s < 1$ to
-$s = 1$ (\Cref{thm:trace-kernel-zero-boundary}) through the extension from the boundary and
-density; the reduction needs $s \leq 1$, where $\iota^\Omega_{s,1}$ maps $H^1_0(\Omega)$ into
-$H^s_0(\Omega)$ (\Cref{lem:restriction-inclusion}).
+The proof reduces the case $s < 1$ to $s = 1$ (\Cref{thm:trace-kernel-zero-boundary}) through
+the extension from the boundary and density; the reduction needs $s \leq 1$, where
+$\iota^\Omega_{s,1}$ maps $H^1_0(\Omega)$ into $H^s_0(\Omega)$ (\Cref{lem:restriction-inclusion}).
 
 \section{Compactly supported functions on Besov domains}
 \label{sec:besov-domain-localisation}
@@ -11516,7 +11508,6 @@ On a bounded Lipschitz domain the converse inclusion holds for $\theta < 1/2$ by
 inequalities. For $\theta > 1/2$, and for $\theta = 1/2$ with $q < \infty$, the Dirichlet spaces
 carry the boundary condition; for $\theta = 1/2$ and $q = 2$ the interpolation space is the
 Lions--Magenes space $H^{1/2}_{00}(\Omega)$ \cite[Chapter~1, Theorem~11.7]{LionsMagenes1972}.
-Both descriptions are later goals.
 
 \chapter{Besov spaces on compact manifolds}
 \label{ch:manifolds}
@@ -12116,9 +12107,10 @@ into $\R^n$ is smooth.
   Rd.SmoothDomain.GlobalAtlas.indicator_piece}
 \leanok
 \uses{def:global-atlas, def:chart-pieces}
-The extension by $0$ is an isometry $L_p(\overline{\Omega}) \to L_p(\R^n)$. On the half-space
-$\{y_0 \geq 0\}$, the $i$-th piece of $g$ is $(\psi_i\, \mathrm{ext}\, g) \circ \tau_i$. The
-hyperplane $\{y_0 = 0\}$ is a null set, and $\tau_i$ preserves the Lebesgue measure.
+The extension by $0$, $\mathrm{ext} \colon L_p(\overline{\Omega}) \to L_p(\R^n)$, is an isometry.
+On the half-space $\{y_0 \geq 0\}$, the $i$-th piece of $g$ is
+$(\psi_i\, \mathrm{ext}\, g) \circ \tau_i$. The hyperplane $\{y_0 = 0\}$ is a null set, and
+$\tau_i$ preserves the Lebesgue measure.
 \end{lemma}
 
 \begin{proof}
@@ -12221,7 +12213,7 @@ $H_0$, and $(T G)|_{H_0} = T^\partial(G|_{H_0})$ for every $G : \R^n \to \C$. Fo
 atlases $A, A'$ the restriction of $T_{ij}$ is $T^\partial_{ij}$.
 \end{definition}
 
-\begin{definition}[Besov spaces on the boundary]
+\begin{definition}[Besov spaces on the boundary of a manifold]
 \label{def:manifold-boundary-besov}
 \lean{Manifold.BesovAtlas.boundaryPiece, Manifold.BesovAtlas.MemAtlasBoundaryBesov}
 \leanok
@@ -12970,7 +12962,7 @@ local, and uniformly elliptic in the charts, which needs in addition the bounds 
 charts on the compact supports, are remarks outside the formalisation.
 The test functions $w$ are arbitrary near the boundary of $M$, so the boundary
 condition is the natural one, as for the Neumann problem (\Cref{thm:neumann-weak-eigen}). The form
-$a_A$ depends on the atlas; the Laplace--Beltrami operator of a Riemannian metric is a later goal.
+$a_A$ depends on the atlas.
 
 \begin{corollary}[$H^1(M)$ in the eigenbasis of the chart form]
 \label{cor:chart-sobolev-spectral}

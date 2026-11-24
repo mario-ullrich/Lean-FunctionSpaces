@@ -47,14 +47,14 @@ equivalent to the norm of `B^{1/2}_{2,2}(Γ)`
   unity (`Rd.BoundedLipschitzDomain.mem_traceKer_iff`). The restriction to `Ω` keeps the boundary
   trace (`Rd.BoundedLipschitzDomain.boundaryTrace_restrictProj`).
 * **The trace space of `H^s(Ω)`** is its orthogonal complement
-  (`Rd.BoundedLipschitzDomain.TraceSpace`), with the trace `Rd.BoundedLipschitzDomain.domainTrace`,
-  the orthogonal projection, and the extension `Rd.BoundedLipschitzDomain.domainExtend`, the
-  inclusion: `domainTrace ∘ domainExtend = id`, both have norm at most `1`, the kernel of the trace
-  is the trace kernel, and `H^s(Ω) ⧸ traceKer` is isometrically isomorphic to the trace space
-  (`Rd.BoundedLipschitzDomain.quotientEquivTraceSpace`). Two elements of `H^s(Ω)` have the same
-  trace iff their boundary traces agree almost everywhere on `Γ`
-  (`Rd.BoundedLipschitzDomain.domainTrace_eq_iff`), and the boundary traces of the elements of the
-  trace space are the functions of `B^{s-1/2}_{2,2}(Γ)`
+  (`Rd.BoundedLipschitzDomain.TraceSpace`), with the trace `γ_s`
+  (`Rd.BoundedLipschitzDomain.domainTrace`), the orthogonal projection, and the extension `E_s`
+  (`Rd.BoundedLipschitzDomain.domainExtend`), the inclusion: `γ_s ∘ E_s = id`, both have norm at
+  most `1`, the kernel of the trace is the trace kernel, and `H^s(Ω) ⧸ traceKer` is isometrically
+  isomorphic to the trace space (`Rd.BoundedLipschitzDomain.quotientEquivTraceSpace`). Two
+  elements of `H^s(Ω)` have the same trace iff their boundary traces agree almost everywhere on
+  `Γ` (`Rd.BoundedLipschitzDomain.domainTrace_eq_iff`), and the boundary traces of the elements
+  of the trace space are the functions of `B^{s-1/2}_{2,2}(Γ)`
   (`Rd.BoundedLipschitzDomain.memBoundaryBesov_domainExtend`,
   `Rd.BoundedLipschitzDomain.exists_traceSpace_of_memBoundaryBesov`).
 * **The dual of the trace space** (`Rd.BoundedLipschitzDomain.DualTraceSpace`) is

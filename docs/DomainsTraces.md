@@ -193,17 +193,18 @@ extension from the boundary, one operator for every smoothness, so that the corr
   be those of `[0, 1]^d` moved by `x ↦ a + L x` (`Cube.cubeSplineSchemeAt`). Then
   `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞` iff `f` agrees on `Ω` with a
   function in the approximation space `A^s_q` of these splines
-  (`Rd.BoundedLipschitzDomain.exists_memApprox_cubeSplineSchemeAt_iff`), iff `f = ∑_k b_k` on `Ω`
-  with tensor splines `b_k` of level `k` on `Q` and `‖(2^(ks) ‖b_k‖_{L_p(Q)})_k‖_{ℓ_q} < ∞`
+  (`Rd.BoundedLipschitzDomain.exists_memApprox_cubeSplineSchemeAt_iff`), iff `f = ∑_k b_k` on `Ω`,
+  the series converging in `L_p(Q)`, with tensor splines `b_k` of level `k` on `Q` and
+  `‖(2^(ks) ‖b_k‖_{L_p(Q)})_k‖_{ℓ_q} < ∞`
   (`Rd.HasBesovExtension.exists_cubeSplineBlocksAt_iff`). Both hold for every measurable `Ω ⊆ Q`
   with the extension property, where the function `G` in `A^s_q` can be chosen with
   `‖G‖_{A^s_q} ≤ C (‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q})` for one `C < ∞`
   (`Rd.HasBesovExtension.exists_cubeSplineAt_le`) and the modulus may have any order `r' > s`
   (`Rd.HasBesovExtension.exists_memApprox_cubeSplineSchemeAt_iff_of_order_of_hasBesovExtension`),
   and one direction holds for every measurable `Ω ⊆ Q` and `0 ≤ s < r - 1 + 1/p`
-  (`Rd.modNormOn_lt_top_of_memApprox_cubeSplineSchemeAt`). The best approximations `E_k(f)` of
-  `f` in `L_p(Ω)` by the restrictions of the splines of level `k` (`Rd.domainSplineScheme`) then
-  satisfy
+  (`Rd.modNormOn_lt_top_of_memApprox_cubeSplineSchemeAt`). The errors `E_k(f)` of best
+  approximation of `f` in `L_p(Ω)` by the restrictions of the splines of level `k`
+  (`Rd.domainSplineScheme`) then satisfy
   `‖(2^(ks) E_k(f))_k‖_{ℓ_q} ≤ C (‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q})`
   (`Rd.HasBesovExtension.exists_approxNormDyadic_domainSplineScheme_le`). On `[0, 1]^d` itself the
   tensor splines describe the restrictions of `B^s_{p,q}(ℝ^d)`
@@ -261,7 +262,8 @@ extension from the boundary, one operator for every smoothness, so that the corr
 * **Besov spaces on `Γ` and the trace operator.** With `Ω` and `Γ` as above and the surface
   measure `σ` of `Γ`, let `1 ≤ p ≤ ∞` and `1 ≤ q ≤ ∞`. `B^s_{p,q}(Ω)` is the space of the
   `f ∈ L_p(V)` vanishing outside `Ω` with
-  `N_Ω(f) = ‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`, normed by `N_Ω`
+  `N_Ω(f) = ‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞` for differences of a
+  fixed order `r`, normed by `N_Ω`
   (`Rd.BoundedLipschitzDomain.DomainBesov`), and `B^t_{p,q}(Γ)` is the space of the
   `g ∈ L_p(Γ)` with a finite quasi-norm by chart pieces for a fixed resolution of unity, normed by
   it (`Rd.BoundedLipschitzDomain.BoundaryBesov`); both are Banach spaces
@@ -275,10 +277,11 @@ extension from the boundary, one operator for every smoothness, so that the corr
   every extension `F` of `f` with a finite norm on `V` (`Rd.BoundedLipschitzDomain.besovTrace`,
   `Rd.BoundedLipschitzDomain.besovTrace_ae`; Schneider–Vybíral, Theorem 4.11; Mayboroda,
   Theorem 1.1.3(i)), and it is onto (`Rd.BoundedLipschitzDomain.besovTrace_surjective`). For
-  `0 < t < 1`, `g ↦ 1_Ω ∑_j ζ_j E_j G_j` is a bounded linear right inverse
+  `0 < t < 1`, `g ↦ 1_Ω ∑_j ζ_j E_j G_j`, with the chart pieces `G_j` of `g`, the extensions
+  `E_j` of the graph domains and cut-offs `ζ_j`, is a bounded linear right inverse
   `B^t_{p,q}(Γ) → B^{t+1/p}_{p,q}(Ω)` (`Rd.BoundedLipschitzDomain.besovExtend`,
-  `Rd.BoundedLipschitzDomain.toLp_besovTrace_besovExtend`); it is linear because the extensions
-  `E_j` of the graph domains are (`Rd.LipschitzGraph.graphExtension_add`).
+  `Rd.BoundedLipschitzDomain.toLp_besovTrace_besovExtend`); it is linear because the `E_j` are
+  (`Rd.LipschitzGraph.graphExtension_add`).
 * **`H^1` on bounded Lipschitz domains.** Let `Ω` be a bounded Lipschitz domain with boundary `Γ`.
   `f ∈ L_2(V)` lies in `H^1(Ω)` if `f = F` almost everywhere on `Ω` for some `F ∈ W^1_2(V)`
   (`Rd.BoundedLipschitzDomain.MemSobolevOn`, a definition by extension); `H^1(Ω)` contains `0`, is
@@ -366,7 +369,7 @@ extension from the boundary, one operator for every smoothness, so that the corr
   is at most `√2` times this `B^1_{2,2}` quantity (`Rd.modNorm_half_one_le`), so
   `‖ι U‖_2 + ∑_k 2^(k/2) ω_2(ι U, 2^(-k))_2 ≤ √2 C ‖U‖` (`Rd.modNorm_half_one_le_norm`); for
   `1/2 < s < 2` and `U ∈ H^s(V)` with `L_2` function `ι_s U` (`Rd.sobolevToL2`) the same
-  quantity of `ι_s U` is at most `c C_s ‖U‖` with explicit constants
+  quantity of `ι_s U` is at most `c_s C_{s,2} ‖U‖` with explicit constants
   (`Rd.modNorm_half_one_le_norm_of_lt`), so the trace of `H^s(V)` on a Lipschitz graph is
   bounded (`Rd.LipschitzGraph.exists_enorm_graphTrace_sobolevToL2_le`). Let `Ω` be a bounded
   Lipschitz domain with boundary `Γ`, `1/2 < s < 3/2`, and `H^s(Ω)` the Hilbert space of the
@@ -379,12 +382,12 @@ extension from the boundary, one operator for every smoothness, so that the corr
   orthogonal complement (`Rd.BoundedLipschitzDomain.TraceSpace`), with the trace `γ_s`, the
   orthogonal projection, and the extension `E_s`, the inclusion
   (`Rd.BoundedLipschitzDomain.domainTrace`, `Rd.BoundedLipschitzDomain.domainExtend`). By this
-  definition `γ_s E_s = id`, `‖γ_s u‖ ≤ ‖u‖`, `‖E_s t‖ = ‖t‖`, the kernel of `γ_s` is the trace
+  definition `γ_s E_s = id`, `‖γ_s u‖ ≤ ‖u‖`, `‖E_s w‖ = ‖w‖`, the kernel of `γ_s` is the trace
   kernel, and `H^s(Ω) ⧸ ker γ_s` is isometrically isomorphic to the trace space
   (`Rd.BoundedLipschitzDomain.domainTrace_domainExtend`,
   `Rd.BoundedLipschitzDomain.ker_domainTrace`, `Rd.BoundedLipschitzDomain.quotientEquivTraceSpace`).
   Two elements of `H^s(Ω)` have the same trace iff their boundary traces agree almost everywhere on
-  `Γ` (`Rd.BoundedLipschitzDomain.domainTrace_eq_iff`), and `t ↦ Tr_Γ(E_s t)` maps the trace space
+  `Γ` (`Rd.BoundedLipschitzDomain.domainTrace_eq_iff`), and `w ↦ Tr_Γ(E_s w)` maps the trace space
   onto `B^{s-1/2}_{2,2}(Γ)` modulo null sets of `Γ`
   (`Rd.BoundedLipschitzDomain.memBoundaryBesov_domainExtend`,
   `Rd.BoundedLipschitzDomain.exists_traceSpace_of_memBoundaryBesov`,
@@ -435,7 +438,7 @@ extension from the boundary, one operator for every smoothness, so that the corr
   (`Rd.BoundedLipschitzDomain.boundaryTraceL2`, `Rd.BoundedLipschitzDomain.traceL2`,
   `Rd.BoundedLipschitzDomain.boundaryTraceL2_apply_ae`,
   `Rd.BoundedLipschitzDomain.traceL2_injective`, `Rd.BoundedLipschitzDomain.ker_boundaryTraceL2`);
-  every `g ∈ B^{s-1/2}_{2,2}(Γ)` is `τ t` for some `t`, so `B^{s-1/2}_{2,2}(Γ) ⊆ L_2(Γ)`
+  every `g ∈ B^{s-1/2}_{2,2}(Γ)` is `τ w` for some `w`, so `B^{s-1/2}_{2,2}(Γ) ⊆ L_2(Γ)`
   (`Rd.BoundedLipschitzDomain.exists_traceL2_ae_eq`,
   `Rd.BoundedLipschitzDomain.memLp_of_memBoundaryBesov`). The outward unit normal field
   `ν(y) = ∑_j ψ_j(y) ν_j(P_j y)`, with the chart normals `ν_j` and the canonical resolution of
@@ -444,13 +447,13 @@ extension from the boundary, one operator for every smoothness, so that the corr
   `Rd.BoundedLipschitzDomain.norm_outwardNormal_le`).
 * **The norm of the trace space.** Let `Ω` be a bounded Lipschitz domain with boundary `Γ`,
   `1/2 < s < 3/2`, `Ω.TraceSpace s` the trace space of `H^s(Ω)` and `τ_s` its trace into
-  `L_2(Γ)`. For every resolution of unity `ψ` and `t` in the trace space, `‖t‖` is the least norm
-  `‖U‖` of a `U ∈ H^s(V)` with the boundary trace of `t`
+  `L_2(Γ)`. For every resolution of unity `ψ` and `w` in the trace space, `‖w‖` is the least norm
+  `‖U‖` of a `U ∈ H^s(V)` with the boundary trace of `w`
   (`Rd.BoundedLipschitzDomain.enorm_eq_iInf`), the quotient norm of `γ_s(H^s(Ω))`, which McLean,
   Theorem 3.38, shows to be equivalent to his chart norm, and there is `C < ∞` with
-  `‖t‖ ≤ C ‖τ_s t‖_{B^{s-1/2}_{2,2}(Γ)}` and `‖τ_s t‖_{B^{s-1/2}_{2,2}(Γ)} ≤ C ‖t‖`
+  `‖w‖ ≤ C ‖τ_s w‖_{B^{s-1/2}_{2,2}(Γ)}` and `‖τ_s w‖_{B^{s-1/2}_{2,2}(Γ)} ≤ C ‖w‖`
   (`Rd.BoundedLipschitzDomain.exists_traceL2_norm_equiv`). Every `g ∈ B^{s-1/2}_{2,2}(Γ)` is the
-  boundary trace of some `E_s t` with `‖t‖ ≤ C ‖g‖_{B^{s-1/2}_{2,2}(Γ)}`
+  boundary trace of some `E_s w` with `‖w‖ ≤ C ‖g‖_{B^{s-1/2}_{2,2}(Γ)}`
   (`Rd.BoundedLipschitzDomain.exists_traceSpace_of_memBoundaryBesov_le`), and the range of `τ_s`
   is `B^{s-1/2}_{2,2}(Γ)` (`Rd.BoundedLipschitzDomain.mem_range_traceL2_iff`). `τ_s` is an
   isomorphism of the trace space of `H^s(Ω)` onto the Banach space `B^{s-1/2}_{2,2}(Γ)`

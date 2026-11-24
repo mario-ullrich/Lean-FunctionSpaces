@@ -721,7 +721,7 @@ $\|h\|_p^p = \int h^p \, d\mu$ for every measurable $h : X \to [0, \infty]$.
 For every family $a$ in $[0, \infty]$ indexed by $I$, every $u \in [0, \infty]$ and every
 $r > 0$, $\|(a_i^r)_i\|_{\ell_u} = \|a\|_{\ell_{ur}}^r$.
 
-For every $q \in [0, \infty]$ the function $x \mapsto \|(g_i(x))_i\|_{\ell_q}$ is measurable.
+For every $0 < q \leq \infty$ the function $x \mapsto \|(g_i(x))_i\|_{\ell_q}$ is measurable.
 \end{lemma}
 
 \begin{proof}
@@ -915,8 +915,8 @@ Pointwise $2^{js} |h_j(x)| \leq \|(2^{is} |h_i(x)|)_i\|_{\ell_q}$ (\Cref{lem:lq-
   MeasureTheory.tendsto_eLpNorm_lqNorm_ite_le}
 \leanok
 \uses{lem:lq-basic, lem:lp-norm-nonnegative}
-For every measure space $(X, \mu)$, all $p, q \in [0, \infty]$, every set $P \subseteq \N$ and
-all measurable $g_j \colon X \to [0, \infty]$, $j \in \N$, the function
+For every measure space $(X, \mu)$, every $p \in [0, \infty]$, every $0 < q \leq \infty$, every
+set $P \subseteq \N$ and all measurable $g_j \colon X \to [0, \infty]$, $j \in \N$, the function
 $x \mapsto \|(\mathbf 1_P(j) \, g_j(x))_j\|_{\ell_q}$ is measurable and
 \[
   \bigl\| x \mapsto \|(\mathbf 1_P(j) \, g_j(x))_j\|_{\ell_q} \bigr\|_p
@@ -1008,7 +1008,7 @@ families with values in $[0, \infty]$; only (3) and (5) below involve the weight
   MeasureTheory.eLpNorm_lqNorm_dyadicWeight_mono_smoothness}
 \leanok
 \uses{lem:lq-basic, lem:lp-norm-nonnegative, lem:lp-norm-homogeneity}
-Let $(X, \mu)$ be a measure space, $p, q \in [0, \infty]$, $s \leq t$ in $\R$ and
+Let $(X, \mu)$ be a measure space, $p \in [0, \infty]$, $0 < q \leq \infty$, $s \leq t$ in $\R$ and
 $u_j, v_j, w_j \colon X \to [0, \infty]$, $j \in \N$, with $u_j$ and $w_j$ measurable, and write
 $N_q(w) = \bigl\| x \mapsto \|(w_j(x))_j\|_{\ell_q} \bigr\|_p$ and
 $2^{\cdot s} u = (2^{js} u_j)_j$.
@@ -2791,13 +2791,13 @@ $|g_0| \leq \|(g_j)_j\|_{\ell_2}$ and $\|(v(x), 0, 0, \dots)\|_{\ell_2} = |v(x)|
 \label{ch:gelfand-triples}
 
 Throughout this chapter inner products are linear in the second argument, as in Mathlib. In the
-first two sections $V$ and $H$ are Hilbert spaces over $\R$ or $\C$, $V^*$ is the space of
-bounded linear functionals on $V$, and $\iota : V \to H$ is a bounded linear operator. If $\iota$
-is injective with dense range, $V \subseteq H \subseteq V^*$ is a Gelfand triple, often called a
-rigged Hilbert space, with pivot space $H$ \cite{Brezis2011}; for separable $V$ it is an
+first section $X$ and $H$ are Hilbert spaces over $\R$ or $\C$, $X^*$ is the space of
+bounded linear functionals on $X$, and $\iota : X \to H$ is a bounded linear operator. If $\iota$
+is injective with dense range, $X \subseteq H \subseteq X^*$ is a Gelfand triple, often called a
+rigged Hilbert space, with pivot space $H$ \cite{Brezis2011}; for separable $X$ it is an
 evolution triple in Zeidler's sense \cite{ZeidlerIIA}. Riesz's representation theorem identifies
-$H$ with its dual, and the duality of $V^*$ and $V$ extends the inner product of $H$. The chapter
-defines the map $H \to V^*$ of the triple (\Cref{def:pivot-dual}), shows that it is injective
+$H$ with its dual, and the duality of $X^*$ and $X$ extends the inner product of $H$. The chapter
+defines the map $H \to X^*$ of the triple (\Cref{def:pivot-dual}), shows that it is injective
 exactly when $\iota$ has dense range (\Cref{thm:pivot-dual}), and gives a test for dense range
 in $L_2$ (\Cref{lem:l2-dense-smooth}). The function spaces give the triples
 $H^s(\R^d) \subseteq L_2(\R^d) \subseteq H^{-s}(\R^d)$ (\Cref{thm:rd-gelfand-triple}),
@@ -2819,7 +2819,7 @@ $(K^m)^\perp = (K^\perp)^m$ for every subspace $K$, and the dual of $E^m$ is $(E
 \label{lem:dense-range-orthogonal}
 \lean{ContinuousLinearMap.denseRange_iff_orthogonal_range_eq_bot}
 \leanok
-Let $X$ be a topological vector space over $\R$ or $\C$ and $T : X \to H$ a continuous linear
+Let $Y$ be a topological vector space over $\R$ or $\C$ and $T : Y \to H$ a continuous linear
 operator into a Hilbert space. Then $T$ has dense range if and only if
 $(\operatorname{ran} T)^\perp = \{0\}$.
 \end{lemma}
@@ -2835,13 +2835,13 @@ eq\_\allowbreak top\_\allowbreak iff}).
 \label{def:pivot-dual}
 \lean{ContinuousLinearMap.pivotDual}
 \leanok
-The pivot dual of $\iota$ is $J = R_V \circ \iota^* : H \to V^*$, the adjoint
-$\iota^* : H \to V$ followed by Riesz's conjugate-linear isometry $R_V : V \to V^*$,
-$R_V(x)(v) = \langle x, v \rangle_V$ (Mathlib's \texttt{ContinuousLinearMap.\allowbreak adjoint}
+The pivot dual of $\iota$ is $\iota^\flat = R_X \circ \iota^* : H \to X^*$, the adjoint
+$\iota^* : H \to X$ followed by Riesz's conjugate-linear isometry $R_X : X \to X^*$,
+$R_X(x)(v) = \langle x, v \rangle_X$ (Mathlib's \texttt{ContinuousLinearMap.\allowbreak adjoint}
 and \texttt{InnerProductSpace.\allowbreak toDual}). It is conjugate-linear and bounded.
 \end{definition}
 
-\begin{theorem}[The pivot dual]
+\begin{theorem}[Properties of the pivot dual]
 \label{thm:pivot-dual}
 \lean{ContinuousLinearMap.pivotDual_apply_apply, ContinuousLinearMap.pivotDual_apply_apply_self,
   ContinuousLinearMap.norm_pivotDual_apply, ContinuousLinearMap.norm_pivotDual,
@@ -2850,40 +2850,42 @@ and \texttt{InnerProductSpace.\allowbreak toDual}). It is conjugate-linear and b
   MeasureTheory.L2.pivotDual_apply_apply_eq_integral}
 \leanok
 \uses{def:pivot-dual, lem:dense-range-orthogonal}
-For all $g \in H$ and $v, w \in V$,
+For all $g \in H$ and $v, w \in X$,
 \[
-  (J g)(v) = \langle g, \iota v \rangle_H \quad\text{and}\quad
-  (J \iota v)(w) = \langle \iota v, \iota w \rangle_H ,
+  (\iota^\flat g)(v) = \langle g, \iota v \rangle_H \quad\text{and}\quad
+  (\iota^\flat \iota v)(w) = \langle \iota v, \iota w \rangle_H ,
 \]
-$\|J g\| = \|\iota^* g\| \leq \|\iota\| \, \|g\|$, and $\|J\| = \|\iota\|$. The kernel of $J$ is
-$(\operatorname{ran} \iota)^\perp$. The pivot dual $J$ is injective if and only if $\iota$ has
-dense range, and $J \circ \iota : V \to V^*$ is injective if and only if $\iota$ is injective.
-If $H = L_2(\mu)$ with scalar values, then $(J g)(v) = \int \overline{g} \, \iota v \, d\mu$.
+$\|\iota^\flat g\| = \|\iota^* g\| \leq \|\iota\| \, \|g\|$, and $\|\iota^\flat\| = \|\iota\|$. The
+kernel of $\iota^\flat$ is $(\operatorname{ran} \iota)^\perp$. The pivot dual $\iota^\flat$ is
+injective if and only if $\iota$ has dense range, and $\iota^\flat \circ \iota : X \to X^*$ is
+injective if and only if $\iota$ is injective. If $H = L_2(\mu)$ with scalar values, then
+$(\iota^\flat g)(v) = \int \overline{g} \, \iota v \, d\mu$.
 \end{theorem}
 
 \begin{proof}
 \leanok
-$(J g)(v) = \langle \iota^* g, v \rangle_V = \langle g, \iota v \rangle_H$ (Mathlib's
+$(\iota^\flat g)(v) = \langle \iota^* g, v \rangle_X = \langle g, \iota v \rangle_H$ (Mathlib's
 \texttt{ContinuousLinearMap.\allowbreak adjoint\_\allowbreak inner\_\allowbreak left}); for
 $H = L_2(\mu)$ this is $\int \overline{g} \, \iota v \, d\mu$ (Mathlib's
-\texttt{MeasureTheory.\allowbreak L2.\allowbreak inner\_\allowbreak def}). $R_V$ is an
+\texttt{MeasureTheory.\allowbreak L2.\allowbreak inner\_\allowbreak def}). $R_X$ is an
 isometry, and so is $\iota \mapsto \iota^*$ (Mathlib's \texttt{ContinuousLinearMap.\allowbreak
-adjoint} is a linear isometric equivalence), which gives the norms. Since $R_V$ is injective,
-$J g = 0$ if and only if $\iota^* g = 0$, and $\ker \iota^* = (\operatorname{ran} \iota)^\perp$
-(Mathlib's \texttt{ContinuousLinearMap.\allowbreak orthogonal\_\allowbreak range}); by
-\Cref{lem:dense-range-orthogonal} this kernel is $\{0\}$ if and only if $\iota$ has dense range.
-Let $\iota$ be injective. If $J \iota v = 0$, then $\|\iota v\|^2 = (J \iota v)(v) = 0$, so
-$\iota v = 0$ and, $\iota$ being injective, $v = 0$. Conversely, $\iota v = \iota w$ gives
-$J \iota v = J \iota w$, so injectivity of $J \circ \iota$ forces $v = w$. Equivalently,
-$J \circ \iota = R_V \circ (\iota^* \iota)$ with $R_V$ injective, and $\iota^* \iota$ is injective
-if and only if $\iota$ is (Mathlib's \texttt{ContinuousLinearMap.\allowbreak
+adjoint} is a linear isometric equivalence), which gives the norms. Since $R_X$ is injective,
+$\iota^\flat g = 0$ if and only if $\iota^* g = 0$, and
+$\ker \iota^* = (\operatorname{ran} \iota)^\perp$ (Mathlib's \texttt{ContinuousLinearMap.\allowbreak
+orthogonal\_\allowbreak range}); by \Cref{lem:dense-range-orthogonal} this kernel is $\{0\}$ if
+and only if $\iota$ has dense range. Let $\iota$ be injective. If $\iota^\flat \iota v = 0$, then
+$\|\iota v\|^2 = (\iota^\flat \iota v)(v) = 0$, so $\iota v = 0$ and, $\iota$ being injective,
+$v = 0$. Conversely, $\iota v = \iota w$ gives $\iota^\flat \iota v = \iota^\flat \iota w$, so
+injectivity of $\iota^\flat \circ \iota$ forces $v = w$. Equivalently,
+$\iota^\flat \circ \iota = R_X \circ (\iota^* \iota)$ with $R_X$ injective, and $\iota^* \iota$ is
+injective if and only if $\iota$ is (Mathlib's \texttt{ContinuousLinearMap.\allowbreak
 adjoint\_\allowbreak comp\_\allowbreak self\_\allowbreak injective\_\allowbreak iff}).
 \end{proof}
 
-If $\iota$ is injective with dense range, then $J$ and $J \circ \iota$ are injective, and
-$V \subseteq H \subseteq V^*$ through $\iota$ and $J$ is the Gelfand triple with pivot space $H$:
-by the first identity, the functional $J g$ evaluated at $v$ is the inner product of $g$ and
-$\iota v$ in $H$.
+If $\iota$ is injective with dense range, then $\iota^\flat$ and $\iota^\flat \circ \iota$ are
+injective, and $X \subseteq H \subseteq X^*$ through $\iota$ and $\iota^\flat$ is the Gelfand triple
+with pivot space $H$: by the first identity, the functional $\iota^\flat g$ evaluated at $v$ is the
+inner product of $g$ and $\iota v$ in $H$.
 
 \section{Dense subspaces of \texorpdfstring{$L_2$}{L\_2}}
 \label{sec:l2-dense-smooth}
@@ -2898,7 +2900,7 @@ Let $E$ be a finite-dimensional real normed space, $\mu$ a locally finite Borel 
 $U \subseteq E$ open with $\mu(E \setminus U) = 0$. Let $1 \leq p \leq \infty$ and $F$ a real
 Banach space. If $f \in L_p(\mu; F)$ satisfies $\int \psi f \, d\mu = 0$ for every smooth
 $\psi : E \to \R$ with compact support in $U$, then $f = 0$. Every continuous linear operator
-$T : X \to L_2(\mu)$ from a complex topological vector space into the complex-valued
+$T : Y \to L_2(\mu)$ from a complex topological vector space into the complex-valued
 $L_2(\mu)$ whose range contains, up to $\mu$-null sets, every smooth $\psi : E \to \R$ with
 compact support in $U$ has dense range.
 \end{lemma}

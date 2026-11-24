@@ -2019,14 +2019,14 @@ fourierInv\_\allowbreak fourier\_\allowbreak eq}).
 \lean{Rd.tendsto_sobolevConv_dilate}
 \leanok
 \uses{def:sobolev-convolution, thm:approx-identity, lem:dilate}
-For every integrable $\eta$ with $\int \eta = 1$, every filter, every family $(c_i)$ of nonzero
-reals with $c_i \to \infty$, every $s \in \R$ and every $U \in H^s(V)$, $\eta_{c_i} * U \to U$
-in $H^s(V)$, where $\eta_c(x) = c^n \eta(c x)$ and $n = \dim V$ (\Cref{lem:dilate}).
+For every integrable $\eta$ with $\int \eta = 1$, every $s \in \R$ and every $U \in H^s(V)$,
+$\eta_c * U \to U$ in $H^s(V)$ as $c \to \infty$, where $\eta_c(x) = c^n \eta(c x)$ and
+$n = \dim V$ (\Cref{lem:dilate}).
 \end{theorem}
 
 \begin{proof}
 \leanok
-$\|\eta_{c_i} * U - U\|_{H^s} = \|\eta_{c_i} * J_s U - J_s U\|_2$
+$\|\eta_c * U - U\|_{H^s} = \|\eta_c * J_s U - J_s U\|_2$
 (\Cref{def:sobolev-convolution}), which tends to $0$ (\Cref{thm:approx-identity}).
 \end{proof}
 
@@ -2092,8 +2092,8 @@ $\iota_s U = F$.
 \begin{proof}
 \leanok
 $F$ lies in the approximation space $A^s_2$ of the band-limited scheme (\Cref{thm:rd-besov}),
-hence in $H^s(V)$ (\Cref{cor:sobolev-two-besov}); let $U$ be $F$ as an element of the bundled
-space. Its tempered distribution is that of $F$, so $\iota_s U = F$ (\Cref{lem:sobolev-to-l2}).
+hence in $H^s(V)$ (\Cref{cor:sobolev-two-besov}); let $U$ be the element of $H^s(V)$ with the
+tempered distribution $F$. Then $\iota_s U = F$ (\Cref{lem:sobolev-to-l2}).
 \end{proof}
 
 \begin{lemma}[Smooth cut-offs in $H^s(V)$]

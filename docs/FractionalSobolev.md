@@ -4,43 +4,42 @@ Part of [Characterizations of Function Spaces](../README.md). Blueprint: part *D
 manifolds*, chapter *Fractional Sobolev spaces on Lipschitz domains*.
 
 The Sobolev spaces of an open set `Ω ⊆ V` are built inside Mathlib's `H^s(ℝ^d)` for every real `s`
-([Lipschitz domains and traces](DomainsTraces.md)): `H^s(Ω)` is the space of restrictions,
-`H̃^s(Ω)` the closure of the test functions of `Ω` in `H^s(ℝ^d)`, and `H^s_0(Ω)` the closure of
-their restrictions in `H^s(Ω)`. This block compares `H̃^s(Ω)` with `H^s_0(Ω)`, following Hewett and
+([Lipschitz domains and traces](DomainsTraces.md)): `H^s(Ω)` is the space of restrictions, `H̃^s(Ω)`
+the closure of the test functions of `Ω` in `H^s(ℝ^d)`, and `H^s_0(Ω)` the closure of their
+restrictions in `H^s(Ω)`. This block compares `H̃^s(Ω)` with `H^s_0(Ω)`, following Hewett and
 Moiola. The inclusions `H^s(ℝ^d) ⊆ H^t(ℝ^d)`, `t ≤ s`, of [Sobolev spaces on `ℝ^d`](SobolevRd.md)
-keep test functions and vanishing on `Ω`, so they give bounded injective inclusions
-`H^s(Ω) ⊆ H^t(Ω)` with dense range that map `H^s_0(Ω)` into `H^t_0(Ω)`. Restriction maps
+preserve the test functions and the elements vanishing on `Ω`, so they give bounded injective
+inclusions `H^s(Ω) ⊆ H^t(Ω)` with dense range that map `H^s_0(Ω)` into `H^t_0(Ω)`. Restriction maps
 `H̃^s(Ω)` into `H^s_0(Ω)`; it is an isomorphism as soon as the zero extension bound
 `‖U‖ ≤ C ‖U + W‖` holds for the test functions `U` of `Ω` and the `W` that vanish on `Ω`, and then
-`‖U‖ ≤ C ‖U|_Ω‖` on `H̃^s(Ω)`. The derivatives `H^{s+1}(ℝ^d) → H^s(ℝ^d)` keep test functions and
-vanishing on `Ω`, and the exact recursion of the norms carries the bound from `s` to `s + 1` with
-the same constant. At `s = 0` the bound holds with
-`C = 1` on every open set, since the `L_2` functions of `U` and `W` have disjoint supports; hence
-restriction is an isometry of `H̃^m(Ω)` onto `H^m_0(Ω)` for every open `Ω` and every `m ∈ ℕ`. For
-`s ≥ 0` the `L_2` functions of `H̃^s(Ω)` vanish outside `Ω`, so restriction is injective on
-`H̃^s(Ω)` for every open `Ω`. On a bounded Lipschitz domain, conversely, every element of
-`H^s(ℝ^d)`, `s ≥ 0`, whose `L_2` function vanishes outside `Ω` lies in `H̃^s(Ω)`: mollification
-converges in `H^s(ℝ^d)` and smooth cut-offs keep `H^s(ℝ^d)` ([Sobolev spaces on
-`ℝ^d`](SobolevRd.md)), and the cone mollifiers of the charts push such an element into
-`H̃^s(Ω)`. The indicator `1_Ω` of a bounded Lipschitz domain is a pointwise multiplier of
-`B^s_{p,q}(ℝ^d)` for `0 < s < 1/p`: the steps `h` that cross the boundary start in a layer of
-width `≲ ‖h‖` along it, so `1_Ω` turns smooth atoms into atoms of smoothness `1/p`. At
-`p = q = 2` this gives the zero extension bound and `H̃^s(Ω) = H^s_0(Ω) = H^s(Ω)` for
-`0 ≤ s < 1/2`. For `1/2 < s < 1` a Hardy inequality takes its place: a function that vanishes
-near the boundary of a Lipschitz graph domain, divided by the `s`-th power of its height above
-the graph, is controlled by its first differences in the domain, through a dyadic Hardy
-inequality on the vertical lines. Extension by zero from a graph domain is then bounded on such
-functions, with a constant independent of how close to the boundary they vanish, and the charts
-of a bounded Lipschitz domain give the zero extension bound. Lifted through derivatives, the two
-cases give `H̃^s(Ω) ≅ H^s_0(Ω)` for every `s ≥ 0` with `s - 1/2 ∉ ℕ_0`. For `1 ≤ s < 3/2` the
-zero extension of a function of `H^s(Ω)` with vanishing trace lies in `H^s(ℝ^d)`: Green's formula
-gives its derivatives, the zero extensions of the derivatives, and these lie in `H^{s-1}(ℝ^d)`,
-since `s - 1 < 1/2` and `1_Ω` keeps `H^{s-1}(ℝ^d)`. So the kernel of the trace of `H^s(Ω)` is
-`H^s_0(Ω)` for every `1/2 < s < 3/2`, and `H^s(Ω) ⧸ H^s_0(Ω) ≅ H^{s-1/2}(Γ)`. For `ℂ^m`-valued
-functions the spaces are the Hilbert direct sums `X^m` of `m` copies, as in McLean's treatment of
-systems, and the traces, the isomorphisms and the duals act componentwise; the orthogonal
-complement of `K^m` is `(Kᗮ)^m`, so the orthogonal complement of the kernel of the vector trace in
-`H^s(Ω)^m` is the sum of `m` copies of the trace space of `H^s(Ω)`.
+`‖U‖ ≤ C ‖U|_Ω‖` on `H̃^s(Ω)`. The derivatives `H^{s+1}(ℝ^d) → H^s(ℝ^d)` preserve the test functions
+and the elements vanishing on `Ω`, and the exact recursion of the norms carries the bound from `s`
+to `s + 1` with the same constant. At `s = 0` the bound holds with `C = 1` on every open set, since
+the `L_2` functions of `U` and `W` have disjoint supports; hence restriction is an isometry of
+`H̃^m(Ω)` onto `H^m_0(Ω)` for every open `Ω` and every `m ∈ ℕ = {0, 1, 2, …}`. For `s ≥ 0` the `L_2`
+functions of `H̃^s(Ω)` vanish outside `Ω`, so restriction is injective on `H̃^s(Ω)` for every open
+`Ω`. On a bounded Lipschitz domain, conversely, every element of `H^s(ℝ^d)`, `s ≥ 0`, whose `L_2`
+function vanishes outside `Ω` lies in `H̃^s(Ω)`: mollification converges in `H^s(ℝ^d)` and smooth
+cut-offs keep `H^s(ℝ^d)` ([Sobolev spaces on `ℝ^d`](SobolevRd.md)), and the cone mollifiers of the
+charts push such an element into `H̃^s(Ω)`. The indicator `1_Ω` of a bounded Lipschitz domain is a
+pointwise multiplier of `B^s_{p,q}(ℝ^d)` for `0 < s < 1/p`: the steps `h` that cross the boundary
+start in a layer of width `≲ ‖h‖` along it, so `1_Ω` turns smooth atoms into atoms of smoothness
+`1/p`. At `p = q = 2` this gives the zero extension bound and `H̃^s(Ω) ≅ H^s_0(Ω) = H^s(Ω)` for
+`0 ≤ s < 1/2`. For `1/2 < s < 1` a Hardy inequality takes its place: a function that vanishes near
+the boundary of a Lipschitz graph domain, divided by the `s`-th power of its height above the graph,
+is controlled by its first differences in the domain, through a dyadic Hardy inequality on the
+vertical lines. Extension by zero from a graph domain is then bounded on such functions, with a
+constant independent of how close to the boundary they vanish, and the charts of a bounded Lipschitz
+domain give the zero extension bound. Lifted through derivatives, the two cases give
+`H̃^s(Ω) ≅ H^s_0(Ω)` for every `s ≥ 0` with `s - 1/2 ∉ ℕ`. For `1 ≤ s < 3/2` the zero extension of a
+function of `H^s(Ω)` with vanishing trace lies in `H^s(ℝ^d)`: Green's formula gives its derivatives,
+the zero extensions of the derivatives, and these lie in `H^{s-1}(ℝ^d)`, since `s - 1 < 1/2` and
+`1_Ω` keeps `H^{s-1}(ℝ^d)`. So the kernel of the trace of `H^s(Ω)` is `H^s_0(Ω)` for every
+`1/2 < s < 3/2`, and `H^s(Ω) ⧸ H^s_0(Ω) ≅ H^{s-1/2}(Γ)`. For `ℂ^m`-valued functions the spaces are
+the Hilbert direct sums `X^m` of `m` copies, as in McLean's treatment of systems, and the traces,
+the isomorphisms and the duals act componentwise; the orthogonal complement of `K^m` is `(Kᗮ)^m`, so
+the orthogonal complement of the kernel of the vector trace in `H^s(Ω)^m` is the sum of `m` copies
+of the trace space of `H^s(Ω)`.
 
 ## Main results
 
@@ -54,14 +53,14 @@ span of the test functions of `Ω` in `H^s(V)` (`Rd.testSpan`), and `U ↦ U|_Ω
   `Rd.sobolevInclusion_ofTest`), has dense range (`Rd.denseRange_sobolevInclusion`), satisfies
   `ι_{t,s} W ∈ N^t(Ω)` iff `W ∈ N^s(Ω)` (`Rd.sobolevInclusion_mem_vanishOn_iff`), and maps
   `T^s(Ω)` into `T^t(Ω)` (`Rd.sobolevInclusion_mem_testSpan`). The inclusion
-  `H^s(Ω) ⊆ H^t(Ω)`, `u ↦ (ι_{t,s} u)|_Ω` (`Rd.restrictionInclusion`), is injective, has norm
-  at most `1`, satisfies `ι_{t,s}(U|_Ω) = (ι_{t,s} U)|_Ω` for `U ∈ H^s(V)`, has dense range, and
-  maps `H^s_0(Ω)` into `H^t_0(Ω)` (`Rd.restrictionInclusion_injective`,
+  `ι^Ω_{t,s} : H^s(Ω) → H^t(Ω)`, `u ↦ (ι_{t,s} u)|_Ω` (`Rd.restrictionInclusion`), is injective,
+  has norm at most `1`, satisfies `ι^Ω_{t,s}(U|_Ω) = (ι_{t,s} U)|_Ω` for `U ∈ H^s(V)`, has dense
+  range, and maps `H^s_0(Ω)` into `H^t_0(Ω)` (`Rd.restrictionInclusion_injective`,
   `Rd.norm_restrictionInclusion_apply_le`, `Rd.restrictionInclusion_restrictProj`,
   `Rd.denseRange_restrictionInclusion`, `Rd.restrictionInclusion_mem_zeroBoundarySpace`).
-* **Derivatives keep test functions and vanishing.** For every real `s` and `v ∈ V`, the
-  derivative `∂_v : H^{s+1}(V) → H^s(V)` maps a test function `φ` of `Ω` to the test function
-  `∂_v φ`, `T^{s+1}(Ω)` into `T^s(Ω)` and `N^{s+1}(Ω)` into `N^s(Ω)`
+* **Derivatives preserve test functions, `T^s(Ω)` and `N^s(Ω)`.** For every real `s` and
+  `v ∈ V`, the derivative `∂_v : H^{s+1}(V) → H^s(V)` maps a test function `φ` of `Ω` to the
+  test function `∂_v φ`, `T^{s+1}(Ω)` into `T^s(Ω)` and `N^{s+1}(Ω)` into `N^s(Ω)`
   (`Rd.sobolevLineDeriv_ofTest`, `Rd.sobolevLineDeriv_mem_testSpan`,
   `Rd.sobolevLineDeriv_mem_vanishOn`).
 * **Injectivity for `s ≥ 0`.** For `s ≥ 0` and every `U ∈ H̃^s(Ω)`, the `L_2` function of `U`
@@ -102,7 +101,7 @@ span of the test functions of `Ω` in `H^s(V)` (`Rd.testSpan`), and `U ↦ U|_Ω
   (`Rd.BoundedLipschitzDomain.exists_volume_switchSet_inter_closedBall_le`), and `1_Ω a` is a
   regular atom of exponent `1/p` for every smooth atom `a` of order `1`
   (`Rd.BoundedLipschitzDomain.exists_isRegularAtom_indicator`).
-* **`H̃^s(Ω) = H^s_0(Ω) = H^s(Ω)` for `0 ≤ s < 1/2`.** On a bounded Lipschitz domain the zero
+* **`H̃^s(Ω) ≅ H^s_0(Ω) = H^s(Ω)` for `0 ≤ s < 1/2`.** On a bounded Lipschitz domain the zero
   extension bound holds at every `0 ≤ s < 1/2`
   (`Rd.BoundedLipschitzDomain.exists_hasZeroExtensionBound_of_lt_half`), every `U ∈ H^s(V)` has a
   zero extension `U' ∈ H̃^s(Ω)` with `ι_s U' = 1_Ω ι_s U` and `U'|_Ω = U|_Ω`
@@ -121,17 +120,18 @@ span of the test functions of `Ω` in `H^s(V)` (`Rd.testSpan`), and `U ↦ U|_Ω
   `N_{s,Ω'}(G) = ‖G‖_{L_2(Ω')} + ‖(2^(ks) ω_1(G, 2^(-k), Ω')_2)_k‖_{ℓ_2}`. Every `G ∈ L_2(V)`
   that vanishes almost everywhere on `{x ∈ Ω' : η(x) < ε}` for some `ε > 0` satisfies
   `∫_{Ω'} |G|² / min(η, 1)^(2s) ≤ (1 + K_s 2^(2s+2)) N_{s,Ω'}(G)²`
-  (`Rd.LipschitzGraph.lintegral_div_min_graphHeight_le_modNormOn`; for `1/2 < s < 1` a weaker,
-  directional form of Dyda 2004, Theorem 1.1), and there is `C < ∞`, independent of `ε`, with
+  (`Rd.LipschitzGraph.lintegral_div_min_graphHeight_le_modNormOn`; for `1/2 < s < 1` a weaker
+  form of Dyda 2004, Theorem 1.1, with moduli of smoothness, the height and an additional `L_2`
+  term), and there is `C < ∞`, independent of `ε`, with
   `‖1_{Ω'} G‖_2 + ‖(2^(ks) ω_1(1_{Ω'} G, 2^(-k))_2)_k‖_{ℓ_2} ≤ C N_{s,Ω'}(G)`
   (`Rd.LipschitzGraph.exists_modNorm_indicatorLp_le_of_vanish`). On a bounded Lipschitz domain
   the zero extension bound holds at every `1/2 < s < 1`
   (`Rd.BoundedLipschitzDomain.exists_hasZeroExtensionBound_of_half_lt`; McLean, Theorem 3.33;
   Hewett–Moiola, Lemma 2.1), so restriction is an isomorphism of `H̃^s(Ω)` onto `H^s_0(Ω)`.
-* **`H̃^s(Ω) ≅ H^s_0(Ω)` for `s ≥ 0`, `s - 1/2 ∉ ℕ_0`.** The zero extension bound at `s` gives
-  the bound with the same constant at `s + m` for every `m ∈ ℕ_0`
+* **`H̃^s(Ω) ≅ H^s_0(Ω)` for `s ≥ 0`, `s - 1/2 ∉ ℕ`.** The zero extension bound at `s` gives
+  the bound with the same constant at `s + m` for every `m ∈ ℕ`
   (`Rd.HasZeroExtensionBound.add_natCast`). On a bounded Lipschitz domain the zero extension
-  bound holds at every `s ≥ 0` with `s - 1/2 ∉ ℕ_0`
+  bound holds at every `s ≥ 0` with `s - 1/2 ∉ ℕ`
   (`Rd.BoundedLipschitzDomain.exists_hasZeroExtensionBound`), and restriction is an isomorphism
   of `H̃^s(Ω)` onto `H^s_0(Ω)` with `‖U|_Ω‖ ≤ ‖U‖ ≤ C ‖U|_Ω‖`
   (`Rd.BoundedLipschitzDomain.tildeEquivZeroBoundaryOfNeHalf`; McLean, Theorem 3.33; the case
@@ -172,8 +172,8 @@ span of the test functions of `Ω` in `H^s(V)` (`Rd.testSpan`), and `U ↦ U|_Ω
   bounded linear right inverse (`Rd.BoundedLipschitzDomain.vecBesovTrace`,
   `Rd.BoundedLipschitzDomain.vecBesovTrace_surjective`, `Rd.BoundedLipschitzDomain.vecBesovExtend`).
   Restriction is an isometric isomorphism of `H̃^l(Ω')^m` onto `H^l_0(Ω')^m` for every open `Ω'` and
-  `l ∈ ℕ_0` (`Rd.vecTildeEquivZeroBoundaryNat`) and an isomorphism of `H̃^s(Ω)^m` onto `H^s_0(Ω)^m`
-  for `s ≥ 0`, `s - 1/2 ∉ ℕ_0` (`Rd.BoundedLipschitzDomain.vecTildeEquivZeroBoundaryOfNeHalf`). The
+  `l ∈ ℕ` (`Rd.vecTildeEquivZeroBoundaryNat`) and an isomorphism of `H̃^s(Ω)^m` onto `H^s_0(Ω)^m`
+  for `s ≥ 0`, `s - 1/2 ∉ ℕ` (`Rd.BoundedLipschitzDomain.vecTildeEquivZeroBoundaryOfNeHalf`). The
   dual of `H̃^s(Ω')^m` is `H^{-s}(Ω')^m`, with `ℓ(U) = ∑_i [W_i, U_i]` (`Rd.vecDualEquiv`,
   `Rd.vecDualEquiv_apply`), and Riesz identifies the dual of `H^t(Γ)^m`, `0 < t < 1`, with
   `H^t(Γ)^m`, whose inner product is the sum of the chart-wise Gagliardo inner products of the
@@ -186,14 +186,14 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 
 | Result | Lean | Human-checked | Files |
 |---|---|---|---|
-| The inclusions `H^s(ℝ^d) ⊆ H^t(ℝ^d)` on Schwartz and test functions, their dense range, the `L_2` functions of Schwartz functions, vanishing on `Ω` and the span of the test functions under the inclusions, the injective inclusion `H^s(Ω) ⊆ H^t(Ω)` with norm at most `1`, dense range and `H^s_0(Ω) ⊆ H^t_0(Ω)`, and derivatives that keep test functions and vanishing on `Ω` | ✅ | ✗ | `Domains/Sobolev/SobolevRestrictionInclusions` |
+| The inclusions `H^s(ℝ^d) ⊆ H^t(ℝ^d)` on Schwartz and test functions, their dense range, the `L_2` functions of Schwartz functions, vanishing on `Ω` and the span of the test functions under the inclusions, the injective inclusion `H^s(Ω) ⊆ H^t(Ω)` with norm at most `1`, dense range and `H^s_0(Ω) ⊆ H^t_0(Ω)`, and derivatives that preserve the test functions, `T^s(Ω)` and `N^s(Ω)` | ✅ | ✗ | `Domains/Sobolev/SobolevRestrictionInclusions` |
 | The injectivity of restriction on `H̃^s(Ω)` for `s ≥ 0`, the zero extension bound, the isomorphism `H̃^s(Ω) ≅ H^s_0(Ω)` under it, its lift from `s` to `s + 1` and to `s + m` for `m ∈ ℕ`, and the isometry `H̃^m(Ω) ≅ H^m_0(Ω)` for every open set and `m ∈ ℕ` | ✅ | ✗ | `Domains/Sobolev/ZeroExtensionBound` |
 | Smoothing with compact support, cone mollifiers, mollified functions and functions with compact support in `Ω` as elements of `H̃^s(Ω)`, localised functions, the chart pieces, and `H̃^s(Ω)`, `s ≥ 0`, on a bounded Lipschitz domain as the functions of `H^s(ℝ^d)` that vanish outside `Ω` | ✅ | ✗ | `Domains/Sobolev/TildeSpaceSupport` |
 | Switch sets of a step and crossing points on the boundary, the height above a Lipschitz graph and its continuity, slabs along a graph, and the boundary layer `\|S_h(Ω) ∩ B̄(c, ρ)\| ≤ C ‖h‖ ρ^(d-1)` of a bounded Lipschitz domain, also at the scales of atoms | ✅ | ✗ | `Domains/Lipschitz/BoundaryLayers` |
 | Differences of cut-off functions, indicators of smooth atoms as regular atoms of exponent `1/p`, and the indicator of a bounded Lipschitz domain as a pointwise multiplier of `B^s_{p,q}(ℝ^d)` for `0 < s < 1/p`, `1 ≤ p < ∞`, `1 ≤ q ≤ ∞` | ✅ | ✗ | `Domains/Lipschitz/IndicatorMultiplier` |
 | The zero extension bound for `0 ≤ s < 1/2`, zero extensions in `H^s(ℝ^d)`, functions of `H^s(Ω)`, `s ≥ 0`, whose zero extension lies in `H^s(ℝ^d)` as elements of `H^s_0(Ω)`, `H^s_0(Ω) = H^s(Ω)` and the isomorphism `H̃^s(Ω) ≅ H^s(Ω)` for `0 ≤ s < 1/2` | ✅ | ✗ | `Domains/Sobolev/SobolevZeroExtension` |
 | Integrals in graph coordinates, vertical forms and vertical difference quotients, the Hardy inequality `∫_{Ω'} \|G\|² / min(η, 1)^(2s) ≤ (1 + K_s 2^(2s+2)) N_{s,Ω'}(G)²` on a Lipschitz graph domain for `s > 1/2` and `G` vanishing near the graph, differences of the extension by zero, and the extension by zero from a graph domain | ✅ | ✗ | `Domains/Lipschitz/GraphHardy` |
-| The cut-off by the charts, extensions of test functions that vanish on `Ω` outside a compact set, localised functions that vanish near the graphs, the zero extension bound for `1/2 < s < 1` on a bounded Lipschitz domain, the bound for every `s ≥ 0` with `s - 1/2 ∉ ℕ_0`, and the isomorphism `H̃^s(Ω) ≅ H^s_0(Ω)` for these `s` | ✅ | ✗ | `Domains/Sobolev/TildeZeroBoundaryEquiv` |
+| The cut-off by the charts, extensions of test functions that vanish on `Ω` outside a compact set, localised functions that vanish near the graphs, the zero extension bound for `1/2 < s < 1` on a bounded Lipschitz domain, the bound for every `s ≥ 0` with `s - 1/2 ∉ ℕ`, and the isomorphism `H̃^s(Ω) ≅ H^s_0(Ω)` for these `s` | ✅ | ✗ | `Domains/Sobolev/TildeZeroBoundaryEquiv` |
 | Zero extensions of the trace kernel of `H^s(Ω)` for `1 ≤ s < 3/2`, `ker γ_s = H^s_0(Ω)` for `1/2 < s < 3/2`, vanishing trace as a zero extension in `H^s(ℝ^d)`, and `H^s(Ω) ⧸ H^s_0(Ω)` isometric to the trace space of `H^s(Ω)` and isomorphic to `H^{s-1/2}(Γ)` | ✅ | ✗ | `Domains/Traces/TraceKernelGeneral` |
 | The spaces `H^s(Ω)^m`, `H̃^s(Ω)^m`, `H^s_0(Ω)^m`, the trace space of `H^s(Ω)^m` and `H^t(Γ)^m`, the vector traces into the trace space, onto `H^{s-1/2}(Γ)^m` and onto `B^{s-1/p}_{p,q}(Γ)^m` with their right inverses, the kernels of the traces of `H^s(Ω)^m`, `H̃^s(Ω)^m ≅ H^s_0(Ω)^m`, and the duals of `H̃^s(Ω)^m` and `H^t(Γ)^m` | ✅ | ✗ | `Domains/Sobolev/VectorSobolevSpaces` |
 
