@@ -365,7 +365,8 @@ variable {f : Lp ℂ p vol} {b : ℕ → Lp ℂ p vol} {e : ℕ → ℝ≥0∞}
 
 /-- **Two near-best steps are close**: for `0 < p ≤ 1`, if `‖f - b_j‖_p ≤ e_j` for every `j` and
 `e` decreases, then `‖b_{j+1} - b_j‖_p^p ≤ 2 e_j^p` (`MeasureTheory.Lp.enorm_sub_rpow_le_two_mul`
-with `‖f - b_{j+1}‖_p ≤ e_{j+1} ≤ e_j`). -/
+with `‖f - b_{j+1}‖_p ≤ e_{j+1} ≤ e_j`). For a general couple this is
+`InterpCouple.norm0_sub_succ_rpow_le_of_nearBest`. -/
 theorem enorm_sub_rpow_le_of_nearBest (hp1 : p ≤ 1) (hbe : ∀ j, ‖f - b j‖ₑ ≤ e j)
     (he : Antitone e) (j : ℕ) : ‖b (j + 1) - b j‖ₑ ^ p.toReal ≤ 2 * e j ^ p.toReal :=
   Lp.enorm_sub_rpow_le_two_mul hp1 ((hbe (j + 1)).trans (he j.le_succ)) (hbe j)
@@ -531,7 +532,9 @@ variable {s : ℝ} {q : ℝ≥0∞}
 
 /-- **Near-best steps exist**: for every `f ∈ L_p[0, 1]` and `s` there are `ℱ_j`-measurable
 `b_j ∈ L_p` with `‖f - b_j‖_p ≤ E(2^j, f) + ‖f‖_p 2^(-j(s+1))` in the step couple
-(`InterpCouple.exists_norm0_sub_le_eFunctional_add`); for `‖f‖_p = 0` take `b_j = 0`. -/
+(`InterpCouple.exists_norm0_sub_le_eFunctional_add`); for `‖f‖_p = 0` take `b_j = 0`. This is
+`InterpCouple.exists_nearBest_eFunctional` for the step couple, with the complexity bound
+`N₁(b_j) ≤ 2^j` read as `ℱ_j`-measurability. -/
 theorem exists_nearBest_stepCouple (f : Lp ℂ p vol) (s : ℝ) :
     ∃ b : ℕ → Lp ℂ p vol, (∀ j, b j ∈ lpMeas ℂ ℝ (dyadicFiltration j) p vol) ∧
       ∀ j, ‖f - b j‖ₑ ≤
@@ -545,7 +548,8 @@ theorem exists_nearBest_stepCouple (f : Lp ℂ p vol) (s : ℝ) :
     (mul_ne_zero hf0 (ENNReal.dyadicWeight_ne_zero (-(s + 1)) j))
   exact ⟨b, fun j => mem_lpMeas_of_stepCouple_norm1_le (hb1 j), hb0⟩
 
-/-- The tolerances `e_j = E(2^j, f) + ‖f‖_p 2^(-j(s+1))` decrease for `s ≥ -1`. -/
+/-- The tolerances `e_j = E(2^j, f) + ‖f‖_p 2^(-j(s+1))` decrease for `s ≥ -1`, the step couple's
+case of `InterpCouple.antitone_eFunctional_add_dyadicWeight`. -/
 theorem antitone_eFunctional_stepCouple_add (hs : -1 ≤ s) (f : Lp ℂ p vol) :
     Antitone fun j : ℕ =>
       (stepCouple p).eFunctional ((2 ^ j : ℕ) : ℝ≥0∞) f + ‖f‖ₑ * dyadicWeight (-(s + 1)) j :=
