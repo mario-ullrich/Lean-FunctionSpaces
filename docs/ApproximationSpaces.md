@@ -289,6 +289,7 @@ Paths are relative to `ApproximationSpaces/`, without `.lean`.
 | Approximation spaces as interpolation spaces `A^s_q = (X, A^r_∞)_{s/r,q}`, reiteration of approximation spaces, the sandwich principle | ✅ | ✗ | `Interpolation/ApproxSpaces` |
 | The E-functional of a couple, the spaces `E_{α,q}` and their dyadic norm, complexity couples, `E_{s,q} = A^s_q` for schemes | ✅ | ✗ | `Interpolation/EFunctional` |
 | Moduli compatible with a `ρ`-normed couple, coincidence of `E_{s,q}` with the classical space | ✅ | ✗ | `Interpolation/EFunctionalModuli` |
+| Homogeneity of the E-functional, embeddings of the dyadic norms in the smoothness and the fine index, additive maps, near-best sequences and their blocks, Pietsch's form of a couple and its equivalence with the dyadic norm | ✅ | ✗ | `Interpolation/EFunctionalSpaces` |
 | Moduli compatible with a scheme, coincidence with the classical space, interpolation of the classical spaces | ✅ | ✗ | `Moduli` |
 | Block decompositions, series moved up by a number of levels, projection schemes and dyadic blocks | ✅ | ✗ | `Decompositions/Blocks`, `Decompositions/Projection` |
 | Synthesis with decay, atomic systems, `b^s_{p,q}`, atomic characterisation | ✅ | ✗ | `Decompositions/Synthesis`, `Decompositions/Atomic` |

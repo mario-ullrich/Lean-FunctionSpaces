@@ -3044,12 +3044,18 @@ $\ell_{q/\rho}$ applies, since $\|(z_k^\rho)_k\|_{\ell_{q/\rho}} = \|z\|_{\ell_q
 \label{lem:steps-into-l1}
 \lean{Haar.eq_of_dyadicIndex_eq, Haar.memLp_of_stronglyMeasurable_dyadicFiltration,
   Haar.memLp_of_mem_lpMeas, Haar.mem_lpMeas_of_le, Haar.sum_setLIntegral_haarDyadicInterval,
+  Haar.le_dyadicWeight_mul_setLIntegral_of_dyadicIndex,
   Haar.setLIntegral_enorm_le_of_dyadicIndex, Haar.eLpNorm_one_le_of_mem_lpMeas}
 \leanok
 \uses{def:dyadic-filtration, lem:condexp-partition, cor:haar-besov, def:pp-scheme,
   lem:pp-bookkeeping, def:step-couple}
-Let $j \in \N$ and let $G$ be constant on every $I_{j,n}$, $n \in \Z$. Let $S$ be a measurable
-union of such intervals. Then
+Let $j \in \N$. For every $x \in [0, 1)$, every $F \colon \R \to [0, \infty]$ constant on the
+interval $I$ of level $j$ that contains $x$ and every measurable set $S \supseteq I$,
+\[
+  F(x) \leq 2^j \int_{S \cap [0, 1]} F .
+\]
+Let $G$ be constant on every $I_{j,n}$, $n \in \Z$, and let $S$ be a measurable union of such
+intervals. Then
 \[
   \int_{S \cap [0, 1]} |G| \leq 2^{j(1/p - 1)} \Bigl( \int_{S \cap [0, 1]} |G|^p \Bigr)^{1/p} .
 \]
@@ -3059,8 +3065,9 @@ $0 < r \leq \infty$, and $\|a\|_1 \leq 2^{j(1/p - 1)} \|a\|_p$.
 
 \begin{proof}
 \leanok
-For $x \in S \cap [0, 1)$ the interval $I$ of level $j$ containing $x$ lies in $S$, so
-$|G(x)|^p 2^{-j} = \int_I |G|^p \leq J$ with $J = \int_{S \cap [0, 1]} |G|^p$. Hence
+Since $I \subseteq [0, 1)$ has length $2^{-j}$ and $F = F(x)$ on $I$,
+$F(x) 2^{-j} = \int_I F \leq \int_{S \cap [0, 1]} F$. For $x \in S \cap [0, 1)$ this interval
+lies in $S$, so $|G(x)|^p \leq 2^j J$ with $J = \int_{S \cap [0, 1]} |G|^p$. Hence
 $|G| = |G|^p |G|^{1-p} \leq |G|^p (2^j J)^{(1-p)/p}$ on $S \cap [0, 1)$; integrate. An
 $\mathcal{F}_j$-measurable function is constant on every $I_{j,n}$
 (\Cref{lem:condexp-partition}), and on $[0, 1]$ it is a step function with $2^j$ values
@@ -3069,6 +3076,29 @@ $\mathcal{F}_j$-measurable function is constant on every $I_{j,n}$
 
 With the values $c_n$ of $a$ on the intervals of level $j$, the last inequality reads
 $2^{-j} \sum_n |c_n| \leq 2^{-j} (\sum_n |c_n|^p)^{1/p}$.
+
+\begin{lemma}[Sup norm of steps]
+\label{lem:steps-sup-bound}
+\lean{Haar.eLpNorm_top_le_of_mem_lpMeas}
+\leanok
+\uses{def:dyadic-filtration, lem:condexp-partition, lem:steps-into-l1}
+Let $j \in \N$. For every $\mathcal{F}_j$-measurable function $a$ on $[0, 1]$ and every
+$0 < r \leq \infty$,
+\[
+  \|a\|_\infty \leq 2^{j/r} \|a\|_r ,
+\]
+with $1/\infty = 0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $r = \infty$ both sides agree. For $r < \infty$, $a$ has a representative constant on every
+$I_{j,n}$ (\Cref{lem:condexp-partition}), and the first inequality of \Cref{lem:steps-into-l1}
+with $F = |a|^r$ and $S = \R$ gives $|a(x)|^r \leq 2^j \|a\|_r^r$ for every $x \in [0, 1)$.
+\end{proof}
+
+For $r < \infty$, with the values $c_n$ of $a$ on the intervals of level $j$, the inequality reads
+$\max_n |c_n| \leq (\sum_n |c_n|^r)^{1/r}$.
 
 \begin{definition}[Level norms of the Haar expansion]
 \label{def:haar-level-norm}

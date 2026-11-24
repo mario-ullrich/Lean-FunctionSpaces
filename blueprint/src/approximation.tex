@@ -3539,6 +3539,163 @@ N_0(v))$, at the cost $C_q$, and use $C_q \geq 1$.
 
 Part (4) is~\cite[Lemma~7.1.6]{BerghLofstrom} in dyadic form.
 
+The next three lemmas and Pietsch's form of \Cref{def:e-pietsch-norm} collect what the Besov
+spaces of a scheme of functions in $L_p$, $0 < p \leq \infty$, need from the $E$-functional. Their
+hypotheses on $N_0$ are homogeneity and, for the blocks of near-best sequences, evenness and the
+$\rho$-triangle inequality, which $\|\cdot\|_p$ satisfies with $\rho = \min(p, 1)$.
+
+\begin{lemma}[Homogeneity, embeddings and maps]
+\label{lem:e-method-calculus}
+\lean{InterpCouple.eFunctional_smul_le, InterpCouple.eNormDyadic_smul_le,
+  InterpCouple.eNormDyadic_zero, InterpCouple.eNormDyadic_mono_exponent,
+  InterpCouple.eNormDyadic_le_of_lt, InterpCouple.eFunctional_map_le}
+\leanok
+\uses{def:e-method, lem:lq-reindex}
+Let $A = (N_0, N_1)$ be a couple on $U$ and let $u \in U$.
+\begin{enumerate}
+  \item Let $U$ be a real vector space, let $N_1(0) = 0$, let $N_0(ca) \leq |c| \, N_0(a)$ for
+    all $c \in \R$ and $a \in U$, and let $N_1(ca) \leq N_1(a)$ for all $c \neq 0$ and
+    $a \in U$. Then for all $c, s \in \R$, $t \in [0, \infty]$ and $q \in (0, \infty]$,
+    \[
+      E(t, cu) \leq |c| \, E(t, u) \qquad \text{and} \qquad
+      \|cu\|^{\mathrm{dy}}_{E, s, q} \leq |c| \, \|u\|^{\mathrm{dy}}_{E, s, q} .
+    \]
+  \item If $N_0(0) = N_1(0) = 0$, then $\|0\|^{\mathrm{dy}}_{E, s, q} = 0$ for all $s \in \R$ and
+    $q \in (0, \infty]$.
+  \item For all $s \in \R$ and $0 < q \leq r \leq \infty$,
+    $\|u\|^{\mathrm{dy}}_{E, s, r} \leq \|u\|^{\mathrm{dy}}_{E, s, q}$.
+  \item For all real $t < s$ and all $q, r \in (0, \infty]$, with the constant
+    $\gamma_{s - t, r} < \infty$ of \Cref{lem:lq-reindex},
+    \[
+      \|u\|^{\mathrm{dy}}_{E, t, r} \leq \gamma_{s - t, r} \, \|u\|^{\mathrm{dy}}_{E, s, q} .
+    \]
+  \item Let $N_1(0) = 0$, let $B = (N_0', N_1')$ be a couple on an abelian group $V$ with
+    $E$-functional $E'$, let $T : U \to V$ be additive and $0 \leq M < \infty$, and let
+    $N_0'(Ta) \leq M \, N_0(a)$ and $N_1'(Ta) \leq N_1(a)$ for every $a \in U$. Then
+    $E'(t, Tu) \leq M \, E(t, u)$ for every $t \in [0, \infty]$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:e-functional, lem:lq-basic}
+(1) For $c \neq 0$ and $N_1(b) \leq t$, the element $cb$ is admissible and
+$N_0(cu - cb) \leq |c| \, N_0(u - b)$; take the infimum over $b$. For $c = 0$, the first
+hypothesis with $c = 0$ gives $N_0(0) = 0$, and $E(t, 0) \leq N_0(0)$ since $b = 0$ is
+admissible. The bound for the dyadic norm follows termwise, since the $\ell_q$ norm is
+homogeneous. (2) $E(t, 0) = 0$ by \Cref{lem:e-functional}. (3) The $\ell_q$ norms decrease in
+$q$ (\Cref{lem:lq-basic}). (4) With $L = \|(2^{ks} E(2^k, u))_k\|_{\ell_q}$, every term satisfies
+$2^{kt} E(2^k, u) = 2^{-k(s-t)} \, 2^{ks} E(2^k, u) \leq 2^{-k(s-t)} L$, and
+$\|(2^{-k(s-t)})_k\|_{\ell_r} \leq \gamma_{s-t, r}$; and $N_0(u) \leq \gamma_{s-t, r} N_0(u)$
+since $\gamma_{s-t, r} \geq 1$. (5) If $N_1(b) \leq t$, then $N_1'(Tb) \leq t$ and
+$N_0'(Tu - Tb) = N_0'(T(u - b)) \leq M \, N_0(u - b)$; for $M > 0$, multiplication by $M$
+commutes with the infimum since $0 < M < \infty$. For $M = 0$, the element $b = 0$ is admissible
+since $N_1(0) = 0$, and $E'(t, Tu) \leq N_0'(Tu) \leq 0$.
+\end{proof}
+
+\begin{lemma}[Near-best sequences]
+\label{lem:e-near-best}
+\lean{InterpCouple.exists_nearBest_eFunctional, InterpCouple.antitone_eFunctional_add_dyadicWeight,
+  InterpCouple.norm0_sub_succ_rpow_le_of_nearBest}
+\leanok
+\uses{def:e-functional}
+Let $A = (N_0, N_1)$ be a couple on $U$, let $u \in U$ and $s \in \R$, and put
+$e_k = E(2^k, u) + N_0(u) \, 2^{-k(s+1)}$ for $k \in \N$.
+\begin{enumerate}
+  \item If $N_1(0) = 0$, there are $b_k \in U$, $k \in \N$, with $N_1(b_k) \leq 2^k$ and
+    $N_0(u - b_k) \leq e_k$ for every $k$.
+  \item If $s \geq -1$, the sequence $(e_k)_k$ decreases.
+  \item Let $N_0$ be even, let $\rho \geq 0$ and let
+    $N_0(a + b)^\rho \leq N_0(a)^\rho + N_0(b)^\rho$ for all $a, b \in U$. If $b_k \in U$ and a
+    decreasing sequence $(d_k)_k$ in $[0, \infty]$ satisfy $N_0(u - b_k) \leq d_k$ for every
+    $k$, then $N_0(b_{k+1} - b_k)^\rho \leq 2 d_k^\rho$ for every $k$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:e-functional}
+(1) If $N_0(u) = 0$ or $N_0(u) = \infty$, take $b_k = 0$: it is admissible since $N_1(0) = 0$,
+and $N_0(u - 0) = N_0(u) \leq e_k$. Otherwise $E(2^k, u) \leq N_0(u) < \infty$, the tolerance
+$N_0(u) \, 2^{-k(s+1)}$ is positive, and (3) of \Cref{lem:e-functional} gives $b_k$.
+(2) $E(t, u)$ decreases in $t$ (\Cref{lem:e-functional}), and $2^{-k(s+1)}$ decreases in $k$ for
+$s + 1 \geq 0$. (3) Write $b_{k+1} - b_k = (u - b_k) - (u - b_{k+1})$; evenness and the
+subadditivity of $N_0^\rho$ give
+$N_0(b_{k+1} - b_k)^\rho \leq d_k^\rho + d_{k+1}^\rho \leq 2 d_k^\rho$.
+\end{proof}
+
+In $L_p$ with $0 < p < 1$, near-best sequences take the role of bounded projections onto the
+approximants.
+
+\begin{definition}[Pietsch's form]
+\label{def:e-pietsch-norm}
+\lean{InterpCouple.eNormPietsch}
+\leanok
+\uses{def:e-functional, def:lq-norm}
+Let $A = (N_0, N_1)$ be a couple on $U$, let $s \in \R$ and $q \in (0, \infty]$, and
+$1/\infty = 0$. \emph{Pietsch's form} of the norm of $E_{s, q}$ is
+\[
+  \|u\|^{\mathrm{P}}_{E, s, q} = \bigl\| \bigl((n+1)^{s - 1/q} E(n, u)\bigr)_{n \in \N}
+  \bigr\|_{\ell_q} , \qquad u \in U .
+\]
+\end{definition}
+
+\begin{lemma}[Pietsch's form against the dyadic norm]
+\label{lem:e-pietsch-norm}
+\lean{InterpCouple.antitone_eFunctional_natCast,
+  InterpCouple.eFunctional_zero_left, InterpCouple.eNormPietsch_zero,
+  InterpCouple.eNormPietsch_le_eNormDyadic, InterpCouple.eNormDyadic_le_eNormPietsch,
+  InterpCouple.eNormPietsch_lt_top_iff, InterpCouple.eNormPietsch_map_le,
+  ENNReal.lqNorm_pow_mul_rpow, ENNReal.lqNorm_pow_mul_le_dyadic,
+  ENNReal.lqNorm_dyadic_succ_le_lqNorm_pow_mul, ENNReal.dyadic_le_lqNorm_pow_mul}
+\leanok
+\uses{def:e-pietsch-norm, def:e-method, lem:lq-quasi-triangle, lem:e-method-calculus}
+Let $q \in (0, \infty]$, let $C_q$ be the constant of \Cref{lem:lq-quasi-triangle}, and
+$1/\infty = 0$. Let $A = (N_0, N_1)$ be a couple on $U$, let $s \in \R$ and $u \in U$.
+\begin{enumerate}
+  \item Let $(e_n)_{n \in \N}$ be a sequence in $[0, \infty]$ and put
+    $P = \|((n+1)^{s - 1/q} e_n)_n\|_{\ell_q}$. If $q < \infty$, then
+    $P^q = \sum_n (n+1)^{sq - 1} e_n^q$. If $s \geq 0$ and $(e_n)_n$ decreases, then with
+    $D = \|(2^{ks} e_{2^k})_k\|_{\ell_q}$,
+    \[
+      P \leq C_q \, 2^s (e_0 + D) , \qquad e_0 + D \leq 4 C_q^2 \, 2^s P , \qquad
+      \|(2^{ks} e_{2^{k+1}})_k\|_{\ell_q} \leq 2 C_q P .
+    \]
+  \item If $N_0(0) = N_1(0) = 0$, then $\|0\|^{\mathrm{P}}_{E, s, q} = 0$.
+  \item The sequence $(E(n, u))_{n \in \N}$ decreases. Let $s \geq 0$. If $N_1(0) = 0$, then
+    $\|u\|^{\mathrm{P}}_{E, s, q} \leq C_q \, 2^s \, \|u\|^{\mathrm{dy}}_{E, s, q}$. If every $b$
+    with $N_1(b) < 1$ is $0$, then
+    $\|u\|^{\mathrm{dy}}_{E, s, q} \leq 4 C_q^2 \, 2^s \, \|u\|^{\mathrm{P}}_{E, s, q}$. Under both
+    hypotheses, $E(0, u) = N_0(u)$, and $\|u\|^{\mathrm{P}}_{E, s, q} < \infty$ if and only if
+    $\|u\|^{\mathrm{dy}}_{E, s, q} < \infty$.
+  \item Under the hypotheses of (5) of \Cref{lem:e-method-calculus},
+    $\|Tu\|^{\mathrm{P}}_{E', s, q} \leq M \, \|u\|^{\mathrm{P}}_{E, s, q}$, with $E'$ the
+    $E$-functional of $B$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:condensation, lem:lq-basic, lem:e-functional}
+(1) The identity for $P^q$ holds termwise. The bounds follow the steps of
+\Cref{lem:dyadic-norm-below-one}, with $e_0$ in place of $E_0(f) = \|f\|$. For $q = \infty$ use
+the supremum form of \Cref{lem:condensation}. For $q < \infty$, \Cref{lem:condensation} with
+$\gamma = sq - 1$ and $b_n = e_n^q$ gives
+$P^q \leq e_0^q + 2^{\max(sq - 1, 0)} D^q \leq 2^{sq} (e_0^q + D^q)$, and
+$(x^q + y^q)^{1/q} \leq C_q (x + y)$; this is the first bound. In the other direction it bounds
+the shifted sum $\sum_k 2^{ksq} e_{2^{k+1}}^q$ by $2^{\max(1 - sq, 0)} P^q$, and for the shifted
+sequence the factor of \Cref{lem:condensation} is $2^{\max(1 - sq, 0)} \leq 2 \leq (2 C_q)^q$;
+this is the third bound. For the second bound, the term $n = 0$ gives $e_0 \leq P$, the first
+dyadic term is $e_1 \leq e_0$, splitting it off costs $C_q$, the others are bounded by the third
+bound and $2^{(k+1)s} = 2^s 2^{ks}$, and $1 + C_q + 2 C_q^2 2^s \leq 4 C_q^2 2^s$.
+(2) $E(n, 0) = 0$ by \Cref{lem:e-functional}. (3) $E(t, u)$ decreases in $t$
+(\Cref{lem:e-functional}); apply (1) to $e_n = E(n, u)$. If $N_1(0) = 0$, then
+$E(0, u) \leq N_0(u)$, since $b = 0$ is admissible; this gives the first bound. If every $b$ with
+$N_1(b) < 1$ is $0$, every admissible $b$ at $t = 0$ is $0$, so $E(0, u) \geq N_0(u)$; this gives
+the second bound. The constants are finite, so the two forms are finite together.
+(4) Termwise by (5) of \Cref{lem:e-method-calculus}.
+\end{proof}
+
 \paragraph{The complexity couple.}
 
 \begin{definition}[Complexity couple]
@@ -3573,7 +3730,7 @@ in the dyadic scheme of a sequence of subspaces (\Cref{def:comap}).
   InterpCouple.ofMonotoneSubgroups_norm1_add_le,
   InterpCouple.eq_zero_of_ofMonotoneSubgroups_norm1_lt_one,
   InterpCouple.eFunctional_ofMonotoneSubgroups_two_pow,
-  InterpCouple.eFunctional_ofMonotoneSubgroups_sub_of_mem}
+  InterpCouple.eFunctional_ofMonotoneSubgroups_sub_of_mem, InterpCouple.complexity_norm1_map_le}
 \leanok
 \uses{def:complexity-couple, def:e-functional}
 Let $(N, N_1)$ be the complexity couple of $N$ and sets $S_n$, and let $u \in U$.
@@ -3587,6 +3744,10 @@ Let $(N, N_1)$ be the complexity couple of $N$ and sets $S_n$, and let $u \in U$
     satisfy $S_m + S_n \subseteq S_{m+n}$; $S_0 = \{0\}$ and $S_{2^j} = V_j$. Hence the couple of
     the subgroups satisfies all conclusions of (2), $E(2^j, u) = \inf_{b \in V_j} N(u - b)$, and
     $E(2^j, u - a) = E(2^j, u)$ for every $a \in V_j$.
+  \item Let $(N', N_1')$ be the complexity couple of $N' : V \to [0, \infty]$ and sets
+    $S_n' \subseteq V$ of an abelian group $V$, and let $T : U \to V$ map every $S_n$ into
+    $S_n'$. Then
+    $N_1'(Tb) \leq N_1(b)$ for every $b \in U$.
 \end{enumerate}
 \end{lemma}
 
@@ -3598,28 +3759,31 @@ $N_1(a + b) \leq m + n$; and $N_1(b) < 1$ means $b \in S_0$. (3) For $1 \leq m \
 $\lfloor \log_2 m \rfloor \leq \lfloor \log_2 n \rfloor$ and
 $\lfloor \log_2 m \rfloor, \lfloor \log_2 n \rfloor \leq \lfloor \log_2 (m + n) \rfloor$, and
 subgroups are closed under sums and negatives. The substitution $b \mapsto a + b$ maps $V_j$
-onto itself.
+onto itself. (4) If $b \in S_n$, then $Tb \in S_n'$, so $N_1'(Tb) \leq n$.
 \end{proof}
 
 \begin{theorem}[The $E$-method for approximation schemes]
 \label{thm:complexity-couple-approx}
 \lean{ApproximationScheme.eFunctional_complexityCouple,
   ApproximationScheme.eNormDyadic_complexityCouple,
-  ApproximationScheme.memEMethod_complexityCouple_iff}
+  ApproximationScheme.memEMethod_complexityCouple_iff,
+  ApproximationScheme.eNormPietsch_complexityCouple}
 \leanok
 \uses{def:complexity-couple, lem:complexity-couple, lem:e-method-dyadic, def:dyadic-norm,
-  lem:dyadic-norm-below-one}
+  lem:dyadic-norm-below-one, def:e-pietsch-norm, def:approx-space}
 Let $A$ be an approximation scheme in $X$. For the complexity couple of $A$, $E(n, f) = E_n(f)$
-for every $n \in \N$ and $f \in X$, and the dyadic norm of $E_{s, q}$ is the dyadic quasi-norm
-$\|f\|^{\mathrm{dy}}_{A^s_q}$. Hence $E_{s, q} = A^s_q$ for $s > 0$ and $q \in (0, \infty]$, and
-for $s = 0$ and $q = \infty$.
+for every $n \in \N$ and $f \in X$, the dyadic norm of $E_{s, q}$ is the dyadic quasi-norm
+$\|f\|^{\mathrm{dy}}_{A^s_q}$, and Pietsch's form $\|f\|^{\mathrm{P}}_{E, s, q}$ of
+\Cref{def:e-pietsch-norm} is Pietsch's quasi-norm $\|f\|_{A^s_q}$. Hence $E_{s, q} = A^s_q$ for
+$s > 0$ and $q \in (0, \infty]$, and for $s = 0$ and $q = \infty$.
 \end{theorem}
 
 \begin{proof}
 \leanok
 The sets $A_n$ increase, $A_0 = \{0\}$, and (1) of \Cref{lem:complexity-couple} gives
-$E(n, f) = \inf_{a \in A_n} \|f - a\| = E_n(f)$. Then (3) of \Cref{lem:e-method-dyadic} and
-\Cref{lem:dyadic-norm-below-one} give the equality of the spaces.
+$E(n, f) = \inf_{a \in A_n} \|f - a\| = E_n(f)$, so the dyadic norm and Pietsch's form of the
+couple agree termwise with the two quasi-norms of $A^s_q$. Then (3) of
+\Cref{lem:e-method-dyadic} and \Cref{lem:dyadic-norm-below-one} give the equality of the spaces.
 \end{proof}
 
 For approximation schemes this is the $E$-method of~\cite[Section~7.1]{BerghLofstrom}; the
@@ -4667,6 +4831,107 @@ $\iota_{r,p}(S^{(r)}_n) = S^{(p)}_n$ and $\iota_{r,p}^{-1}(S^{(p)}_n) = S^{(r)}_
 The map $\iota_{r,p}$ sends the class of $a$ in $L_r$ to its class in $L_p$, and it is
 injective.
 \end{proof}
+
+A scheme of essentially bounded functions defines a couple on $L_p$ for every exponent
+$0 < p \leq \infty$, through the quasi-norm of $L_p$ alone; for $p \geq 1$ it is the complexity
+couple of a scheme in the normed space $L_p$.
+
+\begin{definition}[The couple of a scheme in $L_p$]
+\label{def:scheme-lp-couple}
+\lean{FunctionScheme.lpSets, FunctionScheme.mem_lpSets, FunctionScheme.topInclusion_mem_lpSets,
+  FunctionScheme.lpCouple, FunctionScheme.lpCouple_norm0}
+\leanok
+\uses{def:scheme, def:complexity-couple, lem:inclusion-linear}
+Let $S$ be an approximation scheme in $L_\infty$ and $0 < p \leq \infty$. The
+\emph{approximants of $S$ in $L_p$} are the sets $S^{(p)}_n = \iota_{\infty,p}(S_n) \subseteq
+L_p$, $n \in \N$, with the inclusion $\iota_{\infty,p}$ of \Cref{lem:inclusion-linear}. The
+\emph{couple of $S$ in $L_p$} is the complexity couple of the quasi-norm $\|\cdot\|_p$ and the
+sets $S^{(p)}_n$ (\Cref{def:complexity-couple}):
+\[
+  N_0(f) = \|f\|_p , \qquad N_1(f) = \inf \{ n \in \N : f \in S^{(p)}_n \} , \qquad f \in L_p .
+\]
+\end{definition}
+
+\begin{lemma}[Properties of the couple of a scheme in $L_p$]
+\label{lem:scheme-lp-couple}
+\lean{FunctionScheme.lpSets_zero, FunctionScheme.monotone_lpSets,
+  FunctionScheme.smul_mem_lpSets, FunctionScheme.neg_mem_lpSets,
+  FunctionScheme.lpSets_add_subset, FunctionScheme.inclusion_mem_lpSets,
+  FunctionScheme.lpCouple_norm0_add_rpow_le, FunctionScheme.lpCouple_norm0_smul,
+  FunctionScheme.lpCouple_norm1_le_of_mem, FunctionScheme.mem_lpSets_of_lpCouple_norm1_le,
+  FunctionScheme.lpCouple_norm1_zero, FunctionScheme.lpCouple_norm1_neg,
+  FunctionScheme.lpCouple_norm1_add_le, FunctionScheme.lpCouple_norm1_smul_le,
+  FunctionScheme.eq_zero_of_lpCouple_norm1_lt_one, FunctionScheme.isQuasiNormed_lpCouple,
+  MeasureTheory.Lp.eLpNorm_sub_topInclusion, FunctionScheme.eFunctional_lpCouple_natCast,
+  FunctionScheme.exists_nearBest_lpCouple, FunctionScheme.lpCouple_norm1_inclusion_le}
+\leanok
+\uses{def:scheme-lp-couple, def:couple, def:e-functional, lem:lq-quasi-triangle,
+  lem:inclusion-linear}
+Let $S$ be an approximation scheme in $L_\infty$, let $0 < p \leq \infty$ and
+$\rho = \min(1, p)$, let $C_p$ be the constant of \Cref{lem:lq-quasi-triangle}, and let
+$(N_0, N_1)$ be the couple of $S$ in $L_p$, with $E$-functional $E$.
+\begin{enumerate}
+  \item The sets $S^{(p)}_n$ increase, $S^{(p)}_0 = \{0\}$, $c \, S^{(p)}_n \subseteq S^{(p)}_n$
+    for every $c \in \R$ and $n \in \N$, and $S^{(p)}_m + S^{(p)}_n \subseteq S^{(p)}_{m+n}$ for
+    all $m, n \in \N$. For $p \leq r \leq \infty$ and every $n \in \N$,
+    $\iota_{r,p}(S^{(r)}_n) \subseteq S^{(p)}_n$.
+  \item The couple is quasi-normed with constant $C_p$, and for all $f, g \in L_p$ and
+    $c \in \R$,
+    \[
+      N_0(f + g)^\rho \leq N_0(f)^\rho + N_0(g)^\rho , \qquad N_0(cf) = |c| \, N_0(f) .
+    \]
+    Moreover, for all $f \in L_p$, $c \in \R$ and $n \in \N$, $N_1(cf) \leq N_1(f)$;
+    $N_1(f) \leq n$ if and only if $f \in S^{(p)}_n$; and $N_1(f) < 1$ implies $f = 0$.
+  \item For all $f \in L_p$, $a \in L_\infty$ and every exponent $t$,
+    $\|f - \iota_{\infty,p} a\|_t = \|f - a\|_t$. For all $n \in \N$ and $f \in L_p$,
+    $E(n, f) = \inf_{a \in S_n} \|f - a\|_p$.
+  \item For all $f \in L_p$ and $s \in \R$ there are $b_k \in S_{2^k}$, $k \in \N$, with
+    $\|f - b_k\|_p \leq E(2^k, f) + \|f\|_p \, 2^{-k(s+1)}$ for every $k$.
+  \item Let $p \leq r \leq \infty$, and let $N_1^{(p)}$ and $N_1^{(r)}$ be the complexities of the
+    couples of $S$ in $L_p$ and in $L_r$. Then $N_1^{(p)}(\iota_{r,p} f) \leq N_1^{(r)}(f)$ for
+    every $f \in L_r$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:complexity-couple, lem:lp-quasi-triangle, lem:e-near-best}
+(1) The inclusion $\iota_{\infty,p}$ is linear and maps $S_n$ onto $S^{(p)}_n$, so the axioms of
+$S$ pass to the sets $S^{(p)}_n$; and $\iota_{r,p} \circ \iota_{\infty,r} = \iota_{\infty,p}$
+(\Cref{lem:inclusion-linear}). (2) The quasi-triangle inequality of $\|\cdot\|_p$ with the
+constant $C_p$ is Mathlib's \texttt{eLpNorm\_\allowbreak add\_\allowbreak le'}, the
+$\rho$-triangle inequality is \Cref{lem:lp-quasi-triangle}, and $\|cf\|_p = |c| \, \|f\|_p$. The
+properties of $N_1$ follow from (1) by \Cref{lem:complexity-couple}, which gives subadditivity,
+so the quasi-triangle inequality for $N_1$ holds with $C_p \geq 1$; for $N_1(cf) \leq N_1(f)$
+apply its part (4) to $f \mapsto cf$. (3) The first identity holds since
+$\iota_{\infty,p} a = a$ almost everywhere. By \Cref{lem:complexity-couple},
+$E(n, f) = \inf_{b \in S^{(p)}_n} \|f - b\|_p$, and the first identity for $t = p$ gives the
+second.
+(4) Part (1) of \Cref{lem:e-near-best} gives $b_k' \in L_p$ with $N_1(b_k') \leq 2^k$ and this
+bound; by (2) $b_k' \in S^{(p)}_{2^k}$, so $b_k' = \iota_{\infty,p} b_k$ for some
+$b_k \in S_{2^k}$. (5) Part (4) of \Cref{lem:complexity-couple} for $T = \iota_{r,p}$ and (1).
+\end{proof}
+
+\begin{lemma}[The couple of a scheme for $p \geq 1$]
+\label{lem:scheme-lp-couple-bridge}
+\lean{FunctionScheme.lpCouple_eq_complexityCouple}
+\leanok
+\uses{def:scheme-lp-couple, def:comap, def:complexity-couple}
+Let $S$ be an approximation scheme in $L_\infty$ and $1 \leq p \leq \infty$. The couple of $S$ in
+$L_p$ is the complexity couple of the image scheme $\iota_{\infty,p}(S)$ in the normed space
+$L_p$, whose sets are the $S^{(p)}_n$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Both couples are complexity couples of the sets $S^{(p)}_n$, and for $p \geq 1$ the quasi-norm
+$\|\cdot\|_p$ is the norm of $L_p$.
+\end{proof}
+
+By \Cref{lem:scheme-lp-couple-bridge} and \Cref{thm:complexity-couple-approx}, for $p \geq 1$ the
+$E$-functional of the couple of $S$ in $L_p$ at $t = n$ is the error of best approximation from
+$S^{(p)}_n$, and its dyadic norm and Pietsch's form are the two quasi-norms of
+$A^s_q(L_p, \iota_{\infty,p}(S))$.
 
 \begin{definition}[Besov space]
 \label{def:besov}

@@ -31,6 +31,7 @@ public import ApproximationSpaces.Interpolation.Reiteration
 public import ApproximationSpaces.Interpolation.ApproxSpaces
 public import ApproximationSpaces.Interpolation.EFunctional
 public import ApproximationSpaces.Interpolation.EFunctionalModuli
+public import ApproximationSpaces.Interpolation.EFunctionalSpaces
 public import ApproximationSpaces.Decompositions.Projection
 public import ApproximationSpaces.Decompositions.Blocks
 public import ApproximationSpaces.Decompositions.Synthesis
@@ -202,6 +203,16 @@ in the root namespace.
   and the coincidence of `E_{s,q}` with the classical space for `0 < s < θ`
   (`InterpCouple.CoupleModulusData.memEMethod_iff_coupleModNorm_lt_top`), as for `L_p`,
   `0 < p < 1`.
+* `ApproximationSpaces.Interpolation.EFunctionalSpaces`: the calculus of the E-functional that
+  the Besov spaces of a scheme of functions in `L_p`, `0 < p ≤ ∞`, need: homogeneity
+  (`InterpCouple.eNormDyadic_smul_le`), the embeddings of the dyadic norms in the fine index and
+  the smoothness (`InterpCouple.eNormDyadic_le_of_lt`), additive maps
+  (`InterpCouple.eFunctional_map_le`), near-best sequences with decreasing tolerances
+  (`InterpCouple.exists_nearBest_eFunctional`) and the block bound
+  `N₀(b_{k+1} - b_k)^ρ ≤ 2 e_k^ρ` (`InterpCouple.norm0_sub_succ_rpow_le_of_nearBest`), and
+  Pietsch's form `InterpCouple.eNormPietsch`, equivalent to the dyadic norm for `s ≥ 0` and
+  `q ∈ (0, ∞]` and equal to `‖f‖_{A^s_q}` for the complexity couple of a scheme
+  (`ApproximationScheme.eNormPietsch_complexityCouple`).
 
 ### Decompositions (`Decompositions/`)
 
