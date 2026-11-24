@@ -24,8 +24,8 @@ Chandler-Wilde, Hewett and Moiola (Theorem 3.3), for every open set and every re
 * **`J_{2s}` as an isometry**: `Rd.besselShift s : H^s(V) ≃ₗᵢ[ℂ] H^{-s}(V)` keeps the `L_2`
   function `J_s U` and acts on distributions as `J_{2s}` (`Rd.toDistr_besselShift`).
 * **The pairing** `[W, U] = ⟪J_{-s} W, J_s U⟫_{L_2}` of `W ∈ H^{-s}(V)` and `U ∈ H^s(V)`
-  (`Rd.sobolevPairing`, bundled in `U` as `Rd.pairingCLM`) has `|[W, U]| ≤ ‖W‖ ‖U‖` and extends
-  `U(φ)` and `conj (W(φ))` for test functions `φ` (`Rd.sobolevPairing_ofTest_left`,
+  (`Rd.sobolevPairing`, bundled in `U` as `Rd.sobolevPairingCLM`) has `|[W, U]| ≤ ‖W‖ ‖U‖`
+  and extends `U(φ)` and `conj (W(φ))` for test functions `φ` (`Rd.sobolevPairing_ofTest_left`,
   `Rd.sobolevPairing_ofTest_right`); at `s = 1` and for Schwartz `W` it is the `L_2` inner product
   (`Rd.sobolevPairing_one_toLp`).
 * **Orthogonal complements**: `⟪U, φ⟫_{H^s} = conj ((J_{2s} U)(φ))` for test functions `φ`
@@ -219,7 +219,7 @@ variable (s) in
 /-- **The pairing of `H^{-s}(V)` and `H^s(V)`**: `[W, U] = ⟪J_{-s} W, J_s U⟫_{L_2}`, the `L_2`
 inner product of the `L_2` functions of `W` and `U`. It is conjugate-linear in `W`
 (`Rd.sobolevPairing_add_left`, `Rd.sobolevPairing_smul_left`) and linear in `U`
-(`Rd.sobolevPairing_add_right`, `Rd.sobolevPairing_smul_right`, `Rd.pairingCLM`), Mathlib's
+(`Rd.sobolevPairing_add_right`, `Rd.sobolevPairing_smul_right`, `Rd.sobolevPairingCLM`), Mathlib's
 convention for inner products. For test functions it is the distributional pairing
 (`Rd.sobolevPairing_ofTest_left`, `Rd.sobolevPairing_ofTest_right`). -/
 noncomputable def sobolevPairing (W : H^{-s}(V)) (U : H^{s}(V)) : ℂ :=
@@ -259,15 +259,15 @@ variable (s) in
 /-- **The pairing as a bounded functional**: for `W ∈ H^{-s}(V)`, `U ↦ [W, U]` as a continuous
 linear map `H^s(V) → ℂ`, the inner product with `J_{-s} W` (Mathlib's `innerSL`) after the
 isometry `U ↦ J_s U` onto `L_2(V)`. -/
-noncomputable def pairingCLM (W : H^{-s}(V)) : H^{s}(V) →L[ℂ] ℂ :=
+noncomputable def sobolevPairingCLM (W : H^{-s}(V)) : H^{s}(V) →L[ℂ] ℂ :=
   (innerSL ℂ W.toLp).comp
     (BesselPotentialSpace.toLpₗᵢ V ℂ s 2).toContinuousLinearEquiv.toContinuousLinearMap
 
-/-- `pairingCLM s W U = [W, U]`. -/
+/-- `sobolevPairingCLM s W U = [W, U]`. -/
 @[simp]
-theorem pairingCLM_apply (W : H^{-s}(V)) (U : H^{s}(V)) :
-    pairingCLM s W U = sobolevPairing s W U := by
-  simp only [pairingCLM, sobolevPairing, ContinuousLinearMap.comp_apply,
+theorem sobolevPairingCLM_apply (W : H^{-s}(V)) (U : H^{s}(V)) :
+    sobolevPairingCLM s W U = sobolevPairing s W U := by
+  simp only [sobolevPairingCLM, sobolevPairing, ContinuousLinearMap.comp_apply,
     ContinuousLinearEquiv.coe_coe, LinearIsometryEquiv.coe_toContinuousLinearEquiv,
     BesselPotentialSpace.toLpₗᵢ_apply, innerSL_apply_apply]
 
