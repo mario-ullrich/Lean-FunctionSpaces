@@ -235,15 +235,21 @@ costs at most the factor $C$. It is condition (iv) of Hewett and Moiola
   Rd.HasZeroExtensionBound.coe_tildeLinearEquivZeroBoundary_apply,
   Rd.HasZeroExtensionBound.tildeEquivZeroBoundaryOfBound,
   Rd.HasZeroExtensionBound.coe_tildeEquivZeroBoundaryOfBound_apply,
-  Rd.HasZeroExtensionBound.norm_restrictProj_eq}
+  Rd.HasZeroExtensionBound.norm_restrictProj_eq,
+  Rd.HasZeroExtensionBound.tildeSpace_le_orthogonal,
+  Rd.HasZeroExtensionBound.coe_restrictProj_of_mem_tildeSpace,
+  Rd.HasZeroExtensionBound.map_subtype_zeroBoundarySpace}
 \leanok
 \uses{def:zero-extension-bound, thm:sobolev-restriction-quotient, lem:sobolev-restriction-basic,
-  lem:sobolev-tilde-zero-boundary-closed, lem:sobolev-tilde-restriction-range}
+  lem:sobolev-tilde-zero-boundary-closed, lem:sobolev-tilde-restriction-range,
+  def:sobolev-restriction-space}
 Let $s \in \R$, $\Omega \subseteq V$ open and $C \in \R$, and let $\Omega$ have the zero
 extension bound with constant $C$ at $s$. Then $\|U\| \leq C \|r_\Omega U\|$ for every
 $U \in \tilde H^s(\Omega)$, and $U \mapsto r_\Omega U$ is an isomorphism of $\tilde H^s(\Omega)$
 onto $H^s_0(\Omega)$ with $\|r_\Omega U\| \leq \|U\| \leq C \|r_\Omega U\|$. If $C = 1$, it is an
-isometry.
+isometry, $\tilde H^s(\Omega) \subseteq N^s(\Omega)^\perp = H^s(\Omega)$, $r_\Omega U = U$ for
+every $U \in \tilde H^s(\Omega)$, and $\tilde H^s(\Omega) = H^s_0(\Omega)$ as subspaces of
+$H^s(V)$.
 \end{theorem}
 
 \begin{proof}
@@ -257,7 +263,13 @@ the range is closed (Mathlib's \texttt{AntilipschitzWith.\allowbreak isClosed\_\
 range}), and its closure is $H^s_0(\Omega)$ (\Cref{lem:sobolev-tilde-restriction-range}). The
 bound $\|r_\Omega U\| \leq \|U\|$ is \Cref{lem:sobolev-restriction-basic}; with the two bounds
 the bijection is an isomorphism (Mathlib's \texttt{LinearEquiv.\allowbreak
-toContinuousLinearEquivOfBounds}).
+toContinuousLinearEquivOfBounds}). For $C = 1$, $\|r_\Omega U\| = \|U\|$ on
+$\tilde H^s(\Omega)$. Since $r_\Omega$ is the orthogonal projection onto $H^s(\Omega)$
+(\Cref{def:sobolev-restriction-space}), Pythagoras,
+$\|U\|^2 = \|r_\Omega U\|^2 + \|U - r_\Omega U\|^2$, gives $U = r_\Omega U \in H^s(\Omega)$
+(Mathlib's \texttt{Submodule.\allowbreak mem\_\allowbreak iff\_\allowbreak norm\_\allowbreak
+starProjection}), so $r_\Omega$ maps $\tilde H^s(\Omega)$ identically onto its range
+$H^s_0(\Omega)$.
 \end{proof}
 
 \begin{theorem}[Lifting the zero extension bound]
@@ -316,12 +328,34 @@ $\|U\| = \|\iota_0 U\|_2$ and $\|U + W\| = \|\iota_0 U + \iota_0 W\|_2$
 constant $1$ to every $m$, and \Cref{thm:zero-extension-bound-iso} gives the isometry.
 \end{proof}
 
-Since $r_\Omega$ is the orthogonal projection onto $H^m(\Omega)$ and isometric on
-$\tilde H^m(\Omega)$, it fixes $\tilde H^m(\Omega)$, so $\tilde H^m(\Omega) = H^m_0(\Omega)$ as
-subspaces of $H^m(V)$. At $m = 1$ the theorem is \Cref{thm:sobolev-tilde-zero-boundary}, proved
-there through weak derivatives. Hewett and Moiola prove the integer case from the formula of the
-$H^m$ inner product as a sum of integrals of derivatives; here the norm recursion lifts the case
-$m = 0$, where the $L_2$ functions of $U$ and $W$ have disjoint supports.
+\begin{corollary}[$\tilde H^m(\Omega) = H^m_0(\Omega)$ in $H^m(V)$ for $m \in \N$]
+\label{cor:tilde-zero-boundary-integer-subspace}
+\lean{Rd.tildeSpace_natCast_le_orthogonal, Rd.coe_restrictProj_of_mem_tildeSpace_natCast,
+  Rd.coe_tildeEquivZeroBoundaryNat_symm_apply, Rd.map_subtype_zeroBoundarySpace_natCast}
+\leanok
+\uses{thm:tilde-zero-boundary-integer, thm:zero-extension-bound-iso,
+  def:sobolev-restriction-space, def:sobolev-tilde-zero-boundary}
+For every open $\Omega \subseteq V$ and every $m \in \N$:
+$\tilde H^m(\Omega) \subseteq N^m(\Omega)^\perp = H^m(\Omega)$; $r_\Omega U = U$ for every
+$U \in \tilde H^m(\Omega)$; for every $u \in H^m_0(\Omega)$, the element
+$\tilde u \in \tilde H^m(\Omega)$ with $r_\Omega \tilde u = u$ is $u$; and
+$\tilde H^m(\Omega) = H^m_0(\Omega)$ as subspaces of $H^m(V)$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+By \Cref{thm:tilde-zero-boundary-integer}, $\Omega$ has the zero extension bound with constant
+$1$ at $m$, so \Cref{thm:zero-extension-bound-iso} gives the first, second and fourth claim. For
+$u \in H^m_0(\Omega)$ the second claim gives $u = r_\Omega \tilde u = \tilde u$.
+\end{proof}
+
+At $m = 1$, \Cref{thm:sobolev-tilde-zero-boundary} is the isometry of
+\Cref{thm:tilde-zero-boundary-integer}, and \Cref{lem:sobolev-tilde-in-restriction} gives the
+first and third claims of \Cref{cor:tilde-zero-boundary-integer-subspace}; both are proved there
+through weak derivatives. Hewett and Moiola
+prove the integer case from the formula of the $H^m$ inner product as a sum of integrals of
+derivatives; here the norm recursion lifts the case $m = 0$, where the $L_2$ functions of $U$ and
+$W$ have disjoint supports.
 
 \section{\texorpdfstring{$\tilde H^s(\Omega)$}{Tilde H\^{}s(Omega)} by supports}
 \label{sec:tilde-space-support}

@@ -40,6 +40,11 @@ inequality on test functions, and proves that inequality for every integer `s �
   for every `m ∈ ℕ` (`Rd.hasZeroExtensionBound_natCast`), so restriction is an isometry of
   `H̃^m(Ω)` onto `H^m_0(Ω)` for every open `Ω` (`Rd.tildeEquivZeroBoundaryNat`; Hewett and
   Moiola, Lemma 2.2(iii); Chandler-Wilde, Hewett and Moiola, Lemma 3.31(vi)).
+* **Subspaces of `H^s(V)`**: an orthogonal projection that keeps the norm of a vector fixes it,
+  so under the bound with `C = 1` restriction is the identity on `H̃^s(Ω)` and
+  `H̃^s(Ω) = H^s_0(Ω)` as subspaces of `H^s(V)`
+  (`Rd.HasZeroExtensionBound.map_subtype_zeroBoundarySpace`); in particular for every `m ∈ ℕ`
+  and every open `Ω` (`Rd.map_subtype_zeroBoundarySpace_natCast`).
 -/
 
 @[expose] public section
@@ -282,5 +287,74 @@ noncomputable def tildeEquivZeroBoundaryNat (m : ℕ) (Ω : Opens V) :
 theorem coe_tildeEquivZeroBoundaryNat_apply (m : ℕ) (U : tildeSpace m Ω) :
     (tildeEquivZeroBoundaryNat m Ω U : RestrictionSpace m Ω) = restrictProj m Ω U :=
   rfl
+
+/-! ### `H̃^s(Ω)` and `H^s_0(Ω)` as subspaces of `H^s(V)` -/
+
+/-- **Under the zero extension bound with `C = 1`, `H̃^s(Ω)` lies in `H^s(Ω)`**: every element
+of `H̃^s(Ω)` is orthogonal to the elements vanishing on `Ω`. Restriction is the orthogonal
+projection onto `H^s(Ω)` and keeps the norm of `U ∈ H̃^s(Ω)`
+(`Rd.HasZeroExtensionBound.norm_restrictProj_eq`), and a vector whose orthogonal projection has
+the same norm lies in the subspace (Mathlib's `Submodule.mem_iff_norm_starProjection`). -/
+theorem HasZeroExtensionBound.tildeSpace_le_orthogonal (h : HasZeroExtensionBound s Ω 1) :
+    tildeSpace s Ω ≤ (vanishOn s Ω)ᗮ :=
+  fun U hU => ((vanishOn s Ω)ᗮ.mem_iff_norm_starProjection U).2 (h.norm_restrictProj_eq hU)
+
+/-- **Under the zero extension bound with `C = 1`, restriction is the identity on `H̃^s(Ω)`**:
+for `U ∈ H̃^s(Ω)`, `U|_Ω = U` as elements of `H^s(V)`, since `U` lies in `H^s(Ω)`
+(`Rd.HasZeroExtensionBound.tildeSpace_le_orthogonal`) and the orthogonal projection fixes its
+range (Mathlib's `Submodule.starProjection_eq_self_iff`). -/
+theorem HasZeroExtensionBound.coe_restrictProj_of_mem_tildeSpace
+    (h : HasZeroExtensionBound s Ω 1) {U : H^{s}(V)} (hU : U ∈ tildeSpace s Ω) :
+    ((restrictProj s Ω U : RestrictionSpace s Ω) : H^{s}(V)) = U :=
+  Submodule.starProjection_eq_self_iff.2 (h.tildeSpace_le_orthogonal hU)
+
+/-- **Under the zero extension bound with `C = 1`, `H̃^s(Ω) = H^s_0(Ω)` as subspaces of
+`H^s(V)`**: the image of `H^s_0(Ω) ⊆ H^s(Ω)` under the inclusion `H^s(Ω) ⊆ H^s(V)` is
+`H̃^s(Ω)`. Every element of `H^s_0(Ω)` is the restriction of some `W ∈ H̃^s(Ω)`
+(`Rd.HasZeroExtensionBound.range_tildeToRestrictionL`), and every element of `H̃^s(Ω)` is its
+own restriction (`Rd.HasZeroExtensionBound.coe_restrictProj_of_mem_tildeSpace`). -/
+theorem HasZeroExtensionBound.map_subtype_zeroBoundarySpace (h : HasZeroExtensionBound s Ω 1) :
+    (zeroBoundarySpace s Ω).map (vanishOn s Ω)ᗮ.subtype = tildeSpace s Ω := by
+  ext U
+  rw [← h.range_tildeToRestrictionL]
+  refine ⟨?_, fun hU => ⟨restrictProj s Ω U, ⟨⟨U, hU⟩, rfl⟩,
+    h.coe_restrictProj_of_mem_tildeSpace hU⟩⟩
+  rintro ⟨_, ⟨W, rfl⟩, rfl⟩
+  change ((restrictProj s Ω W : RestrictionSpace s Ω) : H^{s}(V)) ∈ tildeSpace s Ω
+  rw [h.coe_restrictProj_of_mem_tildeSpace W.2]
+  exact W.2
+
+/-- **`H̃^m(Ω)` lies in `H^m(Ω)`, for every open `Ω` and `m ∈ ℕ`**: every element of `H̃^m(Ω)` is
+orthogonal to the elements vanishing on `Ω`, by the zero extension bound with `C = 1`
+(`Rd.hasZeroExtensionBound_natCast`, `Rd.HasZeroExtensionBound.tildeSpace_le_orthogonal`). -/
+theorem tildeSpace_natCast_le_orthogonal (m : ℕ) : tildeSpace m Ω ≤ (vanishOn m Ω)ᗮ :=
+  (hasZeroExtensionBound_natCast Ω m).tildeSpace_le_orthogonal
+
+/-- **Restriction is the identity on `H̃^m(Ω)`, for every open `Ω` and `m ∈ ℕ`**: for
+`U ∈ H̃^m(Ω)`, `U|_Ω = U` as elements of `H^m(V)`, by the zero extension bound with `C = 1`
+(`Rd.hasZeroExtensionBound_natCast`,
+`Rd.HasZeroExtensionBound.coe_restrictProj_of_mem_tildeSpace`). -/
+theorem coe_restrictProj_of_mem_tildeSpace_natCast {m : ℕ} {U : H^{m}(V)}
+    (hU : U ∈ tildeSpace m Ω) : ((restrictProj m Ω U : RestrictionSpace m Ω) : H^{m}(V)) = U :=
+  (hasZeroExtensionBound_natCast Ω m).coe_restrictProj_of_mem_tildeSpace hU
+
+/-- **The element of `H̃^m(Ω)` with restriction `u ∈ H^m_0(Ω)` is `u` itself**, for every open
+`Ω` and `m ∈ ℕ`: the inverse of `Rd.tildeEquivZeroBoundaryNat` is the identity inside
+`H^m(V)`, since restriction is the identity on `H̃^m(Ω)`
+(`Rd.coe_restrictProj_of_mem_tildeSpace_natCast`). -/
+theorem coe_tildeEquivZeroBoundaryNat_symm_apply (m : ℕ) (u : zeroBoundarySpace m Ω) :
+    (((tildeEquivZeroBoundaryNat m Ω).symm u : tildeSpace m Ω) : H^{m}(V)) =
+      ((u : RestrictionSpace m Ω) : H^{m}(V)) := by
+  rw [← coe_restrictProj_of_mem_tildeSpace_natCast ((tildeEquivZeroBoundaryNat m Ω).symm u).2,
+    ← coe_tildeEquivZeroBoundaryNat_apply, LinearIsometryEquiv.apply_symm_apply]
+
+variable (Ω) in
+/-- **`H̃^m(Ω) = H^m_0(Ω)` as subspaces of `H^m(V)`, for every open `Ω` and `m ∈ ℕ`**: the image
+of `H^m_0(Ω) ⊆ H^m(Ω)` under the inclusion `H^m(Ω) ⊆ H^m(V)` is `H̃^m(Ω)`, by the zero
+extension bound with `C = 1` (`Rd.hasZeroExtensionBound_natCast`,
+`Rd.HasZeroExtensionBound.map_subtype_zeroBoundarySpace`). -/
+theorem map_subtype_zeroBoundarySpace_natCast (m : ℕ) :
+    (zeroBoundarySpace m Ω).map (vanishOn m Ω)ᗮ.subtype = tildeSpace m Ω :=
+  (hasZeroExtensionBound_natCast Ω m).map_subtype_zeroBoundarySpace
 
 end Rd

@@ -83,13 +83,17 @@ span of the test functions of `Ω` in `H^s(V)` (`Rd.testSpan`), and `U ↦ U|_Ω
   (`Rd.HasZeroExtensionBound.norm_le_norm_restrictProj`,
   `Rd.HasZeroExtensionBound.range_tildeToRestrictionL`,
   `Rd.HasZeroExtensionBound.tildeEquivZeroBoundaryOfBound`), an isometry if `C = 1`
-  (`Rd.HasZeroExtensionBound.norm_restrictProj_eq`). The bound at `s` gives the bound with the
-  same constant at `s + 1` (`Rd.HasZeroExtensionBound.add_one`).
+  (`Rd.HasZeroExtensionBound.norm_restrictProj_eq`). For `C = 1` restriction fixes every element
+  of `H̃^s(Ω)`, and `H̃^s(Ω) = H^s_0(Ω)` as subspaces of `H^s(V)`
+  (`Rd.HasZeroExtensionBound.map_subtype_zeroBoundarySpace`). The bound at `s` gives the bound
+  with the same constant at `s + 1` (`Rd.HasZeroExtensionBound.add_one`).
 * **`H̃^m(Ω) ≅ H^m_0(Ω)` isometrically on every open set.** Every open `Ω` has the zero extension
   bound with constant `1` at every `m ∈ ℕ` (`Rd.hasZeroExtensionBound_zero`,
   `Rd.hasZeroExtensionBound_natCast`), and restriction is an isometric isomorphism of `H̃^m(Ω)`
   onto `H^m_0(Ω)` (`Rd.tildeEquivZeroBoundaryNat`; Hewett–Moiola, Lemma 2.2(iii);
-  Chandler-Wilde–Hewett–Moiola, Lemma 3.31(vi)).
+  Chandler-Wilde–Hewett–Moiola, Lemma 3.31(vi)); restriction fixes every element of
+  `H̃^m(Ω)`, so `H̃^m(Ω) = H^m_0(Ω)` as subspaces of `H^m(V)`
+  (`Rd.map_subtype_zeroBoundarySpace_natCast`).
 * **The indicator of a Lipschitz domain as a multiplier.** Let `Ω` be a bounded Lipschitz domain,
   `1 ≤ p < ∞` and `0 < s < 1/p`. There is `C < ∞` with
   `‖1_Ω F‖_p + ‖(2^(ks) ω_1(1_Ω F, 2^(-k))_p)_k‖_{ℓ_q}`
