@@ -8,6 +8,7 @@ module
 public import FunctionSpaces.Wavelets.Examples.HaarBesov
 public import FunctionSpaces.Domains.Interval.PiecewiseInverse
 public import ApproximationSpaces.Interpolation.EFunctionalModuli
+public import FunctionSpaces.Analysis.Lp.QuasiNorm
 
 /-!
 # Dyadic step functions in `L_p[0, 1]`, `0 < p ≤ 1`
@@ -68,65 +69,6 @@ open MeasureTheory Set Polynomial
 open Rd (higherDiff measurable_higherDiff)
 open scoped ENNReal
 open ENNReal (dyadicWeight lqNorm)
-
-/-! ### The quasi-norm of `L_p` and the first moment method -/
-
-namespace MeasureTheory
-
-variable {α : Type*} [MeasurableSpace α] {μ : Measure α}
-
-/-- The quasi-norm of `L_p(μ)` vanishes at `0`, for every `p`. -/
-theorem Lp.enorm_zero {E : Type*} [NormedAddCommGroup E] {p : ℝ≥0∞} :
-    ‖(0 : Lp E p μ)‖ₑ = 0 := by
-  rw [Lp.enorm_def, eLpNorm_congr_ae (Lp.coeFn_zero E p μ), eLpNorm_zero]
-
-/-- The quasi-norm of `L_p(μ)` is even, `‖-f‖_p = ‖f‖_p`, for every `p`. -/
-theorem Lp.enorm_neg {E : Type*} [NormedAddCommGroup E] {p : ℝ≥0∞} (f : Lp E p μ) :
-    ‖-f‖ₑ = ‖f‖ₑ := by
-  rw [Lp.enorm_def, Lp.enorm_def, eLpNorm_congr_ae (Lp.coeFn_neg f), eLpNorm_neg]
-
-/-- **The `p`-th power of the quasi-norm of `L_p` is subadditive for `p ≤ 1`**:
-`‖f + g‖_p^p ≤ ‖f‖_p^p + ‖g‖_p^p` for `f, g ∈ L_p(μ)`, from the same inequality for functions
-(`MeasureTheory.eLpNorm_add_rpow_le_of_le_one`). At `p = 0` both sides are powers `x^0 = 1`. -/
-theorem Lp.enorm_add_rpow_le_of_le_one {E : Type*} [NormedAddCommGroup E] {p : ℝ≥0∞}
-    (hp1 : p ≤ 1) (f g : Lp E p μ) :
-    ‖f + g‖ₑ ^ p.toReal ≤ ‖f‖ₑ ^ p.toReal + ‖g‖ₑ ^ p.toReal := by
-  rcases eq_or_ne p 0 with rfl | hp0
-  · simp only [ENNReal.toReal_zero, ENNReal.rpow_zero]
-    exact le_self_add
-  rw [Lp.enorm_def, Lp.enorm_def, Lp.enorm_def, eLpNorm_congr_ae (Lp.coeFn_add f g)]
-  exact eLpNorm_add_rpow_le_of_le_one hp0 hp1 _ _
-
-/-- **Two approximants of one element are close**, `p ≤ 1`: if `‖f - g‖_p ≤ e` and
-`‖f - h‖_p ≤ e` in `L_p(μ)`, then `‖g - h‖_p^p ≤ 2 e^p`, since `g - h = (f - h) - (f - g)`
-(`MeasureTheory.Lp.enorm_add_rpow_le_of_le_one`, `MeasureTheory.Lp.enorm_neg`). -/
-theorem Lp.enorm_sub_rpow_le_two_mul {E : Type*} [NormedAddCommGroup E] {p : ℝ≥0∞}
-    (hp1 : p ≤ 1) {f g h : Lp E p μ} {e : ℝ≥0∞} (hg : ‖f - g‖ₑ ≤ e) (hh : ‖f - h‖ₑ ≤ e) :
-    ‖g - h‖ₑ ^ p.toReal ≤ 2 * e ^ p.toReal :=
-  calc ‖g - h‖ₑ ^ p.toReal = ‖(f - h) + -(f - g)‖ₑ ^ p.toReal := by
-        rw [show (f - h) + -(f - g) = g - h by abel]
-    _ ≤ ‖f - h‖ₑ ^ p.toReal + ‖-(f - g)‖ₑ ^ p.toReal := Lp.enorm_add_rpow_le_of_le_one hp1 _ _
-    _ ≤ e ^ p.toReal + e ^ p.toReal := by
-        rw [Lp.enorm_neg]
-        exact add_le_add (ENNReal.rpow_le_rpow hh ENNReal.toReal_nonneg)
-          (ENNReal.rpow_le_rpow hg ENNReal.toReal_nonneg)
-    _ = 2 * e ^ p.toReal := (two_mul _).symm
-
-/-- **A value of `F` approximates `F` on `s` at least as well as the mean of all values** (the
-first moment method, Mathlib's `exists_le_setLAverage`): for measurable `F`, a set `s` of finite
-positive measure and every exponent `r`, some `y ∈ s` has
-`∫_s |F(x) - F(y)|^r dx ≤ μ(s)⁻¹ ∫_s ∫_s |F(x) - F(z)|^r dx dz`. -/
-theorem exists_setLIntegral_enorm_sub_rpow_le [SFinite μ] {F : α → ℂ} (hF : Measurable F)
-    {s : Set α} (hμ0 : μ s ≠ 0) (hμ : μ s ≠ ∞) (r : ℝ) :
-    ∃ y ∈ s, ∫⁻ x in s, ‖F x - F y‖ₑ ^ r ∂μ ≤
-      (μ s)⁻¹ * ∫⁻ y in s, ∫⁻ x in s, ‖F x - F y‖ₑ ^ r ∂μ ∂μ := by
-  have hG : Measurable fun y => ∫⁻ x in s, ‖F x - F y‖ₑ ^ r ∂μ :=
-    Measurable.lintegral_prod_left' (f := fun z : α × α => ‖F z.1 - F z.2‖ₑ ^ r)
-      (((hF.comp measurable_fst).sub (hF.comp measurable_snd)).enorm.pow_const r)
-  obtain ⟨y, hy, hle⟩ := exists_le_setLAverage hμ0 hμ hG.aemeasurable
-  exact ⟨y, hy, hle.trans_eq (by rw [setLAverage_eq, ENNReal.div_eq_inv_mul])⟩
-
-end MeasureTheory
 
 /-! ### Averages over dyadic intervals -/
 
