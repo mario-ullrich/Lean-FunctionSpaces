@@ -33,17 +33,17 @@ local means quasi-norm, `E g` has a finite `B^{s+1/p}_{p,q}`-norm with differenc
 (`Rd.LipschitzGraph.modNorm_graphExtension_le_of_atoms`), since the coefficient quasi-norm with
 smoothness `s + 1/p` on `V` is the one with smoothness `s` on `H`:
 `(s + 1/p) - n/p = s - (n-1)/p`. Its trace is `g`
-(`Rd.LipschitzGraph.trace_graphExtension_of_atoms`): the partial sums `∑_{j ≤ J} F_j` are
-continuous with traces `∑_{j ≤ J} g_j → g` (`Rd.LipschitzGraph.trace_sum_traceExtTerm`), and they
-converge to `E g` in `B^{1/p}_{p,1}`, where the trace is linear and continuous
-(`Rd.LipschitzGraph.trace_sub`, `Rd.LipschitzGraph.enorm_trace_le`).
+(`Rd.LipschitzGraph.graphTrace_graphExtension_of_atoms`): the partial sums `∑_{j ≤ J} F_j` are
+continuous with traces `∑_{j ≤ J} g_j → g` (`Rd.LipschitzGraph.graphTrace_sum_traceExtTerm`), and
+they converge to `E g` in `B^{1/p}_{p,1}`, where the trace is linear and continuous
+(`Rd.LipschitzGraph.graphTrace_sub`, `Rd.LipschitzGraph.enorm_graphTrace_le`).
 
 On a Lipschitz graph the extended atoms form a package of order `2`
 (`Rd.LipschitzGraph.exists_extension_atoms`). This gives the bound for `0 < s < 1`
 (`Rd.LipschitzGraph.modNorm_graphExtension_le`, `Rd.LipschitzGraph.modNorm_graphExtension_lt_top`),
-`Tr (E g) = g` (`Rd.LipschitzGraph.trace_graphExtension`), and with the boundedness of the trace
-the trace space (`Rd.LipschitzGraph.exists_trace_eq_iff`; Schneider–Vybíral, Theorem 4.11 for
-graph domains and `p ≥ 1`): `g` is the trace of a function with finite intrinsic
+`Tr (E g) = g` (`Rd.LipschitzGraph.graphTrace_graphExtension`), and with the boundedness of the
+trace the trace space (`Rd.LipschitzGraph.exists_graphTrace_eq_iff`; Schneider–Vybíral, Theorem 4.11
+for graph domains and `p ≥ 1`): `g` is the trace of a function with finite intrinsic
 `B^{s+1/p}_{p,q}`-norm on `Ω` iff `g ∈ B^s_{p,q}(H)`. On the half-space the extended atoms form
 packages of every order (`FunctionSpaces.Domains.Traces.HalfSpaceTrace`).
 
@@ -112,22 +112,23 @@ variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDim
 
 /-- The **extension of a function on `H`** at level `j`: `A(x) = a(Px) v_j(x)`. -/
 noncomputable def extendAtom (j : ℕ) (a : Ω.hyperplane → ℂ) (x : V) : ℂ :=
-  a (Ω.proj x) * Ω.vertCutoff j x
+  a (Ω.graphProj x) * Ω.vertCutoff j x
 
 /-- `A(γ x') = a(x')`. -/
 theorem extendAtom_graphMap (j : ℕ) (a : Ω.hyperplane → ℂ) (x' : Ω.hyperplane) :
     Ω.extendAtom j a (Ω.graphMap x') = a x' := by
-  rw [extendAtom, Ω.proj_graphMap, Ω.vertCutoff_graphMap, mul_one]
+  rw [extendAtom, Ω.graphProj_graphMap, Ω.vertCutoff_graphMap, mul_one]
 
 /-- The extension of a continuous function is continuous. -/
 theorem continuous_extendAtom (j : ℕ) {a : Ω.hyperplane → ℂ} (hac : Continuous a) :
     Continuous (Ω.extendAtom j a) :=
-  (hac.comp Ω.proj.continuous).mul (Ω.continuous_vertCutoff j)
+  (hac.comp Ω.graphProj.continuous).mul (Ω.continuous_vertCutoff j)
 
 omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- `Δ_h^l (a ∘ P)(x) = Δ_{Ph}^l a(Px)`. -/
-theorem higherDiff_comp_proj (l : ℕ) (h : V) (a : Ω.hyperplane → ℂ) (x : V) :
-    (fwdDiff h)^[l] (fun y => a (Ω.proj y)) x = (fwdDiff (Ω.proj h))^[l] a (Ω.proj x) := by
+theorem higherDiff_comp_graphProj (l : ℕ) (h : V) (a : Ω.hyperplane → ℂ) (x : V) :
+    (fwdDiff h)^[l] (fun y => a (Ω.graphProj y)) x =
+      (fwdDiff (Ω.graphProj h))^[l] a (Ω.graphProj x) := by
   rw [higherDiff_apply, higherDiff_apply]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [map_add, map_smul]
@@ -151,22 +152,22 @@ theorem enorm_higherDiff_two_extendAtom_le (j : ℕ) {a : Ω.hyperplane → ℂ}
         min 1 (ENNReal.ofReal (2 ^ j * ‖h‖) ^ (2 : ℝ)) := by
   set t := ENNReal.ofReal (2 ^ j * ‖h‖)
   set B := ENNReal.ofReal Ω.vertCutoffConst
-  have hu : ∀ l ≤ 2, ‖(fwdDiff h)^[l] (fun y => a (Ω.proj y)) x‖ₑ ≤
+  have hu : ∀ l ≤ 2, ‖(fwdDiff h)^[l] (fun y => a (Ω.graphProj y)) x‖ₑ ≤
       A * min 1 (t ^ (l : ℝ)) := fun l hl => by
-    rw [Ω.higherDiff_comp_proj]
+    rw [Ω.higherDiff_comp_graphProj]
     refine (ha l hl _ _).trans (mul_le_mul' le_rfl (min_le_min le_rfl
       (ENNReal.rpow_le_rpow (ENNReal.ofReal_le_ofReal ?_) (Nat.cast_nonneg l))))
-    exact mul_le_mul_of_nonneg_left (Ω.norm_proj_le h) (by positivity)
+    exact mul_le_mul_of_nonneg_left (Ω.norm_graphProj_le h) (by positivity)
   have hv : ∀ m ≤ 2, ∀ y, ‖(fwdDiff h)^[m] (Ω.vertCutoff j) y‖ₑ ≤ B * min 1 (t ^ (m : ℝ)) :=
     fun m hm y => Ω.enorm_higherDiff_vertCutoff_le j hm h y
   have hterm : ∀ l ∈ Finset.range (2 + 1), ‖(Nat.choose 2 l : ℂ) *
-      ((fwdDiff h)^[l] (fun y => a (Ω.proj y)) x *
+      ((fwdDiff h)^[l] (fun y => a (Ω.graphProj y)) x *
         (fwdDiff h)^[2 - l] (Ω.vertCutoff j) (x + (l : ℝ) • h))‖ₑ ≤
       (Nat.choose 2 l : ℝ≥0∞) * (A * B * min 1 (t ^ (2 : ℝ))) := fun l hl => by
     have hl2 : l ≤ 2 := Nat.lt_succ_iff.1 (Finset.mem_range.1 hl)
     rw [enorm_mul, enorm_mul, ← ofReal_norm, Complex.norm_natCast, ENNReal.ofReal_natCast]
     refine mul_le_mul' le_rfl ?_
-    calc ‖(fwdDiff h)^[l] (fun y => a (Ω.proj y)) x‖ₑ *
+    calc ‖(fwdDiff h)^[l] (fun y => a (Ω.graphProj y)) x‖ₑ *
           ‖(fwdDiff h)^[2 - l] (Ω.vertCutoff j) (x + (l : ℝ) • h)‖ₑ
         ≤ (A * min 1 (t ^ (l : ℝ))) * (B * min 1 (t ^ ((2 - l : ℕ) : ℝ))) :=
           mul_le_mul' (hu l hl2) (hv (2 - l) (Nat.sub_le 2 l) _)
@@ -180,9 +181,10 @@ theorem enorm_higherDiff_two_extendAtom_le (j : ℕ) {a : Ω.hyperplane → ℂ}
   have hsum : ∑ l ∈ Finset.range (2 + 1), (Nat.choose 2 l : ℝ≥0∞) = 4 := by
     simp [Finset.sum_range_succ]
     norm_num
-  rw [show Ω.extendAtom j a = fun y => a (Ω.proj y) * Ω.vertCutoff j y from rfl, higherDiff_mul]
+  rw [show Ω.extendAtom j a = fun y => a (Ω.graphProj y) * Ω.vertCutoff j y from rfl,
+    higherDiff_mul]
   calc ‖∑ l ∈ Finset.range (2 + 1), (Nat.choose 2 l : ℂ) *
-        ((fwdDiff h)^[l] (fun y => a (Ω.proj y)) x *
+        ((fwdDiff h)^[l] (fun y => a (Ω.graphProj y)) x *
           (fwdDiff h)^[2 - l] (Ω.vertCutoff j) (x + (l : ℝ) • h))‖ₑ
       ≤ ∑ l ∈ Finset.range (2 + 1), (Nat.choose 2 l : ℝ≥0∞) * (A * B * min 1 (t ^ (2 : ℝ))) :=
         (enorm_sum_le _ _).trans (Finset.sum_le_sum hterm)
@@ -206,8 +208,9 @@ noncomputable def extendCenter (j : ℕ) (c' : Ω.hyperplane) : V :=
   (c' : V) + Ω.smoothGraph j c' • Ω.e
 
 /-- The projection of the extended centre is the centre. -/
-theorem proj_extendCenter (j : ℕ) (c' : Ω.hyperplane) : Ω.proj (Ω.extendCenter j c') = c' := by
-  rw [extendCenter, map_add, map_smul, Ω.proj_e, smul_zero, add_zero, Ω.proj_coe]
+theorem graphProj_extendCenter (j : ℕ) (c' : Ω.hyperplane) :
+    Ω.graphProj (Ω.extendCenter j c') = c' := by
+  rw [extendCenter, map_add, map_smul, Ω.graphProj_e, smul_zero, add_zero, Ω.graphProj_coe]
 
 /-- **The support of extended atoms**: if `a = 0` outside `B̄(c', d 2^(-j))`, then `A = 0` outside
 `B̄(c' + φ_j(c') e, (d (1 + M ‖ρ‖_1) + c + 1) 2^(-j))`. -/
@@ -215,29 +218,30 @@ theorem extendAtom_eq_zero (j : ℕ) {a : Ω.hyperplane → ℂ} {d : ℝ} {c' :
     (h0 : ∀ y, d / 2 ^ j < ‖y - c'‖ → a y = 0) {x : V}
     (hx : Ω.extendRadius d / 2 ^ j < ‖x - Ω.extendCenter j c'‖) : Ω.extendAtom j a x = 0 := by
   by_contra hne
-  have ha : a (Ω.proj x) ≠ 0 := left_ne_zero_of_mul hne
+  have ha : a (Ω.graphProj x) ≠ 0 := left_ne_zero_of_mul hne
   have hv : Ω.vertCutoff j x ≠ 0 := right_ne_zero_of_mul hne
-  have h1 : ‖Ω.proj x - c'‖ ≤ d / 2 ^ j := not_lt.1 fun h => ha (h0 _ h)
-  have h2 : |inner ℝ x Ω.e - Ω.smoothGraph j (Ω.proj x)| ≤ (Ω.cutoffLevel + 1) / 2 ^ j :=
+  have h1 : ‖Ω.graphProj x - c'‖ ≤ d / 2 ^ j := not_lt.1 fun h => ha (h0 _ h)
+  have h2 : |inner ℝ x Ω.e - Ω.smoothGraph j (Ω.graphProj x)| ≤ (Ω.cutoffLevel + 1) / 2 ^ j :=
     le_of_lt (not_le.1 fun h => hv (Ω.vertCutoff_eq_zero j h))
-  have h3 : |Ω.smoothGraph j (Ω.proj x) - Ω.smoothGraph j c'| ≤
+  have h3 : |Ω.smoothGraph j (Ω.graphProj x) - Ω.smoothGraph j c'| ≤
       Ω.M * Ω.graphBumpNorm * (d / 2 ^ j) :=
     (Ω.abs_smoothGraph_sub_le j _ _).trans (mul_le_mul_of_nonneg_left h1
       (mul_nonneg Ω.M_nonneg Ω.graphBumpNorm_nonneg))
-  have hdecomp : x - Ω.extendCenter j c' = ((Ω.proj x - c' : Ω.hyperplane) : V) +
+  have hdecomp : x - Ω.extendCenter j c' = ((Ω.graphProj x - c' : Ω.hyperplane) : V) +
       (inner ℝ x Ω.e - Ω.smoothGraph j c') • Ω.e := by
-    have hx' : x = (Ω.proj x : V) + inner ℝ x Ω.e • Ω.e := by rw [coe_proj, sub_add_cancel]
+    have hx' : x = (Ω.graphProj x : V) + inner ℝ x Ω.e • Ω.e := by
+      rw [coe_graphProj, sub_add_cancel]
     conv_lhs => rw [hx']
     rw [extendCenter, Submodule.coe_sub, sub_smul]
     abel
   have hle : ‖x - Ω.extendCenter j c'‖ ≤ Ω.extendRadius d / 2 ^ j := by
     rw [hdecomp]
-    calc ‖((Ω.proj x - c' : Ω.hyperplane) : V) + (inner ℝ x Ω.e - Ω.smoothGraph j c') • Ω.e‖
-        ≤ ‖Ω.proj x - c'‖ + |inner ℝ x Ω.e - Ω.smoothGraph j c'| := by
+    calc ‖((Ω.graphProj x - c' : Ω.hyperplane) : V) + (inner ℝ x Ω.e - Ω.smoothGraph j c') • Ω.e‖
+        ≤ ‖Ω.graphProj x - c'‖ + |inner ℝ x Ω.e - Ω.smoothGraph j c'| := by
           refine (norm_add_le _ _).trans (le_of_eq ?_)
           rw [norm_smul, Ω.norm_e, mul_one, Real.norm_eq_abs, Submodule.norm_coe]
-      _ ≤ ‖Ω.proj x - c'‖ + (|inner ℝ x Ω.e - Ω.smoothGraph j (Ω.proj x)| +
-            |Ω.smoothGraph j (Ω.proj x) - Ω.smoothGraph j c'|) := by
+      _ ≤ ‖Ω.graphProj x - c'‖ + (|inner ℝ x Ω.e - Ω.smoothGraph j (Ω.graphProj x)| +
+            |Ω.smoothGraph j (Ω.graphProj x) - Ω.smoothGraph j c'|) := by
           gcongr
           exact abs_sub_le _ _ _
       _ ≤ d / 2 ^ j + ((Ω.cutoffLevel + 1) / 2 ^ j + Ω.M * Ω.graphBumpNorm * (d / 2 ^ j)) :=
@@ -346,10 +350,11 @@ theorem exists_extension_atoms (Lh : ℕ) :
       (Ω.extRadiusH_nonneg Lh)
       (fun y hy => cellAtom_eq_zero (fun z hz => Ω.graphBump.dualKernel_eq_zero_of_lt Lh j hz) m hy)
       (fun l hl h' y => hb j hh m l hl h' y)
-  · refine card_le_of_norm_sub_cellCenter_le j (by linarith) (Ω.proj x) S fun m hm => ?_
-    calc ‖Ω.proj x - cellCenter j m‖ = ‖Ω.proj (x - Ω.extendCenter j (cellCenter j m))‖ := by
-          rw [map_sub, Ω.proj_extendCenter]
-      _ ≤ ‖x - Ω.extendCenter j (cellCenter j m)‖ := Ω.norm_proj_le _
+  · refine card_le_of_norm_sub_cellCenter_le j (by linarith) (Ω.graphProj x) S fun m hm => ?_
+    calc ‖Ω.graphProj x - cellCenter j m‖
+      _ = ‖Ω.graphProj (x - Ω.extendCenter j (cellCenter j m))‖ := by
+          rw [map_sub, Ω.graphProj_extendCenter]
+      _ ≤ ‖x - Ω.extendCenter j (cellCenter j m)‖ := Ω.norm_graphProj_le _
       _ ≤ (Ω.extendRadius (Ω.extRadiusH Lh) + 2) / 2 ^ j := by
           simpa only [Nat.cast_ofNat] using (hS m hm).2
 
@@ -681,13 +686,13 @@ theorem modNorm_traceExtTerm_le (hp : p ≠ ∞) (Lh : ℕ) {r : ℕ} {d : ℝ} 
 formula on `H`: for `L ≥ 1`, `s > 0` and partial sums with a finite norm with moduli of order `L`
 and smoothness `s + 1/p`, `Tr (∑_{j ≤ J} F_j) = ∑_{j ≤ J} η_j ⋆ (k_j ⋆ g)`, since the partial sums
 are continuous with the values `∑_{j ≤ J} (η_j ⋆ (k_j ⋆ g))(x')` on the graph
-(`Rd.LipschitzGraph.trace_ae_eq_comp_graphMap`). -/
-theorem trace_sum_traceExtTerm (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) (Lh : ℕ) {s : ℝ} (hs : 0 < s)
+(`Rd.LipschitzGraph.graphTrace_ae_eq_comp_graphMap`). -/
+theorem graphTrace_sum_traceExtTerm (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) (Lh : ℕ) {s : ℝ} (hs : 0 < s)
     {q : ℝ≥0∞} (hq : 1 ≤ q) (g : Lp ℂ p (volume : Measure Ω.hyperplane)) (J : ℕ)
     (hFJ : ‖∑ j ∈ Finset.range (J + 1), Ω.traceExtTerm hp Lh j g‖ₑ + lqNorm q (fun k =>
       dyadicWeight (s + 1 / p.toReal) k *
         lpModulus p L (∑ j ∈ Finset.range (J + 1), Ω.traceExtTerm hp Lh j g) k) < ∞) :
-    Ω.trace hp L (∑ j ∈ Finset.range (J + 1), Ω.traceExtTerm hp Lh j g) =
+    Ω.graphTrace hp L (∑ j ∈ Finset.range (J + 1), Ω.traceExtTerm hp Lh j g) =
       ∑ j ∈ Finset.range (J + 1),
         convLp hp (Ω.graphBump.integrable_dualKernel Lh j) (Ω.graphBump.localMean hp Lh j g) := by
   have hcont : Continuous fun x => ∑ j ∈ Finset.range (J + 1), Ω.extLevel hp Lh j g x :=
@@ -700,7 +705,7 @@ theorem trace_sum_traceExtTerm (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) (Lh : �
       with x hx1 hx2
     rw [hx1]
     exact Finset.sum_congr rfl fun j _ => hx2 j
-  have htr := Ω.trace_ae_eq_comp_graphMap hp hL hs hq
+  have htr := Ω.graphTrace_ae_eq_comp_graphMap hp hL hs hq
     (Ω.intrinsicNorm_lt_top_of_modNorm hp L hq hFJ).1 hcont hae
   refine Lp.ext ?_
   filter_upwards [htr, Lp.coeFn_fun_finsetSum (Finset.range (J + 1))
@@ -763,15 +768,15 @@ theorem modNorm_graphExtension_lt_top_of_atoms (hp : p ≠ ∞) (Lh : ℕ) {r L 
 atoms of order `r ≤ L` with constant `C < ∞` (`Rd.LipschitzGraph.HasExtensionAtoms`), `Lh ≥ 1`,
 `s > 0` with `s + 1/p < r` and `g ∈ L_p(H)` with a finite local means quasi-norm
 `‖(2^(js) ‖k_j ⋆ g‖_p)_j‖_{ℓ_q}`, `Tr (E g) = g`. The partial sums `∑_{j ≤ J} F_j` are continuous
-with traces `∑_{j ≤ J} η_j ⋆ (k_j ⋆ g) → g` (`Rd.LipschitzGraph.trace_sum_traceExtTerm`), and they
-converge to `E g` in `B^{1/p}_{p,1}` with order `L`, where the trace is continuous
-(`Rd.LipschitzGraph.tendsto_trace_of_modNorm_sub_le`). -/
-theorem trace_graphExtension_of_atoms (hp : p ≠ ∞) {Lh : ℕ} (hLh : 1 ≤ Lh) {r L : ℕ}
+with traces `∑_{j ≤ J} η_j ⋆ (k_j ⋆ g) → g` (`Rd.LipschitzGraph.graphTrace_sum_traceExtTerm`), and
+they converge to `E g` in `B^{1/p}_{p,1}` with order `L`, where the trace is continuous
+(`Rd.LipschitzGraph.tendsto_graphTrace_of_modNorm_sub_le`). -/
+theorem graphTrace_graphExtension_of_atoms (hp : p ≠ ∞) {Lh : ℕ} (hLh : 1 ≤ Lh) {r L : ℕ}
     (hrL : r ≤ L) {d : ℝ} {C : ℝ≥0∞} {N : ℕ} (hC : C ≠ ∞) (hat : Ω.HasExtensionAtoms p Lh r d C N)
     {s : ℝ} (hs : 0 < s) (hsr : s + 1 / p.toReal < r) {q : ℝ≥0∞} (hq : 1 ≤ q)
     {g : Lp ℂ p (volume : Measure Ω.hyperplane)}
     (hX : Ω.graphBump.localMeansNorm hp Lh s q g < ∞) :
-    Ω.trace hp L (Ω.graphExtension hp Lh g) = g := by
+    Ω.graphTrace hp L (Ω.graphExtension hp Lh g) = g := by
   have hL : 1 ≤ L := (one_le_of_add_one_div_toReal_lt hs hsr).trans hrL
   set T : ℕ → Lp ℂ p (volume : Measure V) := fun j => Ω.traceExtTerm hp Lh j g
   have hsum : Summable T := Ω.summable_traceExtTerm hp Lh hs hq hX
@@ -792,7 +797,7 @@ theorem trace_graphExtension_of_atoms (hp : p ≠ ∞) {Lh : ℕ} (hLh : 1 ≤ L
       ∑' i, T (i + (J + 1)) := fun J => by
     rw [graphExtension, ← hsum.sum_add_tsum_nat_add (J + 1)]
     abel
-  have hconv := Ω.tendsto_trace_of_modNorm_sub_le hp L hs hq
+  have hconv := Ω.tendsto_graphTrace_of_modNorm_sub_le hp L hs hq
     (Ω.intrinsicNorm_lt_top_of_modNorm hp L hq hF).2
     (fun J => (Ω.intrinsicNorm_lt_top_of_modNorm hp L hq (hFJ J)).2) htail
     (fun J => ne_top_of_le_ne_top hhsum (ENNReal.tsum_comp_le_tsum_of_injective
@@ -803,10 +808,10 @@ theorem trace_graphExtension_of_atoms (hp : p ≠ ∞) {Lh : ℕ} (hLh : 1 ≤ L
         (ENNReal.tsum_le_tsum fun i =>
           Ω.modNorm_one_traceExtTerm_le hp Lh hrL hat hs hsr g (i + (J + 1)))
   -- the traces of the partial sums are the partial sums of the reproducing formula on `H`
-  have hpart : ∀ J, Ω.trace hp L (∑ j ∈ Finset.range (J + 1), T j) =
+  have hpart : ∀ J, Ω.graphTrace hp L (∑ j ∈ Finset.range (J + 1), T j) =
       ∑ j ∈ Finset.range (J + 1),
         convLp hp (Ω.graphBump.integrable_dualKernel Lh j) (Ω.graphBump.localMean hp Lh j g) :=
-    fun J => Ω.trace_sum_traceExtTerm hp hL Lh hs hq g J (hFJ J)
+    fun J => Ω.graphTrace_sum_traceExtTerm hp hL Lh hs hq g J (hFJ J)
   have hlim := Ω.graphBump.tendsto_sum_dual_localMean hp hLh g
   simp_rw [← hpart] at hlim
   exact tendsto_nhds_unique hconv hlim
@@ -814,13 +819,14 @@ theorem trace_graphExtension_of_atoms (hp : p ≠ ∞) {Lh : ℕ} (hLh : 1 ≤ L
 /-- **The trace of the extension** (Schneider–Vybíral, Theorem 4.11, for `p ≥ 1`): for
 `0 < s < 1`, `L ≥ 2` and `g ∈ L_p(H)` with `‖g‖_p + ‖(2^(ks) ω_1(g, 2^(-k))_p)_k‖_{ℓ_q} < ∞`,
 the extension of moment order `1` has `Tr (E g) = g`, from the extended atoms of order `2`
-(`Rd.LipschitzGraph.exists_extension_atoms`, `Rd.LipschitzGraph.trace_graphExtension_of_atoms`). -/
-theorem trace_graphExtension (hp : p ≠ ∞) {L : ℕ} (hL : 2 ≤ L) {s : ℝ} (hs : 0 < s) (hs1 : s < 1)
-    {q : ℝ≥0∞} (hq : 1 ≤ q) {g : Lp ℂ p (volume : Measure Ω.hyperplane)}
+(`Rd.LipschitzGraph.exists_extension_atoms`,
+`Rd.LipschitzGraph.graphTrace_graphExtension_of_atoms`). -/
+theorem graphTrace_graphExtension (hp : p ≠ ∞) {L : ℕ} (hL : 2 ≤ L) {s : ℝ} (hs : 0 < s)
+    (hs1 : s < 1) {q : ℝ≥0∞} (hq : 1 ≤ q) {g : Lp ℂ p (volume : Measure Ω.hyperplane)}
     (hg : ‖g‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p 1 g k) < ∞) :
-    Ω.trace hp L (Ω.graphExtension hp 1 g) = g := by
+    Ω.graphTrace hp L (Ω.graphExtension hp 1 g) = g := by
   obtain ⟨C, N, hC, hat⟩ := Ω.exists_extension_atoms (p := p) 1
-  exact Ω.trace_graphExtension_of_atoms hp le_rfl hL hC hat hs
+  exact Ω.graphTrace_graphExtension_of_atoms hp le_rfl hL hC hat hs
     (add_one_div_toReal_lt hp hs1 (le_refl 2)) hq
     ((Ω.graphBump.localMeansNorm_le hp 1 s hq g).trans_lt
       (ENNReal.mul_lt_top (Ω.graphBump.upperConst_ne_top 1 s).lt_top hg))
@@ -829,22 +835,22 @@ theorem trace_graphExtension (hp : p ≠ ∞) {L : ℕ} (hL : 2 ≤ L) {s : ℝ}
 `p ≥ 1`): for `1 ≤ p < ∞`, `0 < s < 1`, `1 ≤ q ≤ ∞` and `L ≥ 2`, `g ∈ L_p(H)` is the trace of some
 `f` with `‖f‖_{L_p(Ω)} + ‖(2^(k(s+1/p)) ω_L(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞` iff
 `‖g‖_p + ‖(2^(ks) ω_1(g, 2^(-k))_p)_k‖_{ℓ_q} < ∞`. The trace is bounded
-(`Rd.LipschitzGraph.modNorm_trace_le`), and `E g` is such an `f`
-(`Rd.LipschitzGraph.trace_graphExtension`). -/
-theorem exists_trace_eq_iff (hp : p ≠ ∞) {L : ℕ} (hL : 2 ≤ L) {s : ℝ} (hs : 0 < s) (hs1 : s < 1)
-    {q : ℝ≥0∞} (hq : 1 ≤ q) (g : Lp ℂ p (volume : Measure Ω.hyperplane)) :
+(`Rd.LipschitzGraph.modNorm_graphTrace_le`), and `E g` is such an `f`
+(`Rd.LipschitzGraph.graphTrace_graphExtension`). -/
+theorem exists_graphTrace_eq_iff (hp : p ≠ ∞) {L : ℕ} (hL : 2 ≤ L) {s : ℝ} (hs : 0 < s)
+    (hs1 : s < 1) {q : ℝ≥0∞} (hq : 1 ≤ q) (g : Lp ℂ p (volume : Measure Ω.hyperplane)) :
     (∃ f : Lp ℂ p (volume : Measure V),
-        modNormOn Ω.measurableSet_domain L (s + 1 / p.toReal) q f < ∞ ∧ Ω.trace hp L f = g) ↔
+        modNormOn Ω.measurableSet_domain L (s + 1 / p.toReal) q f < ∞ ∧ Ω.graphTrace hp L f = g) ↔
       ‖g‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p 1 g k) < ∞ := by
   constructor
   · rintro ⟨f, hf, rfl⟩
-    obtain ⟨K, hK, hle⟩ := Ω.modNorm_trace_le hp L hs hs1 hq
+    obtain ⟨K, hK, hle⟩ := Ω.modNorm_graphTrace_le hp L hs hs1 hq
     exact (hle f hf).trans_lt (ENNReal.mul_lt_top hK.lt_top hf)
   · intro hg
     obtain ⟨K, hK, hle⟩ := Ω.modNorm_graphExtension_le hp hs hs1 hq
     exact ⟨Ω.graphExtension hp 1 g, (Ω.intrinsicNorm_lt_top_of_modNorm hp L hq
       (Ω.modNorm_graphExtension_lt_top hp hL hs hs1 hq hg)).1,
-      Ω.trace_graphExtension hp hL hs hs1 hq hg⟩
+      Ω.graphTrace_graphExtension hp hL hs hs1 hq hg⟩
 
 end TraceExtension
 

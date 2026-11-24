@@ -11,24 +11,26 @@ public import FunctionSpaces.Domains.Traces.GraphTraceCharts
 /-!
 # Traces of every order on the half-space
 
-For the flat graph domain `Ω = {x : 0 < ⟪x, e⟫}` (`Rd.LipschitzGraph.flat`) the graph map is the
-inclusion of `H = e^⊥` (`Rd.LipschitzGraph.flat_graphMap`), so the restrictions of smooth atoms
-to `H` are smooth atoms of the same order (`Rd.LipschitzGraph.isSmoothAtom_comp_graphMap_flat`).
-The trace atoms are therefore regular atoms of every order and exponent
-(`Rd.LipschitzGraph.exists_trace_atoms_flat`), and the trace theorem holds for every `s > 0`:
+For the flat graph domain `Ω = {x : 0 < ⟪x, e⟫}` (`Rd.LipschitzGraph.halfSpaceGraph`) the graph map
+is the inclusion of `H = e^⊥` (`Rd.LipschitzGraph.halfSpaceGraph_graphMap`), so the restrictions of
+smooth atoms to `H` are smooth atoms of the same order
+(`Rd.LipschitzGraph.isSmoothAtom_comp_graphMap_halfSpaceGraph`). The trace atoms are therefore
+regular atoms of every order and exponent (`Rd.LipschitzGraph.exists_trace_atoms_halfSpaceGraph`),
+and the trace theorem holds for every `s > 0`:
 
 `‖Tr f‖_{L_p(H)} + ‖(2^(ks) ω_r(Tr f, 2^(-k))_p)_k‖_{ℓ_q}
   ≤ K (‖f‖_{L_p(Ω)} + ‖(2^(k(s+1/p)) ω_L(f, 2^(-k), Ω)_p)_k‖_{ℓ_q})`   (`r > s`)
 
-(`Rd.LipschitzGraph.modNorm_trace_le_flat`), where the Lipschitz case allows only `s < 1`.
+(`Rd.LipschitzGraph.modNorm_graphTrace_le_halfSpaceGraph`), where the Lipschitz case allows only
+`s < 1`.
 
 **The extension of every order.** The extension `A(x) = a(Px) χ(2^j ⟪x, e⟫)` of a smooth atom on
 `H` is a smooth atom on `V` of the same order
-(`Rd.LipschitzGraph.exists_isSmoothAtom_extendAtom_flat`; for the flat graph the vertical cut-off
-is `χ(2^j ⟪x, e⟫)`, `Rd.LipschitzGraph.vertCutoff_flat`).
+(`Rd.LipschitzGraph.exists_isSmoothAtom_extendAtom_halfSpaceGraph`; for the flat graph the vertical
+cut-off is `χ(2^j ⟪x, e⟫)`, `Rd.LipschitzGraph.vertCutoff_halfSpaceGraph`).
 The extended atoms therefore form packages of extended atoms of every order
-(`Rd.LipschitzGraph.exists_flat_extension_atoms`). With the terms `g_j = η_j ⋆ (k_j ⋆ g)` of the
-reproducing formula on `H` of moment order `Lh`, the extension of the graph domain
+(`Rd.LipschitzGraph.exists_halfSpaceGraph_extension_atoms`). With the terms `g_j = η_j ⋆ (k_j ⋆ g)`
+of the reproducing formula on `H` of moment order `Lh`, the extension of the graph domain
 (`Rd.LipschitzGraph.graphExtension`) is `E g = ∑_j g_j(Px) χ(2^j ⟪x, e⟫)` and satisfies, for
 `s > 0` and `s + 1/p < r`,
 
@@ -36,13 +38,14 @@ reproducing formula on `H` of moment order `Lh`, the extension of the graph doma
   ≤ K (‖g‖_{L_p(H)} + ‖(2^(ks) ω_{Lh}(g, 2^(-k))_p)_k‖_{ℓ_q})`
 
 (`Rd.LipschitzGraph.modNorm_flatExtension_le`), and `Tr (E g) = g`
-(`Rd.LipschitzGraph.trace_flatExtension`). Hence `B^s_{p,q}(H)` is the trace space of
+(`Rd.LipschitzGraph.graphTrace_flatExtension`). Hence `B^s_{p,q}(H)` is the trace space of
 `B^{s+1/p}_{p,q}` of the half-space for every `s > 0`
-(`Rd.LipschitzGraph.exists_trace_eq_iff_flat`). The extension of the Lipschitz case uses moment
-order `1` on `H` and reaches only `s < 1`; here the moment order `Lh > s` matches the smoothness.
+(`Rd.LipschitzGraph.exists_graphTrace_eq_iff_halfSpaceGraph`). The extension of the Lipschitz case
+uses moment order `1` on `H` and reaches only `s < 1`; here the moment order `Lh > s` matches the
+smoothness.
 
 **Functions continuous on the closed half-space** have their restrictions as traces
-(`Rd.trace_ae_eq_of_continuousOn`): the folding `x ↦ x + (|⟪x, e⟫| - ⟪x, e⟫) e`
+(`Rd.graphTrace_ae_eq_of_continuousOn`): the folding `x ↦ x + (|⟪x, e⟫| - ⟪x, e⟫) e`
 (`Rd.foldHalfSpace`) extends them continuously to `V`.
 -/
 
@@ -75,25 +78,27 @@ variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDim
 
 omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- The graph map of the flat graph is the inclusion of `H = e^⊥`. -/
-theorem flat_graphMap (x' : (flat e he).hyperplane) : (flat e he).graphMap x' = x' := by
-  simp [graphMap, flat]
+theorem halfSpaceGraph_graphMap (x' : (halfSpaceGraph e he).hyperplane) :
+    (halfSpaceGraph e he).graphMap x' = x' := by
+  simp [graphMap, halfSpaceGraph]
 
 /-- **Restrictions of smooth atoms to the hyperplane**: for the flat graph, a smooth atom on `V`
 of order `K` with centre `c` restricts to a smooth atom on `H` of order `K` with centre `P c`,
 the same radius factor and the same constant. -/
-theorem isSmoothAtom_comp_graphMap_flat {K : ℕ} {d A : ℝ} {j : ℕ} {c : V}
+theorem isSmoothAtom_comp_graphMap_halfSpaceGraph {K : ℕ} {d A : ℝ} {j : ℕ} {c : V}
     {a : V → ℂ} (ha : IsSmoothAtom Set.univ K d A j c a) :
-    IsSmoothAtom Set.univ K d A j ((flat e he).proj c) (a ∘ (flat e he).graphMap) := by
-  set Ω := flat e he
+    IsSmoothAtom Set.univ K d A j ((halfSpaceGraph e he).graphProj c)
+      (a ∘ (halfSpaceGraph e he).graphMap) := by
+  set Ω := halfSpaceGraph e he
   set ι : Ω.hyperplane →L[ℝ] V := Ω.hyperplane.subtypeL
-  have hγ : Ω.graphMap = ι := funext (flat_graphMap e he)
+  have hγ : Ω.graphMap = ι := funext (halfSpaceGraph_graphMap e he)
   have hι : ‖ι‖ ≤ 1 := ContinuousLinearMap.opNorm_le_bound _ zero_le_one fun x => by simp [ι]
   have hac : ContDiff ℝ K a := contDiffOn_univ.1 ha.contDiffOn
   have hc : ContDiff ℝ K (a ∘ Ω.graphMap) := by
     rw [hγ]
     exact hac.comp ι.contDiff
   refine ⟨hc.continuous.aestronglyMeasurable,
-    fun x' hx' => ha.eq_zero _ (hx'.trans_le (Ω.norm_sub_proj_le x' c)), hc.contDiffOn,
+    fun x' hx' => ha.eq_zero _ (hx'.trans_le (Ω.norm_sub_graphProj_le x' c)), hc.contDiffOn,
     fun l hl y _ => ?_⟩
   rw [iteratedFDerivWithin_univ, hγ]
   refine (norm_iteratedFDeriv_comp_clm_le ι hac y (by exact_mod_cast hl)).trans ?_
@@ -111,15 +116,16 @@ radius factor `d`, a constant `C < ∞` and an overlap bound `N` such that the r
 `a_{j,m} ∘ γ` of the cell atoms of `η_j ⋆ h` are regular atoms on `H` of order and exponent `r`
 centred at `P c_{j,m}`, and the centres of the cells meeting `H` have overlap at most `N`
 (`Rd.LipschitzGraph.norm_graphMap_sub_cellCenter_le` with `t = r`). -/
-theorem exists_trace_atoms_flat (b : LocalMeansBump V) {p : ℝ≥0∞} (hp1 : 1 ≤ p) (L : ℕ) {r : ℕ}
-    (hr : 1 ≤ r) :
+theorem exists_trace_atoms_halfSpaceGraph (b : LocalMeansBump V) {p : ℝ≥0∞} (hp1 : 1 ≤ p) (L : ℕ)
+    {r : ℕ} (hr : 1 ≤ r) :
     ∃ (d : ℝ) (C : ℝ≥0∞) (N : ℕ), 0 ≤ d ∧ C ≠ ∞ ∧ ∀ (j : ℕ) {h : V → ℂ}, MemLp h p volume →
-      (∀ m, IsRegularAtom p r r d C j ((flat e he).proj (cellCenter j m))
-        (cellAtom p (b.dualKernel L j) j h m ∘ (flat e he).graphMap)) ∧
+      (∀ m, IsRegularAtom p r r d C j ((halfSpaceGraph e he).graphProj (cellCenter j m))
+        (cellAtom p (b.dualKernel L j) j h m ∘ (halfSpaceGraph e he).graphMap)) ∧
       ∀ x' (S : Finset (Fin (finrank ℝ V) → ℤ)),
-        (∀ m ∈ S, (flat e he).traceCoef b p L j h m ≠ 0 ∧
-          ‖x' - (flat e he).proj (cellCenter j m)‖ ≤ (d + r) / 2 ^ j) → S.card ≤ N := by
-  set Ω := flat e he
+        (∀ m ∈ S, (halfSpaceGraph e he).traceCoef b p L j h m ≠ 0 ∧
+          ‖x' - (halfSpaceGraph e he).graphProj (cellCenter j m)‖ ≤ (d + r) / 2 ^ j) →
+            S.card ≤ N := by
+  set Ω := halfSpaceGraph e he
   obtain ⟨A, hA, hsm⟩ := b.exists_isSmoothAtom_cellAtom hp1 L r
   set d := 2 * (L : ℝ) * b.radius + finrank ℝ V with hd_def
   have hd : 0 ≤ d :=
@@ -137,7 +143,7 @@ theorem exists_trace_atoms_flat (b : LocalMeansBump V) {p : ℝ≥0∞} (hp1 : 1
       (ENNReal.mul_ne_top (ENNReal.natCast_ne_top _)
         (ENNReal.mul_ne_top ENNReal.ofReal_ne_top measure_ball_lt_top.ne)))
   · exact isRegularAtomOn_of_isSmoothAtom convex_univ MeasurableSet.univ hint hr le_rfl hd hA
-      (isSmoothAtom_comp_graphMap_flat e he (hsm j hh m))
+      (isSmoothAtom_comp_graphMap_halfSpaceGraph e he (hsm j hh m))
   · refine card_le_of_norm_sub_cellCenter_le j
       (add_nonneg hd (mul_nonneg (by linarith [Ω.M_nonneg]) (by positivity))) (Ω.graphMap x') S
       fun m hm => ?_
@@ -151,74 +157,76 @@ theorem exists_trace_atoms_flat (b : LocalMeansBump V) {p : ℝ≥0∞} (hp1 : 1
 /-- **The trace of a series, of every order**: on the flat graph, for `0 < s < r` there is
 `K < ∞` with `‖Tr‖_{L_p(H)} + ‖(2^(ks) ω_r(Tr, 2^(-k))_p)_k‖_{ℓ_q} ≤
 K ‖(2^(j(s+1/p)) ‖h_j‖_p)_j‖_{ℓ_q}` for the trace `Tr = ∑_j (η_j ⋆ h_j) ∘ γ`, from the trace
-atoms of order `r` (`Rd.LipschitzGraph.exists_trace_atoms_flat`,
+atoms of order `r` (`Rd.LipschitzGraph.exists_trace_atoms_halfSpaceGraph`,
 `Rd.LipschitzGraph.modNorm_traceSeries_le_of_atoms`). -/
-theorem modNorm_traceSeries_le_flat (b : LocalMeansBump V) {p : ℝ≥0∞} [Fact (1 ≤ p)]
+theorem modNorm_traceSeries_le_halfSpaceGraph (b : LocalMeansBump V) {p : ℝ≥0∞} [Fact (1 ≤ p)]
     (hp : p ≠ ∞) (L : ℕ) {r : ℕ} (hr : 1 ≤ r) {s : ℝ} (hs : 0 < s) (hsr : s < r) {q : ℝ≥0∞}
     (hq : 1 ≤ q) :
     ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ h : ℕ → Lp ℂ p (volume : Measure V),
       lqNorm q (fun j => dyadicWeight (s + 1 / p.toReal) j * ‖h j‖ₑ) < ∞ →
-      ‖(flat e he).traceSeries b hp L h‖ₑ + lqNorm q (fun k =>
-          dyadicWeight s k * lpModulus p r ((flat e he).traceSeries b hp L h) k) ≤
+      ‖(halfSpaceGraph e he).traceSeries b hp L h‖ₑ + lqNorm q (fun k =>
+          dyadicWeight s k * lpModulus p r ((halfSpaceGraph e he).traceSeries b hp L h) k) ≤
         K * lqNorm q (fun j => dyadicWeight (s + 1 / p.toReal) j * ‖h j‖ₑ) := by
-  obtain ⟨d, C, N, -, hC, hatoms⟩ := exists_trace_atoms_flat e he b (Fact.out : 1 ≤ p) L hr
-  exact (flat e he).modNorm_traceSeries_le_of_atoms b hp L hs hsr hq hC hatoms
+  obtain ⟨d, C, N, -, hC, hatoms⟩ :=
+    exists_trace_atoms_halfSpaceGraph e he b (Fact.out : 1 ≤ p) L hr
+  exact (halfSpaceGraph e he).modNorm_traceSeries_le_of_atoms b hp L hs hsr hq hC hatoms
 
 /-- **The trace theorem of every order on the half-space**: for `1 ≤ p < ∞`, `0 < s < r` and
 `1 ≤ q ≤ ∞` there is `K < ∞` with
 `‖Tr f‖_{L_p(H)} + ‖(2^(ks) ω_r(Tr f, 2^(-k))_p)_k‖_{ℓ_q} ≤
 K (‖f‖_{L_p(Ω)} + ‖(2^(k(s+1/p)) ω_L(f, 2^(-k), Ω)_p)_k‖_{ℓ_q})`. -/
-theorem modNorm_trace_le_flat {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞) (L : ℕ) {r : ℕ}
+theorem modNorm_graphTrace_le_halfSpaceGraph {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞) (L : ℕ) {r : ℕ}
     (hr : 1 ≤ r) {s : ℝ} (hs : 0 < s) (hsr : s < r) {q : ℝ≥0∞} (hq : 1 ≤ q) :
     ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ f : Lp ℂ p (volume : Measure V),
-      modNormOn (flat e he).measurableSet_domain L (s + 1 / p.toReal) q f < ∞ →
-      ‖(flat e he).trace hp L f‖ₑ +
-          lqNorm q (fun k => dyadicWeight s k * lpModulus p r ((flat e he).trace hp L f) k) ≤
-        K * modNormOn (flat e he).measurableSet_domain L (s + 1 / p.toReal) q f := by
-  set Ω := flat e he
-  obtain ⟨K, hK, hle⟩ := modNorm_traceSeries_le_flat e he Ω.coneBump hp L hr hs hsr hq
+      modNormOn (halfSpaceGraph e he).measurableSet_domain L (s + 1 / p.toReal) q f < ∞ →
+      ‖(halfSpaceGraph e he).graphTrace hp L f‖ₑ +
+          lqNorm q (fun k => dyadicWeight s k *
+            lpModulus p r ((halfSpaceGraph e he).graphTrace hp L f) k) ≤
+        K * modNormOn (halfSpaceGraph e he).measurableSet_domain L (s + 1 / p.toReal) q f := by
+  set Ω := halfSpaceGraph e he
+  obtain ⟨K, hK, hle⟩ := modNorm_traceSeries_le_halfSpaceGraph e he Ω.coneBump hp L hr hs hsr hq
   refine ⟨K * Ω.intrinsicConst L, ENNReal.mul_ne_top hK (Ω.intrinsicConst_ne_top L),
     fun f hf => ?_⟩
   have hX := Ω.intrinsicNorm_lt_top hp L (s + 1 / p.toReal) hq hf
   rw [mul_assoc]
-  exact (hle (fun j => Ω.cutoff (Ω.coneBump.localMean hp L j f)) hX).trans
+  exact (hle (fun j => Ω.graphCutoff (Ω.coneBump.localMean hp L j f)) hX).trans
     (mul_le_mul' le_rfl (Ω.intrinsicNorm_le hp L (s + 1 / p.toReal) hq f))
 
 /-! ### Extended atoms of every order -/
 
 /-- The mollified graph of the flat graph vanishes. -/
-theorem smoothGraph_flat (j : ℕ) (x' : (flat e he).hyperplane) :
-    (flat e he).smoothGraph j x' = 0 := by
-  have h : (flat e he).graphFun = 0 := funext fun x' => by simp [graphFun, flat]
+theorem smoothGraph_halfSpaceGraph (j : ℕ) (x' : (halfSpaceGraph e he).hyperplane) :
+    (halfSpaceGraph e he).smoothGraph j x' = 0 := by
+  have h : (halfSpaceGraph e he).graphFun = 0 := funext fun x' => by simp [graphFun, halfSpaceGraph]
   simp [smoothGraph, h, conv, convolution_zero]
 
 /-- The vertical cut-off of the flat graph is `v_j(x) = χ(2^j ⟪x, e⟫)`. -/
-theorem vertCutoff_flat (j : ℕ) (x : V) :
-    (flat e he).vertCutoff j x = (flat e he).profile (2 ^ j * inner ℝ x e) := by
-  rw [vertCutoff, vertCoord, smoothGraph_flat, sub_zero]
+theorem vertCutoff_halfSpaceGraph (j : ℕ) (x : V) :
+    (halfSpaceGraph e he).vertCutoff j x = (halfSpaceGraph e he).profile (2 ^ j * inner ℝ x e) := by
+  rw [vertCutoff, vertCoord, smoothGraph_halfSpaceGraph, sub_zero]
   rfl
 
 /-- **Extended atoms of every order**: for the flat graph and every order `K` there is `B ≥ 0`
 such that the extension `A(x) = a(Px) χ(2^j ⟪x, e⟫)` of a smooth atom `a` on `H` of order `K`,
 level `j`, radius factor `d` and constant `A` is a smooth atom on `V` of order `K` with radius
 factor `extendRadius d`, constant `2^K B A` and centre `c'`, by Leibniz's rule. -/
-theorem exists_isSmoothAtom_extendAtom_flat (K : ℕ) :
-    ∃ B : ℝ, 0 ≤ B ∧ ∀ {d A : ℝ} {j : ℕ} {c' : (flat e he).hyperplane}
-      {a : (flat e he).hyperplane → ℂ}, 0 ≤ A → IsSmoothAtom Set.univ K d A j c' a →
-      IsSmoothAtom Set.univ K ((flat e he).extendRadius d) (2 ^ K * B * A) j
-        ((flat e he).extendCenter j c') ((flat e he).extendAtom j a) := by
-  set Ω := flat e he
+theorem exists_isSmoothAtom_extendAtom_halfSpaceGraph (K : ℕ) :
+    ∃ B : ℝ, 0 ≤ B ∧ ∀ {d A : ℝ} {j : ℕ} {c' : (halfSpaceGraph e he).hyperplane}
+      {a : (halfSpaceGraph e he).hyperplane → ℂ}, 0 ≤ A → IsSmoothAtom Set.univ K d A j c' a →
+      IsSmoothAtom Set.univ K ((halfSpaceGraph e he).extendRadius d) (2 ^ K * B * A) j
+        ((halfSpaceGraph e he).extendCenter j c') ((halfSpaceGraph e he).extendAtom j a) := by
+  set Ω := halfSpaceGraph e he
   obtain ⟨B₀, hB₀⟩ := exists_iteratedFDeriv_bound Ω.contDiff_profile Ω.hasCompactSupport_profile K
   refine ⟨|B₀|, abs_nonneg _, fun {d A j c' a} hA ha => ?_⟩
-  set P : V →L[ℝ] Ω.hyperplane := Ω.proj
+  set P : V →L[ℝ] Ω.hyperplane := Ω.graphProj
   set ℓ : V →L[ℝ] ℝ := (2 ^ j : ℝ) • innerSL ℝ e
   have hℓx : ∀ x, ℓ x = 2 ^ j * inner ℝ x e := fun x => by
     simp [ℓ, real_inner_comm]
   have hext : Ω.extendAtom j a = fun x => (a ∘ P) x * (Ω.profile ∘ ℓ) x := funext fun x => by
-    rw [extendAtom, vertCutoff_flat, Function.comp_apply, Function.comp_apply, hℓx]
+    rw [extendAtom, vertCutoff_halfSpaceGraph, Function.comp_apply, Function.comp_apply, hℓx]
   have hP : ‖P‖ ≤ 1 := ContinuousLinearMap.opNorm_le_bound _ zero_le_one fun x => by
     rw [one_mul]
-    exact Ω.norm_proj_le x
+    exact Ω.norm_graphProj_le x
   have hℓ : ‖ℓ‖ ≤ 2 ^ j := ContinuousLinearMap.opNorm_le_bound _ (by positivity) fun x => by
     rw [hℓx, norm_mul, Real.norm_of_nonneg (by positivity)]
     gcongr
@@ -283,13 +291,13 @@ variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 order `r ≥ 1` there are a radius factor `d`, a constant `C < ∞` and an overlap bound `N` such that
 the extensions of the cell atoms on `H` form a package of extended atoms of order `r`
 (`Rd.LipschitzGraph.HasExtensionAtoms`): the cell atoms are smooth of order `r`, and so are their
-extensions (`Rd.LipschitzGraph.exists_isSmoothAtom_extendAtom_flat`). -/
-theorem exists_flat_extension_atoms (Lh : ℕ) {r : ℕ} (hr : 1 ≤ r) :
-    ∃ (d : ℝ) (C : ℝ≥0∞) (N : ℕ), C ≠ ∞ ∧ (flat e he).HasExtensionAtoms p Lh r d C N := by
-  set Ω := flat e he
+extensions (`Rd.LipschitzGraph.exists_isSmoothAtom_extendAtom_halfSpaceGraph`). -/
+theorem exists_halfSpaceGraph_extension_atoms (Lh : ℕ) {r : ℕ} (hr : 1 ≤ r) :
+    ∃ (d : ℝ) (C : ℝ≥0∞) (N : ℕ), C ≠ ∞ ∧ (halfSpaceGraph e he).HasExtensionAtoms p Lh r d C N := by
+  set Ω := halfSpaceGraph e he
   have hp1 : 1 ≤ p := Fact.out
   obtain ⟨A, hA, hsm⟩ := Ω.graphBump.exists_isSmoothAtom_cellAtom hp1 Lh r
-  obtain ⟨B, hB, hext⟩ := exists_isSmoothAtom_extendAtom_flat e he r
+  obtain ⟨B, hB, hext⟩ := exists_isSmoothAtom_extendAtom_halfSpaceGraph e he r
   set d := Ω.extendRadius (Ω.extRadiusH Lh)
   have hd : 0 ≤ d := Ω.extendRadius_nonneg (Ω.extRadiusH_nonneg Lh)
   have hBA : 0 ≤ 2 ^ r * B * A := by positivity
@@ -305,10 +313,11 @@ theorem exists_flat_extension_atoms (Lh : ℕ) {r : ℕ} (hr : 1 ≤ r) :
     fun j h hh => ⟨fun m => ?_, fun x S hS => ?_⟩⟩
   · exact isRegularAtomOn_of_isSmoothAtom convex_univ MeasurableSet.univ hint hr le_rfl hd hBA
       (hext hA (hsm j hh m))
-  · refine card_le_of_norm_sub_cellCenter_le j (by positivity) (Ω.proj x) S fun m hm => ?_
-    calc ‖Ω.proj x - cellCenter j m‖ = ‖Ω.proj (x - Ω.extendCenter j (cellCenter j m))‖ := by
-          rw [map_sub, Ω.proj_extendCenter]
-      _ ≤ ‖x - Ω.extendCenter j (cellCenter j m)‖ := Ω.norm_proj_le _
+  · refine card_le_of_norm_sub_cellCenter_le j (by positivity) (Ω.graphProj x) S fun m hm => ?_
+    calc ‖Ω.graphProj x - cellCenter j m‖
+      _ = ‖Ω.graphProj (x - Ω.extendCenter j (cellCenter j m))‖ := by
+          rw [map_sub, Ω.graphProj_extendCenter]
+      _ ≤ ‖x - Ω.extendCenter j (cellCenter j m)‖ := Ω.norm_graphProj_le _
       _ ≤ (d + r) / 2 ^ j := (hS m hm).2
 
 /-- **The extension of every order is bounded by the local means**: for the flat graph, `s > 0`
@@ -318,15 +327,16 @@ extension `E g` of moment order `Lh` (`Rd.LipschitzGraph.graphExtension`), from 
 of order `r` (`Rd.LipschitzGraph.modNorm_graphExtension_le_localMeansNorm`). -/
 theorem modNorm_flatExtension_le_localMeansNorm (hp : p ≠ ∞) (Lh : ℕ) {r : ℕ} {s : ℝ}
     (hs : 0 < s) (hsr : s + 1 / p.toReal < r) {q : ℝ≥0∞} (hq : 1 ≤ q) :
-    ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ g : Lp ℂ p (volume : Measure (flat e he).hyperplane),
-      (flat e he).graphBump.localMeansNorm hp Lh s q g < ∞ →
-      ‖(flat e he).graphExtension hp Lh g‖ₑ + lqNorm q (fun k => dyadicWeight (s + 1 / p.toReal) k *
-          lpModulus p r ((flat e he).graphExtension hp Lh g) k) ≤
-        K * (flat e he).graphBump.localMeansNorm hp Lh s q g := by
-  obtain ⟨d, C, N, hC, hat⟩ := exists_flat_extension_atoms e he (p := p) Lh
+    ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ g : Lp ℂ p (volume : Measure (halfSpaceGraph e he).hyperplane),
+      (halfSpaceGraph e he).graphBump.localMeansNorm hp Lh s q g < ∞ →
+      ‖(halfSpaceGraph e he).graphExtension hp Lh g‖ₑ +
+        lqNorm q (fun k => dyadicWeight (s + 1 / p.toReal) k *
+          lpModulus p r ((halfSpaceGraph e he).graphExtension hp Lh g) k) ≤
+        K * (halfSpaceGraph e he).graphBump.localMeansNorm hp Lh s q g := by
+  obtain ⟨d, C, N, hC, hat⟩ := exists_halfSpaceGraph_extension_atoms e he (p := p) Lh
     (one_le_of_add_one_div_toReal_lt hs hsr)
   exact ⟨_, atomSynthConst_ne_top Fact.out N hC r (by positivity) hsr, fun g hX =>
-    (flat e he).modNorm_graphExtension_le_localMeansNorm hp Lh hat hs hsr hq hX⟩
+    (halfSpaceGraph e he).modNorm_graphExtension_le_localMeansNorm hp Lh hat hs hsr hq hX⟩
 
 /-- **The extension of every order, bounded by the moduli of `g`**: for the flat graph, `s > 0`
 and `s + 1/p < r` there is `K < ∞` with
@@ -335,55 +345,58 @@ K (‖g‖_{L_p(H)} + ‖(2^(ks) ω_{Lh}(g, 2^(-k))_p)_k‖_{ℓ_q})` for the ex
 (`Rd.LipschitzGraph.modNorm_graphExtension_le_of_atoms`). -/
 theorem modNorm_flatExtension_le (hp : p ≠ ∞) (Lh : ℕ) {r : ℕ} {s : ℝ} (hs : 0 < s)
     (hsr : s + 1 / p.toReal < r) {q : ℝ≥0∞} (hq : 1 ≤ q) :
-    ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ g : Lp ℂ p (volume : Measure (flat e he).hyperplane),
+    ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ g : Lp ℂ p (volume : Measure (halfSpaceGraph e he).hyperplane),
       ‖g‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p Lh g k) < ∞ →
-      ‖(flat e he).graphExtension hp Lh g‖ₑ + lqNorm q (fun k => dyadicWeight (s + 1 / p.toReal) k *
-          lpModulus p r ((flat e he).graphExtension hp Lh g) k) ≤
+      ‖(halfSpaceGraph e he).graphExtension hp Lh g‖ₑ +
+        lqNorm q (fun k => dyadicWeight (s + 1 / p.toReal) k *
+          lpModulus p r ((halfSpaceGraph e he).graphExtension hp Lh g) k) ≤
         K * (‖g‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p Lh g k)) := by
-  obtain ⟨d, C, N, hC, hat⟩ := exists_flat_extension_atoms e he (p := p) Lh
+  obtain ⟨d, C, N, hC, hat⟩ := exists_halfSpaceGraph_extension_atoms e he (p := p) Lh
     (one_le_of_add_one_div_toReal_lt hs hsr)
   exact ⟨_, ENNReal.mul_ne_top (atomSynthConst_ne_top Fact.out N hC r (by positivity) hsr)
-    ((flat e he).graphBump.upperConst_ne_top Lh s), fun g hg =>
-      (flat e he).modNorm_graphExtension_le_of_atoms hp Lh hat hs hsr hq hg⟩
+    ((halfSpaceGraph e he).graphBump.upperConst_ne_top Lh s), fun g hg =>
+      (halfSpaceGraph e he).modNorm_graphExtension_le_of_atoms hp Lh hat hs hsr hq hg⟩
 
 /-- **The trace of the extension of every order**: for the flat graph, `L ≥ 2`, `Lh ≥ 1`, `s > 0`
 with `s + 1/p < L` and `g ∈ L_p(H)` with a finite local means quasi-norm
 `‖(2^(js) ‖k_j ⋆ g‖_p)_j‖_{ℓ_q}`, the extension of moment order `Lh` has `Tr (E g) = g`, from the
-extended atoms of order `L` (`Rd.LipschitzGraph.trace_graphExtension_of_atoms`). -/
-theorem trace_flatExtension (hp : p ≠ ∞) {L : ℕ} (hL : 2 ≤ L) {Lh : ℕ} (hLh : 1 ≤ Lh) {s : ℝ}
+extended atoms of order `L` (`Rd.LipschitzGraph.graphTrace_graphExtension_of_atoms`). -/
+theorem graphTrace_flatExtension (hp : p ≠ ∞) {L : ℕ} (hL : 2 ≤ L) {Lh : ℕ} (hLh : 1 ≤ Lh) {s : ℝ}
     (hs : 0 < s) (hsL : s + 1 / p.toReal < L) {q : ℝ≥0∞} (hq : 1 ≤ q)
-    {g : Lp ℂ p (volume : Measure (flat e he).hyperplane)}
-    (hX : (flat e he).graphBump.localMeansNorm hp Lh s q g < ∞) :
-    (flat e he).trace hp L ((flat e he).graphExtension hp Lh g) = g := by
-  obtain ⟨d, C, N, hC, hat⟩ := exists_flat_extension_atoms e he (p := p) Lh (r := L) (by omega)
-  exact (flat e he).trace_graphExtension_of_atoms hp hLh le_rfl hC hat hs hsL hq hX
+    {g : Lp ℂ p (volume : Measure (halfSpaceGraph e he).hyperplane)}
+    (hX : (halfSpaceGraph e he).graphBump.localMeansNorm hp Lh s q g < ∞) :
+    (halfSpaceGraph e he).graphTrace hp L ((halfSpaceGraph e he).graphExtension hp Lh g) = g := by
+  obtain ⟨d, C, N, hC, hat⟩ :=
+    exists_halfSpaceGraph_extension_atoms e he (p := p) Lh (r := L) (by omega)
+  exact (halfSpaceGraph e he).graphTrace_graphExtension_of_atoms hp hLh le_rfl hC hat hs hsL hq hX
 
 /-- **The trace space of the half-space, for every smoothness**: for `1 ≤ p < ∞`, `s > 0`,
 `1 ≤ q ≤ ∞`, `L ≥ 2` with `s + 1/p < L`, and `r > s`, `g ∈ L_p(H)` is the trace of some `f` with
 `‖f‖_{L_p(Ω)} + ‖(2^(k(s+1/p)) ω_L(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞` iff
 `‖g‖_p + ‖(2^(ks) ω_r(g, 2^(-k))_p)_k‖_{ℓ_q} < ∞`. The trace is bounded
-(`Rd.LipschitzGraph.modNorm_trace_le_flat`), and the extension of moment order `r` is such an `f`
-(`Rd.LipschitzGraph.trace_flatExtension`). -/
-theorem exists_trace_eq_iff_flat (hp : p ≠ ∞) {L : ℕ} (hL : 2 ≤ L) {r : ℕ} {s : ℝ} (hs : 0 < s)
-    (hsr : s < r) (hsL : s + 1 / p.toReal < L) {q : ℝ≥0∞} (hq : 1 ≤ q)
-    (g : Lp ℂ p (volume : Measure (flat e he).hyperplane)) :
+(`Rd.LipschitzGraph.modNorm_graphTrace_le_halfSpaceGraph`), and the extension of moment order `r` is
+such an `f` (`Rd.LipschitzGraph.graphTrace_flatExtension`). -/
+theorem exists_graphTrace_eq_iff_halfSpaceGraph (hp : p ≠ ∞) {L : ℕ} (hL : 2 ≤ L) {r : ℕ} {s : ℝ}
+    (hs : 0 < s) (hsr : s < r) (hsL : s + 1 / p.toReal < L) {q : ℝ≥0∞} (hq : 1 ≤ q)
+    (g : Lp ℂ p (volume : Measure (halfSpaceGraph e he).hyperplane)) :
     (∃ f : Lp ℂ p (volume : Measure V),
-        modNormOn (flat e he).measurableSet_domain L (s + 1 / p.toReal) q f < ∞ ∧
-          (flat e he).trace hp L f = g) ↔
+        modNormOn (halfSpaceGraph e he).measurableSet_domain L (s + 1 / p.toReal) q f < ∞ ∧
+          (halfSpaceGraph e he).graphTrace hp L f = g) ↔
       ‖g‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r g k) < ∞ := by
   have hr : 1 ≤ r := Nat.cast_pos.1 (hs.trans hsr)
   constructor
   · rintro ⟨f, hf, rfl⟩
-    obtain ⟨K, hK, hle⟩ := modNorm_trace_le_flat e he hp L hr hs hsr hq
+    obtain ⟨K, hK, hle⟩ := modNorm_graphTrace_le_halfSpaceGraph e he hp L hr hs hsr hq
     exact (hle f hf).trans_lt (ENNReal.mul_lt_top hK.lt_top hf)
   · intro hg
-    have hX : (flat e he).graphBump.localMeansNorm hp r s q g < ∞ :=
-      ((flat e he).graphBump.localMeansNorm_le hp r s hq g).trans_lt
-        (ENNReal.mul_lt_top ((flat e he).graphBump.upperConst_ne_top r s).lt_top hg)
+    have hX : (halfSpaceGraph e he).graphBump.localMeansNorm hp r s q g < ∞ :=
+      ((halfSpaceGraph e he).graphBump.localMeansNorm_le hp r s hq g).trans_lt
+        (ENNReal.mul_lt_top ((halfSpaceGraph e he).graphBump.upperConst_ne_top r s).lt_top hg)
     obtain ⟨K, hK, hle⟩ := modNorm_flatExtension_le_localMeansNorm e he hp r hs hsL hq
-    exact ⟨(flat e he).graphExtension hp r g, ((flat e he).intrinsicNorm_lt_top_of_modNorm hp L
-      hq ((hle g hX).trans_lt (ENNReal.mul_lt_top hK.lt_top hX))).1,
-      trace_flatExtension e he hp hL hr hs hsL hq hX⟩
+    exact ⟨(halfSpaceGraph e he).graphExtension hp r g,
+      ((halfSpaceGraph e he).intrinsicNorm_lt_top_of_modNorm hp L hq
+        ((hle g hX).trans_lt (ENNReal.mul_lt_top hK.lt_top hX))).1,
+      graphTrace_flatExtension e he hp hL hr hs hsL hq hX⟩
 
 end Extension
 
@@ -441,15 +454,16 @@ intrinsic quasi-norm of smoothness `s + 1/p`, `s > 0`, on the open half-space, a
 continuous on the closed half-space, vanish there outside a compact set, and agree with `f` almost
 everywhere on the open half-space. Then `Tr f = G` almost everywhere on `e^⊥`. The folded `G ∘ F`
 is continuous with compact support and agrees with `f` on the half-space, and traces of continuous
-functions are restrictions (`Rd.LipschitzGraph.trace_ae_eq_comp_graphMap`). -/
-theorem trace_ae_eq_of_continuousOn (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s : ℝ} (hs : 0 < s)
+functions are restrictions (`Rd.LipschitzGraph.graphTrace_ae_eq_comp_graphMap`). -/
+theorem graphTrace_ae_eq_of_continuousOn (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s : ℝ} (hs : 0 < s)
     {q : ℝ≥0∞} (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure V)}
-    (hf : modNormOn (LipschitzGraph.flat e he).measurableSet_domain L (s + 1 / p.toReal) q f < ∞)
+    (hf : modNormOn (LipschitzGraph.halfSpaceGraph e he).measurableSet_domain L
+      (s + 1 / p.toReal) q f < ∞)
     {G : V → ℂ} (hG : ContinuousOn G (closedHalfSpace e)) {K : Set V} (hK : IsCompact K)
     (hGK : ∀ x ∈ closedHalfSpace e, x ∉ K → G x = 0)
-    (hfG : ∀ᵐ x ∂volume, x ∈ (LipschitzGraph.flat e he).domain → f x = G x) :
-    (LipschitzGraph.flat e he).trace hp L f =ᵐ[volume] fun x' => G x' := by
-  set Ω := LipschitzGraph.flat e he
+    (hfG : ∀ᵐ x ∂volume, x ∈ (LipschitzGraph.halfSpaceGraph e he).domain → f x = G x) :
+    (LipschitzGraph.halfSpaceGraph e he).graphTrace hp L f =ᵐ[volume] fun x' => G x' := by
+  set Ω := LipschitzGraph.halfSpaceGraph e he
   set G' := G ∘ foldHalfSpace e
   have hG'c : Continuous G' :=
     hG.comp_continuous (continuous_foldHalfSpace e) (foldHalfSpace_mem he)
@@ -463,9 +477,9 @@ theorem trace_ae_eq_of_continuousOn (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s
     exact hGK _ (foldHalfSpace_mem he x) hfx
   have hmem : MemLp G' p volume := hG'c.memLp_of_hasCompactSupport hG's
   have hFG : (hmem.toLp G' : V → ℂ) =ᵐ[volume] G' := hmem.coeFn_toLp
-  have hcut : Ω.cutoff (hmem.toLp G') = Ω.cutoff f := by
+  have hcut : Ω.graphCutoff (hmem.toLp G') = Ω.graphCutoff f := by
     refine Lp.ext ?_
-    filter_upwards [Ω.cutoff_apply_ae (hmem.toLp G'), Ω.cutoff_apply_ae f, hFG, hfG]
+    filter_upwards [Ω.graphCutoff_apply_ae (hmem.toLp G'), Ω.graphCutoff_apply_ae f, hFG, hfG]
       with x h1 h2 h3 h4
     rw [h1, h2]
     by_cases hx : x ∈ Ω.domain
@@ -475,13 +489,13 @@ theorem trace_ae_eq_of_continuousOn (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s
     · rw [indicator_of_notMem hx, indicator_of_notMem hx]
   have hFfin : modNormOn Ω.measurableSet_domain L (s + 1 / p.toReal) q (hmem.toLp G') < ∞ :=
     (modNormOn_congr Ω.measurableSet_domain hcut).trans_lt hf
-  rw [← Ω.trace_congr hp L hcut]
-  filter_upwards [Ω.trace_ae_eq_comp_graphMap hp hL hs hq hFfin hG'c hFG] with x' hx'
+  rw [← Ω.graphTrace_congr hp L hcut]
+  filter_upwards [Ω.graphTrace_ae_eq_comp_graphMap hp hL hs hq hFfin hG'c hFG] with x' hx'
   have hx'0 : inner ℝ (x' : V) e = 0 := by
     have h := x'.2
     rw [Submodule.mem_orthogonal_singleton_iff_inner_right, real_inner_comm] at h
     exact h
-  rw [hx', Function.comp_apply, LipschitzGraph.flat_graphMap]
+  rw [hx', Function.comp_apply, LipschitzGraph.halfSpaceGraph_graphMap]
   show G (foldHalfSpace e x') = G x'
   rw [foldHalfSpace_of_nonneg e hx'0.ge]
 

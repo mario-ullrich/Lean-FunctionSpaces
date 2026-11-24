@@ -55,19 +55,19 @@ variable (A : BesovAtlas I M)
 /-- The **chart measure** of a Besov atlas: `μ_A = ∑_k (κ_k⁻¹)_* (ψ_k ∘ κ_k⁻¹ · vol|_{T_k})`,
 `T_k` the target of the extended chart `κ_k`. -/
 noncomputable def chartMeasure : Measure M :=
-  ∑ k, Measure.map (A.ext k).symm ((volume.restrict (A.ext k).target).withDensity
-    fun y => ENNReal.ofReal (A.psi k ((A.ext k).symm y)))
+  ∑ k, Measure.map (A.extChart k).symm ((volume.restrict (A.extChart k).target).withDensity
+    fun y => ENNReal.ofReal (A.psi k ((A.extChart k).symm y)))
 
 /-- **The chart measure of a measurable set**: `μ_A(S) = ∑_k ∫_{S_k} ψ_k(κ_k⁻¹ y) dy`, where
 `S_k` is the set of `y ∈ T_k` with `κ_k⁻¹ y ∈ S`. -/
 theorem chartMeasure_apply {S : Set M} (hS : MeasurableSet S) :
-    A.chartMeasure S = ∑ k, ∫⁻ y in (A.ext k).target ∩ (A.ext k).symm ⁻¹' S,
-      ENNReal.ofReal (A.psi k ((A.ext k).symm y)) := by
+    A.chartMeasure S = ∑ k, ∫⁻ y in (A.extChart k).target ∩ (A.extChart k).symm ⁻¹' S,
+      ENNReal.ofReal (A.psi k ((A.extChart k).symm y)) := by
   rw [chartMeasure, Measure.coe_finsetSum, Finset.sum_apply]
   refine Finset.sum_congr rfl fun k _ => ?_
   have hT := measurableSet_extend_target I (A.chart k)
-  have hκ : AEMeasurable (A.ext k).symm ((volume.restrict (A.ext k).target).withDensity
-      fun y => ENNReal.ofReal (A.psi k ((A.ext k).symm y))) :=
+  have hκ : AEMeasurable (A.extChart k).symm ((volume.restrict (A.extChart k).target).withDensity
+      fun y => ENNReal.ofReal (A.psi k ((A.extChart k).symm y))) :=
     (((A.chart k).continuousOn_extend_symm (I := I)).aemeasurable hT).mono_ac
       (withDensity_absolutelyContinuous _ _)
   rw [Measure.map_apply_of_aemeasurable hκ hS, withDensity_apply' _ _,
@@ -80,22 +80,22 @@ instance isFiniteMeasure_chartMeasure [CompactSpace M] : IsFiniteMeasure A.chart
   rw [A.chartMeasure_apply MeasurableSet.univ]
   refine ENNReal.sum_lt_top.2 fun k _ => ?_
   have hT := measurableSet_extend_target I (A.chart k)
-  have hK : IsCompact (A.ext k '' tsupport (A.psi k)) :=
+  have hK : IsCompact (A.extChart k '' tsupport (A.psi k)) :=
     (isClosed_tsupport _).isCompact.image_of_continuousOn ((A.chart k).continuousOn_extend.mono
       (by rw [OpenPartialHomeomorph.extend_source]; exact A.tsupport_psi_subset k))
   rw [preimage_univ, inter_univ]
-  calc ∫⁻ y in (A.ext k).target, ENNReal.ofReal (A.psi k ((A.ext k).symm y))
-      ≤ ∫⁻ y in (A.ext k).target, (A.ext k '' tsupport (A.psi k)).indicator 1 y := by
+  calc ∫⁻ y in (A.extChart k).target, ENNReal.ofReal (A.psi k ((A.extChart k).symm y))
+      ≤ ∫⁻ y in (A.extChart k).target, (A.extChart k '' tsupport (A.psi k)).indicator 1 y := by
         refine setLIntegral_mono' hT fun y hy => ?_
-        by_cases h0 : A.psi k ((A.ext k).symm y) = 0
+        by_cases h0 : A.psi k ((A.extChart k).symm y) = 0
         · rw [h0, ENNReal.ofReal_zero]
           exact zero_le
-        · have hyK : y ∈ A.ext k '' tsupport (A.psi k) :=
-            ⟨_, subset_tsupport _ h0, (A.ext k).right_inv hy⟩
+        · have hyK : y ∈ A.extChart k '' tsupport (A.psi k) :=
+            ⟨_, subset_tsupport _ h0, (A.extChart k).right_inv hy⟩
           rw [indicator_of_mem hyK, Pi.one_apply, ← ENNReal.ofReal_one]
           exact ENNReal.ofReal_le_ofReal (A.psi_le_one k _)
-    _ ≤ ∫⁻ y, (A.ext k '' tsupport (A.psi k)).indicator 1 y := setLIntegral_le_lintegral _ _
-    _ = volume (A.ext k '' tsupport (A.psi k)) := lintegral_indicator_one hK.measurableSet
+    _ ≤ ∫⁻ y, (A.extChart k '' tsupport (A.psi k)).indicator 1 y := setLIntegral_le_lintegral _ _
+    _ = volume (A.extChart k '' tsupport (A.psi k)) := lintegral_indicator_one hK.measurableSet
     _ < ⊤ := hK.measure_lt_top
 
 /-! ### The density in a chart -/
@@ -203,8 +203,8 @@ vanishes off the source of `Φ_k` (`Manifold.BesovAtlas.densityTerm_eq_zero`), a
 theorem setLIntegral_densityTerm {e : OpenPartialHomeomorph M H} (he : e ∈ atlas H M)
     (k : Fin A.n) {B : Set E} (hB : MeasurableSet B) :
     ∫⁻ z in B ∩ (e.extend I).target, ENNReal.ofReal (A.densityTerm e k z) =
-      ∫⁻ y in (A.ext k).target ∩ (A.ext k).symm ⁻¹' (e.source ∩ e.extend I ⁻¹' B),
-        ENNReal.ofReal (A.psi k ((A.ext k).symm y)) := by
+      ∫⁻ y in (A.extChart k).target ∩ (A.extChart k).symm ⁻¹' (e.source ∩ e.extend I ⁻¹' B),
+        ENNReal.ofReal (A.psi k ((A.extChart k).symm y)) := by
   set Φ := I.extendCoordChange e (A.chart k)
   have hΦm : MeasurableSet Φ.source := measurableSet_coordChange_source e (A.chart k)
   have hT := measurableSet_extend_target I e
@@ -230,10 +230,10 @@ theorem setLIntegral_densityTerm {e : OpenPartialHomeomorph M H} (he : e ∈ atl
     _ = _ := by
         refine setLIntegral_congr_fun (hB.inter hΦm) fun z hz => ?_
         obtain ⟨-, hzs⟩ := (mem_coordChange_source _ _).1 hz.2
-        have hzs' : (e.extend I).symm z ∈ (A.ext k).source := by
+        have hzs' : (e.extend I).symm z ∈ (A.extChart k).source := by
           rwa [OpenPartialHomeomorph.extend_source]
-        rw [densityTerm, ENNReal.ofReal_mul (abs_nonneg _), coordChange_apply,
-          (A.ext k).left_inv hzs']
+        rw [densityTerm, ENNReal.ofReal_mul (abs_nonneg _), extendCoordChange_apply,
+          (A.extChart k).left_inv hzs']
 
 /-- **The chart measure in a chart**: for every chart `e` of the atlas of `M` (`e ∈ atlas H M`),
 with extended chart `κ`,

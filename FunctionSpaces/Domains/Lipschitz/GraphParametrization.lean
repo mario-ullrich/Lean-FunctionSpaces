@@ -16,14 +16,14 @@ graph of `φ` over the hyperplane `H = e^⊥` (`Rd.LipschitzGraph.hyperplane`), 
 (`Rd.LipschitzGraph.finrank_hyperplane_add_one`), with `H^⊥ = ℝ e`
 (`Rd.LipschitzGraph.orthogonal_hyperplane`) and the Lebesgue measure of its inner product.
 The **graph map** `γ(x') = x' + φ(x') e` (`Rd.LipschitzGraph.graphMap`) satisfies `P(γ x') = x'`
-for the orthogonal projection `Px = x - ⟪x, e⟫ e` onto `H` (`Rd.LipschitzGraph.proj`, from the
+for the orthogonal projection `Px = x - ⟪x, e⟫ e` onto `H` (`Rd.LipschitzGraph.graphProj`, from the
 formula for the projection onto the hyperplane of any unit vector,
 `Rd.coe_orthogonalProjectionOnto_orthogonalComplement_singleton`), and it is Lipschitz with
 constant `1 + M` (`Rd.LipschitzGraph.norm_graphMap_sub_le`), and the graph function `φ|_H`
 (`Rd.LipschitzGraph.phiH`) is `M`-Lipschitz (`Rd.LipschitzGraph.lipschitzWith_phiH`). The
 boundary of `Ω` is the graph: `y ∈ ∂Ω` iff `γ(Py) = y` iff `⟪y, e⟫ = φ(y)`
-(`Rd.LipschitzGraph.mem_frontier_domain_iff`, `Rd.LipschitzGraph.graphMap_proj_eq_iff`), so `∂Ω`
-is the range of `γ` (`Rd.LipschitzGraph.range_graphMap`).
+(`Rd.LipschitzGraph.mem_frontier_domain_iff`, `Rd.LipschitzGraph.graphMap_graphProj_eq_iff`), so
+`∂Ω` is the range of `γ` (`Rd.LipschitzGraph.range_graphMap`).
 
 **Traces of atoms** (`Rd.LipschitzGraph.isRegularAtom_comp_graphMap`): a continuous `a` on `V`
 that vanishes outside `B̄(c, d 2^(-j))`, with `|a| ≤ A` and `|a(x + h) - a(x)| ≤ A min(1, 2^j ‖h‖)`,
@@ -103,38 +103,39 @@ theorem finrank_hyperplane_eq_sub_one [FiniteDimensional ℝ V] :
   omega
 
 /-- The **orthogonal projection** onto `H`. -/
-noncomputable def proj : V →L[ℝ] Ω.hyperplane := Ω.hyperplane.orthogonalProjectionOnto
+noncomputable def graphProj : V →L[ℝ] Ω.hyperplane := Ω.hyperplane.orthogonalProjectionOnto
 
 /-- `Px = x - ⟪x, e⟫ e`. -/
-theorem coe_proj (x : V) : (Ω.proj x : V) = x - inner ℝ x Ω.e • Ω.e := by
-  rw [proj, coe_orthogonalProjectionOnto_orthogonalComplement_singleton Ω.norm_e, real_inner_comm]
+theorem coe_graphProj (x : V) : (Ω.graphProj x : V) = x - inner ℝ x Ω.e • Ω.e := by
+  rw [graphProj, coe_orthogonalProjectionOnto_orthogonalComplement_singleton Ω.norm_e,
+    real_inner_comm]
 
 /-- For `a ∈ H`, `⟪a, v⟫ = ⟪a, Pv⟫`: Mathlib's
 `Submodule.inner_orthogonalProjectionOnto_eq_of_mem_left`. -/
-theorem inner_coe_eq_inner_proj (a : Ω.hyperplane) (v : V) :
-    inner ℝ (a : V) v = inner ℝ a (Ω.proj v) :=
+theorem inner_coe_eq_inner_graphProj (a : Ω.hyperplane) (v : V) :
+    inner ℝ (a : V) v = inner ℝ a (Ω.graphProj v) :=
   (Ω.hyperplane.inner_orthogonalProjectionOnto_eq_of_mem_left a v).symm
 
 /-- `‖Px‖ ≤ ‖x‖`. -/
-theorem norm_proj_le (x : V) : ‖Ω.proj x‖ ≤ ‖x‖ :=
+theorem norm_graphProj_le (x : V) : ‖Ω.graphProj x‖ ≤ ‖x‖ :=
   Submodule.norm_orthogonalProjectionOnto_apply_le _ x
 
 /-- `P x' = x'` on `H`. -/
-theorem proj_coe (x' : Ω.hyperplane) : Ω.proj x' = x' :=
+theorem graphProj_coe (x' : Ω.hyperplane) : Ω.graphProj x' = x' :=
   Submodule.orthogonalProjectionOnto_mem_subspace_eq_self x'
 
 /-- `P e = 0`. -/
-theorem proj_e : Ω.proj Ω.e = 0 := by
+theorem graphProj_e : Ω.graphProj Ω.e = 0 := by
   apply Subtype.ext
-  rw [coe_proj, Ω.inner_e_self, one_smul, sub_self]
+  rw [coe_graphProj, Ω.inner_e_self, one_smul, sub_self]
   rfl
 
 /-- The **graph map** `γ(x') = x' + φ(x') e`. -/
 noncomputable def graphMap (x' : Ω.hyperplane) : V := (x' : V) + Ω.phi x' • Ω.e
 
 /-- `P(γ x') = x'`. -/
-theorem proj_graphMap (x' : Ω.hyperplane) : Ω.proj (Ω.graphMap x') = x' := by
-  rw [graphMap, map_add, map_smul, Ω.proj_e, smul_zero, add_zero, Ω.proj_coe]
+theorem graphProj_graphMap (x' : Ω.hyperplane) : Ω.graphProj (Ω.graphMap x') = x' := by
+  rw [graphMap, map_add, map_smul, Ω.graphProj_e, smul_zero, add_zero, Ω.graphProj_coe]
 
 /-- `⟪γ x', e⟫ = φ(x')`: the graph map lands on the boundary. -/
 theorem inner_graphMap (x' : Ω.hyperplane) : inner ℝ (Ω.graphMap x') Ω.e = Ω.phi x' := by
@@ -182,7 +183,7 @@ theorem continuous_phiH : Continuous Ω.phiH := Ω.lipschitzWith_phiH.continuous
 /-- **Steps into the cone from the boundary stay in the domain**: `γ x' + K ⊆ Ω`, since
 `φ(γ x') = ⟪γ x', e⟫` and a step `y` into the cone raises `⟪·, e⟫` faster than `φ`
 (`Rd.LipschitzGraph.phi_add_le`). -/
-theorem graphMap_add_mem (x' : Ω.hyperplane) {y : V} (hy : y ∈ Ω.cone) :
+theorem graphMap_add_mem (x' : Ω.hyperplane) {y : V} (hy : y ∈ Ω.graphCone) :
     Ω.graphMap x' + y ∈ Ω.domain := by
   have h := Ω.phi_add_le (Ω.graphMap x') y
   have hy' : Ω.M * ‖y - inner ℝ y Ω.e • Ω.e‖ < inner ℝ y Ω.e := hy
@@ -192,35 +193,37 @@ theorem graphMap_add_mem (x' : Ω.hyperplane) {y : V} (hy : y ∈ Ω.cone) :
   linarith
 
 /-- `‖x' - Pc‖ ≤ ‖γ x' - c‖`: the projection is a contraction. -/
-theorem norm_sub_proj_le (x' : Ω.hyperplane) (c : V) : ‖x' - Ω.proj c‖ ≤ ‖Ω.graphMap x' - c‖ := by
-  calc ‖x' - Ω.proj c‖ = ‖Ω.proj (Ω.graphMap x' - c)‖ := by rw [map_sub, Ω.proj_graphMap]
-    _ ≤ ‖Ω.graphMap x' - c‖ := Ω.norm_proj_le _
+theorem norm_sub_graphProj_le (x' : Ω.hyperplane) (c : V) :
+    ‖x' - Ω.graphProj c‖ ≤ ‖Ω.graphMap x' - c‖ := by
+  calc ‖x' - Ω.graphProj c‖ = ‖Ω.graphProj (Ω.graphMap x' - c)‖ := by
+        rw [map_sub, Ω.graphProj_graphMap]
+    _ ≤ ‖Ω.graphMap x' - c‖ := Ω.norm_graphProj_le _
 
 /-! ### The boundary of a graph domain -/
 
 /-- `φ(Py) = φ(y)`: `φ` is constant in the direction `e`. -/
-theorem phi_proj (y : V) : Ω.phi (Ω.proj y) = Ω.phi y := by
-  have h := Ω.const (Ω.proj y) (inner ℝ y Ω.e)
-  rw [coe_proj, sub_add_cancel] at h
-  rw [coe_proj]
+theorem phi_graphProj (y : V) : Ω.phi (Ω.graphProj y) = Ω.phi y := by
+  have h := Ω.const (Ω.graphProj y) (inner ℝ y Ω.e)
+  rw [coe_graphProj, sub_add_cancel] at h
+  rw [coe_graphProj]
   exact h.symm
 
 /-- **The graph** `γ(Py) = y` consists of the points with `⟪y, e⟫ = φ(y)`. -/
-theorem graphMap_proj_eq_iff (y : V) :
-    Ω.graphMap (Ω.proj y) = y ↔ inner ℝ y Ω.e = Ω.phi y := by
+theorem graphMap_graphProj_eq_iff (y : V) :
+    Ω.graphMap (Ω.graphProj y) = y ↔ inner ℝ y Ω.e = Ω.phi y := by
   constructor
   · intro h
-    have h1 := Ω.inner_graphMap (Ω.proj y)
-    rw [h, phi_proj] at h1
+    have h1 := Ω.inner_graphMap (Ω.graphProj y)
+    rw [h, phi_graphProj] at h1
     exact h1
   · intro h
-    rw [graphMap, phi_proj, coe_proj, ← h, sub_add_cancel]
+    rw [graphMap, phi_graphProj, coe_graphProj, ← h, sub_add_cancel]
 
 /-- **The boundary of a graph domain is the graph**: `y ∈ ∂Ω` iff `γ(Py) = y`, since the
 closure of `Ω` is `{φ ≤ ⟪·, e⟫}` (`Rd.LipschitzGraph.closure_domain`) and `Ω` is open. -/
 theorem mem_frontier_domain_iff (y : V) :
-    y ∈ frontier Ω.domain ↔ Ω.graphMap (Ω.proj y) = y := by
-  rw [graphMap_proj_eq_iff, frontier, Ω.isOpen_domain.interior_eq, Ω.closure_domain]
+    y ∈ frontier Ω.domain ↔ Ω.graphMap (Ω.graphProj y) = y := by
+  rw [graphMap_graphProj_eq_iff, frontier, Ω.isOpen_domain.interior_eq, Ω.closure_domain]
   exact ⟨fun h => (le_antisymm h.1 (not_lt.1 h.2)).symm, fun h => ⟨h.ge, h.not_gt⟩⟩
 
 /-- **The range of the graph map is the boundary** of the graph domain. -/
@@ -229,7 +232,7 @@ theorem range_graphMap : Set.range Ω.graphMap = frontier Ω.domain := by
   rw [Ω.mem_frontier_domain_iff]
   constructor
   · rintro ⟨x', rfl⟩
-    rw [Ω.proj_graphMap]
+    rw [Ω.graphProj_graphMap]
   · intro h
     exact ⟨_, h⟩
 
@@ -247,13 +250,13 @@ theorem isRegularAtom_comp_graphMap {p : ℝ≥0∞} {d : ℝ} (hd : 0 ≤ d) {A
     (hdiff : ∀ h x, ‖a (x + h) - a x‖ₑ ≤ A * min 1 (ENNReal.ofReal (2 ^ j * ‖h‖))) :
     IsRegularAtom p 1 1 d (ENNReal.ofReal (1 + Ω.M) * A * (((1 + 1 : ℕ) : ℝ≥0∞) *
       (ENNReal.ofReal (d ^ finrank ℝ Ω.hyperplane) * volume (ball (0 : Ω.hyperplane) 1))) ^
-        (1 / p.toReal)) j (Ω.proj c) (a ∘ Ω.graphMap) := by
+        (1 / p.toReal)) j (Ω.graphProj c) (a ∘ Ω.graphMap) := by
   have hK : 1 ≤ ENNReal.ofReal (1 + Ω.M) := by
     rw [← ENNReal.ofReal_one]
     exact ENNReal.ofReal_le_ofReal (by linarith [Ω.M_nonneg])
   refine isRegularAtom_of_pointwise hd (hac.comp Ω.continuous_graphMap).aestronglyMeasurable
     (fun x' hx' => ?_) (fun x' => ?_) (fun h' x' => ?_)
-  · exact h0 _ (hx'.trans_le (Ω.norm_sub_proj_le x' c))
+  · exact h0 _ (hx'.trans_le (Ω.norm_sub_graphProj_le x' c))
   · exact (hle _).trans (le_mul_of_one_le_left' hK)
   · simp only [Function.iterate_one, fwdDiff, Function.comp_apply, ENNReal.rpow_one]
     set v := Ω.graphMap (x' + h') - Ω.graphMap x'

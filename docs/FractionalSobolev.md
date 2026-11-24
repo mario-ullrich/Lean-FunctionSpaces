@@ -67,7 +67,7 @@ span of the test functions of `Ω` in `H^s(V)` (`Rd.testSpan`), and `U ↦ U|_Ω
 * **Injectivity for `s ≥ 0`.** For `s ≥ 0` and every `U ∈ H̃^s(Ω)`, the `L_2` function of `U`
   vanishes almost everywhere outside `Ω` (`Rd.sobolevToL2_ae_eq_zero_of_mem_tildeSpace`), and
   `U|_Ω = 0` implies `U = 0` (`Rd.eq_zero_of_mem_tildeSpace_of_restrictProj_eq_zero`,
-  `Rd.tildeToRestrictionL_injective`; Hewett–Moiola, Lemma 2.2(iii)).
+  `Rd.tildeToRestrictionL_injective_of_nonneg`; Hewett–Moiola, Lemma 2.2(iii)).
 * **`H̃^s(Ω)` by supports.** Let `s ≥ 0` and `ι_s U` be the `L_2` function of `U ∈ H^s(V)`. For
   a smooth `η` with compact support, `∫ η = 1` and dilates `η_c(x) = c^d η(c x)`: if `ι_s U`
   vanishes almost everywhere outside a compact set `S` and `supp η_{2^n} + S ⊆ Ω` for large `n`,
@@ -83,7 +83,7 @@ span of the test functions of `Ω` in `H^s(V)` (`Rd.testSpan`), and `U ↦ U|_Ω
   `H^s_0(Ω)` with `‖U|_Ω‖ ≤ ‖U‖ ≤ C ‖U|_Ω‖`
   (`Rd.HasZeroExtensionBound.norm_le_norm_restrictProj`,
   `Rd.HasZeroExtensionBound.range_tildeToRestrictionL`,
-  `Rd.HasZeroExtensionBound.tildeEquivZeroBoundary`), an isometry if `C = 1`
+  `Rd.HasZeroExtensionBound.tildeEquivZeroBoundaryOfBound`), an isometry if `C = 1`
   (`Rd.HasZeroExtensionBound.norm_restrictProj_eq`). The bound at `s` gives the bound with the
   same constant at `s + 1` (`Rd.HasZeroExtensionBound.add_one`).
 * **`H̃^m(Ω) ≅ H^m_0(Ω)` isometrically on every open set.** Every open `Ω` has the zero extension
@@ -121,7 +121,7 @@ span of the test functions of `Ω` in `H^s(V)` (`Rd.testSpan`), and `U ↦ U|_Ω
   `N_{s,Ω'}(G) = ‖G‖_{L_2(Ω')} + ‖(2^(ks) ω_1(G, 2^(-k), Ω')_2)_k‖_{ℓ_2}`. Every `G ∈ L_2(V)`
   that vanishes almost everywhere on `{x ∈ Ω' : η(x) < ε}` for some `ε > 0` satisfies
   `∫_{Ω'} |G|² / min(η, 1)^(2s) ≤ (1 + K_s 2^(2s+2)) N_{s,Ω'}(G)²`
-  (`Rd.LipschitzGraph.lintegral_div_min_height_le_modNormOn`; for `1/2 < s < 1` a weaker,
+  (`Rd.LipschitzGraph.lintegral_div_min_graphHeight_le_modNormOn`; for `1/2 < s < 1` a weaker,
   directional form of Dyda 2004, Theorem 1.1), and there is `C < ∞`, independent of `ε`, with
   `‖1_{Ω'} G‖_2 + ‖(2^(ks) ω_1(1_{Ω'} G, 2^(-k))_2)_k‖_{ℓ_2} ≤ C N_{s,Ω'}(G)`
   (`Rd.LipschitzGraph.exists_modNorm_indicatorLp_le_of_vanish`). On a bounded Lipschitz domain

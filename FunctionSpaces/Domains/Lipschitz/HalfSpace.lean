@@ -14,11 +14,11 @@ public import Mathlib.Geometry.Manifold.Instances.Real
 
 Lipschitz graph domains have the extension property (`Rd.LipschitzGraph.hasBesovExtension`):
 Rychkov's extension agrees with `f` on the domain and is bounded by a constant times the intrinsic
-quasi-norm (`Rd.LipschitzGraph.modNorm_extension_le_modNormOn`).
+quasi-norm (`Rd.LipschitzGraph.modNorm_rychkovExtension_le_modNormOn`).
 
 The closed half-space `{x : 0 ≤ ⟪x, e⟫}` for a unit vector `e` (`Rd.closedHalfSpace`) is a Besov
 domain (`Rd.BesovDomain.closedHalfSpace`): it differs from the flat Lipschitz graph domain
-`{x : 0 < ⟪x, e⟫}` (`Rd.LipschitzGraph.flat`) by the null set `e^⊥`
+`{x : 0 < ⟪x, e⟫}` (`Rd.LipschitzGraph.halfSpaceGraph`) by the null set `e^⊥`
 (`Rd.volume_orthogonal_singleton_eq_zero`, `Rd.closedHalfSpace_ae_eq`), and the extension property
 is the same for sets that agree up to a null set (`Rd.HasBesovExtension.congr_set`,
 `Rd.BesovDomain.of_ae_eq`).
@@ -26,10 +26,11 @@ is the same for sets that agree up to a null set (`Rd.HasBesovExtension.congr_se
 The models of manifolds are Besov domains: the range of a model with corners is one if it agrees
 up to a null set with a set with the extension property (`Rd.BesovDomain.range_of_ae_eq`); the
 range of the model with corners of the Euclidean half-space is the closed half-space
-`{y : 0 ≤ ⟪y, e₀⟫}` for the unit vector `e₀ = (1, 0, …, 0)` (`Rd.e0`, `Rd.norm_e0`,
-`Manifold.range_eq_closedHalfSpace`, `Rd.BesovDomain.range_euclideanHalfSpace`), and the range `V`
-of a model without boundary is the whole space (`Rd.BesovDomain.range_of_boundaryless`). The first
-coordinate is `⟪y, e₀⟫` (`Rd.coord_zero_eq_inner`).
+`{y : 0 ≤ ⟪y, e₀⟫}` for the unit vector `e₀ = (1, 0, …, 0)` (`Rd.firstUnitVector`,
+`Rd.norm_firstUnitVector`, `Manifold.range_eq_closedHalfSpace`,
+`Rd.BesovDomain.range_euclideanHalfSpace`), and the range `V` of a model without boundary is the
+whole space (`Rd.BesovDomain.range_of_boundaryless`). The first coordinate is `⟪y, e₀⟫`
+(`Rd.coord_zero_eq_inner`).
 -/
 
 @[expose] public section
@@ -62,17 +63,17 @@ theorem volume_orthogonal_singleton_eq_zero {e : V} (he : e ≠ 0) :
 /-! ### The extension property of Lipschitz graph domains -/
 
 /-- **Lipschitz graph domains have the extension property**: Rychkov's extension agrees with `f`
-on the domain (`Rd.LipschitzGraph.cutoff_extension_of_modNormOn`) and is bounded by a constant
-times the intrinsic quasi-norm (`Rd.LipschitzGraph.modNorm_extension_le_modNormOn`); the proof
-takes `C = G.coneBump.bumpSynthConst r s * G.intrinsicConst r`. -/
+on the domain (`Rd.LipschitzGraph.graphCutoff_rychkovExtension_of_modNormOn`) and is bounded by a
+constant times the intrinsic quasi-norm (`Rd.LipschitzGraph.modNorm_rychkovExtension_le_modNormOn`);
+the proof takes `C = G.coneBump.bumpSynthConst r s * G.intrinsicConst r`. -/
 theorem LipschitzGraph.hasBesovExtension (G : LipschitzGraph V) :
     HasBesovExtension G.measurableSet_domain := by
   intro p _ hp r s hs hsr q hq
   have hr : 1 ≤ r := Nat.one_le_iff_ne_zero.2 (Nat.cast_pos.1 (hs.trans hsr)).ne'
   exact ⟨G.coneBump.bumpSynthConst r s * G.intrinsicConst r, ENNReal.mul_ne_top
     (G.coneBump.bumpSynthConst_ne_top hs hsr) (G.intrinsicConst_ne_top r), fun f hf =>
-    ⟨G.extension hp r f, G.cutoff_extension_of_modNormOn hp hr hs hq hf,
-      G.modNorm_extension_le_modNormOn hp r hs hq hf⟩⟩
+    ⟨G.rychkovExtension hp r f, G.graphCutoff_rychkovExtension_of_modNormOn hp hr hs hq hf,
+      G.modNorm_rychkovExtension_le_modNormOn hp r hs hq hf⟩⟩
 
 /-! ### The half-space -/
 
@@ -104,7 +105,7 @@ theorem mem_interior_closedHalfSpace {e : V} (he : e ≠ 0) : e ∈ interior (cl
 omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- The **flat Lipschitz graph domain**: the open half-space `{x : 0 < ⟪x, e⟫}` for a unit
 vector `e`, with graph function `0`. -/
-def LipschitzGraph.flat (e : V) (he : ‖e‖ = 1) : LipschitzGraph V where
+def LipschitzGraph.halfSpaceGraph (e : V) (he : ‖e‖ = 1) : LipschitzGraph V where
   e := e
   norm_e := he
   M := 0
@@ -115,13 +116,13 @@ def LipschitzGraph.flat (e : V) (he : ‖e‖ = 1) : LipschitzGraph V where
 
 omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- The flat domain is the open half-space. -/
-theorem LipschitzGraph.flat_domain (e : V) (he : ‖e‖ = 1) :
-    (LipschitzGraph.flat e he).domain = {x | 0 < inner ℝ x e} := rfl
+theorem LipschitzGraph.halfSpaceGraph_domain (e : V) (he : ‖e‖ = 1) :
+    (LipschitzGraph.halfSpaceGraph e he).domain = {x | 0 < inner ℝ x e} := rfl
 
 /-- **The closed half-space is the open one up to a null set**: they differ by the hyperplane
 `e^⊥`, a proper subspace. -/
 theorem closedHalfSpace_ae_eq {e : V} (he : ‖e‖ = 1) :
-    closedHalfSpace e =ᵐ[volume] (LipschitzGraph.flat e he).domain := by
+    closedHalfSpace e =ᵐ[volume] (LipschitzGraph.halfSpaceGraph e he).domain := by
   have he0 : e ≠ 0 := fun h => by simp [h] at he
   have hnull := volume_orthogonal_singleton_eq_zero he0
   refine ae_eq_set.2 ⟨measure_mono_null (fun x hx => ?_) hnull, ?_⟩
@@ -129,7 +130,7 @@ theorem closedHalfSpace_ae_eq {e : V} (he : ‖e‖ = 1) :
     have h2 : ¬ 0 < inner ℝ x e := hx.2
     rw [SetLike.mem_coe, Submodule.mem_orthogonal_singleton_iff_inner_right, real_inner_comm]
     exact le_antisymm (not_lt.1 h2) h1
-  · have hsub : (LipschitzGraph.flat e he).domain ⊆ closedHalfSpace e :=
+  · have hsub : (LipschitzGraph.halfSpaceGraph e he).domain ⊆ closedHalfSpace e :=
       fun x (hx : 0 < inner ℝ x e) => hx.le
     rw [sdiff_eq_empty.2 hsub, measure_empty]
 
@@ -139,7 +140,7 @@ graph domain (`Rd.closedHalfSpace_ae_eq`), which has the extension property
 theorem BesovDomain.closedHalfSpace {e : V} (he : ‖e‖ = 1) : BesovDomain (closedHalfSpace e) :=
   of_ae_eq (convex_closedHalfSpace e) (isClosed_closedHalfSpace e)
     ⟨e, mem_interior_closedHalfSpace fun h => by simp [h] at he⟩
-    (LipschitzGraph.flat e he).hasBesovExtension (closedHalfSpace_ae_eq he)
+    (LipschitzGraph.halfSpaceGraph e he).hasBesovExtension (closedHalfSpace_ae_eq he)
 
 /-! ### The models of manifolds -/
 
@@ -148,23 +149,23 @@ section FirstAxis
 variable {n : ℕ} [NeZero n]
 
 /-- The unit vector `e₀ = (1, 0, …, 0)` of `ℝ^n`. -/
-noncomputable def e0 : EuclideanSpace ℝ (Fin n) := EuclideanSpace.single 0 1
+noncomputable def firstUnitVector : EuclideanSpace ℝ (Fin n) := EuclideanSpace.single 0 1
 
 /-- `‖e₀‖ = 1`. -/
-theorem norm_e0 : ‖(e0 : EuclideanSpace ℝ (Fin n))‖ = 1 := by
-  simp [e0]
+theorem norm_firstUnitVector : ‖(firstUnitVector : EuclideanSpace ℝ (Fin n))‖ = 1 := by
+  simp [firstUnitVector]
 
 /-- The first coordinate is the inner product with `e₀`. -/
-theorem coord_zero_eq_inner (y : EuclideanSpace ℝ (Fin n)) : y 0 = inner ℝ y e0 := by
-  simp [e0, EuclideanSpace.inner_single_right]
+theorem coord_zero_eq_inner (y : EuclideanSpace ℝ (Fin n)) : y 0 = inner ℝ y firstUnitVector := by
+  simp [firstUnitVector, EuclideanSpace.inner_single_right]
 
 open scoped Manifold in
 /-- The range of the half-space model is the closed half-space `{y : 0 ≤ ⟪y, e₀⟫}`. -/
 theorem _root_.Manifold.range_eq_closedHalfSpace :
-    range (𝓡∂ n) = Rd.closedHalfSpace (Rd.e0 : EuclideanSpace ℝ (Fin n)) := by
+    range (𝓡∂ n) = Rd.closedHalfSpace (Rd.firstUnitVector : EuclideanSpace ℝ (Fin n)) := by
   rw [range_modelWithCornersEuclideanHalfSpace]
   ext y
-  simp [Rd.closedHalfSpace, Rd.e0, EuclideanSpace.inner_single_right]
+  simp [Rd.closedHalfSpace, Rd.firstUnitVector, EuclideanSpace.inner_single_right]
 
 end FirstAxis
 
@@ -183,7 +184,7 @@ theorem BesovDomain.range_of_ae_eq {H : Type*} [TopologicalSpace H] (I : ModelWi
 instance BesovDomain.range_euclideanHalfSpace (n : ℕ) [NeZero n] :
     BesovDomain (Set.range (modelWithCornersEuclideanHalfSpace n)) := by
   rw [Manifold.range_eq_closedHalfSpace]
-  exact BesovDomain.closedHalfSpace norm_e0
+  exact BesovDomain.closedHalfSpace norm_firstUnitVector
 
 /-- **A model without boundary is a Besov domain**: its range is the whole space. -/
 instance BesovDomain.range_of_boundaryless {H : Type*} [TopologicalSpace H]

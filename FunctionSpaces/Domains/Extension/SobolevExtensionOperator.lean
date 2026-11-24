@@ -222,8 +222,8 @@ theorem ae_localExtensionJet_eq [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {U
 /-- **The bound of the local extension of jets**: for the local extension `F` of a jet
 `u = (f, (g_i)_i)` and weak derivatives `G_i = ∂_{e_i} F ∈ L_p(V)`,
 `‖F‖_p + ∑_i ‖G_i‖_p ≤ C (‖f‖_{L_p(O)} + ∑_i ‖g_i‖_{L_p(O)})` with
-`C = Rd.LocalMeansBump.extensionConst b p`
-(`Rd.LocalMeansBump.enorm_localExtension_add_le_extensionConst`). -/
+`C = Rd.LocalMeansBump.bumpExtensionConst b p`
+(`Rd.LocalMeansBump.enorm_localExtension_add_le_bumpExtensionConst`). -/
 theorem enorm_localExtensionJet_add_le [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {W : Set V}
     (hW : MeasurableSet W) {T O : Opens V} (hTO : T ≤ O)
     (hsupp : ∀ x ∈ W, ∀ j i, ∀ y ∈ tsupport (dilate (2 ^ j) (b.divKernel i : V → ℂ)), x - y ∈ T)
@@ -231,8 +231,8 @@ theorem enorm_localExtensionJet_add_le [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ 
     (hG : ∀ i, HasWeakLineDeriv ⊤ (fun _ : Fin 1 => gridBasis V i)
       (b.localExtensionJet hp1 hp hW hTO hsupp u) (G i)) :
     ‖b.localExtensionJet hp1 hp hW hTO hsupp u‖ₑ + ∑ i, ‖G i‖ₑ ≤
-      b.extensionConst p * (‖u.1.1‖ₑ + ∑ i, ‖u.1.2 i‖ₑ) :=
-  b.enorm_localExtension_add_le_extensionConst hp1 hp hW
+      b.bumpExtensionConst p * (‖u.1.1‖ₑ + ∑ i, ‖u.1.2 i‖ₑ) :=
+  b.enorm_localExtension_add_le_bumpExtensionConst hp1 hp hW
     (b.tlLocalNormOn_indicatorExtendLp_le hp1 hp hW hTO hsupp u)
     (b.tlLocalNormOn_indicatorExtendLp_lt_top hp1 hp hW hTO hsupp u) hG
 
@@ -241,12 +241,12 @@ the gradient): let `U ⊆ T ⊆ O` with `T` and `O` open, let the dual kernels a
 see `W`, and let `x - y ∈ T` for every `x ∈ W`, every level `j` and every `y` in the support of
 `(K_i)_{2^j}`. Then for `1 < p < ∞` the local extension of jets
 (`Rd.LocalMeansBump.localExtensionJet`) with its weak derivatives (`Rd.sobolevJet.liftJet`) is an
-extension operator from `U` with the constant `Rd.LocalMeansBump.extensionConst b p`. -/
+extension operator from `U` with the constant `Rd.LocalMeansBump.bumpExtensionConst b p`. -/
 noncomputable def sobolevExtensionOp [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {U W : Set V}
     (hU : MeasurableSet U) (hW : MeasurableSet W) {T O : Opens V} (hTO : T ≤ O) (hUT : U ⊆ T)
     (hUW : ∀ x ∈ U, ∀ j y, b.dualKernel 2 j y ≠ 0 → x - y ∈ W)
     (hsupp : ∀ x ∈ W, ∀ j i, ∀ y ∈ tsupport (dilate (2 ^ j) (b.divKernel i : V → ℂ)), x - y ∈ T) :
-    SobolevExtensionOp p O U (b.extensionConst p) :=
+    SobolevExtensionOp p O U (b.bumpExtensionConst p) :=
   let L := sobolevJet.liftJet (b.localExtensionJet hp1 hp hW hTO hsupp) fun u i =>
     (exists_hasWeakLineDeriv_of_memTriebelLizorkin hp1 hp (fun _ : Fin 1 => gridBasis V i)
       (b.memTriebelLizorkin_localExtensionJet hp1 hp hW hTO hsupp u)).imp fun _ h => h.1
@@ -262,14 +262,14 @@ gradient): let `U ⊆ T` with `T` open, let the dual kernels at points of `U` on
 `x - y ∈ T` for every `x ∈ W`, every level `j` and every `y` in the support of `(K_i)_{2^j}`. Then
 for `1 < p < ∞` the local extension `F = ∑_j η_j ⋆ 1_W (k_j ⋆ 1_T f)` of order two lies in
 `F^1_{p,2}(V) = W^1_p(V)` and agrees with `f` on `U`, with the constant
-`Rd.LocalMeansBump.extensionConst b p`: the extension operator from one patch
+`Rd.LocalMeansBump.bumpExtensionConst b p`: the extension operator from one patch
 (`Rd.LocalMeansBump.sobolevExtensionOp` with `O = T`) applied to `f`
 (`Rd.SobolevExtensionOp.extendsSobolev`). -/
 theorem extendsSobolev [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {U W : Set V}
     (hU : MeasurableSet U) (hW : MeasurableSet W) {T : Opens V} (hUT : U ⊆ T)
     (hUW : ∀ x ∈ U, ∀ j y, b.dualKernel 2 j y ≠ 0 → x - y ∈ W)
     (hsupp : ∀ x ∈ W, ∀ j i, ∀ y ∈ tsupport (dilate (2 ^ j) (b.divKernel i : V → ℂ)), x - y ∈ T) :
-    ExtendsSobolev p T U (b.extensionConst p) :=
+    ExtendsSobolev p T U (b.bumpExtensionConst p) :=
   have : Fact (1 ≤ p) := ⟨hp1.le⟩
   (b.sobolevExtensionOp hp1 hp hU hW (O := T) le_rfl hUT hUW hsupp).extendsSobolev hUT
 
@@ -408,7 +408,7 @@ theorem exists_sobolevExtensionOp_boundary [Nontrivial V] (hp1 : 1 < p) (hp : p 
     exact Set.inter_subset_left
   have hU : Ω.carrier ∩ ball c (ρ - 2 * ε) = G.domain ∩ ball c (ρ - 2 * ε) :=
     Ω.inter_ball_eq j (by linarith)
-  refine ⟨b.extensionConst p, b.extensionConst_ne_top hp1 hp, ?_⟩
+  refine ⟨b.bumpExtensionConst p, b.bumpExtensionConst_ne_top hp1 hp, ?_⟩
   rw [hU]
   exact ⟨b.sobolevExtensionOp hp1 hp ((G.isOpen_domain.inter isOpen_ball).measurableSet)
     ((G.isOpen_domain.inter isOpen_ball).measurableSet) (T := ⟨_, hTo⟩) hTΩ
@@ -439,7 +439,7 @@ theorem exists_sobolevExtensionOp_interior [Nontrivial V] (hp1 : 1 < p) (hp : p 
   set b := LocalMeansBump.centered (V := V) hR0
   have hR : 2 * b.radius = δ := by rw [LocalMeansBump.centered_radius]; ring
   have hUΩ := setOf_lt_infDist_compl_subset Ω.carrier (by positivity : (0 : ℝ) ≤ 2 * δ)
-  refine ⟨b.extensionConst p, b.extensionConst_ne_top hp1 hp, ?_⟩
+  refine ⟨b.bumpExtensionConst p, b.bumpExtensionConst_ne_top hp1 hp, ?_⟩
   rw [Set.inter_eq_right.2 hUΩ]
   refine ⟨b.sobolevExtensionOp hp1 hp (measurableSet_infDist_gt Ω.carrier (2 * δ))
     (measurableSet_infDist_gt Ω.carrier δ) (T := Ω.toOpens) le_rfl hUΩ

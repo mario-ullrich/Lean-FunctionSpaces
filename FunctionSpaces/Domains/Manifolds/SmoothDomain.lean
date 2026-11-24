@@ -25,8 +25,8 @@ half-space `𝓡∂ n`:
 Both are instances of a **straightener** (`Rd.SmoothDomain.Straightener`): a smooth,
 measure-preserving bijection `σ` of `ℝ^n` with smooth inverse and an open set `B` on which the
 closure of `Ω` is `{0 ≤ σ(x)_0}`. Each straightener gives a chart of the closure
-(`Rd.SmoothDomain.Straightener.chart`); the changes of charts are restrictions of the smooth maps
-`σ' ∘ τ`, so the closure is a smooth manifold (`Rd.SmoothDomain.isManifold`).
+(`Rd.SmoothDomain.Straightener.straightenerChart`); the changes of charts are restrictions of the
+smooth maps `σ' ∘ τ`, so the closure is a smooth manifold (`Rd.SmoothDomain.isManifold`).
 -/
 
 @[expose] public section
@@ -43,11 +43,12 @@ variable {n : ℕ} [NeZero n]
 /-- The **alignment** of a vector `e` with `e₀`: the reflection in `(e - e₀)^⊥`. -/
 noncomputable def alignTo (e : EuclideanSpace ℝ (Fin n)) :
     EuclideanSpace ℝ (Fin n) ≃ₗᵢ[ℝ] EuclideanSpace ℝ (Fin n) :=
-  (ℝ ∙ (e - e0))ᗮ.reflection
+  (ℝ ∙ (e - firstUnitVector))ᗮ.reflection
 
 /-- The alignment maps a unit vector `e` to `e₀`. -/
-theorem alignTo_apply_self {e : EuclideanSpace ℝ (Fin n)} (he : ‖e‖ = 1) : alignTo e e = e0 :=
-  Submodule.reflection_sub (by rw [he, norm_e0])
+theorem alignTo_apply_self {e : EuclideanSpace ℝ (Fin n)} (he : ‖e‖ = 1) :
+    alignTo e e = firstUnitVector :=
+  Submodule.reflection_sub (by rw [he, norm_firstUnitVector])
 
 /-! ### Closures -/
 
@@ -131,7 +132,7 @@ theorem coe_invMap {y : EuclideanHalfSpace n} (hy : S.tau ((𝓡∂ n) y) ∈ S.
 
 /-- The **chart** of the closure given by a straightener: `x ↦ σ(x)` on `closure Ω ∩ B`, with
 values in the half-space. -/
-noncomputable def chart :
+noncomputable def straightenerChart :
     OpenPartialHomeomorph (closure Ω.carrier) (EuclideanHalfSpace n) where
   toFun := S.toMap
   invFun := S.invMap
@@ -164,21 +165,22 @@ noncomputable def chart :
       S.coe_invMap hy
 
 /-- The source of the chart is `closure Ω ∩ B`. -/
-theorem mem_chart_source {x : closure Ω.carrier} :
-    x ∈ S.chart.source ↔ (x : EuclideanSpace ℝ (Fin n)) ∈ S.B := Iff.rfl
+theorem mem_straightenerChart_source {x : closure Ω.carrier} :
+    x ∈ S.straightenerChart.source ↔ (x : EuclideanSpace ℝ (Fin n)) ∈ S.B := Iff.rfl
 
 /-- The target of the chart. -/
-theorem mem_chart_target {y : EuclideanHalfSpace n} :
-    y ∈ S.chart.target ↔ S.tau ((𝓡∂ n) y) ∈ S.B := Iff.rfl
+theorem mem_straightenerChart_target {y : EuclideanHalfSpace n} :
+    y ∈ S.straightenerChart.target ↔ S.tau ((𝓡∂ n) y) ∈ S.B := Iff.rfl
 
 /-- On its source the chart is `σ`, read in `ℝ^n`. -/
-theorem chart_apply_coe {x : closure Ω.carrier} (hx : (x : EuclideanSpace ℝ (Fin n)) ∈ S.B) :
-    (𝓡∂ n) (S.chart x) = S.sigma x :=
+theorem straightenerChart_apply_coe {x : closure Ω.carrier}
+    (hx : (x : EuclideanSpace ℝ (Fin n)) ∈ S.B) : (𝓡∂ n) (S.straightenerChart x) = S.sigma x :=
   S.coe_toMap hx
 
 /-- On its target the inverse chart is `τ`, read in `ℝ^n`. -/
-theorem chart_symm_coe {y : EuclideanHalfSpace n} (hy : S.tau ((𝓡∂ n) y) ∈ S.B) :
-    ((S.chart.symm y : closure Ω.carrier) : EuclideanSpace ℝ (Fin n)) = S.tau ((𝓡∂ n) y) :=
+theorem straightenerChart_symm_coe {y : EuclideanHalfSpace n} (hy : S.tau ((𝓡∂ n) y) ∈ S.B) :
+    ((S.straightenerChart.symm y : closure Ω.carrier) : EuclideanSpace ℝ (Fin n)) =
+      S.tau ((𝓡∂ n) y) :=
   S.coe_invMap hy
 
 end Straightener
@@ -188,7 +190,7 @@ end Straightener
 /-- The **straightening** of the `j`-th boundary patch: `σ_j(x) = A_j (x - φ_j(x) e_j)`. -/
 noncomputable def straighten (j : Fin Ω.N) (x : EuclideanSpace ℝ (Fin n)) :
     EuclideanSpace ℝ (Fin n) :=
-  alignTo (Ω.graph j).e ((Ω.graph j).flatten x)
+  alignTo (Ω.graph j).e ((Ω.graph j).graphFlatten x)
 
 /-- The inverse of the straightening. -/
 noncomputable def unstraighten (j : Fin Ω.N) (y : EuclideanSpace ℝ (Fin n)) :
@@ -200,24 +202,24 @@ noncomputable def unstraighten (j : Fin Ω.N) (y : EuclideanSpace ℝ (Fin n)) :
 theorem straighten_coord (j : Fin Ω.N) (x : EuclideanSpace ℝ (Fin n)) :
     Ω.straighten j x 0 = inner ℝ x (Ω.graph j).e - (Ω.graph j).phi x := by
   rw [coord_zero_eq_inner, straighten, ← alignTo_apply_self (Ω.graph j).norm_e,
-    LinearIsometryEquiv.inner_map_map, LipschitzGraph.inner_flatten]
+    LinearIsometryEquiv.inner_map_map, LipschitzGraph.inner_graphFlatten]
 
 /-- The straightener of the `j`-th boundary patch, on the `j`-th boundary ball. -/
 noncomputable def boundaryStraightener (j : Fin Ω.N) : Ω.Straightener where
   sigma := Ω.straighten j
   tau := Ω.unstraighten j
   contDiff_sigma := (alignTo (Ω.graph j).e).toContinuousLinearEquiv.contDiff.comp
-    ((Ω.graph j).contDiff_flatten (Ω.contDiff_phi j))
+    ((Ω.graph j).contDiff_graphFlatten (Ω.contDiff_phi j))
   contDiff_tau := ((Ω.graph j).contDiff_unflatten (Ω.contDiff_phi j)).comp
     (alignTo (Ω.graph j).e).symm.toContinuousLinearEquiv.contDiff
   sigma_tau y := by
-    simp only [straighten, unstraighten, LipschitzGraph.flatten_unflatten,
+    simp only [straighten, unstraighten, LipschitzGraph.graphFlatten_unflatten,
       LinearIsometryEquiv.apply_symm_apply]
   tau_sigma x := by
     simp only [straighten, unstraighten, LinearIsometryEquiv.symm_apply_apply,
-      LipschitzGraph.unflatten_flatten]
+      LipschitzGraph.unflatten_graphFlatten]
   measurePreserving_sigma := (alignTo (Ω.graph j).e).measurePreserving.comp
-    (Ω.graph j).measurePreserving_flatten
+    (Ω.graph j).measurePreserving_graphFlatten
   B := ball (Ω.center j) (Ω.radius j)
   isOpen_B := isOpen_ball
   isBounded_B := isBounded_ball
@@ -250,12 +252,12 @@ theorem ball_interiorRadius_subset {x₀ : EuclideanSpace ℝ (Fin n)} (hx₀ : 
 /-- Around an interior point, the translated first coordinate is positive:
 `(x - x₀ + 2ρ e₀)_0 > 0` for `‖x - x₀‖ < ρ`. -/
 theorem interior_coord_pos {x₀ x : EuclideanSpace ℝ (Fin n)} {ρ : ℝ} (hx : x ∈ ball x₀ ρ) :
-    0 < (x - x₀ + (2 * ρ) • e0 : EuclideanSpace ℝ (Fin n)) 0 := by
+    0 < (x - x₀ + (2 * ρ) • firstUnitVector : EuclideanSpace ℝ (Fin n)) 0 := by
   have h1 : |(x - x₀) 0| ≤ ‖x - x₀‖ := by
     have := PiLp.norm_apply_le (x - x₀) 0
     rwa [Real.norm_eq_abs] at this
   have h2 : ‖x - x₀‖ < ρ := by rwa [← dist_eq_norm]
-  have he : (e0 : EuclideanSpace ℝ (Fin n)) 0 = 1 := by simp [e0]
+  have he : (firstUnitVector : EuclideanSpace ℝ (Fin n)) 0 = 1 := by simp [firstUnitVector]
   simp only [PiLp.add_apply, PiLp.smul_apply, smul_eq_mul, he, mul_one]
   linarith [neg_abs_le ((x - x₀) 0), norm_nonneg (x - x₀)]
 
@@ -263,8 +265,8 @@ theorem interior_coord_pos {x₀ x : EuclideanSpace ℝ (Fin n)} {ρ : ℝ} (hx 
 `B(x₀, ρ) ⊆ Ω`, which lands in the open half-space. -/
 noncomputable def interiorStraightener {x₀ : EuclideanSpace ℝ (Fin n)} (hx₀ : x₀ ∈ Ω.carrier) :
     Ω.Straightener where
-  sigma x := x - x₀ + (2 * Ω.interiorRadius hx₀) • e0
-  tau y := y - (2 * Ω.interiorRadius hx₀) • e0 + x₀
+  sigma x := x - x₀ + (2 * Ω.interiorRadius hx₀) • firstUnitVector
+  tau y := y - (2 * Ω.interiorRadius hx₀) • firstUnitVector + x₀
   contDiff_sigma := (contDiff_id.sub contDiff_const).add contDiff_const
   contDiff_tau := (contDiff_id.sub contDiff_const).add contDiff_const
   sigma_tau y := by abel
@@ -311,8 +313,8 @@ theorem mem_straightenerAt (x : closure Ω.carrier) :
 /-- **The closure of a smooth domain is a charted space** over the half-space: its atlas consists
 of the charts of all straighteners. -/
 noncomputable instance chartedSpace : ChartedSpace (EuclideanHalfSpace n) (closure Ω.carrier) where
-  atlas := {e | ∃ S : Ω.Straightener, e = S.chart}
-  chartAt x := (Ω.straightenerAt x).chart
+  atlas := {e | ∃ S : Ω.Straightener, e = S.straightenerChart}
+  chartAt x := (Ω.straightenerAt x).straightenerChart
   mem_chart_source x := Ω.mem_straightenerAt x
   chart_mem_atlas _ := ⟨_, rfl⟩
 
@@ -325,14 +327,14 @@ instance isManifold : IsManifold (𝓡∂ n) ∞ (closure Ω.carrier) := by
   obtain ⟨⟨hz1, hz2⟩, hzI⟩ := hz
   have hzz : (𝓡∂ n) ((𝓡∂ n).symm z) = z := (𝓡∂ n).right_inv hzI
   have hτ : S.tau z ∈ S.B := by
-    have h := S.mem_chart_target.1 hz1
+    have h := S.mem_straightenerChart_target.1 hz1
     rwa [hzz] at h
-  have hsymm := S.chart_symm_coe (y := (𝓡∂ n).symm z) (by rw [hzz]; exact hτ)
+  have hsymm := S.straightenerChart_symm_coe (y := (𝓡∂ n).symm z) (by rw [hzz]; exact hτ)
   rw [hzz] at hsymm
-  have hB' : ((S.chart.symm ((𝓡∂ n).symm z) : closure Ω.carrier) : EuclideanSpace ℝ (Fin n)) ∈
-      S'.B := S'.mem_chart_source.1 hz2
+  have hB' : ((S.straightenerChart.symm ((𝓡∂ n).symm z) : closure Ω.carrier) :
+      EuclideanSpace ℝ (Fin n)) ∈ S'.B := S'.mem_straightenerChart_source.1 hz2
   simp only [Function.comp_apply, OpenPartialHomeomorph.coe_trans]
-  rw [S'.chart_apply_coe hB', hsymm]
+  rw [S'.straightenerChart_apply_coe hB', hsymm]
 
 /-- **The inclusion of the closure into `ℝ^n` is smooth**: in the chart of a straightener it is
 `τ`. -/
@@ -350,13 +352,14 @@ theorem contMDiff_subtype_val :
     have hzI : z ∈ range (𝓡∂ n) := extChartAt_target_subset_range x hz
     have hzz : (𝓡∂ n) ((𝓡∂ n).symm z) = z := (𝓡∂ n).right_inv hzI
     rw [extChartAt_target] at hz
-    have hzt : S.tau ((𝓡∂ n) ((𝓡∂ n).symm z)) ∈ S.B := S.mem_chart_target.1 hz.1
+    have hzt : S.tau ((𝓡∂ n) ((𝓡∂ n).symm z)) ∈ S.B := S.mem_straightenerChart_target.1 hz.1
     have hcomp : (extChartAt 𝓘(ℝ, EuclideanSpace ℝ (Fin n)) (x : EuclideanSpace ℝ (Fin n)) ∘
         Subtype.val ∘ (extChartAt (𝓡∂ n) x).symm) z =
-          ((S.chart.symm ((𝓡∂ n).symm z) : closure Ω.carrier) : EuclideanSpace ℝ (Fin n)) := by
+          ((S.straightenerChart.symm ((𝓡∂ n).symm z) : closure Ω.carrier) :
+            EuclideanSpace ℝ (Fin n)) := by
       rw [extChartAt_model_space_eq_id]
       rfl
-    rw [hcomp, S.chart_symm_coe hzt, hzz]
+    rw [hcomp, S.straightenerChart_symm_coe hzt, hzz]
   exact (S.contDiff_tau.contDiffAt.contDiffWithinAt).congr_of_eventuallyEq hev
     (hev.self_of_nhdsWithin (extChartAt_target_subset_range x (mem_extChartAt_target x)))
 
@@ -372,7 +375,7 @@ noncomputable def volumeOn : Measure (closure Ω.carrier) :=
 
 /-- The image of the target of the chart of a straightener is `σ(closure Ω ∩ B)`. -/
 theorem Straightener.extend_target (S : Ω.Straightener) :
-    (S.chart.extend (𝓡∂ n)).target = S.sigma '' (closure Ω.carrier ∩ S.B) := by
+    (S.straightenerChart.extend (𝓡∂ n)).target = S.sigma '' (closure Ω.carrier ∩ S.B) := by
   rw [OpenPartialHomeomorph.extend_target']
   ext z
   constructor
@@ -380,8 +383,8 @@ theorem Straightener.extend_target (S : Ω.Straightener) :
     have hτ : S.tau ((𝓡∂ n) y) ∈ S.B := hy
     exact ⟨S.tau ((𝓡∂ n) y), ⟨S.tau_mem_closure y.2 hτ, hτ⟩, S.sigma_tau _⟩
   · rintro ⟨x, ⟨hxcl, hxB⟩, rfl⟩
-    refine ⟨S.chart ⟨x, hxcl⟩, S.chart.map_source hxB, ?_⟩
-    exact S.chart_apply_coe (x := ⟨x, hxcl⟩) hxB
+    refine ⟨S.straightenerChart ⟨x, hxcl⟩, S.straightenerChart.map_source hxB, ?_⟩
+    exact S.straightenerChart_apply_coe (x := ⟨x, hxcl⟩) hxB
 
 /-- **The Lebesgue measure is a smooth measure** on the closure, with density `1` in every chart:
 the straighteners preserve the Lebesgue measure. -/
@@ -394,19 +397,22 @@ instance isSmoothMeasure_volumeOn : Manifold.IsSmoothMeasure (𝓡∂ n) Ω.volu
     have hσemb : MeasurableEmbedding S.sigma :=
       (Homeomorph.mk ⟨S.sigma, S.tau, S.tau_sigma, S.sigma_tau⟩ S.contDiff_sigma.continuous
         S.contDiff_tau.continuous).measurableEmbedding
-    have hsrc : MeasurableSet S.chart.source := S.chart.open_source.measurableSet
+    have hsrc : MeasurableSet S.straightenerChart.source :=
+      S.straightenerChart.open_source.measurableSet
     -- the extended chart is `σ` on the source
-    have hcongr : Measure.map (S.chart.extend (𝓡∂ n)) (Ω.volumeOn.restrict S.chart.source) =
-        Measure.map (S.sigma ∘ Subtype.val) (Ω.volumeOn.restrict S.chart.source) := by
+    have hcongr : Measure.map (S.straightenerChart.extend (𝓡∂ n))
+          (Ω.volumeOn.restrict S.straightenerChart.source) =
+        Measure.map (S.sigma ∘ Subtype.val) (Ω.volumeOn.restrict S.straightenerChart.source) := by
       refine Measure.map_congr ((ae_restrict_iff' hsrc).2 (Eventually.of_forall fun x hx => ?_))
-      rw [OpenPartialHomeomorph.extend_coe, Function.comp_apply, S.chart_apply_coe hx]
+      rw [OpenPartialHomeomorph.extend_coe, Function.comp_apply, S.straightenerChart_apply_coe hx]
       rfl
     rw [withDensity_one, hcongr, ← Measure.map_map S.contDiff_sigma.continuous.measurable
       measurable_subtype_coe, S.extend_target]
-    have hval : Measure.map Subtype.val (Ω.volumeOn.restrict S.chart.source) =
+    have hval : Measure.map Subtype.val (Ω.volumeOn.restrict S.straightenerChart.source) =
         (volume : Measure (EuclideanSpace ℝ (Fin n))).restrict (S.B ∩ closure Ω.carrier) := by
-      rw [show S.chart.source = Subtype.val ⁻¹' S.B from rfl, ← hemb.restrict_map, volumeOn,
-        hemb.map_comap, Subtype.range_coe, Measure.restrict_restrict S.isOpen_B.measurableSet]
+      rw [show S.straightenerChart.source = Subtype.val ⁻¹' S.B from rfl, ← hemb.restrict_map,
+        volumeOn, hemb.map_comap, Subtype.range_coe,
+        Measure.restrict_restrict S.isOpen_B.measurableSet]
     rw [hval, inter_comm]
     exact (S.measurePreserving_sigma.restrict_image_emb hσemb _).map_eq
 

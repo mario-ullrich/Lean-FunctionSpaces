@@ -39,7 +39,8 @@ conjugate-linear in the first argument, as in Mathlib.
   `Manifold.BesovAtlas.chartForm_eigenfunction_integral`), the weak eigenvalue equation of the
   chart form with the natural boundary condition.
 * **`H^1(M)` in the eigenbasis**: `f ∈ B^1_{2,2}(M)` iff
-  `∑_i (1 + ⌊√(1 + λ_i)⌋₊)² |⟨e_i, f⟩|² < ∞` (`Manifold.BesovAtlas.memBesov_one_two_iff_spectral`).
+  `∑_i (1 + ⌊√(1 + λ_i)⌋₊)² |⟨e_i, f⟩|² < ∞`
+  (`Manifold.BesovAtlas.memManifoldBesov_one_two_iff_spectral`).
 -/
 
 @[expose] public section
@@ -180,12 +181,12 @@ theorem isCompactOperator_chartSobolevEmbedding [Nontrivial E] :
 `U ∈ H^1(E)` and every chart index `k`, `L_k (ι U) = J u` for some `u ∈ H^1_A(M)`. The function
 `ι U` has finite `B^1_{2,2}(E)` quasi-norm (`Rd.memWSobolev_toL2`,
 `Rd.memWSobolev_one_iff_modulus`), so its lift lies in `B^1_{2,2}(M)`
-(`Manifold.BesovAtlas.memBesov_chartLiftLp`), which is the range of `J`
-(`Manifold.BesovAtlas.mem_range_chartSobolevEmbedding_iff_memBesov`). -/
+(`Manifold.BesovAtlas.memAtlasBesov_chartLiftLp`), which is the range of `J`
+(`Manifold.BesovAtlas.mem_range_chartSobolevEmbedding_iff_memAtlasBesov`). -/
 theorem chartLiftLp_toL2_mem_range [IsManifold I ∞ M] (k : Fin A.n) (U : H^{1}(E)) :
     A.chartLiftLp μ Rd.two_ne_top k (Rd.toL2 U) ∈ range (A.chartSobolevEmbedding μ) := by
-  rw [A.mem_range_chartSobolevEmbedding_iff_memBesov]
-  exact A.memBesov_chartLiftLp Rd.two_ne_top k (r := 2) one_le_two one_pos (by norm_num)
+  rw [A.mem_range_chartSobolevEmbedding_iff_memAtlasBesov]
+  exact A.memAtlasBesov_chartLiftLp Rd.two_ne_top k (r := 2) one_le_two one_pos (by norm_num)
     one_le_two ((Rd.memWSobolev_one_iff_modulus le_rfl _).1 (Rd.memWSobolev_toL2 U))
 
 /-- **The chart Sobolev embedding has dense range**: every `f ∈ L_2(μ)` is `∑_k L_k P_k f`
@@ -401,8 +402,8 @@ theorem mem_range_chartSobolevEmbedding_iff_spectral (f : Lp ℂ 2 μ) :
 `∑_i (1 + ⌊√(1 + λ_i)⌋₊)² |⟨e_i, f⟩|² < ∞`
 (`Manifold.BesovAtlas.mem_range_chartSobolevEmbedding_iff`,
 `Manifold.BesovAtlas.mem_range_chartSobolevEmbedding_iff_spectral`). -/
-theorem memBesov_one_two_iff_spectral [T2Space M] (f : Lp ℂ 2 μ) :
-    Manifold.MemBesov I μ Rd.two_ne_top 1 2 f ↔
+theorem memManifoldBesov_one_two_iff_spectral [T2Space M] (f : Lp ℂ 2 μ) :
+    Manifold.MemManifoldBesov I μ Rd.two_ne_top 1 2 f ↔
       Memℓp (fun i => ((1 + ⌊Real.sqrt (1 + A.chartEigenvalue μ i)⌋₊ : ℕ) : ℂ) *
         (A.chartScheme μ).basis.repr f i) 2 :=
   (A.mem_range_chartSobolevEmbedding_iff f).symm.trans

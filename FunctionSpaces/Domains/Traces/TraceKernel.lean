@@ -178,7 +178,7 @@ theorem eq_sum_add_of_ae_eq_zero (ψ : Ω.BoundaryPartition) {χ : V → ℝ}
     (hχ1 : ∀ x ∈ Ω.carrier, χ x + ∑ j, ψ.toFun j x = 1) {C : ℝ}
     (hc : Continuous fun x => (χ x : ℂ)) (hC : ∀ x, ‖(χ x : ℂ)‖ ≤ C) {U : H^{1}(V)}
     (hU : ∀ᵐ x ∂volume, x ∉ Ω.carrier → toL2 U x = 0)
-    {Wj : Fin Ω.N → H^{1}(V)} (hWj : ∀ j, toL2 (Wj j) = ψ.localize j (toL2 U))
+    {Wj : Fin Ω.N → H^{1}(V)} (hWj : ∀ j, toL2 (Wj j) = ψ.localizeL2 j (toL2 U))
     {W0 : H^{1}(V)} (hW0 : toL2 W0 = mulLp hc hC (toL2 U)) : U = ∑ j, Wj j + W0 :=
   Ω.eq_sum_add_of_ae_eq_zero_of_nonneg zero_le_one ψ hχ1 hc hC (by rwa [sobolevToL2_one])
     (by rwa [sobolevToL2_one]) (by rwa [sobolevToL2_one])
@@ -313,17 +313,17 @@ noncomputable def dualTraceKerEquiv :
 /-- **`ℓ` is the pairing with `dualTraceKerEquiv Ω ℓ`**: `ℓ(u) = [W, u]` for
 `W = dualTraceKerEquiv Ω ℓ` and every `u ∈ ker γ`, read as an element of `H^1(V)`. -/
 theorem dualTraceKerEquiv_apply (ℓ : StrongDual ℂ (Ω.traceKer 1)) (u : Ω.traceKer 1) :
-    ℓ u = pairing 1 (Ω.dualTraceKerEquiv ℓ : H^{-1}(V)) ((u : Ω.SobolevOne) : H^{1}(V)) := by
+    ℓ u = sobolevPairing 1 (Ω.dualTraceKerEquiv ℓ : H^{-1}(V)) ((u : Ω.SobolevOne) : H^{1}(V)) := by
   have h := InnerProductSpace.toDual_symm_apply (𝕜 := ℂ) (E := Ω.traceKer 1) (x := u) (y := ℓ)
   rw [← h, ← LinearIsometryEquiv.inner_map_map Ω.tildeEquivTraceKer.symm,
     Submodule.coe_inner, dualTraceKerEquiv, LinearIsometryEquiv.trans_apply,
-    LinearIsometryEquiv.trans_apply, coe_tildeEquivRestriction_apply, pairing_besselShift,
+    LinearIsometryEquiv.trans_apply, coe_tildeEquivRestriction_apply, sobolevPairing_besselShift,
     Ω.coe_tildeEquivTraceKer_symm_apply u]
 
 /-- The functional of `W ∈ H^{-1}(Ω)` on `ker γ` is `u ↦ [W, u]`. -/
 theorem dualTraceKerEquiv_symm_apply (W : RestrictionSpace (-1) Ω.toOpens) (u : Ω.traceKer 1) :
     Ω.dualTraceKerEquiv.symm W u =
-      pairing 1 (W : H^{-1}(V)) ((u : Ω.SobolevOne) : H^{1}(V)) := by
+      sobolevPairing 1 (W : H^{-1}(V)) ((u : Ω.SobolevOne) : H^{1}(V)) := by
   rw [dualTraceKerEquiv_apply, LinearIsometryEquiv.apply_symm_apply]
 
 /-- **Uniqueness of the representing element**: `dualTraceKerEquiv Ω ℓ = W` iff
@@ -331,7 +331,7 @@ theorem dualTraceKerEquiv_symm_apply (W : RestrictionSpace (-1) Ω.toOpens) (u :
 theorem dualTraceKerEquiv_eq_iff (ℓ : StrongDual ℂ (Ω.traceKer 1))
     (W : RestrictionSpace (-1) Ω.toOpens) :
     Ω.dualTraceKerEquiv ℓ = W ↔ ∀ u : Ω.traceKer 1,
-      ℓ u = pairing 1 (W : H^{-1}(V)) ((u : Ω.SobolevOne) : H^{1}(V)) := by
+      ℓ u = sobolevPairing 1 (W : H^{-1}(V)) ((u : Ω.SobolevOne) : H^{1}(V)) := by
   rw [← LinearIsometryEquiv.eq_symm_apply, ContinuousLinearMap.ext_iff]
   simp only [dualTraceKerEquiv_symm_apply]
 

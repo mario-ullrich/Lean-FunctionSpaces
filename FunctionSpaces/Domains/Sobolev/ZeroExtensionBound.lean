@@ -23,7 +23,8 @@ inequality on test functions, and proves that inequality for every integer `s �
   `H̃^s(Ω)` (`Rd.HasZeroExtensionBound.norm_le_norm_restrictProj`), so the range of the
   restriction is closed and equals `H^s_0(Ω)`
   (`Rd.HasZeroExtensionBound.range_tildeToRestrictionL`), and restriction is an isomorphism
-  `H̃^s(Ω) ≅ H^s_0(Ω)` with bounds `1` and `C` (`Rd.HasZeroExtensionBound.tildeEquivZeroBoundary`).
+  `H̃^s(Ω) ≅ H^s_0(Ω)` with bounds `1` and `C`
+  (`Rd.HasZeroExtensionBound.tildeEquivZeroBoundaryOfBound`).
 * **Injectivity for `s ≥ 0`**: for every open `Ω`, the `L_2` function of an element of
   `H̃^s(Ω)` vanishes outside `Ω` (`Rd.sobolevToL2_ae_eq_zero_of_mem_tildeSpace`), so restriction
   is injective on `H̃^s(Ω)` (`Rd.eq_zero_of_mem_tildeSpace_of_restrictProj_eq_zero`; Hewett and
@@ -75,7 +76,7 @@ theorem eq_zero_of_mem_tildeSpace_of_restrictProj_eq_zero (hs : 0 ≤ s) {U : H^
 
 /-- **Restriction `H̃^s(Ω) → H^s(Ω)` is injective for `s ≥ 0`**, for every open `Ω`
 (`Rd.eq_zero_of_mem_tildeSpace_of_restrictProj_eq_zero`). -/
-theorem tildeToRestrictionL_injective (hs : 0 ≤ s) :
+theorem tildeToRestrictionL_injective_of_nonneg (hs : 0 ≤ s) :
     Function.Injective (tildeToRestrictionL s Ω) :=
   (injective_iff_map_eq_zero _).2 fun U hU =>
     Subtype.ext (eq_zero_of_mem_tildeSpace_of_restrictProj_eq_zero hs U.2 hU)
@@ -163,7 +164,7 @@ Lemma 2.9: (iv) implies (i)): restriction is an isomorphism of `H̃^s(Ω)` onto 
 (`Rd.HasZeroExtensionBound.norm_le_norm_restrictProj`); Mathlib's
 `LinearEquiv.toContinuousLinearEquivOfBounds` with the bounds `1` and `C`, no open mapping
 theorem. -/
-noncomputable def HasZeroExtensionBound.tildeEquivZeroBoundary
+noncomputable def HasZeroExtensionBound.tildeEquivZeroBoundaryOfBound
     (h : HasZeroExtensionBound s Ω C) : tildeSpace s Ω ≃L[ℂ] zeroBoundarySpace s Ω :=
   h.tildeLinearEquivZeroBoundary.toContinuousLinearEquivOfBounds 1 C
     (fun U => by
@@ -174,10 +175,10 @@ noncomputable def HasZeroExtensionBound.tildeEquivZeroBoundary
       rw [← h.coe_tildeLinearEquivZeroBoundary_apply, LinearEquiv.apply_symm_apply] at hb
       exact hb)
 
-/-- `h.tildeEquivZeroBoundary U` is the restriction of `U` to `Ω`. -/
-theorem HasZeroExtensionBound.coe_tildeEquivZeroBoundary_apply
+/-- `h.tildeEquivZeroBoundaryOfBound U` is the restriction of `U` to `Ω`. -/
+theorem HasZeroExtensionBound.coe_tildeEquivZeroBoundaryOfBound_apply
     (h : HasZeroExtensionBound s Ω C) (U : tildeSpace s Ω) :
-    (h.tildeEquivZeroBoundary U : RestrictionSpace s Ω) = restrictProj s Ω U :=
+    (h.tildeEquivZeroBoundaryOfBound U : RestrictionSpace s Ω) = restrictProj s Ω U :=
   rfl
 
 /-- **Under the zero extension bound with `C = 1`, restriction is isometric on `H̃^s(Ω)`**:

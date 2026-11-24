@@ -20,12 +20,12 @@ direction of each graph domain replaces the rotations of the usual definition. I
 `Rd.BoundedLipschitzDomain.mem_carrier_iff_of_mem_ball`).
 
 **Restrictions by intrinsic differences**
-(`Rd.BoundedLipschitzDomain.exists_besov_extension_iff_modulusOn`): for `1 ≤ p < ∞`,
+(`Rd.BoundedLipschitzDomain.exists_besov_extension_iff_modulusOn_indicator`): for `1 ≤ p < ∞`,
 `0 < s < r` and `1 ≤ q ≤ ∞`, `f` agrees on `Ω` with some `F ∈ L_p(V)` with
 `‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff
 `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`; likewise with the band-limited
-approximation spaces (`Rd.BoundedLipschitzDomain.exists_memApprox_extension_iff`). The extension
-comes with a bound: its quasi-norm on `V` is at most `C` times the intrinsic one, with `C`
+approximation spaces (`Rd.BoundedLipschitzDomain.exists_memApprox_extension_iff_indicator`). The
+extension comes with a bound: its quasi-norm on `V` is at most `C` times the intrinsic one, with `C`
 depending only on `Ω`, `p`, `r`, `s` and `q`
 (`Rd.BoundedLipschitzDomain.exists_besov_extension_le`).
 
@@ -697,7 +697,7 @@ theorem exists_besov_extension_of_modulusOn (hp : p ≠ ∞) {r : ℕ} {s : ℝ}
 `1 ≤ p < ∞`, `0 < s < r` and `1 ≤ q ≤ ∞`, `f` agrees on `Ω` with some `F ∈ L_p(V)` with
 `‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff
 `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`. -/
-theorem exists_besov_extension_iff_modulusOn (hp : p ≠ ∞) {r : ℕ} {s : ℝ} (hs : 0 < s)
+theorem exists_besov_extension_iff_modulusOn_indicator (hp : p ≠ ∞) {r : ℕ} {s : ℝ} (hs : 0 < s)
     (hsr : s < r) {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Lp ℂ p (volume : Measure V)) :
     (∃ F : Lp ℂ p (volume : Measure V), indicatorLp Ω.measurableSet F =
         indicatorLp Ω.measurableSet f ∧
@@ -712,12 +712,12 @@ theorem exists_besov_extension_iff_modulusOn (hp : p ≠ ∞) {r : ℕ} {s : ℝ
 `1 ≤ p < ∞`, `0 < s < r` and `1 ≤ q ≤ ∞`, `f` agrees on `Ω` with some `F` in the approximation
 space `A^s_q(L_p(V))` of band-limited functions iff
 `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`. -/
-theorem exists_memApprox_extension_iff (hp : p ≠ ∞) {r : ℕ} {s : ℝ} (hs : 0 < s) (hsr : s < r)
-    {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Lp ℂ p (volume : Measure V)) :
+theorem exists_memApprox_extension_iff_indicator (hp : p ≠ ∞) {r : ℕ} {s : ℝ} (hs : 0 < s)
+    (hsr : s < r) {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Lp ℂ p (volume : Measure V)) :
     (∃ F : Lp ℂ p (volume : Measure V), indicatorLp Ω.measurableSet F =
         indicatorLp Ω.measurableSet f ∧ (bandScheme hp).MemApprox s q F) ↔
       modNormOn Ω.measurableSet r s q f < ∞ := by
-  rw [← Ω.exists_besov_extension_iff_modulusOn hp hs hsr hq f]
+  rw [← Ω.exists_besov_extension_iff_modulusOn_indicator hp hs hsr hq f]
   exact exists_congr fun F =>
     and_congr_right fun _ => memApprox_bandScheme_iff_modulus hp hs.le hsr hq F
 
@@ -730,8 +730,8 @@ quasi-norm `N_Ω(f) = ‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖
 differences of order `r`. For `1 ≤ q ≤ ∞` it is a Banach space with the norm `N_Ω`
 (`Rd.BoundedLipschitzDomain.completeSpace_domainBesov`); for `1 ≤ p < ∞`, `0 < s < r` and
 `1 ≤ q ≤ ∞` its elements are the restrictions to `Ω` of the functions of `B^s_{p,q}(V)`
-(`Rd.BoundedLipschitzDomain.exists_besov_extension_iff_modulusOn`). Storing `1_Ω f` instead of
-the class of `f` on `Ω` keeps the space inside `L_p(V)`. -/
+(`Rd.BoundedLipschitzDomain.exists_besov_extension_iff_modulusOn_indicator`). Storing `1_Ω f`
+instead of the class of `f` on `Ω` keeps the space inside `L_p(V)`. -/
 @[ext]
 structure DomainBesov (r : ℕ) (s : ℝ) (q : ℝ≥0∞) where
   /-- The function in `L_p(V)`, zero outside `Ω`. -/

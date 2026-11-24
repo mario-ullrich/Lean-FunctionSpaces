@@ -17,15 +17,15 @@ A **Lipschitz graph domain** in `V` is `Ω = {x : φ(x) < ⟪x, e⟫}` for a uni
 `e = e_d` this is `{x_d > φ(x_1, …, x_(d-1))}`. The function `φ` is Lipschitz in Mathlib's sense
 (`Rd.LipschitzGraph.lipschitzWith_phi`), `Ω` is open (`Rd.LipschitzGraph.toOpens`), and its
 closure is `{x : φ(x) ≤ ⟪x, e⟫}` (`Rd.LipschitzGraph.closure_domain`). With the
-cone `K = {y : M ‖y - ⟪y, e⟫ e‖ < ⟪y, e⟫}` (`Rd.LipschitzGraph.cone`), `Ω + K ⊆ Ω`
+cone `K = {y : M ‖y - ⟪y, e⟫ e‖ < ⟪y, e⟫}` (`Rd.LipschitzGraph.graphCone`), `Ω + K ⊆ Ω`
 (`Rd.LipschitzGraph.add_mem`): a step into the cone raises `⟪·, e⟫` faster than `φ`. The cone is
 closed under positive scaling and contains a ball around `e/4`
-(`Rd.LipschitzGraph.ball_subset_cone`). The closed cone `K̄ = {y : M ‖y - ⟪y, e⟫ e‖ ≤ ⟪y, e⟫}`
+(`Rd.LipschitzGraph.ball_subset_graphCone`). The closed cone `K̄ = {y : M ‖y - ⟪y, e⟫ e‖ ≤ ⟪y, e⟫}`
 (`Rd.LipschitzGraph.closedCone`) is closed under nonnegative scaling, and still `Ω + K̄ ⊆ Ω`
 (`Rd.LipschitzGraph.add_mem_of_mem_closedCone`); for the closure, `Ω̄ + K ⊆ Ω`
 (`Rd.LipschitzGraph.add_mem_of_mem_closure`). Both rest on `φ(x + y) ≤ φ(x) + M ‖y - ⟪y, e⟫ e‖`
 (`Rd.LipschitzGraph.phi_add_le`). If the closed support of `η` lies in `K`, so does that of every
-dilate `η_c`, `c > 0` (`Rd.LipschitzGraph.mem_cone_of_mem_tsupport_dilate`).
+dilate `η_c`, `c > 0` (`Rd.LipschitzGraph.mem_graphCone_of_mem_tsupport_dilate`).
 
 The **cone bump** (`Rd.LipschitzGraph.coneBump`) is a bump for local means supported in
 `-K ∩ B(0, 1/2)`: the bump of the smooth bump function around `-e/4` of radius `ρ`
@@ -40,8 +40,8 @@ bump (`Rd.LipschitzGraph.coneSupported_meansKernel`).
 `x ∈ Ω`, `(k ⋆ f)(x)` depends only on `f` on `Ω`, since `x - y ∈ x + K ⊆ Ω` whenever `k(y) ≠ 0`.
 This is the support principle for two sets, `(k ⋆ 1_W f)(x) = (k ⋆ f)(x)` if `x - y ∈ W` whenever
 `k(y) ≠ 0` (`Rd.conv_indicator_eq_of_forall`, `Rd.indicatorLp_convLp_indicatorLp`), for `W = Ω`.
-On `L_p`, with the cut-off `f ↦ 1_Ω f` (`Rd.LipschitzGraph.cutoff`, from `Rd.indicatorLp`):
-`1_Ω (k ⋆ (1_Ω h)) = 1_Ω (k ⋆ h)` (`Rd.LipschitzGraph.cutoff_convLp_cutoff`).
+On `L_p`, with the cut-off `f ↦ 1_Ω f` (`Rd.LipschitzGraph.graphCutoff`, from `Rd.indicatorLp`):
+`1_Ω (k ⋆ (1_Ω h)) = 1_Ω (k ⋆ h)` (`Rd.LipschitzGraph.graphCutoff_convLp_graphCutoff`).
 Two classes have the same cut-off iff they agree almost everywhere on the set
 (`Rd.indicatorLp_eq_iff_ae_eq_restrict`).
 -/
@@ -121,13 +121,13 @@ variable (Ω : LipschitzGraph V)
 def domain : Set V := {x | Ω.phi x < inner ℝ x Ω.e}
 
 /-- The cone `K = {y : M ‖y - ⟪y, e⟫ e‖ < ⟪y, e⟫}`. -/
-def cone : Set V := {y | Ω.M * ‖y - inner ℝ y Ω.e • Ω.e‖ < inner ℝ y Ω.e}
+def graphCone : Set V := {y | Ω.M * ‖y - inner ℝ y Ω.e • Ω.e‖ < inner ℝ y Ω.e}
 
 /-- The closed cone `K̄ = {y : M ‖y - ⟪y, e⟫ e‖ ≤ ⟪y, e⟫}`, which contains `K`. -/
 def closedCone : Set V := {y | Ω.M * ‖y - inner ℝ y Ω.e • Ω.e‖ ≤ inner ℝ y Ω.e}
 
 /-- The cone lies in the closed cone. -/
-theorem cone_subset_closedCone : Ω.cone ⊆ Ω.closedCone := fun y hy => by
+theorem graphCone_subset_closedCone : Ω.graphCone ⊆ Ω.closedCone := fun y hy => by
   have hy' : Ω.M * ‖y - inner ℝ y Ω.e • Ω.e‖ < inner ℝ y Ω.e := hy
   exact hy'.le
 
@@ -157,22 +157,23 @@ theorem add_mem_of_mem_closedCone {x y : V} (hx : x ∈ Ω.domain) (hy : y ∈ �
 
 /-- **Steps into the cone stay in the domain**: `Ω + K ⊆ Ω`, the case `K ⊆ K̄` of
 `Rd.LipschitzGraph.add_mem_of_mem_closedCone`. -/
-theorem add_mem {x y : V} (hx : x ∈ Ω.domain) (hy : y ∈ Ω.cone) : x + y ∈ Ω.domain :=
-  Ω.add_mem_of_mem_closedCone hx (Ω.cone_subset_closedCone hy)
+theorem add_mem {x y : V} (hx : x ∈ Ω.domain) (hy : y ∈ Ω.graphCone) : x + y ∈ Ω.domain :=
+  Ω.add_mem_of_mem_closedCone hx (Ω.graphCone_subset_closedCone hy)
 
 /-- The cone is closed under positive scaling. -/
-theorem smul_mem_cone {c : ℝ} (hc : 0 < c) {y : V} (hy : y ∈ Ω.cone) : c • y ∈ Ω.cone := by
+theorem smul_mem_graphCone {c : ℝ} (hc : 0 < c) {y : V} (hy : y ∈ Ω.graphCone) :
+    c • y ∈ Ω.graphCone := by
   have hy' : Ω.M * ‖y - inner ℝ y Ω.e • Ω.e‖ < inner ℝ y Ω.e := hy
   show Ω.M * ‖c • y - inner ℝ (c • y) Ω.e • Ω.e‖ < inner ℝ (c • y) Ω.e
   rw [real_inner_smul_left, ← smul_smul, ← smul_sub, norm_smul, Real.norm_of_nonneg hc.le]
   nlinarith
 
 /-- Multiples of a step in the cone stay in the domain: `x + l h ∈ Ω`. -/
-theorem add_nsmul_mem {x h : V} (hx : x ∈ Ω.domain) (hh : h ∈ Ω.cone) (l : ℕ) :
+theorem add_nsmul_mem {x h : V} (hx : x ∈ Ω.domain) (hh : h ∈ Ω.graphCone) (l : ℕ) :
     x + (l : ℝ) • h ∈ Ω.domain := by
   rcases Nat.eq_zero_or_pos l with rfl | hl
   · simpa using hx
-  · exact Ω.add_mem hx (Ω.smul_mem_cone (by exact_mod_cast hl) hh)
+  · exact Ω.add_mem hx (Ω.smul_mem_graphCone (by exact_mod_cast hl) hh)
 
 /-- The closed cone is closed. -/
 theorem isClosed_closedCone : IsClosed Ω.closedCone :=
@@ -200,7 +201,7 @@ theorem continuous_phi : Continuous Ω.phi :=
 /-- **Steps into the open cone from the closure stay in the domain**: `Ω̄ + K ⊆ Ω`, since
 `φ(x) ≤ ⟪x, e⟫` on the closure of `Ω` and the cone is defined by a strict inequality
 (`Rd.LipschitzGraph.phi_add_le`). -/
-theorem add_mem_of_mem_closure {x y : V} (hx : x ∈ closure Ω.domain) (hy : y ∈ Ω.cone) :
+theorem add_mem_of_mem_closure {x y : V} (hx : x ∈ closure Ω.domain) (hy : y ∈ Ω.graphCone) :
     x + y ∈ Ω.domain := by
   have hx' : Ω.phi x ≤ inner ℝ x Ω.e :=
     closure_lt_subset_le Ω.continuous_phi (continuous_id.inner continuous_const) hx
@@ -261,7 +262,7 @@ theorem two_mul_add_one_mul_coneRadius_le : (2 * Ω.M + 1) * Ω.coneRadius ≤ 1
 
 /-- **A ball inside the cone**: `B(e/4, ρ) ⊆ K`, since the component orthogonal to `e` of a point
 of the ball is at most `2ρ` and its component along `e` at least `1/4 - ρ`. -/
-theorem ball_subset_cone : Metric.ball ((1 / 4 : ℝ) • Ω.e) Ω.coneRadius ⊆ Ω.cone := by
+theorem ball_subset_graphCone : Metric.ball ((1 / 4 : ℝ) • Ω.e) Ω.coneRadius ⊆ Ω.graphCone := by
   intro w hw
   rw [Metric.mem_ball, dist_eq_norm] at hw
   set d := w - (1 / 4 : ℝ) • Ω.e with hd
@@ -295,7 +296,7 @@ theorem ball_subset_cone : Metric.ball ((1 / 4 : ℝ) • Ω.e) Ω.coneRadius �
 /-! ### Kernels supported in `-K` -/
 
 /-- A kernel `k` is **supported in `-K`** if `k(y) ≠ 0` implies `-y ∈ K`. -/
-def ConeSupported (k : V → ℂ) : Prop := ∀ y, k y ≠ 0 → -y ∈ Ω.cone
+def ConeSupported (k : V → ℂ) : Prop := ∀ y, k y ≠ 0 → -y ∈ Ω.graphCone
 
 variable {Ω}
 
@@ -317,17 +318,17 @@ theorem ConeSupported.sub {k k' : V → ℂ} (hk : Ω.ConeSupported k) (hk' : Ω
 theorem ConeSupported.dilate {k : V → ℂ} (hk : Ω.ConeSupported k) {c : ℝ} (hc : 0 < c) :
     Ω.ConeSupported (Rd.dilate c k) := fun y hy => by
   have hky : k (c • y) ≠ 0 := fun h => hy (by simp [Rd.dilate, h])
-  have h := Ω.smul_mem_cone (inv_pos.2 hc) (hk (c • y) hky)
+  have h := Ω.smul_mem_graphCone (inv_pos.2 hc) (hk (c • y) hky)
   rwa [smul_neg, inv_smul_smul₀ hc.ne'] at h
 
 variable (Ω) in
 /-- **Dilates of a cone kernel are cone kernels**: if the closed support of `η` lies in the cone
 `K` and `c > 0`, so does the closed support of `η_c`, since `c x ∈ supp η` for `x ∈ supp η_c`
 (`Rd.smul_mem_tsupport_of_mem_tsupport_dilate`) and `c⁻¹ K ⊆ K`
-(`Rd.LipschitzGraph.smul_mem_cone`). -/
-theorem mem_cone_of_mem_tsupport_dilate {η : V → ℂ} (hη : tsupport η ⊆ Ω.cone) {c : ℝ}
-    (hc : 0 < c) {x : V} (hx : x ∈ tsupport (Rd.dilate c η)) : x ∈ Ω.cone := by
-  have h := Ω.smul_mem_cone (inv_pos.2 hc)
+(`Rd.LipschitzGraph.smul_mem_graphCone`). -/
+theorem mem_graphCone_of_mem_tsupport_dilate {η : V → ℂ} (hη : tsupport η ⊆ Ω.graphCone) {c : ℝ}
+    (hc : 0 < c) {x : V} (hx : x ∈ tsupport (Rd.dilate c η)) : x ∈ Ω.graphCone := by
+  have h := Ω.smul_mem_graphCone (inv_pos.2 hc)
     (hη (smul_mem_tsupport_of_mem_tsupport_dilate hc.ne' hx))
   rwa [inv_smul_smul₀ hc.ne'] at h
 
@@ -373,7 +374,7 @@ theorem coneSupported_coneBump : Ω.ConeSupported Ω.coneBump.toFun := fun y hy 
   have hy' : y ∈ Function.support (Ω.coneBumpBase.normed volume) := fun h =>
     hy (show ((Ω.coneBumpBase.normed volume y : ℝ) : ℂ) = 0 by rw [h, Complex.ofReal_zero])
   rw [Ω.coneBumpBase.support_normed_eq, Metric.mem_ball, dist_eq_norm] at hy'
-  refine Ω.ball_subset_cone ?_
+  refine Ω.ball_subset_graphCone ?_
   rw [Metric.mem_ball, dist_eq_norm, show -y - (1 / 4 : ℝ) • Ω.e = -(y - -((1 / 4 : ℝ) • Ω.e))
     by abel, norm_neg]
   exact hy'
@@ -433,44 +434,46 @@ theorem conv_indicator_eq {k : V → ℂ} (hk : Ω.ConeSupported k) (f : V → �
 variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 
 /-- The **cut-off** `f ↦ 1_Ω f` on `L_p`. -/
-noncomputable def cutoff : Lp ℂ p (volume : Measure V) →L[ℂ] Lp ℂ p (volume : Measure V) :=
+noncomputable def graphCutoff : Lp ℂ p (volume : Measure V) →L[ℂ] Lp ℂ p (volume : Measure V) :=
   indicatorLp Ω.measurableSet_domain
 
 /-- The cut-off is `1_Ω f` almost everywhere. -/
-theorem cutoff_apply_ae (f : Lp ℂ p (volume : Measure V)) :
-    Ω.cutoff f =ᵐ[volume] Ω.domain.indicator f :=
+theorem graphCutoff_apply_ae (f : Lp ℂ p (volume : Measure V)) :
+    Ω.graphCutoff f =ᵐ[volume] Ω.domain.indicator f :=
   indicatorLp_apply_ae Ω.measurableSet_domain f
 
 /-- `‖1_Ω f‖_p = ‖f‖_{L_p(Ω)}`. -/
-theorem enorm_cutoff (f : Lp ℂ p (volume : Measure V)) :
-    ‖Ω.cutoff f‖ₑ = eLpNorm (Ω.domain.indicator f) p volume := by
-  rw [Lp.enorm_def, eLpNorm_congr_ae (Ω.cutoff_apply_ae f)]
+theorem enorm_graphCutoff (f : Lp ℂ p (volume : Measure V)) :
+    ‖Ω.graphCutoff f‖ₑ = eLpNorm (Ω.domain.indicator f) p volume := by
+  rw [Lp.enorm_def, eLpNorm_congr_ae (Ω.graphCutoff_apply_ae f)]
 
 /-- `‖1_Ω f‖_p ≤ ‖f‖_p`. -/
-theorem enorm_cutoff_le (f : Lp ℂ p (volume : Measure V)) : ‖Ω.cutoff f‖ₑ ≤ ‖f‖ₑ :=
+theorem enorm_graphCutoff_le (f : Lp ℂ p (volume : Measure V)) : ‖Ω.graphCutoff f‖ₑ ≤ ‖f‖ₑ :=
   enorm_indicatorLp_le _ f
 
 /-- Elements of `L_p` with the same cut-off agree almost everywhere on `Ω`. -/
-theorem indicator_ae_eq_of_cutoff_eq {F f : Lp ℂ p (volume : Measure V)}
-    (hFf : Ω.cutoff F = Ω.cutoff f) : Ω.domain.indicator F =ᵐ[volume] Ω.domain.indicator f := by
-  filter_upwards [Ω.cutoff_apply_ae F, Ω.cutoff_apply_ae f] with x h1 h2
+theorem indicator_ae_eq_of_graphCutoff_eq {F f : Lp ℂ p (volume : Measure V)}
+    (hFf : Ω.graphCutoff F = Ω.graphCutoff f) :
+    Ω.domain.indicator F =ᵐ[volume] Ω.domain.indicator f := by
+  filter_upwards [Ω.graphCutoff_apply_ae F, Ω.graphCutoff_apply_ae f] with x h1 h2
   rw [← h1, ← h2, hFf]
 
 /-- **The support principle on `L_p`**: `1_Ω (k ⋆ (1_Ω h)) = 1_Ω (k ⋆ h)` for an integrable
 kernel supported in `-K` (`Rd.indicatorLp_convLp_indicatorLp` for `U = W = Ω`). -/
-theorem cutoff_convLp_cutoff (hp : p ≠ ∞) {k : V → ℂ} (hk : Integrable k)
+theorem graphCutoff_convLp_graphCutoff (hp : p ≠ ∞) {k : V → ℂ} (hk : Integrable k)
     (hks : Ω.ConeSupported k) (h : Lp ℂ p (volume : Measure V)) :
-    Ω.cutoff (convLp hp hk (Ω.cutoff h)) = Ω.cutoff (convLp hp hk h) :=
+    Ω.graphCutoff (convLp hp hk (Ω.graphCutoff h)) = Ω.graphCutoff (convLp hp hk h) :=
   indicatorLp_convLp_indicatorLp hp hk Ω.measurableSet_domain Ω.measurableSet_domain
     (fun _ hx _ hy => hks.sub_mem hx hy) h
 
 /-- **Convolutions of functions that agree on `Ω` agree on `Ω`**: if `1_Ω F = 1_Ω f`, then
 `1_Ω (k ⋆ F) = 1_Ω (k ⋆ f)` for an integrable kernel supported in `-K`. -/
-theorem cutoff_convLp_eq (hp : p ≠ ∞) {k : V → ℂ} (hk : Integrable k)
+theorem graphCutoff_convLp_eq (hp : p ≠ ∞) {k : V → ℂ} (hk : Integrable k)
     (hks : Ω.ConeSupported k) {F f : Lp ℂ p (volume : Measure V)}
-    (hFf : Ω.cutoff F = Ω.cutoff f) :
-    Ω.cutoff (convLp hp hk F) = Ω.cutoff (convLp hp hk f) := by
-  rw [← Ω.cutoff_convLp_cutoff hp hk hks F, hFf, Ω.cutoff_convLp_cutoff hp hk hks f]
+    (hFf : Ω.graphCutoff F = Ω.graphCutoff f) :
+    Ω.graphCutoff (convLp hp hk F) = Ω.graphCutoff (convLp hp hk f) := by
+  rw [← Ω.graphCutoff_convLp_graphCutoff hp hk hks F, hFf,
+    Ω.graphCutoff_convLp_graphCutoff hp hk hks f]
 
 end LipschitzGraph
 

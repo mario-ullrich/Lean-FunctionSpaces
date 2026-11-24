@@ -143,12 +143,12 @@ theorem memSobolevOn_iff_exists_memApprox (f : Lp ℂ 2 (volume : Measure V)) :
 /-- **`H^1(Ω)` by intrinsic differences**: for every order `r ≥ 2`, `f ∈ L_2(V)` lies in `H^1(Ω)`
 iff `‖f‖_{L_2(Ω)} + ‖(2^k ω_r(f, 2^(-k), Ω)_2)_k‖_{ℓ_2} < ∞`, with the moduli of smoothness of `f`
 inside `Ω`. This is the extension theorem for bounded Lipschitz domains
-(`Rd.BoundedLipschitzDomain.exists_memApprox_extension_iff`) at `p = q = 2`, `s = 1`. -/
+(`Rd.BoundedLipschitzDomain.exists_memApprox_extension_iff_indicator`) at `p = q = 2`, `s = 1`. -/
 theorem memSobolevOn_iff_modulusOn {r : ℕ} (hr : 2 ≤ r) (f : Lp ℂ 2 (volume : Measure V)) :
     Ω.MemSobolevOn f ↔ modNormOn Ω.measurableSet r 1 2 f < ∞ := by
   have hr' : (1 : ℝ) < r := by exact_mod_cast Nat.lt_of_lt_of_le one_lt_two hr
   rw [memSobolevOn_iff_exists_memApprox,
-    Ω.exists_memApprox_extension_iff two_ne_top one_pos hr' one_le_two f]
+    Ω.exists_memApprox_extension_iff_indicator two_ne_top one_pos hr' one_le_two f]
 
 /-- **The intrinsic norm is at most the norm of every extension**: for every order `r` and all
 `F, f ∈ L_2(V)` with `F = f` almost everywhere on `Ω`,

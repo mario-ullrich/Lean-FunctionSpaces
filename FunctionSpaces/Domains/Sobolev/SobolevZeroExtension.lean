@@ -170,11 +170,11 @@ theorem zeroBoundarySpace_eq_top_of_lt_half (hs0 : 0 ≤ s) (hs : s < 1 / 2) :
 for `s ≤ 1/2`, p. 3, cf. Remark 2.6; McLean, Theorem 3.33):
 restriction is an isomorphism of `H̃^s(Ω)` onto `H^s(Ω)`, the isomorphism onto `H^s_0(Ω)` of the
 zero extension bound (`Rd.BoundedLipschitzDomain.exists_hasZeroExtensionBound_of_lt_half`,
-`Rd.HasZeroExtensionBound.tildeEquivZeroBoundary`) followed by `H^s_0(Ω) = H^s(Ω)`
+`Rd.HasZeroExtensionBound.tildeEquivZeroBoundaryOfBound`) followed by `H^s_0(Ω) = H^s(Ω)`
 (`Rd.BoundedLipschitzDomain.zeroBoundarySpace_eq_top_of_lt_half`). -/
 noncomputable def tildeEquivRestrictionSpaceOfLtHalf (hs0 : 0 ≤ s) (hs : s < 1 / 2) :
     tildeSpace s Ω.toOpens ≃L[ℂ] RestrictionSpace s Ω.toOpens :=
-  (Ω.exists_hasZeroExtensionBound_of_lt_half hs0 hs).choose_spec.tildeEquivZeroBoundary.trans
+  (Ω.exists_hasZeroExtensionBound_of_lt_half hs0 hs).choose_spec.tildeEquivZeroBoundaryOfBound.trans
     (LinearIsometryEquiv.ofTop _ _
       (Ω.zeroBoundarySpace_eq_top_of_lt_half hs0 hs)).toContinuousLinearEquiv
 

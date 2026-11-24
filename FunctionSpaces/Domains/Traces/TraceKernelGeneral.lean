@@ -240,7 +240,7 @@ keeps the class of `u` (Mathlib's `Submodule.quotEquivOfEq_mk`), and
 theorem quotientZeroBoundaryEquivTraceSpace_mk (s : ℝ) (u : RestrictionSpace s Ω.toOpens)
     (hs : 1 / 2 < s := by norm_num) (hs' : s < 3 / 2 := by norm_num) :
     Ω.quotientZeroBoundaryEquivTraceSpace s hs hs' (Submodule.Quotient.mk u) =
-      Ω.trace s hs hs' u := by
+      Ω.domainTrace s hs hs' u := by
   rw [quotientZeroBoundaryEquivTraceSpace, LinearIsometryEquiv.trans_apply]
   exact Ω.quotientEquivTraceSpace_mk s u hs hs'
 

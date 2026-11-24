@@ -33,7 +33,7 @@ smooth near each point of its frontier.
   sphere it lies above the graph of `y ↦ R - √(R² - ‖y‖²)`, smooth for `‖y‖ < R/2`
   (`Rd.contDiffOn_sphereProfile_norm`). Hence the smooth domain `Rd.SmoothDomain.ball`, whose
   closure is a compact manifold with boundary, with the Besov spaces of
-  `Rd.SmoothDomain.memBesov_ball_iff`.
+  `Rd.SmoothDomain.memManifoldBesov_ball_iff`.
 -/
 
 @[expose] public section
@@ -187,21 +187,24 @@ theorem exists_chart (h : IsBoundedSmoothDomain Ω) (z : frontier Ω) :
   exact ⟨(r, G), hr, hG, h'⟩
 
 /-- A chosen smooth chart at the frontier point `z`: its radius and its graph domain. -/
-noncomputable def chart (h : IsBoundedSmoothDomain Ω) (z : frontier Ω) : ℝ × LipschitzGraph V :=
+noncomputable def smoothChart (h : IsBoundedSmoothDomain Ω) (z : frontier Ω) :
+    ℝ × LipschitzGraph V :=
   Classical.choose (h.exists_chart z)
 
 /-- The radius of the chosen smooth chart is positive. -/
-theorem chart_fst_pos (h : IsBoundedSmoothDomain Ω) (z : frontier Ω) : 0 < (h.chart z).1 :=
+theorem smoothChart_fst_pos (h : IsBoundedSmoothDomain Ω) (z : frontier Ω) :
+    0 < (h.smoothChart z).1 :=
   (Classical.choose_spec (h.exists_chart z)).1
 
 /-- The graph function of the chosen smooth chart is smooth. -/
-theorem contDiff_chart_phi (h : IsBoundedSmoothDomain Ω) (z : frontier Ω) :
-    ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (h.chart z).2.phi :=
+theorem contDiff_smoothChart_phi (h : IsBoundedSmoothDomain Ω) (z : frontier Ω) :
+    ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (h.smoothChart z).2.phi :=
   (Classical.choose_spec (h.exists_chart z)).2.1
 
 /-- On the ball of the chosen smooth chart, `Ω` is its graph domain. -/
-theorem ball_inter_chart (h : IsBoundedSmoothDomain Ω) (z : frontier Ω) :
-    ball (z : V) (h.chart z).1 ∩ Ω = ball (z : V) (h.chart z).1 ∩ (h.chart z).2.domain :=
+theorem ball_inter_smoothChart (h : IsBoundedSmoothDomain Ω) (z : frontier Ω) :
+    ball (z : V) (h.smoothChart z).1 ∩ Ω =
+      ball (z : V) (h.smoothChart z).1 ∩ (h.smoothChart z).2.domain :=
   (Classical.choose_spec (h.exists_chart z)).2.2
 
 end IsBoundedSmoothDomain
@@ -211,17 +214,18 @@ namespace SmoothDomain
 variable {n : ℕ} [NeZero n] {Ω : Set (EuclideanSpace ℝ (Fin n))}
 
 /-- **The smooth domain of a bounded smooth set** in `ℝ^n`: the chosen smooth charts at the
-frontier points (`Rd.IsBoundedSmoothDomain.chart`) give a bounded Lipschitz domain with carrier
-`Ω` (`Rd.BoundedLipschitzDomain.ofCharts`), whose graph functions are smooth since each graph
-domain is one of the charts (`Rd.BoundedLipschitzDomain.exists_graph_ofCharts_eq`). -/
+frontier points (`Rd.IsBoundedSmoothDomain.smoothChart`) give a bounded Lipschitz domain with
+carrier `Ω` (`Rd.BoundedLipschitzDomain.ofCharts`), whose graph functions are smooth since each
+graph domain is one of the charts (`Rd.BoundedLipschitzDomain.exists_graph_ofCharts_eq`). -/
 noncomputable def ofIsBoundedSmoothDomain (h : IsBoundedSmoothDomain Ω) : SmoothDomain n where
-  toBoundedLipschitzDomain := BoundedLipschitzDomain.ofCharts h.1 h.2.1 (fun z => (h.chart z).1)
-    h.chart_fst_pos (fun z => (h.chart z).2) h.ball_inter_chart
+  toBoundedLipschitzDomain :=
+    BoundedLipschitzDomain.ofCharts h.1 h.2.1 (fun z => (h.smoothChart z).1)
+      h.smoothChart_fst_pos (fun z => (h.smoothChart z).2) h.ball_inter_smoothChart
   contDiff_phi j := by
     obtain ⟨z, hz⟩ := BoundedLipschitzDomain.exists_graph_ofCharts_eq h.1 h.2.1 _
-      h.chart_fst_pos _ h.ball_inter_chart j
+      h.smoothChart_fst_pos _ h.ball_inter_smoothChart j
     rw [hz]
-    exact h.contDiff_chart_phi z
+    exact h.contDiff_smoothChart_phi z
 
 /-- The carrier of `Rd.SmoothDomain.ofIsBoundedSmoothDomain h` is `Ω`. -/
 @[simp]
@@ -300,13 +304,13 @@ theorem SmoothDomain.carrier_ball {n : ℕ} [NeZero n] (c : EuclideanSpace ℝ (
 function `f ∈ L_p` of the closure of the ball `B(c, R)`, a compact manifold with boundary with the
 Lebesgue measure, lies in its Besov space `B^s_{p,q}` iff
 `‖f‖_{L_p(B(c, R))} + ‖(2^(ks) ω_r(f, 2^(-k), B(c, R))_p)_k‖_{ℓ_q} < ∞`, with `f` extended by `0`
-(`Rd.SmoothDomain.memBesov_iff_modNormOn_lt_top` for `Rd.SmoothDomain.ball`). -/
-theorem SmoothDomain.memBesov_ball_iff {n : ℕ} [NeZero n] (c : EuclideanSpace ℝ (Fin n)) (R : ℝ)
-    {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ⊤) {s : ℝ} (hs : 0 < s) {r : ℕ} (hsr : s < r)
+(`Rd.SmoothDomain.memManifoldBesov_iff_modNormOn_lt_top` for `Rd.SmoothDomain.ball`). -/
+theorem SmoothDomain.memManifoldBesov_ball_iff {n : ℕ} [NeZero n] (c : EuclideanSpace ℝ (Fin n))
+    (R : ℝ) {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ⊤) {s : ℝ} (hs : 0 < s) {r : ℕ} (hsr : s < r)
     {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Lp ℂ p (SmoothDomain.ball c R).volumeOn) :
-    Manifold.MemBesov (𝓡∂ n) (SmoothDomain.ball c R).volumeOn hp s q f ↔
+    Manifold.MemManifoldBesov (𝓡∂ n) (SmoothDomain.ball c R).volumeOn hp s q f ↔
       modNormOn (measurableSet_ball : MeasurableSet (ball c R)) r s q
         ((SmoothDomain.ball c R).extLp hp f) < ⊤ :=
-  memBesov_iff_modNormOn_lt_top hp hs hsr hq f
+  memManifoldBesov_iff_modNormOn_lt_top hp hs hsr hq f
 
 end Rd

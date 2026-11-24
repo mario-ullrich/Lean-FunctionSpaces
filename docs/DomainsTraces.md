@@ -76,8 +76,9 @@ extension from the boundary, one operator for every smoothness, so that the corr
   `Ω` with some `F ∈ L_p(V)` with `‖F‖_p + ‖(2^(ks) ω_L(F, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff
   `‖(2^(js) ‖k_j ⋆ f‖_{L_p(Ω)})_j‖_{ℓ_q} < ∞` (`Rd.LipschitzGraph.exists_besov_extension_iff`).
   Then `Ext f = ∑_j η_j ⋆ (1_Ω (k_j ⋆ f))` is such an `F`, the same operator for all
-  `0 < s < L` (`Rd.LipschitzGraph.extension`, `Rd.LipschitzGraph.cutoff_extension`,
-  `Rd.LipschitzGraph.modNorm_extension_le`).
+  `0 < s < L` (`Rd.LipschitzGraph.rychkovExtension`,
+  `Rd.LipschitzGraph.graphCutoff_rychkovExtension`,
+  `Rd.LipschitzGraph.modNorm_rychkovExtension_le`).
 * **Besov spaces on Lipschitz graph domains by intrinsic differences.** With `Ω` as above, let
   `ω_r(f, t, Ω)_p = sup_{|h| ≤ t} ‖Δ_h^r f‖_{L_p(Ω_{rh})}`, where
   `Ω_{rh} = {x : x, x + h, …, x + rh ∈ Ω}`, be the modulus of smoothness on `Ω`
@@ -85,9 +86,10 @@ extension from the boundary, one operator for every smoothness, so that the corr
   with some `F ∈ L_p(V)` with `‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff
   `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`, with equivalent quasi-norms, and
   `Ext f` is such an `F` (`Rd.LipschitzGraph.exists_besov_extension_iff_modulusOn`,
-  `Rd.LipschitzGraph.modNormOn_le_modNorm`, `Rd.LipschitzGraph.modNorm_extension_le_modNormOn`).
-  The same condition describes the restrictions to `Ω` of the band-limited approximation spaces
-  `A^s_q(L_p(V), (E_k))` (`Rd.LipschitzGraph.exists_memApprox_extension_iff`).
+  `Rd.LipschitzGraph.modNormOn_le_modNorm`,
+  `Rd.LipschitzGraph.modNorm_rychkovExtension_le_modNormOn`). The same condition describes the
+  restrictions to `Ω` of the band-limited approximation spaces `A^s_q(L_p(V), (E_k))`
+  (`Rd.LipschitzGraph.exists_memApprox_extension_iff`).
 * **Besov spaces on bounded Lipschitz domains by intrinsic differences.** Let `Ω ⊆ V` be a bounded
   Lipschitz domain: a bounded open set whose boundary is covered by finitely many open balls `B_j`,
   centred on the boundary, with `B_j ∩ Ω = B_j ∩ Ω_j` for Lipschitz graph domains `Ω_j`
@@ -101,9 +103,9 @@ extension from the boundary, one operator for every smoothness, so that the corr
   with `‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff
   `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`, and the same condition describes the
   restrictions of the band-limited approximation spaces
-  (`Rd.BoundedLipschitzDomain.exists_besov_extension_iff_modulusOn`,
-  `Rd.BoundedLipschitzDomain.exists_memApprox_extension_iff`). The extension comes with a bound:
-  there is `C < ∞` such that `F` can be chosen with
+  (`Rd.BoundedLipschitzDomain.exists_besov_extension_iff_modulusOn_indicator`,
+  `Rd.BoundedLipschitzDomain.exists_memApprox_extension_iff_indicator`). The extension comes with a
+  bound: there is `C < ∞` such that `F` can be chosen with
   `‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} ≤`
   `C (‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q})` for every `f`
   (`Rd.BoundedLipschitzDomain.exists_besov_extension_le`). The proof pastes local
@@ -115,35 +117,35 @@ extension from the boundary, one operator for every smoothness, so that the corr
   Lipschitz constant `M`, and `H = e^⊥`. The boundary of `Ω` is the image of the graph map
   `γ(x') = x' + φ(x') e`, `x' ∈ H` (`Rd.LipschitzGraph.graphMap`). For `f ∈ L_p(V)` the trace
   `Tr f = ∑_j (η_j ⋆ 1_Ω (k_j ⋆ f)) ∘ γ`, with the kernels of the cone bump, is a function in
-  `L_p(H)` (`Rd.LipschitzGraph.trace`). For `1 ≤ p < ∞`, `0 < s < 1` and `1 ≤ q ≤ ∞` there is
+  `L_p(H)` (`Rd.LipschitzGraph.graphTrace`). For `1 ≤ p < ∞`, `0 < s < 1` and `1 ≤ q ≤ ∞` there is
   `K < ∞` with
   `‖Tr f‖_{L_p(H)} + ‖(2^(ks) ω_1(Tr f, 2^(-k))_p)_k‖_{ℓ_q} ≤ K (‖f‖_{L_p(Ω)} +
-  ‖(2^(k(s+1/p)) ω_L(f, 2^(-k), Ω)_p)_k‖_{ℓ_q})` (`Rd.LipschitzGraph.modNorm_trace_le`), and
+  ‖(2^(k(s+1/p)) ω_L(f, 2^(-k), Ω)_p)_k‖_{ℓ_q})` (`Rd.LipschitzGraph.modNorm_graphTrace_le`), and
   `Tr f = G ∘ γ` almost everywhere if `f` has a continuous representative `G`
-  (`Rd.LipschitzGraph.trace_ae_eq_comp_graphMap`). The cell atoms of the terms restrict to atoms of
-  order `1` on `H` (`Rd.LipschitzGraph.isRegularAtom_comp_graphMap`), and the atomic synthesis on
-  `H` gives the bound.
+  (`Rd.LipschitzGraph.graphTrace_ae_eq_comp_graphMap`). The cell atoms of the terms restrict to
+  atoms of order `1` on `H` (`Rd.LipschitzGraph.isRegularAtom_comp_graphMap`), and the atomic
+  synthesis on `H` gives the bound.
 * **The trace space of a Lipschitz graph domain.** For `1 ≤ p < ∞`, `0 < s < 1`, `1 ≤ q ≤ ∞` and
   `L ≥ 2`, `g ∈ L_p(H)` is the trace of some `f ∈ L_p(V)` with
   `‖f‖_{L_p(Ω)} + ‖(2^(k(s+1/p)) ω_L(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞` iff
-  `‖g‖_p + ‖(2^(ks) ω_1(g, 2^(-k))_p)_k‖_{ℓ_q} < ∞` (`Rd.LipschitzGraph.exists_trace_eq_iff`). The
-  extension `E g` of moment order `1` (`Rd.LipschitzGraph.graphExtension`) extends the atoms of
+  `‖g‖_p + ‖(2^(ks) ω_1(g, 2^(-k))_p)_k‖_{ℓ_q} < ∞` (`Rd.LipschitzGraph.exists_graphTrace_eq_iff`).
+  The extension `E g` of moment order `1` (`Rd.LipschitzGraph.graphExtension`) extends the atoms of
   `g` by
   `A(x) = a(Px) χ(2^j (⟪x, e⟫ - φ_j(Px)))` with a graph `φ_j` mollified at scale `2^(-j)`; it has a
   finite `B^{s+1/p}_{p,q}`-norm on `V` (`Rd.LipschitzGraph.modNorm_graphExtension_le`) and the trace
-  `g` (`Rd.LipschitzGraph.trace_graphExtension`).
+  `g` (`Rd.LipschitzGraph.graphTrace_graphExtension`).
 * **Traces of every order on the half-space.** Let `Ω = {x : ⟪x, e⟫ > 0}` for a unit vector `e`
-  (`Rd.LipschitzGraph.flat`) and `H = e^⊥`. For `1 ≤ p < ∞`, `s > 0`, `1 ≤ q ≤ ∞`, `L ≥ 2` with
-  `s + 1/p < L`, and `r > s`, `g ∈ L_p(H)` is the trace of some `f ∈ L_p(V)` with
+  (`Rd.LipschitzGraph.halfSpaceGraph`) and `H = e^⊥`. For `1 ≤ p < ∞`, `s > 0`, `1 ≤ q ≤ ∞`, `L ≥ 2`
+  with `s + 1/p < L`, and `r > s`, `g ∈ L_p(H)` is the trace of some `f ∈ L_p(V)` with
   `‖f‖_{L_p(Ω)} + ‖(2^(k(s+1/p)) ω_L(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞` iff
-  `‖g‖_p + ‖(2^(ks) ω_r(g, 2^(-k))_p)_k‖_{ℓ_q} < ∞` (`Rd.LipschitzGraph.exists_trace_eq_iff_flat`).
-  The trace is bounded for every `s > 0` (`Rd.LipschitzGraph.modNorm_trace_le_flat`), since the cell
-  atoms restrict to smooth atoms on `H`; the extension
-  `E g = ∑_j (η_j ⋆ k_j ⋆ g)(Px) χ(2^j ⟪x, e⟫)` with local means of moment order `r` on `H`
-  (`Rd.LipschitzGraph.graphExtension` of the flat graph, whose extended atoms are smooth of every
-  order) is bounded
+  `‖g‖_p + ‖(2^(ks) ω_r(g, 2^(-k))_p)_k‖_{ℓ_q} < ∞`
+  (`Rd.LipschitzGraph.exists_graphTrace_eq_iff_halfSpaceGraph`). The trace is bounded for every
+  `s > 0` (`Rd.LipschitzGraph.modNorm_graphTrace_le_halfSpaceGraph`), since the cell atoms restrict
+  to smooth atoms on `H`; the extension `E g = ∑_j (η_j ⋆ k_j ⋆ g)(Px) χ(2^j ⟪x, e⟫)` with local
+  means of moment order `r` on `H` (`Rd.LipschitzGraph.graphExtension` of the flat graph, whose
+  extended atoms are smooth of every order) is bounded
   (`Rd.LipschitzGraph.modNorm_flatExtension_le`) and has the trace `g`
-  (`Rd.LipschitzGraph.trace_flatExtension`).
+  (`Rd.LipschitzGraph.graphTrace_flatExtension`).
 * **The half-space is a Besov domain.** A Besov domain is a closed convex set with nonempty
   interior whose functions of finite intrinsic quasi-norm extend to `V` with a bound
   (`Rd.BesovDomain`, see [Besov spaces on `ℝ^d`](Rd.md)), a hypothesis class whose field is
@@ -197,8 +199,8 @@ extension from the boundary, one operator for every smoothness, so that the corr
   with the extension property, where the function `G` in `A^s_q` can be chosen with
   `‖G‖_{A^s_q} ≤ C (‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q})` for one `C < ∞`
   (`Rd.HasBesovExtension.exists_cubeSplineAt_le`) and the modulus may have any order `r' > s`
-  (`Rd.HasBesovExtension.exists_memApprox_cubeSplineSchemeAt_iff_of_order`), and one direction
-  holds for every measurable `Ω ⊆ Q` and `0 ≤ s < r - 1 + 1/p`
+  (`Rd.HasBesovExtension.exists_memApprox_cubeSplineSchemeAt_iff_of_order_of_hasBesovExtension`),
+  and one direction holds for every measurable `Ω ⊆ Q` and `0 ≤ s < r - 1 + 1/p`
   (`Rd.modNormOn_lt_top_of_memApprox_cubeSplineSchemeAt`). The best approximations `E_k(f)` of
   `f` in `L_p(Ω)` by the restrictions of the splines of level `k` (`Rd.domainSplineScheme`) then
   satisfy
@@ -235,8 +237,9 @@ extension from the boundary, one operator for every smoothness, so that the corr
   `B^s_{p,q}(Γ)` depends on the resolution of unity
   (`Rd.BoundedLipschitzDomain.boundaryTrace_eventuallyEq`,
   `Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_of_boundaryPartition`). The proof rests on the
-  change of chart for the traces of graph domains (`Rd.LipschitzGraph.trace_ae_eq_trace_comp`),
-  whose Lipschitz chart maps keep null sets (`Rd.volume_image_eq_zero_of_lipschitzWith`).
+  change of chart for the traces of graph domains
+  (`Rd.LipschitzGraph.graphTrace_ae_eq_graphTrace_comp`), whose Lipschitz chart maps keep null sets
+  (`Rd.volume_image_eq_zero_of_lipschitzWith`).
 * **Besov quasi-norms on the boundary.** With `Ω`, `Γ` and `ψ` as above, the quasi-norm
   `‖g‖_{B^s_{p,q}(Γ)}` is the sum over the charts of
   `‖G_j‖_{L_p(H_j)} + ‖(2^(ks) ω_1(G_j, 2^(-k))_p)_k‖_{ℓ_q}` for the chart pieces
@@ -326,16 +329,16 @@ extension from the boundary, one operator for every smoothness, so that the corr
   two are the same subspace (`Rd.coe_tildeEquivZeroBoundary_symm_apply`).
 * **Duality on open sets.** Let `Ω ⊆ V` be open and `s` real. `J_{2s}` is an isometry of
   `H^s(V)` onto `H^{-s}(V)` (`Rd.besselShift`, `Rd.toDistr_besselShift`), and
-  `[W, U] = ⟪J_{-s} W, J_s U⟫_{L_2}` pairs `W ∈ H^{-s}(V)` with `U ∈ H^s(V)` (`Rd.pairing`), with
-  `|[W, U]| ≤ ‖W‖ ‖U‖`, `[φ, U] = U(φ)` for test functions `φ` of `Ω`, and
-  `[ψ, U] = ⟪ψ, U⟫_{L_2}` for Schwartz `ψ` at `s = 1` (`Rd.norm_pairing_le`,
-  `Rd.pairing_ofTest_left`, `Rd.pairing_one_toLp`). `U` is orthogonal to `H̃^s(Ω)` iff `J_{2s} U`
-  vanishes on `Ω` (`Rd.mem_orthogonal_tildeSpace_iff`), so `J_{2s}` maps `H̃^s(Ω)` isometrically
-  onto `H^{-s}(Ω)` and `H^s(Ω)` onto `H̃^{-s}(Ω)` (`Rd.tildeEquivRestriction`,
+  `[W, U] = ⟪J_{-s} W, J_s U⟫_{L_2}` pairs `W ∈ H^{-s}(V)` with `U ∈ H^s(V)` (`Rd.sobolevPairing`),
+  with `|[W, U]| ≤ ‖W‖ ‖U‖`, `[φ, U] = U(φ)` for test functions `φ` of `Ω`, and
+  `[ψ, U] = ⟪ψ, U⟫_{L_2}` for Schwartz `ψ` at `s = 1` (`Rd.norm_sobolevPairing_le`,
+  `Rd.sobolevPairing_ofTest_left`, `Rd.sobolevPairing_one_toLp`). `U` is orthogonal to `H̃^s(Ω)` iff
+  `J_{2s} U` vanishes on `Ω` (`Rd.mem_orthogonal_tildeSpace_iff`), so `J_{2s}` maps `H̃^s(Ω)`
+  isometrically onto `H^{-s}(Ω)` and `H^s(Ω)` onto `H̃^{-s}(Ω)` (`Rd.tildeEquivRestriction`,
   `Rd.restrictionEquivTilde`). Every bounded functional `ℓ` on `H̃^s(Ω)` is `U ↦ [W, U]` for
-  exactly one `W ∈ H^{-s}(Ω)`, with `‖W‖ = ‖ℓ‖` (`Rd.dualEquiv`, `Rd.dualEquiv_apply`,
-  `Rd.dualEquiv_eq_iff`; Chandler-Wilde, Hewett and Moiola, Theorem 3.3), and every extension
-  of `W` to `V` gives the same pairing (`Rd.dualEquiv_apply_of_restrictProj_eq`); likewise
+  exactly one `W ∈ H^{-s}(Ω)`, with `‖W‖ = ‖ℓ‖` (`Rd.tildeDualEquiv`, `Rd.tildeDualEquiv_apply`,
+  `Rd.tildeDualEquiv_eq_iff`; Chandler-Wilde, Hewett and Moiola, Theorem 3.3), and every extension
+  of `W` to `V` gives the same pairing (`Rd.tildeDualEquiv_apply_of_restrictProj_eq`); likewise
   `(H^s(Ω))^* ≅ H̃^{-s}(Ω)` and `(H^1_0(Ω))^* ≅ H^{-1}(Ω)` (`Rd.dualRestrictionEquiv`,
   `Rd.dualZeroBoundaryEquiv`). On the way, the Bessel potential `J_t` of a real Schwartz
   function is real (`Rd.conj_besselSchwartz_apply`), from `conj (𝓕 f) = 𝓕⁻(conj f)` on `V`
@@ -351,10 +354,10 @@ extension from the boundary, one operator for every smoothness, so that the corr
   `H^s(V) ⊂ L_2(V) ⊂ H^{-s}(V)`. For open `Ω`, `U ↦ (ι_s U)|_Ω` is injective with dense range
   from `H̃^s(Ω)` into `L_2(Ω)` (`Rd.tildeToL2`, `Rd.tildeToL2_injective`,
   `Rd.denseRange_tildeToL2`), and its pivot dual followed by the duality
-  `(H̃^s(Ω))^* ≅ H^{-s}(Ω)` (`Rd.dualEquiv`) sends `g ∈ L_2(Ω)` to the `W_g ∈ H^{-s}(Ω)` with
+  `(H̃^s(Ω))^* ≅ H^{-s}(Ω)` (`Rd.tildeDualEquiv`) sends `g ∈ L_2(Ω)` to the `W_g ∈ H^{-s}(Ω)` with
   `[W_g, U] = ∫_Ω conj (g) ι_s U` for every `U ∈ H̃^s(Ω)`
-  (`Rd.pivotDual_tildeToL2_apply_apply`, `Rd.pairing_dualEquiv_pivotDual_tildeToL2`): the triple
-  `H̃^s(Ω) ⊂ L_2(Ω) ⊂ H^{-s}(Ω)`, for `s = 1` the triple `H^1_0(Ω) ⊂ L_2(Ω) ⊂ H^{-1}(Ω)`.
+  (`Rd.pivotDual_tildeToL2_apply_apply`, `Rd.sobolevPairing_tildeDualEquiv_pivotDual_tildeToL2`):
+  the triple `H̃^s(Ω) ⊂ L_2(Ω) ⊂ H^{-s}(Ω)`, for `s = 1` the triple `H^1_0(Ω) ⊂ L_2(Ω) ⊂ H^{-1}(Ω)`.
 * **The trace spaces of a bounded Lipschitz domain.** For every `U ∈ H^1(V)` with `L_2` function
   `ι U` (`Rd.toL2`), `‖ι U‖_2 + ‖(2^k ω_2(ι U, 2^(-k))_2)_k‖_{ℓ_2} ≤ C ‖U‖` with an explicit
   constant (`Rd.modNorm_two_le_norm`, `Rd.sobolevOneBesovConst`). Conversely
@@ -365,7 +368,7 @@ extension from the boundary, one operator for every smoothness, so that the corr
   `1/2 < s < 2` and `U ∈ H^s(V)` with `L_2` function `ι_s U` (`Rd.sobolevToL2`) the same
   quantity of `ι_s U` is at most `c C_s ‖U‖` with explicit constants
   (`Rd.modNorm_half_one_le_norm_of_lt`), so the trace of `H^s(V)` on a Lipschitz graph is
-  bounded (`Rd.LipschitzGraph.exists_enorm_trace_sobolevToL2_le`). Let `Ω` be a bounded
+  bounded (`Rd.LipschitzGraph.exists_enorm_graphTrace_sobolevToL2_le`). Let `Ω` be a bounded
   Lipschitz domain with boundary `Γ`, `1/2 < s < 3/2`, and `H^s(Ω)` the Hilbert space of the
   restriction space. The chart traces
   `u ↦ Tr_j(ψ_j ι_s u)` are bounded operators from `H^s(Ω)` to `L_2` of the hyperplanes of the
@@ -374,22 +377,25 @@ extension from the boundary, one operator for every smoothness, so that the corr
   vanishes almost everywhere on `Γ`, for every resolution of unity
   (`Rd.BoundedLipschitzDomain.mem_traceKer_iff`). The trace space of `H^s(Ω)` is defined as its
   orthogonal complement (`Rd.BoundedLipschitzDomain.TraceSpace`), with the trace `γ_s`, the
-  orthogonal projection, and the extension `E_s`, the inclusion. By this definition
-  `γ_s E_s = id`, `‖γ_s u‖ ≤ ‖u‖`, `‖E_s t‖ = ‖t‖`, the kernel of `γ_s` is the trace kernel,
-  and `H^s(Ω) ⧸ ker γ_s` is isometrically isomorphic to the trace space
-  (`Rd.BoundedLipschitzDomain.trace_extend`, `Rd.BoundedLipschitzDomain.ker_trace`,
-  `Rd.BoundedLipschitzDomain.quotientEquivTraceSpace`). Two elements of `H^s(Ω)` have the same trace
-  iff their boundary traces agree almost everywhere on `Γ`
-  (`Rd.BoundedLipschitzDomain.trace_eq_iff`), and `t ↦ Tr_Γ(E_s t)` maps the trace space onto
-  `B^{s-1/2}_{2,2}(Γ)` modulo null sets of `Γ` (`Rd.BoundedLipschitzDomain.memBoundaryBesov_extend`,
+  orthogonal projection, and the extension `E_s`, the inclusion
+  (`Rd.BoundedLipschitzDomain.domainTrace`, `Rd.BoundedLipschitzDomain.domainExtend`). By this
+  definition `γ_s E_s = id`, `‖γ_s u‖ ≤ ‖u‖`, `‖E_s t‖ = ‖t‖`, the kernel of `γ_s` is the trace
+  kernel, and `H^s(Ω) ⧸ ker γ_s` is isometrically isomorphic to the trace space
+  (`Rd.BoundedLipschitzDomain.domainTrace_domainExtend`,
+  `Rd.BoundedLipschitzDomain.ker_domainTrace`, `Rd.BoundedLipschitzDomain.quotientEquivTraceSpace`).
+  Two elements of `H^s(Ω)` have the same trace iff their boundary traces agree almost everywhere on
+  `Γ` (`Rd.BoundedLipschitzDomain.domainTrace_eq_iff`), and `t ↦ Tr_Γ(E_s t)` maps the trace space
+  onto `B^{s-1/2}_{2,2}(Γ)` modulo null sets of `Γ`
+  (`Rd.BoundedLipschitzDomain.memBoundaryBesov_domainExtend`,
   `Rd.BoundedLipschitzDomain.exists_traceSpace_of_memBoundaryBesov`,
-  `Rd.BoundedLipschitzDomain.boundaryTrace_extend_eventuallyEq_iff`), with equivalent norms
+  `Rd.BoundedLipschitzDomain.boundaryTrace_domainExtend_eventuallyEq_iff`), with equivalent norms
   (*The norm of the trace space* below). The dual of the trace space
   (`Rd.BoundedLipschitzDomain.DualTraceSpace`) is conjugate-linearly isometric to it by Riesz
   (`Rd.BoundedLipschitzDomain.dualTraceEquiv`), and the adjoint of the trace is the extension
-  (`Rd.BoundedLipschitzDomain.adjoint_trace`). The family is indexed by `s`; `Ω.TraceSpace 1` is
-  the trace space of `H^1(Ω)`, and its statements with `Rd.toL2` are
-  `Rd.BoundedLipschitzDomain.mem_traceKer_one_iff` and `Rd.BoundedLipschitzDomain.trace_one_eq_iff`.
+  (`Rd.BoundedLipschitzDomain.adjoint_domainTrace`). The family is indexed by `s`; `Ω.TraceSpace 1`
+  is the trace space of `H^1(Ω)`, and its statements with `Rd.toL2` are
+  `Rd.BoundedLipschitzDomain.mem_traceKer_one_iff` and
+  `Rd.BoundedLipschitzDomain.domainTrace_one_eq_iff`.
 * **The area formula for Lipschitz graphs.** Let `Ω = {x : φ(x) < ⟪x, e⟫}` be a Lipschitz graph
   domain in `V`, `dim V = n`, with the graph map `γ(x') = x' + φ(x') e` over the hyperplane
   `H = e^⊥`, whose range is the boundary of `Ω` (`Rd.LipschitzGraph.range_graphMap`), and let
@@ -406,7 +412,7 @@ extension from the boundary, one operator for every smoothness, so that the corr
   (`Rd.LipschitzGraph.normDet_linearGraph`). The outward unit normal
   `ν = (∇φ - e)/√(1 + ‖∇φ‖²)` is a measurable unit vector with `⟪ν, y⟫ < 0` for every `y` in the
   cone of `Ω` (`Rd.LipschitzGraph.normalAt`, `Rd.LipschitzGraph.norm_normalAt`,
-  `Rd.LipschitzGraph.inner_normalAt_neg_of_mem_cone`).
+  `Rd.LipschitzGraph.inner_normalAt_neg_of_mem_graphCone`).
 * **The surface measure of a bounded Lipschitz domain.** Let `Ω` be a bounded Lipschitz domain
   in `V`, `dim V = n`, with boundary `Γ`, boundary balls `B_j` and charts `γ_j` over the
   hyperplanes `H_j`. The surface measure `σ` is `μHE[n-1]` restricted to `Γ`
@@ -434,7 +440,8 @@ extension from the boundary, one operator for every smoothness, so that the corr
   `Rd.BoundedLipschitzDomain.memLp_of_memBoundaryBesov`). The outward unit normal field
   `ν(y) = ∑_j ψ_j(y) ν_j(P_j y)`, with the chart normals `ν_j` and the canonical resolution of
   unity `ψ` (`Rd.BoundedLipschitzDomain.boundaryPartition`, nonnegative), is measurable with
-  `‖ν‖ ≤ 1` (`Rd.BoundedLipschitzDomain.normal`, `Rd.BoundedLipschitzDomain.norm_normal_le`).
+  `‖ν‖ ≤ 1` (`Rd.BoundedLipschitzDomain.outwardNormal`,
+  `Rd.BoundedLipschitzDomain.norm_outwardNormal_le`).
 * **The norm of the trace space.** Let `Ω` be a bounded Lipschitz domain with boundary `Γ`,
   `1/2 < s < 3/2`, `Ω.TraceSpace s` the trace space of `H^s(Ω)` and `τ_s` its trace into
   `L_2(Γ)`. For every resolution of unity `ψ` and `t` in the trace space, `‖t‖` is the least norm
@@ -537,7 +544,7 @@ extension from the boundary, one operator for every smoothness, so that the corr
   (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memWSobolev`). On a Lipschitz
   graph domain `Ω = {x : φ(x) < ⟪x, e⟫}` with `M`-Lipschitz `φ`, the flattening
   `F(x) = x - φ(x) e` and its inverse are `(1 + M)`-Lipschitz and preserve Lebesgue measure
-  (`Rd.LipschitzGraph.measurePreserving_flatten`,
+  (`Rd.LipschitzGraph.measurePreserving_graphFlatten`,
   `Rd.LipschitzGraph.measurePreserving_unflatten`), and the even reflection of `f ∘ F⁻¹` across
   `e^⊥`, composed with `F` (`Rd.LipschitzGraph.reflectionExtension`), is `f` on `Ω`, is weakly
   differentiable on `V` (`Rd.LipschitzGraph.hasWeakLineDeriv_reflectionExtension`) and satisfies
@@ -575,8 +582,8 @@ extension from the boundary, one operator for every smoothness, so that the corr
   domain with the graph map `γ(x') = x' + φ(x') e` over the hyperplane `H = e^⊥`, the gradient
   `∇φ` of `φ|_H`, the outward unit normal `ν` and `n = dim V`, and let
   `n_v = ⟪∇φ, v⟫ - ⟪v, e⟫ = ⟪v, ν⟫ √(1 + ‖∇φ‖²)` (`Rd.LipschitzGraph.normalWeight`,
-  `Rd.LipschitzGraph.inner_normalAt_mul_gram`). For every `C^1` function `g` with compact support
-  and every `v ∈ V`, `∫_Ω ∂_v g = ∫_H g(γ x') n_v(x') dx' = ∫_{γ(H)} g ⟪v, ν ∘ P⟫ dμHE[n-1]`
+  `Rd.LipschitzGraph.inner_normalAt_mul_gramDensity`). For every `C^1` function `g` with compact
+  support and every `v ∈ V`, `∫_Ω ∂_v g = ∫_H g(γ x') n_v(x') dx' = ∫_{γ(H)} g ⟪v, ν ∘ P⟫ dμHE[n-1]`
   (`Rd.LipschitzGraph.setIntegral_lineDeriv_eq`,
   `Rd.LipschitzGraph.setIntegral_lineDeriv_eq_surface`). For all `f, g ∈ W^1_2(V)` and their weak
   derivatives `f_v = ∂_v f`, `g_v = ∂_v g` in `L_2(V)`,
@@ -596,10 +603,10 @@ extension from the boundary, one operator for every smoothness, so that the corr
   `Rd.norm_weakDerivL2_le`).
 * **Green's formula on bounded Lipschitz domains.** Let `Ω` be a bounded Lipschitz domain with
   boundary `Γ`, surface measure `σ`, outward unit normal field `ν`
-  (`Rd.BoundedLipschitzDomain.normal`), boundary balls `B_j`, graph domains `Ω_j` with traces
+  (`Rd.BoundedLipschitzDomain.outwardNormal`), boundary balls `B_j`, graph domains `Ω_j` with traces
   `Tr_j`, graph maps `γ_j` and normal weights `n^j_v`. For all `U, W ∈ H^1(V)` and every `v ∈ V`,
   `∫_Ω (∂_v U) W + U ∂_v W = ∫_Γ T_Γ U · T_Γ W ⟪v, ν⟫ dσ` with the trace `T_Γ : H^1(V) → L_2(Γ)`
-  (`Rd.BoundedLipschitzDomain.setIntegral_green_surface`), and for all `u, w ∈ H^1(Ω)`,
+  (`Rd.BoundedLipschitzDomain.setIntegral_green_surfaceMeasure`), and for all `u, w ∈ H^1(Ω)`,
   `∫_Ω (∂_v u) w + u ∂_v w = ∫_Γ γ_{L_2} u · γ_{L_2} w ⟪v, ν⟫ dσ` with the trace
   `γ_{L_2} : H^1(Ω) → L_2(Γ)` (`Rd.BoundedLipschitzDomain.setIntegral_green_sobolevOne`), also
   with weak derivatives on `Ω`
@@ -607,19 +614,20 @@ extension from the boundary, one operator for every smoothness, so that the corr
   for every resolution of unity `ψ` on `Γ`, all `f, g ∈ W^1_2(V)` and the weak derivatives
   `f_v = ∂_v f`, `g_v = ∂_v g` in `L_2(V)`,
   `∫_Ω f_v g + f g_v = ∑_j ∫_{H_j} ψ_j(γ_j x') Tr_j f(x') Tr_j g(x') n^j_v(x') dx'`
-  (`Rd.BoundedLipschitzDomain.setIntegral_green`). On every ball `B_j`, `ν = ν_j ∘ P_j`
-  `σ`-almost everywhere, so `‖ν‖ = 1` `σ`-almost everywhere
-  (`Rd.BoundedLipschitzDomain.normal_ae_eq_normalAt`, `Rd.BoundedLipschitzDomain.norm_normal_ae`).
-  For every `u ∈ H^1(Ω)`, the zero extension `1_Ω u` lies in `W^1_2(V)` iff the trace of `u`
-  vanishes (`Rd.BoundedLipschitzDomain.memWSobolev_indicatorLp_iff_mem_traceKer`), and then
+  (`Rd.BoundedLipschitzDomain.setIntegral_green_of_boundaryPartition`). On every ball `B_j`,
+  `ν = ν_j ∘ P_j` `σ`-almost everywhere, so `‖ν‖ = 1` `σ`-almost everywhere
+  (`Rd.BoundedLipschitzDomain.outwardNormal_ae_eq_normalAt`,
+  `Rd.BoundedLipschitzDomain.norm_outwardNormal_ae`). For every `u ∈ H^1(Ω)`, the zero extension
+  `1_Ω u` lies in `W^1_2(V)` iff the trace of `u` vanishes
+  (`Rd.BoundedLipschitzDomain.memWSobolev_indicatorLp_iff_mem_traceKer`), and then
   `∂_v (1_Ω u) = 1_Ω ∂_v u`
   (`Rd.BoundedLipschitzDomain.hasWeakLineDeriv_indicatorLp_of_mem_traceKer`). The proof pastes
   Green's formula on the graph domains with a resolution of unity equal to one near `Γ`
-  (`Rd.BoundedLipschitzDomain.setIntegral_green_of_nhds`); the interior piece integrates to zero
-  by integration by parts in `H^1(V)` (`Rd.integral_weakDeriv_mul_add_eq_zero`). The chart normals
+  (`Rd.BoundedLipschitzDomain.setIntegral_green_of_nhds`); the interior piece integrates to zero by
+  integration by parts in `H^1(V)` (`Rd.integral_weakDeriv_mul_add_eq_zero`). The chart normals
   agree almost everywhere because Gauss–Green for `C^1` functions in two charts gives the same
   boundary integrals (`Rd.BoundedLipschitzDomain.normalAt_graphMap_ae_eq`), and the traces from
-  above and from below a graph agree (`Rd.LipschitzGraph.traceH1_ae_eq_traceH1_lower`).
+  above and from below a graph agree (`Rd.LipschitzGraph.traceH1_ae_eq_traceH1_lowerGraph`).
 * **The kernel of the trace.** Let `Ω` be a bounded Lipschitz domain with boundary `Γ`, `H^1(Ω)`
   the Hilbert space of restrictions of `H^1(V)`, `H̃^1(Ω)` the closure of the test functions of
   `Ω` in `H^1(V)`, `H^1_0(Ω)` the closure of their restrictions in `H^1(Ω)`, and `ker γ` the

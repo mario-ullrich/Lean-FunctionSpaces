@@ -163,7 +163,7 @@ variable (Ω : BoundedLipschitzDomain V)
 /-- **In a boundary ball the boundary is the graph**: for `y ∈ B_j`, `y ∈ Γ` iff `γ_j(P_j y) = y`,
 since `Ω` and `Ω_j` agree on the open ball `B_j` (Mathlib's `frontier_inter_open_inter`). -/
 theorem mem_frontier_iff (j : Fin Ω.N) {y : V} (hy : y ∈ ball (Ω.center j) (Ω.radius j)) :
-    y ∈ frontier Ω.carrier ↔ (Ω.graph j).graphMap ((Ω.graph j).proj y) = y := by
+    y ∈ frontier Ω.carrier ↔ (Ω.graph j).graphMap ((Ω.graph j).graphProj y) = y := by
   have h := frontier_inter_open_inter (s := Ω.carrier)
     (isOpen_ball : IsOpen (ball (Ω.center j) (Ω.radius j)))
   rw [Ω.inter_ball_eq j le_rfl, frontier_inter_open_inter isOpen_ball] at h
@@ -176,14 +176,14 @@ theorem mem_frontier_iff (j : Fin Ω.N) {y : V} (hy : y ∈ ball (Ω.center j) (
 theorem graphMap_mem_frontier (j : Fin Ω.N) {x' : (Ω.graph j).hyperplane}
     (hx : (Ω.graph j).graphMap x' ∈ ball (Ω.center j) (Ω.radius j)) :
     (Ω.graph j).graphMap x' ∈ frontier Ω.carrier := by
-  rw [Ω.mem_frontier_iff j hx, (Ω.graph j).proj_graphMap]
+  rw [Ω.mem_frontier_iff j hx, (Ω.graph j).graphProj_graphMap]
 
 /-- **Boundary points in two balls lie on both graphs**: if `γ_j(x') ∈ B_j ∩ B_k`, then
 `γ_k(P_k γ_j x') = γ_j x'`. -/
-theorem graphMap_proj_graphMap (j k : Fin Ω.N) {x' : (Ω.graph j).hyperplane}
+theorem graphMap_graphProj_graphMap (j k : Fin Ω.N) {x' : (Ω.graph j).hyperplane}
     (hj : (Ω.graph j).graphMap x' ∈ ball (Ω.center j) (Ω.radius j))
     (hk : (Ω.graph j).graphMap x' ∈ ball (Ω.center k) (Ω.radius k)) :
-    (Ω.graph k).graphMap ((Ω.graph k).proj ((Ω.graph j).graphMap x')) =
+    (Ω.graph k).graphMap ((Ω.graph k).graphProj ((Ω.graph j).graphMap x')) =
       (Ω.graph j).graphMap x' :=
   (Ω.mem_frontier_iff k hk).1 (Ω.graphMap_mem_frontier j hj)
 
@@ -232,15 +232,15 @@ theorem eventually_aeBoundary_iff {P : V → Prop} :
 
 /-- **Chart statements hold almost everywhere on the boundary**: if `P(γ_k x')` holds for almost
 every `x' ∈ H_k` with `γ_k(x') ∈ B_k`, then `P` holds almost everywhere on `Γ ∩ B_k`, by the change
-of chart (`Rd.LipschitzGraph.ae_proj_graphMap`). -/
+of chart (`Rd.LipschitzGraph.ae_graphProj_graphMap`). -/
 theorem eventually_aeBoundary_of_chart (k : Fin Ω.N) {P : V → Prop}
     (h : ∀ᵐ x' ∂(volume : Measure (Ω.graph k).hyperplane),
       (Ω.graph k).graphMap x' ∈ ball (Ω.center k) (Ω.radius k) → P ((Ω.graph k).graphMap x')) :
     ∀ᶠ y in Ω.aeBoundary, y ∈ ball (Ω.center k) (Ω.radius k) → P y := by
   rw [eventually_aeBoundary_iff]
   intro j
-  filter_upwards [(Ω.graph j).ae_proj_graphMap (Ω.graph k) h] with x' hx hj hk
-  have hA := Ω.graphMap_proj_graphMap j k hj hk
+  filter_upwards [(Ω.graph j).ae_graphProj_graphMap (Ω.graph k) h] with x' hx hj hk
+  have hA := Ω.graphMap_graphProj_graphMap j k hj hk
   have h' := hx hA
   rw [hA] at h'
   exact h' hk
@@ -287,7 +287,7 @@ theorem MemBoundaryBesov.congr {ψ : Ω.BoundaryPartition} {s : ℝ} {q : ℝ≥
 graph domains `Ω_k` (cone bumps, differences of order `L`). -/
 noncomputable def boundaryTrace (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞) (L : ℕ)
     (F : Lp ℂ p (volume : Measure V)) (y : V) : ℂ :=
-  ∑ k, ψ.toComplex k y * (Ω.graph k).trace hp L F ((Ω.graph k).proj y)
+  ∑ k, ψ.toComplex k y * (Ω.graph k).graphTrace hp L F ((Ω.graph k).graphProj y)
 
 /-- **The boundary trace in a chart**: for `F` with a finite `B^{s+1/p}_{p,q}`-norm of order
 `L > s + 1/p` on `V`, `Tr_Γ F(γ_j x') = Tr_j F(x')` for almost every `x' ∈ H_j` with
@@ -300,15 +300,15 @@ theorem boundaryTrace_graphMap (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞) {L :
       dyadicWeight (s + 1 / p.toReal) k * lpModulus p L F k) < ∞) (j : Fin Ω.N) :
     ∀ᵐ x' ∂(volume : Measure (Ω.graph j).hyperplane),
       (Ω.graph j).graphMap x' ∈ ball (Ω.center j) (Ω.radius j) →
-        Ω.boundaryTrace ψ hp L F ((Ω.graph j).graphMap x') = (Ω.graph j).trace hp L F x' := by
-  have hcc := fun k => (Ω.graph j).trace_ae_eq_trace_comp (Ω.graph k) hp hL hs hsL hq hF
+        Ω.boundaryTrace ψ hp L F ((Ω.graph j).graphMap x') = (Ω.graph j).graphTrace hp L F x' := by
+  have hcc := fun k => (Ω.graph j).graphTrace_ae_eq_graphTrace_comp (Ω.graph k) hp hL hs hsL hq hF
   filter_upwards [ae_all_iff.2 hcc] with x' hx hj
   have hterm : ∀ k, ψ.toComplex k ((Ω.graph j).graphMap x') *
-      (Ω.graph k).trace hp L F ((Ω.graph k).proj ((Ω.graph j).graphMap x')) =
-        ψ.toComplex k ((Ω.graph j).graphMap x') * (Ω.graph j).trace hp L F x' := fun k => by
+      (Ω.graph k).graphTrace hp L F ((Ω.graph k).graphProj ((Ω.graph j).graphMap x')) =
+        ψ.toComplex k ((Ω.graph j).graphMap x') * (Ω.graph j).graphTrace hp L F x' := fun k => by
     by_cases hψ : ψ.toFun k ((Ω.graph j).graphMap x') = 0
     · rw [ψ.toComplex_of_eq_zero hψ, zero_mul, zero_mul]
-    · rw [← hx k (Ω.graphMap_proj_graphMap j k hj (ψ.mem_ball_of_ne_zero hψ))]
+    · rw [← hx k (Ω.graphMap_graphProj_graphMap j k hj (ψ.mem_ball_of_ne_zero hψ))]
   rw [boundaryTrace, Finset.sum_congr rfl fun k _ => hterm k, ← Finset.sum_mul,
     ψ.sum_toComplex_eq_one (Ω.graphMap_mem_frontier j hj), one_mul]
 
@@ -327,7 +327,7 @@ theorem boundaryTrace_eventuallyEq (ψ ψ' : Ω.BoundaryPartition) (hp : p ≠ �
 
 /-- **The boundary trace of continuous functions is the restriction**: if `F` has a continuous
 representative `G`, then `Tr_Γ F = G` almost everywhere on `Γ`
-(`Rd.LipschitzGraph.trace_ae_eq_comp_graphMap`). -/
+(`Rd.LipschitzGraph.graphTrace_ae_eq_comp_graphMap`). -/
 theorem boundaryTrace_eventuallyEq_of_continuous (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞)
     {L : ℕ} (hL : 1 ≤ L) {s : ℝ} (hs : 0 < s) (hsL : s + 1 / p.toReal < L) {q : ℝ≥0∞}
     (hq : 1 ≤ q) {F : Lp ℂ p (volume : Measure V)}
@@ -337,14 +337,14 @@ theorem boundaryTrace_eventuallyEq_of_continuous (ψ : Ω.BoundaryPartition) (hp
     Ω.boundaryTrace ψ hp L F =ᶠ[Ω.aeBoundary] G := by
   refine Ω.eventually_aeBoundary_iff.2 fun j => ?_
   filter_upwards [Ω.boundaryTrace_graphMap ψ hp hL hs hsL hq hF j,
-    (Ω.graph j).trace_ae_eq_comp_graphMap hp hL hs hq
+    (Ω.graph j).graphTrace_ae_eq_comp_graphMap hp hL hs hq
       ((Ω.graph j).intrinsicNorm_lt_top_of_modNorm hp L hq hF).1 hG hFG] with x' h1 h2 hj
   rw [h1 hj, h2]
   rfl
 
 /-- **The boundary trace depends only on `F` on `Ω`**: if `F₁ = F₂` almost everywhere on `Ω`, then
 `Tr_Γ F₁ = Tr_Γ F₂` almost everywhere on `Γ`, since `Ω` agrees with `Ω_j` on `B_j`
-(`Rd.LipschitzGraph.trace_ae_eq_of_ae_eq`). -/
+(`Rd.LipschitzGraph.graphTrace_ae_eq_of_ae_eq`). -/
 theorem boundaryTrace_congr (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L)
     {s : ℝ} (hs : 0 < s) (hsL : s + 1 / p.toReal < L) {q : ℝ≥0∞} (hq : 1 ≤ q)
     {F₁ F₂ : Lp ℂ p (volume : Measure V)}
@@ -355,7 +355,7 @@ theorem boundaryTrace_congr (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞) {L : �
     (h : ∀ᵐ x ∂(volume : Measure V), x ∈ Ω.carrier → F₁ x = F₂ x) :
     Ω.boundaryTrace ψ hp L F₁ =ᶠ[Ω.aeBoundary] Ω.boundaryTrace ψ hp L F₂ := by
   refine Ω.eventually_aeBoundary_iff.2 fun j => ?_
-  have hloc := (Ω.graph j).trace_ae_eq_of_ae_eq hp L hs hq
+  have hloc := (Ω.graph j).graphTrace_ae_eq_of_ae_eq hp L hs hq
     ((Ω.graph j).intrinsicNorm_lt_top_of_modNorm hp L hq hF₁).2
     ((Ω.graph j).intrinsicNorm_lt_top_of_modNorm hp L hq hF₂).2
     (isOpen_ball : IsOpen (ball (Ω.center j) (Ω.radius j)))
@@ -371,7 +371,7 @@ theorem boundaryTrace_congr (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞) {L : �
 `F₁, F₂` with finite `‖F_i‖_p + ‖(2^(k(s+1/p)) ω_L(F_i, 2^(-k))_p)_k‖_{ℓ_q}`,
 `Tr_Γ(F₁ + F₂) = Tr_Γ F₁ + Tr_Γ F₂` almost everywhere on `Γ`: in each chart the boundary traces
 are traces of the graph domain (`Rd.BoundedLipschitzDomain.boundaryTrace_graphMap`), which are
-linear (`Rd.LipschitzGraph.trace_sub`). The order is `L ≥ 1`, since `0 < s + 1/p < L`. -/
+linear (`Rd.LipschitzGraph.graphTrace_sub`). The order is `L ≥ 1`, since `0 < s + 1/p < L`. -/
 theorem boundaryTrace_add (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞) {L : ℕ} {s : ℝ} (hs : 0 < s)
     (hsL : s + 1 / p.toReal < L) {q : ℝ≥0∞} (hq : 1 ≤ q) {F₁ F₂ : Lp ℂ p (volume : Measure V)}
     (hF₁ : ‖F₁‖ₑ + lqNorm q (fun k =>
@@ -384,20 +384,20 @@ theorem boundaryTrace_add (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞) {L : ℕ}
   have hF := (modNorm_add_le F₁ F₂ L (s + 1 / p.toReal) hq).trans_lt
     (ENNReal.add_lt_top.2 ⟨hF₁, hF₂⟩)
   refine Ω.eventually_aeBoundary_iff.2 fun j => ?_
-  have hsub := (Ω.graph j).trace_sub hp L hs hq
+  have hsub := (Ω.graph j).graphTrace_sub hp L hs hq
     ((Ω.graph j).intrinsicNorm_lt_top_of_modNorm hp L hq hF).2
     ((Ω.graph j).intrinsicNorm_lt_top_of_modNorm hp L hq hF₂).2
   rw [add_sub_cancel_right] at hsub
   filter_upwards [Ω.boundaryTrace_graphMap ψ hp hL hs hsL hq hF j,
     Ω.boundaryTrace_graphMap ψ hp hL hs hsL hq hF₁ j,
     Ω.boundaryTrace_graphMap ψ hp hL hs hsL hq hF₂ j,
-    Lp.coeFn_sub ((Ω.graph j).trace hp L (F₁ + F₂)) ((Ω.graph j).trace hp L F₂)] with
+    Lp.coeFn_sub ((Ω.graph j).graphTrace hp L (F₁ + F₂)) ((Ω.graph j).graphTrace hp L F₂)] with
     x' h1 h2 h3 h4 hj
   rw [Pi.add_apply, h1 hj, h2 hj, h3 hj, hsub, h4, Pi.sub_apply, sub_add_cancel]
 
 /-- **The boundary trace is homogeneous**: under the hypotheses of
 `Rd.BoundedLipschitzDomain.boundaryTrace_add`, `Tr_Γ(c F) = c Tr_Γ F` almost everywhere on `Γ`
-for every `c ∈ ℂ` (`Rd.LipschitzGraph.trace_smul`, `Rd.modNorm_const_smul`). -/
+for every `c ∈ ℂ` (`Rd.LipschitzGraph.graphTrace_smul`, `Rd.modNorm_const_smul`). -/
 theorem boundaryTrace_smul (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞) {L : ℕ} {s : ℝ} (hs : 0 < s)
     (hsL : s + 1 / p.toReal < L) {q : ℝ≥0∞} (hq : 1 ≤ q) (c : ℂ)
     {F : Lp ℂ p (volume : Measure V)}
@@ -412,24 +412,24 @@ theorem boundaryTrace_smul (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞) {L : ℕ
   refine Ω.eventually_aeBoundary_iff.2 fun j => ?_
   filter_upwards [Ω.boundaryTrace_graphMap ψ hp hL hs hsL hq hcF j,
     Ω.boundaryTrace_graphMap ψ hp hL hs hsL hq hF j,
-    Lp.coeFn_smul c ((Ω.graph j).trace hp L F)] with x' h1 h2 h3 hj
-  rw [Pi.smul_apply, h1 hj, h2 hj, (Ω.graph j).trace_smul, h3, Pi.smul_apply]
+    Lp.coeFn_smul c ((Ω.graph j).graphTrace hp L F)] with x' h1 h2 h3 hj
+  rw [Pi.smul_apply, h1 hj, h2 hj, (Ω.graph j).graphTrace_smul, h3, Pi.smul_apply]
 
 /-! ### The trace space -/
 
 /-- **The chart pieces of the boundary trace are traces**: `(ψ_j Tr_Γ F) ∘ γ_j = Tr_j(ψ_j F)` almost
-everywhere on `H_j` (`Rd.LipschitzGraph.trace_mulLp_ae`). -/
-theorem trace_mulLp_ae_boundaryTrace (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞) {L : ℕ}
+everywhere on `H_j` (`Rd.LipschitzGraph.graphTrace_mulLp_ae`). -/
+theorem graphTrace_mulLp_ae_boundaryTrace (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞) {L : ℕ}
     (hL : 1 ≤ L) {s : ℝ} (hs : 0 < s) (hsL : s + 1 / p.toReal < L) {q : ℝ≥0∞} (hq : 1 ≤ q)
     {F : Lp ℂ p (volume : Measure V)}
     (hF : ‖F‖ₑ + lqNorm q (fun k =>
       dyadicWeight (s + 1 / p.toReal) k * lpModulus p L F k) < ∞) (j : Fin Ω.N) {C : ℝ}
     (hC : ∀ l ≤ L, ∀ x, ‖iteratedFDeriv ℝ l (ψ.toComplex j) x‖ ≤ C) :
-    (Ω.graph j).trace hp L (mulLp (ψ.contDiff_toComplex j).continuous
+    (Ω.graph j).graphTrace hp L (mulLp (ψ.contDiff_toComplex j).continuous
       (norm_le_of_iteratedFDeriv_le hC) F) =ᵐ[volume] fun x' =>
         ψ.toComplex j ((Ω.graph j).graphMap x') *
           Ω.boundaryTrace ψ hp L F ((Ω.graph j).graphMap x') := by
-  filter_upwards [(Ω.graph j).trace_mulLp_ae hp hL hs hsL hq (ψ.contDiff_toComplex j) hC hF,
+  filter_upwards [(Ω.graph j).graphTrace_mulLp_ae hp hL hs hsL hq (ψ.contDiff_toComplex j) hC hF,
     Ω.boundaryTrace_graphMap ψ hp hL hs hsL hq hF j] with x' h1 h2
   rw [h1]
   by_cases hψ : ψ.toFun j ((Ω.graph j).graphMap x') = 0
@@ -439,7 +439,7 @@ theorem trace_mulLp_ae_boundaryTrace (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞
 /-- **The boundary trace lies in `B^s_{p,q}(Γ)`** (Schneider–Vybíral, Theorem 4.11, for `p ≥ 1`,
 the bound): for `1 ≤ p < ∞`, `0 < s < 1`, `1 ≤ q ≤ ∞`, `s + 1/p < L` and `F` with
 `‖F‖_p + ‖(2^(k(s+1/p)) ω_L(F, 2^(-k))_p)_k‖_{ℓ_q} < ∞`. The chart pieces are the traces of `ψ_j F`
-on the graph domains (`Rd.LipschitzGraph.modNorm_trace_le`). -/
+on the graph domains (`Rd.LipschitzGraph.modNorm_graphTrace_le`). -/
 theorem memBoundaryBesov_boundaryTrace (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞) {L : ℕ}
     (hL : 1 ≤ L) {s : ℝ} (hs : 0 < s) (hs1 : s < 1) (hsL : s + 1 / p.toReal < L) {q : ℝ≥0∞}
     (hq : 1 ≤ q) {F : Lp ℂ p (volume : Measure V)}
@@ -450,9 +450,9 @@ theorem memBoundaryBesov_boundaryTrace (ψ : Ω.BoundaryPartition) (hp : p ≠ �
   obtain ⟨C, hC⟩ := exists_iteratedFDeriv_bound (ψ.contDiff_toComplex j)
     (ψ.hasCompactSupport_toComplex j) L
   have hFj := modNorm_mulLp_lt_top hp (ψ.contDiff_toComplex j) hC hsL hq hF
-  obtain ⟨K, hK, hle⟩ := (Ω.graph j).modNorm_trace_le hp L hs hs1 hq
+  obtain ⟨K, hK, hle⟩ := (Ω.graph j).modNorm_graphTrace_le hp L hs hs1 hq
   have hX := ((Ω.graph j).intrinsicNorm_lt_top_of_modNorm hp L hq hFj).1
-  exact ⟨_, Ω.trace_mulLp_ae_boundaryTrace ψ hp hL hs hsL hq hF j hC,
+  exact ⟨_, Ω.graphTrace_mulLp_ae_boundaryTrace ψ hp hL hs hsL hq hF j hC,
     (hle _ hX).trans_lt (ENNReal.mul_lt_top hK.lt_top hX)⟩
 
 /-- **The localised extensions have a finite norm**: for `1 ≤ p < ∞`, `0 < s < 1`, `1 ≤ q ≤ ∞`,
@@ -481,8 +481,8 @@ theorem modNorm_extensionSum_lt_top (hp : p ≠ ∞) {L : ℕ} (hL : 2 ≤ L) {s
 `G_j = (ψ_j g) ∘ γ_j` almost everywhere on `H_j`, the function `F = ∑_j ζ_j E_j G_j` has
 `Tr_Γ F = g` almost everywhere on `Γ`. In the chart of `Ω_k`,
 `Tr_k(ζ_j E_j G_j) = ζ_j ψ_j g = ψ_j g` by the change of chart
-(`Rd.LipschitzGraph.trace_mulLp_ae`, `Rd.LipschitzGraph.trace_ae_eq_trace_comp`,
-`Rd.LipschitzGraph.trace_graphExtension`), and `∑_j ψ_j = 1` on `Γ`. -/
+(`Rd.LipschitzGraph.graphTrace_mulLp_ae`, `Rd.LipschitzGraph.graphTrace_ae_eq_graphTrace_comp`,
+`Rd.LipschitzGraph.graphTrace_graphExtension`), and `∑_j ψ_j = 1` on `Γ`. -/
 theorem boundaryTrace_extensionSum_eventuallyEq (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞) {L : ℕ}
     (hL : 2 ≤ L) {s : ℝ} (hs : 0 < s) (hs1 : s < 1) {q : ℝ≥0∞} (hq : 1 ≤ q)
     {ζ : Fin Ω.N → V → ℂ} (hζs : ∀ j, ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (ζ j))
@@ -502,19 +502,20 @@ theorem boundaryTrace_extensionSum_eventuallyEq (ψ : Ω.BoundaryPartition) (hp 
   have hsum := Ω.modNorm_extensionSum_lt_top hp hL hs hs1 hq hζs hC G hGfin
   refine Ω.eventually_aeBoundary_iff.2 fun k => ?_
   -- the trace in the chart of `Ω_k`
-  have htr := (Ω.graph k).trace_finsetSum hp L hs hq Finset.univ
+  have htr := (Ω.graph k).graphTrace_finsetSum hp L hs hq Finset.univ
     (F := fun j => mulLp (hζs j).continuous (norm_le_of_iteratedFDeriv_le (hC j))
       ((Ω.graph j).graphExtension hp 1 (G j))) fun j _ => hFfin j
-  have hmul := fun j => (Ω.graph k).trace_mulLp_ae hp hL1 hs hsL hq (hζs j) (hC j) (hEfin j)
-  have hcc := fun j => (Ω.graph k).trace_ae_eq_trace_comp (Ω.graph j) hp hL1 hs hsL hq (hEfin j)
-  have hGj := fun j => (Ω.graph k).ae_proj_graphMap (Ω.graph j) (hG j)
+  have hmul := fun j => (Ω.graph k).graphTrace_mulLp_ae hp hL1 hs hsL hq (hζs j) (hC j) (hEfin j)
+  have hcc :=
+    fun j => (Ω.graph k).graphTrace_ae_eq_graphTrace_comp (Ω.graph j) hp hL1 hs hsL hq (hEfin j)
+  have hGj := fun j => (Ω.graph k).ae_graphProj_graphMap (Ω.graph j) (hG j)
   filter_upwards [Ω.boundaryTrace_graphMap ψ hp hL1 hs hsL hq hsum k,
-    Lp.coeFn_fun_finsetSum Finset.univ fun j => (Ω.graph k).trace hp L
+    Lp.coeFn_fun_finsetSum Finset.univ fun j => (Ω.graph k).graphTrace hp L
       (mulLp (hζs j).continuous (norm_le_of_iteratedFDeriv_le (hC j))
         ((Ω.graph j).graphExtension hp 1 (G j))),
     ae_all_iff.2 hmul, ae_all_iff.2 hcc, ae_all_iff.2 hGj] with x' h1 h2 h3 h4 h5 hk
   have hΓ := Ω.graphMap_mem_frontier k hk
-  have hterm : ∀ j, (Ω.graph k).trace hp L (mulLp (hζs j).continuous
+  have hterm : ∀ j, (Ω.graph k).graphTrace hp L (mulLp (hζs j).continuous
       (norm_le_of_iteratedFDeriv_le (hC j)) ((Ω.graph j).graphExtension hp 1 (G j))) x' =
         ψ.toComplex j ((Ω.graph k).graphMap x') * g ((Ω.graph k).graphMap x') := fun j => by
     rw [h3 j]
@@ -524,10 +525,10 @@ theorem boundaryTrace_extensionSum_eventuallyEq (ψ : Ω.BoundaryPartition) (hp 
         rw [hζ1 j _ hψ] at hζ
         exact one_ne_zero hζ
       rw [hζ, ψ.toComplex_of_eq_zero hψ, zero_mul, zero_mul]
-    · have hA := Ω.graphMap_proj_graphMap k j hk (hζB j _ hζ)
+    · have hA := Ω.graphMap_graphProj_graphMap k j hk (hζB j _ hζ)
       have h5' := h5 j hA
       rw [hA] at h5'
-      rw [h4 j hA, (Ω.graph j).trace_graphExtension hp hL hs hs1 hq (hGfin j), h5']
+      rw [h4 j hA, (Ω.graph j).graphTrace_graphExtension hp hL hs hs1 hq (hGfin j), h5']
       by_cases hψ : ψ.toFun j ((Ω.graph k).graphMap x') = 0
       · rw [ψ.toComplex_of_eq_zero hψ, zero_mul, mul_zero]
       · rw [hζ1 j _ hψ, one_mul]

@@ -24,7 +24,7 @@ gradient `∇φ(x') ∈ H` almost everywhere (`Rd.LipschitzGraph.gradPhi`). The 
 (`Rd.LipschitzGraph.euclideanHausdorffMeasure_graphMap_image`) states, for every measurable
 `A ⊆ H`, `μHE[n-1] (γ(A)) = ∫_A √(1 + ‖∇φ(x')‖²) dx'` for Mathlib's Euclidean Hausdorff measure
 `μHE[n-1]`, normalised to be the volume on hyperplanes. In measure form, the image of the measure
-with density `√(1 + ‖∇φ‖²)` (`Rd.LipschitzGraph.gram`) is `μHE[n-1]` on `γ(H)`
+with density `√(1 + ‖∇φ‖²)` (`Rd.LipschitzGraph.gramDensity`) is `μHE[n-1]` on `γ(H)`
 (`Rd.LipschitzGraph.map_graphMap_withDensity`), and in integral form
 `∫_{γ(H)} F dμHE[n-1] = ∫_H F(γ x') √(1 + ‖∇φ(x')‖²) dx'` for every `F : V → [0, ∞]` and every
 `F : V → ℂ` (`Rd.LipschitzGraph.lintegral_graphMap`, `Rd.LipschitzGraph.integral_graphMap`).
@@ -42,7 +42,7 @@ and antilipschitz with constant `1`:
 * **Nearby graphs** (`Rd.LipschitzGraph.euclideanHausdorffMeasure_graphOver_image_le`): if the
   increments of two functions on `P ⊆ H` differ by at most `δ ‖x' - y'‖`, the Hausdorff measures
   of their graphs over `P` differ at most by the factor `(1 + δ)^(n-1)`, by the bound for
-  Lipschitz maps (`LipschitzOnWith.euclideanHausdorffMeasure_image_le`, from Mathlib's
+  Lipschitz maps (`LipschitzOnWith.euclideanHausdorffMeasure_image_le_pow_mul`, from Mathlib's
   `LipschitzOnWith.hausdorffMeasure_image_le`).
 * **Good pieces** (`Rd.LipschitzGraph.exists_goodPartition`): for `ε > 0`, `H` is, up to a null
   set, a countable disjoint union of measurable sets on which `φ` is `2ε`-close to an affine
@@ -65,7 +65,7 @@ open scoped ENNReal NNReal
 increases `μHE[d]` by at most the factor `K^d`, `μHE[d] (f '' s) ≤ K^d μHE[d] s`. This is
 Mathlib's `LipschitzOnWith.hausdorffMeasure_image_le` for the normalised measure `μHE[d]`, a
 fixed multiple of `μH[d]`. -/
-theorem LipschitzOnWith.euclideanHausdorffMeasure_image_le {X Y : Type*} [EMetricSpace X]
+theorem LipschitzOnWith.euclideanHausdorffMeasure_image_le_pow_mul {X Y : Type*} [EMetricSpace X]
     [MeasurableSpace X] [BorelSpace X] [EMetricSpace Y] [MeasurableSpace Y] [BorelSpace Y]
     {K : ℝ≥0} {f : X → Y} {s : Set X} (h : LipschitzOnWith K f s) (d : ℕ) :
     μHE[d] (f '' s) ≤ (K : ℝ≥0∞) ^ d * μHE[d] s := by
@@ -109,7 +109,7 @@ theorem euclideanHausdorffMeasure_image_le_of_near {X Y : Type*} [NormedAddCommG
           add_le_add le_rfl ((h x hx y hy).trans (mul_le_mul_of_nonneg_left (h₂ x hx y hy) hδ))
       _ = (1 + δ) * ‖f₂ x - f₂ y‖ := by ring
   rw [← himg]
-  exact hlip.euclideanHausdorffMeasure_image_le d
+  exact hlip.euclideanHausdorffMeasure_image_le_pow_mul d
 
 /-- **The function `t ↦ √(1 + t²)` is `1`-Lipschitz**:
 `|√(1 + a²) - √(1 + b²)| ≤ |a - b|`. -/
@@ -193,13 +193,13 @@ noncomputable def graphOver (h : Ω.hyperplane → ℝ) (x' : Ω.hyperplane) : V
   (x' : V) + h x' • Ω.e
 
 /-- `P(x' + h(x') e) = x'`. -/
-theorem proj_graphOver (h : Ω.hyperplane → ℝ) (x' : Ω.hyperplane) :
-    Ω.proj (Ω.graphOver h x') = x' := by
-  rw [graphOver, map_add, map_smul, Ω.proj_e, smul_zero, add_zero, Ω.proj_coe]
+theorem graphProj_graphOver (h : Ω.hyperplane → ℝ) (x' : Ω.hyperplane) :
+    Ω.graphProj (Ω.graphOver h x') = x' := by
+  rw [graphOver, map_add, map_smul, Ω.graphProj_e, smul_zero, add_zero, Ω.graphProj_coe]
 
 /-- Graphs over the hyperplane are injective. -/
 theorem graphOver_injective (h : Ω.hyperplane → ℝ) : Function.Injective (Ω.graphOver h) :=
-  fun x' y' hxy => by rw [← Ω.proj_graphOver h x', hxy, Ω.proj_graphOver]
+  fun x' y' hxy => by rw [← Ω.graphProj_graphOver h x', hxy, Ω.graphProj_graphOver]
 
 /-- **Pythagoras**: `‖x' + a e‖² = ‖x'‖² + a²` for `x' ∈ H`, since `x' ⊥ e`. -/
 theorem norm_coe_add_smul_e_sq (x' : Ω.hyperplane) (a : ℝ) :
@@ -210,8 +210,8 @@ theorem norm_coe_add_smul_e_sq (x' : Ω.hyperplane) (a : ℝ) :
 /-- `‖x'‖ ≤ ‖x' + a e‖` for `x' ∈ H`, since `x'` is the projection of `x' + a e` onto `H`. -/
 theorem norm_le_norm_coe_add_smul_e (x' : Ω.hyperplane) (a : ℝ) :
     ‖x'‖ ≤ ‖(x' : V) + a • Ω.e‖ :=
-  calc ‖x'‖ = ‖Ω.proj (Ω.graphOver (fun _ => a) x')‖ := by rw [Ω.proj_graphOver]
-    _ ≤ ‖(x' : V) + a • Ω.e‖ := Ω.norm_proj_le _
+  calc ‖x'‖ = ‖Ω.graphProj (Ω.graphOver (fun _ => a) x')‖ := by rw [Ω.graphProj_graphOver]
+    _ ≤ ‖(x' : V) + a • Ω.e‖ := Ω.norm_graphProj_le _
 
 /-- The increments of a graph over the hyperplane:
 `γ_h x' - γ_h y' = (x' - y') + (h x' - h y') e`. -/
@@ -226,9 +226,9 @@ theorem graphOver_sub (h : Ω.hyperplane → ℝ) (x' y' : Ω.hyperplane) :
 `H`. -/
 theorem norm_sub_le_norm_graphOver_sub (h : Ω.hyperplane → ℝ) (x' y' : Ω.hyperplane) :
     ‖x' - y'‖ ≤ ‖Ω.graphOver h x' - Ω.graphOver h y'‖ :=
-  calc ‖x' - y'‖ = ‖Ω.proj (Ω.graphOver h x' - Ω.graphOver h y')‖ := by
-        rw [map_sub, Ω.proj_graphOver, Ω.proj_graphOver]
-    _ ≤ _ := Ω.norm_proj_le _
+  calc ‖x' - y'‖ = ‖Ω.graphProj (Ω.graphOver h x' - Ω.graphOver h y')‖ := by
+        rw [map_sub, Ω.graphProj_graphOver, Ω.graphProj_graphOver]
+    _ ≤ _ := Ω.norm_graphProj_le _
 
 /-- The increments of two graphs differ by a multiple of `e`:
 `(γ_{h₁} x' - γ_{h₁} y') - (γ_{h₂} x' - γ_{h₂} y') = ((h₁ x' - h₁ y') - (h₂ x' - h₂ y')) e`. -/
@@ -435,27 +435,28 @@ theorem norm_gradPhi_le (x' : Ω.hyperplane) : ‖Ω.gradPhi x'‖ ≤ Ω.M := b
 /-- The **Gram density** `√(1 + ‖∇φ(x')‖²)` of the graph map. Where `φ|_H` is differentiable,
 the derivative of the graph map at `x'` is the linear graph of `∇φ(x')`, and the density is its
 norm determinant in Mathlib's sense (`normDet_linearGraph`). -/
-noncomputable def gram (x' : Ω.hyperplane) : ℝ := √(1 + ‖Ω.gradPhi x'‖ ^ 2)
+noncomputable def gramDensity (x' : Ω.hyperplane) : ℝ := √(1 + ‖Ω.gradPhi x'‖ ^ 2)
 
 /-- The Gram density is at least `1`. -/
-theorem one_le_gram (x' : Ω.hyperplane) : 1 ≤ Ω.gram x' :=
+theorem one_le_gramDensity (x' : Ω.hyperplane) : 1 ≤ Ω.gramDensity x' :=
   Real.one_le_sqrt.2 (le_add_of_nonneg_right (sq_nonneg _))
 
 /-- The Gram density is positive. -/
-theorem gram_pos (x' : Ω.hyperplane) : 0 < Ω.gram x' := one_pos.trans_le (Ω.one_le_gram x')
+theorem gramDensity_pos (x' : Ω.hyperplane) : 0 < Ω.gramDensity x' :=
+  one_pos.trans_le (Ω.one_le_gramDensity x')
 
 /-- The Gram density `√(1 + ‖∇φ(x')‖²)` is at least `1`, as an element of `[0, ∞]`. -/
-theorem one_le_ofReal_gram (x' : Ω.hyperplane) : 1 ≤ ENNReal.ofReal (Ω.gram x') :=
-  ENNReal.one_le_ofReal.2 (Ω.one_le_gram x')
+theorem one_le_ofReal_gramDensity (x' : Ω.hyperplane) : 1 ≤ ENNReal.ofReal (Ω.gramDensity x') :=
+  ENNReal.one_le_ofReal.2 (Ω.one_le_gramDensity x')
 
 /-- The Gram density is at most `√(1 + M²)`. -/
-theorem gram_le (x' : Ω.hyperplane) : Ω.gram x' ≤ √(1 + Ω.M ^ 2) := by
+theorem gramDensity_le (x' : Ω.hyperplane) : Ω.gramDensity x' ≤ √(1 + Ω.M ^ 2) := by
   refine Real.sqrt_le_sqrt (add_le_add le_rfl ?_)
   exact pow_le_pow_left₀ (norm_nonneg _) (Ω.norm_gradPhi_le x') 2
 
 /-- `|√(1 + ‖∇φ(x')‖²) - √(1 + ‖g‖²)| ≤ ‖∇φ(x') - g‖`. -/
-theorem abs_gram_sub_le (x' g : Ω.hyperplane) :
-    |Ω.gram x' - √(1 + ‖g‖ ^ 2)| ≤ ‖Ω.gradPhi x' - g‖ :=
+theorem abs_gramDensity_sub_le (x' g : Ω.hyperplane) :
+    |Ω.gramDensity x' - √(1 + ‖g‖ ^ 2)| ≤ ‖Ω.gradPhi x' - g‖ :=
   (abs_sqrt_one_add_sq_sub_le _ _).trans (abs_norm_sub_norm_le _ _)
 
 /-! ### The outward unit normal -/
@@ -464,27 +465,28 @@ theorem abs_gram_sub_le (x' g : Ω.hyperplane) :
 `ν(x') = (∇φ(x') - e) / √(1 + ‖∇φ(x')‖²)`. Where `φ|_H` is differentiable, it is the
 normalised gradient at `γ x'` of `x ↦ φ(Px) - ⟪x, e⟫`, a function that is negative on `Ω`. -/
 noncomputable def normalAt (x' : Ω.hyperplane) : V :=
-  (Ω.gram x')⁻¹ • ((Ω.gradPhi x' : V) - Ω.e)
+  (Ω.gramDensity x')⁻¹ • ((Ω.gradPhi x' : V) - Ω.e)
 
 /-- `‖∇φ(x') - e‖ = √(1 + ‖∇φ(x')‖²)`, by Pythagoras. -/
-theorem norm_gradPhi_sub_e (x' : Ω.hyperplane) : ‖(Ω.gradPhi x' : V) - Ω.e‖ = Ω.gram x' := by
+theorem norm_gradPhi_sub_e (x' : Ω.hyperplane) : ‖(Ω.gradPhi x' : V) - Ω.e‖ = Ω.gramDensity x' := by
   have h := Ω.norm_coe_add_smul_e_sq (Ω.gradPhi x') (-1)
   rw [neg_one_smul, ← sub_eq_add_neg, neg_one_sq, add_comm] at h
-  rw [gram, ← h, Real.sqrt_sq (norm_nonneg _)]
+  rw [gramDensity, ← h, Real.sqrt_sq (norm_nonneg _)]
 
 /-- The normal is a unit vector. -/
 theorem norm_normalAt (x' : Ω.hyperplane) : ‖Ω.normalAt x'‖ = 1 := by
-  rw [normalAt, norm_smul, norm_inv, Real.norm_of_nonneg (Ω.gram_pos x').le,
-    Ω.norm_gradPhi_sub_e, inv_mul_cancel₀ (Ω.gram_pos x').ne']
+  rw [normalAt, norm_smul, norm_inv, Real.norm_of_nonneg (Ω.gramDensity_pos x').le,
+    Ω.norm_gradPhi_sub_e, inv_mul_cancel₀ (Ω.gramDensity_pos x').ne']
 
 /-- `⟪ν(x'), e⟫ = -1/√(1 + ‖∇φ(x')‖²) < 0`: the normal points downwards, out of `Ω`. -/
-theorem inner_normalAt_e (x' : Ω.hyperplane) : inner ℝ (Ω.normalAt x') Ω.e = -(Ω.gram x')⁻¹ := by
+theorem inner_normalAt_e (x' : Ω.hyperplane) :
+    inner ℝ (Ω.normalAt x') Ω.e = -(Ω.gramDensity x')⁻¹ := by
   rw [normalAt, real_inner_smul_left, inner_sub_left, Ω.inner_coe_e, Ω.inner_e_self]
   ring
 
 /-- **The normal points away from the cone**: `⟪ν(x'), y⟫ < 0` for every `y` in the cone `K`,
 since `⟪∇φ(x'), y⟫ = ⟪∇φ(x'), Py⟫ ≤ M ‖Py‖ < ⟪y, e⟫`. -/
-theorem inner_normalAt_neg_of_mem_cone (x' : Ω.hyperplane) {y : V} (hy : y ∈ Ω.cone) :
+theorem inner_normalAt_neg_of_mem_graphCone (x' : Ω.hyperplane) {y : V} (hy : y ∈ Ω.graphCone) :
     inner ℝ (Ω.normalAt x') y < 0 := by
   have hy' : Ω.M * ‖y - inner ℝ y Ω.e • Ω.e‖ < inner ℝ y Ω.e := hy
   have hP : inner ℝ (Ω.gradPhi x' : V) y =
@@ -499,7 +501,7 @@ theorem inner_normalAt_neg_of_mem_cone (x' : Ω.hyperplane) {y : V} (hy : y ∈ 
     rw [inner_sub_left, real_inner_comm y Ω.e]
     linarith
   rw [normalAt, real_inner_smul_left]
-  exact mul_neg_of_pos_of_neg (inv_pos.2 (Ω.gram_pos x')) hneg
+  exact mul_neg_of_pos_of_neg (inv_pos.2 (Ω.gramDensity_pos x')) hneg
 
 /-! ### Good pieces -/
 
@@ -520,20 +522,20 @@ theorem IsGoodPiece.mono {ε : ℝ} {g : Ω.hyperplane} {P Q : Set Ω.hyperplane
 variable {Ω} in
 /-- On a good piece, `√(1 + ‖g‖²) ≤ (1 + ε) √(1 + ‖∇φ(x')‖²)`, since the Gram density is at
 least `1` and within `ε` of `√(1 + ‖g‖²)`. -/
-theorem IsGoodPiece.sqrt_le_mul_gram {ε : ℝ} (hε : 0 ≤ ε) {g : Ω.hyperplane}
+theorem IsGoodPiece.sqrt_le_mul_gramDensity {ε : ℝ} (hε : 0 ≤ ε) {g : Ω.hyperplane}
     {P : Set Ω.hyperplane} (h : Ω.IsGoodPiece ε g P) {x' : Ω.hyperplane} (hx : x' ∈ P) :
-    √(1 + ‖g‖ ^ 2) ≤ (1 + ε) * Ω.gram x' := by
-  have h1 := (abs_sub_comm _ _).trans_le ((Ω.abs_gram_sub_le x' g).trans (h.2 x' hx))
-  have h2 := Ω.one_le_gram x'
+    √(1 + ‖g‖ ^ 2) ≤ (1 + ε) * Ω.gramDensity x' := by
+  have h1 := (abs_sub_comm _ _).trans_le ((Ω.abs_gramDensity_sub_le x' g).trans (h.2 x' hx))
+  have h2 := Ω.one_le_gramDensity x'
   have h3 := (abs_le.1 h1).2
   nlinarith
 
 variable {Ω} in
 /-- On a good piece, `√(1 + ‖∇φ(x')‖²) ≤ (1 + ε) √(1 + ‖g‖²)`. -/
-theorem IsGoodPiece.gram_le_mul_sqrt {ε : ℝ} (hε : 0 ≤ ε) {g : Ω.hyperplane}
+theorem IsGoodPiece.gramDensity_le_mul_sqrt {ε : ℝ} (hε : 0 ≤ ε) {g : Ω.hyperplane}
     {P : Set Ω.hyperplane} (h : Ω.IsGoodPiece ε g P) {x' : Ω.hyperplane} (hx : x' ∈ P) :
-    Ω.gram x' ≤ (1 + ε) * √(1 + ‖g‖ ^ 2) := by
-  have h1 := (Ω.abs_gram_sub_le x' g).trans (h.2 x' hx)
+    Ω.gramDensity x' ≤ (1 + ε) * √(1 + ‖g‖ ^ 2) := by
+  have h1 := (Ω.abs_gramDensity_sub_le x' g).trans (h.2 x' hx)
   have h2 : 1 ≤ √(1 + ‖g‖ ^ 2) := Real.one_le_sqrt.2 (le_add_of_nonneg_right (sq_nonneg _))
   have h3 := (abs_le.1 h1).2
   nlinarith
@@ -620,12 +622,12 @@ theorem measurable_gradPhi : Measurable Ω.gradPhi :=
     (measurable_fderiv ℝ Ω.phiH)
 
 /-- The Gram density is measurable. -/
-theorem measurable_gram : Measurable Ω.gram :=
+theorem measurable_gramDensity : Measurable Ω.gramDensity :=
   ((Ω.measurable_gradPhi.norm.pow_const 2).const_add 1).sqrt
 
 /-- The outward unit normal is measurable. -/
 theorem measurable_normalAt : Measurable Ω.normalAt :=
-  (Ω.measurable_gram.inv).smul
+  (Ω.measurable_gramDensity.inv).smul
     ((continuous_subtype_val.measurable.comp Ω.measurable_gradPhi).sub measurable_const)
 
 /-- **Rademacher's theorem** for `φ|_H`: it is differentiable almost everywhere on `H`. -/
@@ -650,7 +652,7 @@ theorem euclideanHausdorffMeasure_linearGraph_image (g : Ω.hyperplane) (P : Set
 `γ` is Lipschitz and `μHE[m]` is the volume on `H`. -/
 theorem euclideanHausdorffMeasure_graphMap_image_eq_zero {N : Set Ω.hyperplane}
     (hN : volume N = 0) : μHE[finrank ℝ Ω.hyperplane] (Ω.graphMap '' N) = 0 := by
-  have h := Ω.lipschitzWith_graphMap.lipschitzOnWith.euclideanHausdorffMeasure_image_le
+  have h := Ω.lipschitzWith_graphMap.lipschitzOnWith.euclideanHausdorffMeasure_image_le_pow_mul
     (s := N) (finrank ℝ Ω.hyperplane)
   rw [InnerProductSpace.euclideanHausdorffMeasure_eq_volume (V := Ω.hyperplane), hN,
     mul_zero] at h
@@ -665,23 +667,23 @@ theorem IsGoodPiece.euclideanHausdorffMeasure_image_le {ε : ℝ} (hε : 0 ≤ �
     {g : Ω.hyperplane} {P : Set Ω.hyperplane} (h : Ω.IsGoodPiece ε g P) :
     μHE[finrank ℝ Ω.hyperplane] (Ω.graphMap '' P) ≤
       ENNReal.ofReal (areaFactor (finrank ℝ Ω.hyperplane) ε) *
-        ∫⁻ x' in P, ENNReal.ofReal (Ω.gram x') := by
+        ∫⁻ x' in P, ENNReal.ofReal (Ω.gramDensity x') := by
   have h1 : μHE[finrank ℝ Ω.hyperplane] (Ω.graphMap '' P) ≤
       ENNReal.ofReal (1 + 2 * ε) ^ finrank ℝ Ω.hyperplane *
         μHE[finrank ℝ Ω.hyperplane] (Ω.linearGraph g '' P) :=
     Ω.euclideanHausdorffMeasure_graphOver_image_le Ω.phiH (fun x' => inner ℝ g x')
       (by positivity) h.1 _
   have h2 : ENNReal.ofReal √(1 + ‖g‖ ^ 2) * volume P ≤
-      ENNReal.ofReal (1 + ε) * ∫⁻ x' in P, ENNReal.ofReal (Ω.gram x') := by
-    rw [← setLIntegral_const, ← lintegral_const_mul _ Ω.measurable_gram.ennreal_ofReal]
-    refine setLIntegral_mono (measurable_const.mul Ω.measurable_gram.ennreal_ofReal)
+      ENNReal.ofReal (1 + ε) * ∫⁻ x' in P, ENNReal.ofReal (Ω.gramDensity x') := by
+    rw [← setLIntegral_const, ← lintegral_const_mul _ Ω.measurable_gramDensity.ennreal_ofReal]
+    refine setLIntegral_mono (measurable_const.mul Ω.measurable_gramDensity.ennreal_ofReal)
       fun x' hx => ?_
     rw [← ENNReal.ofReal_mul (by linarith)]
-    exact ENNReal.ofReal_le_ofReal (h.sqrt_le_mul_gram hε hx)
+    exact ENNReal.ofReal_le_ofReal (h.sqrt_le_mul_gramDensity hε hx)
   rw [Ω.euclideanHausdorffMeasure_linearGraph_image] at h1
   calc _ ≤ _ := h1
     _ ≤ ENNReal.ofReal (1 + 2 * ε) ^ finrank ℝ Ω.hyperplane *
-        (ENNReal.ofReal (1 + ε) * ∫⁻ x' in P, ENNReal.ofReal (Ω.gram x')) :=
+        (ENNReal.ofReal (1 + ε) * ∫⁻ x' in P, ENNReal.ofReal (Ω.gramDensity x')) :=
       mul_le_mul' le_rfl h2
     _ = _ := by
       rw [areaFactor, ENNReal.ofReal_mul (by positivity), ENNReal.ofReal_pow (by linarith),
@@ -690,9 +692,9 @@ theorem IsGoodPiece.euclideanHausdorffMeasure_image_le {ε : ℝ} (hε : 0 ≤ �
 variable {Ω} in
 /-- **Lower bound on a good piece**:
 `∫_P √(1 + ‖∇φ‖²) ≤ C_ε μHE[m] (γ '' P)` with the area factor `C_ε = (1 + 2ε)^m (1 + ε)`. -/
-theorem IsGoodPiece.lintegral_gram_le {ε : ℝ} (hε : 0 ≤ ε) {g : Ω.hyperplane}
+theorem IsGoodPiece.lintegral_gramDensity_le {ε : ℝ} (hε : 0 ≤ ε) {g : Ω.hyperplane}
     {P : Set Ω.hyperplane} (h : Ω.IsGoodPiece ε g P) :
-    ∫⁻ x' in P, ENNReal.ofReal (Ω.gram x') ≤
+    ∫⁻ x' in P, ENNReal.ofReal (Ω.gramDensity x') ≤
       ENNReal.ofReal (areaFactor (finrank ℝ Ω.hyperplane) ε) *
         μHE[finrank ℝ Ω.hyperplane] (Ω.graphMap '' P) := by
   have h1 : μHE[finrank ℝ Ω.hyperplane] (Ω.linearGraph g '' P) ≤
@@ -701,11 +703,11 @@ theorem IsGoodPiece.lintegral_gram_le {ε : ℝ} (hε : 0 ≤ ε) {g : Ω.hyperp
     Ω.euclideanHausdorffMeasure_graphOver_image_le (fun x' => inner ℝ g x') Ω.phiH
       (by positivity)
       (fun x' hx y' hy => by rw [abs_sub_comm]; exact h.1 x' hx y' hy) _
-  have h2 : ∫⁻ x' in P, ENNReal.ofReal (Ω.gram x') ≤
+  have h2 : ∫⁻ x' in P, ENNReal.ofReal (Ω.gramDensity x') ≤
       ENNReal.ofReal (1 + ε) * (ENNReal.ofReal √(1 + ‖g‖ ^ 2) * volume P) := by
     rw [← mul_assoc, ← ENNReal.ofReal_mul (by linarith), ← setLIntegral_const]
     exact setLIntegral_mono measurable_const fun x' hx =>
-      ENNReal.ofReal_le_ofReal (h.gram_le_mul_sqrt hε hx)
+      ENNReal.ofReal_le_ofReal (h.gramDensity_le_mul_sqrt hε hx)
   rw [← Ω.euclideanHausdorffMeasure_linearGraph_image] at h2
   calc _ ≤ _ := h2
     _ ≤ ENNReal.ofReal (1 + ε) * (ENNReal.ofReal (1 + 2 * ε) ^ finrank ℝ Ω.hyperplane *
@@ -771,7 +773,7 @@ theorem euclideanHausdorffMeasure_graphMap_image_le_mul {ε : ℝ} (hε : 0 < ε
     {A : Set Ω.hyperplane} (hA : MeasurableSet A) :
     μHE[finrank ℝ Ω.hyperplane] (Ω.graphMap '' A) ≤
       ENNReal.ofReal (areaFactor (finrank ℝ Ω.hyperplane) ε) *
-        ∫⁻ x' in A, ENNReal.ofReal (Ω.gram x') := by
+        ∫⁻ x' in A, ENNReal.ofReal (Ω.gramDensity x') := by
   obtain ⟨Q, g, hQm, hQd, hQnull, hQg⟩ := Ω.exists_goodPartition hε
   have hsplit : Ω.graphMap '' A ⊆
       (⋃ n, Ω.graphMap '' (A ∩ Q n)) ∪ Ω.graphMap '' (A \ ⋃ n, Q n) := by
@@ -791,10 +793,10 @@ theorem euclideanHausdorffMeasure_graphMap_image_le_mul {ε : ℝ} (hε : 0 < ε
         rw [hnull, add_zero]
     _ ≤ ∑' n, μHE[finrank ℝ Ω.hyperplane] (Ω.graphMap '' (A ∩ Q n)) := measure_iUnion_le _
     _ ≤ ∑' n, ENNReal.ofReal (areaFactor (finrank ℝ Ω.hyperplane) ε) *
-        ∫⁻ x' in A ∩ Q n, ENNReal.ofReal (Ω.gram x') := ENNReal.tsum_le_tsum fun n =>
+        ∫⁻ x' in A ∩ Q n, ENNReal.ofReal (Ω.gramDensity x') := ENNReal.tsum_le_tsum fun n =>
           ((hQg n).mono Set.inter_subset_right).euclideanHausdorffMeasure_image_le hε.le
     _ = ENNReal.ofReal (areaFactor (finrank ℝ Ω.hyperplane) ε) *
-        ∫⁻ x' in ⋃ n, A ∩ Q n, ENNReal.ofReal (Ω.gram x') := by
+        ∫⁻ x' in ⋃ n, A ∩ Q n, ENNReal.ofReal (Ω.gramDensity x') := by
       rw [ENNReal.tsum_mul_left, lintegral_iUnion (fun n => hA.inter (hQm n)) hdisj]
     _ ≤ _ := mul_le_mul' le_rfl (lintegral_mono_set (Set.iUnion_subset fun n =>
           Set.inter_subset_left))
@@ -803,28 +805,28 @@ theorem euclideanHausdorffMeasure_graphMap_image_le_mul {ε : ℝ} (hε : 0 < ε
 `∫_A √(1 + ‖∇φ‖²) ≤ C_ε μHE[m] (γ '' A)` with the area factor `C_ε = (1 + 2ε)^m (1 + ε)`: the
 integral over the null rest of `A` vanishes, and the images `γ '' (A ∩ Q_n)` are disjoint and
 measurable, since `γ` is an injective measurable embedding. -/
-theorem lintegral_gram_le_mul {ε : ℝ} (hε : 0 < ε) {A : Set Ω.hyperplane}
+theorem lintegral_gramDensity_le_mul {ε : ℝ} (hε : 0 < ε) {A : Set Ω.hyperplane}
     (hA : MeasurableSet A) :
-    ∫⁻ x' in A, ENNReal.ofReal (Ω.gram x') ≤
+    ∫⁻ x' in A, ENNReal.ofReal (Ω.gramDensity x') ≤
       ENNReal.ofReal (areaFactor (finrank ℝ Ω.hyperplane) ε) *
         μHE[finrank ℝ Ω.hyperplane] (Ω.graphMap '' A) := by
   obtain ⟨Q, g, hQm, hQd, hQnull, hQg⟩ := Ω.exists_goodPartition hε
   have hdisj : Pairwise (Disjoint on fun n => A ∩ Q n) := fun i j hij =>
     (hQd hij).mono Set.inter_subset_right Set.inter_subset_right
-  have hA' : ∫⁻ x' in A, ENNReal.ofReal (Ω.gram x') =
-      ∫⁻ x' in ⋃ n, A ∩ Q n, ENNReal.ofReal (Ω.gram x') := by
-    have hzero : ∫⁻ x' in A \ ⋃ n, Q n, ENNReal.ofReal (Ω.gram x') = 0 :=
+  have hA' : ∫⁻ x' in A, ENNReal.ofReal (Ω.gramDensity x') =
+      ∫⁻ x' in ⋃ n, A ∩ Q n, ENNReal.ofReal (Ω.gramDensity x') := by
+    have hzero : ∫⁻ x' in A \ ⋃ n, Q n, ENNReal.ofReal (Ω.gramDensity x') = 0 :=
       setLIntegral_measure_zero _ _ (measure_mono_null (fun x' hx => hx.2) hQnull)
     rw [← lintegral_inter_add_sdiff _ A (MeasurableSet.iUnion hQm), hzero, add_zero,
       Set.inter_iUnion]
   have himg : Pairwise (Disjoint on fun n => Ω.graphMap '' (A ∩ Q n)) := fun i j hij =>
     (Set.disjoint_image_iff Ω.graphMap_injective).2 (hdisj hij)
-  calc ∫⁻ x' in A, ENNReal.ofReal (Ω.gram x')
-      = ∑' n, ∫⁻ x' in A ∩ Q n, ENNReal.ofReal (Ω.gram x') := by
+  calc ∫⁻ x' in A, ENNReal.ofReal (Ω.gramDensity x')
+      = ∑' n, ∫⁻ x' in A ∩ Q n, ENNReal.ofReal (Ω.gramDensity x') := by
         rw [hA', lintegral_iUnion (fun n => hA.inter (hQm n)) hdisj]
     _ ≤ ∑' n, ENNReal.ofReal (areaFactor (finrank ℝ Ω.hyperplane) ε) *
         μHE[finrank ℝ Ω.hyperplane] (Ω.graphMap '' (A ∩ Q n)) := ENNReal.tsum_le_tsum fun n =>
-          ((hQg n).mono Set.inter_subset_right).lintegral_gram_le hε.le
+          ((hQg n).mono Set.inter_subset_right).lintegral_gramDensity_le hε.le
     _ = ENNReal.ofReal (areaFactor (finrank ℝ Ω.hyperplane) ε) *
         μHE[finrank ℝ Ω.hyperplane] (⋃ n, Ω.graphMap '' (A ∩ Q n)) := by
       rw [ENNReal.tsum_mul_left, measure_iUnion himg fun n =>
@@ -836,23 +838,23 @@ theorem lintegral_gram_le_mul {ε : ℝ} (hε : 0 < ε) {A : Set Ω.hyperplane}
 `μHE[n-1] (γ '' A) = ∫_A √(1 + ‖∇φ(x')‖²) dx'`, where `n = dim V`, `μHE[n-1]` is Mathlib's
 `(n-1)`-dimensional Euclidean Hausdorff measure on `V`, normalised to be the volume on
 hyperplanes, and `γ x' = x' + φ(x') e` is the graph map. The two bounds for a fixed `ε > 0`
-(`euclideanHausdorffMeasure_graphMap_image_le_mul`, `lintegral_gram_le_mul`) carry the area
+(`euclideanHausdorffMeasure_graphMap_image_le_mul`, `lintegral_gramDensity_le_mul`) carry the area
 factor `(1 + 2ε)^(n-1) (1 + ε)` (`Rd.areaFactor`), which tends to `1` as `ε → 0`
 (`Rd.tendsto_areaFactor`, `Rd.le_of_forall_pos_le_ofReal_mul_of_tendsto`). -/
 theorem euclideanHausdorffMeasure_graphMap_image {A : Set Ω.hyperplane} (hA : MeasurableSet A) :
-    μHE[finrank ℝ V - 1] (Ω.graphMap '' A) = ∫⁻ x' in A, ENNReal.ofReal (Ω.gram x') := by
+    μHE[finrank ℝ V - 1] (Ω.graphMap '' A) = ∫⁻ x' in A, ENNReal.ofReal (Ω.gramDensity x') := by
   rw [← Ω.finrank_hyperplane_eq_sub_one]
   exact le_antisymm
     (le_of_forall_pos_le_ofReal_mul_of_tendsto (tendsto_areaFactor _) fun _ hε =>
       Ω.euclideanHausdorffMeasure_graphMap_image_le_mul hε hA)
     (le_of_forall_pos_le_ofReal_mul_of_tendsto (tendsto_areaFactor _) fun _ hε =>
-      Ω.lintegral_gram_le_mul hε hA)
+      Ω.lintegral_gramDensity_le_mul hε hA)
 
 /-- **The area formula in measure form**: the image under the graph map of the measure on `H`
 with density `√(1 + ‖∇φ‖²)` is `μHE[n-1]` restricted to the graph `γ(H)`. -/
 theorem map_graphMap_withDensity :
     Measure.map Ω.graphMap
-        ((volume : Measure Ω.hyperplane).withDensity fun x' => ENNReal.ofReal (Ω.gram x')) =
+        ((volume : Measure Ω.hyperplane).withDensity fun x' => ENNReal.ofReal (Ω.gramDensity x')) =
       (μHE[finrank ℝ V - 1] : Measure V).restrict (Set.range Ω.graphMap) := by
   ext B hB
   have hpre := Ω.measurableEmbedding_graphMap.measurable hB
@@ -865,9 +867,9 @@ theorem map_graphMap_withDensity :
 measurable or not, since `γ` is a measurable embedding and the density is finite. -/
 theorem lintegral_graphMap (F : V → ℝ≥0∞) :
     ∫⁻ y in Set.range Ω.graphMap, F y ∂(μHE[finrank ℝ V - 1] : Measure V) =
-      ∫⁻ x', F (Ω.graphMap x') * ENNReal.ofReal (Ω.gram x') := by
+      ∫⁻ x', F (Ω.graphMap x') * ENNReal.ofReal (Ω.gramDensity x') := by
   rw [← Ω.map_graphMap_withDensity, Ω.measurableEmbedding_graphMap.lintegral_map,
-    lintegral_withDensity_eq_lintegral_mul_non_measurable _ Ω.measurable_gram.ennreal_ofReal
+    lintegral_withDensity_eq_lintegral_mul_non_measurable _ Ω.measurable_gramDensity.ennreal_ofReal
       (ae_of_all _ fun _ => ENNReal.ofReal_lt_top)]
   simp only [Pi.mul_apply, mul_comm]
 
@@ -876,12 +878,12 @@ theorem lintegral_graphMap (F : V → ℝ≥0∞) :
 measurable embedding and the density is finite (`Rd.LipschitzGraph.map_graphMap_withDensity`). -/
 theorem integral_graphMap (F : V → ℂ) :
     ∫ y in Set.range Ω.graphMap, F y ∂(μHE[finrank ℝ V - 1] : Measure V) =
-      ∫ x', F (Ω.graphMap x') * (Ω.gram x' : ℂ) := by
+      ∫ x', F (Ω.graphMap x') * (Ω.gramDensity x' : ℂ) := by
   rw [← Ω.map_graphMap_withDensity, Ω.measurableEmbedding_graphMap.integral_map,
-    integral_withDensity_eq_integral_toReal_smul Ω.measurable_gram.ennreal_ofReal
+    integral_withDensity_eq_integral_toReal_smul Ω.measurable_gramDensity.ennreal_ofReal
       (ae_of_all _ fun _ => ENNReal.ofReal_lt_top)]
   refine integral_congr_ae (ae_of_all _ fun x' => ?_)
-  simp only [ENNReal.toReal_ofReal (Ω.gram_pos x').le, Complex.real_smul, mul_comm]
+  simp only [ENNReal.toReal_ofReal (Ω.gramDensity_pos x').le, Complex.real_smul, mul_comm]
 
 end LipschitzGraph
 

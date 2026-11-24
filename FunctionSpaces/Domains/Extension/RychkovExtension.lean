@@ -24,7 +24,7 @@ support principle for two sets (`Rd.indicatorLp_convLp_indicatorLp`), on `U` the
 those of the reproducing formula `∑_{j ≤ J} η_j ⋆ k_j ⋆ f → f`. The terms are linear in `f`
 (`Rd.LocalMeansBump.localExtTerm_add`, `Rd.LocalMeansBump.localExtTerm_smul`).
 
-**Rychkov's extension** (`Rd.LipschitzGraph.extension`) for a Lipschitz graph domain `Ω` with
+**Rychkov's extension** (`Rd.LipschitzGraph.rychkovExtension`) for a Lipschitz graph domain `Ω` with
 cone `K` and `L ≥ 1` is the local extension of the cone bump for `W = Ω`,
 
 `Ext f = ∑_j η_j ⋆ (1_Ω (k_j ⋆ f))`.
@@ -33,9 +33,9 @@ Its quasi-norm on `Ω` is the **intrinsic local means quasi-norm**
 `‖(2^(js) ‖1_Ω (k_j ⋆ f)‖_p)_j‖_{ℓ_q}` (`Rd.LipschitzGraph.intrinsicNorm`), which depends only on
 `f` on `Ω` (`Rd.LipschitzGraph.intrinsicNorm_congr`). The kernels of the cone bump are supported in
 `-K`, so `x - y ∈ x + K ⊆ Ω` for `x ∈ Ω` and `η_j(y) ≠ 0`, and `Ext f = f` on `Ω`
-(`Rd.LipschitzGraph.cutoff_extension`); for `0 < s < L`,
+(`Rd.LipschitzGraph.graphCutoff_rychkovExtension`); for `0 < s < L`,
 `‖Ext f‖_p + ‖(2^(is) ω_L(Ext f, 2^(-i))_p)_i‖_{ℓ_q} ≤ C ‖(2^(js) ‖1_Ω (k_j ⋆ f)‖_p)_j‖_{ℓ_q}`
-(`Rd.LipschitzGraph.modNorm_extension_le`).
+(`Rd.LipschitzGraph.modNorm_rychkovExtension_le`).
 
 **Restrictions** (`Rd.LipschitzGraph.exists_besov_extension_iff`): for `0 < s < L`, `f` agrees on
 `Ω` with some `F ∈ L_p(V)` satisfying the Besov condition by differences iff the intrinsic
@@ -224,18 +224,18 @@ noncomputable def intrinsicNorm (hp : p ≠ ∞) (L : ℕ) (s : ℝ) (q : ℝ≥
 theorem intrinsicNorm_def (hp : p ≠ ∞) (L : ℕ) (s : ℝ) (q : ℝ≥0∞)
     (f : Lp ℂ p (volume : Measure V)) :
     Ω.intrinsicNorm hp L s q f =
-      lqNorm q (fun j => dyadicWeight s j * ‖Ω.cutoff (Ω.coneBump.localMean hp L j f)‖ₑ) :=
+      lqNorm q (fun j => dyadicWeight s j * ‖Ω.graphCutoff (Ω.coneBump.localMean hp L j f)‖ₑ) :=
   rfl
 
 /-- **The intrinsic quasi-norm depends only on `f` on `Ω`**: the kernels `k_j` are supported in
 `-K` (the support principle). -/
 theorem intrinsicNorm_congr (hp : p ≠ ∞) (L : ℕ) (s : ℝ) (q : ℝ≥0∞)
-    {F f : Lp ℂ p (volume : Measure V)} (hFf : Ω.cutoff F = Ω.cutoff f) :
+    {F f : Lp ℂ p (volume : Measure V)} (hFf : Ω.graphCutoff F = Ω.graphCutoff f) :
     Ω.intrinsicNorm hp L s q F = Ω.intrinsicNorm hp L s q f := by
   rw [intrinsicNorm_def, intrinsicNorm_def]
   congr 1
   funext j
-  exact congrArg (fun g => dyadicWeight s j * ‖g‖ₑ) (Ω.cutoff_convLp_eq hp
+  exact congrArg (fun g => dyadicWeight s j * ‖g‖ₑ) (Ω.graphCutoff_convLp_eq hp
     (Ω.coneBump.integrable_meansKernel L j) (Ω.coneSupported_meansKernel L j) hFf)
 
 /-- The intrinsic quasi-norm is at most the local means quasi-norm. -/
@@ -254,7 +254,7 @@ theorem summable_extTerm (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 < s) {q : 
 
 /-- **Rychkov's extension** `Ext f = ∑_j η_j ⋆ (1_Ω (k_j ⋆ f))`: the local extension of the cone
 bump for `W = Ω`. -/
-noncomputable def extension (hp : p ≠ ∞) (L : ℕ) (f : Lp ℂ p (volume : Measure V)) :
+noncomputable def rychkovExtension (hp : p ≠ ∞) (L : ℕ) (f : Lp ℂ p (volume : Measure V)) :
     Lp ℂ p (volume : Measure V) :=
   Ω.coneBump.localExtension hp Ω.measurableSet_domain L f
 
@@ -262,24 +262,25 @@ noncomputable def extension (hp : p ≠ ∞) (L : ℕ) (f : Lp ℂ p (volume : M
 theorem tendsto_sum_extTerm (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞} (hq : 1 ≤ q)
     {f : Lp ℂ p (volume : Measure V)} (hf : Ω.intrinsicNorm hp L s q f < ∞) :
     Tendsto (fun J => ∑ j ∈ Finset.range (J + 1), Ω.extTerm hp L j f) atTop
-      (𝓝 (Ω.extension hp L f)) :=
+      (𝓝 (Ω.rychkovExtension hp L f)) :=
   Ω.coneBump.tendsto_sum_localExtTerm hp Ω.measurableSet_domain L hs hq hf
 
 /-- **The extension agrees with `f` on `Ω`**: `1_Ω Ext f = 1_Ω f`. The dual kernels at points of
 `Ω` only see `Ω`, since they are supported in `-K` (`Rd.LocalMeansBump.indicatorLp_localExtension`
 for `U = W = Ω`). -/
-theorem cutoff_extension (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞}
-    (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure V)} (hf : Ω.intrinsicNorm hp L s q f < ∞) :
-    Ω.cutoff (Ω.extension hp L f) = Ω.cutoff f :=
+theorem graphCutoff_rychkovExtension (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s : ℝ} (hs : 0 < s)
+    {q : ℝ≥0∞} (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure V)}
+    (hf : Ω.intrinsicNorm hp L s q f < ∞) :
+    Ω.graphCutoff (Ω.rychkovExtension hp L f) = Ω.graphCutoff f :=
   Ω.coneBump.indicatorLp_localExtension hp hL Ω.measurableSet_domain Ω.measurableSet_domain
     (fun _ hx j _ hy => (Ω.coneSupported_dualKernel L j).sub_mem hx hy) hs hq hf
 
 /-- **The extension satisfies the Besov condition by differences**: for `0 < s < L`,
 `‖Ext f‖_p + ‖(2^(is) ω_L(Ext f, 2^(-i))_p)_i‖_{ℓ_q} ≤ C ‖(2^(js) ‖1_Ω (k_j ⋆ f)‖_p)_j‖_{ℓ_q}`. -/
-theorem modNorm_extension_le (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞} (hq : 1 ≤ q)
-    {f : Lp ℂ p (volume : Measure V)} (hf : Ω.intrinsicNorm hp L s q f < ∞) :
-    ‖Ω.extension hp L f‖ₑ +
-        lqNorm q (fun i => dyadicWeight s i * lpModulus p L (Ω.extension hp L f) i) ≤
+theorem modNorm_rychkovExtension_le (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞}
+    (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure V)} (hf : Ω.intrinsicNorm hp L s q f < ∞) :
+    ‖Ω.rychkovExtension hp L f‖ₑ +
+        lqNorm q (fun i => dyadicWeight s i * lpModulus p L (Ω.rychkovExtension hp L f) i) ≤
       Ω.coneBump.bumpSynthConst L s * Ω.intrinsicNorm hp L s q f :=
   Ω.coneBump.modNorm_localExtension_le hp Ω.measurableSet_domain L hs hq hf
 
@@ -289,7 +290,7 @@ theorem modNorm_extension_le (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 < s) {
 is finite; `F = Ext f` is such a function. -/
 theorem exists_besov_extension_iff (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s : ℝ} (hs : 0 < s)
     (hsL : s < L) {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Lp ℂ p (volume : Measure V)) :
-    (∃ F : Lp ℂ p (volume : Measure V), Ω.cutoff F = Ω.cutoff f ∧
+    (∃ F : Lp ℂ p (volume : Measure V), Ω.graphCutoff F = Ω.graphCutoff f ∧
         ‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p L F k) < ∞) ↔
       Ω.intrinsicNorm hp L s q f < ∞ := by
   constructor
@@ -299,8 +300,8 @@ theorem exists_besov_extension_iff (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s 
       ((Ω.coneBump.localMeansNorm_le hp L s hq F).trans_lt
         (ENNReal.mul_lt_top (Ω.coneBump.upperConst_ne_top L s).lt_top hF))
   · intro hf
-    exact ⟨Ω.extension hp L f, Ω.cutoff_extension hp hL hs hq hf,
-      (Ω.modNorm_extension_le hp L hs hq hf).trans_lt
+    exact ⟨Ω.rychkovExtension hp L f, Ω.graphCutoff_rychkovExtension hp hL hs hq hf,
+      (Ω.modNorm_rychkovExtension_le hp L hs hq hf).trans_lt
         (ENNReal.mul_lt_top (Ω.coneBump.bumpSynthConst_ne_top hs hsL).lt_top hf)⟩
 
 end LipschitzGraph

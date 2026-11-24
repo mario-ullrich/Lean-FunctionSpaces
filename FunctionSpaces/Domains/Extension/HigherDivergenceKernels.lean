@@ -518,13 +518,13 @@ theorem ConeSupported.mul_left {G : V → ℂ} (hG : Ω.ConeSupported G) (c : V 
 omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- **Weighted dilation averages of cone kernels are cone kernels**: if `G` is supported in `-K`,
 so is every weighted dilation average of `G`, since `A_w G(y) ≠ 0` needs `G(e^s y) ≠ 0` for some
-`s`, and `-e^s y ∈ K` gives `-y ∈ K` (`Rd.LipschitzGraph.smul_mem_cone`). -/
+`s`, and `-e^s y ∈ K` gives `-y ∈ K` (`Rd.LipschitzGraph.smul_mem_graphCone`). -/
 theorem coneSupported_weightedDilation {G : V → ℂ} (hG : Ω.ConeSupported G) (a b : ℝ)
     (w : ℝ → ℂ) : Ω.ConeSupported (weightedDilation a b w G) := fun y hy => by
   by_contra hny
   refine hy (weightedDilation_eq_zero a b w fun s _ => ?_)
   by_contra hne
-  have h := Ω.smul_mem_cone (inv_pos.2 (Real.exp_pos s)) (hG _ hne)
+  have h := Ω.smul_mem_graphCone (inv_pos.2 (Real.exp_pos s)) (hG _ hne)
   rw [smul_neg, inv_smul_smul₀ (Real.exp_pos s).ne'] at h
   exact hny h
 
@@ -989,7 +989,7 @@ theorem tsupport_dilate_higherKernel_subset {b : LocalMeansBump V} (hb : Ω.Cone
   refine subset_inter (tsupport_dilate_two_pow_subset
     (Ω.isClosed_closedCone.preimage continuous_neg) (fun y hy => ?_) (fun c hc y hy => ?_) j)
     (b.tsupport_dilate_higherKernel_subset_closedBall hL i j)
-  · exact Ω.cone_subset_closedCone (Ω.coneSupported_higherDivKernel hb _ _ _ i y hy)
+  · exact Ω.graphCone_subset_closedCone (Ω.coneSupported_higherDivKernel hb _ _ _ i y hy)
   · have h := Ω.smul_mem_closedCone (inv_nonneg.2 (zero_le_one.trans hc)) hy
     rwa [smul_neg, inv_smul_smul₀ (zero_lt_one.trans_le hc).ne'] at h
 

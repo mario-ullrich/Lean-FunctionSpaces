@@ -41,7 +41,7 @@ Short steps `-y ∈ K̄`, `‖y‖ ≤ ε`, take `Ω ∩ B(c, ρ - ε)` into `Ω
 (`Rd.LipschitzGraph.sub_mem_patch_of_mem_closedCone`); this gives the support conditions of all
 cone-supported kernels of small support.
 
-Bumps of every radius come from rescaling (`Rd.LocalMeansBump.rescale`) and from the normalised
+Bumps of every radius come from rescaling (`Rd.LocalMeansBump.bumpRescale`) and from the normalised
 smooth bump centred at `0` (`Rd.LocalMeansBump.centered`). The cone bump of a Lipschitz graph
 domain, rescaled, is supported in the reflected cone with a radius `R ≤ 1/2` and `a R ≤ ε`
 (`Rd.LipschitzGraph.exists_coneBump_radius_le`).
@@ -66,7 +66,7 @@ namespace LocalMeansBump
 variable (b : LocalMeansBump V)
 
 /-- The **rescaled bump** `c^n b(c ·)`, of radius `R / c`. -/
-noncomputable def rescale {c : ℝ} (hc : 0 < c) : LocalMeansBump V where
+noncomputable def bumpRescale {c : ℝ} (hc : 0 < c) : LocalMeansBump V where
   toFun := Rd.dilate c b.toFun
   radius := b.radius / c
   radius_nonneg := div_nonneg b.radius_nonneg hc.le
@@ -79,7 +79,7 @@ noncomputable def rescale {c : ℝ} (hc : 0 < c) : LocalMeansBump V where
   integral_eq_one := by rw [integral_dilate _ hc, b.integral_eq_one]
 
 /-- The rescaled bump has radius `R / c`. -/
-theorem rescale_radius {c : ℝ} (hc : 0 < c) : (b.rescale hc).radius = b.radius / c := rfl
+theorem bumpRescale_radius {c : ℝ} (hc : 0 < c) : (b.bumpRescale hc).radius = b.radius / c := rfl
 
 /-- The dilated moment kernels vanish outside the ball of radius `L R`. -/
 theorem scaledMoment_eq_zero (L j : ℕ) {y : V} (hy : L * b.radius < ‖y‖) :
@@ -118,8 +118,8 @@ namespace LipschitzGraph
 variable (Ω : LipschitzGraph V)
 
 /-- Rescaled bumps supported in `-K` are supported in `-K`. -/
-theorem coneSupported_rescale {b : LocalMeansBump V} (hb : Ω.ConeSupported b.toFun) {c : ℝ}
-    (hc : 0 < c) : Ω.ConeSupported (b.rescale hc).toFun :=
+theorem coneSupported_bumpRescale {b : LocalMeansBump V} (hb : Ω.ConeSupported b.toFun) {c : ℝ}
+    (hc : 0 < c) : Ω.ConeSupported (b.bumpRescale hc).toFun :=
   hb.dilate hc
 
 /-- **Cone bumps of small radius**: for `a ≥ 0` and `ε > 0` the cone bump rescaled by
@@ -128,8 +128,9 @@ theorem coneSupported_rescale {b : LocalMeansBump V} (hb : Ω.ConeSupported b.to
 theorem exists_coneBump_radius_le {a ε : ℝ} (ha : 0 ≤ a) (hε : 0 < ε) :
     ∃ b : LocalMeansBump V, Ω.ConeSupported b.toFun ∧ b.radius ≤ 1 / 2 ∧ a * b.radius ≤ ε := by
   have hc : 0 < 1 + a / ε := by positivity
-  refine ⟨Ω.coneBump.rescale hc, Ω.coneSupported_rescale Ω.coneSupported_coneBump hc, ?_, ?_⟩ <;>
-    rw [LocalMeansBump.rescale_radius, Ω.coneBump_radius]
+  refine ⟨Ω.coneBump.bumpRescale hc,
+    Ω.coneSupported_bumpRescale Ω.coneSupported_coneBump hc, ?_, ?_⟩ <;>
+    rw [LocalMeansBump.bumpRescale_radius, Ω.coneBump_radius]
   · exact div_le_self (by norm_num) (le_add_of_nonneg_right (by positivity))
   · rw [← mul_div_assoc, div_le_iff₀ hc, mul_add, mul_one, mul_div_cancel₀ a hε.ne']
     linarith
@@ -161,7 +162,7 @@ theorem patch_support {b : LocalMeansBump V} (hb : Ω.ConeSupported b.toFun) {L 
   have hyR : ‖y‖ ≤ L * b.radius := not_lt.1 fun h => hy (b.dualKernel_eq_zero L j h)
   rw [show ρ - 2 * ε = ρ - ε - ε by ring] at hx
   exact Ω.sub_mem_patch_of_mem_closedCone hx
-    (Ω.cone_subset_closedCone (Ω.coneSupported_dualKernel_of hb L j y hy)) (hyR.trans hLR)
+    (Ω.graphCone_subset_closedCone (Ω.coneSupported_dualKernel_of hb L j y hy)) (hyR.trans hLR)
 
 /-- **Boundary patches, the step condition**: for a bump supported in `-K` with `L R ≤ ε`, the steps
 `-c'^(-1) z`, `c' ≥ 1`, `b(z) ≠ 0`, take `Ω ∩ B(c, ρ - ε)` into `Ω ∩ B(c, ρ)`. -/
@@ -171,7 +172,7 @@ theorem patch_step {b : LocalMeansBump V} (hb : Ω.ConeSupported b.toFun) {L : �
       Ω.domain ∩ ball c (ρ - ε) ⊆ diffStepSet (Ω.domain ∩ ball c ρ) L (-c'⁻¹ • z) := by
   intro c' hc' z hz x ⟨hxΩ, hxc⟩ l hl
   have hc0 : 0 < c' := zero_lt_one.trans_le hc'
-  have hzK : -z ∈ Ω.cone := hb z hz
+  have hzK : -z ∈ Ω.graphCone := hb z hz
   have hzR : ‖z‖ ≤ b.radius := not_lt.1 fun h => hz (b.eq_zero z h)
   have hh : -c'⁻¹ • z = c'⁻¹ • -z := by rw [neg_smul, smul_neg]
   have hnorm : ‖(l : ℝ) • (-c'⁻¹ • z)‖ ≤ L * b.radius := by
@@ -184,7 +185,7 @@ theorem patch_step {b : LocalMeansBump V} (hb : Ω.ConeSupported b.toFun) {L : �
       _ = L * b.radius := by ring
   refine ⟨?_, ?_⟩
   · rw [hh]
-    exact Ω.add_nsmul_mem hxΩ (Ω.smul_mem_cone (inv_pos.2 hc0) hzK) l
+    exact Ω.add_nsmul_mem hxΩ (Ω.smul_mem_graphCone (inv_pos.2 hc0) hzK) l
   · rw [mem_ball] at hxc ⊢
     calc dist (x + (l : ℝ) • (-c'⁻¹ • z)) c ≤ dist x c + ‖(l : ℝ) • (-c'⁻¹ • z)‖ := by
           rw [dist_eq_norm, dist_eq_norm, add_sub_right_comm]

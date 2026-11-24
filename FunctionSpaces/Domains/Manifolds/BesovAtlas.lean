@@ -179,7 +179,7 @@ theorem coordChange_target_eq_image :
     OpenPartialHomeomorph.extend_image_source_inter]
 
 /-- The change of charts is `e'.extend I ∘ (e.extend I).symm`. -/
-theorem coordChange_apply (y : E) :
+theorem extendCoordChange_apply (y : E) :
     I.extendCoordChange e e' y = e'.extend I ((e.extend I).symm y) := rfl
 
 /-- **The image of a set under a change of charts**: for charts `e`, `e'` with extended charts
@@ -192,7 +192,8 @@ theorem image_coordChange_inter (B : Set E) :
   rw [inter_comm, PartialEquiv.image_source_inter_eq', ← (I.extendCoordChange e e').symm_source,
     ModelWithCorners.extendCoordChange_symm]
   ext y
-  simp only [mem_inter_iff, mem_preimage, mem_coordChange_source, coordChange_apply, and_assoc]
+  simp only [mem_inter_iff, mem_preimage, mem_coordChange_source, extendCoordChange_apply,
+    and_assoc]
 
 /-- The source of a change of charts is measurable: it is the intersection of the closed range
 of `I` with an open set (`Manifold.range_inter_coordChange_source`). -/
@@ -209,7 +210,7 @@ namespace BesovAtlas
 variable (A : BesovAtlas I M)
 
 /-- The extended chart `κ_i = e_i.extend I`. -/
-noncomputable abbrev ext (i : Fin A.n) : PartialEquiv M E := (A.chart i).extend I
+noncomputable abbrev extChart (i : Fin A.n) : PartialEquiv M E := (A.chart i).extend I
 
 omit [FiniteDimensional ℝ E] in
 /-- `ψ_i ≤ 1`. -/
@@ -240,12 +241,13 @@ theorem inv_card_le_sum_sq_psi (x : M) : (A.n : ℝ)⁻¹ ≤ ∑ i, A.psi i x ^
 
 /-- The **chart piece** `(ψ_i g) ∘ κ_i⁻¹` on the target of `κ_i`, `0` outside. -/
 noncomputable def piece (i : Fin A.n) (g : M → ℂ) : E → ℂ :=
-  (A.ext i).target.indicator fun y => (A.psi i ((A.ext i).symm y) : ℂ) * g ((A.ext i).symm y)
+  (A.extChart i).target.indicator fun y => (A.psi i ((A.extChart i).symm y) : ℂ) *
+    g ((A.extChart i).symm y)
 
 /-- **The carrier of the `i`-th piece**: the set `κ_i(tsupport ψ_i) ⊆ range I`, outside which
 the piece `(ψ_i g) ∘ κ_i⁻¹` vanishes; it is compact on a compact manifold. -/
 def pieceCarrier (i : Fin A.n) : Set E :=
-  A.ext i '' tsupport (A.psi i)
+  A.extChart i '' tsupport (A.psi i)
 
 omit [FiniteDimensional ℝ E] in
 /-- The carrier of a piece is compact, the image of the compact `tsupport ψ_i` under the chart. -/
@@ -264,9 +266,9 @@ omit [FiniteDimensional ℝ E] in
 `y ∉ κ_i(tsupport ψ_i)`. -/
 theorem piece_eq_zero_of_notMem (i : Fin A.n) (g : M → ℂ) {y : E} (hy : y ∉ A.pieceCarrier i) :
     A.piece i g y = 0 := by
-  by_cases hyt : y ∈ (A.ext i).target
-  · have hψ : A.psi i ((A.ext i).symm y) = 0 :=
-      image_eq_zero_of_notMem_tsupport fun h => hy ⟨_, h, (A.ext i).right_inv hyt⟩
+  by_cases hyt : y ∈ (A.extChart i).target
+  · have hψ : A.psi i ((A.extChart i).symm y) = 0 :=
+      image_eq_zero_of_notMem_tsupport fun h => hy ⟨_, h, (A.extChart i).right_inv hyt⟩
     rw [piece, indicator_of_mem hyt, hψ, Complex.ofReal_zero, zero_mul]
   · rw [piece, indicator_of_notMem hyt]
 
@@ -284,10 +286,11 @@ theorem continuousOn_piece [CompactSpace M] (i : Fin A.n) {g : M → ℂ} (hg : 
   · obtain ⟨x, hx, rfl⟩ := hyK
     have hxs : x ∈ (A.chart i).source := A.tsupport_psi_subset i hx
     have hU := (A.chart i).extend_target_mem_nhdsWithin (I := I) hxs
-    have hyt : A.ext i x ∈ (A.ext i).target :=
-      (A.ext i).map_source (by rw [OpenPartialHomeomorph.extend_source]; exact hxs)
-    have hcont : ContinuousOn (fun y => (A.psi i ((A.ext i).symm y) : ℂ) * g ((A.ext i).symm y))
-        (A.ext i).target :=
+    have hyt : A.extChart i x ∈ (A.extChart i).target :=
+      (A.extChart i).map_source (by rw [OpenPartialHomeomorph.extend_source]; exact hxs)
+    have hcont : ContinuousOn
+        (fun y => (A.psi i ((A.extChart i).symm y) : ℂ) * g ((A.extChart i).symm y))
+        (A.extChart i).target :=
       (Complex.continuous_ofReal.comp_continuousOn ((A.contMDiff_psi i).continuous.comp_continuousOn
         (A.chart i).continuousOn_extend_symm)).mul
           (hg.comp_continuousOn (A.chart i).continuousOn_extend_symm)
@@ -311,9 +314,9 @@ theorem aestronglyMeasurable_piece (i : Fin A.n) {g : M → ℂ} (hg : StronglyM
     AEStronglyMeasurable (A.piece i g) volume := by
   have hT := measurableSet_extend_target I (A.chart i)
   refine (aestronglyMeasurable_indicator_iff hT).2 ?_
-  have hκ : AEMeasurable (A.ext i).symm (volume.restrict (A.ext i).target) :=
+  have hκ : AEMeasurable (A.extChart i).symm (volume.restrict (A.extChart i).target) :=
     ((A.chart i).continuousOn_extend_symm (I := I)).aemeasurable hT
-  have hψ : ContinuousOn (fun y => (A.psi i ((A.ext i).symm y) : ℂ)) (A.ext i).target :=
+  have hψ : ContinuousOn (fun y => (A.psi i ((A.extChart i).symm y) : ℂ)) (A.extChart i).target :=
     Complex.continuous_ofReal.comp_continuousOn ((A.contMDiff_psi i).continuous.comp_continuousOn
       (A.chart i).continuousOn_extend_symm)
   exact (hψ.aestronglyMeasurable hT).mul (hg.aestronglyMeasurable.comp_aemeasurable hκ)
@@ -464,20 +467,21 @@ omit [FiniteDimensional ℝ E] in
 /-- **The change of charts at a point of both sources**: for `y = κ_i x` with `x` in the source
 of `κ'_j`, `T_{ij} G (y) = ψ_i(x) θ'_j(x) G(κ'_j x)`. -/
 theorem transition_apply_of_mem (i : Fin A.n) (j : Fin A'.n) (G : E → ℂ) {y : E}
-    (hy : y ∈ (A.ext i).target) (hx : (A.ext i).symm y ∈ (A'.chart j).source) :
-    (A.transition A' i j).apply G y = ((A.psi i ((A.ext i).symm y) *
-      A'.theta j ((A.ext i).symm y) : ℝ) : ℂ) * G (A'.ext j ((A.ext i).symm y)) := by
-  have hx' : (A.ext i).symm y ∈ (A'.ext j).source := by rwa [OpenPartialHomeomorph.extend_source]
+    (hy : y ∈ (A.extChart i).target) (hx : (A.extChart i).symm y ∈ (A'.chart j).source) :
+    (A.transition A' i j).apply G y = ((A.psi i ((A.extChart i).symm y) *
+      A'.theta j ((A.extChart i).symm y) : ℝ) : ℂ) * G (A'.extChart j ((A.extChart i).symm y)) := by
+  have hx' : (A.extChart i).symm y ∈ (A'.extChart j).source := by
+    rwa [OpenPartialHomeomorph.extend_source]
   rw [transition_apply, indicator_of_mem ((mem_coordChange_source _ _).2 ⟨hy, hx⟩),
-    coordChange_apply]
+    extendCoordChange_apply]
   simp only [transition, chartChange]
-  rw [indicator_of_mem ((A'.ext j).map_source hx'), (A'.ext j).left_inv hx']
+  rw [indicator_of_mem ((A'.extChart j).map_source hx'), (A'.extChart j).left_inv hx']
 
 omit [FiniteDimensional ℝ E] in
 /-- **The change of charts off the common sources**: `T_{ij} G (y) = 0` unless `y = κ_i x` with `x`
 in the source of `κ'_j`. -/
 theorem transition_apply_of_notMem (i : Fin A.n) (j : Fin A'.n) (G : E → ℂ) {y : E}
-    (h : y ∈ (A.ext i).target → (A.ext i).symm y ∉ (A'.chart j).source) :
+    (h : y ∈ (A.extChart i).target → (A.extChart i).symm y ∉ (A'.chart j).source) :
     (A.transition A' i j).apply G y = 0 := by
   rw [transition_apply, indicator_of_notMem fun h' => ?_]
   obtain ⟨h1, h2⟩ := (mem_coordChange_source _ _).1 h'
@@ -488,14 +492,14 @@ omit [FiniteDimensional ℝ E] in
 `ψ_i g = ∑_j ψ_i ψ'_j g` and `θ'_j ψ'_j = ψ'_j` (`Manifold.BesovAtlas.transition_apply_of_mem`). -/
 theorem piece_eq_sum_apply (i : Fin A.n) (g : M → ℂ) (y : E) :
     A.piece i g y = ∑ j, (A.transition A' i j).apply (A'.piece j g) y := by
-  by_cases hy : y ∈ (A.ext i).target
-  · set x := (A.ext i).symm y
+  by_cases hy : y ∈ (A.extChart i).target
+  · set x := (A.extChart i).symm y
     have hterm : ∀ j, (A.transition A' i j).apply (A'.piece j g) y =
         (A.psi i x : ℂ) * (A'.psi j x : ℂ) * g x := fun j => by
       by_cases hxj : x ∈ (A'.chart j).source
-      · have hxj' : x ∈ (A'.ext j).source := by rwa [OpenPartialHomeomorph.extend_source]
+      · have hxj' : x ∈ (A'.extChart j).source := by rwa [OpenPartialHomeomorph.extend_source]
         rw [A.transition_apply_of_mem A' i j _ hy hxj, piece,
-          indicator_of_mem ((A'.ext j).map_source hxj'), (A'.ext j).left_inv hxj']
+          indicator_of_mem ((A'.extChart j).map_source hxj'), (A'.extChart j).left_inv hxj']
         push_cast
         have h := congrArg (fun t : ℝ => (t : ℂ)) (A'.theta_mul_psi j x)
         push_cast at h
@@ -662,8 +666,8 @@ change of charts `T_{ik}` with the cut-off `ψ_i θ_k` (`Manifold.BesovAtlas.tra
 theorem piece_chartLift (i k : Fin A.n) (F : E → ℂ) :
     A.piece i (chartLift I (A.chart k) (A.theta k) F) = (A.transition A i k).apply F := by
   funext y
-  by_cases hy : y ∈ (A.ext i).target
-  · by_cases hxk : (A.ext i).symm y ∈ (A.chart k).source
+  by_cases hy : y ∈ (A.extChart i).target
+  · by_cases hxk : (A.extChart i).symm y ∈ (A.chart k).source
     · rw [A.transition_apply_of_mem A i k F hy hxk, piece, indicator_of_mem hy, chartLift,
         indicator_of_mem hxk]
       push_cast

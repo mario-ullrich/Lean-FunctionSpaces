@@ -26,7 +26,7 @@ mollification in `H^s(V)` (`Rd.tendsto_sobolevConv_dilate`) and smooth cut-offs
 
 * **Localised functions**: for a resolution of unity `ψ` of a bounded Lipschitz domain, every
   `ψ_j ι_s U` is `ι_s W` for some `W ∈ H^s(V)`
-  (`Rd.BoundedLipschitzDomain.BoundaryPartition.exists_sobolevToL2_eq_localize`).
+  (`Rd.BoundedLipschitzDomain.BoundaryPartition.exists_sobolevToL2_eq_localizeL2`).
 * **Mollified functions**: smoothing a function that vanishes outside a compact set `S` with a
   smooth kernel of compact support gives a Schwartz function supported in `supp K + S`
   (`Rd.exists_schwartz_eq_conv`). Let `η` be smooth with compact support and `∫ η = 1`, and
@@ -68,10 +68,10 @@ Lipschitz domain, every chart `j` and `U ∈ H^s(V)` there is `W ∈ H^s(V)` wit
 since `ψ_j` is smooth with closed support in the bounded ball `B_j`
 (`Rd.BoundedLipschitzDomain.BoundaryPartition.hasCompactSupport`,
 `Rd.exists_sobolevToL2_eq_mulLp`). At `s = 1` this is
-`Rd.BoundedLipschitzDomain.BoundaryPartition.exists_toL2_eq_localize`. -/
-theorem BoundedLipschitzDomain.BoundaryPartition.exists_sobolevToL2_eq_localize
+`Rd.BoundedLipschitzDomain.BoundaryPartition.exists_toL2_eq_localizeL2`. -/
+theorem BoundedLipschitzDomain.BoundaryPartition.exists_sobolevToL2_eq_localizeL2
     {Ω : BoundedLipschitzDomain V} (ψ : Ω.BoundaryPartition) (j : Fin Ω.N) (hs : 0 ≤ s)
-    (U : H^{s}(V)) : ∃ W : H^{s}(V), sobolevToL2 hs W = ψ.localize j (sobolevToL2 hs U) :=
+    (U : H^{s}(V)) : ∃ W : H^{s}(V), sobolevToL2 hs W = ψ.localizeL2 j (sobolevToL2 hs U) :=
   exists_sobolevToL2_eq_mulLp hs (ψ.contDiff j) (ψ.hasCompactSupport j) _ _ U
 
 /-! ### Smooth functions supported in `Ω` -/
@@ -169,17 +169,17 @@ the closure of the graph domain into the domain (`Rd.LipschitzGraph.add_mem_of_m
 noncomputable def coneMollifier : V → ℂ := bumpMollifier Ω.coneMollifierBase
 
 /-- The cone mollifier is supported in the open cone and in `B̄(0, 1/2)`: its closed support is
-`B̄(e/4, ρ/2) ⊆ B(e/4, ρ) ⊆ K` (`Rd.LipschitzGraph.ball_subset_cone`), and
+`B̄(e/4, ρ/2) ⊆ B(e/4, ρ) ⊆ K` (`Rd.LipschitzGraph.ball_subset_graphCone`), and
 `‖e/4‖ + ρ/2 ≤ 1/2`. -/
 theorem tsupport_coneMollifier_subset :
-    tsupport Ω.coneMollifier ⊆ Ω.cone ∩ closedBall 0 (1 / 2) := by
+    tsupport Ω.coneMollifier ⊆ Ω.graphCone ∩ closedBall 0 (1 / 2) := by
   intro z hz
   have h := tsupport_bumpMollifier_subset Ω.coneMollifierBase hz
   have hρ := Ω.coneRadius_pos
   have hρ8 := Ω.coneRadius_le
   have hr : Ω.coneMollifierBase.rOut = Ω.coneRadius / 2 := rfl
   rw [hr] at h
-  refine ⟨Ω.ball_subset_cone (closedBall_subset_ball (by linarith) h), ?_⟩
+  refine ⟨Ω.ball_subset_graphCone (closedBall_subset_ball (by linarith) h), ?_⟩
   rw [mem_closedBall, dist_eq_norm] at h
   have he : ‖(1 / 4 : ℝ) • Ω.e‖ = 1 / 4 := by
     rw [norm_smul, Ω.norm_e, mul_one, Real.norm_of_nonneg (by norm_num)]
@@ -203,9 +203,10 @@ continuous bounded real function with closed support in the boundary ball `B_j`.
 `W ∈ H^s(V)` with `ι_s W = ζ ι_s U` lies in `H̃^s(Ω)`. `ι_s W` vanishes outside the compact set
 `S = Ω̄_j ∩ supp ζ`, since `Ω ∩ B_j` is the graph domain `Ω_j` inside `B_j`; the cone mollifier of
 the chart moves `S` into `Ω_j` (`Rd.LipschitzGraph.add_mem_of_mem_closure`,
-`Rd.LipschitzGraph.mem_cone_of_mem_tsupport_dilate`), and its small dilates keep it inside `B_j`
-(`Rd.eventually_tsupport_dilate_add_subset_thickening`, `Rd.mem_tildeSpace_of_dilate_of_nonneg`).
-At `s = 1` this is `Rd.BoundedLipschitzDomain.mem_tildeSpace_of_mulLp_chart`. -/
+`Rd.LipschitzGraph.mem_graphCone_of_mem_tsupport_dilate`), and its small dilates keep it inside
+`B_j` (`Rd.eventually_tsupport_dilate_add_subset_thickening`,
+`Rd.mem_tildeSpace_of_dilate_of_nonneg`). At `s = 1` this is
+`Rd.BoundedLipschitzDomain.mem_tildeSpace_of_mulLp_chart`. -/
 theorem mem_tildeSpace_of_mulLp_chart_of_nonneg (hs : 0 ≤ s) (j : Fin Ω.N) {U : H^{s}(V)}
     (hU : ∀ᵐ x ∂volume, x ∉ Ω.carrier → sobolevToL2 hs U x = 0) {ζ : V → ℝ}
     (hζ : tsupport ζ ⊆ ball (Ω.center j) (Ω.radius j)) {C : ℝ}
@@ -232,7 +233,7 @@ theorem mem_tildeSpace_of_mulLp_chart_of_nonneg (hs : 0 ≤ s) (j : Fin Ω.N) {U
   filter_upwards [eventually_tsupport_dilate_add_subset_thickening (hη.trans inter_subset_right)
     hδ (closure (Ω.graph j).domain ∩ tsupport ζ)] with n hn
   rintro _ ⟨z, hz, y, hy, rfl⟩
-  have hzK := (Ω.graph j).mem_cone_of_mem_tsupport_dilate (hη.trans inter_subset_left)
+  have hzK := (Ω.graph j).mem_graphCone_of_mem_tsupport_dilate (hη.trans inter_subset_left)
     (by positivity) hz
   have hzyB : z + y ∈ ball (Ω.center j) (Ω.radius j) :=
     hδB (thickening_subset_of_subset δ inter_subset_right (hn ⟨z, hz, y, hy, rfl⟩))
@@ -246,18 +247,18 @@ theorem mem_tildeSpace_of_mulLp_chart_of_nonneg (hs : 0 ≤ s) (j : Fin Ω.N) {U
 `χ + ∑_j ψ_j = 1` on `Ω` for a resolution of unity `ψ` and a continuous bounded real `χ`, then
 `F = ∑_j ψ_j F + χ F` for every `F ∈ L_2(V)` vanishing almost everywhere outside `Ω`: on `Ω` the
 factors add up to `1`, outside `Ω` both sides vanish. -/
-theorem eq_sum_localize_add_mulLp (ψ : Ω.BoundaryPartition) {χ : V → ℝ}
+theorem eq_sum_localizeL2_add_mulLp (ψ : Ω.BoundaryPartition) {χ : V → ℝ}
     (hχ1 : ∀ x ∈ Ω.carrier, χ x + ∑ j, ψ.toFun j x = 1) {C : ℝ}
     (hc : Continuous fun x => (χ x : ℂ)) (hC : ∀ x, ‖(χ x : ℂ)‖ ≤ C)
     {F : Lp ℂ 2 (volume : Measure V)} (hF : ∀ᵐ x ∂volume, x ∉ Ω.carrier → F x = 0) :
-    F = ∑ j, ψ.localize j F + mulLp hc hC F := by
+    F = ∑ j, ψ.localizeL2 j F + mulLp hc hC F := by
   refine Lp.ext ?_
   have hloc : ∀ᵐ x ∂(volume : Measure V), ∀ j,
-      (ψ.localize j F : V → ℂ) x = ψ.toComplex j x * F x :=
+      (ψ.localizeL2 j F : V → ℂ) x = ψ.toComplex j x * F x :=
     ae_all_iff.2 fun j => mulLp_apply_ae _ _ _
   filter_upwards [hF, hloc, mulLp_apply_ae hc hC F,
-    Lp.coeFn_add (∑ j, ψ.localize j F) (mulLp hc hC F),
-    Lp.coeFn_fun_finsetSum Finset.univ fun j => ψ.localize j F] with x h1 h2 h3 h4 h5
+    Lp.coeFn_add (∑ j, ψ.localizeL2 j F) (mulLp hc hC F),
+    Lp.coeFn_fun_finsetSum Finset.univ fun j => ψ.localizeL2 j F] with x h1 h2 h3 h4 h5
   rw [h4, Pi.add_apply, h5, h3]
   simp only [h2]
   rw [← Finset.sum_mul, ← add_mul]
@@ -271,20 +272,20 @@ theorem eq_sum_localize_add_mulLp (ψ : Ω.BoundaryPartition) {χ : V → ℝ}
 /-- **The decomposition of a function vanishing outside `Ω`**, for `s ≥ 0`: if `χ + ∑_j ψ_j = 1`
 on `Ω`, `U ∈ H^s(V)` has `ι_s U = 0` almost everywhere outside `Ω`, `ι_s W_j = ψ_j ι_s U` and
 `ι_s W_0 = χ ι_s U`, then `U = ∑_j W_j + W_0` in `H^s(V)`: the `L_2` functions agree
-(`Rd.BoundedLipschitzDomain.eq_sum_localize_add_mulLp`), and `ι_s` is injective
+(`Rd.BoundedLipschitzDomain.eq_sum_localizeL2_add_mulLp`), and `ι_s` is injective
 (`Rd.sobolevToL2_injective`). At `s = 1` this is
 `Rd.BoundedLipschitzDomain.eq_sum_add_of_ae_eq_zero`. -/
 theorem eq_sum_add_of_ae_eq_zero_of_nonneg (hs : 0 ≤ s) (ψ : Ω.BoundaryPartition)
     {χ : V → ℝ} (hχ1 : ∀ x ∈ Ω.carrier, χ x + ∑ j, ψ.toFun j x = 1) {C : ℝ}
     (hc : Continuous fun x => (χ x : ℂ)) (hC : ∀ x, ‖(χ x : ℂ)‖ ≤ C) {U : H^{s}(V)}
     (hU : ∀ᵐ x ∂volume, x ∉ Ω.carrier → sobolevToL2 hs U x = 0) {Wj : Fin Ω.N → H^{s}(V)}
-    (hWj : ∀ j, sobolevToL2 hs (Wj j) = ψ.localize j (sobolevToL2 hs U))
+    (hWj : ∀ j, sobolevToL2 hs (Wj j) = ψ.localizeL2 j (sobolevToL2 hs U))
     {W0 : H^{s}(V)} (hW0 : sobolevToL2 hs W0 = mulLp hc hC (sobolevToL2 hs U)) :
     U = ∑ j, Wj j + W0 := by
   refine sobolevToL2_injective hs ?_
   rw [map_add, map_sum, hW0]
   simp only [hWj]
-  exact Ω.eq_sum_localize_add_mulLp ψ hχ1 hc hC hU
+  exact Ω.eq_sum_localizeL2_add_mulLp ψ hχ1 hc hC hU
 
 /-- **Functions vanishing outside `Ω` lie in `H̃^s(Ω)`, `s ≥ 0`**: on a bounded Lipschitz
 domain, every `U ∈ H^s(V)` with `ι_s U = 0` almost everywhere outside `Ω` lies in the closure of
@@ -303,7 +304,7 @@ theorem mem_tildeSpace_of_ae_eq_zero_of_nonneg (hs : 0 ≤ s) {U : H^{s}(V)}
   obtain ⟨χ, hχ, hcs, hχΩ, hχ1⟩ := exists_interior_cutoff ψ hψ
   have hc : Continuous fun x => (χ x : ℂ) := Complex.continuous_ofReal.comp hχ.continuous
   obtain ⟨C, hC⟩ := hc.bounded_above_of_compact_support (hcs.comp_left Complex.ofReal_zero)
-  choose Wj hWj using fun j => ψ.exists_sobolevToL2_eq_localize j hs U
+  choose Wj hWj using fun j => ψ.exists_sobolevToL2_eq_localizeL2 j hs U
   obtain ⟨W0, hW0⟩ := exists_sobolevToL2_eq_mulLp hs hχ hcs hc hC U
   rw [Ω.eq_sum_add_of_ae_eq_zero_of_nonneg hs ψ hχ1 hc hC hU hWj hW0]
   refine add_mem (Submodule.sum_mem _ fun j _ =>

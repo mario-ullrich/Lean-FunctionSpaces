@@ -203,7 +203,7 @@ Lipschitz domain `Ω` in dimension `n ≥ 1`, `0 < θ < 1`, `1 ≤ q ≤ ∞` an
 (for natural `r` and `θ > 0` this is `r ≥ 1`), if the intrinsic quasi-norm `N_Ω(f)` with moduli
 of order `r` is finite, then `f|_Ω` lies in the approximation space `A^θ_q` of the Neumann
 scheme. The Besov extension theorem gives `F` with `F = f` on `Ω` in `B^θ_{2,q}(V)`
-(`Rd.BoundedLipschitzDomain.exists_memApprox_extension_iff`), that is in
+(`Rd.BoundedLipschitzDomain.exists_memApprox_extension_iff_indicator`), that is in
 `(L_2(V), H^1(V))_{θ,q}` (`Rd.memKMethod_lpBesselPotentialCouple_iff`); the restriction maps it
 into `(L_2(Ω), W^1_2(Ω))_{θ,q}` (`Rd.memKMethod_neumann_restrict_of_memKMethod`), which is
 `A^θ_q` (`Rd.BoundedLipschitzDomain.memKMethod_neumann_iff`). -/
@@ -212,7 +212,7 @@ theorem memApprox_neumannScheme_of_modNormOn_lt_top {θ : ℝ} {q : ℝ≥0∞} 
     (hf : modNormOn Ω.measurableSet r θ q f < ∞) :
     Ω.neumannScheme.toScheme.MemApprox θ q
       (LpToLpRestrictCLM V ℂ ℂ volume 2 (Ω.toOpens : Set V) f) := by
-  obtain ⟨F, hFf, hF⟩ := (Ω.exists_memApprox_extension_iff two_ne_top hθ hθr hq f).2 hf
+  obtain ⟨F, hFf, hF⟩ := (Ω.exists_memApprox_extension_iff_indicator two_ne_top hθ hθr hq f).2 hf
   have hK : (lpBesselPotentialCouple (p := 2) 1).MemKMethod θ q F := by
     refine (memKMethod_lpBesselPotentialCouple_iff ENNReal.one_lt_two two_ne_top one_pos hθ hθ'
       hq).2 ?_

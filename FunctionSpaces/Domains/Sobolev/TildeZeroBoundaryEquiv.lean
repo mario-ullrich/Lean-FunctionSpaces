@@ -22,7 +22,7 @@ differences, equivalent to the norm of `H^s(V)` on the `L_2` functions
   (`Rd.BoundedLipschitzDomain.exists_hasZeroExtensionBound_of_half_lt`): there is `C` with
   `‖U‖ ≤ C ‖U + W‖` for every `U` in the span `T^s(Ω)` of the test functions and every `W`
   vanishing on `Ω`, so restriction is an isomorphism of `H̃^s(Ω)` onto `H^s_0(Ω)`
-  (`Rd.HasZeroExtensionBound.tildeEquivZeroBoundary`; McLean, Theorem 3.33; Hewett–Moiola,
+  (`Rd.HasZeroExtensionBound.tildeEquivZeroBoundaryOfBound`; McLean, Theorem 3.33; Hewett–Moiola,
   Lemma 2.1). With `Φ = ι_s(U + W)`, `ι_s U = 1_Ω Φ` (`Rd.sobolevToL2_eq_indicatorLp_add`).
 * **The decomposition** (`Rd.BoundedLipschitzDomain.indicatorLp_eq_sum_add`): for a resolution of
   unity `ψ` and an interior cut-off `χ` with `χ + ∑_j ψ_j = 1` on `Ω`,
@@ -31,8 +31,8 @@ differences, equivalent to the norm of `H^s(V)` on the `L_2` functions
 * **Vanishing near the graphs.** The `L_2` function of `U + W` vanishes on `Ω` outside a compact
   subset of `Ω` (`Rd.BoundedLipschitzDomain.exists_isCompact_sobolevToL2_add_eq_zero`, from the
   Schwartz function of `U`), so each `ψ_j Φ` vanishes on the points of `Ω_j` of small height above
-  the graph (`Rd.BoundedLipschitzDomain.exists_mul_eq_zero_of_height_lt`): the point straight below
-  such a point on the graph is close to it, inside the chart ball and outside `Ω`.
+  the graph (`Rd.BoundedLipschitzDomain.exists_mul_eq_zero_of_graphHeight_lt`): the point straight
+  below such a point on the graph is close to it, inside the chart ball and outside `Ω`.
 
 The extension by zero from each graph domain
 (`Rd.LipschitzGraph.exists_modNorm_indicatorLp_le_of_vanish`, which rests on the Hardy inequality
@@ -150,11 +150,11 @@ Take `ε` below the distance of `K` to `V \ Ω` and of `supp ψ_j` to `V \ B_j`
 (Mathlib's `IsCompact.exists_thickening_subset_open`). If `ψ_j(x) ≠ 0`, `x ∈ Ω_j` and
 `η_j(x) < ε`, then `x ∈ Ω` (`Rd.BoundedLipschitzDomain.mem_carrier_iff_of_mem_ball`), and the
 point `z = x - η_j(x) e_j` on the graph is at distance `η_j(x) < ε` from `x`; it lies in `B_j`
-but not in `Ω_j` (`Rd.LipschitzGraph.height_add_smul`), hence not in `Ω`, so `x ∉ K`. -/
-theorem exists_mul_eq_zero_of_height_lt (ψ : Ω.BoundaryPartition) (j : Fin Ω.N) {K : Set V}
+but not in `Ω_j` (`Rd.LipschitzGraph.graphHeight_add_smul`), hence not in `Ω`, so `x ∉ K`. -/
+theorem exists_mul_eq_zero_of_graphHeight_lt (ψ : Ω.BoundaryPartition) (j : Fin Ω.N) {K : Set V}
     (hK : IsCompact K) (hKΩ : K ⊆ Ω.carrier) {Φ : V → ℂ}
     (hΦ : ∀ᵐ x ∂volume, x ∈ Ω.carrier → x ∉ K → Φ x = 0) :
-    ∃ ε > 0, ∀ᵐ x ∂volume, x ∈ (Ω.graph j).domain → (Ω.graph j).height x < ε →
+    ∃ ε > 0, ∀ᵐ x ∂volume, x ∈ (Ω.graph j).domain → (Ω.graph j).graphHeight x < ε →
       ψ.toComplex j x * Φ x = 0 := by
   obtain ⟨δ, hδ, hδK⟩ := hK.exists_thickening_subset_open Ω.isOpen hKΩ
   obtain ⟨δ', hδ', hδψ⟩ := (ψ.hasCompactSupport j).isCompact.exists_thickening_subset_open
@@ -164,33 +164,33 @@ theorem exists_mul_eq_zero_of_height_lt (ψ : Ω.BoundaryPartition) (j : Fin Ω.
   by_cases hψ : ψ.toFun j x = 0
   · rw [ψ.toComplex_of_eq_zero hψ, zero_mul]
   have hxΩ : x ∈ Ω.carrier := (Ω.mem_carrier_iff_of_mem_ball (ψ.mem_ball_of_ne_zero hψ)).2 hxd
-  have hη0 : 0 < (Ω.graph j).height x := ((Ω.graph j).mem_domain_iff_height_pos x).1 hxd
+  have hη0 : 0 < (Ω.graph j).graphHeight x := ((Ω.graph j).mem_domain_iff_graphHeight_pos x).1 hxd
   have hxK : x ∉ K := fun hxK => by
-    set z := x + (-(Ω.graph j).height x) • (Ω.graph j).e
+    set z := x + (-(Ω.graph j).graphHeight x) • (Ω.graph j).e
     have hdist : dist z x < min δ δ' := by
-      rw [dist_eq_norm, show z - x = (-(Ω.graph j).height x) • (Ω.graph j).e by simp [z],
+      rw [dist_eq_norm, show z - x = (-(Ω.graph j).graphHeight x) • (Ω.graph j).e by simp [z],
         norm_smul, (Ω.graph j).norm_e, mul_one, Real.norm_eq_abs, abs_neg, abs_of_pos hη0]
       exact hxη
     have hzΩ : z ∈ Ω.carrier :=
       hδK (mem_thickening_iff.2 ⟨x, hxK, hdist.trans_le (min_le_left _ _)⟩)
     have hzB : z ∈ ball (Ω.center j) (Ω.radius j) := hδψ (mem_thickening_iff.2
       ⟨x, subset_tsupport _ hψ, hdist.trans_le (min_le_right _ _)⟩)
-    have hzd := ((Ω.graph j).mem_domain_iff_height_pos z).1
+    have hzd := ((Ω.graph j).mem_domain_iff_graphHeight_pos z).1
       ((Ω.mem_carrier_iff_of_mem_ball hzB).1 hzΩ)
-    rw [(Ω.graph j).height_add_smul, add_neg_cancel] at hzd
+    rw [(Ω.graph j).graphHeight_add_smul, add_neg_cancel] at hzd
     exact lt_irrefl _ hzd
   rw [hx hxΩ hxK, mul_zero]
 
 /-- **The zero extension bound for `1/2 < s < 1`** (McLean, Theorem 3.33; Hewett–Moiola,
 Lemma 2.1): a bounded Lipschitz domain has the zero extension bound at `s` with some constant
 `C`, so restriction is an isomorphism of `H̃^s(Ω)` onto `H^s_0(Ω)`
-(`Rd.HasZeroExtensionBound.tildeEquivZeroBoundary`). For `U ∈ T^s(Ω)` and `W` vanishing on `Ω`
-let `Φ = ι_s(U + W)`; then `ι_s U = 1_Ω Φ = ∑_j 1_{Ω_j}(ψ_j Φ) + χ Φ`
+(`Rd.HasZeroExtensionBound.tildeEquivZeroBoundaryOfBound`). For `U ∈ T^s(Ω)` and `W` vanishing on
+`Ω` let `Φ = ι_s(U + W)`; then `ι_s U = 1_Ω Φ = ∑_j 1_{Ω_j}(ψ_j Φ) + χ Φ`
 (`Rd.sobolevToL2_eq_indicatorLp_add`, `Rd.BoundedLipschitzDomain.indicatorLp_eq_sum_add`), each
 `ψ_j Φ` vanishes near the graph of `Ω_j`
 (`Rd.BoundedLipschitzDomain.exists_isCompact_sobolevToL2_add_eq_zero`,
-`Rd.BoundedLipschitzDomain.exists_mul_eq_zero_of_height_lt`), so the extension by zero from `Ω_j`
-(`Rd.LipschitzGraph.exists_modNorm_indicatorLp_le_of_vanish`, `s > 1/2`) and the smooth
+`Rd.BoundedLipschitzDomain.exists_mul_eq_zero_of_graphHeight_lt`), so the extension by zero from
+`Ω_j` (`Rd.LipschitzGraph.exists_modNorm_indicatorLp_le_of_vanish`, `s > 1/2`) and the smooth
 multipliers (`Rd.exists_mul_modNorm_le`, `s < 1`) give `N_s(ι_s U) ≤ C' N_s(Φ)`; the norm of
 `H^s(V)` and `N_s` are equivalent (`Rd.enorm_le_modNorm_sobolevToL2`,
 `Rd.modNorm_sobolevToL2_le`). -/
@@ -217,8 +217,8 @@ theorem exists_hasZeroExtensionBound_of_half_lt (hs : 1 / 2 < s) (hs1 : s < 1) :
   choose G hGae hG using fun j => hψmul j Φ
   obtain ⟨Kc, hKc, hKcΩ, hΦK⟩ := Ω.exists_isCompact_sobolevToL2_add_eq_zero hs0 hU hW
   have hvan : ∀ j, ∃ ε > 0, ∀ᵐ x ∂volume, x ∈ (Ω.graph j).domain →
-      (Ω.graph j).height x < ε → G j x = 0 := fun j => by
-    obtain ⟨ε, hε, h⟩ := Ω.exists_mul_eq_zero_of_height_lt ψ j hKc hKcΩ hΦK
+      (Ω.graph j).graphHeight x < ε → G j x = 0 := fun j => by
+    obtain ⟨ε, hε, h⟩ := Ω.exists_mul_eq_zero_of_graphHeight_lt ψ j hKc hKcΩ hΦK
     refine ⟨ε, hε, ?_⟩
     filter_upwards [h, hGae j] with x hx hGx hxd hxη
     rw [hGx]
@@ -282,24 +282,25 @@ theorem exists_hasZeroExtensionBound (hs0 : 0 ≤ s) (hs : ∀ k : ℕ, s ≠ k 
 bounded `Ω` and `s ≥ 0` of Hewett–Moiola, Lemma 2.1): on a bounded Lipschitz domain, restriction
 is an isomorphism of `H̃^s(Ω)` onto `H^s_0(Ω)`, the isomorphism of the zero extension bound
 (`Rd.BoundedLipschitzDomain.exists_hasZeroExtensionBound`,
-`Rd.HasZeroExtensionBound.tildeEquivZeroBoundary`), with `‖U|_Ω‖ ≤ ‖U‖ ≤ C ‖U|_Ω‖`. With the
-Gelfand triple `H̃^s(Ω) ⊂ L_2(Ω) ⊂ H^{-s}(Ω)` (`Rd.pairing_dualEquiv_pivotDual_tildeToL2`) it
-gives the triple `H^s_0(Ω) ⊂ L_2(Ω) ⊂ H^{-s}(Ω)` up to equivalent norms.
+`Rd.HasZeroExtensionBound.tildeEquivZeroBoundaryOfBound`), with `‖U|_Ω‖ ≤ ‖U‖ ≤ C ‖U|_Ω‖`. With the
+Gelfand triple `H̃^s(Ω) ⊂ L_2(Ω) ⊂ H^{-s}(Ω)`
+(`Rd.sobolevPairing_tildeDualEquiv_pivotDual_tildeToL2`) it gives the triple
+`H^s_0(Ω) ⊂ L_2(Ω) ⊂ H^{-s}(Ω)` up to equivalent norms.
 
 The two spaces sit in different ambient spaces: `H̃^s(Ω)` (`Rd.tildeSpace`) is the closure of the
 test functions of `Ω` in `H^s(V)`, and `H^s_0(Ω)` (`Rd.zeroBoundarySpace`) is the closure of their
 restrictions in `H^s(Ω)`. For `s ≥ 0` and every open `Ω`, restriction maps `H̃^s(Ω)` into
-`H^s_0(Ω)` injectively, with dense range and norm at most `1` (`Rd.tildeToRestrictionL_injective`,
-`Rd.closure_range_tildeToRestrictionL`, `Rd.norm_restrictProj_apply_le`; Hewett–Moiola,
-Lemma 2.2(iii)). It is onto exactly when extending by zero is bounded, `‖U‖ ≤ C ‖U|_Ω‖` on
-`H̃^s(Ω)` (Hewett–Moiola, the list after Lemma 2.9). At `s ∈ 1/2 + ℕ_0` this fails on smooth
-bounded domains (Hewett–Moiola, Remark 2.5). At `s = 1/2` the constant `1` lies in
-`H^{1/2}_0(Ω) = H^{1/2}(Ω)`, but its zero extension `1_Ω` does not lie in `H^{1/2}(V)`, so `1` is
-the restriction of no element of `H̃^{1/2}(Ω)`; this holds for every bounded Lipschitz domain
-(Chandler-Wilde–Hewett–Moiola, Remark 3.32). -/
+`H^s_0(Ω)` injectively, with dense range and norm at most `1`
+(`Rd.tildeToRestrictionL_injective_of_nonneg`, `Rd.closure_range_tildeToRestrictionL`,
+`Rd.norm_restrictProj_apply_le`; Hewett–Moiola, Lemma 2.2(iii)). It is onto exactly when extending
+by zero is bounded, `‖U‖ ≤ C ‖U|_Ω‖` on `H̃^s(Ω)` (Hewett–Moiola, the list after Lemma 2.9). At
+`s ∈ 1/2 + ℕ_0` this fails on smooth bounded domains (Hewett–Moiola, Remark 2.5). At `s = 1/2` the
+constant `1` lies in `H^{1/2}_0(Ω) = H^{1/2}(Ω)`, but its zero extension `1_Ω` does not lie in
+`H^{1/2}(V)`, so `1` is the restriction of no element of `H̃^{1/2}(Ω)`; this holds for every bounded
+Lipschitz domain (Chandler-Wilde–Hewett–Moiola, Remark 3.32). -/
 noncomputable def tildeEquivZeroBoundaryOfNeHalf (hs0 : 0 ≤ s) (hs : ∀ k : ℕ, s ≠ k + 1 / 2) :
     tildeSpace s Ω.toOpens ≃L[ℂ] zeroBoundarySpace s Ω.toOpens :=
-  (Ω.exists_hasZeroExtensionBound hs0 hs).choose_spec.tildeEquivZeroBoundary
+  (Ω.exists_hasZeroExtensionBound hs0 hs).choose_spec.tildeEquivZeroBoundaryOfBound
 
 /-- `Ω.tildeEquivZeroBoundaryOfNeHalf hs0 hs U` is the restriction of `U` to `Ω`. -/
 theorem coe_tildeEquivZeroBoundaryOfNeHalf_apply (hs0 : 0 ≤ s) (hs : ∀ k : ℕ, s ≠ k + 1 / 2)

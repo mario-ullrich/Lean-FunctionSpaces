@@ -40,8 +40,8 @@ extension theorem itself (`Rd.BoundedLipschitzDomain.exists_extendsSobolev`) are
 * **One patch**: the local extension lies in `F^1_{p,2}(V) = W^1_p(V)`
   (`Rd.LocalMeansBump.memTriebelLizorkin_localExtension_of_tlLocalNormOn`), agrees with `f` on the
   patch (`Rd.LocalMeansBump.ae_localExtension_eq_of_ae_eq_indicator`) and has the constant
-  `Rd.LocalMeansBump.extensionConst`
-  (`Rd.LocalMeansBump.enorm_localExtension_add_le_extensionConst`);
+  `Rd.LocalMeansBump.bumpExtensionConst`
+  (`Rd.LocalMeansBump.enorm_localExtension_add_le_bumpExtensionConst`);
   `Rd.ExtendsSobolev p O U C` says that extensions from `U` exist with the constant `C`.
 * **Pasting** (`Rd.extendsSobolev_of_cover`): a smooth resolution of unity subordinate to a finite
   cover pastes extensions in `W^1_p(V)`, by the product rule (`Rd.hasWeakLineDeriv_mulLp`), with
@@ -567,13 +567,14 @@ theorem tlLocalNormOn_le_patchConst [Fact (1 ≤ p)] [Nontrivial V] (hp1 : 1 < p
 /-- The constant `(2 ‖m‖_1 (1 - 2^(-1))⁻¹ + (∑_i C_i) A) C_b` of the extension from one patch, with
 the constants `C_i = Rd.tlToSobolevConst p e_i` of the weak derivatives of `F^1_{p,2}` functions,
 `A = Rd.LocalMeansBump.tlUpperConst b 2 p 2 1` and `C_b = Rd.LocalMeansBump.patchConst b p`. -/
-noncomputable def extensionConst (p : ℝ≥0∞) : ℝ≥0∞ :=
+noncomputable def bumpExtensionConst (p : ℝ≥0∞) : ℝ≥0∞ :=
   (2 * eLpNorm (momentKernel b.toFun 2) 1 volume * (1 - (2 : ℝ≥0∞) ^ (-(1 : ℝ)))⁻¹ +
     (∑ i, tlToSobolevConst p (fun _ : Fin 1 => gridBasis V i)) * b.tlUpperConst 2 p 2 1) *
     b.patchConst p
 
 /-- The constant of the extension from one patch is finite for `1 < p < ∞`. -/
-theorem extensionConst_ne_top {p : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ ∞) : b.extensionConst p ≠ ∞ :=
+theorem bumpExtensionConst_ne_top {p : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ ∞) :
+    b.bumpExtensionConst p ≠ ∞ :=
   ENNReal.mul_ne_top (ENNReal.add_ne_top.2 ⟨ENNReal.mul_ne_top (ENNReal.mul_ne_top
     ENNReal.ofNat_ne_top (eLpNorm_momentKernel_ne_top b.integrable 2))
       (ENNReal.one_sub_two_rpow_neg_inv_ne_top one_pos),
@@ -612,15 +613,16 @@ theorem ae_localExtension_eq_of_ae_eq_indicator [Fact (1 ≤ p)] (hp : p ≠ ∞
 of `F` on `W` is finite and at most `C_b Y`, `C_b = Rd.LocalMeansBump.patchConst b p`, then the
 local extension `E = ∑_j η_j ⋆ 1_W (k_j ⋆ F)` and every family of weak derivatives
 `G_i = ∂_{e_i} E ∈ L_p(V)` satisfy `‖E‖_p + ∑_i ‖G_i‖_p ≤ C Y` with
-`C = Rd.LocalMeansBump.extensionConst b p` (`Rd.exists_hasWeakLineDeriv_of_memTriebelLizorkin`). -/
-theorem enorm_localExtension_add_le_extensionConst [Fact (1 ≤ p)] [Nontrivial V] (hp1 : 1 < p)
+`C = Rd.LocalMeansBump.bumpExtensionConst b p`
+(`Rd.exists_hasWeakLineDeriv_of_memTriebelLizorkin`). -/
+theorem enorm_localExtension_add_le_bumpExtensionConst [Fact (1 ≤ p)] [Nontrivial V] (hp1 : 1 < p)
     (hp : p ≠ ∞) {W : Set V} (hW : MeasurableSet W) {F : Lp ℂ p (volume : Measure V)}
     {Y : ℝ≥0∞} (hX : b.tlLocalNormOn hp hW 2 1 2 F ≤ b.patchConst p * Y)
     (hXf : b.tlLocalNormOn hp hW 2 1 2 F < ∞)
     {G : Fin (finrank ℝ V) → Lp ℂ p (volume : Measure V)}
     (hG : ∀ i, HasWeakLineDeriv ⊤ (fun _ : Fin 1 => gridBasis V i)
       (b.localExtension hp hW 2 F) (G i)) :
-    ‖b.localExtension hp hW 2 F‖ₑ + ∑ i, ‖G i‖ₑ ≤ b.extensionConst p * Y := by
+    ‖b.localExtension hp hW 2 F‖ₑ + ∑ i, ‖G i‖ₑ ≤ b.bumpExtensionConst p * Y := by
   have hTL := b.triebelLizorkinNorm_localExtension_le hp1 hp hW 2 one_pos ENNReal.one_lt_two hXf
   have hmem := b.memTriebelLizorkin_localExtension_of_tlLocalNormOn hp1 hp hW hXf
   have hFn := b.enorm_localExtension_le_of_tlLocalNormOn hp hW 2 one_pos two_ne_zero hXf
@@ -641,7 +643,7 @@ theorem enorm_localExtension_add_le_extensionConst [Fact (1 ≤ p)] [Nontrivial 
     _ ≤ (2 * eLpNorm (momentKernel b.toFun 2) 1 volume * (1 - (2 : ℝ≥0∞) ^ (-(1 : ℝ)))⁻¹ +
         (∑ i, tlToSobolevConst p (fun _ : Fin 1 => gridBasis V i)) * b.tlUpperConst 2 p 2 1) *
         (b.patchConst p * Y) := mul_le_mul_right hX _
-    _ = _ := by rw [extensionConst]; ring
+    _ = _ := by rw [bumpExtensionConst]; ring
 
 end LocalMeansBump
 
@@ -736,8 +738,9 @@ theorem exists_momentKernel_ne_zero_of_divKernel_ne_zero (i : Fin (finrank ℝ V
 /-- **The supports of the dilated divergence kernels**: if the divergence kernel `K_i` vanishes
 outside a closed set `S` with `c y ∈ S ⇒ y ∈ S` for `c ≥ 1`, then every dilate `(K_i)_{2^j}` is
 supported in `S` (`Rd.tsupport_dilate_two_pow_subset`). -/
-theorem tsupport_dilate_divKernel_subset (i : Fin (finrank ℝ V)) {S : Set V} (hS : IsClosed S)
-    (hK : ∀ y, b.divKernel i y ≠ 0 → y ∈ S) (hscale : ∀ c : ℝ, 1 ≤ c → ∀ y, c • y ∈ S → y ∈ S)
+theorem tsupport_dilate_divKernel_subset_of_isClosed (i : Fin (finrank ℝ V)) {S : Set V}
+    (hS : IsClosed S) (hK : ∀ y, b.divKernel i y ≠ 0 → y ∈ S)
+    (hscale : ∀ c : ℝ, 1 ≤ c → ∀ y, c • y ∈ S → y ∈ S)
     (j : ℕ) : tsupport (dilate (2 ^ j) (b.divKernel i : V → ℂ)) ⊆ S :=
   tsupport_dilate_two_pow_subset hS hK hscale j
 
@@ -745,7 +748,7 @@ theorem tsupport_dilate_divKernel_subset (i : Fin (finrank ℝ V)) {S : Set V} (
 in the closed ball of radius `2R`. -/
 theorem tsupport_dilate_divKernel_subset_closedBall (i : Fin (finrank ℝ V)) (j : ℕ) :
     tsupport (dilate (2 ^ j) (b.divKernel i : V → ℂ)) ⊆ closedBall 0 (2 * b.radius) := by
-  refine b.tsupport_dilate_divKernel_subset i isClosed_closedBall (fun y hy => ?_)
+  refine b.tsupport_dilate_divKernel_subset_of_isClosed i isClosed_closedBall (fun y hy => ?_)
     (fun c hc y hy => ?_) j
   · obtain ⟨t, ht1, -, ht⟩ := b.exists_momentKernel_ne_zero_of_divKernel_ne_zero i hy
     have h := not_lt.1 fun h => ht (b.momentKernel_two_eq_zero h)
@@ -770,12 +773,12 @@ theorem tsupport_dilate_divKernel_subset {b : LocalMeansBump V} (hb : G.ConeSupp
     (i : Fin (finrank ℝ V)) (j : ℕ) :
     tsupport (dilate (2 ^ j) (b.divKernel i : V → ℂ)) ⊆
       {y | -y ∈ G.closedCone} ∩ closedBall 0 (2 * b.radius) := by
-  refine Set.subset_inter (b.tsupport_dilate_divKernel_subset i
+  refine Set.subset_inter (b.tsupport_dilate_divKernel_subset_of_isClosed i
     (G.isClosed_closedCone.preimage continuous_neg) (fun y hy => ?_) (fun c hc y hy => ?_) j)
     (b.tsupport_dilate_divKernel_subset_closedBall i j)
   · obtain ⟨t, ht1, -, ht⟩ := b.exists_momentKernel_ne_zero_of_divKernel_ne_zero i hy
     have h := G.smul_mem_closedCone (inv_nonneg.2 (zero_le_one.trans ht1))
-      (G.cone_subset_closedCone (G.coneSupported_momentKernel_of hb 2 _ ht))
+      (G.graphCone_subset_closedCone (G.coneSupported_momentKernel_of hb 2 _ ht))
     rwa [smul_neg, inv_smul_smul₀ (zero_lt_one.trans_le ht1).ne'] at h
   · have h := G.smul_mem_closedCone (inv_nonneg.2 (zero_le_one.trans hc)) hy
     rwa [smul_neg, inv_smul_smul₀ (zero_lt_one.trans_le hc).ne'] at h

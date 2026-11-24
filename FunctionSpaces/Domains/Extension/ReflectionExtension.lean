@@ -16,20 +16,21 @@ public import FunctionSpaces.Domains.Lipschitz.GraphStraightening
 Let `Ω = {x : φ(x) < ⟪x, e⟫}` be a Lipschitz graph domain (`Rd.LipschitzGraph`) with the
 flattening `F(x) = x - φ(x) e` and its inverse `F⁻¹(y) = y + φ(y) e`.
 
-* **Flattening** (`Rd.LipschitzGraph.mapsTo_flatten`,
+* **Flattening** (`Rd.LipschitzGraph.mapsTo_graphFlatten`,
   `Rd.LipschitzGraph.mapsTo_unflatten_inter_ball`): `F` maps `Ω` into the half-space
   `H₊ = {⟪y, e⟫ > 0}` and `F⁻¹` maps `H₊ ∩ B(0, R)` into `Ω ∩ B(0, R')`. Both preserve Lebesgue
-  measure (`Rd.LipschitzGraph.measurePreserving_flatten`,
+  measure (`Rd.LipschitzGraph.measurePreserving_graphFlatten`,
   `Rd.LipschitzGraph.measurePreserving_unflatten`).
 * **The extension by reflection** (`Rd.LipschitzGraph.reflectionExtension`): the even reflection
   (`Rd.evenReflection`) of `f ∘ F⁻¹` across `e^⊥`, composed with `F`. It is `f` on `Ω` and
   `f ∘ R` below the graph, for the graph reflection `R = F⁻¹ ∘ σ ∘ F`
-  (`Rd.LipschitzGraph.reflect_eq`). It is linear (`Rd.LipschitzGraph.reflectionExtensionLinearMap`)
-  and sees only the values on `Ω` (`Rd.LipschitzGraph.reflectionExtension_congr_ae`). If `f` and
-  its weak derivatives on `Ω` are integrable on the bounded parts of `Ω`, it is weakly
-  differentiable on `V` (`Rd.LipschitzGraph.hasWeakLineDeriv_reflectionExtension_of_integrableOn`,
-  by the chain rule `Rd.HasWeakLineDeriv.comp_lipschitzWith` for `F⁻¹` and for `F`); for
-  `1 ≤ p ≤ ∞` and `f ∈ W^1_p(Ω)`, with `‖E f‖_{L_p(V)} ≤ 2 ‖f‖_{L_p(Ω)}` and
+  (`Rd.LipschitzGraph.graphReflect_eq`). It is linear
+  (`Rd.LipschitzGraph.reflectionExtensionLinearMap`) and sees only the values on `Ω`
+  (`Rd.LipschitzGraph.reflectionExtension_congr_ae`). If `f` and its weak derivatives on `Ω` are
+  integrable on the bounded parts of `Ω`, it is weakly differentiable on `V`
+  (`Rd.LipschitzGraph.hasWeakLineDeriv_reflectionExtension_of_integrableOn`, by the chain rule
+  `Rd.HasWeakLineDeriv.comp_lipschitzWith` for `F⁻¹` and for `F`); for `1 ≤ p ≤ ∞` and
+  `f ∈ W^1_p(Ω)`, with `‖E f‖_{L_p(V)} ≤ 2 ‖f‖_{L_p(Ω)}` and
   `‖∂_v E f‖_{L_p(V)} ≤ 2 (1 + M)² ‖v‖ ∑_i ‖∂_{e_i} f‖_{L_p(Ω)}`.
 * **Bounded Lipschitz domains**: a boundary patch extends by a cutoff
   (`Rd.BoundedLipschitzDomain.hasWeakLineDeriv_mul_graph`) and the reflection in its graph domain
@@ -57,18 +58,18 @@ section Flattening
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] (Ω : LipschitzGraph V)
 
 /-- **The flattening maps the domain into the half-space** `H₊ = {⟪y, e⟫ > 0}`
-(`Rd.LipschitzGraph.inner_flatten`). -/
-theorem mapsTo_flatten : MapsTo Ω.flatten Ω.domain (openHalfSpace Ω.e) := fun x hx => by
+(`Rd.LipschitzGraph.inner_graphFlatten`). -/
+theorem mapsTo_graphFlatten : MapsTo Ω.graphFlatten Ω.domain (openHalfSpace Ω.e) := fun x hx => by
   have hx' : Ω.phi x < inner ℝ x Ω.e := hx
-  show 0 < inner ℝ (Ω.flatten x) Ω.e
-  rw [Ω.inner_flatten]
+  show 0 < inner ℝ (Ω.graphFlatten x) Ω.e
+  rw [Ω.inner_graphFlatten]
   linarith
 
 /-- **The inverse flattening maps the half-space into the domain**: `⟪y, e⟫ > 0` gives
 `y + φ(y) e ∈ Ω`, since its flattening is `y`. -/
 theorem mapsTo_unflatten : MapsTo Ω.unflatten (openHalfSpace Ω.e) Ω.domain := fun y hy => by
-  have h := Ω.inner_flatten (Ω.unflatten y)
-  rw [Ω.flatten_unflatten] at h
+  have h := Ω.inner_graphFlatten (Ω.unflatten y)
+  rw [Ω.graphFlatten_unflatten] at h
   have hy' : 0 < inner ℝ y Ω.e := hy
   show Ω.phi (Ω.unflatten y) < inner ℝ (Ω.unflatten y) Ω.e
   linarith
@@ -98,48 +99,49 @@ variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] (Ω : Lips
 
 /-- The **reflection across the graph** `x ↦ x + 2(φ(x) - ⟪x, e⟫) e`: it moves `x` along `e` to the
 point at the same distance on the other side of the graph. -/
-def reflect (x : V) : V := x + (2 * (Ω.phi x - inner ℝ x Ω.e)) • Ω.e
+def graphReflect (x : V) : V := x + (2 * (Ω.phi x - inner ℝ x Ω.e)) • Ω.e
 
 /-- **The graph reflection in flat coordinates**: it is the reflection `σ` across the hyperplane
 `e^⊥` after the flattening, followed by the inverse flattening. -/
-theorem reflect_eq : Ω.reflect = Ω.unflatten ∘ halfSpaceReflection Ω.e ∘ Ω.flatten := by
+theorem graphReflect_eq :
+    Ω.graphReflect = Ω.unflatten ∘ halfSpaceReflection Ω.e ∘ Ω.graphFlatten := by
   funext x
-  simp only [Function.comp_apply, reflect, unflatten]
-  rw [halfSpaceReflection_apply Ω.norm_e, Ω.inner_flatten]
-  have hφ : Ω.phi (Ω.flatten x - (2 * (inner ℝ x Ω.e - Ω.phi x)) • Ω.e) = Ω.phi x := by
-    rw [Ω.phi_sub_smul, flatten, Ω.phi_sub_smul]
-  rw [hφ, flatten]
+  simp only [Function.comp_apply, graphReflect, unflatten]
+  rw [halfSpaceReflection_apply Ω.norm_e, Ω.inner_graphFlatten]
+  have hφ : Ω.phi (Ω.graphFlatten x - (2 * (inner ℝ x Ω.e - Ω.phi x)) • Ω.e) = Ω.phi x := by
+    rw [Ω.phi_sub_smul, graphFlatten, Ω.phi_sub_smul]
+  rw [hφ, graphFlatten]
   module
 
 /-- The graph reflection is an involution. -/
-theorem reflect_reflect (x : V) : Ω.reflect (Ω.reflect x) = x := by
-  simp only [reflect_eq, Function.comp_apply, flatten_unflatten,
-    halfSpaceReflection_halfSpaceReflection, unflatten_flatten]
+theorem graphReflect_graphReflect (x : V) : Ω.graphReflect (Ω.graphReflect x) = x := by
+  simp only [graphReflect_eq, Function.comp_apply, graphFlatten_unflatten,
+    halfSpaceReflection_halfSpaceReflection, unflatten_graphFlatten]
 
 /-- The **extension by reflection** of a function `u` on the graph domain `Ω`: the even reflection
 (`Rd.evenReflection`) of `u ∘ F⁻¹` across `e^⊥` in the flat coordinates `F(x) = x - φ(x) e`, that
 is `u` on `Ω` (`Rd.LipschitzGraph.reflectionExtension_of_mem`) and `u` after the graph reflection
 below the graph (`Rd.LipschitzGraph.reflectionExtension_of_lt`). -/
 noncomputable def reflectionExtension (u : V → ℂ) : V → ℂ :=
-  evenReflection Ω.e (u ∘ Ω.unflatten) ∘ Ω.flatten
+  evenReflection Ω.e (u ∘ Ω.unflatten) ∘ Ω.graphFlatten
 
 /-- On the graph domain the extension by reflection of `u` is `u`. -/
 theorem reflectionExtension_of_mem (u : V → ℂ) {x : V} (hx : x ∈ Ω.domain) :
     Ω.reflectionExtension u x = u x := by
   rw [reflectionExtension, Function.comp_apply,
-    evenReflection_of_mem Ω.norm_e _ (Ω.mapsTo_flatten hx), Function.comp_apply,
-    unflatten_flatten]
+    evenReflection_of_mem Ω.norm_e _ (Ω.mapsTo_graphFlatten hx), Function.comp_apply,
+    unflatten_graphFlatten]
 
 /-- Below the graph, `⟪x, e⟫ < φ(x)`, the extension by reflection of `u` is `u` at the reflected
 point. -/
 theorem reflectionExtension_of_lt (u : V → ℂ) {x : V} (hx : inner ℝ x Ω.e < Ω.phi x) :
-    Ω.reflectionExtension u x = u (Ω.reflect x) := by
-  have h : halfSpaceReflection Ω.e (Ω.flatten x) ∈ openHalfSpace Ω.e := by
-    show 0 < inner ℝ (halfSpaceReflection Ω.e (Ω.flatten x)) Ω.e
-    rw [inner_halfSpaceReflection Ω.norm_e, Ω.inner_flatten]
+    Ω.reflectionExtension u x = u (Ω.graphReflect x) := by
+  have h : halfSpaceReflection Ω.e (Ω.graphFlatten x) ∈ openHalfSpace Ω.e := by
+    show 0 < inner ℝ (halfSpaceReflection Ω.e (Ω.graphFlatten x)) Ω.e
+    rw [inner_halfSpaceReflection Ω.norm_e, Ω.inner_graphFlatten]
     linarith
   rw [reflectionExtension, Function.comp_apply, evenReflection_of_reflection_mem Ω.norm_e _ h,
-    reflect_eq]
+    graphReflect_eq]
   rfl
 
 /-- The extension by reflection is additive (`Rd.evenReflection_add`). -/
@@ -170,11 +172,11 @@ theorem reflectionExtensionLinearMap_apply (u : V → ℂ) :
 
 variable [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V]
 
-/-- The graph reflection preserves the Lebesgue measure (`Rd.LipschitzGraph.reflect_eq`). -/
-theorem measurePreserving_reflect : MeasurePreserving Ω.reflect volume volume := by
-  rw [reflect_eq]
+/-- The graph reflection preserves the Lebesgue measure (`Rd.LipschitzGraph.graphReflect_eq`). -/
+theorem measurePreserving_graphReflect : MeasurePreserving Ω.graphReflect volume volume := by
+  rw [graphReflect_eq]
   exact Ω.measurePreserving_unflatten.comp
-    ((measurePreserving_halfSpaceReflection Ω.e).comp Ω.measurePreserving_flatten)
+    ((measurePreserving_halfSpaceReflection Ω.e).comp Ω.measurePreserving_graphFlatten)
 
 /-- **The extension by reflection sees only the values on the graph domain**: if `u = u'` almost
 everywhere on the graph domain, then their extensions by reflection agree almost everywhere on
@@ -193,7 +195,7 @@ theorem reflectionExtension_congr_ae {u u' : V → ℂ} (h : u =ᵐ[volume.restr
   have h3 : evenReflection Ω.e (u ∘ Ω.unflatten) =ᵐ[volume]
       evenReflection Ω.e (u' ∘ Ω.unflatten) :=
     h2.add ((measurePreserving_halfSpaceReflection Ω.e).quasiMeasurePreserving.ae_eq_comp h2)
-  exact Ω.measurePreserving_flatten.quasiMeasurePreserving.ae_eq_comp h3
+  exact Ω.measurePreserving_graphFlatten.quasiMeasurePreserving.ae_eq_comp h3
 
 end Reflection
 
@@ -257,10 +259,10 @@ flat coordinates (`Rd.LipschitzGraph.flatDeriv`) and `σ` the reflection across 
 weak derivative `∂_v` of the extension by reflection on `V`
 (`Rd.LipschitzGraph.hasWeakLineDeriv_reflectionExtension`). -/
 noncomputable def reflectionDeriv (g : Fin (finrank ℝ V) → V → ℂ) (v x : V) : ℂ :=
-  (openHalfSpace Ω.e : Set V).indicator (Ω.flatDeriv g (fderiv ℝ Ω.flatten x v)) (Ω.flatten x) +
-    (openHalfSpace Ω.e : Set V).indicator
-      (Ω.flatDeriv g (halfSpaceReflection Ω.e (fderiv ℝ Ω.flatten x v)))
-      (halfSpaceReflection Ω.e (Ω.flatten x))
+  (openHalfSpace Ω.e : Set V).indicator (Ω.flatDeriv g (fderiv ℝ Ω.graphFlatten x v))
+    (Ω.graphFlatten x) + (openHalfSpace Ω.e : Set V).indicator
+      (Ω.flatDeriv g (halfSpaceReflection Ω.e (fderiv ℝ Ω.graphFlatten x v)))
+      (halfSpaceReflection Ω.e (Ω.graphFlatten x))
 
 /-- **The chain rule collapses the basis sum**: for every `a` and `y`,
 `∑_k ⟪a, e_k⟫ (1_{H₊}(D_{e_k})(y) + 1_{H₊}(D_{σ e_k})(σ y)) = 1_{H₊}(D_a)(y) + 1_{H₊}(D_{σ a})(σ y)`
@@ -292,13 +294,14 @@ theorem sum_inner_mul_indicator_flatDeriv (a y : V) :
 `σ` preserves norms and `Rd.LipschitzGraph.norm_flatDeriv_le`. -/
 theorem norm_reflectionDeriv_le (v x : V) :
     ‖Ω.reflectionDeriv g v x‖ ≤ (1 + Ω.M) ^ 2 * ‖v‖ *
-      ((openHalfSpace Ω.e : Set V).indicator (fun y => ∑ i, ‖g i (Ω.unflatten y)‖) (Ω.flatten x) +
+      ((openHalfSpace Ω.e : Set V).indicator (fun y => ∑ i, ‖g i (Ω.unflatten y)‖)
+        (Ω.graphFlatten x) +
         (openHalfSpace Ω.e : Set V).indicator (fun y => ∑ i, ‖g i (Ω.unflatten y)‖)
-          (halfSpaceReflection Ω.e (Ω.flatten x))) := by
+          (halfSpaceReflection Ω.e (Ω.graphFlatten x))) := by
   have hM : 0 ≤ 1 + Ω.M := add_nonneg zero_le_one Ω.M_nonneg
-  have hA : ‖fderiv ℝ Ω.flatten x v‖ ≤ (1 + Ω.M) * ‖v‖ :=
-    ((fderiv ℝ Ω.flatten x).le_opNorm v).trans
-      (mul_le_mul_of_nonneg_right (norm_fderiv_le_of_lipschitz ℝ Ω.lipschitzWith_flatten)
+  have hA : ‖fderiv ℝ Ω.graphFlatten x v‖ ≤ (1 + Ω.M) * ‖v‖ :=
+    ((fderiv ℝ Ω.graphFlatten x).le_opNorm v).trans
+      (mul_le_mul_of_nonneg_right (norm_fderiv_le_of_lipschitz ℝ Ω.lipschitzWith_graphFlatten)
         (norm_nonneg v))
   have hb : ∀ w y : V, ‖w‖ ≤ (1 + Ω.M) * ‖v‖ →
       ‖(openHalfSpace Ω.e : Set V).indicator (Ω.flatDeriv g w) y‖ ≤ (1 + Ω.M) ^ 2 * ‖v‖ *
@@ -400,7 +403,7 @@ theorem hasWeakLineDeriv_reflectionExtension_of_integrableOn {f : V → ℂ}
       (fun w => Ω.integrableOn_flatDeriv_inter_ball hg w)
       (Ω.hasWeakLineDeriv_comp_unflatten hfg) w
   have h := HasWeakLineDeriv.comp_lipschitzWith (O := ⊤) (U := ⊤) (fun k => hE (gridBasis V k))
-    Ω.lipschitzWith_flatten Ω.measurePreserving_flatten (fun _ _ => trivial) v
+    Ω.lipschitzWith_graphFlatten Ω.measurePreserving_graphFlatten (fun _ _ => trivial) v
   exact h.congr_ae EventuallyEq.rfl (ae_of_all _ fun x =>
     Ω.sum_inner_mul_indicator_flatDeriv _ _)
 
@@ -422,7 +425,7 @@ measure). -/
 theorem eLpNorm_reflectionExtension_le {p : ℝ≥0∞} (hp : 1 ≤ p) (f : V → ℂ) :
     eLpNorm (Ω.reflectionExtension f) p volume ≤ 2 * eLpNorm f p (volume.restrict Ω.domain) := by
   have h1 := eLpNorm_comp_le_of_mapsTo (h := evenReflection Ω.e (f ∘ Ω.unflatten)) (U := univ)
-    Ω.measurePreserving_flatten MeasurableSet.univ (mapsTo_univ _ _) p
+    Ω.measurePreserving_graphFlatten MeasurableSet.univ (mapsTo_univ _ _) p
   rw [Measure.restrict_univ] at h1
   calc eLpNorm (Ω.reflectionExtension f) p volume
       ≤ eLpNorm (evenReflection Ω.e (f ∘ Ω.unflatten)) p volume := h1
@@ -470,10 +473,10 @@ theorem eLpNorm_reflectionDeriv_le {p : ℝ≥0∞} (hp : 1 ≤ p) {f : V → �
   set Ψ : V → ℝ := fun y => (openHalfSpace Ω.e : Set V).indicator S y +
     (openHalfSpace Ω.e : Set V).indicator S (halfSpaceReflection Ω.e y)
   have h1 := eLpNorm_comp_le_of_mapsTo (h := Ψ) (U := univ)
-    Ω.measurePreserving_flatten MeasurableSet.univ (mapsTo_univ _ _) p
+    Ω.measurePreserving_graphFlatten MeasurableSet.univ (mapsTo_univ _ _) p
   rw [Measure.restrict_univ] at h1
   calc eLpNorm (Ω.reflectionDeriv g v) p volume
-      ≤ eLpNorm (((1 + Ω.M) ^ 2 * ‖v‖) • (Ψ ∘ Ω.flatten)) p volume :=
+      ≤ eLpNorm (((1 + Ω.M) ^ 2 * ‖v‖) • (Ψ ∘ Ω.graphFlatten)) p volume :=
         eLpNorm_mono_real hm fun x => (Ω.norm_reflectionDeriv_le v x).trans_eq rfl
     _ ≤ ‖(1 + Ω.M) ^ 2 * ‖v‖‖ₑ * eLpNorm Ψ p volume :=
         eLpNorm_const_smul_le.trans (by gcongr)

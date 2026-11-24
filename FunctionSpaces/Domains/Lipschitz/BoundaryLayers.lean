@@ -26,16 +26,16 @@ Lipschitz domain is a layer of width `≲ ‖h‖` along the boundary.
   (`Rd.measurableSet_switchSet`, `Rd.volume_switchSet_le`), from Mathlib's
   `MeasurableSet.symmDiff` and `Set.symmDiff_subset_union`.
 * **The height above a graph.** For a Lipschitz graph domain `{x : φ(x) < ⟪x, e⟫}` the height
-  `η(x) = ⟪x, e⟫ - φ(x)` (`Rd.LipschitzGraph.height`) is continuous
-  (`Rd.LipschitzGraph.continuous_height`), positive exactly on the domain
-  (`Rd.LipschitzGraph.mem_domain_iff_height_pos`), grows by `r` along `r e`
-  (`Rd.LipschitzGraph.height_add_smul`), is the last coordinate of the graph coordinates
-  `(x', t) ↦ γ(x') + t e` (`Rd.LipschitzGraph.height_graphEquiv`), and is `(1 + M)`-Lipschitz
-  (`Rd.LipschitzGraph.abs_height_add_sub_le`). A switch point of the graph domain for the step
-  `h` has `|η(x)| ≤ (1 + M) ‖h‖` (`Rd.LipschitzGraph.abs_height_le_of_mem_switchSet`), and the
+  `η(x) = ⟪x, e⟫ - φ(x)` (`Rd.LipschitzGraph.graphHeight`) is continuous
+  (`Rd.LipschitzGraph.continuous_graphHeight`), positive exactly on the domain
+  (`Rd.LipschitzGraph.mem_domain_iff_graphHeight_pos`), grows by `r` along `r e`
+  (`Rd.LipschitzGraph.graphHeight_add_smul`), is the last coordinate of the graph coordinates
+  `(x', t) ↦ γ(x') + t e` (`Rd.LipschitzGraph.graphHeight_graphEquiv`), and is `(1 + M)`-Lipschitz
+  (`Rd.LipschitzGraph.abs_graphHeight_add_sub_le`). A switch point of the graph domain for the step
+  `h` has `|η(x)| ≤ (1 + M) ‖h‖` (`Rd.LipschitzGraph.abs_graphHeight_le_of_mem_switchSet`), and the
   slab `{|η| ≤ δ}` meets a closed ball of radius `ρ` in a set of volume at most
-  `2 δ ρ^(n-1) |B^{n-1}_1|` (`Rd.LipschitzGraph.volume_abs_height_le_inter_closedBall`), since the
-  graph coordinates preserve the Lebesgue measure.
+  `2 δ ρ^(n-1) |B^{n-1}_1|` (`Rd.LipschitzGraph.volume_abs_graphHeight_le_inter_closedBall`), since
+  the graph coordinates preserve the Lebesgue measure.
 * **The layer of a bounded Lipschitz domain**
   (`Rd.BoundedLipschitzDomain.exists_volume_switchSet_inter_closedBall_le`): there is `C < ∞` with
   `|S_h(Ω) ∩ B̄(c, ρ)| ≤ C ‖h‖ ρ^(n-1)` for all `c`, `h` and `ρ ≥ ‖h‖`. For short steps every
@@ -138,38 +138,39 @@ namespace LipschitzGraph
 variable (Ω : LipschitzGraph V)
 
 /-- The **height** `η(x) = ⟪x, e⟫ - φ(x)` of `x` above the graph of `Ω`; it is positive exactly on
-the domain (`Rd.LipschitzGraph.mem_domain_iff_height_pos`). -/
-def height (x : V) : ℝ := inner ℝ x Ω.e - Ω.phi x
+the domain (`Rd.LipschitzGraph.mem_domain_iff_graphHeight_pos`). -/
+def graphHeight (x : V) : ℝ := inner ℝ x Ω.e - Ω.phi x
 
 /-- The height `η(x) = ⟪x, e⟫ - φ(x)` is continuous. -/
-theorem continuous_height : Continuous Ω.height :=
+theorem continuous_graphHeight : Continuous Ω.graphHeight :=
   (continuous_id.inner continuous_const).sub Ω.continuous_phi
 
 /-- `x` lies in the graph domain iff its height is positive. -/
-theorem mem_domain_iff_height_pos (x : V) : x ∈ Ω.domain ↔ 0 < Ω.height x := by
+theorem mem_domain_iff_graphHeight_pos (x : V) : x ∈ Ω.domain ↔ 0 < Ω.graphHeight x := by
   show Ω.phi x < inner ℝ x Ω.e ↔ 0 < inner ℝ x Ω.e - Ω.phi x
   exact sub_pos.symm
 
 /-- **The height grows by `r` along `r e`**: `η(x + r e) = η(x) + r`, since `⟪e, e⟫ = 1` and `φ`
 is constant along `e`. -/
-theorem height_add_smul (x : V) (r : ℝ) : Ω.height (x + r • Ω.e) = Ω.height x + r := by
-  rw [height, height, inner_add_left, real_inner_smul_left, Ω.inner_e_self, Ω.const]
+theorem graphHeight_add_smul (x : V) (r : ℝ) :
+    Ω.graphHeight (x + r • Ω.e) = Ω.graphHeight x + r := by
+  rw [graphHeight, graphHeight, inner_add_left, real_inner_smul_left, Ω.inner_e_self, Ω.const]
   ring
 
 /-- The points `γ(x') = x' + φ(x') e` of the graph have height `0`. -/
-theorem height_graphMap (x' : Ω.hyperplane) : Ω.height (Ω.graphMap x') = 0 := by
-  rw [height, Ω.inner_graphMap, Ω.phi_graphMap, sub_self]
+theorem graphHeight_graphMap (x' : Ω.hyperplane) : Ω.graphHeight (Ω.graphMap x') = 0 := by
+  rw [graphHeight, Ω.inner_graphMap, Ω.phi_graphMap, sub_self]
 
 /-- **The height is `(1 + M)`-Lipschitz**: `|η(x + h) - η(x)| ≤ (1 + M) ‖h‖`, from
 `|⟪h, e⟫| ≤ ‖h‖` (Cauchy–Schwarz, `‖e‖ = 1`) and the Lipschitz bound of `φ`. -/
-theorem abs_height_add_sub_le (x h : V) :
-    |Ω.height (x + h) - Ω.height x| ≤ (1 + Ω.M) * ‖h‖ := by
+theorem abs_graphHeight_add_sub_le (x h : V) :
+    |Ω.graphHeight (x + h) - Ω.graphHeight x| ≤ (1 + Ω.M) * ‖h‖ := by
   have h1 := abs_real_inner_le_norm h Ω.e
   rw [Ω.norm_e, mul_one] at h1
   have h2 := Ω.lipschitz (x + h) x
   rw [add_sub_cancel_left] at h2
-  have e : Ω.height (x + h) - Ω.height x = inner ℝ h Ω.e - (Ω.phi (x + h) - Ω.phi x) := by
-    simp only [height, inner_add_left]
+  have e : Ω.graphHeight (x + h) - Ω.graphHeight x = inner ℝ h Ω.e - (Ω.phi (x + h) - Ω.phi x) := by
+    simp only [graphHeight, inner_add_left]
     ring
   obtain ⟨a1, a2⟩ := abs_le.1 h1
   obtain ⟨b1, b2⟩ := abs_le.1 h2
@@ -179,13 +180,13 @@ theorem abs_height_add_sub_le (x h : V) :
 /-- **Switch points of a graph domain lie near the graph**: if exactly one of `x` and `x + h` lies
 in the domain (`Rd.switchSet_eq_symmDiff`, Mathlib's `Set.mem_symmDiff`), then
 `|η(x)| ≤ (1 + M) ‖h‖`, since `η` changes sign between `x` and `x + h`
-(`Rd.LipschitzGraph.mem_domain_iff_height_pos`) and is `(1 + M)`-Lipschitz
-(`Rd.LipschitzGraph.abs_height_add_sub_le`). -/
-theorem abs_height_le_of_mem_switchSet {h x : V} (hx : x ∈ switchSet Ω.domain h) :
-    |Ω.height x| ≤ (1 + Ω.M) * ‖h‖ := by
-  obtain ⟨hd1, hd2⟩ := abs_le.1 (Ω.abs_height_add_sub_le x h)
-  simp only [switchSet_eq_symmDiff, Set.mem_symmDiff, mem_preimage, Ω.mem_domain_iff_height_pos,
-    not_lt] at hx
+(`Rd.LipschitzGraph.mem_domain_iff_graphHeight_pos`) and is `(1 + M)`-Lipschitz
+(`Rd.LipschitzGraph.abs_graphHeight_add_sub_le`). -/
+theorem abs_graphHeight_le_of_mem_switchSet {h x : V} (hx : x ∈ switchSet Ω.domain h) :
+    |Ω.graphHeight x| ≤ (1 + Ω.M) * ‖h‖ := by
+  obtain ⟨hd1, hd2⟩ := abs_le.1 (Ω.abs_graphHeight_add_sub_le x h)
+  simp only [switchSet_eq_symmDiff, Set.mem_symmDiff, mem_preimage,
+    Ω.mem_domain_iff_graphHeight_pos, not_lt] at hx
   rw [abs_le]
   rcases hx with ⟨h0, h1⟩ | ⟨h1, h0⟩ <;> constructor <;> linarith
 
@@ -194,41 +195,41 @@ section Coordinates
 variable [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V]
 
 /-- **The height is the last graph coordinate**: `η(γ(x') + t e) = t`
-(`Rd.LipschitzGraph.height_add_smul`, `Rd.LipschitzGraph.height_graphMap`). -/
-theorem height_graphEquiv (p : Ω.hyperplane × ℝ) : Ω.height (Ω.graphEquiv p) = p.2 := by
-  rw [graphEquiv_apply, height_add_smul, height_graphMap, zero_add]
+(`Rd.LipschitzGraph.graphHeight_add_smul`, `Rd.LipschitzGraph.graphHeight_graphMap`). -/
+theorem graphHeight_graphEquiv (p : Ω.hyperplane × ℝ) : Ω.graphHeight (Ω.graphEquiv p) = p.2 := by
+  rw [graphEquiv_apply, graphHeight_add_smul, graphHeight_graphMap, zero_add]
 
 /-- **The projection of the graph coordinates is the first coordinate**: `P(γ(x') + t e) = x'`,
 since `P e = 0` and `P γ(x') = x'`. -/
-theorem proj_graphEquiv (p : Ω.hyperplane × ℝ) : Ω.proj (Ω.graphEquiv p) = p.1 := by
-  rw [graphEquiv_apply, map_add, map_smul, Ω.proj_e, smul_zero, add_zero, Ω.proj_graphMap]
+theorem graphProj_graphEquiv (p : Ω.hyperplane × ℝ) : Ω.graphProj (Ω.graphEquiv p) = p.1 := by
+  rw [graphEquiv_apply, map_add, map_smul, Ω.graphProj_e, smul_zero, add_zero, Ω.graphProj_graphMap]
 
 /-- **The slab `{|η| ≤ δ}` inside a ball**: `|{|η| ≤ δ} ∩ B̄(c, ρ)| ≤ 2 δ ρ^(n-1) |B^H_1|` for
 `ρ ≥ 0` and every real `δ`, with `B^H_1` the unit ball of the hyperplane `H = e^⊥` of dimension
 `n - 1`; for `δ < 0` the set is empty and the bound reads `0`. In graph
 coordinates `(x', t)` the set lies in `B̄^H(Pc, ρ) × [-δ, δ]`
-(`Rd.LipschitzGraph.height_graphEquiv`,
-`Rd.LipschitzGraph.proj_graphEquiv`, `‖P‖ ≤ 1`), and the graph coordinates preserve the Lebesgue
-measure (`Rd.LipschitzGraph.measurePreserving_graphEquiv`; Mathlib's
+(`Rd.LipschitzGraph.graphHeight_graphEquiv`,
+`Rd.LipschitzGraph.graphProj_graphEquiv`, `‖P‖ ≤ 1`), and the graph coordinates preserve the
+Lebesgue measure (`Rd.LipschitzGraph.measurePreserving_graphEquiv`; Mathlib's
 `MeasurePreserving.measure_preimage_equiv`, for every set). -/
-theorem volume_abs_height_le_inter_closedBall (c : V) {ρ : ℝ} (hρ : 0 ≤ ρ) (δ : ℝ) :
-    volume ({x | |Ω.height x| ≤ δ} ∩ closedBall c ρ) ≤
+theorem volume_abs_graphHeight_le_inter_closedBall (c : V) {ρ : ℝ} (hρ : 0 ≤ ρ) (δ : ℝ) :
+    volume ({x | |Ω.graphHeight x| ≤ δ} ∩ closedBall c ρ) ≤
       ENNReal.ofReal (2 * δ) * ENNReal.ofReal ρ ^ (finrank ℝ V - 1) *
         volume (ball (0 : Ω.hyperplane) 1) := by
-  have hsub : Ω.graphEquiv ⁻¹' ({x | |Ω.height x| ≤ δ} ∩ closedBall c ρ) ⊆
-      closedBall (Ω.proj c) ρ ×ˢ Icc (-δ) δ := by
+  have hsub : Ω.graphEquiv ⁻¹' ({x | |Ω.graphHeight x| ≤ δ} ∩ closedBall c ρ) ⊆
+      closedBall (Ω.graphProj c) ρ ×ˢ Icc (-δ) δ := by
     rintro p ⟨h1, h2⟩
-    have h1' : |p.2| ≤ δ := by simpa only [mem_ofPred_eq, Ω.height_graphEquiv] using h1
+    have h1' : |p.2| ≤ δ := by simpa only [mem_ofPred_eq, Ω.graphHeight_graphEquiv] using h1
     refine ⟨?_, abs_le.1 h1'⟩
-    rw [mem_closedBall, dist_eq_norm, ← Ω.proj_graphEquiv p, ← map_sub]
-    refine (Ω.norm_proj_le _).trans ?_
+    rw [mem_closedBall, dist_eq_norm, ← Ω.graphProj_graphEquiv p, ← map_sub]
+    refine (Ω.norm_graphProj_le _).trans ?_
     rw [mem_closedBall, dist_eq_norm] at h2
     exact h2
-  calc volume ({x | |Ω.height x| ≤ δ} ∩ closedBall c ρ)
-      = (volume.prod volume) (Ω.graphEquiv ⁻¹' ({x | |Ω.height x| ≤ δ} ∩ closedBall c ρ)) :=
+  calc volume ({x | |Ω.graphHeight x| ≤ δ} ∩ closedBall c ρ)
+      = (volume.prod volume) (Ω.graphEquiv ⁻¹' ({x | |Ω.graphHeight x| ≤ δ} ∩ closedBall c ρ)) :=
         (Ω.measurePreserving_graphEquiv.measure_preimage_equiv _).symm
-    _ ≤ (volume.prod volume) (closedBall (Ω.proj c) ρ ×ˢ Icc (-δ) δ) := measure_mono hsub
-    _ = volume (closedBall (Ω.proj c) ρ) * volume (Icc (-δ) δ) := Measure.prod_prod _ _
+    _ ≤ (volume.prod volume) (closedBall (Ω.graphProj c) ρ ×ˢ Icc (-δ) δ) := measure_mono hsub
+    _ = volume (closedBall (Ω.graphProj c) ρ) * volume (Icc (-δ) δ) := Measure.prod_prod _ _
     _ = _ := by
         rw [Measure.addHaar_closedBall _ _ hρ, Real.volume_Icc, Ω.finrank_hyperplane_eq_sub_one,
           ENNReal.ofReal_pow hρ, sub_neg_eq_add, ← two_mul]
@@ -266,11 +267,11 @@ the boundary and `‖h‖ ≤ ε`, every switch point `x` of `Ω` has `|η_i(x)|
 chart `i`. The step `[x, x + h]` contains a boundary point
 (`Rd.exists_mem_frontier_of_mem_switchSet`), which lies in some `B(c_i, ρ_i - 2ε)`; so `x` and
 `x + h` lie in `B_i`, where `Ω` is the graph domain `Ω_i`, and
-`Rd.LipschitzGraph.abs_height_le_of_mem_switchSet` applies. -/
+`Rd.LipschitzGraph.abs_graphHeight_le_of_mem_switchSet` applies. -/
 theorem switchSet_subset_iUnion {ε : ℝ}
     (hε : frontier Ω.carrier ⊆ ⋃ i, ball (Ω.center i) (Ω.radius i - 2 * ε)) {h : V}
     (hh : ‖h‖ ≤ ε) :
-    switchSet Ω.carrier h ⊆ ⋃ i, {x | |(Ω.graph i).height x| ≤ (1 + (Ω.graph i).M) * ‖h‖} := by
+    switchSet Ω.carrier h ⊆ ⋃ i, {x | |(Ω.graph i).graphHeight x| ≤ (1 + (Ω.graph i).M) * ‖h‖} := by
   intro x hx
   obtain ⟨z, hzs, hzΓ⟩ := exists_mem_frontier_of_mem_switchSet hx
   obtain ⟨i, hi⟩ := mem_iUnion.1 (hε hzΓ)
@@ -289,14 +290,14 @@ theorem switchSet_subset_iUnion {ε : ℝ}
   have hsw : x ∈ switchSet (Ω.graph i).domain h := fun hiff => hx (by
     rw [Ω.mem_carrier_iff_of_mem_ball h1, Ω.mem_carrier_iff_of_mem_ball h2]
     exact hiff)
-  exact mem_iUnion.2 ⟨i, (Ω.graph i).abs_height_le_of_mem_switchSet hsw⟩
+  exact mem_iUnion.2 ⟨i, (Ω.graph i).abs_graphHeight_le_of_mem_switchSet hsw⟩
 
 variable [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V]
 
 /-- **The layer for short steps**: if the shrunk balls `B(c_i, ρ_i - 2ε)` cover the boundary,
 `‖h‖ ≤ ε` and `ρ ≥ 0`, then `|S_h(Ω) ∩ B̄(c, ρ)| ≤ ∑_i 2 (1 + M_i) |B^{H_i}_1| · ‖h‖ ρ^(n-1)`, by
 `Rd.BoundedLipschitzDomain.switchSet_subset_iUnion` and the slab volumes
-`Rd.LipschitzGraph.volume_abs_height_le_inter_closedBall`. -/
+`Rd.LipschitzGraph.volume_abs_graphHeight_le_inter_closedBall`. -/
 theorem volume_switchSet_inter_closedBall_le_of_le {ε : ℝ}
     (hε : frontier Ω.carrier ⊆ ⋃ i, ball (Ω.center i) (Ω.radius i - 2 * ε)) {h : V}
     (hh : ‖h‖ ≤ ε) (c : V) {ρ : ℝ} (hρ : 0 ≤ ρ) :
@@ -304,7 +305,7 @@ theorem volume_switchSet_inter_closedBall_le_of_le {ε : ℝ}
       (∑ i, ENNReal.ofReal (2 * (1 + (Ω.graph i).M)) *
         volume (ball (0 : (Ω.graph i).hyperplane) 1)) *
         ENNReal.ofReal ‖h‖ * ENNReal.ofReal ρ ^ (finrank ℝ V - 1) := by
-  set S : Fin Ω.N → Set V := fun i => {x | |(Ω.graph i).height x| ≤ (1 + (Ω.graph i).M) * ‖h‖}
+  set S : Fin Ω.N → Set V := fun i => {x | |(Ω.graph i).graphHeight x| ≤ (1 + (Ω.graph i).M) * ‖h‖}
   have hM : ∀ i, 0 ≤ 1 + (Ω.graph i).M := fun i => by linarith [(Ω.graph i).M_nonneg]
   calc volume (switchSet Ω.carrier h ∩ closedBall c ρ)
       ≤ volume (⋃ i, S i ∩ closedBall c ρ) := by
@@ -313,7 +314,7 @@ theorem volume_switchSet_inter_closedBall_le_of_le {ε : ℝ}
     _ ≤ ∑ i, volume (S i ∩ closedBall c ρ) := measure_iUnion_fintype_le _ _
     _ ≤ ∑ i, ENNReal.ofReal (2 * ((1 + (Ω.graph i).M) * ‖h‖)) *
           ENNReal.ofReal ρ ^ (finrank ℝ V - 1) * volume (ball (0 : (Ω.graph i).hyperplane) 1) :=
-        Finset.sum_le_sum fun i _ => (Ω.graph i).volume_abs_height_le_inter_closedBall c hρ _
+        Finset.sum_le_sum fun i _ => (Ω.graph i).volume_abs_graphHeight_le_inter_closedBall c hρ _
     _ = _ := by
         rw [Finset.sum_mul, Finset.sum_mul]
         refine Finset.sum_congr rfl fun i _ => ?_

@@ -13,7 +13,7 @@ public import FunctionSpaces.Domains.Extension.LocalExtension
 
 The **trace** of `f` on the boundary `Γ` of a Lipschitz graph domain `Ω`, a function on the
 hyperplane `H = e^⊥` through the graph map `γ`, is the series of the restrictions of the terms of
-Rychkov's extension (`Rd.LipschitzGraph.trace`):
+Rychkov's extension (`Rd.LipschitzGraph.graphTrace`):
 
 `Tr f = ∑_j (η_j ⋆ h_j) ∘ γ`,  `h_j = 1_Ω (k_j ⋆ f)`,
 
@@ -21,7 +21,7 @@ with the local means `k_j` and dual kernels `η_j` of the cone bump; by the supp
 `f` on `Ω` enters. More generally `Rd.LipschitzGraph.traceSeries` restricts `∑_j η_j ⋆ h_j` for
 any `h_j ∈ L_p(V)`.
 
-**The trace theorem** (`Rd.LipschitzGraph.modNorm_trace_le`; Schneider–Vybíral, Theorem 4.2,
+**The trace theorem** (`Rd.LipschitzGraph.modNorm_graphTrace_le`; Schneider–Vybíral, Theorem 4.2,
 for `p ≥ 1`): for `1 ≤ p < ∞`, `0 < s < 1` and `1 ≤ q ≤ ∞`,
 
 `‖Tr f‖_{L_p(H)} + ‖(2^(ks) ω_1(Tr f, 2^(-k))_p)_k‖_{ℓ_q}
@@ -39,10 +39,11 @@ concludes (`Rd.LipschitzGraph.modNorm_traceSeries_le`). This last step holds for
 every order `r > s` (`Rd.LipschitzGraph.modNorm_traceSeries_le_of_atoms`), which gives the traces
 of every order on the half-space.
 
-The trace is linear (`Rd.LipschitzGraph.trace_sub`, `Rd.LipschitzGraph.trace_smul`) and bounded
-by the intrinsic norm of `B^{1/p}_{p,1}` on `Ω` (`Rd.LipschitzGraph.enorm_trace_le_modNormOn`), so
-by the norm of `B^{1/p}_{p,1}` on `V` (`Rd.LipschitzGraph.enorm_trace_le`), hence continuous
-along sequences that converge in this norm (`Rd.LipschitzGraph.tendsto_trace_of_modNorm_sub_le`).
+The trace is linear (`Rd.LipschitzGraph.graphTrace_sub`, `Rd.LipschitzGraph.graphTrace_smul`) and
+bounded by the intrinsic norm of `B^{1/p}_{p,1}` on `Ω`
+(`Rd.LipschitzGraph.enorm_graphTrace_le_modNormOn`), so by the norm of `B^{1/p}_{p,1}` on `V`
+(`Rd.LipschitzGraph.enorm_graphTrace_le`), hence continuous along sequences that converge in this
+norm (`Rd.LipschitzGraph.tendsto_graphTrace_of_modNorm_sub_le`).
 -/
 
 @[expose] public section
@@ -123,19 +124,22 @@ within `(d + t) 2^(-j)` of `x'`, `d = ρ + n`, then the centre lies within
 theorem norm_graphMap_sub_cellCenter_le {p : ℝ≥0∞} {K g : V → ℂ} {ρ t : ℝ} {j : ℕ}
     (hK : ∀ y, ρ / 2 ^ j < ‖y‖ → K y = 0) {m : Fin (finrank ℝ V) → ℤ}
     (hne : ∃ y', cellAtom p K j g m (Ω.graphMap y') ≠ 0) {x' : Ω.hyperplane}
-    (hdist : ‖x' - Ω.proj (cellCenter j m)‖ ≤ (ρ + finrank ℝ V + t) / 2 ^ j) :
+    (hdist : ‖x' - Ω.graphProj (cellCenter j m)‖ ≤ (ρ + finrank ℝ V + t) / 2 ^ j) :
     ‖Ω.graphMap x' - cellCenter j m‖ ≤
       (ρ + finrank ℝ V + (1 + Ω.M) * (2 * (ρ + finrank ℝ V) + t)) / 2 ^ j := by
   set d := ρ + finrank ℝ V
   obtain ⟨y', hy'⟩ := hne
   have h1 : ‖Ω.graphMap y' - cellCenter j m‖ ≤ d / 2 ^ j :=
     not_lt.1 fun hlt => hy' (cellAtom_eq_zero hK m hlt)
-  have h2 : ‖y' - Ω.proj (cellCenter j m)‖ ≤ d / 2 ^ j := (Ω.norm_sub_proj_le y' _).trans h1
+  have h2 : ‖y' - Ω.graphProj (cellCenter j m)‖ ≤ d / 2 ^ j :=
+    (Ω.norm_sub_graphProj_le y' _).trans h1
   have h3 : ‖x' - y'‖ ≤ (2 * d + t) / 2 ^ j := by
-    calc ‖x' - y'‖ = ‖(x' - Ω.proj (cellCenter j m)) - (y' - Ω.proj (cellCenter j m))‖ := by
+    calc ‖x' - y'‖
+      _ = ‖(x' - Ω.graphProj (cellCenter j m)) - (y' - Ω.graphProj (cellCenter j m))‖ := by
           congr 1
           abel
-      _ ≤ ‖x' - Ω.proj (cellCenter j m)‖ + ‖y' - Ω.proj (cellCenter j m)‖ := norm_sub_le _ _
+      _ ≤ ‖x' - Ω.graphProj (cellCenter j m)‖ + ‖y' - Ω.graphProj (cellCenter j m)‖ :=
+          norm_sub_le _ _
       _ ≤ (d + t) / 2 ^ j + d / 2 ^ j := add_le_add hdist h2
       _ = (2 * d + t) / 2 ^ j := by ring
   calc ‖Ω.graphMap x' - cellCenter j m‖
@@ -156,11 +160,11 @@ centres of the cells meeting the graph have overlap at most `N`: such a centre l
 `x'`. -/
 theorem exists_trace_atoms {p : ℝ≥0∞} (hp1 : 1 ≤ p) (L : ℕ) :
     ∃ (d : ℝ) (C : ℝ≥0∞) (N : ℕ), 0 ≤ d ∧ C ≠ ∞ ∧ ∀ (j : ℕ) {h : V → ℂ}, MemLp h p volume →
-      (∀ m, IsRegularAtom p 1 1 d C j (Ω.proj (cellCenter j m))
+      (∀ m, IsRegularAtom p 1 1 d C j (Ω.graphProj (cellCenter j m))
         (cellAtom p (b.dualKernel L j) j h m ∘ Ω.graphMap)) ∧
       ∀ x' (S : Finset (Fin (finrank ℝ V) → ℤ)),
-        (∀ m ∈ S, Ω.traceCoef b p L j h m ≠ 0 ∧ ‖x' - Ω.proj (cellCenter j m)‖ ≤ (d + 1) / 2 ^ j) →
-          S.card ≤ N := by
+        (∀ m ∈ S, Ω.traceCoef b p L j h m ≠ 0 ∧ ‖x' - Ω.graphProj (cellCenter j m)‖ ≤
+          (d + 1) / 2 ^ j) → S.card ≤ N := by
   obtain ⟨A, hA, hb⟩ := b.exists_higherDiff_dualKernel_bound L 1
   have ht : 0 ≤ 1 - 1 / p.toReal := one_sub_one_div_toReal_nonneg hp1
   set ρ := 2 * (L : ℝ) * b.radius
@@ -235,7 +239,7 @@ theorem eLpNorm_traceFun_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) (L
   refine ⟨(N : ℝ≥0∞) ^ (1 - 1 / p.toReal) * C, ENNReal.mul_ne_top
     (ENNReal.rpow_ne_top_of_nonneg hexp (ENNReal.natCast_ne_top N)) hC, fun j h hh => ?_⟩
   obtain ⟨hat, hN⟩ := hatoms j hh
-  have hlev := eLpNorm_levelSum_le hp1 hp (fun m => Ω.proj (cellCenter j m))
+  have hlev := eLpNorm_levelSum_le hp1 hp (fun m => Ω.graphProj (cellCenter j m))
     (fun m => cellAtom p (b.dualKernel L j) j h m ∘ Ω.graphMap) (Ω.traceCoef b p L j h)
     (fun x' S hS => hN x' S fun m hm => ⟨(hS m hm).1, by simpa only [Nat.cast_one] using (hS m hm).2⟩)
     hat
@@ -339,11 +343,11 @@ by the atomic synthesis on `H` (`Rd.modNorm_le_coeffNorm`) and
 theorem modNorm_traceSeries_le_of_atoms (hp : p ≠ ∞) (L : ℕ) {r : ℕ} {s : ℝ} (hs : 0 < s)
     (hsr : s < r) {q : ℝ≥0∞} (hq : 1 ≤ q) {d : ℝ} {C : ℝ≥0∞} {N : ℕ} (hC : C ≠ ∞)
     (hatoms : ∀ (j : ℕ) {h : V → ℂ}, MemLp h p volume →
-      (∀ m, IsRegularAtom p r r d C j (Ω.proj (cellCenter j m))
+      (∀ m, IsRegularAtom p r r d C j (Ω.graphProj (cellCenter j m))
         (cellAtom p (b.dualKernel L j) j h m ∘ Ω.graphMap)) ∧
       ∀ x' (S : Finset (Fin (finrank ℝ V) → ℤ)),
-        (∀ m ∈ S, Ω.traceCoef b p L j h m ≠ 0 ∧ ‖x' - Ω.proj (cellCenter j m)‖ ≤ (d + r) / 2 ^ j) →
-          S.card ≤ N) :
+        (∀ m ∈ S, Ω.traceCoef b p L j h m ≠ 0 ∧ ‖x' - Ω.graphProj (cellCenter j m)‖ ≤
+          (d + r) / 2 ^ j) → S.card ≤ N) :
     ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ h : ℕ → Lp ℂ p (volume : Measure V),
       lqNorm q (fun j => dyadicWeight (s + 1 / p.toReal) j * ‖h j‖ₑ) < ∞ →
       ‖Ω.traceSeries b hp L h‖ₑ +
@@ -352,7 +356,7 @@ theorem modNorm_traceSeries_le_of_atoms (hp : p ≠ ∞) (L : ℕ) {r : ℕ} {s 
   have hp1 : 1 ≤ p := Fact.out
   have hp0 : p ≠ 0 := (zero_lt_one.trans_le hp1).ne'
   refine ⟨atomSynthConst p N C r s r, atomSynthConst_ne_top hp1 N hC r hs hsr, fun h hX => ?_⟩
-  have hsyn := modNorm_le_coeffNorm hp (fun j m => Ω.proj (cellCenter j m))
+  have hsyn := modNorm_le_coeffNorm hp (fun j m => Ω.graphProj (cellCenter j m))
     (fun j m => cellAtom p (b.dualKernel L j) j (h j) m ∘ Ω.graphMap)
     (fun j => Ω.traceCoef b p L j (h j))
     (fun j x' S hS => (hatoms j (Lp.memLp (h j))).2 x' S hS)
@@ -400,26 +404,27 @@ variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 /-- The **trace** on the boundary of the Lipschitz graph domain `Ω`, a function on `H`:
 `Tr f = ∑_j (η_j ⋆ 1_Ω (k_j ⋆ f)) ∘ γ` with the kernels of the cone bump; only `f` on `Ω`
 enters. -/
-noncomputable def trace (hp : p ≠ ∞) (L : ℕ) (f : Lp ℂ p (volume : Measure V)) :
+noncomputable def graphTrace (hp : p ≠ ∞) (L : ℕ) (f : Lp ℂ p (volume : Measure V)) :
     Lp ℂ p (volume : Measure Ω.hyperplane) :=
-  Ω.traceSeries Ω.coneBump hp L fun j => Ω.cutoff (Ω.coneBump.localMean hp L j f)
+  Ω.traceSeries Ω.coneBump hp L fun j => Ω.graphCutoff (Ω.coneBump.localMean hp L j f)
 
 /-- **The trace theorem on Lipschitz graph domains** (Schneider–Vybíral, Theorem 4.2,
 for `p ≥ 1`): for `1 ≤ p < ∞`, `0 < s < 1` and `1 ≤ q ≤ ∞` there is `K < ∞` with
 `‖Tr f‖_{L_p(H)} + ‖(2^(ks) ω_1(Tr f, 2^(-k))_p)_k‖_{ℓ_q} ≤
 K (‖f‖_{L_p(Ω)} + ‖(2^(k(s+1/p)) ω_L(f, 2^(-k), Ω)_p)_k‖_{ℓ_q})`. -/
-theorem modNorm_trace_le (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 < s) (hs1 : s < 1) {q : ℝ≥0∞}
+theorem modNorm_graphTrace_le (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 < s) (hs1 : s < 1) {q : ℝ≥0∞}
     (hq : 1 ≤ q) :
     ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ f : Lp ℂ p (volume : Measure V),
       modNormOn Ω.measurableSet_domain L (s + 1 / p.toReal) q f < ∞ →
-      ‖Ω.trace hp L f‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p 1 (Ω.trace hp L f) k) ≤
+      ‖Ω.graphTrace hp L f‖ₑ +
+        lqNorm q (fun k => dyadicWeight s k * lpModulus p 1 (Ω.graphTrace hp L f) k) ≤
         K * modNormOn Ω.measurableSet_domain L (s + 1 / p.toReal) q f := by
   obtain ⟨K, hK, hle⟩ := Ω.modNorm_traceSeries_le Ω.coneBump hp L hs hs1 hq
   refine ⟨K * Ω.intrinsicConst L, ENNReal.mul_ne_top hK (Ω.intrinsicConst_ne_top L),
     fun f hf => ?_⟩
   have hX := Ω.intrinsicNorm_lt_top hp L (s + 1 / p.toReal) hq hf
   rw [mul_assoc]
-  exact (hle (fun j => Ω.cutoff (Ω.coneBump.localMean hp L j f)) hX).trans
+  exact (hle (fun j => Ω.graphCutoff (Ω.coneBump.localMean hp L j f)) hX).trans
     (mul_le_mul' le_rfl (Ω.intrinsicNorm_le hp L (s + 1 / p.toReal) hq f))
 
 /-! ### The trace of continuous functions -/
@@ -431,13 +436,13 @@ sums of the reproducing formula are `m_{2^J} ⋆ m_{2^J} ⋆ f` at every point. 
 theorem sum_traceFun_eq_conv (hp : p ≠ ∞) (L J : ℕ) (f : Lp ℂ p (volume : Measure V))
     (x' : Ω.hyperplane) :
     ∑ j ∈ Finset.range (J + 1),
-        Ω.traceFun Ω.coneBump L j (Ω.cutoff (Ω.coneBump.localMean hp L j f)) x' =
+        Ω.traceFun Ω.coneBump L j (Ω.graphCutoff (Ω.coneBump.localMean hp L j f)) x' =
       conv (Ω.coneBump.scaledMoment L J) (convLp hp (Ω.coneBump.integrable_scaledMoment L J) f)
         volume (Ω.graphMap x') := by
-  have hcut : ∀ j, Ω.traceFun Ω.coneBump L j (Ω.cutoff (Ω.coneBump.localMean hp L j f)) x' =
+  have hcut : ∀ j, Ω.traceFun Ω.coneBump L j (Ω.graphCutoff (Ω.coneBump.localMean hp L j f)) x' =
       conv (Ω.coneBump.dualKernel L j) (Ω.coneBump.localMean hp L j f) volume (Ω.graphMap x') :=
     fun j => by
-      rw [traceFun, conv_congr_ae (Ω.cutoff_apply_ae _),
+      rw [traceFun, conv_congr_ae (Ω.graphCutoff_apply_ae _),
         conv_indicator_eq_of_forall _ (fun z hz => ?_) volume]
       rw [sub_eq_add_neg]
       exact Ω.graphMap_add_mem x' (Ω.coneSupported_dualKernel L j z hz)
@@ -449,7 +454,7 @@ theorem sum_traceFun_eq_conv (hp : p ≠ ∞) (L J : ℕ) (f : Lp ℂ p (volume 
 theorem sum_traceFun_eq (hp : p ≠ ∞) (L J : ℕ) {f : Lp ℂ p (volume : Measure V)} {G : V → ℂ}
     (hfG : (f : V → ℂ) =ᵐ[volume] G) (x' : Ω.hyperplane) :
     ∑ j ∈ Finset.range (J + 1),
-        Ω.traceFun Ω.coneBump L j (Ω.cutoff (Ω.coneBump.localMean hp L j f)) x' =
+        Ω.traceFun Ω.coneBump L j (Ω.graphCutoff (Ω.coneBump.localMean hp L j f)) x' =
       conv (Ω.coneBump.scaledMoment L J) (conv (Ω.coneBump.scaledMoment L J) G volume) volume
         (Ω.graphMap x') := by
   rw [Ω.sum_traceFun_eq_conv hp L J f]
@@ -462,28 +467,28 @@ theorem sum_traceFun_eq (hp : p ≠ ∞) (L J : ℕ) {f : Lp ℂ p (volume : Mea
 norm of smoothness `s + 1/p`, `s > 0`, a subsequence of `(m_{2^J} ⋆ (m_{2^J} ⋆ f))(γ x')` converges
 to `Tr f(x')` for almost every `x'`, since the partial sums of the trace series converge in
 `L_p(H)`. -/
-theorem exists_subseq_tendsto_trace (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞}
+theorem exists_subseq_tendsto_graphTrace (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞}
     (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure V)}
     (hX : Ω.intrinsicNorm hp L (s + 1 / p.toReal) q f < ∞) :
     ∃ ns : ℕ → ℕ, StrictMono ns ∧ ∀ᵐ x' ∂(volume : Measure Ω.hyperplane),
       Tendsto (fun k => conv (Ω.coneBump.scaledMoment L (ns k))
         (convLp hp (Ω.coneBump.integrable_scaledMoment L (ns k)) f) volume (Ω.graphMap x')) atTop
-          (𝓝 (Ω.trace hp L f x')) := by
+          (𝓝 (Ω.graphTrace hp L f x')) := by
   have hp0 : p ≠ 0 := (zero_lt_one.trans_le (Fact.out : 1 ≤ p)).ne'
   have hS := Ω.tendsto_sum_traceTerm Ω.coneBump hp L hs hq
-    (h := fun j => Ω.cutoff (Ω.coneBump.localMean hp L j f)) hX
+    (h := fun j => Ω.graphCutoff (Ω.coneBump.localMean hp L j f)) hX
   have hSae : ∀ᵐ x' ∂(volume : Measure Ω.hyperplane), ∀ J,
       (∑ j ∈ Finset.range (J + 1), Ω.traceTerm Ω.coneBump hp L j
-        (Ω.cutoff (Ω.coneBump.localMean hp L j f))) x' =
+        (Ω.graphCutoff (Ω.coneBump.localMean hp L j f))) x' =
       conv (Ω.coneBump.scaledMoment L J) (convLp hp (Ω.coneBump.integrable_scaledMoment L J) f)
         volume (Ω.graphMap x') := by
     rw [ae_all_iff]
     intro J
     have h1 := Lp.coeFn_fun_finsetSum (Finset.range (J + 1))
-      (fun j => Ω.traceTerm Ω.coneBump hp L j (Ω.cutoff (Ω.coneBump.localMean hp L j f)))
+      (fun j => Ω.traceTerm Ω.coneBump hp L j (Ω.graphCutoff (Ω.coneBump.localMean hp L j f)))
     have h2 : ∀ᵐ x' ∂(volume : Measure Ω.hyperplane), ∀ j,
-        Ω.traceTerm Ω.coneBump hp L j (Ω.cutoff (Ω.coneBump.localMean hp L j f)) x' =
-          Ω.traceFun Ω.coneBump L j (Ω.cutoff (Ω.coneBump.localMean hp L j f)) x' :=
+        Ω.traceTerm Ω.coneBump hp L j (Ω.graphCutoff (Ω.coneBump.localMean hp L j f)) x' =
+          Ω.traceFun Ω.coneBump L j (Ω.graphCutoff (Ω.coneBump.localMean hp L j f)) x' :=
       ae_all_iff.2 fun j => Ω.traceTerm_ae Ω.coneBump hp L j _
     filter_upwards [h1, h2] with x' hx1 hx2
     rw [hx1, ← Ω.sum_traceFun_eq_conv hp L J f x']
@@ -499,12 +504,12 @@ theorem exists_subseq_tendsto_trace (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0
 and a finite intrinsic `B^{s+1/p}_{p,q}`-norm on `Ω`, then `Tr f = G ∘ γ` almost everywhere on
 `H`: the mollified restrictions converge at every point to `G(γ x')`
 (`Rd.conv_dilate_near`, twice), and a subsequence converges almost everywhere to `Tr f`. -/
-theorem trace_ae_eq_comp_graphMap (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s : ℝ} (hs : 0 < s)
+theorem graphTrace_ae_eq_comp_graphMap (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s : ℝ} (hs : 0 < s)
     {q : ℝ≥0∞} (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure V)}
     (hf : modNormOn Ω.measurableSet_domain L (s + 1 / p.toReal) q f < ∞)
     {G : V → ℂ} (hG : Continuous G) (hfG : (f : V → ℂ) =ᵐ[volume] G) :
-    Ω.trace hp L f =ᵐ[volume] G ∘ Ω.graphMap := by
-  obtain ⟨ns, hns, hae⟩ := Ω.exists_subseq_tendsto_trace hp L hs hq
+    Ω.graphTrace hp L f =ᵐ[volume] G ∘ Ω.graphMap := by
+  obtain ⟨ns, hns, hae⟩ := Ω.exists_subseq_tendsto_graphTrace hp L hs hq
     (Ω.intrinsicNorm_lt_top hp L (s + 1 / p.toReal) hq hf)
   have hΦ := integrable_momentKernel Ω.coneBump.integrable L
   have hone := integral_momentKernel Ω.coneBump.integrable Ω.coneBump.integral_eq_one hL
@@ -566,17 +571,17 @@ theorem traceTerm_sub (b : LocalMeansBump V) (hp : p ≠ ∞) (L j : ℕ)
   ring
 
 /-- **The trace is linear** on the functions with a finite intrinsic norm of smoothness `> 1/p`. -/
-theorem trace_sub (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞} (hq : 1 ≤ q)
+theorem graphTrace_sub (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞} (hq : 1 ≤ q)
     {f₁ f₂ : Lp ℂ p (volume : Measure V)}
     (h₁ : Ω.intrinsicNorm hp L (s + 1 / p.toReal) q f₁ < ∞)
     (h₂ : Ω.intrinsicNorm hp L (s + 1 / p.toReal) q f₂ < ∞) :
-    Ω.trace hp L (f₁ - f₂) = Ω.trace hp L f₁ - Ω.trace hp L f₂ := by
-  simp only [trace, traceSeries, map_sub]
+    Ω.graphTrace hp L (f₁ - f₂) = Ω.graphTrace hp L f₁ - Ω.graphTrace hp L f₂ := by
+  simp only [graphTrace, traceSeries, map_sub]
   simp_rw [Ω.traceTerm_sub]
   exact Summable.tsum_sub (Ω.summable_traceTerm Ω.coneBump hp L hs hq
-      (h := fun j => Ω.cutoff (Ω.coneBump.localMean hp L j f₁)) h₁)
+      (h := fun j => Ω.graphCutoff (Ω.coneBump.localMean hp L j f₁)) h₁)
     (Ω.summable_traceTerm Ω.coneBump hp L hs hq
-      (h := fun j => Ω.cutoff (Ω.coneBump.localMean hp L j f₂)) h₂)
+      (h := fun j => Ω.graphCutoff (Ω.coneBump.localMean hp L j f₂)) h₂)
 
 /-- The traces of the terms commute with complex scalars, since convolution does
 (`Rd.conv_smul`). -/
@@ -591,11 +596,11 @@ theorem traceTerm_smul (b : LocalMeansBump V) (hp : p ≠ ∞) (L j : ℕ) (c : 
 
 /-- **The trace commutes with complex scalars**: `Tr (c f) = c Tr f` for every `f ∈ L_p(V)`, since
 every term of the trace series does and `∑' j, c x_j = c ∑' j, x_j` (Mathlib's
-`tsum_const_smul''`). With `Rd.LipschitzGraph.trace_sub` the trace is linear on the functions of
-finite intrinsic norm. -/
-theorem trace_smul (hp : p ≠ ∞) (L : ℕ) (c : ℂ) (f : Lp ℂ p (volume : Measure V)) :
-    Ω.trace hp L (c • f) = c • Ω.trace hp L f := by
-  simp only [trace, traceSeries, map_smul]
+`tsum_const_smul''`). With `Rd.LipschitzGraph.graphTrace_sub` the trace is linear on the functions
+of finite intrinsic norm. -/
+theorem graphTrace_smul (hp : p ≠ ∞) (L : ℕ) (c : ℂ) (f : Lp ℂ p (volume : Measure V)) :
+    Ω.graphTrace hp L (c • f) = c • Ω.graphTrace hp L f := by
+  simp only [graphTrace, traceSeries, map_smul]
   simp_rw [Ω.traceTerm_smul]
   exact tsum_const_smul'' c
 
@@ -603,16 +608,16 @@ theorem trace_smul (hp : p ≠ ∞) (L : ℕ) (c : ℂ) (f : Lp ℂ p (volume : 
 `‖Tr f‖_{L_p(H)} ≤ K (‖f‖_{L_p(Ω)} + ∑_k 2^(k/p) ω_L(f, 2^(-k), Ω)_p)`, by the bounds of the terms
 (`Rd.LipschitzGraph.eLpNorm_traceFun_le`) and the comparison of the intrinsic local means with the
 moduli on `Ω`. -/
-theorem enorm_trace_le_modNormOn (hp : p ≠ ∞) (L : ℕ) :
+theorem enorm_graphTrace_le_modNormOn (hp : p ≠ ∞) (L : ℕ) :
     ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ f : Lp ℂ p (volume : Measure V),
-      ‖Ω.trace hp L f‖ₑ ≤ K * modNormOn Ω.measurableSet_domain L (1 / p.toReal) 1 f := by
+      ‖Ω.graphTrace hp L f‖ₑ ≤ K * modNormOn Ω.measurableSet_domain L (1 / p.toReal) 1 f := by
   obtain ⟨K, hK, hle⟩ := Ω.eLpNorm_traceFun_le Ω.coneBump Fact.out hp L
   refine ⟨K * Ω.intrinsicConst L, ENNReal.mul_ne_top hK (Ω.intrinsicConst_ne_top L),
     fun f => ?_⟩
-  calc ‖Ω.trace hp L f‖ₑ ≤ ∑' j, ‖Ω.traceTerm Ω.coneBump hp L j
-        (Ω.cutoff (Ω.coneBump.localMean hp L j f))‖ₑ := enorm_tsum_le_tsum_enorm
+  calc ‖Ω.graphTrace hp L f‖ₑ ≤ ∑' j, ‖Ω.traceTerm Ω.coneBump hp L j
+        (Ω.graphCutoff (Ω.coneBump.localMean hp L j f))‖ₑ := enorm_tsum_le_tsum_enorm
     _ ≤ ∑' j, K * (dyadicWeight (1 / p.toReal) j *
-          ‖Ω.cutoff (Ω.coneBump.localMean hp L j f)‖ₑ) :=
+          ‖Ω.graphCutoff (Ω.coneBump.localMean hp L j f)‖ₑ) :=
         ENNReal.tsum_le_tsum fun j => by
           rw [Lp.enorm_def, eLpNorm_congr_ae (Ω.traceTerm_ae Ω.coneBump hp L j _)]
           refine (hle j (Lp.memLp _)).trans ?_
@@ -625,29 +630,29 @@ theorem enorm_trace_le_modNormOn (hp : p ≠ ∞) (L : ℕ) :
 
 /-- **The trace in `L_p(H)` is bounded by the `B^{1/p}_{p,1}`-norm**:
 `‖Tr f‖_{L_p(H)} ≤ K (‖f‖_p + ∑_k 2^(k/p) ω_L(f, 2^(-k))_p)`, since the intrinsic quantity of
-`Rd.LipschitzGraph.enorm_trace_le_modNormOn` is at most this one
+`Rd.LipschitzGraph.enorm_graphTrace_le_modNormOn` is at most this one
 (`Rd.LipschitzGraph.modNormOn_le_modNorm`). -/
-theorem enorm_trace_le (hp : p ≠ ∞) (L : ℕ) :
+theorem enorm_graphTrace_le (hp : p ≠ ∞) (L : ℕ) :
     ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ f : Lp ℂ p (volume : Measure V),
-      ‖Ω.trace hp L f‖ₑ ≤
+      ‖Ω.graphTrace hp L f‖ₑ ≤
         K * (‖f‖ₑ + lqNorm 1 (fun k => dyadicWeight (1 / p.toReal) k * lpModulus p L f k)) := by
-  obtain ⟨K, hK, hle⟩ := Ω.enorm_trace_le_modNormOn hp L
+  obtain ⟨K, hK, hle⟩ := Ω.enorm_graphTrace_le_modNormOn hp L
   exact ⟨K, hK, fun f => (hle f).trans (mul_le_mul' le_rfl (Ω.modNormOn_le_modNorm L _ 1 rfl))⟩
 
 /-- **The trace along a convergent sequence**: if `F` and the `F_J` have finite intrinsic norms of
 smoothness `s + 1/p`, `s > 0`, and `‖F - F_J‖_p + ‖(2^(k/p) ω_L(F - F_J, 2^(-k))_p)_k‖_{ℓ_1} ≤ b_J`
 with `b_J < ∞` and `b_J → 0`, then `Tr F_J → Tr F`: the trace is linear
-(`Rd.LipschitzGraph.trace_sub`) and bounded by the norm of `B^{1/p}_{p,1}`
-(`Rd.LipschitzGraph.enorm_trace_le`). -/
-theorem tendsto_trace_of_modNorm_sub_le (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞}
+(`Rd.LipschitzGraph.graphTrace_sub`) and bounded by the norm of `B^{1/p}_{p,1}`
+(`Rd.LipschitzGraph.enorm_graphTrace_le`). -/
+theorem tendsto_graphTrace_of_modNorm_sub_le (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞}
     (hq : 1 ≤ q) {F : Lp ℂ p (volume : Measure V)} {FJ : ℕ → Lp ℂ p (volume : Measure V)}
     (hF : Ω.intrinsicNorm hp L (s + 1 / p.toReal) q F < ∞)
     (hFJ : ∀ J, Ω.intrinsicNorm hp L (s + 1 / p.toReal) q (FJ J) < ∞) {b : ℕ → ℝ≥0∞}
     (hb : Tendsto b atTop (𝓝 0)) (hbtop : ∀ J, b J ≠ ∞)
     (hle : ∀ J, ‖F - FJ J‖ₑ +
       lqNorm 1 (fun k => dyadicWeight (1 / p.toReal) k * lpModulus p L (F - FJ J) k) ≤ b J) :
-    Tendsto (fun J => Ω.trace hp L (FJ J)) atTop (𝓝 (Ω.trace hp L F)) := by
-  obtain ⟨KT, hKT, hTle⟩ := Ω.enorm_trace_le hp L
+    Tendsto (fun J => Ω.graphTrace hp L (FJ J)) atTop (𝓝 (Ω.graphTrace hp L F)) := by
+  obtain ⟨KT, hKT, hTle⟩ := Ω.enorm_graphTrace_le hp L
   have hKb0 : Tendsto (fun J => KT * b J) atTop (𝓝 0) := by
     simpa using ENNReal.Tendsto.const_mul hb (Or.inr hKT)
   have hKb : Tendsto (fun J => (KT * b J).toReal) atTop (𝓝 0) := by
@@ -655,7 +660,7 @@ theorem tendsto_trace_of_modNorm_sub_le (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs
     rwa [ENNReal.toReal_zero] at h
   rw [tendsto_iff_norm_sub_tendsto_zero]
   refine squeeze_zero (fun J => norm_nonneg _) (fun J => ?_) hKb
-  rw [norm_sub_rev, ← Ω.trace_sub hp L hs hq hF (hFJ J), ← toReal_enorm]
+  rw [norm_sub_rev, ← Ω.graphTrace_sub hp L hs hq hF (hFJ J), ← toReal_enorm]
   exact ENNReal.toReal_mono (ENNReal.mul_ne_top hKT (hbtop J))
     ((hTle _).trans (mul_le_mul' le_rfl (hle J)))
 

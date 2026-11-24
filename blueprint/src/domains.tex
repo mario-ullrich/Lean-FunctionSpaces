@@ -56,7 +56,7 @@ spaces, also in block form, with Jackson's inequality for the splines restricted
 
 \begin{definition}[Lipschitz graph domains]
 \label{def:lipschitz-graph}
-\lean{Rd.LipschitzGraph, Rd.LipschitzGraph.domain, Rd.LipschitzGraph.cone,
+\lean{Rd.LipschitzGraph, Rd.LipschitzGraph.domain, Rd.LipschitzGraph.graphCone,
   Rd.LipschitzGraph.lipschitzWith_phi, Rd.LipschitzGraph.continuous_phi,
   Rd.LipschitzGraph.isOpen_domain, Rd.LipschitzGraph.toOpens, Rd.LipschitzGraph.coe_toOpens,
   Rd.LipschitzGraph.measurableSet_domain}
@@ -75,11 +75,11 @@ For $V = \R^d$ and $e = e_d$ this is $\Omega = \{x : x_d > \varphi(x_1, \dots, x
 
 \begin{lemma}[The cone]
 \label{lem:graph-cone}
-\lean{Rd.LipschitzGraph.add_mem, Rd.LipschitzGraph.smul_mem_cone,
+\lean{Rd.LipschitzGraph.add_mem, Rd.LipschitzGraph.smul_mem_graphCone,
   Rd.LipschitzGraph.add_nsmul_mem, Rd.LipschitzGraph.coneRadius,
   Rd.LipschitzGraph.coneRadius_pos, Rd.LipschitzGraph.coneRadius_le,
-  Rd.LipschitzGraph.two_mul_add_one_mul_coneRadius_le, Rd.LipschitzGraph.ball_subset_cone,
-  Rd.LipschitzGraph.closedCone, Rd.LipschitzGraph.cone_subset_closedCone,
+  Rd.LipschitzGraph.two_mul_add_one_mul_coneRadius_le, Rd.LipschitzGraph.ball_subset_graphCone,
+  Rd.LipschitzGraph.closedCone, Rd.LipschitzGraph.graphCone_subset_closedCone,
   Rd.LipschitzGraph.isClosed_closedCone, Rd.LipschitzGraph.smul_mem_closedCone,
   Rd.LipschitzGraph.phi_add_le, Rd.LipschitzGraph.add_mem_of_mem_closedCone}
 \leanok
@@ -116,7 +116,8 @@ combinations of such functions and their dilations $k_c$, $c > 0$, are supported
 
 \begin{lemma}[The closure of a graph domain]
 \label{lem:graph-domain-closure-cone}
-\lean{Rd.LipschitzGraph.add_mem_of_mem_closure, Rd.LipschitzGraph.mem_cone_of_mem_tsupport_dilate}
+\lean{Rd.LipschitzGraph.add_mem_of_mem_closure,
+  Rd.LipschitzGraph.mem_graphCone_of_mem_tsupport_dilate}
 \leanok
 \uses{def:lipschitz-graph, lem:graph-cone, lem:dilate}
 For every Lipschitz graph domain $\Omega_0 = \{x : \varphi(x) < \langle x, e \rangle\}$ with cone
@@ -240,10 +241,10 @@ LpToLpRestrictCLM}).
 
 \begin{lemma}[The support principle]
 \label{lem:support-principle}
-\lean{Rd.LipschitzGraph.conv_indicator_eq, Rd.LipschitzGraph.cutoff,
-  Rd.LipschitzGraph.cutoff_apply_ae, Rd.LipschitzGraph.enorm_cutoff,
-  Rd.LipschitzGraph.enorm_cutoff_le, Rd.LipschitzGraph.indicator_ae_eq_of_cutoff_eq,
-  Rd.LipschitzGraph.cutoff_convLp_cutoff, Rd.LipschitzGraph.cutoff_convLp_eq,
+\lean{Rd.LipschitzGraph.conv_indicator_eq, Rd.LipschitzGraph.graphCutoff,
+  Rd.LipschitzGraph.graphCutoff_apply_ae, Rd.LipschitzGraph.enorm_graphCutoff,
+  Rd.LipschitzGraph.enorm_graphCutoff_le, Rd.LipschitzGraph.indicator_ae_eq_of_graphCutoff_eq,
+  Rd.LipschitzGraph.graphCutoff_convLp_graphCutoff, Rd.LipschitzGraph.graphCutoff_convLp_eq,
   Rd.LipschitzGraph.ConeSupported.sub_mem}
 \leanok
 \uses{def:cone-supported, lem:graph-cone, lem:indicator-lp, lem:conv-op}
@@ -283,8 +284,8 @@ $\|(2^{js} \|k_j * f\|_p)_j\|_{\ell_q}$.
 \begin{theorem}[The extension operator]
 \label{thm:graph-extension}
 \lean{Rd.LipschitzGraph.extTerm, Rd.LipschitzGraph.summable_extTerm,
-  Rd.LipschitzGraph.extension, Rd.LipschitzGraph.tendsto_sum_extTerm,
-  Rd.LipschitzGraph.cutoff_extension, Rd.LipschitzGraph.modNorm_extension_le}
+  Rd.LipschitzGraph.rychkovExtension, Rd.LipschitzGraph.tendsto_sum_extTerm,
+  Rd.LipschitzGraph.graphCutoff_rychkovExtension, Rd.LipschitzGraph.modNorm_rychkovExtension_le}
 \leanok
 \uses{def:intrinsic-local-means, lem:support-principle, lem:reproducing-formula,
   lem:local-means-synthesis}
@@ -338,7 +339,7 @@ The notation is that of the previous section.
 \begin{lemma}[Steps in the cone]
 \label{lem:cone-steps}
 \lean{Rd.LipschitzGraph.subset_diffStepSet, Rd.LipschitzGraph.subset_diffStepSet_of_coneSupported,
-  Rd.LipschitzGraph.enorm_cutoff_sub_convLp_scaled_le}
+  Rd.LipschitzGraph.enorm_graphCutoff_sub_convLp_scaledMoment_le}
 \leanok
 \uses{lem:graph-cone, def:rd-modulus-on, thm:moment-approx, lem:cone-bump}
 For $h \in K$ and $r \in \N$, $\Omega \subseteq \Omega_{rh}$. Consequently, for
@@ -357,8 +358,8 @@ $-2^{-j} z = 2^{-j} (-z)$ lies in $K$ and has length at most $2^{-(j+1)}$; apply
 
 \begin{lemma}[Intrinsic local means and moduli on $\Omega$]
 \label{lem:intrinsic-upper}
-\lean{Rd.LipschitzGraph.enorm_cutoff_localMean_zero_le,
-  Rd.LipschitzGraph.enorm_cutoff_localMean_succ_le, Rd.LipschitzGraph.intrinsicConst,
+\lean{Rd.LipschitzGraph.enorm_graphCutoff_localMean_zero_le,
+  Rd.LipschitzGraph.enorm_graphCutoff_localMean_succ_le, Rd.LipschitzGraph.intrinsicConst,
   Rd.LipschitzGraph.intrinsicConst_ne_top, Rd.LocalMeansBump.momentConst_ne_top,
   Rd.LipschitzGraph.intrinsicNorm_le, Rd.LipschitzGraph.intrinsicNorm_lt_top}
 \leanok
@@ -387,8 +388,9 @@ $a = \|f\|_{L_p(\Omega)}$ gives the last claim.
 
 \begin{theorem}[Besov spaces on Lipschitz graph domains by intrinsic differences]
 \label{thm:graph-besov}
-\lean{Rd.LipschitzGraph.modNormOn_le_modNorm, Rd.LipschitzGraph.cutoff_extension_of_modNormOn,
-  Rd.LipschitzGraph.modNorm_extension_le_modNormOn,
+\lean{Rd.LipschitzGraph.modNormOn_le_modNorm,
+  Rd.LipschitzGraph.graphCutoff_rychkovExtension_of_modNormOn,
+  Rd.LipschitzGraph.modNorm_rychkovExtension_le_modNormOn,
   Rd.LipschitzGraph.exists_besov_extension_iff_modulusOn,
   Rd.LipschitzGraph.exists_memApprox_extension_iff}
 \leanok
@@ -439,11 +441,11 @@ For $x \in U$, $k(y) (1_W h)(x - y) = k(y) h(x - y)$ for every $y$.
 
 \begin{lemma}[Bumps of every radius]
 \label{lem:bumps-every-radius}
-\lean{Rd.LocalMeansBump.rescale, Rd.LocalMeansBump.rescale_radius,
+\lean{Rd.LocalMeansBump.bumpRescale, Rd.LocalMeansBump.bumpRescale_radius,
   Rd.LocalMeansBump.scaledMoment_eq_zero, Rd.LocalMeansBump.dualKernel_eq_zero,
   Rd.LocalMeansBump.meansKernel_eq_zero, Rd.LipschitzGraph.coneSupported_momentKernel_of,
   Rd.LipschitzGraph.coneSupported_scaledMoment_of, Rd.LipschitzGraph.coneSupported_dualKernel_of,
-  Rd.LipschitzGraph.coneSupported_rescale, Rd.LipschitzGraph.exists_coneBump_radius_le}
+  Rd.LipschitzGraph.coneSupported_bumpRescale, Rd.LipschitzGraph.exists_coneBump_radius_le}
 \leanok
 \uses{def:local-means, def:cone-supported, lem:dilate, lem:cone-bump}
 If $g$ is a bump for local means of radius $R$ (\Cref{def:local-means}) and $c > 0$, then $g_c$ is
@@ -496,7 +498,8 @@ $\operatorname{dist}(x - y, x) < \operatorname{dist}(x, O^c)$, so $x - y \in O$.
 
 \begin{lemma}[Local means on a set]
 \label{lem:local-means-on-sets}
-\lean{Rd.LocalMeansBump.localNormOn, Rd.LocalMeansBump.enorm_indicatorLp_sub_convLp_scaled_le,
+\lean{Rd.LocalMeansBump.localNormOn,
+  Rd.LocalMeansBump.enorm_indicatorLp_sub_convLp_scaledMoment_le,
   Rd.LocalMeansBump.enorm_indicatorLp_localMean_zero_le,
   Rd.LocalMeansBump.enorm_indicatorLp_localMean_succ_le, Rd.LocalMeansBump.localNormOn_le}
 \leanok
@@ -728,8 +731,8 @@ $\delta$, $r$ and $j$, so $C$ is the constant of \Cref{thm:local-extension} for 
 \lean{Rd.BoundedLipschitzDomain.modNorm_eq_modNormOn_of_carrier_eq_univ,
   Rd.BoundedLipschitzDomain.exists_besov_extension_le,
   Rd.BoundedLipschitzDomain.exists_besov_extension_of_modulusOn,
-  Rd.BoundedLipschitzDomain.exists_besov_extension_iff_modulusOn,
-  Rd.BoundedLipschitzDomain.exists_memApprox_extension_iff}
+  Rd.BoundedLipschitzDomain.exists_besov_extension_iff_modulusOn_indicator,
+  Rd.BoundedLipschitzDomain.exists_memApprox_extension_iff_indicator}
 \leanok
 \uses{lem:bounded-lipschitz-geometry, lem:bounded-patches, lem:pasting, lem:restriction-moduli,
   thm:rd-besov}
@@ -884,7 +887,7 @@ preimage.
 
 \begin{lemma}[Lipschitz maps and Euclidean Hausdorff measures]
 \label{lem:hausdorff-lipschitz-image}
-\lean{LipschitzOnWith.euclideanHausdorffMeasure_image_le,
+\lean{LipschitzOnWith.euclideanHausdorffMeasure_image_le_pow_mul,
   Rd.euclideanHausdorffMeasure_image_le_of_near}
 \leanok
 For all metric spaces $X$, $Y$, every $K \geq 0$, every $s \subseteq X$, every $f : X \to Y$ that
@@ -954,7 +957,7 @@ $V$.
 
 \begin{lemma}[Increments of graphs over the hyperplane]
 \label{lem:graph-over}
-\lean{Rd.LipschitzGraph.proj_graphOver, Rd.LipschitzGraph.graphOver_injective,
+\lean{Rd.LipschitzGraph.graphProj_graphOver, Rd.LipschitzGraph.graphOver_injective,
   Rd.LipschitzGraph.norm_coe_add_smul_e_sq, Rd.LipschitzGraph.norm_le_norm_coe_add_smul_e,
   Rd.LipschitzGraph.graphOver_sub, Rd.LipschitzGraph.norm_sub_le_norm_graphOver_sub,
   Rd.LipschitzGraph.graphOver_sub_sub}
@@ -1143,7 +1146,7 @@ $\mathcal H^{n-1}(\gamma(N)) \leq (1 + M)^{n-1} \mathcal H^{n-1}(N)$ by
 
 \begin{definition}[The gradient and the Gram density]
 \label{def:graph-gradient}
-\lean{Rd.LipschitzGraph.gradPhi, Rd.LipschitzGraph.gram}
+\lean{Rd.LipschitzGraph.gradPhi, Rd.LipschitzGraph.gramDensity}
 \leanok
 \uses{lem:graph-map-area}
 For $x' \in H$, $\nabla\varphi(x') \in H$ is the gradient of $\varphi|_H$ at $x'$ (Mathlib's
@@ -1154,9 +1157,10 @@ $\sqrt{1 + \|\nabla\varphi(x')\|^2}$ is the Gram density of the graph map.
 \begin{lemma}[Properties of the gradient]
 \label{lem:graph-gradient}
 \lean{Rd.LipschitzGraph.inner_gradPhi, Rd.LipschitzGraph.norm_gradPhi_le,
-  Rd.LipschitzGraph.one_le_gram, Rd.LipschitzGraph.gram_pos, Rd.LipschitzGraph.gram_le,
-  Rd.LipschitzGraph.abs_gram_sub_le, Rd.LipschitzGraph.measurable_gradPhi,
-  Rd.LipschitzGraph.measurable_gram, Rd.LipschitzGraph.ae_differentiableAt_phiH}
+  Rd.LipschitzGraph.one_le_gramDensity, Rd.LipschitzGraph.gramDensity_pos,
+  Rd.LipschitzGraph.gramDensity_le, Rd.LipschitzGraph.abs_gramDensity_sub_le,
+  Rd.LipschitzGraph.measurable_gradPhi, Rd.LipschitzGraph.measurable_gramDensity,
+  Rd.LipschitzGraph.ae_differentiableAt_phiH}
 \leanok
 \uses{def:graph-gradient, lem:area-elementary}
 For all $x', v, g \in H$: $\langle \nabla\varphi(x'), v \rangle$ is the derivative of
@@ -1187,8 +1191,8 @@ $\|\nabla\varphi(x') - g\| \leq \varepsilon$ for all $x', y' \in P$.
 
 \begin{lemma}[The Gram density on good pieces]
 \label{lem:good-piece-gram}
-\lean{Rd.LipschitzGraph.IsGoodPiece.mono, Rd.LipschitzGraph.IsGoodPiece.sqrt_le_mul_gram,
-  Rd.LipschitzGraph.IsGoodPiece.gram_le_mul_sqrt}
+\lean{Rd.LipschitzGraph.IsGoodPiece.mono, Rd.LipschitzGraph.IsGoodPiece.sqrt_le_mul_gramDensity,
+  Rd.LipschitzGraph.IsGoodPiece.gramDensity_le_mul_sqrt}
 \leanok
 \uses{def:good-piece, lem:graph-gradient}
 For every $\varepsilon \geq 0$, every $g \in H$ and every good piece $P$ for $\varepsilon$ and $g$,
@@ -1206,7 +1210,7 @@ least $1$.
 \begin{lemma}[The area formula on good pieces, up to a factor]
 \label{lem:good-piece-bounds}
 \lean{Rd.LipschitzGraph.IsGoodPiece.euclideanHausdorffMeasure_image_le,
-  Rd.LipschitzGraph.IsGoodPiece.lintegral_gram_le}
+  Rd.LipschitzGraph.IsGoodPiece.lintegral_gramDensity_le}
 \leanok
 \uses{lem:good-piece-gram, lem:graph-over-hausdorff, thm:linear-graph-area, def:area-factor}
 For every $\varepsilon \geq 0$, every $g \in H$ and every good piece $P$ for $\varepsilon$ and $g$,
@@ -1287,7 +1291,7 @@ a null set by Rademacher's theorem.
 \begin{lemma}[The area formula up to a factor]
 \label{lem:area-fixed-accuracy}
 \lean{Rd.LipschitzGraph.euclideanHausdorffMeasure_graphMap_image_le_mul,
-  Rd.LipschitzGraph.lintegral_gram_le_mul}
+  Rd.LipschitzGraph.lintegral_gramDensity_le_mul}
 \leanok
 \uses{lem:good-partition, lem:good-piece-bounds, lem:graph-map-null, lem:graph-map-area}
 For every $\varepsilon > 0$ and every measurable $A \subseteq H$, with the area factor
@@ -1359,7 +1363,7 @@ $x \mapsto \varphi(Px) - \langle x, e \rangle$, a function that is negative on $
 \begin{lemma}[Properties of the normal]
 \label{lem:graph-normal}
 \lean{Rd.LipschitzGraph.norm_gradPhi_sub_e, Rd.LipschitzGraph.norm_normalAt,
-  Rd.LipschitzGraph.inner_normalAt_e, Rd.LipschitzGraph.inner_normalAt_neg_of_mem_cone,
+  Rd.LipschitzGraph.inner_normalAt_e, Rd.LipschitzGraph.inner_normalAt_neg_of_mem_graphCone,
   Rd.LipschitzGraph.measurable_normalAt}
 \leanok
 \uses{def:graph-normal, lem:graph-gradient, lem:graph-over, lem:graph-cone}
@@ -1703,7 +1707,7 @@ $B^{s-1/2}_{2,2}(\Gamma)$ inside $L_2(\Gamma)$.
 
 \begin{definition}[The outward unit normal field]
 \label{def:boundary-normal}
-\lean{Rd.BoundedLipschitzDomain.normal}
+\lean{Rd.BoundedLipschitzDomain.outwardNormal}
 \leanok
 \uses{def:graph-normal, def:trace-space-setting}
 For $y \in V$, $\nu(y) = \sum_j \psi^0_j(y) \, \nu_j(P_j y)$, with the outward unit normals
@@ -1712,7 +1716,8 @@ $\nu_j$ of the graph domains $\Omega_j$ (\Cref{def:graph-normal}).
 
 \begin{lemma}[Properties of the normal field]
 \label{lem:boundary-normal}
-\lean{Rd.BoundedLipschitzDomain.measurable_normal, Rd.BoundedLipschitzDomain.norm_normal_le}
+\lean{Rd.BoundedLipschitzDomain.measurable_outwardNormal,
+  Rd.BoundedLipschitzDomain.norm_outwardNormal_le}
 \leanok
 \uses{def:boundary-normal, lem:graph-normal}
 $\nu$ is measurable, and $\|\nu(y)\| \leq 1$ for every $y \in V$.
@@ -1820,9 +1825,10 @@ maps, so they keep the class $C^n$.
 
 \begin{theorem}[Lipschitz near a point by graph domains]
 \label{thm:lipschitz-near-point}
-\lean{Rd.isLipschitzDomainAt_of_ball_inter_eq, Rd.IsLipschitzDomainAt.exists_ball_inter_eq,
-  Rd.isLipschitzDomainAt_iff, Rd.IsLipschitzDomainAt.congr_ball,
-  Rd.localGraph_inter_ball_eq_of_eqOn, Rd.isLipschitzDomainAt_of_lipschitzOnWith}
+\lean{Rd.isLipschitzDomainAt_of_ball_inter_eq,
+  Rd.IsLipschitzDomainAt.exists_ball_inter_eq_lipschitzGraph, Rd.isLipschitzDomainAt_iff,
+  Rd.IsLipschitzDomainAt.congr_ball, Rd.localGraph_inter_ball_eq_of_eqOn,
+  Rd.isLipschitzDomainAt_of_lipschitzOnWith}
 \leanok
 \uses{def:lipschitz-near-point, lem:local-graph-domain}
 For every $z \in V$, every $\nu \in V$, every $\rho \in \R$ and all
@@ -1860,13 +1866,14 @@ hyperplane that the ball sees.
 \lean{Rd.exists_finset_cover_frontier, Rd.frontierCenters, Rd.frontier_subset_frontierCenters,
   Rd.frontierCenterAt, Rd.BoundedLipschitzDomain.ofCharts,
   Rd.BoundedLipschitzDomain.carrier_ofCharts, Rd.BoundedLipschitzDomain.exists_graph_ofCharts_eq,
-  Rd.IsBoundedLipschitzDomain.exists_chart, Rd.IsBoundedLipschitzDomain.chart,
-  Rd.IsBoundedLipschitzDomain.chart_fst_pos, Rd.IsBoundedLipschitzDomain.ball_inter_chart,
+  Rd.IsBoundedLipschitzDomain.exists_chart_lipschitzGraph,
+  Rd.IsBoundedLipschitzDomain.lipschitzChart, Rd.IsBoundedLipschitzDomain.lipschitzChart_fst_pos,
+  Rd.IsBoundedLipschitzDomain.ball_inter_lipschitzChart,
   Rd.BoundedLipschitzDomain.ofIsBoundedLipschitzDomain,
   Rd.BoundedLipschitzDomain.carrier_ofIsBoundedLipschitzDomain,
   Rd.BoundedLipschitzDomain.exists_ball_inter_eq_graph,
-  Rd.BoundedLipschitzDomain.isLipschitzDomainAt,
-  Rd.BoundedLipschitzDomain.isBoundedLipschitzDomain, Rd.isBoundedLipschitzDomain_iff_exists}
+  Rd.BoundedLipschitzDomain.isLipschitzDomainAt, Rd.BoundedLipschitzDomain.isBoundedLipschitzDomain,
+  Rd.isBoundedLipschitzDomain_iff_exists}
 \leanok
 \uses{def:bounded-lipschitz, thm:lipschitz-near-point}
 For every bounded Lipschitz domain $\Omega$ with balls $B_j$ and graph domains $\Omega_j$ and every
@@ -2509,8 +2516,8 @@ $G$ on $Q$ (\Cref{prop:cube-spline-scheme-at}), hence with $f$ on $\Omega$
 \begin{theorem}[Splines on domains through restriction]
 \label{thm:domain-splines}
 \lean{Rd.HasBesovExtension.exists_cubeSplineAt_le,
-  Rd.HasBesovExtension.exists_memApprox_cubeSplineSchemeAt_iff,
-  Rd.HasBesovExtension.exists_memApprox_cubeSplineSchemeAt_iff_of_order,
+  Rd.HasBesovExtension.exists_memApprox_cubeSplineSchemeAt_iff_of_hasBesovExtension,
+  Rd.HasBesovExtension.exists_memApprox_cubeSplineSchemeAt_iff_of_order_of_hasBesovExtension,
   Rd.BoundedLipschitzDomain.exists_memApprox_cubeSplineSchemeAt_iff,
   Rd.BoundedLipschitzDomain.exists_memApprox_cubeSplineSchemeAt_iff_of_order,
   Rd.BoundedLipschitzDomain.exists_memApprox_cubeSplineSchemeAt_iff_exists_besov}
@@ -2690,14 +2697,14 @@ function on $H$.
   Rd.LipschitzGraph.inner_coe_e, Rd.LipschitzGraph.sub_inner_smul_mem,
   Rd.LipschitzGraph.finrank_hyperplane_add_one, Rd.LipschitzGraph.finrank_hyperplane_eq_sub_one,
   Rd.LipschitzGraph.finrank_hyperplane_eq,
-  Rd.LipschitzGraph.orthogonal_hyperplane, Rd.LipschitzGraph.proj, Rd.LipschitzGraph.coe_proj,
-  Rd.LipschitzGraph.inner_coe_eq_inner_proj, Rd.LipschitzGraph.norm_proj_le,
-  Rd.LipschitzGraph.proj_coe, Rd.LipschitzGraph.proj_e, Rd.LipschitzGraph.graphMap,
-  Rd.LipschitzGraph.proj_graphMap, Rd.LipschitzGraph.inner_graphMap,
-  Rd.LipschitzGraph.phi_graphMap, Rd.LipschitzGraph.norm_graphMap_sub_le,
-  Rd.LipschitzGraph.continuous_graphMap, Rd.LipschitzGraph.phiH,
-  Rd.LipschitzGraph.lipschitzWith_phiH, Rd.LipschitzGraph.continuous_phiH,
-  Rd.LipschitzGraph.norm_sub_proj_le, Rd.LipschitzGraph.graphMap_add_mem}
+  Rd.LipschitzGraph.orthogonal_hyperplane, Rd.LipschitzGraph.graphProj,
+  Rd.LipschitzGraph.coe_graphProj, Rd.LipschitzGraph.inner_coe_eq_inner_graphProj,
+  Rd.LipschitzGraph.norm_graphProj_le, Rd.LipschitzGraph.graphProj_coe,
+  Rd.LipschitzGraph.graphProj_e, Rd.LipschitzGraph.graphMap, Rd.LipschitzGraph.graphProj_graphMap,
+  Rd.LipschitzGraph.inner_graphMap, Rd.LipschitzGraph.phi_graphMap,
+  Rd.LipschitzGraph.norm_graphMap_sub_le, Rd.LipschitzGraph.continuous_graphMap,
+  Rd.LipschitzGraph.phiH, Rd.LipschitzGraph.lipschitzWith_phiH, Rd.LipschitzGraph.continuous_phiH,
+  Rd.LipschitzGraph.norm_sub_graphProj_le, Rd.LipschitzGraph.graphMap_add_mem}
 \leanok
 \uses{def:lipschitz-graph, lem:graph-cone}
 Let $P x = x - \langle x, e \rangle e$ be the orthogonal projection onto $H$ and
@@ -2718,22 +2725,22 @@ product and graph coordinates over $H$ write it as a shear along $e$.
 
 \begin{lemma}[Flattening and product coordinates]
 \label{lem:flattening}
-\lean{Rd.LipschitzGraph.flatten, Rd.LipschitzGraph.unflatten, Rd.LipschitzGraph.phi_sub_smul,
-  Rd.LipschitzGraph.unflatten_flatten, Rd.LipschitzGraph.flatten_unflatten,
-  Rd.LipschitzGraph.inner_flatten, Rd.LipschitzGraph.flattenEquiv,
-  Rd.LipschitzGraph.continuous_flatten, Rd.LipschitzGraph.continuous_unflatten,
-  Rd.LipschitzGraph.lipschitzWith_unflatten, Rd.LipschitzGraph.lipschitzWith_flatten,
+\lean{Rd.LipschitzGraph.graphFlatten, Rd.LipschitzGraph.unflatten, Rd.LipschitzGraph.phi_sub_smul,
+  Rd.LipschitzGraph.unflatten_graphFlatten, Rd.LipschitzGraph.graphFlatten_unflatten,
+  Rd.LipschitzGraph.inner_graphFlatten, Rd.LipschitzGraph.graphFlattenEquiv,
+  Rd.LipschitzGraph.continuous_graphFlatten, Rd.LipschitzGraph.continuous_unflatten,
+  Rd.LipschitzGraph.lipschitzWith_unflatten, Rd.LipschitzGraph.lipschitzWith_graphFlatten,
   Rd.LipschitzGraph.graph_subset_image_unflatten,
-  Rd.LipschitzGraph.contDiff_flatten, Rd.LipschitzGraph.contDiff_unflatten,
-  Rd.LipschitzGraph.fderiv_phi_e, Rd.LipschitzGraph.hasFDerivAt_flatten,
+  Rd.LipschitzGraph.contDiff_graphFlatten, Rd.LipschitzGraph.contDiff_unflatten,
+  Rd.LipschitzGraph.fderiv_phi_e, Rd.LipschitzGraph.hasFDerivAt_graphFlatten,
   Rd.LipschitzGraph.det_fderiv_flatten, Rd.LipschitzGraph.lineEquiv,
-  Rd.LipschitzGraph.coe_lineEquiv, Rd.LipschitzGraph.prodEquiv,
-  Rd.LipschitzGraph.prodEquiv_apply, Rd.LipschitzGraph.measurePreserving_prodEquiv,
+  Rd.LipschitzGraph.coe_lineEquiv, Rd.LipschitzGraph.graphProdEquiv,
+  Rd.LipschitzGraph.graphProdEquiv_apply, Rd.LipschitzGraph.measurePreserving_graphProdEquiv,
   Rd.LipschitzGraph.graphShear, Rd.LipschitzGraph.measurePreserving_graphShear,
   Rd.LipschitzGraph.graphEquiv, Rd.LipschitzGraph.graphEquiv_apply,
   Rd.LipschitzGraph.measurePreserving_graphEquiv, Rd.LipschitzGraph.unflatten_eq,
-  Rd.LipschitzGraph.flatten_eq, Rd.LipschitzGraph.measurePreserving_unflatten,
-  Rd.LipschitzGraph.measurePreserving_flatten}
+  Rd.LipschitzGraph.graphFlatten_eq, Rd.LipschitzGraph.measurePreserving_unflatten,
+  Rd.LipschitzGraph.measurePreserving_graphFlatten}
 \leanok
 \uses{def:lipschitz-graph, def:graph-map}
 For a Lipschitz graph domain $\{x : \phi(x) < \langle x, e \rangle\}$ with $M$-Lipschitz
@@ -2910,7 +2917,7 @@ $\operatorname{Tr} = \sum_j (\eta_j * h_j) \circ \gamma$ converges absolutely in
 
 \begin{theorem}[The trace theorem on Lipschitz graph domains]
 \label{thm:trace-graph}
-\lean{Rd.LipschitzGraph.trace, Rd.LipschitzGraph.modNorm_trace_le}
+\lean{Rd.LipschitzGraph.graphTrace, Rd.LipschitzGraph.modNorm_graphTrace_le}
 \leanok
 \uses{thm:trace-series, lem:intrinsic-upper}
 The trace of $f \in L_p$ is
@@ -2933,10 +2940,10 @@ $h_j = 1_\Omega (k_j * f)$, and \Cref{lem:intrinsic-upper} with smoothness $s + 
 
 \begin{lemma}[Linearity and continuity of the trace]
 \label{lem:trace-linear}
-\lean{Rd.LipschitzGraph.traceTerm_sub, Rd.LipschitzGraph.trace_sub,
-  Rd.LipschitzGraph.traceTerm_smul, Rd.LipschitzGraph.trace_smul,
-  Rd.LipschitzGraph.enorm_trace_le, Rd.LipschitzGraph.tendsto_trace_of_modNorm_sub_le,
-  Rd.LipschitzGraph.enorm_trace_le_modNormOn}
+\lean{Rd.LipschitzGraph.traceTerm_sub, Rd.LipschitzGraph.graphTrace_sub,
+  Rd.LipschitzGraph.traceTerm_smul, Rd.LipschitzGraph.graphTrace_smul,
+  Rd.LipschitzGraph.enorm_graphTrace_le, Rd.LipschitzGraph.tendsto_graphTrace_of_modNorm_sub_le,
+  Rd.LipschitzGraph.enorm_graphTrace_le_modNormOn}
 \leanok
 \uses{thm:trace-graph, lem:trace-terms-lp, lem:intrinsic-upper, thm:graph-besov, def:conv}
 For every $c \in \C$ and every $f \in L_p(V)$, $\operatorname{Tr}(c f) = c \operatorname{Tr} f$.
@@ -2995,7 +3002,7 @@ Both sides are continuous and agree almost everywhere by \Cref{lem:reproducing-f
 
 \begin{lemma}[The trace as a limit of mollified restrictions]
 \label{lem:trace-mollified}
-\lean{Rd.LipschitzGraph.sum_traceFun_eq_conv, Rd.LipschitzGraph.exists_subseq_tendsto_trace}
+\lean{Rd.LipschitzGraph.sum_traceFun_eq_conv, Rd.LipschitzGraph.exists_subseq_tendsto_graphTrace}
 \leanok
 \uses{thm:trace-series, lem:reproducing-pointwise, lem:support-principle-two, def:graph-map}
 Let $s > 0$ and let $f \in L_p$ have a finite intrinsic norm of smoothness $s + 1/p$. The partial
@@ -3013,7 +3020,7 @@ $L_p(H)$ (\Cref{thm:trace-series}), and a subsequence converges almost everywher
 
 \begin{theorem}[The trace of continuous functions]
 \label{thm:trace-continuous}
-\lean{Rd.LipschitzGraph.sum_traceFun_eq, Rd.LipschitzGraph.trace_ae_eq_comp_graphMap}
+\lean{Rd.LipschitzGraph.sum_traceFun_eq, Rd.LipschitzGraph.graphTrace_ae_eq_comp_graphMap}
 \leanok
 \uses{lem:trace-mollified, lem:approx-identity-points}
 Let $L \geq 1$, $s > 0$, and let $f \in L_p$ have a finite norm as in \Cref{thm:trace-graph} and a
@@ -3137,11 +3144,11 @@ $\|h\| > 2^{-j}$, $|\Delta_h^m v_j| \leq 4$.
 \begin{lemma}[Extended atoms]
 \label{lem:extended-atoms}
 \lean{Rd.min_one_rpow_mul_le, Rd.LipschitzGraph.extendAtom, Rd.LipschitzGraph.extendAtom_graphMap,
-  Rd.LipschitzGraph.continuous_extendAtom, Rd.LipschitzGraph.higherDiff_comp_proj,
+  Rd.LipschitzGraph.continuous_extendAtom, Rd.LipschitzGraph.higherDiff_comp_graphProj,
   Rd.LipschitzGraph.enorm_extendAtom_le, Rd.LipschitzGraph.enorm_higherDiff_two_extendAtom_le,
   Rd.LipschitzGraph.extendRadius, Rd.LipschitzGraph.extendRadius_nonneg,
   Rd.LipschitzGraph.extendCenter,
-  Rd.LipschitzGraph.proj_extendCenter, Rd.LipschitzGraph.extendAtom_eq_zero,
+  Rd.LipschitzGraph.graphProj_extendCenter, Rd.LipschitzGraph.extendAtom_eq_zero,
   Rd.LipschitzGraph.isRegularAtom_extendAtom}
 \leanok
 \uses{lem:vertical-cutoff, lem:leibniz-differences, lem:pointwise-atoms}
@@ -3274,9 +3281,9 @@ $\Delta_h^{r + l} f = \Delta_h^l \Delta_h^r f$ and $\|\Delta_h^l g\|_p \leq 2^l 
 \label{thm:trace-extension}
 \lean{Rd.add_one_div_toReal_lt, Rd.one_div_toReal_pos, Rd.one_le_of_add_one_div_toReal_lt,
   Rd.modNorm_one_tsum_le, Rd.LipschitzGraph.modNorm_traceExtTerm_le,
-  Rd.LipschitzGraph.modNorm_one_traceExtTerm_le, Rd.LipschitzGraph.trace_sum_traceExtTerm,
+  Rd.LipschitzGraph.modNorm_one_traceExtTerm_le, Rd.LipschitzGraph.graphTrace_sum_traceExtTerm,
   Rd.LipschitzGraph.modNorm_graphExtension_lt_top_of_atoms,
-  Rd.LipschitzGraph.trace_graphExtension_of_atoms, Rd.LipschitzGraph.trace_graphExtension}
+  Rd.LipschitzGraph.graphTrace_graphExtension_of_atoms, Rd.LipschitzGraph.graphTrace_graphExtension}
 \leanok
 \uses{def:extension-atom-package, lem:extension-atoms-two, thm:graph-trace-extension,
   thm:trace-continuous, lem:trace-linear, lem:moduli-orders, lem:reproducing-formula,
@@ -3308,7 +3315,7 @@ the local means quasi-norm of $g$ is finite (\Cref{thm:local-means}).
 
 \begin{theorem}[The trace space of a Lipschitz graph domain]
 \label{thm:graph-trace-space}
-\lean{Rd.LipschitzGraph.exists_trace_eq_iff}
+\lean{Rd.LipschitzGraph.exists_graphTrace_eq_iff}
 \leanok
 \uses{thm:trace-graph, thm:trace-extension, lem:moduli-orders}
 Let $1 \leq p < \infty$, $0 < s < 1$, $1 \leq q \leq \infty$ and $L \geq 2$. A function
@@ -3335,8 +3342,8 @@ and $H = e^\perp$.
 
 \begin{lemma}[Restrictions of smooth atoms to the hyperplane]
 \label{lem:smooth-atoms-hyperplane}
-\lean{Rd.norm_iteratedFDeriv_comp_clm_le, Rd.LipschitzGraph.flat_graphMap,
-  Rd.LipschitzGraph.isSmoothAtom_comp_graphMap_flat}
+\lean{Rd.norm_iteratedFDeriv_comp_clm_le, Rd.LipschitzGraph.halfSpaceGraph_graphMap,
+  Rd.LipschitzGraph.isSmoothAtom_comp_graphMap_halfSpaceGraph}
 \leanok
 \uses{def:smooth-atoms, def:graph-map}
 The graph map of $\Omega$ is the inclusion of $H$. A smooth atom on $V$ of order $K$ with centre
@@ -3352,8 +3359,9 @@ inclusion has norm at most $1$. For $x' \in H$, $\|x' - Pc\| \leq \|x' - c\|$.
 
 \begin{theorem}[The trace theorem of every order]
 \label{thm:trace-every-order}
-\lean{Rd.LipschitzGraph.exists_trace_atoms_flat, Rd.LipschitzGraph.modNorm_traceSeries_le_flat,
-  Rd.LipschitzGraph.modNorm_trace_le_flat}
+\lean{Rd.LipschitzGraph.exists_trace_atoms_halfSpaceGraph,
+  Rd.LipschitzGraph.modNorm_traceSeries_le_halfSpaceGraph,
+  Rd.LipschitzGraph.modNorm_graphTrace_le_halfSpaceGraph}
 \leanok
 \uses{lem:smooth-atoms-hyperplane, lem:cell-atoms-smooth, lem:smooth-atoms-regular,
   lem:trace-atom-centres, lem:cells-partition, lem:trace-series-atoms, thm:trace-graph}
@@ -3379,8 +3387,8 @@ $(3d + r) 2^{-j}$ of the point (\Cref{lem:trace-atom-centres} with $M = 0$ and $
 
 \begin{lemma}[Extended atoms of every order]
 \label{lem:extended-atoms-every-order}
-\lean{Rd.LipschitzGraph.smoothGraph_flat, Rd.LipschitzGraph.vertCutoff_flat,
-  Rd.LipschitzGraph.exists_isSmoothAtom_extendAtom_flat}
+\lean{Rd.LipschitzGraph.smoothGraph_halfSpaceGraph, Rd.LipschitzGraph.vertCutoff_halfSpaceGraph,
+  Rd.LipschitzGraph.exists_isSmoothAtom_extendAtom_halfSpaceGraph}
 \leanok
 \uses{def:vertical-cutoff, lem:extended-atoms, def:smooth-atoms}
 For $\Omega$ the vertical cut-off is $v_j(x) = \chi(2^j \langle x, e \rangle)$. For every order $K$
@@ -3403,7 +3411,7 @@ atoms are smooth of every order.
 
 \begin{theorem}[The extension of every order is bounded]
 \label{thm:flat-extension-bounded}
-\lean{Rd.LipschitzGraph.exists_flat_extension_atoms,
+\lean{Rd.LipschitzGraph.exists_halfSpaceGraph_extension_atoms,
   Rd.LipschitzGraph.modNorm_flatExtension_le_localMeansNorm,
   Rd.LipschitzGraph.modNorm_flatExtension_le}
 \leanok
@@ -3430,7 +3438,7 @@ overlap. \Cref{thm:graph-trace-extension} (1) with this package of order $r$ con
 
 \begin{theorem}[The trace of the extension of every order]
 \label{thm:trace-flat-extension}
-\lean{Rd.LipschitzGraph.trace_flatExtension}
+\lean{Rd.LipschitzGraph.graphTrace_flatExtension}
 \leanok
 \uses{thm:flat-extension-bounded, thm:trace-extension}
 Let $1 \leq p < \infty$ and $1 \leq q \leq \infty$. For every $L \geq 2$, $L_H \geq 1$, $s > 0$
@@ -3446,7 +3454,7 @@ $\|(2^{js} \|k_j * g\|_p)_j\|_{\ell_q} < \infty$, $\operatorname{Tr}(E g) = g$.
 
 \begin{theorem}[The trace space of the half-space]
 \label{thm:half-space-trace-space}
-\lean{Rd.LipschitzGraph.exists_trace_eq_iff_flat}
+\lean{Rd.LipschitzGraph.exists_graphTrace_eq_iff_halfSpaceGraph}
 \leanok
 \uses{thm:trace-every-order, thm:flat-extension-bounded, thm:trace-flat-extension}
 Let $1 \leq p < \infty$, $s > 0$, $1 \leq q \leq \infty$, $L \geq 2$ with $s + 1/p < L$, and
@@ -3468,7 +3476,7 @@ $L_H = r$ has finite norm (\Cref{thm:flat-extension-bounded}) and trace $g$
 \label{lem:trace-continuous-half-space}
 \lean{Rd.foldHalfSpace, Rd.continuous_foldHalfSpace, Rd.foldHalfSpace_of_nonneg,
   Rd.inner_foldHalfSpace, Rd.foldHalfSpace_mem, Rd.norm_foldHalfSpace,
-  Rd.trace_ae_eq_of_continuousOn}
+  Rd.graphTrace_ae_eq_of_continuousOn}
 \leanok
 \uses{thm:trace-continuous, lem:trace-locality}
 Let $f \in L_p(V)$ have a finite intrinsic norm of smoothness $s + 1/p$, $s > 0$, on $\Omega$, and
@@ -3497,8 +3505,8 @@ $P_1$, $P_2$.
 \begin{lemma}[Locality of the trace]
 \label{lem:trace-locality}
 \lean{Rd.LipschitzGraph.conv_scaledMoment_convLp_eq_zero,
-  Rd.LipschitzGraph.trace_ae_eq_zero_of_ae_eq_zero, Rd.LipschitzGraph.intrinsicNorm_sub_le,
-  Rd.LipschitzGraph.trace_ae_eq_of_ae_eq, Rd.LipschitzGraph.trace_congr}
+  Rd.LipschitzGraph.graphTrace_ae_eq_zero_of_ae_eq_zero, Rd.LipschitzGraph.intrinsicNorm_sub_le,
+  Rd.LipschitzGraph.graphTrace_ae_eq_of_ae_eq, Rd.LipschitzGraph.graphTrace_congr}
 \leanok
 \uses{lem:trace-mollified, lem:trace-linear, lem:support-principle-two}
 Let $s > 0$, let $f_1, f_2 \in L_p$ have finite intrinsic norms of smoothness $s + 1/p$, and let
@@ -3520,9 +3528,10 @@ $1_\Omega f$ (\Cref{lem:support-principle-two}).
 
 \begin{lemma}[Approximation by the partial sums of the reproducing formula]
 \label{lem:partial-sums-approx}
-\lean{Rd.LocalMeansBump.partialSum, Rd.LocalMeansBump.partialSum_ae,
+\lean{Rd.LocalMeansBump.reproducingSum, Rd.LocalMeansBump.reproducingSum_ae,
   Rd.LocalMeansBump.continuous_partialSum_rep, Rd.LocalMeansBump.sum_range_ite_lt,
-  Rd.LocalMeansBump.tendsto_modNorm_sub_partialSum, Rd.LocalMeansBump.modNorm_partialSum_lt_top}
+  Rd.LocalMeansBump.tendsto_modNorm_sub_reproducingSum,
+  Rd.LocalMeansBump.modNorm_reproducingSum_lt_top}
 \leanok
 \uses{lem:reproducing-formula, lem:local-means-synthesis, lem:intrinsic-upper}
 The partial sums $G_J = \sum_{j \leq J} \eta_j * (k_j * f)$ are continuous and, for $0 < \sigma < L$,
@@ -3545,7 +3554,7 @@ means quasi-norm is finite (\Cref{lem:intrinsic-upper}).
 
 \begin{lemma}[The traces of the partial sums]
 \label{lem:trace-partial-sums}
-\lean{Rd.LipschitzGraph.tendsto_trace_partialSum}
+\lean{Rd.LipschitzGraph.tendsto_graphTrace_reproducingSum}
 \leanok
 \uses{lem:partial-sums-approx, lem:trace-linear, lem:restriction-moduli, lem:moduli-orders}
 Let $s > 0$, $s + 1/p < L$ and
@@ -3576,9 +3585,9 @@ Lebesgue measure, and a $K$-Lipschitz map $f$ has $\mu_H^k(f(N)) \leq K^k \mu_H^
 
 \begin{theorem}[Change of chart]
 \label{thm:change-of-chart}
-\lean{Rd.LipschitzGraph.lipschitzWith_proj_graphMap,
-  Rd.LipschitzGraph.finrank_hyperplane_eq_finrank, Rd.LipschitzGraph.ae_proj_graphMap,
-  Rd.LipschitzGraph.trace_ae_eq_trace_comp}
+\lean{Rd.LipschitzGraph.lipschitzWith_graphProj_graphMap,
+  Rd.LipschitzGraph.finrank_hyperplane_eq_finrank, Rd.LipschitzGraph.ae_graphProj_graphMap,
+  Rd.LipschitzGraph.graphTrace_ae_eq_graphTrace_comp}
 \leanok
 \uses{lem:trace-partial-sums, thm:trace-continuous, lem:lipschitz-null}
 Let $s > 0$, $s + 1/p < L$ and
@@ -3603,7 +3612,7 @@ converges to both values.
 
 \begin{lemma}[Traces of products with smooth functions]
 \label{lem:trace-products}
-\lean{Rd.LipschitzGraph.trace_mulLp_ae}
+\lean{Rd.LipschitzGraph.graphTrace_mulLp_ae}
 \leanok
 \uses{thm:change-of-chart, thm:multipliers, thm:trace-continuous, lem:trace-partial-sums}
 Let $s > 0$, $s + 1/p < L$, $F$ as in \Cref{thm:change-of-chart}, and $\psi$ smooth with bounded
@@ -3621,7 +3630,7 @@ everywhere.
 
 \begin{lemma}[The trace of a product is bounded]
 \label{lem:trace-products-bound}
-\lean{Rd.LipschitzGraph.exists_modNorm_trace_mulLp_le}
+\lean{Rd.LipschitzGraph.exists_modNorm_graphTrace_mulLp_le}
 \leanok
 \uses{thm:trace-graph, thm:graph-besov, thm:multipliers, lem:trace-partial-sums}
 For all $1 \leq p < \infty$, $0 < s < 1$, $1 \leq q \leq \infty$ and $L \in \N$ with
@@ -3646,9 +3655,9 @@ which is at most $M$ times the norm of $F$, with the multiplier constant $M$ of 
 
 \begin{lemma}[Traces of finite sums]
 \label{lem:trace-sums}
-\lean{Rd.LipschitzGraph.trace_zero, Rd.LipschitzGraph.trace_finsetSum,
+\lean{Rd.LipschitzGraph.graphTrace_zero, Rd.LipschitzGraph.graphTrace_finsetSum,
   Rd.LipschitzGraph.intrinsicNorm_add_le, Rd.LipschitzGraph.intrinsicNorm_finsetSum_lt_top,
-  Rd.LipschitzGraph.trace_finsetSum_of_intrinsicNorm}
+  Rd.LipschitzGraph.graphTrace_finsetSum_of_intrinsicNorm}
 \leanok
 \uses{lem:trace-linear, lem:pasting}
 For $s > 0$ and summands $F_i$ with finite norms
@@ -3672,10 +3681,11 @@ maps $\gamma_j$, projections $P_j$ and traces $\operatorname{Tr}_j$.
 
 \begin{lemma}[The boundary in the charts]
 \label{lem:boundary-charts}
-\lean{Rd.LipschitzGraph.closure_domain, Rd.LipschitzGraph.phi_proj,
-  Rd.LipschitzGraph.graphMap_proj_eq_iff, Rd.LipschitzGraph.mem_frontier_domain_iff,
+\lean{Rd.LipschitzGraph.closure_domain, Rd.LipschitzGraph.phi_graphProj,
+  Rd.LipschitzGraph.graphMap_graphProj_eq_iff, Rd.LipschitzGraph.mem_frontier_domain_iff,
   Rd.LipschitzGraph.range_graphMap, Rd.BoundedLipschitzDomain.mem_frontier_iff,
-  Rd.BoundedLipschitzDomain.graphMap_mem_frontier, Rd.BoundedLipschitzDomain.graphMap_proj_graphMap}
+  Rd.BoundedLipschitzDomain.graphMap_mem_frontier,
+  Rd.BoundedLipschitzDomain.graphMap_graphProj_graphMap}
 \leanok
 \uses{def:bounded-lipschitz, def:graph-map}
 For every Lipschitz graph domain, the closure is $\{x : \phi(x) \leq \langle x, e \rangle\}$, and
@@ -3824,7 +3834,7 @@ $\Omega_j$ (\Cref{thm:boundary-trace-charts}), which are linear on these functio
 
 \begin{theorem}[The boundary trace is bounded]
 \label{thm:boundary-trace-bounded}
-\lean{Rd.BoundedLipschitzDomain.trace_mulLp_ae_boundaryTrace,
+\lean{Rd.BoundedLipschitzDomain.graphTrace_mulLp_ae_boundaryTrace,
   Rd.BoundedLipschitzDomain.memBoundaryBesov_boundaryTrace}
 \leanok
 \uses{thm:boundary-trace-charts, lem:trace-products, thm:trace-graph, thm:multipliers,
@@ -5326,7 +5336,7 @@ $J_t u$ is real for real $u$.
 
 \begin{lemma}[Schwartz functions in $H^t(V)$]
 \label{lem:sobolev-schwartz-elements}
-\lean{Rd.inner_toLp_toLp, Rd.toLp_schwartz, Rd.toLp_ofTest, Rd.inner_ofTest_toLp,
+\lean{Rd.besselPotential_inner_toLp_toLp, Rd.toLp_schwartz, Rd.toLp_ofTest, Rd.inner_ofTest_toLp,
   Rd.inner_ofTest_left}
 \leanok
 \uses{lem:bessel-schwartz-distribution, lem:bessel-potential-l2-schwartz,
@@ -5381,9 +5391,9 @@ $J_s J_s = J_{2s}$. The last statement is \Cref{lem:sobolev-schwartz-elements}, 
 
 \begin{definition}[The pairing of $H^{-s}(V)$ and $H^s(V)$]
 \label{def:sobolev-pairing}
-\lean{Rd.pairing, Rd.pairing_add_left, Rd.pairing_sub_left, Rd.pairing_smul_left,
-  Rd.pairing_add_right, Rd.pairing_sub_right, Rd.pairing_smul_right, Rd.pairingCLM,
-  Rd.pairingCLM_apply}
+\lean{Rd.sobolevPairing, Rd.sobolevPairing_add_left, Rd.sobolevPairing_sub_left,
+  Rd.sobolevPairing_smul_left, Rd.sobolevPairing_add_right, Rd.sobolevPairing_sub_right,
+  Rd.sobolevPairing_smul_right, Rd.pairingCLM, Rd.pairingCLM_apply}
 \leanok
 For $s \in \R$, $W \in H^{-s}(V)$ and $U \in H^s(V)$,
 $[W, U] = \langle J_{-s} W, J_s U \rangle_{L_2}$. It is conjugate-linear in $W$ and linear in $U$,
@@ -5393,8 +5403,8 @@ $H^s(V)$.
 
 \begin{proposition}[Properties of the pairing]
 \label{prop:sobolev-pairing}
-\lean{Rd.norm_pairing_le, Rd.pairing_besselShift, Rd.pairing_ofTest_left,
-  Rd.pairing_ofTest_right, Rd.pairing_one_toLp}
+\lean{Rd.norm_sobolevPairing_le, Rd.sobolevPairing_besselShift, Rd.sobolevPairing_ofTest_left,
+  Rd.sobolevPairing_ofTest_right, Rd.sobolevPairing_one_toLp}
 \leanok
 \uses{def:sobolev-pairing, lem:bessel-shift, lem:sobolev-schwartz-elements,
   lem:sobolev-one-to-l2, lem:plancherel-l2}
@@ -5480,7 +5490,8 @@ $H^s(\Omega)$.
 
 \begin{lemma}[Elements vanishing on $\Omega$ pair to zero]
 \label{lem:sobolev-pairing-vanishing}
-\lean{Rd.pairing_eq_zero_of_mem_vanishOn_left, Rd.pairing_eq_zero_of_mem_vanishOn_right}
+\lean{Rd.sobolevPairing_eq_zero_of_mem_vanishOn_left,
+  Rd.sobolevPairing_eq_zero_of_mem_vanishOn_right}
 \leanok
 \uses{thm:tilde-restriction-shift, prop:sobolev-pairing}
 For every open $\Omega$, every $s \in \R$, every $W \in N^{-s}(\Omega)$ and every
@@ -5498,8 +5509,8 @@ complement of $N^s(\Omega)$ (\Cref{thm:tilde-restriction-shift}).
 
 \begin{theorem}[The dual of $\tilde H^s(\Omega)$ is $H^{-s}(\Omega)$]
 \label{thm:sobolev-duality}
-\lean{Rd.dualEquiv, Rd.dualEquiv_apply, Rd.dualEquiv_symm_apply, Rd.dualEquiv_eq_iff,
-  Rd.norm_dualEquiv, Rd.dualEquiv_apply_of_restrictProj_eq}
+\lean{Rd.tildeDualEquiv, Rd.tildeDualEquiv_apply, Rd.tildeDualEquiv_symm_apply,
+  Rd.tildeDualEquiv_eq_iff, Rd.norm_tildeDualEquiv, Rd.tildeDualEquiv_apply_of_restrictProj_eq}
 \leanok
 \uses{thm:tilde-restriction-shift, prop:sobolev-pairing, lem:sobolev-pairing-vanishing}
 For every open $\Omega$, every $s \in \R$ and every bounded linear functional $\ell$ on
@@ -5639,7 +5650,7 @@ range.
 \begin{theorem}[The Gelfand triple
   $\tilde H^s(\Omega) \subseteq L_2(\Omega) \subseteq H^{-s}(\Omega)$]
 \label{thm:domain-gelfand-triple}
-\lean{Rd.pivotDual_tildeToL2_apply_apply, Rd.pairing_dualEquiv_pivotDual_tildeToL2}
+\lean{Rd.pivotDual_tildeToL2_apply_apply, Rd.sobolevPairing_tildeDualEquiv_pivotDual_tildeToL2}
 \leanok
 \uses{thm:pivot-dual, lem:tilde-dense-l2, thm:sobolev-duality}
 Let $\Omega \subseteq V$ be open, $s \geq 0$, and $J_\Omega : L_2(\Omega) \to
@@ -5809,7 +5820,7 @@ for $H^s(V)$ (\Cref{thm:sobolev-besov-constants}) in \Cref{sec:trace-space-norm}
 
 \begin{lemma}[The trace of $H^1(V)$ on a Lipschitz graph is bounded]
 \label{lem:graph-trace-sobolev-one}
-\lean{Rd.LipschitzGraph.exists_enorm_trace_toL2_le}
+\lean{Rd.LipschitzGraph.exists_enorm_graphTrace_toL2_le}
 \leanok
 \uses{lem:trace-linear, thm:sobolev-one-besov-constant}
 For every Lipschitz graph domain with hyperplane $H$ and trace $\operatorname{Tr}$
@@ -5826,7 +5837,7 @@ $\iota U$ (\Cref{lem:trace-linear}), which is at most $\sqrt 2 \, C_1 \|U\|$
 
 \begin{lemma}[$H^s(V) \subseteq B^{1/2}_{2,1}(V)$ and the trace on a Lipschitz graph]
 \label{lem:graph-trace-sobolev}
-\lean{Rd.modNorm_half_one_le_norm_of_lt, Rd.LipschitzGraph.exists_enorm_trace_sobolevToL2_le}
+\lean{Rd.modNorm_half_one_le_norm_of_lt, Rd.LipschitzGraph.exists_enorm_graphTrace_sobolevToL2_le}
 \leanok
 \uses{lem:trace-linear, lem:besov-half-one-general, thm:sobolev-besov-constants}
 Let $1/2 < s < 2$, let $c_s$ be the constant of \Cref{lem:besov-half-one-general} and $C_{s,2}$
@@ -5901,7 +5912,7 @@ $\sum_j \psi_j \leq 1$ on $V$.
   Rd.BoundedLipschitzDomain.sum_boundaryPartition_le_one,
   Rd.BoundedLipschitzDomain.BoundaryPartition.derivBound,
   Rd.BoundedLipschitzDomain.BoundaryPartition.derivBound_spec,
-  Rd.BoundedLipschitzDomain.BoundaryPartition.localize}
+  Rd.BoundedLipschitzDomain.BoundaryPartition.localizeL2}
 \leanok
 \uses{def:sobolev-restriction-space, def:boundary-partition, lem:product-modulus,
   lem:resolution-of-unity, lem:resolution-of-unity-nonneg}
@@ -5915,10 +5926,11 @@ $\psi_j$ of order at most $2$.
 \begin{theorem}[The chart traces are bounded]
 \label{thm:chart-traces-bounded}
 \lean{Rd.BoundedLipschitzDomain.chartTraceLinear,
-  Rd.BoundedLipschitzDomain.BoundaryPartition.intrinsicNorm_localize_lt_top,
+  Rd.BoundedLipschitzDomain.BoundaryPartition.intrinsicNorm_localizeL2_lt_top,
   Rd.BoundedLipschitzDomain.chartTraceLinear_apply,
-  Rd.BoundedLipschitzDomain.exists_enorm_trace_localize_le, Rd.BoundedLipschitzDomain.chartTrace,
-  Rd.BoundedLipschitzDomain.chartTrace_apply, Rd.BoundedLipschitzDomain.chartTrace_ae_eq}
+  Rd.BoundedLipschitzDomain.exists_enorm_graphTrace_localizeL2_le,
+  Rd.BoundedLipschitzDomain.chartTrace, Rd.BoundedLipschitzDomain.chartTrace_apply,
+  Rd.BoundedLipschitzDomain.chartTrace_ae_eq}
 \leanok
 \uses{def:trace-space-setting, lem:besov-half-one-general, lem:graph-trace-sobolev,
   lem:trace-linear, lem:product-modulus, lem:trace-partial-sums, thm:multipliers,
@@ -6034,8 +6046,8 @@ and the boundary trace depends only on the function on $\Omega$
 
 \begin{definition}[The trace space of $H^s(\Omega)$]
 \label{def:trace-space}
-\lean{Rd.BoundedLipschitzDomain.TraceSpace, Rd.BoundedLipschitzDomain.trace,
-  Rd.BoundedLipschitzDomain.extend}
+\lean{Rd.BoundedLipschitzDomain.TraceSpace, Rd.BoundedLipschitzDomain.domainTrace,
+  Rd.BoundedLipschitzDomain.domainExtend}
 \leanok
 \uses{def:trace-kernel}
 Let $1/2 < s < 3/2$. The trace space of $H^s(\Omega)$ is $(N^s_\Gamma)^\perp$, the orthogonal
@@ -6048,9 +6060,11 @@ extension $E = E_1$.
 
 \begin{theorem}[Trace and extension]
 \label{thm:trace-space-operators}
-\lean{Rd.BoundedLipschitzDomain.trace_extend, Rd.BoundedLipschitzDomain.norm_trace_apply_le,
-  Rd.BoundedLipschitzDomain.norm_extend_apply, Rd.BoundedLipschitzDomain.trace_eq_zero_iff,
-  Rd.BoundedLipschitzDomain.ker_trace, Rd.BoundedLipschitzDomain.sub_extend_trace_mem,
+\lean{Rd.BoundedLipschitzDomain.domainTrace_domainExtend,
+  Rd.BoundedLipschitzDomain.norm_domainTrace_apply_le,
+  Rd.BoundedLipschitzDomain.norm_domainExtend_apply,
+  Rd.BoundedLipschitzDomain.domainTrace_eq_zero_iff, Rd.BoundedLipschitzDomain.ker_domainTrace,
+  Rd.BoundedLipschitzDomain.sub_domainExtend_domainTrace_mem,
   Rd.BoundedLipschitzDomain.quotientEquivTraceSpace,
   Rd.BoundedLipschitzDomain.quotientEquivTraceSpace_mk}
 \leanok
@@ -6077,11 +6091,12 @@ functions on $\Gamma$.
 
 \begin{theorem}[The functions of the trace space]
 \label{thm:trace-space-functions}
-\lean{Rd.BoundedLipschitzDomain.trace_eq_iff, Rd.BoundedLipschitzDomain.trace_one_eq_iff,
-  Rd.BoundedLipschitzDomain.boundaryTrace_extend_trace,
-  Rd.BoundedLipschitzDomain.boundaryTrace_extend_eventuallyEq_iff,
+\lean{Rd.BoundedLipschitzDomain.domainTrace_eq_iff,
+  Rd.BoundedLipschitzDomain.domainTrace_one_eq_iff,
+  Rd.BoundedLipschitzDomain.boundaryTrace_domainExtend_domainTrace,
+  Rd.BoundedLipschitzDomain.boundaryTrace_domainExtend_eventuallyEq_iff,
   Rd.BoundedLipschitzDomain.memBoundaryBesov_sobolevToL2,
-  Rd.BoundedLipschitzDomain.memBoundaryBesov_extend,
+  Rd.BoundedLipschitzDomain.memBoundaryBesov_domainExtend,
   Rd.BoundedLipschitzDomain.exists_traceSpace_of_memBoundaryBesov}
 \leanok
 \uses{thm:trace-kernel-boundary, thm:trace-space-operators, thm:boundary-trace-bounded,
@@ -6136,7 +6151,8 @@ the trace space $(N^s_\Gamma)^\perp$.
 \begin{theorem}[Riesz for the dual of the trace space and the adjoint of the trace]
 \label{thm:dual-trace-space}
 \lean{Rd.BoundedLipschitzDomain.dualTraceEquiv, Rd.BoundedLipschitzDomain.dualTraceEquiv_apply,
-  Rd.BoundedLipschitzDomain.eq_dualTraceEquiv_of_forall, Rd.BoundedLipschitzDomain.adjoint_trace}
+  Rd.BoundedLipschitzDomain.eq_dualTraceEquiv_of_forall,
+  Rd.BoundedLipschitzDomain.adjoint_domainTrace}
 \leanok
 \uses{def:dual-trace-space, thm:trace-space-operators}
 Let $1/2 < s < 3/2$. For every $\ell \in ((N^s_\Gamma)^\perp)^*$ there is exactly one
@@ -6174,8 +6190,8 @@ $N_\Gamma^\perp$ of $H^1(\Omega)$ and $B^{1/2}_{2,2}(\Gamma)$.
 
 \begin{lemma}[Restrictions and the trace of $H^s(\Omega)$]
 \label{lem:boundary-trace-restriction}
-\lean{Rd.BoundedLipschitzDomain.enorm_trace_restrictProj_le,
-  Rd.BoundedLipschitzDomain.trace_restrictProj_eq,
+\lean{Rd.BoundedLipschitzDomain.enorm_domainTrace_restrictProj_le,
+  Rd.BoundedLipschitzDomain.domainTrace_restrictProj_eq,
   Rd.BoundedLipschitzDomain.enorm_le_of_boundaryTrace_eventuallyEq}
 \leanok
 \uses{lem:sobolev-restriction-basic, lem:boundary-trace-restriction-sobolev,
@@ -6216,7 +6232,7 @@ $\|E_s t\| = \|t\|$ (\Cref{thm:trace-space-operators}).
 \begin{lemma}[Bounds of the trace of $H^s(V)$ and of an extension into $H^s(V)$]
 \label{lem:trace-space-norm-bounds}
 \lean{Rd.BoundedLipschitzDomain.exists_boundaryBesovNorm_sobolevToL2_le,
-  Rd.BoundedLipschitzDomain.exists_boundaryBesovNorm_extend_le,
+  Rd.BoundedLipschitzDomain.exists_boundaryBesovNorm_domainExtend_le,
   Rd.BoundedLipschitzDomain.exists_sobolevToL2_boundaryTrace_eq_le}
 \leanok
 \uses{thm:boundary-besov-norm-trace, thm:boundary-besov-norm-extension,
@@ -6274,7 +6290,7 @@ makes $g \mapsto E_s t$ a bounded linear operator.
 
 \begin{theorem}[$(N^s_\Gamma)^\perp$ and $B^{s-1/2}_{2,2}(\Gamma)$ have equivalent norms]
 \label{thm:trace-space-norm-equiv}
-\lean{Rd.BoundedLipschitzDomain.exists_enorm_le_boundaryBesovNorm_extend,
+\lean{Rd.BoundedLipschitzDomain.exists_enorm_le_boundaryBesovNorm_domainExtend,
   Rd.BoundedLipschitzDomain.exists_traceL2_norm_equiv}
 \leanok
 \uses{thm:trace-space-right-inverse, lem:trace-space-norm-bounds, thm:trace-space-functions,
@@ -6346,7 +6362,7 @@ and bounded in both directions by \Cref{thm:trace-space-norm-equiv} for $\psi^0$
 \begin{theorem}[The bounded linear right inverse of the trace]
 \label{thm:trace-right-inverse}
 \lean{Rd.BoundedLipschitzDomain.traceRightInverse,
-  Rd.BoundedLipschitzDomain.trace_traceRightInverse,
+  Rd.BoundedLipschitzDomain.domainTrace_traceRightInverse,
   Rd.BoundedLipschitzDomain.boundaryTraceL2_traceRightInverse,
   Rd.BoundedLipschitzDomain.norm_traceRightInverse_le}
 \leanok
@@ -6442,7 +6458,7 @@ $a(y)$.
 
 \begin{lemma}[Double integrals in a chart]
 \label{lem:boundary-double-integral-charts}
-\lean{Rd.LipschitzGraph.one_le_ofReal_gram,
+\lean{Rd.LipschitzGraph.one_le_ofReal_gramDensity,
   Rd.BoundedLipschitzDomain.lintegral_chart_le,
   Rd.BoundedLipschitzDomain.lintegral_le_chart,
   Rd.BoundedLipschitzDomain.lintegral_lintegral_surfaceMeasure_of_support,
@@ -7433,10 +7449,11 @@ gives $F \in \Sob{1}{p}(V)$. (2) Every term of the left side is at most $C X < \
 
 \begin{theorem}[The extension from one patch]
 \label{thm:one-patch-extension}
-\lean{Rd.LocalMeansBump.extensionConst, Rd.LocalMeansBump.extensionConst_ne_top,
+\lean{Rd.LocalMeansBump.bumpExtensionConst, Rd.LocalMeansBump.bumpExtensionConst_ne_top,
   Rd.LocalMeansBump.memTriebelLizorkin_localExtension_of_tlLocalNormOn,
   Rd.LocalMeansBump.ae_localExtension_eq_of_ae_eq_indicator,
-  Rd.LocalMeansBump.enorm_localExtension_add_le_extensionConst, Rd.LocalMeansBump.extendsSobolev}
+  Rd.LocalMeansBump.enorm_localExtension_add_le_bumpExtensionConst,
+  Rd.LocalMeansBump.extendsSobolev}
 \leanok
 \uses{thm:tl-local-means-gradient, lem:tl-local-extension, def:extends-sobolev,
   thm:triebel-lizorkin-to-sobolev, thm:local-extension, lem:support-principle-two}
@@ -7496,7 +7513,7 @@ $Y = \|f\|_{L_p(O)} + \sum_i \|g_i\|_{L_p(O)}$.
 \begin{lemma}[Supports of the dilated divergence kernels]
 \label{lem:divergence-kernel-supports}
 \lean{Rd.LocalMeansBump.exists_momentKernel_ne_zero_of_divKernel_ne_zero,
-  Rd.LocalMeansBump.tsupport_dilate_divKernel_subset,
+  Rd.LocalMeansBump.tsupport_dilate_divKernel_subset_of_isClosed,
   Rd.LocalMeansBump.tsupport_dilate_divKernel_subset_closedBall,
   Rd.LipschitzGraph.tsupport_dilate_divKernel_subset, Rd.LipschitzGraph.patch_support_divKernel}
 \leanok
@@ -8093,7 +8110,7 @@ flattening and $F^{-1}(y) = y + \varphi(y) e$ its inverse (\Cref{lem:flattening}
 
 \begin{lemma}[Flattening a Lipschitz graph domain]
 \label{lem:lipschitz-flattening}
-\lean{Rd.LipschitzGraph.mapsTo_flatten, Rd.LipschitzGraph.mapsTo_unflatten,
+\lean{Rd.LipschitzGraph.mapsTo_graphFlatten, Rd.LipschitzGraph.mapsTo_unflatten,
   Rd.LipschitzGraph.mapsTo_unflatten_inter_ball}
 \leanok
 \uses{lem:flattening, def:half-space-reflection}
@@ -8112,7 +8129,7 @@ Both $F$ and $F^{-1}$ preserve Lebesgue measure (\Cref{lem:flattening}).
 
 \begin{definition}[The extension by reflection]
 \label{def:graph-reflection-extension}
-\lean{Rd.LipschitzGraph.reflect, Rd.LipschitzGraph.reflectionExtension}
+\lean{Rd.LipschitzGraph.graphReflect, Rd.LipschitzGraph.reflectionExtension}
 \leanok
 \uses{def:half-space-reflection, lem:flattening}
 For a Lipschitz graph domain $G$ the \emph{graph reflection} is
@@ -8123,9 +8140,9 @@ $e^\perp$ (\Cref{def:half-space-reflection}).
 
 \begin{lemma}[The graph reflection]
 \label{lem:graph-reflection}
-\lean{Rd.LipschitzGraph.reflect_eq, Rd.LipschitzGraph.reflect_reflect,
+\lean{Rd.LipschitzGraph.graphReflect_eq, Rd.LipschitzGraph.graphReflect_graphReflect,
   Rd.LipschitzGraph.reflectionExtension_of_mem, Rd.LipschitzGraph.reflectionExtension_of_lt,
-  Rd.LipschitzGraph.measurePreserving_reflect}
+  Rd.LipschitzGraph.measurePreserving_graphReflect}
 \leanok
 \uses{def:graph-reflection-extension, lem:half-space-reflection, lem:lipschitz-flattening,
   lem:flattening}
@@ -9431,7 +9448,7 @@ directional derivatives vanishes.
 
 \begin{lemma}[The domain in product coordinates]
 \label{lem:graph-product-coordinates}
-\lean{Rd.LipschitzGraph.prodEquiv_mem_domain_iff,
+\lean{Rd.LipschitzGraph.graphProdEquiv_mem_domain_iff,
   Rd.LipschitzGraph.graphMap_add_smul_mem_domain_iff}
 \leanok
 \uses{def:lipschitz-graph, lem:flattening}
@@ -9544,7 +9561,7 @@ $n_v(x') = \langle \nabla\varphi(x'), v \rangle - \langle v, e \rangle$.
 
 \begin{lemma}[Properties of the normal weight]
 \label{lem:normal-weight}
-\lean{Rd.LipschitzGraph.inner_normalAt_mul_gram, Rd.LipschitzGraph.abs_normalWeight_le,
+\lean{Rd.LipschitzGraph.inner_normalAt_mul_gramDensity, Rd.LipschitzGraph.abs_normalWeight_le,
   Rd.LipschitzGraph.measurable_normalWeight, Rd.LipschitzGraph.memLp_top_normalWeight}
 \leanok
 \uses{def:normal-weight, def:graph-normal, lem:graph-gradient}
@@ -9690,7 +9707,8 @@ $\int_\Omega \partial_v g = \int_\Gamma g \langle v, \nu \rangle \, d\sigma$.
 
 \begin{lemma}[Continuity of both sides of Green's formula]
 \label{lem:green-continuous}
-\lean{Rd.setIntegral_weakDeriv_mul_add_eq, Rd.continuous_setIntegral_weakDeriv_mul_add,
+\lean{Rd.setIntegral_weakDeriv_mul_add_eq,
+  Rd.continuous_setIntegral_weakDeriv_mul_add_of_measurableSet,
   Rd.LipschitzGraph.integral_mul_mul_normalWeight_eq,
   Rd.LipschitzGraph.continuous_setIntegral_weakDeriv_mul_add,
   Rd.LipschitzGraph.continuous_integral_traceH1_mul_normalWeight}
@@ -9911,7 +9929,7 @@ of $x$ has zero directional derivatives at $x$.
 \label{lem:sobolev-one-products}
 \lean{Rd.exists_toL2_eq_mulLp, Rd.ae_weakDeriv_mul_add_eq_zero_of_mulLp,
   Rd.BoundedLipschitzDomain.BoundaryPartition.hasCompactSupport,
-  Rd.BoundedLipschitzDomain.BoundaryPartition.exists_toL2_eq_localize}
+  Rd.BoundedLipschitzDomain.BoundaryPartition.exists_toL2_eq_localizeL2}
 \leanok
 \uses{lem:product-rule-lp, lem:sobolev-one-weak-gradient-norm,
   lem:sobolev-one-weak-derivative-local, def:trace-space-setting}
@@ -9957,7 +9975,7 @@ compact. Then $g(x) = \phi(P x) \, \chi(x)$, since $P \gamma(x') = x'$.
 
 \begin{definition}[The domain below the graph]
 \label{def:lower-graph-domain}
-\lean{Rd.LipschitzGraph.lower}
+\lean{Rd.LipschitzGraph.lowerGraph}
 \leanok
 \uses{def:lipschitz-graph}
 For a Lipschitz graph domain $\Omega = \{x : \varphi(x) < \langle x, e \rangle\}$ with Lipschitz
@@ -9967,8 +9985,9 @@ function $-\varphi$ and Lipschitz constant $M$.
 
 \begin{lemma}[The domain below the graph]
 \label{lem:lower-graph-domain}
-\lean{Rd.LipschitzGraph.mem_lower_domain_iff, Rd.LipschitzGraph.notMem_domain_of_mem_lower_domain,
-  Rd.LipschitzGraph.lower_graphMap_proj_graphMap}
+\lean{Rd.LipschitzGraph.mem_lowerGraph_domain_iff,
+  Rd.LipschitzGraph.notMem_domain_of_mem_lowerGraph_domain,
+  Rd.LipschitzGraph.lowerGraph_graphMap_graphProj_graphMap}
 \leanok
 \uses{def:lower-graph-domain, lem:boundary-charts}
 For every Lipschitz graph domain $\Omega$ with graph map $\gamma$ and lower graph domain
@@ -9986,7 +10005,8 @@ $y = \gamma(x')$ has $\langle y, e \rangle = \varphi(y)$, so it lies on the grap
 
 \begin{theorem}[The traces from both sides of a graph]
 \label{thm:traces-both-sides}
-\lean{Rd.LipschitzGraph.traceH1_ae_eq_traceH1_lower, Rd.LipschitzGraph.traceH1_ae_eq_zero_of_lower}
+\lean{Rd.LipschitzGraph.traceH1_ae_eq_traceH1_lowerGraph,
+  Rd.LipschitzGraph.traceH1_ae_eq_zero_of_lowerGraph}
 \leanok
 \uses{lem:lower-graph-domain, thm:change-of-chart, lem:trace-locality,
   lem:graph-trace-sobolev-one-operator}
@@ -10033,7 +10053,7 @@ lies in the bounded set $\Omega$.
 
 \begin{lemma}[The pieces of Green's formula]
 \label{lem:green-pieces}
-\lean{Rd.BoundedLipschitzDomain.setIntegral_weakDeriv_mul_add_localize,
+\lean{Rd.BoundedLipschitzDomain.setIntegral_weakDeriv_mul_add_localizeL2,
   Rd.BoundedLipschitzDomain.setIntegral_weakDeriv_mul_add_mulLp_eq_zero,
   Rd.BoundedLipschitzDomain.toL2_ae_eq_sum_add}
 \leanok
@@ -10099,7 +10119,7 @@ $\partial_v W = \partial_v (\sum_j W_j + W_0)$ (\Cref{lem:green-pieces},
   Rd.BoundedLipschitzDomain.integrable_mul_inner_normalAt,
   Rd.BoundedLipschitzDomain.integral_mul_inner_normalAt_sub_eq_zero,
   Rd.BoundedLipschitzDomain.integral_graphMap_mul_inner_normalAt_sub_eq_zero,
-  Rd.BoundedLipschitzDomain.locallyIntegrable_inner_normalAt_sub_mul_gram}
+  Rd.BoundedLipschitzDomain.locallyIntegrable_inner_normalAt_sub_mul_gramDensity}
 \leanok
 \uses{thm:graph-gauss-green, lem:localisation-integrals, thm:surface-measure-charts-complex,
   thm:surface-measure-null-sets, lem:graph-normal, lem:graph-gradient}
@@ -10135,7 +10155,7 @@ $2 \|v\| \sqrt{1 + M_j^2}$ (\Cref{lem:graph-normal}, \Cref{lem:graph-gradient}).
 \begin{theorem}[The chart normals agree]
 \label{thm:chart-normals-agree}
 \lean{Rd.BoundedLipschitzDomain.normalAt_graphMap_ae_eq,
-  Rd.BoundedLipschitzDomain.normalAt_proj_ae_eq}
+  Rd.BoundedLipschitzDomain.normalAt_graphProj_ae_eq}
 \leanok
 \uses{lem:domain-gauss-green-chart, lem:hyperplane-test-restriction,
   thm:surface-measure-null-sets, lem:graph-gradient}
@@ -10158,8 +10178,9 @@ statement is the first in the chart $j$ (\Cref{thm:surface-measure-null-sets}).
 
 \begin{theorem}[The unit normal]
 \label{thm:boundary-normal-chart}
-\lean{Rd.BoundedLipschitzDomain.normal_ae_eq_normalAt, Rd.BoundedLipschitzDomain.norm_normal_ae,
-  Rd.BoundedLipschitzDomain.inner_normal_neg_ae}
+\lean{Rd.BoundedLipschitzDomain.outwardNormal_ae_eq_normalAt,
+  Rd.BoundedLipschitzDomain.norm_outwardNormal_ae,
+  Rd.BoundedLipschitzDomain.inner_outwardNormal_neg_ae}
 \leanok
 \uses{thm:chart-normals-agree, def:boundary-normal, lem:graph-normal, def:surface-measure}
 For every $j$ and $\sigma$-almost every $y \in B_j$, $\nu(y) = \nu_j(P_j y)$ and
@@ -10180,9 +10201,9 @@ $\sum_k \psi^0_k(y) = 1$. The chart normals are unit vectors and point away from
 \begin{lemma}[The boundary integral in the charts]
 \label{lem:boundary-integral-charts}
 \lean{Rd.BoundedLipschitzDomain.ambientTraceL2_graphMap_ae,
-  Rd.BoundedLipschitzDomain.normal_graphMap_ae,
-  Rd.BoundedLipschitzDomain.integrable_ambientTraceL2_mul_inner_normal,
-  Rd.BoundedLipschitzDomain.integral_ambientTraceL2_mul_inner_normal_eq}
+  Rd.BoundedLipschitzDomain.outwardNormal_graphMap_ae,
+  Rd.BoundedLipschitzDomain.integrable_ambientTraceL2_mul_inner_outwardNormal,
+  Rd.BoundedLipschitzDomain.integral_ambientTraceL2_mul_inner_outwardNormal_eq}
 \leanok
 \uses{thm:surface-measure-null-sets, thm:ambient-trace-l2, thm:boundary-trace-charts,
   thm:boundary-normal-chart, lem:boundary-normal, thm:surface-measure-charts-complex,
@@ -10213,11 +10234,11 @@ give the identity.
 
 \begin{theorem}[Green's formula on a bounded Lipschitz domain]
 \label{thm:domain-green}
-\lean{Rd.BoundedLipschitzDomain.setIntegral_green_surface,
+\lean{Rd.BoundedLipschitzDomain.setIntegral_green_surfaceMeasure,
   Rd.BoundedLipschitzDomain.setIntegral_green_sobolevOne,
   Rd.BoundedLipschitzDomain.setIntegral_green_sobolevOne_of_hasWeakLineDeriv,
-  Rd.BoundedLipschitzDomain.setIntegral_green_besselPotentialSpace,
-  Rd.BoundedLipschitzDomain.setIntegral_green}
+  Rd.BoundedLipschitzDomain.setIntegral_green_besselPotentialSpace_of_boundaryPartition,
+  Rd.BoundedLipschitzDomain.setIntegral_green_of_boundaryPartition}
 \leanok
 \uses{thm:domain-green-charts-nhds, lem:boundary-integral-charts, lem:boundary-partition-nhds,
   thm:trace-l2, lem:sobolev-one-weak-gradient-norm, lem:sobolev-one-weak-derivative-operator,
@@ -11595,7 +11616,7 @@ From now on $M$ is compact, smooth, and the range $\Omega$ of $I$ is a Besov dom
 \label{def:besov-atlas}
 \lean{Manifold.BesovAtlas, Manifold.BesovAtlas.nonempty,
   Manifold.exists_contMDiff_eq_one_tsupport_subset, Manifold.contDiffOn_comp_extend_symm,
-  Manifold.BesovAtlas.ext, Manifold.BesovAtlas.psi_le_one, Manifold.BesovAtlas.theta_mul_psi}
+  Manifold.BesovAtlas.extChart, Manifold.BesovAtlas.psi_le_one, Manifold.BesovAtlas.theta_mul_psi}
 \leanok
 A Besov atlas consists of finitely many charts $e_i$ of the atlas with extended charts
 $\kappa_i$, a smooth partition of unity $(\psi_i)$ with $\operatorname{tsupport} \psi_i \subseteq
@@ -11670,7 +11691,7 @@ $(\psi_i g) \circ \kappa_i^{-1}$; outside the compact carrier it vanishes on an 
 \label{lem:coord-change}
 \lean{Manifold.range_inter_coordChange_source, Manifold.range_inter_coordChange_target,
   Manifold.mem_coordChange_source, Manifold.coordChange_target_eq_image,
-  Manifold.coordChange_apply, Manifold.image_coordChange_inter,
+  Manifold.extendCoordChange_apply, Manifold.image_coordChange_inter,
   Manifold.measurableSet_coordChange_source}
 \leanok
 For charts $e, e'$ the change of charts $\Phi = \kappa' \circ \kappa^{-1}$ (Mathlib's
@@ -11865,9 +11886,9 @@ is a Besov domain, for example to the sphere $S^n$, $n \geq 1$ (\Cref{ex:sphere-
 
 \begin{definition}[The Besov quasi-norm of an atlas]
 \label{def:manifold-besov-norm}
-\lean{Manifold.BesovAtlas.besovNorm, Manifold.BesovAtlas.modNormOn_pieceLp_le_besovNorm,
-  Manifold.BesovAtlas.besovNorm_add_le, Manifold.BesovAtlas.besovNorm_const_smul,
-  Manifold.BesovAtlas.exists_enorm_le_besovNorm}
+\lean{Manifold.BesovAtlas.atlasBesovNorm, Manifold.BesovAtlas.modNormOn_pieceLp_le_atlasBesovNorm,
+  Manifold.BesovAtlas.atlasBesovNorm_add_le, Manifold.BesovAtlas.atlasBesovNorm_const_smul,
+  Manifold.BesovAtlas.exists_enorm_le_atlasBesovNorm}
 \leanok
 \uses{def:chart-pieces, lem:modnorm-on, lem:chart-integrals}
 For a Besov atlas $A$, $r \in \N$, $s \in \R$ and $1 \leq q \leq \infty$,
@@ -11881,7 +11902,7 @@ $\|f\|_{L_p(\mu)} \leq C \|f\|_{A, r, s, q}$.
 
 \begin{theorem}[Independence of the atlas]
 \label{thm:atlas-independence}
-\lean{Manifold.BesovAtlas.besovNorm_le_besovNorm}
+\lean{Manifold.BesovAtlas.atlasBesovNorm_le_atlasBesovNorm}
 \leanok
 \uses{def:manifold-besov-norm, thm:pieces-two-atlases, thm:besov-domain-invariance}
 For two Besov atlases $A, A'$, $0 < s < r$ and $1 \leq q \leq \infty$ there is $C < \infty$ with
@@ -11898,11 +11919,13 @@ $N_\Omega(T_{ij} G) \leq C_{ij} N_\Omega(G)$ on the Besov domain $\Omega$
 
 \begin{definition}[Besov spaces on compact manifolds]
 \label{def:manifold-besov}
-\lean{Manifold.BesovAtlas.MemBesov, Manifold.BesovAtlas.memBesov_iff_besovNorm_lt_top,
-  Manifold.BesovAtlas.memBesov_iff_memBesov, Manifold.MemBesov, Manifold.memBesov_iff,
-  Manifold.BesovAtlas.MemBesov.add, Manifold.BesovAtlas.MemBesov.const_smul,
-  Manifold.BesovAtlas.MemBesov.zero, Manifold.BesovAtlas.MemBesov.finsetSum,
-  Manifold.BesovAtlas.MemBesov.modNormOn_pieceLp_lt_top}
+\lean{Manifold.BesovAtlas.MemAtlasBesov,
+  Manifold.BesovAtlas.memAtlasBesov_iff_atlasBesovNorm_lt_top,
+  Manifold.BesovAtlas.memAtlasBesov_iff_memAtlasBesov, Manifold.MemManifoldBesov,
+  Manifold.memManifoldBesov_iff, Manifold.BesovAtlas.MemAtlasBesov.add,
+  Manifold.BesovAtlas.MemAtlasBesov.const_smul, Manifold.BesovAtlas.MemAtlasBesov.zero,
+  Manifold.BesovAtlas.MemAtlasBesov.finsetSum,
+  Manifold.BesovAtlas.MemAtlasBesov.modNormOn_pieceLp_lt_top_of_memAtlasBesov}
 \leanok
 \uses{thm:atlas-independence, thm:besov-domain-invariance}
 For $s > 0$, $f \in L_p(\mu)$ lies in $\Besov{s}{p}{q}(M)$ if $\|f\|_{A, \lfloor s \rfloor + 1, s,
@@ -11920,7 +11943,7 @@ Besov domain (\Cref{thm:besov-domain-invariance}) piece by piece.
 
 \begin{lemma}[Besov spaces of an atlas by the pieces]
 \label{lem:manifold-besov-pieces}
-\lean{Manifold.BesovAtlas.memBesov_iff_forall_modNormOn_lt_top}
+\lean{Manifold.BesovAtlas.memAtlasBesov_iff_forall_modNormOn_lt_top}
 \leanok
 \uses{def:manifold-besov, def:manifold-besov-norm}
 For every $s > 0$, every integer $r > s$, every $q \in [1, \infty]$ and every
@@ -11942,7 +11965,7 @@ A finite sum is finite if and only if every term is finite, and the order does n
   Manifold.BesovAtlas.piece_chartLift, Manifold.BesovAtlas.chartLiftLp,
   Manifold.BesovAtlas.chartLiftLp_ae, Manifold.BesovAtlas.chartLiftLp_add,
   Manifold.BesovAtlas.chartLiftLp_smul, Manifold.BesovAtlas.pieceLp_chartLiftLp,
-  Manifold.BesovAtlas.memBesov_chartLiftLp}
+  Manifold.BesovAtlas.memAtlasBesov_chartLiftLp}
 \leanok
 \uses{def:manifold-besov, def:chart-transition, thm:diffeo-invariance, lem:chart-integrals}
 Let $e$ be a chart of the atlas with extended chart $\kappa$. For $\theta \colon M \to \R$ and
@@ -12002,9 +12025,11 @@ The carriers of smooth bounded domains are exactly the bounded sets with smooth 
 \lean{Rd.SmoothDomain.Straightener, Rd.SmoothDomain.Straightener.tau_mem_closure,
   Rd.SmoothDomain.Straightener.toMap, Rd.SmoothDomain.Straightener.coe_toMap,
   Rd.SmoothDomain.Straightener.invMap, Rd.SmoothDomain.Straightener.coe_invMap,
-  Rd.SmoothDomain.Straightener.chart, Rd.SmoothDomain.Straightener.mem_chart_source,
-  Rd.SmoothDomain.Straightener.mem_chart_target, Rd.SmoothDomain.Straightener.chart_apply_coe,
-  Rd.SmoothDomain.Straightener.chart_symm_coe}
+  Rd.SmoothDomain.Straightener.straightenerChart,
+  Rd.SmoothDomain.Straightener.mem_straightenerChart_source,
+  Rd.SmoothDomain.Straightener.mem_straightenerChart_target,
+  Rd.SmoothDomain.Straightener.straightenerChart_apply_coe,
+  Rd.SmoothDomain.Straightener.straightenerChart_symm_coe}
 \leanok
 \uses{def:smooth-domain}
 A straightener of the closure of a smooth domain $\Omega$ is a smooth, measure-preserving bijection
@@ -12082,12 +12107,13 @@ into $\R^n$ is smooth.
 
 \begin{lemma}[Extension by zero and the pieces]
 \label{lem:global-pieces}
-\lean{Rd.SmoothDomain.extend, Rd.SmoothDomain.extend_coe, Rd.SmoothDomain.extend_eq_zero,
-  Rd.SmoothDomain.stronglyMeasurable_extend, Rd.SmoothDomain.eLpNorm_extend,
-  Rd.SmoothDomain.memLp_extend, Rd.SmoothDomain.extLp, Rd.SmoothDomain.extLp_ae,
-  Rd.SmoothDomain.volume_coord_zero_eq_zero, Rd.SmoothDomain.Straightener.mem_image_iff,
-  Rd.SmoothDomain.Straightener.homeomorph, Rd.SmoothDomain.Straightener.measurePreserving_tau,
-  Rd.SmoothDomain.GlobalAtlas.piece_apply, Rd.SmoothDomain.GlobalAtlas.indicator_piece}
+\lean{Rd.SmoothDomain.extendByZero, Rd.SmoothDomain.extendByZero_coe,
+  Rd.SmoothDomain.extendByZero_eq_zero, Rd.SmoothDomain.stronglyMeasurable_extendByZero,
+  Rd.SmoothDomain.eLpNorm_extendByZero, Rd.SmoothDomain.memLp_extendByZero, Rd.SmoothDomain.extLp,
+  Rd.SmoothDomain.extLp_ae, Rd.SmoothDomain.volume_coord_zero_eq_zero,
+  Rd.SmoothDomain.Straightener.mem_image_iff, Rd.SmoothDomain.Straightener.homeomorph,
+  Rd.SmoothDomain.Straightener.measurePreserving_tau, Rd.SmoothDomain.GlobalAtlas.piece_apply,
+  Rd.SmoothDomain.GlobalAtlas.indicator_piece}
 \leanok
 \uses{def:global-atlas, def:chart-pieces}
 The extension by $0$ is an isometry $L_p(\overline{\Omega}) \to L_p(\R^n)$. On the half-space
@@ -12127,7 +12153,8 @@ evaluates the function only at points of the set.
 \begin{theorem}[The Besov space of a smooth domain by charts]
 \label{thm:smooth-domain-besov}
 \lean{Rd.SmoothDomain.GlobalAtlas.modNormOn_pieceLp_lt_top,
-  Rd.SmoothDomain.GlobalAtlas.modNormOn_extLp_lt_top, Rd.SmoothDomain.memBesov_iff_modNormOn_lt_top}
+  Rd.SmoothDomain.GlobalAtlas.modNormOn_extLp_lt_top,
+  Rd.SmoothDomain.memManifoldBesov_iff_modNormOn_lt_top}
 \leanok
 \uses{lem:global-pieces, lem:global-changes, def:manifold-besov, thm:bounded-lipschitz-besov,
   thm:half-space-besov-domain}
@@ -12160,10 +12187,10 @@ the orthogonal projection $P$ onto $H_0$ and the Lebesgue measure of $H_0$.
 \begin{lemma}[Changes of charts preserve the boundary]
 \label{lem:coord-change-boundary}
 \lean{Manifold.flatDomain, Manifold.bdry, Manifold.mem_bdry_iff, Manifold.bdry_subset_range,
-  Manifold.coe_proj_of_mem_bdry, Manifold.isClosed_bdry, Manifold.mem_interior_extend_target_iff,
-  Manifold.coordChange_mem_bdry, Manifold.mem_coordChange_source_iff_of_bdry,
-  Manifold.mem_coordChange_target_iff_of_bdry, Manifold.coe_proj_coordChange,
-  Manifold.coe_proj_coordChange_symm}
+  Manifold.coe_graphProj_of_mem_bdry, Manifold.isClosed_bdry,
+  Manifold.mem_interior_extend_target_iff, Manifold.coordChange_mem_bdry,
+  Manifold.mem_coordChange_source_iff_of_bdry, Manifold.mem_coordChange_target_iff_of_bdry,
+  Manifold.coe_graphProj_coordChange, Manifold.coe_graphProj_coordChange_symm}
 \leanok
 \uses{lem:coord-change}
 $H_0$ is a closed subspace contained in the half-space. A point $y$ of the target of an extended
@@ -12196,7 +12223,7 @@ atlases $A, A'$ the restriction of $T_{ij}$ is $T^\partial_{ij}$.
 
 \begin{definition}[Besov spaces on the boundary]
 \label{def:manifold-boundary-besov}
-\lean{Manifold.BesovAtlas.boundaryPiece, Manifold.BesovAtlas.MemBoundaryBesov}
+\lean{Manifold.BesovAtlas.boundaryPiece, Manifold.BesovAtlas.MemAtlasBoundaryBesov}
 \leanok
 \uses{def:chart-pieces}
 For a Besov atlas $A$, the $i$-th boundary piece of $g : M \to \C$ is the restriction
@@ -12209,8 +12236,8 @@ $\|G_i\|_p + \|(2^{ks} \omega_r(G_i, 2^{-k})_p)_k\|_{\ell_q} < \infty$, $r = \lf
 \begin{theorem}[Independence of the atlas on the boundary]
 \label{thm:boundary-atlas-independence}
 \lean{Manifold.BesovAtlas.boundaryPiece_eq_sum, Manifold.BesovAtlas.interior_univ_bdry_nonempty,
-  Manifold.BesovAtlas.MemBoundaryBesov.of_atlas,
-  Manifold.BesovAtlas.memBoundaryBesov_iff_memBoundaryBesov}
+  Manifold.BesovAtlas.MemAtlasBoundaryBesov.of_atlas,
+  Manifold.BesovAtlas.memAtlasBoundaryBesov_iff_memAtlasBoundaryBesov}
 \leanok
 \uses{def:manifold-boundary-besov, def:boundary-chart-change, thm:pieces-two-atlases,
   thm:diffeo-invariance, lem:modnorm-on}
@@ -12238,7 +12265,7 @@ half-space $\Omega_0 = \{y : y_0 > 0\}$ (\Cref{thm:trace-every-order}).
 
 \begin{lemma}[The closed and the open half-space]
 \label{lem:closed-open-half-space}
-\lean{Manifold.range_ae_eq_domain, Manifold.cutoff_eq_indicatorLp, Manifold.modNormOn_range_eq}
+\lean{Manifold.range_ae_eq_domain, Manifold.graphCutoff_eq_indicatorLp, Manifold.modNormOn_range_eq}
 \leanok
 \uses{lem:null-set-domains, thm:half-space-besov-domain}
 The range of the model is the closed half-space $\{y : y_0 \geq 0\}$, which differs from
@@ -12256,8 +12283,8 @@ change only by null sets when $\Omega_0$ is replaced by its closure
 
 \begin{theorem}[The trace commutes with the changes of charts]
 \label{thm:trace-chart-change}
-\lean{Manifold.trace_chartChange_applyLp_of_continuous,
-  Manifold.trace_chartChange_applyLp_of_modNorm, Manifold.trace_chartChange_applyLp}
+\lean{Manifold.graphTrace_chartChange_applyLp_of_continuous,
+  Manifold.graphTrace_chartChange_applyLp_of_modNorm, Manifold.graphTrace_chartChange_applyLp}
 \leanok
 \uses{def:boundary-chart-change, lem:trace-continuous-half-space, lem:partial-sums-approx,
   lem:trace-linear, thm:diffeo-invariance, lem:closed-open-half-space, def:besov-domain}
@@ -12281,7 +12308,8 @@ $\operatorname{Tr} G_J \to \operatorname{Tr} G$ in $L_p(H_0)$, where $T^\partial
 
 \begin{definition}[The trace on the boundary]
 \label{def:manifold-boundary-trace}
-\lean{Manifold.BesovAtlas.boundaryTrace, Manifold.BesovAtlas.boundaryPiece_boundaryTrace_eq_sum}
+\lean{Manifold.BesovAtlas.atlasBoundaryTrace,
+  Manifold.BesovAtlas.boundaryPiece_atlasBoundaryTrace_eq_sum}
 \leanok
 \uses{def:manifold-boundary-besov, def:boundary-chart-change}
 For a Besov atlas $A$, an order $L$ and $f \in L_p(\mu)$, the trace on the boundary is
@@ -12293,8 +12321,9 @@ is the cut-off of $T_{ki}$.
 
 \begin{theorem}[The boundary pieces of the trace]
 \label{thm:boundary-trace-pieces}
-\lean{Manifold.BesovAtlas.trace_pieceLp_eq_sum, Manifold.BesovAtlas.boundaryPiece_boundaryTrace,
-  Manifold.BesovAtlas.boundaryPiece_boundaryTrace_of_atlas}
+\lean{Manifold.BesovAtlas.graphTrace_pieceLp_eq_sum,
+  Manifold.BesovAtlas.boundaryPiece_atlasBoundaryTrace,
+  Manifold.BesovAtlas.boundaryPiece_atlasBoundaryTrace_of_atlas}
 \leanok
 \uses{def:manifold-boundary-trace, thm:trace-chart-change, thm:pieces-two-atlases, lem:trace-sums,
   thm:boundary-atlas-independence}
@@ -12316,9 +12345,10 @@ general $A'$ combine it with \Cref{thm:boundary-atlas-independence}.
 
 \begin{theorem}[The trace theorem on compact manifolds]
 \label{thm:manifold-trace}
-\lean{Manifold.exists_flatGraphExtension, Manifold.BesovAtlas.exists_boundaryTrace_norm_le,
-  Manifold.BesovAtlas.memBoundaryBesov_boundaryTrace, Manifold.BesovAtlas.exists_boundaryTrace_eq,
-  Manifold.BesovAtlas.memBoundaryBesov_iff_exists_boundaryTrace}
+\lean{Manifold.exists_flatGraphExtension, Manifold.BesovAtlas.exists_atlasBoundaryTrace_norm_le,
+  Manifold.BesovAtlas.memAtlasBoundaryBesov_atlasBoundaryTrace,
+  Manifold.BesovAtlas.exists_atlasBoundaryTrace_eq,
+  Manifold.BesovAtlas.memAtlasBoundaryBesov_iff_exists_atlasBoundaryTrace}
 \leanok
 \uses{thm:boundary-trace-pieces, thm:trace-every-order, thm:half-space-trace-space, lem:chart-lift,
   def:manifold-besov-norm}
@@ -12357,7 +12387,7 @@ restriction to the boundary.
 
 \begin{corollary}[Traces of continuous functions]
 \label{cor:manifold-trace-continuous}
-\lean{Manifold.BesovAtlas.boundaryPiece_boundaryTrace_of_continuous}
+\lean{Manifold.BesovAtlas.boundaryPiece_atlasBoundaryTrace_of_continuous}
 \leanok
 \uses{thm:boundary-trace-pieces, lem:piece-carrier, lem:trace-continuous-half-space,
   def:chart-pieces}
@@ -12382,8 +12412,8 @@ The closure of a smooth bounded domain is a compact manifold with boundary
 
 \begin{corollary}[The trace theorem on smooth bounded domains]
 \label{cor:smooth-domain-trace}
-\lean{Rd.SmoothDomain.memBoundaryBesov_iff_exists_boundaryTrace,
-  Rd.SmoothDomain.boundaryPiece_boundaryTrace_of_continuous}
+\lean{Rd.SmoothDomain.smooth_memAtlasBoundaryBesov_iff_exists_atlasBoundaryTrace,
+  Rd.SmoothDomain.smooth_boundaryPiece_atlasBoundaryTrace_of_continuous}
 \leanok
 \uses{thm:manifold-trace, cor:manifold-trace-continuous, thm:smooth-domain-manifold}
 Let $\Omega$ be a smooth bounded domain with the Lebesgue measure on $\overline{\Omega}$, $A$ a
@@ -12489,9 +12519,9 @@ $r/4$, so $\Omega$ agrees on $B(z, r/4)$ with the region above the graph of $\ps
 
 \begin{theorem}[Bounded smooth sets and smooth bounded domains]
 \label{thm:bounded-smooth-sets}
-\lean{Rd.IsBoundedSmoothDomain.exists_chart, Rd.IsBoundedSmoothDomain.chart,
-  Rd.IsBoundedSmoothDomain.chart_fst_pos, Rd.IsBoundedSmoothDomain.contDiff_chart_phi,
-  Rd.IsBoundedSmoothDomain.ball_inter_chart, Rd.SmoothDomain.ofIsBoundedSmoothDomain,
+\lean{Rd.IsBoundedSmoothDomain.exists_chart, Rd.IsBoundedSmoothDomain.smoothChart,
+  Rd.IsBoundedSmoothDomain.smoothChart_fst_pos, Rd.IsBoundedSmoothDomain.contDiff_smoothChart_phi,
+  Rd.IsBoundedSmoothDomain.ball_inter_smoothChart, Rd.SmoothDomain.ofIsBoundedSmoothDomain,
   Rd.SmoothDomain.carrier_ofIsBoundedSmoothDomain, Rd.SmoothDomain.isBoundedSmoothDomain,
   Rd.isBoundedSmoothDomain_iff_exists}
 \leanok
@@ -12544,7 +12574,7 @@ Besov spaces by charts are the intrinsic ones.
 
 \begin{corollary}[The Besov spaces of the closed ball]
 \label{cor:ball-besov}
-\lean{Rd.SmoothDomain.memBesov_ball_iff}
+\lean{Rd.SmoothDomain.memManifoldBesov_ball_iff}
 \leanok
 \uses{thm:smooth-ball, thm:smooth-domain-besov}
 For every $n \geq 1$, every $c \in \R^n$, every $R \in \R$, every $1 \leq p < \infty$, all
@@ -12722,7 +12752,7 @@ $g$.
 \begin{theorem}[$H^1_A(M) = B^1_{2,2}(M)$]
 \label{thm:chart-sobolev-besov}
 \lean{Manifold.BesovAtlas.mem_range_chartSobolevEmbedding_iff_forall_piece,
-  Manifold.BesovAtlas.mem_range_chartSobolevEmbedding_iff_memBesov,
+  Manifold.BesovAtlas.mem_range_chartSobolevEmbedding_iff_memAtlasBesov,
   Manifold.BesovAtlas.range_chartSobolevEmbedding_eq,
   Manifold.BesovAtlas.mem_range_chartSobolevEmbedding_iff}
 \leanok
@@ -12945,7 +12975,7 @@ $a_A$ depends on the atlas; the Laplace--Beltrami operator of a Riemannian metri
 \begin{corollary}[$H^1(M)$ in the eigenbasis of the chart form]
 \label{cor:chart-sobolev-spectral}
 \lean{Manifold.BesovAtlas.mem_range_chartSobolevEmbedding_iff_spectral,
-  Manifold.BesovAtlas.memBesov_one_two_iff_spectral}
+  Manifold.BesovAtlas.memManifoldBesov_one_two_iff_spectral}
 \leanok
 \uses{thm:chart-eigenbasis, cor:compact-embedding-interpolation, thm:chart-sobolev-besov}
 Let $\dim E \geq 1$, let $A$ be a Besov atlas, and let $(e_i)$ and $\lambda_i$ be as in
@@ -13100,7 +13130,7 @@ of its expansion in the eigenbasis of the chart form (\Cref{prop:spectral-projec
 
 \begin{corollary}[Dyadic blocks of the eigenfunction expansion]
 \label{cor:spectral-besov-manifold-blocks}
-\lean{Manifold.BesovAtlas.memBesov_iff_blockNorm_lt_top}
+\lean{Manifold.BesovAtlas.memManifoldBesov_iff_blockNorm_lt_top}
 \leanok
 \uses{thm:spectral-besov-manifold, thm:spectral-coefficients, prop:spectral-projections,
   thm:chart-eigenbasis}
@@ -13119,7 +13149,7 @@ $q \in [1, \infty]$ and every $f \in L_2(\mu)$,
 
 \begin{corollary}[$\Besov{\theta}{2}{2}(M)$ by the eigenvalues of the chart form]
 \label{cor:spectral-sobolev-manifold}
-\lean{Manifold.BesovAtlas.memBesov_two_iff_chartEigenvalue}
+\lean{Manifold.BesovAtlas.memManifoldBesov_two_iff_chartEigenvalue}
 \leanok
 \uses{thm:spectral-besov-manifold, cor:compact-embedding-interpolation, thm:chart-eigenbasis}
 Let $\dim E \geq 1$, let $A$ be a Besov atlas, and let $(e_i)$ and $\lambda_i$ be as in

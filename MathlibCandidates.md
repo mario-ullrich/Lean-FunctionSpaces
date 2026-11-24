@@ -687,11 +687,12 @@ declarations.
   next to `Lp.norm_le_norm_of_ae_le` in `Mathlib/MeasureTheory/Function/LpSpace/Basic.lean`.
 * **Duality of Bessel potential spaces** (`FunctionSpaces/Domains/Sobolev/SobolevDuality.lean`): the
   inner product of Mathlib's `H^{s,2}(V, ℂ)` is that of the `L_2` functions `J_s U`
-  (`Rd.inner_toLp_toLp`); the isometry `J_{2s} : H^{s,2} → H^{-s,2}` (`Rd.besselShift`) and the
-  pairing `⟪J_{-s} W, J_s U⟫_{L_2}` of `H^{-s,2}` and `H^{s,2}` (`Rd.pairing`), which extends the
-  action of distributions on test functions (`Rd.pairing_ofTest_left`);
-  `⟪U, φ⟫ = conj ((J_{2s} U)(φ))` for real test functions `φ` (`Rd.inner_ofTest_eq`). These belong
-  in `Mathlib/Analysis/FunctionalSpaces/BesselPotentialSpace.lean`. Also the reality of the Bessel
+  (`Rd.besselPotential_inner_toLp_toLp`); the isometry `J_{2s} : H^{s,2} → H^{-s,2}`
+  (`Rd.besselShift`) and the pairing `⟪J_{-s} W, J_s U⟫_{L_2}` of `H^{-s,2}` and `H^{s,2}`
+  (`Rd.sobolevPairing`), which extends the action of distributions on test functions
+  (`Rd.sobolevPairing_ofTest_left`); `⟪U, φ⟫ = conj ((J_{2s} U)(φ))` for real test functions `φ`
+  (`Rd.inner_ofTest_eq`). These belong in
+  `Mathlib/Analysis/FunctionalSpaces/BesselPotentialSpace.lean`. Also the reality of the Bessel
   potential of real Schwartz functions (`Rd.conj_besselSchwartz_apply`), and the conjugation
   identities `conj (𝓕 f) = 𝓕⁻(conj f)` and `conj (𝓕⁻ f) = 𝓕(conj f)` for `f : V → ℂ`
   (`Rd.conj_fourier_apply`, `Rd.conj_fourierInv_apply` in
@@ -771,11 +772,11 @@ declarations.
   `LinearMap.euclideanHausdorffMeasure_image_eq_normDet_mul_volume`, with `LinearMap.normDet` in
   `Mathlib/Analysis/InnerProductSpace/NormDet.lean`), and lacks the one for Lipschitz maps
   (2026-10-14). Two steps are general: a map that is `K`-Lipschitz on `s` satisfies
-  `μHE[d] (f '' s) ≤ K^d μHE[d] s` (`LipschitzOnWith.euclideanHausdorffMeasure_image_le`, next to
-  `Isometry.euclideanHausdorffMeasure_image`), and images under two maps with nearby increments have
-  comparable measures (`Rd.euclideanHausdorffMeasure_image_le_of_near`). For the graph
-  `γ(x') = x' + φ(x') e` of a Lipschitz function over the hyperplane `H = e^⊥`, the area formula
-  `μHE[n-1] (γ '' A) = ∫_A √(1 + ‖∇φ‖²)` with its measure and integral forms
+  `μHE[d] (f '' s) ≤ K^d μHE[d] s` (`LipschitzOnWith.euclideanHausdorffMeasure_image_le_pow_mul`,
+  next to `Isometry.euclideanHausdorffMeasure_image`), and images under two maps with nearby
+  increments have comparable measures (`Rd.euclideanHausdorffMeasure_image_le_of_near`). For the
+  graph `γ(x') = x' + φ(x') e` of a Lipschitz function over the hyperplane `H = e^⊥`, the area
+  formula `μHE[n-1] (γ '' A) = ∫_A √(1 + ‖∇φ‖²)` with its measure and integral forms
   (`Rd.LipschitzGraph.euclideanHausdorffMeasure_graphMap_image`,
   `Rd.LipschitzGraph.map_graphMap_withDensity`, `Rd.LipschitzGraph.lintegral_graphMap`). For Mathlib
   the graph would be stated for a Lipschitz function on a Euclidean space without the structure
@@ -786,7 +787,7 @@ declarations.
   and hence `μHE[n]`-measure zero (`MeasureTheory.Measure.euclideanHausdorffMeasure_zero_or_top`).
   In Mathlib it would follow from the finiteness of `μHE[n-1]` on the graph of a Lipschitz
   function over a bounded subset of a hyperplane, a consequence of
-  `LipschitzOnWith.euclideanHausdorffMeasure_image_le`.
+  `LipschitzOnWith.euclideanHausdorffMeasure_image_le_pow_mul`.
 * **Preconnected sets cross the frontier** (`FunctionSpaces/Domains/Lipschitz/BoundaryLayers.lean`):
   a preconnected set that meets `U` and its complement meets `frontier U`
   (`Rd.inter_frontier_nonempty_of_isPreconnected`), from Mathlib's

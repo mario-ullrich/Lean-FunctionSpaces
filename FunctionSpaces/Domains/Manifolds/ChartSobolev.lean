@@ -155,9 +155,9 @@ theorem chartLift_piece (k : Fin A.n) (g : M → ℂ) :
     chartLift I (A.chart k) (A.theta k) (A.piece k g) = fun x => (A.psi k x : ℂ) * g x := by
   funext x
   by_cases hx : x ∈ (A.chart k).source
-  · have hx' : x ∈ (A.ext k).source := by rwa [OpenPartialHomeomorph.extend_source]
-    rw [chartLift, indicator_of_mem hx, piece, indicator_of_mem ((A.ext k).map_source hx'),
-      (A.ext k).left_inv hx', ← mul_assoc, ← Complex.ofReal_mul, A.theta_mul_psi]
+  · have hx' : x ∈ (A.extChart k).source := by rwa [OpenPartialHomeomorph.extend_source]
+    rw [chartLift, indicator_of_mem hx, piece, indicator_of_mem ((A.extChart k).map_source hx'),
+      (A.extChart k).left_inv hx', ← mul_assoc, ← Complex.ofReal_mul, A.theta_mul_psi]
   · have hψ : A.psi k x = 0 :=
       image_eq_zero_of_notMem_tsupport fun h => hx (A.tsupport_psi_subset k h)
     rw [chartLift, indicator_of_notMem hx, hψ, Complex.ofReal_zero, zero_mul]
@@ -192,7 +192,7 @@ theorem sum_chartLiftCLM_comp_pieceCLM :
 /-- **The carrier of the `k`-th lift**: the compact set `κ_k(tsupport θ_k) ⊆ range I`, the only
 part of `E` that the lift `θ_k · F ∘ κ_k` sees. -/
 def liftCarrier (k : Fin A.n) : Set E :=
-  A.ext k '' tsupport (A.theta k)
+  A.extChart k '' tsupport (A.theta k)
 
 omit [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E] [MeasurableSpace M]
   [BorelSpace M] in
@@ -226,7 +226,7 @@ theorem chartLiftLp_eq_of_ae_eq_on [Rd.BesovDomain (range I)] (k : Fin A.n)
   by_cases hxs : x ∈ (A.chart k).source
   · simp only [chartLift, indicator_of_mem hxs]
     by_cases hxt : x ∈ tsupport (A.theta k)
-    · have hy : A.ext k x ∈ A.liftCarrier k := mem_image_of_mem _ hxt
+    · have hy : A.extChart k x ∈ A.liftCarrier k := mem_image_of_mem _ hxt
       rw [(h3 hxt).1 ⟨hy, (h3 hxt).2 (A.liftCarrier_subset_range k hy)⟩]
     · rw [image_eq_zero_of_notMem_tsupport hxt, Complex.ofReal_zero, zero_mul, zero_mul]
   · simp only [chartLift, indicator_of_notMem hxs]
@@ -394,35 +394,36 @@ embedding iff `f ∈ B^1_{2,2}` for the atlas `A`. Each piece vanishes outside a
 (`Manifold.BesovAtlas.exists_pieceLp_eq_zero_off_ball`), so it has a weak gradient in `L_2(O_I)`
 iff its intrinsic `B^1_{2,2}` quasi-norm on `range I` of order `2` is finite
 (`Rd.BesovDomain.exists_hasWeakLineDeriv_iff_modNormOn_lt_top`). -/
-theorem mem_range_chartSobolevEmbedding_iff_memBesov [Rd.BesovDomain (range I)]
+theorem mem_range_chartSobolevEmbedding_iff_memAtlasBesov [Rd.BesovDomain (range I)]
     (f : Lp ℂ 2 μ) :
-    f ∈ range (A.chartSobolevEmbedding μ) ↔ A.MemBesov Rd.two_ne_top 1 2 f := by
+    f ∈ range (A.chartSobolevEmbedding μ) ↔ A.MemAtlasBesov Rd.two_ne_top 1 2 f := by
   rw [A.mem_range_chartSobolevEmbedding_iff_forall_piece,
-    A.memBesov_iff_forall_modNormOn_lt_top Rd.two_ne_top (r := 2) one_pos (by norm_num) one_le_two]
+    A.memAtlasBesov_iff_forall_modNormOn_lt_top Rd.two_ne_top (r := 2) one_pos (by norm_num)
+      one_le_two]
   refine forall_congr' fun i => ?_
   obtain ⟨R, hR⟩ := A.exists_pieceLp_eq_zero_off_ball (μ := μ) Rd.two_ne_top i
   exact Rd.BesovDomain.exists_hasWeakLineDeriv_iff_modNormOn_lt_top le_rfl (hR f)
 
 /-- **The chart Sobolev space is the same for every atlas**: two Besov atlases `A, A'` give the
 same range `J(H^1_A(M)) = J(H^1_{A'}(M))` in `L_2(μ)`, since both are `B^1_{2,2}(M)`
-(`Manifold.BesovAtlas.memBesov_iff_memBesov`). -/
+(`Manifold.BesovAtlas.memAtlasBesov_iff_memAtlasBesov`). -/
 theorem range_chartSobolevEmbedding_eq [Rd.BesovDomain (range I)] [IsManifold I ∞ M]
     (A' : BesovAtlas I M) :
     range (A.chartSobolevEmbedding μ) = range (A'.chartSobolevEmbedding μ) := by
   ext f
-  rw [A.mem_range_chartSobolevEmbedding_iff_memBesov,
-    A'.mem_range_chartSobolevEmbedding_iff_memBesov]
-  exact A.memBesov_iff_memBesov Rd.two_ne_top A' one_pos one_le_two f
+  rw [A.mem_range_chartSobolevEmbedding_iff_memAtlasBesov,
+    A'.mem_range_chartSobolevEmbedding_iff_memAtlasBesov]
+  exact A.memAtlasBesov_iff_memAtlasBesov Rd.two_ne_top A' one_pos one_le_two f
 
 /-- **`H^1_A(M) = B^1_{2,2}(M)`**: for every Besov atlas `A` of a compact manifold whose model range
 is a Besov domain, `f ∈ L_2(μ)` is a value of the chart Sobolev embedding iff `f` lies in the Besov
-space `B^1_{2,2}(M)` (`Manifold.BesovAtlas.mem_range_chartSobolevEmbedding_iff_memBesov`,
-`Manifold.memBesov_iff`). -/
+space `B^1_{2,2}(M)` (`Manifold.BesovAtlas.mem_range_chartSobolevEmbedding_iff_memAtlasBesov`,
+`Manifold.memManifoldBesov_iff`). -/
 theorem mem_range_chartSobolevEmbedding_iff [Rd.BesovDomain (range I)] [T2Space M]
     [IsManifold I ∞ M] (f : Lp ℂ 2 μ) :
-    f ∈ range (A.chartSobolevEmbedding μ) ↔ Manifold.MemBesov I μ Rd.two_ne_top 1 2 f := by
-  rw [Manifold.memBesov_iff I μ Rd.two_ne_top A one_pos one_le_two f]
-  exact A.mem_range_chartSobolevEmbedding_iff_memBesov f
+    f ∈ range (A.chartSobolevEmbedding μ) ↔ Manifold.MemManifoldBesov I μ Rd.two_ne_top 1 2 f := by
+  rw [Manifold.memManifoldBesov_iff I μ Rd.two_ne_top A one_pos one_le_two f]
+  exact A.mem_range_chartSobolevEmbedding_iff_memAtlasBesov f
 
 end BesovAtlas
 

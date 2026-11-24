@@ -50,7 +50,7 @@ graphs `γ_j(x') = x' + φ_j(x') e_j` over the hyperplanes `H_j`.
   the range of `Rd.modNorm_sobolevToL2_lt_top`; they take the hypotheses `1/2 < s < 3/2` of the
   family, for one calling convention.
 * **The outward unit normal** `ν(y) = ∑_j ψ_j(y) ν_j(P_j y)`
-  (`Rd.BoundedLipschitzDomain.normal`) is pasted from the chart normals `ν_j` with the fixed
+  (`Rd.BoundedLipschitzDomain.outwardNormal`) is pasted from the chart normals `ν_j` with the fixed
   resolution of unity `ψ = Rd.BoundedLipschitzDomain.boundaryPartition`, which is nonnegative; it is
   measurable with `‖ν‖ ≤ 1`.
 -/
@@ -117,22 +117,22 @@ of `φ_j` (`Rd.LipschitzGraph.lintegral_graphMap`). -/
 theorem lintegral_surfaceMeasure_of_support (j : Fin Ω.N) (F : V → ℝ≥0∞)
     (hF : ∀ y, F y ≠ 0 → y ∈ ball (Ω.center j) (Ω.radius j)) :
     ∫⁻ y, F y ∂Ω.surfaceMeasure =
-      ∫⁻ x', F ((Ω.graph j).graphMap x') * ENNReal.ofReal ((Ω.graph j).gram x') := by
+      ∫⁻ x', F ((Ω.graph j).graphMap x') * ENNReal.ofReal ((Ω.graph j).gramDensity x') := by
   have hs : Function.support F ⊆ ball (Ω.center j) (Ω.radius j) := fun y hy => hF y hy
   rw [← setLIntegral_eq_of_support_subset hs, surfaceMeasure_restrict_ball,
     setLIntegral_eq_of_support_subset hs, LipschitzGraph.lintegral_graphMap]
 
 /-- **Integrals in the chart are at most those over `Γ`**: for every `F : V → [0, ∞]` vanishing
 outside `B_j`, `∫_{H_j} F(γ_j x') dx' ≤ ∫_Γ F dσ`, since the density `√(1 + ‖∇φ_j‖²)` is at least
-`1` (`Rd.LipschitzGraph.one_le_ofReal_gram`). -/
+`1` (`Rd.LipschitzGraph.one_le_ofReal_gramDensity`). -/
 theorem lintegral_chart_le (j : Fin Ω.N) (F : V → ℝ≥0∞)
     (hF : ∀ y, F y ≠ 0 → y ∈ ball (Ω.center j) (Ω.radius j)) :
     ∫⁻ x', F ((Ω.graph j).graphMap x') ≤ ∫⁻ y, F y ∂Ω.surfaceMeasure := by
   rw [Ω.lintegral_surfaceMeasure_of_support j F hF]
-  exact lintegral_mono fun x' => le_mul_of_one_le_right' ((Ω.graph j).one_le_ofReal_gram x')
+  exact lintegral_mono fun x' => le_mul_of_one_le_right' ((Ω.graph j).one_le_ofReal_gramDensity x')
 
 /-- **Integrals over `Γ` by the chart**: for every `F : V → [0, ∞]` vanishing outside `B_j`,
-`∫_Γ F dσ ≤ √(1 + M_j²) ∫_{H_j} F(γ_j x') dx'` (`Rd.LipschitzGraph.gram_le`). -/
+`∫_Γ F dσ ≤ √(1 + M_j²) ∫_{H_j} F(γ_j x') dx'` (`Rd.LipschitzGraph.gramDensity_le`). -/
 theorem lintegral_le_chart (j : Fin Ω.N) (F : V → ℝ≥0∞)
     (hF : ∀ y, F y ≠ 0 → y ∈ ball (Ω.center j) (Ω.radius j)) :
     ∫⁻ y, F y ∂Ω.surfaceMeasure ≤
@@ -141,7 +141,7 @@ theorem lintegral_le_chart (j : Fin Ω.N) (F : V → ℝ≥0∞)
     ← lintegral_const_mul' _ _ ENNReal.ofReal_ne_top]
   refine lintegral_mono fun x' => ?_
   rw [mul_comm]
-  exact mul_le_mul' (ENNReal.ofReal_le_ofReal ((Ω.graph j).gram_le x')) le_rfl
+  exact mul_le_mul' (ENNReal.ofReal_le_ofReal ((Ω.graph j).gramDensity_le x')) le_rfl
 
 /-- **Complex integrals over a boundary ball in the chart**: for every `F : V → ℂ` vanishing outside
 `B_j`, `∫_Γ F dσ = ∫_{H_j} F(γ_j x') √(1 + ‖∇φ_j(x')‖²) dx'`, by the area formula for the graph of
@@ -149,7 +149,7 @@ theorem lintegral_le_chart (j : Fin Ω.N) (F : V → ℝ≥0∞)
 theorem integral_surfaceMeasure_of_support (j : Fin Ω.N) (F : V → ℂ)
     (hF : ∀ y, F y ≠ 0 → y ∈ ball (Ω.center j) (Ω.radius j)) :
     ∫ y, F y ∂Ω.surfaceMeasure =
-      ∫ x', F ((Ω.graph j).graphMap x') * ((Ω.graph j).gram x' : ℂ) := by
+      ∫ x', F ((Ω.graph j).graphMap x') * ((Ω.graph j).gramDensity x' : ℂ) := by
   have h : ∀ y, y ∉ ball (Ω.center j) (Ω.radius j) → F y = 0 := fun y hy =>
     by_contra fun h => hy (hF y h)
   rw [← setIntegral_eq_integral_of_forall_compl_eq_zero h, surfaceMeasure_restrict_ball,
@@ -161,8 +161,8 @@ are `∫_Γ F dσ`. -/
 theorem lintegral_chart_eq (j k : Fin Ω.N) (F : V → ℝ≥0∞)
     (hF : ∀ y, F y ≠ 0 →
       y ∈ ball (Ω.center j) (Ω.radius j) ∩ ball (Ω.center k) (Ω.radius k)) :
-    ∫⁻ x', F ((Ω.graph j).graphMap x') * ENNReal.ofReal ((Ω.graph j).gram x') =
-      ∫⁻ y', F ((Ω.graph k).graphMap y') * ENNReal.ofReal ((Ω.graph k).gram y') := by
+    ∫⁻ x', F ((Ω.graph j).graphMap x') * ENNReal.ofReal ((Ω.graph j).gramDensity x') =
+      ∫⁻ y', F ((Ω.graph k).graphMap y') * ENNReal.ofReal ((Ω.graph k).gramDensity y') := by
   rw [← Ω.lintegral_surfaceMeasure_of_support j F fun y hy => (hF y hy).1,
     Ω.lintegral_surfaceMeasure_of_support k F fun y hy => (hF y hy).2]
 
@@ -189,7 +189,7 @@ It holds for every `F`, measurable or not. -/
 theorem lintegral_surfaceMeasure (ψ : Ω.BoundaryPartition)
     (hψ : ∀ j, ∀ y ∈ frontier Ω.carrier, 0 ≤ ψ.toFun j y) (F : V → ℝ≥0∞) :
     ∫⁻ y, F y ∂Ω.surfaceMeasure = ∑ j, ∫⁻ x', ENNReal.ofReal (ψ.toFun j ((Ω.graph j).graphMap x')) *
-      F ((Ω.graph j).graphMap x') * ENNReal.ofReal ((Ω.graph j).gram x') := by
+      F ((Ω.graph j).graphMap x') * ENNReal.ofReal ((Ω.graph j).gramDensity x') := by
   conv_lhs => rw [Ω.surfaceMeasure_eq_sum_withDensity ψ hψ]
   rw [lintegral_sum_measure, tsum_fintype]
   refine Finset.sum_congr rfl fun j _ => ?_
@@ -216,7 +216,7 @@ each `ψ_j f` is integrable since `ψ_j` is bounded, and vanishes outside `B_j`
 theorem integral_surfaceMeasure (ψ : Ω.BoundaryPartition) {f : V → ℂ}
     (hf : Integrable f Ω.surfaceMeasure) :
     ∫ y, f y ∂Ω.surfaceMeasure = ∑ j, ∫ x', ψ.toComplex j ((Ω.graph j).graphMap x') *
-      f ((Ω.graph j).graphMap x') * ((Ω.graph j).gram x' : ℂ) := by
+      f ((Ω.graph j).graphMap x') * ((Ω.graph j).gramDensity x' : ℂ) := by
   have hsum : ∫ y, f y ∂Ω.surfaceMeasure =
       ∫ y, ∑ j, ψ.toComplex j y * f y ∂Ω.surfaceMeasure :=
     integral_congr_ae (Ω.ae_eq_sum_mul ψ f)
@@ -232,7 +232,7 @@ theorem integral_surfaceMeasure (ψ : Ω.BoundaryPartition) {f : V → ℂ}
 balls `B_j` cover `Γ`. It holds for every `F`, measurable or not. -/
 theorem lintegral_surfaceMeasure_le_sum (F : V → ℝ≥0∞) :
     ∫⁻ y, F y ∂Ω.surfaceMeasure ≤ ∑ j, ∫⁻ x', (ball (Ω.center j) (Ω.radius j)).indicator F
-      ((Ω.graph j).graphMap x') * ENNReal.ofReal ((Ω.graph j).gram x') := by
+      ((Ω.graph j).graphMap x') * ENNReal.ofReal ((Ω.graph j).gramDensity x') := by
   have hcov : Ω.surfaceMeasure.restrict (⋃ j, ball (Ω.center j) (Ω.radius j)) =
       Ω.surfaceMeasure :=
     Measure.restrict_eq_self_of_ae_mem (Ω.ae_mem_frontier.mono fun _ hy => Ω.frontier_subset hy)
@@ -255,13 +255,13 @@ instance isFiniteMeasure_surfaceMeasure : IsFiniteMeasure Ω.surfaceMeasure := b
   have hA : MeasurableSet A :=
     (Ω.graph j).measurableEmbedding_graphMap.measurable measurableSet_ball
   calc ∫⁻ x', (ball (Ω.center j) (Ω.radius j)).indicator 1 ((Ω.graph j).graphMap x') *
-        ENNReal.ofReal ((Ω.graph j).gram x')
+        ENNReal.ofReal ((Ω.graph j).gramDensity x')
       ≤ ∫⁻ x', A.indicator (fun _ => ENNReal.ofReal √(1 + (Ω.graph j).M ^ 2)) x' := by
         refine lintegral_mono fun x' => ?_
         by_cases hx : x' ∈ A
         · rw [indicator_of_mem hx, indicator_of_mem (show (Ω.graph j).graphMap x' ∈ _ from hx),
             Pi.one_apply, one_mul]
-          exact ENNReal.ofReal_le_ofReal ((Ω.graph j).gram_le x')
+          exact ENNReal.ofReal_le_ofReal ((Ω.graph j).gramDensity_le x')
         · rw [indicator_of_notMem (show (Ω.graph j).graphMap x' ∉ _ from hx), zero_mul]
           exact zero_le
     _ = ENNReal.ofReal √(1 + (Ω.graph j).M ^ 2) * volume A := lintegral_indicator_const hA _
@@ -280,8 +280,8 @@ theorem ae_surfaceMeasure_ball_iff (j : Fin Ω.N) {P : V → Prop} :
     ae_restrict_iff' measurableSet_ball, ← LipschitzGraph.map_graphMap_withDensity,
     (Ω.graph j).measurableEmbedding_graphMap.ae_map_iff]
   have hac := withDensity_absolutelyContinuous' (μ := (volume : Measure (Ω.graph j).hyperplane))
-    (Ω.graph j).measurable_gram.ennreal_ofReal.aemeasurable
-    (ae_of_all _ fun x' => (ENNReal.ofReal_pos.2 ((Ω.graph j).gram_pos x')).ne')
+    (Ω.graph j).measurable_gramDensity.ennreal_ofReal.aemeasurable
+    (ae_of_all _ fun x' => (ENNReal.ofReal_pos.2 ((Ω.graph j).gramDensity_pos x')).ne')
   exact ⟨fun h => hac.ae_le h, fun h => (withDensity_absolutelyContinuous _ _).ae_le h⟩
 
 /-- **`σ`-almost everywhere statements in a chart**: if `P` holds `σ`-almost everywhere, then
@@ -333,13 +333,13 @@ theorem stronglyMeasurable_boundaryTrace (ψ : Ω.BoundaryPartition) (hp : p ≠
     (F : Lp ℂ p (volume : Measure V)) : StronglyMeasurable (Ω.boundaryTrace ψ hp L F) :=
   Finset.stronglyMeasurable_fun_sum _ fun k _ =>
     (ψ.contDiff_toComplex k).continuous.stronglyMeasurable.mul
-      ((Lp.stronglyMeasurable _).comp_measurable (Ω.graph k).proj.continuous.measurable)
+      ((Lp.stronglyMeasurable _).comp_measurable (Ω.graph k).graphProj.continuous.measurable)
 
 /-- **The `L_p(Γ)` bound of the boundary trace**: under the hypotheses of the trace theorem,
 `∫_Γ |Tr_Γ F|^p dσ ≤ ∑_j √(1 + M_j²) ‖Tr_j F‖_{L_p(H_j)}^p`, with the Lipschitz constants `M_j`
 of the charts. In the chart `j`, `Tr_Γ F ∘ γ_j = Tr_j F` almost everywhere on `γ_j⁻¹(B_j)`
 (`Rd.BoundedLipschitzDomain.boundaryTrace_graphMap`) and the Gram density is at most
-`√(1 + M_j²)` (`Rd.LipschitzGraph.gram_le`). -/
+`√(1 + M_j²)` (`Rd.LipschitzGraph.gramDensity_le`). -/
 theorem lintegral_enorm_boundaryTrace_le (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞) {L : ℕ}
     (hL : 1 ≤ L) {s : ℝ} (hs : 0 < s) (hsL : s + 1 / p.toReal < L) {q : ℝ≥0∞} (hq : 1 ≤ q)
     {F : Lp ℂ p (volume : Measure V)}
@@ -347,14 +347,14 @@ theorem lintegral_enorm_boundaryTrace_le (ψ : Ω.BoundaryPartition) (hp : p ≠
       dyadicWeight (s + 1 / p.toReal) k * lpModulus p L F k) < ∞) :
     ∫⁻ y, ‖Ω.boundaryTrace ψ hp L F y‖ₑ ^ p.toReal ∂Ω.surfaceMeasure ≤
       ∑ j, ENNReal.ofReal √(1 + (Ω.graph j).M ^ 2) *
-        ∫⁻ x', ‖(Ω.graph j).trace hp L F x'‖ₑ ^ p.toReal := by
+        ∫⁻ x', ‖(Ω.graph j).graphTrace hp L F x'‖ₑ ^ p.toReal := by
   refine (Ω.lintegral_surfaceMeasure_le_sum _).trans (Finset.sum_le_sum fun j _ => ?_)
   rw [← lintegral_const_mul' _ _ ENNReal.ofReal_ne_top]
   refine lintegral_mono_ae ((Ω.boundaryTrace_graphMap ψ hp hL hs hsL hq hF j).mono
     fun x' hx => ?_)
   by_cases hb : (Ω.graph j).graphMap x' ∈ ball (Ω.center j) (Ω.radius j)
   · rw [indicator_of_mem hb, hx hb, mul_comm]
-    exact mul_le_mul' (ENNReal.ofReal_le_ofReal ((Ω.graph j).gram_le x')) le_rfl
+    exact mul_le_mul' (ENNReal.ofReal_le_ofReal ((Ω.graph j).gramDensity_le x')) le_rfl
   · rw [indicator_of_notMem hb, zero_mul]
     exact zero_le
 
@@ -396,7 +396,7 @@ theorem memLp_boundaryTrace_sobolevToL2 (ψ : Ω.BoundaryPartition) (s : ℝ) (U
 /-- **The `L_2(Γ)` bound of the trace of `H^s(V)`**, `1/2 < s < 3/2`:
 `‖Tr_Γ ι_s U‖_{L_2(Γ)} ≤ C ‖U‖` for every resolution of unity and every `U ∈ H^s(V)`, with
 `C = (∑_j √(1 + M_j²) K_j²)^(1/2)` for the constants `K_j` of the traces of the graph domains
-`Ω_j` (`Rd.LipschitzGraph.exists_enorm_trace_sobolevToL2_le`,
+`Ω_j` (`Rd.LipschitzGraph.exists_enorm_graphTrace_sobolevToL2_le`,
 `Rd.BoundedLipschitzDomain.lintegral_enorm_boundaryTrace_le`). -/
 theorem exists_eLpNorm_boundaryTrace_sobolevToL2_le (s : ℝ) (hs : 1 / 2 < s := by norm_num)
     (hs' : s < 3 / 2 := by norm_num) :
@@ -404,12 +404,12 @@ theorem exists_eLpNorm_boundaryTrace_sobolevToL2_le (s : ℝ) (hs : 1 / 2 < s :=
       eLpNorm (Ω.boundaryTrace ψ two_ne_top 2 (sobolevToL2 (one_half_pos.trans hs).le U)) 2
         Ω.surfaceMeasure ≤ C * ‖U‖ₑ := by
   have hs0 : 0 ≤ s := (one_half_pos.trans hs).le
-  choose K hK hle using fun j => (Ω.graph j).exists_enorm_trace_sobolevToL2_le hs (by linarith)
+  choose K hK hle using fun j => (Ω.graph j).exists_enorm_graphTrace_sobolevToL2_le hs (by linarith)
   refine ⟨(∑ j, ENNReal.ofReal √(1 + (Ω.graph j).M ^ 2) * K j ^ (2 : ℝ)) ^ (1 / 2 : ℝ),
     ENNReal.rpow_ne_top_of_nonneg (by norm_num) (ENNReal.sum_ne_top.2 fun j _ =>
       ENNReal.mul_ne_top ENNReal.ofReal_ne_top
         (ENNReal.rpow_ne_top_of_nonneg (by norm_num) (hK j))), fun ψ U => ?_⟩
-  have hj : ∀ j, ∫⁻ x', ‖(Ω.graph j).trace two_ne_top 2 (sobolevToL2 hs0 U) x'‖ₑ ^
+  have hj : ∀ j, ∫⁻ x', ‖(Ω.graph j).graphTrace two_ne_top 2 (sobolevToL2 hs0 U) x'‖ₑ ^
       (2 : ℝ≥0∞).toReal ≤ K j ^ (2 : ℝ) * ‖U‖ₑ ^ (2 : ℝ) := fun j => by
     rw [ENNReal.toReal_ofNat, lintegral_rpow_enorm_eq_rpow_eLpNorm' two_pos,
       ← ENNReal.mul_rpow_of_nonneg _ _ (by norm_num)]
@@ -516,34 +516,34 @@ space of `H^s(Ω)` goes to the boundary trace of its extension `E_s t ∈ H^s(Ω
 (`Rd.BoundedLipschitzDomain.traceL2_injective`). -/
 noncomputable def traceL2 (s : ℝ) (hs : 1 / 2 < s := by norm_num)
     (hs' : s < 3 / 2 := by norm_num) : Ω.TraceSpace s hs hs' →L[ℂ] Ω.BoundaryL2 :=
-  Ω.ambientTraceL2 s hs hs' ∘L (vanishOn s Ω.toOpens)ᗮ.subtypeL ∘L Ω.extend s hs hs'
+  Ω.ambientTraceL2 s hs hs' ∘L (vanishOn s Ω.toOpens)ᗮ.subtypeL ∘L Ω.domainExtend s hs hs'
 
 /-- `traceL2 s t = Tr_Γ ι_s (E_s t)` almost everywhere on `Γ`, for every resolution of unity. -/
 theorem traceL2_apply_ae (ψ : Ω.BoundaryPartition) {s : ℝ} {hs : 1 / 2 < s} {hs' : s < 3 / 2}
     (t : Ω.TraceSpace s hs hs') :
     (Ω.traceL2 s hs hs' t : V → ℂ) =ᵐ[Ω.surfaceMeasure] Ω.boundaryTrace ψ two_ne_top 2
       (sobolevToL2 (one_half_pos.trans hs).le
-        ((Ω.extend s hs hs' t : RestrictionSpace s Ω.toOpens) : H^{s}(V))) :=
+        ((Ω.domainExtend s hs hs' t : RestrictionSpace s Ω.toOpens) : H^{s}(V))) :=
   Ω.ambientTraceL2_apply_ae ψ s _ hs hs'
 
 /-- `traceL2 1 t = Tr_Γ ι (E_1 t)` almost everywhere on `Γ` with the `L_2` function `Rd.toL2`, the
 case `s = 1` of `Rd.BoundedLipschitzDomain.traceL2_apply_ae` (`Rd.sobolevToL2_one`). -/
 theorem traceL2_one_apply_ae (ψ : Ω.BoundaryPartition) (t : Ω.TraceSpace 1) :
     ((Ω.traceL2 1) t : V → ℂ) =ᵐ[Ω.surfaceMeasure] Ω.boundaryTrace ψ two_ne_top 2
-      (toL2 (((Ω.extend 1) t : Ω.SobolevOne) : H^{1}(V))) := by
+      (toL2 (((Ω.domainExtend 1) t : Ω.SobolevOne) : H^{1}(V))) := by
   have h := Ω.traceL2_apply_ae ψ t
   rwa [sobolevToL2_one] at h
 
 /-- **The trace of the trace space in `L_2(Γ)` is injective**: elements of the trace space with
 the same boundary trace almost everywhere on `Γ` are equal
-(`Rd.BoundedLipschitzDomain.boundaryTrace_extend_eventuallyEq_iff`), and `σ`-null sets are the
+(`Rd.BoundedLipschitzDomain.boundaryTrace_domainExtend_eventuallyEq_iff`), and `σ`-null sets are the
 null sets of the charts (`Rd.BoundedLipschitzDomain.ae_surfaceMeasure_iff_aeBoundary`). -/
 theorem traceL2_injective (s : ℝ) (hs : 1 / 2 < s := by norm_num)
     (hs' : s < 3 / 2 := by norm_num) : Function.Injective (Ω.traceL2 s hs hs') := by
   intro t t' h
   have h1 := Ω.traceL2_apply_ae Ω.boundaryPartition t
   rw [h] at h1
-  exact (Ω.boundaryTrace_extend_eventuallyEq_iff Ω.boundaryPartition t t').1
+  exact (Ω.boundaryTrace_domainExtend_eventuallyEq_iff Ω.boundaryPartition t t').1
     (Ω.ae_surfaceMeasure_iff_aeBoundary.1 (h1.symm.trans (Ω.traceL2_apply_ae _ t')))
 
 /-- **The trace `γ^s_{L_2} : H^s(Ω) → L_2(Γ)`**, `1/2 < s < 3/2`: the trace `γ_s` onto the trace
@@ -551,17 +551,18 @@ space followed by the trace of the trace space in `L_2(Γ)`; `γ_{L_2} = γ^1_{L
 the trace kernel (`Rd.BoundedLipschitzDomain.ker_boundaryTraceL2`). -/
 noncomputable def boundaryTraceL2 (s : ℝ) (hs : 1 / 2 < s := by norm_num)
     (hs' : s < 3 / 2 := by norm_num) : RestrictionSpace s Ω.toOpens →L[ℂ] Ω.BoundaryL2 :=
-  Ω.traceL2 s hs hs' ∘L Ω.trace s hs hs'
+  Ω.traceL2 s hs hs' ∘L Ω.domainTrace s hs hs'
 
 /-- **`γ^s_{L_2} u` is the boundary trace of `u`**: `γ^s_{L_2} u = Tr_Γ ι_s u` almost everywhere
-on `Γ`, for every resolution of unity (`Rd.BoundedLipschitzDomain.boundaryTrace_extend_trace`). -/
+on `Γ`, for every resolution of unity
+(`Rd.BoundedLipschitzDomain.boundaryTrace_domainExtend_domainTrace`). -/
 theorem boundaryTraceL2_apply_ae (ψ : Ω.BoundaryPartition) (s : ℝ)
     (u : RestrictionSpace s Ω.toOpens) (hs : 1 / 2 < s := by norm_num)
     (hs' : s < 3 / 2 := by norm_num) :
     (Ω.boundaryTraceL2 s hs hs' u : V → ℂ) =ᵐ[Ω.surfaceMeasure]
       Ω.boundaryTrace ψ two_ne_top 2 (sobolevToL2 (one_half_pos.trans hs).le (u : H^{s}(V))) :=
-  (Ω.traceL2_apply_ae ψ (Ω.trace s hs hs' u)).trans
-    (Ω.ae_surfaceMeasure_iff_aeBoundary.2 (Ω.boundaryTrace_extend_trace ψ s u hs hs'))
+  (Ω.traceL2_apply_ae ψ (Ω.domainTrace s hs hs' u)).trans
+    (Ω.ae_surfaceMeasure_iff_aeBoundary.2 (Ω.boundaryTrace_domainExtend_domainTrace ψ s u hs hs'))
 
 /-- **`γ_{L_2} u` is the boundary trace of `u ∈ H^1(Ω)`** with the `L_2` function `Rd.toL2`, the
 case `s = 1` of `Rd.BoundedLipschitzDomain.boundaryTraceL2_apply_ae` (`Rd.sobolevToL2_one`). -/
@@ -635,21 +636,21 @@ resolution of unity `ψ = Rd.BoundedLipschitzDomain.boundaryPartition`, which is
 is defined on all of `V`, measurable and of norm at most `1`; for `y ∈ Γ` it is a convex
 combination of the chart normals `ν_j(P_j y)` with `ψ_j(y) > 0`. On each boundary ball `B_j` it
 is the chart normal `ν_j(P_j y)` for `σ`-almost every `y`, by the Gauss–Green theorem in two
-charts (`Rd.BoundedLipschitzDomain.normal_ae_eq_normalAt`). -/
-noncomputable def normal (y : V) : V :=
-  ∑ j, Ω.boundaryPartition.toFun j y • (Ω.graph j).normalAt ((Ω.graph j).proj y)
+charts (`Rd.BoundedLipschitzDomain.outwardNormal_ae_eq_normalAt`). -/
+noncomputable def outwardNormal (y : V) : V :=
+  ∑ j, Ω.boundaryPartition.toFun j y • (Ω.graph j).normalAt ((Ω.graph j).graphProj y)
 
 /-- The unit normal field is measurable. -/
-theorem measurable_normal : Measurable Ω.normal :=
+theorem measurable_outwardNormal : Measurable Ω.outwardNormal :=
   Finset.measurable_fun_sum _ fun j _ =>
     (Ω.boundaryPartition.contDiff j).continuous.measurable.smul
-      ((Ω.graph j).measurable_normalAt.comp (Ω.graph j).proj.continuous.measurable)
+      ((Ω.graph j).measurable_normalAt.comp (Ω.graph j).graphProj.continuous.measurable)
 
 omit [MeasurableSpace V] [BorelSpace V] in
 /-- The unit normal field has norm at most `1`: `‖ν(y)‖ ≤ ∑_j ψ_j(y) ≤ 1`. -/
-theorem norm_normal_le (y : V) : ‖Ω.normal y‖ ≤ 1 := by
-  calc ‖Ω.normal y‖ ≤ ∑ j, ‖Ω.boundaryPartition.toFun j y • (Ω.graph j).normalAt
-        ((Ω.graph j).proj y)‖ := norm_sum_le _ _
+theorem norm_outwardNormal_le (y : V) : ‖Ω.outwardNormal y‖ ≤ 1 := by
+  calc ‖Ω.outwardNormal y‖ ≤ ∑ j, ‖Ω.boundaryPartition.toFun j y • (Ω.graph j).normalAt
+        ((Ω.graph j).graphProj y)‖ := norm_sum_le _ _
     _ = ∑ j, Ω.boundaryPartition.toFun j y := Finset.sum_congr rfl fun j _ => by
         rw [norm_smul, (Ω.graph j).norm_normalAt, mul_one]
         exact Real.norm_of_nonneg (Ω.boundaryPartition_nonneg j y)

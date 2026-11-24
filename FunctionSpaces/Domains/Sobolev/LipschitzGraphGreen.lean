@@ -28,8 +28,8 @@ Let `Ω = {x : φ(x) < ⟪x, e⟫}` be a Lipschitz graph domain in `V`, `dim V =
 * **Gauss–Green for `C^1` functions** (`Rd.LipschitzGraph.setIntegral_lineDeriv_eq`): for
   `g ∈ C^1` with compact support and every direction `v`, `∫_Ω ∂_v g = ∫_H g(γ x') n_v(x') dx'`
   with the normal weight `n_v = ⟪∇φ, v⟫ - ⟪v, e⟫ = ⟪v, ν⟫ √(1 + ‖∇φ‖²)`
-  (`Rd.LipschitzGraph.normalWeight`, `Rd.LipschitzGraph.inner_normalAt_mul_gram`); with the area
-  formula, `∫_Ω ∂_v g = ∫_Γ g ⟪v, ν⟫ dμHE[n-1]`
+  (`Rd.LipschitzGraph.normalWeight`, `Rd.LipschitzGraph.inner_normalAt_mul_gramDensity`); with the
+  area formula, `∫_Ω ∂_v g = ∫_Γ g ⟪v, ν⟫ dμHE[n-1]`
   (`Rd.LipschitzGraph.setIntegral_lineDeriv_eq_surface`). The proof uses the ray integral
   `Ψ(y) = ∫_0^∞ g(y + t e) dt` (`Rd.rayIntegral`), a differentiable function with
   `∂_e Ψ = -g` and bounded derivative, and the compactly supported Lipschitz function `Ψ ∘ γ` on
@@ -292,7 +292,8 @@ theorem setIntegral_weakDeriv_mul_add_eq {s : Set V} (hs : MeasurableSet s) (v :
 /-- The left side of Green's formula on a measurable set `s`,
 `(U, W) ↦ ∫_s (∂_v U) W + U ∂_v W`, is continuous on `H^1(V) × H^1(V)`: a sum of bounded
 bilinear pairings (`Rd.setIntegral_weakDeriv_mul_add_eq`). -/
-theorem continuous_setIntegral_weakDeriv_mul_add {s : Set V} (hs : MeasurableSet s) (v : V) :
+theorem continuous_setIntegral_weakDeriv_mul_add_of_measurableSet {s : Set V}
+    (hs : MeasurableSet s) (v : V) :
     Continuous fun p : H^{1}(V) × H^{1}(V) =>
       ∫ x in s, weakDerivL2 v p.1 x * toL2 p.2 x + toL2 p.1 x * weakDerivL2 v p.2 x := by
   set P := (ContinuousLinearMap.mul ℂ ℂ).lpPairing (volume : Measure V) 2 2
@@ -341,9 +342,9 @@ theorem setIntegral_domain_eq_of_measurePreserving {E : Type*} [NormedAddCommGro
       indicator_of_notMem (show t ∉ Ioi (a x') from h)]
 
 /-- `x' + t e ∈ Ω` iff `φ(x') < t`. -/
-theorem prodEquiv_mem_domain_iff (p : Ω.hyperplane × ℝ) :
-    Ω.prodEquiv p ∈ Ω.domain ↔ Ω.phi p.1 < p.2 := by
-  rw [prodEquiv_apply]
+theorem graphProdEquiv_mem_domain_iff (p : Ω.hyperplane × ℝ) :
+    Ω.graphProdEquiv p ∈ Ω.domain ↔ Ω.phi p.1 < p.2 := by
+  rw [graphProdEquiv_apply]
   change Ω.phi ((p.1 : V) + p.2 • Ω.e) < inner ℝ ((p.1 : V) + p.2 • Ω.e) Ω.e ↔ _
   rw [Ω.const, inner_add_left, Ω.inner_coe_e, real_inner_smul_left, Ω.inner_e_self, mul_one,
     zero_add]
@@ -361,9 +362,9 @@ theorem graphMap_add_smul_mem_domain_iff (x' : Ω.hyperplane) (t : ℝ) :
 theorem setIntegral_domain_eq {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] {F : V → E}
     (hF : IntegrableOn F Ω.domain) :
     ∫ x in Ω.domain, F x = ∫ x' : Ω.hyperplane, ∫ t in Ioi (Ω.phi x'), F (x' + t • Ω.e) := by
-  rw [Ω.setIntegral_domain_eq_of_measurePreserving Ω.prodEquiv Ω.measurePreserving_prodEquiv
-    (fun x' => Ω.phi x') Ω.prodEquiv_mem_domain_iff hF]
-  simp only [prodEquiv_apply]
+  rw [Ω.setIntegral_domain_eq_of_measurePreserving Ω.graphProdEquiv
+    Ω.measurePreserving_graphProdEquiv (fun x' => Ω.phi x') Ω.graphProdEquiv_mem_domain_iff hF]
+  simp only [graphProdEquiv_apply]
 
 /-- **Fubini in graph coordinates**: `∫_Ω F = ∫_H ∫_0^∞ F(γ(x') + t e) dt dx'` for every `F`
 integrable on `Ω`. -/
@@ -378,17 +379,17 @@ theorem setIntegral_domain_eq_graphMap {E : Type*} [NormedAddCommGroup E] [Norme
 
 /-- The **normal weight** `n_v(x') = ⟪∇φ(x'), v⟫ - ⟪v, e⟫` of the direction `v` in the chart: the
 boundary term of `∫_Ω ∂_v g` is `∫_H g(γ x') n_v(x') dx'`, and
-`n_v = ⟪v, ν⟫ √(1 + ‖∇φ‖²)` (`Rd.LipschitzGraph.inner_normalAt_mul_gram`). -/
+`n_v = ⟪v, ν⟫ √(1 + ‖∇φ‖²)` (`Rd.LipschitzGraph.inner_normalAt_mul_gramDensity`). -/
 noncomputable def normalWeight (v : V) (x' : Ω.hyperplane) : ℝ :=
   inner ℝ (Ω.gradPhi x' : V) v - inner ℝ v Ω.e
 
 omit [MeasurableSpace V] [BorelSpace V] in
 /-- **The normal weight by the unit normal**: `⟪v, ν(x')⟫ √(1 + ‖∇φ(x')‖²) = n_v(x')`, since
 `ν = (∇φ - e)/√(1 + ‖∇φ‖²)`. -/
-theorem inner_normalAt_mul_gram (v : V) (x' : Ω.hyperplane) :
-    inner ℝ v (Ω.normalAt x') * Ω.gram x' = Ω.normalWeight v x' := by
+theorem inner_normalAt_mul_gramDensity (v : V) (x' : Ω.hyperplane) :
+    inner ℝ v (Ω.normalAt x') * Ω.gramDensity x' = Ω.normalWeight v x' := by
   rw [normalAt, real_inner_smul_right, inner_sub_right, normalWeight, real_inner_comm v,
-    mul_comm, ← mul_assoc, mul_inv_cancel₀ (Ω.gram_pos x').ne', one_mul]
+    mul_comm, ← mul_assoc, mul_inv_cancel₀ (Ω.gramDensity_pos x').ne', one_mul]
 
 omit [MeasurableSpace V] [BorelSpace V] in
 /-- The normal weight is bounded: `|n_v| ≤ (M + 1) ‖v‖`, since `‖∇φ‖ ≤ M`. -/
@@ -569,13 +570,13 @@ theorem setIntegral_lineDeriv_eq (hg : ContDiff ℝ 1 g) (hgc : HasCompactSuppor
       ).integrable_of_hasCompactSupport
       ((hgc.fderiv (𝕜 := ℝ)).comp_left (g := fun L : V →L[ℝ] ℂ => L v) rfl)).integrableOn
   have hG := Ω.integrable_comp_graphMap hg.continuous hgc
-  have hA := Ω.integrable_fderiv_rayIntegral hg hgc (Ω.proj v)
-  have hB := Ω.integrable_inner_gradPhi_mul hg.continuous hgc (Ω.proj v)
-  have hv : v = (Ω.proj v : V) + inner ℝ v Ω.e • Ω.e := by rw [coe_proj]; abel
+  have hA := Ω.integrable_fderiv_rayIntegral hg hgc (Ω.graphProj v)
+  have hB := Ω.integrable_inner_gradPhi_mul hg.continuous hgc (Ω.graphProj v)
+  have hv : v = (Ω.graphProj v : V) + inner ℝ v Ω.e • Ω.e := by rw [coe_graphProj]; abel
   simp only [hdv]
   rw [Ω.setIntegral_domain_eq_graphMap hint]
   calc ∫ x', ∫ t in Ioi (0 : ℝ), fderiv ℝ g (Ω.graphMap x' + t • Ω.e) v
-      = ∫ x', (fderiv ℝ (rayIntegral g Ω.e) (Ω.graphMap x') (Ω.proj v) -
+      = ∫ x', (fderiv ℝ (rayIntegral g Ω.e) (Ω.graphMap x') (Ω.graphProj v) -
           (inner ℝ v Ω.e : ℂ) * g (Ω.graphMap x')) := by
         refine integral_congr_ae (ae_of_all _ fun x' => ?_)
         simp only
@@ -583,27 +584,27 @@ theorem setIntegral_lineDeriv_eq (hg : ContDiff ℝ 1 g) (hgc : HasCompactSuppor
         conv_lhs => rw [hv]
         rw [map_add, map_smul, fderiv_rayIntegral_self hg hgc Ω.norm_e, Complex.real_smul]
         ring
-    _ = (∫ x', fderiv ℝ (rayIntegral g Ω.e) (Ω.graphMap x') (Ω.proj v)) -
+    _ = (∫ x', fderiv ℝ (rayIntegral g Ω.e) (Ω.graphMap x') (Ω.graphProj v)) -
           ∫ x', (inner ℝ v Ω.e : ℂ) * g (Ω.graphMap x') := integral_sub hA (hG.const_mul _)
-    _ = (∫ x', (inner ℝ (Ω.gradPhi x') (Ω.proj v) : ℂ) * g (Ω.graphMap x')) -
+    _ = (∫ x', (inner ℝ (Ω.gradPhi x') (Ω.graphProj v) : ℂ) * g (Ω.graphMap x')) -
           ∫ x', (inner ℝ v Ω.e : ℂ) * g (Ω.graphMap x') := by
         rw [Ω.integral_fderiv_rayIntegral_graphMap hg hgc]
-    _ = ∫ x', ((inner ℝ (Ω.gradPhi x') (Ω.proj v) : ℂ) * g (Ω.graphMap x') -
+    _ = ∫ x', ((inner ℝ (Ω.gradPhi x') (Ω.graphProj v) : ℂ) * g (Ω.graphMap x') -
           (inner ℝ v Ω.e : ℂ) * g (Ω.graphMap x')) := (integral_sub hB (hG.const_mul _)).symm
     _ = _ := by
         refine integral_congr_ae (ae_of_all _ fun x' => ?_)
-        simp only [normalWeight, Ω.inner_coe_eq_inner_proj, Complex.ofReal_sub]
+        simp only [normalWeight, Ω.inner_coe_eq_inner_graphProj, Complex.ofReal_sub]
         ring
 
 /-- **Gauss–Green with the unit normal**: `∫_Ω ∂_v g = ∫_H g(γ x') ⟪v, ν(x')⟫ √(1 + ‖∇φ(x')‖²) dx'`
-(`Rd.LipschitzGraph.inner_normalAt_mul_gram`). -/
+(`Rd.LipschitzGraph.inner_normalAt_mul_gramDensity`). -/
 theorem setIntegral_lineDeriv_eq_normal (hg : ContDiff ℝ 1 g) (hgc : HasCompactSupport g)
     (v : V) :
     ∫ x in Ω.domain, lineDeriv ℝ g x v =
-      ∫ x', g (Ω.graphMap x') * (inner ℝ v (Ω.normalAt x') : ℂ) * (Ω.gram x' : ℂ) := by
+      ∫ x', g (Ω.graphMap x') * (inner ℝ v (Ω.normalAt x') : ℂ) * (Ω.gramDensity x' : ℂ) := by
   rw [Ω.setIntegral_lineDeriv_eq hg hgc]
   refine integral_congr_ae (ae_of_all _ fun x' => ?_)
-  simp only [← Ω.inner_normalAt_mul_gram, Complex.ofReal_mul]
+  simp only [← Ω.inner_normalAt_mul_gramDensity, Complex.ofReal_mul]
   ring
 
 /-- **The vertical direction**: `∫_Ω ∂_e g = -∫_H g(γ x') dx'`, the fundamental theorem of calculus
@@ -631,9 +632,9 @@ support and every direction `v`, `∫_Ω ∂_v g = ∫_Γ g ⟪v, ν⟫ dμHE[n-
 theorem setIntegral_lineDeriv_eq_surface (hg : ContDiff ℝ 1 g) (hgc : HasCompactSupport g)
     (v : V) :
     ∫ x in Ω.domain, lineDeriv ℝ g x v = ∫ y in range Ω.graphMap,
-      g y * (inner ℝ v (Ω.normalAt (Ω.proj y)) : ℂ) ∂(μHE[finrank ℝ V - 1] : Measure V) := by
+      g y * (inner ℝ v (Ω.normalAt (Ω.graphProj y)) : ℂ) ∂(μHE[finrank ℝ V - 1] : Measure V) := by
   rw [Ω.integral_graphMap, Ω.setIntegral_lineDeriv_eq_normal hg hgc]
-  simp only [proj_graphMap]
+  simp only [graphProj_graphMap]
 
 /-! ### Green's formula -/
 
@@ -663,10 +664,10 @@ theorem integral_mul_mul_normalWeight_eq (v : V) (a b : Lp ℂ 2 (volume : Measu
   ring
 
 /-- The left side of Green's formula, `(U, W) ↦ ∫_Ω (∂_v U) W + U ∂_v W`, is continuous on
-`H^1(V) × H^1(V)` (`Rd.continuous_setIntegral_weakDeriv_mul_add`). -/
+`H^1(V) × H^1(V)` (`Rd.continuous_setIntegral_weakDeriv_mul_add_of_measurableSet`). -/
 theorem continuous_setIntegral_weakDeriv_mul_add (v : V) : Continuous fun p : H^{1}(V) × H^{1}(V) =>
     ∫ x in Ω.domain, weakDerivL2 v p.1 x * toL2 p.2 x + toL2 p.1 x * weakDerivL2 v p.2 x :=
-  Rd.continuous_setIntegral_weakDeriv_mul_add Ω.measurableSet_domain v
+  Rd.continuous_setIntegral_weakDeriv_mul_add_of_measurableSet Ω.measurableSet_domain v
 
 /-- The right side of Green's formula, `(U, W) ↦ ∫_H Tr U · Tr W · n_v`, is continuous on
 `H^1(V) × H^1(V)`. -/
@@ -738,7 +739,8 @@ theorem setIntegral_green (f g : Lp ℂ 2 (volume : Measure V)) (hf : MemWSobole
     (hfv : HasWeakLineDeriv ⊤ (fun _ : Fin 1 => v) f fv)
     (hgv : HasWeakLineDeriv ⊤ (fun _ : Fin 1 => v) g gv) :
     ∫ x in Ω.domain, fv x * g x + f x * gv x =
-      ∫ x', Ω.trace two_ne_top 2 f x' * Ω.trace two_ne_top 2 g x' * (Ω.normalWeight v x' : ℂ) := by
+      ∫ x', Ω.graphTrace two_ne_top 2 f x' * Ω.graphTrace two_ne_top 2 g x' *
+        (Ω.normalWeight v x' : ℂ) := by
   obtain ⟨U, rfl⟩ := exists_toL2_eq_of_memWSobolev hf
   obtain ⟨W, rfl⟩ := exists_toL2_eq_of_memWSobolev hg
   rw [← weakDerivL2_eq hfv, ← weakDerivL2_eq hgv]
@@ -750,11 +752,11 @@ the traces and the normal read through the projection `P` (the area formula
 `Rd.LipschitzGraph.integral_graphMap`). -/
 theorem setIntegral_green_surface (U W : H^{1}(V)) (v : V) :
     ∫ x in Ω.domain, weakDerivL2 v U x * toL2 W x + toL2 U x * weakDerivL2 v W x =
-      ∫ y in range Ω.graphMap, Ω.traceH1 U (Ω.proj y) * Ω.traceH1 W (Ω.proj y) *
-        (inner ℝ v (Ω.normalAt (Ω.proj y)) : ℂ) ∂(μHE[finrank ℝ V - 1] : Measure V) := by
+      ∫ y in range Ω.graphMap, Ω.traceH1 U (Ω.graphProj y) * Ω.traceH1 W (Ω.graphProj y) *
+        (inner ℝ v (Ω.normalAt (Ω.graphProj y)) : ℂ) ∂(μHE[finrank ℝ V - 1] : Measure V) := by
   rw [Ω.setIntegral_green_besselPotentialSpace, Ω.integral_graphMap]
   refine integral_congr_ae (ae_of_all _ fun x' => ?_)
-  simp only [proj_graphMap, ← Ω.inner_normalAt_mul_gram, Complex.ofReal_mul]
+  simp only [graphProj_graphMap, ← Ω.inner_normalAt_mul_gramDensity, Complex.ofReal_mul]
   ring
 
 end LipschitzGraph

@@ -184,7 +184,8 @@ a closed subspace that contains $T^s(\Omega)$, hence $\tilde H^s(\Omega)$. At $s
 
 \begin{lemma}[Restriction is injective on $\tilde H^s(\Omega)$ for $s \geq 0$]
 \label{lem:tilde-restriction-injective}
-\lean{Rd.eq_zero_of_mem_tildeSpace_of_restrictProj_eq_zero, Rd.tildeToRestrictionL_injective}
+\lean{Rd.eq_zero_of_mem_tildeSpace_of_restrictProj_eq_zero,
+  Rd.tildeToRestrictionL_injective_of_nonneg}
 \leanok
 \uses{lem:tilde-space-vanishes-outside-nonneg, prop:sobolev-vanishing-one,
   lem:sobolev-restriction-basic, lem:sobolev-to-l2}
@@ -229,8 +230,8 @@ costs at most the factor $C$. It is condition (iv) of Hewett and Moiola
   Rd.HasZeroExtensionBound.range_tildeToRestrictionL,
   Rd.HasZeroExtensionBound.tildeLinearEquivZeroBoundary,
   Rd.HasZeroExtensionBound.coe_tildeLinearEquivZeroBoundary_apply,
-  Rd.HasZeroExtensionBound.tildeEquivZeroBoundary,
-  Rd.HasZeroExtensionBound.coe_tildeEquivZeroBoundary_apply,
+  Rd.HasZeroExtensionBound.tildeEquivZeroBoundaryOfBound,
+  Rd.HasZeroExtensionBound.coe_tildeEquivZeroBoundaryOfBound_apply,
   Rd.HasZeroExtensionBound.norm_restrictProj_eq}
 \leanok
 \uses{def:zero-extension-bound, thm:sobolev-restriction-quotient, lem:sobolev-restriction-basic,
@@ -333,7 +334,7 @@ graph domains $\Omega_j$ with cones $K_j$ (\Cref{def:bounded-lipschitz}, \Cref{l
 
 \begin{lemma}[Localised functions in $H^s(V)$]
 \label{lem:sobolev-localize}
-\lean{Rd.BoundedLipschitzDomain.BoundaryPartition.exists_sobolevToL2_eq_localize}
+\lean{Rd.BoundedLipschitzDomain.BoundaryPartition.exists_sobolevToL2_eq_localizeL2}
 \leanok
 \uses{lem:sobolev-cutoff, def:boundary-partition, def:bounded-lipschitz,
   def:trace-space-setting}
@@ -415,7 +416,7 @@ At $s = 1$ this is \Cref{thm:tilde-space-mollified}.
 \begin{lemma}[Chart pieces in $\tilde H^s$]
 \label{lem:tilde-space-chart-pieces-general}
 \lean{Rd.BoundedLipschitzDomain.mem_tildeSpace_of_mulLp_chart_of_nonneg,
-  Rd.BoundedLipschitzDomain.eq_sum_localize_add_mulLp,
+  Rd.BoundedLipschitzDomain.eq_sum_localizeL2_add_mulLp,
   Rd.BoundedLipschitzDomain.eq_sum_add_of_ae_eq_zero_of_nonneg}
 \leanok
 \uses{thm:tilde-space-mollified-general, def:cone-mollifier, lem:graph-domain-closure-cone,
@@ -537,7 +538,7 @@ preserve the Lebesgue measure.
 
 \begin{definition}[The height above a graph]
 \label{def:graph-height}
-\lean{Rd.LipschitzGraph.height, Rd.LipschitzGraph.continuous_height}
+\lean{Rd.LipschitzGraph.graphHeight, Rd.LipschitzGraph.continuous_graphHeight}
 \leanok
 \uses{def:lipschitz-graph}
 For a Lipschitz graph domain $\Omega' = \{x : \varphi(x) < \langle x, e \rangle\}$, the height of
@@ -547,10 +548,10 @@ the difference of a continuous linear form and the Lipschitz function $\varphi$.
 
 \begin{lemma}[Properties of the height]
 \label{lem:graph-height}
-\lean{Rd.LipschitzGraph.mem_domain_iff_height_pos, Rd.LipschitzGraph.height_add_smul,
-  Rd.LipschitzGraph.height_graphMap, Rd.LipschitzGraph.height_graphEquiv,
-  Rd.LipschitzGraph.proj_graphEquiv, Rd.LipschitzGraph.abs_height_add_sub_le,
-  Rd.LipschitzGraph.abs_height_le_of_mem_switchSet}
+\lean{Rd.LipschitzGraph.mem_domain_iff_graphHeight_pos, Rd.LipschitzGraph.graphHeight_add_smul,
+  Rd.LipschitzGraph.graphHeight_graphMap, Rd.LipschitzGraph.graphHeight_graphEquiv,
+  Rd.LipschitzGraph.graphProj_graphEquiv, Rd.LipschitzGraph.abs_graphHeight_add_sub_le,
+  Rd.LipschitzGraph.abs_graphHeight_le_of_mem_switchSet}
 \leanok
 \uses{def:graph-height, def:graph-map, lem:flattening, def:switch-set}
 Let $\eta$ be the height of a Lipschitz graph domain $\Omega'$ with Lipschitz constant $M$, $P$
@@ -575,7 +576,7 @@ $0 < \eta(x) \leq \eta(x) - \eta(x + h)$ or $0 \leq -\eta(x) < \eta(x + h) - \et
 
 \begin{lemma}[Slabs along a graph]
 \label{lem:graph-slab}
-\lean{Rd.LipschitzGraph.volume_abs_height_le_inter_closedBall}
+\lean{Rd.LipschitzGraph.volume_abs_graphHeight_le_inter_closedBall}
 \leanok
 \uses{lem:graph-height, lem:flattening, def:graph-map}
 Let $\eta$ be the height of a Lipschitz graph domain with hyperplane $H$, and $\beta_H$ the volume
@@ -689,8 +690,8 @@ $\|\mathbf 1_S\|_p = \mu(S)^{1/p}$.
 \begin{lemma}[Indicators of smooth atoms]
 \label{lem:indicator-atoms}
 \lean{ENNReal.rpow_le_self_of_one_le, Rd.IsSmoothAtom.enorm_sub_le_indicator,
-  Rd.IsSmoothAtom.indicator_switchSet_le, Rd.IsSmoothAtom.eLpNorm_indicator_le,
-  Rd.IsSmoothAtom.eLpNorm_fwdDiff_indicator_le,
+  Rd.IsSmoothAtom.indicator_switchSet_le, Rd.IsSmoothAtom.eLpNorm_indicator_le_dyadicWeight,
+  Rd.IsSmoothAtom.eLpNorm_fwdDiff_indicator_le_of_volume_le,
   Rd.BoundedLipschitzDomain.exists_isRegularAtom_indicator}
 \leanok
 \uses{cor:boundary-layer-atoms, lem:cut-off-differences, lem:smooth-atoms-regular,
@@ -1124,7 +1125,7 @@ of\_\allowbreak ae\_\allowbreak prod}, finish the proof.
 \begin{definition}[Vertical forms]
 \label{def:vertical-form}
 \lean{Rd.LipschitzGraph.verticalForm, Rd.LipschitzGraph.measurable_verticalForm,
-  Rd.LipschitzGraph.heightPairs, Rd.LipschitzGraph.verticalQuotient,
+  Rd.LipschitzGraph.graphHeightPairs, Rd.LipschitzGraph.verticalQuotient,
   Rd.LipschitzGraph.measurable_verticalQuotient}
 \leanok
 \uses{def:graph-height}
@@ -1145,7 +1146,7 @@ $t \mapsto G(\gamma(x') + t e)$.
 
 \begin{lemma}[{The Hardy inequality on $(0, 1]$ along the vertical lines}]
 \label{lem:vertical-hardy}
-\lean{Rd.LipschitzGraph.halfLineForm_graphEquiv, Rd.LipschitzGraph.lintegral_Ioc_height_le}
+\lean{Rd.LipschitzGraph.halfLineForm_graphEquiv, Rd.LipschitzGraph.lintegral_Ioc_graphHeight_le}
 \leanok
 \uses{def:vertical-form, def:half-line-form}
 For $G \colon V \to \C$, $x' \in H$ and real $s$,
@@ -1201,9 +1202,9 @@ $2 \cdot 2^{-k} 2^{(k+1)(1+2s)} = 2^{2s+2} 2^{2ks}$.
 
 \begin{theorem}[A Hardy inequality on Lipschitz graph domains]
 \label{thm:graph-hardy}
-\lean{Rd.LipschitzGraph.lintegral_div_min_height_le,
-  Rd.LipschitzGraph.lintegral_div_min_height_le_modNormOn,
-  Rd.LipschitzGraph.exists_lintegral_div_height_le}
+\lean{Rd.LipschitzGraph.lintegral_div_min_graphHeight_le,
+  Rd.LipschitzGraph.lintegral_div_min_graphHeight_le_modNormOn,
+  Rd.LipschitzGraph.exists_lintegral_div_graphHeight_le}
 \leanok
 \uses{def:graph-height, lem:modnorm-on, def:half-line-form}
 Let $s > 1/2$, $G \in L_2(V)$ and $\varepsilon > 0$ with $G = 0$ almost everywhere on
@@ -1313,7 +1314,7 @@ $\eta_j$ (\Cref{def:bounded-lipschitz}).
 \label{lem:zero-extension-charts}
 \lean{Rd.BoundedLipschitzDomain.indicatorLp_eq_sum_add,
   Rd.BoundedLipschitzDomain.exists_isCompact_sobolevToL2_add_eq_zero,
-  Rd.BoundedLipschitzDomain.exists_mul_eq_zero_of_height_lt}
+  Rd.BoundedLipschitzDomain.exists_mul_eq_zero_of_graphHeight_lt}
 \leanok
 \uses{def:bounded-lipschitz, def:boundary-partition, lem:indicator-lp, def:graph-height,
   def:sobolev-tilde-zero-boundary, def:sobolev-vanishing, def:sobolev-to-l2}

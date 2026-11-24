@@ -520,7 +520,7 @@ noncomputable def sobolevTrace (s : ℝ) (hs : 1 / 2 < s := by norm_num)
     (hs' : s < 3 / 2 := by norm_num) :
     RestrictionSpace s Ω.toOpens →L[ℂ] Ω.BoundarySobolev (s - 1 / 2) :=
   (Ω.traceSpaceEquivBoundarySobolev s hs hs' :
-    Ω.TraceSpace s hs hs' →L[ℂ] Ω.BoundarySobolev (s - 1 / 2)) ∘L Ω.trace s hs hs'
+    Ω.TraceSpace s hs hs' →L[ℂ] Ω.BoundarySobolev (s - 1 / 2)) ∘L Ω.domainTrace s hs hs'
 
 /-- **The extension `H^{s-1/2}(Γ) → H^s(Ω)`**, `1/2 < s < 3/2`: the inverse of the isomorphism
 `Rd.BoundedLipschitzDomain.traceSpaceEquivBoundarySobolev` followed by the extension `E_s`, a
@@ -529,7 +529,7 @@ bounded linear right inverse of the trace
 noncomputable def sobolevExtend (s : ℝ) (hs : 1 / 2 < s := by norm_num)
     (hs' : s < 3 / 2 := by norm_num) :
     Ω.BoundarySobolev (s - 1 / 2) →L[ℂ] RestrictionSpace s Ω.toOpens :=
-  Ω.extend s hs hs' ∘L ((Ω.traceSpaceEquivBoundarySobolev s hs hs').symm :
+  Ω.domainExtend s hs hs' ∘L ((Ω.traceSpaceEquivBoundarySobolev s hs hs').symm :
     Ω.BoundarySobolev (s - 1 / 2) →L[ℂ] Ω.TraceSpace s hs hs')
 
 /-- The trace into `H^{s-1/2}(Γ)` has the function `γ^s_{L_2} u ∈ L_2(Γ)`
@@ -540,23 +540,23 @@ theorem toLp_sobolevTrace (s : ℝ) (u : RestrictionSpace s Ω.toOpens)
   rfl
 
 /-- **The extension is a right inverse of the trace**: `γ(E g) = g` for every
-`g ∈ H^{s-1/2}(Γ)` (`Rd.BoundedLipschitzDomain.trace_extend`). -/
+`g ∈ H^{s-1/2}(Γ)` (`Rd.BoundedLipschitzDomain.domainTrace_domainExtend`). -/
 theorem sobolevTrace_sobolevExtend (s : ℝ) (g : Ω.BoundarySobolev (s - 1 / 2))
     (hs : 1 / 2 < s := by norm_num) (hs' : s < 3 / 2 := by norm_num) :
     Ω.sobolevTrace s hs hs' (Ω.sobolevExtend s hs hs' g) = g := by
-  change Ω.traceSpaceEquivBoundarySobolev s hs hs' (Ω.trace s hs hs'
-    (Ω.extend s hs hs' ((Ω.traceSpaceEquivBoundarySobolev s hs hs').symm g))) = g
-  rw [trace_extend, ContinuousLinearEquiv.apply_symm_apply]
+  change Ω.traceSpaceEquivBoundarySobolev s hs hs' (Ω.domainTrace s hs hs'
+    (Ω.domainExtend s hs hs' ((Ω.traceSpaceEquivBoundarySobolev s hs hs').symm g))) = g
+  rw [domainTrace_domainExtend, ContinuousLinearEquiv.apply_symm_apply]
 
 /-- **The kernel of the trace `H^s(Ω) → H^{s-1/2}(Γ)` is the trace kernel**: the isomorphism with
-`H^{s-1/2}(Γ)` is injective (`Rd.BoundedLipschitzDomain.ker_trace`). -/
+`H^{s-1/2}(Γ)` is injective (`Rd.BoundedLipschitzDomain.ker_domainTrace`). -/
 theorem ker_sobolevTrace (s : ℝ) (hs : 1 / 2 < s := by norm_num)
     (hs' : s < 3 / 2 := by norm_num) :
     (Ω.sobolevTrace s hs hs').ker = Ω.traceKer s hs hs' := by
-  rw [← Ω.ker_trace s hs hs']
+  rw [← Ω.ker_domainTrace s hs hs']
   ext u
-  change Ω.traceSpaceEquivBoundarySobolev s hs hs' (Ω.trace s hs hs' u) = 0 ↔
-    Ω.trace s hs hs' u = 0
+  change Ω.traceSpaceEquivBoundarySobolev s hs hs' (Ω.domainTrace s hs hs' u) = 0 ↔
+    Ω.domainTrace s hs hs' u = 0
   exact (Ω.traceSpaceEquivBoundarySobolev s hs hs').map_eq_zero_iff
 
 /-- **Restrictions of `H^s(V)` lie in `B^s_{2,2}(Ω)`**, `0 < s < 2`: for `U ∈ H^s(V)`,

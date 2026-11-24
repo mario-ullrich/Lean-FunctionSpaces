@@ -23,9 +23,9 @@ with a cut-off is a smooth change of variables with a cut-off on the whole hyper
 The **boundary pieces** of `g : M → ℂ` are the restrictions of the chart pieces to `H₀`
 (`Manifold.BesovAtlas.boundaryPiece`), and `g ∈ B^s_{p,q}(∂M)` if every boundary piece agrees
 almost everywhere with a function of finite Besov quasi-norm on `H₀`
-(`Manifold.BesovAtlas.MemBoundaryBesov`). This does not depend on the atlas
-(`Manifold.BesovAtlas.memBoundaryBesov_iff_memBoundaryBesov`): the boundary pieces of two atlases
-are related by the boundary changes of charts, which are bounded on `B^s_{p,q}(H₀)`.
+(`Manifold.BesovAtlas.MemAtlasBoundaryBesov`). This does not depend on the atlas
+(`Manifold.BesovAtlas.memAtlasBoundaryBesov_iff_memAtlasBoundaryBesov`): the boundary pieces of two
+atlases are related by the boundary changes of charts, which are bounded on `B^s_{p,q}(H₀)`.
 -/
 
 @[expose] public section
@@ -44,7 +44,7 @@ variable {n : ℕ} [NeZero n]
 /-- The flat graph domain `{y : y_0 > 0}` of `ℝ^n`. -/
 noncomputable abbrev flatDomain (n : ℕ) [NeZero n] :
     Rd.LipschitzGraph (EuclideanSpace ℝ (Fin n)) :=
-  Rd.LipschitzGraph.flat Rd.e0 Rd.norm_e0
+  Rd.LipschitzGraph.halfSpaceGraph Rd.firstUnitVector Rd.norm_firstUnitVector
 
 /-- The **boundary hyperplane** `H₀ = e₀^⊥ = {y : y_0 = 0}` of the half-space. -/
 noncomputable abbrev bdry (n : ℕ) [NeZero n] : Submodule ℝ (EuclideanSpace ℝ (Fin n)) :=
@@ -63,9 +63,9 @@ theorem bdry_subset_range :
   exact (mem_bdry_iff.1 hy).ge
 
 /-- The projection onto `H₀` is the identity on `H₀`. -/
-theorem coe_proj_of_mem_bdry {y : EuclideanSpace ℝ (Fin n)} (hy : y ∈ bdry n) :
-    ((flatDomain n).proj y : EuclideanSpace ℝ (Fin n)) = y := by
-  have h := (flatDomain n).proj_coe ⟨y, hy⟩
+theorem coe_graphProj_of_mem_bdry {y : EuclideanSpace ℝ (Fin n)} (hy : y ∈ bdry n) :
+    ((flatDomain n).graphProj y : EuclideanSpace ℝ (Fin n)) = y := by
+  have h := (flatDomain n).graphProj_coe ⟨y, hy⟩
   rw [show ((⟨y, hy⟩ : bdry n) : EuclideanSpace ℝ (Fin n)) = y from rfl] at h
   rw [h]
 
@@ -111,7 +111,7 @@ theorem coordChange_mem_bdry [IsManifold (𝓡∂ n) ∞ M]
   have hge : 0 ≤ e'.extend (𝓡∂ n) x 0 := by
     have := (e'.extend_target_subset_range (I := 𝓡∂ n)) hx'
     rwa [range_modelWithCornersEuclideanHalfSpace] at this
-  rw [coordChange_apply, mem_bdry_iff]
+  rw [extendCoordChange_apply, mem_bdry_iff]
   exact le_antisymm (not_lt.1 fun h => h0 (hiff.2 h)) hge
 
 /-! ### Changes of charts on the boundary -/
@@ -142,21 +142,21 @@ theorem mem_coordChange_target_iff_of_bdry (y' : bdry n) :
 omit [CompactSpace M] in
 include he he' in
 /-- The change of charts maps the boundary part of its source into `H₀`. -/
-theorem coe_proj_coordChange {x' : bdry n}
+theorem coe_graphProj_coordChange {x' : bdry n}
     (hx : (x' : EuclideanSpace ℝ (Fin n)) ∈ ((𝓡∂ n).extendCoordChange e e').source) :
-    ((flatDomain n).proj ((𝓡∂ n).extendCoordChange e e' x') : EuclideanSpace ℝ (Fin n)) =
+    ((flatDomain n).graphProj ((𝓡∂ n).extendCoordChange e e' x') : EuclideanSpace ℝ (Fin n)) =
       (𝓡∂ n).extendCoordChange e e' x' :=
-  coe_proj_of_mem_bdry (coordChange_mem_bdry he he' hx x'.2)
+  coe_graphProj_of_mem_bdry (coordChange_mem_bdry he he' hx x'.2)
 
 omit [CompactSpace M] in
 include he he' in
 /-- The inverse change of charts maps the boundary part of its target into `H₀`. -/
-theorem coe_proj_coordChange_symm {y' : bdry n}
+theorem coe_graphProj_coordChange_symm {y' : bdry n}
     (hy : (y' : EuclideanSpace ℝ (Fin n)) ∈ ((𝓡∂ n).extendCoordChange e e').target) :
-    ((flatDomain n).proj (((𝓡∂ n).extendCoordChange e e').symm y') :
+    ((flatDomain n).graphProj (((𝓡∂ n).extendCoordChange e e').symm y') :
       EuclideanSpace ℝ (Fin n)) = ((𝓡∂ n).extendCoordChange e e').symm y' := by
   have hy' : (y' : EuclideanSpace ℝ (Fin n)) ∈ ((𝓡∂ n).extendCoordChange e' e).source := hy
-  exact coe_proj_coordChange he' he hy'
+  exact coe_graphProj_coordChange he' he hy'
 
 /-- The boundary hyperplane is closed. -/
 theorem isClosed_bdry : IsClosed ((bdry n : Set (EuclideanSpace ℝ (Fin n)))) :=
@@ -172,18 +172,18 @@ noncomputable def boundaryChartChange : Rd.CutoffDiffeo (Set.univ : Set (bdry n)
     ((𝓡∂ n).symm ⁻¹' (e.symm ≫ₕ e').target)
   isOpen_U := (BesovAtlas.chartChange he he' c hc hcs).isOpen_U.preimage continuous_subtype_val
   isOpen_U' := (BesovAtlas.chartChange he he' c hc hcs).isOpen_U'.preimage continuous_subtype_val
-  Phi x' := (flatDomain n).proj ((𝓡∂ n).extendCoordChange e e' x')
-  Psi y' := (flatDomain n).proj (((𝓡∂ n).extendCoordChange e e').symm y')
+  Phi x' := (flatDomain n).graphProj ((𝓡∂ n).extendCoordChange e e' x')
+  Psi y' := (flatDomain n).graphProj (((𝓡∂ n).extendCoordChange e e').symm y')
   chi y' := (BesovAtlas.chartChange he he' c hc hcs).chi y'
   K0 := (fun y' : bdry n => (y' : EuclideanSpace ℝ (Fin n))) ⁻¹'
     (BesovAtlas.chartChange he he' c hc hcs).K0
   contDiffOn_Phi := by
-    refine (flatDomain n).proj.contDiff.comp_contDiffOn
+    refine (flatDomain n).graphProj.contDiff.comp_contDiffOn
       ((BesovAtlas.chartChange he he' c hc hcs).contDiffOn_Phi.comp
         (bdry n).subtypeL.contDiff.contDiffOn fun x' hx' => ?_)
     exact ⟨bdry_subset_range x'.2, hx'.2⟩
   contDiffOn_Psi := by
-    refine (flatDomain n).proj.contDiff.comp_contDiffOn
+    refine (flatDomain n).graphProj.contDiff.comp_contDiffOn
       ((BesovAtlas.chartChange he he' c hc hcs).contDiffOn_Psi.comp
         (bdry n).subtypeL.contDiff.contDiffOn fun y' hy' => ?_)
     exact ⟨bdry_subset_range y'.2, hy'.2⟩
@@ -195,45 +195,46 @@ noncomputable def boundaryChartChange : Rd.CutoffDiffeo (Set.univ : Set (bdry n)
     have hx : (x' : EuclideanSpace ℝ (Fin n)) ∈ ((𝓡∂ n).extendCoordChange e e').source :=
       (mem_coordChange_source_iff_of_bdry x').1 hx'.2
     refine ⟨mem_univ _, ?_⟩
-    show (((flatDomain n).proj ((𝓡∂ n).extendCoordChange e e' x') : bdry n) :
+    show (((flatDomain n).graphProj ((𝓡∂ n).extendCoordChange e e' x') : bdry n) :
       EuclideanSpace ℝ (Fin n)) ∈ (𝓡∂ n).symm ⁻¹' (e.symm ≫ₕ e').target
-    rw [coe_proj_coordChange he he' hx]
+    rw [coe_graphProj_coordChange he he' hx]
     have := (BesovAtlas.chartChange he he' c hc hcs).mapsTo_Phi ⟨bdry_subset_range x'.2, hx'.2⟩
     exact this.2
   mapsTo_Psi y' hy' := by
     have hy : (y' : EuclideanSpace ℝ (Fin n)) ∈ ((𝓡∂ n).extendCoordChange e e').target :=
       (mem_coordChange_target_iff_of_bdry y').1 hy'.2
     refine ⟨mem_univ _, ?_⟩
-    show (((flatDomain n).proj (((𝓡∂ n).extendCoordChange e e').symm y') : bdry n) :
+    show (((flatDomain n).graphProj (((𝓡∂ n).extendCoordChange e e').symm y') : bdry n) :
       EuclideanSpace ℝ (Fin n)) ∈ (𝓡∂ n).symm ⁻¹' (e.symm ≫ₕ e').source
-    rw [coe_proj_coordChange_symm he he' hy]
+    rw [coe_graphProj_coordChange_symm he he' hy]
     have := (BesovAtlas.chartChange he he' c hc hcs).mapsTo_Psi ⟨bdry_subset_range y'.2, hy'.2⟩
     exact this.2
   left_inv x' hx' := by
     have hx : (x' : EuclideanSpace ℝ (Fin n)) ∈ ((𝓡∂ n).extendCoordChange e e').source :=
       (mem_coordChange_source_iff_of_bdry x').1 hx'.2
     apply Subtype.ext
-    have h1 := coe_proj_coordChange he he' hx
+    have h1 := coe_graphProj_coordChange he he' hx
     have hmem : ((𝓡∂ n).extendCoordChange e e' x') ∈ ((𝓡∂ n).extendCoordChange e e').target :=
       ((𝓡∂ n).extendCoordChange e e').map_source hx
-    have h2 := coe_proj_coordChange_symm he he'
-      (y' := (flatDomain n).proj ((𝓡∂ n).extendCoordChange e e' x')) (by rw [h1]; exact hmem)
-    show (((flatDomain n).proj (((𝓡∂ n).extendCoordChange e e').symm
-      (((flatDomain n).proj ((𝓡∂ n).extendCoordChange e e' x') : bdry n) :
+    have h2 := coe_graphProj_coordChange_symm he he'
+      (y' := (flatDomain n).graphProj ((𝓡∂ n).extendCoordChange e e' x')) (by rw [h1]; exact hmem)
+    show (((flatDomain n).graphProj (((𝓡∂ n).extendCoordChange e e').symm
+      (((flatDomain n).graphProj ((𝓡∂ n).extendCoordChange e e' x') : bdry n) :
         EuclideanSpace ℝ (Fin n))) : bdry n) : EuclideanSpace ℝ (Fin n)) = x'
     rw [h2, h1, ((𝓡∂ n).extendCoordChange e e').left_inv hx]
   right_inv y' hy' := by
     have hy : (y' : EuclideanSpace ℝ (Fin n)) ∈ ((𝓡∂ n).extendCoordChange e e').target :=
       (mem_coordChange_target_iff_of_bdry y').1 hy'.2
     apply Subtype.ext
-    have h1 := coe_proj_coordChange_symm he he' hy
+    have h1 := coe_graphProj_coordChange_symm he he' hy
     have hmem : ((𝓡∂ n).extendCoordChange e e').symm y' ∈
         ((𝓡∂ n).extendCoordChange e e').source :=
       ((𝓡∂ n).extendCoordChange e e').map_target hy
-    have h2 := coe_proj_coordChange he he'
-      (x' := (flatDomain n).proj (((𝓡∂ n).extendCoordChange e e').symm y')) (by rw [h1]; exact hmem)
-    show (((flatDomain n).proj ((𝓡∂ n).extendCoordChange e e'
-      (((flatDomain n).proj (((𝓡∂ n).extendCoordChange e e').symm y') : bdry n) :
+    have h2 := coe_graphProj_coordChange he he'
+      (x' := (flatDomain n).graphProj (((𝓡∂ n).extendCoordChange e e').symm y'))
+        (by rw [h1]; exact hmem)
+    show (((flatDomain n).graphProj ((𝓡∂ n).extendCoordChange e e'
+      (((flatDomain n).graphProj (((𝓡∂ n).extendCoordChange e e').symm y') : bdry n) :
         EuclideanSpace ℝ (Fin n))) : bdry n) : EuclideanSpace ℝ (Fin n)) = y'
     rw [h2, h1, ((𝓡∂ n).extendCoordChange e e').right_inv hy]
   isCompact_K0 :=
@@ -256,10 +257,10 @@ theorem chartChange_apply_coe (G : EuclideanSpace ℝ (Fin n) → ℂ) (x' : bdr
     swap
     · exact ⟨mem_univ _, (mem_coordChange_source_iff_of_bdry x').2 hx⟩
     show _ = (BesovAtlas.chartChange he he' c hc hcs).chi
-      (((flatDomain n).proj ((𝓡∂ n).extendCoordChange e e' x') : bdry n) :
-        EuclideanSpace ℝ (Fin n)) * G (((flatDomain n).proj
+      (((flatDomain n).graphProj ((𝓡∂ n).extendCoordChange e e' x') : bdry n) :
+        EuclideanSpace ℝ (Fin n)) * G (((flatDomain n).graphProj
           ((𝓡∂ n).extendCoordChange e e' x') : bdry n) : EuclideanSpace ℝ (Fin n))
-    rw [coe_proj_coordChange he he' hx]
+    rw [coe_graphProj_coordChange he he' hx]
   · rw [BesovAtlas.chartChange_apply, indicator_of_notMem hx, Rd.CutoffDiffeo.apply,
       indicator_of_notMem fun h => hx ((mem_coordChange_source_iff_of_bdry x').1 h.2)]
 
@@ -292,7 +293,7 @@ theorem boundaryPiece_eq_sum (i : Fin A.n) (g : M → ℂ) (x' : bdry n) :
 
 /-- The **Besov space of the boundary** for a Besov atlas: `g : M → ℂ` whose boundary pieces agree
 almost everywhere with functions on `H₀` of finite Besov quasi-norm of order `⌊s⌋ + 1`. -/
-def MemBoundaryBesov (p : ℝ≥0∞) [Fact (1 ≤ p)] (s : ℝ) (q : ℝ≥0∞) (g : M → ℂ) : Prop :=
+def MemAtlasBoundaryBesov (p : ℝ≥0∞) [Fact (1 ≤ p)] (s : ℝ) (q : ℝ≥0∞) (g : M → ℂ) : Prop :=
   ∀ i, ∃ G : Lp ℂ p (volume : Measure (bdry n)), (G : bdry n → ℂ) =ᵐ[volume] A.boundaryPiece i g ∧
     ‖G‖ₑ + lqNorm q (fun k => dyadicWeight s k * Rd.lpModulus p (⌊s⌋₊ + 1) G k) < ⊤
 
@@ -303,9 +304,9 @@ theorem interior_univ_bdry_nonempty : (interior (Set.univ : Set (bdry n))).Nonem
 
 /-- **The Besov space of the boundary does not depend on the atlas**: the boundary pieces of `A`
 are sums of boundary changes of charts of those of `A'`, which are bounded on `B^s_{p,q}(H₀)`. -/
-theorem MemBoundaryBesov.of_atlas {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ⊤) {s : ℝ} (hs : 0 < s)
-    {q : ℝ≥0∞} (hq : 1 ≤ q) {g : M → ℂ} (h : A'.MemBoundaryBesov p s q g) :
-    A.MemBoundaryBesov p s q g := by
+theorem MemAtlasBoundaryBesov.of_atlas {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ⊤) {s : ℝ} (hs : 0 < s)
+    {q : ℝ≥0∞} (hq : 1 ≤ q) {g : M → ℂ} (h : A'.MemAtlasBoundaryBesov p s q g) :
+    A.MemAtlasBoundaryBesov p s q g := by
   intro i
   choose G' hG'ae hG'fin using h
   set r := ⌊s⌋₊ + 1
@@ -331,11 +332,11 @@ theorem MemBoundaryBesov.of_atlas {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ 
     exact (hT j (G' j)).trans_lt (ENNReal.mul_lt_top (hC j).lt_top (hG'fin j))
 
 /-- **The Besov space of the boundary does not depend on the atlas**. -/
-theorem memBoundaryBesov_iff_memBoundaryBesov {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ⊤) {s : ℝ}
-    (hs : 0 < s) {q : ℝ≥0∞} (hq : 1 ≤ q) (g : M → ℂ) :
-    A.MemBoundaryBesov p s q g ↔ A'.MemBoundaryBesov p s q g :=
-  ⟨fun h => MemBoundaryBesov.of_atlas A' A hp hs hq h,
-    fun h => MemBoundaryBesov.of_atlas A A' hp hs hq h⟩
+theorem memAtlasBoundaryBesov_iff_memAtlasBoundaryBesov {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ⊤)
+    {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞} (hq : 1 ≤ q) (g : M → ℂ) :
+    A.MemAtlasBoundaryBesov p s q g ↔ A'.MemAtlasBoundaryBesov p s q g :=
+  ⟨fun h => MemAtlasBoundaryBesov.of_atlas A' A hp hs hq h,
+    fun h => MemAtlasBoundaryBesov.of_atlas A A' hp hs hq h⟩
 
 end BesovAtlas
 

@@ -165,10 +165,10 @@ theorem contDiff_localPhi (z : V) {n : WithTop ℕ∞} (hG : ContDiff ℝ n G.ph
 `Ω = {x : φ_z(P(x - z)) < ⟪e, x - z⟫}`, since `φ(x) = φ(z + P(x - z))` by the constancy of `φ`
 along `e`. -/
 theorem domain_eq_localPhi (z : V) :
-    G.domain = {x | G.localPhi z (G.proj (x - z)) < inner ℝ G.e (x - z)} := by
+    G.domain = {x | G.localPhi z (G.graphProj (x - z)) < inner ℝ G.e (x - z)} := by
   ext x
-  have hphi : G.phi (z + (G.proj (x - z) : V)) = G.phi x := by
-    rw [G.coe_proj, ← G.const (z + (x - z - inner ℝ (x - z) G.e • G.e)) (inner ℝ (x - z) G.e)]
+  have hphi : G.phi (z + (G.graphProj (x - z) : V)) = G.phi x := by
+    rw [G.coe_graphProj, ← G.const (z + (x - z - inner ℝ (x - z) G.e • G.e)) (inner ℝ (x - z) G.e)]
     congr 1
     abel
   show G.phi x < inner ℝ x G.e ↔ G.phi (z + _) - inner ℝ z G.e < inner ℝ G.e (x - z)
@@ -187,7 +187,7 @@ theorem isLipschitzDomainAt_of_ball_inter_eq {Ω : Set V} {z : V} {r : ℝ} (hr 
 
 /-- **A set Lipschitz near `z` agrees with a Lipschitz graph domain on a ball** around `z`: the
 graph domain of the local graph (`Rd.LipschitzGraph.ofLocal`). -/
-theorem IsLipschitzDomainAt.exists_ball_inter_eq {Ω : Set V} {z : V}
+theorem IsLipschitzDomainAt.exists_ball_inter_eq_lipschitzGraph {Ω : Set V} {z : V}
     (h : IsLipschitzDomainAt Ω z) :
     ∃ r : ℝ, 0 < r ∧ ∃ G : LipschitzGraph V, ball z r ∩ Ω = ball z r ∩ G.domain := by
   obtain ⟨r, hr, ν, hν, L, φ, hφ, hΩ⟩ := h
@@ -198,7 +198,7 @@ theorem IsLipschitzDomainAt.exists_ball_inter_eq {Ω : Set V} {z : V}
 theorem isLipschitzDomainAt_iff {Ω : Set V} {z : V} :
     IsLipschitzDomainAt Ω z ↔
       ∃ r : ℝ, 0 < r ∧ ∃ G : LipschitzGraph V, ball z r ∩ Ω = ball z r ∩ G.domain :=
-  ⟨IsLipschitzDomainAt.exists_ball_inter_eq, fun ⟨_, hr, G, h⟩ =>
+  ⟨IsLipschitzDomainAt.exists_ball_inter_eq_lipschitzGraph, fun ⟨_, hr, G, h⟩ =>
     isLipschitzDomainAt_of_ball_inter_eq hr G h⟩
 
 /-- **Being Lipschitz near `z` depends only on the set near `z`**: if `Ω` and `Ω'` agree on a ball
@@ -207,7 +207,7 @@ theorem isLipschitzDomainAt_iff {Ω : Set V} {z : V} :
 theorem IsLipschitzDomainAt.congr_ball {Ω Ω' : Set V} {z : V} {ρ : ℝ} (hρ : 0 < ρ)
     (h : ball z ρ ∩ Ω = ball z ρ ∩ Ω') (h' : IsLipschitzDomainAt Ω' z) :
     IsLipschitzDomainAt Ω z := by
-  obtain ⟨r, hr, G, hG⟩ := h'.exists_ball_inter_eq
+  obtain ⟨r, hr, G, hG⟩ := h'.exists_ball_inter_eq_lipschitzGraph
   have h1 : ball z (min r ρ) ∩ ball z ρ = ball z (min r ρ) :=
     inter_eq_left.2 (ball_subset_ball (min_le_right _ _))
   have h2 : ball z (min r ρ) ∩ ball z r = ball z (min r ρ) :=
@@ -336,24 +336,27 @@ namespace IsBoundedLipschitzDomain
 variable {Ω : Set V}
 
 /-- **A chart at each frontier point**: a radius `r > 0` and a Lipschitz graph domain that agrees
-with `Ω` on `B(z, r)` (`Rd.IsLipschitzDomainAt.exists_ball_inter_eq`). -/
-theorem exists_chart (h : IsBoundedLipschitzDomain Ω) (z : frontier Ω) :
+with `Ω` on `B(z, r)` (`Rd.IsLipschitzDomainAt.exists_ball_inter_eq_lipschitzGraph`). -/
+theorem exists_chart_lipschitzGraph (h : IsBoundedLipschitzDomain Ω) (z : frontier Ω) :
     ∃ q : ℝ × LipschitzGraph V, 0 < q.1 ∧ ball (z : V) q.1 ∩ Ω = ball (z : V) q.1 ∩ q.2.domain := by
-  obtain ⟨r, hr, G, hG⟩ := (h.2.2 z z.2).exists_ball_inter_eq
+  obtain ⟨r, hr, G, hG⟩ := (h.2.2 z z.2).exists_ball_inter_eq_lipschitzGraph
   exact ⟨(r, G), hr, hG⟩
 
 /-- A chosen chart at the frontier point `z`: its radius and its Lipschitz graph domain. -/
-noncomputable def chart (h : IsBoundedLipschitzDomain Ω) (z : frontier Ω) : ℝ × LipschitzGraph V :=
-  Classical.choose (h.exists_chart z)
+noncomputable def lipschitzChart (h : IsBoundedLipschitzDomain Ω) (z : frontier Ω) :
+    ℝ × LipschitzGraph V :=
+  Classical.choose (h.exists_chart_lipschitzGraph z)
 
 /-- The radius of the chosen chart is positive. -/
-theorem chart_fst_pos (h : IsBoundedLipschitzDomain Ω) (z : frontier Ω) : 0 < (h.chart z).1 :=
-  (Classical.choose_spec (h.exists_chart z)).1
+theorem lipschitzChart_fst_pos (h : IsBoundedLipschitzDomain Ω) (z : frontier Ω) :
+    0 < (h.lipschitzChart z).1 :=
+  (Classical.choose_spec (h.exists_chart_lipschitzGraph z)).1
 
 /-- On the ball of the chosen chart, `Ω` is its Lipschitz graph domain. -/
-theorem ball_inter_chart (h : IsBoundedLipschitzDomain Ω) (z : frontier Ω) :
-    ball (z : V) (h.chart z).1 ∩ Ω = ball (z : V) (h.chart z).1 ∩ (h.chart z).2.domain :=
-  (Classical.choose_spec (h.exists_chart z)).2
+theorem ball_inter_lipschitzChart (h : IsBoundedLipschitzDomain Ω) (z : frontier Ω) :
+    ball (z : V) (h.lipschitzChart z).1 ∩ Ω =
+      ball (z : V) (h.lipschitzChart z).1 ∩ (h.lipschitzChart z).2.domain :=
+  (Classical.choose_spec (h.exists_chart_lipschitzGraph z)).2
 
 end IsBoundedLipschitzDomain
 
@@ -362,12 +365,12 @@ namespace BoundedLipschitzDomain
 variable [FiniteDimensional ℝ V] {Ω : Set V}
 
 /-- **The bounded Lipschitz domain of a bounded Lipschitz set**: the chosen charts at the frontier
-points (`Rd.IsBoundedLipschitzDomain.chart`) form a family of charts, and
+points (`Rd.IsBoundedLipschitzDomain.lipschitzChart`) form a family of charts, and
 `Rd.BoundedLipschitzDomain.ofCharts` gives a `Rd.BoundedLipschitzDomain` with carrier `Ω`. -/
 noncomputable def ofIsBoundedLipschitzDomain (h : IsBoundedLipschitzDomain Ω) :
     BoundedLipschitzDomain V :=
-  ofCharts h.1 h.2.1 (fun z => (h.chart z).1) h.chart_fst_pos (fun z => (h.chart z).2)
-    h.ball_inter_chart
+  ofCharts h.1 h.2.1 (fun z => (h.lipschitzChart z).1) h.lipschitzChart_fst_pos
+    (fun z => (h.lipschitzChart z).2) h.ball_inter_lipschitzChart
 
 /-- The carrier of `Rd.BoundedLipschitzDomain.ofIsBoundedLipschitzDomain h` is `Ω`. -/
 @[simp]

@@ -15,14 +15,14 @@ public import FunctionSpaces.Rd.Differences.SobolevSlobodeckij
 
 Let `V` be a finite-dimensional real inner product space, such as `ℝ^d`, with Lebesgue measure,
 `Ω = {x : φ(x) < ⟪x, e⟫}` a Lipschitz graph domain with Lipschitz constant `M`, and
-`η(x) = ⟪x, e⟫ - φ(x)` the height above the graph (`Rd.LipschitzGraph.height`). For `s > 1/2` and
-`G ∈ L_2(V)` with `G = 0` almost everywhere on `{x ∈ Ω : η(x) < ε}` for some `ε > 0`, write
+`η(x) = ⟪x, e⟫ - φ(x)` the height above the graph (`Rd.LipschitzGraph.graphHeight`). For `s > 1/2`
+and `G ∈ L_2(V)` with `G = 0` almost everywhere on `{x ∈ Ω : η(x) < ε}` for some `ε > 0`, write
 `N_{s,Ω}(G) = ‖1_Ω G‖_2 + ‖(2^(ks) ω_1(G, 2^(-k), Ω)_2)_k‖_{ℓ_2}` for the intrinsic `B^s_{2,2}`
 quantity of first differences on `Ω` (`Rd.modNormOn`).
 
-* **The Hardy inequality** (`Rd.LipschitzGraph.lintegral_div_min_height_le`,
-  `Rd.LipschitzGraph.lintegral_div_min_height_le_modNormOn`,
-  `Rd.LipschitzGraph.exists_lintegral_div_height_le`):
+* **The Hardy inequality** (`Rd.LipschitzGraph.lintegral_div_min_graphHeight_le`,
+  `Rd.LipschitzGraph.lintegral_div_min_graphHeight_le_modNormOn`,
+  `Rd.LipschitzGraph.exists_lintegral_div_graphHeight_le`):
   `∫_Ω |G|² / min(η, 1)^(2s) ≤ ∫_Ω |G|² + K_s 2^(2s+2) ∑_k 2^(2ks) ω_1(G, 2^(-k), Ω)_2²
   ≤ (1 + K_s 2^(2s+2)) N_{s,Ω}(G)²`, with `K_s` the constant of the Hardy inequality on `(0, 1]`
   (`Rd.halfLineHardyConst`); the constants depend only on `s`. In the graph coordinates
@@ -31,7 +31,7 @@ quantity of first differences on `Ω` (`Rd.modNormOn`).
   the left side on `{0 < η ≤ 1}` is an integral over the vertical lines of the Hardy integrals on
   `(0, 1]` (`Rd.lintegral_div_rpow_le_halfLineForm`), whose forms are the integrals of the vertical
   form (`Rd.LipschitzGraph.verticalForm`, `Rd.LipschitzGraph.halfLineForm_graphEquiv`,
-  `Rd.LipschitzGraph.lintegral_Ioc_height_le`).
+  `Rd.LipschitzGraph.lintegral_Ioc_graphHeight_le`).
   The substitution `τ = η(x) + r` turns the vertical forms into the vertical difference quotients
   `|G(x + r e) - G(x)|² / |r|^(1+2s)` on the pairs of heights `η(x), η(x) + r ∈ (0, 1]`
   (`Rd.LipschitzGraph.verticalQuotient`, `Rd.LipschitzGraph.lintegral_verticalForm_eq`); these
@@ -55,7 +55,7 @@ quantity of first differences on `Ω` (`Rd.modNormOn`).
 
 The vertical form and the vertical difference quotient of a measurable function are measurable
 (`Rd.LipschitzGraph.measurable_verticalForm`, `Rd.LipschitzGraph.measurable_verticalQuotient`),
-since the height is continuous (`Rd.LipschitzGraph.continuous_height`).
+since the height is continuous (`Rd.LipschitzGraph.continuous_graphHeight`).
 -/
 
 @[expose] public section
@@ -100,16 +100,16 @@ theorem ae_ae_graphEquiv {P : V → Prop} (h : ∀ᵐ x ∂volume, P x) :
 Hardy inequality on that line (`Rd.LipschitzGraph.halfLineForm_graphEquiv`). -/
 noncomputable def verticalForm (s : ℝ) (G : V → ℂ) (x : V) : ℝ≥0∞ :=
   ∫⁻ τ in Ioc (0 : ℝ) 1,
-    ‖G x - G (x + (τ - Ω.height x) • Ω.e)‖ₑ ^ 2 / ‖Ω.height x - τ‖ₑ ^ (1 + 2 * s)
+    ‖G x - G (x + (τ - Ω.graphHeight x) • Ω.e)‖ₑ ^ 2 / ‖Ω.graphHeight x - τ‖ₑ ^ (1 + 2 * s)
 
 /-- The vertical form of a measurable `G` is measurable (Mathlib's
 `Measurable.lintegral_prod_right'`). -/
 theorem measurable_verticalForm (s : ℝ) {G : V → ℂ} (hG : Measurable G) :
     Measurable (Ω.verticalForm s G) := by
-  have hη := Ω.continuous_height.measurable
+  have hη := Ω.continuous_graphHeight.measurable
   refine Measurable.lintegral_prod_right' (ν := volume.restrict (Ioc (0 : ℝ) 1))
-    (f := fun p : V × ℝ => ‖G p.1 - G (p.1 + (p.2 - Ω.height p.1) • Ω.e)‖ₑ ^ 2 /
-      ‖Ω.height p.1 - p.2‖ₑ ^ (1 + 2 * s)) ?_
+    (f := fun p : V × ℝ => ‖G p.1 - G (p.1 + (p.2 - Ω.graphHeight p.1) • Ω.e)‖ₑ ^ 2 /
+      ‖Ω.graphHeight p.1 - p.2‖ₑ ^ (1 + 2 * s)) ?_
   refine Measurable.div ?_ ?_
   · refine ((hG.comp measurable_fst).sub (hG.comp ?_)).enorm.pow_const 2
     exact measurable_fst.add (((measurable_snd.sub (hη.comp measurable_fst))).smul_const _)
@@ -117,11 +117,11 @@ theorem measurable_verticalForm (s : ℝ) {G : V → ℂ} (hG : Measurable G) :
 
 /-- **Vertical forms on a line**: on the vertical line of `x' ∈ H`, the Gagliardo form on `(0, 1]`
 of `t ↦ G(γ(x') + t e)` is the integral of the vertical form over the heights `t ∈ (0, 1]`, since
-`η(γ(x') + t e) = t` (`Rd.LipschitzGraph.height_graphEquiv`). -/
+`η(γ(x') + t e) = t` (`Rd.LipschitzGraph.graphHeight_graphEquiv`). -/
 theorem halfLineForm_graphEquiv (s : ℝ) (G : V → ℂ) (x' : Ω.hyperplane) :
     halfLineForm s (fun t => G (Ω.graphEquiv (x', t))) =
       ∫⁻ t in Ioc (0 : ℝ) 1, Ω.verticalForm s G (Ω.graphEquiv (x', t)) := by
-  simp only [halfLineForm, verticalForm, Ω.height_graphEquiv]
+  simp only [halfLineForm, verticalForm, Ω.graphHeight_graphEquiv]
   refine lintegral_congr fun t => lintegral_congr fun τ => ?_
   rw [Ω.graphEquiv_apply (x', t), Ω.graphEquiv_apply (x', τ), add_assoc, ← add_smul,
     add_sub_cancel]
@@ -133,48 +133,49 @@ theorem halfLineForm_graphEquiv (s : ℝ) (G : V → ℂ) (x' : Ω.hyperplane) :
 of Hardy integrals on `(0, 1]`, `G` vanishes near `0` on almost every line
 (`Rd.LipschitzGraph.ae_ae_graphEquiv`), and `Rd.lintegral_div_rpow_le_halfLineForm` with
 `Rd.LipschitzGraph.halfLineForm_graphEquiv` applies on each. -/
-theorem lintegral_Ioc_height_le {s : ℝ} (hs : 1 / 2 < s) {G : V → ℂ} (hG : Measurable G)
-    {ε : ℝ} (hε : 0 < ε) (hG0 : ∀ᵐ x ∂volume, x ∈ Ω.domain → Ω.height x < ε → G x = 0) :
-    ∫⁻ x in Ω.height ⁻¹' Ioc 0 1, ‖G x‖ₑ ^ 2 / ENNReal.ofReal (Ω.height x) ^ (2 * s) ≤
-      halfLineHardyConst s * ∫⁻ x in Ω.height ⁻¹' Ioc 0 1, Ω.verticalForm s G x := by
-  have hη := Ω.continuous_height.measurable
-  have hS : MeasurableSet (Ω.height ⁻¹' Ioc (0 : ℝ) 1) := hη measurableSet_Ioc
-  have key : ∀ F : V → ℝ≥0∞, Measurable F → ∫⁻ x in Ω.height ⁻¹' Ioc 0 1, F x =
+theorem lintegral_Ioc_graphHeight_le {s : ℝ} (hs : 1 / 2 < s) {G : V → ℂ} (hG : Measurable G)
+    {ε : ℝ} (hε : 0 < ε) (hG0 : ∀ᵐ x ∂volume, x ∈ Ω.domain → Ω.graphHeight x < ε → G x = 0) :
+    ∫⁻ x in Ω.graphHeight ⁻¹' Ioc 0 1, ‖G x‖ₑ ^ 2 / ENNReal.ofReal (Ω.graphHeight x) ^ (2 * s) ≤
+      halfLineHardyConst s * ∫⁻ x in Ω.graphHeight ⁻¹' Ioc 0 1, Ω.verticalForm s G x := by
+  have hη := Ω.continuous_graphHeight.measurable
+  have hS : MeasurableSet (Ω.graphHeight ⁻¹' Ioc (0 : ℝ) 1) := hη measurableSet_Ioc
+  have key : ∀ F : V → ℝ≥0∞, Measurable F → ∫⁻ x in Ω.graphHeight ⁻¹' Ioc 0 1, F x =
       ∫⁻ x', ∫⁻ t in Ioc (0 : ℝ) 1, F (Ω.graphEquiv (x', t)) := fun F hF => by
     rw [← lintegral_indicator hS, Ω.lintegral_eq_lintegral_graphEquiv (hF.indicator hS)]
     refine lintegral_congr fun x' => ?_
     rw [← lintegral_indicator measurableSet_Ioc]
     refine lintegral_congr fun t => ?_
-    simp only [indicator, mem_preimage, Ω.height_graphEquiv]
-  rw [key (fun x => ‖G x‖ₑ ^ 2 / ENNReal.ofReal (Ω.height x) ^ (2 * s))
+    simp only [indicator, mem_preimage, Ω.graphHeight_graphEquiv]
+  rw [key (fun x => ‖G x‖ₑ ^ 2 / ENNReal.ofReal (Ω.graphHeight x) ^ (2 * s))
       ((hG.enorm.pow_const 2).div (hη.ennreal_ofReal.pow_const _)),
     key _ (Ω.measurable_verticalForm s hG),
     ← lintegral_const_mul' _ _ (halfLineHardyConst_ne_top hs)]
   refine lintegral_mono_ae ?_
   filter_upwards [Ω.ae_ae_graphEquiv hG0] with x' hx'
-  simp only [Ω.height_graphEquiv]
+  simp only [Ω.graphHeight_graphEquiv]
   rw [← Ω.halfLineForm_graphEquiv]
   refine lintegral_div_rpow_le_halfLineForm hs
     (hG.comp (Ω.graphEquiv.measurable.comp measurable_prodMk_left)) hε ?_
   filter_upwards [hx'] with t ht hti
-  have h2 : Ω.height (Ω.graphEquiv (x', t)) = t := Ω.height_graphEquiv (x', t)
-  exact ht ((Ω.mem_domain_iff_height_pos _).2 (by rw [h2]; exact hti.1)) (by rw [h2]; exact hti.2)
+  have h2 : Ω.graphHeight (Ω.graphEquiv (x', t)) = t := Ω.graphHeight_graphEquiv (x', t)
+  exact ht ((Ω.mem_domain_iff_graphHeight_pos _).2 (by rw [h2]; exact hti.1))
+    (by rw [h2]; exact hti.2)
 
 /-- The **pairs of heights** `{(x, r) : η(x) ∈ (0, 1], η(x) + r ∈ (0, 1]}`: the points `x` of `Ω`
 of height at most `1` whose vertical translate `x + r e` is again such a point
-(`Rd.LipschitzGraph.height_add_smul`). -/
-def heightPairs : Set (V × ℝ) :=
-  {p | Ω.height p.1 ∈ Ioc (0 : ℝ) 1 ∧ Ω.height p.1 + p.2 ∈ Ioc (0 : ℝ) 1}
+(`Rd.LipschitzGraph.graphHeight_add_smul`). -/
+def graphHeightPairs : Set (V × ℝ) :=
+  {p | Ω.graphHeight p.1 ∈ Ioc (0 : ℝ) 1 ∧ Ω.graphHeight p.1 + p.2 ∈ Ioc (0 : ℝ) 1}
 
 /-- The **vertical difference quotient** `|G(x + r e) - G(x)|² / |r|^(1+2s)` on the pairs of
-heights (`Rd.LipschitzGraph.heightPairs`), and `0` elsewhere. -/
+heights (`Rd.LipschitzGraph.graphHeightPairs`), and `0` elsewhere. -/
 noncomputable def verticalQuotient (s : ℝ) (G : V → ℂ) : V × ℝ → ℝ≥0∞ :=
-  Ω.heightPairs.indicator fun p => ‖G (p.1 + p.2 • Ω.e) - G p.1‖ₑ ^ 2 / ‖p.2‖ₑ ^ (1 + 2 * s)
+  Ω.graphHeightPairs.indicator fun p => ‖G (p.1 + p.2 • Ω.e) - G p.1‖ₑ ^ 2 / ‖p.2‖ₑ ^ (1 + 2 * s)
 
 /-- The vertical difference quotient of a measurable `G` is measurable. -/
 theorem measurable_verticalQuotient (s : ℝ) {G : V → ℂ} (hG : Measurable G) :
     Measurable (Ω.verticalQuotient s G) := by
-  have hη := Ω.continuous_height.measurable
+  have hη := Ω.continuous_graphHeight.measurable
   refine Measurable.indicator (Measurable.div ?_ (measurable_snd.enorm.pow_const _))
     ((hη.comp measurable_fst measurableSet_Ioc).inter
       ((hη.comp measurable_fst).add measurable_snd measurableSet_Ioc))
@@ -186,31 +187,32 @@ theorem measurable_verticalQuotient (s : ℝ) {G : V → ℂ} (hG : Measurable G
 (`Rd.LipschitzGraph.verticalQuotient`), by the substitution `τ = η(x) + r` in the vertical form
 (Mathlib's `lintegral_add_left_eq_self`). -/
 theorem lintegral_verticalForm_eq (s : ℝ) (G : V → ℂ) :
-    ∫⁻ x in Ω.height ⁻¹' Ioc 0 1, Ω.verticalForm s G x =
+    ∫⁻ x in Ω.graphHeight ⁻¹' Ioc 0 1, Ω.verticalForm s G x =
       ∫⁻ x, ∫⁻ r, Ω.verticalQuotient s G (x, r) := by
-  rw [← lintegral_indicator (Ω.continuous_height.measurable measurableSet_Ioc)]
+  rw [← lintegral_indicator (Ω.continuous_graphHeight.measurable measurableSet_Ioc)]
   refine lintegral_congr fun x => ?_
-  by_cases hx : Ω.height x ∈ Ioc (0 : ℝ) 1
-  · rw [indicator_of_mem (show x ∈ Ω.height ⁻¹' Ioc 0 1 from hx), verticalForm,
-      ← lintegral_indicator measurableSet_Ioc, ← lintegral_add_left_eq_self _ (Ω.height x)]
+  by_cases hx : Ω.graphHeight x ∈ Ioc (0 : ℝ) 1
+  · rw [indicator_of_mem (show x ∈ Ω.graphHeight ⁻¹' Ioc 0 1 from hx), verticalForm,
+      ← lintegral_indicator measurableSet_Ioc, ← lintegral_add_left_eq_self _ (Ω.graphHeight x)]
     refine lintegral_congr fun r => ?_
-    by_cases hr : Ω.height x + r ∈ Ioc (0 : ℝ) 1
+    by_cases hr : Ω.graphHeight x + r ∈ Ioc (0 : ℝ) 1
     · rw [indicator_of_mem hr]
-      simp only [verticalQuotient, indicator_of_mem (show (x, r) ∈ Ω.heightPairs from ⟨hx, hr⟩),
+      simp only [verticalQuotient,
+        indicator_of_mem (show (x, r) ∈ Ω.graphHeightPairs from ⟨hx, hr⟩),
         add_sub_cancel_left, sub_add_cancel_left, enorm_neg]
       rw [enorm_sub_rev]
     · rw [indicator_of_notMem hr]
-      exact (indicator_of_notMem (fun h : (x, r) ∈ Ω.heightPairs => hr h.2) _).symm
-  · rw [indicator_of_notMem (show x ∉ Ω.height ⁻¹' Ioc 0 1 from hx)]
+      exact (indicator_of_notMem (fun h : (x, r) ∈ Ω.graphHeightPairs => hr h.2) _).symm
+  · rw [indicator_of_notMem (show x ∉ Ω.graphHeight ⁻¹' Ioc 0 1 from hx)]
     refine ((lintegral_congr fun r => ?_).trans lintegral_zero).symm
-    exact indicator_of_notMem (fun h : (x, r) ∈ Ω.heightPairs => hx h.1) _
+    exact indicator_of_notMem (fun h : (x, r) ∈ Ω.graphHeightPairs => hx h.1) _
 
 /-- **The vertical differences on a dyadic shell**: for `s ≥ -1/2`, `G ∈ L_2(V)` and
 `2^(-k-1) < |r| ≤ 2^(-k)`, `∫_V q(x, r) dx ≤ 2^((k+1)(1+2s)) ω_1(G, 2^(-k), Ω)_2²` for the
 vertical difference quotient `q` (`Rd.LipschitzGraph.verticalQuotient`). The pairs of heights lie
-in the step set `Ω_{re}` (`Rd.LipschitzGraph.height_add_smul`), `|r|^(-1-2s) ≤ 2^((k+1)(1+2s))`,
-and `‖1_{Ω_{re}} Δ_{re} G‖_2 ≤ ω_1(G, 2^(-k), Ω)_2` since `‖r e‖ = |r| ≤ 2^(-k)`
-(`Rd.eLpNorm_indicator_higherDiff_le_modulusOn`). -/
+in the step set `Ω_{re}` (`Rd.LipschitzGraph.graphHeight_add_smul`),
+`|r|^(-1-2s) ≤ 2^((k+1)(1+2s))`, and `‖1_{Ω_{re}} Δ_{re} G‖_2 ≤ ω_1(G, 2^(-k), Ω)_2` since
+`‖r e‖ = |r| ≤ 2^(-k)` (`Rd.eLpNorm_indicator_higherDiff_le_modulusOn`). -/
 theorem lintegral_verticalQuotient_le {s : ℝ} (hs : -(1 / 2) ≤ s)
     (G : Lp ℂ 2 (volume : Measure V)) {k : ℕ} {r : ℝ} (hr : r ∈ dyadicAnnulus (1 : ℝ) k) :
     ∫⁻ x, Ω.verticalQuotient s G (x, r) ≤
@@ -225,11 +227,11 @@ theorem lintegral_verticalQuotient_le {s : ℝ} (hs : -(1 / 2) ≤ s)
   have hpt : ∀ x, Ω.verticalQuotient s G (x, r) ≤ ‖(diffStepSet Ω.domain 1 (r • Ω.e)).indicator
       (fwdDiff (r • Ω.e) (G : V → ℂ)) x‖ₑ ^ 2 * dyadicWeight (1 + 2 * s) (k + 1) := fun x => by
     simp only [verticalQuotient]
-    by_cases hx : (x, r) ∈ Ω.heightPairs
+    by_cases hx : (x, r) ∈ Ω.graphHeightPairs
     · have hst : x ∈ diffStepSet Ω.domain 1 (r • Ω.e) := fun l hl => by
         rcases Nat.le_one_iff_eq_zero_or_eq_one.1 hl with rfl | rfl
-        · simpa [Ω.mem_domain_iff_height_pos] using hx.1.1
-        · simpa [Ω.mem_domain_iff_height_pos, Ω.height_add_smul] using hx.2.1
+        · simpa [Ω.mem_domain_iff_graphHeight_pos] using hx.1.1
+        · simpa [Ω.mem_domain_iff_graphHeight_pos, Ω.graphHeight_add_smul] using hx.2.1
       rw [indicator_of_mem hx, indicator_of_mem hst, div_eq_mul_inv]
       exact mul_le_mul' le_rfl hinv
     · rw [indicator_of_notMem hx]
@@ -258,7 +260,7 @@ vanishes at `0` and for `|r| > 1` and is bounded on the dyadic shells
 (`Rd.LipschitzGraph.lintegral_verticalQuotient_le`, `Rd.lintegral_real_le_tsum_dyadicAnnulus`).
 -/
 theorem lintegral_verticalForm_le {s : ℝ} (hs : -(1 / 2) ≤ s) (G : Lp ℂ 2 (volume : Measure V)) :
-    ∫⁻ x in Ω.height ⁻¹' Ioc 0 1, Ω.verticalForm s G x ≤
+    ∫⁻ x in Ω.graphHeight ⁻¹' Ioc 0 1, Ω.verticalForm s G x ≤
       2 ^ (2 * s + 2) * ∑' k, (dyadicWeight s k * lpModulusOn 2 Ω.domain 1 G k) ^ 2 := by
   have hHm := Ω.measurable_verticalQuotient s (Lp.stronglyMeasurable G).measurable
   rw [Ω.lintegral_verticalForm_eq, lintegral_lintegral_swap
@@ -297,37 +299,40 @@ form of Dyda 2004, Theorem 1.1, for `p = 2`): for `s > 1/2`, `G ∈ L_2(V)` and 
 almost everywhere on `{x ∈ Ω : η(x) < ε}`,
 `∫_Ω |G|² / min(η, 1)^(2s) ≤ ∫_Ω |G|² + K_s 2^(2s+2) ∑_k (2^(ks) ω_1(G, 2^(-k), Ω)_2)²`,
 with `K_s` of `Rd.halfLineHardyConst`; the constant depends neither on `ε` nor on `Ω`. On
-`{0 < η ≤ 1}` this is `Rd.LipschitzGraph.lintegral_Ioc_height_le` with
+`{0 < η ≤ 1}` this is `Rd.LipschitzGraph.lintegral_Ioc_graphHeight_le` with
 `Rd.LipschitzGraph.lintegral_verticalForm_le`; on `{η > 1}` the integrand is `|G|²`. -/
-theorem lintegral_div_min_height_le {s : ℝ} (hs : 1 / 2 < s) (G : Lp ℂ 2 (volume : Measure V))
-    {ε : ℝ} (hε : 0 < ε) (hG0 : ∀ᵐ x ∂volume, x ∈ Ω.domain → Ω.height x < ε → G x = 0) :
-    ∫⁻ x in Ω.domain, ‖G x‖ₑ ^ 2 / ENNReal.ofReal (min (Ω.height x) 1) ^ (2 * s) ≤
+theorem lintegral_div_min_graphHeight_le {s : ℝ} (hs : 1 / 2 < s) (G : Lp ℂ 2 (volume : Measure V))
+    {ε : ℝ} (hε : 0 < ε) (hG0 : ∀ᵐ x ∂volume, x ∈ Ω.domain → Ω.graphHeight x < ε → G x = 0) :
+    ∫⁻ x in Ω.domain, ‖G x‖ₑ ^ 2 / ENNReal.ofReal (min (Ω.graphHeight x) 1) ^ (2 * s) ≤
       (∫⁻ x in Ω.domain, ‖G x‖ₑ ^ 2) + halfLineHardyConst s * 2 ^ (2 * s + 2) *
         ∑' k, (dyadicWeight s k * lpModulusOn 2 Ω.domain 1 G k) ^ 2 := by
   have hG := (Lp.stronglyMeasurable G).measurable
-  have hη := Ω.continuous_height.measurable
-  set F : V → ℝ≥0∞ := fun x => ‖G x‖ₑ ^ 2 / ENNReal.ofReal (min (Ω.height x) 1) ^ (2 * s)
-  have hsub : Ω.domain ⊆ Ω.height ⁻¹' Ioc 0 1 ∪ (Ω.domain ∩ Ω.height ⁻¹' Ioi 1) := fun x hx => by
-    by_cases h1 : Ω.height x ≤ 1
-    · exact Or.inl ⟨(Ω.mem_domain_iff_height_pos x).1 hx, h1⟩
+  have hη := Ω.continuous_graphHeight.measurable
+  set F : V → ℝ≥0∞ := fun x => ‖G x‖ₑ ^ 2 / ENNReal.ofReal (min (Ω.graphHeight x) 1) ^ (2 * s)
+  have hsub : Ω.domain ⊆
+      Ω.graphHeight ⁻¹' Ioc 0 1 ∪ (Ω.domain ∩ Ω.graphHeight ⁻¹' Ioi 1) := fun x hx => by
+    by_cases h1 : Ω.graphHeight x ≤ 1
+    · exact Or.inl ⟨(Ω.mem_domain_iff_graphHeight_pos x).1 hx, h1⟩
     · exact Or.inr ⟨hx, not_le.1 h1⟩
-  have h1 : ∫⁻ x in Ω.height ⁻¹' Ioc 0 1, F x ≤ halfLineHardyConst s * (2 ^ (2 * s + 2) *
+  have h1 : ∫⁻ x in Ω.graphHeight ⁻¹' Ioc 0 1, F x ≤ halfLineHardyConst s * (2 ^ (2 * s + 2) *
       ∑' k, (dyadicWeight s k * lpModulusOn 2 Ω.domain 1 G k) ^ 2) := by
-    rw [setLIntegral_congr_fun (g := fun x => ‖G x‖ₑ ^ 2 / ENNReal.ofReal (Ω.height x) ^ (2 * s))
+    rw [setLIntegral_congr_fun
+      (g := fun x => ‖G x‖ₑ ^ 2 / ENNReal.ofReal (Ω.graphHeight x) ^ (2 * s))
       (hη measurableSet_Ioc) fun x hx => by
-        simp only [F, min_eq_left (show Ω.height x ≤ 1 from hx.2)]]
-    exact (Ω.lintegral_Ioc_height_le hs hG hε hG0).trans
+        simp only [F, min_eq_left (show Ω.graphHeight x ≤ 1 from hx.2)]]
+    exact (Ω.lintegral_Ioc_graphHeight_le hs hG hε hG0).trans
       (mul_le_mul' le_rfl (Ω.lintegral_verticalForm_le (by linarith) G))
-  have h2 : ∫⁻ x in Ω.domain ∩ Ω.height ⁻¹' Ioi 1, F x ≤ ∫⁻ x in Ω.domain, ‖G x‖ₑ ^ 2 := by
+  have h2 : ∫⁻ x in Ω.domain ∩ Ω.graphHeight ⁻¹' Ioi 1, F x ≤ ∫⁻ x in Ω.domain, ‖G x‖ₑ ^ 2 := by
     rw [setLIntegral_congr_fun (g := fun x => ‖G x‖ₑ ^ 2)
       (Ω.measurableSet_domain.inter (hη measurableSet_Ioi)) fun x hx => by
-        simp only [F, min_eq_right (show 1 ≤ Ω.height x from (mem_Ioi.1 hx.2).le),
+        simp only [F, min_eq_right (show 1 ≤ Ω.graphHeight x from (mem_Ioi.1 hx.2).le),
           ENNReal.ofReal_one, ENNReal.one_rpow, div_one]]
     exact lintegral_mono_set inter_subset_left
   calc ∫⁻ x in Ω.domain, F x
-      ≤ ∫⁻ x in Ω.height ⁻¹' Ioc 0 1 ∪ (Ω.domain ∩ Ω.height ⁻¹' Ioi 1), F x :=
+      ≤ ∫⁻ x in Ω.graphHeight ⁻¹' Ioc 0 1 ∪ (Ω.domain ∩ Ω.graphHeight ⁻¹' Ioi 1), F x :=
         lintegral_mono_set hsub
-    _ ≤ (∫⁻ x in Ω.height ⁻¹' Ioc 0 1, F x) + ∫⁻ x in Ω.domain ∩ Ω.height ⁻¹' Ioi 1, F x :=
+    _ ≤ (∫⁻ x in Ω.graphHeight ⁻¹' Ioc 0 1, F x) +
+          ∫⁻ x in Ω.domain ∩ Ω.graphHeight ⁻¹' Ioi 1, F x :=
         lintegral_union_le F _ _
     _ ≤ halfLineHardyConst s * (2 ^ (2 * s + 2) *
           ∑' k, (dyadicWeight s k * lpModulusOn 2 Ω.domain 1 G k) ^ 2) +
@@ -339,12 +344,12 @@ theorem lintegral_div_min_height_le {s : ℝ} (hs : 1 / 2 < s) (G : Lp ℂ 2 (vo
 `∫_Ω |G|² / min(η, 1)^(2s) ≤ (1 + K_s 2^(2s+2)) N_{s,Ω}(G)²` with `K_s` of
 `Rd.halfLineHardyConst` and the intrinsic quasi-norm
 `N_{s,Ω}(G) = ‖1_Ω G‖_2 + ‖(2^(ks) ω_1(G, 2^(-k), Ω)_2)_k‖_{ℓ_2}` (`Rd.modNormOn`); the constant
-depends neither on `ε` nor on `Ω`. From `Rd.LipschitzGraph.lintegral_div_min_height_le`, since
+depends neither on `ε` nor on `Ω`. From `Rd.LipschitzGraph.lintegral_div_min_graphHeight_le`, since
 `∫_Ω |G|² = ‖1_Ω G‖_2²` and the sum is the square of the `ℓ_2` norm in `N_{s,Ω}(G)`. -/
-theorem lintegral_div_min_height_le_modNormOn {s : ℝ} (hs : 1 / 2 < s)
+theorem lintegral_div_min_graphHeight_le_modNormOn {s : ℝ} (hs : 1 / 2 < s)
     (G : Lp ℂ 2 (volume : Measure V)) {ε : ℝ} (hε : 0 < ε)
-    (hG0 : ∀ᵐ x ∂volume, x ∈ Ω.domain → Ω.height x < ε → G x = 0) :
-    ∫⁻ x in Ω.domain, ‖G x‖ₑ ^ 2 / ENNReal.ofReal (min (Ω.height x) 1) ^ (2 * s) ≤
+    (hG0 : ∀ᵐ x ∂volume, x ∈ Ω.domain → Ω.graphHeight x < ε → G x = 0) :
+    ∫⁻ x in Ω.domain, ‖G x‖ₑ ^ 2 / ENNReal.ofReal (min (Ω.graphHeight x) 1) ^ (2 * s) ≤
       (1 + halfLineHardyConst s * 2 ^ (2 * s + 2)) *
         modNormOn Ω.measurableSet_domain 1 s 2 G ^ 2 := by
   set N := modNormOn Ω.measurableSet_domain 1 s 2 G
@@ -356,7 +361,7 @@ theorem lintegral_div_min_height_le_modNormOn {s : ℝ} (hs : 1 / 2 < s)
   have hM : ∑' k, (dyadicWeight s k * lpModulusOn 2 Ω.domain 1 G k) ^ 2 ≤ N ^ 2 := by
     rw [← ENNReal.lqNorm_two_sq]
     exact pow_le_pow_left₀ zero_le le_add_self 2
-  calc _ ≤ _ := Ω.lintegral_div_min_height_le hs G hε hG0
+  calc _ ≤ _ := Ω.lintegral_div_min_graphHeight_le hs G hε hG0
     _ ≤ N ^ 2 + halfLineHardyConst s * 2 ^ (2 * s + 2) * N ^ 2 :=
         add_le_add hI (mul_le_mul' le_rfl hM)
     _ = (1 + halfLineHardyConst s * 2 ^ (2 * s + 2)) * N ^ 2 := by ring
@@ -364,16 +369,16 @@ theorem lintegral_div_min_height_le_modNormOn {s : ℝ} (hs : 1 / 2 < s)
 /-- **The Hardy inequality on a Lipschitz graph domain with a finite constant**: for `s > 1/2`
 there is `C < ∞` such that `∫_Ω |G|² / min(η, 1)^(2s) ≤ C N_{s,Ω}(G)²` for every `G ∈ L_2(V)`
 that vanishes almost everywhere on `{x ∈ Ω : η(x) < ε}` for some `ε > 0`; the constant
-`C = 1 + K_s 2^(2s+2)` of `Rd.LipschitzGraph.lintegral_div_min_height_le_modNormOn` is finite
+`C = 1 + K_s 2^(2s+2)` of `Rd.LipschitzGraph.lintegral_div_min_graphHeight_le_modNormOn` is finite
 (`Rd.halfLineHardyConst_ne_top`). -/
-theorem exists_lintegral_div_height_le {s : ℝ} (hs : 1 / 2 < s) :
+theorem exists_lintegral_div_graphHeight_le {s : ℝ} (hs : 1 / 2 < s) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ G : Lp ℂ 2 (volume : Measure V),
-      (∃ ε > 0, ∀ᵐ x ∂volume, x ∈ Ω.domain → Ω.height x < ε → G x = 0) →
-      ∫⁻ x in Ω.domain, ‖G x‖ₑ ^ 2 / ENNReal.ofReal (min (Ω.height x) 1) ^ (2 * s) ≤
+      (∃ ε > 0, ∀ᵐ x ∂volume, x ∈ Ω.domain → Ω.graphHeight x < ε → G x = 0) →
+      ∫⁻ x in Ω.domain, ‖G x‖ₑ ^ 2 / ENNReal.ofReal (min (Ω.graphHeight x) 1) ^ (2 * s) ≤
         C * modNormOn Ω.measurableSet_domain 1 s 2 G ^ 2 :=
   ⟨1 + halfLineHardyConst s * 2 ^ (2 * s + 2), ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top,
     ENNReal.mul_ne_top (halfLineHardyConst_ne_top hs) (ENNReal.two_rpow_ne_top _)⟩,
-    fun G ⟨_, hε, hG0⟩ => Ω.lintegral_div_min_height_le_modNormOn hs G hε hG0⟩
+    fun G ⟨_, hε, hG0⟩ => Ω.lintegral_div_min_graphHeight_le_modNormOn hs G hε hG0⟩
 
 /-! ### Extension by zero -/
 
@@ -382,12 +387,12 @@ omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 `|Δ_y(1_Ω G)(x)| ≤ |1_{Ω_y} Δ_y G(x)| + |1_L G(x)| + |1_L G(x + y)|` with the layer
 `L = {0 < η ≤ (1 + M) ‖y‖}`. If exactly one of `x` and `x + y` lies in `Ω`, that point lies in
 `L`, since the height changes sign between them and is `(1 + M)`-Lipschitz
-(`Rd.LipschitzGraph.abs_height_le_of_mem_switchSet`). -/
+(`Rd.LipschitzGraph.abs_graphHeight_le_of_mem_switchSet`). -/
 theorem enorm_fwdDiff_indicator_le (G : V → ℂ) (y x : V) :
     ‖fwdDiff y (Ω.domain.indicator G) x‖ₑ ≤
       ‖(diffStepSet Ω.domain 1 y).indicator (fwdDiff y G) x‖ₑ +
-        ‖(Ω.height ⁻¹' Ioc 0 ((1 + Ω.M) * ‖y‖)).indicator G x‖ₑ +
-        ‖(Ω.height ⁻¹' Ioc 0 ((1 + Ω.M) * ‖y‖)).indicator G (x + y)‖ₑ := by
+        ‖(Ω.graphHeight ⁻¹' Ioc 0 ((1 + Ω.M) * ‖y‖)).indicator G x‖ₑ +
+        ‖(Ω.graphHeight ⁻¹' Ioc 0 ((1 + Ω.M) * ‖y‖)).indicator G (x + y)‖ₑ := by
   simp only [fwdDiff]
   by_cases hx : x ∈ Ω.domain <;> by_cases hxy : x + y ∈ Ω.domain
   · have hst : x ∈ diffStepSet Ω.domain 1 y := fun l hl => by
@@ -396,15 +401,15 @@ theorem enorm_fwdDiff_indicator_le (G : V → ℂ) (y x : V) :
       · simpa using hxy
     rw [indicator_of_mem hx, indicator_of_mem hxy, indicator_of_mem hst]
     exact le_add_right (le_add_right le_rfl)
-  · have hL : x ∈ Ω.height ⁻¹' Ioc 0 ((1 + Ω.M) * ‖y‖) :=
-      ⟨(Ω.mem_domain_iff_height_pos x).1 hx, (le_abs_self _).trans
-        (Ω.abs_height_le_of_mem_switchSet
+  · have hL : x ∈ Ω.graphHeight ⁻¹' Ioc 0 ((1 + Ω.M) * ‖y‖) :=
+      ⟨(Ω.mem_domain_iff_graphHeight_pos x).1 hx, (le_abs_self _).trans
+        (Ω.abs_graphHeight_le_of_mem_switchSet
           (show ¬(x ∈ Ω.domain ↔ x + y ∈ Ω.domain) from fun h => hxy (h.1 hx)))⟩
     rw [indicator_of_mem hx, indicator_of_notMem hxy, indicator_of_mem hL, zero_sub, enorm_neg]
     exact le_add_right le_add_self
-  · have hL : x + y ∈ Ω.height ⁻¹' Ioc 0 ((1 + Ω.M) * ‖y‖) := by
-      refine ⟨(Ω.mem_domain_iff_height_pos _).1 hxy, (le_abs_self _).trans ?_⟩
-      have h := Ω.abs_height_le_of_mem_switchSet (h := -y) (x := x + y)
+  · have hL : x + y ∈ Ω.graphHeight ⁻¹' Ioc 0 ((1 + Ω.M) * ‖y‖) := by
+      refine ⟨(Ω.mem_domain_iff_graphHeight_pos _).1 hxy, (le_abs_self _).trans ?_⟩
+      have h := Ω.abs_graphHeight_le_of_mem_switchSet (h := -y) (x := x + y)
         (show ¬(x + y ∈ Ω.domain ↔ x + y + -y ∈ Ω.domain) by
           rw [add_neg_cancel_right]
           exact fun h => hx (h.1 hxy))
@@ -422,10 +427,10 @@ translation invariance of the `L_2` norm (Mathlib's `eLpNorm_comp_measurePreserv
 theorem eLpNorm_fwdDiff_indicator_le {G : V → ℂ} (hG : AEStronglyMeasurable G volume) (y : V) :
     eLpNorm (fwdDiff y (Ω.domain.indicator G)) 2 volume ≤
       eLpNorm ((diffStepSet Ω.domain 1 y).indicator (fwdDiff y G)) 2 volume +
-        2 * eLpNorm ((Ω.height ⁻¹' Ioc 0 ((1 + Ω.M) * ‖y‖)).indicator G) 2 volume := by
+        2 * eLpNorm ((Ω.graphHeight ⁻¹' Ioc 0 ((1 + Ω.M) * ‖y‖)).indicator G) 2 volume := by
   have hτ := measurePreserving_add_right (volume : Measure V) y
-  have hL : MeasurableSet (Ω.height ⁻¹' Ioc (0 : ℝ) ((1 + Ω.M) * ‖y‖)) :=
-    Ω.continuous_height.measurable measurableSet_Ioc
+  have hL : MeasurableSet (Ω.graphHeight ⁻¹' Ioc (0 : ℝ) ((1 + Ω.M) * ‖y‖)) :=
+    Ω.continuous_graphHeight.measurable measurableSet_Ioc
   have hGΩ := hG.indicator Ω.measurableSet_domain
   have hfd : AEStronglyMeasurable (fwdDiff y (Ω.domain.indicator G)) volume := by
     unfold fwdDiff
@@ -437,8 +442,8 @@ theorem eLpNorm_fwdDiff_indicator_le {G : V → ℂ} (hG : AEStronglyMeasurable 
   have hLG := hG.indicator hL
   have hpt : ∀ x, ‖fwdDiff y (Ω.domain.indicator G) x‖ₑ ≤
       ‖((fun x => ‖(diffStepSet Ω.domain 1 y).indicator (fwdDiff y G) x‖ₑ) +
-        (fun x => ‖(Ω.height ⁻¹' Ioc 0 ((1 + Ω.M) * ‖y‖)).indicator G x‖ₑ) +
-        (fun x => ‖(Ω.height ⁻¹' Ioc 0 ((1 + Ω.M) * ‖y‖)).indicator G x‖ₑ) ∘ (· + y)) x‖ₑ :=
+        (fun x => ‖(Ω.graphHeight ⁻¹' Ioc 0 ((1 + Ω.M) * ‖y‖)).indicator G x‖ₑ) +
+        (fun x => ‖(Ω.graphHeight ⁻¹' Ioc 0 ((1 + Ω.M) * ‖y‖)).indicator G x‖ₑ) ∘ (· + y)) x‖ₑ :=
     fun x => by
       simp only [Pi.add_apply, Function.comp_apply, enorm_eq_self]
       exact Ω.enorm_fwdDiff_indicator_le G y x
@@ -455,13 +460,13 @@ steps `‖y‖ ≤ 2^(-k)`. -/
 theorem lpModulus_indicatorLp_le (G : Lp ℂ 2 (volume : Measure V)) (k : ℕ) :
     lpModulus 2 1 (indicatorLp Ω.measurableSet_domain G) k ≤
       lpModulusOn 2 Ω.domain 1 G k +
-        2 * eLpNorm ((Ω.height ⁻¹' Ioc 0 ((1 + Ω.M) / 2 ^ k)).indicator G) 2 volume := by
+        2 * eLpNorm ((Ω.graphHeight ⁻¹' Ioc 0 ((1 + Ω.M) / 2 ^ k)).indicator G) 2 volume := by
   rw [lpModulus, smoothnessModulus_congr_ae (indicatorLp_apply_ae Ω.measurableSet_domain G)]
   refine iSup₂_le fun y hy => ?_
   refine (Ω.eLpNorm_fwdDiff_indicator_le (Lp.aestronglyMeasurable G) y).trans
     (add_le_add (eLpNorm_indicator_higherDiff_le_modulusOn (r := 1) hy) ?_)
   refine mul_le_mul' le_rfl (eLpNorm_mono ((Lp.aestronglyMeasurable G).indicator
-    (Ω.continuous_height.measurable measurableSet_Ioc)) fun x => norm_indicator_le_of_subset
+    (Ω.continuous_graphHeight.measurable measurableSet_Ioc)) fun x => norm_indicator_le_of_subset
       (preimage_mono (Ioc_subset_Ioc_right ?_)) _ x)
   rw [div_eq_mul_one_div]
   exact mul_le_mul_of_nonneg_left hy (by linarith [Ω.M_nonneg])
@@ -472,13 +477,13 @@ theorem lpModulus_indicatorLp_le (G : Lp ℂ 2 (volume : Measure V)) (k : ℕ) :
 height. -/
 theorem tsum_sq_eLpNorm_layer_le {s : ℝ} (hs : 0 < s) (G : Lp ℂ 2 (volume : Measure V)) :
     ∑' k, (dyadicWeight s k *
-        eLpNorm ((Ω.height ⁻¹' Ioc 0 ((1 + Ω.M) / 2 ^ k)).indicator G) 2 volume) ^ 2 ≤
+        eLpNorm ((Ω.graphHeight ⁻¹' Ioc 0 ((1 + Ω.M) / 2 ^ k)).indicator G) 2 volume) ^ 2 ≤
       (1 - (2 : ℝ≥0∞) ^ (-(2 * s)))⁻¹ * ENNReal.ofReal (1 + Ω.M) ^ (2 * s) *
-        ∫⁻ x in Ω.domain, ‖G x‖ₑ ^ 2 / ENNReal.ofReal (min (Ω.height x) 1) ^ (2 * s) := by
-  have hη := Ω.continuous_height.measurable
-  have hdom : Ω.height ⁻¹' Ioi 0 = Ω.domain := by
+        ∫⁻ x in Ω.domain, ‖G x‖ₑ ^ 2 / ENNReal.ofReal (min (Ω.graphHeight x) 1) ^ (2 * s) := by
+  have hη := Ω.continuous_graphHeight.measurable
+  have hdom : Ω.graphHeight ⁻¹' Ioi 0 = Ω.domain := by
     ext x
-    exact (Ω.mem_domain_iff_height_pos x).symm
+    exact (Ω.mem_domain_iff_graphHeight_pos x).symm
   have h := tsum_dyadicWeight_mul_setLIntegral_le (μ := volume) hη
     (by linarith [Ω.M_nonneg] : (0 : ℝ) < 1 + Ω.M) hs (fun x => ‖G x‖ₑ ^ 2)
   rw [hdom] at h
@@ -494,14 +499,14 @@ quasi-norm `N_{s,Ω}` (`Rd.modNormOn`). The modulus of `1_Ω G` is at most the m
 plus twice the layer norms (`Rd.LipschitzGraph.lpModulus_indicatorLp_le`), and the weighted layer
 norms are at most a multiple of `N_{s,Ω}(G)` by the Hardy inequality
 (`Rd.LipschitzGraph.tsum_sq_eLpNorm_layer_le`,
-`Rd.LipschitzGraph.exists_lintegral_div_height_le`). -/
+`Rd.LipschitzGraph.exists_lintegral_div_graphHeight_le`). -/
 theorem exists_modNorm_indicatorLp_le_of_vanish {s : ℝ} (hs : 1 / 2 < s) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ G : Lp ℂ 2 (volume : Measure V),
-      (∃ ε > 0, ∀ᵐ x ∂volume, x ∈ Ω.domain → Ω.height x < ε → G x = 0) →
+      (∃ ε > 0, ∀ᵐ x ∂volume, x ∈ Ω.domain → Ω.graphHeight x < ε → G x = 0) →
       ‖indicatorLp Ω.measurableSet_domain G‖ₑ + lqNorm 2 (fun k => dyadicWeight s k *
           lpModulus 2 1 (indicatorLp Ω.measurableSet_domain G) k) ≤
         C * modNormOn Ω.measurableSet_domain 1 s 2 G := by
-  obtain ⟨C₁, hC₁, h₁⟩ := Ω.exists_lintegral_div_height_le hs
+  obtain ⟨C₁, hC₁, h₁⟩ := Ω.exists_lintegral_div_graphHeight_le hs
   set K := (1 - (2 : ℝ≥0∞) ^ (-(2 * s)))⁻¹ * ENNReal.ofReal (1 + Ω.M) ^ (2 * s) * C₁
   have hK : K ≠ ∞ := ENNReal.mul_ne_top (ENNReal.mul_ne_top
     (ENNReal.one_sub_two_rpow_neg_inv_ne_top (by linarith))
@@ -511,13 +516,13 @@ theorem exists_modNorm_indicatorLp_le_of_vanish {s : ℝ} (hs : 1 / 2 < s) :
     fun G hG => ?_⟩
   set N := modNormOn Ω.measurableSet_domain 1 s 2 G
   set lam : ℕ → ℝ≥0∞ := fun k =>
-    eLpNorm ((Ω.height ⁻¹' Ioc 0 ((1 + Ω.M) / 2 ^ k)).indicator G) 2 volume
+    eLpNorm ((Ω.graphHeight ⁻¹' Ioc 0 ((1 + Ω.M) / 2 ^ k)).indicator G) 2 volume
   have hlam : lqNorm 2 (fun k => dyadicWeight s k * lam k) ≤ max K 1 * N := by
     refine (ENNReal.pow_le_pow_left_iff two_ne_zero).1 ?_
     rw [ENNReal.lqNorm_two_sq]
     calc ∑' k, (dyadicWeight s k * lam k) ^ 2
         ≤ (1 - (2 : ℝ≥0∞) ^ (-(2 * s)))⁻¹ * ENNReal.ofReal (1 + Ω.M) ^ (2 * s) *
-          ∫⁻ x in Ω.domain, ‖G x‖ₑ ^ 2 / ENNReal.ofReal (min (Ω.height x) 1) ^ (2 * s) :=
+          ∫⁻ x in Ω.domain, ‖G x‖ₑ ^ 2 / ENNReal.ofReal (min (Ω.graphHeight x) 1) ^ (2 * s) :=
           Ω.tsum_sq_eLpNorm_layer_le (by linarith) G
       _ ≤ (1 - (2 : ℝ≥0∞) ^ (-(2 * s)))⁻¹ * ENNReal.ofReal (1 + Ω.M) ^ (2 * s) *
           (C₁ * N ^ 2) := mul_le_mul' le_rfl (h₁ G hG)

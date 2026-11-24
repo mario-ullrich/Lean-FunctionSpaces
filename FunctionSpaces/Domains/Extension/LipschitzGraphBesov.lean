@@ -18,10 +18,10 @@ differences lie in `K` and have length at most `1/(2c)`, and
 
 `‖1_Ω (f - m_{2^j} ⋆ f)‖_p ≤ ‖g‖_1 ω_L(f, 2^(-(j+1)), Ω)_p`
 
-(`Rd.LipschitzGraph.enorm_cutoff_sub_convLp_scaled_le`, from
+(`Rd.LipschitzGraph.enorm_graphCutoff_sub_convLp_scaledMoment_le`, from
 `Rd.eLpNorm_indicator_sub_convLp_momentKernel_le`). Hence the intrinsic local means are bounded
 by the moduli on `Ω` at the same scale, `‖1_Ω (k_j ⋆ f)‖_p ≤ 2 ‖g‖_1 ω_L(f, 2^(-j), Ω)_p` for
-`j ≥ 1` (`Rd.LipschitzGraph.enorm_cutoff_localMean_succ_le`), and
+`j ≥ 1` (`Rd.LipschitzGraph.enorm_graphCutoff_localMean_succ_le`), and
 
 `‖(2^(js) ‖1_Ω (k_j ⋆ f)‖_p)_j‖_{ℓ_q} ≤ C (‖f‖_{L_p(Ω)} + ‖(2^(js) ω_L(f, 2^(-j), Ω)_p)_j‖_{ℓ_q})`
 
@@ -36,7 +36,7 @@ scales, so the modulus on `Ω` is never dilated.
 `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`. The quasi-norms are equivalent: the
 intrinsic one is at most that of every such `F` (`Rd.LipschitzGraph.modNormOn_le_modNorm`), and
 Rychkov's extension `F = Ext f` attains it up to a constant
-(`Rd.LipschitzGraph.modNorm_extension_le_modNormOn`). Since differences and band-limited
+(`Rd.LipschitzGraph.modNorm_rychkovExtension_le_modNormOn`). Since differences and band-limited
 approximation describe the same spaces on `V` (`Rd.memApprox_bandScheme_iff_modulus`), the
 restrictions of the approximation spaces `A^s_q(L_p(V))` of band-limited functions are described
 by the same intrinsic condition (`Rd.LipschitzGraph.exists_memApprox_extension_iff`).
@@ -60,7 +60,7 @@ variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDim
 
 /-- **Moment kernels approximate with the modulus on `T`**: if the steps take `W` into `T`,
 `‖1_W (f - m_{2^j} ⋆ f)‖_p ≤ ‖g‖_1 ω_L(f, R 2^(-j), T)_p`. -/
-theorem enorm_indicatorLp_sub_convLp_scaled_le (hp : p ≠ ∞) {W T : Set V}
+theorem enorm_indicatorLp_sub_convLp_scaledMoment_le (hp : p ≠ ∞) {W T : Set V}
     (hW : MeasurableSet W) (L j : ℕ)
     (hstep : ∀ c : ℝ, 1 ≤ c → ∀ z, b.toFun z ≠ 0 → W ⊆ diffStepSet T L (-c⁻¹ • z))
     (f : Lp ℂ p (volume : Measure V)) :
@@ -102,9 +102,9 @@ theorem enorm_indicatorLp_localMean_succ_le (hp : p ≠ ∞) {W T : Set V} (hW :
         exact enorm_sub_le
     _ ≤ A * lpModulusOn p T L f (j + 1) + A * lpModulusOn p T L f (j + 1) :=
         add_le_add
-          ((b.enorm_indicatorLp_sub_convLp_scaled_le hp hW L j hstep f).trans
+          ((b.enorm_indicatorLp_sub_convLp_scaledMoment_le hp hW L j hstep f).trans
             (mul_le_mul' le_rfl (hmono j le_rfl)))
-          ((b.enorm_indicatorLp_sub_convLp_scaled_le hp hW L (j + 1) hstep f).trans
+          ((b.enorm_indicatorLp_sub_convLp_scaledMoment_le hp hW L (j + 1) hstep f).trans
             (mul_le_mul' le_rfl (hmono (j + 1) (Nat.le_succ j))))
     _ = 2 * A * lpModulusOn p T L f (j + 1) := by ring
 
@@ -125,7 +125,7 @@ variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] (Ω : Lips
 /-! ### Steps in the cone -/
 
 /-- **Steps in the cone stay in `Ω`**: `Ω ⊆ Ω_{rh}` for `h ∈ K`. -/
-theorem subset_diffStepSet {h : V} (hh : h ∈ Ω.cone) (r : ℕ) :
+theorem subset_diffStepSet {h : V} (hh : h ∈ Ω.graphCone) (r : ℕ) :
     Ω.domain ⊆ diffStepSet Ω.domain r h :=
   fun _ hx l _ => Ω.add_nsmul_mem hx hh l
 
@@ -134,7 +134,7 @@ theorem subset_diffStepSet {h : V} (hh : h ∈ Ω.cone) (r : ℕ) :
 theorem subset_diffStepSet_of_coneSupported {g : V → ℂ} (hg : Ω.ConeSupported g) {c : ℝ}
     (hc : 0 < c) (r : ℕ) {z : V} (hz : g z ≠ 0) : Ω.domain ⊆ diffStepSet Ω.domain r (-c⁻¹ • z) := by
   rw [neg_smul, ← smul_neg]
-  exact Ω.subset_diffStepSet (Ω.smul_mem_cone (inv_pos.2 hc) (hg z hz)) r
+  exact Ω.subset_diffStepSet (Ω.smul_mem_graphCone (inv_pos.2 hc) (hg z hz)) r
 
 variable [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] {p : ℝ≥0∞} [Fact (1 ≤ p)]
 
@@ -142,36 +142,36 @@ variable [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] {p : ℝ�
 
 /-- **Moment kernels approximate with the modulus on `Ω`**:
 `‖1_Ω (f - m_{2^j} ⋆ f)‖_p ≤ ‖g‖_1 ω_L(f, 2^(-(j+1)), Ω)_p` for the cone bump `g`. -/
-theorem enorm_cutoff_sub_convLp_scaled_le (hp : p ≠ ∞) (L j : ℕ)
+theorem enorm_graphCutoff_sub_convLp_scaledMoment_le (hp : p ≠ ∞) (L j : ℕ)
     (f : Lp ℂ p (volume : Measure V)) :
-    ‖Ω.cutoff (f - convLp hp (Ω.coneBump.integrable_scaledMoment L j) f)‖ₑ ≤
+    ‖Ω.graphCutoff (f - convLp hp (Ω.coneBump.integrable_scaledMoment L j) f)‖ₑ ≤
       (∫⁻ z, ‖Ω.coneBump.toFun z‖ₑ) * lpModulusOn p Ω.domain L f (j + 1) := by
   have hR : Ω.coneBump.radius / 2 ^ j = 1 / 2 ^ (j + 1) := by
     rw [Ω.coneBump_radius, pow_succ]
     ring
   rw [lpModulusOn, ← hR]
-  exact Ω.coneBump.enorm_indicatorLp_sub_convLp_scaled_le hp Ω.measurableSet_domain L j
+  exact Ω.coneBump.enorm_indicatorLp_sub_convLp_scaledMoment_le hp Ω.measurableSet_domain L j
     (fun _ hc _ hz => Ω.subset_diffStepSet_of_coneSupported Ω.coneSupported_coneBump
       (lt_of_lt_of_le one_pos hc) L hz) f
 
 /-- `‖1_Ω (k_0 ⋆ f)‖_p ≤ ‖m‖_1 ‖f‖_{L_p(Ω)}`, by the support principle. -/
-theorem enorm_cutoff_localMean_zero_le (hp : p ≠ ∞) (L : ℕ) (f : Lp ℂ p (volume : Measure V)) :
-    ‖Ω.cutoff (Ω.coneBump.localMean hp L 0 f)‖ₑ ≤
-      eLpNorm (momentKernel Ω.coneBump.toFun L) 1 volume * ‖Ω.cutoff f‖ₑ := by
-  have h := Ω.cutoff_convLp_cutoff hp (Ω.coneBump.integrable_meansKernel L 0)
+theorem enorm_graphCutoff_localMean_zero_le (hp : p ≠ ∞) (L : ℕ) (f : Lp ℂ p (volume : Measure V)) :
+    ‖Ω.graphCutoff (Ω.coneBump.localMean hp L 0 f)‖ₑ ≤
+      eLpNorm (momentKernel Ω.coneBump.toFun L) 1 volume * ‖Ω.graphCutoff f‖ₑ := by
+  have h := Ω.graphCutoff_convLp_graphCutoff hp (Ω.coneBump.integrable_meansKernel L 0)
     (Ω.coneSupported_meansKernel L 0) f
-  calc ‖Ω.cutoff (Ω.coneBump.localMean hp L 0 f)‖ₑ
-      = ‖Ω.cutoff (Ω.coneBump.localMean hp L 0 (Ω.cutoff f))‖ₑ := congrArg (‖·‖ₑ) h.symm
-    _ ≤ ‖Ω.coneBump.localMean hp L 0 (Ω.cutoff f)‖ₑ := Ω.enorm_cutoff_le _
-    _ ≤ eLpNorm (momentKernel Ω.coneBump.toFun L) 1 volume * ‖Ω.cutoff f‖ₑ :=
-        Ω.coneBump.enorm_localMean_zero_le hp L (Ω.cutoff f)
+  calc ‖Ω.graphCutoff (Ω.coneBump.localMean hp L 0 f)‖ₑ
+      = ‖Ω.graphCutoff (Ω.coneBump.localMean hp L 0 (Ω.graphCutoff f))‖ₑ := congrArg (‖·‖ₑ) h.symm
+    _ ≤ ‖Ω.coneBump.localMean hp L 0 (Ω.graphCutoff f)‖ₑ := Ω.enorm_graphCutoff_le _
+    _ ≤ eLpNorm (momentKernel Ω.coneBump.toFun L) 1 volume * ‖Ω.graphCutoff f‖ₑ :=
+        Ω.coneBump.enorm_localMean_zero_le hp L (Ω.graphCutoff f)
 
 /-- **Intrinsic local means are bounded by the modulus on `Ω`**:
 `‖1_Ω (k_{j+1} ⋆ f)‖_p ≤ 2 ‖g‖_1 ω_L(f, 2^(-(j+1)), Ω)_p`, since
 `k_{j+1} ⋆ f = (f - m_{2^j} ⋆ f) - (f - m_{2^(j+1)} ⋆ f)`. -/
-theorem enorm_cutoff_localMean_succ_le (hp : p ≠ ∞) (L j : ℕ)
+theorem enorm_graphCutoff_localMean_succ_le (hp : p ≠ ∞) (L j : ℕ)
     (f : Lp ℂ p (volume : Measure V)) :
-    ‖Ω.cutoff (Ω.coneBump.localMean hp L (j + 1) f)‖ₑ ≤
+    ‖Ω.graphCutoff (Ω.coneBump.localMean hp L (j + 1) f)‖ₑ ≤
       2 * (∫⁻ z, ‖Ω.coneBump.toFun z‖ₑ) * lpModulusOn p Ω.domain L f (j + 1) :=
   Ω.coneBump.enorm_indicatorLp_localMean_succ_le hp Ω.measurableSet_domain L j
     (fun _ hc _ hz => Ω.subset_diffStepSet_of_coneSupported Ω.coneSupported_coneBump
@@ -195,8 +195,9 @@ theorem intrinsicNorm_le (hp : p ≠ ∞) (L : ℕ) (s : ℝ) {q : ℝ≥0∞} (
     Ω.intrinsicNorm hp L s q f ≤ Ω.intrinsicConst L *
       modNormOn Ω.measurableSet_domain L s q f :=
   ENNReal.lqNorm_dyadicWeight_le_of_head_of_succ_le hq s
-    (fun j => ‖Ω.cutoff (Ω.coneBump.localMean hp L j f)‖ₑ) (lpModulusOn p Ω.domain L f)
-    (Ω.enorm_cutoff_localMean_zero_le hp L f) fun j => Ω.enorm_cutoff_localMean_succ_le hp L j f
+    (fun j => ‖Ω.graphCutoff (Ω.coneBump.localMean hp L j f)‖ₑ) (lpModulusOn p Ω.domain L f)
+    (Ω.enorm_graphCutoff_localMean_zero_le hp L f) fun j =>
+      Ω.enorm_graphCutoff_localMean_succ_le hp L j f
 
 /-- Finite intrinsic moduli give a finite intrinsic local means quasi-norm. -/
 theorem intrinsicNorm_lt_top (hp : p ≠ ∞) (L : ℕ) (s : ℝ) {q : ℝ≥0∞} (hq : 1 ≤ q)
@@ -213,30 +214,30 @@ theorem intrinsicNorm_lt_top (hp : p ≠ ∞) (L : ℕ) (s : ℝ) {q : ℝ≥0�
 ‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q}`; the case `O = Ω` of
 `Rd.modNormOn_le_modNorm_of_indicatorLp`, since the cut-off is `indicatorLp`. -/
 theorem modNormOn_le_modNorm (r : ℕ) (s : ℝ) (q : ℝ≥0∞) {F f : Lp ℂ p (volume : Measure V)}
-    (hFf : Ω.cutoff F = Ω.cutoff f) :
+    (hFf : Ω.graphCutoff F = Ω.graphCutoff f) :
     modNormOn Ω.measurableSet_domain r s q f ≤
       ‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r F k) :=
   modNormOn_le_modNorm_of_indicatorLp Ω.measurableSet_domain r s q hFf
 
 /-- **Rychkov's extension agrees with `f` on `Ω`** when the intrinsic moduli are finite. -/
-theorem cutoff_extension_of_modNormOn (hp : p ≠ ∞) {r : ℕ} (hr : 1 ≤ r) {s : ℝ} (hs : 0 < s)
-    {q : ℝ≥0∞} (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure V)}
+theorem graphCutoff_rychkovExtension_of_modNormOn (hp : p ≠ ∞) {r : ℕ} (hr : 1 ≤ r) {s : ℝ}
+    (hs : 0 < s) {q : ℝ≥0∞} (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure V)}
     (hf : modNormOn Ω.measurableSet_domain r s q f < ∞) :
-    Ω.cutoff (Ω.extension hp r f) = Ω.cutoff f :=
-  Ω.cutoff_extension hp hr hs hq (Ω.intrinsicNorm_lt_top hp r s hq hf)
+    Ω.graphCutoff (Ω.rychkovExtension hp r f) = Ω.graphCutoff f :=
+  Ω.graphCutoff_rychkovExtension hp hr hs hq (Ω.intrinsicNorm_lt_top hp r s hq hf)
 
 /-- **Rychkov's extension is bounded in the moduli**: for `s > 0`,
 `‖Ext f‖_p + ‖(2^(ks) ω_r(Ext f, 2^(-k))_p)_k‖_{ℓ_q} ≤
 C (‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q})`, with `C` finite for `s < r`. -/
-theorem modNorm_extension_le_modNormOn (hp : p ≠ ∞) (r : ℕ) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞}
+theorem modNorm_rychkovExtension_le_modNormOn (hp : p ≠ ∞) (r : ℕ) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞}
     (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure V)}
     (hf : modNormOn Ω.measurableSet_domain r s q f < ∞) :
-    ‖Ω.extension hp r f‖ₑ +
-        lqNorm q (fun k => dyadicWeight s k * lpModulus p r (Ω.extension hp r f) k) ≤
+    ‖Ω.rychkovExtension hp r f‖ₑ +
+        lqNorm q (fun k => dyadicWeight s k * lpModulus p r (Ω.rychkovExtension hp r f) k) ≤
       Ω.coneBump.bumpSynthConst r s * Ω.intrinsicConst r *
         modNormOn Ω.measurableSet_domain r s q f := by
   rw [mul_assoc]
-  exact (Ω.modNorm_extension_le hp r hs hq (Ω.intrinsicNorm_lt_top hp r s hq hf)).trans
+  exact (Ω.modNorm_rychkovExtension_le hp r hs hq (Ω.intrinsicNorm_lt_top hp r s hq hf)).trans
     (mul_le_mul' le_rfl (Ω.intrinsicNorm_le hp r s hq f))
 
 /-- **Restrictions of Besov spaces to Lipschitz graph domains, by intrinsic differences**: for
@@ -246,7 +247,7 @@ theorem modNorm_extension_le_modNormOn (hp : p ≠ ∞) (r : ℕ) {s : ℝ} (hs 
 `F`. -/
 theorem exists_besov_extension_iff_modulusOn (hp : p ≠ ∞) {r : ℕ} {s : ℝ} (hs : 0 < s)
     (hsr : s < r) {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Lp ℂ p (volume : Measure V)) :
-    (∃ F : Lp ℂ p (volume : Measure V), Ω.cutoff F = Ω.cutoff f ∧
+    (∃ F : Lp ℂ p (volume : Measure V), Ω.graphCutoff F = Ω.graphCutoff f ∧
         ‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r F k) < ∞) ↔
       modNormOn Ω.measurableSet_domain r s q f < ∞ := by
   have hr : 1 ≤ r := Nat.one_le_iff_ne_zero.2 (Nat.cast_pos.1 (hs.trans hsr)).ne'
@@ -262,7 +263,7 @@ space `A^s_q(L_p(V))` of band-limited functions iff
 `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`. -/
 theorem exists_memApprox_extension_iff (hp : p ≠ ∞) {r : ℕ} {s : ℝ} (hs : 0 < s) (hsr : s < r)
     {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Lp ℂ p (volume : Measure V)) :
-    (∃ F : Lp ℂ p (volume : Measure V), Ω.cutoff F = Ω.cutoff f ∧
+    (∃ F : Lp ℂ p (volume : Measure V), Ω.graphCutoff F = Ω.graphCutoff f ∧
         (bandScheme hp).MemApprox s q F) ↔
       modNormOn Ω.measurableSet_domain r s q f < ∞ := by
   rw [← Ω.exists_besov_extension_iff_modulusOn hp hs hsr hq f]

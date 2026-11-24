@@ -98,7 +98,7 @@ theorem coe_vecTildeEquivZeroBoundaryNat_apply (m l : ℕ) (Ω : Opens V) (U : V
 representation on `H̃^s(Ω)^m` (Mathlib's `InnerProductSpace.toDual`) followed by the isometry
 `H̃^s(Ω) ≅ H^{-s}(Ω)` of `Rd.tildeEquivRestriction` in each component; conjugate-linear and
 isometric. A functional `ℓ` is the sum of the pairings of the components
-(`Rd.vecDualEquiv_apply`), the vector form of `Rd.dualEquiv`. -/
+(`Rd.vecDualEquiv_apply`), the vector form of `Rd.tildeDualEquiv`. -/
 noncomputable def vecDualEquiv (m : ℕ) (s : ℝ) (Ω : Opens V) :
     StrongDual ℂ (VecTildeSpace m s Ω) ≃ₗᵢ⋆[ℂ] VecRestrictionSpace m (-s) Ω :=
   (InnerProductSpace.toDual ℂ (VecTildeSpace m s Ω)).symm.trans
@@ -106,10 +106,10 @@ noncomputable def vecDualEquiv (m : ℕ) (s : ℝ) (Ω : Opens V) :
 
 /-- **`ℓ` is the sum of the componentwise pairings**: `ℓ(U) = ∑_i [W_i, U_i]` for
 `W = vecDualEquiv m s Ω ℓ` and every `U ∈ H̃^s(Ω)^m` (Mathlib's
-`InnerProductSpace.toDual_symm_apply`, `PiLp.inner_apply`; `Rd.pairing_besselShift`). -/
+`InnerProductSpace.toDual_symm_apply`, `PiLp.inner_apply`; `Rd.sobolevPairing_besselShift`). -/
 theorem vecDualEquiv_apply (m : ℕ) {s : ℝ} {Ω : Opens V} (ℓ : StrongDual ℂ (VecTildeSpace m s Ω))
     (U : VecTildeSpace m s Ω) :
-    ℓ U = ∑ i, pairing s (vecDualEquiv m s Ω ℓ i : H^{-s}(V)) (U i : H^{s}(V)) := by
+    ℓ U = ∑ i, sobolevPairing s (vecDualEquiv m s Ω ℓ i : H^{-s}(V)) (U i : H^{s}(V)) := by
   have h : ℓ U = InnerProductSpace.toDual ℂ (VecTildeSpace m s Ω)
       ((InnerProductSpace.toDual ℂ (VecTildeSpace m s Ω)).symm ℓ) U := by
     rw [LinearIsometryEquiv.apply_symm_apply]
@@ -117,7 +117,7 @@ theorem vecDualEquiv_apply (m : ℕ) {s : ℝ} {Ω : Opens V} (ℓ : StrongDual 
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [Submodule.coe_inner, vecDualEquiv, LinearIsometryEquiv.trans_apply,
     LinearIsometryEquiv.piLpCongrRight_apply, PiLp.toLp_apply, coe_tildeEquivRestriction_apply,
-    pairing_besselShift]
+    sobolevPairing_besselShift]
 
 namespace BoundedLipschitzDomain
 
@@ -144,34 +144,35 @@ each component. -/
 noncomputable def vecTrace (m : ℕ) (s : ℝ) (hs : 1 / 2 < s := by norm_num)
     (hs' : s < 3 / 2 := by norm_num) :
     VecRestrictionSpace m s Ω.toOpens →L[ℂ] Ω.VecTraceSpace m s hs hs' :=
-  PiLp.compLeftL m (Ω.trace s hs hs')
+  PiLp.compLeftL m (Ω.domainTrace s hs hs')
 
 /-- **The vector extension** `Ω.VecTraceSpace m s → H^s(Ω)^m`, `1/2 < s < 3/2`: the extension
 `E_s` in each component, an isometry (`Rd.BoundedLipschitzDomain.norm_vecExtend_apply`). -/
 noncomputable def vecExtend (m : ℕ) (s : ℝ) (hs : 1 / 2 < s := by norm_num)
     (hs' : s < 3 / 2 := by norm_num) :
     Ω.VecTraceSpace m s hs hs' →L[ℂ] VecRestrictionSpace m s Ω.toOpens :=
-  PiLp.compLeftL m (Ω.extend s hs hs')
+  PiLp.compLeftL m (Ω.domainExtend s hs hs')
 
 /-- **The vector extension is a right inverse of the vector trace**
-(`Rd.BoundedLipschitzDomain.trace_extend` in each component). -/
+(`Rd.BoundedLipschitzDomain.domainTrace_domainExtend` in each component). -/
 @[simp]
 theorem vecTrace_vecExtend {m : ℕ} {s : ℝ} {hs : 1 / 2 < s} {hs' : s < 3 / 2}
     (w : Ω.VecTraceSpace m s hs hs') : Ω.vecTrace m s hs hs' (Ω.vecExtend m s hs hs' w) = w :=
-  PiLp.ext fun i => Ω.trace_extend (w i)
+  PiLp.ext fun i => Ω.domainTrace_domainExtend (w i)
 
 /-- **The vector extension is an isometry**: `‖E_s^m w‖ = ‖w‖`
-(`Rd.BoundedLipschitzDomain.norm_extend_apply` in each component, `PiLp.norm_compLeftL_apply`). -/
+(`Rd.BoundedLipschitzDomain.norm_domainExtend_apply` in each component,
+`PiLp.norm_compLeftL_apply`). -/
 theorem norm_vecExtend_apply {m : ℕ} {s : ℝ} {hs : 1 / 2 < s} {hs' : s < 3 / 2}
     (w : Ω.VecTraceSpace m s hs hs') : ‖Ω.vecExtend m s hs hs' w‖ = ‖w‖ :=
-  PiLp.norm_compLeftL_apply m (fun t => Ω.norm_extend_apply t) w
+  PiLp.norm_compLeftL_apply m (fun t => Ω.norm_domainExtend_apply t) w
 
 /-- **The kernel of the vector trace is the vector trace kernel** (`PiLp.ker_compLeftL`,
-`Rd.BoundedLipschitzDomain.ker_trace`). -/
+`Rd.BoundedLipschitzDomain.ker_domainTrace`). -/
 theorem ker_vecTrace (m : ℕ) (s : ℝ) (hs : 1 / 2 < s := by norm_num)
     (hs' : s < 3 / 2 := by norm_num) :
     (Ω.vecTrace m s hs hs').ker = Ω.vecTraceKer m s hs hs' := by
-  rw [vecTrace, PiLp.ker_compLeftL, Ω.ker_trace s hs hs', vecTraceKer]
+  rw [vecTrace, PiLp.ker_compLeftL, Ω.ker_domainTrace s hs hs', vecTraceKer]
 
 /-- **The orthogonal complement of the vector trace kernel** is `((ker γ_s)ᗮ)^m`, the tuples of
 elements of the trace space (`PiLp.orthogonal_piSubmodule`). -/

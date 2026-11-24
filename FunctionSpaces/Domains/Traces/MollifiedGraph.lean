@@ -396,7 +396,7 @@ theorem norm_profile_second_le (a t : ℝ) :
 
 /-- The **vertical coordinate** `ψ_j(x) = 2^j (⟪x, e⟫ - φ_j(Px))`. -/
 noncomputable def vertCoord (j : ℕ) (x : V) : ℝ :=
-  2 ^ j * (inner ℝ x Ω.e - Ω.smoothGraph j (Ω.proj x))
+  2 ^ j * (inner ℝ x Ω.e - Ω.smoothGraph j (Ω.graphProj x))
 
 /-- The **vertical cut-off** `v_j = χ ∘ ψ_j`. -/
 noncomputable def vertCutoff (j : ℕ) (x : V) : ℂ := Ω.profile (Ω.vertCoord j x)
@@ -407,19 +407,20 @@ theorem abs_vertCoord_sub_le (j : ℕ) (x h : V) :
   have h1 : |inner ℝ (x + h) Ω.e - inner ℝ x Ω.e| ≤ ‖h‖ := by
     rw [inner_add_left, add_sub_cancel_left]
     exact (abs_real_inner_le_norm h Ω.e).trans (by rw [Ω.norm_e, mul_one])
-  have h2 : |Ω.smoothGraph j (Ω.proj (x + h)) - Ω.smoothGraph j (Ω.proj x)| ≤
+  have h2 : |Ω.smoothGraph j (Ω.graphProj (x + h)) - Ω.smoothGraph j (Ω.graphProj x)| ≤
       Ω.M * Ω.graphBumpNorm * ‖h‖ := by
     refine (Ω.abs_smoothGraph_sub_le j _ _).trans ?_
     rw [map_add, add_sub_cancel_left]
-    exact mul_le_mul_of_nonneg_left (Ω.norm_proj_le h)
+    exact mul_le_mul_of_nonneg_left (Ω.norm_graphProj_le h)
       (mul_nonneg Ω.M_nonneg Ω.graphBumpNorm_nonneg)
-  have heq : Ω.vertCoord j (x + h) - Ω.vertCoord j x = 2 ^ j * ((inner ℝ (x + h) Ω.e -
-      inner ℝ x Ω.e) - (Ω.smoothGraph j (Ω.proj (x + h)) - Ω.smoothGraph j (Ω.proj x))) := by
+  have heq : Ω.vertCoord j (x + h) - Ω.vertCoord j x =
+      2 ^ j * ((inner ℝ (x + h) Ω.e - inner ℝ x Ω.e) -
+        (Ω.smoothGraph j (Ω.graphProj (x + h)) - Ω.smoothGraph j (Ω.graphProj x))) := by
     simp only [vertCoord]
     ring
   rw [heq, abs_mul, abs_of_pos (by positivity)]
   calc 2 ^ j * |(inner ℝ (x + h) Ω.e - inner ℝ x Ω.e) -
-        (Ω.smoothGraph j (Ω.proj (x + h)) - Ω.smoothGraph j (Ω.proj x))|
+        (Ω.smoothGraph j (Ω.graphProj (x + h)) - Ω.smoothGraph j (Ω.graphProj x))|
       ≤ 2 ^ j * (‖h‖ + Ω.M * Ω.graphBumpNorm * ‖h‖) :=
         mul_le_mul_of_nonneg_left ((abs_sub _ _).trans (add_le_add h1 h2)) (by positivity)
     _ = 2 ^ j * (1 + Ω.M * Ω.graphBumpNorm) * ‖h‖ := by ring
@@ -430,21 +431,23 @@ no second differences. -/
 theorem abs_second_vertCoord_le (j : ℕ) {h : V} (hh : ‖h‖ ≤ 1 / 2 ^ j) (x : V) :
     |Ω.vertCoord j (x + (2 : ℝ) • h) - 2 * Ω.vertCoord j (x + h) + Ω.vertCoord j x| ≤
       4 * Ω.M * Ω.graphBumpDeriv * (2 ^ j * ‖h‖) ^ 2 := by
-  have hP : ‖Ω.proj h‖ ≤ 1 / 2 ^ j := (Ω.norm_proj_le h).trans hh
-  have h1 := Ω.abs_second_smoothGraph_le j hP (Ω.proj x)
+  have hP : ‖Ω.graphProj h‖ ≤ 1 / 2 ^ j := (Ω.norm_graphProj_le h).trans hh
+  have h1 := Ω.abs_second_smoothGraph_le j hP (Ω.graphProj x)
   have heq : Ω.vertCoord j (x + (2 : ℝ) • h) - 2 * Ω.vertCoord j (x + h) + Ω.vertCoord j x =
-      -(2 ^ j * (Ω.smoothGraph j (Ω.proj x + (2 : ℝ) • Ω.proj h) -
-        2 * Ω.smoothGraph j (Ω.proj x + Ω.proj h) + Ω.smoothGraph j (Ω.proj x))) := by
+      -(2 ^ j * (Ω.smoothGraph j (Ω.graphProj x + (2 : ℝ) • Ω.graphProj h) -
+        2 * Ω.smoothGraph j (Ω.graphProj x + Ω.graphProj h) +
+          Ω.smoothGraph j (Ω.graphProj x))) := by
     simp only [vertCoord, map_add, map_smul, inner_add_left, real_inner_smul_left]
     ring
   rw [heq, abs_neg, abs_mul, abs_of_pos (by positivity)]
-  have hP2 : ‖Ω.proj h‖ ^ 2 ≤ ‖h‖ ^ 2 := pow_le_pow_left₀ (norm_nonneg _) (Ω.norm_proj_le h) 2
+  have hP2 : ‖Ω.graphProj h‖ ^ 2 ≤ ‖h‖ ^ 2 :=
+    pow_le_pow_left₀ (norm_nonneg _) (Ω.norm_graphProj_le h) 2
   have hc : 0 ≤ 4 * Ω.M * Ω.graphBumpDeriv * 2 ^ j :=
     mul_nonneg (mul_nonneg (mul_nonneg (by norm_num) Ω.M_nonneg) Ω.graphBumpDeriv_nonneg)
       (by positivity)
-  calc 2 ^ j * |Ω.smoothGraph j (Ω.proj x + (2 : ℝ) • Ω.proj h) -
-        2 * Ω.smoothGraph j (Ω.proj x + Ω.proj h) + Ω.smoothGraph j (Ω.proj x)|
-      ≤ 2 ^ j * (4 * Ω.M * Ω.graphBumpDeriv * 2 ^ j * ‖Ω.proj h‖ ^ 2) :=
+  calc 2 ^ j * |Ω.smoothGraph j (Ω.graphProj x + (2 : ℝ) • Ω.graphProj h) -
+        2 * Ω.smoothGraph j (Ω.graphProj x + Ω.graphProj h) + Ω.smoothGraph j (Ω.graphProj x)|
+      ≤ 2 ^ j * (4 * Ω.M * Ω.graphBumpDeriv * 2 ^ j * ‖Ω.graphProj h‖ ^ 2) :=
         mul_le_mul_of_nonneg_left h1 (by positivity)
     _ ≤ 2 ^ j * (4 * Ω.M * Ω.graphBumpDeriv * 2 ^ j * ‖h‖ ^ 2) := by gcongr
     _ = 4 * Ω.M * Ω.graphBumpDeriv * (2 ^ j * ‖h‖) ^ 2 := by ring
@@ -456,7 +459,7 @@ theorem norm_vertCutoff_le (j : ℕ) (x : V) : ‖Ω.vertCutoff j x‖ ≤ 1 := 
 `|ψ_j(γ x')| = 2^j |φ(x') - φ_j(x')| ≤ 2 M ‖ρ‖_1 < c`. -/
 theorem vertCutoff_graphMap (j : ℕ) (x' : Ω.hyperplane) : Ω.vertCutoff j (Ω.graphMap x') = 1 := by
   apply Ω.profile_eq_one
-  rw [vertCoord, Ω.inner_graphMap, Ω.proj_graphMap, abs_mul, abs_of_pos (by positivity),
+  rw [vertCoord, Ω.inner_graphMap, Ω.graphProj_graphMap, abs_mul, abs_of_pos (by positivity),
     abs_sub_comm]
   have h := Ω.abs_smoothGraph_sub_phi_le j x'
   have hpos : (0 : ℝ) < 2 ^ j := by positivity
@@ -468,7 +471,7 @@ theorem vertCutoff_graphMap (j : ℕ) (x' : Ω.hyperplane) : Ω.vertCutoff j (Ω
 /-- **The vertical cut-off vanishes far from the smoothed graph**: `v_j(x) = 0` if
 `|⟪x, e⟫ - φ_j(Px)| ≥ (c + 1) 2^(-j)`. -/
 theorem vertCutoff_eq_zero (j : ℕ) {x : V}
-    (hx : (Ω.cutoffLevel + 1) / 2 ^ j ≤ |inner ℝ x Ω.e - Ω.smoothGraph j (Ω.proj x)|) :
+    (hx : (Ω.cutoffLevel + 1) / 2 ^ j ≤ |inner ℝ x Ω.e - Ω.smoothGraph j (Ω.graphProj x)|) :
     Ω.vertCutoff j x = 0 := by
   apply Ω.profile_eq_zero
   rw [vertCoord, abs_mul, abs_of_pos (by positivity)]
@@ -478,7 +481,7 @@ theorem vertCutoff_eq_zero (j : ℕ) {x : V}
 /-- The vertical cut-off is continuous. -/
 theorem continuous_vertCutoff (j : ℕ) : Continuous (Ω.vertCutoff j) :=
   Ω.contDiff_profile.continuous.comp (continuous_const.mul ((continuous_id.inner
-    continuous_const).sub ((Ω.continuous_smoothGraph j).comp Ω.proj.continuous)))
+    continuous_const).sub ((Ω.continuous_smoothGraph j).comp Ω.graphProj.continuous)))
 
 /-- The constant `B` of the differences of the vertical cut-off. -/
 noncomputable def vertCutoffConst : ℝ :=

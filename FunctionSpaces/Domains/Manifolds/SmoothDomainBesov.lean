@@ -12,7 +12,7 @@ public import FunctionSpaces.Domains.Manifolds.SmoothDomain
 
 For a smooth bounded domain `Ω ⊆ ℝ^n` the Besov space of the compact manifold `closure Ω` with
 the Lebesgue measure, defined by charts, is the space of functions on `Ω` with finite intrinsic
-Besov quasi-norm (`Rd.SmoothDomain.memBesov_iff_modNormOn_lt_top`):
+Besov quasi-norm (`Rd.SmoothDomain.memManifoldBesov_iff_modNormOn_lt_top`):
 
 `f ∈ B^s_{p,q}(closure Ω)  ↔  ‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`
 
@@ -108,7 +108,7 @@ the partition of unity and of the cut-offs to the closure. -/
 noncomputable def GlobalAtlas.toBesovAtlas (G : Ω.GlobalAtlas) :
     Manifold.BesovAtlas (𝓡∂ n) (closure Ω.carrier) where
   n := G.N
-  chart i := (G.S i).chart
+  chart i := (G.S i).straightenerChart
   chart_mem i := ⟨G.S i, rfl⟩
   psi i x := G.psi i x
   contMDiff_psi i :=
@@ -132,42 +132,42 @@ noncomputable def GlobalAtlas.toBesovAtlas (G : Ω.GlobalAtlas) :
 variable (Ω)
 
 /-- The **extension by `0`** of a function on the closure to `ℝ^n`. -/
-noncomputable def extend (g : closure Ω.carrier → ℂ) : EuclideanSpace ℝ (Fin n) → ℂ :=
+noncomputable def extendByZero (g : closure Ω.carrier → ℂ) : EuclideanSpace ℝ (Fin n) → ℂ :=
   Function.extend Subtype.val g 0
 
 variable {Ω}
 
 /-- The extension agrees with the function on the closure. -/
-theorem extend_coe (g : closure Ω.carrier → ℂ) (x : closure Ω.carrier) :
-    Ω.extend g x = g x :=
+theorem extendByZero_coe (g : closure Ω.carrier → ℂ) (x : closure Ω.carrier) :
+    Ω.extendByZero g x = g x :=
   Subtype.val_injective.extend_apply g 0 x
 
 /-- The extension vanishes outside the closure. -/
-theorem extend_eq_zero (g : closure Ω.carrier → ℂ) {x : EuclideanSpace ℝ (Fin n)}
-    (hx : x ∉ closure Ω.carrier) : Ω.extend g x = 0 :=
+theorem extendByZero_eq_zero (g : closure Ω.carrier → ℂ) {x : EuclideanSpace ℝ (Fin n)}
+    (hx : x ∉ closure Ω.carrier) : Ω.extendByZero g x = 0 :=
   Function.extend_val_apply' hx
 
 /-- The extension of a strongly measurable function is strongly measurable. -/
-theorem stronglyMeasurable_extend {g : closure Ω.carrier → ℂ} (hg : StronglyMeasurable g) :
-    StronglyMeasurable (Ω.extend g) :=
+theorem stronglyMeasurable_extendByZero {g : closure Ω.carrier → ℂ} (hg : StronglyMeasurable g) :
+    StronglyMeasurable (Ω.extendByZero g) :=
   (MeasurableEmbedding.subtype_coe isClosed_closure.measurableSet).stronglyMeasurable_extend hg
     stronglyMeasurable_const
 
 /-- **The extension preserves `L_p` norms**: `‖ext g‖_{L_p(ℝ^n)} = ‖g‖_{L_p(closure Ω)}`. -/
-theorem eLpNorm_extend {g : closure Ω.carrier → ℂ} (hg : StronglyMeasurable g) {p : ℝ≥0∞}
-    (hp0 : p ≠ 0) (hp : p ≠ ⊤) : eLpNorm (Ω.extend g) p volume = eLpNorm g p Ω.volumeOn := by
+theorem eLpNorm_extendByZero {g : closure Ω.carrier → ℂ} (hg : StronglyMeasurable g) {p : ℝ≥0∞}
+    (hp0 : p ≠ 0) (hp : p ≠ ⊤) : eLpNorm (Ω.extendByZero g) p volume = eLpNorm g p Ω.volumeOn := by
   have he : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
   have hcl : MeasurableSet (closure Ω.carrier) := isClosed_closure.measurableSet
   refine ENNReal.rpow_left_injective he.ne' ?_
   simp only
-  rw [eLpNorm_rpow_eq (Ω.stronglyMeasurable_extend hg).aestronglyMeasurable hp0 hp,
+  rw [eLpNorm_rpow_eq (Ω.stronglyMeasurable_extendByZero hg).aestronglyMeasurable hp0 hp,
     eLpNorm_rpow_eq hg.aestronglyMeasurable hp0 hp]
-  have hsupp : Function.support (fun x => ‖Ω.extend g x‖ₑ ^ p.toReal) ⊆ closure Ω.carrier :=
+  have hsupp : Function.support (fun x => ‖Ω.extendByZero g x‖ₑ ^ p.toReal) ⊆ closure Ω.carrier :=
     fun x hx => by
       by_contra h
-      exact hx (by simp only [extend_eq_zero g h, enorm_zero, ENNReal.zero_rpow_of_pos he])
+      exact hx (by simp only [extendByZero_eq_zero g h, enorm_zero, ENNReal.zero_rpow_of_pos he])
   rw [← setLIntegral_eq_of_support_subset hsupp, ← lintegral_subtype_comap hcl]
-  simp only [extend_coe]
+  simp only [extendByZero_coe]
   rfl
 
 /-! ### The pieces of the global atlas -/
@@ -178,13 +178,13 @@ omit [NeZero n] in
 theorem volume_coord_zero_eq_zero [NeZero n] :
     volume {y : EuclideanSpace ℝ (Fin n) | y 0 = 0} = 0 := by
   have h : {y : EuclideanSpace ℝ (Fin n) | y 0 = 0} =
-      ((ℝ ∙ (e0 : EuclideanSpace ℝ (Fin n)))ᗮ : Set (EuclideanSpace ℝ (Fin n))) := by
+      ((ℝ ∙ (firstUnitVector : EuclideanSpace ℝ (Fin n)))ᗮ : Set (EuclideanSpace ℝ (Fin n))) := by
     ext y
     rw [SetLike.mem_coe, Submodule.mem_orthogonal_singleton_iff_inner_right, real_inner_comm,
       ← coord_zero_eq_inner]
     rfl
   rw [h]
-  exact volume_orthogonal_singleton_eq_zero (norm_ne_zero_iff.1 (by simp [norm_e0]))
+  exact volume_orthogonal_singleton_eq_zero (norm_ne_zero_iff.1 (by simp [norm_firstUnitVector]))
 
 namespace Straightener
 
@@ -244,8 +244,8 @@ theorem theta_mul_psi (i : Fin G.N) (x : EuclideanSpace ℝ (Fin n)) :
 /-- **The pieces of the global atlas**: `piece_i g = 1_{σ_i(closure Ω ∩ B_i)} (ψ_i ext g) ∘ τ_i`. -/
 theorem piece_apply (i : Fin G.N) (g : closure Ω.carrier → ℂ) (y : EuclideanSpace ℝ (Fin n)) :
     G.toBesovAtlas.piece i g y = ((G.S i).sigma '' (closure Ω.carrier ∩ (G.S i).B)).indicator
-      (fun y => (G.psi i ((G.S i).tau y) : ℂ) * Ω.extend g ((G.S i).tau y)) y := by
-  have ht : (G.toBesovAtlas.ext i).target = (G.S i).sigma '' (closure Ω.carrier ∩ (G.S i).B) :=
+      (fun y => (G.psi i ((G.S i).tau y) : ℂ) * Ω.extendByZero g ((G.S i).tau y)) y := by
+  have ht : (G.toBesovAtlas.extChart i).target = (G.S i).sigma '' (closure Ω.carrier ∩ (G.S i).B) :=
     (G.S i).extend_target
   unfold Manifold.BesovAtlas.piece
   rw [ht]
@@ -256,20 +256,20 @@ theorem piece_apply (i : Fin G.N) (g : closure Ω.carrier → ℂ) (y : Euclidea
       rw [range_modelWithCornersEuclideanHalfSpace]
       exact hy0
     have hyy : (𝓡∂ n) ((𝓡∂ n).symm y) = y := (𝓡∂ n).right_inv hyI
-    have hcoe : (((G.toBesovAtlas.ext i).symm y : closure Ω.carrier) :
+    have hcoe : (((G.toBesovAtlas.extChart i).symm y : closure Ω.carrier) :
         EuclideanSpace ℝ (Fin n)) = (G.S i).tau y := by
       rw [OpenPartialHomeomorph.extend_coe_symm, Function.comp_apply]
-      have h := (G.S i).chart_symm_coe (y := (𝓡∂ n).symm y) (by rw [hyy]; exact hyB)
+      have h := (G.S i).straightenerChart_symm_coe (y := (𝓡∂ n).symm y) (by rw [hyy]; exact hyB)
       rw [hyy] at h
       exact h
-    rw [← hcoe, extend_coe]
+    rw [← hcoe, extendByZero_coe]
     rfl
   · rw [indicator_of_notMem hy, indicator_of_notMem hy]
 
 /-- **The pieces on the half-space**: `1_{y_0 ≥ 0} piece_i g = 1_{y_0 ≥ 0} (ψ_i ext g) ∘ τ_i`. -/
 theorem indicator_piece (i : Fin G.N) (g : closure Ω.carrier → ℂ) :
     (range (𝓡∂ n)).indicator (G.toBesovAtlas.piece i g) = (range (𝓡∂ n)).indicator
-      (fun y => (G.psi i ((G.S i).tau y) : ℂ) * Ω.extend g ((G.S i).tau y)) := by
+      (fun y => (G.psi i ((G.S i).tau y) : ℂ) * Ω.extendByZero g ((G.S i).tau y)) := by
   funext y
   by_cases hyI : y ∈ range (𝓡∂ n)
   · rw [indicator_of_mem hyI, indicator_of_mem hyI, G.piece_apply]
@@ -288,19 +288,19 @@ variable {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ⊤)
 
 include hp in
 /-- The extension of `f ∈ L_p(closure Ω)` is in `L_p(ℝ^n)`. -/
-theorem memLp_extend (f : Lp ℂ p Ω.volumeOn) : MemLp (Ω.extend f) p volume := by
+theorem memLp_extendByZero (f : Lp ℂ p Ω.volumeOn) : MemLp (Ω.extendByZero f) p volume := by
   have hp0 : p ≠ 0 := (zero_lt_one.trans_le (Fact.out : 1 ≤ p)).ne'
-  rw [memLp_iff, eLpNorm_extend (Lp.stronglyMeasurable f) hp0 hp]
+  rw [memLp_iff, eLpNorm_extendByZero (Lp.stronglyMeasurable f) hp0 hp]
   exact Lp.eLpNorm_lt_top f
 
 variable (Ω) in
 /-- The **extension by `0`** of `f ∈ L_p(closure Ω)` as an element of `L_p(ℝ^n)`. -/
 noncomputable def extLp (f : Lp ℂ p Ω.volumeOn) :
     Lp ℂ p (volume : Measure (EuclideanSpace ℝ (Fin n))) :=
-  (memLp_extend hp f).toLp _
+  (memLp_extendByZero hp f).toLp _
 
 /-- The extension in `L_p` is the extension by `0`, almost everywhere. -/
-theorem extLp_ae (f : Lp ℂ p Ω.volumeOn) : Ω.extLp hp f =ᵐ[volume] Ω.extend f :=
+theorem extLp_ae (f : Lp ℂ p Ω.volumeOn) : Ω.extLp hp f =ᵐ[volume] Ω.extendByZero f :=
   MemLp.coeFn_toLp _
 
 /-! ### The changes of variables between the domain and the charts -/
@@ -366,19 +366,19 @@ theorem GlobalAtlas.modNormOn_pieceLp_lt_top (G : Ω.GlobalAtlas) {r : ℕ} {s :
   have hr : 1 ≤ r := Nat.one_le_iff_ne_zero.2 (Nat.cast_pos.1 (hs.trans hsr)).ne'
   set hΩh := BesovDomain.measurableSet (range (𝓡∂ n))
   obtain ⟨F, hFf, hF⟩ :=
-    (Ω.exists_besov_extension_iff_modulusOn hp hs hsr hq (Ω.extLp hp f)).2 hf
+    (Ω.exists_besov_extension_iff_modulusOn_indicator hp hs hsr hq (Ω.extLp hp f)).2 hf
   set T := G.toChart i
   obtain ⟨C, hC, hT⟩ := T.modNormOn_applyLp_le convex_univ interior_univ_nonempty
     MeasurableSet.univ hp hr hs hsr hq
   -- `f = F` on `Ω`
-  have hΩf : ∀ᵐ x ∂volume, x ∈ Ω.carrier → Ω.extend f x = F x := by
+  have hΩf : ∀ᵐ x ∂volume, x ∈ Ω.carrier → Ω.extendByZero f x = F x := by
     filter_upwards [(ae_restrict_iff' Ω.measurableSet).1
       ((indicatorLp_eq_iff_ae_eq_restrict Ω.measurableSet).1 hFf), Ω.extLp_ae hp f]
       with x h1 h3 hx
     rw [h1 hx, h3]
   -- the piece agrees with `(ψ_i F) ∘ τ_i` on the half-space
   have hgood : ∀ᵐ y ∂volume, y ∈ range (𝓡∂ n) →
-      (G.psi i ((G.S i).tau y) : ℂ) * Ω.extend f ((G.S i).tau y) =
+      (G.psi i ((G.S i).tau y) : ℂ) * Ω.extendByZero f ((G.S i).tau y) =
         (G.psi i ((G.S i).tau y) : ℂ) * F ((G.S i).tau y) := by
     have h0 : ∀ᵐ y ∂(volume : Measure (EuclideanSpace ℝ (Fin n))),
         y ∉ {y : EuclideanSpace ℝ (Fin n) | y 0 = 0} :=
@@ -445,7 +445,8 @@ theorem GlobalAtlas.modNormOn_extLp_lt_top (G : Ω.GlobalAtlas) {r : ℕ} {s : �
     exact (hT i _).trans_lt (ENNReal.mul_lt_top (hC i).lt_top hGi)
   -- `θ_i (G_i ∘ σ_i) = ψ_i f` on `Ω`
   have hpiece : ∀ i, ∀ᵐ x ∂volume, x ∈ Ω.carrier →
-      (G.theta i x : ℂ) * Gi i ((G.S i).sigma x) = (G.psi i x : ℂ) * Ω.extend f x := fun i => by
+      (G.theta i x : ℂ) * Gi i ((G.S i).sigma x) =
+        (G.psi i x : ℂ) * Ω.extendByZero f x := fun i => by
     have h1 : ∀ᵐ y ∂volume, y ∈ range (𝓡∂ n) → Gi i y = G.toBesovAtlas.piece i f y := by
       filter_upwards [(ae_restrict_iff' hΩh).1
         ((indicatorLp_eq_iff_ae_eq_restrict hΩh).1 (hGif i)),
@@ -461,7 +462,7 @@ theorem GlobalAtlas.modNormOn_extLp_lt_top (G : Ω.GlobalAtlas) {r : ℕ} {s : �
         ⟨hσ0.le, by rwa [(G.S i).tau_sigma]⟩), (G.S i).tau_sigma]
       have h := congrArg (fun t : ℝ => (t : ℂ)) (G.theta_mul_psi i x)
       push_cast at h
-      linear_combination Ω.extend f x * h
+      linear_combination Ω.extendByZero f x * h
     · rw [G.theta_eq_zero i hB, G.psi_eq_zero i hB, Complex.ofReal_zero, zero_mul, zero_mul]
   -- `F = f` on `Ω`
   have hFΩ : indicatorLp Ω.measurableSet F = indicatorLp Ω.measurableSet (Ω.extLp hp f) := by
@@ -490,14 +491,14 @@ theorem GlobalAtlas.modNormOn_extLp_lt_top (G : Ω.GlobalAtlas) {r : ℕ} {s : �
 bounded domain `Ω ⊆ ℝ^n`, `1 ≤ p < ∞`, `0 < s < r` and `1 ≤ q ≤ ∞`, `f ∈ L_p(closure Ω)` lies in
 the Besov space `B^s_{p,q}` of the compact manifold `closure Ω` with the Lebesgue measure iff
 `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`. -/
-theorem memBesov_iff_modNormOn_lt_top {s : ℝ} (hs : 0 < s) {r : ℕ} (hsr : s < r) {q : ℝ≥0∞}
+theorem memManifoldBesov_iff_modNormOn_lt_top {s : ℝ} (hs : 0 < s) {r : ℕ} (hsr : s < r) {q : ℝ≥0∞}
     (hq : 1 ≤ q) (f : Lp ℂ p Ω.volumeOn) :
-    Manifold.MemBesov (𝓡∂ n) Ω.volumeOn hp s q f ↔
+    Manifold.MemManifoldBesov (𝓡∂ n) Ω.volumeOn hp s q f ↔
       modNormOn Ω.measurableSet r s q (Ω.extLp hp f) < ⊤ := by
   obtain ⟨G⟩ := GlobalAtlas.nonempty Ω
-  rw [Manifold.memBesov_iff (I := 𝓡∂ n) (μ := Ω.volumeOn) hp G.toBesovAtlas hs hq f,
-    G.toBesovAtlas.memBesov_iff_besovNorm_lt_top hp hs hsr hq f,
-    Manifold.BesovAtlas.besovNorm, ENNReal.sum_lt_top]
+  rw [Manifold.memManifoldBesov_iff (I := 𝓡∂ n) (μ := Ω.volumeOn) hp G.toBesovAtlas hs hq f,
+    G.toBesovAtlas.memAtlasBesov_iff_atlasBesovNorm_lt_top hp hs hsr hq f,
+    Manifold.BesovAtlas.atlasBesovNorm, ENNReal.sum_lt_top]
   exact ⟨fun h => G.modNormOn_extLp_lt_top hp hs hsr hq f fun i => h i (Finset.mem_univ i),
     fun h i _ => G.modNormOn_pieceLp_lt_top hp hs hsr hq f h i⟩
 

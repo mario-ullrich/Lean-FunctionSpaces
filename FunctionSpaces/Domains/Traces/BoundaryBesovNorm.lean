@@ -23,7 +23,7 @@ resolution of unity `(ψ_j)` on `Γ` (`Rd.BoundedLipschitzDomain.BoundaryPartiti
   almost everywhere on `Γ`, and it is subadditive and homogeneous.
 * **The trace is bounded** (`Rd.BoundedLipschitzDomain.exists_boundaryBesovNorm_boundaryTrace_le`):
   `‖Tr_Γ F‖_{B^s_{p,q}(Γ)} ≤ C (‖F‖_p + ‖(2^(k(s+1/p)) ω_L(F, 2^(-k))_p)_k‖_{ℓ_q})`, chart by chart
-  (`Rd.LipschitzGraph.exists_modNorm_trace_mulLp_le`).
+  (`Rd.LipschitzGraph.exists_modNorm_graphTrace_mulLp_le`).
 * **The extension is bounded** (`Rd.BoundedLipschitzDomain.exists_boundaryTrace_eq_le`): every
   `g ∈ B^s_{p,q}(Γ)` is `Tr_Γ F` almost everywhere on `Γ` for an `F` with
   `‖F‖_p + ‖(2^(k(s+1/p)) ω_L(F, 2^(-k))_p)_k‖_{ℓ_q} ≤ C ‖g‖_{B^s_{p,q}(Γ)}`, namely
@@ -308,8 +308,8 @@ theorem chart_ae_eq_zero_of_boundaryBesovNorm_eq_zero (ψ : Ω.BoundaryPartition
 `1 ≤ p < ∞`, `0 < s < 1`, `1 ≤ q ≤ ∞` and `s + 1/p < L` (so `L ≥ 1`), there is `C < ∞` with
 `‖Tr_Γ F‖_{B^s_{p,q}(Γ)} ≤ C (‖F‖_p + ‖(2^(k(s+1/p)) ω_L(F, 2^(-k))_p)_k‖_{ℓ_q})` for every `F`
 with a finite right side. The chart pieces of `Tr_Γ F` are the traces `Tr_j(ψ_j F)`
-(`Rd.BoundedLipschitzDomain.trace_mulLp_ae_boundaryTrace`), bounded chart by chart
-(`Rd.LipschitzGraph.exists_modNorm_trace_mulLp_le`); `C = ∑_j K_j`. -/
+(`Rd.BoundedLipschitzDomain.graphTrace_mulLp_ae_boundaryTrace`), bounded chart by chart
+(`Rd.LipschitzGraph.exists_modNorm_graphTrace_mulLp_le`); `C = ∑_j K_j`. -/
 theorem exists_boundaryBesovNorm_boundaryTrace_le (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞)
     {L : ℕ} {s : ℝ} (hs : 0 < s) (hs1 : s < 1) (hsL : s + 1 / p.toReal < L)
     {q : ℝ≥0∞} (hq : 1 ≤ q) :
@@ -322,11 +322,11 @@ theorem exists_boundaryBesovNorm_boundaryTrace_le (ψ : Ω.BoundaryPartition) (h
   choose M hM using fun j => exists_iteratedFDeriv_bound (ψ.contDiff_toComplex j)
     (ψ.hasCompactSupport_toComplex j) L
   choose K hK hle using fun j =>
-    (Ω.graph j).exists_modNorm_trace_mulLp_le hp hs hs1 hsL hq (ψ.contDiff_toComplex j) (hM j)
+    (Ω.graph j).exists_modNorm_graphTrace_mulLp_le hp hs hs1 hsL hq (ψ.contDiff_toComplex j) (hM j)
   refine ⟨∑ j, K j, ENNReal.sum_ne_top.2 fun j _ => hK j, fun F hF => ?_⟩
   rw [Finset.sum_mul]
   exact (Ω.boundaryBesovNorm_le_sum ψ _ fun j =>
-    Ω.trace_mulLp_ae_boundaryTrace ψ hp hL hs hsL hq hF j (hM j)).trans
+    Ω.graphTrace_mulLp_ae_boundaryTrace ψ hp hL hs hsL hq hF j (hM j)).trans
     (Finset.sum_le_sum fun j _ => hle j F hF)
 
 /-- **A bounded extension from the boundary** (following Schneider–Vybíral, Theorem 4.11, for

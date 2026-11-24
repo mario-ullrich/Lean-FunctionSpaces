@@ -44,58 +44,59 @@ approximation spaces are `B^θ_{2,q}(M)`, `0 < θ < 1`.
   example the sphere (`Manifold.exists_isSmoothMeasure_sphere`). The Besov quasi-norm of a Besov
   atlas `A` is `‖f‖_{A,r,s,q} = ∑_i N_Ω((ψ_i f) ∘ κ_i⁻¹)` with
   `N_Ω(G) = ‖G‖_{L_p(Ω)} + ‖(2^(ks) ω_r(G, 2^(-k), Ω)_p)_k‖_{ℓ_q}`, `Ω = range I`
-  (`Manifold.BesovAtlas.besovNorm`). For two Besov atlases, `0 < s < r` and `1 ≤ q ≤ ∞` there is
-  `C < ∞` with `‖f‖_{A,r,s,q} ≤ C ‖f‖_{A',r,s,q}` for all `f ∈ L_p(μ)`
-  (`Manifold.BesovAtlas.besovNorm_le_besovNorm`), so `B^s_{p,q}(M)` (`Manifold.MemBesov`) depends
-  neither on the atlas nor on the order (`Manifold.memBesov_iff`,
-  `Manifold.BesovAtlas.memBesov_iff_besovNorm_lt_top`). The pieces of two atlases are related by
-  the changes of charts with cut-offs (`Manifold.BesovAtlas.pieceLp_eq_sum`), which are bounded on
-  the Besov domain.
+  (`Manifold.BesovAtlas.atlasBesovNorm`). For two Besov atlases, `0 < s < r` and `1 ≤ q ≤ ∞` there
+  is `C < ∞` with `‖f‖_{A,r,s,q} ≤ C ‖f‖_{A',r,s,q}` for all `f ∈ L_p(μ)`
+  (`Manifold.BesovAtlas.atlasBesovNorm_le_atlasBesovNorm`), so `B^s_{p,q}(M)`
+  (`Manifold.MemManifoldBesov`) depends neither on the atlas nor on the order
+  (`Manifold.memManifoldBesov_iff`, `Manifold.BesovAtlas.memAtlasBesov_iff_atlasBesovNorm_lt_top`).
+  The pieces of two atlases are related by the changes of charts with cut-offs
+  (`Manifold.BesovAtlas.pieceLp_eq_sum`), which are bounded on the Besov domain.
 * **Smooth bounded domains as manifolds with boundary.** The closure of a smooth bounded domain
   `Ω ⊆ ℝ^n` (a bounded Lipschitz domain with smooth graph functions, `Rd.SmoothDomain`) is a
   compact smooth manifold with boundary modelled on the half-space `{y : y_0 ≥ 0}`
   (`Rd.SmoothDomain.isManifold`): near the boundary the charts are the straightenings
   `x ↦ A(x - φ(x) e)`, which preserve the Lebesgue measure
-  (`Rd.LipschitzGraph.measurePreserving_flatten`), so the Lebesgue measure is a
+  (`Rd.LipschitzGraph.measurePreserving_graphFlatten`), so the Lebesgue measure is a
   smooth measure (`Rd.SmoothDomain.isSmoothMeasure_volumeOn`). For `1 ≤ p < ∞`, `0 < s < r` and
   `1 ≤ q ≤ ∞`, `f ∈ L_p(closure Ω)` lies in the Besov space `B^s_{p,q}` of this manifold iff
   `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`
-  (`Rd.SmoothDomain.memBesov_iff_modNormOn_lt_top`): the descriptions by charts, by intrinsic
-  differences and as restrictions of `B^s_{p,q}(ℝ^n)` coincide. `Rd.SmoothDomain` carries its
-  charts as data; its carriers are exactly the bounded open sets that agree near each boundary
+  (`Rd.SmoothDomain.memManifoldBesov_iff_modNormOn_lt_top`): the descriptions by charts, by
+  intrinsic differences and as restrictions of `B^s_{p,q}(ℝ^n)` coincide. `Rd.SmoothDomain` carries
+  its charts as data; its carriers are exactly the bounded open sets that agree near each boundary
   point with the region above the graph of a function smooth near the origin
   (`Rd.IsBoundedSmoothDomain`, `Rd.isBoundedSmoothDomain_iff_exists`), each such set carries the
   smooth domain `Rd.SmoothDomain.ofIsBoundedSmoothDomain`, and every open ball is such a set
-  (`Rd.SmoothDomain.ball`, with its Besov spaces in `Rd.SmoothDomain.memBesov_ball_iff`).
+  (`Rd.SmoothDomain.ball`, with its Besov spaces in `Rd.SmoothDomain.memManifoldBesov_ball_iff`).
 * **Besov spaces on the boundary of a compact manifold.** Let `M` be a compact smooth manifold
   with boundary modelled on the half-space `{y ∈ ℝ^n : y_0 ≥ 0}`. The changes of charts map the
   boundary hyperplane `H₀ = {y_0 = 0}` into itself (`Manifold.coordChange_mem_bdry`), and their
   restrictions to `H₀` are smooth changes of variables with cut-offs on all of `H₀`
   (`Manifold.boundaryChartChange`). For a Besov atlas `A`, `g : M → ℂ` lies in `B^s_{p,q}(∂M)`
-  (`Manifold.BesovAtlas.MemBoundaryBesov`) if the restrictions to `H₀` of its chart pieces agree
-  almost everywhere with functions in `B^s_{p,q}(H₀)`. For `1 ≤ p < ∞`, `s > 0` and
+  (`Manifold.BesovAtlas.MemAtlasBoundaryBesov`) if the restrictions to `H₀` of its chart pieces
+  agree almost everywhere with functions in `B^s_{p,q}(H₀)`. For `1 ≤ p < ∞`, `s > 0` and
   `1 ≤ q ≤ ∞` this does not depend on the atlas
-  (`Manifold.BesovAtlas.memBoundaryBesov_iff_memBoundaryBesov`).
+  (`Manifold.BesovAtlas.memAtlasBoundaryBesov_iff_memAtlasBoundaryBesov`).
 * **The trace theorem on compact manifolds with boundary.** With `M` as above, a smooth measure `μ`,
   `1 ≤ p < ∞`, `s > 0`, `1 ≤ q ≤ ∞` and the trace `Tr` of order `L ≥ 2`, `L > s + 1/p`, of the
   half-space, the trace of `f ∈ L_p(μ)` on `∂M` is
-  `Tr_A f = ∑_i θ_i · Tr((ψ_i f) ∘ κ_i⁻¹) ∘ P ∘ κ_i` (`Manifold.BesovAtlas.boundaryTrace`). The
+  `Tr_A f = ∑_i θ_i · Tr((ψ_i f) ∘ κ_i⁻¹) ∘ P ∘ κ_i` (`Manifold.BesovAtlas.atlasBoundaryTrace`). The
   trace commutes with the changes of charts
-  (`Manifold.trace_chartChange_applyLp`), so for `f ∈ B^{s+1/p}_{p,q}(M)` the boundary pieces of
-  `Tr_A f` are the traces of the chart pieces of `f`, for every atlas
-  (`Manifold.BesovAtlas.boundaryPiece_boundaryTrace_of_atlas`). The trace is bounded: there is
+  (`Manifold.graphTrace_chartChange_applyLp`), so for `f ∈ B^{s+1/p}_{p,q}(M)` the boundary pieces
+  of `Tr_A f` are the traces of the chart pieces of `f`, for every atlas
+  (`Manifold.BesovAtlas.boundaryPiece_atlasBoundaryTrace_of_atlas`). The trace is bounded: there is
   `C < ∞` such that every boundary piece of `Tr_A f` agrees almost everywhere with some
   `G ∈ L_p(H₀)` with `‖G‖_p + ‖(2^(js) ω_{⌊s⌋+1}(G, 2^(-j))_p)_j‖_{ℓ_q} ≤ C ‖f‖_{A,L,s+1/p,q}`
-  (`Manifold.BesovAtlas.exists_boundaryTrace_norm_le`). `B^s_{p,q}(∂M)` is the trace space
+  (`Manifold.BesovAtlas.exists_atlasBoundaryTrace_norm_le`). `B^s_{p,q}(∂M)` is the trace space
   of `B^{s+1/p}_{p,q}(M)`: `g ∈ B^s_{p,q}(∂M)` iff the boundary pieces of `g` agree almost
   everywhere with those of `Tr_A f` for some `f ∈ B^{s+1/p}_{p,q}(M)`
-  (`Manifold.BesovAtlas.memBoundaryBesov_iff_exists_boundaryTrace`). If `f` has a continuous
-  representative `g`, the boundary pieces of `Tr_A f` are those of `g`: the trace is the
-  restriction to the boundary (`Manifold.BesovAtlas.boundaryPiece_boundaryTrace_of_continuous`).
-  For the closure of a smooth bounded domain with the Lebesgue measure this is the trace theorem
-  for the Besov spaces of its boundary defined by charts, for every `s > 0`
-  (`Rd.SmoothDomain.memBoundaryBesov_iff_exists_boundaryTrace`,
-  `Rd.SmoothDomain.boundaryPiece_boundaryTrace_of_continuous`).
+  (`Manifold.BesovAtlas.memAtlasBoundaryBesov_iff_exists_atlasBoundaryTrace`). If `f` has a
+  continuous representative `g`, the boundary pieces of `Tr_A f` are those of `g`: the trace is the
+  restriction to the boundary
+  (`Manifold.BesovAtlas.boundaryPiece_atlasBoundaryTrace_of_continuous`). For the closure of a
+  smooth bounded domain with the Lebesgue measure this is the trace theorem for the Besov spaces of
+  its boundary defined by charts, for every `s > 0`
+  (`Rd.SmoothDomain.smooth_memAtlasBoundaryBesov_iff_exists_atlasBoundaryTrace`,
+  `Rd.SmoothDomain.smooth_boundaryPiece_atlasBoundaryTrace_of_continuous`).
 * **The Dirichlet eigenbasis.** Let `Ω ⊆ V` be a bounded open set and
   `J : H^1_0(Ω) → L_2(Ω)` the restriction (`Rd.dirichletEmbedding`). Then `J` is a compact
   dense embedding (`Rd.dirichletCompactEmbedding`), and its spectral scheme
@@ -164,17 +165,19 @@ approximation spaces are `B^θ_{2,q}(M)`, `0 < θ < 1`.
   of the chart form the weights satisfy `∑_k ψ_k² ≥ 1/N` for `N` charts
   (`Manifold.BesovAtlas.inv_card_le_sum_sq_psi`), a step toward its uniform
   ellipticity in the charts. `f ∈ B^1_{2,2}(M)` iff
-  `∑_i (1 + ⌊√(1 + λ_i)⌋)² |⟨e_i, f⟩|² < ∞` (`Manifold.BesovAtlas.memBesov_one_two_iff_spectral`).
-  For `0 < θ < 1` and `1 ≤ q ≤ ∞`, `f ∈ (L_2(μ), H^1_A(M))_{θ,q}` iff every piece `P_k f` has a
-  finite intrinsic quasi-norm on `Ω_I` (`Manifold.BesovAtlas.memKMethod_chartSobolev_iff`), so
-  `f ∈ B^θ_{2,q}(M)` iff `f` lies in the approximation space `A^θ_q` of the chart eigenbasis
+  `∑_i (1 + ⌊√(1 + λ_i)⌋)² |⟨e_i, f⟩|² < ∞`
+  (`Manifold.BesovAtlas.memManifoldBesov_one_two_iff_spectral`). For `0 < θ < 1` and `1 ≤ q ≤ ∞`,
+  `f ∈ (L_2(μ), H^1_A(M))_{θ,q}` iff every piece `P_k f` has a finite intrinsic quasi-norm on `Ω_I`
+  (`Manifold.BesovAtlas.memKMethod_chartSobolev_iff`), so `f ∈ B^θ_{2,q}(M)` iff `f` lies in the
+  approximation space `A^θ_q` of the chart eigenbasis
   (`Manifold.BesovAtlas.memApprox_chartScheme_iff`), iff
-  `‖P_1 f‖_2 + ‖(2^(kθ) ‖Δ_k f‖_2)_k‖_{ℓ_q} < ∞` for the dyadic blocks `Δ_k f` of its
-  eigenfunction expansion (`Manifold.BesovAtlas.memBesov_iff_blockNorm_lt_top`), and for `q = 2`
-  iff `∑_i (1 + λ_i)^θ |⟨e_i, f⟩|² < ∞` (`Manifold.BesovAtlas.memBesov_two_iff_chartEigenvalue`).
-  On the closure of a bounded smooth domain `Ω` these are the intrinsic `B^θ_{2,q}(Ω)`
-  (`Rd.SmoothDomain.memApprox_chartScheme_iff_modNormOn`); the sphere `S^n`, `n ≥ 1`, with the
-  chart measure of a Besov atlas is an example without boundary
+  `‖P_1 f‖_2 + ‖(2^(kθ) ‖Δ_k f‖_2)_k‖_{ℓ_q} < ∞` for the dyadic blocks `Δ_k f` of its eigenfunction
+  expansion (`Manifold.BesovAtlas.memManifoldBesov_iff_blockNorm_lt_top`), and for `q = 2` iff
+  `∑_i (1 + λ_i)^θ |⟨e_i, f⟩|² < ∞`
+  (`Manifold.BesovAtlas.memManifoldBesov_two_iff_chartEigenvalue`). On the closure of a bounded
+  smooth domain `Ω` these are the intrinsic `B^θ_{2,q}(Ω)`
+  (`Rd.SmoothDomain.memApprox_chartScheme_iff_modNormOn`); the sphere `S^n`, `n ≥ 1`, with the chart
+  measure of a Besov atlas is an example without boundary
   (`Manifold.memApprox_chartScheme_sphere_iff`).
 
 ## What is formalised

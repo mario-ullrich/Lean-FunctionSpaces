@@ -241,7 +241,7 @@ For a general scheme the project describes `A^s_q`
   `‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff
   `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`, with differences inside `Ω`; some
   such `F` has quasi-norm at most `C` times the intrinsic one, one `C < ∞` for all `f`
-  (`Rd.BoundedLipschitzDomain.exists_besov_extension_iff_modulusOn`,
+  (`Rd.BoundedLipschitzDomain.exists_besov_extension_iff_modulusOn_indicator`,
   `Rd.BoundedLipschitzDomain.exists_besov_extension_le`). For `1 < p < ∞` and every `m`, every
   `f ∈ L_p(Ω)` with weak derivatives of order at most `m` in `L_p(Ω)` agrees on `Ω` with some
   `F ∈ W^m_p(V)` (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memWSobolev_order`); for
@@ -263,7 +263,7 @@ For a general scheme the project describes `A^s_q`
 * **Compact manifolds.** Let `M` be a compact Hausdorff smooth manifold of dimension `d ≥ 1`,
   without boundary, with boundary or with corners, with a smooth measure `μ`. For `1 ≤ p < ∞`,
   `s > 0` and `1 ≤ q ≤ ∞`, `B^s_{p,q}(M)`, defined by the chart pieces of a Besov atlas, is the
-  same for every atlas (`Manifold.memBesov_iff`).
+  same for every atlas (`Manifold.memManifoldBesov_iff`).
 * **Traces.** Let `Ω` be as above, with boundary `Γ` and surface measure `σ`, the
   `(d-1)`-dimensional Hausdorff measure on `Γ`. For `1 ≤ p < ∞`, `1 ≤ q ≤ ∞` and
   `1/p < s < 1 + 1/p`, let `B^s_{p,q}(Ω)` carry the intrinsic quasi-norm with differences of
@@ -310,7 +310,7 @@ For a general scheme the project describes `A^s_q`
   On a Lipschitz graph domain `Ω'` with height `h(x)` above the graph and `1/2 < s < 1`, every
   `G ∈ L_2(V)` that vanishes near the graph has
   `∫_{Ω'} |G|² / min(h, 1)^(2s) ≤ C (‖G‖_{L_2(Ω')} + ‖(2^(ks) ω_1(G, 2^(-k), Ω')_2)_k‖_{ℓ_2})²`
-  (`Rd.LipschitzGraph.exists_lintegral_div_height_le`), a fractional Hardy inequality. On a
+  (`Rd.LipschitzGraph.exists_lintegral_div_graphHeight_le`), a fractional Hardy inequality. On a
   bounded Lipschitz domain the traces, the isomorphisms and the duals hold componentwise for
   `ℂ^m`-valued functions, in the Hilbert direct sums `X^m`: the trace maps `H^s(Ω)^m` onto
   `H^{s-1/2}(Γ)^m` with kernel `H^s_0(Ω)^m` for `1/2 < s < 3/2`, restriction maps `H̃^s(Ω)^m`
@@ -329,7 +329,7 @@ For a general scheme the project describes `A^s_q`
   element of `H^{-s}(V)` whose distribution is `g` (`Rd.pivotDual_sobolevToL2_apply_apply`); on
   `Ω` and on `Γ` the pairing of the dual space with the smaller space extends the inner product
   of `L_2`, as `U ↦ ∫_Ω conj (g) ι_s U`, with `ι_s U` the `L_2` function of `U`, and
-  `h ↦ ∫_Γ conj (g) h dσ` (`Rd.pairing_dualEquiv_pivotDual_tildeToL2`,
+  `h ↦ ∫_Γ conj (g) h dσ` (`Rd.sobolevPairing_tildeDualEquiv_pivotDual_tildeToL2`,
   `Rd.BoundedLipschitzDomain.pivotDual_boundarySobolevToL2_apply_apply`).
 * **Eigenfunction expansions.** For an orthonormal basis of weak eigenfunctions `e_i` with
   eigenvalues `λ_i`, let `A_k` be the span of the `e_i` with `⌊√(1 + λ_i)⌋ < k`, and let

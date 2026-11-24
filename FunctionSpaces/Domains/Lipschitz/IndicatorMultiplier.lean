@@ -36,8 +36,9 @@ with a multiplier are non-smooth atoms.
   `C d^n 2^(-jn) min(1, 2^j ‖h‖)`
   (`Rd.BoundedLipschitzDomain.exists_volume_switchSet_inter_closedBall_div_two_pow_le`).
   An `L_p` bound by two indicators (`Rd.eLpNorm_le_of_enorm_le_indicator_add`) gives the
-  difference bound with the exponent `1/p` (`Rd.IsSmoothAtom.eLpNorm_fwdDiff_indicator_le`); the
-  norm bound is `Rd.IsSmoothAtom.eLpNorm_indicator_le`.
+  difference bound with the exponent `1/p`
+  (`Rd.IsSmoothAtom.eLpNorm_fwdDiff_indicator_le_of_volume_le`); the norm bound is
+  `Rd.IsSmoothAtom.eLpNorm_indicator_le_dyadicWeight`.
 * **The multiplier theorem.** The smooth atomic decomposition of `F`
   (`Rd.LocalMeansBump.atomic_decomposition_smooth`, with the standard bump) passes through
   `1_Ω`: `1_Ω F = ∑_j ∑_m λ_{j,m} 1_Ω a_{j,m}` with the same coefficients, the atomic synthesis
@@ -153,7 +154,7 @@ smooth atom `a` on `V` of order `1` with level `j`, radius factor `d` and consta
 `‖1_U a‖_p ≤ |B_1|^(1/p) A d^n 2^(-jn/p)`, since `|1_U a| ≤ A` (`Rd.IsSmoothAtom.norm_le`)
 vanishes outside `B̄(c, d 2^(-j))` (`Rd.eLpNorm_le_of_bound_of_support`) and `(d^n)^(1/p) ≤ d^n`
 (`ENNReal.rpow_le_self_of_one_le`). -/
-theorem IsSmoothAtom.eLpNorm_indicator_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) {U : Set V}
+theorem IsSmoothAtom.eLpNorm_indicator_le_dyadicWeight {p : ℝ≥0∞} (hp1 : 1 ≤ p) {U : Set V}
     (hU : MeasurableSet U) {d A : ℝ} (hd : 1 ≤ d) {j : ℕ} {c : V} {a : V → ℂ}
     (ha : IsSmoothAtom univ 1 d A j c a) :
     eLpNorm (U.indicator a) p volume ≤ volume (ball (0 : V) 1) ^ (1 / p.toReal) *
@@ -189,7 +190,7 @@ bound `Rd.enorm_indicator_add_sub_le` with `Rd.IsSmoothAtom.enorm_sub_le_indicat
 `Rd.IsSmoothAtom.indicator_switchSet_le` gives two indicators
 (`Rd.eLpNorm_le_of_enorm_le_indicator_add`); for `1/p ≤ 1`, `m = min(1, 2^j ‖h‖) ≤ m^(1/p)`,
 `(d^n)^(1/p) ≤ d^n` and `2^(1/p) ≤ 2` (`ENNReal.rpow_le_self_of_one_le`). -/
-theorem IsSmoothAtom.eLpNorm_fwdDiff_indicator_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) {U : Set V}
+theorem IsSmoothAtom.eLpNorm_fwdDiff_indicator_le_of_volume_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) {U : Set V}
     (hU : MeasurableSet U) {d A : ℝ} (hd : 1 ≤ d) {j : ℕ} {c : V} {a : V → ℂ}
     (ha : IsSmoothAtom univ 1 d A j c a) {h : V} {C : ℝ≥0∞}
     (hC : volume (switchSet U h ∩ closedBall c (d / 2 ^ j)) ≤ C *
@@ -263,8 +264,8 @@ variable (Ω : BoundedLipschitzDomain V)
 Theorem 5.4(i)): for `1 ≤ p` (`p = ∞` included, with exponent `1/∞ = 0`) there is `K < ∞` such
 that for every smooth atom `a` on `V` of order `1`, level `j`, centre `c`, radius factor `d ≥ 1`
 and constant `A`, the function `1_Ω a` is a regular atom of exponent `1/p` and order `1` with the
-constant `K A d^n` (`Rd.IsSmoothAtom.eLpNorm_indicator_le`,
-`Rd.IsSmoothAtom.eLpNorm_fwdDiff_indicator_le`, with the boundary layer
+constant `K A d^n` (`Rd.IsSmoothAtom.eLpNorm_indicator_le_dyadicWeight`,
+`Rd.IsSmoothAtom.eLpNorm_fwdDiff_indicator_le_of_volume_le`, with the boundary layer
 `Rd.BoundedLipschitzDomain.exists_volume_switchSet_inter_closedBall_div_two_pow_le`). The
 exponent `1/p` is the volume of the layer, `≈ ‖h‖ ρ^(n-1)`, raised to `1/p`. -/
 theorem exists_isRegularAtom_indicator {p : ℝ≥0∞} (hp1 : 1 ≤ p) :
@@ -281,13 +282,13 @@ theorem exists_isRegularAtom_indicator {p : ℝ≥0∞} (hp1 : 1 ≤ p) :
   refine ⟨ha.aestronglyMeasurable.indicator Ω.measurableSet,
     fun x hx => indicator_apply_eq_zero.2 fun _ => ha.eq_zero x hx, ?_, fun h => ?_⟩
   · rw [indicator_univ]
-    refine (ha.eLpNorm_indicator_le hp1 Ω.measurableSet hd).trans ?_
+    refine (ha.eLpNorm_indicator_le_dyadicWeight hp1 Ω.measurableSet hd).trans ?_
     gcongr
     calc volume (ball (0 : V) 1) ^ (1 / p.toReal)
         ≤ 4 * volume (ball (0 : V) 1) ^ (1 / p.toReal) := le_mul_of_one_le_left' (by norm_num)
       _ ≤ _ := le_self_add
   · rw [diffStepSet_univ, indicator_univ, Function.iterate_one]
-    exact ha.eLpNorm_fwdDiff_indicator_le hp1 Ω.measurableSet hd (hlayer c h hd j)
+    exact ha.eLpNorm_fwdDiff_indicator_le_of_volume_le hp1 Ω.measurableSet hd (hlayer c h hd j)
 
 /-- **The indicator of a bounded Lipschitz domain is a pointwise multiplier of `B^s_{p,q}(V)` for
 `0 < s < 1/p`** (Triebel 2002, Proposition 5.3 and Remark 5.4; Schneider–Vybíral, Theorem 5.4(i)

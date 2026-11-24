@@ -147,9 +147,10 @@ theorem lintegral_lintegral_surfaceMeasure_of_support (j : Fin Ω.N) (F : V → 
       x ∈ ball (Ω.center j) (Ω.radius j) ∧ y ∈ ball (Ω.center j) (Ω.radius j)) :
     ∫⁻ x, ∫⁻ y, F x y ∂Ω.surfaceMeasure ∂Ω.surfaceMeasure =
       ∫⁻ x', ∫⁻ y', F ((Ω.graph j).graphMap x') ((Ω.graph j).graphMap y') *
-        ENNReal.ofReal ((Ω.graph j).gram y') * ENNReal.ofReal ((Ω.graph j).gram x') := by
+        ENNReal.ofReal ((Ω.graph j).gramDensity y') *
+          ENNReal.ofReal ((Ω.graph j).gramDensity x') := by
   have hin : ∀ x, ∫⁻ y, F x y ∂Ω.surfaceMeasure =
-      ∫⁻ y', F x ((Ω.graph j).graphMap y') * ENNReal.ofReal ((Ω.graph j).gram y') := fun x =>
+      ∫⁻ y', F x ((Ω.graph j).graphMap y') * ENNReal.ofReal ((Ω.graph j).gramDensity y') := fun x =>
     Ω.lintegral_surfaceMeasure_of_support j (F x) fun y hy => (hF x y hy).2
   simp_rw [hin]
   rw [Ω.lintegral_surfaceMeasure_of_support j _ fun x hx => by_contra fun hxB => hx (by
@@ -160,7 +161,7 @@ theorem lintegral_lintegral_surfaceMeasure_of_support (j : Fin Ω.N) (F : V → 
 /-- **Double integrals in the chart are at most those over `Γ`**: for every `F : V → V → [0, ∞]`
 that vanishes unless both points lie in `B_j`,
 `∫_{H_j} ∫_{H_j} F(γ_j x', γ_j y') dy' dx' ≤ ∫_Γ ∫_Γ F dσ dσ`, since the density
-`√(1 + ‖∇φ_j‖²)` is at least `1` (`Rd.LipschitzGraph.one_le_ofReal_gram`). -/
+`√(1 + ‖∇φ_j‖²)` is at least `1` (`Rd.LipschitzGraph.one_le_ofReal_gramDensity`). -/
 theorem lintegral_lintegral_chart_le (j : Fin Ω.N) (F : V → V → ℝ≥0∞)
     (hF : ∀ x y, F x y ≠ 0 →
       x ∈ ball (Ω.center j) (Ω.radius j) ∧ y ∈ ball (Ω.center j) (Ω.radius j)) :
@@ -168,8 +169,8 @@ theorem lintegral_lintegral_chart_le (j : Fin Ω.N) (F : V → V → ℝ≥0∞)
       ∫⁻ x, ∫⁻ y, F x y ∂Ω.surfaceMeasure ∂Ω.surfaceMeasure := by
   rw [Ω.lintegral_lintegral_surfaceMeasure_of_support j F hF]
   exact lintegral_mono fun x' => lintegral_mono fun y' =>
-    le_mul_of_one_le_right' ((Ω.graph j).one_le_ofReal_gram x') |>.trans'
-      (le_mul_of_one_le_right' ((Ω.graph j).one_le_ofReal_gram y'))
+    le_mul_of_one_le_right' ((Ω.graph j).one_le_ofReal_gramDensity x') |>.trans'
+      (le_mul_of_one_le_right' ((Ω.graph j).one_le_ofReal_gramDensity y'))
 
 variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 
@@ -183,21 +184,23 @@ theorem aestronglyMeasurable_of_memBoundaryBesov (ψ : Ω.BoundaryPartition) {s 
     AEStronglyMeasurable g Ω.surfaceMeasure := by
   choose G hG _ using hg
   have hj : ∀ j, (fun y => ψ.toComplex j y * g y) =ᵐ[Ω.surfaceMeasure]
-      (ball (Ω.center j) (Ω.radius j)).indicator fun y => G j ((Ω.graph j).proj y) := by
+      (ball (Ω.center j) (Ω.radius j)).indicator fun y => G j ((Ω.graph j).graphProj y) := by
     intro j
     have h1 := (Ω.ae_surfaceMeasure_ball_iff j (P := fun y => ψ.toComplex j y * g y =
-      (ball (Ω.center j) (Ω.radius j)).indicator (fun y => G j ((Ω.graph j).proj y)) y)).2
+      (ball (Ω.center j) (Ω.radius j)).indicator (fun y => G j ((Ω.graph j).graphProj y)) y)).2
       ((hG j).mono fun x' hx' hB => by
-        rw [indicator_of_mem hB, (Ω.graph j).proj_graphMap, hx'])
+        rw [indicator_of_mem hB, (Ω.graph j).graphProj_graphMap, hx'])
     filter_upwards [h1] with y hy
     by_cases hyB : y ∈ ball (Ω.center j) (Ω.radius j)
     · exact hy hyB
     · have hψ : ψ.toFun j y = 0 := by_contra fun h => hyB (ψ.mem_ball_of_ne_zero h)
       rw [ψ.toComplex_of_eq_zero hψ, zero_mul, indicator_of_notMem hyB]
   refine AEStronglyMeasurable.congr (f := fun y => ∑ j, (ball (Ω.center j) (Ω.radius j)).indicator
-    (fun y => G j ((Ω.graph j).proj y)) y) (Finset.stronglyMeasurable_fun_sum Finset.univ fun j _ =>
-    ((Lp.stronglyMeasurable (G j)).comp_measurable
-      (Ω.graph j).proj.continuous.measurable).indicator measurableSet_ball).aestronglyMeasurable ?_
+    (fun y => G j ((Ω.graph j).graphProj y)) y)
+    (Finset.stronglyMeasurable_fun_sum Finset.univ fun j _ =>
+      ((Lp.stronglyMeasurable (G j)).comp_measurable
+        (Ω.graph j).graphProj.continuous.measurable).indicator
+          measurableSet_ball).aestronglyMeasurable ?_
   filter_upwards [ae_all_iff.2 hj, Ω.ae_eq_sum_mul ψ g] with y h1 h2
   rw [h2]
   exact Finset.sum_congr rfl fun j _ => (h1 j).symm
@@ -279,8 +282,8 @@ theorem lintegral_lintegral_indicator_le_slobodeckijForm (j : Fin Ω.N) (f : V �
         ‖y' - x'‖ₑ ^ (((finrank ℝ V - 1 : ℕ) : ℝ) + s * p.toReal)) *
           ENNReal.ofReal √(1 + (Ω.graph j).M ^ 2) * ENNReal.ofReal √(1 + (Ω.graph j).M ^ 2) :=
         mul_le_mul' (mul_le_mul' (h1.trans h2)
-          (ENNReal.ofReal_le_ofReal ((Ω.graph j).gram_le y')))
-          (ENNReal.ofReal_le_ofReal ((Ω.graph j).gram_le x'))
+          (ENNReal.ofReal_le_ofReal ((Ω.graph j).gramDensity_le y')))
+          (ENNReal.ofReal_le_ofReal ((Ω.graph j).gramDensity_le x'))
     _ = _ := by ring
 
 omit [Fact (1 ≤ p)] in

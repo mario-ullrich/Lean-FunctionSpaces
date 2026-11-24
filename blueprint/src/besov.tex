@@ -7655,10 +7655,11 @@ $N_\Omega(f; r') \leq \|F\|_p + \|(2^{ks} \omega_{r'}(F, 2^{-k})_p)_k\|_{\ell_q}
 \label{thm:half-space-besov-domain}
 \lean{Rd.orthogonal_singleton_ne_top, Rd.volume_orthogonal_singleton_eq_zero,
   Rd.closedHalfSpace, Rd.isClosed_closedHalfSpace, Rd.convex_closedHalfSpace,
-  Rd.mem_interior_closedHalfSpace, Rd.LipschitzGraph.flat, Rd.LipschitzGraph.flat_domain,
-  Rd.closedHalfSpace_ae_eq, Rd.BesovDomain.closedHalfSpace,
-  Rd.e0, Rd.norm_e0, Rd.coord_zero_eq_inner, Manifold.range_eq_closedHalfSpace,
-  Rd.BesovDomain.range_euclideanHalfSpace, Rd.BesovDomain.range_of_boundaryless}
+  Rd.mem_interior_closedHalfSpace, Rd.LipschitzGraph.halfSpaceGraph,
+  Rd.LipschitzGraph.halfSpaceGraph_domain, Rd.closedHalfSpace_ae_eq, Rd.BesovDomain.closedHalfSpace,
+  Rd.firstUnitVector, Rd.norm_firstUnitVector, Rd.coord_zero_eq_inner,
+  Manifold.range_eq_closedHalfSpace, Rd.BesovDomain.range_euclideanHalfSpace,
+  Rd.BesovDomain.range_of_boundaryless}
 \leanok
 \uses{def:besov-domain, lem:null-set-domains, thm:graph-besov}
 For every nonzero $e \in V$, the hyperplane $e^\perp$ is a null set. For a unit vector $e$ the

@@ -33,8 +33,9 @@ the chart form (`Manifold.BesovAtlas.chartScheme`). Let `0 < θ < 1` and `1 ≤ 
 * **The main theorem** (`Manifold.BesovAtlas.memApprox_chartScheme_iff`): `f ∈ B^θ_{2,q}(M)` iff
   `f` lies in the approximation space `A^θ_q` of the eigenbasis of the chart form; equivalently
   `‖P_1 f‖_2 + ‖(2^(kθ) ‖Δ_k f‖_2)_k‖_{ℓ_q} < ∞` for the dyadic blocks `Δ_k f` of its
-  eigenfunction expansion (`Manifold.BesovAtlas.memBesov_iff_blockNorm_lt_top`), and for `q = 2`,
-  `∑_i (1 + λ_i)^θ |⟨e_i, f⟩|² < ∞` (`Manifold.BesovAtlas.memBesov_two_iff_chartEigenvalue`).
+  eigenfunction expansion (`Manifold.BesovAtlas.memManifoldBesov_iff_blockNorm_lt_top`), and for
+  `q = 2`, `∑_i (1 + λ_i)^θ |⟨e_i, f⟩|² < ∞`
+  (`Manifold.BesovAtlas.memManifoldBesov_two_iff_chartEigenvalue`).
 * **Smooth domains**: on the closure of a bounded smooth domain `Ω ⊆ ℝ^n`, the approximation
   spaces of the chart scheme are the intrinsic `B^θ_{2,q}(Ω)`
   (`Rd.SmoothDomain.memApprox_chartScheme_iff_modNormOn`), for example on the closed ball
@@ -228,13 +229,15 @@ atlas `A`, for `0 < θ < 1`, `1 ≤ q ≤ ∞` and every `f ∈ L_2(μ)`, `f` li
 space `A^θ_q` of the eigenbasis of the chart form iff `f ∈ B^θ_{2,q}(M)`. The approximation space
 is `(L_2(μ), H^1_A(M))_{θ,q}` (`CompactDenseEmbedding.memKMethod_iff_memApprox`), described by
 the pieces (`Manifold.BesovAtlas.memKMethod_chartSobolev_iff` with `r = 1`), and so is
-`B^θ_{2,q}(M)` (`Manifold.BesovAtlas.memBesov_iff_forall_modNormOn_lt_top`,
-`Manifold.memBesov_iff`). -/
+`B^θ_{2,q}(M)` (`Manifold.BesovAtlas.memAtlasBesov_iff_forall_modNormOn_lt_top`,
+`Manifold.memManifoldBesov_iff`). -/
 theorem memApprox_chartScheme_iff [T2Space M] (hθ : 0 < θ) (hθ' : θ < 1) (hq : 1 ≤ q)
     (f : Lp ℂ 2 μ) :
-    (A.chartScheme μ).toScheme.MemApprox θ q f ↔ Manifold.MemBesov I μ Rd.two_ne_top θ q f := by
-  rw [Manifold.memBesov_iff I μ Rd.two_ne_top A hθ hq,
-    A.memBesov_iff_forall_modNormOn_lt_top Rd.two_ne_top hθ (r := 1) (by exact_mod_cast hθ') hq,
+    (A.chartScheme μ).toScheme.MemApprox θ q f ↔
+      Manifold.MemManifoldBesov I μ Rd.two_ne_top θ q f := by
+  rw [Manifold.memManifoldBesov_iff I μ Rd.two_ne_top A hθ hq,
+    A.memAtlasBesov_iff_forall_modNormOn_lt_top Rd.two_ne_top hθ (r := 1)
+      (by exact_mod_cast hθ') hq,
     ← A.memKMethod_chartSobolev_iff hθ hθ' hq le_rfl f]
   exact ((A.chartCompactEmbedding μ).memKMethod_iff_memApprox hθ hθ' hq).symm
 
@@ -243,9 +246,9 @@ theorem memApprox_chartScheme_iff [T2Space M] (hθ : 0 < θ) (hθ' : θ < 1) (hq
 `‖P_1 f‖ + ‖(2^(kθ) ‖Δ_k f‖)_k‖_{ℓ_q} < ∞` for the dyadic blocks `Δ_k f` of the expansion of `f`
 in the eigenbasis of the chart form (`Manifold.BesovAtlas.memApprox_chartScheme_iff`,
 `SpectralScheme.memApprox_iff_blockNorm_lt_top`). -/
-theorem memBesov_iff_blockNorm_lt_top [T2Space M] (hθ : 0 < θ) (hθ' : θ < 1) (hq : 1 ≤ q)
+theorem memManifoldBesov_iff_blockNorm_lt_top [T2Space M] (hθ : 0 < θ) (hθ' : θ < 1) (hq : 1 ≤ q)
     (f : Lp ℂ 2 μ) :
-    Manifold.MemBesov I μ Rd.two_ne_top θ q f ↔
+    Manifold.MemManifoldBesov I μ Rd.two_ne_top θ q f ↔
       (A.chartScheme μ).spectralProjectionScheme.blockNorm θ q f < ⊤ := by
   rw [← A.memApprox_chartScheme_iff hθ hθ' hq,
     (A.chartScheme μ).memApprox_iff_blockNorm_lt_top hθ hq]
@@ -254,9 +257,9 @@ theorem memBesov_iff_blockNorm_lt_top [T2Space M] (hθ : 0 < θ) (hθ' : θ < 1)
 `f ∈ L_2(μ)`, `f ∈ B^θ_{2,2}(M)` iff `∑_i (1 + λ_i)^θ |⟨e_i, f⟩|² < ∞`, that is, the sequence
 `((1 + λ_i)^(θ/2) ⟨e_i, f⟩)_i` lies in `ℓ_2` (`Manifold.BesovAtlas.memApprox_chartScheme_iff`,
 `CompactDenseEmbedding.memApprox_two_iff` and `1 + λ_i = σ_i⁻²`). -/
-theorem memBesov_two_iff_chartEigenvalue [T2Space M] (hθ : 0 < θ) (hθ' : θ < 1)
+theorem memManifoldBesov_two_iff_chartEigenvalue [T2Space M] (hθ : 0 < θ) (hθ' : θ < 1)
     (f : Lp ℂ 2 μ) :
-    Manifold.MemBesov I μ Rd.two_ne_top θ 2 f ↔
+    Manifold.MemManifoldBesov I μ Rd.two_ne_top θ 2 f ↔
       Memℓp (fun i => (((1 + A.chartEigenvalue μ i) ^ (θ / 2) : ℝ) : ℂ) *
         (A.chartScheme μ).basis.repr f i) 2 := by
   have h : ∀ i, (1 + A.chartEigenvalue μ i) ^ (θ / 2) =
@@ -281,7 +284,7 @@ theorem memApprox_chartScheme_sphere_iff {n : ℕ} [NeZero n]
     (A : BesovAtlas (𝓡 n) (sphere (0 : EuclideanSpace ℝ (Fin (n + 1))) 1)) {θ : ℝ} {q : ℝ≥0∞}
     (hθ : 0 < θ) (hθ' : θ < 1) (hq : 1 ≤ q) (f : Lp ℂ 2 A.chartMeasure) :
     (A.chartScheme A.chartMeasure).toScheme.MemApprox θ q f ↔
-      Manifold.MemBesov (𝓡 n) A.chartMeasure Rd.two_ne_top θ q f :=
+      Manifold.MemManifoldBesov (𝓡 n) A.chartMeasure Rd.two_ne_top θ q f :=
   A.memApprox_chartScheme_iff hθ hθ' hq f
 
 end Manifold
@@ -298,20 +301,20 @@ measure, for `0 < θ < 1`, `1 ≤ q ≤ ∞`, every order `r ≥ 1` and every `f
 lies in the approximation space `A^θ_q` of the eigenbasis of the chart form iff
 `‖f‖_{L_2(Ω)} + ‖(2^(kθ) ω_r(f, 2^(-k), Ω)_2)_k‖_{ℓ_q} < ∞`
 (`Manifold.BesovAtlas.memApprox_chartScheme_iff`,
-`Rd.SmoothDomain.memBesov_iff_modNormOn_lt_top`). -/
+`Rd.SmoothDomain.memManifoldBesov_iff_modNormOn_lt_top`). -/
 theorem memApprox_chartScheme_iff_modNormOn (Ω : SmoothDomain n)
     (A : Manifold.BesovAtlas (𝓡∂ n) (closure Ω.carrier)) (hθ : 0 < θ) (hθ' : θ < 1) (hq : 1 ≤ q)
     {r : ℕ} (hr : 1 ≤ r) (f : Lp ℂ 2 Ω.volumeOn) :
     (A.chartScheme Ω.volumeOn).toScheme.MemApprox θ q f ↔
       modNormOn Ω.measurableSet r θ q (Ω.extLp two_ne_top f) < ⊤ :=
   (A.memApprox_chartScheme_iff hθ hθ' hq f).trans
-    (memBesov_iff_modNormOn_lt_top two_ne_top hθ (hθ'.trans_le (Nat.one_le_cast.2 hr)) hq f)
+    (memManifoldBesov_iff_modNormOn_lt_top two_ne_top hθ (hθ'.trans_le (Nat.one_le_cast.2 hr)) hq f)
 
 /-- **The closed ball by the chart eigenbasis**: for the ball `B(c, R) ⊆ ℝ^n`, `n ≥ 1`, and every
 Besov atlas `A` of its closure with the Lebesgue measure, for `0 < θ < 1`, `1 ≤ q ≤ ∞`, every order
 `r ≥ 1` and every `f`, `f` lies in the approximation space `A^θ_q` of the eigenbasis of the chart
 form iff `‖f‖_{L_2(B)} + ‖(2^(kθ) ω_r(f, 2^(-k), B)_2)_k‖_{ℓ_q} < ∞`
-(`Manifold.BesovAtlas.memApprox_chartScheme_iff`, `Rd.SmoothDomain.memBesov_ball_iff`). -/
+(`Manifold.BesovAtlas.memApprox_chartScheme_iff`, `Rd.SmoothDomain.memManifoldBesov_ball_iff`). -/
 theorem memApprox_chartScheme_ball_iff (c : EuclideanSpace ℝ (Fin n)) (R : ℝ)
     (A : Manifold.BesovAtlas (𝓡∂ n) (closure (SmoothDomain.ball c R).carrier)) (hθ : 0 < θ)
     (hθ' : θ < 1) (hq : 1 ≤ q) {r : ℕ} (hr : 1 ≤ r) (f : Lp ℂ 2 (SmoothDomain.ball c R).volumeOn) :
@@ -319,7 +322,7 @@ theorem memApprox_chartScheme_ball_iff (c : EuclideanSpace ℝ (Fin n)) (R : ℝ
       modNormOn (measurableSet_ball : MeasurableSet (ball c R)) r θ q
         ((SmoothDomain.ball c R).extLp two_ne_top f) < ⊤ :=
   (A.memApprox_chartScheme_iff hθ hθ' hq f).trans
-    (memBesov_ball_iff c R two_ne_top hθ (hθ'.trans_le (Nat.one_le_cast.2 hr)) hq f)
+    (memManifoldBesov_ball_iff c R two_ne_top hθ (hθ'.trans_le (Nat.one_le_cast.2 hr)) hq f)
 
 end SmoothDomain
 

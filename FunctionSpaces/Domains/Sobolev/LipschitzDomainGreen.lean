@@ -26,23 +26,24 @@ hyperplanes `H_j`, the graph maps `γ_j`, the traces `Tr_j`, the normal weights
   give Green's formula on the graph domains, and the interior piece `χ W` with the smooth
   `χ = 1_Ω (1 - ∑_j ψ_j)` of compact support in `Ω`
   (`Rd.BoundedLipschitzDomain.exists_interior_cutoff`) integrates to zero.
-* **The unit normal** (`Rd.BoundedLipschitzDomain.normal_ae_eq_normalAt`): on every ball `B_j`,
-  `ν = ν_j ∘ P_j` `σ`-almost everywhere, so `‖ν‖ = 1` and `ν` points out of `Ω` almost everywhere
-  (`Rd.BoundedLipschitzDomain.norm_normal_ae`, `Rd.BoundedLipschitzDomain.inner_normal_neg_ae`).
-  Gauss–Green for `C^1` functions in two charts gives the same boundary integrals, and test
-  functions on `H_j` are restrictions of test functions on `V`
-  (`Rd.LipschitzGraph.exists_contDiff_comp_graphMap_eq`).
-* **Green's formula** (`Rd.BoundedLipschitzDomain.setIntegral_green_surface`,
+* **The unit normal** (`Rd.BoundedLipschitzDomain.outwardNormal_ae_eq_normalAt`): on every ball
+  `B_j`, `ν = ν_j ∘ P_j` `σ`-almost everywhere, so `‖ν‖ = 1` and `ν` points out of `Ω` almost
+  everywhere (`Rd.BoundedLipschitzDomain.norm_outwardNormal_ae`,
+  `Rd.BoundedLipschitzDomain.inner_outwardNormal_neg_ae`). Gauss–Green for `C^1` functions in two
+  charts gives the same boundary integrals, and test functions on `H_j` are restrictions of test
+  functions on `V` (`Rd.LipschitzGraph.exists_contDiff_comp_graphMap_eq`).
+* **Green's formula** (`Rd.BoundedLipschitzDomain.setIntegral_green_surfaceMeasure`,
   `Rd.BoundedLipschitzDomain.setIntegral_green_sobolevOne`):
   `∫_Ω (∂_v u) w + u ∂_v w = ∫_Γ γ_{L_2} u · γ_{L_2} w ⟪v, ν⟫ dσ` for `u, w ∈ H^1(Ω)`, with the
   trace `γ_{L_2} : H^1(Ω) → L_2(Γ)`, also with weak derivatives on `Ω`
   (`Rd.BoundedLipschitzDomain.setIntegral_green_sobolevOne_of_hasWeakLineDeriv`), and in chart
-  form for every resolution of unity (`Rd.BoundedLipschitzDomain.setIntegral_green`).
+  form for every resolution of unity
+  (`Rd.BoundedLipschitzDomain.setIntegral_green_of_boundaryPartition`).
 * **The zero extension** (`Rd.BoundedLipschitzDomain.memWSobolev_indicatorLp_iff_mem_traceKer`): for
   `u ∈ H^1(Ω)`, `1_Ω u ∈ W^1_2(V)` iff the trace of `u` vanishes, and then
   `∂_v (1_Ω u) = 1_Ω ∂_v u`. One direction is Green's formula without boundary term, the other
   compares the traces from both sides of each graph, with the lower graph domain
-  `{x : ⟪x, e⟫ < φ(x)}` (`Rd.LipschitzGraph.lower`).
+  `{x : ⟪x, e⟫ < φ(x)}` (`Rd.LipschitzGraph.lowerGraph`).
 -/
 
 @[expose] public section
@@ -87,11 +88,11 @@ theorem setIntegral_weakDeriv_mul_add_add {s : Set V} (hs : MeasurableSet s) (v 
   ring
 
 /-- The left side of Green's formula on `V`, `(U, W) ↦ ∫ (∂_v U) W + U ∂_v W`, is continuous on
-`H^1(V) × H^1(V)` (`Rd.continuous_setIntegral_weakDeriv_mul_add` on `s = V`). -/
+`H^1(V) × H^1(V)` (`Rd.continuous_setIntegral_weakDeriv_mul_add_of_measurableSet` on `s = V`). -/
 theorem continuous_integral_weakDeriv_mul_add (v : V) : Continuous fun p : H^{1}(V) × H^{1}(V) =>
     ∫ x, weakDerivL2 v p.1 x * toL2 p.2 x + toL2 p.1 x * weakDerivL2 v p.2 x := by
   simpa only [Measure.restrict_univ] using
-    continuous_setIntegral_weakDeriv_mul_add (V := V) MeasurableSet.univ v
+    continuous_setIntegral_weakDeriv_mul_add_of_measurableSet (V := V) MeasurableSet.univ v
 
 /-- **Integration by parts for Schwartz functions**: `∫ (∂_v w₁) w₂ + w₁ ∂_v w₂ = 0` for Schwartz
 functions `w₁, w₂` (Mathlib's `SchwartzMap.integral_mul_lineDerivOp_right_eq_neg_left`). -/
@@ -231,10 +232,10 @@ theorem exists_contDiff_comp_graphMap_eq {W : Set V} (hW : IsOpen W) {φ : Ω.hy
   have hχc : HasCompactSupport (χ ()) :=
     isCompact_of_isClosed_isBounded (isClosed_tsupport _)
       (hK.isBounded.thickening.subset ((hχW ()).trans inter_subset_right))
-  refine ⟨fun x => φ (Ω.proj x) * χ () x, (hφ.comp Ω.proj.contDiff).mul (hχ ()),
+  refine ⟨fun x => φ (Ω.graphProj x) * χ () x, (hφ.comp Ω.graphProj.contDiff).mul (hχ ()),
     hχc.mul_left, tsupport_mul_subset_right.trans ((hχW ()).trans inter_subset_left),
     fun x' => ?_⟩
-  simp only [Ω.proj_graphMap]
+  simp only [Ω.graphProj_graphMap]
   by_cases hx : x' ∈ tsupport φ
   · have h1 := hχ1.self_of_nhdsSet _ ⟨x', hx, rfl⟩
     rw [Fintype.sum_unique] at h1
@@ -246,9 +247,9 @@ theorem exists_contDiff_comp_graphMap_eq {W : Set V} (hW : IsOpen W) {φ : Ω.hy
 
 /-- **The lower graph domain** `{x : ⟪x, e⟫ < φ(x)}` below the graph of `φ`, as a Lipschitz graph
 domain with the direction `-e` and the function `-φ`; it has the same graph
-(`Rd.LipschitzGraph.lower_graphMap_proj_graphMap`) and lies in the complement of `Ω`
-(`Rd.LipschitzGraph.notMem_domain_of_mem_lower_domain`). -/
-def lower : LipschitzGraph V where
+(`Rd.LipschitzGraph.lowerGraph_graphMap_graphProj_graphMap`) and lies in the complement of `Ω`
+(`Rd.LipschitzGraph.notMem_domain_of_mem_lowerGraph_domain`). -/
+def lowerGraph : LipschitzGraph V where
   e := -Ω.e
   norm_e := by rw [norm_neg, Ω.norm_e]
   M := Ω.M
@@ -261,48 +262,51 @@ def lower : LipschitzGraph V where
 
 omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- The lower graph domain is `{x : ⟪x, e⟫ < φ(x)}`. -/
-theorem mem_lower_domain_iff (x : V) : x ∈ Ω.lower.domain ↔ inner ℝ x Ω.e < Ω.phi x := by
+theorem mem_lowerGraph_domain_iff (x : V) : x ∈ Ω.lowerGraph.domain ↔ inner ℝ x Ω.e < Ω.phi x := by
   change -Ω.phi x < inner ℝ x (-Ω.e) ↔ _
   rw [inner_neg_right, neg_lt_neg_iff]
 
 omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- The lower graph domain lies in the complement of `Ω`. -/
-theorem notMem_domain_of_mem_lower_domain {x : V} (hx : x ∈ Ω.lower.domain) :
-    x ∉ Ω.domain := fun h => lt_asymm h ((Ω.mem_lower_domain_iff x).1 hx)
+theorem notMem_domain_of_mem_lowerGraph_domain {x : V} (hx : x ∈ Ω.lowerGraph.domain) :
+    x ∉ Ω.domain := fun h => lt_asymm h ((Ω.mem_lowerGraph_domain_iff x).1 hx)
 
 omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- **The two domains have the same graph**: every point `γ(x')` of the graph of `Ω` is the point
 `γ_-(P_- γ(x'))` of the graph of the lower domain. -/
-theorem lower_graphMap_proj_graphMap (x' : Ω.hyperplane) :
-    Ω.lower.graphMap (Ω.lower.proj (Ω.graphMap x')) = Ω.graphMap x' := by
-  rw [Ω.lower.graphMap_proj_eq_iff]
+theorem lowerGraph_graphMap_graphProj_graphMap (x' : Ω.hyperplane) :
+    Ω.lowerGraph.graphMap (Ω.lowerGraph.graphProj (Ω.graphMap x')) = Ω.graphMap x' := by
+  rw [Ω.lowerGraph.graphMap_graphProj_eq_iff]
   change inner ℝ (Ω.graphMap x') (-Ω.e) = -Ω.phi (Ω.graphMap x')
   rw [inner_neg_right, Ω.inner_graphMap, Ω.phi_graphMap]
 
 /-- **The traces from above and from below agree**: for `U ∈ H^1(V)`, the trace of `U` on the
 graph from `Ω` and from the lower domain agree, `Tr U(x') = Tr_- U(P_- γ(x'))` for almost every
-`x' ∈ H` (`Rd.LipschitzGraph.trace_ae_eq_trace_comp`). -/
-theorem traceH1_ae_eq_traceH1_lower (U : H^{1}(V)) :
+`x' ∈ H` (`Rd.LipschitzGraph.graphTrace_ae_eq_graphTrace_comp`). -/
+theorem traceH1_ae_eq_traceH1_lowerGraph (U : H^{1}(V)) :
     ∀ᵐ x' ∂(volume : Measure Ω.hyperplane),
-      Ω.traceH1 U x' = Ω.lower.traceH1 U (Ω.lower.proj (Ω.graphMap x')) := by
-  filter_upwards [Ω.trace_ae_eq_trace_comp Ω.lower two_ne_top one_le_two (s := 1 / 2)
+      Ω.traceH1 U x' = Ω.lowerGraph.traceH1 U (Ω.lowerGraph.graphProj (Ω.graphMap x')) := by
+  filter_upwards [Ω.graphTrace_ae_eq_graphTrace_comp Ω.lowerGraph two_ne_top one_le_two (s := 1 / 2)
     (by norm_num) (by norm_num) one_le_two (modNorm_toL2_lt_top U)] with x' hx'
-  exact hx' (Ω.lower_graphMap_proj_graphMap x')
+  exact hx' (Ω.lowerGraph_graphMap_graphProj_graphMap x')
 
 /-- **Functions vanishing below the graph have zero trace**: if `U ∈ H^1(V)` vanishes almost
 everywhere on the part of the lower domain inside an open set `O`, then `Tr U(x') = 0` for almost
 every `x'` with `γ(x') ∈ O`: the trace from below vanishes there
-(`Rd.LipschitzGraph.trace_ae_eq_zero_of_ae_eq_zero`) and equals the trace from above
-(`Rd.LipschitzGraph.traceH1_ae_eq_traceH1_lower`, with the null sets carried over by
-`Rd.LipschitzGraph.ae_proj_graphMap`). -/
-theorem traceH1_ae_eq_zero_of_lower {U : H^{1}(V)} {O : Set V} (hO : IsOpen O)
-    (hU : ∀ᵐ x ∂(volume : Measure V), x ∈ Ω.lower.domain → x ∈ O → toL2 U x = 0) :
+(`Rd.LipschitzGraph.graphTrace_ae_eq_zero_of_ae_eq_zero`) and equals the trace from above
+(`Rd.LipschitzGraph.traceH1_ae_eq_traceH1_lowerGraph`, with the null sets carried over by
+`Rd.LipschitzGraph.ae_graphProj_graphMap`). -/
+theorem traceH1_ae_eq_zero_of_lowerGraph {U : H^{1}(V)} {O : Set V} (hO : IsOpen O)
+    (hU : ∀ᵐ x ∂(volume : Measure V), x ∈ Ω.lowerGraph.domain → x ∈ O → toL2 U x = 0) :
     ∀ᵐ x' ∂(volume : Measure Ω.hyperplane), Ω.graphMap x' ∈ O → Ω.traceH1 U x' = 0 := by
-  have h0 := Ω.lower.trace_ae_eq_zero_of_ae_eq_zero two_ne_top 2 (s := 1 / 2) (by norm_num)
-    one_le_two (Ω.lower.intrinsicNorm_toL2_lt_top U) hO hU
-  filter_upwards [Ω.traceH1_ae_eq_traceH1_lower U, Ω.ae_proj_graphMap Ω.lower h0] with x' h1 h2 hx'
+  have h0 :=
+    Ω.lowerGraph.graphTrace_ae_eq_zero_of_ae_eq_zero two_ne_top 2 (s := 1 / 2) (by norm_num)
+    one_le_two (Ω.lowerGraph.intrinsicNorm_toL2_lt_top U) hO hU
+  filter_upwards [Ω.traceH1_ae_eq_traceH1_lowerGraph U,
+    Ω.ae_graphProj_graphMap Ω.lowerGraph h0] with x' h1 h2 hx'
   rw [h1]
-  exact h2 (Ω.lower_graphMap_proj_graphMap x') (by rw [Ω.lower_graphMap_proj_graphMap]; exact hx')
+  exact h2 (Ω.lowerGraph_graphMap_graphProj_graphMap x')
+    (by rw [Ω.lowerGraph_graphMap_graphProj_graphMap]; exact hx')
 
 end LipschitzGraph
 
@@ -358,8 +362,8 @@ theorem exists_interior_cutoff (ψ : Ω.BoundaryPartition)
 /-- **Localised `H^1(V)` functions**: for every resolution of unity `ψ`, every chart `j` and
 `W ∈ H^1(V)` there is `W' ∈ H^1(V)` whose `L_2` function is `ψ_j ι W`
 (`Rd.exists_toL2_eq_mulLp`). -/
-theorem BoundaryPartition.exists_toL2_eq_localize (ψ : Ω.BoundaryPartition) (j : Fin Ω.N)
-    (W : H^{1}(V)) : ∃ W' : H^{1}(V), toL2 W' = ψ.localize j (toL2 W) :=
+theorem BoundaryPartition.exists_toL2_eq_localizeL2 (ψ : Ω.BoundaryPartition) (j : Fin Ω.N)
+    (W : H^{1}(V)) : ∃ W' : H^{1}(V), toL2 W' = ψ.localizeL2 j (toL2 W) :=
   exists_toL2_eq_mulLp (ψ.contDiff j) (ψ.hasCompactSupport j) _ _ W
 
 /-! ### Green's formula in chart form -/
@@ -368,9 +372,9 @@ theorem BoundaryPartition.exists_toL2_eq_localize (ψ : Ω.BoundaryPartition) (j
 then `∫_Ω (∂_v U) W' + U ∂_v W' = ∫_{H_j} ψ_j(γ_j x') Tr_j U Tr_j W n^j_v dx'`. The integrand
 vanishes outside `B_j`, where `Ω` agrees with the graph domain `Ω_j`, so this is Green's formula
 on `Ω_j` (`Rd.LipschitzGraph.setIntegral_green_besselPotentialSpace`) with
-`Tr_j (ψ_j W) = (ψ_j ∘ γ_j) Tr_j W` (`Rd.LipschitzGraph.trace_mulLp_ae`). -/
-theorem setIntegral_weakDeriv_mul_add_localize (ψ : Ω.BoundaryPartition) (j : Fin Ω.N)
-    (U : H^{1}(V)) {W W' : H^{1}(V)} (hW' : toL2 W' = ψ.localize j (toL2 W)) (v : V) :
+`Tr_j (ψ_j W) = (ψ_j ∘ γ_j) Tr_j W` (`Rd.LipschitzGraph.graphTrace_mulLp_ae`). -/
+theorem setIntegral_weakDeriv_mul_add_localizeL2 (ψ : Ω.BoundaryPartition) (j : Fin Ω.N)
+    (U : H^{1}(V)) {W W' : H^{1}(V)} (hW' : toL2 W' = ψ.localizeL2 j (toL2 W)) (v : V) :
     ∫ x in Ω.carrier, weakDerivL2 v U x * toL2 W' x + toL2 U x * weakDerivL2 v W' x =
       ∫ x', ψ.toComplex j ((Ω.graph j).graphMap x') * (Ω.graph j).traceH1 U x' *
         (Ω.graph j).traceH1 W x' * ((Ω.graph j).normalWeight v x' : ℂ) := by
@@ -383,11 +387,11 @@ theorem setIntegral_weakDeriv_mul_add_localize (ψ : Ω.BoundaryPartition) (j : 
     (hz.mono fun x hx hxB => hx fun h => hxB (ψ.tsupport_subset j h)),
     (Ω.graph j).setIntegral_green_besselPotentialSpace U W' v]
   refine integral_congr_ae ?_
-  have htr := (Ω.graph j).trace_mulLp_ae two_ne_top one_le_two (s := 1 / 2) (by norm_num)
+  have htr := (Ω.graph j).graphTrace_mulLp_ae two_ne_top one_le_two (s := 1 / 2) (by norm_num)
     (by norm_num) one_le_two (ψ.contDiff_toComplex j) (ψ.derivBound_spec j)
     (modNorm_toL2_lt_top W)
   filter_upwards [htr] with x' hx'
-  rw [(Ω.graph j).traceH1_apply W', hW', BoundaryPartition.localize, hx',
+  rw [(Ω.graph j).traceH1_apply W', hW', BoundaryPartition.localizeL2, hx',
     (Ω.graph j).traceH1_apply W]
   ring
 
@@ -409,7 +413,7 @@ theorem setIntegral_weakDeriv_mul_add_mulLp_eq_zero {χ : V → ℝ} (hχΩ : ts
 theorem toL2_ae_eq_sum_add (ψ : Ω.BoundaryPartition) {χ : V → ℝ}
     (hχ1 : ∀ x ∈ Ω.carrier, χ x + ∑ j, ψ.toFun j x = 1) {C : ℝ}
     (hc : Continuous fun x => (χ x : ℂ)) (hC : ∀ x, ‖(χ x : ℂ)‖ ≤ C) (W : H^{1}(V))
-    {Wj : Fin Ω.N → H^{1}(V)} (hWj : ∀ j, toL2 (Wj j) = ψ.localize j (toL2 W))
+    {Wj : Fin Ω.N → H^{1}(V)} (hWj : ∀ j, toL2 (Wj j) = ψ.localizeL2 j (toL2 W))
     {W0 : H^{1}(V)} (hW0 : toL2 W0 = mulLp hc hC (toL2 W)) :
     (toL2 W : V → ℂ) =ᵐ[volume.restrict Ω.carrier] toL2 (∑ j, Wj j + W0) := by
   have h0 : (toL2 W0 : V → ℂ) =ᵐ[volume] fun x => (χ x : ℂ) * toL2 W x := by
@@ -437,7 +441,7 @@ to one near the boundary**: if `∑_j ψ_j = 1` on a neighbourhood of `Γ`, then
 `∫_Ω (∂_v U) W + U ∂_v W = ∑_j ∫_{H_j} ψ_j(γ_j x') Tr_j U Tr_j W n^j_v dx'`. Split
 `W = ∑_j ψ_j W + χ W` on `Ω` with the interior cut-off `χ`
 (`Rd.BoundedLipschitzDomain.exists_interior_cutoff`): the chart pieces are Green's formula on the
-graph domains (`Rd.BoundedLipschitzDomain.setIntegral_weakDeriv_mul_add_localize`), and the
+graph domains (`Rd.BoundedLipschitzDomain.setIntegral_weakDeriv_mul_add_localizeL2`), and the
 interior piece vanishes
 (`Rd.BoundedLipschitzDomain.setIntegral_weakDeriv_mul_add_mulLp_eq_zero`). -/
 theorem setIntegral_green_of_nhds (ψ : Ω.BoundaryPartition)
@@ -448,7 +452,7 @@ theorem setIntegral_green_of_nhds (ψ : Ω.BoundaryPartition)
   obtain ⟨χ, hχ, hcs, hχΩ, hχ1⟩ := exists_interior_cutoff ψ hψ
   have hc : Continuous fun x => (χ x : ℂ) := Complex.continuous_ofReal.comp hχ.continuous
   obtain ⟨C, hC⟩ := hc.bounded_above_of_compact_support (hcs.comp_left Complex.ofReal_zero)
-  choose Wj hWj using fun j => ψ.exists_toL2_eq_localize j W
+  choose Wj hWj using fun j => ψ.exists_toL2_eq_localizeL2 j W
   obtain ⟨W0, hW0⟩ := exists_toL2_eq_mulLp hχ hcs hc hC W
   have hae := toL2_ae_eq_sum_add ψ hχ1 hc hC W hWj hW0
   have hint : ∫ x in Ω.carrier, weakDerivL2 v U x * toL2 W x + toL2 U x * weakDerivL2 v W x =
@@ -460,7 +464,7 @@ theorem setIntegral_green_of_nhds (ψ : Ω.BoundaryPartition)
   rw [hint, setIntegral_weakDeriv_mul_add_add Ω.measurableSet,
     setIntegral_weakDeriv_mul_add_sum Ω.measurableSet,
     setIntegral_weakDeriv_mul_add_mulLp_eq_zero hχΩ hc hC U hW0, add_zero]
-  exact Finset.sum_congr rfl fun j _ => setIntegral_weakDeriv_mul_add_localize ψ j U (hWj j) v
+  exact Finset.sum_congr rfl fun j _ => setIntegral_weakDeriv_mul_add_localizeL2 ψ j U (hWj j) v
 
 /-! ### The unit normal is the chart normal -/
 
@@ -474,7 +478,7 @@ the domain is the graph domain `Ω_j`, so this is Gauss–Green on `Ω_j`
 theorem setIntegral_lineDeriv_eq_chart (j : Fin Ω.N) {g : V → ℂ} (hg : ContDiff ℝ 1 g)
     (hgB : tsupport g ⊆ ball (Ω.center j) (Ω.radius j)) (v : V) :
     ∫ x in Ω.carrier, lineDeriv ℝ g x v = ∫ y, g y *
-      (inner ℝ v ((Ω.graph j).normalAt ((Ω.graph j).proj y)) : ℂ) ∂Ω.surfaceMeasure := by
+      (inner ℝ v ((Ω.graph j).normalAt ((Ω.graph j).graphProj y)) : ℂ) ∂Ω.surfaceMeasure := by
   have hgc : HasCompactSupport g :=
     isCompact_of_isClosed_isBounded (isClosed_tsupport g) (isBounded_ball.subset hgB)
   rw [setIntegral_eq_of_inter_eq Ω.measurableSet (Ω.graph j).measurableSet_domain
@@ -483,18 +487,18 @@ theorem setIntegral_lineDeriv_eq_chart (j : Fin Ω.N) {g : V → ℂ} (hg : Cont
     (Ω.graph j).setIntegral_lineDeriv_eq_normal hg hgc v,
     Ω.integral_surfaceMeasure_of_support j _ fun y hy =>
       hgB (subset_tsupport _ (left_ne_zero_of_mul hy))]
-  simp only [LipschitzGraph.proj_graphMap]
+  simp only [LipschitzGraph.graphProj_graphMap]
 
 /-- For a continuous `g` with compact support, `y ↦ g(y) ⟪v, ν_j(P_j y)⟫` is integrable with
 respect to the finite surface measure: it is bounded and measurable. -/
 theorem integrable_mul_inner_normalAt (j : Fin Ω.N) {g : V → ℂ} (hg : Continuous g)
     (hgc : HasCompactSupport g) (v : V) :
-    Integrable (fun y => g y * (inner ℝ v ((Ω.graph j).normalAt ((Ω.graph j).proj y)) : ℂ))
+    Integrable (fun y => g y * (inner ℝ v ((Ω.graph j).normalAt ((Ω.graph j).graphProj y)) : ℂ))
       Ω.surfaceMeasure := by
   obtain ⟨C, hC⟩ := hg.bounded_above_of_compact_support hgc
-  have hm : Measurable fun y => (inner ℝ v ((Ω.graph j).normalAt ((Ω.graph j).proj y)) : ℂ) :=
+  have hm : Measurable fun y => (inner ℝ v ((Ω.graph j).normalAt ((Ω.graph j).graphProj y)) : ℂ) :=
     Complex.measurable_ofReal.comp (measurable_const.inner
-      ((Ω.graph j).measurable_normalAt.comp (Ω.graph j).proj.continuous.measurable))
+      ((Ω.graph j).measurable_normalAt.comp (Ω.graph j).graphProj.continuous.measurable))
   refine Integrable.of_bound (hg.aestronglyMeasurable.mul hm.aestronglyMeasurable) (C * ‖v‖)
     (ae_of_all _ fun y => ?_)
   rw [norm_mul, Complex.norm_real, Real.norm_eq_abs]
@@ -509,8 +513,8 @@ theorem integral_mul_inner_normalAt_sub_eq_zero (j k : Fin Ω.N) {g : V → ℂ}
     (hg : ContDiff ℝ 1 g)
     (hgB : tsupport g ⊆ ball (Ω.center j) (Ω.radius j) ∩ ball (Ω.center k) (Ω.radius k))
     (v : V) :
-    ∫ y, g y * (inner ℝ v ((Ω.graph j).normalAt ((Ω.graph j).proj y) -
-      (Ω.graph k).normalAt ((Ω.graph k).proj y)) : ℂ) ∂Ω.surfaceMeasure = 0 := by
+    ∫ y, g y * (inner ℝ v ((Ω.graph j).normalAt ((Ω.graph j).graphProj y) -
+      (Ω.graph k).normalAt ((Ω.graph k).graphProj y)) : ℂ) ∂Ω.surfaceMeasure = 0 := by
   have hgc : HasCompactSupport g := isCompact_of_isClosed_isBounded (isClosed_tsupport g)
     (isBounded_ball.subset (hgB.trans inter_subset_left))
   have hj := Ω.setIntegral_lineDeriv_eq_chart j hg (hgB.trans inter_subset_left) v
@@ -529,36 +533,39 @@ theorem integral_graphMap_mul_inner_normalAt_sub_eq_zero (j k : Fin Ω.N) {g : V
     (hgB : tsupport g ⊆ ball (Ω.center j) (Ω.radius j) ∩ ball (Ω.center k) (Ω.radius k))
     (v : V) :
     ∫ x', g ((Ω.graph j).graphMap x') * ((inner ℝ v ((Ω.graph j).normalAt x' -
-      (Ω.graph k).normalAt ((Ω.graph k).proj ((Ω.graph j).graphMap x'))) *
-        (Ω.graph j).gram x' : ℝ) : ℂ) = 0 := by
+      (Ω.graph k).normalAt ((Ω.graph k).graphProj ((Ω.graph j).graphMap x'))) *
+        (Ω.graph j).gramDensity x' : ℝ) : ℂ) = 0 := by
   rw [← Ω.integral_mul_inner_normalAt_sub_eq_zero j k hg hgB v,
     Ω.integral_surfaceMeasure_of_support j _ fun y hy =>
       (hgB (subset_tsupport _ (left_ne_zero_of_mul hy))).1]
   refine integral_congr_ae (ae_of_all _ fun x' => ?_)
-  simp only [LipschitzGraph.proj_graphMap, Complex.ofReal_mul]
+  simp only [LipschitzGraph.graphProj_graphMap, Complex.ofReal_mul]
   ring
 
 /-- The density `x' ↦ ⟪v, ν_j(x') - ν_k(P_k γ_j x')⟫ √(1 + ‖∇φ_j(x')‖²)` is locally integrable on
 `H_j`: it is measurable and bounded by `2 ‖v‖ √(1 + M_j²)`. -/
-theorem locallyIntegrable_inner_normalAt_sub_mul_gram (j k : Fin Ω.N) (v : V) :
+theorem locallyIntegrable_inner_normalAt_sub_mul_gramDensity (j k : Fin Ω.N) (v : V) :
     LocallyIntegrable (fun x' => inner ℝ v ((Ω.graph j).normalAt x' -
-      (Ω.graph k).normalAt ((Ω.graph k).proj ((Ω.graph j).graphMap x'))) * (Ω.graph j).gram x')
+      (Ω.graph k).normalAt ((Ω.graph k).graphProj ((Ω.graph j).graphMap x'))) *
+        (Ω.graph j).gramDensity x')
       (volume : Measure (Ω.graph j).hyperplane) := by
   have hm : Measurable fun x' => inner ℝ v ((Ω.graph j).normalAt x' -
-      (Ω.graph k).normalAt ((Ω.graph k).proj ((Ω.graph j).graphMap x'))) * (Ω.graph j).gram x' :=
+      (Ω.graph k).normalAt ((Ω.graph k).graphProj ((Ω.graph j).graphMap x'))) *
+        (Ω.graph j).gramDensity x' :=
     (measurable_const.inner ((Ω.graph j).measurable_normalAt.sub
-      ((Ω.graph k).measurable_normalAt.comp ((Ω.graph k).proj.continuous.comp
-        (Ω.graph j).continuous_graphMap).measurable))).mul (Ω.graph j).measurable_gram
+      ((Ω.graph k).measurable_normalAt.comp ((Ω.graph k).graphProj.continuous.comp
+        (Ω.graph j).continuous_graphMap).measurable))).mul (Ω.graph j).measurable_gramDensity
   refine (memLp_top_of_bound hm.aestronglyMeasurable (‖v‖ * 2 * √(1 + (Ω.graph j).M ^ 2))
     (ae_of_all _ fun x' => ?_)).locallyIntegrable le_top
   have hn : ‖(Ω.graph j).normalAt x' -
-      (Ω.graph k).normalAt ((Ω.graph k).proj ((Ω.graph j).graphMap x'))‖ ≤ 2 := by
+      (Ω.graph k).normalAt ((Ω.graph k).graphProj ((Ω.graph j).graphMap x'))‖ ≤ 2 := by
     refine (norm_sub_le _ _).trans ?_
     rw [(Ω.graph j).norm_normalAt, (Ω.graph k).norm_normalAt]
     norm_num
-  rw [norm_mul, Real.norm_eq_abs, Real.norm_of_nonneg ((Ω.graph j).gram_pos x').le]
+  rw [norm_mul, Real.norm_eq_abs, Real.norm_of_nonneg ((Ω.graph j).gramDensity_pos x').le]
   exact mul_le_mul ((abs_real_inner_le_norm _ _).trans (mul_le_mul_of_nonneg_left hn
-    (norm_nonneg _))) ((Ω.graph j).gram_le x') ((Ω.graph j).gram_pos x').le (by positivity)
+    (norm_nonneg _))) ((Ω.graph j).gramDensity_le x') ((Ω.graph j).gramDensity_pos x').le
+    (by positivity)
 
 /-- **The chart normals agree on the overlaps, in the chart**: for almost every `x' ∈ H_j` with
 `γ_j(x') ∈ B_j ∩ B_k`, `ν_j(x') = ν_k(P_k γ_j x')`. The density
@@ -572,17 +579,17 @@ theorem normalAt_graphMap_ae_eq (j k : Fin Ω.N) :
     ∀ᵐ x' ∂(volume : Measure (Ω.graph j).hyperplane),
       (Ω.graph j).graphMap x' ∈ ball (Ω.center j) (Ω.radius j) ∩ ball (Ω.center k) (Ω.radius k) →
         (Ω.graph j).normalAt x' =
-          (Ω.graph k).normalAt ((Ω.graph k).proj ((Ω.graph j).graphMap x')) := by
+          (Ω.graph k).normalAt ((Ω.graph k).graphProj ((Ω.graph j).graphMap x')) := by
   set W := ball (Ω.center j) (Ω.radius j) ∩ ball (Ω.center k) (Ω.radius k)
   have hW : IsOpen W := isOpen_ball.inter isOpen_ball
   have hO : IsOpen ((Ω.graph j).graphMap ⁻¹' W) := hW.preimage (Ω.graph j).continuous_graphMap
   set b := stdOrthonormalBasis ℝ V
   have hi : ∀ i, ∀ᵐ x' ∂(volume : Measure (Ω.graph j).hyperplane),
       x' ∈ (Ω.graph j).graphMap ⁻¹' W → inner ℝ (b i) ((Ω.graph j).normalAt x' -
-        (Ω.graph k).normalAt ((Ω.graph k).proj ((Ω.graph j).graphMap x'))) *
-          (Ω.graph j).gram x' = 0 := fun i =>
+        (Ω.graph k).normalAt ((Ω.graph k).graphProj ((Ω.graph j).graphMap x'))) *
+          (Ω.graph j).gramDensity x' = 0 := fun i =>
     hO.ae_eq_zero_of_integral_contDiff_smul_eq_zero
-      ((Ω.locallyIntegrable_inner_normalAt_sub_mul_gram j k (b i)).locallyIntegrableOn _)
+      ((Ω.locallyIntegrable_inner_normalAt_sub_mul_gramDensity j k (b i)).locallyIntegrableOn _)
       fun φ hφ hφc hφO => by
         obtain ⟨g, hg, -, hgW, hgφ⟩ := (Ω.graph j).exists_contDiff_comp_graphMap_eq hW hφ hφc hφO
         have h := Ω.integral_graphMap_mul_inner_normalAt_sub_eq_zero j k (g := fun y => (g y : ℂ))
@@ -593,55 +600,56 @@ theorem normalAt_graphMap_ae_eq (j k : Fin Ω.N) :
         simpa only [smul_eq_mul] using h
   filter_upwards [ae_all_iff.2 hi] with x' hx' hxW
   rw [← sub_eq_zero, ← b.sum_repr' ((Ω.graph j).normalAt x' -
-    (Ω.graph k).normalAt ((Ω.graph k).proj ((Ω.graph j).graphMap x')))]
+    (Ω.graph k).normalAt ((Ω.graph k).graphProj ((Ω.graph j).graphMap x')))]
   refine Finset.sum_eq_zero fun i _ => ?_
-  rw [(mul_eq_zero.1 (hx' i hxW)).resolve_right ((Ω.graph j).gram_pos x').ne', zero_smul]
+  rw [(mul_eq_zero.1 (hx' i hxW)).resolve_right ((Ω.graph j).gramDensity_pos x').ne', zero_smul]
 
 /-- **The chart normals agree on the overlaps**: for `σ`-almost every `y ∈ B_j ∩ B_k`,
 `ν_j(P_j y) = ν_k(P_k y)` (`Rd.BoundedLipschitzDomain.normalAt_graphMap_ae_eq` and the null sets
 of `σ` in the chart, `Rd.BoundedLipschitzDomain.ae_surfaceMeasure_ball_iff`). -/
-theorem normalAt_proj_ae_eq (j k : Fin Ω.N) :
+theorem normalAt_graphProj_ae_eq (j k : Fin Ω.N) :
     ∀ᵐ y ∂Ω.surfaceMeasure, y ∈ ball (Ω.center j) (Ω.radius j) →
       y ∈ ball (Ω.center k) (Ω.radius k) →
-        (Ω.graph j).normalAt ((Ω.graph j).proj y) = (Ω.graph k).normalAt ((Ω.graph k).proj y) := by
+        (Ω.graph j).normalAt ((Ω.graph j).graphProj y) =
+          (Ω.graph k).normalAt ((Ω.graph k).graphProj y) := by
   refine (Ω.ae_surfaceMeasure_ball_iff j).2 ?_
   filter_upwards [Ω.normalAt_graphMap_ae_eq j k] with x' hx' hj hk
-  rw [LipschitzGraph.proj_graphMap]
+  rw [LipschitzGraph.graphProj_graphMap]
   exact hx' ⟨hj, hk⟩
 
 /-- **The unit normal is the chart normal**: for every chart `j` and `σ`-almost every `y ∈ B_j`,
 `ν(y) = ν_j(P_j y)`. On `Γ`, `ν(y) = ∑_k ψ_k(y) ν_k(P_k y)` is a combination with weights
 summing to `1` of chart normals that all agree with `ν_j(P_j y)`
-(`Rd.BoundedLipschitzDomain.normalAt_proj_ae_eq`). -/
-theorem normal_ae_eq_normalAt (j : Fin Ω.N) :
+(`Rd.BoundedLipschitzDomain.normalAt_graphProj_ae_eq`). -/
+theorem outwardNormal_ae_eq_normalAt (j : Fin Ω.N) :
     ∀ᵐ y ∂Ω.surfaceMeasure, y ∈ ball (Ω.center j) (Ω.radius j) →
-      Ω.normal y = (Ω.graph j).normalAt ((Ω.graph j).proj y) := by
-  filter_upwards [ae_all_iff.2 fun k => Ω.normalAt_proj_ae_eq j k, Ω.ae_mem_frontier]
+      Ω.outwardNormal y = (Ω.graph j).normalAt ((Ω.graph j).graphProj y) := by
+  filter_upwards [ae_all_iff.2 fun k => Ω.normalAt_graphProj_ae_eq j k, Ω.ae_mem_frontier]
     with y hy hΓ hj
-  have hterm : ∀ k, Ω.boundaryPartition.toFun k y • (Ω.graph k).normalAt ((Ω.graph k).proj y) =
-      Ω.boundaryPartition.toFun k y • (Ω.graph j).normalAt ((Ω.graph j).proj y) := fun k => by
+  have hterm : ∀ k, Ω.boundaryPartition.toFun k y • (Ω.graph k).normalAt ((Ω.graph k).graphProj y) =
+      Ω.boundaryPartition.toFun k y • (Ω.graph j).normalAt ((Ω.graph j).graphProj y) := fun k => by
     by_cases h : Ω.boundaryPartition.toFun k y = 0
     · rw [h, zero_smul, zero_smul]
     · rw [hy k hj (Ω.boundaryPartition.mem_ball_of_ne_zero h)]
-  rw [normal, Finset.sum_congr rfl fun k _ => hterm k, ← Finset.sum_smul,
+  rw [outwardNormal, Finset.sum_congr rfl fun k _ => hterm k, ← Finset.sum_smul,
     Ω.boundaryPartition.sum_eq_one y hΓ, one_smul]
 
 /-- **The unit normal is a unit vector**: `‖ν(y)‖ = 1` for `σ`-almost every `y`
-(`Rd.BoundedLipschitzDomain.normal_ae_eq_normalAt`, `Rd.LipschitzGraph.norm_normalAt`). -/
-theorem norm_normal_ae : ∀ᵐ y ∂Ω.surfaceMeasure, ‖Ω.normal y‖ = 1 := by
-  filter_upwards [ae_all_iff.2 Ω.normal_ae_eq_normalAt, Ω.ae_mem_frontier] with y hy hΓ
+(`Rd.BoundedLipschitzDomain.outwardNormal_ae_eq_normalAt`, `Rd.LipschitzGraph.norm_normalAt`). -/
+theorem norm_outwardNormal_ae : ∀ᵐ y ∂Ω.surfaceMeasure, ‖Ω.outwardNormal y‖ = 1 := by
+  filter_upwards [ae_all_iff.2 Ω.outwardNormal_ae_eq_normalAt, Ω.ae_mem_frontier] with y hy hΓ
   obtain ⟨j, hj⟩ := mem_iUnion.1 (Ω.frontier_subset hΓ)
   rw [hy j hj, (Ω.graph j).norm_normalAt]
 
 /-- **The unit normal points out of `Ω`**: for every chart `j`, `σ`-almost every `y ∈ B_j` and
 every `w` in the cone `K_j` of `Ω_j`, `⟪ν(y), w⟫ < 0`
-(`Rd.LipschitzGraph.inner_normalAt_neg_of_mem_cone`). -/
-theorem inner_normal_neg_ae (j : Fin Ω.N) :
+(`Rd.LipschitzGraph.inner_normalAt_neg_of_mem_graphCone`). -/
+theorem inner_outwardNormal_neg_ae (j : Fin Ω.N) :
     ∀ᵐ y ∂Ω.surfaceMeasure, y ∈ ball (Ω.center j) (Ω.radius j) →
-      ∀ w ∈ (Ω.graph j).cone, inner ℝ (Ω.normal y) w < 0 := by
-  filter_upwards [Ω.normal_ae_eq_normalAt j] with y hy hj w hw
+      ∀ w ∈ (Ω.graph j).graphCone, inner ℝ (Ω.outwardNormal y) w < 0 := by
+  filter_upwards [Ω.outwardNormal_ae_eq_normalAt j] with y hy hj w hw
   rw [hy hj]
-  exact (Ω.graph j).inner_normalAt_neg_of_mem_cone _ hw
+  exact (Ω.graph j).inner_normalAt_neg_of_mem_graphCone _ hw
 
 /-! ### Green's formula with the surface measure -/
 
@@ -661,48 +669,49 @@ theorem ambientTraceL2_graphMap_ae (j : Fin Ω.N) (U : H^{1}(V)) :
   rw [h1 hj, h2 hj, (Ω.graph j).traceH1_apply]
 
 /-- **The unit normal in a chart**: `ν(γ_j x') = ν_j(x')` for almost every `x' ∈ H_j` with
-`γ_j(x') ∈ B_j` (`Rd.BoundedLipschitzDomain.normal_ae_eq_normalAt`). -/
-theorem normal_graphMap_ae (j : Fin Ω.N) :
+`γ_j(x') ∈ B_j` (`Rd.BoundedLipschitzDomain.outwardNormal_ae_eq_normalAt`). -/
+theorem outwardNormal_graphMap_ae (j : Fin Ω.N) :
     ∀ᵐ x' ∂(volume : Measure (Ω.graph j).hyperplane),
       (Ω.graph j).graphMap x' ∈ ball (Ω.center j) (Ω.radius j) →
-        Ω.normal ((Ω.graph j).graphMap x') = (Ω.graph j).normalAt x' := by
-  filter_upwards [(Ω.ae_surfaceMeasure_ball_iff j).1 (Ω.normal_ae_eq_normalAt j)] with x' hx' hj
-  rw [hx' hj, LipschitzGraph.proj_graphMap]
+        Ω.outwardNormal ((Ω.graph j).graphMap x') = (Ω.graph j).normalAt x' := by
+  filter_upwards [(Ω.ae_surfaceMeasure_ball_iff j).1 (Ω.outwardNormal_ae_eq_normalAt j)]
+    with x' hx' hj
+  rw [hx' hj, LipschitzGraph.graphProj_graphMap]
 
 /-- The boundary integrand `T_Γ U · T_Γ W ⟪v, ν⟫` of Green's formula, with the trace
 `T_Γ = Rd.BoundedLipschitzDomain.ambientTraceL2 1` of `H^1(V)`, is integrable with respect to the
 surface measure: a product of two `L_2(Γ)` functions and a bounded one. -/
-theorem integrable_ambientTraceL2_mul_inner_normal (U W : H^{1}(V)) (v : V) :
+theorem integrable_ambientTraceL2_mul_inner_outwardNormal (U W : H^{1}(V)) (v : V) :
     Integrable (fun y => (Ω.ambientTraceL2 1) U y * (Ω.ambientTraceL2 1) W y *
-      (inner ℝ v (Ω.normal y) : ℂ)) Ω.surfaceMeasure :=
+      (inner ℝ v (Ω.outwardNormal y) : ℂ)) Ω.surfaceMeasure :=
   ((Lp.memLp _).integrable_mul (Lp.memLp _)).mul_bdd
     (Complex.measurable_ofReal.comp
-      (measurable_const.inner Ω.measurable_normal)).aestronglyMeasurable
+      (measurable_const.inner Ω.measurable_outwardNormal)).aestronglyMeasurable
     (ae_of_all _ fun y => by
       rw [Complex.norm_real, Real.norm_eq_abs]
       exact (abs_real_inner_le_norm _ _).trans
-        (mul_le_of_le_one_right (norm_nonneg _) (Ω.norm_normal_le y)))
+        (mul_le_of_le_one_right (norm_nonneg _) (Ω.norm_outwardNormal_le y)))
 
 /-- **The boundary integral of Green's formula in the charts**: for every resolution of unity `ψ`,
 `U, W ∈ H^1(V)` and every direction `v`,
 `∫_Γ T_Γ U · T_Γ W ⟪v, ν⟫ dσ = ∑_j ∫_{H_j} ψ_j(γ_j x') Tr_j U Tr_j W n^j_v dx'`, by the
 surface measure in the charts (`Rd.BoundedLipschitzDomain.integral_surfaceMeasure`), the traces and
 the normal in the charts, and `⟪v, ν_j⟫ √(1 + ‖∇φ_j‖²) = n^j_v`
-(`Rd.LipschitzGraph.inner_normalAt_mul_gram`). -/
-theorem integral_ambientTraceL2_mul_inner_normal_eq (ψ : Ω.BoundaryPartition) (U W : H^{1}(V))
-    (v : V) :
-    ∫ y, (Ω.ambientTraceL2 1) U y * (Ω.ambientTraceL2 1) W y * (inner ℝ v (Ω.normal y) : ℂ)
+(`Rd.LipschitzGraph.inner_normalAt_mul_gramDensity`). -/
+theorem integral_ambientTraceL2_mul_inner_outwardNormal_eq (ψ : Ω.BoundaryPartition)
+    (U W : H^{1}(V)) (v : V) :
+    ∫ y, (Ω.ambientTraceL2 1) U y * (Ω.ambientTraceL2 1) W y * (inner ℝ v (Ω.outwardNormal y) : ℂ)
       ∂Ω.surfaceMeasure =
       ∑ j, ∫ x', ψ.toComplex j ((Ω.graph j).graphMap x') * (Ω.graph j).traceH1 U x' *
         (Ω.graph j).traceH1 W x' * ((Ω.graph j).normalWeight v x' : ℂ) := by
-  rw [Ω.integral_surfaceMeasure ψ (Ω.integrable_ambientTraceL2_mul_inner_normal U W v)]
+  rw [Ω.integral_surfaceMeasure ψ (Ω.integrable_ambientTraceL2_mul_inner_outwardNormal U W v)]
   refine Finset.sum_congr rfl fun j _ => integral_congr_ae ?_
   filter_upwards [Ω.ambientTraceL2_graphMap_ae j U, Ω.ambientTraceL2_graphMap_ae j W,
-    Ω.normal_graphMap_ae j] with x' h1 h2 h3
+    Ω.outwardNormal_graphMap_ae j] with x' h1 h2 h3
   by_cases hψ : ψ.toFun j ((Ω.graph j).graphMap x') = 0
   · simp only [ψ.toComplex_of_eq_zero hψ, zero_mul]
   · have hj := ψ.mem_ball_of_ne_zero hψ
-    rw [h1 hj, h2 hj, h3 hj, ← (Ω.graph j).inner_normalAt_mul_gram, Complex.ofReal_mul]
+    rw [h1 hj, h2 hj, h3 hj, ← (Ω.graph j).inner_normalAt_mul_gramDensity, Complex.ofReal_mul]
     ring
 
 /-- **Green's formula on a bounded Lipschitz domain** (Grisvard, Theorem 1.5.3.1): for all
@@ -711,26 +720,26 @@ theorem integral_ambientTraceL2_mul_inner_normal_eq (ψ : Ω.BoundaryPartition) 
 `T_Γ U, T_Γ W ∈ L_2(Γ)` (`Rd.BoundedLipschitzDomain.ambientTraceL2`), the outward unit normal `ν`
 and the surface measure `σ`. The chart form for a resolution of unity equal to one near `Γ`
 (`Rd.BoundedLipschitzDomain.setIntegral_green_of_nhds`) is the boundary integral in the charts
-(`Rd.BoundedLipschitzDomain.integral_ambientTraceL2_mul_inner_normal_eq`). -/
-theorem setIntegral_green_surface (U W : H^{1}(V)) (v : V) :
+(`Rd.BoundedLipschitzDomain.integral_ambientTraceL2_mul_inner_outwardNormal_eq`). -/
+theorem setIntegral_green_surfaceMeasure (U W : H^{1}(V)) (v : V) :
     ∫ x in Ω.carrier, weakDerivL2 v U x * toL2 W x + toL2 U x * weakDerivL2 v W x =
-      ∫ y, (Ω.ambientTraceL2 1) U y * (Ω.ambientTraceL2 1) W y * (inner ℝ v (Ω.normal y) : ℂ)
+      ∫ y, (Ω.ambientTraceL2 1) U y * (Ω.ambientTraceL2 1) W y * (inner ℝ v (Ω.outwardNormal y) : ℂ)
         ∂Ω.surfaceMeasure := by
   obtain ⟨ψ, -, -, hψ⟩ := Ω.exists_boundaryPartition_nhds
-  rw [setIntegral_green_of_nhds ψ hψ, Ω.integral_ambientTraceL2_mul_inner_normal_eq ψ]
+  rw [setIntegral_green_of_nhds ψ hψ, Ω.integral_ambientTraceL2_mul_inner_outwardNormal_eq ψ]
 
 /-- **Green's formula on `H^1(Ω)`**: for all `u, w ∈ H^1(Ω)` and every direction `v`,
 `∫_Ω (∂_v u) w + u ∂_v w = ∫_Γ γ_{L_2} u · γ_{L_2} w ⟪v, ν⟫ dσ` with the trace
 `γ_{L_2} = Rd.BoundedLipschitzDomain.boundaryTraceL2 1 : H^1(Ω) → L_2(Γ)`; the left side uses the
-representatives of `u, w` in `H^1(V)` (`Rd.BoundedLipschitzDomain.setIntegral_green_surface`,
+representatives of `u, w` in `H^1(V)` (`Rd.BoundedLipschitzDomain.setIntegral_green_surfaceMeasure`,
 `Rd.BoundedLipschitzDomain.boundaryTraceL2_eq_ambientTraceL2`). -/
 theorem setIntegral_green_sobolevOne (u w : Ω.SobolevOne) (v : V) :
     ∫ x in Ω.carrier, weakDerivL2 v (u : H^{1}(V)) x * toL2 (w : H^{1}(V)) x +
         toL2 (u : H^{1}(V)) x * weakDerivL2 v (w : H^{1}(V)) x =
-      ∫ y, (Ω.boundaryTraceL2 1) u y * (Ω.boundaryTraceL2 1) w y * (inner ℝ v (Ω.normal y) : ℂ)
-        ∂Ω.surfaceMeasure := by
+      ∫ y, (Ω.boundaryTraceL2 1) u y * (Ω.boundaryTraceL2 1) w y *
+        (inner ℝ v (Ω.outwardNormal y) : ℂ) ∂Ω.surfaceMeasure := by
   rw [Ω.boundaryTraceL2_eq_ambientTraceL2 1 u, Ω.boundaryTraceL2_eq_ambientTraceL2 1 w]
-  exact Ω.setIntegral_green_surface _ _ v
+  exact Ω.setIntegral_green_surfaceMeasure _ _ v
 
 /-- **Green's formula on `H^1(Ω)` with weak derivatives on `Ω`**: for all `u, w ∈ H^1(Ω)`, every
 direction `v` and weak derivatives `u_v = ∂_v u`, `w_v = ∂_v w` on `Ω`,
@@ -744,8 +753,8 @@ theorem setIntegral_green_sobolevOne_of_hasWeakLineDeriv (u w : Ω.SobolevOne) (
     (huv : HasWeakLineDeriv Ω.toOpens (fun _ : Fin 1 => v) (toL2 (u : H^{1}(V))) uv)
     (hwv : HasWeakLineDeriv Ω.toOpens (fun _ : Fin 1 => v) (toL2 (w : H^{1}(V))) wv) :
     ∫ x in Ω.carrier, uv x * toL2 (w : H^{1}(V)) x + toL2 (u : H^{1}(V)) x * wv x =
-      ∫ y, (Ω.boundaryTraceL2 1) u y * (Ω.boundaryTraceL2 1) w y * (inner ℝ v (Ω.normal y) : ℂ)
-        ∂Ω.surfaceMeasure := by
+      ∫ y, (Ω.boundaryTraceL2 1) u y * (Ω.boundaryTraceL2 1) w y *
+        (inner ℝ v (Ω.outwardNormal y) : ℂ) ∂Ω.surfaceMeasure := by
   rw [← Ω.setIntegral_green_sobolevOne u w v]
   have h1 := ((hasWeakLineDeriv_weakDerivL2 v (u : H^{1}(V))).mono le_top).unique huv
   have h2 := ((hasWeakLineDeriv_weakDerivL2 v (w : H^{1}(V))).mono le_top).unique hwv
@@ -758,38 +767,39 @@ theorem setIntegral_green_sobolevOne_of_hasWeakLineDeriv (u w : Ω.SobolevOne) (
 `U, W ∈ H^1(V)` and every direction `v`,
 `∫_Ω (∂_v U) W + U ∂_v W = ∑_j ∫_{H_j} ψ_j(γ_j x') Tr_j U Tr_j W n^j_v dx'` with the traces `Tr_j`
 of the graph domains and the normal weights `n^j_v = ⟪∇φ_j, v⟫ - ⟪v, e_j⟫`
-(`Rd.BoundedLipschitzDomain.setIntegral_green_surface`,
-`Rd.BoundedLipschitzDomain.integral_ambientTraceL2_mul_inner_normal_eq`). -/
-theorem setIntegral_green_besselPotentialSpace (ψ : Ω.BoundaryPartition) (U W : H^{1}(V))
-    (v : V) :
+(`Rd.BoundedLipschitzDomain.setIntegral_green_surfaceMeasure`,
+`Rd.BoundedLipschitzDomain.integral_ambientTraceL2_mul_inner_outwardNormal_eq`). -/
+theorem setIntegral_green_besselPotentialSpace_of_boundaryPartition (ψ : Ω.BoundaryPartition)
+    (U W : H^{1}(V)) (v : V) :
     ∫ x in Ω.carrier, weakDerivL2 v U x * toL2 W x + toL2 U x * weakDerivL2 v W x =
       ∑ j, ∫ x', ψ.toComplex j ((Ω.graph j).graphMap x') * (Ω.graph j).traceH1 U x' *
         (Ω.graph j).traceH1 W x' * ((Ω.graph j).normalWeight v x' : ℂ) := by
-  rw [Ω.setIntegral_green_surface, Ω.integral_ambientTraceL2_mul_inner_normal_eq ψ]
+  rw [Ω.setIntegral_green_surfaceMeasure, Ω.integral_ambientTraceL2_mul_inner_outwardNormal_eq ψ]
 
 /-- **Green's formula on a bounded Lipschitz domain, for `W^1_2(V)` functions**: for every
 resolution of unity `ψ`, all `f, g ∈ L_2(V)` with `f, g ∈ W^1_2(V)`, every direction `v` and the
 weak derivatives `f_v = ∂_v f`, `g_v = ∂_v g` in `L_2(V)`,
 `∫_Ω f_v g + f g_v = ∑_j ∫_{H_j} ψ_j(γ_j x') Tr_j f Tr_j g n^j_v dx'`
-(`Rd.BoundedLipschitzDomain.setIntegral_green_besselPotentialSpace`). -/
-theorem setIntegral_green (ψ : Ω.BoundaryPartition) (f g : Lp ℂ 2 (volume : Measure V))
-    (hf : MemWSobolev 1 f) (hg : MemWSobolev 1 g) (v : V) {fv gv : Lp ℂ 2 (volume : Measure V)}
+(`Rd.BoundedLipschitzDomain.setIntegral_green_besselPotentialSpace_of_boundaryPartition`). -/
+theorem setIntegral_green_of_boundaryPartition (ψ : Ω.BoundaryPartition)
+    (f g : Lp ℂ 2 (volume : Measure V)) (hf : MemWSobolev 1 f) (hg : MemWSobolev 1 g) (v : V)
+    {fv gv : Lp ℂ 2 (volume : Measure V)}
     (hfv : HasWeakLineDeriv ⊤ (fun _ : Fin 1 => v) f fv)
     (hgv : HasWeakLineDeriv ⊤ (fun _ : Fin 1 => v) g gv) :
     ∫ x in Ω.carrier, fv x * g x + f x * gv x =
       ∑ j, ∫ x', ψ.toComplex j ((Ω.graph j).graphMap x') *
-        (Ω.graph j).trace two_ne_top 2 f x' * (Ω.graph j).trace two_ne_top 2 g x' *
+        (Ω.graph j).graphTrace two_ne_top 2 f x' * (Ω.graph j).graphTrace two_ne_top 2 g x' *
           ((Ω.graph j).normalWeight v x' : ℂ) := by
   obtain ⟨U, rfl⟩ := exists_toL2_eq_of_memWSobolev hf
   obtain ⟨W, rfl⟩ := exists_toL2_eq_of_memWSobolev hg
   rw [← weakDerivL2_eq hfv, ← weakDerivL2_eq hgv]
-  exact Ω.setIntegral_green_besselPotentialSpace ψ U W v
+  exact Ω.setIntegral_green_besselPotentialSpace_of_boundaryPartition ψ U W v
 
 /-! ### The zero extension of functions with vanishing trace -/
 
 /-- **Functions with vanishing trace have no boundary term**: for `u` in the trace kernel,
 `W ∈ H^1(V)` and every direction `v`, `∫_Ω (∂_v u) W + u ∂_v W = 0`
-(`Rd.BoundedLipschitzDomain.setIntegral_green_surface`, `γ_{L_2} u = 0` by
+(`Rd.BoundedLipschitzDomain.setIntegral_green_surfaceMeasure`, `γ_{L_2} u = 0` by
 `Rd.BoundedLipschitzDomain.ker_boundaryTraceL2`). -/
 theorem setIntegral_green_of_mem_traceKer {u : Ω.SobolevOne} (hu : u ∈ Ω.traceKer 1)
     (W : H^{1}(V)) (v : V) :
@@ -801,7 +811,7 @@ theorem setIntegral_green_of_mem_traceKer {u : Ω.SobolevOne} (hu : u ∈ Ω.tra
       exact hu
     rw [← Ω.boundaryTraceL2_eq_ambientTraceL2 1 u]
     exact LinearMap.mem_ker.1 hk
-  rw [Ω.setIntegral_green_surface, h0]
+  rw [Ω.setIntegral_green_surfaceMeasure, h0]
   refine integral_eq_zero_of_ae ?_
   filter_upwards [Lp.coeFn_zero (E := ℂ) (p := 2) (μ := Ω.surfaceMeasure)] with y hy
   rw [hy]
@@ -852,9 +862,9 @@ theorem memWSobolev_indicatorLp_of_mem_traceKer {u : Ω.SobolevOne} (hu : u ∈ 
 /-- **A function whose zero extension lies in `W^1_2(V)` has vanishing trace**: if
 `1_Ω u ∈ W^1_2(V)` for `u ∈ H^1(Ω)`, then `u` lies in the trace kernel. In the chart `j`, the
 trace of `u` is the trace of `F = 1_Ω u` (they agree on `Ω_j ∩ B_j`,
-`Rd.LipschitzGraph.trace_ae_eq_of_ae_eq`), and `F` vanishes on the part of the lower domain in
+`Rd.LipschitzGraph.graphTrace_ae_eq_of_ae_eq`), and `F` vanishes on the part of the lower domain in
 `B_j`, which lies outside `Ω`, so its trace vanishes
-(`Rd.LipschitzGraph.traceH1_ae_eq_zero_of_lower`). -/
+(`Rd.LipschitzGraph.traceH1_ae_eq_zero_of_lowerGraph`). -/
 theorem mem_traceKer_of_memWSobolev_indicatorLp {u : Ω.SobolevOne}
     (hu : MemWSobolev 1 (indicatorLp Ω.measurableSet (toL2 (u : H^{1}(V))))) :
     u ∈ Ω.traceKer 1 := by
@@ -865,15 +875,16 @@ theorem mem_traceKer_of_memWSobolev_indicatorLp {u : Ω.SobolevOne}
   rw [Ω.mem_traceKer_one_iff Ω.boundaryPartition, EventuallyEq, Ω.eventually_aeBoundary_iff]
   intro j
   have hB := Ω.inter_ball_eq j le_rfl
-  have h1 := (Ω.graph j).trace_ae_eq_of_ae_eq two_ne_top 2 (s := 1 / 2) (by norm_num) one_le_two
+  have h1 :=
+    (Ω.graph j).graphTrace_ae_eq_of_ae_eq two_ne_top 2 (s := 1 / 2) (by norm_num) one_le_two
     ((Ω.graph j).intrinsicNorm_toL2_lt_top (u : H^{1}(V)))
     ((Ω.graph j).intrinsicNorm_toL2_lt_top F) isOpen_ball (by
       filter_upwards [hFe] with x hx hxd hxB
       have hxΩ : x ∈ Ω.carrier := ((Set.ext_iff.1 hB x).2 ⟨hxd, hxB⟩).1
       rw [hx, indicator_of_mem hxΩ])
-  have h2 := (Ω.graph j).traceH1_ae_eq_zero_of_lower (U := F) isOpen_ball (by
+  have h2 := (Ω.graph j).traceH1_ae_eq_zero_of_lowerGraph (U := F) isOpen_ball (by
     filter_upwards [hFe] with x hx hxd hxB
-    have hxΩ : x ∉ Ω.carrier := fun h => (Ω.graph j).notMem_domain_of_mem_lower_domain hxd
+    have hxΩ : x ∉ Ω.carrier := fun h => (Ω.graph j).notMem_domain_of_mem_lowerGraph_domain hxd
       ((Set.ext_iff.1 hB x).1 ⟨h, hxB⟩).1
     rw [hx, indicator_of_notMem hxΩ])
   filter_upwards [h1, h2, Ω.boundaryTrace_graphMap Ω.boundaryPartition two_ne_top one_le_two

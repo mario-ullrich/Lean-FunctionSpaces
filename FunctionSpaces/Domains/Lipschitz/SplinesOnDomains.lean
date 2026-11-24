@@ -37,10 +37,10 @@ In the theorems on `Ω`, `1 ≤ p < ∞`, `1 ≤ q ≤ ∞`, `r ≥ 1`, and
   (`Rd.HasBesovExtension`) and `0 < s < r - 1 + 1/p`, every `f` with `N_Ω(f) < ∞` agrees on `Ω`
   with some `G` in that approximation space, with `‖G‖_{A^s_q} ≤ C N_Ω(f)` for one `C < ∞`
   (`Rd.HasBesovExtension.exists_cubeSplineAt_le`,
-  `Rd.HasBesovExtension.exists_memApprox_cubeSplineSchemeAt_iff`), also with an intrinsic modulus
-  of every order `r' > s`
-  (`Rd.HasBesovExtension.exists_memApprox_cubeSplineSchemeAt_iff_of_order`); equivalently
-  `f = ∑_k b_k` on `Ω` with tensor splines `b_k` of level `k` on `Q` and
+  `Rd.HasBesovExtension.exists_memApprox_cubeSplineSchemeAt_iff_of_hasBesovExtension`), also with an
+  intrinsic modulus of every order `r' > s`
+  (`Rd.HasBesovExtension.exists_memApprox_cubeSplineSchemeAt_iff_of_order_of_hasBesovExtension`);
+  equivalently `f = ∑_k b_k` on `Ω` with tensor splines `b_k` of level `k` on `Q` and
   `‖(2^(ks) ‖b_k‖_{L_p(Q)})_k‖_{ℓ_q} < ∞` (`Rd.HasBesovExtension.exists_cubeSplineBlocksAt_iff`,
   the norm `N_3` of DeVore–Popov, Theorem 5.1).
 * **Bounded Lipschitz domains and the unit cube.** Every bounded Lipschitz domain in `Q` has the
@@ -451,9 +451,10 @@ splines of order `r` on `Q` iff
 `N_Ω(f) = ‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`
 (`Rd.modNormOn_lt_top_of_memApprox_cubeSplineSchemeAt`,
 `Rd.HasBesovExtension.exists_cubeSplineAt_le`). -/
-theorem exists_memApprox_cubeSplineSchemeAt_iff (h : HasBesovExtension hΩ) (hp : p ≠ ∞)
-    {a : EuclideanSpace ℝ (Fin d)} {L : ℝ} (hL : 0 < L) (hΩQ : Ω ⊆ euclideanCubeAt a L) {r : ℕ}
-    (hr : 1 ≤ r) {s : ℝ} {q : ℝ≥0∞} (hq : 1 ≤ q) (hs : 0 < s)
+theorem exists_memApprox_cubeSplineSchemeAt_iff_of_hasBesovExtension (h : HasBesovExtension hΩ)
+    (hp : p ≠ ∞) {a : EuclideanSpace ℝ (Fin d)} {L : ℝ} (hL : 0 < L)
+    (hΩQ : Ω ⊆ euclideanCubeAt a L) {r : ℕ} (hr : 1 ≤ r) {s : ℝ} {q : ℝ≥0∞} (hq : 1 ≤ q)
+    (hs : 0 < s)
     (hsr : s < (r : ℝ) - 1 + 1 / p.toReal)
     (f : Lp ℂ p (volume : Measure (EuclideanSpace ℝ (Fin d)))) :
     (∃ G : Lp ℂ p (volume.restrict (euclideanCubeAt a L)),
@@ -470,13 +471,13 @@ theorem exists_memApprox_cubeSplineSchemeAt_iff (h : HasBesovExtension hΩ) (hp 
       (hG.trans_lt (ENNReal.mul_lt_top hC.lt_top hf))⟩
 
 /-- **The same with an intrinsic modulus of every order `r' > s`**: under the hypotheses of
-`Rd.HasBesovExtension.exists_memApprox_cubeSplineSchemeAt_iff`, `f` agrees on `Ω` with an
-element of the approximation space `A^s_q` of the tensor splines of order `r` on `Q` iff
+`Rd.HasBesovExtension.exists_memApprox_cubeSplineSchemeAt_iff_of_hasBesovExtension`, `f` agrees on
+`Ω` with an element of the approximation space `A^s_q` of the tensor splines of order `r` on `Q` iff
 `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_{r'}(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`, since on a set with the
 extension property the order of the differences does not matter
 (`Rd.HasBesovExtension.modNormOn_order_le_of_hasBesovExtension`). -/
-theorem exists_memApprox_cubeSplineSchemeAt_iff_of_order (h : HasBesovExtension hΩ)
-    (hp : p ≠ ∞) {a : EuclideanSpace ℝ (Fin d)} {L : ℝ} (hL : 0 < L)
+theorem exists_memApprox_cubeSplineSchemeAt_iff_of_order_of_hasBesovExtension
+    (h : HasBesovExtension hΩ) (hp : p ≠ ∞) {a : EuclideanSpace ℝ (Fin d)} {L : ℝ} (hL : 0 < L)
     (hΩQ : Ω ⊆ euclideanCubeAt a L) {r r' : ℕ} (hr : 1 ≤ r) {s : ℝ} {q : ℝ≥0∞} (hq : 1 ≤ q)
     (hs : 0 < s) (hsr : s < (r : ℝ) - 1 + 1 / p.toReal) (hsr' : s < r')
     (f : Lp ℂ p (volume : Measure (EuclideanSpace ℝ (Fin d)))) :
@@ -484,7 +485,7 @@ theorem exists_memApprox_cubeSplineSchemeAt_iff_of_order (h : HasBesovExtension 
         indicatorLp hΩ (indicatorExtendLp (measurableSet_euclideanCubeAt a L) subset_rfl G) =
           indicatorLp hΩ f ∧ (cubeSplineSchemeAt p a hL r).MemApprox s q G) ↔
       modNormOn hΩ r' s q f < ∞ := by
-  rw [h.exists_memApprox_cubeSplineSchemeAt_iff hp hL hΩQ hr hq hs hsr f]
+  rw [h.exists_memApprox_cubeSplineSchemeAt_iff_of_hasBesovExtension hp hL hΩQ hr hq hs hsr f]
   have hsr₀ := lt_of_lt_splineRange hsr
   obtain ⟨C, hC, hle⟩ := h.modNormOn_order_le_of_hasBesovExtension hp hs hsr₀ hsr' hq
   obtain ⟨C', hC', hle'⟩ := h.modNormOn_order_le_of_hasBesovExtension hp hs hsr' hsr₀ hq
@@ -498,7 +499,7 @@ the sum `G = ∑_k b_k` in `L_p(Q)` of tensor splines `b_k` of order `r` and lev
 `‖(2^(ks) ‖b_k‖_{L_p(Q)})_k‖_{ℓ_q} < ∞` (DeVore–Popov, Theorem 5.1, the norm `N_3`): the block
 decomposition of the approximation space
 (`ApproximationScheme.memApprox_iff_blockDecompNorm_lt_top`) and
-`Rd.HasBesovExtension.exists_memApprox_cubeSplineSchemeAt_iff`. -/
+`Rd.HasBesovExtension.exists_memApprox_cubeSplineSchemeAt_iff_of_hasBesovExtension`. -/
 theorem exists_cubeSplineBlocksAt_iff (h : HasBesovExtension hΩ) (hp : p ≠ ∞)
     {a : EuclideanSpace ℝ (Fin d)} {L : ℝ} (hL : 0 < L) (hΩQ : Ω ⊆ euclideanCubeAt a L) {r : ℕ}
     (hr : 1 ≤ r) {s : ℝ} {q : ℝ≥0∞} (hq : 1 ≤ q) (hs : 0 < s)
@@ -510,7 +511,7 @@ theorem exists_cubeSplineBlocksAt_iff (h : HasBesovExtension hΩ) (hp : p ≠ �
         lqNorm q (fun k => dyadicWeight s k * ‖b k‖ₑ) < ∞ ∧
         indicatorLp hΩ (indicatorExtendLp (measurableSet_euclideanCubeAt a L) subset_rfl G) =
           indicatorLp hΩ f) ↔ modNormOn hΩ r s q f < ∞ := by
-  rw [← h.exists_memApprox_cubeSplineSchemeAt_iff hp hL hΩQ hr hq hs hsr f]
+  rw [← h.exists_memApprox_cubeSplineSchemeAt_iff_of_hasBesovExtension hp hL hΩQ hr hq hs hsr f]
   constructor
   · rintro ⟨b, G, hb, hbG, hlq, hGf⟩
     exact ⟨G, hGf, (ApproximationScheme.memApprox_iff_blockDecompNorm_lt_top hs hq).2
@@ -535,7 +536,7 @@ domain in a cube `Q = a + L [0, 1]^d`, `1 ≤ p < ∞`, `1 ≤ q ≤ ∞`, `r �
 space `A^s_q` of the tensor splines of order `r` on `Q` iff
 `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`
 (`Rd.BoundedLipschitzDomain.hasBesovExtension`,
-`Rd.HasBesovExtension.exists_memApprox_cubeSplineSchemeAt_iff`). -/
+`Rd.HasBesovExtension.exists_memApprox_cubeSplineSchemeAt_iff_of_hasBesovExtension`). -/
 theorem exists_memApprox_cubeSplineSchemeAt_iff (hp : p ≠ ∞) {a : EuclideanSpace ℝ (Fin d)}
     {L : ℝ} (hL : 0 < L) (hΩQ : Ω.carrier ⊆ euclideanCubeAt a L) {r : ℕ} (hr : 1 ≤ r) {s : ℝ}
     {q : ℝ≥0∞} (hq : 1 ≤ q) (hs : 0 < s) (hsr : s < (r : ℝ) - 1 + 1 / p.toReal)
@@ -545,14 +546,15 @@ theorem exists_memApprox_cubeSplineSchemeAt_iff (hp : p ≠ ∞) {a : EuclideanS
             (indicatorExtendLp (measurableSet_euclideanCubeAt a L) subset_rfl G) =
           indicatorLp Ω.measurableSet f ∧ (cubeSplineSchemeAt p a hL r).MemApprox s q G) ↔
       modNormOn Ω.measurableSet r s q f < ∞ :=
-  Ω.hasBesovExtension.exists_memApprox_cubeSplineSchemeAt_iff hp hL hΩQ hr hq hs hsr f
+  Ω.hasBesovExtension.exists_memApprox_cubeSplineSchemeAt_iff_of_hasBesovExtension hp hL hΩQ hr hq
+    hs hsr f
 
 /-- **The same with an intrinsic modulus of every order `r' > s`**: under the hypotheses of
 `Rd.BoundedLipschitzDomain.exists_memApprox_cubeSplineSchemeAt_iff`, `f` agrees on `Ω` with an
 element of the approximation space `A^s_q` of the tensor splines of order `r` on `Q` iff
 `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_{r'}(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`
 (`Rd.BoundedLipschitzDomain.hasBesovExtension`,
-`Rd.HasBesovExtension.exists_memApprox_cubeSplineSchemeAt_iff_of_order`). -/
+`Rd.HasBesovExtension.exists_memApprox_cubeSplineSchemeAt_iff_of_order_of_hasBesovExtension`). -/
 theorem exists_memApprox_cubeSplineSchemeAt_iff_of_order (hp : p ≠ ∞)
     {a : EuclideanSpace ℝ (Fin d)} {L : ℝ} (hL : 0 < L) (hΩQ : Ω.carrier ⊆ euclideanCubeAt a L)
     {r r' : ℕ} (hr : 1 ≤ r) {s : ℝ} {q : ℝ≥0∞} (hq : 1 ≤ q) (hs : 0 < s)
@@ -563,15 +565,15 @@ theorem exists_memApprox_cubeSplineSchemeAt_iff_of_order (hp : p ≠ ∞)
             (indicatorExtendLp (measurableSet_euclideanCubeAt a L) subset_rfl G) =
           indicatorLp Ω.measurableSet f ∧ (cubeSplineSchemeAt p a hL r).MemApprox s q G) ↔
       modNormOn Ω.measurableSet r' s q f < ∞ :=
-  Ω.hasBesovExtension.exists_memApprox_cubeSplineSchemeAt_iff_of_order hp hL hΩQ hr hq hs hsr
-    hsr' f
+  Ω.hasBesovExtension.exists_memApprox_cubeSplineSchemeAt_iff_of_order_of_hasBesovExtension hp hL
+    hΩQ hr hq hs hsr hsr' f
 
 /-- **The restrictions of `B^s_{p,q}(ℝ^d)` and of the tensor spline space of the cube to `Ω`
 agree**: under the hypotheses of
 `Rd.BoundedLipschitzDomain.exists_memApprox_cubeSplineSchemeAt_iff`, `f` agrees on `Ω` with an
 element of the approximation space `A^s_q` of the tensor splines of order `r` on `Q` iff it
 agrees on `Ω` with some `F ∈ L_p(ℝ^d)` with `‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} < ∞`
-(`Rd.BoundedLipschitzDomain.exists_besov_extension_iff_modulusOn`). -/
+(`Rd.BoundedLipschitzDomain.exists_besov_extension_iff_modulusOn_indicator`). -/
 theorem exists_memApprox_cubeSplineSchemeAt_iff_exists_besov (hp : p ≠ ∞)
     {a : EuclideanSpace ℝ (Fin d)} {L : ℝ} (hL : 0 < L) (hΩQ : Ω.carrier ⊆ euclideanCubeAt a L)
     {r : ℕ} (hr : 1 ≤ r) {s : ℝ} {q : ℝ≥0∞} (hq : 1 ≤ q) (hs : 0 < s)
@@ -584,7 +586,7 @@ theorem exists_memApprox_cubeSplineSchemeAt_iff_exists_besov (hp : p ≠ ∞)
       ∃ F : Lp ℂ p (volume : Measure (EuclideanSpace ℝ (Fin d))),
         indicatorLp Ω.measurableSet F = indicatorLp Ω.measurableSet f ∧
           ‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r F k) < ∞ := by
-  rw [Ω.exists_besov_extension_iff_modulusOn hp hs (lt_of_lt_splineRange hsr) hq f]
+  rw [Ω.exists_besov_extension_iff_modulusOn_indicator hp hs (lt_of_lt_splineRange hsr) hq f]
   exact Ω.exists_memApprox_cubeSplineSchemeAt_iff hp hL hΩQ hr hq hs hsr f
 
 end BoundedLipschitzDomain
