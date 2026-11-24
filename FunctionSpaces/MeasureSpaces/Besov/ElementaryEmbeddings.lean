@@ -43,25 +43,29 @@ and `q ≤ q'`, `B^s_{p,q} ⊆ B^t_{p,q'}`. -/
 theorem MemBesov.mono (hq : 1 ≤ q) (hq' : 1 ≤ q') (ht : 0 ≤ t)
     (h : t < s ∨ (t = s ∧ q ≤ q')) {f : Lp ℂ p μ} (hf : S.MemBesov μ p s q f) :
     S.MemBesov μ p t q' f :=
-  ApproximationScheme.MemApprox.mono hq hq' ht h hf
+  memBesov_iff_memApprox.2
+    (ApproximationScheme.MemApprox.mono hq hq' ht h (memBesov_iff_memApprox.1 hf))
 
 /-- **Embedding in the integrability**, norm form: for `p ≤ r`,
 `‖ι f‖_{B^s_{p,q}} ≤ ‖ι‖ ‖f‖_{B^s_{r,q}}` with `ι : L_r ↪ L_p`. -/
 theorem besovNorm_inclusion_le (hpr : p ≤ r) (f : Lp ℂ r μ) :
     S.besovNorm μ p s q (Lp.inclusionOfExponentLe (𝕜 := ℝ) μ hpr f) ≤
-      ‖Lp.inclusionOfExponentLe (E := ℂ) (𝕜 := ℝ) μ hpr‖ₑ * S.besovNorm μ r s q f :=
-  ApproximationScheme.approxNorm_map_le _ (fun _ _ hg => inclusion_mem_toLp hpr hg) f
+      ‖Lp.inclusionOfExponentLe (E := ℂ) (𝕜 := ℝ) μ hpr‖ₑ * S.besovNorm μ r s q f := by
+  rw [besovNorm_eq_approxNorm, besovNorm_eq_approxNorm]
+  exact ApproximationScheme.approxNorm_map_le _ (fun _ _ hg => inclusion_mem_toLp hpr hg) f
 
 /-- **Embedding in the integrability**: for `p ≤ r`, `B^s_{r,q} ⊆ B^s_{p,q}` through the
 inclusion `L_r ↪ L_p`. -/
 theorem MemBesov.inclusion (hpr : p ≤ r) {f : Lp ℂ r μ} (hf : S.MemBesov μ r s q f) :
     S.MemBesov μ p s q (Lp.inclusionOfExponentLe (𝕜 := ℝ) μ hpr f) :=
-  ApproximationScheme.MemApprox.map _ (fun _ _ hg => inclusion_mem_toLp hpr hg) hf
+  memBesov_iff_memApprox.2 (ApproximationScheme.MemApprox.map _
+    (fun _ _ hg => inclusion_mem_toLp hpr hg) (memBesov_iff_memApprox.1 hf))
 
 /-- **Embedding of the uniform Besov space**: a bounded continuous function in the
 approximation space of `S` in the sup norm lies in every `B^s_{p,q}`. -/
 theorem MemBesov.of_sup {a : Ω →ᵇ ℂ} (ha : S.MemApprox s q a) :
     S.MemBesov μ p s q (BoundedContinuousFunction.toLp (E := ℂ) p μ ℝ a) :=
-  ApproximationScheme.MemApprox.map _ (fun _ _ hb => toLp_mem_toLp hb) ha
+  memBesov_iff_memApprox.2
+    (ApproximationScheme.MemApprox.map _ (fun _ _ hb => toLp_mem_toLp hb) ha)
 
 end FunctionScheme

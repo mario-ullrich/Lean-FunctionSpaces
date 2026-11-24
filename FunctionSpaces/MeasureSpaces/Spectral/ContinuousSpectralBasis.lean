@@ -128,8 +128,7 @@ variable {s : ℝ} {q : ℝ≥0∞}
 theorem memBesov_two_two_iff (hs : 0 < s) (f : Lp ℂ 2 μ) :
     B.basisScheme.MemBesov μ 2 s 2 f ↔
       Memℓp (fun i => ((((1 + B.level i : ℕ) : ℝ) ^ s : ℝ) : ℂ) * B.basis.repr f i) 2 := by
-  change (B.basisScheme.toLp μ 2).MemApprox s 2 f ↔ _
-  rw [toLp_basisScheme_eq]
+  rw [FunctionScheme.memBesov_iff_memApprox, toLp_basisScheme_eq]
   exact B.memApprox_two_iff_levelWeight hs f
 
 /-- **The Littlewood–Paley characterisation of `B^s_{2,q}`** for a continuous spectral basis,
@@ -138,8 +137,7 @@ with sharp cut-offs at the levels `2^k`: for `s > 0` and `1 ≤ q ≤ ∞`, `f �
 `‖Δ_k f‖_2² = ∑_{2^k ≤ λ(i) < 2^(k+1)} |⟨e_i, f⟩|²`. -/
 theorem memBesov_two_iff_blockNorm_lt_top (hs : 0 < s) (hq : 1 ≤ q) (f : Lp ℂ 2 μ) :
     B.basisScheme.MemBesov μ 2 s q f ↔ B.spectralProjectionScheme.blockNorm s q f < ∞ := by
-  change (B.basisScheme.toLp μ 2).MemApprox s q f ↔ _
-  rw [toLp_basisScheme_eq]
+  rw [FunctionScheme.memBesov_iff_memApprox, toLp_basisScheme_eq]
   exact B.memApprox_iff_blockNorm_lt_top hs hq
 
 /-- The **Sobolev space `H^s`** of a continuous spectral basis, `s > 0`, as a Sobolev space for
@@ -168,12 +166,12 @@ theorem mem_range_sobolev_iff (hs : 0 < s) (f : Lp ℂ 2 μ) :
 /-- **`H^s ⊆ B^s_{2,∞}`**, from Jackson's inequality. -/
 theorem sobolev_memBesov_top (hs : 0 < s) (c : ℓ²(ι, ℂ)) :
     B.basisScheme.MemBesov μ 2 s ∞ ((B.sobolevSpace s hs).incl c) :=
-  (B.sobolevSpace s hs).memApprox_top c
+  FunctionScheme.memBesov_iff_memApprox.2 ((B.sobolevSpace s hs).memApprox_top c)
 
 /-- **`B^t_{2,q} ⊆ H^s` for `t > s`**, from Bernstein's inequality. -/
 theorem exists_sobolev_of_memBesov (hs : 0 < s) {t : ℝ} (hst : s < t) (hq : 1 ≤ q)
     {f : Lp ℂ 2 μ} (hf : B.basisScheme.MemBesov μ 2 t q f) :
     ∃ c : ℓ²(ι, ℂ), (B.sobolevSpace s hs).incl c = f :=
-  (B.sobolevSpace s hs).exists_eq_of_lt hst hq hf
+  (B.sobolevSpace s hs).exists_eq_of_lt hst hq (FunctionScheme.memBesov_iff_memApprox.1 hf)
 
 end ContinuousSpectralBasis

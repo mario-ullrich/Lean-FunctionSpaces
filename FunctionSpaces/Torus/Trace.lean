@@ -545,10 +545,12 @@ theorem trace_besov (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞} (hq
         (periodicTraceBound p n hp).limitTrace f = g) := by
   have hβ : 0 ≤ p.toReal⁻¹ := by positivity
   refine ⟨fun f hf => ?_, fun g hg => ?_⟩
-  · have := (periodicTraceBound p n hp).memApprox_limitTrace hβ (by linarith) hq hf
+  · have := (periodicTraceBound p n hp).memApprox_limitTrace hβ (by linarith) hq
+      (FunctionScheme.memBesov_iff_memApprox.1 hf)
+    rw [FunctionScheme.memBesov_iff_memApprox]
     rwa [add_sub_cancel_right] at this
   · obtain ⟨f, hf, hfg, -⟩ := (periodicTraceBound p n hp).exists_limitTrace_eq hβ ENNReal.one_ne_top
-      (periodicTraceBound_rightInverse p hp) hs hq hg
-    exact ⟨f, hf, hfg⟩
+      (periodicTraceBound_rightInverse p hp) hs hq (FunctionScheme.memBesov_iff_memApprox.1 hg)
+    exact ⟨f, FunctionScheme.memBesov_iff_memApprox.2 hf, hfg⟩
 
 end Torus

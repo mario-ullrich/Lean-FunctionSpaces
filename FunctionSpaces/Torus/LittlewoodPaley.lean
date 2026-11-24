@@ -200,7 +200,8 @@ theorem periodicLittlewoodPaleyNorm_le_approxNormDyadic_trigScheme (hp : p ≠ �
 theorem memBesov_iff_periodicLittlewoodPaleyNorm_lt_top (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞}
     (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure (UnitAddTorus d))} :
     (trigScheme d).MemBesov volume p s q f ↔ periodicLittlewoodPaleyNorm hp s q f < ∞ := by
-  rw [FunctionScheme.MemBesov, ApproximationScheme.memApprox_iff_approxNormDyadic_lt_top hq hs.le]
+  rw [FunctionScheme.memBesov_iff_memApprox,
+    ApproximationScheme.memApprox_iff_approxNormDyadic_lt_top hq hs.le]
   have hK : eLpNorm (Rd.lpKernel (V := EuclideanSpace ℝ d)) 1 volume < ∞ :=
     Rd.eLpNorm_lpKernel_lt_top
   constructor

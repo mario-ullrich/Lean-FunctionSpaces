@@ -78,7 +78,7 @@ theorem memPeriodicSobolev_of_memPeriodicSobolev_of_lt [Nonempty d] (hp1 : 1 < p
     linarith [Nat.cast_nonneg (α := ℝ) k]
   obtain ⟨g, hgf, hg⟩ := memPeriodicSobolev_exists_inclusion_eq hp1 hp hpr hm hf
   exact ⟨g, hgf, memPeriodicSobolev_of_memBesov (hp1.trans_le hpr) hr
-    (hg.of_lt (le_max_of_le_right one_le_two) (le_min Fact.out one_le_two) (Nat.cast_nonneg k)
-      hkm)⟩
+    (FunctionScheme.memBesov_iff_memApprox.2 ((FunctionScheme.memBesov_iff_memApprox.1 hg).of_lt
+      (le_max_of_le_right one_le_two) (le_min Fact.out one_le_two) (Nat.cast_nonneg k) hkm))⟩
 
 end Torus

@@ -72,9 +72,9 @@ theorem SobolevSpace.exists_eq_inclusion (h : S.HasNikolskii μ D) (hD : 0 ≤ D
     (hst : V'.order < V.order - nikolskiiExponent D p r) (y : W) :
     ∃ y' : W', Lp.inclusionOfExponentLe (𝕜 := ℝ) μ hpr (V'.incl y') = V.incl y := by
   have hα : nikolskiiExponent D p r < V.order := by linarith [V'.order_pos]
-  obtain ⟨g, hg, hmem⟩ :=
-    MemBesov.exists_inclusion_eq_of_nikolskii h hD hpr hα le_top (V.memApprox_top y)
-  obtain ⟨y', hy'⟩ := V'.exists_eq_of_lt hst le_top hmem
+  obtain ⟨g, hg, hmem⟩ := MemBesov.exists_inclusion_eq_of_nikolskii h hD hpr hα le_top
+    (memBesov_iff_memApprox.2 (V.memApprox_top y))
+  obtain ⟨y', hy'⟩ := V'.exists_eq_of_lt hst le_top (memBesov_iff_memApprox.1 hmem)
   exact ⟨y', by rw [hy', hg]⟩
 
 /-- **The Sobolev embedding** in the classical form of the exponents: `t - D/r < s - D/p`. -/
@@ -91,6 +91,7 @@ theorem SobolevSpace.exists_boundedContinuous [μ.IsOpenPosMeasure] (h : S.HasNi
     (hD : 0 ≤ D) (V : S.SobolevSpace μ p W) (hs : D * p.toReal⁻¹ < V.order) (y : W) :
     ∃ a : Ω →ᵇ ℂ, Lp.inclusionOfExponentLe (𝕜 := ℝ) μ le_top
       (BoundedContinuousFunction.toLp (E := ℂ) ∞ μ ℝ a) = V.incl y :=
-  MemBesov.exists_boundedContinuous_of_nikolskii h hD hs le_top (V.memApprox_top y)
+  MemBesov.exists_boundedContinuous_of_nikolskii h hD hs le_top
+    (memBesov_iff_memApprox.2 (V.memApprox_top y))
 
 end FunctionScheme

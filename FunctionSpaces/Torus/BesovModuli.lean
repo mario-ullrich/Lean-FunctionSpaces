@@ -163,7 +163,8 @@ defined by the modulus of smoothness: `f ∈ B^s_{2,q}` iff
 theorem memBesov_iff_modulusNorm_lt_top (hs : 0 < s) (hs1 : s < 1) (hq : 1 ≤ q)
     (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
     (trigScheme d).MemBesov volume 2 s q f ↔ (trigModulusData d).modNorm s q f < ∞ :=
-  (trigModulusData d).memApprox_iff_modNorm_lt_top hq hs.le hs1 f
+  FunctionScheme.memBesov_iff_memApprox.trans
+    ((trigModulusData d).memApprox_iff_modNorm_lt_top hq hs.le hs1 f)
 
 /-! ### The modulus and the dyadic Fourier blocks -/
 
