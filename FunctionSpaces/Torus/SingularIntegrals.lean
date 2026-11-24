@@ -14,14 +14,14 @@ public import FunctionSpaces.Rd.Sobolev.DerivativeKernels
 
 Let `(θ_j)_{j ∈ ℕ}` be a Calderón–Zygmund family on `ℝ^d`, `d ≥ 1`, with overlap `B` and
 Hörmander constant `H` (`Rd.IsCZFamily`), acting on the torus `𝕋^d` by
-`(θ_j ⋆ f)(t) = ∫ θ_j(y) f(t - π y) dy` (`Torus.econv`). For `1 < p < ∞`, with the constant
+`(θ_j ⋆ f)(t) = ∫ θ_j(y) f(t - π y) dy` (`Torus.periodicEconv`). For `1 < p < ∞`, with the constant
 `C = 3^{d/p} S_{d,p}(B, H) + D` (`Torus.periodicCZConst`), where `S_{d,p}(B, H)` is the strong
 type constant on `ℝ^d` (`Rd.czConst`) and `D` bounds the **far mass**
 `∫_{‖y‖ ≥ 1} ∑_j |θ_j(y)| dy` (`Torus.farMass`):
 
-* **the analysis operator** (`Torus.eLpNorm_lqNorm_econv_le`):
+* **the analysis operator** (`Torus.eLpNorm_lqNorm_periodicEconv_le`):
   `‖ ‖((θ_j ⋆ f)(t))_j‖_{ℓ_2} ‖_{L_p(𝕋^d)} ≤ C ‖f‖_p` for every `f ∈ L_p(𝕋^d)`;
-* **the synthesis operators** (`Torus.eLpNorm_sum_econv_le`):
+* **the synthesis operators** (`Torus.eLpNorm_sum_periodicEconv_le`):
   `‖∑_{j ∈ s} θ_j ⋆ g_j‖_{L_p(𝕋^d)} ≤ C ‖ ‖(g_j(t))_j‖_{ℓ_2} ‖_{L_p(𝕋^d)}` for every finite set
   `s` and all measurable `g_j ∈ L_p(𝕋^d)`.
 
@@ -29,10 +29,10 @@ The proof transfers the bounds of `ℝ^d` (`Rd.IsCZFamily.eLpNorm_lqNorm_conv_le
 `Rd.IsCZFamily.eLpNorm_sum_conv_le`) by localising the periodic lift, as for the
 Fefferman–Stein inequality. At a point `x` of the period box `P_0 = (0, 1]^d`,
 `(θ_j ⋆ f)(π x) = (θ_j ⋆ (f ∘ π))(x)`; the part of `f ∘ π` on the box `(-1, 2]^d` is a function
-on `ℝ^d` with `L_p` norm `3^{d/p} ‖f‖_p` (`Torus.eLpNorm_indicator_tripleBox_comp_proj`), and the
-rest is only seen by `θ_j` at points `‖y‖ ≥ 1` (`Torus.one_le_norm_of_sub_notMem_tripleBox`,
-`Torus.enorm_econv_proj_sub_conv_le`). These far parts are bounded at every point by the
-**far convolution** `∫_{‖y‖ ≥ 1} (∑_j |θ_j(y)|) G(t - π y) dy` (`Torus.farConv`), whose `L_p`
+on `ℝ^d` with `L_p` norm `3^{d/p} ‖f‖_p` (`Torus.eLpNorm_indicator_tripleBox_comp_quotientProj`),
+and the rest is only seen by `θ_j` at points `‖y‖ ≥ 1` (`Torus.one_le_norm_of_sub_notMem_tripleBox`,
+`Torus.enorm_periodicEconv_quotientProj_sub_conv_le`). These far parts are bounded at every point by
+the **far convolution** `∫_{‖y‖ ≥ 1} (∑_j |θ_j(y)|) G(t - π y) dy` (`Torus.farConv`), whose `L_p`
 norm is at most the far mass times `‖G‖_p` by Young's inequality (`Torus.eLpNorm_farConv_le`).
 For dilations `θ_j = (G_j)_{2^j}` of a uniform Schwartz family with bounds `A` the far mass is at
 most `2 T_A`, with the tail constant `T_A = Rd.familyTailConst` (`Torus.farMass_dilate_le`); this
@@ -120,7 +120,7 @@ with the far parts of a family of kernels on `ℝ^d`; it bounds the far parts of
 `θ_j ⋆ g_j` at every point. -/
 noncomputable def farConv (θ : ℕ → EuclideanSpace ℝ d → ℂ) (G : UnitAddTorus d → ℝ≥0∞)
     (t : UnitAddTorus d) : ℝ≥0∞ :=
-  ∫⁻ y in {y : EuclideanSpace ℝ d | 1 ≤ ‖y‖}, (∑' j, ‖θ j y‖ₑ) * G (t - proj y)
+  ∫⁻ y in {y : EuclideanSpace ℝ d | 1 ≤ ‖y‖}, (∑' j, ‖θ j y‖ₑ) * G (t - quotientProj y)
 
 /-- The kernel `y ↦ ∑_j |θ_j(y)|` of the far parts is almost everywhere measurable for every
 measure `ν` below the Lebesgue measure, such as its restriction to `{‖y‖ ≥ 1}`. -/
@@ -136,13 +136,13 @@ for `1 ≤ q`, an s-finite measure `ν` on `ℝ^d`, an almost everywhere measura
 `MeasureTheory.lintegral_rpow_lintegral_mul_le`: the kernel form
 `MeasureTheory.lintegral_rpow_lintegral_kernel_le` for `K(t, y) = G(t - π y)`, with
 `∫_{𝕋^d} G(t - π y)^q dt = ∫_{𝕋^d} G^q` by the translation invariance of the Haar measure. -/
-theorem lintegral_rpow_lintegral_mul_comp_sub_proj_le {ν : Measure (EuclideanSpace ℝ d)}
+theorem lintegral_rpow_lintegral_mul_comp_sub_quotientProj_le {ν : Measure (EuclideanSpace ℝ d)}
     [SFinite ν] {q : ℝ} (hq1 : 1 ≤ q) {a : EuclideanSpace ℝ d → ℝ≥0∞} (ha : AEMeasurable a ν)
     {G : UnitAddTorus d → ℝ≥0∞} (hG : Measurable G) :
-    ∫⁻ t, (∫⁻ y, a y * G (t - proj y) ∂ν) ^ q ≤ (∫⁻ y, a y ∂ν) ^ q * ∫⁻ t, G t ^ q :=
-  lintegral_rpow_lintegral_kernel_le hq1 ha (K := fun t y => G (t - proj y))
-    (hG.comp (measurable_fst.sub (measurable_proj.comp measurable_snd))).aemeasurable
-    fun y => (lintegral_sub_right_eq_self (fun t => G t ^ q) (proj y)).le
+    ∫⁻ t, (∫⁻ y, a y * G (t - quotientProj y) ∂ν) ^ q ≤ (∫⁻ y, a y ∂ν) ^ q * ∫⁻ t, G t ^ q :=
+  lintegral_rpow_lintegral_kernel_le hq1 ha (K := fun t y => G (t - quotientProj y))
+    (hG.comp (measurable_fst.sub (measurable_quotientProj.comp measurable_snd))).aemeasurable
+    fun y => (lintegral_sub_right_eq_self (fun t => G t ^ q) (quotientProj y)).le
 
 /-- For almost everywhere strongly measurable kernels `θ_j` and measurable `G`, the far
 convolution `Torus.farConv θ G` is almost everywhere measurable. -/
@@ -150,10 +150,10 @@ theorem aemeasurable_farConv {θ : ℕ → EuclideanSpace ℝ d → ℂ}
     (hθ : ∀ j, AEStronglyMeasurable (θ j) volume) {G : UnitAddTorus d → ℝ≥0∞} (hG : Measurable G) :
     AEMeasurable (farConv θ G) volume := by
   have hprod : AEMeasurable (Function.uncurry fun (t : UnitAddTorus d) y =>
-      (∑' j, ‖θ j y‖ₑ) * G (t - proj y))
+      (∑' j, ‖θ j y‖ₑ) * G (t - quotientProj y))
       (volume.prod (volume.restrict {y : EuclideanSpace ℝ d | 1 ≤ ‖y‖})) :=
     (aemeasurable_tsum_enorm hθ _ Measure.restrict_le_self).comp_snd.mul
-      (hG.comp (measurable_fst.sub (measurable_proj.comp measurable_snd))).aemeasurable
+      (hG.comp (measurable_fst.sub (measurable_quotientProj.comp measurable_snd))).aemeasurable
   exact hprod.lintegral_prod_right'
 
 /-- **Young's inequality for the far convolution**: for almost everywhere strongly measurable
@@ -170,7 +170,7 @@ theorem eLpNorm_farConv_le {θ : ℕ → EuclideanSpace ℝ d → ℂ}
   rw [ENNReal.mul_rpow_of_nonneg _ _ (by linarith), eLpNorm_rpow_eq_lintegral hp0 hp
     hG.aemeasurable]
   simp only [enorm_eq_self]
-  exact lintegral_rpow_lintegral_mul_comp_sub_proj_le hq1
+  exact lintegral_rpow_lintegral_mul_comp_sub_quotientProj_le hq1
     (aemeasurable_tsum_enorm hθ _ Measure.restrict_le_self) hG
 
 /-- **The far parts as a far convolution**: `∑_j ∫_{‖y‖ ≥ 1} |θ_j(y)| G(t - π y) dy` is the far
@@ -178,10 +178,10 @@ convolution of `G`, by monotone convergence. -/
 theorem tsum_setLIntegral_eq_farConv {θ : ℕ → EuclideanSpace ℝ d → ℂ}
     (hθ : ∀ j, AEStronglyMeasurable (θ j) volume) {G : UnitAddTorus d → ℝ≥0∞} (hG : Measurable G)
     (t : UnitAddTorus d) :
-    ∑' j, ∫⁻ y in {y : EuclideanSpace ℝ d | 1 ≤ ‖y‖}, ‖θ j y‖ₑ * G (t - proj y) =
+    ∑' j, ∫⁻ y in {y : EuclideanSpace ℝ d | 1 ≤ ‖y‖}, ‖θ j y‖ₑ * G (t - quotientProj y) =
       farConv θ G t := by
-  rw [farConv, ← lintegral_tsum (f := fun j y => ‖θ j y‖ₑ * G (t - proj y)) fun j =>
-    (hθ j).restrict.enorm.mul (hG.comp (measurable_const.sub measurable_proj)).aemeasurable]
+  rw [farConv, ← lintegral_tsum (f := fun j y => ‖θ j y‖ₑ * G (t - quotientProj y)) fun j =>
+    (hθ j).restrict.enorm.mul (hG.comp (measurable_const.sub measurable_quotientProj)).aemeasurable]
   exact lintegral_congr fun y => ENNReal.tsum_mul_right
 
 /-! ### Pointwise localisation -/
@@ -191,16 +191,18 @@ theorem tsum_setLIntegral_eq_farConv {θ : ℕ → EuclideanSpace ℝ d → ℂ}
 `|(θ ⋆ f)(π x) - (θ ⋆ 1_{(-1,2]^d} (f ∘ π))(x)| ≤ ∫_{‖y‖ ≥ 1} |θ(y)| |f(π x - π y)| dy`, with
 the convolution on `ℝ^d` in the second term. The difference is the integral over the `y` with
 `x - y ∉ (-1, 2]^d`, and these have `‖y‖ ≥ 1`. -/
-theorem enorm_econv_proj_sub_conv_le {θ : EuclideanSpace ℝ d → ℂ} {f : UnitAddTorus d → ℂ}
-    {x : EuclideanSpace ℝ d} (hx : x ∈ periodBox 0)
-    (hint : Integrable fun y => θ y * f (proj x - proj y)) :
-    ‖econv θ f (proj x) - Rd.conv θ (tripleBox.indicator (f ∘ proj)) volume x‖ₑ ≤
-      ∫⁻ y in {y : EuclideanSpace ℝ d | 1 ≤ ‖y‖}, ‖θ y‖ₑ * ‖f (proj x - proj y)‖ₑ := by
+theorem enorm_periodicEconv_quotientProj_sub_conv_le {θ : EuclideanSpace ℝ d → ℂ}
+    {f : UnitAddTorus d → ℂ} {x : EuclideanSpace ℝ d} (hx : x ∈ periodBox 0)
+    (hint : Integrable fun y => θ y * f (quotientProj x - quotientProj y)) :
+    ‖periodicEconv θ f (quotientProj x) -
+      Rd.conv θ (tripleBox.indicator (f ∘ quotientProj)) volume x‖ₑ ≤
+      ∫⁻ y in {y : EuclideanSpace ℝ d | 1 ≤ ‖y‖},
+        ‖θ y‖ₑ * ‖f (quotientProj x - quotientProj y)‖ₑ := by
   set S : Set (EuclideanSpace ℝ d) := {y | x - y ∈ tripleBox}
   have hS : MeasurableSet S :=
     measurableSet_tripleBox.preimage (measurable_const.sub measurable_id)
-  have hconv : Rd.conv θ (tripleBox.indicator (f ∘ proj)) volume x =
-      ∫ y in S, θ y * f (proj x - proj y) := by
+  have hconv : Rd.conv θ (tripleBox.indicator (f ∘ quotientProj)) volume x =
+      ∫ y in S, θ y * f (quotientProj x - quotientProj y) := by
     rw [Rd.conv_apply, ← integral_indicator hS]
     refine integral_congr_ae (Eventually.of_forall fun y => ?_)
     dsimp only
@@ -209,8 +211,8 @@ theorem enorm_econv_proj_sub_conv_le {θ : EuclideanSpace ℝ d → ℂ} {f : Un
         map_sub]
     · rw [indicator_of_notMem hy, indicator_of_notMem (show y ∉ S from hy), mul_zero]
   have hsplit := integral_add_compl hS hint
-  rw [hconv, show econv θ f (proj x) = ∫ y, θ y * f (proj x - proj y) from rfl, ← hsplit,
-    add_sub_cancel_left]
+  rw [hconv, show periodicEconv θ f (quotientProj x) =
+      ∫ y, θ y * f (quotientProj x - quotientProj y) from rfl, ← hsplit, add_sub_cancel_left]
   refine (enorm_integral_le_lintegral_enorm _).trans ?_
   simp only [enorm_mul]
   exact lintegral_mono_set fun y hy => one_le_norm_of_sub_notMem_tripleBox hx hy
@@ -218,65 +220,68 @@ theorem enorm_econv_proj_sub_conv_le {θ : EuclideanSpace ℝ d → ℂ} {f : Un
 /-- **The convolution integrals of lifts converge absolutely**: for integrable kernels `θ_j` and
 measurable `g_j ∈ L_1(𝕋^d)`, for almost every `x ∈ ℝ^d` and every `j` the integral
 `∫ θ_j(y) g_j(π x - π y) dy` converges absolutely (`Torus.ae_integrable_econv`, lifted by
-`Torus.ae_comp_proj`). -/
-theorem ae_integrable_econv_proj {θ : ℕ → EuclideanSpace ℝ d → ℂ} (hθ : ∀ j, Integrable (θ j))
-    {g : ℕ → UnitAddTorus d → ℂ} (hg : ∀ j, Measurable (g j)) (hgi : ∀ j, Integrable (g j)) :
+`Torus.ae_comp_quotientProj`). -/
+theorem ae_integrable_econv_quotientProj {θ : ℕ → EuclideanSpace ℝ d → ℂ}
+    (hθ : ∀ j, Integrable (θ j)) {g : ℕ → UnitAddTorus d → ℂ} (hg : ∀ j, Measurable (g j))
+    (hgi : ∀ j, Integrable (g j)) :
     ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ d)), ∀ j,
-      Integrable fun y => θ j y * g j (proj x - proj y) :=
-  ae_all_iff.2 fun j => ae_comp_proj (ae_integrable_econv (hθ j) (hg j) (hgi j))
+      Integrable fun y => θ j y * g j (quotientProj x - quotientProj y) :=
+  ae_all_iff.2 fun j => ae_comp_quotientProj (ae_integrable_econv (hθ j) (hg j) (hgi j))
 
 /-- **Localisation of the analysis operator**: at `x ∈ P_0` where all convolution integrals
 converge absolutely,
 `‖((θ_j ⋆ f)(π x))_j‖_{ℓ_2} ≤ ‖((θ_j ⋆ 1_{(-1,2]^d} (f ∘ π))(x))_j‖_{ℓ_2} + F(π x)` with the far
 convolution `F` of `|f|` (`Torus.farConv`): the triangle inequality in `ℓ_2`, and
 `‖·‖_{ℓ_2} ≤ ‖·‖_{ℓ_1}` for the far parts. -/
-theorem lqNorm_econv_proj_le {θ : ℕ → EuclideanSpace ℝ d → ℂ}
+theorem lqNorm_periodicEconv_quotientProj_le {θ : ℕ → EuclideanSpace ℝ d → ℂ}
     (hθ : ∀ j, AEStronglyMeasurable (θ j) volume) {f : UnitAddTorus d → ℂ} (hf : Measurable f)
     {x : EuclideanSpace ℝ d} (hx : x ∈ periodBox 0)
-    (hint : ∀ j, Integrable fun y => θ j y * f (proj x - proj y)) :
-    lqNorm 2 (fun j => ‖econv (θ j) f (proj x)‖ₑ) ≤
-      lqNorm 2 (fun j => ‖Rd.conv (θ j) (tripleBox.indicator (f ∘ proj)) volume x‖ₑ) +
-        farConv θ (fun t => ‖f t‖ₑ) (proj x) := by
-  have hj : ∀ j, ‖econv (θ j) f (proj x)‖ₑ ≤
-      ‖Rd.conv (θ j) (tripleBox.indicator (f ∘ proj)) volume x‖ₑ +
-        ∫⁻ y in {y : EuclideanSpace ℝ d | 1 ≤ ‖y‖}, ‖θ j y‖ₑ * ‖f (proj x - proj y)‖ₑ := by
+    (hint : ∀ j, Integrable fun y => θ j y * f (quotientProj x - quotientProj y)) :
+    lqNorm 2 (fun j => ‖periodicEconv (θ j) f (quotientProj x)‖ₑ) ≤
+      lqNorm 2 (fun j => ‖Rd.conv (θ j) (tripleBox.indicator (f ∘ quotientProj)) volume x‖ₑ) +
+        farConv θ (fun t => ‖f t‖ₑ) (quotientProj x) := by
+  have hj : ∀ j, ‖periodicEconv (θ j) f (quotientProj x)‖ₑ ≤
+      ‖Rd.conv (θ j) (tripleBox.indicator (f ∘ quotientProj)) volume x‖ₑ +
+        ∫⁻ y in {y : EuclideanSpace ℝ d | 1 ≤ ‖y‖},
+            ‖θ j y‖ₑ * ‖f (quotientProj x - quotientProj y)‖ₑ := by
     intro j
-    calc ‖econv (θ j) f (proj x)‖ₑ
-        = ‖Rd.conv (θ j) (tripleBox.indicator (f ∘ proj)) volume x +
-            (econv (θ j) f (proj x) -
-              Rd.conv (θ j) (tripleBox.indicator (f ∘ proj)) volume x)‖ₑ := by
+    calc ‖periodicEconv (θ j) f (quotientProj x)‖ₑ
+        = ‖Rd.conv (θ j) (tripleBox.indicator (f ∘ quotientProj)) volume x +
+            (periodicEconv (θ j) f (quotientProj x) -
+              Rd.conv (θ j) (tripleBox.indicator (f ∘ quotientProj)) volume x)‖ₑ := by
           rw [add_sub_cancel]
       _ ≤ _ := (enorm_add_le _ _).trans
-          (add_le_add le_rfl (enorm_econv_proj_sub_conv_le hx (hint j)))
+          (add_le_add le_rfl (enorm_periodicEconv_quotientProj_sub_conv_le hx (hint j)))
   refine (ENNReal.lqNorm_mono hj).trans ((ENNReal.lqNorm_add_le one_le_two _ _).trans ?_)
   refine add_le_add le_rfl ((ENNReal.lqNorm_le_lqNorm_one one_le_two _).trans_eq ?_)
-  exact tsum_setLIntegral_eq_farConv hθ hf.enorm (proj x)
+  exact tsum_setLIntegral_eq_farConv hθ hf.enorm (quotientProj x)
 
 /-- **Localisation of the synthesis operators**: at `x ∈ P_0` where all convolution integrals
 converge absolutely, for every finite set `s`,
 `|∑_{j ∈ s} (θ_j ⋆ g_j)(π x)| ≤ |∑_{j ∈ s} (θ_j ⋆ 1_{(-1,2]^d} (g_j ∘ π))(x)| + F(π x)` with the
 far convolution `F` of `G(t) = ‖(g_j(t))_j‖_{ℓ_2}` (`Torus.farConv`), since `|g_j| ≤ G`. -/
-theorem enorm_sum_econv_proj_le {θ : ℕ → EuclideanSpace ℝ d → ℂ}
+theorem enorm_sum_periodicEconv_quotientProj_le {θ : ℕ → EuclideanSpace ℝ d → ℂ}
     (hθ : ∀ j, AEStronglyMeasurable (θ j) volume) {g : ℕ → UnitAddTorus d → ℂ}
     (hg : ∀ j, Measurable (g j)) (s : Finset ℕ) {x : EuclideanSpace ℝ d} (hx : x ∈ periodBox 0)
-    (hint : ∀ j, Integrable fun y => θ j y * g j (proj x - proj y)) :
-    ‖∑ j ∈ s, econv (θ j) (g j) (proj x)‖ₑ ≤
-      ‖∑ j ∈ s, Rd.conv (θ j) (tripleBox.indicator (g j ∘ proj)) volume x‖ₑ +
-        farConv θ (fun t => lqNorm 2 fun j => ‖g j t‖ₑ) (proj x) := by
-  set c : ℕ → ℂ := fun j => Rd.conv (θ j) (tripleBox.indicator (g j ∘ proj)) volume x
+    (hint : ∀ j, Integrable fun y => θ j y * g j (quotientProj x - quotientProj y)) :
+    ‖∑ j ∈ s, periodicEconv (θ j) (g j) (quotientProj x)‖ₑ ≤
+      ‖∑ j ∈ s, Rd.conv (θ j) (tripleBox.indicator (g j ∘ quotientProj)) volume x‖ₑ +
+        farConv θ (fun t => lqNorm 2 fun j => ‖g j t‖ₑ) (quotientProj x) := by
+  set c : ℕ → ℂ := fun j => Rd.conv (θ j) (tripleBox.indicator (g j ∘ quotientProj)) volume x
   have hG : Measurable fun t => lqNorm 2 fun j => ‖g j t‖ₑ :=
     measurable_lqNorm_comp (fun j => (hg j).enorm) 2
-  have hfar : ∑ j ∈ s, ‖econv (θ j) (g j) (proj x) - c j‖ₑ ≤
-      farConv θ (fun t => lqNorm 2 fun j => ‖g j t‖ₑ) (proj x) := by
+  have hfar : ∑ j ∈ s, ‖periodicEconv (θ j) (g j) (quotientProj x) - c j‖ₑ ≤
+      farConv θ (fun t => lqNorm 2 fun j => ‖g j t‖ₑ) (quotientProj x) := by
     rw [← tsum_setLIntegral_eq_farConv hθ hG]
-    refine (Finset.sum_le_sum fun j _ => (enorm_econv_proj_sub_conv_le hx (hint j)).trans
+    refine (Finset.sum_le_sum fun j _ =>
+      (enorm_periodicEconv_quotientProj_sub_conv_le hx (hint j)).trans
       (lintegral_mono fun y => mul_le_mul_right ?_ _)).trans (ENNReal.sum_le_tsum s)
-    exact ENNReal.le_lqNorm two_ne_zero (fun i => ‖g i (proj x - proj y)‖ₑ) j
-  calc ‖∑ j ∈ s, econv (θ j) (g j) (proj x)‖ₑ
-      = ‖∑ j ∈ s, c j + ∑ j ∈ s, (econv (θ j) (g j) (proj x) - c j)‖ₑ := by
+    exact ENNReal.le_lqNorm two_ne_zero (fun i => ‖g i (quotientProj x - quotientProj y)‖ₑ) j
+  calc ‖∑ j ∈ s, periodicEconv (θ j) (g j) (quotientProj x)‖ₑ
+      = ‖∑ j ∈ s, c j + ∑ j ∈ s, (periodicEconv (θ j) (g j) (quotientProj x) - c j)‖ₑ := by
         rw [← Finset.sum_add_distrib]
         simp only [add_sub_cancel]
-    _ ≤ ‖∑ j ∈ s, c j‖ₑ + ∑ j ∈ s, ‖econv (θ j) (g j) (proj x) - c j‖ₑ :=
+    _ ≤ ‖∑ j ∈ s, c j‖ₑ + ∑ j ∈ s, ‖periodicEconv (θ j) (g j) (quotientProj x) - c j‖ₑ :=
         (enorm_add_le _ _).trans (add_le_add le_rfl (enorm_sum_le _ _))
     _ ≤ _ := add_le_add le_rfl hfar
 
@@ -303,27 +308,28 @@ every `1 < p < ∞` and every `f ∈ L_p(𝕋^d)`,
 `‖ ‖((θ_j ⋆ f)(t))_j‖_{ℓ_2} ‖_{L_p(𝕋^d)} ≤ C ‖f‖_p` with `C = Torus.periodicCZConst d p B H D`.
 The lift splits into the part on `(-1, 2]^d`, bounded by the strong type on `ℝ^d`, and the far
 part, bounded by Young's inequality for the far convolution. -/
-theorem eLpNorm_lqNorm_econv_le [Nonempty d] {θ : ℕ → EuclideanSpace ℝ d → ℂ} {B H D : ℝ≥0∞}
+theorem eLpNorm_lqNorm_periodicEconv_le [Nonempty d] {θ : ℕ → EuclideanSpace ℝ d → ℂ} {B H D : ℝ≥0∞}
     (h : Rd.IsCZFamily θ B H) (hD : farMass θ ≤ D) {p : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ ∞)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
-    eLpNorm (fun t => lqNorm 2 fun j => ‖econv (θ j) f t‖ₑ) p volume ≤
+    eLpNorm (fun t => lqNorm 2 fun j => ‖periodicEconv (θ j) f t‖ₑ) p volume ≤
       periodicCZConst d p B H D * ‖f‖ₑ := by
   have hp0 : p ≠ 0 := (zero_lt_one.trans hp1).ne'
   have hθ : ∀ j, AEStronglyMeasurable (θ j) volume := fun j => (h.integrable j).1
   have hfm : Measurable f := (Lp.stronglyMeasurable f).measurable
-  have hF : AEMeasurable (fun t => lqNorm 2 fun j => ‖econv (θ j) f t‖ₑ) volume :=
-    aemeasurable_lqNorm_comp (fun j => (aestronglyMeasurable_econv (hθ j) hfm).enorm) 2
-  have hsplit := eLpNorm_le_of_comp_proj_le hp1.le hF (aemeasurable_farConv hθ hfm.enorm)
-    (A := fun x => lqNorm 2 fun j => ‖Rd.conv (θ j) (tripleBox.indicator (f ∘ proj)) volume x‖ₑ)
+  have hF : AEMeasurable (fun t => lqNorm 2 fun j => ‖periodicEconv (θ j) f t‖ₑ) volume :=
+    aemeasurable_lqNorm_comp (fun j => (aestronglyMeasurable_periodicEconv (hθ j) hfm).enorm) 2
+  have hsplit := eLpNorm_le_of_comp_quotientProj_le hp1.le hF (aemeasurable_farConv hθ hfm.enorm)
+    (A := fun x => lqNorm 2 fun j =>
+      ‖Rd.conv (θ j) (tripleBox.indicator (f ∘ quotientProj)) volume x‖ₑ)
     (by
       filter_upwards [ae_restrict_mem (measurableSet_periodBox 0), ae_restrict_of_ae
-        (ae_integrable_econv_proj (g := fun _ => f) h.integrable (fun _ => hfm)
+        (ae_integrable_econv_quotientProj (g := fun _ => f) h.integrable (fun _ => hfm)
           fun _ => (Lp.memLp f).integrable hp1.le)]
         with x hx hint
-      exact lqNorm_econv_proj_le hθ hfm hx hint)
+      exact lqNorm_periodicEconv_quotientProj_le hθ hfm hx hint)
   have hnear := h.eLpNorm_lqNorm_conv_le hp1 hp
-    (memLp_indicator_tripleBox_comp_proj hp0 hp (Lp.memLp f))
-  rw [eLpNorm_indicator_tripleBox_comp_proj hp0 hp (Lp.aestronglyMeasurable f)] at hnear
+    (memLp_indicator_tripleBox_comp_quotientProj hp0 hp (Lp.memLp f))
+  rw [eLpNorm_indicator_tripleBox_comp_quotientProj hp0 hp (Lp.aestronglyMeasurable f)] at hnear
   refine hsplit.trans ?_
   rw [Lp.enorm_def, periodicCZConst, add_mul]
   refine add_le_add (hnear.trans_eq (by ring)) ?_
@@ -336,34 +342,35 @@ Calderón–Zygmund family `(θ_j)_j` on `ℝ^d` with overlap `B`, Hörmander co
 at most `D`, every `1 < p < ∞`, every finite set `s` and all measurable `g_j ∈ L_p(𝕋^d)`,
 `‖∑_{j ∈ s} θ_j ⋆ g_j‖_{L_p(𝕋^d)} ≤ C ‖ ‖(g_j(t))_j‖_{ℓ_2} ‖_{L_p(𝕋^d)}` with
 `C = Torus.periodicCZConst d p B H D`. -/
-theorem eLpNorm_sum_econv_le [Nonempty d] {θ : ℕ → EuclideanSpace ℝ d → ℂ} {B H D : ℝ≥0∞}
+theorem eLpNorm_sum_periodicEconv_le [Nonempty d] {θ : ℕ → EuclideanSpace ℝ d → ℂ} {B H D : ℝ≥0∞}
     (h : Rd.IsCZFamily θ B H) (hD : farMass θ ≤ D) {p : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ ∞)
     (s : Finset ℕ) {g : ℕ → UnitAddTorus d → ℂ} (hgm : ∀ j, Measurable (g j))
     (hg : ∀ j, MemLp (g j) p volume) :
-    eLpNorm (fun t => ∑ j ∈ s, econv (θ j) (g j) t) p volume ≤
+    eLpNorm (fun t => ∑ j ∈ s, periodicEconv (θ j) (g j) t) p volume ≤
       periodicCZConst d p B H D * eLpNorm (fun t => lqNorm 2 fun j => ‖g j t‖ₑ) p volume := by
   have hp0 : p ≠ 0 := (zero_lt_one.trans hp1).ne'
   have hθ : ∀ j, AEStronglyMeasurable (θ j) volume := fun j => (h.integrable j).1
   have hG : Measurable fun t => lqNorm 2 fun j => ‖g j t‖ₑ :=
     measurable_lqNorm_comp (fun j => (hgm j).enorm) 2
-  have hsum : AEStronglyMeasurable (fun t => ∑ j ∈ s, econv (θ j) (g j) t) volume :=
-    Finset.aestronglyMeasurable_fun_sum s fun j _ => aestronglyMeasurable_econv (hθ j) (hgm j)
-  have hsplit := eLpNorm_le_of_comp_proj_le hp1.le hsum.enorm (aemeasurable_farConv hθ hG)
-    (A := fun x => ‖∑ j ∈ s, Rd.conv (θ j) (tripleBox.indicator (g j ∘ proj)) volume x‖ₑ)
+  have hsum : AEStronglyMeasurable (fun t => ∑ j ∈ s, periodicEconv (θ j) (g j) t) volume :=
+    Finset.aestronglyMeasurable_fun_sum s fun j _ =>
+      aestronglyMeasurable_periodicEconv (hθ j) (hgm j)
+  have hsplit := eLpNorm_le_of_comp_quotientProj_le hp1.le hsum.enorm (aemeasurable_farConv hθ hG)
+    (A := fun x => ‖∑ j ∈ s, Rd.conv (θ j) (tripleBox.indicator (g j ∘ quotientProj)) volume x‖ₑ)
     (by
       filter_upwards [ae_restrict_mem (measurableSet_periodBox 0), ae_restrict_of_ae
-        (ae_integrable_econv_proj h.integrable hgm fun j => (hg j).integrable hp1.le)]
+        (ae_integrable_econv_quotientProj h.integrable hgm fun j => (hg j).integrable hp1.le)]
         with x hx hint
-      exact enorm_sum_econv_proj_le hθ hgm s hx hint)
+      exact enorm_sum_periodicEconv_quotientProj_le hθ hgm s hx hint)
   rw [eLpNorm_enorm _ hsum, eLpNorm_enorm _ (Finset.aestronglyMeasurable_fun_sum s fun j _ =>
     Rd.aestronglyMeasurable_conv (hθ j)
-      (memLp_indicator_tripleBox_comp_proj hp0 hp (hg j)).aestronglyMeasurable)] at hsplit
+      (memLp_indicator_tripleBox_comp_quotientProj hp0 hp (hg j)).aestronglyMeasurable)] at hsplit
   have hnear := h.eLpNorm_sum_conv_le hp1 hp s fun j =>
-    memLp_indicator_tripleBox_comp_proj hp0 hp (hg j)
-  have hfun : (fun x => lqNorm 2 fun j => ‖tripleBox.indicator (g j ∘ proj) x‖ₑ) =
-      tripleBox.indicator fun y => lqNorm 2 fun j => ‖g j (proj y)‖ₑ := funext fun x => by
+    memLp_indicator_tripleBox_comp_quotientProj hp0 hp (hg j)
+  have hfun : (fun x => lqNorm 2 fun j => ‖tripleBox.indicator (g j ∘ quotientProj) x‖ₑ) =
+      tripleBox.indicator fun y => lqNorm 2 fun j => ‖g j (quotientProj y)‖ₑ := funext fun x => by
     simp only [enorm_indicator_eq_indicator_enorm]
-    exact ENNReal.lqNorm_indicator 2 _ (fun j y => ‖(g j ∘ proj) y‖ₑ) x
+    exact ENNReal.lqNorm_indicator 2 _ (fun j y => ‖(g j ∘ quotientProj) y‖ₑ) x
   rw [hfun, eLpNorm_indicator_tripleBox hp0 hp hG.aemeasurable] at hnear
   refine hsplit.trans ?_
   rw [periodicCZConst, add_mul]

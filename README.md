@@ -350,8 +350,8 @@ For a general scheme the project describes `A^s_q`
   of the vectors `e_i`. For `0 < τ < 2` and `θ = 1/τ - 1/2`, `f ∈ H` lies in the approximation
   space `A^θ_τ` of `(A_n)` iff `∑_i |⟨e_i, f⟩|^τ < ∞` (Stechkin for `τ = 1`; Pietsch, DeVore in
   general; `HilbertBasis.memApprox_nTerm_iff`). For the Fourier basis of `L_2(𝕋^d)` the
-  condition is `∑_{k ∈ ℤ^d} |f̂(k)|^τ < ∞` (`Torus.memApprox_nTerm_iff`). For the Haar basis
-  `1`, `h_{k,i}` (`0 ≤ i < 2^k`) of `L_2[0, 1]` it is
+  condition is `∑_{k ∈ ℤ^d} |f̂(k)|^τ < ∞` (`Torus.periodic_memApprox_nTerm_iff`). For the Haar
+  basis `1`, `h_{k,i}` (`0 ≤ i < 2^k`) of `L_2[0, 1]` it is
   `|∫_0^1 f|^τ + ∑_k ∑_{i<2^k} |⟨f, h_{k,i}⟩|^τ < ∞` (`Haar.memApprox_nTerm_iff_haarCoeff`); for
   `1 ≤ τ < 2`, `f ∈ A^θ_τ` iff `‖f‖_τ + ‖(2^(kθ) ω_1(f, 2^(-k), [0, 1])_τ)_k‖_{ℓ_τ} < ∞`, that is,
   iff `f ∈ B^θ_{τ,τ}[0, 1]` (DeVore–Jawerth–Popov; `Haar.memApprox_nTerm_iff_modulus`).

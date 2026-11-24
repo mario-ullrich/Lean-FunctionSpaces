@@ -12,8 +12,8 @@ public import ApproximationSpaces.Trace
 # Traces on the torus
 
 The trace of a function on `𝕋^(n+1)` is its restriction to the face `{x_0 = 0} ≅ 𝕋^n`,
-`x' ↦ f(0, x')` (`Torus.face`, `Torus.restrictFace`).  It is defined on continuous functions,
-not on `L_p`.  This file shows, for `1 ≤ p < ∞`, `1 ≤ q ≤ ∞` and `s > 0`
+`x' ↦ f(0, x')` (`Torus.faceEmbedding`, `Torus.restrictFace`).  It is defined on continuous
+functions, not on `L_p`.  This file shows, for `1 ≤ p < ∞`, `1 ≤ q ≤ ∞` and `s > 0`
 (`Torus.trace_besov`): the restriction extends from trigonometric polynomials to a map from
 `B^{s+1/p}_{p,q}(𝕋^(n+1))` into `B^s_{p,q}(𝕋^n)`, and every element of `B^s_{p,q}(𝕋^n)` is a
 trace.  Both directions are the abstract trace theorem (`ApproximationSpaces.Trace`) for two
@@ -25,7 +25,7 @@ since they send monomials to multiples of monomials (`Torus.restrictFace_mem_tri
   `t ↦ a(t, x')` the one-dimensional Nikolskii inequality bounds `|a(0, x')|^p` by
   `2⌈p/2⌉ m ∫ |a(t, x')|^p dt`; integration over `x'` (Fubini on `𝕋^(n+1) = 𝕋 × 𝕋^n`,
   `Torus.lintegral_eq_lintegral_cons`) gives the bound.  So the restriction is a trace bound
-  of exponent `1/p` (`Torus.traceBound`).
+  of exponent `1/p` (`Torus.periodicTraceBound`).
 * **The extension** (`Torus.extendFace`): `b` on `𝕋^n` of degree `< m` extends to
   `φ_m(x_0) b(x')`, of degree `< 3m`, with the normalised Fejér kernel
   `φ_m = m^(-2) |∑_{j<m} e^(2πijx_0)|²` (`Torus.fejerFace`).  Since `φ_m(0) = 1`,
@@ -43,11 +43,11 @@ namespace Torus
 variable {n : ℕ}
 
 /-- The face `{x_0 = 0}` of `𝕋^(n+1)`: `x' ↦ (0, x')`. -/
-noncomputable def face (n : ℕ) : C(UnitAddTorus (Fin n), UnitAddTorus (Fin (n + 1))) :=
+noncomputable def faceEmbedding (n : ℕ) : C(UnitAddTorus (Fin n), UnitAddTorus (Fin (n + 1))) :=
   ⟨fun x' => Fin.cons 0 x', continuous_const.finCons continuous_id⟩
 
 @[simp]
-theorem face_apply (x' : UnitAddTorus (Fin n)) : face n x' = Fin.cons 0 x' := rfl
+theorem faceEmbedding_apply (x' : UnitAddTorus (Fin n)) : faceEmbedding n x' = Fin.cons 0 x' := rfl
 
 /-- The line `t ↦ (t, x')` through `x'`, parametrised by `𝕋^1`. -/
 noncomputable def lineThrough (x' : UnitAddTorus (Fin n)) :
@@ -72,22 +72,23 @@ theorem compLinear_apply {Y Z : Type*} [TopologicalSpace Y] [TopologicalSpace Z]
 /-- The restriction to the face `{x_0 = 0}`. -/
 noncomputable abbrev restrictFace (n : ℕ) :
     (UnitAddTorus (Fin (n + 1)) →ᵇ ℂ) →ₗ[ℂ] (UnitAddTorus (Fin n) →ᵇ ℂ) :=
-  compLinear (face n)
+  compLinear (faceEmbedding n)
 
 /-- `deg (k_1, …, k_n) ≤ deg (k_0, …, k_n)`. -/
-theorem deg_tail_le (k : Fin (n + 1) → ℤ) : deg (Fin.tail k) ≤ deg k :=
-  deg_le_iff.2 fun i => natAbs_le_deg k i.succ
+theorem trigDeg_tail_le (k : Fin (n + 1) → ℤ) : trigDeg (Fin.tail k) ≤ trigDeg k :=
+  trigDeg_le_iff.2 fun i => natAbs_le_trigDeg k i.succ
 
 /-- `|k_0| ≤ deg k`, as the degree of the one-variable index `(k_0)`. -/
-theorem deg_const_le (k : Fin (n + 1) → ℤ) : deg (fun _ : Fin 1 => k 0) ≤ deg k :=
-  deg_le_iff.2 fun _ => natAbs_le_deg k 0
+theorem trigDeg_const_le (k : Fin (n + 1) → ℤ) : trigDeg (fun _ : Fin 1 => k 0) ≤ trigDeg k :=
+  trigDeg_le_iff.2 fun _ => natAbs_le_trigDeg k 0
 
 /-- The restriction of a monomial to the face is a monomial: `e_k(0, x') = e_{k'}(x')`. -/
 theorem restrictFace_trigMonomial (k : Fin (n + 1) → ℤ) :
     restrictFace n (trigMonomial k) = trigMonomial (Fin.tail k) := by
   ext x'
-  simp only [compLinear_apply, face_apply, trigMonomial_apply, mFourier, ContinuousMap.coe_mk,
-    Fin.prod_univ_succ, Fin.cons_zero, Fin.cons_succ, fourier_eval_zero, one_mul, Fin.tail]
+  simp only [compLinear_apply, faceEmbedding_apply, trigMonomial_apply, mFourier,
+    ContinuousMap.coe_mk, Fin.prod_univ_succ, Fin.cons_zero, Fin.cons_succ, fourier_eval_zero,
+    one_mul, Fin.tail]
 
 /-- A monomial on a line is a multiple of a one-variable monomial:
 `e_k(t, x') = e_{k'}(x') e_{k_0}(t)`. -/
@@ -106,7 +107,7 @@ theorem restrictFace_mem_trigPoly {m : ℕ} {a : UnitAddTorus (Fin (n + 1)) →�
     (ha : a ∈ trigPoly (Fin (n + 1)) m) : restrictFace n a ∈ trigPoly (Fin n) m :=
   map_mem_trigPoly _ (fun k hk => by
     rw [restrictFace_trigMonomial]
-    exact trigMonomial_mem_trigPoly ((deg_tail_le k).trans_lt hk)) ha
+    exact trigMonomial_mem_trigPoly ((trigDeg_tail_le k).trans_lt hk)) ha
 
 /-- The restriction of a trigonometric polynomial of degree `< m` to a line is a one-variable
 trigonometric polynomial of degree `< m`. -/
@@ -115,7 +116,7 @@ theorem compLinear_lineThrough_mem_trigPoly (x' : UnitAddTorus (Fin n)) {m : ℕ
     compLinear (lineThrough x') a ∈ trigPoly (Fin 1) m :=
   map_mem_trigPoly _ (fun k hk => by
     rw [compLinear_lineThrough_trigMonomial]
-    exact Submodule.smul_mem _ _ (trigMonomial_mem_trigPoly ((deg_const_le k).trans_lt hk))) ha
+    exact Submodule.smul_mem _ _ (trigMonomial_mem_trigPoly ((trigDeg_const_le k).trans_lt hk))) ha
 
 /-- **Fubini on `𝕋^(n+1) = 𝕋 × 𝕋^n`**, with the first factor written as `𝕋^1`:
 `∫ F = ∫_{x'} ∫_v F(v_0, x')`. -/
@@ -202,11 +203,12 @@ noncomputable def tailMap (n : ℕ) : C(UnitAddTorus (Fin (n + 1)), UnitAddTorus
 theorem tailMap_apply (x : UnitAddTorus (Fin (n + 1))) : tailMap n x = Fin.tail x := rfl
 
 /-- `deg (0, k') = deg k'`, at most. -/
-theorem deg_cons_zero_le (k : Fin n → ℤ) : deg (Fin.cons 0 k : Fin (n + 1) → ℤ) ≤ deg k :=
-  deg_le_iff.2 fun i => by
+theorem trigDeg_cons_zero_le (k : Fin n → ℤ) :
+    trigDeg (Fin.cons 0 k : Fin (n + 1) → ℤ) ≤ trigDeg k :=
+  trigDeg_le_iff.2 fun i => by
     refine Fin.cases ?_ (fun j => ?_) i
     · simp
-    · simpa using natAbs_le_deg k j
+    · simpa using natAbs_le_trigDeg k j
 
 /-- A monomial of the face coordinates is a monomial of `𝕋^(n+1)`: `e_{k'}(x') = e_{(0,k')}(x)`. -/
 theorem compLinear_tailMap_trigMonomial (k : Fin n → ℤ) :
@@ -221,7 +223,7 @@ theorem compLinear_tailMap_mem_trigPoly {m : ℕ} {b : UnitAddTorus (Fin n) →�
     (hb : b ∈ trigPoly (Fin n) m) : compLinear (tailMap n) b ∈ trigPoly (Fin (n + 1)) m :=
   map_mem_trigPoly _ (fun k hk => by
     rw [compLinear_tailMap_trigMonomial]
-    exact trigMonomial_mem_trigPoly ((deg_cons_zero_le k).trans_lt hk)) hb
+    exact trigMonomial_mem_trigPoly ((trigDeg_cons_zero_le k).trans_lt hk)) hb
 
 /-- The monomial `e^{2πi j x_0}` at `(u, x')` is `e^{2πi j u}`. -/
 theorem trigMonomial_single_cons (j : ℤ) (u : UnitAddCircle) (x' : UnitAddTorus (Fin n)) :
@@ -231,8 +233,8 @@ theorem trigMonomial_single_cons (j : ℤ) (u : UnitAddCircle) (x' : UnitAddToru
   rw [Finset.prod_eq_one fun i _ => by simp [Fin.succ_ne_zero], mul_one]
 
 /-- `deg (j, 0, …, 0) = |j|`, at most. -/
-theorem deg_single_le (j : ℤ) : deg (Pi.single 0 j : Fin (n + 1) → ℤ) ≤ j.natAbs :=
-  deg_le_iff.2 fun i => by
+theorem trigDeg_single_le (j : ℤ) : trigDeg (Pi.single 0 j : Fin (n + 1) → ℤ) ≤ j.natAbs :=
+  trigDeg_le_iff.2 fun i => by
     by_cases h : i = 0
     · subst h; simp
     · simp [h]
@@ -254,7 +256,7 @@ theorem star_mem_trigPoly {d : Type*} [Fintype d] {m : ℕ} {T : UnitAddTorus d 
   refine Submodule.sum_mem _ fun k hk => ?_
   rw [star_smul, star_trigMonomial]
   refine Submodule.smul_mem _ _ (trigMonomial_mem_trigPoly ?_)
-  have : deg (-k) = deg k := by simp [deg]
+  have : trigDeg (-k) = trigDeg k := by simp [trigDeg]
   rw [this]; exact mem_boxLt.1 (ht hk)
 
 /-- The **Dirichlet sum** `D_m(x) = ∑_{j<m} e^{2πi j x_0}` on `𝕋^(n+1)`. -/
@@ -269,7 +271,7 @@ theorem dirichletSum_cons (m : ℕ) (u : UnitAddCircle) (x' : UnitAddTorus (Fin 
 /-- `D_m` has degree `< m`. -/
 theorem dirichletSum_mem_trigPoly (m : ℕ) : dirichletSum n m ∈ trigPoly (Fin (n + 1)) m :=
   Submodule.sum_mem _ fun j hj => trigMonomial_mem_trigPoly
-    ((deg_single_le _).trans_lt (by simpa using Finset.mem_range.1 hj))
+    ((trigDeg_single_le _).trans_lt (by simpa using Finset.mem_range.1 hj))
 
 /-- `|D_m| ≤ m`. -/
 theorem norm_dirichletSum_le (m : ℕ) (x : UnitAddTorus (Fin (n + 1))) :
@@ -289,7 +291,7 @@ theorem lintegral_enorm_dirichletSum_sq (m : ℕ) :
   have hD : dirichletSum n m = ∑ k ∈ (Finset.range m).image
       (fun j : ℕ => (Pi.single 0 (j : ℤ) : Fin (n + 1) → ℤ)), (1 : ℂ) • trigMonomial k := by
     rw [Finset.sum_image hinj]; simp [dirichletSum]
-  have h2 := norm_toLp_sum_sq ((Finset.range m).image
+  have h2 := periodic_norm_toLp_sum_sq ((Finset.range m).image
     (fun j : ℕ => (Pi.single 0 (j : ℤ) : Fin (n + 1) → ℤ))) (fun _ => (1 : ℂ))
   rw [← hD] at h2
   simp only [norm_one, one_pow, Finset.sum_const, nsmul_eq_mul, mul_one] at h2
@@ -454,77 +456,80 @@ theorem iUnionSubmodule_le_range (d : Type*) [Fintype d] :
   exact ⟨a, rfl⟩
 
 /-- The restriction to the face on the `L_p` classes of trigonometric polynomials. -/
-noncomputable def traceOnApprox (n : ℕ) :
+noncomputable def periodicTraceOnApprox (n : ℕ) :
     ((trigScheme (Fin (n + 1))).toLp volume p).iUnionSubmodule →ₗ[ℝ]
       Lp ℂ p (volume : Measure (UnitAddTorus (Fin n))) :=
   toLpR p (Fin n) ∘ₗ (restrictFace n).restrictScalars ℝ ∘ₗ
     (LinearEquiv.ofInjective (toLpR p (Fin (n + 1))) (toLpR_injective p _)).symm.toLinearMap ∘ₗ
       Submodule.inclusion (iUnionSubmodule_le_range p (Fin (n + 1)))
 
-theorem traceOnApprox_apply (a : UnitAddTorus (Fin (n + 1)) →ᵇ ℂ)
+theorem periodicTraceOnApprox_apply (a : UnitAddTorus (Fin (n + 1)) →ᵇ ℂ)
     (h : toLpR p (Fin (n + 1)) a ∈ ((trigScheme (Fin (n + 1))).toLp volume p).iUnionSubmodule) :
-    traceOnApprox p n ⟨toLpR p (Fin (n + 1)) a, h⟩ = toLpR p (Fin n) (restrictFace n a) := by
+    periodicTraceOnApprox p n ⟨toLpR p (Fin (n + 1)) a, h⟩ =
+      toLpR p (Fin n) (restrictFace n a) := by
   have he : Submodule.inclusion (iUnionSubmodule_le_range p (Fin (n + 1)))
       ⟨toLpR p (Fin (n + 1)) a, h⟩ =
         LinearEquiv.ofInjective (toLpR p (Fin (n + 1))) (toLpR_injective p _) a :=
     Subtype.ext (by rw [LinearEquiv.ofInjective_apply]; rfl)
-  simp only [traceOnApprox, LinearMap.coe_comp, Function.comp_apply, LinearEquiv.coe_coe, he,
-    LinearEquiv.symm_apply_apply, LinearMap.restrictScalars_apply]
+  simp only [periodicTraceOnApprox, LinearMap.coe_comp, Function.comp_apply, LinearEquiv.coe_coe,
+    he, LinearEquiv.symm_apply_apply, LinearMap.restrictScalars_apply]
 
 /-- The constant `(2⌈p/2⌉)^(1/p)` of the trace inequality. -/
-noncomputable def traceConstTorus : ℝ≥0∞ := ((2 * ⌈p.toReal / 2⌉₊ : ℕ) : ℝ≥0∞) ^ p.toReal⁻¹
+noncomputable def periodicTraceConst : ℝ≥0∞ := ((2 * ⌈p.toReal / 2⌉₊ : ℕ) : ℝ≥0∞) ^ p.toReal⁻¹
 
 /-- **The restriction to the face is a trace bound** of exponent `1/p` from the trigonometric
 scheme of `𝕋^(n+1)` to that of `𝕋^n` in `L_p`, `1 ≤ p < ∞`. -/
-noncomputable def traceBound (n : ℕ) (hp : p ≠ ∞) :
+noncomputable def periodicTraceBound (n : ℕ) (hp : p ≠ ∞) :
     ApproximationScheme.TraceBound ((trigScheme (Fin (n + 1))).toLp volume p)
       ((trigScheme (Fin n)).toLp volume p) p.toReal⁻¹ :=
-  ApproximationScheme.TraceBound.ofSubmodule (traceOnApprox p n)
+  ApproximationScheme.TraceBound.ofSubmodule (periodicTraceOnApprox p n)
     (fun m g hg => by
       obtain ⟨a, ha, hag⟩ := hg
       have hg' : g = ⟨toLpR p (Fin (n + 1)) a, hag ▸ g.2⟩ := Subtype.ext hag.symm
-      rw [hg', traceOnApprox_apply]
+      rw [hg', periodicTraceOnApprox_apply]
       exact FunctionScheme.toLp_mem_toLp (restrictFace_mem_trigPoly ha))
-    (traceConstTorus p) (ENNReal.rpow_ne_top_of_nonneg (by positivity) (ENNReal.natCast_ne_top _))
+    (periodicTraceConst p)
+      (ENNReal.rpow_ne_top_of_nonneg (by positivity) (ENNReal.natCast_ne_top _))
     (fun m hm g hg => by
       obtain ⟨a, ha, hag⟩ := hg
       have hg' : g = ⟨toLpR p (Fin (n + 1)) a, hag ▸ g.2⟩ := Subtype.ext hag.symm
-      rw [hg', traceOnApprox_apply, enorm_toLpR, enorm_toLpR]
+      rw [hg', periodicTraceOnApprox_apply, enorm_toLpR, enorm_toLpR]
       refine (eLpNorm_restrictFace_le ha (Fact.out) hp).trans_eq ?_
-      rw [traceConstTorus, one_div, Nat.cast_mul, Nat.cast_mul, ← mul_assoc, Nat.cast_mul,
+      rw [periodicTraceConst, one_div, Nat.cast_mul, Nat.cast_mul, ← mul_assoc, Nat.cast_mul,
         ENNReal.mul_rpow_of_nonneg _ _ (by positivity)])
 
 /-- On trigonometric polynomials the trace is the restriction to the face. -/
-theorem traceBound_T_toLp (hp : p ≠ ∞) {m : ℕ} {a : UnitAddTorus (Fin (n + 1)) →ᵇ ℂ}
+theorem periodicTraceBound_T_toLp (hp : p ≠ ∞) {m : ℕ} {a : UnitAddTorus (Fin (n + 1)) →ᵇ ℂ}
     (ha : a ∈ trigPoly (Fin (n + 1)) m) :
-    (traceBound p n hp).T (toLpR p (Fin (n + 1)) a) = toLpR p (Fin n) (restrictFace n a) := by
+    (periodicTraceBound p n hp).T (toLpR p (Fin (n + 1)) a) =
+      toLpR p (Fin n) (restrictFace n a) := by
   have hmem : toLpR p (Fin (n + 1)) a ∈
       ((trigScheme (Fin (n + 1))).toLp volume p).iUnionSubmodule :=
     ApproximationScheme.mem_iUnionSubmodule (FunctionScheme.toLp_mem_toLp (n := m) ha)
-  unfold traceBound
+  unfold periodicTraceBound
   exact (ApproximationScheme.TraceBound.ofSubmodule_T _ _ _ _ _ ⟨_, hmem⟩).trans
-    (traceOnApprox_apply p a hmem)
+    (periodicTraceOnApprox_apply p a hmem)
 
 /-- **The trace of a trigonometric polynomial** is its restriction to the face. -/
-theorem traceBound_ext_toLp (hp : p ≠ ∞) {m : ℕ} {a : UnitAddTorus (Fin (n + 1)) →ᵇ ℂ}
-    (ha : a ∈ trigPoly (Fin (n + 1)) m) :
-    (traceBound p n hp).limitTrace (toLpR p (Fin (n + 1)) a) =
+theorem periodicTraceBound_limitTrace_toLp (hp : p ≠ ∞) {m : ℕ}
+    {a : UnitAddTorus (Fin (n + 1)) →ᵇ ℂ} (ha : a ∈ trigPoly (Fin (n + 1)) m) :
+    (periodicTraceBound p n hp).limitTrace (toLpR p (Fin (n + 1)) a) =
       toLpR p (Fin n) (restrictFace n a) := by
-  exact ((traceBound p n hp).limitTrace_eq_of_mem (by positivity)
-    (FunctionScheme.toLp_mem_toLp (n := m) ha)).trans (traceBound_T_toLp p hp ha)
+  exact ((periodicTraceBound p n hp).limitTrace_eq_of_mem (by positivity)
+    (FunctionScheme.toLp_mem_toLp (n := m) ha)).trans (periodicTraceBound_T_toLp p hp ha)
 
 /-- **The extension is a right inverse on approximants**: every polynomial of degree `< 2^k` on
 `𝕋^n` is the trace of a polynomial of degree `< 2^(k+2)` on `𝕋^(n+1)` of norm
 `≤ 2^(-k/p) ‖b‖_p`. -/
-theorem traceBound_rightInverse (hp : p ≠ ∞) :
-    (traceBound p n hp).RightInverseBound 2 1 := by
+theorem periodicTraceBound_rightInverse (hp : p ≠ ∞) :
+    (periodicTraceBound p n hp).RightInverseBound 2 1 := by
   intro k b' hb'
   obtain ⟨b, hb, rfl⟩ := hb'
   have hm : 1 ≤ 2 ^ k := Nat.one_le_two_pow
   have hmem : extendFace n (2 ^ k) b ∈ trigPoly (Fin (n + 1)) (2 ^ (k + 2)) :=
     trigPoly_mono (by rw [pow_add]; omega) (extendFace_mem_trigPoly hb)
   refine ⟨toLpR p (Fin (n + 1)) (extendFace n (2 ^ k) b), FunctionScheme.toLp_mem_toLp hmem, ?_, ?_⟩
-  · rw [traceBound_T_toLp p hp hmem, restrictFace_extendFace hm]
+  · rw [periodicTraceBound_T_toLp p hp hmem, restrictFace_extendFace hm]
   · rw [enorm_toLpR, one_mul, ← ENNReal.natCast_two_pow_rpow]
     exact (eLpNorm_extendFace_le hm b Fact.out hp).trans_eq (by rw [enorm_toLpR])
 
@@ -534,16 +539,16 @@ restriction to the face `{x_0 = 0}` extends from trigonometric polynomials to a 
 of some `f ∈ B^{s+1/p}_{p,q}(𝕋^(n+1))`. -/
 theorem trace_besov (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞} (hq : 1 ≤ q) :
     (∀ f, (trigScheme (Fin (n + 1))).MemBesov volume p (s + p.toReal⁻¹) q f →
-      (trigScheme (Fin n)).MemBesov volume p s q ((traceBound p n hp).limitTrace f)) ∧
+      (trigScheme (Fin n)).MemBesov volume p s q ((periodicTraceBound p n hp).limitTrace f)) ∧
     (∀ g, (trigScheme (Fin n)).MemBesov volume p s q g →
       ∃ f, (trigScheme (Fin (n + 1))).MemBesov volume p (s + p.toReal⁻¹) q f ∧
-        (traceBound p n hp).limitTrace f = g) := by
+        (periodicTraceBound p n hp).limitTrace f = g) := by
   have hβ : 0 ≤ p.toReal⁻¹ := by positivity
   refine ⟨fun f hf => ?_, fun g hg => ?_⟩
-  · have := (traceBound p n hp).memApprox_limitTrace hβ (by linarith) hq hf
+  · have := (periodicTraceBound p n hp).memApprox_limitTrace hβ (by linarith) hq hf
     rwa [add_sub_cancel_right] at this
-  · obtain ⟨f, hf, hfg, -⟩ := (traceBound p n hp).exists_limitTrace_eq hβ ENNReal.one_ne_top
-      (traceBound_rightInverse p hp) hs hq hg
+  · obtain ⟨f, hf, hfg, -⟩ := (periodicTraceBound p n hp).exists_limitTrace_eq hβ ENNReal.one_ne_top
+      (periodicTraceBound_rightInverse p hp) hs hq hg
     exact ⟨f, hf, hfg⟩
 
 end Torus

@@ -14,7 +14,8 @@ public import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 
 The **modulus of smoothness** (of first order) of `f ∈ L_2(𝕋^d)` is
 
-`ω(f, t)_2 = sup_{‖h‖ ≤ t} ‖f(· + h) - f‖_2`   (`Torus.modulus`, `Torus.modulus_eq_iSup`),
+`ω(f, t)_2 = sup_{‖h‖ ≤ t} ‖f(· + h) - f‖_2`
+(`Torus.periodicModulus`, `Torus.periodicModulus_eq_iSup`),
 
 the modulus of order `1` in `L_2` of `Rd.smoothnessModulus` for the Haar measure on `𝕋^d`, with the
 sup norm `‖h‖ = max_i ‖h_i‖` on `𝕋^d`.  For every order `r` and `1 ≤ p` the modulus
@@ -22,7 +23,7 @@ sup norm `‖h‖ = max_i ‖h_i‖` on `𝕋^d`.  For every order `r` and `1 �
 `ω_r(f, c t)_p ≤ (1 + c)^r ω_r(f, t)_p` (`Torus.periodic_smoothnessModulus_mul_le`).  This file
 proves **Jackson's theorem**
 
-`E_n(f)_2² ≤ d · ω(f, 1/n)_2²`   (`Torus.approxError_sq_le_card_mul_modulus_sq`),
+`E_n(f)_2² ≤ d · ω(f, 1/n)_2²`   (`Torus.approxError_sq_le_card_mul_periodicModulus_sq`),
 
 the error of best approximation by trigonometric polynomials of degree `< n` controlled by the
 modulus.  The proof averages over translations in the coordinate directions: by Parseval,
@@ -43,35 +44,36 @@ variable {d : Type*} [Fintype d]
 
 /-- The **modulus of smoothness** `ω(f, t)_2 = sup_{‖h‖ ≤ t} ‖f(· + h) - f‖_2`, the modulus of
 order `1` in `L_2` of `Rd.smoothnessModulus` for the Haar measure on `𝕋^d`. -/
-noncomputable def modulus (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) (t : ℝ) : ℝ≥0∞ :=
+noncomputable def periodicModulus (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) (t : ℝ) : ℝ≥0∞ :=
   Rd.smoothnessModulus volume 1 2 (f : UnitAddTorus d → ℂ) t
 
 /-- `‖τ_h f - f‖_2 = ‖Δ_h f‖_2` for the representative of `f`. -/
-theorem enorm_translate_sub_eq (h : UnitAddTorus d)
+theorem enorm_periodicTranslate_sub_eq (h : UnitAddTorus d)
     (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
-    ‖translate h f - f‖ₑ = eLpNorm ((fwdDiff h)^[1] (f : UnitAddTorus d → ℂ)) 2 volume := by
+    ‖periodicTranslate h f - f‖ₑ = eLpNorm ((fwdDiff h)^[1] (f : UnitAddTorus d → ℂ)) 2 volume := by
   rw [Lp.enorm_def, Function.iterate_one]
   refine eLpNorm_congr_ae ?_
-  filter_upwards [Lp.coeFn_sub (translate h f) f, coeFn_translate h f] with x h1 h2
+  filter_upwards [Lp.coeFn_sub (periodicTranslate h f) f, coeFn_periodicTranslate h f] with x h1 h2
   rw [h1, Pi.sub_apply, h2]
   rfl
 
 /-- **The modulus through translations**: `ω(f, t)_2 = sup_{‖h‖ ≤ t} ‖τ_h f - f‖_2`. -/
-theorem modulus_eq_iSup (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) (t : ℝ) :
-    modulus f t = ⨆ (h : UnitAddTorus d) (_ : ‖h‖ ≤ t), ‖translate h f - f‖ₑ := by
-  simp only [enorm_translate_sub_eq]
+theorem periodicModulus_eq_iSup (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) (t : ℝ) :
+    periodicModulus f t = ⨆ (h : UnitAddTorus d) (_ : ‖h‖ ≤ t), ‖periodicTranslate h f - f‖ₑ := by
+  simp only [enorm_periodicTranslate_sub_eq]
   rfl
 
 variable {f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))}
 
 /-- `‖τ_h f - f‖_2 ≤ ω(f, t)_2` for `‖h‖ ≤ t`. -/
-theorem enorm_translate_sub_le_modulus {t : ℝ} {h : UnitAddTorus d} (hh : ‖h‖ ≤ t) :
-    ‖translate h f - f‖ₑ ≤ modulus f t := by
-  rw [enorm_translate_sub_eq]
+theorem enorm_periodicTranslate_sub_le_periodicModulus {t : ℝ} {h : UnitAddTorus d} (hh : ‖h‖ ≤ t) :
+    ‖periodicTranslate h f - f‖ₑ ≤ periodicModulus f t := by
+  rw [enorm_periodicTranslate_sub_eq]
   exact Rd.eLpNorm_higherDiff_le_smoothnessModulus hh
 
 /-- The modulus of smoothness increases in `t`. -/
-theorem modulus_mono (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) : Monotone (modulus f) :=
+theorem periodicModulus_mono (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
+    Monotone (periodicModulus f) :=
   Rd.smoothnessModulus_mono 1 2 _
 
 /-- The norm on the circle is at most the absolute value of a representative. -/
@@ -79,36 +81,39 @@ theorem norm_coe_le_abs (u : ℝ) : ‖(u : UnitAddCircle)‖ ≤ |u| := by
   simpa using QuotientAddGroup.norm_mk_le_norm (S := AddSubgroup.zmultiples (1 : ℝ)) (m := u)
 
 /-- Translation is an isometry of `L_2(𝕋^d)`. -/
-theorem enorm_translate (h : UnitAddTorus d) (g : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
-    ‖translate h g‖ₑ = ‖g‖ₑ := by
-  rw [← ofReal_norm, ← ofReal_norm, translate, Lp.norm_compMeasurePreserving]
+theorem enorm_periodicTranslate (h : UnitAddTorus d)
+    (g : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) : ‖periodicTranslate h g‖ₑ = ‖g‖ₑ := by
+  rw [← ofReal_norm, ← ofReal_norm, periodicTranslate, Lp.norm_compMeasurePreserving]
 
 /-- `τ_0 = id`. -/
-theorem translate_zero (g : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) : translate 0 g = g := by
+theorem periodicTranslate_zero (g : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
+    periodicTranslate 0 g = g := by
   ext1
-  filter_upwards [coeFn_translate 0 g] with x hx
+  filter_upwards [coeFn_periodicTranslate 0 g] with x hx
   rw [hx, add_zero]
 
 /-- `τ_{a+b} = τ_a τ_b`. -/
-theorem translate_add (a b : UnitAddTorus d) (g : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
-    translate (a + b) g = translate a (translate b g) := by
+theorem periodicTranslate_add (a b : UnitAddTorus d)
+    (g : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
+    periodicTranslate (a + b) g = periodicTranslate a (periodicTranslate b g) := by
   ext1
-  filter_upwards [coeFn_translate (a + b) g, coeFn_translate a (translate b g),
+  filter_upwards [coeFn_periodicTranslate (a + b) g,
+    coeFn_periodicTranslate a (periodicTranslate b g),
     (measurePreserving_add_right volume a).quasiMeasurePreserving.ae_eq_comp
-      (coeFn_translate b g)] with x h1 h2 h3
+      (coeFn_periodicTranslate b g)] with x h1 h2 h3
   simp only [Function.comp_apply] at h3
   rw [h1, h2, h3, add_assoc]
 
 /-- `‖τ_{n h} f - f‖_2 ≤ n ‖τ_h f - f‖_2`, by telescoping. -/
-theorem enorm_translate_nsmul_sub_le (n : ℕ) (h : UnitAddTorus d)
+theorem enorm_periodicTranslate_nsmul_sub_le (n : ℕ) (h : UnitAddTorus d)
     (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
-    ‖translate (n • h) f - f‖ₑ ≤ n * ‖translate h f - f‖ₑ := by
+    ‖periodicTranslate (n • h) f - f‖ₑ ≤ n * ‖periodicTranslate h f - f‖ₑ := by
   induction n with
-  | zero => simp [translate_zero]
+  | zero => simp [periodicTranslate_zero]
   | succ n ih =>
-    rw [succ_nsmul', translate_add, ← sub_add_sub_cancel _ (translate h f), ← map_sub,
-      Nat.cast_succ, add_mul, one_mul]
-    exact (enorm_add_le _ _).trans (add_le_add_left ((enorm_translate _ _).trans_le ih) _)
+    rw [succ_nsmul', periodicTranslate_add, ← sub_add_sub_cancel _ (periodicTranslate h f),
+      ← map_sub, Nat.cast_succ, add_mul, one_mul]
+    exact (enorm_add_le _ _).trans (add_le_add_left ((enorm_periodicTranslate _ _).trans_le ih) _)
 
 /-- Every point of the circle has a representative `x ∈ ℝ` with `|x| = ‖u‖`. -/
 theorem exists_coe_eq_abs_eq_norm (u : UnitAddCircle) :
@@ -213,7 +218,7 @@ theorem ofReal_le_lintegral_enorm_fourier_sub_one_sq (a : ℤ) {t : ℝ} (ht : 0
   exact ENNReal.ofReal_le_ofReal (le_integral_norm_fourier_sub_one_sq a hat)
 
 /-- On a coordinate axis, `e_k(u eᵢ) = e^(2πi kᵢ u)`. -/
-theorem mFourier_single [DecidableEq d] (k : d → ℤ) (i : d) (u : UnitAddCircle) :
+theorem mFourier_apply_single [DecidableEq d] (k : d → ℤ) (i : d) (u : UnitAddCircle) :
     mFourier k (Pi.single i u) = fourier (k i) u := by
   simp only [mFourier, ContinuousMap.coe_mk]
   rw [Finset.prod_eq_single i (fun j _ hj => by simp [Pi.single_eq_of_ne hj]) (by simp)]
@@ -223,7 +228,7 @@ theorem mFourier_single [DecidableEq d] (k : d → ℤ) (i : d) (u : UnitAddCirc
 `E_n(f)_2² ≤ ∑_{deg k ≥ n} |f̂(k)|²`. -/
 theorem approxError_sq_le_tsum (n : ℕ) (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
     ((trigScheme d).toLp volume 2).approxError f n ^ 2 ≤
-      ∑' k, if n ≤ deg k then ‖mFourierCoeff f k‖ₑ ^ 2 else 0 := by
+      ∑' k, if n ≤ trigDeg k then ‖mFourierCoeff f k‖ₑ ^ 2 else 0 := by
   rw [toLp_trigScheme_eq]
   have h1 := (fourierScheme d).spectralProjectionScheme.approxError_le_enorm_sub n f
   refine (pow_le_pow_left₀ bot_le h1 2).trans (le_of_eq ?_)
@@ -232,7 +237,7 @@ theorem approxError_sq_le_tsum (n : ℕ) (f : Lp ℂ 2 (volume : Measure (UnitAd
   congr 1; funext k
   change ‖(fourierScheme d).basis.repr (f - (fourierScheme d).levelTruncate n f) k‖ₑ ^ 2 = _
   rw [SpectralScheme.repr_sub_levelTruncate]
-  change (‖if deg k < n then 0 else mFourierBasis.repr f k‖ₑ) ^ 2 = _
+  change (‖if trigDeg k < n then 0 else mFourierBasis.repr f k‖ₑ) ^ 2 = _
   rw [mFourierBasis_repr]
   split_ifs with h1 h2 h2
   · omega
@@ -241,14 +246,14 @@ theorem approxError_sq_le_tsum (n : ℕ) (f : Lp ℂ 2 (volume : Measure (UnitAd
   · omega
 
 /-- **Jackson's theorem in `L_2(𝕋^d)`**: `E_n(f)_2² ≤ d · ω(f, 1/n)_2²` for `n ≥ 1`. -/
-theorem approxError_sq_le_card_mul_modulus_sq {n : ℕ} (hn : 1 ≤ n)
+theorem approxError_sq_le_card_mul_periodicModulus_sq {n : ℕ} (hn : 1 ≤ n)
     (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
     ((trigScheme d).toLp volume 2).approxError f n ^ 2 ≤
-      (Fintype.card d : ℝ≥0∞) * modulus f (1 / n) ^ 2 := by
+      (Fintype.card d : ℝ≥0∞) * periodicModulus f (1 / n) ^ 2 := by
   classical
   set t : ℝ := 1 / n
   have ht : 0 < t := by positivity
-  set ω := modulus f t
+  set ω := periodicModulus f t
   set c : (d → ℤ) → ℝ≥0∞ := fun k => ‖mFourierCoeff f k‖ₑ ^ 2
   set I : d → (d → ℤ) → ℝ≥0∞ := fun i k =>
     ∫⁻ u in Ioc 0 t, ‖fourier (k i) (u : UnitAddCircle) - 1‖ₑ ^ 2
@@ -265,33 +270,33 @@ theorem approxError_sq_le_card_mul_modulus_sq {n : ℕ} (hn : 1 ≤ n)
           rw [lintegral_tsum hmeas]
           congr 1; funext k
           rw [lintegral_mul_const' _ _ (ENNReal.pow_ne_top enorm_ne_top), mul_comm]
-      _ = ∫⁻ u in Ioc 0 t, ‖translate (Pi.single i (u : UnitAddCircle)) f - f‖ₑ ^ 2 := by
+      _ = ∫⁻ u in Ioc 0 t, ‖periodicTranslate (Pi.single i (u : UnitAddCircle)) f - f‖ₑ ^ 2 := by
           congr 1; funext u
-          rw [enorm_translate_sub_sq]
-          simp_rw [mFourier_single]
+          rw [enorm_periodicTranslate_sub_sq]
+          simp_rw [mFourier_apply_single]
           rfl
       _ ≤ ∫⁻ _u in Ioc 0 t, ω ^ 2 := by
           refine setLIntegral_mono measurable_const fun u hu => ?_
           gcongr
-          refine enorm_translate_sub_le_modulus ?_
+          refine enorm_periodicTranslate_sub_le_periodicModulus ?_
           rw [Pi.norm_single]
           exact (norm_coe_le_abs u).trans (by rw [abs_of_pos hu.1]; exact hu.2)
       _ = ω ^ 2 * ENNReal.ofReal t := by
           rw [setLIntegral_const, Real.volume_Ioc, sub_zero]
   -- each frequency of degree `≥ n` is seen by one coordinate
-  have hfreq : ∀ k, (if n ≤ deg k then ENNReal.ofReal t * c k else 0) ≤ c k * ∑ i, I i k := by
+  have hfreq : ∀ k, (if n ≤ trigDeg k then ENNReal.ofReal t * c k else 0) ≤ c k * ∑ i, I i k := by
     intro k
     split_ifs with hk
     · have hne : (Finset.univ : Finset d).Nonempty := by
         by_contra h
         rw [Finset.not_nonempty_iff_eq_empty] at h
-        have : deg k = 0 := by simp [deg, h]
+        have : trigDeg k = 0 := by simp [trigDeg, h]
         omega
       obtain ⟨i, -, hi⟩ := Finset.exists_mem_eq_sup _ hne fun i => (k i).natAbs
       have hat : 1 ≤ |((k i : ℤ) : ℝ)| * t := by
         rw [← Int.cast_abs, ← Int.natCast_natAbs]
         have : (n : ℝ) ≤ (k i).natAbs := by
-          have := hk; rw [deg, hi] at this; exact_mod_cast this
+          have := hk; rw [trigDeg, hi] at this; exact_mod_cast this
         simp only [t]
         rw [mul_one_div, le_div_iff₀ (by positivity), one_mul]
         exact this
@@ -301,10 +306,10 @@ theorem approxError_sq_le_card_mul_modulus_sq {n : ℕ} (hn : 1 ≤ n)
             gcongr; exact Finset.single_le_sum (f := fun j => I j k) (fun _ _ => bot_le)
               (Finset.mem_univ i)
     · exact bot_le
-  have hsum : ENNReal.ofReal t * ∑' k, (if n ≤ deg k then c k else 0) ≤
+  have hsum : ENNReal.ofReal t * ∑' k, (if n ≤ trigDeg k then c k else 0) ≤
       ENNReal.ofReal t * ((Fintype.card d : ℝ≥0∞) * ω ^ 2) := by
-    calc ENNReal.ofReal t * ∑' k, (if n ≤ deg k then c k else 0)
-        = ∑' k, (if n ≤ deg k then ENNReal.ofReal t * c k else 0) := by
+    calc ENNReal.ofReal t * ∑' k, (if n ≤ trigDeg k then c k else 0)
+        = ∑' k, (if n ≤ trigDeg k then ENNReal.ofReal t * c k else 0) := by
           rw [← ENNReal.tsum_mul_left]; congr 1; funext k; split_ifs <;> simp
       _ ≤ ∑' k, c k * ∑ i, I i k := ENNReal.tsum_le_tsum hfreq
       _ = ∑ i, ∑' k, c k * I i k := by

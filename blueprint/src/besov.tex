@@ -521,12 +521,12 @@ a local instance of one file; the project re-declares it as a scoped instance.
 
 \begin{definition}[Trigonometric polynomials]
 \label{def:trig-poly}
-\lean{Torus.deg, Torus.boxLt, Torus.card_boxLt_le, Torus.trigMonomial, Torus.trigPoly,
+\lean{Torus.trigDeg, Torus.boxLt, Torus.card_boxLt_le, Torus.trigMonomial, Torus.trigPoly,
   Torus.trigScheme, TorusHaar.volume_eq_haarAddCircle, TorusHaar.isAddHaarMeasure,
-  TorusHaar.isProbabilityMeasure, Torus.natAbs_le_deg, Torus.deg_le_iff, Torus.deg_add_le,
-  Torus.deg_zero, Torus.mem_boxLt, Torus.boxLt_zero, Torus.boxLt_mono, Torus.trigMonomial_apply,
-  Torus.trigPoly_zero, Torus.trigPoly_mono, Torus.trigMonomial_mem_trigPoly, Torus.mem_trigScheme,
-  Torus.map_mem_trigPoly}
+  TorusHaar.isProbabilityMeasure, Torus.natAbs_le_trigDeg, Torus.trigDeg_le_iff,
+  Torus.trigDeg_add_le, Torus.trigDeg_zero, Torus.mem_boxLt, Torus.boxLt_zero, Torus.boxLt_mono,
+  Torus.trigMonomial_apply, Torus.trigPoly_zero, Torus.trigPoly_mono,
+  Torus.trigMonomial_mem_trigPoly, Torus.mem_trigScheme, Torus.map_mem_trigPoly}
 \leanok
 \uses{def:function-scheme}
 The degree of $k \in \Z^d$ is $\deg k = \max_j |k_j|$, with $\deg k = 0$ for $d = \emptyset$.
@@ -557,7 +557,7 @@ $e_k e_l = e_{k+l}$ and $\deg(k + l) \leq \deg k + \deg l$.
 \begin{lemma}[Supremum norm and $L_2$ norm]
 \label{lem:trig-sup-l2}
 \lean{Torus.norm_sq_le_card_mul_norm_toLp_sq, Torus.exists_sum_of_mem_trigPoly,
-  Torus.norm_toLp_sum_sq, Torus.toLp_trigMonomial}
+  Torus.periodic_norm_toLp_sum_sq, Torus.toLp_trigMonomial}
 \leanok
 \uses{def:trig-poly}
 For every $n \in \N$ and $T \in \mathcal{T}_n$, $\sup |T|^2 \leq (2n)^d \, \|T\|_{L_2}^2$.
@@ -601,8 +601,9 @@ Divide by $(\sup|T|)^{2m-p}$ and take $p$-th roots. For $p = \infty$ the constan
 
 \begin{definition}[Sobolev space $H^s(\T^d)$]
 \label{def:torus-sobolev}
-\lean{Torus.fourierScheme, Torus.toLp_trigScheme_eq, Torus.sobolevSpace,
-  Torus.mem_range_sobolev_iff, Torus.sobolevSpace_order, Torus.sobolevSpace_incl}
+\lean{Torus.fourierScheme, Torus.toLp_trigScheme_eq, Torus.periodicSobolevSpace,
+  Torus.periodic_mem_range_sobolev_iff, Torus.periodicSobolevSpace_order,
+  Torus.periodicSobolevSpace_incl}
 \leanok
 \uses{def:spectral, def:sobolev-embed, prop:spectral-jackson-bernstein, def:sobolev-scheme}
 The Fourier basis $(e_k)_{k \in \Z^d}$ of $L_2(\T^d)$ with the level $\deg$ is a spectral
@@ -646,8 +647,8 @@ $\sum_{\deg k < n} |e_k(x)|^2 \leq 2^d n^d$. The Nikolskii property is \Cref{thm
 \begin{theorem}[Embeddings on the torus]
 \label{thm:torus-embeddings}
 \lean{Torus.memBesov_exists_inclusion_eq, Torus.memBesov_exists_continuous,
-  Torus.sobolev_memBesov_top, Torus.exists_sobolev_of_memBesov, Torus.sobolev_exists_inclusion_eq,
-  Torus.sobolev_exists_continuous, Torus.toLp_toContinuousMap}
+  Torus.periodic_sobolev_memBesov_top, Torus.periodic_exists_sobolev_of_memBesov,
+  Torus.sobolev_exists_inclusion_eq, Torus.sobolev_exists_continuous, Torus.toLp_toContinuousMap}
 \leanok
 \uses{thm:torus-nikolskii, thm:besov-embedding, def:torus-sobolev, prop:smoothness}
 Let $1 \leq p \leq r \leq \infty$ and $1 \leq q \leq \infty$.
@@ -676,8 +677,8 @@ theorem, which Mathlib does not have.
 
 \begin{theorem}[Fourier coefficients]
 \label{thm:torus-coefficients}
-\lean{Torus.memBesov_two_two_iff, Torus.fourierBlock, Torus.enorm_fourierBlock_sq,
-  Torus.memBesov_two_iff_blockNorm_lt_top}
+\lean{Torus.periodic_memBesov_two_two_iff, Torus.fourierBlock, Torus.enorm_fourierBlock_sq,
+  Torus.periodic_memBesov_two_iff_blockNorm_lt_top}
 \leanok
 \uses{thm:spectral-coefficients, def:torus-sobolev}
 Let $s > 0$, $1 \leq q \leq \infty$ and $f \in L_2(\T^d)$. Then $f \in
@@ -704,7 +705,7 @@ $\Lambda \subseteq \Z^d$ of frequencies chosen for each $f$.
 
 \begin{corollary}[$n$-term trigonometric approximation]
 \label{cor:torus-nterm}
-\lean{Torus.memApprox_nTerm_iff}
+\lean{Torus.periodic_memApprox_nTerm_iff}
 \leanok
 \uses{thm:stechkin}
 Let $0 < \tau < 2$ and $\theta = 1/\tau - 1/2$. Then $f \in L_2(\T^d)$ lies in the
@@ -737,10 +738,10 @@ trace theorems of \Cref{ch:traces-abstract} extend it to Besov spaces.
 
 \begin{definition}[Restriction to the face]
 \label{def:face-restriction}
-\lean{Torus.face, Torus.restrictFace, Torus.compLinear, Torus.lineThrough,
+\lean{Torus.faceEmbedding, Torus.restrictFace, Torus.compLinear, Torus.lineThrough,
   Torus.restrictFace_trigMonomial, Torus.restrictFace_mem_trigPoly,
-  Torus.compLinear_lineThrough_mem_trigPoly, Torus.face_apply, Torus.lineThrough_apply,
-  Torus.compLinear_apply, Torus.deg_tail_le, Torus.deg_const_le,
+  Torus.compLinear_lineThrough_mem_trigPoly, Torus.faceEmbedding_apply, Torus.lineThrough_apply,
+  Torus.compLinear_apply, Torus.trigDeg_tail_le, Torus.trigDeg_const_le,
   Torus.compLinear_lineThrough_trigMonomial}
 \leanok
 \uses{def:trig-poly}
@@ -795,8 +796,8 @@ kernel estimates.
   Torus.fejerFace_cons_zero, Torus.enorm_fejerFace_le, Torus.lintegral_enorm_fejerFace,
   Torus.lintegral_enorm_dirichletSum_sq, Torus.extendFace_mem_trigPoly,
   Torus.restrictFace_extendFace, Torus.eLpNorm_extendFace_le, Torus.tailMap_apply,
-  Torus.deg_cons_zero_le, Torus.compLinear_tailMap_trigMonomial,
-  Torus.compLinear_tailMap_mem_trigPoly, Torus.trigMonomial_single_cons, Torus.deg_single_le,
+  Torus.trigDeg_cons_zero_le, Torus.compLinear_tailMap_trigMonomial,
+  Torus.compLinear_tailMap_mem_trigPoly, Torus.trigMonomial_single_cons, Torus.trigDeg_single_le,
   Torus.star_trigMonomial, Torus.star_mem_trigPoly, Torus.dirichletSum_cons,
   Torus.dirichletSum_mem_trigPoly, Torus.norm_dirichletSum_le, Torus.fejerFace_apply,
   Torus.fejerFace_mem_trigPoly, Torus.toLpR, Torus.toLpR_injective, Torus.enorm_toLpR,
@@ -822,9 +823,10 @@ and \Cref{lem:fubini-cons} gives $\int |E b|^p = \int \varphi_m^p \cdot \int |b|
 
 \begin{theorem}[Traces of Besov spaces on the torus]
 \label{thm:trace-torus}
-\lean{Torus.traceBound, Torus.traceOnApprox, Torus.traceBound_ext_toLp,
-  Torus.traceBound_rightInverse, Torus.trace_besov, Torus.traceOnApprox_apply,
-  Torus.traceConstTorus, Torus.traceBound_T_toLp}
+\lean{Torus.periodicTraceBound, Torus.periodicTraceOnApprox,
+  Torus.periodicTraceBound_limitTrace_toLp, Torus.periodicTraceBound_rightInverse,
+  Torus.trace_besov, Torus.periodicTraceOnApprox_apply, Torus.periodicTraceConst,
+  Torus.periodicTraceBound_T_toLp}
 \leanok
 \uses{thm:trace-inequality-torus, lem:fejer-extension, thm:trace-transfer,
   thm:trace-surjective}
@@ -898,7 +900,7 @@ $\|f - V_k f\|_p \leq C_V \|f - a_k\|_p$.
 \begin{theorem}[The trace of a continuous function]
 \label{thm:trace-torus-continuous}
 \lean{Torus.continuous_restrictFace, Torus.toLpR_valleePoussinBCF_mem,
-  Torus.traceBound_ext_eq_restrictFace, Torus.trace_besov_eq_restrictFace,
+  Torus.periodicTraceBound_limitTrace_eq_restrictFace, Torus.trace_besov_eq_restrictFace,
   Torus.ae_trace_eq_restrictFace, Torus.exists_trace_eq_restrictFace}
 \leanok
 \uses{thm:trace-torus, lem:trace-ext, lem:torus-vallee-poussin, thm:torus-embeddings,
@@ -941,7 +943,7 @@ are also real interpolation spaces between two of them (\Cref{thm:torus-besov-in
 
 \begin{definition}[Translation]
 \label{def:translation}
-\lean{Torus.translate, Torus.coeFn_translate}
+\lean{Torus.periodicTranslate, Torus.coeFn_periodicTranslate}
 \leanok
 For $h \in \T^d$, the translation $\tau_h : L_2(\T^d) \to L_2(\T^d)$ is
 $(\tau_h f)(x) = f(x + h)$.
@@ -949,9 +951,10 @@ $(\tau_h f)(x) = f(x + h)$.
 
 \begin{lemma}[Fourier coefficients of translates]
 \label{lem:translation-fourier}
-\lean{Torus.mFourierCoeff_translate, Torus.mFourier_add_apply, Torus.enorm_translate_sub_sq,
-  Torus.norm_mFourier_sub_one_le, Torus.norm_prod_sub_one_le, Torus.norm_fourier_sub_one_le,
-  Torus.mFourier_apply_zero, Torus.mFourier_neg_neg, Torus.repr_translate}
+\lean{Torus.mFourierCoeff_periodicTranslate, Torus.mFourier_add_apply,
+  Torus.enorm_periodicTranslate_sub_sq, Torus.norm_mFourier_sub_one_le, Torus.norm_prod_sub_one_le,
+  Torus.norm_fourier_sub_one_le, Torus.mFourier_apply_zero, Torus.mFourier_neg_neg,
+  Torus.repr_periodicTranslate}
 \leanok
 \uses{def:translation}
 For every $h \in \T^d$, $f \in L_2(\T^d)$ and $k \in \Z^d$,
@@ -971,8 +974,9 @@ complex numbers of modulus $1$, and $|e^{i\theta} - 1| \leq |\theta|$.
 
 \begin{definition}[Modulus of smoothness]
 \label{def:modulus}
-\lean{Torus.modulus, Torus.enorm_translate_sub_eq, Torus.modulus_eq_iSup, Torus.modulus_mono,
-  Torus.enorm_translate_sub_le_modulus, Torus.norm_coe_le_abs}
+\lean{Torus.periodicModulus, Torus.enorm_periodicTranslate_sub_eq, Torus.periodicModulus_eq_iSup,
+  Torus.periodicModulus_mono, Torus.enorm_periodicTranslate_sub_le_periodicModulus,
+  Torus.norm_coe_le_abs}
 \leanok
 \uses{def:translation, def:rd-modulus}
 For $f \in L_2(\T^d)$ and $t \in \R$,
@@ -983,8 +987,8 @@ $\|\tau_h f - f\|_2 = \|\Delta_h f\|_2$, this is the modulus of order $1$ in $L_
 
 \begin{lemma}[Growth of the modulus]
 \label{lem:modulus-linear}
-\lean{Torus.enorm_translate, Torus.translate_zero, Torus.translate_add,
-  Torus.enorm_translate_nsmul_sub_le, Torus.exists_coe_eq_abs_eq_norm,
+\lean{Torus.enorm_periodicTranslate, Torus.periodicTranslate_zero, Torus.periodicTranslate_add,
+  Torus.enorm_periodicTranslate_nsmul_sub_le, Torus.exists_coe_eq_abs_eq_norm,
   Torus.periodic_smoothnessModulus_nat_mul_le, Torus.periodic_smoothnessModulus_mul_le,
   Torus.norm_exp_I_mul_sub_one_sq, Torus.fourier_coe_eq_exp, Torus.norm_fourier_sub_one_sq}
 \leanok
@@ -1016,10 +1020,10 @@ translations along the coordinate axes.
 
 \begin{theorem}[Jackson's theorem on the torus]
 \label{thm:torus-jackson}
-\lean{Torus.approxError_sq_le_card_mul_modulus_sq, Torus.approxError_sq_le_tsum,
+\lean{Torus.approxError_sq_le_card_mul_periodicModulus_sq, Torus.approxError_sq_le_tsum,
   Torus.integral_norm_fourier_sub_one_sq, Torus.le_integral_norm_fourier_sub_one_sq,
-  Torus.approxError_le_modulus, Torus.ofReal_le_lintegral_enorm_fourier_sub_one_sq,
-  Torus.mFourier_single}
+  Torus.approxError_le_periodicModulus, Torus.ofReal_le_lintegral_enorm_fourier_sub_one_sq,
+  Torus.mFourier_apply_single}
 \leanok
 \uses{def:modulus, lem:translation-fourier, def:torus-sobolev}
 For every $n \geq 1$ and $f \in L_2(\T^d)$, the error of approximation by $\mathcal{T}_n$ in
@@ -1049,8 +1053,8 @@ In particular $E_n(f)_2 \leq (\#d + 1) \, \omega(f, 1/n)_2$, the form used below
 
 \begin{lemma}[The inverse inequality on the torus]
 \label{lem:torus-inverse}
-\lean{Torus.mFourierCoeff_eq_zero_of_mem, Torus.enorm_translate_sub_le_of_mem,
-  Torus.modulus_le_of_mem}
+\lean{Torus.mFourierCoeff_eq_zero_of_mem, Torus.enorm_periodicTranslate_sub_le_of_mem,
+  Torus.periodicModulus_le_of_mem}
 \leanok
 \uses{def:modulus, lem:translation-fourier, def:torus-sobolev}
 Let $n, j, k \in \N$, $h \in \T^d$, and let $a \in \mathcal{T}_n$ be a trigonometric
@@ -1114,8 +1118,8 @@ $\Delta_K f = \sum_{2^K \leq \deg k < 2^{K+1}} \hat f(k) e_k$.
 
 \begin{lemma}[The modulus through the dyadic blocks]
 \label{lem:torus-modulus-blocks}
-\lean{Torus.blockMult, Torus.enorm_mFourier_sub_one_le_blockMult, Torus.enorm_translate_sub_sq_le,
-  Torus.modulus_le_tsum_block, Torus.blockMult_le}
+\lean{Torus.blockMult, Torus.enorm_mFourier_sub_one_le_blockMult,
+  Torus.enorm_periodicTranslate_sub_sq_le, Torus.periodicModulus_le_tsum_block, Torus.blockMult_le}
 \leanok
 \uses{def:modulus, lem:translation-fourier, thm:torus-coefficients}
 Let $f \in L_2(\T^d)$, $t \in \R$, and let $m_K(t) = \min(2, 2\pi \, \#d \, 2^{K+1} t)$. For
@@ -1147,11 +1151,12 @@ $m \in \Z^d$ as a point of $\R^d$.
 
 \begin{lemma}[The quotient map]
 \label{lem:torus-proj}
-\lean{Torus.proj, Torus.proj_apply, Torus.continuous_proj, Torus.measurable_proj,
-  Torus.norm_proj_le, Torus.norm_le_card_mul, Torus.exists_proj_eq, Torus.latticeVec,
-  Torus.latticeVec_apply, Torus.latticeVec_neg, Torus.inner_latticeVec,
-  Torus.inner_latticeVec_single, Torus.deg_le_norm_latticeVec, Torus.norm_latticeVec_le,
-  Torus.mFourier_neg_proj, Torus.integral_mul_mFourier_neg_proj}
+\lean{Torus.quotientProj, Torus.quotientProj_apply, Torus.continuous_quotientProj,
+  Torus.measurable_quotientProj, Torus.norm_quotientProj_le, Torus.norm_le_card_mul,
+  Torus.exists_quotientProj_eq, Torus.latticeVec, Torus.latticeVec_apply, Torus.latticeVec_neg,
+  Torus.inner_latticeVec, Torus.inner_latticeVec_single, Torus.trigDeg_le_norm_latticeVec,
+  Torus.norm_latticeVec_le, Torus.mFourier_neg_quotientProj,
+  Torus.integral_mul_mFourier_neg_quotientProj}
 \leanok
 \uses{def:trig-poly}
 The quotient map is an additive homomorphism with $\|\pi x\| \leq |x|$, and every $h \in \T^d$ is
@@ -1171,8 +1176,8 @@ $e_m(\pi y) = \prod_j e^{2\pi i m_j y_j}$.
 
 \begin{definition}[Convolution with a kernel on $\R^d$]
 \label{def:torus-econv}
-\lean{Torus.econv, Torus.measurable_comp_sub_proj, Torus.eLpNorm_comp_sub,
-  Torus.aestronglyMeasurable_econv, Torus.econv_congr_ae}
+\lean{Torus.periodicEconv, Torus.measurable_comp_sub_quotientProj, Torus.eLpNorm_comp_sub,
+  Torus.aestronglyMeasurable_periodicEconv, Torus.periodicEconv_congr_ae}
 \leanok
 \uses{lem:torus-proj}
 For $\Phi : \R^d \to \C$ and $f : \T^d \to \C$,
@@ -1185,9 +1190,10 @@ depends on $f$ only through its class modulo null sets.
 
 \begin{lemma}[Young's inequality on the torus]
 \label{lem:torus-econv-young}
-\lean{Torus.eLpNorm_econv_le, Torus.memLp_econv, Torus.ae_integrable_econv, Torus.econv_add_ae,
-  Torus.econv_smul, Torus.econvLp, Torus.econvLp_apply_ae, Torus.coeFn_sum_econvLp_ae,
-  Torus.enorm_econvLp_le}
+\lean{Torus.eLpNorm_periodicEconv_le, Torus.memLp_periodicEconv, Torus.ae_integrable_econv,
+  Torus.periodicEconv_add_ae, Torus.periodicEconv_smul, Torus.periodicEconvLp,
+  Torus.periodicEconvLp_apply_ae, Torus.coeFn_sum_periodicEconvLp_ae,
+  Torus.enorm_periodicEconvLp_le}
 \leanok
 \uses{def:torus-econv, lem:weighted-jensen}
 For $1 \leq p < \infty$, $\Phi \in L_1(\R^d)$ and $f \in L_p(\T^d)$, the integral converges
@@ -1210,9 +1216,10 @@ integral, and the class of a finite sum is the sum of the representatives.
 
 \begin{theorem}[Fourier multipliers on the torus]
 \label{thm:torus-econv-fourier}
-\lean{Torus.econv_mFourier, Torus.econvLp_mFourierLp, Torus.trigPolyLp,
+\lean{Torus.periodicEconv_mFourier, Torus.periodicEconvLp_mFourierLp, Torus.trigPolyLp,
   Torus.trigPolyLp_eq_span, Torus.mFourierLp_mem_trigPolyLp, Torus.isClosed_trigPolyLp,
-  Torus.mem_toLp_trigScheme_iff, Torus.econvLp_mem_trigPolyLp, Torus.econvLp_eq_self_of_mem}
+  Torus.mem_toLp_trigScheme_iff, Torus.periodicEconvLp_mem_trigPolyLp,
+  Torus.periodicEconvLp_eq_self_of_mem}
 \leanok
 \uses{lem:torus-econv-young, def:trig-poly}
 For $\Phi \in L_1(\R^d)$ and $m \in \Z^d$, $\Phi * e_m = \mathcal{F}\Phi(m) \, e_m$. If
@@ -1251,9 +1258,10 @@ $\bigcup_n \mathcal{T}_n$. \Cref{lem:error-tendsto} gives the convergence of the
 
 \begin{lemma}[Convolution of continuous functions on the torus]
 \label{lem:torus-econv-continuous}
-\lean{Torus.integrable_mul_comp_sub_proj, Torus.continuous_econv, Torus.norm_econv_le,
-  Torus.econvBCF, Torus.econvBCF_apply, Torus.norm_econvBCF_le, Torus.toLp_econvBCF,
-  Torus.econvBCF_mem_trigPoly, Torus.econvBCF_eq_self_of_mem}
+\lean{Torus.integrable_mul_comp_sub_quotientProj, Torus.continuous_periodicEconv,
+  Torus.norm_periodicEconv_le, Torus.periodicEconvBCF, Torus.periodicEconvBCF_apply,
+  Torus.norm_periodicEconvBCF_le, Torus.toLp_periodicEconvBCF, Torus.periodicEconvBCF_mem_trigPoly,
+  Torus.periodicEconvBCF_eq_self_of_mem}
 \leanok
 \uses{def:torus-econv, lem:torus-econv-young, thm:torus-econv-fourier, def:trig-poly}
 For every $\Phi \in L_1(\R^d)$ the map $g \mapsto \Phi * g$ is a bounded linear operator on the
@@ -1275,7 +1283,7 @@ integral, so the classes agree. The last two claims hold for the classes in $L_2
 
 \begin{lemma}[Differences of the convolution]
 \label{lem:torus-econv-differences}
-\lean{Torus.econv_add_proj, Torus.higherDiff_econv_ae}
+\lean{Torus.periodicEconv_add_quotientProj, Torus.higherDiff_periodicEconv_ae}
 \leanok
 \uses{def:torus-econv, lem:torus-econv-young}
 For $\Phi \in L_1(\R^d)$, $f \in L_1(\T^d)$, $x \in \R^d$ and $t \in \T^d$,
@@ -1297,9 +1305,9 @@ of \Cref{def:rd-modulus} for the Haar measure on $\T^d$.
 
 \begin{lemma}[Jackson's approximant on the torus]
 \label{lem:torus-lp-jackson-approx}
-\lean{Torus.econv_dilate_apply, Torus.ae_integrable_dilate_mul,
-  Torus.neg_one_pow_mul_higherDiff_proj, Torus.jacksonApprox,
-  Torus.jacksonApprox_mem_trigPolyLp, Torus.ae_sub_jacksonApprox_eq}
+\lean{Torus.periodicEconv_dilate_apply, Torus.periodic_ae_integrable_dilate_mul,
+  Torus.neg_one_pow_mul_higherDiff_quotientProj, Torus.periodicJacksonApprox,
+  Torus.periodicJacksonApprox_mem_trigPolyLp, Torus.ae_sub_periodicJacksonApprox_eq}
 \leanok
 \uses{thm:torus-econv-fourier, def:lp-kernels, lem:fourier-dilate}
 With the kernel $\Phi$ of \Cref{def:lp-kernels} and $\Phi_c(x) = c^d \Phi(c x)$, the approximant
@@ -1320,7 +1328,7 @@ $(l+1) \, \pi(-c^{-1} z) = -\pi((c/(l+1))^{-1} z)$.
 
 \begin{theorem}[Jackson's inequality in $L_p(\T^d)$]
 \label{thm:torus-lp-jackson}
-\lean{Torus.enorm_sub_jacksonApprox_le, Torus.approxError_trigScheme_le,
+\lean{Torus.enorm_sub_periodicJacksonApprox_le, Torus.approxError_trigScheme_le,
   Torus.lpModulus_le_two_pow_mul_succ}
 \leanok
 \uses{lem:torus-lp-jackson-approx, lem:modulus-linear, lem:jackson-weighted-average}
@@ -1342,8 +1350,8 @@ $|\Phi|$.
 
 \begin{theorem}[Bernstein's inequality in $L_p(\T^d)$]
 \label{thm:torus-lp-bernstein}
-\lean{Torus.bernsteinConst, Torus.bernsteinConst_ne_top, Torus.econvLp_Theta_eq_self,
-  Torus.lpModulus_le_of_mem_trigPolyLp}
+\lean{Torus.periodicBernsteinConst, Torus.periodicBernsteinConst_ne_top,
+  Torus.periodicEconvLp_dilatedBandKernel_eq_self, Torus.lpModulus_le_of_mem_trigPolyLp}
 \leanok
 \uses{thm:torus-econv-fourier, lem:torus-econv-differences, lem:lp-kernels-frequency,
   thm:band-inverse}
@@ -1367,7 +1375,7 @@ $k < j$, $\omega_r(a, t)_p \leq 2^r \|a\|_p$.
 
 \begin{theorem}[Besov spaces on the torus through moduli of smoothness]
 \label{thm:torus-lp-moduli}
-\lean{Torus.lpModulusData, Torus.approxNormDyadic_le_modNorm_lp,
+\lean{Torus.trigLpModulusData, Torus.approxNormDyadic_le_modNorm_lp,
   Torus.modNorm_le_approxNormDyadic_lp, Torus.memBesov_iff_modNorm_lt_top_lp}
 \leanok
 \uses{thm:torus-lp-jackson, thm:torus-lp-bernstein, thm:modulus-coincidence, def:modulus-data}
@@ -1396,7 +1404,7 @@ same for the quasi-norms by differences.
 
 \begin{theorem}[Besov spaces on the torus by differences interpolate]
 \label{thm:torus-besov-interpolate}
-\lean{Torus.memKMethod_modCouple_iff, Torus.memKMethod_leftModCouple_iff}
+\lean{Torus.periodic_memKMethod_modCouple_iff, Torus.periodic_memKMethod_leftModCouple_iff}
 \leanok
 \uses{thm:torus-lp-moduli, def:modulus-couples, cor:modulus-spaces-interpolate}
 Let $1 \leq p < \infty$, let $r \geq 1$ be an integer, let $0 < \eta < 1$,
@@ -1430,9 +1438,11 @@ $L_p(\T^d)$.
 
 \begin{lemma}[Identities of convolution operators on the torus]
 \label{lem:torus-econv-identities}
-\lean{Torus.ext_mFourierLp, Torus.econvLp_comp_econvLp, Torus.econvLp_comp_econvLp_of_eq,
-  Torus.econvLp_comm, Torus.econvLp_add_kernel, Torus.econvLp_sub_kernel,
-  Torus.econv_smul_kernel, Torus.econvLp_congr_kernel, Torus.econvLp_eq_zero_of_mem}
+\lean{Torus.ext_mFourierLp, Torus.periodicEconvLp_comp_periodicEconvLp,
+  Torus.periodicEconvLp_comp_periodicEconvLp_of_eq, Torus.periodicEconvLp_comm,
+  Torus.periodicEconvLp_add_kernel, Torus.periodicEconvLp_sub_kernel,
+  Torus.periodicEconv_smul_kernel, Torus.periodicEconvLp_congr_kernel,
+  Torus.periodicEconvLp_eq_zero_of_mem}
 \leanok
 \uses{def:torus-econv, thm:torus-econv-fourier, lem:torus-econv-young, lem:fourier-conv}
 For every normed space $F$, two bounded linear maps $L_p(\T^d) \to F$ that agree on every $e_m$,
@@ -1464,8 +1474,8 @@ on $\R^d$ give the same operator on $L_p(\T^d)$.
 
 \begin{theorem}[Approximate identities on the torus]
 \label{thm:torus-approx-identity}
-\lean{Torus.norm_econvLp_le, Torus.tendsto_econvLp_of_fourier, Torus.tendsto_econvLp_dilate,
-  Torus.tendsto_econvLp_dilatedLpKernel}
+\lean{Torus.norm_periodicEconvLp_le, Torus.tendsto_periodicEconvLp_of_fourier,
+  Torus.tendsto_periodicEconvLp_dilate, Torus.tendsto_periodicEconvLp_dilatedLpKernel}
 \leanok
 \uses{lem:torus-econv-young, thm:torus-econv-fourier, lem:fourier-conv, lem:fourier-dilate,
   lem:dilate, lem:lp-kernels-basic}
@@ -1495,7 +1505,7 @@ $c_J = 2^J$ (\Cref{lem:lp-kernels-basic}).
 
 \begin{definition}[Littlewood--Paley blocks on the torus]
 \label{def:torus-lp-blocks}
-\lean{Torus.lpBlock, Torus.littlewoodPaleyNorm}
+\lean{Torus.periodicLpBlock, Torus.periodicLittlewoodPaleyNorm}
 \leanok
 \uses{def:lp-kernels, lem:torus-econv-young, def:lq-norm}
 Let $s \in \R$ and $1 \leq q \leq \infty$. The Littlewood--Paley blocks of $f \in L_p(\T^d)$ are
@@ -1506,8 +1516,8 @@ $\|f\|^{\mathrm{LP}}_{s,q} = \|(2^{js} \|\Delta_j f\|_p)_j\|_{\ell_q}$.
 
 \begin{lemma}[Bounds and reconstruction on the torus]
 \label{lem:torus-lp-blocks}
-\lean{Torus.enorm_lpBlock_le, Torus.lpBlock_succ, Torus.sum_lpBlock, Torus.tendsto_sum_lpBlock,
-  Torus.hasSum_lpBlock}
+\lean{Torus.enorm_periodicLpBlock_le, Torus.periodicLpBlock_succ, Torus.sum_periodicLpBlock,
+  Torus.tendsto_sum_periodicLpBlock, Torus.hasSum_periodicLpBlock}
 \leanok
 \uses{def:torus-lp-blocks, lem:torus-econv-young, lem:torus-econv-identities,
   thm:torus-approx-identity, lem:lp-kernels-basic, lem:weighted-blocks}
@@ -1528,8 +1538,8 @@ $\Phi_J * f \to f$ by \Cref{thm:torus-approx-identity}. For the last claim apply
 
 \begin{lemma}[Blocks and trigonometric polynomials]
 \label{lem:torus-lp-blocks-trig}
-\lean{Torus.lpBlock_mem_trigPolyLp, Torus.lpBlock_eq_zero_of_mem,
-  Torus.enorm_lpBlock_le_approxError}
+\lean{Torus.periodicLpBlock_mem_trigPolyLp, Torus.periodicLpBlock_eq_zero_of_mem,
+  Torus.enorm_periodicLpBlock_le_approxError}
 \leanok
 \uses{lem:torus-lp-blocks, thm:torus-econv-fourier, lem:torus-econv-identities,
   lem:lp-kernels-frequency, lem:torus-proj, lem:error-basic}
@@ -1554,8 +1564,8 @@ bounds it by $2 \|\Phi\|_1 \|f - a\|_p$.
 \begin{theorem}[Besov spaces on the torus by Littlewood--Paley blocks]
 \label{thm:torus-lp-besov}
 \lean{Torus.approxNormDyadic_trigScheme_le,
-  Torus.littlewoodPaleyNorm_le_approxNormDyadic_trigScheme,
-  Torus.memBesov_iff_littlewoodPaleyNorm_lt_top}
+  Torus.periodicLittlewoodPaleyNorm_le_approxNormDyadic_trigScheme,
+  Torus.memBesov_iff_periodicLittlewoodPaleyNorm_lt_top}
 \leanok
 \uses{lem:torus-lp-blocks, lem:torus-lp-blocks-trig, thm:block-decomposition, def:dyadic-norm,
   thm:dyadic-norm, def:besov, lem:shifted-blocks, lem:weighted-blocks}
@@ -1599,7 +1609,8 @@ derivatives of the periodic lifts on $\R^d$ (\Cref{thm:torus-weak-derivative-lif
 
 \begin{definition}[Weak derivatives and $W^m_p(\T^d)$]
 \label{def:weak-derivative}
-\lean{Torus.derivSymbol, Torus.HasWeakDeriv, Torus.MemSobolev, Torus.norm_two_pi_I_mul_intCast}
+\lean{Torus.periodicDerivSymbol, Torus.HasPeriodicWeakDeriv, Torus.MemPeriodicSobolev,
+  Torus.norm_two_pi_I_mul_intCast}
 \leanok
 For $\alpha \in \N^d$ put $|\alpha| = \sum_j \alpha_j$ and $(2\pi i k)^\alpha = \prod_j
 (2\pi i k_j)^{\alpha_j}$ for $k \in \Z^d$. Let $1 \leq p \leq \infty$. An element
@@ -1614,7 +1625,8 @@ derivatives along directions in $L_p(\T^d)$ for every $1 \leq p \leq \infty$.
 
 \begin{lemma}[Existence of weak derivatives]
 \label{lem:weak-derivative}
-\lean{Torus.hasWeakDeriv_zero, Torus.exists_hasWeakDeriv, Torus.HasWeakDeriv.mem_l2}
+\lean{Torus.hasPeriodicWeakDeriv_zero, Torus.exists_hasPeriodicWeakDeriv,
+  Torus.HasPeriodicWeakDeriv.mem_l2}
 \leanok
 \uses{def:weak-derivative}
 For every $1 \leq p \leq \infty$ and every $f \in L_p(\T^d)$, $\partial^0 f = f$. Let
@@ -1630,9 +1642,9 @@ since the trigonometric monomials form a Hilbert basis.
 
 \begin{lemma}[Symbols and the Sobolev weight]
 \label{lem:symbol-bounds}
-\lean{Torus.norm_derivSymbol, Torus.norm_derivSymbol_le,
-  Torus.one_add_deg_pow_le, Torus.derivSymbol_zero, Torus.derivSymbol_single, Torus.one_le_two_pi,
-  Torus.abs_le_one_add_deg}
+\lean{Torus.norm_periodicDerivSymbol, Torus.norm_periodicDerivSymbol_le,
+  Torus.one_add_trigDeg_pow_le, Torus.periodicDerivSymbol_zero, Torus.periodicDerivSymbol_single,
+  Torus.one_le_two_pi, Torus.abs_le_one_add_trigDeg}
 \leanok
 \uses{def:weak-derivative, def:trig-poly}
 Let $m \in \N$ and $k \in \Z^d$. For every $\alpha \in \N^d$ with $|\alpha| \leq m$,
@@ -1654,7 +1666,8 @@ $\deg k = |k_j|$ for some $j$, and $|k_j|^m \leq (2\pi |k_j|)^m$.
 
 \begin{theorem}[$\Sob{m}{2}(\T^d) = H^m(\T^d) = \Besov{m}{2}{2}(\T^d)$]
 \label{thm:weak-sobolev}
-\lean{Torus.memSobolev_iff, Torus.memSobolev_iff_memBesov, Torus.memSobolev_iff_mem_range}
+\lean{Torus.memPeriodicSobolev_iff, Torus.memPeriodicSobolev_iff_memBesov,
+  Torus.memPeriodicSobolev_iff_mem_range}
 \leanok
 \uses{lem:weak-derivative, lem:symbol-bounds, thm:torus-coefficients, def:torus-sobolev}
 Let $m \in \N$ and $f \in L_2(\T^d)$. Then $f \in \Sob{m}{2}(\T^d)$ if and only if

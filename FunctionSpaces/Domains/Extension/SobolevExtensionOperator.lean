@@ -63,7 +63,7 @@ structure SobolevExtensionOp (O : Opens V) (U : Set V) (C : ℝ≥0∞) where
   /-- The linear map on jets. -/
   toLinearMap : weakSobolevJet p O →ₗ[ℂ] sobolevJet (V := V) p
   /-- The values lie in `W^1_p(V)`. -/
-  memSobolev : ∀ u, MemWSobolev 1 (toLinearMap u).1.1
+  memWSobolev : ∀ u, MemWSobolev 1 (toLinearMap u).1.1
   /-- The value of `E u` agrees with the value of `u` almost everywhere on `U`. -/
   ae_eq : ∀ u, ∀ᵐ x ∂volume, x ∈ U → (toLinearMap u).1.1 x = u.1.1 x
   /-- The bound with the constant `C`. -/
@@ -82,7 +82,7 @@ theorem extendsSobolev (E : SobolevExtensionOp p O U C) (hUO : U ⊆ O) :
   intro f g hf hg hfg
   let u : weakSobolevJet p O := ⟨(hf.toLp f, fun i => (hg i).toLp (g i)), fun i =>
     (hfg i).congr_ae hf.coeFn_toLp.symm (hg i).coeFn_toLp.symm⟩
-  refine ⟨(E.toLinearMap u).1.1, E.memSobolev u, ?_, (E.toLinearMap u).1.2,
+  refine ⟨(E.toLinearMap u).1.1, E.memWSobolev u, ?_, (E.toLinearMap u).1.2,
     (E.toLinearMap u).2, ?_⟩
   · filter_upwards [E.ae_eq u, (ae_restrict_iff' O.isOpen.measurableSet).1 hf.coeFn_toLp]
       with x h1 h2 hxU
@@ -251,7 +251,7 @@ noncomputable def sobolevExtensionOp [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ �
     (exists_hasWeakLineDeriv_of_memTriebelLizorkin hp1 hp (fun _ : Fin 1 => gridBasis V i)
       (b.memTriebelLizorkin_localExtensionJet hp1 hp hW hTO hsupp u)).imp fun _ h => h.1
   { toLinearMap := L
-    memSobolev := fun u => memWSobolev_of_memTriebelLizorkin hp1 hp
+    memWSobolev := fun u => memWSobolev_of_memTriebelLizorkin hp1 hp
       (b.memTriebelLizorkin_localExtensionJet hp1 hp hW hTO hsupp u)
     ae_eq := fun u => b.ae_localExtensionJet_eq hp1 hp hU hW hTO hUT hUW hsupp u
     bound := fun u => b.enorm_localExtensionJet_add_le hp1 hp hW hTO hsupp u fun i => (L u).2 i }
@@ -343,8 +343,8 @@ noncomputable def paste (E : ∀ k, SobolevExtensionOp p O ((O : Set V) ∩ U k)
     where
   toLinearMap := sobolevJet.liftJet (pasteValue E hc ha) fun u i =>
     ⟨_, hasWeakLineDeriv_pasteValue E hψ hc ha hc' hd u i⟩
-  memSobolev u := MemWSobolev.sum _ fun k _ =>
-    ((E k).memSobolev u).mulLp (hψ k) (hcs k) (hc k) (ha k)
+  memWSobolev u := MemWSobolev.sum _ fun k _ =>
+    ((E k).memWSobolev u).mulLp (hψ k) (hcs k) (hc k) (ha k)
   ae_eq u := ae_pasteValue_eq E hψU hψ1 hc ha u
   bound u := by
     simp only [sobolevJet.liftJet_apply_fst,

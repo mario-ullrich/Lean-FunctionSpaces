@@ -16,7 +16,7 @@ the scheme `S` in `L_p`: a Banach space `W` with an injective bounded map `ι : 
 Jackson's and Bernstein's inequalities of order `s` (`FunctionScheme.SobolevSpace`). It is a
 hypothesis structure whose fields are the embedding, the order and Jackson's and Bernstein's
 inequalities with their constants; its instances in this library are the spaces `H^s` with
-`p = 2` on the torus (`Torus.sobolevSpace`) and for a continuous spectral basis
+`p = 2` on the torus (`Torus.periodicSobolevSpace`) and for a continuous spectral basis
 (`ContinuousSpectralBasis.sobolevSpace`).
 
 If the scheme has the Nikolskii property of dimension `D` (the hypothesis
@@ -56,7 +56,7 @@ variable (S μ p) in
 /-- A **Sobolev space** inside `L_p(μ)` for the scheme `S`: a smoothness space for `S` in
 `L_p(μ)`, that is, a normed space `W` with an injective bounded linear map into `L_p(μ)` and
 Jackson's and Bernstein's inequalities of some order. It is a hypothesis structure; the instances
-are `Torus.sobolevSpace` and `ContinuousSpectralBasis.sobolevSpace`, both for `p = 2`. -/
+are `Torus.periodicSobolevSpace` and `ContinuousSpectralBasis.sobolevSpace`, both for `p = 2`. -/
 abbrev SobolevSpace (W : Type*) [NormedAddCommGroup W] [NormedSpace ℝ W] :=
   SmoothnessSpace (S.toLp μ p) W
 

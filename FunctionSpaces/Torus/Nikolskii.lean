@@ -61,7 +61,7 @@ theorem exists_sum_of_mem_trigPoly {n : ℕ} {T : UnitAddTorus d →ᵇ ℂ} (hT
 
 /-- **Parseval for trigonometric polynomials**: `‖∑ c_k e_k‖_2² = ∑ |c_k|²` (Mathlib's
 `OrthogonalFamily.norm_sum` for the orthonormal characters). -/
-theorem norm_toLp_sum_sq (t : Finset (d → ℤ)) (c : (d → ℤ) → ℂ) :
+theorem periodic_norm_toLp_sum_sq (t : Finset (d → ℤ)) (c : (d → ℤ) → ℂ) :
     ‖BoundedContinuousFunction.toLp (E := ℂ) 2 volume ℂ (∑ k ∈ t, c k • trigMonomial k)‖ ^ 2 =
       ∑ k ∈ t, ‖c k‖ ^ 2 := by
   have hsum : BoundedContinuousFunction.toLp (E := ℂ) 2 volume ℂ (∑ k ∈ t, c k • trigMonomial k)
@@ -77,7 +77,7 @@ theorem norm_sq_le_card_mul_norm_toLp_sq {n : ℕ} {T : UnitAddTorus d →ᵇ �
     ‖T‖ ^ 2 ≤ ((2 * n) ^ Fintype.card d : ℕ) *
       ‖BoundedContinuousFunction.toLp (E := ℂ) 2 volume ℂ T‖ ^ 2 := by
   obtain ⟨t, ht, c, rfl⟩ := exists_sum_of_mem_trigPoly hT
-  rw [norm_toLp_sum_sq]
+  rw [periodic_norm_toLp_sum_sq]
   have hcard : (t.card : ℝ) ≤ ((2 * n) ^ Fintype.card d : ℕ) := by
     exact_mod_cast (Finset.card_le_card ht).trans (card_boxLt_le n)
   have hsup : ‖∑ k ∈ t, c k • trigMonomial k‖ ≤ ∑ k ∈ t, ‖c k‖ := by

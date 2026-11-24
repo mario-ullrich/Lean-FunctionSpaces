@@ -49,7 +49,7 @@ variable {d}
 
 /-- The level of `e_k` is `deg k`. -/
 @[simp]
-theorem fourierEigenbasis_level (k : d → ℤ) : (fourierEigenbasis d).level k = deg k := rfl
+theorem fourierEigenbasis_level (k : d → ℤ) : (fourierEigenbasis d).level k = trigDeg k := rfl
 
 /-- The continuous basis functions are the trigonometric monomials. -/
 @[simp]

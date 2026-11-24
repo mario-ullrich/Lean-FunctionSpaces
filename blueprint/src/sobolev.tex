@@ -4419,7 +4419,7 @@ map $L_p(\T^d) \to \C$, $f \mapsto \hat f(m)$, of norm at most $1$.
 
 \begin{theorem}[Fourier coefficients of convolutions]
 \label{thm:torus-coefficients-convolution}
-\lean{Torus.mFourierCoeff_econvLp, Torus.mFourierCoeff_econv}
+\lean{Torus.mFourierCoeff_periodicEconvLp, Torus.mFourierCoeff_periodicEconv}
 \leanok
 \uses{def:torus-coefficient-functional, lem:torus-econv-young, thm:torus-econv-fourier,
   lem:torus-econv-identities}
@@ -4483,7 +4483,7 @@ multi-indices of \Cref{def:weak-derivative}.
 
 \begin{definition}[Symbols of directional derivatives]
 \label{def:torus-line-symbol}
-\lean{Torus.lineSymbol, Torus.coordIndexEquiv, Torus.coordDirs, Torus.coordCount}
+\lean{Torus.periodicLineSymbol, Torus.coordIndexEquiv, Torus.coordDirs, Torus.coordCount}
 \leanok
 \uses{def:weak-derivative, lem:torus-proj}
 For $k \in \N$, $v \in (\R^d)^k$ and $m \in \Z^d$, regarded as a point of $\R^d$, the symbol of
@@ -4499,9 +4499,10 @@ $\alpha^c_i = \#\{l : c_l = i\}$.
 
 \begin{lemma}[Symbols]
 \label{lem:torus-line-symbol}
-\lean{Torus.lineSymbol_fin_zero, Torus.lineSymbol_neg, Torus.norm_lineSymbol_le,
-  Torus.lineSymbol_append, Torus.lineSymbol_coordDirs, Torus.sum_coordCount,
-  Torus.prod_eq_derivSymbol_coordCount, Torus.lineSymbol_eq_sum}
+\lean{Torus.periodicLineSymbol_fin_zero, Torus.periodicLineSymbol_neg,
+  Torus.norm_periodicLineSymbol_le, Torus.periodicLineSymbol_append,
+  Torus.periodicLineSymbol_coordDirs, Torus.sum_coordCount,
+  Torus.prod_eq_periodicDerivSymbol_coordCount, Torus.periodicLineSymbol_eq_sum}
 \leanok
 \uses{def:torus-line-symbol, lem:torus-proj, lem:dual-derivative-frequency}
 For all $k, j \in \N$, $v \in (\R^d)^k$, $w \in (\R^d)^j$ and $m \in \Z^d$:
@@ -4533,7 +4534,7 @@ $\prod_l \sum_i 2\pi i \, m_i (v_l)_i$ into a sum over the maps $c$ (Mathlib's
 
 \begin{definition}[Weak derivatives along directions on the torus]
 \label{def:torus-weak-line-derivative}
-\lean{Torus.HasWeakLineDeriv}
+\lean{Torus.HasPeriodicWeakLineDeriv}
 \leanok
 \uses{def:torus-line-symbol}
 For every $1 \leq p \leq \infty$, $k \in \N$ and $v \in (\R^d)^k$, an element $g \in L_p(\T^d)$
@@ -4547,13 +4548,15 @@ $\int g \, e_{-m} = (-1)^k \int f \, \partial^v e_{-m}$ for every $m \in \Z^d$.
 
 \begin{lemma}[Properties of weak derivatives on the torus]
 \label{lem:torus-weak-line-derivative-basic}
-\lean{Torus.hasWeakLineDeriv_fin_zero, Torus.hasWeakDeriv_iff_hasWeakLineDeriv,
-  Torus.HasWeakLineDeriv.comp, Torus.HasWeakLineDeriv.unique, Torus.HasWeakDeriv.unique,
-  Torus.HasWeakLineDeriv.add, Torus.HasWeakLineDeriv.smul, Torus.HasWeakLineDeriv.neg,
-  Torus.HasWeakLineDeriv.sub, Torus.HasWeakLineDeriv.sum, Torus.HasWeakDeriv.add,
-  Torus.HasWeakDeriv.smul, Torus.HasWeakLineDeriv.of_tendsto,
-  Torus.hasWeakLineDeriv_mFourierLp, Torus.HasWeakLineDeriv.of_inclusion,
-  Torus.HasWeakDeriv.of_inclusion}
+\lean{Torus.hasPeriodicWeakLineDeriv_fin_zero,
+  Torus.hasPeriodicWeakDeriv_iff_hasPeriodicWeakLineDeriv, Torus.HasPeriodicWeakLineDeriv.comp,
+  Torus.HasPeriodicWeakLineDeriv.unique, Torus.HasPeriodicWeakDeriv.unique,
+  Torus.HasPeriodicWeakLineDeriv.add, Torus.HasPeriodicWeakLineDeriv.smul,
+  Torus.HasPeriodicWeakLineDeriv.neg, Torus.HasPeriodicWeakLineDeriv.sub,
+  Torus.HasPeriodicWeakLineDeriv.sum, Torus.HasPeriodicWeakDeriv.add,
+  Torus.HasPeriodicWeakDeriv.smul, Torus.HasPeriodicWeakLineDeriv.of_tendsto,
+  Torus.hasPeriodicWeakLineDeriv_mFourierLp, Torus.HasPeriodicWeakLineDeriv.of_inclusion,
+  Torus.HasPeriodicWeakDeriv.of_inclusion}
 \leanok
 \uses{def:torus-weak-line-derivative, def:weak-derivative, lem:torus-line-symbol,
   lem:torus-lp-coefficients, def:torus-coefficient-functional,
@@ -4598,8 +4601,8 @@ limits in $\C$ are unique. (6) $\hat e_n(m) = 1$ for $m = n$ and $0$ otherwise
 
 \begin{lemma}[Weak derivatives and convolution on the torus]
 \label{lem:torus-weak-derivative-convolution}
-\lean{Torus.econvLp_iteratedLineDerivOp, Torus.hasWeakLineDeriv_econvLp,
-  Torus.HasWeakLineDeriv.econvLp}
+\lean{Torus.periodicEconvLp_iteratedLineDerivOp, Torus.hasPeriodicWeakLineDeriv_periodicEconvLp,
+  Torus.HasPeriodicWeakLineDeriv.periodicEconvLp_right}
 \leanok
 \uses{def:torus-weak-line-derivative, thm:torus-coefficients-convolution,
   thm:torus-coefficients-uniqueness, lem:fourier-iterated-derivative}
@@ -4627,9 +4630,10 @@ $\Phi * f$.
 
 \begin{theorem}[Sobolev spaces on the torus by directional derivatives]
 \label{thm:torus-sobolev-directions}
-\lean{Torus.hasWeakLineDeriv_sum_coordCount, Torus.memSobolev_iff_exists_hasWeakLineDeriv,
-  Torus.memSobolev_zero, Torus.MemSobolev.add, Torus.MemSobolev.smul,
-  Torus.MemSobolev.mono_order, Torus.MemSobolev.of_inclusion}
+\lean{Torus.hasPeriodicWeakLineDeriv_sum_coordCount,
+  Torus.memPeriodicSobolev_iff_exists_hasPeriodicWeakLineDeriv, Torus.memPeriodicSobolev_zero,
+  Torus.MemPeriodicSobolev.add, Torus.MemPeriodicSobolev.smul, Torus.MemPeriodicSobolev.mono_order,
+  Torus.MemPeriodicSobolev.of_inclusion}
 \leanok
 \uses{def:weak-derivative, def:torus-weak-line-derivative, lem:torus-line-symbol,
   lem:torus-weak-line-derivative-basic, lem:torus-lp-coefficients}
@@ -4718,11 +4722,11 @@ The pairing evaluates the lift $h \circ \pi$, as a distribution on $\R^d$, at $\
 
 \begin{lemma}[The periodic pairing]
 \label{lem:torus-periodic-pairing}
-\lean{Torus.locallyIntegrable_comp_proj_Lp, Torus.integrable_mul_comp_proj,
-  Torus.enorm_integral_mul_comp_proj_le, Torus.exists_norm_integral_mul_comp_proj_le,
-  Torus.integral_mul_comp_proj_add, Torus.integral_mul_comp_proj_smul,
-  Torus.periodicPairing_apply, Torus.periodicPairing_mFourierLp,
-  Torus.periodicPairing_iteratedLineDerivOp_mFourierLp}
+\lean{Torus.locallyIntegrable_comp_quotientProj_Lp, Torus.integrable_mul_comp_quotientProj,
+  Torus.enorm_integral_mul_comp_quotientProj_le,
+  Torus.exists_norm_integral_mul_comp_quotientProj_le, Torus.integral_mul_comp_quotientProj_add,
+  Torus.integral_mul_comp_quotientProj_smul, Torus.periodicPairing_apply,
+  Torus.periodicPairing_mFourierLp, Torus.periodicPairing_iteratedLineDerivOp_mFourierLp}
 \leanok
 \uses{def:torus-periodic-pairing, lem:period-box-counting, lem:period-box-measure,
   lem:torus-proj, lem:translation-fourier, lem:torus-line-symbol,
@@ -4765,8 +4769,9 @@ $\langle \partial^v \varphi, e_m \rangle = \mathcal{F}(\partial^v \varphi)(-m)
 
 \begin{lemma}[From the torus to the lifts]
 \label{lem:torus-weak-derivative-to-lift}
-\lean{Torus.periodicPairing_eq_of_mem_trigPolyLp, Torus.periodicPairing_lpBlock,
-  Torus.HasWeakLineDeriv.periodicPairing_eq, Torus.HasWeakLineDeriv.comp_proj}
+\lean{Torus.periodicPairing_eq_of_mem_trigPolyLp, Torus.periodicPairing_periodicLpBlock,
+  Torus.HasPeriodicWeakLineDeriv.periodicPairing_eq,
+  Torus.HasPeriodicWeakLineDeriv.comp_quotientProj}
 \leanok
 \uses{lem:torus-periodic-pairing, def:torus-weak-line-derivative, def:weak-line-derivative,
   lem:weak-derivative-integral, thm:torus-coefficients-uniqueness, lem:torus-lp-blocks,
@@ -4824,9 +4829,9 @@ of $\R^d$, the modulated bump is
 
 \begin{lemma}[From the lifts to the torus]
 \label{lem:torus-weak-derivative-from-lift}
-\lean{Torus.econv_eq_of_comp_proj, Torus.modulatedBump_apply,
+\lean{Torus.periodicEconv_eq_of_comp_quotientProj, Torus.modulatedBump_apply,
   Torus.hasCompactSupport_modulatedBump, Torus.fourier_modulatedBump,
-  Torus.HasWeakLineDeriv.of_comp_proj}
+  Torus.HasPeriodicWeakLineDeriv.of_comp_quotientProj}
 \leanok
 \uses{def:torus-modulated-bump, def:weak-line-derivative, lem:weak-derivative-convolution-local,
   lem:torus-lift-conv, lem:torus-proj, def:torus-econv, thm:torus-coefficients-convolution,
@@ -4859,8 +4864,8 @@ $\mathcal{F}(\partial^v \eta_m)(m) \, \hat f(m) = \sigma_v(m) \hat f(m)$.
 
 \begin{theorem}[Weak derivatives on the torus as distributions of the lifts]
 \label{thm:torus-weak-derivative-lift}
-\lean{Torus.hasWeakLineDeriv_iff_comp_proj, Torus.hasWeakDeriv_iff_comp_proj,
-  Torus.memSobolev_iff_comp_proj}
+\lean{Torus.hasPeriodicWeakLineDeriv_iff_comp_quotientProj,
+  Torus.hasPeriodicWeakDeriv_iff_comp_quotientProj, Torus.memPeriodicSobolev_iff_comp_quotientProj}
 \leanok
 \uses{lem:torus-weak-derivative-to-lift, lem:torus-weak-derivative-from-lift,
   def:torus-weak-line-derivative, def:weak-derivative, def:weak-line-derivative,
@@ -4893,7 +4898,7 @@ distributional derivatives of order at most $m$ in the lifts of $L_p(\T^d)$.
 
 \begin{theorem}[Classical derivatives on the torus]
 \label{thm:torus-classical-derivative}
-\lean{Torus.hasWeakLineDeriv_of_contDiff, Torus.hasWeakLineDeriv_of_contDiff_chain,
+\lean{Torus.hasPeriodicWeakLineDeriv_of_contDiff, Torus.hasPeriodicWeakLineDeriv_of_contDiff_chain,
   Fin.eq_prod_mul_of_succ_eq}
 \leanok
 \uses{lem:weak-derivative-classical, lem:torus-weak-derivative-from-lift,
@@ -4941,8 +4946,8 @@ it to the coordinate basis.
 
 \begin{lemma}[The blocks on the torus as convolutions with the derivatives]
 \label{lem:torus-blocks-as-derivative-convolutions}
-\lean{Torus.fourier_two_pow_smul_lpBlockKernel_succ, Torus.two_pow_smul_lpBlock_succ,
-  Torus.two_pow_mul_blockFun_succ_ae, Torus.lqNorm_blockFun_succ_le_sum_ae}
+\lean{Torus.fourier_two_pow_smul_lpBlockKernel_succ, Torus.two_pow_smul_periodicLpBlock_succ,
+  Torus.two_pow_mul_periodicBlockFun_succ_ae, Torus.lqNorm_periodicBlockFun_succ_le_sum_ae}
 \leanok
 \uses{cor:psi-derivatives-dilated, lem:fourier-iterated-derivative,
   thm:torus-coefficients-convolution, thm:torus-coefficients-uniqueness,
@@ -4986,7 +4991,7 @@ convolution integrals represent the operators (\Cref{def:torus-lp-blocks},
 
 \begin{definition}[The constants of the embedding into $\TL{m}{p}{2}(\T^d)$]
 \label{def:torus-sobolev-to-tl-const}
-\lean{Torus.sobolevToTLConst, Torus.sobolevToTLConst_ne_top}
+\lean{Torus.periodicSobolevToTLConst, Torus.periodicSobolevToTLConst_ne_top}
 \leanok
 \uses{def:periodic-cz-const, def:hormander-const, def:derivative-family,
   lem:torus-far-mass-derivative-families}
@@ -4999,9 +5004,10 @@ which is finite.
 
 \begin{theorem}[$\Sob{m}{p}(\T^d) \subseteq \TL{m}{p}{2}(\T^d)$]
 \label{thm:torus-sobolev-to-triebel-lizorkin}
-\lean{Torus.eLpNorm_lqNorm_blockFun_succ_le,
-  Torus.triebelLizorkinNorm_le_of_hasWeakLineDeriv, Torus.memTriebelLizorkin_of_hasWeakLineDeriv,
-  Torus.memTriebelLizorkin_of_memSobolev}
+\lean{Torus.eLpNorm_lqNorm_periodicBlockFun_succ_le,
+  Torus.periodicTriebelLizorkinNorm_le_of_hasPeriodicWeakLineDeriv,
+  Torus.memPeriodicTriebelLizorkin_of_hasPeriodicWeakLineDeriv,
+  Torus.memPeriodicTriebelLizorkin_of_memPeriodicSobolev}
 \leanok
 \uses{lem:torus-blocks-as-derivative-convolutions, def:torus-sobolev-to-tl-const,
   thm:cz-family-derivative, lem:torus-far-mass-derivative-families,
@@ -5042,7 +5048,7 @@ $L_p(\T^d)$ (\Cref{thm:torus-sobolev-directions}), and the right side is finite.
 
 \begin{definition}[The constants of the embedding into $\Sob{m}{p}(\T^d)$]
 \label{def:torus-tl-to-sobolev-const}
-\lean{Torus.tlToSobolevConst, Torus.tlToSobolevConst_ne_top}
+\lean{Torus.periodicTLToSobolevConst, Torus.periodicTLToSobolevConst_ne_top}
 \leanok
 \uses{def:periodic-cz-const, def:hormander-const, def:dual-derivative-family,
   lem:torus-far-mass-derivative-families}
@@ -5055,8 +5061,8 @@ which is finite.
 
 \begin{lemma}[The synthesis bound for derivatives of the synthesis kernels on the torus]
 \label{lem:torus-derivative-synthesis-bound}
-\lean{Torus.enorm_sum_econvLp_derivDual_le, Torus.derivSynthesisSum,
-  Torus.enorm_derivSynthesisSum_sub_le}
+\lean{Torus.enorm_sum_periodicEconvLp_derivDual_le, Torus.periodicDerivSynthesisSum,
+  Torus.enorm_periodicDerivSynthesisSum_sub_le}
 \leanok
 \uses{def:torus-tl-to-sobolev-const, lem:torus-econv-identities, lem:psi-dual-derivatives,
   thm:cz-family-dual-derivative, lem:torus-far-mass-derivative-families,
@@ -5095,7 +5101,7 @@ from $N$; the measurability is \Cref{lem:mixed-norm-tails}.
 
 \begin{lemma}[The partial sums of the derivative on the torus]
 \label{lem:torus-derivative-partial-sums}
-\lean{Torus.hasWeakLineDeriv_sum_lpBlock, Torus.cauchySeq_derivSynthesisSum}
+\lean{Torus.hasPeriodicWeakLineDeriv_sum_periodicLpBlock, Torus.cauchySeq_periodicDerivSynthesisSum}
 \leanok
 \uses{lem:torus-derivative-synthesis-bound, lem:torus-weighted-block-tails,
   lem:torus-weak-derivative-convolution, lem:torus-weak-line-derivative-basic,
@@ -5119,9 +5125,9 @@ to zero (\Cref{lem:torus-weighted-block-tails}).
 
 \begin{theorem}[$\TL{m}{p}{2}(\T^d) \subseteq \Sob{m}{p}(\T^d)$]
 \label{thm:torus-triebel-lizorkin-to-sobolev}
-\lean{Torus.exists_hasWeakLineDeriv_of_memTriebelLizorkin,
-  Torus.exists_hasWeakLineDeriv_of_memTriebelLizorkin_of_le,
-  Torus.memSobolev_of_memTriebelLizorkin}
+\lean{Torus.exists_hasPeriodicWeakLineDeriv_of_memPeriodicTriebelLizorkin,
+  Torus.exists_hasPeriodicWeakLineDeriv_of_memPeriodicTriebelLizorkin_of_le,
+  Torus.memPeriodicSobolev_of_memPeriodicTriebelLizorkin}
 \leanok
 \uses{lem:torus-derivative-partial-sums, lem:torus-derivative-synthesis-bound,
   lem:torus-weighted-block-tails, lem:torus-lp-blocks, lem:torus-weak-line-derivative-basic,
@@ -5155,7 +5161,7 @@ The last claim is \Cref{thm:torus-sobolev-directions}.
 
 \begin{corollary}[$\Sob{m}{p}(\T^d) = \TL{m}{p}{2}(\T^d)$]
 \label{cor:torus-sobolev-triebel-lizorkin}
-\lean{Torus.memSobolev_iff_memTriebelLizorkin}
+\lean{Torus.memPeriodicSobolev_iff_memPeriodicTriebelLizorkin}
 \leanok
 \uses{thm:torus-sobolev-to-triebel-lizorkin, thm:torus-triebel-lizorkin-to-sobolev}
 For every $\#d \geq 1$, every $1 < p < \infty$, every $m \in \N$ and every $f \in L_p(\T^d)$,
@@ -5173,8 +5179,9 @@ more, which \Cref{thm:weak-sobolev} proves through the Fourier coefficients.
 
 \begin{corollary}[The Besov sandwich for $\Sob{m}{p}(\T^d)$]
 \label{cor:torus-sobolev-besov-sandwich}
-\lean{Torus.memBesov_of_memSobolev, Torus.memSobolev_of_memBesov,
-  Torus.approxNormDyadic_le_of_hasWeakLineDeriv, Torus.exists_hasWeakLineDeriv_of_memBesov}
+\lean{Torus.memBesov_of_memPeriodicSobolev, Torus.memPeriodicSobolev_of_memBesov,
+  Torus.approxNormDyadic_le_of_hasPeriodicWeakLineDeriv,
+  Torus.exists_hasPeriodicWeakLineDeriv_of_memBesov}
 \leanok
 \uses{cor:torus-sobolev-triebel-lizorkin, thm:torus-sobolev-to-triebel-lizorkin,
   thm:torus-triebel-lizorkin-to-sobolev, thm:torus-tl-besov-sandwich,
@@ -5214,7 +5221,7 @@ gives the second. The bounds combine \Cref{thm:torus-sobolev-to-triebel-lizorkin
 
 \begin{corollary}[$\Sob{m}{p}(\T^d)$ by local means]
 \label{cor:torus-sobolev-local-means}
-\lean{Torus.memSobolev_iff_tlLocalMeans}
+\lean{Torus.memPeriodicSobolev_iff_tlLocalMeans}
 \leanok
 \uses{cor:torus-sobolev-triebel-lizorkin, thm:torus-tl-local-means, def:torus-tl-local-means}
 Let $\#d \geq 1$, $1 < p < \infty$, let $g$ be a bump on $\R^d$ and let $m, L \in \N$ with
@@ -5238,8 +5245,8 @@ inclusion $L_r(\T^d) \hookrightarrow L_p(\T^d)$ for $p \leq r$.
 
 \begin{theorem}[Sobolev embeddings on the torus]
 \label{thm:torus-sobolev-embedding}
-\lean{Torus.memSobolev_exists_inclusion_eq, Torus.memSobolev_exists_continuous,
-  Torus.memSobolev_of_memSobolev_of_lt}
+\lean{Torus.memPeriodicSobolev_exists_inclusion_eq, Torus.memPeriodicSobolev_exists_continuous,
+  Torus.memPeriodicSobolev_of_memPeriodicSobolev_of_lt}
 \leanok
 \uses{cor:torus-sobolev-besov-sandwich, thm:torus-embeddings, def:nikolskii-property,
   thm:approx-embedding}

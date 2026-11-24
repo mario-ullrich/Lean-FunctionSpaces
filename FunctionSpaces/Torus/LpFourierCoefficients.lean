@@ -17,9 +17,9 @@ probability space `𝕋^d` (`Torus.coeffCLM`, `Torus.norm_coeffCLM_le`). The cha
 coefficients `ê_k(m) = 1` for `k = m` and `0` otherwise (`Torus.mFourierCoeff_mFourierLp`).
 
 * **Coefficients of convolutions**: for an integrable kernel `Φ` on `ℝ^d`,
-  `(Φ ⋆ f)^(m) = 𝓕Φ(m) f̂(m)` (`Torus.mFourierCoeff_econvLp`, `Torus.mFourierCoeff_econv`). Both
-  sides are bounded functionals of `f` that agree on the characters, whose span is dense
-  (`Torus.ext_mFourierLp`).
+  `(Φ ⋆ f)^(m) = 𝓕Φ(m) f̂(m)` (`Torus.mFourierCoeff_periodicEconvLp`,
+  `Torus.mFourierCoeff_periodicEconv`). Both sides are bounded functionals of `f` that agree on the
+  characters, whose span is dense (`Torus.ext_mFourierLp`).
 * The inclusion `L_r ⊆ L_p`, `p ≤ r`, keeps the coefficients
   (`Torus.mFourierCoeff_inclusionOfExponentLe`).
 * **Uniqueness**: for `1 ≤ p ≤ ∞`, an element of `L_p(𝕋^d)` is determined by its Fourier
@@ -166,8 +166,8 @@ theorem mFourierCoeff_mFourierLp (k m : d → ℤ) :
     mFourierCoeff (mFourierLp p k) m = if k = m then 1 else 0 := by
   rw [mFourierCoeff_congr_ae (coeFn_mFourierLp p k), mFourierCoeff_mFourier]
 
-/-- **The inclusion `L_r ⊆ L_p` keeps the coefficients**: for `p ≤ r` and `f ∈ L_r(𝕋^d)`, the
-class of `f` in `L_p` has the Fourier coefficients of `f`. -/
+/-- **The inclusion `L_r ⊆ L_p` keeps the coefficients**: for `p ≤ r` and `f ∈ L_r(𝕋^d)`,
+the class of `f` in `L_p` has the Fourier coefficients of `f`. -/
 theorem mFourierCoeff_inclusionOfExponentLe {𝕜 : Type*} [NontriviallyNormedField 𝕜]
     [NormedSpace 𝕜 ℂ] {r : ℝ≥0∞} [Fact (1 ≤ r)] (hpr : p ≤ r)
     (f : Lp ℂ r (volume : Measure (UnitAddTorus d))) (m : d → ℤ) :
@@ -178,13 +178,13 @@ theorem mFourierCoeff_inclusionOfExponentLe {𝕜 : Type*} [NontriviallyNormedFi
 
 /-- **The coefficients of a convolution**: `(Φ ⋆ f)^(m) = 𝓕Φ(m) f̂(m)` for `f ∈ L_p(𝕋^d)`,
 `1 ≤ p < ∞`, and an integrable kernel `Φ` on `ℝ^d`. Both sides are bounded functionals of `f`;
-on `e_k` both are `𝓕Φ(m)` for `k = m` and `0` otherwise (`Torus.econvLp_mFourierLp`). -/
-theorem mFourierCoeff_econvLp (hp : p ≠ ∞) {Φ : EuclideanSpace ℝ d → ℂ} (hΦ : Integrable Φ)
+on `e_k` both are `𝓕Φ(m)` for `k = m` and `0` otherwise (`Torus.periodicEconvLp_mFourierLp`). -/
+theorem mFourierCoeff_periodicEconvLp (hp : p ≠ ∞) {Φ : EuclideanSpace ℝ d → ℂ} (hΦ : Integrable Φ)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) (m : d → ℤ) :
-    mFourierCoeff (econvLp hp hΦ f) m = 𝓕 Φ (latticeVec m) * mFourierCoeff f m := by
-  have h : (coeffCLM p m).comp (econvLp hp hΦ) = 𝓕 Φ (latticeVec m) • coeffCLM p m :=
+    mFourierCoeff (periodicEconvLp hp hΦ f) m = 𝓕 Φ (latticeVec m) * mFourierCoeff f m := by
+  have h : (coeffCLM p m).comp (periodicEconvLp hp hΦ) = 𝓕 Φ (latticeVec m) • coeffCLM p m :=
     ext_mFourierLp hp fun k => by
-      simp only [ContinuousLinearMap.comp_apply, econvLp_mFourierLp, map_smul, smul_apply,
+      simp only [ContinuousLinearMap.comp_apply, periodicEconvLp_mFourierLp, map_smul, smul_apply,
         coeffCLM_apply, mFourierCoeff_mFourierLp, smul_eq_mul]
       by_cases hk : k = m
       · rw [hk]
@@ -194,14 +194,14 @@ theorem mFourierCoeff_econvLp (hp : p ≠ ∞) {Φ : EuclideanSpace ℝ d → �
 
 /-- **The coefficients of a convolution of functions**: `(Φ ⋆ f)^(m) = 𝓕Φ(m) f̂(m)` for
 measurable integrable `f` on `𝕋^d` and an integrable kernel `Φ` on `ℝ^d`, from the case `p = 1`. -/
-theorem mFourierCoeff_econv {Φ : EuclideanSpace ℝ d → ℂ} (hΦ : Integrable Φ)
+theorem mFourierCoeff_periodicEconv {Φ : EuclideanSpace ℝ d → ℂ} (hΦ : Integrable Φ)
     {f : UnitAddTorus d → ℂ} (hf : Measurable f) (hfi : Integrable f volume) (m : d → ℤ) :
-    mFourierCoeff (econv Φ f) m = 𝓕 Φ (latticeVec m) * mFourierCoeff f m := by
+    mFourierCoeff (periodicEconv Φ f) m = 𝓕 Φ (latticeVec m) * mFourierCoeff f m := by
   have hF := (memLp_one_iff_integrable.2 hfi).coeFn_toLp
-  have h := mFourierCoeff_econvLp ENNReal.one_ne_top hΦ
+  have h := mFourierCoeff_periodicEconvLp ENNReal.one_ne_top hΦ
     ((memLp_one_iff_integrable.2 hfi).toLp f) m
-  rwa [mFourierCoeff_congr_ae (econvLp_apply_ae ENNReal.one_ne_top hΦ _),
-    mFourierCoeff_congr_ae (econv_congr_ae Φ (Lp.stronglyMeasurable _).measurable hf hF),
+  rwa [mFourierCoeff_congr_ae (periodicEconvLp_apply_ae ENNReal.one_ne_top hΦ _),
+    mFourierCoeff_congr_ae (periodicEconv_congr_ae Φ (Lp.stronglyMeasurable _).measurable hf hF),
     mFourierCoeff_congr_ae hF] at h
 
 /-! ### Uniqueness -/
@@ -232,19 +232,19 @@ omit [Fact (1 ≤ p)] in
 /-- **An element of `L_1(𝕋^d)` with vanishing Fourier coefficients is `0`**. Every
 Littlewood–Paley block `Δ_j f` is a trigonometric polynomial with the coefficients
 `𝓕ψ_j(m) f̂(m) = 0`, hence `0`, and the partial sums of the blocks converge to `f`
-(`Torus.tendsto_sum_lpBlock`). -/
+(`Torus.tendsto_sum_periodicLpBlock`). -/
 theorem eq_zero_of_mFourierCoeff_eq_zero_one {f : Lp ℂ 1 (volume : Measure (UnitAddTorus d))}
     (h : ∀ m, mFourierCoeff f m = 0) : f = 0 := by
-  have hblock : ∀ j, lpBlock ENNReal.one_ne_top j f = 0 := fun j =>
-    eq_zero_of_mem_trigPolyLp (lpBlock_mem_trigPolyLp ENNReal.one_ne_top j f) fun m => by
-      rw [lpBlock, mFourierCoeff_econvLp, h m, mul_zero]
-  have hlim := tendsto_sum_lpBlock ENNReal.one_ne_top f
+  have hblock : ∀ j, periodicLpBlock ENNReal.one_ne_top j f = 0 := fun j =>
+    eq_zero_of_mem_trigPolyLp (periodicLpBlock_mem_trigPolyLp ENNReal.one_ne_top j f) fun m => by
+      rw [periodicLpBlock, mFourierCoeff_periodicEconvLp, h m, mul_zero]
+  have hlim := tendsto_sum_periodicLpBlock ENNReal.one_ne_top f
   simp only [hblock, Finset.sum_const_zero] at hlim
   exact (tendsto_nhds_unique tendsto_const_nhds hlim).symm
 
-/-- **An element of `L_p(𝕋^d)` with vanishing Fourier coefficients is `0`**, `1 ≤ p ≤ ∞`. Its
-class in `L_1` has the same coefficients (`Torus.mFourierCoeff_inclusionOfExponentLe`), so it is
-`0` by the case `p = 1`, and the inclusion `L_p ⊆ L_1` is injective. -/
+/-- **An element of `L_p(𝕋^d)` with vanishing Fourier coefficients is `0`**, `1 ≤ p ≤ ∞`.
+Its class in `L_1` has the same coefficients (`Torus.mFourierCoeff_inclusionOfExponentLe`), so it
+is `0` by the case `p = 1`, and the inclusion `L_p ⊆ L_1` is injective. -/
 theorem eq_zero_of_mFourierCoeff_eq_zero {f : Lp ℂ p (volume : Measure (UnitAddTorus d))}
     (h : ∀ m, mFourierCoeff f m = 0) : f = 0 := by
   refine Lp.inclusionOfExponentLe_injective (E := ℂ) (𝕜 := ℂ) (μ := volume)

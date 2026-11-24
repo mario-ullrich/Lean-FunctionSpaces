@@ -539,9 +539,11 @@ $L_p(\T^d)$, $1 \leq p < \infty$.
 
 \begin{definition}[Triebel--Lizorkin spaces on the torus]
 \label{def:torus-triebel-lizorkin}
-\lean{Torus.blockFun, Torus.lpBlock_ae_eq_blockFun, Torus.aestronglyMeasurable_blockFun,
-  Torus.enorm_lpBlock_eq_eLpNorm_blockFun, Torus.triebelLizorkinNorm, Torus.MemTriebelLizorkin,
-  Torus.aemeasurable_lqNorm_blockFun, Torus.littlewoodPaleyNorm_eq_lqNorm_eLpNorm}
+\lean{Torus.periodicBlockFun, Torus.periodicLpBlock_ae_eq_periodicBlockFun,
+  Torus.aestronglyMeasurable_periodicBlockFun,
+  Torus.enorm_periodicLpBlock_eq_eLpNorm_periodicBlockFun, Torus.periodicTriebelLizorkinNorm,
+  Torus.MemPeriodicTriebelLizorkin, Torus.aemeasurable_lqNorm_periodicBlockFun,
+  Torus.periodicLittlewoodPaleyNorm_eq_lqNorm_eLpNorm}
 \leanok
 \uses{def:torus-lp-blocks, def:torus-econv, def:lq-norm}
 Let $1 \leq p < \infty$, $s \in \R$ and $1 \leq q \leq \infty$. For $f \in L_p(\T^d)$ and
@@ -557,14 +559,14 @@ and $\TL{s}{p}{q}(\T^d)$ consists of the $f \in L_p(\T^d)$ with $\|f\|_{F^s_{p,q
 
 \begin{proposition}[Elementary properties on the torus]
 \label{prop:torus-tl-elementary}
-\lean{Torus.blockFun_add_ae, Torus.blockFun_smul_ae, Torus.eLpNorm_blockFun_zero_le,
-  Torus.triebelLizorkinNorm_add_le,
-  Torus.triebelLizorkinNorm_smul, Torus.triebelLizorkinNorm_zero,
-  Torus.triebelLizorkinNorm_zero_left, Torus.triebelLizorkinNorm_mono_exponent,
-  Torus.triebelLizorkinNorm_mono_smoothness,
-  Torus.MemTriebelLizorkin.mono_exponent, Torus.MemTriebelLizorkin.mono_smoothness,
-  Torus.MemTriebelLizorkin.add, Torus.MemTriebelLizorkin.smul, Torus.triebelLizorkinSpace,
-  Torus.mem_triebelLizorkinSpace}
+\lean{Torus.periodicBlockFun_add_ae, Torus.periodicBlockFun_smul_ae,
+  Torus.eLpNorm_periodicBlockFun_zero_le, Torus.periodicTriebelLizorkinNorm_add_le,
+  Torus.periodicTriebelLizorkinNorm_smul, Torus.periodicTriebelLizorkinNorm_zero,
+  Torus.periodicTriebelLizorkinNorm_zero_left, Torus.periodicTriebelLizorkinNorm_mono_exponent,
+  Torus.periodicTriebelLizorkinNorm_mono_smoothness,
+  Torus.MemPeriodicTriebelLizorkin.mono_exponent, Torus.MemPeriodicTriebelLizorkin.mono_smoothness,
+  Torus.MemPeriodicTriebelLizorkin.add, Torus.MemPeriodicTriebelLizorkin.smul,
+  Torus.periodicTriebelLizorkinSpace, Torus.mem_periodicTriebelLizorkinSpace}
 \leanok
 \uses{def:torus-triebel-lizorkin, lem:torus-econv-young, lem:lp-kernels-basic, lem:lq-basic,
   lem:lp-norm-homogeneity, lem:mixed-norm-dyadic-family}
@@ -602,7 +604,8 @@ $2^{j \cdot 0}$ are $1$.
 
 \begin{lemma}[The weighted blocks on the torus and their tails]
 \label{lem:torus-weighted-block-tails}
-\lean{Torus.eLpNorm_lqNorm_ite_blockFun_le, Torus.tendsto_eLpNorm_lqNorm_blockFun_tail}
+\lean{Torus.eLpNorm_lqNorm_ite_periodicBlockFun_le,
+  Torus.tendsto_eLpNorm_lqNorm_periodicBlockFun_tail}
 \leanok
 \uses{def:torus-triebel-lizorkin, lem:mixed-norm-tails}
 Let $1 \leq p < \infty$, $s \in \R$, $1 \leq q \leq \infty$ and $f \in L_p(\T^d)$. For every set
@@ -628,11 +631,13 @@ $g_j = 2^{js} |\psi_j * f|$ on $\T^d$, whose mixed norm is $\|f\|_{\TL{s}{p}{q}(
 
 \begin{theorem}[$\TL{s}{p}{p}(\T^d) = \Besov{s}{p}{p}(\T^d)$ and the Besov sandwich on the torus]
 \label{thm:torus-tl-besov-sandwich}
-\lean{Torus.triebelLizorkinNorm_eq_littlewoodPaleyNorm, Torus.memTriebelLizorkin_iff_memBesov,
-  Torus.memTriebelLizorkin_iff_modulus, Torus.littlewoodPaleyNorm_max_le_triebelLizorkinNorm,
-  Torus.triebelLizorkinNorm_le_littlewoodPaleyNorm_min,
-  Torus.approxNormDyadic_le_triebelLizorkinNorm, Torus.triebelLizorkinNorm_le_approxNormDyadic,
-  Torus.memBesov_of_memTriebelLizorkin, Torus.memTriebelLizorkin_of_memBesov}
+\lean{Torus.periodicTriebelLizorkinNorm_eq_periodicLittlewoodPaleyNorm,
+  Torus.memPeriodicTriebelLizorkin_iff_memBesov, Torus.memPeriodicTriebelLizorkin_iff_modulus,
+  Torus.periodicLittlewoodPaleyNorm_max_le_periodicTriebelLizorkinNorm,
+  Torus.periodicTriebelLizorkinNorm_le_periodicLittlewoodPaleyNorm_min,
+  Torus.approxNormDyadic_le_periodicTriebelLizorkinNorm,
+  Torus.periodicTriebelLizorkinNorm_le_approxNormDyadic,
+  Torus.memBesov_of_memPeriodicTriebelLizorkin, Torus.memPeriodicTriebelLizorkin_of_memBesov}
 \leanok
 \uses{def:torus-triebel-lizorkin, cor:mixed-norm-sandwich, thm:torus-lp-besov, def:dyadic-norm,
   thm:torus-lp-moduli}
@@ -1616,8 +1621,9 @@ the union of the $P_m$ with $m \in \{-1, 0, 1\}^d$.
 
 \begin{lemma}[Period boxes are fundamental domains]
 \label{lem:period-box-measure}
-\lean{Torus.lintegral_periodBox, Torus.measurePreserving_proj_periodBox, Torus.volume_periodBox,
-  Torus.eLpNorm_comp_proj_periodBox, Torus.quasiMeasurePreserving_proj, Torus.ae_comp_proj}
+\lean{Torus.lintegral_periodBox, Torus.measurePreserving_quotientProj_periodBox,
+  Torus.volume_periodBox, Torus.eLpNorm_comp_quotientProj_periodBox,
+  Torus.quasiMeasurePreserving_quotientProj, Torus.ae_comp_quotientProj}
 \leanok
 \uses{def:period-box, lem:torus-proj}
 For every $a \in \R^d$ and every $u : \T^d \to [0, \infty]$,
@@ -1643,7 +1649,7 @@ $|\pi^{-1}(N) \cap P_m| = |N| = 0$ for each of the countably many $m$.
 \begin{lemma}[Counting boxes]
 \label{lem:period-box-counting}
 \lean{Torus.ball_subset_iUnion_periodBox, Torus.card_Icc_ceil_le,
-  Torus.setLIntegral_ball_comp_proj_le, Torus.locallyIntegrable_comp_proj,
+  Torus.setLIntegral_ball_comp_quotientProj_le, Torus.locallyIntegrable_comp_quotientProj,
   Torus.ball_subset_tripleBox, Torus.setLIntegral_tripleBox}
 \leanok
 \uses{lem:period-box-measure, def:period-box}
@@ -1670,8 +1676,8 @@ For $r \leq 0$ the ball is empty, and the Lean statement of the first bound cove
 
 \begin{lemma}[$L_p$ norms on the box of side $3$]
 \label{lem:triple-box-norm}
-\lean{Torus.eLpNorm_indicator_tripleBox_comp_proj, Torus.eLpNorm_indicator_tripleBox,
-  Torus.memLp_indicator_tripleBox_comp_proj}
+\lean{Torus.eLpNorm_indicator_tripleBox_comp_quotientProj, Torus.eLpNorm_indicator_tripleBox,
+  Torus.memLp_indicator_tripleBox_comp_quotientProj}
 \leanok
 \uses{lem:period-box-counting, def:period-box}
 For every $0 < p < \infty$ and every almost everywhere strongly measurable $F$ on $\T^d$ with
@@ -1691,7 +1697,7 @@ $u = |F|^p$.
 
 \begin{lemma}[Convolutions and differences of lifts]
 \label{lem:torus-lift-conv}
-\lean{Torus.econv_proj, Torus.higherDiff_comp_proj}
+\lean{Torus.periodicEconv_quotientProj, Torus.higherDiff_comp_quotientProj}
 \leanok
 \uses{def:torus-econv, lem:torus-proj, def:iter-diff}
 For every $\Phi : \R^d \to \C$, every $h : \T^d \to \C$, every $L \in \N$ and all
@@ -1795,8 +1801,8 @@ monotonicity and homogeneity of the $L_p$ norm and \Cref{thm:fefferman-stein-per
 
 \begin{definition}[Local means of Triebel--Lizorkin type on the torus]
 \label{def:torus-tl-local-means}
-\lean{Torus.tlLocalMeansNorm, Torus.aemeasurable_dyadicWeight_mul_econv_kernel,
-  Torus.aemeasurable_lqNorm_econv_kernel}
+\lean{Torus.periodicTLLocalMeansNorm, Torus.aemeasurable_dyadicWeight_mul_periodicEconv_meansKernel,
+  Torus.aemeasurable_lqNorm_periodicEconv_meansKernel}
 \leanok
 \uses{def:tl-local-means, def:torus-econv, def:local-means, lem:lp-norm-nonnegative}
 Let $1 \leq p < \infty$, $s \in \R$, $1 \leq q \leq \infty$ and $L \in \N$, and let $k_j$ be the
@@ -1811,8 +1817,9 @@ and the local means quasi-norm of Triebel--Lizorkin type on the torus is
 
 \begin{lemma}[The reproducing formula on the torus]
 \label{lem:torus-reproducing-formula}
-\lean{Torus.sum_econvLp_dual_kernel, Torus.tendsto_sum_econvLp_dual_kernel,
-  Torus.econvLp_kernel_lpBlock}
+\lean{Torus.sum_periodicEconvLp_dualKernel_meansKernel,
+  Torus.tendsto_sum_periodicEconvLp_dualKernel_meansKernel,
+  Torus.periodicEconvLp_meansKernel_periodicLpBlock}
 \leanok
 \uses{lem:torus-econv-identities, thm:torus-approx-identity, def:local-means,
   lem:reproducing-formula, thm:kernel-identities, def:torus-lp-blocks}
@@ -1837,10 +1844,11 @@ last identity is $\Theta_i * \psi_i = \psi_i$ (\Cref{thm:kernel-identities}) and
 
 \begin{theorem}[Blocks by local means on the torus]
 \label{thm:torus-blocks-by-local-means}
-\lean{Torus.lpBlock_sum_econvLp_dual_ae,
+\lean{Torus.periodicLpBlock_sum_periodicEconvLp_dualKernel_ae,
   Torus.maximalFunction_periodicEconvLp_meansKernel_quotientProj,
-  Torus.ae_enorm_lpBlock_sum_proj_le, Torus.ae_enorm_comp_proj_le_of_tendsto_Lp,
-  Torus.enorm_blockFun_proj_le_tsum_maximal}
+  Torus.ae_enorm_periodicLpBlock_sum_quotientProj_le,
+  Torus.ae_enorm_comp_quotientProj_le_of_tendsto_Lp,
+  Torus.enorm_periodicBlockFun_quotientProj_le_tsum_maximalFunction}
 \leanok
 \uses{thm:blocks-by-local-means, lem:torus-reproducing-formula, lem:torus-lift-conv,
   lem:period-box-measure, lem:torus-econv-identities, lem:lp-limits-pointwise,
@@ -1871,8 +1879,10 @@ bound to $f$.
 
 \begin{theorem}[Local means by blocks on the torus]
 \label{thm:torus-local-means-by-blocks}
-\lean{Torus.econvLp_kernel_sum_lpBlock_ae, Torus.maximalFunction_periodicLpBlock_quotientProj,
-  Torus.ae_enorm_econvLp_kernel_sum_proj_le, Torus.enorm_econv_kernel_proj_le_tsum_maximal}
+\lean{Torus.periodicEconvLp_meansKernel_sum_periodicLpBlock_ae,
+  Torus.maximalFunction_periodicLpBlock_quotientProj,
+  Torus.ae_enorm_periodicEconvLp_meansKernel_sum_quotientProj_le,
+  Torus.enorm_periodicEconv_meansKernel_quotientProj_le_tsum_maximalFunction}
 \leanok
 \uses{thm:local-means-by-blocks, lem:torus-reproducing-formula, lem:torus-lift-conv,
   lem:period-box-measure, lem:torus-lp-blocks, lem:lp-limits-pointwise,
@@ -1899,8 +1909,8 @@ $f$.
 
 \begin{lemma}[The almost diagonal step on the torus]
 \label{lem:torus-tl-local-means-lq}
-\lean{Torus.lqNorm_blockFun_proj_le_lqNorm_maximal,
-  Torus.lqNorm_econv_kernel_proj_le_lqNorm_maximal}
+\lean{Torus.lqNorm_periodicBlockFun_quotientProj_le_lqNorm_maximalFunction,
+  Torus.lqNorm_periodicEconv_meansKernel_quotientProj_le_lqNorm_maximalFunction}
 \leanok
 \uses{thm:torus-blocks-by-local-means, thm:torus-local-means-by-blocks,
   lem:almost-diagonal-pointwise}
@@ -1925,9 +1935,10 @@ with \Cref{lem:almost-diagonal-pointwise}.
 
 \begin{theorem}[Local means characterisation of Triebel--Lizorkin spaces on the torus]
 \label{thm:torus-tl-local-means}
-\lean{Torus.tlUpperConst, Torus.tlUpperConst_ne_top, Torus.tlLowerConst,
-  Torus.tlLowerConst_ne_top, Torus.triebelLizorkinNorm_le_tlLocalMeansNorm,
-  Torus.tlLocalMeansNorm_le_triebelLizorkinNorm, Torus.memTriebelLizorkin_iff_tlLocalMeans}
+\lean{Torus.periodicTLUpperConst, Torus.periodicTLUpperConst_ne_top, Torus.periodicTLLowerConst,
+  Torus.periodicTLLowerConst_ne_top, Torus.periodicTriebelLizorkinNorm_le_periodicTLLocalMeansNorm,
+  Torus.periodicTLLocalMeansNorm_le_periodicTriebelLizorkinNorm,
+  Torus.memPeriodicTriebelLizorkin_iff_tlLocalMeans}
 \leanok
 \uses{lem:torus-tl-local-means-lq, lem:torus-maximal-bounds-mixed-norm,
   lem:almost-diagonal-pointwise, thm:fefferman-stein-periodic, def:torus-triebel-lizorkin,
@@ -2708,7 +2719,7 @@ sandwich principle (\Cref{cor:approximation-space-sandwich}) gives the torus for
 
 \begin{definition}[The constants of the Besov sandwich on the torus]
 \label{def:torus-tl-sandwich-consts}
-\lean{Torus.triebelLizorkinBesovConst, Torus.besovTriebelLizorkinConst}
+\lean{Torus.periodicTriebelLizorkinBesovConst, Torus.periodicBesovTriebelLizorkinConst}
 \leanok
 \uses{thm:torus-tl-besov-sandwich}
 For every $s \in \R$,
@@ -2722,7 +2733,8 @@ the constants of the two bounds of \Cref{thm:torus-tl-besov-sandwich}.
 
 \begin{lemma}[The constants on the torus are finite]
 \label{lem:torus-tl-sandwich-consts-finite}
-\lean{Torus.triebelLizorkinBesovConst_ne_top, Torus.besovTriebelLizorkinConst_ne_top}
+\lean{Torus.periodicTriebelLizorkinBesovConst_ne_top,
+  Torus.periodicBesovTriebelLizorkinConst_ne_top}
 \leanok
 \uses{def:torus-tl-sandwich-consts, lem:lp-kernels-basic}
 For every $s \in \R$, $K_{d,s} < \infty$, and for every $s > 0$, $K'_s < \infty$.
@@ -2735,9 +2747,9 @@ $\Phi$ is integrable (\Cref{lem:lp-kernels-basic}), and $2^{-s} < 1$ for $s > 0$
 
 \begin{definition}[Triebel--Lizorkin couples on the torus]
 \label{def:torus-tl-couples}
-\lean{Torus.triebelLizorkinCouple, Torus.triebelLizorkinCouple_norm0,
-  Torus.triebelLizorkinCouple_norm1, Torus.lpTriebelLizorkinCouple,
-  Torus.lpTriebelLizorkinCouple_norm0, Torus.lpTriebelLizorkinCouple_norm1}
+\lean{Torus.periodicTriebelLizorkinCouple, Torus.periodicTriebelLizorkinCouple_norm0,
+  Torus.periodicTriebelLizorkinCouple_norm1, Torus.periodicLpTriebelLizorkinCouple,
+  Torus.periodicLpTriebelLizorkinCouple_norm0, Torus.periodicLpTriebelLizorkinCouple_norm1}
 \leanok
 \uses{def:couple, def:torus-triebel-lizorkin}
 For every $1 \leq p < \infty$, all $s_0, s_1 \in \R$ and $q_0, q_1 \in [1, \infty]$, the couple
@@ -2748,7 +2760,8 @@ $(L_p(\T^d), \TL{s_1}{p}{q_1}(\T^d))$ is $(\|\cdot\|_p, \|\cdot\|_{F^{s_1}_{p,q_
 
 \begin{theorem}[Triebel--Lizorkin spaces on the torus interpolate to Besov spaces]
 \label{thm:torus-tl-interpolate}
-\lean{Torus.memKMethod_triebelLizorkinCouple_iff, Torus.memKMethod_lpTriebelLizorkinCouple_iff}
+\lean{Torus.memKMethod_periodicTriebelLizorkinCouple_iff,
+  Torus.memKMethod_periodicLpTriebelLizorkinCouple_iff}
 \leanok
 \uses{def:torus-tl-couples, def:couple, thm:torus-tl-besov-sandwich,
   lem:torus-tl-sandwich-consts-finite, cor:approximation-space-sandwich, def:couple-k-method}
@@ -4353,7 +4366,7 @@ synthesis kernels are such dilates by \Cref{lem:psi-base} and \Cref{lem:psi-dual
 
 \begin{lemma}[Young's inequality for the far convolution]
 \label{lem:torus-far-conv-young}
-\lean{Torus.lintegral_rpow_lintegral_mul_comp_sub_proj_le, Torus.eLpNorm_farConv_le,
+\lean{Torus.lintegral_rpow_lintegral_mul_comp_sub_quotientProj_le, Torus.eLpNorm_farConv_le,
   Torus.tsum_setLIntegral_eq_farConv}
 \leanok
 \uses{def:torus-far-mass, lem:weighted-jensen, lem:lp-norm-nonnegative}
@@ -4397,8 +4410,8 @@ $y_i \geq 1$ or $y_i < -1$, and $|y_i| \leq \|y\|$.
 
 \begin{lemma}[Localisation of convolutions]
 \label{lem:torus-conv-localisation}
-\lean{Torus.enorm_econv_proj_sub_conv_le, Torus.ae_integrable_econv_proj,
-  Torus.lqNorm_econv_proj_le, Torus.enorm_sum_econv_proj_le}
+\lean{Torus.enorm_periodicEconv_quotientProj_sub_conv_le, Torus.ae_integrable_econv_quotientProj,
+  Torus.lqNorm_periodicEconv_quotientProj_le, Torus.enorm_sum_periodicEconv_quotientProj_le}
 \leanok
 \uses{lem:torus-triple-box, lem:torus-lift-conv, def:conv, lem:torus-econv-young,
   lem:period-box-measure, lem:lq-basic, lem:torus-far-conv-young, def:torus-far-mass}
@@ -4444,7 +4457,7 @@ over $j \in s$ are at most their sum over all $j$.
 
 \begin{lemma}[From the period box to the torus]
 \label{lem:torus-period-box-split}
-\lean{Torus.eLpNorm_le_of_comp_proj_le}
+\lean{Torus.eLpNorm_le_of_comp_quotientProj_le}
 \leanok
 \uses{lem:period-box-measure}
 For every $1 \leq p \leq \infty$, all almost everywhere measurable $F, G : \T^d \to [0, \infty]$
@@ -4477,7 +4490,7 @@ are.
 
 \begin{theorem}[The strong type of vector-valued singular integrals on the torus]
 \label{thm:torus-vector-valued-strong-type}
-\lean{Torus.eLpNorm_lqNorm_econv_le, Torus.eLpNorm_sum_econv_le}
+\lean{Torus.eLpNorm_lqNorm_periodicEconv_le, Torus.eLpNorm_sum_periodicEconv_le}
 \leanok
 \uses{thm:vector-valued-strong-type, def:periodic-cz-const, lem:torus-conv-localisation,
   lem:torus-period-box-split, lem:triple-box-norm, lem:torus-far-conv-young, def:cz-family,
@@ -4523,8 +4536,8 @@ $1 < p < \infty$ this gives $\TL{0}{p}{2}(\T^d) = L_p(\T^d)$ with equivalent nor
 
 \begin{definition}[The square function constants on the torus]
 \label{def:torus-square-function-consts}
-\lean{Torus.squareFunctionConst, Torus.squareFunctionConst_ne_top, Torus.squareSynthesisConst,
-  Torus.squareSynthesisConst_ne_top}
+\lean{Torus.periodicSquareFunctionConst, Torus.periodicSquareFunctionConst_ne_top,
+  Torus.periodicSquareSynthesisConst, Torus.periodicSquareSynthesisConst_ne_top}
 \leanok
 \uses{def:periodic-cz-const, def:hormander-const, def:uniform-schwartz, def:psi-base,
   def:psi-dual}
@@ -4538,7 +4551,7 @@ Both are finite.
 
 \begin{theorem}[The upper square function bound on the torus]
 \label{thm:torus-square-function-upper}
-\lean{Torus.triebelLizorkinNorm_zero_two_le, Torus.memTriebelLizorkin_zero_two}
+\lean{Torus.periodicTriebelLizorkinNorm_zero_two_le, Torus.memPeriodicTriebelLizorkin_zero_two}
 \leanok
 \uses{def:torus-triebel-lizorkin, prop:torus-tl-elementary, thm:cz-family-psi,
   lem:torus-far-mass-dilate, thm:torus-vector-valued-strong-type,
@@ -4562,7 +4575,8 @@ $2 T_{A^\psi,0,1}$ (\Cref{lem:torus-far-mass-dilate}), and
 
 \begin{lemma}[The reproducing formula on the torus]
 \label{lem:torus-square-function-reproducing}
-\lean{Torus.econvLp_psiDual_lpBlock, Torus.sum_econv_psiDual_lpBlock_ae}
+\lean{Torus.periodicEconvLp_dualLpBlockKernel_periodicLpBlock,
+  Torus.sum_periodicEconv_dualLpBlockKernel_periodicLpBlock_ae}
 \leanok
 \uses{lem:torus-econv-identities, lem:psi-dual-reproduces, def:torus-lp-blocks,
   lem:torus-econv-young, lem:psi-dual-basic}
@@ -4584,7 +4598,7 @@ represents the operator of \Cref{lem:torus-econv-young}.
 
 \begin{theorem}[The lower square function bound on the torus]
 \label{thm:torus-square-function-lower}
-\lean{Torus.enorm_le_triebelLizorkinNorm_zero_two}
+\lean{Torus.enorm_le_periodicTriebelLizorkinNorm_zero_two}
 \leanok
 \uses{lem:torus-square-function-reproducing, thm:cz-family-psi-dual, lem:torus-far-mass-dilate,
   thm:torus-vector-valued-strong-type, prop:torus-tl-elementary,
@@ -4614,7 +4628,8 @@ to $\|f\|_p$ as $J \to \infty$ (\Cref{lem:torus-lp-blocks}).
 
 \begin{corollary}[The square function theorem on the torus]
 \label{cor:torus-square-function-theorem}
-\lean{Torus.triebelLizorkinSpace_zero_two_eq_top, Torus.memTriebelLizorkin_two_of_memBesov}
+\lean{Torus.periodicTriebelLizorkinSpace_zero_two_eq_top,
+  Torus.memPeriodicTriebelLizorkin_two_of_memBesov}
 \leanok
 \uses{thm:torus-square-function-upper, thm:torus-square-function-lower,
   prop:torus-tl-elementary, thm:torus-tl-besov-sandwich}

@@ -53,8 +53,8 @@ The `L_p` tools are in [Tools from analysis](Analysis.md).
   (`FunctionScheme.SobolevSpace.exists_eq_inclusion'`); for `s > D/p` every element of `V` has a
   bounded continuous representative (`FunctionScheme.SobolevSpace.exists_boundedContinuous`). The
   instances of the structure are the spaces `H^s`, `p = 2`, on the torus and for a continuous
-  spectral basis (`Torus.sobolevSpace`, `ContinuousSpectralBasis.sobolevSpace`). The limiting cases
-  are not covered.
+  spectral basis (`Torus.periodicSobolevSpace`, `ContinuousSpectralBasis.sobolevSpace`). The
+  limiting cases are not covered.
 * **Spectral schemes of compact dense embeddings.** An injective compact self-adjoint operator on
   a Hilbert space has a Hilbert basis of eigenvectors with nonzero eigenvalues
   (`ContinuousLinearMap.exists_hilbertBasis_forall_hasEigenvector_ne_zero`, statement from

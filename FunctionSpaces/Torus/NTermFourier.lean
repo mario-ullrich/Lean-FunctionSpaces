@@ -19,12 +19,13 @@ approximates `f` by combinations `∑_{k ∈ Λ} c_k e_k` of at most `n` monomia
 (`HilbertBasis.memApprox_nTerm_iff`) describes its approximation spaces by the Fourier
 coefficients: for `0 < τ < 2` and `θ = 1/τ - 1/2`,
 
-`f ∈ A^θ_τ(L_2(𝕋^d), n-term)  ⟺  ∑_{k ∈ ℤ^d} |f̂(k)|^τ < ∞`   (`Torus.memApprox_nTerm_iff`).
+`f ∈ A^θ_τ(L_2(𝕋^d), n-term)  ⟺  ∑_{k ∈ ℤ^d} |f̂(k)|^τ < ∞`
+(`Torus.periodic_memApprox_nTerm_iff`).
 
 For `τ = 1` the right side says that the Fourier series of `f` converges absolutely, Stechkin's
 original setting. Linear approximation by the trigonometric polynomials of degree `< n` leads
 instead to conditions on the sizes `(1 + max_i |k_i|)^s |f̂(k)|`, with the frequencies ordered by
-degree, such as the Sobolev spaces `H^s(𝕋^d)` of `Torus.sobolevSpace`.
+degree, such as the Sobolev spaces `H^s(𝕋^d)` of `Torus.periodicSobolevSpace`.
 -/
 
 @[expose] public section
@@ -45,8 +46,8 @@ the Fourier coefficients (`UnitAddTorus.mFourierBasis_repr`). For `τ < 1` the s
 quasi-normed, and the condition is stronger than absolute convergence of the Fourier series;
 for `τ = 1` it is absolute convergence, Stechkin's theorem. Linear approximation by
 trigonometric polynomials of degree `< n` gives instead weighted `ℓ_2` conditions on the
-coefficients, such as the Sobolev spaces of `Torus.sobolevSpace`. -/
-theorem memApprox_nTerm_iff {τ : ℝ} (hτ0 : 0 < τ) (hτ2 : τ < 2)
+coefficients, such as the Sobolev spaces of `Torus.periodicSobolevSpace`. -/
+theorem periodic_memApprox_nTerm_iff {τ : ℝ} (hτ0 : 0 < τ) (hτ2 : τ < 2)
     (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
     (nTerm (mFourierBasis (d := d)).coeffDictionary).MemApprox (1 / τ - 1 / 2)
         (ENNReal.ofReal τ) f ↔ ∑' k, ‖mFourierCoeff f k‖ₑ ^ τ < ∞ := by

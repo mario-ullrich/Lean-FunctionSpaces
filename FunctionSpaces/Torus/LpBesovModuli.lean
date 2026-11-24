@@ -13,7 +13,7 @@ public import ApproximationSpaces.Moduli
 # Besov spaces on the torus through moduli of smoothness, for all `1 ≤ p < ∞`
 
 For `1 ≤ p < ∞` and an order `r ≥ 1`, the modulus of smoothness `ω_r(f, 2^(-k))_p` of
-`f ∈ L_p(𝕋^d)` is compatible with the trigonometric polynomials (`Torus.lpModulusData`):
+`f ∈ L_p(𝕋^d)` is compatible with the trigonometric polynomials (`Torus.trigLpModulusData`):
 
 * Jackson's inequality `E_{2^k}(f)_p ≤ 2^r C ω_r(f, 2^(-k))_p` for `k ≥ 1`
   (`Torus.approxError_trigScheme_le` and the halving of the step,
@@ -44,7 +44,7 @@ variable {d : Type*} [Fintype d] {p : ℝ≥0∞} [Fact (1 ≤ p)]
 variable (d) in
 /-- **The modulus of order `r` is compatible with the trigonometric polynomials in `L_p(𝕋^d)`**,
 with inverse order `r`: Jackson's inequality from level `1` on, and the inverse inequality. -/
-noncomputable def lpModulusData (hp : p ≠ ∞) (r : ℕ) :
+noncomputable def trigLpModulusData (hp : p ≠ ∞) (r : ℕ) :
     ApproximationScheme.ModulusData ((trigScheme d).toLp volume p) r where
   modulus f k := Rd.lpModulus p r f k
   add_le f g k := Rd.lpModulus_add_le r f g k
@@ -59,8 +59,8 @@ noncomputable def lpModulusData (hp : p ≠ ∞) (r : ℕ) :
     refine (approxError_trigScheme_le hp r k' f).trans ?_
     rw [mul_assoc]
     exact mul_le_mul' le_rfl (lpModulus_le_two_pow_mul_succ r k' f)
-  CB := bernsteinConst d r
-  CB_ne_top := bernsteinConst_ne_top r
+  CB := periodicBernsteinConst d r
+  CB_ne_top := periodicBernsteinConst_ne_top r
   inverse _ _ _ ha := lpModulus_le_of_mem_trigPolyLp hp r (mem_toLp_trigScheme_iff.1 ha)
 
 /-- **The approximation quasi-norm is at most the moduli quasi-norm** on `L_p(𝕋^d)`:
@@ -68,17 +68,17 @@ noncomputable def lpModulusData (hp : p ≠ ∞) (r : ℕ) :
 theorem approxNormDyadic_le_modNorm_lp (hp : p ≠ ∞) (r : ℕ) {s : ℝ} {q : ℝ≥0∞} (hq : 1 ≤ q)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     ((trigScheme d).toLp volume p).approxNormDyadic s q f ≤
-      (lpModulusData d hp r).directConst s * (lpModulusData d hp r).modNorm s q f :=
-  (lpModulusData d hp r).approxNormDyadic_le_modNorm hq f
+      (trigLpModulusData d hp r).directConst s * (trigLpModulusData d hp r).modNorm s q f :=
+  (trigLpModulusData d hp r).approxNormDyadic_le_modNorm hq f
 
 /-- **The moduli quasi-norm is at most the approximation quasi-norm** on `L_p(𝕋^d)`, for
 `0 ≤ s < r`. -/
 theorem modNorm_le_approxNormDyadic_lp (hp : p ≠ ∞) {r : ℕ} {s : ℝ} (hs : 0 ≤ s) (hsr : s < r)
     {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
-    (lpModulusData d hp r).modNorm s q f ≤
-      (lpModulusData d hp r).inverseConst s *
+    (trigLpModulusData d hp r).modNorm s q f ≤
+      (trigLpModulusData d hp r).inverseConst s *
         ((trigScheme d).toLp volume p).approxNormDyadic s q f :=
-  (lpModulusData d hp r).modNorm_le_approxNormDyadic hq hs hsr f
+  (trigLpModulusData d hp r).modNorm_le_approxNormDyadic hq hs hsr f
 
 /-- **Besov spaces on the torus by moduli of smoothness, for all `1 ≤ p < ∞`**: for `0 < s < r`
 and `1 ≤ q ≤ ∞`, `f ∈ B^s_{p,q}(𝕋^d)` (the approximation space of the trigonometric
@@ -87,6 +87,6 @@ theorem memBesov_iff_modNorm_lt_top_lp (hp : p ≠ ∞) {r : ℕ} {s : ℝ} (hs 
     {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     (trigScheme d).MemBesov volume p s q f ↔
       ‖f‖ₑ + lqNorm q (fun k => dyadicWeight s k * Rd.lpModulus p r f k) < ∞ :=
-  (lpModulusData d hp r).memApprox_iff_modNorm_lt_top hq hs.le hsr f
+  (trigLpModulusData d hp r).memApprox_iff_modNorm_lt_top hq hs.le hsr f
 
 end Torus

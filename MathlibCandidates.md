@@ -249,7 +249,7 @@ declarations.
   Mathlib `v4.35.0` has adjoints and Riesz's representation but no pivot dual or Gelfand triple.
 * **Fourier analysis on the torus** (`FunctionSpaces/Torus/Translation.lean`): the Fourier
   coefficients of a translate, `(τ_h f)^(k) = e_k(h) f̂(k)`
-  (`Torus.mFourierCoeff_translate`), and `|∏ aᵢ - 1| ≤ ∑ |aᵢ - 1|` for unimodular `aᵢ`
+  (`Torus.mFourierCoeff_periodicTranslate`), and `|∏ aᵢ - 1| ≤ ∑ |aᵢ - 1|` for unimodular `aᵢ`
   (`Torus.norm_prod_sub_one_le`). Mathlib's measure on `UnitAddCircle` is a local instance
   in `Mathlib/Analysis/Fourier/AddCircleMulti.lean`, so `mFourierBasis` cannot be used
   outside that file without re-declaring it (`FunctionSpaces/Torus/HaarMeasure.lean`); worth
@@ -562,14 +562,14 @@ declarations.
   period-box identity `∫_{a + (0,1]^d} g(π x) dx = ∫_{𝕋^d} g` on `d → ℝ`
   (`UnitAddTorus.lintegral_preimage`). New here are the measure preservation of
   `π : ℝ^d → 𝕋^d` on every period box of `EuclideanSpace ℝ d`
-  (`Torus.measurePreserving_proj_periodBox`) and the fact that `π` pulls null sets back to null
-  sets (`Torus.quasiMeasurePreserving_proj`).
+  (`Torus.measurePreserving_quotientProj_periodBox`) and the fact that `π` pulls null sets back to
+  null sets (`Torus.quasiMeasurePreserving_quotientProj`).
 * **Fourier coefficients in `L_p(𝕋^d)`** (`FunctionSpaces/Torus/LpFourierCoefficients.lean`),
   for `Mathlib/Analysis/Fourier/AddCircleMulti.lean`: the coefficient `f ↦ f̂(m)` as a bounded
   linear functional of norm at most `1` on `L_p(𝕋^d)`, `1 ≤ p ≤ ∞` (`Torus.coeffCLM`,
   `Torus.norm_coeffCLM_le`), the coefficients of the characters
   (`Torus.mFourierCoeff_mFourierLp`), of convolutions with integrable kernels on `ℝ^d`
-  (`Torus.mFourierCoeff_econvLp`), and uniqueness for `1 ≤ p ≤ ∞`
+  (`Torus.mFourierCoeff_periodicEconvLp`), and uniqueness for `1 ≤ p ≤ ∞`
   (`Torus.eq_of_mFourierCoeff_eq`). Mathlib has uniqueness in `L_2`, through `mFourierBasis`;
   the open PR #43803 (Fejér's theorem on `AddCircle`) overlaps with uniqueness for `d = 1`.
 * **The Fejér–Riesz theorem** (`FunctionSpaces/Wavelets/Examples/Daubechies/FejerRiesz.lean`): a

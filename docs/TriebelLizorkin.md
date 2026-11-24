@@ -86,15 +86,15 @@ and of `L_p` and one of them, are Besov spaces.
 * **Triebel–Lizorkin spaces and the Besov sandwich on the torus.** For `f ∈ L_p(𝕋^d)`,
   `1 ≤ p < ∞`, the same quasi-norm with the blocks `ψ_j ⋆ f(t) = ∫ ψ_j(y) f(t - π y) dy` of the
   kernels on `ℝ^d`, with the quotient map `π : ℝ^d → 𝕋^d`, defines `F^s_{p,q}(𝕋^d)`
-  (`Torus.triebelLizorkinNorm`, `Torus.MemTriebelLizorkin`). The same bounds hold
-  (`Torus.littlewoodPaleyNorm_max_le_triebelLizorkinNorm`,
-  `Torus.triebelLizorkinNorm_le_littlewoodPaleyNorm_min`), and for `s > 0`,
-  `F^s_{p,p}(𝕋^d) = B^s_{p,p}(𝕋^d)` (`Torus.memTriebelLizorkin_iff_memBesov`), also described by
-  moduli of smoothness (`Torus.memTriebelLizorkin_iff_modulus`), and
+  (`Torus.periodicTriebelLizorkinNorm`, `Torus.MemPeriodicTriebelLizorkin`). The same bounds hold
+  (`Torus.periodicLittlewoodPaleyNorm_max_le_periodicTriebelLizorkinNorm`,
+  `Torus.periodicTriebelLizorkinNorm_le_periodicLittlewoodPaleyNorm_min`), and for `s > 0`,
+  `F^s_{p,p}(𝕋^d) = B^s_{p,p}(𝕋^d)` (`Torus.memPeriodicTriebelLizorkin_iff_memBesov`), also
+  described by moduli of smoothness (`Torus.memPeriodicTriebelLizorkin_iff_modulus`), and
   `B^s_{p,min(p,q)}(𝕋^d) ⊆ F^s_{p,q}(𝕋^d) ⊆ B^s_{p,max(p,q)}(𝕋^d)`
-  (`Torus.memTriebelLizorkin_of_memBesov`, `Torus.memBesov_of_memTriebelLizorkin`), with explicit
-  constants (`Torus.approxNormDyadic_le_triebelLizorkinNorm`,
-  `Torus.triebelLizorkinNorm_le_approxNormDyadic`), where
+  (`Torus.memPeriodicTriebelLizorkin_of_memBesov`, `Torus.memBesov_of_memPeriodicTriebelLizorkin`),
+  with explicit constants (`Torus.approxNormDyadic_le_periodicTriebelLizorkinNorm`,
+  `Torus.periodicTriebelLizorkinNorm_le_approxNormDyadic`), where
   `B^s_{p,q}(𝕋^d)` is the approximation space of the trigonometric polynomials, described by the
   Littlewood–Paley blocks of [the torus](Torus.md).
 * **Local means.** Let `k_j` be the local means kernels of order `L` of a bump `g`
@@ -113,11 +113,11 @@ and of `L_p` and one of them, are Besov spaces.
 * **Local means on the torus.** For a bump `g` on `ℝ^d` with local means kernels `k_j` of order
   `L`, acting on the torus by `k_j ⋆ f(t) = ∫ k_j(y) f(t - π y) dy`, the quasi-norm
   `‖f‖^{g,L}_{F^s_{p,q}(𝕋^d)} = ‖ t ↦ ‖(2^(js) |k_j ⋆ f(t)|)_j‖_{ℓ_q} ‖_p`
-  (`Torus.tlLocalMeansNorm`) satisfies the same two bounds with explicit constants
-  (`Torus.tlLocalMeansNorm_le_triebelLizorkinNorm`,
-  `Torus.triebelLizorkinNorm_le_tlLocalMeansNorm`), so for `1 < p < ∞`, `1 < q ≤ ∞` and
-  `0 < s < L`, `f ∈ F^s_{p,q}(𝕋^d)` iff `‖f‖^{g,L}_{F^s_{p,q}(𝕋^d)} < ∞`
-  (`Torus.memTriebelLizorkin_iff_tlLocalMeans`). The pointwise bounds of `ℝ^d` apply to the
+  (`Torus.periodicTLLocalMeansNorm`) satisfies the same two bounds with explicit constants
+  (`Torus.periodicTLLocalMeansNorm_le_periodicTriebelLizorkinNorm`,
+  `Torus.periodicTriebelLizorkinNorm_le_periodicTLLocalMeansNorm`), so for `1 < p < ∞`, `1 < q ≤ ∞`
+  and `0 < s < L`, `f ∈ F^s_{p,q}(𝕋^d)` iff `‖f‖^{g,L}_{F^s_{p,q}(𝕋^d)} < ∞`
+  (`Torus.memPeriodicTriebelLizorkin_iff_tlLocalMeans`). The pointwise bounds of `ℝ^d` apply to the
   periodic lifts `h ∘ π`, and the Fefferman–Stein inequality holds for the maximal functions of
   lifts on the period box `(0, 1]^d`, with the constant `Torus.periodicFSConst d p q`
   (`Torus.feffermanStein_periodic`).
@@ -154,8 +154,8 @@ and of `L_p` and one of them, are Besov spaces.
   the same for every couple of quasi-norms equivalent to these
   (`Rd.memKMethod_iff_memApprox_of_triebelLizorkin_equiv`,
   `Rd.memKMethod_iff_memApprox_of_triebelLizorkin_equiv_left`); on the torus the same two
-  identities hold (`Torus.memKMethod_triebelLizorkinCouple_iff`,
-  `Torus.memKMethod_lpTriebelLizorkinCouple_iff`).
+  identities hold (`Torus.memKMethod_periodicTriebelLizorkinCouple_iff`,
+  `Torus.memKMethod_periodicLpTriebelLizorkinCouple_iff`).
 * **Dilation families and the Hörmander condition.** Let `(G_j)_{j ∈ ℕ}` be Schwartz functions
   on `V`, `dim V = n`, whose Schwartz seminorms `sup_x ‖x‖^k ‖D^l G_j(x)‖` are at most `A_{k,l}`
   for every `j` (`Rd.IsUniformSchwartz`), and `θ_j(x) = 2^(jn) G_j(2^j x)`. For every `y ∈ V`,
@@ -231,16 +231,16 @@ and of `L_p` and one of them, are Besov spaces.
   the torus by `(θ_j ⋆ f)(t) = ∫ θ_j(y) f(t - π y) dy`. If its far mass
   `∫_{‖y‖ ≥ 1} ∑_j |θ_j(y)| dy` is at most `D` (`Torus.farMass`), its analysis and synthesis
   operators satisfy the bounds of the strong type on `L_p(𝕋^d)` with the constant
-  `3^{d/p} S_{ℝ^d,p}(B, H) + D` (`Torus.periodicCZConst`, `Torus.eLpNorm_lqNorm_econv_le`,
-  `Torus.eLpNorm_sum_econv_le`). The proof localises the periodic lift: the part of the lift on
-  the box `(-1, 2]^d` is a function on `ℝ^d`, and the rest is bounded by Young's inequality
+  `3^{d/p} S_{ℝ^d,p}(B, H) + D` (`Torus.periodicCZConst`, `Torus.eLpNorm_lqNorm_periodicEconv_le`,
+  `Torus.eLpNorm_sum_periodicEconv_le`). The proof localises the periodic lift: the part of the lift
+  on the box `(-1, 2]^d` is a function on `ℝ^d`, and the rest is bounded by Young's inequality
   with the far mass (`Torus.eLpNorm_farConv_le`). Dilation families of uniform Schwartz families
   with bounds `A` have far mass at most `2 T_A` (`Torus.farMass_dilate_le`). Hence
   `‖f‖_{F^0_{p,2}(𝕋^d)} ≤ Q^𝕋_p ‖f‖_p` and `‖f‖_p ≤ Q̃^𝕋_p ‖f‖_{F^0_{p,2}(𝕋^d)}` for every
-  `f ∈ L_p(𝕋^d)` (`Torus.triebelLizorkinNorm_zero_two_le`,
-  `Torus.enorm_le_triebelLizorkinNorm_zero_two`), with named constants proved finite
-  (`Torus.squareFunctionConst`, `Torus.squareSynthesisConst`), and
-  `F^0_{p,2}(𝕋^d) = L_p(𝕋^d)` (`Torus.triebelLizorkinSpace_zero_two_eq_top`).
+  `f ∈ L_p(𝕋^d)` (`Torus.periodicTriebelLizorkinNorm_zero_two_le`,
+  `Torus.enorm_le_periodicTriebelLizorkinNorm_zero_two`), with named constants proved finite
+  (`Torus.periodicSquareFunctionConst`, `Torus.periodicSquareSynthesisConst`), and
+  `F^0_{p,2}(𝕋^d) = L_p(𝕋^d)` (`Torus.periodicTriebelLizorkinSpace_zero_two_eq_top`).
 
 ## What is formalised
 

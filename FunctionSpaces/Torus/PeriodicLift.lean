@@ -11,32 +11,33 @@ public import FunctionSpaces.Torus.EuclideanConvolutionIdentities
 # The periodic lift
 
 A function `g` on the torus `𝕋^d` lifts to the `ℤ^d`-periodic function `g ∘ π` on `ℝ^d`, with the
-quotient map `π` (`Torus.proj`). This file compares integrals of lifts with integrals on the torus.
+quotient map `π` (`Torus.quotientProj`). This file compares integrals of lifts with integrals on the
+torus.
 
 * The **period boxes** `P_a = {x : a_i < x_i ≤ a_i + 1}` (`Torus.periodBox`) are fundamental
   domains: `∫_{P_a} g(π x) dx = ∫_{𝕋^d} g` (`Torus.lintegral_periodBox`, from Mathlib's
   `UnitAddTorus.lintegral_preimage`), so `π` maps the Lebesgue measure on `P_a` to the Haar
-  measure (`Torus.measurePreserving_proj_periodBox`), `|P_a| = 1` and
+  measure (`Torus.measurePreserving_quotientProj_periodBox`), `|P_a| = 1` and
   `‖F ∘ π‖_{L_p(P_a)} = ‖F‖_{L_p(𝕋^d)}` (`Torus.volume_periodBox`,
-  `Torus.eLpNorm_comp_proj_periodBox`). Hence a bound `F(π x) ≤ A(x) + G(π x)` for almost every
-  `x ∈ P_0` gives `‖F‖_{L_p(𝕋^d)} ≤ ‖A‖_{L_p(ℝ^d)} + ‖G‖_{L_p(𝕋^d)}`
-  (`Torus.eLpNorm_le_of_comp_proj_le`). The boxes `P_m`, `m ∈ ℤ^d`, partition `ℝ^d`, hence `π`
-  maps null sets back to null sets (`Torus.quasiMeasurePreserving_proj`) and almost everywhere
-  statements on the torus lift (`Torus.ae_comp_proj`).
+  `Torus.eLpNorm_comp_quotientProj_periodBox`). Hence a bound `F(π x) ≤ A(x) + G(π x)` for almost
+  every `x ∈ P_0` gives `‖F‖_{L_p(𝕋^d)} ≤ ‖A‖_{L_p(ℝ^d)} + ‖G‖_{L_p(𝕋^d)}`
+  (`Torus.eLpNorm_le_of_comp_quotientProj_le`). The boxes `P_m`, `m ∈ ℤ^d`, partition `ℝ^d`, hence
+  `π` maps null sets back to null sets (`Torus.quasiMeasurePreserving_quotientProj`) and almost
+  everywhere statements on the torus lift (`Torus.ae_comp_quotientProj`).
 * Convolutions and differences on the torus are those of the lift:
-  `(Φ ⋆ h)(π x) = (Φ ⋆ (h ∘ π))(x)` (`Torus.econv_proj`) and
-  `Δ^L_{π h} f(π x) = Δ^L_h (f ∘ π)(x)` (`Torus.higherDiff_comp_proj`).
+  `(Φ ⋆ h)(π x) = (Φ ⋆ (h ∘ π))(x)` (`Torus.periodicEconv_quotientProj`) and
+  `Δ^L_{π h} f(π x) = Δ^L_h (f ∘ π)(x)` (`Torus.higherDiff_comp_quotientProj`).
 * **Counting boxes**: a ball of radius `r` meets at most `(2r + 2)^d` boxes, so
-  `∫_{B(x,r)} g(π y) dy ≤ (2r + 2)^d ∫_{𝕋^d} g` (`Torus.setLIntegral_ball_comp_proj_le`), lifts
-  of integrable functions are locally integrable (`Torus.locallyIntegrable_comp_proj`, for `L_p`
-  classes `Torus.locallyIntegrable_comp_proj_Lp`), balls of
+  `∫_{B(x,r)} g(π y) dy ≤ (2r + 2)^d ∫_{𝕋^d} g` (`Torus.setLIntegral_ball_comp_quotientProj_le`),
+  lifts of integrable functions are locally integrable (`Torus.locallyIntegrable_comp_quotientProj`,
+  for `L_p` classes `Torus.locallyIntegrable_comp_quotientProj_Lp`), balls of
   radius `r ≤ 1` around points of `P_0` lie in the box `(-1, 2]^d` of side `3`
   (`Torus.ball_subset_tripleBox`), `‖y‖ ≥ 1` whenever `x ∈ P_0` and `x - y ∉ (-1, 2]^d`
   (`Torus.one_le_norm_of_sub_notMem_tripleBox`), and `∫_{(-1,2]^d} g(π y) dy = 3^d ∫_{𝕋^d} g`
   (`Torus.setLIntegral_tripleBox`); hence
   `‖1_{(-1,2]^d} (F ∘ π)‖_{L_p(ℝ^d)} = 3^{d/p} ‖F‖_{L_p(𝕋^d)}`
-  (`Torus.eLpNorm_indicator_tripleBox_comp_proj`, `Torus.eLpNorm_indicator_tripleBox`,
-  `Torus.memLp_indicator_tripleBox_comp_proj`).
+  (`Torus.eLpNorm_indicator_tripleBox_comp_quotientProj`, `Torus.eLpNorm_indicator_tripleBox`,
+  `Torus.memLp_indicator_tripleBox_comp_quotientProj`).
 -/
 
 @[expose] public section
@@ -106,7 +107,7 @@ theorem pairwise_disjoint_periodBox :
 `g : 𝕋^d → [0, ∞]` (Mathlib's `UnitAddTorus.lintegral_preimage`, carried from `d → ℝ` to
 `ℝ^d` by the volume-preserving identification). -/
 theorem lintegral_periodBox (a : d → ℝ) (g : UnitAddTorus d → ℝ≥0∞) :
-    ∫⁻ x in periodBox a, g (proj x) = ∫⁻ t, g t := by
+    ∫⁻ x in periodBox a, g (quotientProj x) = ∫⁻ t, g t := by
   rw [UnitAddTorus.lintegral_preimage g a]
   exact MeasurePreserving.setLIntegral_comp_preimage_emb
     (EuclideanSpace.volume_preserving_symm_measurableEquiv_toLp d)
@@ -115,80 +116,82 @@ theorem lintegral_periodBox (a : d → ℝ) (g : UnitAddTorus d → ℝ≥0∞) 
 
 /-- **The quotient map preserves measure on a period box**: `π` maps the Lebesgue measure on
 `P_a` to the Haar measure of the torus. -/
-theorem measurePreserving_proj_periodBox (a : d → ℝ) :
-    MeasurePreserving proj (volume.restrict (periodBox a)) volume := by
-  refine ⟨measurable_proj, Measure.ext fun s hs => ?_⟩
-  rw [Measure.map_apply measurable_proj hs, ← lintegral_indicator_one (measurable_proj hs),
-    ← lintegral_indicator_one hs, ← lintegral_periodBox a]
+theorem measurePreserving_quotientProj_periodBox (a : d → ℝ) :
+    MeasurePreserving quotientProj (volume.restrict (periodBox a)) volume := by
+  refine ⟨measurable_quotientProj, Measure.ext fun s hs => ?_⟩
+  rw [Measure.map_apply measurable_quotientProj hs,
+    ← lintegral_indicator_one (measurable_quotientProj hs), ← lintegral_indicator_one hs,
+    ← lintegral_periodBox a]
   rfl
 
 /-- A period box has volume `1`. -/
 theorem volume_periodBox (a : d → ℝ) : volume (periodBox a) = 1 := by
-  have h := (measurePreserving_proj_periodBox a).measure_preimage
+  have h := (measurePreserving_quotientProj_periodBox a).measure_preimage
     (MeasurableSet.univ (α := UnitAddTorus d)).nullMeasurableSet
   rwa [preimage_univ, Measure.restrict_apply_univ, measure_univ] at h
 
 /-- `L_p` norms of lifts on a period box are `L_p` norms on the torus:
 `‖F ∘ π‖_{L_p(P_a)} = ‖F‖_{L_p(𝕋^d)}`. -/
-theorem eLpNorm_comp_proj_periodBox {ε : Type*} [TopologicalSpace ε] [ContinuousENorm ε]
+theorem eLpNorm_comp_quotientProj_periodBox {ε : Type*} [TopologicalSpace ε] [ContinuousENorm ε]
     (a : d → ℝ) {F : UnitAddTorus d → ε} (hF : AEStronglyMeasurable F volume) (p : ℝ≥0∞) :
-    eLpNorm (F ∘ proj) p (volume.restrict (periodBox a)) = eLpNorm F p volume :=
-  eLpNorm_comp_measurePreserving hF (measurePreserving_proj_periodBox a)
+    eLpNorm (F ∘ quotientProj) p (volume.restrict (periodBox a)) = eLpNorm F p volume :=
+  eLpNorm_comp_measurePreserving hF (measurePreserving_quotientProj_periodBox a)
 
 /-- **From the period box to the torus**: for `1 ≤ p`, almost everywhere measurable
 `F, G : 𝕋^d → [0, ∞]` and `A : ℝ^d → [0, ∞]` with `F(π x) ≤ A(x) + G(π x)` for almost every
 `x ∈ P_0`, `‖F‖_{L_p(𝕋^d)} ≤ ‖A‖_{L_p(ℝ^d)} + ‖G‖_{L_p(𝕋^d)}`, since `L_p` norms on the torus are
-`L_p` norms of lifts on `P_0` (`Torus.eLpNorm_comp_proj_periodBox`). -/
-theorem eLpNorm_le_of_comp_proj_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) {F G : UnitAddTorus d → ℝ≥0∞}
+`L_p` norms of lifts on `P_0` (`Torus.eLpNorm_comp_quotientProj_periodBox`). -/
+theorem eLpNorm_le_of_comp_quotientProj_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) {F G : UnitAddTorus d → ℝ≥0∞}
     (hF : AEMeasurable F volume) (hG : AEMeasurable G volume) {A : EuclideanSpace ℝ d → ℝ≥0∞}
-    (h : ∀ᵐ x ∂volume.restrict (periodBox 0), F (proj x) ≤ A x + G (proj x)) :
+    (h : ∀ᵐ x ∂volume.restrict (periodBox 0), F (quotientProj x) ≤ A x + G (quotientProj x)) :
     eLpNorm F p volume ≤ eLpNorm A p volume + eLpNorm G p volume :=
-  calc eLpNorm F p volume = eLpNorm (F ∘ proj) p (volume.restrict (periodBox 0)) :=
-        (eLpNorm_comp_proj_periodBox 0 hF.aestronglyMeasurable p).symm
-    _ ≤ eLpNorm (A + G ∘ proj) p (volume.restrict (periodBox 0)) :=
+  calc eLpNorm F p volume = eLpNorm (F ∘ quotientProj) p (volume.restrict (periodBox 0)) :=
+        (eLpNorm_comp_quotientProj_periodBox 0 hF.aestronglyMeasurable p).symm
+    _ ≤ eLpNorm (A + G ∘ quotientProj) p (volume.restrict (periodBox 0)) :=
         eLpNorm_mono_enorm_ae (hF.aestronglyMeasurable.comp_measurePreserving
-          (measurePreserving_proj_periodBox 0)) (h.mono fun x hx => by
+          (measurePreserving_quotientProj_periodBox 0)) (h.mono fun x hx => by
             simpa only [enorm_eq_self, Pi.add_apply, Function.comp_apply] using hx)
     _ ≤ eLpNorm A p (volume.restrict (periodBox 0)) +
-          eLpNorm (G ∘ proj) p (volume.restrict (periodBox 0)) := eLpNorm_add_le hp1
+          eLpNorm (G ∘ quotientProj) p (volume.restrict (periodBox 0)) := eLpNorm_add_le hp1
     _ ≤ eLpNorm A p volume + eLpNorm G p volume :=
         add_le_add (eLpNorm_mono_measure _ Measure.restrict_le_self)
-          (eLpNorm_comp_proj_periodBox 0 hG.aestronglyMeasurable p).le
+          (eLpNorm_comp_quotientProj_periodBox 0 hG.aestronglyMeasurable p).le
 
 /-! ### Null sets and almost everywhere statements -/
 
 /-- **The quotient map pulls null sets back to null sets**: the period boxes `P_m`, `m ∈ ℤ^d`,
 cover `ℝ^d`, and on each of them `π` preserves measure. -/
-theorem quasiMeasurePreserving_proj :
-    QuasiMeasurePreserving (proj : EuclideanSpace ℝ d → UnitAddTorus d) volume volume := by
-  refine ⟨measurable_proj, Measure.AbsolutelyContinuous.mk fun s hs h0 => ?_⟩
-  rw [Measure.map_apply measurable_proj hs]
-  have hcover : proj ⁻¹' s ⊆
-      ⋃ m : d → ℤ, proj ⁻¹' s ∩ periodBox (fun i => (m i : ℝ)) := fun x hx =>
+theorem quasiMeasurePreserving_quotientProj :
+    QuasiMeasurePreserving (quotientProj : EuclideanSpace ℝ d → UnitAddTorus d) volume volume := by
+  refine ⟨measurable_quotientProj, Measure.AbsolutelyContinuous.mk fun s hs h0 => ?_⟩
+  rw [Measure.map_apply measurable_quotientProj hs]
+  have hcover : quotientProj ⁻¹' s ⊆
+      ⋃ m : d → ℤ, quotientProj ⁻¹' s ∩ periodBox (fun i => (m i : ℝ)) := fun x hx =>
     mem_iUnion.2 ⟨fun i => ⌈x i⌉ - 1, hx, mem_periodBox_ceil x⟩
   refine measure_mono_null hcover (measure_iUnion_null fun m => ?_)
-  rw [← Measure.restrict_apply (measurable_proj hs),
-    (measurePreserving_proj_periodBox _).measure_preimage hs.nullMeasurableSet, h0]
+  rw [← Measure.restrict_apply (measurable_quotientProj hs),
+    (measurePreserving_quotientProj_periodBox _).measure_preimage hs.nullMeasurableSet, h0]
 
 /-- **Almost everywhere statements lift**: if `P(t)` holds for almost every `t ∈ 𝕋^d`, then
 `P(π x)` holds for almost every `x ∈ ℝ^d`. -/
-theorem ae_comp_proj {P : UnitAddTorus d → Prop} (h : ∀ᵐ t ∂volume, P t) :
-    ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ d)), P (proj x) :=
-  quasiMeasurePreserving_proj.ae h
+theorem ae_comp_quotientProj {P : UnitAddTorus d → Prop} (h : ∀ᵐ t ∂volume, P t) :
+    ∀ᵐ x ∂(volume : Measure (EuclideanSpace ℝ d)), P (quotientProj x) :=
+  quasiMeasurePreserving_quotientProj.ae h
 
 /-! ### Convolutions and differences of lifts -/
 
 /-- **Convolution commutes with the lift**: `(Φ ⋆ h)(π x) = (Φ ⋆ (h ∘ π))(x)`, a convolution on
 `ℝ^d` on the right. -/
-theorem econv_proj (Φ : EuclideanSpace ℝ d → ℂ) (h : UnitAddTorus d → ℂ)
-    (x : EuclideanSpace ℝ d) : econv Φ h (proj x) = Rd.conv Φ (h ∘ proj) volume x := by
+theorem periodicEconv_quotientProj (Φ : EuclideanSpace ℝ d → ℂ) (h : UnitAddTorus d → ℂ)
+    (x : EuclideanSpace ℝ d) :
+    periodicEconv Φ h (quotientProj x) = Rd.conv Φ (h ∘ quotientProj) volume x := by
   rw [Rd.conv_apply]
-  simp only [econv, Function.comp_apply, map_sub]
+  simp only [periodicEconv, Function.comp_apply, map_sub]
 
 omit [Fintype d] in
 /-- **Differences commute with the lift**: `Δ^L_{π h} f(π x) = Δ^L_h (f ∘ π)(x)`. -/
-theorem higherDiff_comp_proj (f : UnitAddTorus d → ℂ) (L : ℕ) (h x : EuclideanSpace ℝ d) :
-    (fwdDiff (proj h))^[L] f (proj x) = (fwdDiff h)^[L] (f ∘ proj) x := by
+theorem higherDiff_comp_quotientProj (f : UnitAddTorus d → ℂ) (L : ℕ) (h x : EuclideanSpace ℝ d) :
+    (fwdDiff (quotientProj h))^[L] f (quotientProj x) = (fwdDiff h)^[L] (f ∘ quotientProj) x := by
   simp only [fwdDiff_iter_eq_sum_shift, Function.comp_apply, map_add, map_nsmul]
 
 /-! ### Counting boxes -/
@@ -223,9 +226,9 @@ theorem card_Icc_ceil_le (a r : ℝ) (hr : 0 ≤ r) :
 /-- **Counting boxes**: `∫_{B(x,r)} g(π y) dy ≤ (2r + 2)^d ∫_{𝕋^d} g` for every
 `g : 𝕋^d → [0, ∞]` and `r ∈ ℝ`: the ball meets at most `(2r + 2)^d` period boxes, and each
 contributes `∫_{𝕋^d} g`; for `r ≤ 0` the ball is empty. -/
-theorem setLIntegral_ball_comp_proj_le (g : UnitAddTorus d → ℝ≥0∞) (x : EuclideanSpace ℝ d)
+theorem setLIntegral_ball_comp_quotientProj_le (g : UnitAddTorus d → ℝ≥0∞) (x : EuclideanSpace ℝ d)
     (r : ℝ) :
-    ∫⁻ y in ball x r, g (proj y) ≤
+    ∫⁻ y in ball x r, g (quotientProj y) ≤
       ENNReal.ofReal (2 * r + 2) ^ Fintype.card d * ∫⁻ t, g t := by
   classical
   rcases le_or_gt r 0 with hr | hr
@@ -241,9 +244,10 @@ theorem setLIntegral_ball_comp_proj_le (g : UnitAddTorus d → ℝ≥0∞) (x : 
     refine Finset.prod_le_prod fun i _ => ?_
     rw [← ENNReal.ofReal_natCast]
     exact ENNReal.ofReal_le_ofReal (card_Icc_ceil_le (x i) r hr.le)
-  calc ∫⁻ y in ball x r, g (proj y)
-      ≤ ∫⁻ y in ⋃ m ∈ M, periodBox (fun i => (m i : ℝ)), g (proj y) := lintegral_mono_set hsub
-    _ = ∑ m ∈ M, ∫⁻ y in periodBox (fun i => (m i : ℝ)), g (proj y) :=
+  calc ∫⁻ y in ball x r, g (quotientProj y)
+      ≤ ∫⁻ y in ⋃ m ∈ M, periodBox (fun i => (m i : ℝ)), g (quotientProj y) :=
+        lintegral_mono_set hsub
+    _ = ∑ m ∈ M, ∫⁻ y in periodBox (fun i => (m i : ℝ)), g (quotientProj y) :=
         lintegral_biUnion_finset (fun m _ m' _ h => pairwise_disjoint_periodBox h)
           (fun m _ => measurableSet_periodBox _) _
     _ = M.card * ∫⁻ t, g t := by
@@ -252,12 +256,12 @@ theorem setLIntegral_ball_comp_proj_le (g : UnitAddTorus d → ℝ≥0∞) (x : 
 
 /-- **Lifts of integrable functions are locally integrable**: by counting boxes every ball has
 finite integral. -/
-theorem locallyIntegrable_comp_proj {h : UnitAddTorus d → ℂ} (hh : Integrable h volume) :
-    LocallyIntegrable (h ∘ proj) volume := fun x => by
+theorem locallyIntegrable_comp_quotientProj {h : UnitAddTorus d → ℂ} (hh : Integrable h volume) :
+    LocallyIntegrable (h ∘ quotientProj) volume := fun x => by
   refine ⟨ball x 1, ball_mem_nhds x one_pos, ?_, ?_⟩
   · exact (hh.aestronglyMeasurable.comp_quasiMeasurePreserving
-      quasiMeasurePreserving_proj).restrict
-  · refine (setLIntegral_ball_comp_proj_le (fun t => ‖h t‖ₑ) x 1).trans_lt ?_
+      quasiMeasurePreserving_quotientProj).restrict
+  · refine (setLIntegral_ball_comp_quotientProj_le (fun t => ‖h t‖ₑ) x 1).trans_lt ?_
     exact ENNReal.mul_lt_top (ENNReal.pow_lt_top ENNReal.ofReal_lt_top) hh.2
 
 section Lp
@@ -265,9 +269,9 @@ section Lp
 variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 
 /-- The lift `h ∘ π` of `h ∈ L_p(𝕋^d)`, `1 ≤ p`, is locally integrable on `ℝ^d`. -/
-theorem locallyIntegrable_comp_proj_Lp (h : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
-    LocallyIntegrable (⇑h ∘ proj) volume :=
-  locallyIntegrable_comp_proj ((Lp.memLp h).integrable Fact.out)
+theorem locallyIntegrable_comp_quotientProj_Lp (h : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
+    LocallyIntegrable (⇑h ∘ quotientProj) volume :=
+  locallyIntegrable_comp_quotientProj ((Lp.memLp h).integrable Fact.out)
 
 end Lp
 
@@ -322,7 +326,7 @@ theorem one_le_norm_of_sub_notMem_tripleBox {x y : EuclideanSpace ℝ d} (hx : x
 /-- **The box of side `3`**: `∫_{(-1,2]^d} g(π y) dy = 3^d ∫_{𝕋^d} g`, since `(-1, 2]^d` is the
 disjoint union of `3^d` period boxes. -/
 theorem setLIntegral_tripleBox (g : UnitAddTorus d → ℝ≥0∞) :
-    ∫⁻ y in tripleBox, g (proj y) = 3 ^ Fintype.card d * ∫⁻ t, g t := by
+    ∫⁻ y in tripleBox, g (quotientProj y) = 3 ^ Fintype.card d * ∫⁻ t, g t := by
   classical
   have h : tripleBox (d := d) = ⋃ m ∈ Fintype.piFinset fun _ : d => Finset.Icc (-1 : ℤ) 1,
       periodBox (fun i => (m i : ℝ)) := by
@@ -339,14 +343,14 @@ theorem setLIntegral_tripleBox (g : UnitAddTorus d → ℝ≥0∞) :
 `‖1_{(-1,2]^d} (F ∘ π)‖_{L_p(ℝ^d)} = 3^{d/p} ‖F‖_{L_p(𝕋^d)}` for `0 < p < ∞` and every almost
 everywhere strongly measurable `F` on `𝕋^d` with values in a space with an extended norm, such as
 `ℂ` or `[0, ∞]` (`Torus.setLIntegral_tripleBox` for `|F|^p`). -/
-theorem eLpNorm_indicator_tripleBox_comp_proj {ε : Type*} [TopologicalSpace ε]
+theorem eLpNorm_indicator_tripleBox_comp_quotientProj {ε : Type*} [TopologicalSpace ε]
     [ESeminormedAddMonoid ε] {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞) {F : UnitAddTorus d → ε}
     (hF : AEStronglyMeasurable F volume) :
-    eLpNorm (tripleBox.indicator (F ∘ proj)) p volume =
+    eLpNorm (tripleBox.indicator (F ∘ quotientProj)) p volume =
       3 ^ ((Fintype.card d : ℝ) / p.toReal) * eLpNorm F p volume := by
   rw [eLpNorm_indicator_eq_eLpNorm_restrict measurableSet_tripleBox.nullMeasurableSet,
     eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp
-      (hF.comp_quasiMeasurePreserving quasiMeasurePreserving_proj).restrict,
+      (hF.comp_quasiMeasurePreserving quasiMeasurePreserving_quotientProj).restrict,
     eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hF, Function.comp_def,
     setLIntegral_tripleBox (fun t => ‖F t‖ₑ ^ p.toReal),
     ENNReal.mul_rpow_of_nonneg _ _ (by positivity), ← ENNReal.rpow_natCast, ← ENNReal.rpow_mul,
@@ -354,19 +358,19 @@ theorem eLpNorm_indicator_tripleBox_comp_proj {ε : Type*} [TopologicalSpace ε]
 
 /-- `L_p` norms on the box `(-1, 2]^d` for functions with values in `[0, ∞]`:
 `‖1_{(-1,2]^d} (G ∘ π)‖_{L_p(ℝ^d)} = 3^{d/p} ‖G‖_{L_p(𝕋^d)}` for `0 < p < ∞` and almost everywhere
-measurable `G : 𝕋^d → [0, ∞]` (`Torus.eLpNorm_indicator_tripleBox_comp_proj`). -/
+measurable `G : 𝕋^d → [0, ∞]` (`Torus.eLpNorm_indicator_tripleBox_comp_quotientProj`). -/
 theorem eLpNorm_indicator_tripleBox {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞)
     {G : UnitAddTorus d → ℝ≥0∞} (hG : AEMeasurable G volume) :
-    eLpNorm (tripleBox.indicator fun y => G (proj y)) p volume =
+    eLpNorm (tripleBox.indicator fun y => G (quotientProj y)) p volume =
       3 ^ ((Fintype.card d : ℝ) / p.toReal) * eLpNorm G p volume :=
-  eLpNorm_indicator_tripleBox_comp_proj hp0 hp hG.aestronglyMeasurable
+  eLpNorm_indicator_tripleBox_comp_quotientProj hp0 hp hG.aestronglyMeasurable
 
 /-- The part `1_{(-1,2]^d} (f ∘ π)` of the lift of `f ∈ L_p(𝕋^d)`, `0 < p < ∞`, lies in
 `L_p(ℝ^d)`. -/
-theorem memLp_indicator_tripleBox_comp_proj {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞)
+theorem memLp_indicator_tripleBox_comp_quotientProj {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞)
     {f : UnitAddTorus d → ℂ} (hf : MemLp f p volume) :
-    MemLp (tripleBox.indicator (f ∘ proj)) p volume := by
-  rw [memLp_iff, eLpNorm_indicator_tripleBox_comp_proj hp0 hp hf.aestronglyMeasurable]
+    MemLp (tripleBox.indicator (f ∘ quotientProj)) p volume := by
+  rw [memLp_iff, eLpNorm_indicator_tripleBox_comp_quotientProj hp0 hp hf.aestronglyMeasurable]
   exact ENNReal.mul_lt_top (ENNReal.rpow_lt_top_of_nonneg (by positivity) (by norm_num)) hf
 
 end Torus

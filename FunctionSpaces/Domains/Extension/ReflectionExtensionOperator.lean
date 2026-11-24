@@ -174,7 +174,7 @@ noncomputable def toSobolevExtensionOp (hE : IsSobolevExtensionMap p O U C E) (h
   let L := sobolevJet.liftJet (hE.valueMap hC) fun u i =>
     (hE.exists_hasWeakLineDeriv_valueMap hC u).elim fun G hG => ⟨G i, hG.1 i⟩
   { toLinearMap := L
-    memSobolev := fun u => memWSobolev_one_of_forall_gridBasis (L u).2
+    memWSobolev := fun u => memWSobolev_one_of_forall_gridBasis (L u).2
     ae_eq := hE.ae_valueMap_eq hC
     bound := fun u => hE.enorm_valueMap_add_le hC u fun i => (L u).2 i }
 
@@ -364,7 +364,7 @@ noncomputable def sobolevExtensionL [Fact (1 ≤ p)] [Nontrivial V] :
 /-- The values of the extension operator lie in `W^1_p(V)`. -/
 theorem memWSobolev_sobolevExtensionL [Fact (1 ≤ p)] [Nontrivial V]
     (u : weakSobolevJet p Ω.toOpens) : MemWSobolev 1 (Ω.sobolevExtensionL p u).1.1 :=
-  (Classical.choice (Ω.exists_sobolevExtensionOp_reflection (p := p)).choose_spec.2).memSobolev u
+  (Classical.choice (Ω.exists_sobolevExtensionOp_reflection (p := p)).choose_spec.2).memWSobolev u
 
 /-- **The extension operator extends**: the value of `E u` agrees with the value of `u` almost
 everywhere on `Ω`. -/

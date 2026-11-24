@@ -18,7 +18,8 @@ public import Mathlib.Topology.ContinuousMap.Compact
 
 On the torus `𝕋^d = UnitAddTorus d` the **trigonometric monomial** of frequency `k ∈ ℤ^d` is
 `e_k(x) = exp(2πi ⟨k, x⟩)` (Mathlib's `UnitAddTorus.mFourier k`), here as a bounded continuous
-function `Torus.trigMonomial k`.  The **degree** of a frequency is `deg k = max_i |k_i|`, and
+function `Torus.trigMonomial k`.  The **degree** of a frequency is `deg k = max_i |k_i|`
+(`Torus.trigDeg`), and
 
 `trigPoly n = span_ℂ {e_k : deg k < n}`
 
@@ -47,37 +48,37 @@ namespace Torus
 
 variable {d : Type*} [Fintype d]
 
-/-- The **degree** `max_i |k_i|` of a frequency `k ∈ ℤ^d`. -/
-def deg (k : d → ℤ) : ℕ := Finset.univ.sup fun i => (k i).natAbs
+/-- The **degree** `deg k = max_i |k_i|` of a frequency `k ∈ ℤ^d`. -/
+def trigDeg (k : d → ℤ) : ℕ := Finset.univ.sup fun i => (k i).natAbs
 
 /-- `|k_i| ≤ deg k`. -/
-theorem natAbs_le_deg (k : d → ℤ) (i : d) : (k i).natAbs ≤ deg k :=
+theorem natAbs_le_trigDeg (k : d → ℤ) (i : d) : (k i).natAbs ≤ trigDeg k :=
   Finset.le_sup (f := fun i => (k i).natAbs) (Finset.mem_univ i)
 
 /-- `deg k ≤ n` iff `|k_i| ≤ n` for every `i`. -/
-theorem deg_le_iff {k : d → ℤ} {n : ℕ} : deg k ≤ n ↔ ∀ i, (k i).natAbs ≤ n := by
-  simp [deg, Finset.sup_le_iff]
+theorem trigDeg_le_iff {k : d → ℤ} {n : ℕ} : trigDeg k ≤ n ↔ ∀ i, (k i).natAbs ≤ n := by
+  simp [trigDeg, Finset.sup_le_iff]
 
 /-- `deg (k + l) ≤ deg k + deg l`. -/
-theorem deg_add_le (k l : d → ℤ) : deg (k + l) ≤ deg k + deg l :=
-  deg_le_iff.2 fun i => (Int.natAbs_add_le _ _).trans
-    (add_le_add (natAbs_le_deg k i) (natAbs_le_deg l i))
+theorem trigDeg_add_le (k l : d → ℤ) : trigDeg (k + l) ≤ trigDeg k + trigDeg l :=
+  trigDeg_le_iff.2 fun i => (Int.natAbs_add_le _ _).trans
+    (add_le_add (natAbs_le_trigDeg k i) (natAbs_le_trigDeg l i))
 
 /-- `deg 0 = 0`. -/
 @[simp]
-theorem deg_zero : deg (0 : d → ℤ) = 0 := by simp [deg]
+theorem trigDeg_zero : trigDeg (0 : d → ℤ) = 0 := by simp [trigDeg]
 
 variable (d) in
 open Classical in
 /-- The **frequencies of degree `< n`**. -/
 noncomputable def boxLt (n : ℕ) : Finset (d → ℤ) :=
-  (Fintype.piFinset fun _ => Finset.Ioo (-(n : ℤ)) n).filter fun k => deg k < n
+  (Fintype.piFinset fun _ => Finset.Ioo (-(n : ℤ)) n).filter fun k => trigDeg k < n
 
 /-- `k` lies in the box of size `n` iff `deg k < n`. -/
-theorem mem_boxLt {n : ℕ} {k : d → ℤ} : k ∈ boxLt d n ↔ deg k < n := by
+theorem mem_boxLt {n : ℕ} {k : d → ℤ} : k ∈ boxLt d n ↔ trigDeg k < n := by
   simp only [boxLt, Finset.mem_filter, Fintype.mem_piFinset, Finset.mem_Ioo]
   refine ⟨fun h => h.2, fun h => ⟨fun i => ?_, h⟩⟩
-  have := (natAbs_le_deg k i).trans_lt h
+  have := (natAbs_le_trigDeg k i).trans_lt h
   omega
 
 /-- The box of size `0` is empty. -/
@@ -140,7 +141,7 @@ theorem trigPoly_mono : Monotone (trigPoly d) := fun _ _ h =>
   Submodule.span_mono (Set.image_mono (by exact_mod_cast boxLt_mono h))
 
 /-- `e_k` has degree `< n` when `deg k < n`. -/
-theorem trigMonomial_mem_trigPoly {n : ℕ} {k : d → ℤ} (hk : deg k < n) :
+theorem trigMonomial_mem_trigPoly {n : ℕ} {k : d → ℤ} (hk : trigDeg k < n) :
     trigMonomial k ∈ trigPoly d n :=
   Submodule.subset_span ⟨k, by simpa using mem_boxLt.2 hk, rfl⟩
 
@@ -150,7 +151,7 @@ degree `< m` to one of degree `< m`, since these polynomials are the span of the
 (Mathlib's `Submodule.span_le`). -/
 theorem map_mem_trigPoly {ι κ : Type*} [Fintype ι] [Fintype κ]
     (L : (UnitAddTorus ι →ᵇ ℂ) →ₗ[ℂ] (UnitAddTorus κ →ᵇ ℂ)) {m : ℕ}
-    (hL : ∀ k : ι → ℤ, deg k < m → L (trigMonomial k) ∈ trigPoly κ m)
+    (hL : ∀ k : ι → ℤ, trigDeg k < m → L (trigMonomial k) ∈ trigPoly κ m)
     {a : UnitAddTorus ι →ᵇ ℂ} (ha : a ∈ trigPoly ι m) : L a ∈ trigPoly κ m :=
   (Submodule.span_le (p := (trigPoly κ m).comap L)).2
     (by rintro _ ⟨k, hk, rfl⟩; exact hL k (mem_boxLt.1 hk)) ha
@@ -163,7 +164,7 @@ theorem trigPoly_mul_le (m n : ℕ) : trigPoly d m * trigPoly d n ≤ trigPoly d
   refine ⟨k + l, ?_, trigMonomial_add k l⟩
   have hk' := mem_boxLt.1 (by simpa using hk)
   have hl' := mem_boxLt.1 (by simpa using hl)
-  simpa using mem_boxLt.2 ((deg_add_le k l).trans_lt (by omega))
+  simpa using mem_boxLt.2 ((trigDeg_add_le k l).trans_lt (by omega))
 
 /-- The product of polynomials of degree `< m` and `< n` has degree `< m + n`. -/
 theorem mul_mem_trigPoly {m n : ℕ} {S T : UnitAddTorus d →ᵇ ℂ} (hS : S ∈ trigPoly d m)
@@ -207,7 +208,7 @@ theorem map_span_mFourier_le_iSup_trigPoly :
       ⨆ n, trigPoly d n := by
   rw [Submodule.map_span, Submodule.span_le]
   rintro _ ⟨_, ⟨k, rfl⟩, rfl⟩
-  exact Submodule.mem_iSup_of_mem (deg k + 1) (trigMonomial_mem_trigPoly (Nat.lt_succ_self _))
+  exact Submodule.mem_iSup_of_mem (trigDeg k + 1) (trigMonomial_mem_trigPoly (Nat.lt_succ_self _))
 
 /-- **The trigonometric polynomials are uniformly dense** in the bounded continuous functions on
 `𝕋^d`: the image of Mathlib's dense span of the characters (`span_mFourier_closure_eq_top`) under
