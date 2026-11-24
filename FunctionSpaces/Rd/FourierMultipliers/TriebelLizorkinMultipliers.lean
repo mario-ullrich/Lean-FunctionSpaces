@@ -25,7 +25,7 @@ The proof is pointwise. Since `𝓕ψ̃_j 𝓕ψ_j = 𝓕ψ_j`, the block of `m(
 `𝓕(m(D) ψ̃_j)` applied to the block of `u` (`Rd.distribBlock_fourierMultiplierCLM`), so when
 `Δ_j u = g_j ∈ L_p` it is the convolution `(m(D) ψ̃_j) ⋆ g_j`
 (`Rd.distribBlock_fourierMultiplierCLM_eq_convLp`). Here `m(D) ψ̃_j = 2^{jσ} (G_j)_{2^j}` with a
-uniform family `(G_j)` (`Rd.HasSymbolGrowth.exists_isUniformSchwartz_psiDualS`), so
+uniform family `(G_j)` (`Rd.HasSymbolGrowth.exists_isUniformSchwartz_dualLpBlockKernelS`), so
 `2^{j(s-σ)} |Δ_j(m(D) u)| ≤ C M(2^{js} |g_j|)`
 (`Rd.dyadicWeight_mul_enorm_conv_le_maximalFunction`), and the Fefferman–Stein inequality
 (`Rd.eLpNorm_le_of_le_lqNorm_maximalFunction`) finishes.
@@ -49,21 +49,21 @@ variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDim
 distribution `u`, `Δ_j(m(D) u) = 𝓕(m(D) ψ̃_j)(D) Δ_j u`. Both sides are Fourier multipliers of
 `u` (Mathlib's `TemperedDistribution.fourierMultiplierCLM_fourierMultiplierCLM_apply`), with the
 symbols `m 𝓕ψ_j` and `𝓕ψ_j m 𝓕ψ̃_j`, equal since `𝓕ψ̃_j 𝓕ψ_j = 𝓕ψ_j`
-(`Rd.fourier_psiDual_mul_lpBlockKernel`). -/
+(`Rd.fourier_dualLpBlockKernel_mul_lpBlockKernel`). -/
 theorem distribBlock_fourierMultiplierCLM (hm : m.HasTemperateGrowth) (u : 𝓢'(V, ℂ)) (j : ℕ) :
     distribBlock j (TemperedDistribution.fourierMultiplierCLM ℂ m u) =
       TemperedDistribution.fourierMultiplierCLM ℂ
-        (𝓕 (SchwartzMap.fourierMultiplierCLM ℂ m (psiDualS (V := V) j)) : 𝓢(V, ℂ))
+        (𝓕 (SchwartzMap.fourierMultiplierCLM ℂ m (dualLpBlockKernelS (V := V) j)) : 𝓢(V, ℂ))
         (distribBlock j u) := by
   rw [distribBlock, TemperedDistribution.fourierMultiplierCLM_fourierMultiplierCLM_apply hm
-      (𝓕 (psiS (V := V) j)).hasTemperateGrowth,
+      (𝓕 (lpBlockKernelS (V := V) j)).hasTemperateGrowth,
     TemperedDistribution.fourierMultiplierCLM_fourierMultiplierCLM_apply
-      (𝓕 (psiS (V := V) j)).hasTemperateGrowth
-      (𝓕 (SchwartzMap.fourierMultiplierCLM ℂ m (psiDualS (V := V) j))).hasTemperateGrowth]
+      (𝓕 (lpBlockKernelS (V := V) j)).hasTemperateGrowth
+      (𝓕 (SchwartzMap.fourierMultiplierCLM ℂ m (dualLpBlockKernelS (V := V) j))).hasTemperateGrowth]
   refine congrArg (fun f => TemperedDistribution.fourierMultiplierCLM ℂ f u) (funext fun ξ => ?_)
-  rw [Pi.mul_apply, Pi.mul_apply, fourier_fourierMultiplierCLM_apply hm, fourier_psiS_apply,
-    SchwartzMap.fourier_coe, coe_psiDualS]
-  linear_combination (-(m ξ)) * fourier_psiDual_mul_lpBlockKernel (V := V) j ξ
+  rw [Pi.mul_apply, Pi.mul_apply, fourier_fourierMultiplierCLM_apply hm,
+    fourier_lpBlockKernelS_apply, SchwartzMap.fourier_coe, coe_dualLpBlockKernelS]
+  linear_combination (-(m ξ)) * fourier_dualLpBlockKernel_mul_lpBlockKernel (V := V) j ξ
 
 /-- **The blocks of a Fourier multiplier as convolutions**: if `m` has temperate growth,
 `1 ≤ p < ∞` and the block `Δ_j u` of a tempered distribution is an `L_p` function `g`, then
@@ -73,8 +73,8 @@ theorem distribBlock_fourierMultiplierCLM_eq_convLp {p : ℝ≥0∞} [Fact (1 �
     (hm : m.HasTemperateGrowth) {u : 𝓢'(V, ℂ)} {j : ℕ} {g : Lp ℂ p (volume : Measure V)}
     (hg : distribBlock j u = (g : 𝓢'(V, ℂ))) :
     distribBlock j (TemperedDistribution.fourierMultiplierCLM ℂ m u) =
-      (convLp hp (SchwartzMap.fourierMultiplierCLM ℂ m (psiDualS (V := V) j)).integrable g :
-        𝓢'(V, ℂ)) := by
+      (convLp hp (SchwartzMap.fourierMultiplierCLM ℂ m (dualLpBlockKernelS (V := V) j)).integrable
+        g : 𝓢'(V, ℂ)) := by
   rw [distribBlock_fourierMultiplierCLM hm, hg, fourierMultiplierCLM_fourier_toLp_eq_conv hp]
 
 /-! ### The pointwise bound -/
@@ -119,14 +119,16 @@ with the Fefferman–Stein constant `C_{FS} = Rd.feffermanSteinConst V p q`. The
 `Rd.eLpNorm_le_of_le_lqNorm_maximalFunction` applies. -/
 theorem triebelLizorkinNormDistr_fourierMultiplier_le (hp1 : 1 < p) (hp : p ≠ ∞) {q : ℝ≥0∞}
     (hq1 : 1 < q) (hm : m.HasTemperateGrowth) {G : ℕ → 𝓢(V, ℂ)} {A : ℕ → ℕ → ℝ}
-    (hG : IsUniformSchwartz G A) (hK : ∀ j, SchwartzMap.fourierMultiplierCLM ℂ m (psiDualS j) =
+    (hG : IsUniformSchwartz G A)
+    (hK : ∀ j, SchwartzMap.fourierMultiplierCLM ℂ m (dualLpBlockKernelS j) =
       ((((2 : ℝ) ^ j) ^ σ : ℝ) : ℂ) • schwartzDilate (2 ^ j) (pow_ne_zero j two_ne_zero) (G j))
     {N : ℕ} (hN : finrank ℝ V < N) (s : ℝ) {u : 𝓢'(V, ℂ)}
     {g : ℕ → Lp ℂ p (volume : Measure V)} (hg : ∀ j, distribBlock j u = (g j : 𝓢'(V, ℂ))) :
     triebelLizorkinNormDistr p (s - σ) q (TemperedDistribution.fourierMultiplierCLM ℂ m u) ≤
       decayMaximalConst V N * familyDecayConst A 0 N * feffermanSteinConst V p q *
         eLpNorm (fun x => lqNorm q fun j => dyadicWeight s j * ‖g j x‖ₑ) p volume := by
-  set K : ℕ → 𝓢(V, ℂ) := fun j => SchwartzMap.fourierMultiplierCLM ℂ m (psiDualS j) with hKdef
+  set K : ℕ → 𝓢(V, ℂ) :=
+    fun j => SchwartzMap.fourierMultiplierCLM ℂ m (dualLpBlockKernelS j) with hKdef
   refine (triebelLizorkinNormDistr_le (g := fun j => convLp hp (K j).integrable (g j))
     fun j => distribBlock_fourierMultiplierCLM_eq_convLp hp hm (hg j)).trans ?_
   refine eLpNorm_le_of_le_lqNorm_maximalFunction hp1 hp hq1
@@ -141,7 +143,7 @@ theorem triebelLizorkinNormDistr_fourierMultiplier_le (hp1 : 1 < p) (hp : p ≠ 
 `1 < q ≤ ∞`, a symbol `m` of order `σ` and every real `s` there is a finite constant `C` with
 `‖m(D) u‖_{F^{s-σ}_{p,q}} ≤ C ‖u‖_{F^s_{p,q}}` for every tempered distribution `u`; the constant is
 existential. In particular `m(D)` maps `F^s_{p,q}` into `F^{s-σ}_{p,q}`. The uniform family of
-`Rd.HasSymbolGrowth.exists_isUniformSchwartz_psiDualS` and
+`Rd.HasSymbolGrowth.exists_isUniformSchwartz_dualLpBlockKernelS` and
 `Rd.triebelLizorkinNormDistr_fourierMultiplier_le` give the bound for every family of `L_p`
 blocks of `u` (`Rd.le_mul_triebelLizorkinNormDistr`). -/
 theorem exists_triebelLizorkinNormDistr_fourierMultiplier_le (hp1 : 1 < p) (hp : p ≠ ∞)
@@ -150,7 +152,7 @@ theorem exists_triebelLizorkinNormDistr_fourierMultiplier_le (hp1 : 1 < p) (hp :
       triebelLizorkinNormDistr p (s - σ) q
           (TemperedDistribution.fourierMultiplierCLM ℂ m u) ≤
         C * triebelLizorkinNormDistr p s q u := by
-  obtain ⟨G, A, hG, hK⟩ := hm.exists_isUniformSchwartz_psiDualS
+  obtain ⟨G, A, hG, hK⟩ := hm.exists_isUniformSchwartz_dualLpBlockKernelS
   have hN : finrank ℝ V < finrank ℝ V + 1 := Nat.lt_succ_self _
   refine ⟨max 1 (decayMaximalConst V (finrank ℝ V + 1) * familyDecayConst A 0 (finrank ℝ V + 1) *
       feffermanSteinConst V p q), ?_, fun u => le_mul_triebelLizorkinNormDistr ?_ fun g hg => ?_⟩

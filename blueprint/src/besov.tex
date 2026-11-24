@@ -857,8 +857,8 @@ on frequencies of degree $< 2^k$ and $0$ from degree $2^{k+\#d+2}$ on.
 
 \begin{lemma}[De la Vallée Poussin operators on the torus]
 \label{lem:torus-vallee-poussin}
-\lean{Torus.fourier_Theta_latticeVec_eq_zero, Torus.valleePoussin, Torus.valleePoussinBCF,
-  Torus.valleePoussin_mem_trigPolyLp, Torus.valleePoussinBCF_mem_trigPoly,
+\lean{Torus.fourier_dilatedBandKernel_latticeVec_eq_zero, Torus.valleePoussin,
+  Torus.valleePoussinBCF, Torus.valleePoussin_mem_trigPolyLp, Torus.valleePoussinBCF_mem_trigPoly,
   Torus.valleePoussin_eq_self, Torus.valleePoussinBCF_eq_self, Torus.toLp_valleePoussinBCF,
   Torus.valleePoussinConst, Torus.valleePoussinConst_ne_top, Torus.toReal_valleePoussinConst,
   Torus.enorm_sub_valleePoussin_le, Torus.norm_sub_valleePoussinBCF_le,
@@ -5962,7 +5962,7 @@ The case $U = T = V$ is the second statement, by \Cref{lem:rd-modulus-on}.
 
 \begin{lemma}[The Jackson approximant]
 \label{lem:jackson-approx}
-\lean{Rd.conv_Theta_dilate_lpKernel, Rd.jacksonScale, Rd.jacksonScale_pos,
+\lean{Rd.conv_dilatedBandKernel_dilate_lpKernel, Rd.jacksonScale, Rd.jacksonScale_pos,
   Rd.jacksonScale_le, Rd.jacksonApprox, Rd.jacksonApprox_mem_bandSpace,
   Rd.ae_sub_jacksonApprox_eq}
 \leanok
@@ -6119,7 +6119,7 @@ $\Delta_v$ is the translation by $v$, an isometry, minus the identity. The bound
 
 \begin{theorem}[The inverse inequality for band-limited functions]
 \label{thm:band-inverse}
-\lean{Rd.bandInverseConst, Rd.bandInverseConst_ne_top, Rd.eLpNorm_higherDiff_Theta_le,
+\lean{Rd.bandInverseConst, Rd.bandInverseConst_ne_top, Rd.eLpNorm_higherDiff_dilatedBandKernel_le,
   Rd.lpModulus_le_of_mem_bandSpace}
 \leanok
 \uses{lem:schwartz-differences, lem:rd-differences, lem:rd-modulus, thm:young, def:band-space}
@@ -8094,9 +8094,9 @@ $\Omega^{e(m)}_L(f, 2^{-m})_p \leq C_\eta^d \sum_k \prod_i c(m_i, k_i) \|k_k * f
 
 \begin{definition}[Tensor Littlewood--Paley blocks]
 \label{def:mixed-lp}
-\lean{Rd.mixedPsi, Rd.mixedTheta, Rd.integrable_mixedPsi, Rd.integrable_mixedTheta,
-  Rd.conv_mixedTheta_mixedPsi, Rd.sum_mixedPsi, Rd.mixedBlock, Rd.mixedLPNorm,
-  Rd.tendsto_sum_mixedBlock}
+\lean{Rd.mixedLpBlockKernel, Rd.mixedDilatedBandKernel, Rd.integrable_mixedLpBlockKernel,
+  Rd.integrable_mixedDilatedBandKernel, Rd.conv_mixedDilatedBandKernel_mixedLpBlockKernel,
+  Rd.sum_mixedLpBlockKernel, Rd.mixedBlock, Rd.mixedLPNorm, Rd.tendsto_sum_mixedBlock}
 \leanok
 \uses{def:lp-kernels, thm:kernel-identities, lem:tensor-kernel-fubini, thm:approx-identity}
 The tensor blocks are $\delta_k = \otimes_i \psi_{k_i}$, so that

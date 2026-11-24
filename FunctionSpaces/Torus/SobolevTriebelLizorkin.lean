@@ -270,27 +270,29 @@ theorem periodicTLToSobolevConst_ne_top (hp1 : 1 < p) (hp : p ≠ ∞) {k : ℕ}
 `1 < p < ∞`, directions `w ∈ (ℝ^d)^k`, every finite set `s ⊆ ℕ` and `f ∈ L_p(𝕋^d)`,
 `‖∑_{j ∈ s} (∂^w ψ̃_j) ⋆ Δ_j f‖_p ≤ C_w ‖ t ↦ ‖(1_s(j) 2^{jk} (ψ_j ⋆ f)(t))_j‖_{ℓ_2} ‖_p` with
 `C_w = Torus.periodicTLToSobolevConst d p w`. Since `∂^w ψ̃_j = 2^{jk} (∂^w G̃_j)_{2^j}`
-(`Rd.iteratedLineDerivOp_psiDualS`), this is the synthesis bound on the torus
+(`Rd.iteratedLineDerivOp_dualLpBlockKernelS`), this is the synthesis bound on the torus
 (`Torus.eLpNorm_sum_periodicEconv_le`) with the coefficients `1_s(j) 2^{jk} Δ_j f`. -/
 theorem enorm_sum_periodicEconvLp_derivDual_le [Nonempty d] (hp1 : 1 < p) (hp : p ≠ ∞) {k : ℕ}
     (w : Fin k → EuclideanSpace ℝ d) (s : Finset ℕ)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
-    ‖∑ j ∈ s, periodicEconvLp hp (∂^{w} (Rd.psiDualS (V := EuclideanSpace ℝ d) j)).integrable
+    ‖∑ j ∈ s, periodicEconvLp hp
+        (∂^{w} (Rd.dualLpBlockKernelS (V := EuclideanSpace ℝ d) j)).integrable
         (periodicLpBlock hp j f)‖ₑ ≤
       periodicTLToSobolevConst d p w * eLpNorm (fun t => lqNorm 2 fun j =>
         if j ∈ s then dyadicWeight (k : ℝ) j * ‖periodicBlockFun j f t‖ₑ else 0) p volume := by
   set a : ℕ → UnitAddTorus d → ℂ :=
     fun j => (if j ∈ s then (2 : ℂ) ^ (j * k) else 0) • ⇑(periodicLpBlock hp j f)
   have hsum :
-      ⇑(∑ j ∈ s, periodicEconvLp hp (∂^{w} (Rd.psiDualS (V := EuclideanSpace ℝ d) j)).integrable
+      ⇑(∑ j ∈ s, periodicEconvLp hp
+          (∂^{w} (Rd.dualLpBlockKernelS (V := EuclideanSpace ℝ d) j)).integrable
           (periodicLpBlock hp j f)) =ᵐ[volume]
         fun t => ∑ j ∈ s, periodicEconv (Rd.derivDualFamily w j) (a j) t := by
     filter_upwards [coeFn_sum_periodicEconvLp_ae hp s
-      (fun j => (∂^{w} (Rd.psiDualS (V := EuclideanSpace ℝ d) j)).integrable)
+      (fun j => (∂^{w} (Rd.dualLpBlockKernelS (V := EuclideanSpace ℝ d) j)).integrable)
       fun j => periodicLpBlock hp j f] with t h
     rw [h]
     refine Finset.sum_congr rfl fun j hj => ?_
-    rw [Rd.iteratedLineDerivOp_psiDualS, periodicEconv_smul_kernel]
+    rw [Rd.iteratedLineDerivOp_dualLpBlockKernelS, periodicEconv_smul_kernel]
     simp only [a, hj, ↓reduceIte]
   have hnorm : (fun t => lqNorm 2 fun j => ‖a j t‖ₑ) =ᵐ[volume] fun t => lqNorm 2 fun j =>
       if j ∈ s then dyadicWeight (k : ℝ) j * ‖periodicBlockFun j f t‖ₑ else 0 := by
@@ -314,7 +316,7 @@ noncomputable def periodicDerivSynthesisSum (hp : p ≠ ∞) {k : ℕ} (w : Fin 
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) (J : ℕ) :
     Lp ℂ p (volume : Measure (UnitAddTorus d)) :=
   ∑ j ∈ Finset.range J,
-    periodicEconvLp hp (∂^{w} (Rd.psiDualS (V := EuclideanSpace ℝ d) j)).integrable
+    periodicEconvLp hp (∂^{w} (Rd.dualLpBlockKernelS (V := EuclideanSpace ℝ d) j)).integrable
     (periodicLpBlock hp j f)
 
 /-- **The partial sums are weak derivatives**: for `1 ≤ p < ∞`, `w ∈ (ℝ^d)^k` and
@@ -327,10 +329,10 @@ theorem hasPeriodicWeakLineDeriv_sum_periodicLpBlock (hp : p ≠ ∞) {k : ℕ}
       (periodicDerivSynthesisSum hp w f J) :=
   HasPeriodicWeakLineDeriv.sum _ fun j _ => by
     have h :=
-      hasPeriodicWeakLineDeriv_periodicEconvLp hp w (Rd.psiDualS (V := EuclideanSpace ℝ d) j)
-      (periodicLpBlock hp j f)
-    rwa [periodicEconvLp_congr_kernel hp _ (Rd.integrable_psiDual j) (Rd.coe_psiDualS j),
-      periodicEconvLp_dualLpBlockKernel_periodicLpBlock] at h
+      hasPeriodicWeakLineDeriv_periodicEconvLp hp w
+        (Rd.dualLpBlockKernelS (V := EuclideanSpace ℝ d) j) (periodicLpBlock hp j f)
+    rwa [periodicEconvLp_congr_kernel hp _ (Rd.integrable_dualLpBlockKernel j)
+      (Rd.coe_dualLpBlockKernelS j), periodicEconvLp_dualLpBlockKernel_periodicLpBlock] at h
 
 /-- **Differences of partial sums**: for `d ≥ 1`, `1 < p < ∞` and `N ≤ N'`,
 `‖Torus.periodicDerivSynthesisSum hp w f N' - Torus.periodicDerivSynthesisSum hp w f N‖_p` is at

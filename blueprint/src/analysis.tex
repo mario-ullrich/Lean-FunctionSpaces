@@ -356,7 +356,7 @@ smul\_\allowbreak eq\_\allowbreak of\_\allowbreak integrable} and its inverse fo
 \begin{definition}[Cut-offs and kernels]
 \label{def:lp-kernels}
 \lean{Rd.cutoff, Rd.cutoffSchwartz, Rd.coe_cutoffSchwartz, Rd.lpKernelS, Rd.bandKernelS,
-  Rd.lpKernel, Rd.bandKernel, Rd.dilatedLpKernel, Rd.Theta, Rd.lpBlockKernel}
+  Rd.lpKernel, Rd.bandKernel, Rd.dilatedLpKernel, Rd.dilatedBandKernel, Rd.lpBlockKernel}
 \leanok
 \uses{lem:dilate}
 For $0 < a < b$ let $\chi_{a,b}$ be a smooth function on $V$ with values in $[0, 1]$, equal to
@@ -375,13 +375,13 @@ $\psi_j = \Phi_j - \Phi_{j-1}$ for $j \geq 1$.
   Rd.integrable_lpKernel, Rd.integrable_bandKernel, Rd.continuous_lpKernel,
   Rd.continuous_bandKernel, Rd.bddAbove_lpKernel, Rd.bddAbove_bandKernel,
   Rd.integrable_fourier_lpKernel, Rd.integrable_fourier_bandKernel, Rd.integral_lpKernel,
-  Rd.sum_lpBlockKernel, Rd.integrable_dilatedLpKernel, Rd.integrable_Theta,
-  Rd.integrable_lpBlockKernel, Rd.continuous_dilatedLpKernel, Rd.continuous_Theta,
-  Rd.continuous_lpBlockKernel, Rd.bddAbove_dilatedLpKernel, Rd.bddAbove_Theta,
-  Rd.bddAbove_lpBlockKernel, Rd.eLpNorm_dilatedLpKernel_one, Rd.eLpNorm_Theta_one,
+  Rd.sum_lpBlockKernel, Rd.integrable_dilatedLpKernel, Rd.integrable_dilatedBandKernel,
+  Rd.integrable_lpBlockKernel, Rd.continuous_dilatedLpKernel, Rd.continuous_dilatedBandKernel,
+  Rd.continuous_lpBlockKernel, Rd.bddAbove_dilatedLpKernel, Rd.bddAbove_dilatedBandKernel,
+  Rd.bddAbove_lpBlockKernel, Rd.eLpNorm_dilatedLpKernel_one, Rd.eLpNorm_dilatedBandKernel_one,
   Rd.eLpNorm_bandKernel_ne_top, Rd.eLpNorm_lpKernel_ne_top, Rd.eLpNorm_lpKernel_lt_top,
-  Rd.lintegral_enorm_Theta, Rd.eLpNorm_lpBlockKernel_one_le, Rd.integral_dilatedLpKernel,
-  Rd.one_le_eLpNorm_lpKernel}
+  Rd.lintegral_enorm_dilatedBandKernel, Rd.eLpNorm_lpBlockKernel_one_le,
+  Rd.integral_dilatedLpKernel, Rd.one_le_eLpNorm_lpKernel}
 \leanok
 \uses{def:lp-kernels, lem:dilate}
 The cut-offs are Schwartz functions, $\widehat\Phi = \chi_{1,2}$ and $\widehat\Theta = \chi_{2,4}$,
@@ -401,13 +401,14 @@ Finally $1 = |\int \Phi| \leq \int |\Phi| = \|\Phi\|_1$.
 
 \begin{lemma}[The kernels on the frequency side]
 \label{lem:lp-kernels-frequency}
-\lean{Rd.norm_two_pow_inv_smul, Rd.fourier_dilatedLpKernel, Rd.fourier_Theta,
-  Rd.fourier_lpBlockKernel_succ, Rd.integrable_fourier_dilatedLpKernel, Rd.integrable_fourier_Theta,
-  Rd.integrable_fourier_lpBlockKernel, Rd.norm_lt_of_fourier_dilatedLpKernel_ne_zero,
-  Rd.norm_lt_of_fourier_Theta_ne_zero, Rd.fourier_Theta_eq_one,
-  Rd.norm_lt_of_fourier_lpBlockKernel_ne_zero, Rd.fourier_lpBlockKernel_succ_eq_zero,
-  Rd.lt_norm_of_fourier_lpBlockKernel_succ_ne_zero, Rd.fourier_Theta_succ_mul,
-  Rd.fourier_Theta_mul_lpBlockKernel, Rd.fourier_lpBlockKernel_mul_Theta}
+\lean{Rd.norm_two_pow_inv_smul, Rd.fourier_dilatedLpKernel, Rd.fourier_dilatedBandKernel,
+  Rd.fourier_lpBlockKernel_succ, Rd.integrable_fourier_dilatedLpKernel,
+  Rd.integrable_fourier_dilatedBandKernel, Rd.integrable_fourier_lpBlockKernel,
+  Rd.norm_lt_of_fourier_dilatedLpKernel_ne_zero, Rd.norm_lt_of_fourier_dilatedBandKernel_ne_zero,
+  Rd.fourier_dilatedBandKernel_eq_one, Rd.norm_lt_of_fourier_lpBlockKernel_ne_zero,
+  Rd.fourier_lpBlockKernel_succ_eq_zero, Rd.lt_norm_of_fourier_lpBlockKernel_succ_ne_zero,
+  Rd.fourier_dilatedBandKernel_succ_mul, Rd.fourier_dilatedBandKernel_mul_lpBlockKernel,
+  Rd.fourier_lpBlockKernel_mul_dilatedBandKernel}
 \leanok
 \uses{lem:fourier-dilate, lem:fourier-conv, lem:lp-kernels-basic}
 For all $j, k \in \N$ and $\xi \in V$, $\widehat{\Phi_k}(\xi) = \chi_{1,2}(2^{-k} \xi)$ and
@@ -484,7 +485,8 @@ $K * L = \mathcal F^{-1} \widehat{K * L} = \mathcal F^{-1} \widehat M = M$.
 
 \begin{theorem}[Kernel identities]
 \label{thm:kernel-identities}
-\lean{Rd.conv_Theta_succ, Rd.conv_Theta_lpBlockKernel, Rd.conv_lpBlockKernel_Theta}
+\lean{Rd.conv_dilatedBandKernel_succ, Rd.conv_dilatedBandKernel_lpBlockKernel,
+  Rd.conv_lpBlockKernel_dilatedBandKernel}
 \leanok
 \uses{lem:conv-of-fourier, lem:lp-kernels-frequency, lem:lp-kernels-basic}
 For all $j, k \in \N$, $\Theta_{k+1} * \Theta_k = \Theta_k$ and $\Theta_j * \psi_j = \psi_j$,

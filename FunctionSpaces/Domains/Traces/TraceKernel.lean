@@ -33,7 +33,7 @@ closure of their restrictions in `H^s(Ω)`, and `ker γ_s = Ω.traceKer s` the t
   `H^s(V)` for any `s ≥ 0`, are continuous and have zero boundary trace
   (`Rd.BoundedLipschitzDomain.boundaryTrace_sobolevToL2_ofTest`); conversely, `u ∈ H^1(Ω)` with zero
   trace has its zero extension in `H^1(V)`
-  (`Rd.BoundedLipschitzDomain.memWSobolev_indicatorLp_iff_mem_traceKer`), the zero extension lies
+  (`Rd.BoundedLipschitzDomain.memSobolevW_indicatorLp_iff_mem_traceKer`), the zero extension lies
   in `H̃^1(Ω)`, and so `u ∈ H^1_0(Ω)`.
 * **`H̃^1(Ω) ≅ ker γ` and the dual**: restriction is an isometry of `H̃^1(Ω)` onto `ker γ`
   (`Rd.BoundedLipschitzDomain.tildeEquivTraceKer`), and `(ker γ)^* ≅ H^{-1}(Ω)`
@@ -246,13 +246,13 @@ theorem zeroBoundarySpace_le_traceKer (s : ℝ) (hs : 1 / 2 < s := by norm_num)
     (Ω.boundaryTrace_sobolevToL2_ofTest Ω.boundaryPartition (one_half_pos.trans hs).le φ)
 
 /-- **`ker γ ⊆ H^1_0(Ω)`**: for `u` in the trace kernel, the zero extension `1_Ω ι u` is the `L_2`
-function of some `U ∈ H^1(V)` (`Rd.BoundedLipschitzDomain.memWSobolev_indicatorLp_of_mem_traceKer`,
-`Rd.exists_toL2_eq_of_memWSobolev`). `U` vanishes outside `Ω`, so `U ∈ H̃^1(Ω)`
+function of some `U ∈ H^1(V)` (`Rd.BoundedLipschitzDomain.memSobolevW_indicatorLp_of_mem_traceKer`,
+`Rd.exists_toL2_eq_of_memSobolevW`). `U` vanishes outside `Ω`, so `U ∈ H̃^1(Ω)`
 (`Rd.BoundedLipschitzDomain.mem_tildeSpace_of_ae_eq_zero`), and `u = U|_Ω`
 (`Rd.restrictProj_eq_of_ae_eq`) lies in `H^1_0(Ω)` (`Rd.range_tildeToRestriction`). -/
 theorem traceKer_one_le_zeroBoundarySpace : Ω.traceKer 1 ≤ zeroBoundarySpace 1 Ω.toOpens := by
   intro u hu
-  obtain ⟨U, hU⟩ := exists_toL2_eq_of_memWSobolev (Ω.memWSobolev_indicatorLp_of_mem_traceKer hu)
+  obtain ⟨U, hU⟩ := exists_toL2_eq_of_memSobolevW (Ω.memSobolevW_indicatorLp_of_mem_traceKer hu)
   have hUae : (toL2 U : V → ℂ) =ᵐ[volume] Ω.carrier.indicator (toL2 (u : H^{1}(V))) := by
     rw [hU]
     exact indicatorLp_apply_ae _ _

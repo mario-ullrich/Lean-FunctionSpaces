@@ -15,17 +15,18 @@ Let `V` have dimension `n ≥ 1` and `1 < p < ∞`. The **square function** of `
 `x ↦ ‖((ψ_j ⋆ f)(x))_j‖_{ℓ_2}`, and its `L_p` norm is the Triebel–Lizorkin norm
 `‖f‖_{F^0_{p,2}}` by definition (`Rd.triebelLizorkinNorm_zero_left`). The square
 function theorem is the two-sided bound of this norm by `‖f‖_p`, with named constants,
-formulas in the Schwartz seminorms of the fixed blocks and synthesis kernels that are proved
-finite (`Rd.squareFunctionConst_ne_top`, `Rd.squareSynthesisConst_ne_top`):
+formulas in the Schwartz seminorms of the fixed blocks `ψ_j = Rd.lpBlockKernel j` and synthesis
+kernels `ψ̃_j = Rd.dualLpBlockKernel j` that are proved finite (`Rd.squareFunctionConst_ne_top`,
+`Rd.squareSynthesisConst_ne_top`):
 
 * `‖f‖_{F^0_{p,2}} ≤ Q_{V,p} ‖f‖_p` (`Rd.triebelLizorkinNorm_zero_two_le`, constant
   `Rd.squareFunctionConst`): the analysis bound of the Calderón–Zygmund family `(ψ_j)_j`;
 * `‖f‖_p ≤ Q̃_{V,p} ‖f‖_{F^0_{p,2}}` (`Rd.enorm_le_triebelLizorkinNorm_zero_two`, constant
   `Rd.squareSynthesisConst`): the reproducing formula
-  `∑_{j < J} psiDual_j ⋆ (ψ_j ⋆ f) = ∑_{j < J} Δ_j f` almost everywhere, and these partial
-  sums tend to `f` in `L_p` (`Rd.sum_conv_psiDual_blockFun_ae`,
-  `Rd.tendsto_eLpNorm_sum_conv_psiDual_blockFun_sub`), and the synthesis bound of the
-  Calderón–Zygmund family `(psiDual_j)_j`.
+  `∑_{j < J} ψ̃_j ⋆ (ψ_j ⋆ f) = ∑_{j < J} Δ_j f` almost everywhere, and these partial
+  sums tend to `f` in `L_p` (`Rd.sum_conv_dualLpBlockKernel_blockFun_ae`,
+  `Rd.tendsto_eLpNorm_sum_conv_dualLpBlockKernel_blockFun_sub`), and the synthesis bound of the
+  Calderón–Zygmund family `(ψ̃_j)_j`.
 
 By the upper bound every `f ∈ L_p(V)` lies in `F^0_{p,2}` (`Rd.memTriebelLizorkin_zero_two`), so
 the subspace `F^0_{p,2}` of `L_p(V)` is all of `L_p(V)`
@@ -51,9 +52,9 @@ variable (V) in
 /-- The constant `Q_{V,p}` of the **upper square function bound**
 `‖f‖_{F^0_{p,2}} ≤ Q_{V,p} ‖f‖_p`: the strong type constant `Rd.czConst` of the
 Calderón–Zygmund family of the blocks `ψ_j`, with overlap `2` and Hörmander constant
-`4 H_{A^ψ}`, where `A^ψ = Rd.psiBaseBound V` (`Rd.isCZFamily_lpBlockKernel`). -/
+`4 H_{A^ψ}`, where `A^ψ = Rd.lpBlockKernelBaseBound V` (`Rd.isCZFamily_lpBlockKernel`). -/
 noncomputable def squareFunctionConst (p : ℝ≥0∞) : ℝ≥0∞ :=
-  czConst V p 2 (4 * familyHormanderConst V (psiBaseBound V))
+  czConst V p 2 (4 * familyHormanderConst V (lpBlockKernelBaseBound V))
 
 /-- The constant `Rd.squareFunctionConst V p` is finite for `1 < p < ∞`. -/
 theorem squareFunctionConst_ne_top {p : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ ∞) :
@@ -64,10 +65,11 @@ theorem squareFunctionConst_ne_top {p : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ �
 variable (V) in
 /-- The constant `Q̃_{V,p}` of the **lower square function bound**
 `‖f‖_p ≤ Q̃_{V,p} ‖f‖_{F^0_{p,2}}`: the strong type constant `Rd.czConst` of the
-Calderón–Zygmund family of the synthesis kernels `psiDual_j`, with overlap `4` and Hörmander
-constant `4 H_{Ã}`, where `Ã = Rd.psiDualBaseBound V` (`Rd.isCZFamily_psiDual`). -/
+Calderón–Zygmund family of the synthesis kernels `ψ̃_j`, with overlap `4` and Hörmander
+constant `4 H_{Ã}`, where `Ã = Rd.dualLpBlockKernelBaseBound V`
+(`Rd.isCZFamily_dualLpBlockKernel`). -/
 noncomputable def squareSynthesisConst (p : ℝ≥0∞) : ℝ≥0∞ :=
-  czConst V p 4 (4 * familyHormanderConst V (psiDualBaseBound V))
+  czConst V p 4 (4 * familyHormanderConst V (dualLpBlockKernelBaseBound V))
 
 /-- The constant `Rd.squareSynthesisConst V p` is finite for `1 < p < ∞`. -/
 theorem squareSynthesisConst_ne_top {p : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ ∞) :
@@ -96,23 +98,25 @@ theorem memTriebelLizorkin_zero_two [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞
 /-! ### The reproducing formula -/
 
 /-- **The synthesis kernels reproduce the blocks**: for `1 ≤ p < ∞` and `f ∈ L_p(V)`,
-`psiDual_j ⋆ (ψ_j ⋆ f) = ψ_j ⋆ f` almost everywhere, by associativity of convolution and
-`psiDual_j ⋆ ψ_j = ψ_j` (`Rd.conv_psiDual_lpBlockKernel`). -/
-theorem conv_psiDual_blockFun_ae (hp : p ≠ ∞) (j : ℕ) (f : Lp ℂ p (volume : Measure V)) :
-    conv (psiDual j) (blockFun j f) volume =ᵐ[volume] blockFun j f := by
+`ψ̃_j ⋆ (ψ_j ⋆ f) = ψ_j ⋆ f` almost everywhere, by associativity of convolution and
+`ψ̃_j ⋆ ψ_j = ψ_j` (`Rd.conv_dualLpBlockKernel_lpBlockKernel`). -/
+theorem conv_dualLpBlockKernel_blockFun_ae (hp : p ≠ ∞) (j : ℕ) (f : Lp ℂ p (volume : Measure V)) :
+    conv (dualLpBlockKernel j) (blockFun j f) volume =ᵐ[volume] blockFun j f := by
   have h :=
-    conv_conv_ae Fact.out hp (integrable_psiDual j) (integrable_lpBlockKernel j) (Lp.memLp f)
-  rw [conv_psiDual_lpBlockKernel] at h
+    conv_conv_ae Fact.out hp (integrable_dualLpBlockKernel j) (integrable_lpBlockKernel j)
+      (Lp.memLp f)
+  rw [conv_dualLpBlockKernel_lpBlockKernel] at h
   exact h.symm
 
 /-- **The reproducing sums**: for `1 ≤ p < ∞`, `f ∈ L_p(V)` and every finite set `s ⊆ ℕ`,
-`∑_{j ∈ s} psiDual_j ⋆ (ψ_j ⋆ f) = ∑_{j ∈ s} Δ_j f` almost everywhere. -/
-theorem sum_conv_psiDual_blockFun_ae (hp : p ≠ ∞) (s : Finset ℕ)
+`∑_{j ∈ s} ψ̃_j ⋆ (ψ_j ⋆ f) = ∑_{j ∈ s} Δ_j f` almost everywhere. -/
+theorem sum_conv_dualLpBlockKernel_blockFun_ae (hp : p ≠ ∞) (s : Finset ℕ)
     (f : Lp ℂ p (volume : Measure V)) :
-    (fun x => ∑ j ∈ s, conv (psiDual j) (blockFun j f) volume x) =ᵐ[volume]
+    (fun x => ∑ j ∈ s, conv (dualLpBlockKernel j) (blockFun j f) volume x) =ᵐ[volume]
       ⇑(∑ j ∈ s, lpBlock hp j f) := by
-  have h1 : ∀ᵐ x ∂volume, ∀ j, conv (psiDual j) (blockFun j f) volume x = blockFun j f x :=
-    ae_all_iff.2 fun j => conv_psiDual_blockFun_ae hp j f
+  have h1 : ∀ᵐ x ∂volume, ∀ j, conv (dualLpBlockKernel j) (blockFun j f) volume x =
+      blockFun j f x :=
+    ae_all_iff.2 fun j => conv_dualLpBlockKernel_blockFun_ae hp j f
   have h2 : ∀ᵐ x ∂volume, ∀ j, lpBlock hp j f x = blockFun j f x :=
     ae_all_iff.2 fun j => lpBlock_ae_eq_blockFun hp j f
   filter_upwards [h1, h2, Lp.coeFn_fun_finsetSum s fun j => lpBlock hp j f] with x hx1 hx2 hx3
@@ -120,31 +124,31 @@ theorem sum_conv_psiDual_blockFun_ae (hp : p ≠ ∞) (s : Finset ℕ)
   exact Finset.sum_congr rfl fun j _ => (hx1 j).trans (hx2 j).symm
 
 /-- **The reproducing formula**: for `1 ≤ p < ∞` and `f ∈ L_p(V)`,
-`∑_{j < J} psiDual_j ⋆ (ψ_j ⋆ f) → f` in `L_p(V)` as `J → ∞`, since the partial sums are the
+`∑_{j < J} ψ̃_j ⋆ (ψ_j ⋆ f) → f` in `L_p(V)` as `J → ∞`, since the partial sums are the
 partial sums `∑_{j < J} Δ_j f` of the Littlewood–Paley decomposition (`Rd.tendsto_sum_lpBlock`). -/
-theorem tendsto_eLpNorm_sum_conv_psiDual_blockFun_sub (hp : p ≠ ∞)
+theorem tendsto_eLpNorm_sum_conv_dualLpBlockKernel_blockFun_sub (hp : p ≠ ∞)
     (f : Lp ℂ p (volume : Measure V)) :
     Tendsto (fun J => eLpNorm ((fun x => ∑ j ∈ Finset.range J,
-      conv (psiDual j) (blockFun j f) volume x) - ⇑f) p volume) atTop (𝓝 0) := by
+      conv (dualLpBlockKernel j) (blockFun j f) volume x) - ⇑f) p volume) atTop (𝓝 0) := by
   have h := (Lp.tendsto_Lp_iff_tendsto_eLpNorm' _ f).1 (tendsto_sum_lpBlock hp f)
   refine h.congr fun J => eLpNorm_congr_ae ?_
-  exact ((sum_conv_psiDual_blockFun_ae hp _ f).sub EventuallyEq.rfl).symm
+  exact ((sum_conv_dualLpBlockKernel_blockFun_ae hp _ f).sub EventuallyEq.rfl).symm
 
 /-! ### The lower bound and `L_p = F^0_{p,2}` -/
 
 /-- **The lower square function bound**: in dimension `n ≥ 1`, for `1 < p < ∞` and
 `f ∈ L_p(V)`, `‖f‖_p ≤ Q̃_{V,p} ‖f‖_{F^0_{p,2}}` with `Q̃_{V,p} = Rd.squareSynthesisConst V p`.
-The partial sums `∑_{j < J} Δ_j f` tend to `f` and equal `∑_{j < J} psiDual_j ⋆ (ψ_j ⋆ f)`,
-whose `L_p` norms the synthesis bound of the Calderón–Zygmund family `(psiDual_j)_j` controls. -/
+The partial sums `∑_{j < J} Δ_j f` tend to `f` and equal `∑_{j < J} ψ̃_j ⋆ (ψ_j ⋆ f)`,
+whose `L_p` norms the synthesis bound of the Calderón–Zygmund family `(ψ̃_j)_j` controls. -/
 theorem enorm_le_triebelLizorkinNorm_zero_two [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞)
     (f : Lp ℂ p (volume : Measure V)) :
     ‖f‖ₑ ≤ squareSynthesisConst V p * triebelLizorkinNorm 0 2 f := by
   have h : Tendsto (fun J => ‖∑ j ∈ Finset.range J, lpBlock hp j f‖ₑ) atTop (𝓝 ‖f‖ₑ) :=
     (tendsto_sum_lpBlock hp f).enorm
   refine le_of_tendsto' h fun J => ?_
-  rw [Lp.enorm_def, ← eLpNorm_congr_ae (sum_conv_psiDual_blockFun_ae hp _ f),
+  rw [Lp.enorm_def, ← eLpNorm_congr_ae (sum_conv_dualLpBlockKernel_blockFun_ae hp _ f),
     triebelLizorkinNorm_zero_left]
-  exact isCZFamily_psiDual.eLpNorm_sum_conv_le hp1 hp _ fun j => memLp_blockFun hp j f
+  exact isCZFamily_dualLpBlockKernel.eLpNorm_sum_conv_le hp1 hp _ fun j => memLp_blockFun hp j f
 
 /-- **The square function theorem `L_p = F^0_{p,2}`**: in dimension `n ≥ 1`, for `1 < p < ∞`,
 the subspace `F^0_{p,2}` of `L_p(V)` is all of `L_p(V)`. The norms are equivalent by

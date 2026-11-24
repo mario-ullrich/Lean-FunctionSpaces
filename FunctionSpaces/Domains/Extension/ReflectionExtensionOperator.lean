@@ -35,7 +35,7 @@ project for every `1 ≤ p ≤ ∞`.
   `Rd.BoundedLipschitzDomain.exists_extendsSobolev_interior_cutoff`) and from `Ω` with a bound
   (`Rd.BoundedLipschitzDomain.exists_extendsSobolev_reflection`), so `W^1_p(Ω)` is the space of
   restrictions of `W^1_p(V)` in every dimension
-  (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memWSobolev`), and the value of
+  (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolevW`), and the value of
   every jet of `W^1_p(Ω)` lies in `W^1_p(Ω)`
   (`Rd.BoundedLipschitzDomain.memWeakSobolev_of_mem_weakSobolevJet`).
 -/
@@ -174,7 +174,7 @@ noncomputable def toSobolevExtensionOp (hE : IsSobolevExtensionMap p O U C E) (h
   let L := sobolevJet.liftJet (hE.valueMap hC) fun u i =>
     (hE.exists_hasWeakLineDeriv_valueMap hC u).elim fun G hG => ⟨G i, hG.1 i⟩
   { toLinearMap := L
-    memWSobolev := fun u => memWSobolev_one_of_forall_gridBasis (L u).2
+    memSobolevW := fun u => memSobolevW_one_of_forall_gridBasis (L u).2
     ae_eq := hE.ae_valueMap_eq hC
     bound := fun u => hE.enorm_valueMap_add_le hC u fun i => (L u).2 i }
 
@@ -327,13 +327,13 @@ theorem exists_extendsSobolev_reflection [Nontrivial V] (hp : 1 ≤ p) :
 Chapter 9): for a bounded Lipschitz domain `Ω` and `1 ≤ p ≤ ∞`, every `f ∈ W^1_p(Ω)` agrees almost
 everywhere on `Ω` with some `F ∈ W^1_p(V)`
 (`Rd.BoundedLipschitzDomain.exists_extendsSobolev_reflection` in dimension `n ≥ 1`,
-`Rd.exists_memWSobolev_of_memWeakSobolev_of_subsingleton` in dimension `0`). -/
-theorem exists_memWSobolev_of_memWeakSobolev (hp : 1 ≤ p) {f : V → ℂ}
+`Rd.exists_memSobolevW_of_memWeakSobolev_of_subsingleton` in dimension `0`). -/
+theorem exists_memSobolevW_of_memWeakSobolev (hp : 1 ≤ p) {f : V → ℂ}
     (hf : MemWeakSobolev Ω.toOpens 1 p f) :
-    ∃ F : Lp ℂ p (volume : Measure V), MemWSobolev 1 F ∧
+    ∃ F : Lp ℂ p (volume : Measure V), MemSobolevW 1 F ∧
       (F : V → ℂ) =ᵐ[volume.restrict Ω.carrier] f := by
   rcases subsingleton_or_nontrivial V with hV | hV
-  · exact exists_memWSobolev_of_memWeakSobolev_of_subsingleton hf
+  · exact exists_memSobolevW_of_memWeakSobolev_of_subsingleton hf
   obtain ⟨C, -, hC⟩ := Ω.exists_extendsSobolev_reflection hp
   choose g hg hfg using fun i => hf.2 1 le_rfl fun _ => gridBasis V i
   obtain ⟨F, hF, hFf, -⟩ := hC f g hf.1 hg hfg
@@ -341,12 +341,12 @@ theorem exists_memWSobolev_of_memWeakSobolev (hp : 1 ≤ p) {f : V → ℂ}
 
 /-- **`W^1_p(Ω)` is the space of restrictions of `W^1_p(V)` for `1 ≤ p ≤ ∞`**: for a bounded
 Lipschitz domain `Ω`, `f` lies in `W^1_p(Ω)` iff it agrees almost everywhere on `Ω` with some
-`F ∈ W^1_p(V)` (`Rd.BoundedLipschitzDomain.exists_memWSobolev_of_memWeakSobolev`; the
+`F ∈ W^1_p(V)` (`Rd.BoundedLipschitzDomain.exists_memSobolevW_of_memWeakSobolev`; the
 converse restricts the weak derivatives, `Rd.MemWeakSobolev.mono_set`). -/
-theorem memWeakSobolev_iff_exists_memWSobolev (hp : 1 ≤ p) (f : V → ℂ) :
-    MemWeakSobolev Ω.toOpens 1 p f ↔ ∃ F : Lp ℂ p (volume : Measure V), MemWSobolev 1 F ∧
+theorem memWeakSobolev_iff_exists_memSobolevW (hp : 1 ≤ p) (f : V → ℂ) :
+    MemWeakSobolev Ω.toOpens 1 p f ↔ ∃ F : Lp ℂ p (volume : Measure V), MemSobolevW 1 F ∧
       (F : V → ℂ) =ᵐ[volume.restrict Ω.carrier] f := by
-  refine ⟨Ω.exists_memWSobolev_of_memWeakSobolev hp, ?_⟩
+  refine ⟨Ω.exists_memSobolevW_of_memWeakSobolev hp, ?_⟩
   rintro ⟨F, hF, hFf⟩
   exact (MemWeakSobolev.mono_set hF le_top).congr_ae hFf
 
@@ -362,9 +362,9 @@ noncomputable def sobolevExtensionL [Fact (1 ≤ p)] [Nontrivial V] :
     (Ω.exists_sobolevExtensionOp_reflection (p := p)).choose_spec.1
 
 /-- The values of the extension operator lie in `W^1_p(V)`. -/
-theorem memWSobolev_sobolevExtensionL [Fact (1 ≤ p)] [Nontrivial V]
-    (u : weakSobolevJet p Ω.toOpens) : MemWSobolev 1 (Ω.sobolevExtensionL p u).1.1 :=
-  (Classical.choice (Ω.exists_sobolevExtensionOp_reflection (p := p)).choose_spec.2).memWSobolev u
+theorem memSobolevW_sobolevExtensionL [Fact (1 ≤ p)] [Nontrivial V]
+    (u : weakSobolevJet p Ω.toOpens) : MemSobolevW 1 (Ω.sobolevExtensionL p u).1.1 :=
+  (Classical.choice (Ω.exists_sobolevExtensionOp_reflection (p := p)).choose_spec.2).memSobolevW u
 
 /-- **The extension operator extends**: the value of `E u` agrees with the value of `u` almost
 everywhere on `Ω`. -/
@@ -375,14 +375,14 @@ theorem sobolevExtensionL_fst_ae_eq [Fact (1 ≤ p)] [Nontrivial V]
     ((Classical.choice (Ω.exists_sobolevExtensionOp_reflection (p := p)).choose_spec.2).ae_eq u)
 
 /-- **The value of every jet of `W^1_p(Ω)` lies in `W^1_p(Ω)`** for `1 ≤ p ≤ ∞`: it agrees on `Ω`
-with the value of `E u ∈ W^1_p(V)` (`Rd.BoundedLipschitzDomain.memWSobolev_sobolevExtensionL`,
+with the value of `E u ∈ W^1_p(V)` (`Rd.BoundedLipschitzDomain.memSobolevW_sobolevExtensionL`,
 `Rd.BoundedLipschitzDomain.sobolevExtensionL_fst_ae_eq`). With
 `Rd.exists_mem_weakSobolevJet_of_memWeakSobolev`, the values of the jets of `W^1_p(Ω)` are exactly
 the functions of `W^1_p(Ω)`. On every open set the same follows from the weak derivatives along
 the basis (`Rd.hasWeakLineDeriv_of_forall_gridBasis`). -/
 theorem memWeakSobolev_of_mem_weakSobolevJet [Fact (1 ≤ p)] [Nontrivial V]
     (u : weakSobolevJet p Ω.toOpens) : MemWeakSobolev Ω.toOpens 1 p u.1.1 :=
-  ((Ω.memWSobolev_sobolevExtensionL u).mono_set le_top).congr_ae (Ω.sobolevExtensionL_fst_ae_eq u)
+  ((Ω.memSobolevW_sobolevExtensionL u).mono_set le_top).congr_ae (Ω.sobolevExtensionL_fst_ae_eq u)
 
 /-- **The bound of the extension operator** in the norm `‖f‖_p + ∑_i ‖g_i‖_p`: there is a finite
 `C` with `‖F‖_p + ∑_i ‖G_i‖_p ≤ C (‖f‖_{L_p(Ω)} + ∑_i ‖g_i‖_{L_p(Ω)})` for `E (f, g) = (F, G)`. -/
@@ -407,8 +407,8 @@ jets of `W^1_p(V)` that is a right inverse of the restriction and has values in 
 theorem exists_extensionL [Fact (1 ≤ p)] [Nontrivial V] :
     ∃ E : weakSobolevJet p Ω.toOpens →L[ℂ] sobolevJet (V := V) p,
       (sobolevJet.restrictL Ω.toOpens).comp E = ContinuousLinearMap.id ℂ _ ∧
-        ∀ u, MemWSobolev 1 (E u).1.1 :=
-  ⟨Ω.sobolevExtensionL p, Ω.restrictL_comp_sobolevExtensionL, Ω.memWSobolev_sobolevExtensionL⟩
+        ∀ u, MemSobolevW 1 (E u).1.1 :=
+  ⟨Ω.sobolevExtensionL p, Ω.restrictL_comp_sobolevExtensionL, Ω.memSobolevW_sobolevExtensionL⟩
 
 end BoundedLipschitzDomain
 
@@ -421,7 +421,7 @@ theorem exists_extensionL_of_isBoundedLipschitzDomain [Fact (1 ≤ p)] [Nontrivi
     {Ω : Set V} (h : IsBoundedLipschitzDomain Ω) :
     ∃ E : weakSobolevJet p ⟨Ω, h.1⟩ →L[ℂ] sobolevJet (V := V) p,
       (sobolevJet.restrictL ⟨Ω, h.1⟩).comp E = ContinuousLinearMap.id ℂ _ ∧
-        ∀ u, MemWSobolev 1 (E u).1.1 :=
+        ∀ u, MemSobolevW 1 (E u).1.1 :=
   (BoundedLipschitzDomain.ofIsBoundedLipschitzDomain h).exists_extensionL
 
 end BoundedDomains

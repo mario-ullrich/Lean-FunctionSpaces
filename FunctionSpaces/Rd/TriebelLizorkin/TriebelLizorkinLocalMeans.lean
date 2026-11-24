@@ -134,14 +134,14 @@ theorem aemeasurable_lqNorm_conv_meansKernel (L : ℕ) (s : ℝ) (q : ℝ≥0∞
 /-! ### Blocks by local means -/
 
 /-- The constant `C_{L,L',n+1} C_{n,n+1}` of the bound of the blocks by local means: the constant
-of the cross kernels `ψ_j ⋆ η_i` (`Rd.LocalMeansBump.psiDualConst`) at the decay order `n + 1`
+of the cross kernels `ψ_j ⋆ η_i` (`Rd.LocalMeansBump.crossDualConst`) at the decay order `n + 1`
 times the constant of the maximal function bound (`Rd.decayMaximalConst`). -/
 noncomputable def blockByLocalMeansConst (L L' : ℕ) : ℝ≥0∞ :=
-  b.psiDualConst L L' (finrank ℝ V + 1) * decayMaximalConst V (finrank ℝ V + 1)
+  b.crossDualConst L L' (finrank ℝ V + 1) * decayMaximalConst V (finrank ℝ V + 1)
 
 /-- The constant of the bound of the blocks by local means is finite. -/
 theorem blockByLocalMeansConst_ne_top (L L' : ℕ) : b.blockByLocalMeansConst L L' ≠ ∞ :=
-  ENNReal.mul_ne_top (b.psiDualConst_ne_top L L' (Nat.lt_succ_self _))
+  ENNReal.mul_ne_top (b.crossDualConst_ne_top L L' (Nat.lt_succ_self _))
     (decayMaximalConst_ne_top (Nat.lt_succ_self _))
 
 /-- **One term of the reproducing formula under a block**: for `L' ≥ 1`, all levels `i, j`, every
@@ -153,9 +153,9 @@ theorem enorm_conv_conv_lpBlockKernel_dualKernel_le (L : ℕ) {L' : ℕ} (hL' : 
     ‖conv (conv (lpBlockKernel j) (b.dualKernel L i) volume) h volume x‖ₑ ≤
       b.blockByLocalMeansConst L L' * ((if i ≤ j then dyadicWeight (-(L' : ℝ)) (j - i) else 1) *
         maximalFunction (fun y => ‖h y‖ₑ) x) := by
-  have hC : b.psiDualConst L L' (finrank ℝ V + 1) *
+  have hC : b.crossDualConst L L' (finrank ℝ V + 1) *
       (if i ≤ j then dyadicWeight (-(L' : ℝ)) (j - i) else 1) ≠ ∞ :=
-    ENNReal.mul_ne_top (b.psiDualConst_ne_top L L' (Nat.lt_succ_self _))
+    ENNReal.mul_ne_top (b.crossDualConst_ne_top L L' (Nat.lt_succ_self _))
       (ite_dyadicWeight_ne_top _ i j)
   refine (enorm_conv_le_maximalFunction_of_decay (Nat.lt_succ_self _) hC
     (b.enorm_conv_lpBlockKernel_dualKernel_le L hL' (finrank ℝ V + 1) i j) h x).trans (le_of_eq ?_)
@@ -271,14 +271,14 @@ theorem enorm_blockFun_le_tsum_maximalFunction {L : ℕ} (hL : 1 ≤ L) {L' : �
 /-! ### Local means by blocks -/
 
 /-- The constant `C^Θ_{L,n+1} C_{n,n+1}` of the bound of the local means by blocks: the constant
-of the cross kernels `k_j ⋆ Θ_i` (`Rd.LocalMeansBump.kernelThetaConst`) at the decay order
+of the cross kernels `k_j ⋆ Θ_i` (`Rd.LocalMeansBump.crossBandConst`) at the decay order
 `n + 1` times the constant of the maximal function bound (`Rd.decayMaximalConst`). -/
 noncomputable def localMeansByBlockConst (L : ℕ) : ℝ≥0∞ :=
-  b.kernelThetaConst L (finrank ℝ V + 1) * decayMaximalConst V (finrank ℝ V + 1)
+  b.crossBandConst L (finrank ℝ V + 1) * decayMaximalConst V (finrank ℝ V + 1)
 
 /-- The constant of the bound of the local means by blocks is finite. -/
 theorem localMeansByBlockConst_ne_top (L : ℕ) : b.localMeansByBlockConst L ≠ ∞ :=
-  ENNReal.mul_ne_top (b.kernelThetaConst_ne_top L _)
+  ENNReal.mul_ne_top (b.crossBandConst_ne_top L _)
     (decayMaximalConst_ne_top (Nat.lt_succ_self _))
 
 /-- **One term of the block decomposition under a local mean**: for all levels `i, j`, every
@@ -286,12 +286,12 @@ function `h` and every `x`, `|((k_j ⋆ Θ_i) ⋆ h)(x)| ≤ C c_{ji} M|h|(x)` w
 `c_{ji} = 2^(-(j-i)L)` for `i ≤ j`, `c_{ji} = 1` for `i > j`, and
 `C = Rd.LocalMeansBump.localMeansByBlockConst L`. -/
 theorem enorm_conv_conv_meansKernel_dilatedBandKernel_le (L i j : ℕ) (h : V → ℂ) (x : V) :
-    ‖conv (conv (b.meansKernel L j) (Theta i) volume) h volume x‖ₑ ≤
+    ‖conv (conv (b.meansKernel L j) (dilatedBandKernel i) volume) h volume x‖ₑ ≤
       b.localMeansByBlockConst L * ((if i ≤ j then dyadicWeight (-(L : ℝ)) (j - i) else 1) *
         maximalFunction (fun y => ‖h y‖ₑ) x) := by
-  have hC : b.kernelThetaConst L (finrank ℝ V + 1) *
+  have hC : b.crossBandConst L (finrank ℝ V + 1) *
       (if i ≤ j then dyadicWeight (-(L : ℝ)) (j - i) else 1) ≠ ∞ :=
-    ENNReal.mul_ne_top (b.kernelThetaConst_ne_top L _) (ite_dyadicWeight_ne_top _ i j)
+    ENNReal.mul_ne_top (b.crossBandConst_ne_top L _) (ite_dyadicWeight_ne_top _ i j)
   refine (enorm_conv_le_maximalFunction_of_decay (Nat.lt_succ_self _) hC
     (b.enorm_conv_meansKernel_dilatedBandKernel_le L (finrank ℝ V + 1) i j) h x).trans (le_of_eq ?_)
   rw [localMeansByBlockConst]
@@ -301,14 +301,14 @@ theorem enorm_conv_conv_meansKernel_dilatedBandKernel_le (L i j : ℕ) (h : V �
 `k_j ⋆ Δ_i f = (k_j ⋆ Θ_i) ⋆ Δ_i f` in `L_p`, since `Θ_i ⋆ ψ_i = ψ_i`. -/
 theorem localMean_lpBlock (hp : p ≠ ∞) (L i j : ℕ) (f : Lp ℂ p (volume : Measure V)) :
     b.localMean hp L j (lpBlock hp i f) =
-      convLp hp (integrable_conv (b.integrable_meansKernel L j) (integrable_Theta i))
+      convLp hp (integrable_conv (b.integrable_meansKernel L j) (integrable_dilatedBandKernel i))
         (lpBlock hp i f) := by
-  have hT : convLp hp (integrable_Theta i) (lpBlock hp i f) = lpBlock hp i f :=
-    convLp_convLp_of_eq hp (integrable_Theta i) (integrable_lpBlockKernel i)
-      (integrable_lpBlockKernel i) (conv_Theta_lpBlockKernel i) f
+  have hT : convLp hp (integrable_dilatedBandKernel i) (lpBlock hp i f) = lpBlock hp i f :=
+    convLp_convLp_of_eq hp (integrable_dilatedBandKernel i) (integrable_lpBlockKernel i)
+      (integrable_lpBlockKernel i) (conv_dilatedBandKernel_lpBlockKernel i) f
   calc b.localMean hp L j (lpBlock hp i f)
       = convLp hp (b.integrable_meansKernel L j)
-          (convLp hp (integrable_Theta i) (lpBlock hp i f)) := by rw [hT]; rfl
+          (convLp hp (integrable_dilatedBandKernel i) (lpBlock hp i f)) := by rw [hT]; rfl
     _ = _ := convLp_convLp hp _ _ _
 
 /-- **A local mean of a partial sum of blocks**: almost everywhere,
@@ -317,12 +317,14 @@ the right. -/
 theorem localMean_sum_lpBlock_ae (hp : p ≠ ∞) (L J j : ℕ) (f : Lp ℂ p (volume : Measure V)) :
     ∀ᵐ x ∂volume, b.localMean hp L j (∑ i ∈ Finset.range J, lpBlock hp i f) x =
       ∑ i ∈ Finset.range J,
-        conv (conv (b.meansKernel L j) (Theta i) volume) (blockFun i f) volume x := by
+        conv (conv (b.meansKernel L j) (dilatedBandKernel i) volume) (blockFun i f) volume x := by
   simp only [map_sum, b.localMean_lpBlock hp L _ j f]
   have hall := ae_all_iff.2 fun i => convLp_apply_ae hp
-    (integrable_conv (b.integrable_meansKernel L j) (integrable_Theta i)) (lpBlock hp i f)
+    (integrable_conv (b.integrable_meansKernel L j) (integrable_dilatedBandKernel i))
+      (lpBlock hp i f)
   filter_upwards [Lp.coeFn_fun_finsetSum (Finset.range J) fun i => convLp hp
-    (integrable_conv (b.integrable_meansKernel L j) (integrable_Theta i)) (lpBlock hp i f), hall]
+    (integrable_conv (b.integrable_meansKernel L j) (integrable_dilatedBandKernel i))
+      (lpBlock hp i f), hall]
     with x hx hi
   rw [hx]
   refine Finset.sum_congr rfl fun i _ => ?_

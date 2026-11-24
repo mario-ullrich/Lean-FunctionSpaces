@@ -28,12 +28,12 @@ differentiable functions by mollification, cut-off and Fatou's lemma
   `f ∈ L_p(V)` with weak derivatives along `e`, through the cut-offs `χ_R f`
   (`Rd.realCutoff`), whose weak derivatives differ from `χ_R g_k` by `O(1/R) |f|`;
 * **`W^1_p ↪ L_r` for `1/r = 1/p - 1/n`** and every `1 ≤ p`, `p = 1` included
-  (`Rd.exists_memLp_ae_eq_of_hasWeakLineDeriv_one`, `Rd.exists_memLp_ae_eq_of_memWSobolev_one`),
+  (`Rd.exists_memLp_ae_eq_of_hasWeakLineDeriv_one`, `Rd.exists_memLp_ae_eq_of_memSobolevW_one`),
   also with the exponents in the form `1/r + 1/n = 1/p`
-  (`Rd.exists_memLp_ae_eq_of_memWSobolev_one_of_inv_add_inv`);
-* **`W^m_1 ↪ L_r` for `1/r = 1 - m/n`** (`Rd.exists_memLp_ae_eq_of_memWSobolev_one_of_eq`): the
+  (`Rd.exists_memLp_ae_eq_of_memSobolevW_one_of_inv_add_inv`);
+* **`W^m_1 ↪ L_r` for `1/r = 1 - m/n`** (`Rd.exists_memLp_ae_eq_of_memSobolevW_one_of_eq`): the
   derivatives of order below `m` lie in `L_{n/(n-1)}`, and the critical Sobolev embedding of
-  `W^{m-1}_{n/(n-1)}` (`Rd.exists_memLp_ae_eq_of_memWSobolev_of_eq`) applies.
+  `W^{m-1}_{n/(n-1)}` (`Rd.exists_memLp_ae_eq_of_memSobolevW_of_eq`) applies.
 -/
 
 @[expose] public section
@@ -368,32 +368,32 @@ for `p = 1`; `1 < p < n` follows by applying it to `|u|^γ`): for `1 ≤ p`, `r 
 along the orthonormal basis `e` of `Rd.gridBasis` and a representative `u ∈ L_r(V)` with
 `‖u‖_r ≤ C_{V,p} ∑_k ‖G_k‖_p` (`Rd.exists_memLp_ae_eq_of_hasWeakLineDeriv_one`). This includes
 `p = 1`, where `W^1_1` is larger than `F^1_{1,2}`. -/
-theorem exists_memLp_ae_eq_of_memWSobolev_one {p r : ℝ≥0∞} [Fact (1 ≤ p)]
+theorem exists_memLp_ae_eq_of_memSobolevW_one {p r : ℝ≥0∞} [Fact (1 ≤ p)]
     (hr : r ≠ ∞) (hs : nikolskiiExponent (finrank ℝ V) p r = 1)
-    {f : Lp ℂ p (volume : Measure V)} (hf : MemWSobolev 1 f) :
+    {f : Lp ℂ p (volume : Measure V)} (hf : MemSobolevW 1 f) :
     ∃ G : Fin (finrank ℝ V) → Lp ℂ p (volume : Measure V),
       (∀ k, HasWeakLineDeriv ⊤ (fun _ : Fin 1 => gridBasis V k) f (G k)) ∧
       ∃ u : Lp ℂ r (volume : Measure V), (u : V → ℂ) =ᵐ[volume] f ∧
         ‖u‖ₑ ≤ eLpNormLESNormFDerivOfEqInnerConst (volume : Measure V) p.toReal *
           ∑ k, ‖G k‖ₑ := by
   choose G hG using fun k : Fin (finrank ℝ V) =>
-    (memWSobolev_iff_exists_hasWeakLineDeriv f).1 hf 1 le_rfl (fun _ => gridBasis V k)
+    (memSobolevW_iff_exists_hasWeakLineDeriv f).1 hf 1 le_rfl (fun _ => gridBasis V k)
   exact ⟨G, hG, exists_memLp_ae_eq_of_hasWeakLineDeriv_one hr hs hG⟩
 
 /-- **`W^1_p ↪ L_r` with the exponents `1/r + 1/n = 1/p`**, the form of TauCeti's
 `W1p.eLpNorm_value_le_mul_enorm_gradient`: for `1 ≤ p`, `r < ∞` and `r⁻¹ + n⁻¹ = p⁻¹` in
 `[0, ∞]`, every `f ∈ W^1_p(V)` has weak derivatives `G_k ∈ L_p(V)` along the orthonormal basis
 of `Rd.gridBasis` and a representative `u ∈ L_r(V)` with `‖u‖_r ≤ C_{V,p} ∑_k ‖G_k‖_p`
-(`nikolskiiExponent_eq_one_of_inv_add_inv`, `Rd.exists_memLp_ae_eq_of_memWSobolev_one`). -/
-theorem exists_memLp_ae_eq_of_memWSobolev_one_of_inv_add_inv {p r : ℝ≥0∞} [Fact (1 ≤ p)]
+(`nikolskiiExponent_eq_one_of_inv_add_inv`, `Rd.exists_memLp_ae_eq_of_memSobolevW_one`). -/
+theorem exists_memLp_ae_eq_of_memSobolevW_one_of_inv_add_inv {p r : ℝ≥0∞} [Fact (1 ≤ p)]
     (hr : r ≠ ∞) (hexp : r⁻¹ + (finrank ℝ V : ℝ≥0∞)⁻¹ = p⁻¹)
-    {f : Lp ℂ p (volume : Measure V)} (hf : MemWSobolev 1 f) :
+    {f : Lp ℂ p (volume : Measure V)} (hf : MemSobolevW 1 f) :
     ∃ G : Fin (finrank ℝ V) → Lp ℂ p (volume : Measure V),
       (∀ k, HasWeakLineDeriv ⊤ (fun _ : Fin 1 => gridBasis V k) f (G k)) ∧
       ∃ u : Lp ℂ r (volume : Measure V), (u : V → ℂ) =ᵐ[volume] f ∧
         ‖u‖ₑ ≤ eLpNormLESNormFDerivOfEqInnerConst (volume : Measure V) p.toReal *
           ∑ k, ‖G k‖ₑ :=
-  exists_memLp_ae_eq_of_memWSobolev_one hr (nikolskiiExponent_eq_one_of_inv_add_inv Fact.out hexp).2
+  exists_memLp_ae_eq_of_memSobolevW_one hr (nikolskiiExponent_eq_one_of_inv_add_inv Fact.out hexp).2
     hf
 
 /-! ### The Sobolev embedding of `W^m_1` -/
@@ -403,11 +403,11 @@ for `f ∈ L_1(V)` in `W^m_1(V)`, every weak derivative `∂^v f ∈ L_1(V)` of 
 weak derivatives `∂^{(e_j, v)} f ∈ L_1(V)` along the orthonormal basis `e` of `Rd.gridBasis`
 (`Rd.HasWeakLineDeriv.of_cons`), so it has a representative in `L_q(V)`
 (`Rd.exists_memLp_ae_eq_of_hasWeakLineDeriv_one` with `p = 1`). -/
-theorem exists_hasWeakLineDeriv_memLp_of_memWSobolev_of_lt {m : ℕ}
-    {f : Lp ℂ 1 (volume : Measure V)} (hf : MemWSobolev m f) {q : ℝ≥0∞}
+theorem exists_hasWeakLineDeriv_memLp_of_memSobolevW_of_lt {m : ℕ}
+    {f : Lp ℂ 1 (volume : Measure V)} (hf : MemSobolevW m f) {q : ℝ≥0∞}
     (hq : q ≠ ∞) (hs : nikolskiiExponent (finrank ℝ V) 1 q = 1) {k : ℕ} (hk : k < m)
     (v : Fin k → V) : ∃ u : Lp ℂ q (volume : Measure V), HasWeakLineDeriv ⊤ v f u := by
-  have hder := (memWSobolev_iff_exists_hasWeakLineDeriv f).1 hf
+  have hder := (memSobolevW_iff_exists_hasWeakLineDeriv f).1 hf
   obtain ⟨G, hG⟩ := hder k hk.le v
   choose H hH using fun j : Fin (finrank ℝ V) => hder (k + 1) hk (Fin.cons (gridBasis V j) v)
   obtain ⟨u, hu, -⟩ := exists_memLp_ae_eq_of_hasWeakLineDeriv_one hq hs
@@ -418,37 +418,37 @@ theorem exists_hasWeakLineDeriv_memLp_of_memWSobolev_of_lt {m : ℕ}
 
 /-- **`W^m_1 ↪ L_r` for `1/r = 1 - m/n`**, the integrability exponent being `p = 1` (Gagliardo
 1958 and Nirenberg 1959): let `m ≥ 1`, `r < ∞` and `n(1 - 1/r) = m`. Every `f ∈ W^m_1(V)` has a
-representative in `L_r(V)`. For `m = 1` this is `Rd.exists_memLp_ae_eq_of_memWSobolev_one`; for
+representative in `L_r(V)`. For `m = 1` this is `Rd.exists_memLp_ae_eq_of_memSobolevW_one`; for
 `m ≥ 2` and `q = n/(n - 1)` (`nikolskiiExponent_conjExponent_of_eq`), the derivatives of `f` of
-order below `m` lie in `L_q` (`Rd.exists_hasWeakLineDeriv_memLp_of_memWSobolev_of_lt`), so `f`
+order below `m` lie in `L_q` (`Rd.exists_hasWeakLineDeriv_memLp_of_memSobolevW_of_lt`), so `f`
 has a representative in `W^{m-1}_q(V)`, and the critical Sobolev embedding for `1 < q < ∞`
-(`Rd.exists_memLp_ae_eq_of_memWSobolev_of_eq`) applies. -/
-theorem exists_memLp_ae_eq_of_memWSobolev_one_of_eq {m : ℕ} (hm : 1 ≤ m) {r : ℝ≥0∞}
+(`Rd.exists_memLp_ae_eq_of_memSobolevW_of_eq`) applies. -/
+theorem exists_memLp_ae_eq_of_memSobolevW_one_of_eq {m : ℕ} (hm : 1 ≤ m) {r : ℝ≥0∞}
     (hr : r ≠ ∞) (hs : nikolskiiExponent (finrank ℝ V) 1 r = m)
-    {f : Lp ℂ 1 (volume : Measure V)} (hf : MemWSobolev m f) :
+    {f : Lp ℂ 1 (volume : Measure V)} (hf : MemSobolevW m f) :
     ∃ g : Lp ℂ r (volume : Measure V), (g : V → ℂ) =ᵐ[volume] f := by
   rcases hm.eq_or_lt with rfl | hm2
   · obtain ⟨-, -, u, hu, -⟩ :=
-      exists_memLp_ae_eq_of_memWSobolev_one hr (by exact_mod_cast hs) hf
+      exists_memLp_ae_eq_of_memSobolevW_one hr (by exact_mod_cast hs) hf
     exact ⟨u, hu⟩
   obtain ⟨hq1, hq, hq1s, hqr⟩ := nikolskiiExponent_conjExponent_of_eq hm2 hs
   generalize ENNReal.conjExponent (finrank ℝ V : ℝ≥0∞) = q at hq1 hq hq1s hqr
   have : Fact (1 ≤ q) := ⟨hq1.le⟩
   have : Nontrivial V := Module.nontrivial_of_finrank_pos
     (Nat.cast_pos.1 (toReal_inv_eq_of_nikolskiiExponent_eq_one (Nat.cast_nonneg _) hq1s).1)
-  obtain ⟨f', hf'⟩ := exists_hasWeakLineDeriv_memLp_of_memWSobolev_of_lt hf hq hq1s
+  obtain ⟨f', hf'⟩ := exists_hasWeakLineDeriv_memLp_of_memSobolevW_of_lt hf hq hq1s
     (by omega : 0 < m) Fin.elim0
   have hff' : (f' : V → ℂ) =ᵐ[volume] f := by
     have h := hf'.unique (hasWeakLineDeriv_fin_zero _ hf'.1)
     rwa [volume_restrict_top] at h
-  have hS : MemWSobolev (m - 1) f' :=
-    (memWSobolev_iff_exists_hasWeakLineDeriv f').2 fun k hk v => by
-    obtain ⟨u, hu⟩ := exists_hasWeakLineDeriv_memLp_of_memWSobolev_of_lt hf hq hq1s
+  have hS : MemSobolevW (m - 1) f' :=
+    (memSobolevW_iff_exists_hasWeakLineDeriv f').2 fun k hk v => by
+    obtain ⟨u, hu⟩ := exists_hasWeakLineDeriv_memLp_of_memSobolevW_of_lt hf hq hq1s
       (by omega : k < m) v
     refine ⟨u, hu.congr_ae ?_ EventuallyEq.rfl⟩
     rw [volume_restrict_top]
     exact hff'.symm
-  obtain ⟨g, hg⟩ := exists_memLp_ae_eq_of_memWSobolev_of_eq hq1 hq hr hqr hS
+  obtain ⟨g, hg⟩ := exists_memLp_ae_eq_of_memSobolevW_of_eq hq1 hq hr hqr hS
   exact ⟨g, hg.trans hff'⟩
 
 end Rd

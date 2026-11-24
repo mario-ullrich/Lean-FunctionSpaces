@@ -87,7 +87,7 @@ theorem exists_tendsto_sum_convLp (hp : p ≠ ∞) {σ : ℝ} {K : ℕ → 𝓢(
 theorem distribBlock_besselPotential (hp : p ≠ ∞) (s : ℝ) {u : 𝓢'(V, ℂ)} {j : ℕ}
     {g : Lp ℂ p (volume : Measure V)} (hg : distribBlock j u = (g : 𝓢'(V, ℂ))) :
     distribBlock j (besselPotential V ℂ s u) =
-      (convLp hp (besselSchwartz s (psiDualS j)).integrable g : 𝓢'(V, ℂ)) :=
+      (convLp hp (besselSchwartz s (dualLpBlockKernelS j)).integrable g : 𝓢'(V, ℂ)) :=
   distribBlock_fourierMultiplierCLM_eq_convLp hp (hasTemperateGrowth_besselWeight s) hg
 
 /-! ### `H^{s,p} ⊆ F^s_{p,2}` -/
@@ -130,18 +130,19 @@ distribution `u ∈ F^s_{p,2}` the Bessel potential `J_s u` is an `L_p` function
 functions `g_j`, the blocks of `J_s u` are `(J_s ψ̃_j) ⋆ g_j` (`Rd.distribBlock_besselPotential`);
 their partial sums converge in `L_p` (`Rd.exists_tendsto_sum_convLp`, with the synthesis bound
 `Rd.eLpNorm_sum_conv_besselSchwartz_le` of the Calderón–Zygmund family
-`Rd.exists_isCZFamily_besselBase_psiDualBase`), and the limit is `J_s u`
+`Rd.exists_isCZFamily_besselBase_dualLpBlockKernelBase`), and the limit is `J_s u`
 (`Rd.eq_of_tendsto_sum_distribBlock`). -/
 theorem exists_besselPotential_eq_of_memTriebelLizorkinDistr [Nontrivial V] (hp1 : 1 < p)
     (hp : p ≠ ∞) (s : ℝ) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ u : 𝓢'(V, ℂ), MemTriebelLizorkinDistr p s 2 u →
       ∃ h : Lp ℂ p (volume : Measure V), besselPotential V ℂ s u = h ∧
         ‖h‖ₑ ≤ C * triebelLizorkinNormDistr p s 2 u := by
-  obtain ⟨B, H, hB, hH, hθ⟩ := exists_isCZFamily_besselBase_psiDualBase (V := V) s
+  obtain ⟨B, H, hB, hH, hθ⟩ := exists_isCZFamily_besselBase_dualLpBlockKernelBase (V := V) s
   refine ⟨czConst V p B H, czConst_ne_top hp1 hp hB hH, fun u hu => ?_⟩
   obtain ⟨g, hg⟩ := hu.exists_lp_blocks
   have hnorm := triebelLizorkinNormDistr_eq (s := s) (q := 2) hg
-  obtain ⟨h, hlim, hh⟩ := exists_tendsto_sum_convLp hp (K := fun j => besselSchwartz s (psiDualS j))
+  obtain ⟨h, hlim, hh⟩ :=
+    exists_tendsto_sum_convLp hp (K := fun j => besselSchwartz s (dualLpBlockKernelS j))
     (czConst_ne_top hp1 hp hB hH) (hnorm ▸ hu.ne)
     fun t => eLpNorm_sum_conv_besselSchwartz_le hp1 hp hθ t fun j => Lp.memLp (g j)
   exact ⟨h, eq_of_tendsto_sum_distribBlock (fun j => distribBlock_besselPotential hp s (hg j)) hlim,

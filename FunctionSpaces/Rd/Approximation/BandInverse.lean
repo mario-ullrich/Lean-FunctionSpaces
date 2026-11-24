@@ -289,13 +289,13 @@ theorem bandInverseConst_ne_top (r : ℕ) : bandInverseConst V r ≠ ∞ :=
 
 /-- **Differences of the band-limiting kernels in `L_1`**: `‖Δ_h^r Θ_j‖_1 ≤ (2^j ‖h‖)^r ‖D^r Θ‖_1`,
 by the dilation `Δ_h^r Θ_j = (Δ_{2^j h}^r Θ)_{2^j}`. -/
-theorem eLpNorm_higherDiff_Theta_le (r j : ℕ) (h : V) :
-    eLpNorm ((fwdDiff h)^[r] (Theta (V := V) j)) 1 volume ≤
+theorem eLpNorm_higherDiff_dilatedBandKernel_le (r j : ℕ) (h : V) :
+    eLpNorm ((fwdDiff h)^[r] (dilatedBandKernel (V := V) j)) 1 volume ≤
       ENNReal.ofReal (2 ^ j * ‖h‖) ^ r *
         ∫⁻ x, ‖iteratedFDeriv ℝ r (bandKernelS (V := V) : V → ℂ) x‖ₑ := by
   have hint : Integrable ((fwdDiff ((2 : ℝ) ^ j • h))^[r] (bandKernel (V := V))) :=
     integrable_higherDiff integrable_bandKernel r _
-  rw [Theta, higherDiff_dilate, eLpNorm_dilate_one hint (by positivity),
+  rw [dilatedBandKernel, higherDiff_dilate, eLpNorm_dilate_one hint (by positivity),
     eLpNorm_one_eq_lintegral_enorm hint.aestronglyMeasurable]
   refine (lintegral_enorm_higherDiff_schwartz_le _ r bandKernelS).trans_eq ?_
   rw [← ofReal_norm, norm_smul, Real.norm_of_nonneg (by positivity)]
@@ -313,26 +313,27 @@ theorem lpModulus_le_of_mem_bandSpace (hp : p ≠ ∞) (r : ℕ) {j k : ℕ}
   · rw [Nat.sub_eq_zero_of_le hkj.le, ENNReal.dyadicWeight_zero_right, mul_one]
     exact (lpModulus_le r a k).trans (by gcongr; exact le_self_add)
   · rw [mem_bandSpace] at ha
-    have hae : (a : V → ℂ) =ᵐ[volume] conv (Theta j) (a : V → ℂ) volume := by
-      have h1 := convLp_apply_ae hp (integrable_Theta (V := V) j) a
+    have hae : (a : V → ℂ) =ᵐ[volume] conv (dilatedBandKernel j) (a : V → ℂ) volume := by
+      have h1 := convLp_apply_ae hp (integrable_dilatedBandKernel (V := V) j) a
       rw [ha] at h1
       exact h1
     set D := ∫⁻ x, ‖iteratedFDeriv ℝ r (bandKernelS (V := V) : V → ℂ) x‖ₑ
     rw [lpModulus, smoothnessModulus_congr_ae hae]
     refine iSup₂_le fun h hh => ?_
-    have h1 : eLpNorm ((fwdDiff h)^[r] (conv (Theta j) (a : V → ℂ) volume)) p volume ≤
-        eLpNorm ((fwdDiff h)^[r] (Theta (V := V) j)) 1 volume * ‖a‖ₑ := by
-      rw [eLpNorm_congr_ae (higherDiff_conv_ae Fact.out hp (integrable_Theta j) (Lp.memLp a) r h),
+    have h1 : eLpNorm ((fwdDiff h)^[r] (conv (dilatedBandKernel j) (a : V → ℂ) volume)) p volume ≤
+        eLpNorm ((fwdDiff h)^[r] (dilatedBandKernel (V := V) j)) 1 volume * ‖a‖ₑ := by
+      rw [eLpNorm_congr_ae
+          (higherDiff_conv_ae Fact.out hp (integrable_dilatedBandKernel j) (Lp.memLp a) r h),
         Lp.enorm_def]
       exact eLpNorm_conv_le Fact.out hp
-        (integrable_higherDiff (integrable_Theta j) r h).aestronglyMeasurable
+        (integrable_higherDiff (integrable_dilatedBandKernel j) r h).aestronglyMeasurable
         (Lp.aestronglyMeasurable a)
     have h2 : ENNReal.ofReal (2 ^ j * ‖h‖) ^ r ≤ dyadicWeight (-(r : ℝ)) (k - j) := by
       rw [← ENNReal.rpow_natCast]
       exact ENNReal.ofReal_two_pow_mul_rpow_le hjk hh (Nat.cast_nonneg r)
-    calc eLpNorm ((fwdDiff h)^[r] (conv (Theta j) (a : V → ℂ) volume)) p volume
+    calc eLpNorm ((fwdDiff h)^[r] (conv (dilatedBandKernel j) (a : V → ℂ) volume)) p volume
         ≤ ENNReal.ofReal (2 ^ j * ‖h‖) ^ r * D * ‖a‖ₑ :=
-          h1.trans (by gcongr; exact eLpNorm_higherDiff_Theta_le r j h)
+          h1.trans (by gcongr; exact eLpNorm_higherDiff_dilatedBandKernel_le r j h)
       _ ≤ dyadicWeight (-(r : ℝ)) (k - j) * D * ‖a‖ₑ := by gcongr
       _ ≤ bandInverseConst V r * dyadicWeight (-(r : ℝ)) (k - j) * ‖a‖ₑ := by
           rw [mul_comm (dyadicWeight _ _) D]

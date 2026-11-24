@@ -14,8 +14,8 @@ public import FunctionSpaces.Rd.Approximation.BandInverse
 
 On `ℝ^d = Fin d → ℝ` the **tensor Littlewood–Paley blocks** of `f ∈ L_p` are `δ_k ⋆ f` with the
 tensor kernels `δ_k = ⊗_i ψ_{k_i}` of the one-dimensional blocks `ψ_j` (`Rd.lpBlockKernel` on `ℝ`),
-`k ∈ ℕ^d` (`Rd.mixedPsi`, `Rd.mixedBlock`). In Fourier terms `δ_k ⋆ f = 𝓕⁻¹(φ_k 𝓕f)` for the
-tensor product `φ_k = ⊗_i 𝓕ψ_{k_i}` of the one-dimensional dyadic decomposition of unity, and
+`k ∈ ℕ^d` (`Rd.mixedLpBlockKernel`, `Rd.mixedBlock`). In Fourier terms `δ_k ⋆ f = 𝓕⁻¹(φ_k 𝓕f)` for
+the tensor product `φ_k = ⊗_i 𝓕ψ_{k_i}` of the one-dimensional dyadic decomposition of unity, and
 **Vybíral's quasi-norm** of the Besov spaces of dominating mixed smoothness is
 `‖(2^(s|k|_1) ‖δ_k ⋆ f‖_p)_{k ∈ ℕ^d}‖_{ℓ_q(ℕ^d)}` (`Rd.mixedLPNorm`). Over the boxes
 `{k : k_i ≤ J}` the blocks sum to the dilation `(⊗Φ)_{2^J}` of an approximate identity, so
@@ -28,12 +28,12 @@ comparisons with the mixed local means use a reproducing formula, a one-dimensio
 
 * `‖ψ_m ⋆ η_k‖_1 ≤ C 2^(-(m-k)L)` for `k ≤ m`
   (`Rd.LocalMeansBump.exists_eLpNorm_conv_lpBlockKernel_dualKernel_le`): `ψ_m` annihilates the
-  band-limited Jackson approximant `J_{m-3} η_k` (`Rd.conv_lpBlockKernel_Theta`), and
+  band-limited Jackson approximant `J_{m-3} η_k` (`Rd.conv_lpBlockKernel_dilatedBandKernel`), and
   `‖η_k - J_{m-3} η_k‖_1 ≤ C ω_L(η_k, 2^(-(m-3)))_1` (`Rd.enorm_sub_jacksonApprox_le`);
 * `‖k_m ⋆ Θ_k‖_1 ≤ C 2^(-(m-k)L)` for `k < m`
   (`Rd.LocalMeansBump.exists_eLpNorm_conv_meansKernel_dilatedBandKernel_le`): local means are
   bounded by the modulus (`Rd.LocalMeansBump.enorm_localMean_succ_le`), and `Θ_k` is smooth at the
-  scale `2^(-k)` (`Rd.eLpNorm_higherDiff_Theta_le`).
+  scale `2^(-k)` (`Rd.eLpNorm_higherDiff_dilatedBandKernel_le`).
 -/
 
 @[expose] public section
@@ -50,34 +50,35 @@ variable {d : ℕ}
 /-! ### Tensor Littlewood–Paley blocks -/
 
 /-- The **tensor Littlewood–Paley kernels** `δ_k = ⊗_i ψ_{k_i}`. -/
-noncomputable def mixedPsi (k : Fin d → ℕ) : (Fin d → ℝ) → ℂ :=
+noncomputable def mixedLpBlockKernel (k : Fin d → ℕ) : (Fin d → ℝ) → ℂ :=
   tensorKernel fun i => lpBlockKernel (V := ℝ) (k i)
 
 /-- The **tensor band-limiting kernels** `⊗_i Θ_{k_i}`. -/
-noncomputable def mixedTheta (k : Fin d → ℕ) : (Fin d → ℝ) → ℂ :=
-  tensorKernel fun i => Theta (V := ℝ) (k i)
+noncomputable def mixedDilatedBandKernel (k : Fin d → ℕ) : (Fin d → ℝ) → ℂ :=
+  tensorKernel fun i => dilatedBandKernel (V := ℝ) (k i)
 
 /-- The tensor Littlewood–Paley kernels are integrable. -/
-theorem integrable_mixedPsi (k : Fin d → ℕ) : Integrable (mixedPsi k) :=
+theorem integrable_mixedLpBlockKernel (k : Fin d → ℕ) : Integrable (mixedLpBlockKernel k) :=
   integrable_tensorKernel fun i => integrable_lpBlockKernel (k i)
 
 /-- The tensor band-limiting kernels are integrable. -/
-theorem integrable_mixedTheta (k : Fin d → ℕ) : Integrable (mixedTheta k) :=
-  integrable_tensorKernel fun i => integrable_Theta (k i)
+theorem integrable_mixedDilatedBandKernel (k : Fin d → ℕ) : Integrable (mixedDilatedBandKernel k) :=
+  integrable_tensorKernel fun i => integrable_dilatedBandKernel (k i)
 
-/-- **The blocks are band-limited**: `(⊗Θ_{k_i}) ⋆ δ_k = δ_k` (`Rd.conv_Theta_lpBlockKernel` in
-every coordinate). -/
-theorem conv_mixedTheta_mixedPsi (k : Fin d → ℕ) :
-    conv (mixedTheta k) (mixedPsi k) volume = mixedPsi k := by
-  rw [mixedTheta, mixedPsi, conv_tensorKernel]
+/-- **The blocks are band-limited**: `(⊗Θ_{k_i}) ⋆ δ_k = δ_k`
+(`Rd.conv_dilatedBandKernel_lpBlockKernel` in every coordinate). -/
+theorem conv_mixedDilatedBandKernel_mixedLpBlockKernel (k : Fin d → ℕ) :
+    conv (mixedDilatedBandKernel k) (mixedLpBlockKernel k) volume = mixedLpBlockKernel k := by
+  rw [mixedDilatedBandKernel, mixedLpBlockKernel, conv_tensorKernel]
   congr 1
   funext i
-  exact conv_Theta_lpBlockKernel (k i)
+  exact conv_dilatedBandKernel_lpBlockKernel (k i)
 
 /-- **The blocks sum to an approximate identity**: over the boxes `{k : k_i ≤ J}`,
 `∑_k δ_k = (⊗Φ)_{2^J}`. -/
-theorem sum_mixedPsi (J : ℕ) :
-    (fun x => ∑ k ∈ Fintype.piFinset (fun _ : Fin d => Finset.range (J + 1)), mixedPsi k x) =
+theorem sum_mixedLpBlockKernel (J : ℕ) :
+    (fun x => ∑ k ∈ Fintype.piFinset (fun _ : Fin d => Finset.range (J + 1)),
+        mixedLpBlockKernel k x) =
       dilate ((2 : ℝ) ^ J) (tensorKernel fun _ : Fin d => lpKernel (V := ℝ)) := by
   have h := sum_tensorKernel_piFinset (fun _ : Fin d => Finset.range (J + 1))
     (fun _ j => lpBlockKernel (V := ℝ) j)
@@ -95,7 +96,7 @@ variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 /-- The **tensor Littlewood–Paley blocks** `f ↦ δ_k ⋆ f` on `L_p(ℝ^d)`. -/
 noncomputable def mixedBlock (hp : p ≠ ∞) (k : Fin d → ℕ) :
     Lp ℂ p (volume : Measure (Fin d → ℝ)) →L[ℂ] Lp ℂ p (volume : Measure (Fin d → ℝ)) :=
-  convLp hp (integrable_mixedPsi k)
+  convLp hp (integrable_mixedLpBlockKernel k)
 
 /-- **Vybíral's quasi-norm** of the Besov spaces of dominating mixed smoothness,
 `‖(2^(s|k|_1) ‖δ_k ⋆ f‖_p)_{k ∈ ℕ^d}‖_{ℓ_q(ℕ^d)}`. -/
@@ -119,7 +120,7 @@ theorem tendsto_sum_mixedBlock (hp : p ≠ ∞) (f : Lp ℂ p (volume : Measure 
   symm
   simp only [mixedBlock]
   rw [convLp_finsetSum_kernel]
-  exact convLp_congr hp _ _ (sum_mixedPsi J) f
+  exact convLp_congr hp _ _ (sum_mixedLpBlockKernel J) f
 
 /-! ### One-dimensional estimates in `L_1` -/
 
@@ -175,10 +176,10 @@ theorem exists_eLpNorm_conv_lpBlockKernel_dualKernel_le (L : ℕ) :
       (memLp_one_iff_integrable.2 (b.integrable_dualKernel L k)).toLp _
     set P := jacksonApprox h1 L (m - 3) η
     have hP : convLp h1 (integrable_lpBlockKernel (V := ℝ) m) P = 0 := by
-      have hmem : convLp h1 (integrable_Theta (V := ℝ) (m - 3)) P = P :=
+      have hmem : convLp h1 (integrable_dilatedBandKernel (V := ℝ) (m - 3)) P = P :=
         mem_bandSpace.1 (jacksonApprox_mem_bandSpace h1 L (m - 3) η)
       rw [← hmem, convLp_convLp]
-      exact convLp_of_eq_zero h1 _ (conv_lpBlockKernel_Theta (by omega)) P
+      exact convLp_of_eq_zero h1 _ (conv_lpBlockKernel_dilatedBandKernel (by omega)) P
     have hmod : lpModulus 1 L η (m - 3) ≤ b.dualConst L * almostDiagCoeff L (m - 3) k := by
       rw [lpModulus, smoothnessModulus_congr_ae (MemLp.coeFn_toLp _)]
       exact iSup₂_le fun v hv => b.eLpNorm_higherDiff_dualKernel_le L hv
@@ -216,7 +217,7 @@ theorem exists_eLpNorm_conv_lpBlockKernel_dualKernel_le (L : ℕ) :
 differences of `Θ_k` give `2^(-(m-1-k)L)`. -/
 theorem exists_eLpNorm_conv_meansKernel_dilatedBandKernel_le (L : ℕ) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ m k : ℕ,
-      eLpNorm (conv (b.meansKernel L m) (Theta (V := ℝ) k) volume) 1 volume ≤
+      eLpNorm (conv (b.meansKernel L m) (dilatedBandKernel (V := ℝ) k) volume) 1 volume ≤
         C * almostDiagCoeff L m k := by
   have h1 : (1 : ℝ≥0∞) ≠ ∞ := ENNReal.one_ne_top
   set C₀ := 2 * eLpNorm (momentKernel b.toFun L) 1 volume * eLpNorm (bandKernel (V := ℝ)) 1 volume
@@ -234,11 +235,11 @@ theorem exists_eLpNorm_conv_meansKernel_dilatedBandKernel_le (L : ℕ) :
   · obtain ⟨j, rfl⟩ : ∃ j, m = j + 1 := ⟨m - 1, by omega⟩
     have hkj : k ≤ j := by omega
     set Θ : Lp ℂ 1 (volume : Measure ℝ) :=
-      (memLp_one_iff_integrable.2 (integrable_Theta (V := ℝ) k)).toLp _
+      (memLp_one_iff_integrable.2 (integrable_dilatedBandKernel (V := ℝ) k)).toLp _
     have hmod : lpModulus 1 L Θ j ≤ dyadicWeight (-(L : ℝ)) (j - k) * D := by
       rw [lpModulus, smoothnessModulus_congr_ae (MemLp.coeFn_toLp _)]
       refine iSup₂_le fun v hv => ?_
-      refine (eLpNorm_higherDiff_Theta_le L k v).trans (mul_le_mul' ?_ le_rfl)
+      refine (eLpNorm_higherDiff_dilatedBandKernel_le L k v).trans (mul_le_mul' ?_ le_rfl)
       rw [← ENNReal.rpow_natCast]
       exact ENNReal.ofReal_two_pow_mul_rpow_le hkj hv (Nat.cast_nonneg L)
     have hc : dyadicWeight (-(L : ℝ)) (j - k) = almostDiagCoeff L (j + 1) k * dyadicWeight L 1 := by
@@ -246,7 +247,8 @@ theorem exists_eLpNorm_conv_meansKernel_dilatedBandKernel_le (L : ℕ) :
       simp only [almostDiagCoeff, hk', ↓reduceIte]
       rw [show j + 1 - k = (j - k) + 1 by omega, ENNReal.dyadicWeight_add_nat, mul_assoc,
         ENNReal.dyadicWeight_neg_mul_self, mul_one]
-    rw [eLpNorm_conv_eq_enorm_convLp (b.integrable_meansKernel L (j + 1)) (integrable_Theta k)]
+    rw [eLpNorm_conv_eq_enorm_convLp (b.integrable_meansKernel L (j + 1))
+      (integrable_dilatedBandKernel k)]
     calc ‖convLp h1 (b.integrable_meansKernel L (j + 1)) Θ‖ₑ
         ≤ 2 * (∫⁻ z, ‖b.toFun z‖ₑ) * ENNReal.ofReal (1 + b.radius) ^ L * lpModulus 1 L Θ j :=
           b.enorm_localMean_succ_le h1 L j Θ
@@ -261,8 +263,8 @@ theorem exists_eLpNorm_conv_meansKernel_dilatedBandKernel_le (L : ℕ) :
       · rfl
     rw [hc, mul_one]
     refine (eLpNorm_conv_le le_rfl h1 (b.integrable_meansKernel L m).aestronglyMeasurable
-      (integrable_Theta k).aestronglyMeasurable).trans ?_
-    rw [eLpNorm_Theta_one]
+      (integrable_dilatedBandKernel k).aestronglyMeasurable).trans ?_
+    rw [eLpNorm_dilatedBandKernel_one]
     exact (mul_le_mul' (b.eLpNorm_meansKernel_one_le L m) le_rfl).trans le_self_add
 
 end LocalMeansBump
@@ -283,7 +285,7 @@ theorem enorm_mixedBlock_convLp_mixedDualKernel_le (hp : p ≠ ∞) (L : ℕ) {C
       C ^ d * (∏ i, almostDiagCoeff L (m i) (k i)) * ‖h‖ₑ := by
   rw [mixedBlock, convLp_convLp]
   refine (enorm_convLp_le hp _ h).trans (mul_le_mul' ?_ le_rfl)
-  rw [mixedPsi, mixedDualKernel, conv_tensorKernel,
+  rw [mixedLpBlockKernel, mixedDualKernel, conv_tensorKernel,
     eLpNorm_tensorKernel_one fun i =>
       integrable_conv (integrable_lpBlockKernel _) (b.integrable_dualKernel L _),
     ← Fin.prod_const d C, ← Finset.prod_mul_distrib]
@@ -292,19 +294,21 @@ theorem enorm_mixedBlock_convLp_mixedDualKernel_le (hp : p ≠ ∞) (L : ℕ) {C
 /-- One term of the comparison: `‖k_m ⋆ δ_k ⋆ f‖_p ≤ C^d ∏_i c(m_i, k_i) ‖δ_k ⋆ f‖_p` if
 `‖k_m ⋆ Θ_k‖_1 ≤ C c(m, k)` in one variable, since `δ_k = (⊗Θ_{k_i}) ⋆ δ_k`. -/
 theorem enorm_mixedLocalMean_mixedBlock_le (hp : p ≠ ∞) (L : ℕ) {C : ℝ≥0∞}
-    (hC : ∀ m k : ℕ, eLpNorm (conv (b.meansKernel L m) (Theta (V := ℝ) k) volume) 1 volume ≤
-      C * almostDiagCoeff L m k)
+    (hC : ∀ m k : ℕ,
+      eLpNorm (conv (b.meansKernel L m) (dilatedBandKernel (V := ℝ) k) volume) 1 volume ≤
+        C * almostDiagCoeff L m k)
     (m k : Fin d → ℕ) (f : Lp ℂ p (volume : Measure (Fin d → ℝ))) :
     ‖b.mixedLocalMean hp L m (mixedBlock hp k f)‖ₑ ≤
       C ^ d * (∏ i, almostDiagCoeff L (m i) (k i)) * ‖mixedBlock hp k f‖ₑ := by
-  have hΘ : mixedBlock hp k f = convLp hp (integrable_mixedTheta k) (mixedBlock hp k f) := by
+  have hΘ : mixedBlock hp k f =
+      convLp hp (integrable_mixedDilatedBandKernel k) (mixedBlock hp k f) := by
     rw [mixedBlock, convLp_convLp]
-    exact (convLp_congr hp _ _ (conv_mixedTheta_mixedPsi k) f).symm
+    exact (convLp_congr hp _ _ (conv_mixedDilatedBandKernel_mixedLpBlockKernel k) f).symm
   conv_lhs => rw [hΘ, mixedLocalMean, convLp_convLp]
   refine (enorm_convLp_le hp _ _).trans (mul_le_mul' ?_ le_rfl)
-  rw [mixedMeansKernel, mixedTheta, conv_tensorKernel,
+  rw [mixedMeansKernel, mixedDilatedBandKernel, conv_tensorKernel,
     eLpNorm_tensorKernel_one fun i =>
-      integrable_conv (b.integrable_meansKernel L _) (integrable_Theta _),
+      integrable_conv (b.integrable_meansKernel L _) (integrable_dilatedBandKernel _),
     ← Fin.prod_const d C, ← Finset.prod_mul_distrib]
   exact Finset.prod_le_prod fun i _ => hC (m i) (k i)
 

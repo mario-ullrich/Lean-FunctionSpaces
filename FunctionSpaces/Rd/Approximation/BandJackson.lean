@@ -49,9 +49,10 @@ variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDim
 
 /-- **Band-limited dilations of the Littlewood–Paley kernel**: `Θ_k ⋆ Φ_c = Φ_c` for
 `0 < c ≤ 2^k`, since `𝓕Φ_c = χ_{1,2}(c^(-1) ·)` lives in the ball of radius `2c ≤ 2^(k+1)`. -/
-theorem conv_Theta_dilate_lpKernel {k : ℕ} {c : ℝ} (hc : 0 < c) (hck : c ≤ 2 ^ k) :
-    conv (Theta (V := V) k) (dilate c lpKernel) volume = dilate c lpKernel := by
-  refine conv_eq_of_fourier (integrable_Theta k) (integrable_dilate integrable_lpKernel hc.ne')
+theorem conv_dilatedBandKernel_dilate_lpKernel {k : ℕ} {c : ℝ} (hc : 0 < c) (hck : c ≤ 2 ^ k) :
+    conv (dilatedBandKernel (V := V) k) (dilate c lpKernel) volume = dilate c lpKernel := by
+  refine conv_eq_of_fourier (integrable_dilatedBandKernel k)
+    (integrable_dilate integrable_lpKernel hc.ne')
     (continuous_dilate continuous_lpKernel c) (bddAbove_dilate bddAbove_lpKernel c)
     (integrable_dilate integrable_lpKernel hc.ne') (continuous_dilate continuous_lpKernel c)
     (integrable_fourier_dilate integrable_fourier_lpKernel hc) fun ξ => ?_
@@ -63,7 +64,7 @@ theorem conv_Theta_dilate_lpKernel {k : ℕ} {c : ℝ} (hc : 0 < c) (hck : c ≤
       rw [norm_smul, norm_inv, Real.norm_of_nonneg hc.le, inv_mul_lt_iff₀ hc] at h1
       rw [pow_succ]
       linarith
-    rw [fourier_Theta_eq_one hξ, one_mul]
+    rw [fourier_dilatedBandKernel_eq_one hξ, one_mul]
 
 /-- The scales `2^k / (l + 1)` of the Jackson approximant. -/
 noncomputable def jacksonScale (k l : ℕ) : ℝ := 2 ^ k / (l + 1)
@@ -94,7 +95,7 @@ theorem jacksonApprox_mem_bandSpace (hp : p ≠ ∞) (r k : ℕ) (f : Lp ℂ p (
   refine Submodule.sum_mem _ fun l _ => smul_mem_bandSpace _ ?_
   rw [mem_bandSpace]
   exact convLp_convLp_of_eq hp _ _ _
-    (conv_Theta_dilate_lpKernel (jacksonScale_pos k l) (jacksonScale_le k l)) f
+    (conv_dilatedBandKernel_dilate_lpKernel (jacksonScale_pos k l) (jacksonScale_le k l)) f
 
 /-- **The Jackson approximant as an averaged difference**: for almost every `x`,
 `f(x) - J_k f(x) = ∫ Φ(z) (-1)^r Δ^r_{-2^(-k) z} f(x) dz`. -/

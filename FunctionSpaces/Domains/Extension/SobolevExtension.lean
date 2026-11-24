@@ -53,7 +53,7 @@ extension theorem itself (`Rd.BoundedLipschitzDomain.exists_extendsSobolev`) are
   `Rd.BoundedLipschitzDomain.exists_cutoff_interior`), which serve the extensions by reflection and
   those of higher order.
 * **Dimension zero**: for `n = 0`, every `f ∈ W^m_p(O)` agrees on `O` with `F = f` or `F = 0` in
-  `W^m_p(V)` (`Rd.exists_memWSobolev_of_memWeakSobolev_of_subsingleton`).
+  `W^m_p(V)` (`Rd.exists_memSobolevW_of_memWeakSobolev_of_subsingleton`).
 -/
 
 @[expose] public section
@@ -471,7 +471,7 @@ def ExtendsSobolev (O : Opens V) (U : Set V) (C : ℝ≥0∞) : Prop :=
   ∀ (f : V → ℂ) (g : Fin (finrank ℝ V) → V → ℂ), MemLp f p (volume.restrict O) →
     (∀ i, MemLp (g i) p (volume.restrict O)) →
     (∀ i, HasWeakLineDeriv O (fun _ : Fin 1 => gridBasis V i) f (g i)) →
-    ∃ F : Lp ℂ p (volume : Measure V), MemWSobolev 1 F ∧ (∀ᵐ x ∂volume, x ∈ U → F x = f x) ∧
+    ∃ F : Lp ℂ p (volume : Measure V), MemSobolevW 1 F ∧ (∀ᵐ x ∂volume, x ∈ U → F x = f x) ∧
       ∃ G : Fin (finrank ℝ V) → Lp ℂ p (volume : Measure V),
         (∀ i, HasWeakLineDeriv ⊤ (fun _ : Fin 1 => gridBasis V i) F (G i)) ∧
         ‖F‖ₑ + ∑ i, ‖G i‖ₑ ≤
@@ -527,7 +527,7 @@ theorem extendsSobolev_of_eLpNorm_le [Fact (1 ≤ p)] {O : Opens V} {U : Set V} 
       ((hGm i).toLp (G i)) := fun i =>
     (hG i).congr_ae (by rw [volume_restrict_top]; exact hFm.coeFn_toLp.symm)
       (by rw [volume_restrict_top]; exact (hGm i).coeFn_toLp.symm)
-  refine ⟨hFm.toLp F, memWSobolev_one_of_forall_gridBasis hW, ?_, fun i => (hGm i).toLp (G i), hW,
+  refine ⟨hFm.toLp F, memSobolevW_one_of_forall_gridBasis hW, ?_, fun i => (hGm i).toLp (G i), hW,
     ?_⟩
   · filter_upwards [hFm.coeFn_toLp, hFf] with x h1 h2 hx
     rw [h1, h2 hx]
@@ -677,7 +677,7 @@ theorem pasting_bound {ι κ : Type*} [Fintype ι] [Fintype κ] {nF : ℝ≥0∞
 let Sobolev functions on `O` extend from every `O ∩ U_k` with finite constants. Then they extend
 from `O` with a finite constant: for a smooth resolution of unity `(ψ_k)` subordinate to `(U_k)`
 (`Rd.exists_smooth_partition`), `F = ∑_k ψ_k F_k` agrees with `f` on `O` (`Rd.ae_sum_mul_eq`),
-lies in `W^1_p(V)` (`Rd.MemWSobolev.mulLp`) and has the weak derivatives
+lies in `W^1_p(V)` (`Rd.MemSobolevW.mulLp`) and has the weak derivatives
 `∑_k (ψ_k ∂_{e_i} F_k + (∂_{e_i} ψ_k) F_k)`
 (`Rd.hasWeakLineDeriv_mulLp`). -/
 theorem extendsSobolev_of_cover [Fact (1 ≤ p)] {ι : Type*} [Fintype ι] {O : Opens V} (U : ι → Set V)
@@ -703,7 +703,7 @@ theorem extendsSobolev_of_cover [Fact (1 ≤ p)] {ι : Type*} [Fintype ι] {O : 
       ⟨ENNReal.ofReal_ne_top, ENNReal.sum_ne_top.2 fun _ _ => ENNReal.ofReal_ne_top⟩) (hC k), ?_⟩
   intro f g hf hg hfg
   choose F hF hFf G hG hb using fun k => hext k f g hf hg hfg
-  refine ⟨∑ k, mulLp (hc k) (ha k) (F k), MemWSobolev.sum _ fun k _ =>
+  refine ⟨∑ k, mulLp (hc k) (ha k) (F k), MemSobolevW.sum _ fun k _ =>
     (hF k).mulLp (hψ k) (hcs k) (hc k) (ha k), ?_,
     fun i => ∑ k, (mulLp (hc k) (ha k) (G k i) + mulLp (hc' k i) (hd k i) (F k)), fun i => ?_, ?_⟩
   · filter_upwards [Lp.coeFn_fun_finsetSum Finset.univ fun k => mulLp (hc k) (ha k) (F k),
@@ -803,11 +803,11 @@ end LipschitzGraph
 `O`, of every order `m`, agrees almost everywhere on `O` with some `F ∈ W^m_p(V)`. Here `O` is
 empty, and `F = 0` serves, or `O = V`, and `F = f` serves (Mathlib's
 `Subsingleton.eq_univ_of_nonempty`). -/
-theorem exists_memWSobolev_of_memWeakSobolev_of_subsingleton [Subsingleton V] {O : Opens V}
+theorem exists_memSobolevW_of_memWeakSobolev_of_subsingleton [Subsingleton V] {O : Opens V}
     {m : ℕ} {f : V → ℂ} (hf : MemWeakSobolev O m p f) :
-    ∃ F : Lp ℂ p (volume : Measure V), MemWSobolev m F ∧ (F : V → ℂ) =ᵐ[volume.restrict O] f := by
+    ∃ F : Lp ℂ p (volume : Measure V), MemSobolevW m F ∧ (F : V → ℂ) =ᵐ[volume.restrict O] f := by
   rcases (O : Set V).eq_empty_or_nonempty with h | h
-  · refine ⟨0, zero_memWSobolev, ?_⟩
+  · refine ⟨0, zero_memSobolevW, ?_⟩
     rw [h, Measure.restrict_empty, ae_zero]
     exact Filter.eventually_bot
   · obtain rfl : O = ⊤ :=

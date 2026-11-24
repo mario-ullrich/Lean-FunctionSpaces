@@ -36,7 +36,8 @@ the **far convolution** `∫_{‖y‖ ≥ 1} (∑_j |θ_j(y)|) G(t - π y) dy` (
 norm is at most the far mass times `‖G‖_p` by Young's inequality (`Torus.eLpNorm_farConv_le`).
 For dilations `θ_j = (G_j)_{2^j}` of a uniform Schwartz family with bounds `A` the far mass is at
 most `2 T_A`, with the tail constant `T_A = Rd.familyTailConst` (`Torus.farMass_dilate_le`); this
-covers the blocks `ψ_j`, the synthesis kernels `psiDual_j` and the derivative families.
+covers the blocks `ψ_j = Rd.lpBlockKernel j`, the synthesis kernels `ψ̃_j = Rd.dualLpBlockKernel j`
+and the derivative families.
 -/
 
 @[expose] public section
@@ -79,24 +80,26 @@ theorem farMass_dilate_le {G : ℕ → 𝓢(EuclideanSpace ℝ d, ℂ)} {A : ℕ
     _ = 2 * Rd.familyTailConst (EuclideanSpace ℝ d) A 0 1 := by
         rw [ENNReal.tsum_mul_left, ENNReal.tsum_geometric_two, mul_comm]
 
-/-- The far mass of the Littlewood–Paley blocks `ψ_j = (psiBase j)_{2^j}` is at most `2 T_{A^ψ}`,
-with the seminorm bounds `A^ψ = Rd.psiBaseBound`. -/
+/-- The far mass of the Littlewood–Paley blocks `ψ_j = (lpBlockKernelBase j)_{2^j}` is at most
+`2 T_{A^ψ}`, with the seminorm bounds `A^ψ = Rd.lpBlockKernelBaseBound`. -/
 theorem farMass_lpBlockKernel_le :
     farMass (Rd.lpBlockKernel (V := EuclideanSpace ℝ d)) ≤
-      2 * Rd.familyTailConst (EuclideanSpace ℝ d) (Rd.psiBaseBound (EuclideanSpace ℝ d)) 0 1 := by
-  have h := farMass_dilate_le (Rd.isUniformSchwartz_psiBase (V := EuclideanSpace ℝ d))
-  rwa [show (fun j => Rd.dilate (2 ^ j) (Rd.psiBase (V := EuclideanSpace ℝ d) j :
-    EuclideanSpace ℝ d → ℂ)) = Rd.lpBlockKernel from funext Rd.dilate_psiBase] at h
+      2 * Rd.familyTailConst (EuclideanSpace ℝ d)
+        (Rd.lpBlockKernelBaseBound (EuclideanSpace ℝ d)) 0 1 := by
+  have h := farMass_dilate_le (Rd.isUniformSchwartz_lpBlockKernelBase (V := EuclideanSpace ℝ d))
+  rwa [show (fun j => Rd.dilate (2 ^ j) (Rd.lpBlockKernelBase (V := EuclideanSpace ℝ d) j :
+    EuclideanSpace ℝ d → ℂ)) = Rd.lpBlockKernel from funext Rd.dilate_lpBlockKernelBase] at h
 
-/-- The far mass of the synthesis kernels `psiDual_j = (psiDualBase j)_{2^j}` is at most
-`2 T_{Ã}`, with the seminorm bounds `Ã = Rd.psiDualBaseBound`. -/
-theorem farMass_psiDual_le :
-    farMass (Rd.psiDual (V := EuclideanSpace ℝ d)) ≤
-      2 * Rd.familyTailConst (EuclideanSpace ℝ d) (Rd.psiDualBaseBound (EuclideanSpace ℝ d))
-        0 1 := by
-  have h := farMass_dilate_le (Rd.isUniformSchwartz_psiDualBase (V := EuclideanSpace ℝ d))
-  rwa [show (fun j => Rd.dilate (2 ^ j) (Rd.psiDualBase (V := EuclideanSpace ℝ d) j :
-    EuclideanSpace ℝ d → ℂ)) = Rd.psiDual from funext Rd.dilate_psiDualBase] at h
+/-- The far mass of the synthesis kernels `ψ̃_j = (dualLpBlockKernelBase j)_{2^j}` is at most
+`2 T_{Ã}`, with the seminorm bounds `Ã = Rd.dualLpBlockKernelBaseBound`. -/
+theorem farMass_dualLpBlockKernel_le :
+    farMass (Rd.dualLpBlockKernel (V := EuclideanSpace ℝ d)) ≤
+      2 * Rd.familyTailConst (EuclideanSpace ℝ d)
+        (Rd.dualLpBlockKernelBaseBound (EuclideanSpace ℝ d)) 0 1 := by
+  have h := farMass_dilate_le (Rd.isUniformSchwartz_dualLpBlockKernelBase (V := EuclideanSpace ℝ d))
+  rwa [show (fun j => Rd.dilate (2 ^ j) (Rd.dualLpBlockKernelBase (V := EuclideanSpace ℝ d) j :
+    EuclideanSpace ℝ d → ℂ)) = Rd.dualLpBlockKernel from
+      funext Rd.dilate_dualLpBlockKernelBase] at h
 
 /-- The far mass of the derivative family `j ↦ (η_i)_{2^j}` of a multi-index `i` is at most
 `2 T_{A^{η_i}}`, with the seminorm bounds `A^{η_i} = Rd.derivKernelBound i`. -/
@@ -106,8 +109,9 @@ theorem farMass_derivKernelFamily_le {m : ℕ}
       2 * Rd.familyTailConst (EuclideanSpace ℝ d) (Rd.derivKernelBound i) 0 1 :=
   farMass_dilate_le (Rd.isUniformSchwartz_derivKernel i)
 
-/-- The far mass of the dual derivative family `j ↦ (∂^w psiDualBase_j)_{2^j}` of directions
-`w ∈ (ℝ^d)^k` is at most `2 T_{A^w}`, with the seminorm bounds `A^w = Rd.derivDualBound w`. -/
+/-- The far mass of the dual derivative family `j ↦ (∂^w (dualLpBlockKernelBase j))_{2^j}` of
+directions `w ∈ (ℝ^d)^k` is at most `2 T_{A^w}`, with the seminorm bounds
+`A^w = Rd.derivDualBound w`. -/
 theorem farMass_derivDualFamily_le {k : ℕ} (w : Fin k → EuclideanSpace ℝ d) :
     farMass (Rd.derivDualFamily w) ≤
       2 * Rd.familyTailConst (EuclideanSpace ℝ d) (Rd.derivDualBound w) 0 1 :=

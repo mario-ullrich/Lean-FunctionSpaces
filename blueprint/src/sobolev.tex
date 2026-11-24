@@ -74,7 +74,7 @@ $f \in L_p(V)$, $1 \leq p \leq \infty$, with the tempered distribution $u \mapst
 
 \begin{definition}[Weak derivatives and Sobolev spaces]
 \label{def:weak-line-derivative}
-\lean{Rd.HasWeakLineDeriv, Rd.MemWeakSobolev, Rd.MemWSobolev}
+\lean{Rd.HasWeakLineDeriv, Rd.MemWeakSobolev, Rd.MemSobolevW}
 \leanok
 For every $v \in V^k$, $g$ is the weak derivative $\partial^v f$ of $f$ on $\Omega$ if $f$ and $g$
 are locally integrable on $\Omega$ and $\partial^v f = g$ as distributions on $\Omega$. For every
@@ -84,8 +84,10 @@ $\partial^v f$ exists on $\Omega$ and lies in $L_p(\Omega)$. For every $f \in L_
 $f \in \Sob{m}{p}(V)$ means $f \in \Sob{m}{p}(\Omega)$ with $\Omega = V$.
 \end{definition}
 
-Every function in $L_p(\Omega)$ with $p \geq 1$ is locally integrable on $\Omega$
-(\Cref{lem:weak-derivative-basic}), so the weak derivatives in the definition of
+The W of \texttt{Rd.\allowbreak MemSobolevW} stands for the Sobolev space $\Sob{m}{p}$ defined by
+weak derivatives; Mathlib's \texttt{TemperedDistribution.\allowbreak MemSobolev} is the Bessel
+potential space $H^{s,p}$. Every function in $L_p(\Omega)$ with $p \geq 1$ is locally integrable
+on $\Omega$ (\Cref{lem:weak-derivative-basic}), so the weak derivatives in the definition of
 $\Sob{m}{p}(\Omega)$ need no further hypothesis. The definition quantifies over all directions;
 a basis of $V$ enters only in proofs.
 
@@ -117,9 +119,9 @@ $\partial^v f(\varphi) = (-1)^k f(\partial^v \varphi)$ by \Cref{lem:distribution
   Rd.HasWeakLineDeriv.ae_eq_zero_of_ae_eq_zero,
   Rd.locallyIntegrableOn_of_memLp, Rd.memWeakSobolev_zero_iff, Rd.MemWeakSobolev.mono_order,
   Rd.MemWeakSobolev.mono_set, Rd.zero_memWeakSobolev, Rd.MemWeakSobolev.add,
-  Rd.MemWeakSobolev.smul, Rd.MemWeakSobolev.congr_ae, Rd.zero_memWSobolev, Rd.MemWSobolev.add,
-  Rd.MemWSobolev.smul, Rd.HasWeakLineDeriv.sum, Rd.memWSobolev_iff_exists_hasWeakLineDeriv,
-  Rd.MemWSobolev.sum, Rd.HasWeakLineDeriv.eq_of_top, Rd.memWSobolev_one_of_forall_hasWeakLineDeriv,
+  Rd.MemWeakSobolev.smul, Rd.MemWeakSobolev.congr_ae, Rd.zero_memSobolevW, Rd.MemSobolevW.add,
+  Rd.MemSobolevW.smul, Rd.HasWeakLineDeriv.sum, Rd.memSobolevW_iff_exists_hasWeakLineDeriv,
+  Rd.MemSobolevW.sum, Rd.HasWeakLineDeriv.eq_of_top, Rd.memSobolevW_one_of_forall_hasWeakLineDeriv,
   Rd.HasWeakLineDeriv.locallyIntegrable, Rd.HasWeakLineDeriv.locallyIntegrable_deriv,
   Rd.HasWeakLineDeriv.of_cons}
 \leanok
@@ -424,7 +426,7 @@ on test functions and is zero by \Cref{thm:test-functions-determine}.
 
 \begin{corollary}[Sobolev spaces by tempered distributions]
 \label{cor:sobolev-tempered}
-\lean{Rd.memWSobolev_iff_tempered}
+\lean{Rd.memSobolevW_iff_tempered}
 \leanok
 \uses{thm:weak-derivative-tempered, lem:weak-derivative-basic}
 For every $1 \leq p \leq \infty$, every $m \in \N$ and every $f \in L_p(V)$, $f \in \Sob{m}{p}(V)$
@@ -440,7 +442,7 @@ changes it only on a null set (\Cref{lem:weak-derivative-basic}).
 
 \begin{corollary}[Schwartz functions]
 \label{cor:weak-derivative-schwartz}
-\lean{Rd.iteratedLineDerivOp_toLp_eq, Rd.hasWeakLineDeriv_schwartz, Rd.memWSobolev_toLp}
+\lean{Rd.iteratedLineDerivOp_toLp_eq, Rd.hasWeakLineDeriv_schwartz, Rd.memSobolevW_toLp}
 \leanok
 \uses{lem:distribution-transpose, thm:weak-derivative-tempered, cor:sobolev-tempered,
   lem:weak-derivative-basic}
@@ -536,7 +538,7 @@ the identity of \Cref{lem:weak-derivative-integral}.
 \label{lem:weak-derivative-direction-linear}
 \lean{Rd.locallyIntegrableOn_sum_smul, Rd.HasWeakLineDeriv.sum_smul_dir,
   Rd.locallyIntegrableOn_of_forall_gridBasis, Rd.hasWeakLineDeriv_of_forall_gridBasis,
-  Rd.memWSobolev_one_of_forall_gridBasis, Rd.memWeakSobolev_one_of_forall_gridBasis}
+  Rd.memSobolevW_one_of_forall_gridBasis, Rd.memWeakSobolev_one_of_forall_gridBasis}
 \leanok
 \uses{lem:weak-derivative-integral, lem:weak-derivative-basic,
   lem:directional-derivatives-commute, def:dyadic-cubes}
@@ -1327,7 +1329,7 @@ each $e_i$.
 
 \begin{theorem}[$\Sob{1}{2} = H^1$]
 \label{thm:sobolev-one-two}
-\lean{Rd.memSobolev_one_two_of_lineDerivOp_eq, Rd.memWSobolev_one_iff,
+\lean{Rd.memSobolev_one_two_of_lineDerivOp_eq, Rd.memSobolevW_one_iff,
   Rd.enorm_le_of_hasWeakLineDeriv, Rd.enorm_besselPotential_one_sq_eq,
   Rd.sq_norm_besselPotential_one_eq}
 \leanok
@@ -1383,7 +1385,7 @@ The identity $(2\pi)^2 \|h\|_2^2 = (2\pi)^2 \|f\|_2^2 + \sum_i \|g_i\|_2^2$ of
 
 \begin{theorem}[$\Sob{1}{2} = \Besov{1}{2}{2}$]
 \label{thm:sobolev-one-two-besov}
-\lean{Rd.memWSobolev_one_iff_memApprox, Rd.memWSobolev_one_iff_modulus}
+\lean{Rd.memSobolevW_one_iff_memApprox, Rd.memSobolevW_one_iff_modulus}
 \leanok
 \uses{thm:sobolev-one-two, cor:sobolev-two-besov, thm:rd-besov, lem:lp-distribution-determined}
 For every $F \in L_2(V)$, $F \in \Sob{1}{2}(V)$ if and only if $F$ lies in the approximation space
@@ -2187,7 +2189,7 @@ $\partial_v f = h$ as distributions on $\Omega$.
 \begin{lemma}[Derivatives along all directions from the words]
 \label{lem:weak-derivative-words}
 \lean{Rd.iteratedLineDerivOp_eq_sum_prod_smul, Rd.ofFun_sum_smul,
-  Rd.hasWeakLineDeriv_of_gridBasis_words, Rd.memWSobolev_of_forall_gridBasis_words}
+  Rd.hasWeakLineDeriv_of_gridBasis_words, Rd.memSobolevW_of_forall_gridBasis_words}
 \leanok
 \uses{def:weak-line-derivative, def:dyadic-cells, lem:weak-derivative-basic,
   lem:weak-derivative-direction-linear}
@@ -2358,7 +2360,7 @@ support.
 
 \begin{corollary}[Smooth compactly supported multipliers on $\Sob{m}{p}(V)$]
 \label{cor:sobolev-multiplier}
-\lean{Rd.MemWSobolev.exists_hasWeakLineDeriv_mul, Rd.MemWSobolev.mulLp_of_hasCompactSupport}
+\lean{Rd.MemSobolevW.exists_hasWeakLineDeriv_mul, Rd.MemSobolevW.mulLp_of_hasCompactSupport}
 \leanok
 \uses{thm:leibniz-rule, lem:weak-derivative-words, lem:leibniz-constant, lem:product-modulus,
   def:weak-line-derivative}
@@ -2380,7 +2382,7 @@ $\chi \colon V \to \R$ with compact support:
 
 \begin{lemma}[The product rule in $L_p$]
 \label{lem:product-rule-lp}
-\lean{Rd.hasWeakLineDeriv_mulLp, Rd.MemWSobolev.mulLp}
+\lean{Rd.hasWeakLineDeriv_mulLp, Rd.MemSobolevW.mulLp}
 \leanok
 \uses{lem:weak-derivative-product, lem:product-modulus, lem:weak-derivative-basic,
   cor:sobolev-multiplier}
@@ -2494,8 +2496,8 @@ vanishes only at $0$.
 
 \begin{lemma}[The block $\psi_1$]
 \label{lem:psi-one}
-\lean{Rd.psiOneS, Rd.coe_psiOneS, Rd.fourier_psiOneS_apply, Rd.dilate_lpBlockKernel_one,
-  Rd.fourier_lpBlockKernel_succ_eq_fourier_lpBlockKernel_one,
+\lean{Rd.lpBlockKernelOneS, Rd.coe_lpBlockKernelOneS, Rd.fourier_lpBlockKernelOneS_apply,
+  Rd.dilate_lpBlockKernel_one, Rd.fourier_lpBlockKernel_succ_eq_fourier_lpBlockKernel_one,
   Rd.one_lt_norm_of_fourier_lpBlockKernel_one_ne_zero}
 \leanok
 \uses{def:psi-base, lem:psi-base, def:moment-kernel, lem:fourier-dilate,
@@ -2657,7 +2659,7 @@ which is finite.
 
 \begin{lemma}[Derivatives of the synthesis kernels]
 \label{lem:psi-dual-derivatives}
-\lean{Rd.psiDualS, Rd.coe_psiDualS, Rd.iteratedLineDerivOp_psiDualS,
+\lean{Rd.dualLpBlockKernelS, Rd.coe_dualLpBlockKernelS, Rd.iteratedLineDerivOp_dualLpBlockKernelS,
   Rd.isUniformSchwartz_derivDualBase}
 \leanok
 \uses{def:dual-derivative-family, lem:psi-dual-basic, lem:derivative-dilate,
@@ -3121,7 +3123,7 @@ $2^{jm} |(\psi_{j+1} * f)(x)| \leq \sum_\alpha |(\theta^\alpha_j * g_\alpha)(x)|
 \begin{theorem}[$\Sob{m}{p} \subseteq \TL{m}{p}{2}$]
 \label{thm:sobolev-to-triebel-lizorkin}
 \lean{Rd.eLpNorm_lqNorm_blockFun_succ_le, Rd.triebelLizorkinNorm_le_of_hasWeakLineDeriv,
-  Rd.memTriebelLizorkin_of_hasWeakLineDeriv, Rd.memTriebelLizorkin_of_memWSobolev}
+  Rd.memTriebelLizorkin_of_hasWeakLineDeriv, Rd.memTriebelLizorkin_of_memSobolevW}
 \leanok
 \uses{lem:blocks-as-derivative-convolutions, def:sobolev-to-tl-const, thm:cz-family-derivative,
   thm:vector-valued-strong-type, lem:tl-pointwise-blocks, lem:mixed-norm-tools,
@@ -3269,7 +3271,7 @@ and the first bound gives the second (\Cref{lem:synthesis-sums-convergent} (2) a
 
 \begin{lemma}[The partial sums of the derivative]
 \label{lem:derivative-partial-sums}
-\lean{Rd.cauchySeq_toLp_derivSynthesisSum, Rd.hasWeakLineDeriv_sum_conv_psiDual}
+\lean{Rd.cauchySeq_toLp_derivSynthesisSum, Rd.hasWeakLineDeriv_sum_conv_dualLpBlockKernel}
 \leanok
 \uses{lem:derivative-synthesis-bound, lem:synthesis-sums-convergent,
   thm:weak-derivative-convolution, lem:weak-derivative-basic, lem:psi-dual-derivatives}
@@ -3290,7 +3292,7 @@ Cauchy property.
 \begin{theorem}[$\TL{m}{p}{2} \subseteq \Sob{m}{p}$]
 \label{thm:triebel-lizorkin-to-sobolev}
 \lean{Rd.exists_hasWeakLineDeriv_of_memTriebelLizorkin,
-  Rd.exists_hasWeakLineDeriv_of_memTriebelLizorkin_of_le, Rd.memWSobolev_of_memTriebelLizorkin}
+  Rd.exists_hasWeakLineDeriv_of_memTriebelLizorkin_of_le, Rd.memSobolevW_of_memTriebelLizorkin}
 \leanok
 \uses{lem:derivative-partial-sums, lem:derivative-synthesis-bound, lem:synthesis-sums-convergent,
   lem:square-function-reproducing, thm:weak-derivative-limits, lem:weak-derivative-basic,
@@ -3321,7 +3323,7 @@ $\|f\|_{\TL{k}{p}{2}} \leq \|f\|_{\TL{m}{p}{2}}$ (\Cref{prop:tl-elementary}). Th
 
 \begin{corollary}[$\Sob{m}{p} = \TL{m}{p}{2}$]
 \label{cor:sobolev-triebel-lizorkin}
-\lean{Rd.memWSobolev_iff_memTriebelLizorkin}
+\lean{Rd.memSobolevW_iff_memTriebelLizorkin}
 \leanok
 \uses{thm:sobolev-to-triebel-lizorkin, thm:triebel-lizorkin-to-sobolev}
 For every $n \geq 1$, every $1 < p < \infty$, every $m \in \N$ and every $f \in L_p(V)$,
@@ -3338,7 +3340,7 @@ function theorem (\Cref{cor:square-function-theorem}).
 
 \begin{corollary}[The Besov sandwich for $\Sob{m}{p}$]
 \label{cor:sobolev-besov-sandwich}
-\lean{Rd.memApprox_of_memWSobolev, Rd.memWSobolev_of_memApprox,
+\lean{Rd.memApprox_of_memSobolevW, Rd.memSobolevW_of_memApprox,
   Rd.approxNormDyadic_le_of_hasWeakLineDeriv, Rd.exists_hasWeakLineDeriv_of_memApprox}
 \leanok
 \uses{cor:sobolev-triebel-lizorkin, thm:sobolev-to-triebel-lizorkin,
@@ -3375,7 +3377,7 @@ bounds of \Cref{thm:tl-besov-sandwich}.
 
 \begin{corollary}[$\Sob{m}{2} = \Besov{m}{2}{2}$]
 \label{cor:sobolev-integer-two-besov}
-\lean{Rd.memWSobolev_two_iff_memApprox}
+\lean{Rd.memSobolevW_two_iff_memApprox}
 \leanok
 \uses{cor:sobolev-triebel-lizorkin, thm:tl-diagonal}
 For every $n \geq 1$, every $m \geq 1$ and every $f \in L_2(V)$, $f \in \Sob{m}{2}(V)$ if and
@@ -3415,8 +3417,9 @@ see Nikol'ski\u{\i}~\cite{Nikolskii} and Triebel~\cite{Triebel}.
 \begin{lemma}[Convolutions with integrable bounded kernels]
 \label{lem:bounded-kernel-conv-continuous}
 \lean{Rd.integrable_mul_sub_of_enorm_le, Rd.conv_sub_apply_of_enorm_le,
-  Rd.continuous_conv_of_enorm_le, Rd.continuous_conv_schwartz, Rd.coe_schwartzDilate_psiBase,
-  Rd.coe_schwartzDilate_bandKernelS, Rd.continuous_blockFun}
+  Rd.continuous_conv_of_enorm_le, Rd.continuous_conv_schwartz,
+  Rd.coe_schwartzDilate_lpBlockKernelBase, Rd.coe_schwartzDilate_bandKernelS,
+  Rd.continuous_blockFun}
 \leanok
 \uses{def:conv, lem:conv-pointwise-bound, lem:lp-interpolation, lem:schwartz-decay,
   def:schwartz-dilate, lem:psi-base, def:lp-kernels, def:triebel-lizorkin}
@@ -3462,7 +3465,7 @@ with $1/\infty = 0$. The supremum $\sup |\Theta|$ and $N_p$ are finite.
 
 \begin{lemma}[The blocks are band-limited at every point]
 \label{lem:blocks-band-limited-pointwise}
-\lean{Rd.enorm_Theta_le, Rd.conv_Theta_blockFun}
+\lean{Rd.enorm_dilatedBandKernel_le, Rd.conv_dilatedBandKernel_blockFun}
 \leanok
 \uses{def:lp-kernels, lem:lp-kernels-basic, lem:schwartz-decay, thm:kernel-identities,
   lem:conv-assoc, lem:bounded-kernel-conv-continuous, lem:tl-pointwise-blocks}
@@ -3624,8 +3627,8 @@ almost everywhere by \Cref{lem:blocks-ae-convergence}.
 \begin{corollary}[Sobolev embeddings]
 \label{cor:sobolev-embedding}
 \lean{Rd.exists_memLp_ae_eq_of_hasWeakLineDeriv,
-  Rd.exists_boundedContinuous_ae_eq_of_hasWeakLineDeriv, Rd.exists_memLp_ae_eq_of_memWSobolev,
-  Rd.exists_boundedContinuous_ae_eq_of_memWSobolev}
+  Rd.exists_boundedContinuous_ae_eq_of_hasWeakLineDeriv, Rd.exists_memLp_ae_eq_of_memSobolevW,
+  Rd.exists_boundedContinuous_ae_eq_of_memSobolevW}
 \leanok
 \uses{thm:sobolev-to-triebel-lizorkin, def:sobolev-to-tl-const, thm:tl-besov-sandwich,
   cor:sobolev-besov-sandwich, thm:besov-embedding-rd, thm:besov-embedding-bounded-continuous-rd,
@@ -3844,7 +3847,7 @@ decreasing rearrangements; Vyb\'{\i}ral~\cite{VybiralJF2008} gives a short proof
 \begin{theorem}[The critical Sobolev embedding]
 \label{thm:critical-sobolev-embedding}
 \lean{Rd.exists_lp_zero_ae_eq, Rd.exists_memLp_ae_eq_of_hasWeakLineDeriv_of_eq,
-  Rd.exists_memLp_ae_eq_of_memWSobolev_of_le, Rd.exists_memLp_ae_eq_of_memWSobolev_of_eq}
+  Rd.exists_memLp_ae_eq_of_memSobolevW_of_le, Rd.exists_memLp_ae_eq_of_memSobolevW_of_eq}
 \leanok
 \uses{thm:triebel-lizorkin-into-lp, thm:sobolev-to-triebel-lizorkin, def:sobolev-to-tl-const,
   def:critical-embedding-const, prop:tl-elementary, def:nikolskii-property,
@@ -4101,8 +4104,8 @@ hence $n(1 - 1/q) = 1$ by (2) with $p = 1$, and $n(1/q - 1/r) = n(1 - 1/r) - 1 =
 
 \begin{theorem}[$\Sob{1}{p} \hookrightarrow L_r$ for $1/r = 1/p - 1/n$]
 \label{thm:sobolev-one-embedding}
-\lean{Rd.exists_memLp_ae_eq_of_hasWeakLineDeriv_one, Rd.exists_memLp_ae_eq_of_memWSobolev_one,
-  Rd.exists_memLp_ae_eq_of_memWSobolev_one_of_inv_add_inv}
+\lean{Rd.exists_memLp_ae_eq_of_hasWeakLineDeriv_one, Rd.exists_memLp_ae_eq_of_memSobolevW_one,
+  Rd.exists_memLp_ae_eq_of_memSobolevW_one_of_inv_add_inv}
 \leanok
 \uses{thm:gns-weak, lem:gns-exponents, def:weak-line-derivative, lem:weak-derivative-basic}
 \begin{enumerate}
@@ -4135,7 +4138,7 @@ so this case lies outside \Cref{thm:critical-sobolev-embedding}.
 
 \begin{lemma}[The derivatives of $\Sob{m}{1}$ of lower order]
 \label{lem:sobolev-l1-derivatives}
-\lean{Rd.exists_hasWeakLineDeriv_memLp_of_memWSobolev_of_lt}
+\lean{Rd.exists_hasWeakLineDeriv_memLp_of_memSobolevW_of_lt}
 \leanok
 \uses{thm:sobolev-one-embedding, lem:weak-derivative-basic}
 For every $m \in \N$, every $f \in \Sob{m}{1}(V)$, every $q < \infty$ with $n(1 - 1/q) = 1$,
@@ -4153,7 +4156,7 @@ everywhere.
 
 \begin{theorem}[$\Sob{m}{1} \hookrightarrow L_r$ for $1/r = 1 - m/n$]
 \label{thm:sobolev-l1-embedding}
-\lean{Rd.exists_memLp_ae_eq_of_memWSobolev_one_of_eq}
+\lean{Rd.exists_memLp_ae_eq_of_memSobolevW_one_of_eq}
 \leanok
 \uses{thm:sobolev-one-embedding, lem:sobolev-l1-derivatives, lem:gns-exponents,
   thm:critical-sobolev-embedding, lem:weak-derivative-basic}
@@ -4210,7 +4213,7 @@ $\|f\|_p + \sum_\alpha \|\partial^{e_\alpha} f\|_p$.
 \begin{lemma}[The grid norm is finite exactly on $\Sob{m}{p}$]
 \label{lem:sobolev-grid-norm-finite}
 \lean{Rd.exists_hasWeakLineDeriv_of_sobolevGridNorm_lt_top,
-  Rd.sobolevGridNorm_lt_top_of_memWSobolev, Rd.sobolevGridNorm_lt_top_iff}
+  Rd.sobolevGridNorm_lt_top_of_memSobolevW, Rd.sobolevGridNorm_lt_top_iff}
 \leanok
 \uses{def:sobolev-grid-norm, lem:weak-derivative-basic, thm:sobolev-to-triebel-lizorkin,
   cor:sobolev-triebel-lizorkin}
@@ -5649,8 +5652,9 @@ are uniformly Schwartz with some bounds $A$ (\Cref{thm:bessel-kernels-uniform}),
 
 \begin{lemma}[Annuli of the Littlewood--Paley kernels]
 \label{lem:littlewood-paley-annuli}
-\lean{Rd.mem_annulus_of_fourier_psiOneS_ne_zero, Rd.mem_annulus_of_fourier_psiBase_ne_zero,
-  Rd.mem_annulus_of_fourier_psiDualBase_ne_zero}
+\lean{Rd.mem_annulus_of_fourier_lpBlockKernelOneS_ne_zero,
+  Rd.mem_annulus_of_fourier_lpBlockKernelBase_ne_zero,
+  Rd.mem_annulus_of_fourier_dualLpBlockKernelBase_ne_zero}
 \leanok
 \uses{lem:fourier-dilate, lem:psi-one, lem:psi-base, lem:psi-dual-basic,
   lem:psi-dual-frequency, lem:lp-kernels-frequency}
@@ -5833,8 +5837,8 @@ $(\tilde G_j)_{2^j} = \tilde\psi_j$.
 
 \begin{theorem}[The Bessel kernels of the Littlewood--Paley kernels]
 \label{thm:cz-family-bessel-base}
-\lean{Rd.exists_isCZFamily_besselBase, Rd.exists_isCZFamily_besselBase_psiDualBase,
-  Rd.exists_isCZFamily_besselBase_psiBase}
+\lean{Rd.exists_isCZFamily_besselBase, Rd.exists_isCZFamily_besselBase_dualLpBlockKernelBase,
+  Rd.exists_isCZFamily_besselBase_lpBlockKernelBase}
 \leanok
 \uses{def:bessel-base, thm:bessel-kernels-uniform, thm:cz-family-bessel, def:bessel-overlap,
   lem:cz-family-exceptions, lem:littlewood-paley-annuli, def:psi-base, def:psi-dual}
@@ -6039,7 +6043,7 @@ $\|f\|_{F^s_{p,2}} \leq C \|h\|_p < \infty$ (\Cref{thm:bessel-to-triebel-lizorki
 
 \begin{corollary}[$\Sob{m}{p} = H^{m,p}$]
 \label{cor:sobolev-bessel}
-\lean{Rd.memWSobolev_iff_memSobolev_bessel}
+\lean{Rd.memSobolevW_iff_memSobolev_bessel}
 \leanok
 \uses{cor:sobolev-triebel-lizorkin, cor:bessel-triebel-lizorkin}
 For every $n \geq 1$, every $1 < p < \infty$, every $m \in \N$ and every $f \in L_p(V)$,
@@ -6670,7 +6674,7 @@ right side is $2^{j\sigma} 2^{-j\sigma} m(2^j 2^{-j} \xi) \, \widehat\omega(2^{-
 \begin{corollary}[Symbols applied to the synthesis kernels]
 \label{cor:symbol-psi-dual}
 \lean{Rd.HasSymbolGrowth.exists_isUniformSchwartz_symbolBase,
-  Rd.HasSymbolGrowth.exists_isUniformSchwartz_psiDualS}
+  Rd.HasSymbolGrowth.exists_isUniformSchwartz_dualLpBlockKernelS}
 \leanok
 \uses{thm:symbol-kernels-uniform, thm:symbol-dilate, lem:uniform-schwartz-exceptions,
   lem:littlewood-paley-annuli, def:psi-dual, lem:psi-dual-derivatives}

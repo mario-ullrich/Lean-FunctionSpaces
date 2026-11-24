@@ -622,8 +622,8 @@ theorem ae_enorm_conv_meansKernel_le_of_scaledMoment (L : ℕ) {f : V → ℂ} (
 `|g(z)| |Δ^L_{-2^(-k) z} Θ_i(y)| ≤ |g(z)| C R^L 2^(-(k-i)L) (1 + L R)^N 2^(in) (1 + 2^i ‖y‖)^(-N)`
 with `C = Rd.schwartzDecayConst bandKernelS L N`, since the step of the dilated difference has
 length `2^(i-k) ‖z‖ ≤ 2^(i-k) R` on the support of the bump `g`. -/
-theorem enorm_mul_higherDiff_Theta_le (L N : ℕ) {i k : ℕ} (hik : i ≤ k) (z y : V) :
-    ‖b.toFun z‖ₑ * ‖(fwdDiff (-((2 : ℝ) ^ k)⁻¹ • z))^[L] (Theta i) y‖ₑ ≤
+theorem enorm_mul_higherDiff_dilatedBandKernel_le (L N : ℕ) {i k : ℕ} (hik : i ≤ k) (z y : V) :
+    ‖b.toFun z‖ₑ * ‖(fwdDiff (-((2 : ℝ) ^ k)⁻¹ • z))^[L] (dilatedBandKernel i) y‖ₑ ≤
       ‖b.toFun z‖ₑ * (schwartzDecayConst (bandKernelS (V := V)) L N *
         ENNReal.ofReal (b.radius ^ L) * dyadicWeight (-(L : ℝ)) (k - i) *
           ENNReal.ofReal ((1 + L * b.radius) ^ N) *
@@ -673,38 +673,40 @@ theorem enorm_mul_higherDiff_Theta_le (L N : ℕ) {i k : ℕ} (hik : i ≤ k) (z
 (1 + 2^i ‖y‖)^(-N)` with `C = Rd.schwartzDecayConst bandKernelS L N`, by the averaged
 differences of the moment kernel. -/
 theorem ae_enorm_dilatedBandKernel_sub_conv_scaledMoment_le (L N : ℕ) {i k : ℕ} (hik : i ≤ k) :
-    ∀ᵐ y ∂volume, ‖Theta i y - conv (b.scaledMoment L k) (Theta i) volume y‖ₑ ≤
-      (∫⁻ z, ‖b.toFun z‖ₑ) * (schwartzDecayConst (bandKernelS (V := V)) L N *
-        ENNReal.ofReal (b.radius ^ L) * dyadicWeight (-(L : ℝ)) (k - i) *
-          ENNReal.ofReal ((1 + L * b.radius) ^ N) *
-            (2 ^ (i * finrank ℝ V) * ((1 + 2 ^ i * ‖y‖ₑ) ^ N)⁻¹)) := by
+    ∀ᵐ y ∂volume,
+      ‖dilatedBandKernel i y - conv (b.scaledMoment L k) (dilatedBandKernel i) volume y‖ₑ ≤
+        (∫⁻ z, ‖b.toFun z‖ₑ) * (schwartzDecayConst (bandKernelS (V := V)) L N *
+          ENNReal.ofReal (b.radius ^ L) * dyadicWeight (-(L : ℝ)) (k - i) *
+            ENNReal.ofReal ((1 + L * b.radius) ^ N) *
+              (2 ^ (i * finrank ℝ V) * ((1 + 2 ^ i * ‖y‖ₑ) ^ N)⁻¹)) := by
   filter_upwards [ae_enorm_sub_conv_dilate_momentKernel_le le_rfl ENNReal.one_ne_top b.integrable
-    b.integral_eq_one (memLp_one_iff_integrable.2 (integrable_Theta (V := V) i)) L
+    b.integral_eq_one (memLp_one_iff_integrable.2 (integrable_dilatedBandKernel (V := V) i)) L
     (c := (2 : ℝ) ^ k) (by positivity)] with y hy
-  refine hy.trans ((lintegral_mono fun z => b.enorm_mul_higherDiff_Theta_le L N hik z y).trans ?_)
+  refine hy.trans
+    ((lintegral_mono fun z => b.enorm_mul_higherDiff_dilatedBandKernel_le L N hik z y).trans ?_)
   rw [lintegral_mul_const'' _ b.contDiff.continuous.aestronglyMeasurable.enorm]
 
 /-- The constant `2 ‖g‖_1 (2R)^L (1 + 2LR)^N C` of the moment case of `k_j ⋆ Θ_i`, with
 `C = Rd.schwartzDecayConst bandKernelS L N`. -/
-noncomputable def kernelThetaMomentConst (L N : ℕ) : ℝ≥0∞ :=
+noncomputable def crossBandMomentConst (L N : ℕ) : ℝ≥0∞ :=
   2 * (∫⁻ z, ‖b.toFun z‖ₑ) * ENNReal.ofReal ((2 * b.radius) ^ L) *
     ENNReal.ofReal ((1 + 2 * L * b.radius) ^ N) * schwartzDecayConst (bandKernelS (V := V)) L N
 
 /-- The constant of the moment case of `k_j ⋆ Θ_i` is finite. -/
-theorem kernelThetaMomentConst_ne_top (L N : ℕ) : b.kernelThetaMomentConst L N ≠ ∞ :=
+theorem crossBandMomentConst_ne_top (L N : ℕ) : b.crossBandMomentConst L N ≠ ∞ :=
   ENNReal.mul_ne_top (ENNReal.mul_ne_top (ENNReal.mul_ne_top
     (ENNReal.mul_ne_top ENNReal.ofNat_ne_top b.integrable.hasFiniteIntegral.ne)
     ENNReal.ofReal_ne_top) ENNReal.ofReal_ne_top) (schwartzDecayConst_ne_top _ _ _)
 
 /-- **The moment case**: for `i < j` and almost every `y`,
 `|(k_j ⋆ Θ_i)(y)| ≤ C 2^(-(j-i)L) 2^(in) (1 + 2^i ‖y‖)^(-N)` with
-`C = Rd.LocalMeansBump.kernelThetaMomentConst L N`. The kernel `k_j = m_{2^j} - m_{2^(j-1)}` is
+`C = Rd.LocalMeansBump.crossBandMomentConst L N`. The kernel `k_j = m_{2^j} - m_{2^(j-1)}` is
 a difference of two moment kernels
 (`Rd.LocalMeansBump.ae_enorm_conv_meansKernel_le_of_scaledMoment`), and `Θ_i - m_{2^k} ⋆ Θ_i`
 averages differences of order `L` of `Θ_i` with steps of length at most `2^(-k) R`. -/
 theorem ae_enorm_conv_meansKernel_dilatedBandKernel_le_of_lt (L N : ℕ) {i j : ℕ} (hij : i < j) :
-    ∀ᵐ y ∂volume, ‖conv (b.meansKernel L j) (Theta i) volume y‖ₑ ≤
-      b.kernelThetaMomentConst L N * dyadicWeight (-(L : ℝ)) (j - i) *
+    ∀ᵐ y ∂volume, ‖conv (b.meansKernel L j) (dilatedBandKernel i) volume y‖ₑ ≤
+      b.crossBandMomentConst L N * dyadicWeight (-(L : ℝ)) (j - i) *
         2 ^ (i * finrank ℝ V) * ((1 + 2 ^ i * ‖y‖ₑ) ^ N)⁻¹ := by
   have hR0 := b.radius_nonneg
   have hR : ENNReal.ofReal ((1 + L * b.radius) ^ N) ≤
@@ -715,7 +717,7 @@ theorem ae_enorm_conv_meansKernel_dilatedBandKernel_le_of_lt (L N : ℕ) {i j : 
     rw [mul_pow, ENNReal.ofReal_mul (by positivity), ENNReal.ofReal_pow zero_le_two,
       ENNReal.ofReal_ofNat]
   filter_upwards [b.ae_enorm_conv_meansKernel_le_of_scaledMoment L
-    (memLp_one_iff_integrable.2 (integrable_Theta (V := V) i))
+    (memLp_one_iff_integrable.2 (integrable_dilatedBandKernel (V := V) i))
     (C := (∫⁻ z, ‖b.toFun z‖ₑ) * (schwartzDecayConst (bandKernelS (V := V)) L N *
       ENNReal.ofReal (b.radius ^ L) * ENNReal.ofReal ((1 + L * b.radius) ^ N)))
     (u := fun y => 2 ^ (i * finrank ℝ V) * ((1 + 2 ^ i * ‖y‖ₑ) ^ N)⁻¹)
@@ -730,16 +732,16 @@ theorem ae_enorm_conv_meansKernel_dilatedBandKernel_le_of_lt (L N : ℕ) {i j : 
         ENNReal.ofReal (b.radius ^ L) * ENNReal.ofReal ((1 + 2 * L * b.radius) ^ N))) *
           dyadicWeight (-(L : ℝ)) (j - i) *
             (2 ^ (i * finrank ℝ V) * ((1 + 2 ^ i * ‖y‖ₑ) ^ N)⁻¹) := by gcongr
-    _ = _ := by rw [kernelThetaMomentConst, h2R]; ring
+    _ = _ := by rw [crossBandMomentConst, h2R]; ring
 
 /-- The constant `C (‖Θ‖_1 (1 + 4LR)^N + 2^N T)` of the support case of `k_j ⋆ Θ_i`, with
 `C = Rd.LocalMeansBump.kernelSupConst L` and `T = Rd.tailConst bandKernelS 0 N`. -/
-noncomputable def kernelThetaSupportConst (L N : ℕ) : ℝ≥0∞ :=
+noncomputable def crossBandSupportConst (L N : ℕ) : ℝ≥0∞ :=
   ENNReal.ofReal (b.kernelSupConst L) * (eLpNorm (bandKernel (V := V)) 1 volume *
     ENNReal.ofReal ((1 + 4 * L * b.radius) ^ N) + 2 ^ N * tailConst (bandKernelS (V := V)) 0 N)
 
 /-- The constant of the support case of `k_j ⋆ Θ_i` is finite. -/
-theorem kernelThetaSupportConst_ne_top (L N : ℕ) : b.kernelThetaSupportConst L N ≠ ∞ :=
+theorem crossBandSupportConst_ne_top (L N : ℕ) : b.crossBandSupportConst L N ≠ ∞ :=
   ENNReal.mul_ne_top ENNReal.ofReal_ne_top (ENNReal.add_ne_top.2
     ⟨ENNReal.mul_ne_top eLpNorm_bandKernel_ne_top
       ENNReal.ofReal_ne_top,
@@ -750,21 +752,24 @@ theorem kernelThetaSupportConst_ne_top (L N : ℕ) : b.kernelThetaSupportConst L
 `C = Rd.LocalMeansBump.kernelSupConst L`. -/
 theorem lintegral_dilatedBandKernel_mul_meansKernel_le_near (L N i j : ℕ) {y : V}
     (hy : ‖y‖ ≤ 4 * L * b.radius / 2 ^ j) :
-    ∫⁻ z, ‖Theta i z‖ₑ * ‖b.meansKernel L j (y - z)‖ₑ ≤
+    ∫⁻ z, ‖dilatedBandKernel i z‖ₑ * ‖b.meansKernel L j (y - z)‖ₑ ≤
       ENNReal.ofReal (b.kernelSupConst L) * (eLpNorm (bandKernel (V := V)) 1 volume *
         ENNReal.ofReal ((1 + 4 * L * b.radius) ^ N)) *
           2 ^ (j * finrank ℝ V) * ((1 + 2 ^ j * ‖y‖ₑ) ^ N)⁻¹ := by
   have hR0 := b.radius_nonneg
   have h4 : 2 ^ j * ‖y‖ₑ ≤ ENNReal.ofReal (4 * L * b.radius) := two_pow_mul_enorm_le_ofReal hy
   have h1 := ENNReal.one_le_ofReal_mul_inv_of_le (by positivity) h4 N
-  calc ∫⁻ z, ‖Theta i z‖ₑ * ‖b.meansKernel L j (y - z)‖ₑ
-      ≤ ∫⁻ z, ‖Theta i z‖ₑ * (ENNReal.ofReal (b.kernelSupConst L) * 2 ^ (j * finrank ℝ V)) :=
+  calc ∫⁻ z, ‖dilatedBandKernel i z‖ₑ * ‖b.meansKernel L j (y - z)‖ₑ
+      ≤ ∫⁻ z, ‖dilatedBandKernel i z‖ₑ *
+          (ENNReal.ofReal (b.kernelSupConst L) * 2 ^ (j * finrank ℝ V)) :=
         lintegral_mono fun z => mul_le_mul_right (b.enorm_meansKernel_le L j (y - z)) _
     _ = eLpNorm (bandKernel (V := V)) 1 volume *
           (ENNReal.ofReal (b.kernelSupConst L) * 2 ^ (j * finrank ℝ V)) := by
-        rw [lintegral_mul_const'' _ (continuous_Theta (V := V) i).measurable.enorm.aemeasurable,
-          ← eLpNorm_one_eq_lintegral_enorm (continuous_Theta (V := V) i).aestronglyMeasurable,
-          eLpNorm_Theta_one]
+        rw [lintegral_mul_const'' _
+            (continuous_dilatedBandKernel (V := V) i).measurable.enorm.aemeasurable,
+          ← eLpNorm_one_eq_lintegral_enorm
+            (continuous_dilatedBandKernel (V := V) i).aestronglyMeasurable,
+          eLpNorm_dilatedBandKernel_one]
     _ = eLpNorm (bandKernel (V := V)) 1 volume *
           (ENNReal.ofReal (b.kernelSupConst L) * 2 ^ (j * finrank ℝ V)) * 1 := (mul_one _).symm
     _ ≤ eLpNorm (bandKernel (V := V)) 1 volume *
@@ -779,15 +784,15 @@ theorem lintegral_dilatedBandKernel_mul_meansKernel_le_near (L N i j : ℕ) {y :
 vanishes unless `‖z‖ ≥ ‖y‖ / 2`, where the tail of `Θ_i` is small. -/
 theorem lintegral_dilatedBandKernel_mul_meansKernel_le_far (L N : ℕ) {i j : ℕ} (hji : j ≤ i) {y : V}
     (hy : 4 * L * b.radius / 2 ^ j < ‖y‖) :
-    ∫⁻ z, ‖Theta i z‖ₑ * ‖b.meansKernel L j (y - z)‖ₑ ≤
+    ∫⁻ z, ‖dilatedBandKernel i z‖ₑ * ‖b.meansKernel L j (y - z)‖ₑ ≤
       ENNReal.ofReal (b.kernelSupConst L) * (2 ^ N * tailConst (bandKernelS (V := V)) 0 N) *
         2 ^ (j * finrank ℝ V) * ((1 + 2 ^ j * ‖y‖ₑ) ^ N)⁻¹ := by
   have hs : MeasurableSet {z : V | ‖y‖ / 2 ≤ ‖z‖} :=
     measurableSet_le measurable_const measurable_norm
   have hc : ENNReal.ofReal (b.kernelSupConst L) * 2 ^ (j * finrank ℝ V) ≠ ∞ :=
     ENNReal.mul_ne_top ENNReal.ofReal_ne_top (ENNReal.pow_ne_top ENNReal.ofNat_ne_top)
-  have hpt : ∀ z, ‖Theta i z‖ₑ * ‖b.meansKernel L j (y - z)‖ₑ ≤
-      {z : V | ‖y‖ / 2 ≤ ‖z‖}.indicator (fun z => ‖Theta i z‖ₑ) z *
+  have hpt : ∀ z, ‖dilatedBandKernel i z‖ₑ * ‖b.meansKernel L j (y - z)‖ₑ ≤
+      {z : V | ‖y‖ / 2 ≤ ‖z‖}.indicator (fun z => ‖dilatedBandKernel i z‖ₑ) z *
         (ENNReal.ofReal (b.kernelSupConst L) * 2 ^ (j * finrank ℝ V)) := fun z => by
     by_cases hz : ‖y‖ / 2 ≤ ‖z‖
     · rw [Set.indicator_of_mem (show z ∈ {z : V | ‖y‖ / 2 ≤ ‖z‖} from hz)]
@@ -800,10 +805,10 @@ theorem lintegral_dilatedBandKernel_mul_meansKernel_le_far (L N : ℕ) {i j : �
       rw [b.meansKernel_eq_zero_of_lt L j hyz, enorm_zero, mul_zero]
       exact zero_le
   have htail := setLIntegral_enorm_dilate_schwartz_le (bandKernelS (V := V)) N i (‖y‖ / 2)
-  calc ∫⁻ z, ‖Theta i z‖ₑ * ‖b.meansKernel L j (y - z)‖ₑ
-      ≤ ∫⁻ z, {z : V | ‖y‖ / 2 ≤ ‖z‖}.indicator (fun z => ‖Theta i z‖ₑ) z *
+  calc ∫⁻ z, ‖dilatedBandKernel i z‖ₑ * ‖b.meansKernel L j (y - z)‖ₑ
+      ≤ ∫⁻ z, {z : V | ‖y‖ / 2 ≤ ‖z‖}.indicator (fun z => ‖dilatedBandKernel i z‖ₑ) z *
           (ENNReal.ofReal (b.kernelSupConst L) * 2 ^ (j * finrank ℝ V)) := lintegral_mono hpt
-    _ = (∫⁻ z in {z : V | ‖y‖ / 2 ≤ ‖z‖}, ‖Theta i z‖ₑ) *
+    _ = (∫⁻ z in {z : V | ‖y‖ / 2 ≤ ‖z‖}, ‖dilatedBandKernel i z‖ₑ) *
           (ENNReal.ofReal (b.kernelSupConst L) * 2 ^ (j * finrank ℝ V)) := by
         rw [lintegral_mul_const' _ _ hc, lintegral_indicator hs]
     _ ≤ tailConst (bandKernelS (V := V)) 0 N * (2 ^ N * ((1 + 2 ^ j * ‖y‖ₑ) ^ N)⁻¹) *
@@ -814,15 +819,15 @@ theorem lintegral_dilatedBandKernel_mul_meansKernel_le_far (L N : ℕ) {i j : �
 
 /-- **The support case**: for `j ≤ i` and every `y`,
 `|(k_j ⋆ Θ_i)(y)| ≤ C 2^(jn) (1 + 2^j ‖y‖)^(-N)` with
-`C = Rd.LocalMeansBump.kernelThetaSupportConst L N`: `k_j` is bounded by `2^(jn)` and supported
+`C = Rd.LocalMeansBump.crossBandSupportConst L N`: `k_j` is bounded by `2^(jn)` and supported
 in `B̄(0, 2LR 2^(-j))`, and `Θ_i` has small tails. -/
 theorem enorm_conv_meansKernel_dilatedBandKernel_le_of_le (L N : ℕ) {i j : ℕ} (hji : j ≤ i)
     (y : V) :
-    ‖conv (b.meansKernel L j) (Theta i) volume y‖ₑ ≤
-      b.kernelThetaSupportConst L N * 2 ^ (j * finrank ℝ V) * ((1 + 2 ^ j * ‖y‖ₑ) ^ N)⁻¹ := by
+    ‖conv (b.meansKernel L j) (dilatedBandKernel i) volume y‖ₑ ≤
+      b.crossBandSupportConst L N * 2 ^ (j * finrank ℝ V) * ((1 + 2 ^ j * ‖y‖ₑ) ^ N)⁻¹ := by
   rw [conv_comm]
   refine (enorm_conv_le_lintegral _ _ y).trans ?_
-  rw [kernelThetaSupportConst]
+  rw [crossBandSupportConst]
   by_cases hy : ‖y‖ ≤ 4 * L * b.radius / 2 ^ j
   · refine (b.lintegral_dilatedBandKernel_mul_meansKernel_le_near L N i j hy).trans ?_
     gcongr
@@ -833,20 +838,20 @@ theorem enorm_conv_meansKernel_dilatedBandKernel_le_of_le (L N : ℕ) {i j : ℕ
 
 /-- The constant of the cross kernel `k_j ⋆ Θ_i`: the sum of the constants of the moment case
 and of the support case. -/
-noncomputable def kernelThetaConst (L N : ℕ) : ℝ≥0∞ :=
-  b.kernelThetaMomentConst L N + b.kernelThetaSupportConst L N
+noncomputable def crossBandConst (L N : ℕ) : ℝ≥0∞ :=
+  b.crossBandMomentConst L N + b.crossBandSupportConst L N
 
 /-- The constant of the cross kernel `k_j ⋆ Θ_i` is finite. -/
-theorem kernelThetaConst_ne_top (L N : ℕ) : b.kernelThetaConst L N ≠ ∞ :=
-  ENNReal.add_ne_top.2 ⟨b.kernelThetaMomentConst_ne_top L N, b.kernelThetaSupportConst_ne_top L N⟩
+theorem crossBandConst_ne_top (L N : ℕ) : b.crossBandConst L N ≠ ∞ :=
+  ENNReal.add_ne_top.2 ⟨b.crossBandMomentConst_ne_top L N, b.crossBandSupportConst_ne_top L N⟩
 
 /-- **The cross kernel `k_j ⋆ Θ_i`**: for all levels `i, j` and almost every `y`,
 `|(k_j ⋆ Θ_i)(y)| ≤ C c_{ji} 2^(min(i,j) n) (1 + 2^min(i,j) ‖y‖)^(-N)` with
 `c_{ji} = 2^(-(j-i)L)` for `i ≤ j`, `c_{ji} = 1` for `i > j`, and
-`C = Rd.LocalMeansBump.kernelThetaConst L N`. -/
+`C = Rd.LocalMeansBump.crossBandConst L N`. -/
 theorem enorm_conv_meansKernel_dilatedBandKernel_le (L N i j : ℕ) :
-    ∀ᵐ y ∂volume, ‖conv (b.meansKernel L j) (Theta i) volume y‖ₑ ≤
-      b.kernelThetaConst L N * (if i ≤ j then dyadicWeight (-(L : ℝ)) (j - i) else 1) *
+    ∀ᵐ y ∂volume, ‖conv (b.meansKernel L j) (dilatedBandKernel i) volume y‖ₑ ≤
+      b.crossBandConst L N * (if i ≤ j then dyadicWeight (-(L : ℝ)) (j - i) else 1) *
         2 ^ (min i j * finrank ℝ V) * ((1 + 2 ^ (min i j) * ‖y‖ₑ) ^ N)⁻¹ := by
   rcases lt_or_ge i j with hij | hji
   · filter_upwards [b.ae_enorm_conv_meansKernel_dilatedBandKernel_le_of_lt L N hij] with y hy
@@ -861,8 +866,8 @@ theorem enorm_conv_meansKernel_dilatedBandKernel_le (L N i j : ℕ) :
       split_ifs with h
       · rw [show j - i = 0 by omega, ENNReal.dyadicWeight_zero_right]
       · exact le_rfl
-    calc b.kernelThetaSupportConst L N * 2 ^ (j * finrank ℝ V) * ((1 + 2 ^ j * ‖y‖ₑ) ^ N)⁻¹
-        = b.kernelThetaSupportConst L N * 1 * 2 ^ (j * finrank ℝ V) *
+    calc b.crossBandSupportConst L N * 2 ^ (j * finrank ℝ V) * ((1 + 2 ^ j * ‖y‖ₑ) ^ N)⁻¹
+        = b.crossBandSupportConst L N * 1 * 2 ^ (j * finrank ℝ V) *
             ((1 + 2 ^ j * ‖y‖ₑ) ^ N)⁻¹ := by rw [mul_one]
       _ ≤ _ := by
           gcongr
@@ -964,24 +969,24 @@ theorem conv_lpBlockKernel_lpMomentScaled (L j : ℕ) :
 variable (V) in
 /-- The constant `(1 + 2^N) C` of the decay of the blocks `ψ_j`, with
 `C = Rd.schwartzDecayConst lpKernelS 0 N`. -/
-noncomputable def psiDecayConst (N : ℕ) : ℝ≥0∞ :=
+noncomputable def lpBlockKernelDecayConst (N : ℕ) : ℝ≥0∞ :=
   (1 + 2 ^ N) * schwartzDecayConst (lpKernelS (V := V)) 0 N
 
 /-- The decay constant of the blocks is finite. -/
-theorem psiDecayConst_ne_top (N : ℕ) : psiDecayConst V N ≠ ∞ :=
+theorem lpBlockKernelDecayConst_ne_top (N : ℕ) : lpBlockKernelDecayConst V N ≠ ∞ :=
   ENNReal.mul_ne_top (ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top,
     ENNReal.pow_ne_top ENNReal.ofNat_ne_top⟩) (schwartzDecayConst_ne_top _ _ _)
 
 /-- **Decay of the Littlewood–Paley blocks**:
-`|ψ_j(y)| ≤ C 2^(jn) (1 + 2^j ‖y‖)^(-N)` with `C = Rd.psiDecayConst V N`; `ψ_j` is the
+`|ψ_j(y)| ≤ C 2^(jn) (1 + 2^j ‖y‖)^(-N)` with `C = Rd.lpBlockKernelDecayConst V N`; `ψ_j` is the
 difference of the dilations of `Φ` at the scales `2^j` and `2^(j-1)`. -/
 theorem enorm_lpBlockKernel_le (j N : ℕ) (y : V) :
     ‖lpBlockKernel j y‖ₑ ≤
-      psiDecayConst V N * 2 ^ (j * finrank ℝ V) * ((1 + 2 ^ j * ‖y‖ₑ) ^ N)⁻¹ := by
+      lpBlockKernelDecayConst V N * 2 ^ (j * finrank ℝ V) * ((1 + 2 ^ j * ‖y‖ₑ) ^ N)⁻¹ := by
   have hPhi : ∀ k, ‖dilatedLpKernel (V := V) k y‖ₑ ≤ schwartzDecayConst (lpKernelS (V := V)) 0 N *
       2 ^ (k * finrank ℝ V) * ((1 + 2 ^ k * ‖y‖ₑ) ^ N)⁻¹ := fun k =>
     enorm_dilate_schwartz_le (lpKernelS (V := V)) N k y
-  have hS : schwartzDecayConst (lpKernelS (V := V)) 0 N ≤ psiDecayConst V N :=
+  have hS : schwartzDecayConst (lpKernelS (V := V)) 0 N ≤ lpBlockKernelDecayConst V N :=
     le_mul_of_one_le_left zero_le le_self_add
   cases j with
   | zero =>
@@ -1004,8 +1009,8 @@ theorem enorm_lpBlockKernel_le (j N : ℕ) (y : V) :
           gcongr
           · exact hPhi (j + 1)
           · exact (hPhi j).trans (by gcongr)
-      _ = psiDecayConst V N * 2 ^ ((j + 1) * finrank ℝ V) *
-            ((1 + 2 ^ (j + 1) * ‖y‖ₑ) ^ N)⁻¹ := by rw [psiDecayConst]; ring
+      _ = lpBlockKernelDecayConst V N * 2 ^ ((j + 1) * finrank ℝ V) *
+            ((1 + 2 ^ (j + 1) * ‖y‖ₑ) ^ N)⁻¹ := by rw [lpBlockKernelDecayConst]; ring
 
 /-! ### The cross kernel `ψ_j ⋆ η_i` -/
 
@@ -1042,14 +1047,14 @@ namespace LocalMeansBump
 variable (b : LocalMeansBump V)
 
 /-- The constant `C (1 + 2LR)^N 2 ‖m‖_1` of the support cases of `ψ_j ⋆ η_i`, with
-`C = Rd.psiDecayConst V N`. -/
-noncomputable def psiDualSupportConst (L N : ℕ) : ℝ≥0∞ :=
-  psiDecayConst V N * ENNReal.ofReal ((1 + 2 * L * b.radius) ^ N) *
+`C = Rd.lpBlockKernelDecayConst V N`. -/
+noncomputable def crossDualSupportConst (L N : ℕ) : ℝ≥0∞ :=
+  lpBlockKernelDecayConst V N * ENNReal.ofReal ((1 + 2 * L * b.radius) ^ N) *
     (2 * eLpNorm (momentKernel b.toFun L) 1 volume)
 
 /-- The constant of the support cases of `ψ_j ⋆ η_i` is finite. -/
-theorem psiDualSupportConst_ne_top (L N : ℕ) : b.psiDualSupportConst L N ≠ ∞ :=
-  ENNReal.mul_ne_top (ENNReal.mul_ne_top (psiDecayConst_ne_top N) ENNReal.ofReal_ne_top)
+theorem crossDualSupportConst_ne_top (L N : ℕ) : b.crossDualSupportConst L N ≠ ∞ :=
+  ENNReal.mul_ne_top (ENNReal.mul_ne_top (lpBlockKernelDecayConst_ne_top N) ENNReal.ofReal_ne_top)
     (ENNReal.mul_ne_top ENNReal.ofNat_ne_top
       (eLpNorm_momentKernel_ne_top b.integrable L))
 
@@ -1060,11 +1065,11 @@ theorem lintegral_enorm_dualKernel_le (L i : ℕ) :
   exact b.eLpNorm_dualKernel_one_le L i
 
 /-- **The case `i > j`**: `|(ψ_j ⋆ η_i)(y)| ≤ C 2^(jn) (1 + 2^j ‖y‖)^(-N)` with
-`C = Rd.LocalMeansBump.psiDualSupportConst L N`: `η_i` is supported in `B̄(0, 2LR 2^(-i))`, where
+`C = Rd.LocalMeansBump.crossDualSupportConst L N`: `η_i` is supported in `B̄(0, 2LR 2^(-i))`, where
 the Peetre weight at the scale `2^j` changes by at most `(1 + 2LR)^N`. -/
 theorem enorm_conv_lpBlockKernel_dualKernel_le_of_lt (L N : ℕ) {i j : ℕ} (hji : j < i) (y : V) :
     ‖conv (lpBlockKernel j) (b.dualKernel L i) volume y‖ₑ ≤
-      b.psiDualSupportConst L N * 2 ^ (j * finrank ℝ V) * ((1 + 2 ^ j * ‖y‖ₑ) ^ N)⁻¹ := by
+      b.crossDualSupportConst L N * 2 ^ (j * finrank ℝ V) * ((1 + 2 ^ j * ‖y‖ₑ) ^ N)⁻¹ := by
   rw [conv_comm]
   refine (enorm_conv_le_lintegral _ _ y).trans ?_
   have hρ : 0 ≤ 2 * (L : ℝ) * b.radius := by have := b.radius_nonneg; positivity
@@ -1073,21 +1078,21 @@ theorem enorm_conv_lpBlockKernel_dualKernel_le_of_lt (L N : ℕ) {i j : ℕ} (hj
       (pow_le_pow_right₀ one_le_two hji.le)) hw)
   refine (lintegral_mul_peetre_le_of_support (b.continuous_dualKernel L i).aestronglyMeasurable hρ
     hs (fun z => enorm_lpBlockKernel_le j N z) y).trans ?_
-  calc (∫⁻ w, ‖b.dualKernel L i w‖ₑ) * (psiDecayConst V N *
+  calc (∫⁻ w, ‖b.dualKernel L i w‖ₑ) * (lpBlockKernelDecayConst V N *
         ENNReal.ofReal ((1 + 2 * L * b.radius) ^ N) * 2 ^ (j * finrank ℝ V) *
           ((1 + 2 ^ j * ‖y‖ₑ) ^ N)⁻¹)
-      ≤ (2 * eLpNorm (momentKernel b.toFun L) 1 volume) * (psiDecayConst V N *
+      ≤ (2 * eLpNorm (momentKernel b.toFun L) 1 volume) * (lpBlockKernelDecayConst V N *
         ENNReal.ofReal ((1 + 2 * L * b.radius) ^ N) * 2 ^ (j * finrank ℝ V) *
           ((1 + 2 ^ j * ‖y‖ₑ) ^ N)⁻¹) := by gcongr; exact b.lintegral_enorm_dualKernel_le L i
-    _ = _ := by rw [psiDualSupportConst]; ring
+    _ = _ := by rw [crossDualSupportConst]; ring
 
 /-- **The case `i ≤ j ≤ 1`**: `|(ψ_j ⋆ η_i)(y)| ≤ 2^(n+L') C 2^(-(j-i)L') 2^(in)
-(1 + 2^i ‖y‖)^(-N)` with `C = Rd.LocalMeansBump.psiDualSupportConst L N`, as in the case `i > j`
+(1 + 2^i ‖y‖)^(-N)` with `C = Rd.LocalMeansBump.crossDualSupportConst L N`, as in the case `i > j`
 with the Peetre weight at the scale `2^i`. -/
 theorem enorm_conv_lpBlockKernel_dualKernel_le_of_le_one (L N L' : ℕ) {i j : ℕ} (hij : i ≤ j)
     (hj : j ≤ 1) (y : V) :
     ‖conv (lpBlockKernel j) (b.dualKernel L i) volume y‖ₑ ≤
-      2 ^ (finrank ℝ V + L') * b.psiDualSupportConst L N * dyadicWeight (-(L' : ℝ)) (j - i) *
+      2 ^ (finrank ℝ V + L') * b.crossDualSupportConst L N * dyadicWeight (-(L' : ℝ)) (j - i) *
         2 ^ (i * finrank ℝ V) * ((1 + 2 ^ i * ‖y‖ₑ) ^ N)⁻¹ := by
   rw [conv_comm]
   refine (enorm_conv_le_lintegral _ _ y).trans ?_
@@ -1095,14 +1100,14 @@ theorem enorm_conv_lpBlockKernel_dualKernel_le_of_le_one (L N L' : ℕ) {i j : �
   have hs : ∀ w, 2 * L * b.radius / 2 ^ i < ‖w‖ → b.dualKernel L i w = 0 := fun w hw =>
     b.dualKernel_eq_zero_of_lt L i hw
   have hψ : ∀ z : V, ‖lpBlockKernel j z‖ₑ ≤
-      2 ^ finrank ℝ V * psiDecayConst V N * 2 ^ (i * finrank ℝ V) *
+      2 ^ finrank ℝ V * lpBlockKernelDecayConst V N * 2 ^ (i * finrank ℝ V) *
         ((1 + 2 ^ i * ‖z‖ₑ) ^ N)⁻¹ := fun z => by
     have h2 : (2 : ℝ≥0∞) ^ (j * finrank ℝ V) ≤ 2 ^ finrank ℝ V * 2 ^ (i * finrank ℝ V) := by
       rw [← pow_add]
       exact pow_le_pow_right₀ one_le_two (by nlinarith)
     refine (enorm_lpBlockKernel_le j N z).trans ?_
-    calc psiDecayConst V N * 2 ^ (j * finrank ℝ V) * ((1 + 2 ^ j * ‖z‖ₑ) ^ N)⁻¹
-        ≤ psiDecayConst V N * (2 ^ finrank ℝ V * 2 ^ (i * finrank ℝ V)) *
+    calc lpBlockKernelDecayConst V N * 2 ^ (j * finrank ℝ V) * ((1 + 2 ^ j * ‖z‖ₑ) ^ N)⁻¹
+        ≤ lpBlockKernelDecayConst V N * (2 ^ finrank ℝ V * 2 ^ (i * finrank ℝ V)) *
             ((1 + 2 ^ i * ‖z‖ₑ) ^ N)⁻¹ :=
           mul_le_mul' (mul_le_mul_right h2 _)
             (ENNReal.inv_one_add_mul_pow_anti (pow_le_pow_right₀ one_le_two hij) _ N)
@@ -1110,18 +1115,18 @@ theorem enorm_conv_lpBlockKernel_dualKernel_le_of_le_one (L N L' : ℕ) {i j : �
   refine (lintegral_mul_peetre_le_of_support (b.continuous_dualKernel L i).aestronglyMeasurable hρ
     hs hψ y).trans ?_
   have hw := ENNReal.one_le_two_pow_mul_dyadicWeight_neg L' (m := j - i) (by omega)
-  calc (∫⁻ w, ‖b.dualKernel L i w‖ₑ) * (2 ^ finrank ℝ V * psiDecayConst V N *
+  calc (∫⁻ w, ‖b.dualKernel L i w‖ₑ) * (2 ^ finrank ℝ V * lpBlockKernelDecayConst V N *
         ENNReal.ofReal ((1 + 2 * L * b.radius) ^ N) * 2 ^ (i * finrank ℝ V) *
           ((1 + 2 ^ i * ‖y‖ₑ) ^ N)⁻¹)
       ≤ (2 * eLpNorm (momentKernel b.toFun L) 1 volume) * (2 ^ finrank ℝ V *
-        psiDecayConst V N * ENNReal.ofReal ((1 + 2 * L * b.radius) ^ N) *
+        lpBlockKernelDecayConst V N * ENNReal.ofReal ((1 + 2 * L * b.radius) ^ N) *
           2 ^ (i * finrank ℝ V) * ((1 + 2 ^ i * ‖y‖ₑ) ^ N)⁻¹) * 1 := by
         rw [mul_one]; gcongr; exact b.lintegral_enorm_dualKernel_le L i
     _ ≤ (2 * eLpNorm (momentKernel b.toFun L) 1 volume) * (2 ^ finrank ℝ V *
-        psiDecayConst V N * ENNReal.ofReal ((1 + 2 * L * b.radius) ^ N) *
+        lpBlockKernelDecayConst V N * ENNReal.ofReal ((1 + 2 * L * b.radius) ^ N) *
           2 ^ (i * finrank ℝ V) * ((1 + 2 ^ i * ‖y‖ₑ) ^ N)⁻¹) *
             (2 ^ L' * dyadicWeight (-(L' : ℝ)) (j - i)) := by gcongr
-    _ = _ := by rw [psiDualSupportConst, pow_add]; ring
+    _ = _ := by rw [crossDualSupportConst, pow_add]; ring
 
 end LocalMeansBump
 
@@ -1351,28 +1356,28 @@ theorem conv_lpBlockKernel_dualKernel_ae_eq (L L' i j' : ℕ) :
 
 /-- **The case `i ≤ j`, `j ≥ 2`**: for `L' ≥ 1` and almost every `y`,
 `|(ψ_j ⋆ η_i)(y)| ≤ C P I 2^(-(j-i)L') 2^(in) (1 + 2^i ‖y‖)^(-N)` with
-`C = Rd.LocalMeansBump.dualTailConst L L' N`, `P = Rd.psiDecayConst V (2N)` and
+`C = Rd.LocalMeansBump.dualTailConst L L' N`, `P = Rd.lpBlockKernelDecayConst V (2N)` and
 `I = Rd.peetreIntegral V N`: by the moment identity of `Φ`, the averaged differences of `η_i`
 and the convolution of two Peetre bumps. -/
 theorem ae_enorm_conv_lpBlockKernel_dualKernel_le_of_two_le (L N : ℕ) {L' : ℕ} (hL' : 1 ≤ L')
     {i j : ℕ} (hij : i ≤ j) (hj : 2 ≤ j) :
     ∀ᵐ y ∂volume, ‖conv (lpBlockKernel j) (b.dualKernel L i) volume y‖ₑ ≤
-      b.dualTailConst L L' N * psiDecayConst V (2 * N) * peetreIntegral V N *
+      b.dualTailConst L L' N * lpBlockKernelDecayConst V (2 * N) * peetreIntegral V N *
         dyadicWeight (-(L' : ℝ)) (j - i) * 2 ^ (i * finrank ℝ V) *
           ((1 + 2 ^ i * ‖y‖ₑ) ^ N)⁻¹ := by
   obtain ⟨j', rfl⟩ : ∃ j', j = j' + 2 := ⟨j - 2, by omega⟩
   have hD := b.ae_enorm_dualKernel_sub_conv_lpMomentScaled_le L N hL' hij
   have hc : b.dualTailConst L L' N * dyadicWeight (-(L' : ℝ)) (j' + 2 - i) *
-      psiDecayConst V (2 * N) ≠ ∞ :=
+      lpBlockKernelDecayConst V (2 * N) ≠ ∞ :=
     ENNReal.mul_ne_top (ENNReal.mul_ne_top (b.dualTailConst_ne_top L L' N)
-      (ENNReal.dyadicWeight_ne_top _ _)) (psiDecayConst_ne_top _)
+      (ENNReal.dyadicWeight_ne_top _ _)) (lpBlockKernelDecayConst_ne_top _)
   filter_upwards [b.conv_lpBlockKernel_dualKernel_ae_eq L L' i j'] with y hy
   rw [hy, conv_comm]
   refine (enorm_conv_le_lintegral _ _ y).trans ?_
   calc ∫⁻ w, ‖(b.dualKernel L i - conv (lpMomentScaled L' j') (b.dualKernel L i) volume) w‖ₑ *
         ‖lpBlockKernel (j' + 2) (y - w)‖ₑ
       ≤ ∫⁻ w, b.dualTailConst L L' N * dyadicWeight (-(L' : ℝ)) (j' + 2 - i) *
-          psiDecayConst V (2 * N) * (2 ^ ((j' + 2) * finrank ℝ V) *
+          lpBlockKernelDecayConst V (2 * N) * (2 ^ ((j' + 2) * finrank ℝ V) *
             ((1 + 2 ^ (j' + 2) * ‖y - w‖ₑ) ^ (2 * N))⁻¹ *
               (2 ^ (i * finrank ℝ V) * ((1 + 2 ^ i * ‖w‖ₑ) ^ N)⁻¹)) := by
         refine lintegral_mono_ae (hD.mono fun w hw => ?_)
@@ -1380,52 +1385,52 @@ theorem ae_enorm_conv_lpBlockKernel_dualKernel_le_of_two_le (L N : ℕ) {L' : �
               ‖lpBlockKernel (j' + 2) (y - w)‖ₑ
             ≤ (b.dualTailConst L L' N * dyadicWeight (-(L' : ℝ)) (j' + 2 - i) *
                 2 ^ (i * finrank ℝ V) * ((1 + 2 ^ i * ‖w‖ₑ) ^ N)⁻¹) *
-              (psiDecayConst V (2 * N) * 2 ^ ((j' + 2) * finrank ℝ V) *
+              (lpBlockKernelDecayConst V (2 * N) * 2 ^ ((j' + 2) * finrank ℝ V) *
                 ((1 + 2 ^ (j' + 2) * ‖y - w‖ₑ) ^ (2 * N))⁻¹) :=
               mul_le_mul' hw (enorm_lpBlockKernel_le _ _ _)
           _ = _ := by ring
     _ = b.dualTailConst L L' N * dyadicWeight (-(L' : ℝ)) (j' + 2 - i) *
-          psiDecayConst V (2 * N) * ∫⁻ w, 2 ^ ((j' + 2) * finrank ℝ V) *
+          lpBlockKernelDecayConst V (2 * N) * ∫⁻ w, 2 ^ ((j' + 2) * finrank ℝ V) *
             ((1 + 2 ^ (j' + 2) * ‖y - w‖ₑ) ^ (2 * N))⁻¹ *
               (2 ^ (i * finrank ℝ V) * ((1 + 2 ^ i * ‖w‖ₑ) ^ N)⁻¹) :=
         lintegral_const_mul' _ _ hc
     _ ≤ b.dualTailConst L L' N * dyadicWeight (-(L' : ℝ)) (j' + 2 - i) *
-          psiDecayConst V (2 * N) * (peetreIntegral V N * 2 ^ (i * finrank ℝ V) *
+          lpBlockKernelDecayConst V (2 * N) * (peetreIntegral V N * 2 ^ (i * finrank ℝ V) *
             ((1 + 2 ^ i * ‖y‖ₑ) ^ N)⁻¹) := by
         gcongr
         exact lintegral_peetre_mul_le hij N y
     _ = _ := by ring
 
 /-- The constant of the cross kernel `ψ_j ⋆ η_i`: the sum of the constants of the three cases,
-`(1 + 2^(n+L')) C_s + C P I` with `C_s = Rd.LocalMeansBump.psiDualSupportConst L N`,
-`C = Rd.LocalMeansBump.dualTailConst L L' N`, `P = Rd.psiDecayConst V (2N)` and
+`(1 + 2^(n+L')) C_s + C P I` with `C_s = Rd.LocalMeansBump.crossDualSupportConst L N`,
+`C = Rd.LocalMeansBump.dualTailConst L L' N`, `P = Rd.lpBlockKernelDecayConst V (2N)` and
 `I = Rd.peetreIntegral V N`. -/
-noncomputable def psiDualConst (L L' N : ℕ) : ℝ≥0∞ :=
-  (1 + 2 ^ (finrank ℝ V + L')) * b.psiDualSupportConst L N +
-    b.dualTailConst L L' N * psiDecayConst V (2 * N) * peetreIntegral V N
+noncomputable def crossDualConst (L L' N : ℕ) : ℝ≥0∞ :=
+  (1 + 2 ^ (finrank ℝ V + L')) * b.crossDualSupportConst L N +
+    b.dualTailConst L L' N * lpBlockKernelDecayConst V (2 * N) * peetreIntegral V N
 
 /-- The constant of the cross kernel `ψ_j ⋆ η_i` is finite for `N > n`. -/
-theorem psiDualConst_ne_top (L L' : ℕ) {N : ℕ} (hN : finrank ℝ V < N) :
-    b.psiDualConst L L' N ≠ ∞ := by
+theorem crossDualConst_ne_top (L L' : ℕ) {N : ℕ} (hN : finrank ℝ V < N) :
+    b.crossDualConst L L' N ≠ ∞ := by
   refine ENNReal.add_ne_top.2 ⟨ENNReal.mul_ne_top (ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top,
-    ENNReal.pow_ne_top ENNReal.ofNat_ne_top⟩) (b.psiDualSupportConst_ne_top L N), ?_⟩
+    ENNReal.pow_ne_top ENNReal.ofNat_ne_top⟩) (b.crossDualSupportConst_ne_top L N), ?_⟩
   exact ENNReal.mul_ne_top (ENNReal.mul_ne_top (b.dualTailConst_ne_top L L' N)
-    (psiDecayConst_ne_top _)) (peetreIntegral_ne_top hN)
+    (lpBlockKernelDecayConst_ne_top _)) (peetreIntegral_ne_top hN)
 
 /-- **The cross kernel `ψ_j ⋆ η_i`**: for every order `L`, every `L' ≥ 1`, all levels `i, j` and
 almost every `y`, `|(ψ_j ⋆ η_i)(y)| ≤ C c_{ji} 2^(min(i,j) n) (1 + 2^min(i,j) ‖y‖)^(-N)` with
 `c_{ji} = 2^(-(j-i)L')` for `i ≤ j`, `c_{ji} = 1` for `i > j`, and
-`C = Rd.LocalMeansBump.psiDualConst L L' N`. -/
+`C = Rd.LocalMeansBump.crossDualConst L L' N`. -/
 theorem enorm_conv_lpBlockKernel_dualKernel_le (L : ℕ) {L' : ℕ} (hL' : 1 ≤ L') (N i j : ℕ) :
     ∀ᵐ y ∂volume, ‖conv (lpBlockKernel j) (b.dualKernel L i) volume y‖ₑ ≤
-      b.psiDualConst L L' N * (if i ≤ j then dyadicWeight (-(L' : ℝ)) (j - i) else 1) *
+      b.crossDualConst L L' N * (if i ≤ j then dyadicWeight (-(L' : ℝ)) (j - i) else 1) *
         2 ^ (min i j * finrank ℝ V) * ((1 + 2 ^ (min i j) * ‖y‖ₑ) ^ N)⁻¹ := by
-  have h1 : b.psiDualSupportConst L N ≤ b.psiDualConst L L' N :=
+  have h1 : b.crossDualSupportConst L N ≤ b.crossDualConst L L' N :=
     (le_mul_of_one_le_left zero_le le_self_add).trans le_self_add
-  have h2 : 2 ^ (finrank ℝ V + L') * b.psiDualSupportConst L N ≤ b.psiDualConst L L' N :=
+  have h2 : 2 ^ (finrank ℝ V + L') * b.crossDualSupportConst L N ≤ b.crossDualConst L L' N :=
     (mul_le_mul_left le_add_self _).trans le_self_add
-  have h3 : b.dualTailConst L L' N * psiDecayConst V (2 * N) * peetreIntegral V N ≤
-      b.psiDualConst L L' N := le_add_self
+  have h3 : b.dualTailConst L L' N * lpBlockKernelDecayConst V (2 * N) * peetreIntegral V N ≤
+      b.crossDualConst L L' N := le_add_self
   rcases lt_or_ge j i with hji | hij
   · refine Filter.Eventually.of_forall fun y =>
       (b.enorm_conv_lpBlockKernel_dualKernel_le_of_lt L N hji y).trans ?_

@@ -35,7 +35,7 @@ A smooth function `m` on a real normed space has **symbol growth of order `σ`**
   annulus, the kernels `K_j` of `𝓕ω_j` (`Rd.symbolBase`) are uniformly Schwartz
   (`Rd.HasSymbolGrowth.exists_isUniformSchwartz_symbolBase`); for the synthesis kernels `ψ̃_j`
   this gives `m(D) ψ̃_j = 2^{jσ} (G_j)_{2^j}` with a uniform family `(G_j)`
-  (`Rd.HasSymbolGrowth.exists_isUniformSchwartz_psiDualS`).
+  (`Rd.HasSymbolGrowth.exists_isUniformSchwartz_dualLpBlockKernelS`).
 * **The maximal bound**: convolutions with the dilates `(G_j)_{2^j}` of a uniform family are
   bounded by the Hardy–Littlewood maximal function, uniformly in `j`, with the finite constant
   `C_{n,N} C_{A,0,N}` (`Rd.IsUniformSchwartz.enorm_conv_dilate_le_maximalFunction`,
@@ -588,23 +588,25 @@ theorem HasSymbolGrowth.exists_isUniformSchwartz_symbolBase (hm : HasSymbolGrowt
 
 /-- **Symbols applied to the synthesis kernels**: for a symbol `m` of order `σ` there is a
 uniformly Schwartz family `(G_j)` with `m(D) ψ̃_j = 2^{jσ} (G_j)_{2^j}` for every `j`, where
-`ψ̃_j = (psiDualBase j)_{2^j}` (`Rd.psiDualS`). The family `psiDualBase` is constant from `2` on,
-with Fourier transform in `{1/4 ≤ ‖ζ‖ ≤ 4}` (`Rd.mem_annulus_of_fourier_psiDualBase_ne_zero`,
-`Rd.HasSymbolGrowth.exists_isUniformSchwartz_symbolBase`,
-`Rd.fourierMultiplierCLM_schwartzDilate`); the bounds are existential. -/
-theorem HasSymbolGrowth.exists_isUniformSchwartz_psiDualS (hm : HasSymbolGrowth σ m) :
+`ψ̃_j = (dualLpBlockKernelBase j)_{2^j}` (`Rd.dualLpBlockKernelS`). The family
+`dualLpBlockKernelBase` is constant from `2` on, with Fourier transform in `{1/4 ≤ ‖ζ‖ ≤ 4}`
+(`Rd.mem_annulus_of_fourier_dualLpBlockKernelBase_ne_zero`,
+`Rd.HasSymbolGrowth.exists_isUniformSchwartz_symbolBase`, `Rd.fourierMultiplierCLM_schwartzDilate`);
+the bounds are existential. -/
+theorem HasSymbolGrowth.exists_isUniformSchwartz_dualLpBlockKernelS (hm : HasSymbolGrowth σ m) :
     ∃ (G : ℕ → 𝓢(V, ℂ)) (A : ℕ → ℕ → ℝ), IsUniformSchwartz G A ∧ ∀ j,
-      SchwartzMap.fourierMultiplierCLM ℂ m (psiDualS j) =
+      SchwartzMap.fourierMultiplierCLM ℂ m (dualLpBlockKernelS j) =
         ((((2 : ℝ) ^ j) ^ σ : ℝ) : ℂ) •
           schwartzDilate (2 ^ j) (pow_ne_zero j two_ne_zero) (G j) := by
-  obtain ⟨A, hA⟩ := hm.exists_isUniformSchwartz_symbolBase (ω := psiDualBase (V := V)) (M := 2)
+  obtain ⟨A, hA⟩ :=
+    hm.exists_isUniformSchwartz_symbolBase (ω := dualLpBlockKernelBase (V := V)) (M := 2)
     (by norm_num : (0 : ℝ) < 4⁻¹)
     (fun j hj => by
       obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le' hj
       rfl)
-    (fun _ h => mem_annulus_of_fourier_psiDualBase_ne_zero (j := 0) h)
+    (fun _ h => mem_annulus_of_fourier_dualLpBlockKernelBase_ne_zero (j := 0) h)
   exact ⟨_, A, hA, fun j =>
-    fourierMultiplierCLM_schwartzDilate hm.hasTemperateGrowth σ (psiDualBase j) j⟩
+    fourierMultiplierCLM_schwartzDilate hm.hasTemperateGrowth σ (dualLpBlockKernelBase j) j⟩
 
 end Scaled
 

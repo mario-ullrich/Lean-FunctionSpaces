@@ -33,7 +33,7 @@ measure-preserving map between measure spaces.
 * **Directions** (`Rd.HasWeakLineDeriv.sum_smul_dir`, `Rd.hasWeakLineDeriv_of_forall_gridBasis`):
   weak derivatives are linear in the direction, so the derivatives `g_i = ∂_{e_i} f` give
   `∂_v f = ∑_i ⟪v, e_i⟫ g_i` for every `v`, and `W^1_p(V)` and `W^1_p(Ω)` need only the basis
-  directions (`Rd.memWSobolev_one_of_forall_gridBasis`,
+  directions (`Rd.memSobolevW_one_of_forall_gridBasis`,
   `Rd.memWeakSobolev_one_of_forall_gridBasis`).
 * **Cutoffs**: the `L_p` bounds of the product rule with a cutoff of
   `FunctionSpaces.Rd.Sobolev.WeakDerivatives`: if the smooth `χ` has closed support in `B`, the
@@ -347,11 +347,11 @@ theorem hasWeakLineDeriv_of_forall_gridBasis {g : Fin (finrank ℝ V) → V → 
 /-- **`W^1_p(V)` from the basis derivatives**: a function `F ∈ L_p(V)`, `1 ≤ p`, with weak
 derivatives `G_i ∈ L_p(V)` along the basis vectors `e_i` on `V` lies in `W^1_p(V)`; the
 derivative along `v` is the class of `∑_i ⟪v, e_i⟫ G_i`
-(`Rd.hasWeakLineDeriv_of_forall_gridBasis`, `Rd.memWSobolev_one_of_forall_hasWeakLineDeriv`). -/
-theorem memWSobolev_one_of_forall_gridBasis {p : ℝ≥0∞} [Fact (1 ≤ p)]
+(`Rd.hasWeakLineDeriv_of_forall_gridBasis`, `Rd.memSobolevW_one_of_forall_hasWeakLineDeriv`). -/
+theorem memSobolevW_one_of_forall_gridBasis {p : ℝ≥0∞} [Fact (1 ≤ p)]
     {F : Lp ℂ p (volume : Measure V)} {G : Fin (finrank ℝ V) → Lp ℂ p (volume : Measure V)}
-    (h : ∀ i, HasWeakLineDeriv ⊤ (fun _ : Fin 1 => gridBasis V i) F (G i)) : MemWSobolev 1 F := by
-  refine memWSobolev_one_of_forall_hasWeakLineDeriv fun v => ?_
+    (h : ∀ i, HasWeakLineDeriv ⊤ (fun _ : Fin 1 => gridBasis V i) F (G i)) : MemSobolevW 1 F := by
+  refine memSobolevW_one_of_forall_hasWeakLineDeriv fun v => ?_
   have hm : MemLp (fun x => ∑ i, (inner ℝ v (gridBasis V i) : ℂ) * G i x) p volume :=
     memLp_finsetSum Finset.univ fun i _ => (Lp.memLp (G i)).const_mul _
   refine ⟨hm.toLp _, (hasWeakLineDeriv_of_forall_gridBasis h v).congr_ae EventuallyEq.rfl ?_⟩

@@ -635,8 +635,8 @@ declarations.
   (`Rd.ae_eq_of_smulLeftCLM_eq`).
 * **`H^1` by derivatives in `L_2`** (`FunctionSpaces/Rd/Sobolev/SobolevTwoLittlewoodPaley.lean`):
   for `f ∈ L_2(V)`, Mathlib's `TemperedDistribution.MemSobolev 1 2 f` holds iff every directional
-  derivative `∂_v f` of the tempered distribution `f` is an `L_2` function (`Rd.memWSobolev_one_iff`
-  with `Rd.memWSobolev_iff_tempered`); the derivatives along one orthonormal basis `(e_i)` suffice
+  derivative `∂_v f` of the tempered distribution `f` is an `L_2` function (`Rd.memSobolevW_one_iff`
+  with `Rd.memSobolevW_iff_tempered`); the derivatives along one orthonormal basis `(e_i)` suffice
   (`Rd.memSobolev_one_two_of_lineDerivOp_eq`), and
   `(2π)² ‖J_1 f‖_2² = (2π)² ‖f‖_2² + ∑_i ‖∂_{e_i} f‖_2²` (`Rd.lintegral_besselWeight_one_sq_eq`,
   `Rd.enorm_besselPotential_one_sq_eq`). Mathlib has `∂_v : H^s → H^{s-1}`
@@ -706,7 +706,7 @@ declarations.
   it lies in `H^{s,p}(V)`, for every real `s` (`Rd.memTriebelLizorkin_iff_memSobolev_bessel`), for
   `s ≥ 0` every element of `H^{s,p}(V)` is an `L_p` function in `F^s_{p,2}(V)`
   (`Rd.exists_memTriebelLizorkin_of_besselPotential_eq`), and `W^m_p(V) = H^{m,p}(V)`, Calderón's
-  theorem (`Rd.memWSobolev_iff_memSobolev_bessel`), with existential constants. Mathlib has
+  theorem (`Rd.memSobolevW_iff_memSobolev_bessel`), with existential constants. Mathlib has
   `H^{s,p}` with `∂_v : H^{s,p} → H^{s-1,p}` (`TemperedDistribution.MemSobolev.lineDerivOp`); this
   project identifies it with `F^s_{2,2}` for `p = 2` by Plancherel
   (`FunctionSpaces/Rd/Sobolev/SobolevTwoLittlewoodPaley.lean`), and for all `1 < p < ∞` through its

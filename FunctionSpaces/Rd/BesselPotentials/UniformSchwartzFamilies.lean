@@ -38,7 +38,7 @@ Bessel potential on Schwartz functions, the Fourier multiplier with the Bessel w
   explicit overlap `Rd.besselOverlap` and an existential Hörmander constant
   (`Rd.exists_isCZFamily_besselKernelFamily`). At most `N + 1` of them see a frequency
   (`ENNReal.tsum_le_of_dyadic_annulus`). The Fourier transforms of `ψ_1`,
-  `Rd.psiBase (j+1)` and `Rd.psiDualBase (j+2)` vanish outside such annuli.
+  `Rd.lpBlockKernelBase (j+1)` and `Rd.dualLpBlockKernelBase (j+2)` vanish outside such annuli.
 -/
 
 @[expose] public section
@@ -483,40 +483,40 @@ theorem exists_isCZFamily_besselKernelFamily {ωhat : 𝓢(V, ℂ)} {a : ℝ} {N
 
 /-- `𝓕ψ_1` vanishes outside the annulus `{1 ≤ ‖ζ‖ ≤ 2^2 · 1}`. The bound is written as `2^2 · 1`
 to match the hypothesis of `Rd.exists_isCZFamily_besselKernelFamily` with `a = 1`, `N = 2`. -/
-theorem mem_annulus_of_fourier_psiOneS_ne_zero {ζ : V} (h : 𝓕 (psiOneS (V := V)) ζ ≠ 0) :
-    1 ≤ ‖ζ‖ ∧ ‖ζ‖ ≤ 2 ^ 2 * 1 := by
-  rw [fourier_psiOneS_apply] at h
+theorem mem_annulus_of_fourier_lpBlockKernelOneS_ne_zero {ζ : V}
+    (h : 𝓕 (lpBlockKernelOneS (V := V)) ζ ≠ 0) : 1 ≤ ‖ζ‖ ∧ ‖ζ‖ ≤ 2 ^ 2 * 1 := by
+  rw [fourier_lpBlockKernelOneS_apply] at h
   have h4 := norm_lt_of_fourier_lpBlockKernel_ne_zero h
   norm_num at h4 ⊢
   exact ⟨(one_lt_norm_of_fourier_lpBlockKernel_one_ne_zero h).le, h4.le⟩
 
-/-- `𝓕(psiBase (j+1)) = 𝓕(Φ - δ_{1/2} Φ)` vanishes outside the annulus
-`{1/2 ≤ ‖ζ‖ ≤ 2^2 · 1/2}`: `psiBase (j+1) = psiBase 1` and `ψ_1 = (psiBase 1)_2`, so
-`𝓕(psiBase 1)(ζ) = 𝓕ψ_1(2ζ)` (`Rd.fourier_eq_fourier_dilate`) and `1 ≤ ‖2ζ‖ ≤ 4`. The bound is
-written as `2^2 · 2⁻¹` to match the hypothesis of `Rd.exists_isCZFamily_besselKernelFamily` with
-`a = 1/2`, `N = 2`. -/
-theorem mem_annulus_of_fourier_psiBase_ne_zero {j : ℕ} {ζ : V}
-    (h : 𝓕 (psiBase (V := V) (j + 1)) ζ ≠ 0) : 2⁻¹ ≤ ‖ζ‖ ∧ ‖ζ‖ ≤ 2 ^ 2 * 2⁻¹ := by
-  change 𝓕 (psiBase (V := V) 1) ζ ≠ 0 at h
-  have h' : 𝓕 (psiOneS (V := V)) ((2 : ℝ) • ζ) ≠ 0 := by
+/-- `𝓕(lpBlockKernelBase (j+1)) = 𝓕(Φ - δ_{1/2} Φ)` vanishes outside the annulus
+`{1/2 ≤ ‖ζ‖ ≤ 2^2 · 1/2}`: `lpBlockKernelBase (j+1) = lpBlockKernelBase 1` and
+`ψ_1 = (lpBlockKernelBase 1)_2`, so `𝓕(lpBlockKernelBase 1)(ζ) = 𝓕ψ_1(2ζ)`
+(`Rd.fourier_eq_fourier_dilate`) and `1 ≤ ‖2ζ‖ ≤ 4`. The bound is written as `2^2 · 2⁻¹` to match
+the hypothesis of `Rd.exists_isCZFamily_besselKernelFamily` with `a = 1/2`, `N = 2`. -/
+theorem mem_annulus_of_fourier_lpBlockKernelBase_ne_zero {j : ℕ} {ζ : V}
+    (h : 𝓕 (lpBlockKernelBase (V := V) (j + 1)) ζ ≠ 0) : 2⁻¹ ≤ ‖ζ‖ ∧ ‖ζ‖ ≤ 2 ^ 2 * 2⁻¹ := by
+  change 𝓕 (lpBlockKernelBase (V := V) 1) ζ ≠ 0 at h
+  have h' : 𝓕 (lpBlockKernelOneS (V := V)) ((2 : ℝ) • ζ) ≠ 0 := by
     rw [SchwartzMap.fourier_coe] at h ⊢
-    rwa [psiOneS, coe_schwartzDilate, ← fourier_eq_fourier_dilate _ two_pos]
-  obtain ⟨h1, h2⟩ := mem_annulus_of_fourier_psiOneS_ne_zero h'
+    rwa [lpBlockKernelOneS, coe_schwartzDilate, ← fourier_eq_fourier_dilate _ two_pos]
+  obtain ⟨h1, h2⟩ := mem_annulus_of_fourier_lpBlockKernelOneS_ne_zero h'
   rw [norm_smul, Real.norm_two] at h1 h2
   constructor <;> linarith
 
-/-- `𝓕(psiDualBase (j+2)) = 𝓕(δ_2 Φ - δ_{1/4} Φ)` vanishes outside the annulus
-`{1/4 ≤ ‖ζ‖ ≤ 2^4 · 1/4}`: `psiDualBase (j+2) = psiDualBase 2` and
-`psiDual_2 = (psiDualBase 2)_4`, whose Fourier transform vanishes outside `{1 < ‖ξ‖ < 16}`. The
-bound is written as `2^4 · 4⁻¹` to match the hypothesis of
-`Rd.exists_isCZFamily_besselKernelFamily` with `a = 1/4`, `N = 4`. -/
-theorem mem_annulus_of_fourier_psiDualBase_ne_zero {j : ℕ} {ζ : V}
-    (h : 𝓕 (psiDualBase (V := V) (j + 2)) ζ ≠ 0) : 4⁻¹ ≤ ‖ζ‖ ∧ ‖ζ‖ ≤ 2 ^ 4 * 4⁻¹ := by
-  change 𝓕 (psiDualBase (V := V) 2) ζ ≠ 0 at h
+/-- `𝓕(dualLpBlockKernelBase (j+2)) = 𝓕(δ_2 Φ - δ_{1/4} Φ)` vanishes outside the annulus
+`{1/4 ≤ ‖ζ‖ ≤ 2^4 · 1/4}`: `dualLpBlockKernelBase (j+2) = dualLpBlockKernelBase 2` and the
+synthesis kernel `ψ̃_2 = Rd.dualLpBlockKernel 2` is `(dualLpBlockKernelBase 2)_4`, whose Fourier
+transform vanishes outside `{1 < ‖ξ‖ < 16}`. The bound is written as `2^4 · 4⁻¹` to match the
+hypothesis of `Rd.exists_isCZFamily_besselKernelFamily` with `a = 1/4`, `N = 4`. -/
+theorem mem_annulus_of_fourier_dualLpBlockKernelBase_ne_zero {j : ℕ} {ζ : V}
+    (h : 𝓕 (dualLpBlockKernelBase (V := V) (j + 2)) ζ ≠ 0) : 4⁻¹ ≤ ‖ζ‖ ∧ ‖ζ‖ ≤ 2 ^ 4 * 4⁻¹ := by
+  change 𝓕 (dualLpBlockKernelBase (V := V) 2) ζ ≠ 0 at h
   rw [SchwartzMap.fourier_coe, fourier_eq_fourier_dilate _ (pow_pos two_pos 2),
-    dilate_psiDualBase] at h
-  have h1 := lt_norm_of_fourier_psiDual_ne_zero (m := 0) h
-  have h2 := norm_lt_of_fourier_psiDual_ne_zero h
+    dilate_dualLpBlockKernelBase] at h
+  have h1 := lt_norm_of_fourier_dualLpBlockKernel_ne_zero (m := 0) h
+  have h2 := norm_lt_of_fourier_dualLpBlockKernel_ne_zero h
   rw [norm_smul, Real.norm_of_nonneg (by positivity)] at h1 h2
   norm_num at h1 h2 ⊢
   constructor <;> linarith

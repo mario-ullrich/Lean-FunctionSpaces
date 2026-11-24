@@ -13,11 +13,11 @@ public import ApproximationSpaces.Scheme
 
 For `1 ≤ p < ∞` the **band-limited class** of level `k` is
 `E_k = {g ∈ L_p(V) : Θ_k ⋆ g = g}` (`Rd.bandSpace`), with the band-limiting kernel
-`Θ_k = 2^(kn) Θ(2^k ·)` of `Rd.Theta`, whose Fourier transform is `1` on the ball of radius
-`2^(k+1)` and vanishes outside the ball of radius `2^(k+2)`. On the Fourier side `Θ_k ⋆ g = g`
-says `𝓕g = 𝓕Θ_k · 𝓕g`: the spectrum of `g` lies in the ball of radius `2^(k+2)`, and every `g`
-with spectrum in the ball of radius `2^(k+1)` satisfies it. These are the functions of exponential
-type of Nikol'skii's theory; the definition by the kernel works in every `L_p` without
+`Θ_k = 2^(kn) Θ(2^k ·)` of `Rd.dilatedBandKernel`, whose Fourier transform is `1` on the ball of
+radius `2^(k+1)` and vanishes outside the ball of radius `2^(k+2)`. On the Fourier side
+`Θ_k ⋆ g = g` says `𝓕g = 𝓕Θ_k · 𝓕g`: the spectrum of `g` lies in the ball of radius `2^(k+2)`, and
+every `g` with spectrum in the ball of radius `2^(k+1)` satisfies it. These are the functions of
+exponential type of Nikol'skii's theory; the definition by the kernel works in every `L_p` without
 distributions.
 
 The classes are closed subspaces (`Rd.isClosed_bandSpace`) and increase with `k`, since
@@ -37,12 +37,13 @@ variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDim
 
 /-- The **band-limited class** `E_k = {g ∈ L_p : Θ_k ⋆ g = g}`, a real subspace of `L_p(V)`. -/
 noncomputable def bandSpace (hp : p ≠ ∞) (k : ℕ) : Submodule ℝ (Lp ℂ p (volume : Measure V)) :=
-  LinearMap.ker (((convLp hp (integrable_Theta (V := V) k)).restrictScalars ℝ).toLinearMap -
-    LinearMap.id)
+  LinearMap.ker
+    (((convLp hp (integrable_dilatedBandKernel (V := V) k)).restrictScalars ℝ).toLinearMap -
+      LinearMap.id)
 
 /-- `g ∈ E_k` iff `Θ_k ⋆ g = g`. -/
 theorem mem_bandSpace {hp : p ≠ ∞} {k : ℕ} {g : Lp ℂ p (volume : Measure V)} :
-    g ∈ bandSpace hp k ↔ convLp hp (integrable_Theta k) g = g := by
+    g ∈ bandSpace hp k ↔ convLp hp (integrable_dilatedBandKernel k) g = g := by
   rw [bandSpace, LinearMap.mem_ker, LinearMap.sub_apply, sub_eq_zero]
   rfl
 
@@ -56,20 +57,21 @@ theorem smul_mem_bandSpace {hp : p ≠ ∞} {k : ℕ} (c : ℂ) {g : Lp ℂ p (v
 theorem isClosed_bandSpace (hp : p ≠ ∞) (k : ℕ) :
     IsClosed (bandSpace (V := V) hp k : Set (Lp ℂ p (volume : Measure V))) := by
   have h : (bandSpace (V := V) hp k : Set (Lp ℂ p (volume : Measure V))) =
-      {g | convLp hp (integrable_Theta k) g = g} := by
+      {g | convLp hp (integrable_dilatedBandKernel k) g = g} := by
     ext g
     exact mem_bandSpace
   rw [h]
-  exact isClosed_eq (convLp hp (integrable_Theta k)).continuous continuous_id
+  exact isClosed_eq (convLp hp (integrable_dilatedBandKernel k)).continuous continuous_id
 
 /-- **The band-limited classes increase**: `E_k ⊆ E_{k+1}`, since `Θ_{k+1} ⋆ Θ_k = Θ_k`. -/
 theorem bandSpace_mono (hp : p ≠ ∞) : Monotone (bandSpace (V := V) hp) := by
   refine monotone_nat_of_le_succ fun k g hg => ?_
   rw [mem_bandSpace] at hg ⊢
-  calc convLp hp (integrable_Theta (k + 1)) g
-      = convLp hp (integrable_Theta (k + 1)) (convLp hp (integrable_Theta k) g) := by rw [hg]
-    _ = convLp hp (integrable_Theta k) g :=
-        convLp_convLp_of_eq hp _ _ _ (conv_Theta_succ k) g
+  calc convLp hp (integrable_dilatedBandKernel (k + 1)) g
+      = convLp hp (integrable_dilatedBandKernel (k + 1))
+        (convLp hp (integrable_dilatedBandKernel k) g) := by rw [hg]
+    _ = convLp hp (integrable_dilatedBandKernel k) g :=
+        convLp_convLp_of_eq hp _ _ _ (conv_dilatedBandKernel_succ k) g
     _ = g := hg
 
 /-- The **band-limited scheme**: `E_k` at complexity `2^k`, that is, `E_⌊log₂ n⌋` at complexity

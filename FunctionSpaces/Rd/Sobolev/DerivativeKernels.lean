@@ -29,10 +29,10 @@ Fourier transform `𝓕η_i(ξ) = ∏_k ⟪ξ, e_{i_k}⟫ / ((2πi)^m ‖ξ‖^{
   (`Rd.enorm_two_pow_complex`).
 * **The derivative families** `((η_i)_{2^j})_j` are Calderón–Zygmund families with overlap `2`
   (`Rd.isCZFamily_derivKernelFamily`).
-* **The dual derivative families**: for every `w ∈ V^k` the synthesis kernels satisfy
-  `∂^w psiDual_j = 2^{jk} (∂^w psiDualBase_j)_{2^j}` (`Rd.iteratedLineDerivOp_psiDualS`), and the
-  dilates on the right form a Calderón–Zygmund family with overlap `4 ((8π)^k ∏_l ‖w_l‖)²`
-  (`Rd.isCZFamily_derivDualFamily`).
+* **The dual derivative families**: for every `w ∈ V^k` the synthesis kernels `ψ̃_j = (G̃_j)_{2^j}`,
+  `G̃_j = Rd.dualLpBlockKernelBase j`, satisfy `∂^w ψ̃_j = 2^{jk} (∂^w G̃_j)_{2^j}`
+  (`Rd.iteratedLineDerivOp_dualLpBlockKernelS`), and the dilates on the right form a
+  Calderón–Zygmund family with overlap `4 ((8π)^k ∏_l ‖w_l‖)²` (`Rd.isCZFamily_derivDualFamily`).
 -/
 
 @[expose] public section
@@ -149,26 +149,26 @@ theorem contDiffOn_derivSymbol {m : ℕ} (i : Fin m → Fin (finrank ℝ V)) :
 
 /-! ### The block `ψ_1` -/
 
-/-- The block `ψ_1 = Φ_1 - Φ` as a Schwartz function, `ψ_1 = δ_2 (psiBase 1)`. -/
-noncomputable def psiOneS : 𝓢(V, ℂ) := schwartzDilate 2 two_ne_zero (psiBase 1)
+/-- The block `ψ_1 = Φ_1 - Φ` as a Schwartz function, `ψ_1 = δ_2 (lpBlockKernelBase 1)`. -/
+noncomputable def lpBlockKernelOneS : 𝓢(V, ℂ) := schwartzDilate 2 two_ne_zero (lpBlockKernelBase 1)
 
-/-- The Schwartz function `Rd.psiOneS` is the block `ψ_1`. -/
-theorem coe_psiOneS : (psiOneS : V → ℂ) = lpBlockKernel (V := V) 1 := by
-  have h := dilate_psiBase (V := V) 1
+/-- The Schwartz function `Rd.lpBlockKernelOneS` is the block `ψ_1`. -/
+theorem coe_lpBlockKernelOneS : (lpBlockKernelOneS : V → ℂ) = lpBlockKernel (V := V) 1 := by
+  have h := dilate_lpBlockKernelBase (V := V) 1
   rw [pow_one] at h
-  rw [psiOneS, coe_schwartzDilate, h]
+  rw [lpBlockKernelOneS, coe_schwartzDilate, h]
 
 /-- **The blocks are dilates of `ψ_1`**: `ψ_{j+1} = (ψ_1)_{2^j}`. -/
 theorem dilate_lpBlockKernel_one (j : ℕ) :
     dilate (2 ^ j) (lpBlockKernel (V := V) 1) = lpBlockKernel (j + 1) := by
-  rw [← coe_psiOneS, psiOneS, coe_schwartzDilate, dilate_dilate, ← pow_succ,
-    ← dilate_psiBase (j + 1)]
+  rw [← coe_lpBlockKernelOneS, lpBlockKernelOneS, coe_schwartzDilate, dilate_dilate, ← pow_succ,
+    ← dilate_lpBlockKernelBase (j + 1)]
   rfl
 
-/-- The Fourier transform of the Schwartz function `Rd.psiOneS` is `𝓕ψ_1`. -/
-theorem fourier_psiOneS_apply (ξ : V) :
-    𝓕 (psiOneS (V := V)) ξ = 𝓕 (lpBlockKernel (V := V) 1) ξ := by
-  rw [SchwartzMap.fourier_coe, coe_psiOneS]
+/-- The Fourier transform of the Schwartz function `Rd.lpBlockKernelOneS` is `𝓕ψ_1`. -/
+theorem fourier_lpBlockKernelOneS_apply (ξ : V) :
+    𝓕 (lpBlockKernelOneS (V := V)) ξ = 𝓕 (lpBlockKernel (V := V) 1) ξ := by
+  rw [SchwartzMap.fourier_coe, coe_lpBlockKernelOneS]
 
 /-- `𝓕ψ_{j+1}(ξ) = 𝓕ψ_1(2^{-j} ξ)`. -/
 theorem fourier_lpBlockKernel_succ_eq_fourier_lpBlockKernel_one (j : ℕ) (ξ : V) :
@@ -189,8 +189,8 @@ theorem contDiff_derivSymbol_mul_fourier_lpBlockKernel_one {m : ℕ} (i : Fin m 
     ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞)
       (fun ξ : V => derivSymbol i ξ * 𝓕 (lpBlockKernel (V := V) 1) ξ) := by
   have hF : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (𝓕 (lpBlockKernel (V := V) 1)) := by
-    rw [← coe_psiOneS, ← SchwartzMap.fourier_coe]
-    exact SchwartzMap.smooth (𝓕 (psiOneS (V := V))) ⊤
+    rw [← coe_lpBlockKernelOneS, ← SchwartzMap.fourier_coe]
+    exact SchwartzMap.smooth (𝓕 (lpBlockKernelOneS (V := V))) ⊤
   refine contDiff_iff_contDiffAt.2 fun ξ => ?_
   by_cases hξ : ξ = 0
   · subst hξ
@@ -236,11 +236,11 @@ have the same Fourier transform: `(∑_i ∏_k 2πi ⟪ξ, e_{i_k}⟫ σ_i(ξ)) 
 `ξ ≠ 0` (`Rd.sum_prod_mul_derivSymbol`), and `𝓕ψ_1(0) = 0`. -/
 theorem sum_iteratedLineDerivOp_derivKernel (m : ℕ) :
     ∑ i : Fin m → Fin (finrank ℝ V), ∂^{fun k => gridBasis V (i k)} (derivKernel i) =
-      psiOneS (V := V) := by
+      lpBlockKernelOneS (V := V) := by
   apply (FourierTransform.fourierCLE ℂ 𝓢(V, ℂ)).injective
   simp only [FourierTransform.fourierCLE_apply, FourierTransform.fourier_sum]
   ext ξ
-  rw [sum_apply, SchwartzMap.fourier_coe psiOneS, coe_psiOneS]
+  rw [sum_apply, SchwartzMap.fourier_coe lpBlockKernelOneS, coe_lpBlockKernelOneS]
   simp_rw [SchwartzMap.fourier_iteratedLineDerivOp_apply, smul_eq_mul,
     SchwartzMap.fourier_coe (derivKernel _), fourier_derivKernel, ← mul_assoc]
   rw [← Finset.sum_mul]
@@ -259,7 +259,8 @@ theorem two_pow_smul_lpBlockKernel_succ_eq_sum (m j : ℕ) :
         (schwartzDilate (2 ^ j) (pow_ne_zero j two_ne_zero) (derivKernel i))) := by
   have h : ∑ i : Fin m → Fin (finrank ℝ V), ∂^{fun k => gridBasis V (i k)}
       (schwartzDilate (2 ^ j) (pow_ne_zero j two_ne_zero) (derivKernel i)) =
-      ((2 : ℂ) ^ (j * m)) • schwartzDilate (2 ^ j) (pow_ne_zero j two_ne_zero) psiOneS := by
+      ((2 : ℂ) ^ (j * m)) •
+        schwartzDilate (2 ^ j) (pow_ne_zero j two_ne_zero) lpBlockKernelOneS := by
     simp_rw [iteratedLineDerivOp_schwartzDilate]
     rw [← Finset.smul_sum, ← schwartzDilate_sum, sum_iteratedLineDerivOp_derivKernel]
     push_cast
@@ -267,7 +268,7 @@ theorem two_pow_smul_lpBlockKernel_succ_eq_sum (m j : ℕ) :
   funext x
   have hx := congrArg (fun S : 𝓢(V, ℂ) => S x) h
   simp only [sum_apply, smul_apply] at hx
-  rw [Finset.sum_apply, hx, Pi.smul_apply, coe_schwartzDilate, coe_psiOneS,
+  rw [Finset.sum_apply, hx, Pi.smul_apply, coe_schwartzDilate, coe_lpBlockKernelOneS,
     dilate_lpBlockKernel_one]
 
 /-- The complex number `2^n` has absolute value `2^n`, by Mathlib's `enorm_pow` and
@@ -334,35 +335,36 @@ theorem isCZFamily_derivKernelFamily {m : ℕ} (i : Fin m → Fin (finrank ℝ V
 
 /-! ### The dual derivative families -/
 
-/-- The synthesis kernel `psiDual_j = (psiDualBase j)_{2^j}` as a Schwartz function. -/
-noncomputable def psiDualS (j : ℕ) : 𝓢(V, ℂ) :=
-  schwartzDilate (2 ^ j) (pow_ne_zero j two_ne_zero) (psiDualBase j)
+/-- The synthesis kernel `ψ̃_j = (G̃_j)_{2^j}`, `G̃_j = Rd.dualLpBlockKernelBase j`, as a Schwartz
+function. -/
+noncomputable def dualLpBlockKernelS (j : ℕ) : 𝓢(V, ℂ) :=
+  schwartzDilate (2 ^ j) (pow_ne_zero j two_ne_zero) (dualLpBlockKernelBase j)
 
-/-- The Schwartz function `Rd.psiDualS j` is the synthesis kernel `psiDual_j`. -/
-theorem coe_psiDualS (j : ℕ) : (psiDualS j : V → ℂ) = psiDual j := by
-  rw [psiDualS, coe_schwartzDilate, dilate_psiDualBase]
+/-- The Schwartz function `Rd.dualLpBlockKernelS j` is the synthesis kernel `ψ̃_j`. -/
+theorem coe_dualLpBlockKernelS (j : ℕ) : (dualLpBlockKernelS j : V → ℂ) = dualLpBlockKernel j := by
+  rw [dualLpBlockKernelS, coe_schwartzDilate, dilate_dualLpBlockKernelBase]
 
-/-- The **dual derivative bases** `∂^w psiDualBase_j = ∂_{w_0} ⋯ ∂_{w_{k-1}} psiDualBase_j` of
+/-- The **dual derivative bases** `∂^w G̃_j = ∂_{w_0} ⋯ ∂_{w_{k-1}} G̃_j` of
 the directions `w ∈ V^k`. -/
 noncomputable def derivDualBase {k : ℕ} (w : Fin k → V) (j : ℕ) : 𝓢(V, ℂ) :=
-  ∂^{w} (psiDualBase j)
+  ∂^{w} (dualLpBlockKernelBase j)
 
-/-- The **dual derivative family** `j ↦ (∂^w psiDualBase_j)_{2^j}`. -/
+/-- The **dual derivative family** `j ↦ (∂^w G̃_j)_{2^j}`. -/
 noncomputable def derivDualFamily {k : ℕ} (w : Fin k → V) (j : ℕ) : V → ℂ :=
   dilate (2 ^ j) (derivDualBase w j : V → ℂ)
 
 /-- **Derivatives of the synthesis kernels**:
-`∂^w psiDual_j = 2^{jk} (∂^w psiDualBase_j)_{2^j}` as functions
+`∂^w ψ̃_j = 2^{jk} (∂^w G̃_j)_{2^j}` as functions
 (`Rd.iteratedLineDerivOp_schwartzDilate` with `c = 2^j`). -/
-theorem iteratedLineDerivOp_psiDualS {k : ℕ} (w : Fin k → V) (j : ℕ) :
-    ⇑(∂^{w} (psiDualS (V := V) j)) = ((2 : ℂ) ^ (j * k)) • derivDualFamily w j := by
-  rw [psiDualS, iteratedLineDerivOp_schwartzDilate]
+theorem iteratedLineDerivOp_dualLpBlockKernelS {k : ℕ} (w : Fin k → V) (j : ℕ) :
+    ⇑(∂^{w} (dualLpBlockKernelS (V := V) j)) = ((2 : ℂ) ^ (j * k)) • derivDualFamily w j := by
+  rw [dualLpBlockKernelS, iteratedLineDerivOp_schwartzDilate]
   funext x
   rw [smul_apply, coe_schwartzDilate, Pi.smul_apply, derivDualFamily, derivDualBase]
   push_cast
   rw [pow_mul]
 
-/-- The seminorm bounds of the dual derivative bases `j ↦ ∂^w psiDualBase_j`: the larger of the
+/-- The seminorm bounds of the dual derivative bases `j ↦ ∂^w G̃_j`: the larger of the
 seminorms of `∂^w δ_2 Φ` (`j = 0, 1`) and `∂^w (δ_2 Φ - δ_{1/4} Φ)` (`j ≥ 2`). -/
 noncomputable def derivDualBound {k : ℕ} (w : Fin k → V) (a l : ℕ) : ℝ :=
   max (SchwartzMap.seminorm ℝ a l (derivDualBase w 0))
@@ -389,13 +391,13 @@ theorem derivDualOverlap_ne_top {k : ℕ} (w : Fin k → V) : derivDualOverlap w
   ENNReal.mul_ne_top ENNReal.ofNat_ne_top (ENNReal.pow_ne_top (ENNReal.mul_ne_top
     (ENNReal.pow_ne_top ENNReal.ofReal_ne_top) (ENNReal.prod_ne_top fun _ _ => enorm_ne_top)))
 
-/-- `𝓕(∂^w psiDualBase_j)_{2^j}(ξ) = (∏_l 2πi ⟪2^{-j} ξ, w_l⟫) 𝓕 psiDual_j(ξ)`. -/
+/-- `𝓕(∂^w G̃_j)_{2^j}(ξ) = (∏_l 2πi ⟪2^{-j} ξ, w_l⟫) 𝓕ψ̃_j(ξ)`. -/
 theorem fourier_derivDualFamily {k : ℕ} (w : Fin k → V) (j : ℕ) (ξ : V) :
     𝓕 (derivDualFamily w j) ξ = (∏ l, 2 * π * Complex.I *
-      (inner ℝ (((2 : ℝ) ^ j)⁻¹ • ξ) (w l) : ℂ)) * 𝓕 (psiDual (V := V) j) ξ := by
+      (inner ℝ (((2 : ℝ) ^ j)⁻¹ • ξ) (w l) : ℂ)) * 𝓕 (dualLpBlockKernel (V := V) j) ξ := by
   rw [derivDualFamily, fourier_dilate _ (by positivity), ← SchwartzMap.fourier_coe, derivDualBase,
     SchwartzMap.fourier_iteratedLineDerivOp_apply, smul_eq_mul, SchwartzMap.fourier_coe,
-    ← fourier_dilate _ (by positivity), dilate_psiDualBase]
+    ← fourier_dilate _ (by positivity), dilate_dualLpBlockKernelBase]
 
 omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- `|∏_l 2πi ⟪ζ, w_l⟫| ≤ (2πR)^k ∏_l ‖w_l‖` for `‖ζ‖ ≤ R`, by Cauchy–Schwarz. -/
@@ -420,42 +422,42 @@ theorem enorm_prod_inner_le {k : ℕ} (w : Fin k → V) {ζ : V} {R : ℝ} (hζ 
     ENNReal.ofReal_prod_of_nonneg fun l _ => norm_nonneg _]
   simp_rw [ofReal_norm]
 
-/-- `|𝓕(∂^w psiDualBase_j)_{2^j}(ξ)| ≤ (8π)^k (∏_l ‖w_l‖) |𝓕 psiDual_j(ξ)|`: where
-`𝓕 psiDual_j(ξ) ≠ 0`, `‖ξ‖ < 2^{j+2}` (`Rd.norm_lt_of_fourier_psiDual_ne_zero`), so
+/-- `|𝓕(∂^w G̃_j)_{2^j}(ξ)| ≤ (8π)^k (∏_l ‖w_l‖) |𝓕ψ̃_j(ξ)|`: where
+`𝓕ψ̃_j(ξ) ≠ 0`, `‖ξ‖ < 2^{j+2}` (`Rd.norm_lt_of_fourier_dualLpBlockKernel_ne_zero`), so
 `‖2^{-j} ξ‖ < 4`. -/
 theorem enorm_fourier_derivDualFamily_le {k : ℕ} (w : Fin k → V) (j : ℕ) (ξ : V) :
     ‖𝓕 (derivDualFamily w j) ξ‖ₑ ≤
-      ENNReal.ofReal (8 * π) ^ k * (∏ l, ‖w l‖ₑ) * ‖𝓕 (psiDual (V := V) j) ξ‖ₑ := by
+      ENNReal.ofReal (8 * π) ^ k * (∏ l, ‖w l‖ₑ) * ‖𝓕 (dualLpBlockKernel (V := V) j) ξ‖ₑ := by
   rw [fourier_derivDualFamily, enorm_mul]
-  by_cases h : 𝓕 (psiDual (V := V) j) ξ = 0
+  by_cases h : 𝓕 (dualLpBlockKernel (V := V) j) ξ = 0
   · rw [h, enorm_zero, mul_zero, mul_zero]
   · rw [show (8 : ℝ) * π = 2 * π * 4 by ring]
     gcongr
     refine enorm_prod_inner_le w ?_
-    have h1 := norm_lt_of_fourier_psiDual_ne_zero h
+    have h1 := norm_lt_of_fourier_dualLpBlockKernel_ne_zero h
     rw [norm_two_pow_inv_smul, div_le_iff₀ (by positivity)]
     rw [pow_add] at h1
     norm_num at h1
     linarith
 
 /-- **Overlap of a dual derivative family**:
-`∑_j |𝓕(∂^w psiDualBase_j)_{2^j}(ξ)|² ≤ 4 ((8π)^k ∏_l ‖w_l‖)²` for every `ξ`, by
+`∑_j |𝓕(∂^w G̃_j)_{2^j}(ξ)|² ≤ 4 ((8π)^k ∏_l ‖w_l‖)²` for every `ξ`, by
 comparison with the synthesis kernels (`Rd.enorm_fourier_derivDualFamily_le`,
-`Rd.tsum_fourier_psiDual_sq_le`). -/
+`Rd.tsum_fourier_dualLpBlockKernel_sq_le`). -/
 theorem tsum_fourier_derivDualFamily_sq_le {k : ℕ} (w : Fin k → V) (ξ : V) :
     ∑' j, ‖𝓕 (derivDualFamily w j) ξ‖ₑ ^ 2 ≤ derivDualOverlap w :=
   calc ∑' j, ‖𝓕 (derivDualFamily w j) ξ‖ₑ ^ 2
       ≤ ∑' j, (ENNReal.ofReal (8 * π) ^ k * ∏ l, ‖w l‖ₑ) ^ 2 *
-          ‖𝓕 (psiDual (V := V) j) ξ‖ₑ ^ 2 :=
+          ‖𝓕 (dualLpBlockKernel (V := V) j) ξ‖ₑ ^ 2 :=
         ENNReal.tsum_le_tsum fun j => by
           rw [← mul_pow]
           gcongr
           exact enorm_fourier_derivDualFamily_le w j ξ
     _ = (ENNReal.ofReal (8 * π) ^ k * ∏ l, ‖w l‖ₑ) ^ 2 *
-          ∑' j, ‖𝓕 (psiDual (V := V) j) ξ‖ₑ ^ 2 := ENNReal.tsum_mul_left
+          ∑' j, ‖𝓕 (dualLpBlockKernel (V := V) j) ξ‖ₑ ^ 2 := ENNReal.tsum_mul_left
     _ ≤ (ENNReal.ofReal (8 * π) ^ k * ∏ l, ‖w l‖ₑ) ^ 2 * 4 := by
         gcongr
-        exact tsum_fourier_psiDual_sq_le ξ
+        exact tsum_fourier_dualLpBlockKernel_sq_le ξ
     _ = derivDualOverlap w := by rw [derivDualOverlap, mul_comm]
 
 /-- **The dual derivative families are Calderón–Zygmund families** with overlap

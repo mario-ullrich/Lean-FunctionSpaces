@@ -316,15 +316,15 @@ variable [Nontrivial V]
 /-- **Every value of the Neumann space comes from `H^1(Ω)`**: for a bounded Lipschitz domain `Ω`
 in dimension `n ≥ 1` and every `u = (f, g)` in the Neumann space, `f = u_R|_Ω` for some
 `u_R ∈ H^1(Ω)`. The extension operator maps the jet of `u` to a jet `(F, G)` of `W^1_2(V)` with
-`F = f` on `Ω` (`Rd.BoundedLipschitzDomain.memWSobolev_sobolevExtensionL`,
+`F = f` on `Ω` (`Rd.BoundedLipschitzDomain.memSobolevW_sobolevExtensionL`,
 `Rd.BoundedLipschitzDomain.sobolevExtensionL_fst_ae_eq`), and `u_R = F|_Ω`. -/
 theorem exists_restrictL2_eq_neumannEmbedding (u : neumannSpace Ω.toOpens) :
     ∃ uR : RestrictionSpace 1 Ω.toOpens,
       restrictL2 Ω.toOpens uR = neumannEmbedding Ω.toOpens u := by
-  have hF := Ω.memWSobolev_sobolevExtensionL (neumannSpace.toJet Ω.toOpens u)
+  have hF := Ω.memSobolevW_sobolevExtensionL (neumannSpace.toJet Ω.toOpens u)
   have hFf := Ω.sobolevExtensionL_fst_ae_eq (neumannSpace.toJet Ω.toOpens u)
   set F := (Ω.sobolevExtensionL 2 (neumannSpace.toJet Ω.toOpens u)).1.1
-  have hS := (memWSobolev_one_iff F).1 hF
+  have hS := (memSobolevW_one_iff F).1 hF
   have hU : toL2 hS.toBesselPotentialSpace = F :=
     toL2_eq_of_toDistr_eq _ hS.toBesselPotentialSpace_toDistr.symm
   refine ⟨restrictProj 1 Ω.toOpens hS.toBesselPotentialSpace, ?_⟩

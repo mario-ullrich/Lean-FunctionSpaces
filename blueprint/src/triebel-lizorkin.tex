@@ -299,7 +299,7 @@ into a Hausdorff space that agree on a dense set are equal.
 
 \begin{definition}[Blocks of tempered distributions]
 \label{def:distrib-block}
-\lean{Rd.fourier_psiS_apply, Rd.distribBlock}
+\lean{Rd.fourier_lpBlockKernelS_apply, Rd.distribBlock}
 \leanok
 \uses{def:psi-base, lem:psi-base, def:schwartz-dilate, def:lp-kernels}
 For every $j \in \N$ and every tempered distribution $u$ on $V$ let
@@ -324,8 +324,8 @@ $\psi_j * f \in L_r(V)$ of \Cref{def:lp-blocks}.
 
 \begin{theorem}[Littlewood--Paley decomposition of tempered distributions]
 \label{thm:distrib-block-decomposition}
-\lean{Rd.sum_fourier_psiS_apply, Rd.sum_distribBlock, Rd.smulLeftCLM_sum_fourier_psiS,
-  Rd.tendsto_sum_distribBlock}
+\lean{Rd.sum_fourier_lpBlockKernelS_apply, Rd.sum_distribBlock,
+  Rd.smulLeftCLM_sum_fourier_lpBlockKernelS, Rd.tendsto_sum_distribBlock}
 \leanok
 \uses{def:distrib-block, lem:fourier-psi-window, lem:lp-kernels-frequency, def:schwartz-cutoff,
   lem:schwartz-cutoff-tendsto}
@@ -891,15 +891,15 @@ and $2^{-(k-j)L} \leq 2^L \, 2^{-(i-j)L}$ for $k \in \{i - 1, i\}$
 
 \begin{theorem}[The cross kernel of local means and band-limiting kernels]
 \label{thm:cross-kernel-theta}
-\lean{Rd.LocalMeansBump.enorm_mul_higherDiff_Theta_le,
+\lean{Rd.LocalMeansBump.enorm_mul_higherDiff_dilatedBandKernel_le,
   Rd.LocalMeansBump.ae_enorm_dilatedBandKernel_sub_conv_scaledMoment_le,
-  Rd.LocalMeansBump.kernelThetaMomentConst, Rd.LocalMeansBump.kernelThetaMomentConst_ne_top,
+  Rd.LocalMeansBump.crossBandMomentConst, Rd.LocalMeansBump.crossBandMomentConst_ne_top,
   Rd.LocalMeansBump.ae_enorm_conv_meansKernel_dilatedBandKernel_le_of_lt,
-  Rd.LocalMeansBump.kernelThetaSupportConst, Rd.LocalMeansBump.kernelThetaSupportConst_ne_top,
+  Rd.LocalMeansBump.crossBandSupportConst, Rd.LocalMeansBump.crossBandSupportConst_ne_top,
   Rd.LocalMeansBump.lintegral_dilatedBandKernel_mul_meansKernel_le_near,
   Rd.LocalMeansBump.lintegral_dilatedBandKernel_mul_meansKernel_le_far,
   Rd.LocalMeansBump.enorm_conv_meansKernel_dilatedBandKernel_le_of_le,
-  Rd.LocalMeansBump.kernelThetaConst, Rd.LocalMeansBump.kernelThetaConst_ne_top,
+  Rd.LocalMeansBump.crossBandConst, Rd.LocalMeansBump.crossBandConst_ne_top,
   Rd.LocalMeansBump.enorm_conv_meansKernel_dilatedBandKernel_le}
 \leanok
 \uses{lem:local-means-kernel-bounds, lem:local-means-one-scale, lem:conv-second-argument,
@@ -974,7 +974,7 @@ and \Cref{lem:conv-of-fourier} applies to the bounded continuous kernel $\mu_{2^
 
 \begin{lemma}[Decay of the Littlewood--Paley blocks]
 \label{lem:lp-blocks-decay}
-\lean{Rd.psiDecayConst, Rd.psiDecayConst_ne_top, Rd.enorm_lpBlockKernel_le}
+\lean{Rd.lpBlockKernelDecayConst, Rd.lpBlockKernelDecayConst_ne_top, Rd.enorm_lpBlockKernel_le}
 \leanok
 \uses{lem:schwartz-decay, lem:peetre-weights, def:lp-kernels}
 For every $N \in \N$ let $P_N = (1 + 2^N) C_{\Phi,0,N} < \infty$. For every $j \in \N$ and every
@@ -1048,13 +1048,13 @@ $2^{iL'} 2^{-j'L'} = 4^{L'} 2^{-(j'+2-i)L'}$ (\Cref{lem:dyadic-weights-integer})
 
 \begin{theorem}[The cross kernel of blocks and dual kernels]
 \label{thm:cross-kernel-dual}
-\lean{Rd.LocalMeansBump.psiDualSupportConst, Rd.LocalMeansBump.psiDualSupportConst_ne_top,
+\lean{Rd.LocalMeansBump.crossDualSupportConst, Rd.LocalMeansBump.crossDualSupportConst_ne_top,
   Rd.LocalMeansBump.lintegral_enorm_dualKernel_le,
   Rd.LocalMeansBump.enorm_conv_lpBlockKernel_dualKernel_le_of_lt,
   Rd.LocalMeansBump.enorm_conv_lpBlockKernel_dualKernel_le_of_le_one,
   Rd.LocalMeansBump.conv_lpBlockKernel_dualKernel_ae_eq,
   Rd.LocalMeansBump.ae_enorm_conv_lpBlockKernel_dualKernel_le_of_two_le,
-  Rd.LocalMeansBump.psiDualConst, Rd.LocalMeansBump.psiDualConst_ne_top,
+  Rd.LocalMeansBump.crossDualConst, Rd.LocalMeansBump.crossDualConst_ne_top,
   Rd.LocalMeansBump.enorm_conv_lpBlockKernel_dualKernel_le}
 \leanok
 \uses{lem:lp-blocks-decay, lem:small-support-decay, lem:dual-averaged-differences,
@@ -3176,7 +3176,7 @@ vanishes outside the ball of radius $2$ (\Cref{lem:lp-kernels-basic}).
 
 \begin{definition}[The blocks as dilates]
 \label{def:psi-base}
-\lean{Rd.psiBase, Rd.psiBaseBound, Rd.psiBaseBound_nonneg}
+\lean{Rd.lpBlockKernelBase, Rd.lpBlockKernelBaseBound, Rd.lpBlockKernelBaseBound_nonneg}
 \leanok
 \uses{def:lp-kernels, def:schwartz-dilate}
 Let $G^{\psi}_0 = \Phi$ and $G^{\psi}_j = \Phi - \delta_{1/2} \Phi$ for $j \geq 1$, and for
@@ -3186,7 +3186,8 @@ $\sup_x \|x\|^k \|D^l \Phi(x)\|$ and $\sup_x \|x\|^k \|D^l (\Phi - \delta_{1/2} 
 
 \begin{lemma}[The blocks form a uniform family]
 \label{lem:psi-base}
-\lean{Rd.dilate_psiBase, Rd.psiS, Rd.coe_psiS, Rd.isUniformSchwartz_psiBase}
+\lean{Rd.dilate_lpBlockKernelBase, Rd.lpBlockKernelS, Rd.coe_lpBlockKernelS,
+  Rd.isUniformSchwartz_lpBlockKernelBase}
 \leanok
 \uses{def:psi-base, lem:dilate-sub-l1, def:moment-kernel, lem:uniform-schwartz-constants}
 For every $j \in \N$, $\psi_j = (G^{\psi}_j)_{2^j}$, a Schwartz function, and $(G^{\psi}_j)$ is
@@ -3220,7 +3221,8 @@ nonzero at $\xi$, each of modulus at most $1$. \Cref{thm:cz-family-dilation} and
 
 \begin{definition}[Synthesis kernels]
 \label{def:psi-dual}
-\lean{Rd.psiDual, Rd.psiDualBase, Rd.psiDualBaseBound, Rd.psiDualBaseBound_nonneg}
+\lean{Rd.dualLpBlockKernel, Rd.dualLpBlockKernelBase, Rd.dualLpBlockKernelBaseBound,
+  Rd.dualLpBlockKernelBaseBound_nonneg}
 \leanok
 \uses{def:lp-kernels, def:schwartz-dilate}
 Let $\tilde\psi_0 = \Phi_1$, $\tilde\psi_1 = \Phi_2$ and
@@ -3233,9 +3235,10 @@ $\sup_x \|x\|^k \|D^l (\delta_2 \Phi - \delta_{1/4} \Phi)(x)\|$.
 
 \begin{lemma}[Properties of the synthesis kernels]
 \label{lem:psi-dual-basic}
-\lean{Rd.dilate_psiDualBase, Rd.isUniformSchwartz_psiDualBase, Rd.integrable_psiDual,
-  Rd.continuous_psiDual, Rd.bddAbove_psiDual, Rd.integrable_fourier_psiDual,
-  Rd.eLpNorm_psiDual_one_le, Rd.fourier_psiDual_add_two}
+\lean{Rd.dilate_dualLpBlockKernelBase, Rd.isUniformSchwartz_dualLpBlockKernelBase,
+  Rd.integrable_dualLpBlockKernel, Rd.continuous_dualLpBlockKernel, Rd.bddAbove_dualLpBlockKernel,
+  Rd.integrable_fourier_dualLpBlockKernel, Rd.eLpNorm_dualLpBlockKernel_one_le,
+  Rd.fourier_dualLpBlockKernel_add_two}
 \leanok
 \uses{def:psi-dual, lem:dilate-sub-l1, def:moment-kernel, lem:uniform-schwartz-constants,
   lem:dilate, lem:fourier-dilate, lem:lp-kernels-basic, lem:fourier-conv}
@@ -3257,7 +3260,7 @@ $\|\Phi_k\|_1 = \|\Phi\|_1$ (\Cref{lem:lp-kernels-basic}).
 
 \begin{lemma}[The synthesis kernels reproduce the blocks]
 \label{lem:psi-dual-reproduces}
-\lean{Rd.fourier_psiDual_mul_lpBlockKernel, Rd.conv_psiDual_lpBlockKernel}
+\lean{Rd.fourier_dualLpBlockKernel_mul_lpBlockKernel, Rd.conv_dualLpBlockKernel_lpBlockKernel}
 \leanok
 \uses{lem:psi-dual-basic, lem:fourier-phi-values, lem:lp-kernels-frequency,
   lem:conv-of-fourier}
@@ -3275,8 +3278,8 @@ $\widehat{\tilde\psi_j}(\xi) = 1$. The convolution identity follows by \Cref{lem
 
 \begin{lemma}[Frequencies of the synthesis kernels]
 \label{lem:psi-dual-frequency}
-\lean{Rd.enorm_fourier_psiDual_le_one, Rd.norm_lt_of_fourier_psiDual_ne_zero,
-  Rd.lt_norm_of_fourier_psiDual_ne_zero, Rd.mem_Icc_of_fourier_psiDual_ne_zero}
+\lean{Rd.enorm_fourier_dualLpBlockKernel_le_one, Rd.norm_lt_of_fourier_dualLpBlockKernel_ne_zero,
+  Rd.lt_norm_of_fourier_dualLpBlockKernel_ne_zero, Rd.mem_Icc_of_fourier_dualLpBlockKernel_ne_zero}
 \leanok
 \uses{lem:psi-dual-basic, lem:fourier-phi-values, lem:lp-kernels-frequency}
 For every $j \in \N$ and every $\xi \in V$, $|\widehat{\tilde\psi_j}(\xi)| \leq 1$, and if
@@ -3296,7 +3299,7 @@ minimality of $a$, and for $j \geq 2$, $2^{j-2} < \|\xi\| < 2^{a+1}$, so $j \leq
 
 \begin{theorem}[The synthesis kernels form a Calder\'on--Zygmund family]
 \label{thm:cz-family-psi-dual}
-\lean{Rd.tsum_fourier_psiDual_sq_le, Rd.isCZFamily_psiDual}
+\lean{Rd.tsum_fourier_dualLpBlockKernel_sq_le, Rd.isCZFamily_dualLpBlockKernel}
 \leanok
 \uses{lem:psi-dual-basic, lem:psi-dual-frequency, thm:cz-family-dilation}
 For every $\xi \in V$, $\sum_j |\widehat{\tilde\psi_j}(\xi)|^2 \leq 4$, and $(\tilde\psi_j)$ is a
@@ -4232,8 +4235,8 @@ bounds its analysis operator.
 
 \begin{lemma}[The reproducing formula]
 \label{lem:square-function-reproducing}
-\lean{Rd.conv_psiDual_blockFun_ae, Rd.sum_conv_psiDual_blockFun_ae,
-  Rd.tendsto_eLpNorm_sum_conv_psiDual_blockFun_sub}
+\lean{Rd.conv_dualLpBlockKernel_blockFun_ae, Rd.sum_conv_dualLpBlockKernel_blockFun_ae,
+  Rd.tendsto_eLpNorm_sum_conv_dualLpBlockKernel_blockFun_sub}
 \leanok
 \uses{def:triebel-lizorkin, lem:conv-assoc, lem:psi-dual-reproduces, lem:lp-blocks,
   lem:lp-kernels-basic, lem:psi-dual-basic}
@@ -4342,7 +4345,7 @@ measurable $G$.
 \begin{lemma}[The far mass of dilation families]
 \label{lem:torus-far-mass-dilate}
 \lean{Rd.inv_one_add_ofReal_two_pow_le, Torus.farMass_dilate_le, Torus.farMass_lpBlockKernel_le,
-  Torus.farMass_psiDual_le}
+  Torus.farMass_dualLpBlockKernel_le}
 \leanok
 \uses{def:torus-far-mass, def:uniform-schwartz, lem:schwartz-tails,
   lem:uniform-schwartz-constants, def:psi-base, lem:psi-base, def:psi-dual, lem:psi-dual-basic}

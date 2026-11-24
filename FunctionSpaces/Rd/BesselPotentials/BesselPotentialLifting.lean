@@ -25,10 +25,11 @@ distribution by `⟨ξ⟩^s = (1 + ‖ξ‖²)^{s/2}`, and `f` lies in Mathlib's
   and `η ⋆ g = (m(D) η) ⋆ h` whenever `g = m(D) h` (`Rd.conv_eq_conv_fourierMultiplierCLM`); for
   the Bessel weight, `Rd.conv_eq_conv_besselSchwartz`. Moreover `J_s (η ⋆ F) = (J_s η) ⋆ F`
   (`Rd.besselPotential_toLp_conv`).
-* **Bessel kernels of the Littlewood–Paley kernels**: `J_σ` maps the dilates of `psiBase j`
-  and `psiDualBase j` to dyadic multiples of dilated Bessel kernels (`Rd.besselBase`), which form
-  Calderón–Zygmund families (`Rd.exists_isCZFamily_besselBase_psiBase`,
-  `Rd.exists_isCZFamily_besselBase_psiDualBase`).
+* **Bessel kernels of the Littlewood–Paley kernels**: `J_σ` maps the dilates of
+  `lpBlockKernelBase j` and `dualLpBlockKernelBase j` to dyadic multiples of dilated Bessel kernels
+  (`Rd.besselBase`), which form Calderón–Zygmund families
+  (`Rd.exists_isCZFamily_besselBase_lpBlockKernelBase`,
+  `Rd.exists_isCZFamily_besselBase_dualLpBlockKernelBase`).
 * **`F^s_{p,2} ⊆ H^{s,p}` for every real `s`**
   (`Rd.exists_besselPotential_eq_of_memTriebelLizorkin`), also in Mathlib's bundled space
   (`Rd.exists_enorm_toBesselPotentialSpace_le`): `J_s f` is the `L_p` limit of the synthesis
@@ -39,7 +40,7 @@ distribution by `⟨ξ⟩^s = (1 + ‖ξ‖²)^{s/2}`, and `f` lies in Mathlib's
   `J_s f ∈ L_p` is an `L_p` function (`Rd.exists_memTriebelLizorkin_of_besselPotential_eq`), also
   for Mathlib's bundled space (`Rd.exists_memTriebelLizorkin_toDistr`).
 * **The identities**: `Rd.memTriebelLizorkin_iff_memSobolev_bessel` (`f ∈ L_p`, every real `s`)
-  and `Rd.memWSobolev_iff_memSobolev_bessel` (`W^m_p = H^{m,p}`).
+  and `Rd.memSobolevW_iff_memSobolev_bessel` (`W^m_p = H^{m,p}`).
 -/
 
 @[expose] public section
@@ -303,33 +304,34 @@ theorem exists_isCZFamily_besselBase {ω : ℕ → 𝓢(V, ℂ)} {M N : ℕ} {a 
   · rw [besselBase, hω j hj]
 
 /-- **The Bessel kernels of the synthesis kernels form a Calderón–Zygmund family**: for every
-real `σ` there are finite `B`, `H` such that the dilated Bessel kernels of `psiDualBase` form a
-Calderón–Zygmund family with overlap `B` and Hörmander constant `H`. The family `psiDualBase` is
-constant from `2` on, with Fourier transform in `{1/4 ≤ ‖ζ‖ ≤ 2^4 · 1/4}`
-(`Rd.mem_annulus_of_fourier_psiDualBase_ne_zero`). -/
-theorem exists_isCZFamily_besselBase_psiDualBase (σ : ℝ) :
+real `σ` there are finite `B`, `H` such that the dilated Bessel kernels of `dualLpBlockKernelBase`
+form a Calderón–Zygmund family with overlap `B` and Hörmander constant `H`. The family
+`dualLpBlockKernelBase` is constant from `2` on, with Fourier transform in `{1/4 ≤ ‖ζ‖ ≤ 2^4 · 1/4}`
+(`Rd.mem_annulus_of_fourier_dualLpBlockKernelBase_ne_zero`). -/
+theorem exists_isCZFamily_besselBase_dualLpBlockKernelBase (σ : ℝ) :
     ∃ B H : ℝ≥0∞, B ≠ ∞ ∧ H ≠ ∞ ∧
-      IsCZFamily (fun j => dilate (2 ^ j) (besselBase σ (psiDualBase (V := V)) j : V → ℂ))
+      IsCZFamily (fun j => dilate (2 ^ j) (besselBase σ (dualLpBlockKernelBase (V := V)) j : V → ℂ))
         B H :=
   exists_isCZFamily_besselBase (M := 2) (N := 4) (by norm_num : (0 : ℝ) < 4⁻¹)
     (fun j hj => by
       obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le' hj
       rfl)
-    (fun _ h => mem_annulus_of_fourier_psiDualBase_ne_zero (j := 0) h) σ
+    (fun _ h => mem_annulus_of_fourier_dualLpBlockKernelBase_ne_zero (j := 0) h) σ
 
 /-- **The Bessel kernels of the blocks form a Calderón–Zygmund family**: for every real `σ`
-there are finite `B`, `H` such that the dilated Bessel kernels of `psiBase` form a
-Calderón–Zygmund family with overlap `B` and Hörmander constant `H`. The family `psiBase` is
-constant from `1` on, with Fourier transform in `{1/2 ≤ ‖ζ‖ ≤ 2^2 · 1/2}`
-(`Rd.mem_annulus_of_fourier_psiBase_ne_zero`). -/
-theorem exists_isCZFamily_besselBase_psiBase (σ : ℝ) :
+there are finite `B`, `H` such that the dilated Bessel kernels of `lpBlockKernelBase` form a
+Calderón–Zygmund family with overlap `B` and Hörmander constant `H`. The family `lpBlockKernelBase`
+is constant from `1` on, with Fourier transform in `{1/2 ≤ ‖ζ‖ ≤ 2^2 · 1/2}`
+(`Rd.mem_annulus_of_fourier_lpBlockKernelBase_ne_zero`). -/
+theorem exists_isCZFamily_besselBase_lpBlockKernelBase (σ : ℝ) :
     ∃ B H : ℝ≥0∞, B ≠ ∞ ∧ H ≠ ∞ ∧
-      IsCZFamily (fun j => dilate (2 ^ j) (besselBase σ (psiBase (V := V)) j : V → ℂ)) B H :=
+      IsCZFamily (fun j => dilate (2 ^ j) (besselBase σ (lpBlockKernelBase (V := V)) j : V → ℂ))
+        B H :=
   exists_isCZFamily_besselBase (M := 1) (N := 2) (by norm_num : (0 : ℝ) < 2⁻¹)
     (fun j hj => by
       obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le' hj
       rfl)
-    (fun _ h => mem_annulus_of_fourier_psiBase_ne_zero (j := 0) h) σ
+    (fun _ h => mem_annulus_of_fourier_lpBlockKernelBase_ne_zero (j := 0) h) σ
 
 omit [Fact (1 ≤ p)] in
 /-- **Convolution with the Bessel potential of a dilate**: for a family `(ω_j)` of Schwartz
@@ -379,23 +381,24 @@ real `s` there is a finite constant `C` such that for every `f ∈ F^s_{p,2}(V)`
 potential `J_s f` is an `L_p` function `h` with `‖h‖_p ≤ C ‖f‖_{F^s_{p,2}}`; the constant is
 existential. The function `h` is the limit of the synthesis sums
 `∑_{j < J} (J_s ψ̃_j) ⋆ (ψ_j ⋆ f)`, which converge by the synthesis bound of the dilated Bessel
-kernels of `psiDualBase` (`Rd.exists_isCZFamily_besselBase_psiDualBase`,
+kernels of `dualLpBlockKernelBase` (`Rd.exists_isCZFamily_besselBase_dualLpBlockKernelBase`,
 `Rd.eLpNorm_sum_conv_besselSchwartz_le`, `Rd.exists_tendsto_sum_conv_blockFun`); the sums
-without `J_s` tend to `f` (`Rd.tendsto_eLpNorm_sum_conv_psiDual_blockFun_sub`), so
+without `J_s` tend to `f` (`Rd.tendsto_eLpNorm_sum_conv_dualLpBlockKernel_blockFun_sub`), so
 `J_s f = h` (`Rd.besselPotential_eq_of_tendsto`). -/
 theorem exists_besselPotential_eq_of_memTriebelLizorkin [Nontrivial V] (hp1 : 1 < p)
     (hp : p ≠ ∞) (s : ℝ) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ f : Lp ℂ p (volume : Measure V), MemTriebelLizorkin s 2 f →
       ∃ h : Lp ℂ p (volume : Measure V), besselPotential V ℂ s (f : 𝓢'(V, ℂ)) = h ∧
         ‖h‖ₑ ≤ C * triebelLizorkinNorm s 2 f := by
-  obtain ⟨B, H, hB, hH, hθ⟩ := exists_isCZFamily_besselBase_psiDualBase (V := V) s
+  obtain ⟨B, H, hB, hH, hθ⟩ := exists_isCZFamily_besselBase_dualLpBlockKernelBase (V := V) s
   refine ⟨czConst V p B H, czConst_ne_top hp1 hp hB hH, fun f hf => ?_⟩
   obtain ⟨h, hlim, hnorm⟩ := exists_tendsto_sum_conv_blockFun hp
-    (K := fun j => besselSchwartz s (psiDualS j)) (czConst_ne_top hp1 hp hB hH) hf
+    (K := fun j => besselSchwartz s (dualLpBlockKernelS j)) (czConst_ne_top hp1 hp hB hH) hf
     fun t => eLpNorm_sum_conv_besselSchwartz_le hp1 hp hθ t fun j => memLp_blockFun hp j f
-  refine ⟨h, besselPotential_eq_of_tendsto hp s (η := psiDualS)
+  refine ⟨h, besselPotential_eq_of_tendsto hp s (η := dualLpBlockKernelS)
     (fun j => memLp_blockFun hp j f) ?_ hlim, hnorm⟩
-  simpa only [coe_psiDualS] using tendsto_eLpNorm_sum_conv_psiDual_blockFun_sub hp f
+  simpa only [coe_dualLpBlockKernelS] using
+    tendsto_eLpNorm_sum_conv_dualLpBlockKernel_blockFun_sub hp f
 
 /-- **`F^s_{p,2} ⊆ H^{s,p}`**: in dimension `n ≥ 1`, for `1 < p < ∞` and real `s`, every
 `f ∈ F^s_{p,2}(V)` lies in Mathlib's Bessel potential space: `J_s f ∈ L_p(V)`
@@ -412,13 +415,14 @@ theorem memSobolev_bessel_of_memTriebelLizorkin [Nontrivial V] (hp1 : 1 < p) (hp
 /-- **The blocks of a Bessel potential**: if `g ∈ L_q(V)` and `h ∈ L_r(V)` satisfy
 `g = J_{-s} h` as tempered distributions, then for every `j` and `x`,
 `2^{js} |(ψ_j ⋆ g)(x)| = |((K^{-s}_j)_{2^j} ⋆ h)(x)|` with the Bessel kernels `K^{-s}_j` of
-`psiBase` (`Rd.conv_eq_conv_besselSchwartz`, `Rd.conv_besselSchwartz_schwartzDilate`). -/
+`lpBlockKernelBase` (`Rd.conv_eq_conv_besselSchwartz`, `Rd.conv_besselSchwartz_schwartzDilate`). -/
 theorem dyadicWeight_mul_enorm_blockFun_eq {q r : ℝ≥0∞} [Fact (1 ≤ q)] [Fact (1 ≤ r)] {s : ℝ}
     {g : Lp ℂ q (volume : Measure V)} {h : Lp ℂ r (volume : Measure V)}
     (hgh : (g : 𝓢'(V, ℂ)) = besselPotential V ℂ (-s) (h : 𝓢'(V, ℂ))) (j : ℕ) (x : V) :
     dyadicWeight s j * ‖blockFun j g x‖ₑ =
-      ‖conv (dilate (2 ^ j) (besselBase (-s) (psiBase (V := V)) j : V → ℂ)) h volume x‖ₑ := by
-  rw [blockFun, ← coe_psiS, psiS, conv_eq_conv_besselSchwartz hgh,
+      ‖conv (dilate (2 ^ j) (besselBase (-s) (lpBlockKernelBase (V := V)) j : V → ℂ)) h
+        volume x‖ₑ := by
+  rw [blockFun, ← coe_lpBlockKernelS, lpBlockKernelS, conv_eq_conv_besselSchwartz hgh,
     conv_besselSchwartz_schwartzDilate, conv_smul, Pi.smul_apply, smul_eq_mul, enorm_mul,
     enorm_two_pow_rpow, ← mul_assoc, ENNReal.dyadicWeight_neg,
     ENNReal.mul_inv_cancel (ENNReal.dyadicWeight_ne_zero s j) (ENNReal.dyadicWeight_ne_top s j),
@@ -428,15 +432,15 @@ theorem dyadicWeight_mul_enorm_blockFun_eq {q r : ℝ≥0∞} [Fact (1 ≤ q)] [
 and every real `s` there is a finite constant `C` such that `‖g‖_{F^s_{p,2}} ≤ C ‖h‖_p` for all
 `g, h ∈ L_p(V)` with `J_s g = h`; the constant is existential. Since `g = J_{-s} h` (Mathlib's
 `TemperedDistribution.besselPotential_neg_apply_eq_iff`), the weighted blocks of `g` are the
-convolutions of `h` with the dilated Bessel kernels of `psiBase` of order `-s`
+convolutions of `h` with the dilated Bessel kernels of `lpBlockKernelBase` of order `-s`
 (`Rd.dyadicWeight_mul_enorm_blockFun_eq`), a Calderón–Zygmund family
-(`Rd.exists_isCZFamily_besselBase_psiBase`), and the analysis bound applies
+(`Rd.exists_isCZFamily_besselBase_lpBlockKernelBase`), and the analysis bound applies
 (`Rd.IsCZFamily.eLpNorm_lqNorm_conv_le`). -/
 theorem exists_triebelLizorkinNorm_le_of_besselPotential_eq [Nontrivial V] (hp1 : 1 < p)
     (hp : p ≠ ∞) (s : ℝ) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ g h : Lp ℂ p (volume : Measure V),
       besselPotential V ℂ s (g : 𝓢'(V, ℂ)) = h → triebelLizorkinNorm s 2 g ≤ C * ‖h‖ₑ := by
-  obtain ⟨B, H, hB, hH, hθ⟩ := exists_isCZFamily_besselBase_psiBase (V := V) (-s)
+  obtain ⟨B, H, hB, hH, hθ⟩ := exists_isCZFamily_besselBase_lpBlockKernelBase (V := V) (-s)
   refine ⟨czConst V p B H, czConst_ne_top hp1 hp hB hH, fun g h hgh => ?_⟩
   have hg : (g : 𝓢'(V, ℂ)) = besselPotential V ℂ (-s) (h : 𝓢'(V, ℂ)) :=
     ((TemperedDistribution.besselPotential_neg_apply_eq_iff s _ _).2 hgh).symm
@@ -520,11 +524,11 @@ theorem memTriebelLizorkin_iff_memSobolev_bessel [Nontrivial V] (hp1 : 1 < p) (h
 /-- **`W^m_p = H^{m,p}` (Calderón)**: in dimension `n ≥ 1`, for `1 < p < ∞`, `m ∈ ℕ` and
 `f ∈ L_p(V)`, `f` lies in the Sobolev space `W^m_p(V)` of weak derivatives iff it lies in
 Mathlib's Bessel potential space `H^{m,p}(V)`: both are `F^m_{p,2}(V)`
-(`Rd.memWSobolev_iff_memTriebelLizorkin`, `Rd.memTriebelLizorkin_iff_memSobolev_bessel`). -/
-theorem memWSobolev_iff_memSobolev_bessel [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {m : ℕ}
+(`Rd.memSobolevW_iff_memTriebelLizorkin`, `Rd.memTriebelLizorkin_iff_memSobolev_bessel`). -/
+theorem memSobolevW_iff_memSobolev_bessel [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {m : ℕ}
     (f : Lp ℂ p (volume : Measure V)) :
-    MemWSobolev m f ↔ TemperedDistribution.MemSobolev (m : ℝ) p (f : 𝓢'(V, ℂ)) := by
-  rw [memWSobolev_iff_memTriebelLizorkin hp1 hp,
+    MemSobolevW m f ↔ TemperedDistribution.MemSobolev (m : ℝ) p (f : 𝓢'(V, ℂ)) := by
+  rw [memSobolevW_iff_memTriebelLizorkin hp1 hp,
     memTriebelLizorkin_iff_memSobolev_bessel hp1 hp]
 
 end Rd

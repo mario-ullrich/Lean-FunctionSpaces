@@ -45,10 +45,10 @@ Littlewood–Paley kernels are `Φ_k = δ_{2^k} Φ`.
   for the overlap).
 * **Adjoints**: `θ_j^*(x) = conj θ_j(-x)` has the same overlap and Hörmander constants
   (`Rd.IsCZFamily.adjoint`).
-* **The Littlewood–Paley families**: the blocks `ψ_j = (psiBase j)_{2^j}`, Schwartz functions
-  (`Rd.psiS`), with overlap `2` (`Rd.isCZFamily_lpBlockKernel`), and the synthesis kernels
-  `Rd.psiDual` with `psiDual_j ⋆ ψ_j = ψ_j` (`Rd.conv_psiDual_lpBlockKernel`,
-  `Rd.isCZFamily_psiDual`, overlap `4`).
+* **The Littlewood–Paley families**: the blocks `ψ_j = (lpBlockKernelBase j)_{2^j}`, Schwartz
+  functions (`Rd.lpBlockKernelS`), with overlap `2` (`Rd.isCZFamily_lpBlockKernel`), and the
+  synthesis kernels `ψ̃_j = Rd.dualLpBlockKernel j` with `ψ̃_j ⋆ ψ_j = ψ_j`
+  (`Rd.conv_dualLpBlockKernel_lpBlockKernel`, `Rd.isCZFamily_dualLpBlockKernel`, overlap `4`).
 -/
 
 @[expose] public section
@@ -645,47 +645,51 @@ theorem norm_fourier_dilatedLpKernel_sub_le_one (k l : ℕ) (ξ : V) :
   rw [ht, hu, ← Complex.ofReal_sub, Complex.norm_real, Real.norm_eq_abs, abs_sub_le_iff]
   constructor <;> linarith
 
-/-- The Schwartz functions behind the blocks: `psiBase 0 = Φ` and
-`psiBase (j+1) = Φ - δ_{1/2} Φ`, with the dilation `δ_c F(x) = c^n F(c x)`, so that
-`ψ_j = δ_{2^j} (psiBase j)` (`Rd.dilate_psiBase`). -/
-noncomputable def psiBase : ℕ → 𝓢(V, ℂ)
+/-- The Schwartz functions behind the blocks: `lpBlockKernelBase 0 = Φ` and
+`lpBlockKernelBase (j+1) = Φ - δ_{1/2} Φ`, with the dilation `δ_c F(x) = c^n F(c x)`, so that
+`ψ_j = δ_{2^j} (lpBlockKernelBase j)` (`Rd.dilate_lpBlockKernelBase`). -/
+noncomputable def lpBlockKernelBase : ℕ → 𝓢(V, ℂ)
   | 0 => lpKernelS
   | _ + 1 => lpKernelS - schwartzDilate (1 / 2) (by norm_num) lpKernelS
 
-/-- **The blocks are dilates**: `ψ_j = (psiBase j)_{2^j}`. -/
-theorem dilate_psiBase (j : ℕ) : dilate (2 ^ j) (psiBase (V := V) j : V → ℂ) = lpBlockKernel j := by
+/-- **The blocks are dilates**: `ψ_j = (lpBlockKernelBase j)_{2^j}`. -/
+theorem dilate_lpBlockKernelBase (j : ℕ) :
+    dilate (2 ^ j) (lpBlockKernelBase (V := V) j : V → ℂ) = lpBlockKernel j := by
   cases j with
   | zero => rfl
   | succ j =>
     have hcoe : ∀ F H : 𝓢(V, ℂ), ((F - H : 𝓢(V, ℂ)) : V → ℂ) = F - H := fun _ _ => rfl
-    rw [psiBase, hcoe, coe_schwartzDilate, dilate_sub, dilate_dilate]
+    rw [lpBlockKernelBase, hcoe, coe_schwartzDilate, dilate_sub, dilate_dilate]
     show dilate (2 ^ (j + 1)) lpKernel - dilate (2 ^ (j + 1) * (1 / 2)) lpKernel =
       lpBlockKernel (j + 1)
     rw [show (2 : ℝ) ^ (j + 1) * (1 / 2) = 2 ^ j by ring]
     rfl
 
-/-- The Littlewood–Paley block `ψ_j = (psiBase j)_{2^j}` as a Schwartz function. -/
-noncomputable def psiS (j : ℕ) : 𝓢(V, ℂ) :=
-  schwartzDilate (2 ^ j) (pow_ne_zero j two_ne_zero) (psiBase j)
+/-- The Littlewood–Paley block `ψ_j = (lpBlockKernelBase j)_{2^j}` as a Schwartz function. -/
+noncomputable def lpBlockKernelS (j : ℕ) : 𝓢(V, ℂ) :=
+  schwartzDilate (2 ^ j) (pow_ne_zero j two_ne_zero) (lpBlockKernelBase j)
 
-/-- The Schwartz function `Rd.psiS j` is the block `ψ_j` (`Rd.dilate_psiBase`). -/
-theorem coe_psiS (j : ℕ) : (psiS j : V → ℂ) = lpBlockKernel j := by
-  rw [psiS, coe_schwartzDilate, dilate_psiBase]
+/-- The Schwartz function `Rd.lpBlockKernelS j` is the block `ψ_j`
+(`Rd.dilate_lpBlockKernelBase`). -/
+theorem coe_lpBlockKernelS (j : ℕ) : (lpBlockKernelS j : V → ℂ) = lpBlockKernel j := by
+  rw [lpBlockKernelS, coe_schwartzDilate, dilate_lpBlockKernelBase]
 
 variable (V) in
-/-- The seminorm bounds of the family `psiBase`, the larger of the seminorms of `Φ` and of
+/-- The seminorm bounds of the family `lpBlockKernelBase`, the larger of the seminorms of `Φ` and of
 `Φ - δ_{1/2} Φ`. -/
-noncomputable def psiBaseBound (k l : ℕ) : ℝ :=
+noncomputable def lpBlockKernelBaseBound (k l : ℕ) : ℝ :=
   max (SchwartzMap.seminorm ℝ k l (lpKernelS (V := V)))
     (SchwartzMap.seminorm ℝ k l (lpKernelS (V := V) - schwartzDilate (1 / 2) (by norm_num)
       lpKernelS))
 
-/-- The seminorm bounds of the family `psiBase` are nonnegative. -/
-theorem psiBaseBound_nonneg (k l : ℕ) : 0 ≤ psiBaseBound V k l :=
+/-- The seminorm bounds of the family `lpBlockKernelBase` are nonnegative. -/
+theorem lpBlockKernelBaseBound_nonneg (k l : ℕ) : 0 ≤ lpBlockKernelBaseBound V k l :=
   le_max_of_le_left (apply_nonneg _ _)
 
-/-- The family `psiBase` is uniformly Schwartz with bounds `Rd.psiBaseBound V`. -/
-theorem isUniformSchwartz_psiBase : IsUniformSchwartz (psiBase (V := V)) (psiBaseBound V) :=
+/-- The family `lpBlockKernelBase` is uniformly Schwartz with bounds
+`Rd.lpBlockKernelBaseBound V`. -/
+theorem isUniformSchwartz_lpBlockKernelBase :
+    IsUniformSchwartz (lpBlockKernelBase (V := V)) (lpBlockKernelBaseBound V) :=
   IsUniformSchwartz.of_forall_eq_or_eq fun j => by
     cases j with
     | zero => exact Or.inl rfl
@@ -698,47 +702,49 @@ theorem tsum_fourier_lpBlockKernel_sq_le (ξ : V) :
   simpa [besselWeight] using tsum_dyadicWeight_fourier_lpBlockKernel_sq_le (V := V) le_rfl ξ
 
 /-- **The blocks form a Calderón–Zygmund family** with overlap `2` and Hörmander constant
-`4 H_{A^ψ}`, `H_{A^ψ} = Rd.familyHormanderConst V (Rd.psiBaseBound V)`. -/
+`4 H_{A^ψ}`, `H_{A^ψ} = Rd.familyHormanderConst V (Rd.lpBlockKernelBaseBound V)`. -/
 theorem isCZFamily_lpBlockKernel :
-    IsCZFamily (lpBlockKernel (V := V)) 2 (4 * familyHormanderConst V (psiBaseBound V)) := by
-  have h := IsCZFamily.of_dilation (G := psiBase (V := V)) (A := psiBaseBound V) (B := 2)
-    isUniformSchwartz_psiBase fun ξ => by
-    simp_rw [dilate_psiBase]
+    IsCZFamily (lpBlockKernel (V := V)) 2
+      (4 * familyHormanderConst V (lpBlockKernelBaseBound V)) := by
+  have h := IsCZFamily.of_dilation (G := lpBlockKernelBase (V := V))
+    (A := lpBlockKernelBaseBound V) (B := 2) isUniformSchwartz_lpBlockKernelBase fun ξ => by
+    simp_rw [dilate_lpBlockKernelBase]
     exact tsum_fourier_lpBlockKernel_sq_le ξ
-  rwa [show (fun j => dilate (2 ^ j) (psiBase (V := V) j : V → ℂ)) = lpBlockKernel from
-    funext dilate_psiBase] at h
+  rwa [show (fun j => dilate (2 ^ j) (lpBlockKernelBase (V := V) j : V → ℂ)) = lpBlockKernel from
+    funext dilate_lpBlockKernelBase] at h
 
-/-- The **synthesis kernels** `psiDual 0 = Φ_1`, `psiDual 1 = Φ_2`,
-`psiDual (j+2) = Φ_{j+3} - Φ_j`, with `psiDual_j ⋆ ψ_j = ψ_j` (`Rd.conv_psiDual_lpBlockKernel`). -/
-noncomputable def psiDual : ℕ → V → ℂ
+/-- The **synthesis kernels** `ψ̃_0 = Φ_1`, `ψ̃_1 = Φ_2`, `ψ̃_{j+2} = Φ_{j+3} - Φ_j`, with
+`ψ̃_j ⋆ ψ_j = ψ_j` (`Rd.conv_dualLpBlockKernel_lpBlockKernel`). -/
+noncomputable def dualLpBlockKernel : ℕ → V → ℂ
   | 0 => dilatedLpKernel 1
   | 1 => dilatedLpKernel 2
   | j + 2 => dilatedLpKernel (j + 3) - dilatedLpKernel j
 
-/-- The Schwartz functions behind the synthesis kernels: `psiDualBase 0 = psiDualBase 1 = δ_2 Φ`
-and `psiDualBase (j+2) = δ_2 Φ - δ_{1/4} Φ`, with the dilation `δ_c F(x) = c^n F(c x)`, so that
-`psiDual_j = δ_{2^j} (psiDualBase j)` (`Rd.dilate_psiDualBase`). -/
-noncomputable def psiDualBase : ℕ → 𝓢(V, ℂ)
+/-- The Schwartz functions behind the synthesis kernels:
+`dualLpBlockKernelBase 0 = dualLpBlockKernelBase 1 = δ_2 Φ` and
+`dualLpBlockKernelBase (j+2) = δ_2 Φ - δ_{1/4} Φ`, with the dilation `δ_c F(x) = c^n F(c x)`, so
+that `ψ̃_j = δ_{2^j} (dualLpBlockKernelBase j)` (`Rd.dilate_dualLpBlockKernelBase`). -/
+noncomputable def dualLpBlockKernelBase : ℕ → 𝓢(V, ℂ)
   | 0 => schwartzDilate 2 two_ne_zero lpKernelS
   | 1 => schwartzDilate 2 two_ne_zero lpKernelS
   | _ + 2 => schwartzDilate 2 two_ne_zero lpKernelS - schwartzDilate (1 / 4) (by norm_num)
       lpKernelS
 
-/-- **The synthesis kernels are dilates**: `psiDual_j = (psiDualBase j)_{2^j}`. -/
-theorem dilate_psiDualBase (j : ℕ) :
-    dilate (2 ^ j) (psiDualBase (V := V) j : V → ℂ) = psiDual j := by
+/-- **The synthesis kernels are dilates**: `ψ̃_j = (dualLpBlockKernelBase j)_{2^j}`. -/
+theorem dilate_dualLpBlockKernelBase (j : ℕ) :
+    dilate (2 ^ j) (dualLpBlockKernelBase (V := V) j : V → ℂ) = dualLpBlockKernel j := by
   match j with
   | 0 =>
-    rw [psiDualBase, coe_schwartzDilate, dilate_dilate]
+    rw [dualLpBlockKernelBase, coe_schwartzDilate, dilate_dilate]
     show dilate (2 ^ 0 * 2) lpKernel = dilate (2 ^ 1) lpKernel
     norm_num
   | 1 =>
-    rw [psiDualBase, coe_schwartzDilate, dilate_dilate]
+    rw [dualLpBlockKernelBase, coe_schwartzDilate, dilate_dilate]
     show dilate (2 ^ 1 * 2) lpKernel = dilate (2 ^ 2) lpKernel
     norm_num
   | j + 2 =>
     have hcoe : ∀ F H : 𝓢(V, ℂ), ((F - H : 𝓢(V, ℂ)) : V → ℂ) = F - H := fun _ _ => rfl
-    rw [psiDualBase, hcoe, coe_schwartzDilate, coe_schwartzDilate, dilate_sub,
+    rw [dualLpBlockKernelBase, hcoe, coe_schwartzDilate, coe_schwartzDilate, dilate_sub,
       dilate_dilate, dilate_dilate]
     show dilate (2 ^ (j + 2) * 2) lpKernel - dilate (2 ^ (j + 2) * (1 / 4)) lpKernel =
       dilate (2 ^ (j + 3)) lpKernel - dilate (2 ^ j) lpKernel
@@ -746,20 +752,21 @@ theorem dilate_psiDualBase (j : ℕ) :
       show (2 : ℝ) ^ (j + 2) * (1 / 4) = 2 ^ j by ring]
 
 variable (V) in
-/-- The seminorm bounds of the family `psiDualBase`, the larger of the seminorms of `δ_2 Φ` and
-of `δ_2 Φ - δ_{1/4} Φ`. -/
-noncomputable def psiDualBaseBound (k l : ℕ) : ℝ :=
+/-- The seminorm bounds of the family `dualLpBlockKernelBase`, the larger of the seminorms of
+`δ_2 Φ` and of `δ_2 Φ - δ_{1/4} Φ`. -/
+noncomputable def dualLpBlockKernelBaseBound (k l : ℕ) : ℝ :=
   max (SchwartzMap.seminorm ℝ k l (schwartzDilate 2 two_ne_zero (lpKernelS (V := V))))
     (SchwartzMap.seminorm ℝ k l (schwartzDilate 2 two_ne_zero (lpKernelS (V := V)) -
       schwartzDilate (1 / 4) (by norm_num) lpKernelS))
 
-/-- The seminorm bounds of the family `psiDualBase` are nonnegative. -/
-theorem psiDualBaseBound_nonneg (k l : ℕ) : 0 ≤ psiDualBaseBound V k l :=
+/-- The seminorm bounds of the family `dualLpBlockKernelBase` are nonnegative. -/
+theorem dualLpBlockKernelBaseBound_nonneg (k l : ℕ) : 0 ≤ dualLpBlockKernelBaseBound V k l :=
   le_max_of_le_left (apply_nonneg _ _)
 
-/-- The family `psiDualBase` is uniformly Schwartz with bounds `Rd.psiDualBaseBound V`. -/
-theorem isUniformSchwartz_psiDualBase :
-    IsUniformSchwartz (psiDualBase (V := V)) (psiDualBaseBound V) :=
+/-- The family `dualLpBlockKernelBase` is uniformly Schwartz with bounds
+`Rd.dualLpBlockKernelBaseBound V`. -/
+theorem isUniformSchwartz_dualLpBlockKernelBase :
+    IsUniformSchwartz (dualLpBlockKernelBase (V := V)) (dualLpBlockKernelBaseBound V) :=
   IsUniformSchwartz.of_forall_eq_or_eq fun j => by
     match j with
     | 0 => exact Or.inl rfl
@@ -767,30 +774,32 @@ theorem isUniformSchwartz_psiDualBase :
     | _ + 2 => exact Or.inr rfl
 
 /-- The synthesis kernels are integrable. -/
-theorem integrable_psiDual (j : ℕ) : Integrable (psiDual (V := V) j) := by
-  rw [← dilate_psiDualBase]
-  exact integrable_dilate (psiDualBase j).integrable (by positivity)
+theorem integrable_dualLpBlockKernel (j : ℕ) : Integrable (dualLpBlockKernel (V := V) j) := by
+  rw [← dilate_dualLpBlockKernelBase]
+  exact integrable_dilate (dualLpBlockKernelBase j).integrable (by positivity)
 
 /-- The synthesis kernels are continuous. -/
-theorem continuous_psiDual (j : ℕ) : Continuous (psiDual (V := V) j) := by
-  rw [← dilate_psiDualBase]
-  exact continuous_dilate (psiDualBase j).continuous _
+theorem continuous_dualLpBlockKernel (j : ℕ) : Continuous (dualLpBlockKernel (V := V) j) := by
+  rw [← dilate_dualLpBlockKernelBase]
+  exact continuous_dilate (dualLpBlockKernelBase j).continuous _
 
 /-- The synthesis kernels are bounded. -/
-theorem bddAbove_psiDual (j : ℕ) : BddAbove (Set.range fun x => ‖psiDual (V := V) j x‖) := by
-  rw [← dilate_psiDualBase]
+theorem bddAbove_dualLpBlockKernel (j : ℕ) :
+    BddAbove (Set.range fun x => ‖dualLpBlockKernel (V := V) j x‖) := by
+  rw [← dilate_dualLpBlockKernelBase]
   exact bddAbove_dilate (bddAbove_schwartz _) _
 
 /-- The Fourier transforms of the synthesis kernels are integrable. -/
-theorem integrable_fourier_psiDual (j : ℕ) : Integrable (𝓕 (psiDual (V := V) j)) := by
-  rw [← dilate_psiDualBase]
+theorem integrable_fourier_dualLpBlockKernel (j : ℕ) :
+    Integrable (𝓕 (dualLpBlockKernel (V := V) j)) := by
+  rw [← dilate_dualLpBlockKernelBase]
   exact integrable_fourier_dilate
-    (by rw [← SchwartzMap.fourier_coe]; exact (𝓕 (psiDualBase (V := V) j)).integrable)
+    (by rw [← SchwartzMap.fourier_coe]; exact (𝓕 (dualLpBlockKernelBase (V := V) j)).integrable)
     (by positivity)
 
-/-- `‖psiDual_j‖_1 ≤ 2 ‖Φ‖_1`. -/
-theorem eLpNorm_psiDual_one_le (j : ℕ) :
-    eLpNorm (psiDual (V := V) j) 1 volume ≤ 2 * eLpNorm (lpKernel (V := V)) 1 volume := by
+/-- `‖ψ̃_j‖_1 ≤ 2 ‖Φ‖_1`. -/
+theorem eLpNorm_dualLpBlockKernel_one_le (j : ℕ) :
+    eLpNorm (dualLpBlockKernel (V := V) j) 1 volume ≤ 2 * eLpNorm (lpKernel (V := V)) 1 volume := by
   match j with
   | 0 =>
     show eLpNorm (dilatedLpKernel (V := V) 1) 1 volume ≤ _
@@ -809,123 +818,130 @@ theorem eLpNorm_psiDual_one_le (j : ℕ) :
       _ = 2 * eLpNorm (lpKernel (V := V)) 1 volume := by
           rw [eLpNorm_dilatedLpKernel_one, eLpNorm_dilatedLpKernel_one, two_mul]
 
-/-- `𝓕 psiDual_{j+2} = 𝓕Φ_{j+3} - 𝓕Φ_j`. -/
-theorem fourier_psiDual_add_two (j : ℕ) (ξ : V) :
-    𝓕 (psiDual (V := V) (j + 2)) ξ =
+/-- `𝓕ψ̃_{j+2} = 𝓕Φ_{j+3} - 𝓕Φ_j`. -/
+theorem fourier_dualLpBlockKernel_add_two (j : ℕ) (ξ : V) :
+    𝓕 (dualLpBlockKernel (V := V) (j + 2)) ξ =
       𝓕 (dilatedLpKernel (V := V) (j + 3)) ξ - 𝓕 (dilatedLpKernel (V := V) j) ξ :=
   fourier_sub_apply (integrable_dilatedLpKernel _) (integrable_dilatedLpKernel _) ξ
 
-/-- `𝓕 psiDual_j · 𝓕ψ_j = 𝓕ψ_j`: wherever `𝓕ψ_j(ξ) ≠ 0`, `‖ξ‖ < 2^(j+1)`, so
+/-- `𝓕ψ̃_j · 𝓕ψ_j = 𝓕ψ_j`: wherever `𝓕ψ_j(ξ) ≠ 0`, `‖ξ‖ < 2^(j+1)`, so
 `𝓕Φ_{j+1}(ξ) = 1`, and for `j ≥ 2` also `‖ξ‖ > 2^(j-1)`, so `𝓕Φ_{j-2}(ξ) = 0`; hence
-`𝓕 psiDual_j(ξ) = 1` there. -/
-theorem fourier_psiDual_mul_lpBlockKernel (j : ℕ) (ξ : V) :
-    𝓕 (psiDual (V := V) j) ξ * 𝓕 (lpBlockKernel (V := V) j) ξ = 𝓕 (lpBlockKernel (V := V) j) ξ := by
+`𝓕ψ̃_j(ξ) = 1` there. -/
+theorem fourier_dualLpBlockKernel_mul_lpBlockKernel (j : ℕ) (ξ : V) :
+    𝓕 (dualLpBlockKernel (V := V) j) ξ * 𝓕 (lpBlockKernel (V := V) j) ξ =
+      𝓕 (lpBlockKernel (V := V) j) ξ := by
   by_cases h : 𝓕 (lpBlockKernel (V := V) j) ξ = 0
   · rw [h, mul_zero]
   have hlt := norm_lt_of_fourier_lpBlockKernel_ne_zero h
-  suffices 𝓕 (psiDual (V := V) j) ξ = 1 by rw [this, one_mul]
+  suffices 𝓕 (dualLpBlockKernel (V := V) j) ξ = 1 by rw [this, one_mul]
   match j with
   | 0 => exact fourier_dilatedLpKernel_eq_one hlt.le
   | 1 =>
     exact fourier_dilatedLpKernel_eq_one (hlt.le.trans (pow_le_pow_right₀ one_le_two (by omega)))
   | m + 2 =>
     have hgt : 2 ^ (m + 1) < ‖ξ‖ := not_le.1 fun h' => h (fourier_lpBlockKernel_succ_eq_zero h')
-    rw [fourier_psiDual_add_two, fourier_dilatedLpKernel_eq_one hlt.le,
+    rw [fourier_dualLpBlockKernel_add_two, fourier_dilatedLpKernel_eq_one hlt.le,
       fourier_dilatedLpKernel_eq_zero hgt.le, sub_zero]
 
-/-- **The synthesis kernels reproduce the blocks**: `psiDual_j ⋆ ψ_j = ψ_j`, by comparing
+/-- **The synthesis kernels reproduce the blocks**: `ψ̃_j ⋆ ψ_j = ψ_j`, by comparing
 Fourier transforms (`Rd.conv_eq_of_fourier`). -/
-theorem conv_psiDual_lpBlockKernel (j : ℕ) :
-    conv (psiDual (V := V) j) (lpBlockKernel j) volume = lpBlockKernel j :=
-  conv_eq_of_fourier (integrable_psiDual _) (integrable_lpBlockKernel _)
+theorem conv_dualLpBlockKernel_lpBlockKernel (j : ℕ) :
+    conv (dualLpBlockKernel (V := V) j) (lpBlockKernel j) volume = lpBlockKernel j :=
+  conv_eq_of_fourier (integrable_dualLpBlockKernel _) (integrable_lpBlockKernel _)
     (continuous_lpBlockKernel _) (bddAbove_lpBlockKernel _) (integrable_lpBlockKernel _)
     (continuous_lpBlockKernel _) (integrable_fourier_lpBlockKernel _)
-    (fourier_psiDual_mul_lpBlockKernel j)
+    (fourier_dualLpBlockKernel_mul_lpBlockKernel j)
 
-/-- `|𝓕 psiDual_j(ξ)| ≤ 1`. -/
-theorem enorm_fourier_psiDual_le_one (j : ℕ) (ξ : V) : ‖𝓕 (psiDual (V := V) j) ξ‖ₑ ≤ 1 := by
+/-- `|𝓕ψ̃_j(ξ)| ≤ 1`. -/
+theorem enorm_fourier_dualLpBlockKernel_le_one (j : ℕ) (ξ : V) :
+    ‖𝓕 (dualLpBlockKernel (V := V) j) ξ‖ₑ ≤ 1 := by
   rw [← ofReal_norm, ← ENNReal.ofReal_one]
   refine ENNReal.ofReal_le_ofReal ?_
   match j with
   | 0 => exact norm_fourier_dilatedLpKernel_le_one 1 ξ
   | 1 => exact norm_fourier_dilatedLpKernel_le_one 2 ξ
   | m + 2 =>
-    rw [fourier_psiDual_add_two]
+    rw [fourier_dualLpBlockKernel_add_two]
     exact norm_fourier_dilatedLpKernel_sub_le_one (m + 3) m ξ
 
-/-- `𝓕 psiDual_j` vanishes outside the ball of radius `2^(j+2)`. -/
-theorem norm_lt_of_fourier_psiDual_ne_zero {j : ℕ} {ξ : V}
-    (h : 𝓕 (psiDual (V := V) j) ξ ≠ 0) : ‖ξ‖ < 2 ^ (j + 2) := by
+/-- `𝓕ψ̃_j` vanishes outside the ball of radius `2^(j+2)`. -/
+theorem norm_lt_of_fourier_dualLpBlockKernel_ne_zero {j : ℕ} {ξ : V}
+    (h : 𝓕 (dualLpBlockKernel (V := V) j) ξ ≠ 0) : ‖ξ‖ < 2 ^ (j + 2) := by
   match j with
   | 0 => exact norm_lt_of_fourier_dilatedLpKernel_ne_zero h
   | 1 => exact norm_lt_of_fourier_dilatedLpKernel_ne_zero h
   | m + 2 =>
-    rw [fourier_psiDual_add_two] at h
+    rw [fourier_dualLpBlockKernel_add_two] at h
     by_cases h3 : 𝓕 (dilatedLpKernel (V := V) (m + 3)) ξ = 0
     · rw [h3, zero_sub, neg_ne_zero] at h
       exact (norm_lt_of_fourier_dilatedLpKernel_ne_zero h).trans
         (pow_lt_pow_right₀ one_lt_two (by omega))
     · exact norm_lt_of_fourier_dilatedLpKernel_ne_zero h3
 
-/-- `𝓕 psiDual_{m+2}` vanishes on the closed ball of radius `2^m`. -/
-theorem lt_norm_of_fourier_psiDual_ne_zero {m : ℕ} {ξ : V}
-    (h : 𝓕 (psiDual (V := V) (m + 2)) ξ ≠ 0) : 2 ^ m < ‖ξ‖ := by
+/-- `𝓕ψ̃_{m+2}` vanishes on the closed ball of radius `2^m`. -/
+theorem lt_norm_of_fourier_dualLpBlockKernel_ne_zero {m : ℕ} {ξ : V}
+    (h : 𝓕 (dualLpBlockKernel (V := V) (m + 2)) ξ ≠ 0) : 2 ^ m < ‖ξ‖ := by
   by_contra hle
   push Not at hle
   apply h
-  rw [fourier_psiDual_add_two, fourier_dilatedLpKernel_eq_one hle,
+  rw [fourier_dualLpBlockKernel_add_two, fourier_dilatedLpKernel_eq_one hle,
     fourier_dilatedLpKernel_eq_one (hle.trans (pow_le_pow_right₀ one_le_two (by omega))), sub_self]
 
 /-- **At most four synthesis kernels see a frequency**: with `a` the least index such that
-`‖ξ‖ < 2^(a+1)`, `𝓕 psiDual_j(ξ) ≠ 0` forces `a - 1 ≤ j ≤ a + 2`. -/
-theorem mem_Icc_of_fourier_psiDual_ne_zero {a j : ℕ} {ξ : V} (ha : ‖ξ‖ < 2 ^ (a + 1))
-    (hmin : ∀ i < a, ¬ ‖ξ‖ < 2 ^ (i + 1)) (h : 𝓕 (psiDual (V := V) j) ξ ≠ 0) :
+`‖ξ‖ < 2^(a+1)`, `𝓕ψ̃_j(ξ) ≠ 0` forces `a - 1 ≤ j ≤ a + 2`. -/
+theorem mem_Icc_of_fourier_dualLpBlockKernel_ne_zero {a j : ℕ} {ξ : V} (ha : ‖ξ‖ < 2 ^ (a + 1))
+    (hmin : ∀ i < a, ¬ ‖ξ‖ < 2 ^ (i + 1)) (h : 𝓕 (dualLpBlockKernel (V := V) j) ξ ≠ 0) :
     j ∈ Finset.Icc (a - 1) (a + 2) := by
   have hlo : a ≤ j + 1 := by
     by_contra hlt
-    exact hmin (j + 1) (by omega) (norm_lt_of_fourier_psiDual_ne_zero h)
+    exact hmin (j + 1) (by omega) (norm_lt_of_fourier_dualLpBlockKernel_ne_zero h)
   have hhi : j ≤ a + 2 := by
     match j, h with
     | 0, _ => omega
     | 1, _ => omega
     | m + 2, h =>
-      have h1 := (lt_norm_of_fourier_psiDual_ne_zero h).trans ha
+      have h1 := (lt_norm_of_fourier_dualLpBlockKernel_ne_zero h).trans ha
       have h2 : m < a + 1 := (pow_lt_pow_iff_right₀ one_lt_two).1 h1
       omega
   exact Finset.mem_Icc.2 ⟨by omega, hhi⟩
 
-/-- **Overlap of the synthesis kernels**: `∑_j |𝓕 psiDual_j(ξ)|² ≤ 4` for every `ξ`: at most four
-kernels are nonzero at `ξ` (`Rd.mem_Icc_of_fourier_psiDual_ne_zero`), each of modulus at most
-`1`. -/
-theorem tsum_fourier_psiDual_sq_le (ξ : V) : ∑' j, ‖𝓕 (psiDual (V := V) j) ξ‖ₑ ^ 2 ≤ 4 := by
+/-- **Overlap of the synthesis kernels**: `∑_j |𝓕ψ̃_j(ξ)|² ≤ 4` for every `ξ`: at most four
+kernels are nonzero at `ξ` (`Rd.mem_Icc_of_fourier_dualLpBlockKernel_ne_zero`), each of modulus at
+most `1`. -/
+theorem tsum_fourier_dualLpBlockKernel_sq_le (ξ : V) :
+    ∑' j, ‖𝓕 (dualLpBlockKernel (V := V) j) ξ‖ₑ ^ 2 ≤ 4 := by
   classical
   have hex : ∃ a : ℕ, ‖ξ‖ < 2 ^ (a + 1) := by
     obtain ⟨n, hn⟩ := pow_unbounded_of_one_lt ‖ξ‖ (one_lt_two : (1 : ℝ) < 2)
     exact ⟨n, hn.trans (pow_lt_pow_right₀ one_lt_two n.lt_succ_self)⟩
-  have hsupp := fun j => mem_Icc_of_fourier_psiDual_ne_zero (j := j) (Nat.find_spec hex)
+  have hsupp := fun j => mem_Icc_of_fourier_dualLpBlockKernel_ne_zero (j := j) (Nat.find_spec hex)
     (fun i hi => Nat.find_min hex hi)
   rw [tsum_eq_sum (s := Finset.Icc (Nat.find hex - 1) (Nat.find hex + 2)) (fun j hj => ?_)]
-  · calc ∑ j ∈ Finset.Icc (Nat.find hex - 1) (Nat.find hex + 2), ‖𝓕 (psiDual (V := V) j) ξ‖ₑ ^ 2
+  · calc ∑ j ∈ Finset.Icc (Nat.find hex - 1) (Nat.find hex + 2),
+          ‖𝓕 (dualLpBlockKernel (V := V) j) ξ‖ₑ ^ 2
         ≤ ∑ _j ∈ Finset.Icc (Nat.find hex - 1) (Nat.find hex + 2), (1 : ℝ≥0∞) :=
-          Finset.sum_le_sum fun j _ => pow_le_one₀ zero_le (enorm_fourier_psiDual_le_one j ξ)
+          Finset.sum_le_sum fun j _ =>
+            pow_le_one₀ zero_le (enorm_fourier_dualLpBlockKernel_le_one j ξ)
       _ = ((Finset.Icc (Nat.find hex - 1) (Nat.find hex + 2)).card : ℝ≥0∞) := by simp
       _ ≤ 4 := by
           rw [Nat.card_Icc]
           exact_mod_cast (by omega : Nat.find hex + 2 + 1 - (Nat.find hex - 1) ≤ 4)
-  · have : 𝓕 (psiDual (V := V) j) ξ = 0 := by
+  · have : 𝓕 (dualLpBlockKernel (V := V) j) ξ = 0 := by
       by_contra h
       exact hj (hsupp j h)
     simp [this]
 
 /-- **The synthesis kernels form a Calderón–Zygmund family** with overlap `4` and Hörmander
-constant `4 H_Ã`, `H_Ã = Rd.familyHormanderConst V (Rd.psiDualBaseBound V)`. -/
-theorem isCZFamily_psiDual :
-    IsCZFamily (psiDual (V := V)) 4 (4 * familyHormanderConst V (psiDualBaseBound V)) := by
-  have h := IsCZFamily.of_dilation (G := psiDualBase (V := V)) (A := psiDualBaseBound V) (B := 4)
-    isUniformSchwartz_psiDualBase fun ξ => by
-    simp_rw [dilate_psiDualBase]
-    exact tsum_fourier_psiDual_sq_le ξ
-  rwa [show (fun j => dilate (2 ^ j) (psiDualBase (V := V) j : V → ℂ)) = psiDual from
-    funext dilate_psiDualBase] at h
+constant `4 H_Ã`, `H_Ã = Rd.familyHormanderConst V (Rd.dualLpBlockKernelBaseBound V)`. -/
+theorem isCZFamily_dualLpBlockKernel :
+    IsCZFamily (dualLpBlockKernel (V := V)) 4
+      (4 * familyHormanderConst V (dualLpBlockKernelBaseBound V)) := by
+  have h := IsCZFamily.of_dilation (G := dualLpBlockKernelBase (V := V))
+    (A := dualLpBlockKernelBaseBound V) (B := 4) isUniformSchwartz_dualLpBlockKernelBase
+    fun ξ => by
+      simp_rw [dilate_dualLpBlockKernelBase]
+      exact tsum_fourier_dualLpBlockKernel_sq_le ξ
+  rwa [show (fun j => dilate (2 ^ j) (dualLpBlockKernelBase (V := V) j : V → ℂ)) =
+    dualLpBlockKernel from funext dilate_dualLpBlockKernelBase] at h
 
 end Rd

@@ -21,11 +21,12 @@ two-sided bound of this norm by `‖f‖_p`, with named constants that are prove
   `Torus.periodicSquareFunctionConst`): the analysis bound of the vector-valued singular integrals
   on the torus for the Calderón–Zygmund family `(ψ_j)_j`;
 * `‖f‖_p ≤ Q̃^𝕋_p ‖f‖_{F^0_{p,2}(𝕋^d)}` (`Torus.enorm_le_periodicTriebelLizorkinNorm_zero_two`,
-  constant `Torus.periodicSquareSynthesisConst`): the synthesis kernels reproduce the blocks,
-  `psiDual_j ⋆ Δ_j f = Δ_j f` (`Torus.periodicEconvLp_dualLpBlockKernel_periodicLpBlock`), so
-  `∑_{j ∈ s} psiDual_j ⋆ Δ_j f = ∑_{j ∈ s} Δ_j f` almost everywhere
+  constant `Torus.periodicSquareSynthesisConst`): the synthesis kernels
+  `ψ̃_j = Rd.dualLpBlockKernel j` reproduce the blocks, `ψ̃_j ⋆ Δ_j f = Δ_j f`
+  (`Torus.periodicEconvLp_dualLpBlockKernel_periodicLpBlock`), so
+  `∑_{j ∈ s} ψ̃_j ⋆ Δ_j f = ∑_{j ∈ s} Δ_j f` almost everywhere
   (`Torus.sum_periodicEconv_dualLpBlockKernel_periodicLpBlock_ae`); these partial sums tend to `f`
-  (`Torus.tendsto_sum_periodicLpBlock`), and the synthesis bound for the family `(psiDual_j)_j`
+  (`Torus.tendsto_sum_periodicLpBlock`), and the synthesis bound for the family `(ψ̃_j)_j`
   applies.
 
 Hence `F^0_{p,2}(𝕋^d) = L_p(𝕋^d)` (`Torus.periodicTriebelLizorkinSpace_zero_two_eq_top`), and
@@ -49,12 +50,15 @@ variable {d : Type*} [Fintype d] {p : ℝ≥0∞} [Fact (1 ≤ p)]
 variable (d) in
 /-- The constant `Q^𝕋_p` of the **upper square function bound on the torus**: the constant
 `Torus.periodicCZConst` of the Calderón–Zygmund family of the blocks `ψ_j`, with overlap `2`,
-Hörmander constant `4 H_{A^ψ}` and far mass bound `2 T_{A^ψ}`, where `A^ψ = Rd.psiBaseBound`
-(`Rd.isCZFamily_lpBlockKernel`, `Torus.farMass_lpBlockKernel_le`). -/
+Hörmander constant `4 H_{A^ψ}` and far mass bound `2 T_{A^ψ}`, where
+`A^ψ = Rd.lpBlockKernelBaseBound` (`Rd.isCZFamily_lpBlockKernel`,
+`Torus.farMass_lpBlockKernel_le`). -/
 noncomputable def periodicSquareFunctionConst (p : ℝ≥0∞) : ℝ≥0∞ :=
   periodicCZConst d p 2
-    (4 * Rd.familyHormanderConst (EuclideanSpace ℝ d) (Rd.psiBaseBound (EuclideanSpace ℝ d)))
-    (2 * Rd.familyTailConst (EuclideanSpace ℝ d) (Rd.psiBaseBound (EuclideanSpace ℝ d)) 0 1)
+    (4 * Rd.familyHormanderConst (EuclideanSpace ℝ d)
+      (Rd.lpBlockKernelBaseBound (EuclideanSpace ℝ d)))
+    (2 * Rd.familyTailConst (EuclideanSpace ℝ d)
+      (Rd.lpBlockKernelBaseBound (EuclideanSpace ℝ d)) 0 1)
 
 /-- The constant `Torus.periodicSquareFunctionConst d p` is finite for `1 < p < ∞`. -/
 theorem periodicSquareFunctionConst_ne_top {p : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ ∞) :
@@ -65,13 +69,16 @@ theorem periodicSquareFunctionConst_ne_top {p : ℝ≥0∞} (hp1 : 1 < p) (hp : 
 
 variable (d) in
 /-- The constant `Q̃^𝕋_p` of the **lower square function bound on the torus**: the constant
-`Torus.periodicCZConst` of the Calderón–Zygmund family of the synthesis kernels `psiDual_j`,
+`Torus.periodicCZConst` of the Calderón–Zygmund family of the synthesis kernels `ψ̃_j`,
 with overlap `4`, Hörmander constant `4 H_Ã` and far mass bound `2 T_Ã`, where
-`Ã = Rd.psiDualBaseBound` (`Rd.isCZFamily_psiDual`, `Torus.farMass_psiDual_le`). -/
+`Ã = Rd.dualLpBlockKernelBaseBound` (`Rd.isCZFamily_dualLpBlockKernel`,
+`Torus.farMass_dualLpBlockKernel_le`). -/
 noncomputable def periodicSquareSynthesisConst (p : ℝ≥0∞) : ℝ≥0∞ :=
   periodicCZConst d p 4
-    (4 * Rd.familyHormanderConst (EuclideanSpace ℝ d) (Rd.psiDualBaseBound (EuclideanSpace ℝ d)))
-    (2 * Rd.familyTailConst (EuclideanSpace ℝ d) (Rd.psiDualBaseBound (EuclideanSpace ℝ d)) 0 1)
+    (4 * Rd.familyHormanderConst (EuclideanSpace ℝ d)
+      (Rd.dualLpBlockKernelBaseBound (EuclideanSpace ℝ d)))
+    (2 * Rd.familyTailConst (EuclideanSpace ℝ d)
+      (Rd.dualLpBlockKernelBaseBound (EuclideanSpace ℝ d)) 0 1)
 
 /-- The constant `Torus.periodicSquareSynthesisConst d p` is finite for `1 < p < ∞`. -/
 theorem periodicSquareSynthesisConst_ne_top {p : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ ∞) :
@@ -103,25 +110,26 @@ theorem memPeriodicTriebelLizorkin_zero_two [Nonempty d] (hp1 : 1 < p) (hp : p �
 /-! ### The reproducing formula -/
 
 /-- **The synthesis kernels reproduce the blocks**: for `1 ≤ p < ∞` and `f ∈ L_p(𝕋^d)`,
-`psiDual_j ⋆ Δ_j f = Δ_j f`, since `psiDual_j ⋆ ψ_j = ψ_j` on `ℝ^d`
-(`Rd.conv_psiDual_lpBlockKernel`). -/
+`ψ̃_j ⋆ Δ_j f = Δ_j f`, since `ψ̃_j ⋆ ψ_j = ψ_j` on `ℝ^d`
+(`Rd.conv_dualLpBlockKernel_lpBlockKernel`). -/
 theorem periodicEconvLp_dualLpBlockKernel_periodicLpBlock (hp : p ≠ ∞) (j : ℕ)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
-    periodicEconvLp hp (Rd.integrable_psiDual j) (periodicLpBlock hp j f) =
+    periodicEconvLp hp (Rd.integrable_dualLpBlockKernel j) (periodicLpBlock hp j f) =
       periodicLpBlock hp j f :=
-  periodicEconvLp_comp_periodicEconvLp_of_eq hp (Rd.integrable_psiDual j)
+  periodicEconvLp_comp_periodicEconvLp_of_eq hp (Rd.integrable_dualLpBlockKernel j)
     (Rd.integrable_lpBlockKernel j)
-    (Rd.integrable_lpBlockKernel j) (Rd.conv_psiDual_lpBlockKernel j) f
+    (Rd.integrable_lpBlockKernel j) (Rd.conv_dualLpBlockKernel_lpBlockKernel j) f
 
 /-- **The reproducing sums**: for `1 ≤ p < ∞`, `f ∈ L_p(𝕋^d)` and every finite set `s ⊆ ℕ`,
-`∑_{j ∈ s} psiDual_j ⋆ Δ_j f = ∑_{j ∈ s} Δ_j f` almost everywhere, with the pointwise
+`∑_{j ∈ s} ψ̃_j ⋆ Δ_j f = ∑_{j ∈ s} Δ_j f` almost everywhere, with the pointwise
 convolutions of representatives on the left. -/
 theorem sum_periodicEconv_dualLpBlockKernel_periodicLpBlock_ae (hp : p ≠ ∞) (s : Finset ℕ)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
-    (fun t => ∑ j ∈ s, periodicEconv (Rd.psiDual j) (periodicLpBlock hp j f) t) =ᵐ[volume]
+    (fun t => ∑ j ∈ s, periodicEconv (Rd.dualLpBlockKernel j) (periodicLpBlock hp j f) t) =ᵐ[volume]
       ⇑(∑ j ∈ s, periodicLpBlock hp j f) := by
   have h :=
-    coeFn_sum_periodicEconvLp_ae hp s (fun j => Rd.integrable_psiDual (V := EuclideanSpace ℝ d) j)
+    coeFn_sum_periodicEconvLp_ae hp s
+      (fun j => Rd.integrable_dualLpBlockKernel (V := EuclideanSpace ℝ d) j)
     fun j => periodicLpBlock hp j f
   simp only [periodicEconvLp_dualLpBlockKernel_periodicLpBlock] at h
   exact h.symm
@@ -131,8 +139,8 @@ theorem sum_periodicEconv_dualLpBlockKernel_periodicLpBlock_ae (hp : p ≠ ∞) 
 /-- **The lower square function bound on the torus**: for `d ≥ 1`, `1 < p < ∞` and
 `f ∈ L_p(𝕋^d)`, `‖f‖_p ≤ Q̃^𝕋_p ‖f‖_{F^0_{p,2}(𝕋^d)}` with
 `Q̃^𝕋_p = Torus.periodicSquareSynthesisConst d p`. The partial sums `∑_{j < J} Δ_j f` tend to `f`
-(`Torus.tendsto_sum_periodicLpBlock`) and equal `∑_{j < J} psiDual_j ⋆ Δ_j f`, whose `L_p` norms the
-synthesis bound on the torus (`Torus.eLpNorm_sum_periodicEconv_le`) for the family `(psiDual_j)_j`
+(`Torus.tendsto_sum_periodicLpBlock`) and equal `∑_{j < J} ψ̃_j ⋆ Δ_j f`, whose `L_p` norms the
+synthesis bound on the torus (`Torus.eLpNorm_sum_periodicEconv_le`) for the family `(ψ̃_j)_j`
 controls. -/
 theorem enorm_le_periodicTriebelLizorkinNorm_zero_two [Nonempty d] (hp1 : 1 < p) (hp : p ≠ ∞)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
@@ -147,8 +155,8 @@ theorem enorm_le_periodicTriebelLizorkinNorm_zero_two [Nonempty d] (hp1 : 1 < p)
   rw [Lp.enorm_def,
     ← eLpNorm_congr_ae (sum_periodicEconv_dualLpBlockKernel_periodicLpBlock_ae hp _ f),
     periodicTriebelLizorkinNorm_zero_left, ← eLpNorm_congr_ae hblock]
-  exact eLpNorm_sum_periodicEconv_le Rd.isCZFamily_psiDual farMass_psiDual_le hp1 hp _
-    (fun j => (Lp.stronglyMeasurable _).measurable) fun j => Lp.memLp _
+  exact eLpNorm_sum_periodicEconv_le Rd.isCZFamily_dualLpBlockKernel farMass_dualLpBlockKernel_le
+    hp1 hp _ (fun j => (Lp.stronglyMeasurable _).measurable) fun j => Lp.memLp _
 
 /-- **The square function theorem on the torus**: for `d ≥ 1` and `1 < p < ∞`, the subspace
 `F^0_{p,2}(𝕋^d)` of `L_p(𝕋^d)` is all of `L_p(𝕋^d)`. The norms are equivalent by

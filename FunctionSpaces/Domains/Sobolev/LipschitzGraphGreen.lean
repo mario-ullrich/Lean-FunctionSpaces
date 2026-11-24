@@ -734,15 +734,15 @@ theorem setIntegral_green_besselPotentialSpace (U W : H^{1}(V)) (v : V) :
 `∫_Ω f_v g + f g_v = ∫_H Tr f · Tr g · n_v` with the traces of the trace theorem at `s = 1/2` and
 the normal weight `n_v = ⟪∇φ, v⟫ - ⟪v, e⟫`
 (`Rd.LipschitzGraph.setIntegral_green_besselPotentialSpace`). -/
-theorem setIntegral_green (f g : Lp ℂ 2 (volume : Measure V)) (hf : MemWSobolev 1 f)
-    (hg : MemWSobolev 1 g) (v : V) {fv gv : Lp ℂ 2 (volume : Measure V)}
+theorem setIntegral_green (f g : Lp ℂ 2 (volume : Measure V)) (hf : MemSobolevW 1 f)
+    (hg : MemSobolevW 1 g) (v : V) {fv gv : Lp ℂ 2 (volume : Measure V)}
     (hfv : HasWeakLineDeriv ⊤ (fun _ : Fin 1 => v) f fv)
     (hgv : HasWeakLineDeriv ⊤ (fun _ : Fin 1 => v) g gv) :
     ∫ x in Ω.domain, fv x * g x + f x * gv x =
       ∫ x', Ω.graphTrace two_ne_top 2 f x' * Ω.graphTrace two_ne_top 2 g x' *
         (Ω.normalWeight v x' : ℂ) := by
-  obtain ⟨U, rfl⟩ := exists_toL2_eq_of_memWSobolev hf
-  obtain ⟨W, rfl⟩ := exists_toL2_eq_of_memWSobolev hg
+  obtain ⟨U, rfl⟩ := exists_toL2_eq_of_memSobolevW hf
+  obtain ⟨W, rfl⟩ := exists_toL2_eq_of_memSobolevW hg
   rw [← weakDerivL2_eq hfv, ← weakDerivL2_eq hgv]
   exact Ω.setIntegral_green_besselPotentialSpace U W v
 

@@ -89,11 +89,13 @@ theorem are in [Triebel–Lizorkin spaces](TriebelLizorkin.md).
   `L_p(Ω)` (`Rd.MemWeakSobolev`); `W^0_p(Ω) = L_p(Ω)` (`Rd.memWeakSobolev_zero_iff`), the spaces
   decrease in `m` and restrict to smaller open sets (`Rd.MemWeakSobolev.mono_order`,
   `Rd.MemWeakSobolev.mono_set`). For `f ∈ L_p(V)`, `f ∈ W^m_p(V)` is the case `Ω = V`
-  (`Rd.MemWSobolev`), and Schwartz functions lie in every `W^m_p(V)` (`Rd.memWSobolev_toLp`).
+  (`Rd.MemSobolevW`), and Schwartz functions lie in every `W^m_p(V)` (`Rd.memSobolevW_toLp`).
+  The W of `Rd.MemSobolevW` stands for the Sobolev space `W^m_p` defined by weak derivatives;
+  Mathlib's `TemperedDistribution.MemSobolev` is the Bessel potential space `H^{s,p}`.
 * **The bridge to tempered distributions.** For `f ∈ L_p(V)` and `g ∈ L_r(V)`,
   `1 ≤ p, r ≤ ∞`, `g` is the weak derivative `∂^v f` on `V` iff `∂^v f = g` as tempered
   distributions (`Rd.hasWeakLineDeriv_top_iff`); hence `f ∈ W^m_p(V)` iff every tempered
-  derivative `∂^v f` of order at most `m` is an `L_p(V)` function (`Rd.memWSobolev_iff_tempered`).
+  derivative `∂^v f` of order at most `m` is an `L_p(V)` function (`Rd.memSobolevW_iff_tempered`).
   The proof uses that a tempered distribution vanishing on all test functions is zero
   (`Rd.eq_zero_of_testSchwartz`), because the cut-offs `x ↦ χ(x/(N+1)) u(x)` of a Schwartz
   function `u` converge to `u` in the Schwartz space, with every seminorm of the difference at
@@ -121,16 +123,16 @@ theorem are in [Triebel–Lizorkin spaces](TriebelLizorkin.md).
   Fourier transforms add up to `1` (`Rd.exists_fourier_lpBlockKernel_window`), so that
   `∑_j 2^(2js) |𝓕ψ_j(ξ)|² ≤ 2 · 4^s ⟨ξ⟩^{2s}` and `⟨ξ⟩^{2s} ≤ 2 · 5^s ∑_j 2^(2js) |𝓕ψ_j(ξ)|²`
   (`Rd.tsum_dyadicWeight_fourier_lpBlockKernel_sq_le`, `Rd.ofReal_besselWeight_sq_le_tsum`).
-* **`W^1_2 = H^1`.** For `f ∈ L_2(V)`, `f ∈ W^1_2(V)` iff `f ∈ H^1(V)` (`Rd.memWSobolev_one_iff`).
+* **`W^1_2 = H^1`.** For `f ∈ L_2(V)`, `f ∈ W^1_2(V)` iff `f ∈ H^1(V)` (`Rd.memSobolevW_one_iff`).
   If `g ∈ L_2(V)` is the weak derivative `∂_v f` and `J_1 f = h`, then `‖g‖_2 ≤ 2π ‖v‖ ‖h‖_2`
   (`Rd.enorm_le_of_hasWeakLineDeriv`); for the weak derivatives `g_i = ∂_{e_i} f` along any
   orthonormal basis `(e_i)`, `(2π)² ‖h‖_2² = (2π)² ‖f‖_2² + ∑_i ‖g_i‖_2²`
   (`Rd.enorm_besselPotential_one_sq_eq`), hence `‖h‖_2² ≤ ‖f‖_2² + ∑_i ‖g_i‖_2²`
   (`Rd.sq_norm_besselPotential_one_le`). For `F ∈ L_2(V)`, `F ∈ W^1_2(V)` iff `F` lies in the
   Besov space `B^1_{2,2}(V)`, the approximation space of the band-limited classes
-  (`Rd.memWSobolev_one_iff_memApprox`), iff
+  (`Rd.memSobolevW_one_iff_memApprox`), iff
   `‖F‖_2 + ‖(2^k ω_r(F, 2^(-k))_2)_k‖_{ℓ_2} < ∞` for every order `r ≥ 2`
-  (`Rd.memWSobolev_one_iff_modulus`).
+  (`Rd.memSobolevW_one_iff_modulus`).
 * **Rellich's theorem.** For every bounded set `Ω ⊆ V`, of any shape, the restriction
   `F ↦ F|_Ω` from Mathlib's `H^1(V) = H^{1,2}(V, ℂ)` to `L_2(Ω)` is a compact operator
   (`Rd.isCompactOperator_restr_toL2`). Every bounded sequence in `H^1(V)` has a subsequence
@@ -180,8 +182,8 @@ theorem are in [Triebel–Lizorkin spaces](TriebelLizorkin.md).
   (`Rd.two_pow_smul_lpBlockKernel_succ_eq_sum`), and the dilates `((η_α)_{2^j})_j` form a
   Calderón–Zygmund family with overlap `2` (`Rd.isCZFamily_derivKernelFamily`). For directions
   `w ∈ V^k`, `∂^w ψ̃_j = 2^{jk} (∂^w G̃_j)_{2^j}` with the Schwartz functions `G̃_j` behind the
-  synthesis kernels (`Rd.iteratedLineDerivOp_psiDualS`), and the dilates `((∂^w G̃_j)_{2^j})_j`
-  form a Calderón–Zygmund family with overlap `4 ((8π)^k ∏_l ‖w_l‖)²`
+  synthesis kernels (`Rd.iteratedLineDerivOp_dualLpBlockKernelS`), and the dilates
+  `((∂^w G̃_j)_{2^j})_j` form a Calderón–Zygmund family with overlap `4 ((8π)^k ∏_l ‖w_l‖)²`
   (`Rd.isCZFamily_derivDualFamily`). On the way, `𝓕(∂^w G)(ξ) = ∏_l 2πi ⟪ξ, w_l⟫ 𝓕G(ξ)` for
   Schwartz functions `G` with values in a complex normed space
   (`SchwartzMap.fourier_iteratedLineDerivOp_apply`) and
@@ -201,7 +203,7 @@ theorem are in [Triebel–Lizorkin spaces](TriebelLizorkin.md).
   (`Rd.enorm_fourier_le_mul_min`), so `∑_j |𝓕(G_{2^j})(ξ)|² ≤ 4C²` and the dilates `G_{2^j}`
   form a Calderón–Zygmund family (`Rd.isCZFamily_dilate_of_integral_eq_zero`).
 * **`W^m_p = F^m_{p,2}`.** Let `dim V ≥ 1`, `1 < p < ∞` and `m ∈ ℕ`. For `f ∈ L_p(V)`,
-  `f ∈ W^m_p(V)` iff `f ∈ F^m_{p,2}(V)` (`Rd.memWSobolev_iff_memTriebelLizorkin`), with named
+  `f ∈ W^m_p(V)` iff `f ∈ F^m_{p,2}(V)` (`Rd.memSobolevW_iff_memTriebelLizorkin`), with named
   constants in both directions. If the weak derivatives
   `g_α = ∂_{e_{α_0}} ⋯ ∂_{e_{α_{m-1}}} f` along the orthonormal basis `e` of `Rd.gridBasis` lie in
   `L_p(V)` for all multi-indices `α`, then
@@ -215,9 +217,9 @@ theorem are in [Triebel–Lizorkin spaces](TriebelLizorkin.md).
   kernels, proved finite (`Rd.sobolevToTLConst_ne_top`, `Rd.tlToSobolevConst_ne_top`). This gives
   the Besov sandwich:
   `B^m_{p,min(p,2)} ⊆ W^m_p(V)` and, for `m ≥ 1`, `W^m_p(V) ⊆ B^m_{p,max(p,2)}`
-  (`Rd.memWSobolev_of_memApprox`, `Rd.memApprox_of_memWSobolev`, with norm bounds
+  (`Rd.memSobolevW_of_memApprox`, `Rd.memApprox_of_memSobolevW`, with norm bounds
   `Rd.exists_hasWeakLineDeriv_of_memApprox`, `Rd.approxNormDyadic_le_of_hasWeakLineDeriv`), and
-  `W^m_2 = B^m_{2,2}` for `m ≥ 1` (`Rd.memWSobolev_two_iff_memApprox`).
+  `W^m_2 = B^m_{2,2}` for `m ≥ 1` (`Rd.memSobolevW_two_iff_memApprox`).
   The bound of `‖f‖_{F^m_{p,2}}` writes `2^{jm} ψ_{j+1} ⋆ f` as `∑_α (η_α)_{2^j} ⋆ g_α`; the
   bound for `∂^w f` obtains `∂^w f` as the limit in `L_p` of the derivatives
   `∑_{j < J} (∂^w ψ̃_j) ⋆ (ψ_j ⋆ f)` of the reproducing sums (`Rd.derivSynthesisSum`), whose
@@ -237,7 +239,7 @@ theorem are in [Triebel–Lizorkin spaces](TriebelLizorkin.md).
   (`Rd.exists_memLp_ae_eq_of_hasWeakLineDeriv`); if `m > n/p`, a bounded continuous one with
   `sup |a| ≤ K_{V,p,∞,m} M_f` (`Rd.exists_boundedContinuous_ae_eq_of_hasWeakLineDeriv`). In
   particular every `f ∈ W^m_p(V)` has these representatives
-  (`Rd.exists_memLp_ae_eq_of_memWSobolev`, `Rd.exists_boundedContinuous_ae_eq_of_memWSobolev`).
+  (`Rd.exists_memLp_ae_eq_of_memSobolevW`, `Rd.exists_boundedContinuous_ae_eq_of_memSobolevW`).
   The constants are named formulas in norms and Schwartz seminorms of fixed kernels, proved
   finite (`Rd.besovEmbeddingConst_ne_top`, `Rd.sobolevToTLConst_ne_top`).
 * **The critical Sobolev embedding.** Let `dim V = n ≥ 1`, `1 ≤ p₀ < p₁ < ∞`, `θ = p₀/p₁` and
@@ -257,8 +259,8 @@ theorem are in [Triebel–Lizorkin spaces](TriebelLizorkin.md).
   and `m = n(1/p - 1/r) ≥ 1`, `f` with weak derivatives `g_α ∈ L_p(V)` of order `m` has a
   representative `u ∈ L_r(V)` with `‖u‖_r ≤ K_{V,p,r} M_f`
   (`Rd.exists_memLp_ae_eq_of_hasWeakLineDeriv_of_eq`), and `W^m_p(V) ↪ L_r(V)` for every
-  `p ≤ r < ∞` with `n(1/p - 1/r) ≤ m` (`Rd.exists_memLp_ae_eq_of_memWSobolev_of_le`,
-  `Rd.exists_memLp_ae_eq_of_memWSobolev_of_eq`).
+  `p ≤ r < ∞` with `n(1/p - 1/r) ≤ m` (`Rd.exists_memLp_ae_eq_of_memSobolevW_of_le`,
+  `Rd.exists_memLp_ae_eq_of_memSobolevW_of_eq`).
 * **The Gagliardo–Nirenberg–Sobolev inequality.** Let `dim V = n ≥ 1`, `1 ≤ p < ∞` and
   `1/p' = 1/p - 1/n`. Every `f ∈ L_p(V)` with weak derivatives `g_k` along the orthonormal basis
   of `Rd.gridBasis` satisfies `‖f‖_{p'} ≤ C_{V,p} ∑_k ‖g_k‖_p` with Mathlib's constant
@@ -269,11 +271,11 @@ theorem are in [Triebel–Lizorkin spaces](TriebelLizorkin.md).
   convergence in measure of the mollifications, and removes the compact support by cut-offs and
   Fatou's lemma. Hence, for `r < ∞`, `1/r = 1/p - 1/n` and `g_k ∈ L_p(V)`, `f` has a
   representative `u ∈ L_r(V)` with `‖u‖_r ≤ C_{V,p} ∑_k ‖g_k‖_p`, `p = 1` included
-  (`Rd.exists_memLp_ae_eq_of_hasWeakLineDeriv_one`, `Rd.exists_memLp_ae_eq_of_memWSobolev_one`,
+  (`Rd.exists_memLp_ae_eq_of_hasWeakLineDeriv_one`, `Rd.exists_memLp_ae_eq_of_memSobolevW_one`,
   and with the exponents `1/r + 1/n = 1/p`:
-  `Rd.exists_memLp_ae_eq_of_memWSobolev_one_of_inv_add_inv`), and every `f ∈ W^m_1(V)`,
+  `Rd.exists_memLp_ae_eq_of_memSobolevW_one_of_inv_add_inv`), and every `f ∈ W^m_1(V)`,
   `m ≥ 1`, has a representative in `L_r(V)` for `r < ∞` and `1/r = 1 - m/n`
-  (`Rd.exists_memLp_ae_eq_of_memWSobolev_one_of_eq`).
+  (`Rd.exists_memLp_ae_eq_of_memSobolevW_one_of_eq`).
 * **Bessel kernels.** A family `(G_j)` of Schwartz functions is uniformly Schwartz for some
   bounds iff `{G_j}` is a bounded set of the Schwartz space
   (`Rd.exists_isUniformSchwartz_iff_isVonNBounded`). If `(G_j)` is a uniform Schwartz family and
@@ -294,8 +296,9 @@ theorem are in [Triebel–Lizorkin spaces](TriebelLizorkin.md).
   Hörmander constant (`Rd.exists_isCZFamily_besselKernelFamily`); the seminorm bounds and the
   Hörmander constant are existential. The Fourier transforms of `ψ_1`, of `Φ - δ_{1/2} Φ` and
   of `δ_2 Φ - δ_{1/4} Φ` vanish outside such annuli
-  (`Rd.mem_annulus_of_fourier_psiOneS_ne_zero`, `Rd.mem_annulus_of_fourier_psiBase_ne_zero`,
-  `Rd.mem_annulus_of_fourier_psiDualBase_ne_zero`).
+  (`Rd.mem_annulus_of_fourier_lpBlockKernelOneS_ne_zero`,
+  `Rd.mem_annulus_of_fourier_lpBlockKernelBase_ne_zero`,
+  `Rd.mem_annulus_of_fourier_dualLpBlockKernelBase_ne_zero`).
 * **Bessel potential spaces `H^{s,p} = F^s_{p,2}`.** Let `V` have dimension `n ≥ 1`,
   `1 < p < ∞`, and let `J_s` be Mathlib's Bessel potential, the Fourier multiplier with
   `⟨ξ⟩^s = (1 + ‖ξ‖²)^{s/2}`; a tempered distribution `f` lies in Mathlib's Bessel potential
@@ -311,13 +314,14 @@ theorem are in [Triebel–Lizorkin spaces](TriebelLizorkin.md).
   function `g ∈ F^s_{p,2}(V)` with `‖g‖_{F^s_{p,2}} ≤ C ‖h‖_p`
   (`Rd.exists_memTriebelLizorkin_of_besselPotential_eq`; for Mathlib's bundled space
   `Rd.exists_memTriebelLizorkin_toDistr`), and `W^m_p(V) = H^{m,p}(V)` for every `m ∈ ℕ`
-  (Calderón; `Rd.memWSobolev_iff_memSobolev_bessel`). The constants are existential.
+  (Calderón; `Rd.memSobolevW_iff_memSobolev_bessel`). The constants are existential.
   The kernels are the Bessel potentials of the blocks and of the synthesis kernels, dilates of
   Bessel kernels up to `2^{±js}` (`Rd.besselBase`), which form Calderón–Zygmund families
-  (`Rd.exists_isCZFamily_besselBase_psiBase`, `Rd.exists_isCZFamily_besselBase_psiDualBase`).
-  For `p ≤ r < ∞` and real `s ≥ n(1/p - 1/r)`, every element of `H^{s,p}(V)` is a function in
-  `L_r(V)` (`Rd.exists_memLp_eq_of_memSobolev_bessel`), with `‖g‖_r ≤ C ‖F‖_{H^{s,p}}` in Mathlib's
-  bundled space (`Rd.exists_enorm_le_of_besselPotentialSpace`).
+  (`Rd.exists_isCZFamily_besselBase_lpBlockKernelBase`,
+  `Rd.exists_isCZFamily_besselBase_dualLpBlockKernelBase`). For `p ≤ r < ∞` and real
+  `s ≥ n(1/p - 1/r)`, every element of `H^{s,p}(V)` is a function in `L_r(V)`
+  (`Rd.exists_memLp_eq_of_memSobolev_bessel`), with `‖g‖_r ≤ C ‖F‖_{H^{s,p}}` in Mathlib's bundled
+  space (`Rd.exists_enorm_le_of_besselPotentialSpace`).
 * **`H^{s,p} = F^s_{p,2}` for tempered distributions.** Let `n ≥ 1` and `1 < p < ∞`. For every
   real `s` a tempered distribution `u` lies in `H^{s,p}(V)` iff it lies in `F^s_{p,2}` of tempered
   distributions (`Rd.memSobolev_bessel_iff_memTriebelLizorkinDistr`), with finite constants in
@@ -344,7 +348,7 @@ theorem are in [Triebel–Lizorkin spaces](TriebelLizorkin.md).
   (`Rd.HasSymbolGrowth.exists_isUniformSchwartz_symbolKernelFamily`), and
   `m(D) ω_{2^j} = 2^{jσ} (K_j)_{2^j}` with `ω = 𝓕⁻¹ ω̂` (`Rd.fourierMultiplierCLM_schwartzDilate`);
   in particular `m(D) ψ̃_j = 2^{jσ} (G_j)_{2^j}` for the synthesis kernels with a uniform family
-  `(G_j)` (`Rd.HasSymbolGrowth.exists_isUniformSchwartz_psiDualS`). Convolutions with the
+  `(G_j)` (`Rd.HasSymbolGrowth.exists_isUniformSchwartz_dualLpBlockKernelS`). Convolutions with the
   dilates of a uniform family lie below the maximal function, uniformly in `j`
   (`Rd.IsUniformSchwartz.enorm_conv_dilate_le_maximalFunction`).
 * **Fourier multipliers on Triebel–Lizorkin spaces.** Let `1 < p < ∞`, `1 < q ≤ ∞` and `m` a

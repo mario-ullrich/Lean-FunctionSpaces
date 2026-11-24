@@ -90,7 +90,7 @@ theorem tendsto_sum_lpBlock (hp : p ≠ ∞) (f : Lp ℂ p (volume : Measure V))
 theorem lpBlock_mem_bandSpace (hp : p ≠ ∞) (j : ℕ) (f : Lp ℂ p (volume : Measure V)) :
     lpBlock hp j f ∈ bandSpace hp j := by
   rw [mem_bandSpace, lpBlock]
-  exact convLp_convLp_of_eq hp _ _ _ (conv_Theta_lpBlockKernel j) f
+  exact convLp_convLp_of_eq hp _ _ _ (conv_dilatedBandKernel_lpBlockKernel j) f
 
 /-- **High blocks of band-limited functions vanish**: `Δ_j g = 0` for `g ∈ E_i` and `j ≥ i + 3`,
 since `ψ_j ⋆ Θ_i = 0`. -/
@@ -98,7 +98,7 @@ theorem lpBlock_eq_zero_of_mem (hp : p ≠ ∞) {i j : ℕ} (hij : i + 3 ≤ j)
     {g : Lp ℂ p (volume : Measure V)} (hg : g ∈ bandSpace hp i) : lpBlock hp j g = 0 := by
   rw [mem_bandSpace] at hg
   rw [lpBlock, ← hg,
-    convLp_convLp_of_eq hp _ _ (integrable_zero _ _ _) (conv_lpBlockKernel_Theta hij) g]
+    convLp_convLp_of_eq hp _ _ (integrable_zero _ _ _) (conv_lpBlockKernel_dilatedBandKernel hij) g]
   exact convLp_of_eq_zero hp _ rfl g
 
 /-- **Blocks see only the error of band-limited approximation**: for `j ≥ i + 3`,

@@ -41,9 +41,9 @@ The kernels of the Littlewood–Paley decomposition are inverse transforms of sm
   `1 ≤ ‖lpKernel‖_1 < ∞` (`Rd.one_le_eLpNorm_lpKernel`, `Rd.eLpNorm_lpKernel_ne_top`,
   `Rd.eLpNorm_lpKernel_lt_top`), and
   `Rd.bandKernel = 𝓕⁻¹ χ_{2,4}`;
-* their dilations `Φ_k = Rd.dilatedLpKernel k` and `Θ_k = Rd.Theta k` by `2^k`, whose transforms are
-  the cut-offs at scale `2^k` (`Rd.fourier_dilate`: `𝓕(Φ_c)(ξ) = 𝓕Φ(c^(-1) ξ)`), and the blocks
-  `ψ_0 = Φ_0`, `ψ_j = Φ_j - Φ_{j-1}` (`Rd.lpBlockKernel`), with `∑_{j ≤ J} ψ_j = Φ_J`
+* their dilations `Φ_k = Rd.dilatedLpKernel k` and `Θ_k = Rd.dilatedBandKernel k` by `2^k`, whose
+  transforms are the cut-offs at scale `2^k` (`Rd.fourier_dilate`: `𝓕(Φ_c)(ξ) = 𝓕Φ(c^(-1) ξ)`), and
+  the blocks `ψ_0 = Φ_0`, `ψ_j = Φ_j - Φ_{j-1}` (`Rd.lpBlockKernel`), with `∑_{j ≤ J} ψ_j = Φ_J`
   (`Rd.sum_lpBlockKernel`).
 
 On the frequency side `𝓕Φ_k` lives in the ball of radius `2^(k+1)`, `𝓕Θ_k` in the ball of radius
@@ -57,10 +57,10 @@ two blocks `a`, `a + 1` are nonzero, and their transforms add up to `1`
 Fourier transforms (`Rd.conv_eq_of_fourier`: if `𝓕K · 𝓕L = 𝓕M`, then `K ⋆ L = M`, by
 `Rd.fourier_conv` and the inversion theorem `Continuous.fourierInv_fourier_eq`):
 
-* `Θ_{k+1} ⋆ Θ_k = Θ_k` (`Rd.conv_Theta_succ`): the band-limited classes increase;
-* `Θ_j ⋆ ψ_j = ψ_j` (`Rd.conv_Theta_lpBlockKernel`): the blocks are band-limited;
-* `ψ_j ⋆ Θ_k = 0` for `j ≥ k + 3` (`Rd.conv_lpBlockKernel_Theta`): high blocks of band-limited
-  functions vanish.
+* `Θ_{k+1} ⋆ Θ_k = Θ_k` (`Rd.conv_dilatedBandKernel_succ`): the band-limited classes increase;
+* `Θ_j ⋆ ψ_j = ψ_j` (`Rd.conv_dilatedBandKernel_lpBlockKernel`): the blocks are band-limited;
+* `ψ_j ⋆ Θ_k = 0` for `j ≥ k + 3` (`Rd.conv_lpBlockKernel_dilatedBandKernel`): high blocks of
+  band-limited functions vanish.
 -/
 
 @[expose] public section
@@ -397,7 +397,7 @@ theorem integral_lpKernel : ∫ x, lpKernel (V := V) x = 1 := by
 noncomputable def dilatedLpKernel (k : ℕ) : V → ℂ := dilate (2 ^ k) lpKernel
 
 /-- The dilated band-limiting kernel `Θ_k = 2^(kn) Θ(2^k ·)`. -/
-noncomputable def Theta (k : ℕ) : V → ℂ := dilate (2 ^ k) bandKernel
+noncomputable def dilatedBandKernel (k : ℕ) : V → ℂ := dilate (2 ^ k) bandKernel
 
 /-- The **Littlewood–Paley blocks** `ψ_0 = Φ_0`, `ψ_j = Φ_j - Φ_{j-1}`. -/
 noncomputable def lpBlockKernel : ℕ → V → ℂ
@@ -416,7 +416,7 @@ theorem integrable_dilatedLpKernel (k : ℕ) : Integrable (dilatedLpKernel (V :=
   integrable_dilate integrable_lpKernel (by positivity)
 
 /-- The dilated kernels are integrable. -/
-theorem integrable_Theta (k : ℕ) : Integrable (Theta (V := V) k) :=
+theorem integrable_dilatedBandKernel (k : ℕ) : Integrable (dilatedBandKernel (V := V) k) :=
   integrable_dilate integrable_bandKernel (by positivity)
 
 /-- The blocks are integrable. -/
@@ -430,7 +430,7 @@ theorem continuous_dilatedLpKernel (k : ℕ) : Continuous (dilatedLpKernel (V :=
   continuous_dilate continuous_lpKernel _
 
 /-- The dilated kernels are continuous. -/
-theorem continuous_Theta (k : ℕ) : Continuous (Theta (V := V) k) :=
+theorem continuous_dilatedBandKernel (k : ℕ) : Continuous (dilatedBandKernel (V := V) k) :=
   continuous_dilate continuous_bandKernel _
 
 /-- The blocks are continuous. -/
@@ -445,7 +445,8 @@ theorem bddAbove_dilatedLpKernel (k : ℕ) :
   bddAbove_dilate bddAbove_lpKernel _
 
 /-- The dilated kernels are bounded. -/
-theorem bddAbove_Theta (k : ℕ) : BddAbove (Set.range fun x => ‖Theta (V := V) k x‖) :=
+theorem bddAbove_dilatedBandKernel (k : ℕ) :
+    BddAbove (Set.range fun x => ‖dilatedBandKernel (V := V) k x‖) :=
   bddAbove_dilate bddAbove_bandKernel _
 
 /-- The blocks are bounded. -/
@@ -466,8 +467,8 @@ theorem eLpNorm_dilatedLpKernel_one (k : ℕ) :
   eLpNorm_dilate_one integrable_lpKernel (by positivity)
 
 /-- `‖Θ_k‖_1 = ‖Θ‖_1`. -/
-theorem eLpNorm_Theta_one (k : ℕ) :
-    eLpNorm (Theta (V := V) k) 1 volume = eLpNorm (bandKernel (V := V)) 1 volume :=
+theorem eLpNorm_dilatedBandKernel_one (k : ℕ) :
+    eLpNorm (dilatedBandKernel (V := V) k) 1 volume = eLpNorm (bandKernel (V := V)) 1 volume :=
   eLpNorm_dilate_one integrable_bandKernel (by positivity)
 
 /-- The norm `‖Θ‖_1` of the band-limiting kernel is finite. -/
@@ -492,10 +493,10 @@ theorem one_le_eLpNorm_lpKernel : 1 ≤ eLpNorm (lpKernel (V := V)) 1 volume :=
         (eLpNorm_one_eq_lintegral_enorm integrable_lpKernel.aestronglyMeasurable).symm
 
 /-- `∫ |Θ_k| = ‖Θ‖_1` for every dilation, as a lower Lebesgue integral. -/
-theorem lintegral_enorm_Theta (k : ℕ) :
-    ∫⁻ y, ‖Theta (V := V) k y‖ₑ = eLpNorm (bandKernel (V := V)) 1 volume := by
-  rw [← eLpNorm_one_eq_lintegral_enorm (integrable_Theta k).aestronglyMeasurable,
-    eLpNorm_Theta_one]
+theorem lintegral_enorm_dilatedBandKernel (k : ℕ) :
+    ∫⁻ y, ‖dilatedBandKernel (V := V) k y‖ₑ = eLpNorm (bandKernel (V := V)) 1 volume := by
+  rw [← eLpNorm_one_eq_lintegral_enorm (integrable_dilatedBandKernel k).aestronglyMeasurable,
+    eLpNorm_dilatedBandKernel_one]
 
 /-- `‖ψ_j‖_1 ≤ 2 ‖Φ‖_1`. -/
 theorem eLpNorm_lpBlockKernel_one_le (j : ℕ) :
@@ -530,9 +531,10 @@ theorem fourier_dilatedLpKernel (k : ℕ) (ξ : V) :
   rw [dilatedLpKernel, fourier_dilate _ (by positivity), fourier_lpKernel]
 
 /-- `𝓕Θ_k(ξ) = χ_{2,4}(2^(-k) ξ)`. -/
-theorem fourier_Theta (k : ℕ) (ξ : V) :
-    𝓕 (Theta (V := V) k) ξ = cutoff 2 4 two_pos (by norm_num) (((2 : ℝ) ^ k)⁻¹ • ξ) := by
-  rw [Theta, fourier_dilate _ (by positivity), fourier_bandKernel]
+theorem fourier_dilatedBandKernel (k : ℕ) (ξ : V) :
+    𝓕 (dilatedBandKernel (V := V) k) ξ =
+      cutoff 2 4 two_pos (by norm_num) (((2 : ℝ) ^ k)⁻¹ • ξ) := by
+  rw [dilatedBandKernel, fourier_dilate _ (by positivity), fourier_bandKernel]
 
 /-- `𝓕ψ_{j+1} = 𝓕Φ_{j+1} - 𝓕Φ_j`. -/
 theorem fourier_lpBlockKernel_succ (j : ℕ) (ξ : V) :
@@ -545,7 +547,8 @@ theorem integrable_fourier_dilatedLpKernel (k : ℕ) : Integrable (𝓕 (dilated
   integrable_fourier_dilate integrable_fourier_lpKernel (by positivity)
 
 /-- The Fourier transforms of the dilated kernels are integrable. -/
-theorem integrable_fourier_Theta (k : ℕ) : Integrable (𝓕 (Theta (V := V) k)) :=
+theorem integrable_fourier_dilatedBandKernel (k : ℕ) :
+    Integrable (𝓕 (dilatedBandKernel (V := V) k)) :=
   integrable_fourier_dilate integrable_fourier_bandKernel (by positivity)
 
 /-- The Fourier transforms of the blocks are integrable. -/
@@ -568,18 +571,18 @@ theorem norm_lt_of_fourier_dilatedLpKernel_ne_zero {k : ℕ} {ξ : V}
   linarith
 
 /-- `𝓕Θ_k` vanishes outside the ball of radius `2^(k+2)`. -/
-theorem norm_lt_of_fourier_Theta_ne_zero {k : ℕ} {ξ : V} (h : 𝓕 (Theta (V := V) k) ξ ≠ 0) :
-    ‖ξ‖ < 2 ^ (k + 2) := by
-  rw [fourier_Theta] at h
+theorem norm_lt_of_fourier_dilatedBandKernel_ne_zero {k : ℕ} {ξ : V}
+    (h : 𝓕 (dilatedBandKernel (V := V) k) ξ ≠ 0) : ‖ξ‖ < 2 ^ (k + 2) := by
+  rw [fourier_dilatedBandKernel] at h
   have h1 := norm_lt_of_cutoff_ne_zero _ _ h
   rw [norm_two_pow_inv_smul, div_lt_iff₀ (by positivity)] at h1
   rw [pow_succ, pow_succ]
   linarith
 
 /-- `𝓕Θ_k = 1` on the closed ball of radius `2^(k+1)`. -/
-theorem fourier_Theta_eq_one {k : ℕ} {ξ : V} (h : ‖ξ‖ ≤ 2 ^ (k + 1)) :
-    𝓕 (Theta (V := V) k) ξ = 1 := by
-  rw [fourier_Theta]
+theorem fourier_dilatedBandKernel_eq_one {k : ℕ} {ξ : V} (h : ‖ξ‖ ≤ 2 ^ (k + 1)) :
+    𝓕 (dilatedBandKernel (V := V) k) ξ = 1 := by
+  rw [fourier_dilatedBandKernel]
   refine cutoff_eq_one _ _ ?_
   rw [norm_two_pow_inv_smul, div_le_iff₀ (by positivity)]
   rw [pow_succ] at h
@@ -617,27 +620,30 @@ theorem lt_norm_of_fourier_lpBlockKernel_succ_ne_zero {i : ℕ} {ξ : V}
   not_le.1 fun h' => h (fourier_lpBlockKernel_succ_eq_zero h')
 
 /-- `𝓕Θ_{k+1} · 𝓕Θ_k = 𝓕Θ_k`. -/
-theorem fourier_Theta_succ_mul (k : ℕ) (ξ : V) :
-    𝓕 (Theta (V := V) (k + 1)) ξ * 𝓕 (Theta (V := V) k) ξ = 𝓕 (Theta (V := V) k) ξ := by
-  by_cases h : 𝓕 (Theta (V := V) k) ξ = 0
+theorem fourier_dilatedBandKernel_succ_mul (k : ℕ) (ξ : V) :
+    𝓕 (dilatedBandKernel (V := V) (k + 1)) ξ * 𝓕 (dilatedBandKernel (V := V) k) ξ =
+      𝓕 (dilatedBandKernel (V := V) k) ξ := by
+  by_cases h : 𝓕 (dilatedBandKernel (V := V) k) ξ = 0
   · rw [h, mul_zero]
-  · rw [fourier_Theta_eq_one (k := k + 1) (norm_lt_of_fourier_Theta_ne_zero h).le, one_mul]
+  · rw [fourier_dilatedBandKernel_eq_one (k := k + 1)
+      (norm_lt_of_fourier_dilatedBandKernel_ne_zero h).le, one_mul]
 
 /-- `𝓕Θ_j · 𝓕ψ_j = 𝓕ψ_j`. -/
-theorem fourier_Theta_mul_lpBlockKernel (j : ℕ) (ξ : V) :
-    𝓕 (Theta (V := V) j) ξ * 𝓕 (lpBlockKernel (V := V) j) ξ = 𝓕 (lpBlockKernel (V := V) j) ξ := by
+theorem fourier_dilatedBandKernel_mul_lpBlockKernel (j : ℕ) (ξ : V) :
+    𝓕 (dilatedBandKernel (V := V) j) ξ * 𝓕 (lpBlockKernel (V := V) j) ξ =
+      𝓕 (lpBlockKernel (V := V) j) ξ := by
   by_cases h : 𝓕 (lpBlockKernel (V := V) j) ξ = 0
   · rw [h, mul_zero]
-  · rw [fourier_Theta_eq_one (norm_lt_of_fourier_lpBlockKernel_ne_zero h).le, one_mul]
+  · rw [fourier_dilatedBandKernel_eq_one (norm_lt_of_fourier_lpBlockKernel_ne_zero h).le, one_mul]
 
 /-- `𝓕ψ_j · 𝓕Θ_k = 0` for `j ≥ k + 3`. -/
-theorem fourier_lpBlockKernel_mul_Theta {j k : ℕ} (hjk : k + 3 ≤ j) (ξ : V) :
-    𝓕 (lpBlockKernel (V := V) j) ξ * 𝓕 (Theta (V := V) k) ξ = 0 := by
-  by_cases h : 𝓕 (Theta (V := V) k) ξ = 0
+theorem fourier_lpBlockKernel_mul_dilatedBandKernel {j k : ℕ} (hjk : k + 3 ≤ j) (ξ : V) :
+    𝓕 (lpBlockKernel (V := V) j) ξ * 𝓕 (dilatedBandKernel (V := V) k) ξ = 0 := by
+  by_cases h : 𝓕 (dilatedBandKernel (V := V) k) ξ = 0
   · rw [h, mul_zero]
   · obtain ⟨i, rfl⟩ : ∃ i, j = i + 1 := ⟨j - 1, by omega⟩
     rw [fourier_lpBlockKernel_succ_eq_zero, zero_mul]
-    exact (norm_lt_of_fourier_Theta_ne_zero h).le.trans
+    exact (norm_lt_of_fourier_dilatedBandKernel_ne_zero h).le.trans
       (pow_le_pow_right₀ one_le_two (by omega))
 
 /-- **The Fourier transforms of the blocks are bounded by `1`**: `|𝓕ψ_j(ξ)| ≤ 1`, since
@@ -745,28 +751,31 @@ theorem conv_eq_of_fourier {K L M : V → ℂ} (hK : Integrable K) (hL : Integra
   rw [← hc.fourierInv_fourier_eq hKL hFKL, hF, hMc.fourierInv_fourier_eq hM hFM]
 
 /-- **The band-limited classes increase**: `Θ_{k+1} ⋆ Θ_k = Θ_k`. -/
-theorem conv_Theta_succ (k : ℕ) :
-    conv (Theta (V := V) (k + 1)) (Theta k) volume = Theta k :=
-  conv_eq_of_fourier (integrable_Theta _) (integrable_Theta _) (continuous_Theta _)
-    (bddAbove_Theta _) (integrable_Theta _) (continuous_Theta _) (integrable_fourier_Theta _)
-    (fourier_Theta_succ_mul k)
+theorem conv_dilatedBandKernel_succ (k : ℕ) :
+    conv (dilatedBandKernel (V := V) (k + 1)) (dilatedBandKernel k) volume = dilatedBandKernel k :=
+  conv_eq_of_fourier (integrable_dilatedBandKernel _) (integrable_dilatedBandKernel _)
+    (continuous_dilatedBandKernel _) (bddAbove_dilatedBandKernel _) (integrable_dilatedBandKernel _)
+    (continuous_dilatedBandKernel _) (integrable_fourier_dilatedBandKernel _)
+    (fourier_dilatedBandKernel_succ_mul k)
 
 /-- **The blocks are band-limited**: `Θ_j ⋆ ψ_j = ψ_j`. -/
-theorem conv_Theta_lpBlockKernel (j : ℕ) :
-    conv (Theta (V := V) j) (lpBlockKernel j) volume = lpBlockKernel j :=
-  conv_eq_of_fourier (integrable_Theta _) (integrable_lpBlockKernel _) (continuous_lpBlockKernel _)
-    (bddAbove_lpBlockKernel _) (integrable_lpBlockKernel _) (continuous_lpBlockKernel _)
-    (integrable_fourier_lpBlockKernel _) (fourier_Theta_mul_lpBlockKernel j)
+theorem conv_dilatedBandKernel_lpBlockKernel (j : ℕ) :
+    conv (dilatedBandKernel (V := V) j) (lpBlockKernel j) volume = lpBlockKernel j :=
+  conv_eq_of_fourier (integrable_dilatedBandKernel _) (integrable_lpBlockKernel _)
+    (continuous_lpBlockKernel _) (bddAbove_lpBlockKernel _) (integrable_lpBlockKernel _)
+    (continuous_lpBlockKernel _) (integrable_fourier_lpBlockKernel _)
+    (fourier_dilatedBandKernel_mul_lpBlockKernel j)
 
 /-- **High blocks annihilate band-limited kernels**: `ψ_j ⋆ Θ_k = 0` for `j ≥ k + 3`. -/
-theorem conv_lpBlockKernel_Theta {j k : ℕ} (hjk : k + 3 ≤ j) :
-    conv (lpBlockKernel (V := V) j) (Theta k) volume = 0 := by
+theorem conv_lpBlockKernel_dilatedBandKernel {j k : ℕ} (hjk : k + 3 ≤ j) :
+    conv (lpBlockKernel (V := V) j) (dilatedBandKernel k) volume = 0 := by
   have h0 : 𝓕 (0 : V → ℂ) = 0 := funext fun ξ => by simp [Real.fourier_eq]
-  refine conv_eq_of_fourier (integrable_lpBlockKernel _) (integrable_Theta _) (continuous_Theta _)
-    (bddAbove_Theta _) (integrable_zero _ _ _) continuous_zero ?_ fun ξ => ?_
+  refine conv_eq_of_fourier (integrable_lpBlockKernel _) (integrable_dilatedBandKernel _)
+    (continuous_dilatedBandKernel _) (bddAbove_dilatedBandKernel _) (integrable_zero _ _ _)
+    continuous_zero ?_ fun ξ => ?_
   · rw [h0]
     exact integrable_zero _ _ _
-  · rw [h0, fourier_lpBlockKernel_mul_Theta hjk]
+  · rw [h0, fourier_lpBlockKernel_mul_dilatedBandKernel hjk]
     rfl
 
 end Rd

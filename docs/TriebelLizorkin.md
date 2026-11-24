@@ -172,8 +172,8 @@ and of `L_p` and one of them, are Besov spaces.
   `θ_j^*(x) = conj θ_j(-x)` with the same `B` and `H` (`Rd.IsCZFamily.adjoint`). The
   Littlewood–Paley blocks `ψ_j` form such a family with overlap `2` (`Rd.isCZFamily_lpBlockKernel`),
   and so do the synthesis kernels `ψ̃_0 = Φ_1`, `ψ̃_1 = Φ_2`, `ψ̃_j = Φ_{j+1} - Φ_{j-2}` with
-  overlap `4` (`Rd.psiDual`, `Rd.isCZFamily_psiDual`), which reproduce the blocks:
-  `ψ̃_j ⋆ ψ_j = ψ_j` (`Rd.conv_psiDual_lpBlockKernel`).
+  overlap `4` (`Rd.dualLpBlockKernel`, `Rd.isCZFamily_dualLpBlockKernel`), which reproduce the
+  blocks: `ψ̃_j ⋆ ψ_j = ψ_j` (`Rd.conv_dualLpBlockKernel_lpBlockKernel`).
 * **The adjoint of a convolution.** For `K ∈ L_1(V)`, `f ∈ L_p(V)` and `g ∈ L_q(V)` with
   `1/p + 1/q = 1`, `p < ∞`, and the reflection `K^∨(x) = K(-x)` (`Rd.reflectNeg`),
   `∫ (K ⋆ f) g = ∫ f (K^∨ ⋆ g)` (`Rd.integral_conv_mul`). For Schwartz functions `η`, `u`,
@@ -220,12 +220,12 @@ and of `L_p` and one of them, are Besov spaces.
   named constants `Q_{V,p} = S_{V,p}(2, 4 H_{A^ψ})` and `Q̃_{V,p} = S_{V,p}(4, 4 H_Ã)` of the
   Calderón–Zygmund families of the blocks and of the synthesis kernels
   (`Rd.squareFunctionConst`, `Rd.squareSynthesisConst`), where `A^ψ` and `Ã` are the seminorm
-  bounds of the blocks and of the synthesis kernels (`Rd.psiBaseBound`, `Rd.psiDualBaseBound`),
-  formulas in Schwartz seminorms of fixed kernels, proved finite
+  bounds of the blocks and of the synthesis kernels (`Rd.lpBlockKernelBaseBound`,
+  `Rd.dualLpBlockKernelBaseBound`), formulas in Schwartz seminorms of fixed kernels, proved finite
   (`Rd.squareFunctionConst_ne_top`, `Rd.squareSynthesisConst_ne_top`).
   Hence `F^0_{p,2} = L_p(V)` (`Rd.triebelLizorkinSpace_zero_two_eq_top`). The lower bound uses
   the reproducing formula `∑_{j < J} ψ̃_j ⋆ (ψ_j ⋆ f) → f` in `L_p(V)`
-  (`Rd.tendsto_eLpNorm_sum_conv_psiDual_blockFun_sub`).
+  (`Rd.tendsto_eLpNorm_sum_conv_dualLpBlockKernel_blockFun_sub`).
 * **The square function theorem on the torus.** Let `d ≥ 1` and `1 < p < ∞`. A
   Calderón–Zygmund family `(θ_j)_j` on `ℝ^d` with overlap `B` and Hörmander constant `H` acts on
   the torus by `(θ_j ⋆ f)(t) = ∫ θ_j(y) f(t - π y) dy`. If its far mass

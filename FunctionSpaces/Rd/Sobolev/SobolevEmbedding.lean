@@ -35,16 +35,16 @@ Let `V` have dimension `n`, `1 ≤ p < ∞` and `α(n, p, r) = n (1/p - 1/r)` fo
   for `1 ≤ q ≤ ∞` and `s > n/p` the series of the blocks converges uniformly to a bounded
   continuous representative `a` of `f` with `sup |a| ≤ K ‖(2^(js) ‖ψ_j ⋆ f‖_p)_j‖_{ℓ_q}`.
 * **Sobolev embeddings** (`Rd.exists_memLp_ae_eq_of_hasWeakLineDeriv`,
-  `Rd.exists_boundedContinuous_ae_eq_of_hasWeakLineDeriv`, `Rd.exists_memLp_ae_eq_of_memWSobolev`,
-  `Rd.exists_boundedContinuous_ae_eq_of_memWSobolev`): for `n ≥ 1` and `1 < p < ∞`, the bound
+  `Rd.exists_boundedContinuous_ae_eq_of_hasWeakLineDeriv`, `Rd.exists_memLp_ae_eq_of_memSobolevW`,
+  `Rd.exists_boundedContinuous_ae_eq_of_memSobolevW`): for `n ≥ 1` and `1 < p < ∞`, the bound
   `‖f‖_{F^m_{p,2}} ≤ ‖Φ‖_1 ‖f‖_p + 2^m ∑_α K_α ‖∂^α f‖_p` bounds the Littlewood–Paley quasi-norm
   of `B^m_{p,max(p,2)}`, which gives `W^m_p ↪ L_r` for `m > n(1/p - 1/r)` and `W^m_p ↪ C_b` for
   `m > n/p`, with named constants, formulas in norms and Schwartz seminorms of fixed kernels
   that are proved finite. The critical case `1/r = 1/p - m/n` with `r < ∞` (Sobolev's
   inequality) is in `FunctionSpaces.Rd.Sobolev.CriticalSobolevEmbedding`
-  (`Rd.exists_memLp_ae_eq_of_memWSobolev_of_eq`), and for `p = 1` in
+  (`Rd.exists_memLp_ae_eq_of_memSobolevW_of_eq`), and for `p = 1` in
   `FunctionSpaces.Rd.Sobolev.GagliardoNirenbergSobolev`
-  (`Rd.exists_memLp_ae_eq_of_memWSobolev_one_of_eq`).
+  (`Rd.exists_memLp_ae_eq_of_memSobolevW_one_of_eq`).
 -/
 
 @[expose] public section
@@ -134,15 +134,17 @@ theorem continuous_conv_schwartz {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ �
   continuous_conv_of_enorm_le hp1 hp G.integrable (fun y => by simpa using enorm_schwartz_le G 0 y)
     (schwartzDecayConst_ne_top G 0 0) hf
 
-/-- The Littlewood–Paley kernel `ψ_j` is the Schwartz function `(psiBase j)_{2^j}`
-(`Rd.dilate_psiBase`). -/
-theorem coe_schwartzDilate_psiBase (j : ℕ) :
-    (schwartzDilate ((2 : ℝ) ^ j) (by positivity) (psiBase (V := V) j) : V → ℂ) = lpBlockKernel j :=
-  (coe_schwartzDilate _ _ _).trans (dilate_psiBase j)
+/-- The Littlewood–Paley kernel `ψ_j` is the Schwartz function `(lpBlockKernelBase j)_{2^j}`
+(`Rd.dilate_lpBlockKernelBase`). -/
+theorem coe_schwartzDilate_lpBlockKernelBase (j : ℕ) :
+    (schwartzDilate ((2 : ℝ) ^ j) (by positivity) (lpBlockKernelBase (V := V) j) : V → ℂ) =
+      lpBlockKernel j :=
+  (coe_schwartzDilate _ _ _).trans (dilate_lpBlockKernelBase j)
 
 /-- The band-limiting kernel `Θ_j` is the Schwartz function `Θ_{2^j}`. -/
 theorem coe_schwartzDilate_bandKernelS (j : ℕ) :
-    (schwartzDilate ((2 : ℝ) ^ j) (by positivity) (bandKernelS (V := V)) : V → ℂ) = Theta j :=
+    (schwartzDilate ((2 : ℝ) ^ j) (by positivity) (bandKernelS (V := V)) : V → ℂ) =
+      dilatedBandKernel j :=
   coe_schwartzDilate _ _ _
 
 variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
@@ -151,7 +153,7 @@ variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 since `ψ_j` is a Schwartz function (`Rd.continuous_conv_schwartz`). -/
 theorem continuous_blockFun (hp : p ≠ ∞) (j : ℕ) (f : Lp ℂ p (volume : Measure V)) :
     Continuous (blockFun j f) := by
-  rw [blockFun, ← coe_schwartzDilate_psiBase]
+  rw [blockFun, ← coe_schwartzDilate_lpBlockKernelBase]
   exact continuous_conv_schwartz Fact.out hp _ (Lp.memLp f)
 
 /-! ### The Nikolskii inequality for blocks -/
@@ -174,23 +176,23 @@ theorem nikolskiiBlockConst_ne_top : nikolskiiBlockConst V p ≠ ∞ :=
     (ENNReal.rpow_ne_top_of_nonneg (by positivity) iSup_enorm_bandKernel_lt_top.ne)
 
 /-- `|Θ_j(y)| ≤ 2^(jn) sup |Θ|` for every `y`, since `Θ_j(y) = 2^(jn) Θ(2^j y)`. -/
-theorem enorm_Theta_le (j : ℕ) (y : V) :
-    ‖Theta (V := V) j y‖ₑ ≤ 2 ^ (j * finrank ℝ V) * ⨆ z, ‖bandKernel (V := V) z‖ₑ := by
-  rw [Theta, enorm_dilate_two_pow]
+theorem enorm_dilatedBandKernel_le (j : ℕ) (y : V) :
+    ‖dilatedBandKernel (V := V) j y‖ₑ ≤ 2 ^ (j * finrank ℝ V) * ⨆ z, ‖bandKernel (V := V) z‖ₑ := by
+  rw [dilatedBandKernel, enorm_dilate_two_pow]
   gcongr
   exact le_iSup (fun z => ‖bandKernel (V := V) z‖ₑ) _
 
 /-- **The blocks are band-limited at every point**: `Θ_j ⋆ (ψ_j ⋆ f) = ψ_j ⋆ f` for
 `1 ≤ p < ∞` and `f ∈ L_p(V)`. Almost everywhere this is associativity and `Θ_j ⋆ ψ_j = ψ_j`
-(`Rd.conv_conv_ae`, `Rd.conv_Theta_lpBlockKernel`); both sides are continuous
+(`Rd.conv_conv_ae`, `Rd.conv_dilatedBandKernel_lpBlockKernel`); both sides are continuous
 (`Rd.continuous_conv_schwartz`), so they agree everywhere (Mathlib's
 `Continuous.ae_eq_iff_eq`). -/
-theorem conv_Theta_blockFun (hp : p ≠ ∞) (j : ℕ) (f : Lp ℂ p (volume : Measure V)) :
-    conv (Theta j) (blockFun j f) volume = blockFun j f := by
-  have hae : conv (Theta j) (blockFun j f) volume =ᵐ[volume] blockFun j f := by
-    have h := conv_conv_ae Fact.out hp (integrable_Theta (V := V) j) (integrable_lpBlockKernel j)
-      (Lp.memLp f)
-    rw [conv_Theta_lpBlockKernel] at h
+theorem conv_dilatedBandKernel_blockFun (hp : p ≠ ∞) (j : ℕ) (f : Lp ℂ p (volume : Measure V)) :
+    conv (dilatedBandKernel j) (blockFun j f) volume = blockFun j f := by
+  have hae : conv (dilatedBandKernel j) (blockFun j f) volume =ᵐ[volume] blockFun j f := by
+    have h := conv_conv_ae Fact.out hp (integrable_dilatedBandKernel (V := V) j)
+      (integrable_lpBlockKernel j) (Lp.memLp f)
+    rw [conv_dilatedBandKernel_lpBlockKernel] at h
     exact h.symm
   refine (Continuous.ae_eq_iff_eq volume ?_ (continuous_blockFun hp j f)).1 hae
   rw [← coe_schwartzDilate_bandKernelS]
@@ -198,21 +200,22 @@ theorem conv_Theta_blockFun (hp : p ≠ ∞) (j : ℕ) (f : Lp ℂ p (volume : M
 
 /-- **The Nikolskii inequality for blocks at every point**: for `1 ≤ p < ∞`, `f ∈ L_p(V)` and
 every `x`, `|(ψ_j ⋆ f)(x)| ≤ N_p 2^(jn/p) ‖ψ_j ⋆ f‖_p`. The block is `Θ_j ⋆ (ψ_j ⋆ f)`
-(`Rd.conv_Theta_blockFun`), and the pointwise bound of convolutions with `‖Θ_j‖_1 = ‖Θ‖_1` and
-`|Θ_j| ≤ 2^(jn) sup |Θ|` gives the factor `2^(jn/p)` (`ENNReal.two_pow_rpow_eq_dyadicWeight`). -/
+(`Rd.conv_dilatedBandKernel_blockFun`), and the pointwise bound of convolutions with
+`‖Θ_j‖_1 = ‖Θ‖_1` and `|Θ_j| ≤ 2^(jn) sup |Θ|` gives the factor `2^(jn/p)`
+(`ENNReal.two_pow_rpow_eq_dyadicWeight`). -/
 theorem enorm_blockFun_le_nikolskii (hp : p ≠ ∞) (j : ℕ) (f : Lp ℂ p (volume : Measure V))
     (x : V) :
     ‖blockFun j f x‖ₑ ≤ nikolskiiBlockConst V p *
       dyadicWeight (nikolskiiExponent (finrank ℝ V) p ∞) j * eLpNorm (blockFun j f) p volume := by
-  calc ‖blockFun j f x‖ₑ = ‖conv (Theta j) (blockFun j f) volume x‖ₑ := by
-        rw [conv_Theta_blockFun hp j f]
-    _ ≤ eLpNorm (Theta (V := V) j) 1 volume ^ (1 - 1 / p.toReal) *
+  calc ‖blockFun j f x‖ₑ = ‖conv (dilatedBandKernel j) (blockFun j f) volume x‖ₑ := by
+        rw [conv_dilatedBandKernel_blockFun hp j f]
+    _ ≤ eLpNorm (dilatedBandKernel (V := V) j) 1 volume ^ (1 - 1 / p.toReal) *
           (2 ^ (j * finrank ℝ V) * ⨆ z, ‖bandKernel (V := V) z‖ₑ) ^ (1 / p.toReal) *
           eLpNorm (blockFun j f) p volume :=
-        enorm_conv_le_of_enorm_le Fact.out hp (integrable_Theta j).aestronglyMeasurable
-          (enorm_Theta_le j) (aestronglyMeasurable_blockFun j f) x
+        enorm_conv_le_of_enorm_le Fact.out hp (integrable_dilatedBandKernel j).aestronglyMeasurable
+          (enorm_dilatedBandKernel_le j) (aestronglyMeasurable_blockFun j f) x
     _ = _ := by
-        rw [eLpNorm_Theta_one, ENNReal.mul_rpow_of_nonneg _ _ (by positivity),
+        rw [eLpNorm_dilatedBandKernel_one, ENNReal.mul_rpow_of_nonneg _ _ (by positivity),
           ENNReal.two_pow_rpow_eq_dyadicWeight, nikolskiiExponent_top, nikolskiiBlockConst, one_div]
         ring
 
@@ -468,33 +471,33 @@ theorem exists_boundedContinuous_ae_eq_of_hasWeakLineDeriv [Nontrivial V] (hp1 :
 /-- **The Sobolev embedding into `L_r`**: let `n ≥ 1`, `1 < p ≤ r ≤ ∞`, `p < ∞` and
 `m > n(1/p - 1/r)`. Every `f ∈ W^m_p(V)` has a representative in `L_r(V)`: there is
 `g ∈ L_r(V)` with `g = f` almost everywhere. This is `W^m_p ⊆ B^m_{p,max(p,2)}`
-(`Rd.memApprox_of_memWSobolev`) and the Besov embedding (`Rd.exists_memLp_ae_eq_of_memApprox`);
+(`Rd.memApprox_of_memSobolevW`) and the Besov embedding (`Rd.exists_memLp_ae_eq_of_memApprox`);
 `Rd.exists_memLp_ae_eq_of_hasWeakLineDeriv` adds the norm bound. The critical case
 `1/r = 1/p - m/n` with `r < ∞` (Sobolev's inequality) is
-`Rd.exists_memLp_ae_eq_of_memWSobolev_of_eq`, and for `p = 1`
-`Rd.exists_memLp_ae_eq_of_memWSobolev_one_of_eq`. -/
-theorem exists_memLp_ae_eq_of_memWSobolev [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞)
+`Rd.exists_memLp_ae_eq_of_memSobolevW_of_eq`, and for `p = 1`
+`Rd.exists_memLp_ae_eq_of_memSobolevW_one_of_eq`. -/
+theorem exists_memLp_ae_eq_of_memSobolevW [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞)
     {r : ℝ≥0∞} (hpr : p ≤ r) {m : ℕ}
     (hs : nikolskiiExponent (finrank ℝ V) p r < m) {f : Lp ℂ p (volume : Measure V)}
-    (hf : MemWSobolev m f) : ∃ g : Lp ℂ r (volume : Measure V), (g : V → ℂ) =ᵐ[volume] f := by
+    (hf : MemSobolevW m f) : ∃ g : Lp ℂ r (volume : Measure V), (g : V → ℂ) =ᵐ[volume] f := by
   have hm : 1 ≤ m := one_le_of_nikolskiiExponent_lt (Nat.cast_nonneg _) Fact.out hpr hs
   obtain ⟨g, hg, -⟩ := exists_memLp_ae_eq_of_memApprox hp hpr hs
-    (one_le_two.trans (le_max_right _ _)) (memApprox_of_memWSobolev hp1 hp hm hf)
+    (one_le_two.trans (le_max_right _ _)) (memApprox_of_memSobolevW hp1 hp hm hf)
   exact ⟨g, hg⟩
 
 /-- **The Sobolev embedding into bounded continuous functions**: let `n ≥ 1`, `1 < p < ∞` and
 `m > n/p`. Every `f ∈ W^m_p(V)` has a bounded continuous representative. This is
-`W^m_p ⊆ B^m_{p,max(p,2)}` (`Rd.memApprox_of_memWSobolev`) and the Besov embedding into bounded
+`W^m_p ⊆ B^m_{p,max(p,2)}` (`Rd.memApprox_of_memSobolevW`) and the Besov embedding into bounded
 continuous functions (`Rd.exists_boundedContinuous_ae_eq_of_memApprox`);
 `Rd.exists_boundedContinuous_ae_eq_of_hasWeakLineDeriv` adds the norm bound. -/
-theorem exists_boundedContinuous_ae_eq_of_memWSobolev [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞)
+theorem exists_boundedContinuous_ae_eq_of_memSobolevW [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞)
     {m : ℕ} (hs : (finrank ℝ V : ℝ) / p.toReal < m) {f : Lp ℂ p (volume : Measure V)}
-    (hf : MemWSobolev m f) : ∃ a : V →ᵇ ℂ, (a : V → ℂ) =ᵐ[volume] f := by
+    (hf : MemSobolevW m f) : ∃ a : V →ᵇ ℂ, (a : V → ℂ) =ᵐ[volume] f := by
   have hα : nikolskiiExponent (finrank ℝ V) p ∞ < m := by
     rwa [nikolskiiExponent_top, ← div_eq_mul_inv]
   have hm : 1 ≤ m := one_le_of_nikolskiiExponent_lt (Nat.cast_nonneg _) Fact.out le_top hα
   obtain ⟨a, ha, -⟩ := exists_boundedContinuous_ae_eq_of_memApprox hp hs
-    (one_le_two.trans (le_max_right _ _)) (memApprox_of_memWSobolev hp1 hp hm hf)
+    (one_le_two.trans (le_max_right _ _)) (memApprox_of_memSobolevW hp1 hp hm hf)
   exact ⟨a, ha⟩
 
 end Rd

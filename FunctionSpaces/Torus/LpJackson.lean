@@ -275,8 +275,8 @@ of degree `< 2^j`, since `‖m‖ ≤ #d deg m < 2^(#d) 2^j` and `𝓕Θ_J = 1` 
 theorem periodicEconvLp_dilatedBandKernel_eq_self (hp : p ≠ ∞) {j : ℕ}
     {a : Lp ℂ p (volume : Measure (UnitAddTorus d))} (ha : a ∈ trigPolyLp p (2 ^ j)) :
     periodicEconvLp hp
-      (Rd.integrable_Theta (V := EuclideanSpace ℝ d) (j + Fintype.card d)) a = a := by
-  refine periodicEconvLp_eq_self_of_mem hp _ (fun m hm => Rd.fourier_Theta_eq_one ?_) ha
+      (Rd.integrable_dilatedBandKernel (V := EuclideanSpace ℝ d) (j + Fintype.card d)) a = a := by
+  refine periodicEconvLp_eq_self_of_mem hp _ (fun m hm => Rd.fourier_dilatedBandKernel_eq_one ?_) ha
   have hcard : (Fintype.card d : ℝ) ≤ 2 ^ Fintype.card d := by
     have h := (Nat.cast_le (α := ℝ)).2 (Fintype.card d).lt_two_pow_self.le
     push_cast at h
@@ -301,8 +301,8 @@ theorem lpModulus_le_of_mem_trigPolyLp (hp : p ≠ ∞) (r : ℕ) {j k : ℕ}
   · rw [Nat.sub_eq_zero_of_le hkj.le, ENNReal.dyadicWeight_zero_right, mul_one]
     exact (Rd.lpModulus_le r a k).trans (by gcongr; exact le_self_add)
   · set J := j + Fintype.card d
-    set Θ := Rd.Theta (V := EuclideanSpace ℝ d) J
-    have hΘ : Integrable Θ := Rd.integrable_Theta J
+    set Θ := Rd.dilatedBandKernel (V := EuclideanSpace ℝ d) J
+    have hΘ : Integrable Θ := Rd.integrable_dilatedBandKernel J
     have hae : (a : UnitAddTorus d → ℂ) =ᵐ[volume] periodicEconv Θ a := by
       have h1 := periodicEconvLp_apply_ae hp hΘ a
       rw [periodicEconvLp_dilatedBandKernel_eq_self hp ha] at h1
@@ -335,7 +335,7 @@ theorem lpModulus_le_of_mem_trigPolyLp (hp : p ≠ ∞) (r : ℕ) {j k : ℕ}
             exact ENNReal.ofReal_two_pow_mul_rpow_le hjk hh (Nat.cast_nonneg r)
     calc eLpNorm ((fwdDiff (quotientProj x))^[r] (periodicEconv Θ a)) p volume
         ≤ ENNReal.ofReal (2 ^ J * ‖x‖) ^ r * D * ‖a‖ₑ :=
-          h1.trans (by gcongr; exact Rd.eLpNorm_higherDiff_Theta_le r J x)
+          h1.trans (by gcongr; exact Rd.eLpNorm_higherDiff_dilatedBandKernel_le r J x)
       _ ≤ ENNReal.ofReal c ^ r * dyadicWeight (-(r : ℝ)) (k - j) * D * ‖a‖ₑ := by gcongr
       _ = (ENNReal.ofReal c ^ r * D) * dyadicWeight (-(r : ℝ)) (k - j) * ‖a‖ₑ := by ring
       _ ≤ periodicBernsteinConst d r * dyadicWeight (-(r : ℝ)) (k - j) * ‖a‖ₑ := by

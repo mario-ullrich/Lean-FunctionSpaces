@@ -49,38 +49,41 @@ variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 /-! ### De la Vallée Poussin operators -/
 
 /-- `𝓕Θ_j` vanishes at the lattice points of degree `≥ 2^(j+2)`. -/
-theorem fourier_Theta_latticeVec_eq_zero {j : ℕ} {m : d → ℤ} (hm : 2 ^ (j + 2) ≤ trigDeg m) :
-    𝓕 (Rd.Theta (V := EuclideanSpace ℝ d) j) (latticeVec m) = 0 := by
+theorem fourier_dilatedBandKernel_latticeVec_eq_zero {j : ℕ} {m : d → ℤ}
+    (hm : 2 ^ (j + 2) ≤ trigDeg m) :
+    𝓕 (Rd.dilatedBandKernel (V := EuclideanSpace ℝ d) j) (latticeVec m) = 0 := by
   by_contra h
-  have h1 := Rd.norm_lt_of_fourier_Theta_ne_zero h
+  have h1 := Rd.norm_lt_of_fourier_dilatedBandKernel_ne_zero h
   have h2 := trigDeg_le_norm_latticeVec m
   have h3 : ((2 : ℝ) ^ (j + 2)) ≤ trigDeg m := by exact_mod_cast hm
   linarith
 
 /-- The **de la Vallée Poussin operator** `V_k F = Θ_{k+#d} ⋆ F` on `L_p(𝕋^d)`, `1 ≤ p < ∞`, with
-the band-limiting kernel `Θ_J` of `ℝ^d` (`Rd.Theta`). It is a smooth de la Vallée Poussin
-operator: its multiplier is `1` on frequencies of degree `< 2^k` and `0` from degree
+the band-limiting kernel `Θ_J` of `ℝ^d` (`Rd.dilatedBandKernel`). It is a smooth de la Vallée
+Poussin operator: its multiplier is `1` on frequencies of degree `< 2^k` and `0` from degree
 `2^(k+#d+2)` on. -/
 noncomputable def valleePoussin (hp : p ≠ ∞) (k : ℕ) :
     Lp ℂ p (volume : Measure (UnitAddTorus d)) →L[ℂ] Lp ℂ p (volume : Measure (UnitAddTorus d)) :=
-  periodicEconvLp hp (Rd.integrable_Theta (V := EuclideanSpace ℝ d) (k + Fintype.card d))
+  periodicEconvLp hp
+    (Rd.integrable_dilatedBandKernel (V := EuclideanSpace ℝ d) (k + Fintype.card d))
 
 /-- The **de la Vallée Poussin operator** `V_k f = Θ_{k+#d} ⋆ f` on the bounded continuous
 functions on `𝕋^d`, the smooth de la Vallée Poussin operator of `Torus.valleePoussin`. -/
 noncomputable def valleePoussinBCF (k : ℕ) :
     (UnitAddTorus d →ᵇ ℂ) →L[ℂ] (UnitAddTorus d →ᵇ ℂ) :=
-  periodicEconvBCF (Rd.integrable_Theta (V := EuclideanSpace ℝ d) (k + Fintype.card d))
+  periodicEconvBCF (Rd.integrable_dilatedBandKernel (V := EuclideanSpace ℝ d) (k + Fintype.card d))
 
 /-- `V_k F` is a trigonometric polynomial of degree `< 2^(k+#d+2)`. -/
 theorem valleePoussin_mem_trigPolyLp (hp : p ≠ ∞) (k : ℕ)
     (F : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     valleePoussin hp k F ∈ trigPolyLp p (2 ^ (k + Fintype.card d + 2)) :=
-  periodicEconvLp_mem_trigPolyLp hp _ (fun _ hm => fourier_Theta_latticeVec_eq_zero hm) F
+  periodicEconvLp_mem_trigPolyLp hp _
+    (fun _ hm => fourier_dilatedBandKernel_latticeVec_eq_zero hm) F
 
 /-- `V_k f` is a trigonometric polynomial of degree `< 2^(k+#d+2)`. -/
 theorem valleePoussinBCF_mem_trigPoly (k : ℕ) (f : UnitAddTorus d →ᵇ ℂ) :
     valleePoussinBCF k f ∈ trigPoly d (2 ^ (k + Fintype.card d + 2)) :=
-  periodicEconvBCF_mem_trigPoly _ (fun _ hm => fourier_Theta_latticeVec_eq_zero hm) f
+  periodicEconvBCF_mem_trigPoly _ (fun _ hm => fourier_dilatedBandKernel_latticeVec_eq_zero hm) f
 
 /-- `V_k a = a` for every trigonometric polynomial `a` of degree `< 2^k` in `L_p`. -/
 theorem valleePoussin_eq_self (hp : p ≠ ∞) {k : ℕ}
@@ -113,10 +116,11 @@ theorem valleePoussinConst_ne_top : valleePoussinConst d ≠ ∞ :=
 
 /-- The near-best constant is `1 + ∫ |Θ_j|` for every `j`, as a real number. -/
 theorem toReal_valleePoussinConst (j : ℕ) :
-    (valleePoussinConst d).toReal = 1 + ∫ y, ‖Rd.Theta (V := EuclideanSpace ℝ d) j y‖ := by
+    (valleePoussinConst d).toReal =
+      1 + ∫ y, ‖Rd.dilatedBandKernel (V := EuclideanSpace ℝ d) j y‖ := by
   rw [integral_norm_eq_lintegral_enorm
-    (Rd.integrable_Theta (V := EuclideanSpace ℝ d) j).aestronglyMeasurable,
-    Rd.lintegral_enorm_Theta, valleePoussinConst,
+    (Rd.integrable_dilatedBandKernel (V := EuclideanSpace ℝ d) j).aestronglyMeasurable,
+    Rd.lintegral_enorm_dilatedBandKernel, valleePoussinConst,
     ENNReal.toReal_add ENNReal.one_ne_top Rd.eLpNorm_bandKernel_ne_top, ENNReal.toReal_one]
 
 /-- **The de la Vallée Poussin operators are near-best in `L_p`**: for every trigonometric
@@ -126,7 +130,7 @@ theorem enorm_sub_valleePoussin_le (hp : p ≠ ∞) {k : ℕ}
     {a : Lp ℂ p (volume : Measure (UnitAddTorus d))} (ha : a ∈ trigPolyLp p (2 ^ k))
     (F : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     ‖F - valleePoussin hp k F‖ₑ ≤ valleePoussinConst d * ‖F - a‖ₑ := by
-  rw [valleePoussinConst, ← Rd.lintegral_enorm_Theta (k + Fintype.card d)]
+  rw [valleePoussinConst, ← Rd.lintegral_enorm_dilatedBandKernel (k + Fintype.card d)]
   exact ApproximationScheme.enorm_sub_apply_le_of_apply_eq
     (fun x => enorm_periodicEconvLp_le hp _ x) (valleePoussin_eq_self hp ha) F
 

@@ -14,7 +14,7 @@ public import FunctionSpaces.Rd.Sobolev.WeakDerivativeLeibniz
 
 Let `Ω` be a bounded Lipschitz domain in a finite-dimensional real inner product space `V` of
 dimension `n`, `1 < p < ∞` and `m ∈ ℕ`. Every `f ∈ W^m_p(Ω)` agrees on `Ω` with some
-`F ∈ W^m_p(V)` (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memWSobolev_order`), for
+`F ∈ W^m_p(V)` (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolevW_order`), for
 `n ≥ 1` with `‖F‖_{W^m_p(V)} ≤ C ‖f‖_{W^m_p(Ω)}`
 (`Rd.BoundedLipschitzDomain.exists_extendsSobolevOrder`). A word `w : Fin k → Fin n` stands for
 the derivative `∂^{e_w} = ∂_{e_{w_0}} ⋯ ∂_{e_{w_{k-1}}}` along the orthonormal basis
@@ -242,7 +242,7 @@ def ExtendsSobolevOrder (m : ℕ) (O : Opens V) (U : Set V) (C : ℝ≥0∞) : P
   ∀ (f : V → ℂ) (g : (k : ℕ) → (Fin k → Fin (finrank ℝ V)) → V → ℂ),
     (∀ k ≤ m, ∀ w, MemLp (g k w) p (volume.restrict O)) →
     (∀ k ≤ m, ∀ w, HasWeakLineDeriv O (fun l => gridBasis V (w l)) f (g k w)) →
-    ∃ F : Lp ℂ p (volume : Measure V), MemWSobolev m F ∧ (∀ᵐ x ∂volume, x ∈ U → F x = f x) ∧
+    ∃ F : Lp ℂ p (volume : Measure V), MemSobolevW m F ∧ (∀ᵐ x ∂volume, x ∈ U → F x = f x) ∧
       ∃ G : (k : ℕ) → (Fin k → Fin (finrank ℝ V)) → Lp ℂ p (volume : Measure V),
         (∀ k ≤ m, ∀ w, HasWeakLineDeriv ⊤ (fun l => gridBasis V (w l)) F (G k w)) ∧
         ∑ k ∈ Finset.range (m + 1), ∑ w : Fin k → Fin (finrank ℝ V), ‖G k w‖ₑ ≤
@@ -267,7 +267,7 @@ theorem ExtendsSobolevOrder.of_le {m : ℕ} {T O : Opens V} {U : Set V} {C : ℝ
 on `U` with a function `F` on `V` with weak derivatives `G_{k,w} = ∂^{e_w} F` on `V`, `k ≤ m`, and
 `∑_{k ≤ m} ∑_w ‖G_{k,w}‖_p ≤ C ∑_{k ≤ m} ∑_w ‖g_{k,w}‖_{L_p(O)}`. The bound puts the `G_{k,w}`
 into `L_p(V)`, and `F = G_{0,∅}`; then `F ∈ W^m_p(V)` by
-`Rd.memWSobolev_of_forall_gridBasis_words`. -/
+`Rd.memSobolevW_of_forall_gridBasis_words`. -/
 theorem extendsSobolevOrder_of_eLpNorm_le [Fact (1 ≤ p)] {m : ℕ} {O : Opens V} {U : Set V}
     {C : ℝ≥0∞} (hC : C ≠ ∞)
     (h : ∀ (f : V → ℂ) (g : (k : ℕ) → (Fin k → Fin (finrank ℝ V)) → V → ℂ),
@@ -302,7 +302,7 @@ theorem extendsSobolevOrder_of_eLpNorm_le [Fact (1 ≤ p)] {m : ℕ} {O : Opens 
     rw [hGL k hk w]
     exact (hG k hk w).congr_ae (by rw [volume_restrict_top]; exact hFm.coeFn_toLp.symm)
       (by rw [volume_restrict_top]; exact (hGm k hk w).coeFn_toLp.symm)
-  refine ⟨hFm.toLp F, memWSobolev_of_forall_gridBasis_words fun k hk w =>
+  refine ⟨hFm.toLp F, memSobolevW_of_forall_gridBasis_words fun k hk w =>
     ⟨_, Lp.memLp (GLp k w), hW k hk w⟩, ?_, GLp, hW, ?_⟩
   · filter_upwards [hFm.coeFn_toLp, hFf] with x h1 h2 hx
     rw [h1, h2 hx]
@@ -420,7 +420,7 @@ theorem extendsSobolevOrder [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {m : �
       ‖G‖ₑ ≤ tlToSobolevConst p (fun l => gridBasis V (w l)) * triebelLizorkinNorm (m : ℝ) 2
         (b.dilationSmoothed.localExtension hp hW (m + 1) (hf₀.toLp _)))
     fun k hk _ => exists_hasWeakLineDeriv_of_memTriebelLizorkin_of_le hp1 hp hk _ hmem
-  refine ⟨_, memWSobolev_of_memTriebelLizorkin hp1 hp hmem,
+  refine ⟨_, memSobolevW_of_memTriebelLizorkin hp1 hp hmem,
     b.dilationSmoothed.ae_localExtension_eq_of_ae_eq_indicator hp (Nat.le_add_left 1 m) hU hW hUT
       hUW hf₀.coeFn_toLp (b.dilationSmoothed.summable_localExtTerm_of_tlLocalNormOn hp hW (m + 1)
         hs two_ne_zero hXf), G, fun k hk w => (hG k hk w).1, ?_⟩
@@ -634,13 +634,13 @@ theorem exists_extendsSobolevOrder [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞)
 for a bounded Lipschitz domain `Ω`, `1 < p < ∞` and `m ∈ ℕ`, every `f ∈ W^m_p(Ω)` agrees almost
 everywhere on `Ω` with some `F ∈ W^m_p(V)`
 (`Rd.BoundedLipschitzDomain.exists_extendsSobolevOrder` in dimension `n ≥ 1`,
-`Rd.exists_memWSobolev_of_memWeakSobolev_of_subsingleton` in dimension `0`). -/
-theorem exists_memWSobolev_of_memWeakSobolev_order (hp1 : 1 < p) (hp : p ≠ ∞) {m : ℕ}
+`Rd.exists_memSobolevW_of_memWeakSobolev_of_subsingleton` in dimension `0`). -/
+theorem exists_memSobolevW_of_memWeakSobolev_order (hp1 : 1 < p) (hp : p ≠ ∞) {m : ℕ}
     {f : V → ℂ} (hf : MemWeakSobolev Ω.toOpens m p f) :
-    ∃ F : Lp ℂ p (volume : Measure V), MemWSobolev m F ∧
+    ∃ F : Lp ℂ p (volume : Measure V), MemSobolevW m F ∧
       (F : V → ℂ) =ᵐ[volume.restrict Ω.carrier] f := by
   rcases subsingleton_or_nontrivial V with hV | hV
-  · exact exists_memWSobolev_of_memWeakSobolev_of_subsingleton hf
+  · exact exists_memSobolevW_of_memWeakSobolev_of_subsingleton hf
   obtain ⟨C, -, hC⟩ := Ω.exists_extendsSobolevOrder hp1 hp m
   obtain ⟨g, hg⟩ := exists_forall_words_of_forall_le (m := m)
     (P := fun k w (g : V → ℂ) => MemLp g p (volume.restrict Ω.toOpens) ∧
@@ -651,13 +651,13 @@ theorem exists_memWSobolev_of_memWeakSobolev_order (hp1 : 1 < p) (hp : p ≠ ∞
 
 /-- **`W^m_p(Ω)` is the space of restrictions of `W^m_p(V)`**: for a bounded Lipschitz domain `Ω`,
 `1 < p < ∞` and `m ∈ ℕ`, `f` lies in `W^m_p(Ω)` iff it agrees almost everywhere on `Ω` with some
-`F ∈ W^m_p(V)` (`Rd.BoundedLipschitzDomain.exists_memWSobolev_of_memWeakSobolev_order`; the converse
+`F ∈ W^m_p(V)` (`Rd.BoundedLipschitzDomain.exists_memSobolevW_of_memWeakSobolev_order`; the converse
 restricts the weak derivatives, `Rd.MemWeakSobolev.mono_set`). -/
-theorem memWeakSobolev_iff_exists_memWSobolev_order (hp1 : 1 < p) (hp : p ≠ ∞) (m : ℕ)
+theorem memWeakSobolev_iff_exists_memSobolevW_order (hp1 : 1 < p) (hp : p ≠ ∞) (m : ℕ)
     (f : V → ℂ) :
-    MemWeakSobolev Ω.toOpens m p f ↔ ∃ F : Lp ℂ p (volume : Measure V), MemWSobolev m F ∧
+    MemWeakSobolev Ω.toOpens m p f ↔ ∃ F : Lp ℂ p (volume : Measure V), MemSobolevW m F ∧
       (F : V → ℂ) =ᵐ[volume.restrict Ω.carrier] f := by
-  refine ⟨Ω.exists_memWSobolev_of_memWeakSobolev_order hp1 hp, ?_⟩
+  refine ⟨Ω.exists_memSobolevW_of_memWeakSobolev_order hp1 hp, ?_⟩
   rintro ⟨F, hF, hFf⟩
   exact (MemWeakSobolev.mono_set hF le_top).congr_ae hFf
 

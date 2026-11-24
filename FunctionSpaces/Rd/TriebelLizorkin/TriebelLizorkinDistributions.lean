@@ -13,8 +13,8 @@ public import FunctionSpaces.Analysis.Fourier.SchwartzCutoff
 
 The Littlewood–Paley blocks of a tempered distribution `u` on `V` are the Fourier multipliers
 `Δ_j u = (𝓕ψ_j)(D) u` (`Rd.distribBlock`), with the blocks `ψ_j` as Schwartz functions
-(`Rd.psiS`). A tempered distribution lies in `F^s_{p,q}` when every block is an `L_p` function
-`g_j` and `‖ x ↦ ‖(2^{js} |g_j(x)|)_j‖_{ℓ_q} ‖_p < ∞` (`Rd.triebelLizorkinNormDistr`,
+(`Rd.lpBlockKernelS`). A tempered distribution lies in `F^s_{p,q}` when every block is an `L_p`
+function `g_j` and `‖ x ↦ ‖(2^{js} |g_j(x)|)_j‖_{ℓ_q} ‖_p < ∞` (`Rd.triebelLizorkinNormDistr`,
 `Rd.MemTriebelLizorkinDistr`); the quasi-norm is `∞` when some block is no `L_p` function. For
 `p < ∞` this describes `F^s_{p,q}` for every real `s`, without the restriction to `L_p`.
 
@@ -119,15 +119,15 @@ theorem fourierMultiplierCLM_fourier_toLp_eq_conv {r : ℝ≥0∞} [Fact (1 ≤ 
 
 /-! ### The blocks of tempered distributions -/
 
-/-- `𝓕(psiS j)` is the Fourier transform `𝓕ψ_j` of the block. -/
-theorem fourier_psiS_apply (j : ℕ) (ξ : V) :
-    (𝓕 (psiS (V := V) j) : 𝓢(V, ℂ)) ξ = 𝓕 (lpBlockKernel (V := V) j) ξ := by
-  rw [SchwartzMap.fourier_coe, coe_psiS]
+/-- `𝓕(lpBlockKernelS j)` is the Fourier transform `𝓕ψ_j` of the block. -/
+theorem fourier_lpBlockKernelS_apply (j : ℕ) (ξ : V) :
+    (𝓕 (lpBlockKernelS (V := V) j) : 𝓢(V, ℂ)) ξ = 𝓕 (lpBlockKernel (V := V) j) ξ := by
+  rw [SchwartzMap.fourier_coe, coe_lpBlockKernelS]
 
 /-- The **Littlewood–Paley block of a tempered distribution**, `Δ_j u = (𝓕ψ_j)(D) u`, Mathlib's
 Fourier multiplier with the Fourier transform of the block `ψ_j`. -/
 noncomputable def distribBlock (j : ℕ) : 𝓢'(V, ℂ) →L[ℂ] 𝓢'(V, ℂ) :=
-  TemperedDistribution.fourierMultiplierCLM ℂ (𝓕 (psiS (V := V) j) : 𝓢(V, ℂ))
+  TemperedDistribution.fourierMultiplierCLM ℂ (𝓕 (lpBlockKernelS (V := V) j) : 𝓢(V, ℂ))
 
 /-- **The blocks of an `L_r` function**: for `1 ≤ r < ∞` and `f ∈ L_r(V)`, the block of the
 tempered distribution of `f` is that of the `L_r` block `ψ_j ⋆ f` (`Rd.lpBlock`), by
@@ -138,53 +138,53 @@ theorem distribBlock_toTemperedDistribution {r : ℝ≥0∞} [Fact (1 ≤ r)] (h
   rw [distribBlock, fourierMultiplierCLM_fourier_toLp_eq_conv hr]
   refine toTemperedDistribution_eq_of_ae_eq ?_
   filter_upwards [lpBlock_ae_eq_blockFun hr j f,
-    convLp_apply_ae hr (psiS (V := V) j).integrable f] with x h1 h2
-  rw [h1, h2, blockFun, coe_psiS]
+    convLp_apply_ae hr (lpBlockKernelS (V := V) j).integrable f] with x h1 h2
+  rw [h1, h2, blockFun, coe_lpBlockKernelS]
 
 /-! ### The decomposition of tempered distributions -/
 
 /-- **The Fourier transforms of the blocks add up to a cut-off**:
 `∑_{j ≤ J} 𝓕ψ_j(ξ) = χ(2^{-J} ξ)` with `χ = Rd.cutoff 1 2` (`Rd.sum_range_fourier_lpBlockKernel`,
 `Rd.fourier_dilatedLpKernel`). -/
-theorem sum_fourier_psiS_apply (J : ℕ) (ξ : V) :
-    ∑ j ∈ Finset.range (J + 1), (𝓕 (psiS (V := V) j) : 𝓢(V, ℂ)) ξ =
+theorem sum_fourier_lpBlockKernelS_apply (J : ℕ) (ξ : V) :
+    ∑ j ∈ Finset.range (J + 1), (𝓕 (lpBlockKernelS (V := V) j) : 𝓢(V, ℂ)) ξ =
       cutoff 1 2 one_pos one_lt_two (((2 : ℝ) ^ J)⁻¹ • ξ) := by
-  simp_rw [fourier_psiS_apply]
+  simp_rw [fourier_lpBlockKernelS_apply]
   rw [sum_range_fourier_lpBlockKernel, fourier_dilatedLpKernel]
 
 /-- **Partial sums of the blocks as one multiplier**: `∑_{j ≤ J} Δ_j u` is the Fourier multiplier
 with `χ(2^{-J} ·)` (Mathlib's `TemperedDistribution.fourierMultiplierCLM_sum`,
-`Rd.sum_fourier_psiS_apply`). -/
+`Rd.sum_fourier_lpBlockKernelS_apply`). -/
 theorem sum_distribBlock (J : ℕ) (u : 𝓢'(V, ℂ)) :
     ∑ j ∈ Finset.range (J + 1), distribBlock j u =
       TemperedDistribution.fourierMultiplierCLM ℂ
-        (fun ξ => ∑ j ∈ Finset.range (J + 1), (𝓕 (psiS (V := V) j) : 𝓢(V, ℂ)) ξ) u := by
+        (fun ξ => ∑ j ∈ Finset.range (J + 1), (𝓕 (lpBlockKernelS (V := V) j) : 𝓢(V, ℂ)) ξ) u := by
   rw [TemperedDistribution.fourierMultiplierCLM_sum ℂ fun j _ =>
-    (𝓕 (psiS (V := V) j)).hasTemperateGrowth]
+    (𝓕 (lpBlockKernelS (V := V) j)).hasTemperateGrowth]
   simp only [FunLike.coe_sum, Finset.sum_apply, distribBlock]
 
 /-- **The cut-off of the inverse Fourier transform**: multiplying a Schwartz function `w` by
 `∑_{j ≤ J} 𝓕ψ_j = χ(2^{-J} ·)` is the cut-off `Rd.cutoffMul (2^J - 1) w` at radius `2^J`
-(`Rd.sum_fourier_psiS_apply`, `Rd.cutoffMul_apply`). -/
-theorem smulLeftCLM_sum_fourier_psiS (J : ℕ) (w : 𝓢(V, ℂ)) :
+(`Rd.sum_fourier_lpBlockKernelS_apply`, `Rd.cutoffMul_apply`). -/
+theorem smulLeftCLM_sum_fourier_lpBlockKernelS (J : ℕ) (w : 𝓢(V, ℂ)) :
     SchwartzMap.smulLeftCLM ℂ
-        (fun ξ => ∑ j ∈ Finset.range (J + 1), (𝓕 (psiS (V := V) j) : 𝓢(V, ℂ)) ξ) w =
+        (fun ξ => ∑ j ∈ Finset.range (J + 1), (𝓕 (lpBlockKernelS (V := V) j) : 𝓢(V, ℂ)) ξ) w =
       cutoffMul (2 ^ J - 1) w := by
   have hg : (fun ξ => ∑ j ∈ Finset.range (J + 1),
-      (𝓕 (psiS (V := V) j) : 𝓢(V, ℂ)) ξ).HasTemperateGrowth :=
-    Function.HasTemperateGrowth.sum fun j _ => (𝓕 (psiS (V := V) j)).hasTemperateGrowth
+      (𝓕 (lpBlockKernelS (V := V) j) : 𝓢(V, ℂ)) ξ).HasTemperateGrowth :=
+    Function.HasTemperateGrowth.sum fun j _ => (𝓕 (lpBlockKernelS (V := V) j)).hasTemperateGrowth
   have hcast : (((2 ^ J - 1 : ℕ) : ℝ) + 1) = (2 : ℝ) ^ J := by
     rw [Nat.cast_sub Nat.one_le_two_pow]
     push_cast
     ring
   ext x
-  rw [SchwartzMap.smulLeftCLM_apply_apply hg, sum_fourier_psiS_apply, cutoffMul_apply, hcast,
-    smul_eq_mul]
+  rw [SchwartzMap.smulLeftCLM_apply_apply hg, sum_fourier_lpBlockKernelS_apply, cutoffMul_apply,
+    hcast, smul_eq_mul]
 
 /-- **The Littlewood–Paley decomposition of tempered distributions**: for every tempered
 distribution `u` on `V`, `∑_{j < J} Δ_j u → u` in `𝓢'(V, ℂ)`. Tested against a Schwartz function
 `φ`, `∑_{j ≤ J} Δ_j u (φ) = u(𝓕(χ_J 𝓕⁻¹ φ))` with the cut-offs `χ_J = χ(2^{-J} ·)`
-(`Rd.sum_distribBlock`, `Rd.smulLeftCLM_sum_fourier_psiS`), and `χ_J 𝓕⁻¹ φ → 𝓕⁻¹ φ` in the
+(`Rd.sum_distribBlock`, `Rd.smulLeftCLM_sum_fourier_lpBlockKernelS`), and `χ_J 𝓕⁻¹ φ → 𝓕⁻¹ φ` in the
 Schwartz space (`Rd.tendsto_cutoffMul`); `𝓕` and `u` are continuous. -/
 theorem tendsto_sum_distribBlock (u : 𝓢'(V, ℂ)) :
     Tendsto (fun J => ∑ j ∈ Finset.range J, distribBlock j u) atTop (𝓝 u) := by
@@ -200,7 +200,7 @@ theorem tendsto_sum_distribBlock (u : 𝓢'(V, ℂ)) :
   rw [FourierInvPair.fourier_fourierInv_eq] at hlim
   refine hlim.congr fun J => ?_
   rw [sum_distribBlock, TemperedDistribution.fourierMultiplierCLM_apply_apply,
-    smulLeftCLM_sum_fourier_psiS]
+    smulLeftCLM_sum_fourier_lpBlockKernelS]
 
 /-! ### Admissible Littlewood–Paley kernels -/
 
@@ -225,8 +225,8 @@ namespace LPKernel
 variable (K : LPKernel V)
 
 /-- The Schwartz functions behind the blocks: `kernelBase 0 = Φ'` and
-`kernelBase (j+1) = Φ' - δ_{1/2} Φ'`, with the dilation `δ_c G(x) = c^n G(c x)`, as `Rd.psiBase` for
-the kernel of the project. -/
+`kernelBase (j+1) = Φ' - δ_{1/2} Φ'`, with the dilation `δ_c G(x) = c^n G(c x)`, as
+`Rd.lpBlockKernelBase` for the kernel of the project. -/
 noncomputable def kernelBase : ℕ → 𝓢(V, ℂ)
   | 0 => K.kernel
   | _ + 1 => K.kernel - schwartzDilate (1 / 2) (by norm_num) K.kernel
@@ -261,9 +261,9 @@ noncomputable def standardKernel : LPKernel V where
     rw [fourier_lpKernelS]
     exact cutoff_eq_zero one_pos one_lt_two h
 
-/-- The blocks of the kernel of the project are the blocks `Rd.psiS` of the project. -/
+/-- The blocks of the kernel of the project are the blocks `Rd.lpBlockKernelS` of the project. -/
 theorem standardKernel_kernelLpBlockS (j : ℕ) :
-    (standardKernel V).kernelLpBlockS j = Rd.psiS j := by
+    (standardKernel V).kernelLpBlockS j = Rd.lpBlockKernelS j := by
   cases j <;> rfl
 
 /-- The blocks of tempered distributions of the kernel of the project are `Rd.distribBlock`. -/
@@ -470,12 +470,12 @@ theorem kernelTriebelLizorkinNormDistr_toTemperedDistribution (hp : p ≠ ∞) (
 omit [Fact (1 ≤ p)] in
 /-- The quasi-norm of the kernel of the project on `L_p` is `Rd.triebelLizorkinNorm`, for every
 `1 ≤ p ≤ ∞`: the blocks are the same functions (`Rd.LPKernel.standardKernel_kernelLpBlockS`,
-`Rd.coe_psiS`). -/
+`Rd.coe_lpBlockKernelS`). -/
 theorem standardKernel_kernelTriebelLizorkinNorm (s : ℝ) (q : ℝ≥0∞)
     (f : Lp ℂ p (volume : Measure V)) :
     (standardKernel V).kernelTriebelLizorkinNorm s q f = Rd.triebelLizorkinNorm s q f := by
   simp only [kernelTriebelLizorkinNorm, Rd.triebelLizorkinNorm, blockFun,
-    standardKernel_kernelLpBlockS, Rd.coe_psiS]
+    standardKernel_kernelLpBlockS, Rd.coe_lpBlockKernelS]
 
 end LPKernel
 

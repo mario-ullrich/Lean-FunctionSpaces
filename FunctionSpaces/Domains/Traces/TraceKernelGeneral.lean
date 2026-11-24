@@ -175,7 +175,7 @@ theorem ker_sobolevTrace_eq_zeroBoundarySpace (s : ℝ) (hs : 1 / 2 < s := by no
 
 /-- **Vanishing trace by zero extension**, `1/2 < s < 3/2`: `u ∈ H^s(Ω)` lies in `ker γ_s` iff
 its zero extension `1_Ω ι_s u` is `ι_s U'` for some `U' ∈ H^s(V)`. At `s = 1`, with `W^1_2(V)` in
-place of `H^1(V)`, this is `Rd.BoundedLipschitzDomain.memWSobolev_indicatorLp_iff_mem_traceKer`.
+place of `H^1(V)`, this is `Rd.BoundedLipschitzDomain.memSobolevW_indicatorLp_iff_mem_traceKer`.
 If `ι_s U' = 1_Ω ι_s u`, then `u ∈ H^s_0(Ω) ⊆ ker γ_s`
 (`Rd.BoundedLipschitzDomain.mem_zeroBoundarySpace_of_sobolevToL2_eq_indicatorLp`,
 `Rd.BoundedLipschitzDomain.zeroBoundarySpace_le_traceKer`). Conversely, `ker γ_s = H^s_0(Ω)`

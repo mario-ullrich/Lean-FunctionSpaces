@@ -4563,7 +4563,7 @@ of Calder\'on and Stein \cite[Chapter VI]{SteinSingular}.
 
 \begin{lemma}[$H^1(\Omega)$ is a linear space]
 \label{lem:sobolev-lipschitz-domain-basic}
-\lean{Rd.BoundedLipschitzDomain.memSobolevOn_of_memWSobolev,
+\lean{Rd.BoundedLipschitzDomain.memSobolevOn_of_memSobolevW,
   Rd.BoundedLipschitzDomain.zero_memSobolevOn, Rd.BoundedLipschitzDomain.MemSobolevOn.congr_ae,
   Rd.BoundedLipschitzDomain.MemSobolevOn.add, Rd.BoundedLipschitzDomain.MemSobolevOn.smul}
 \leanok
@@ -4652,7 +4652,7 @@ $r = 2$, these $F$ are the $F \in \Sob{1}{2}(V)$ with $F = f$ almost everywhere 
 
 \begin{lemma}[Boundary traces of $H^1$ functions]
 \label{lem:sobolev-lipschitz-domain-trace-extensions}
-\lean{Rd.BoundedLipschitzDomain.isBoundaryTrace_iff_forall_memWSobolev,
+\lean{Rd.BoundedLipschitzDomain.isBoundaryTrace_iff_forall_memSobolevW,
   Rd.BoundedLipschitzDomain.hasBoundaryTrace_iff_memSobolevOn}
 \leanok
 \uses{thm:sobolev-one-two-besov, thm:boundary-trace-space, lem:indicator-lp-eq-iff,
@@ -4894,7 +4894,7 @@ is the compactness that Hiptmair, Pauly and Schulz require (their Assumption F)
 
 \begin{lemma}[Weak derivatives of $H^1(V)$]
 \label{lem:sobolev-one-weak-gradient-norm}
-\lean{Rd.memWSobolev_toL2, Rd.exists_toL2_eq_of_memWSobolev, Rd.exists_hasWeakLineDeriv_toL2,
+\lean{Rd.memSobolevW_toL2, Rd.exists_toL2_eq_of_memSobolevW, Rd.exists_hasWeakLineDeriv_toL2,
   Rd.sq_norm_eq_of_hasWeakLineDeriv, Rd.norm_le_norm_toL2_add_sum}
 \leanok
 \uses{lem:sobolev-one-to-l2, thm:sobolev-one-two, cor:sobolev-tempered,
@@ -7590,7 +7590,7 @@ $\Omega$.
 \begin{theorem}[The extension theorem]
 \label{thm:sobolev-extension}
 \lean{Rd.BoundedLipschitzDomain.exists_extendsSobolev,
-  Rd.exists_memWSobolev_of_memWeakSobolev_of_subsingleton}
+  Rd.exists_memSobolevW_of_memWeakSobolev_of_subsingleton}
 \leanok
 \uses{lem:sobolev-patches, thm:pasting-sobolev, lem:bounded-lipschitz-geometry,
   def:extends-sobolev}
@@ -8425,8 +8425,8 @@ $C_j(\sum_i d_i)$ and $1 + \sum_i d_i$.
 \begin{theorem}[The extension theorem by reflection]
 \label{thm:reflection-extension}
 \lean{Rd.BoundedLipschitzDomain.exists_extendsSobolev_reflection,
-  Rd.BoundedLipschitzDomain.exists_memWSobolev_of_memWeakSobolev,
-  Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memWSobolev}
+  Rd.BoundedLipschitzDomain.exists_memSobolevW_of_memWeakSobolev,
+  Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolevW}
 \leanok
 \uses{lem:reflection-patches, thm:pasting-sobolev, lem:bounded-lipschitz-geometry,
   def:extends-sobolev, lem:weak-derivative-basic, thm:sobolev-extension}
@@ -8564,7 +8564,7 @@ extension operators.
 \label{thm:reflection-extension-operator}
 \lean{Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp_reflection,
   Rd.BoundedLipschitzDomain.sobolevExtensionL,
-  Rd.BoundedLipschitzDomain.memWSobolev_sobolevExtensionL,
+  Rd.BoundedLipschitzDomain.memSobolevW_sobolevExtensionL,
   Rd.BoundedLipschitzDomain.sobolevExtensionL_fst_ae_eq,
   Rd.BoundedLipschitzDomain.memWeakSobolev_of_mem_weakSobolevJet,
   Rd.BoundedLipschitzDomain.exists_enorm_sobolevExtensionL_le,
@@ -9392,8 +9392,8 @@ the constant $\sum_{k \leq m} \sum_{w \in I^k} C_k(\chi)$, finite by
 \begin{theorem}[The extension theorem of higher order]
 \label{thm:higher-sobolev-extension}
 \lean{Rd.BoundedLipschitzDomain.exists_extendsSobolevOrder,
-  Rd.BoundedLipschitzDomain.exists_memWSobolev_of_memWeakSobolev_order,
-  Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memWSobolev_order}
+  Rd.BoundedLipschitzDomain.exists_memSobolevW_of_memWeakSobolev_order,
+  Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolevW_order}
 \leanok
 \uses{lem:higher-patches, thm:pasting-sobolev-higher, lem:extends-sobolev-order,
   lem:bounded-lipschitz-geometry, def:extends-sobolev-order, lem:weak-derivative-basic,
@@ -10308,9 +10308,9 @@ which is the weak derivative (\Cref{lem:weak-derivative-integral}).
 
 \begin{theorem}[The zero extension and the trace kernel]
 \label{thm:zero-extension-trace-kernel}
-\lean{Rd.BoundedLipschitzDomain.memWSobolev_indicatorLp_of_mem_traceKer,
-  Rd.BoundedLipschitzDomain.mem_traceKer_of_memWSobolev_indicatorLp,
-  Rd.BoundedLipschitzDomain.memWSobolev_indicatorLp_iff_mem_traceKer}
+\lean{Rd.BoundedLipschitzDomain.memSobolevW_indicatorLp_of_mem_traceKer,
+  Rd.BoundedLipschitzDomain.mem_traceKer_of_memSobolevW_indicatorLp,
+  Rd.BoundedLipschitzDomain.memSobolevW_indicatorLp_iff_mem_traceKer}
 \leanok
 \uses{lem:green-trace-kernel, lem:weak-derivative-basic, thm:traces-both-sides,
   lem:trace-locality, lem:lower-graph-domain, thm:trace-kernel-boundary, thm:boundary-trace-charts,

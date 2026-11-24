@@ -159,7 +159,7 @@ theorem modNormOn_lt_top_iff_ballDomain {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : 
 `‖g‖_{L_2(Ω)} + ‖(2^k ω_r(g, 2^(-k), Ω)_2)_k‖_{ℓ_2} < ∞` for an order `r ≥ 2`, then `g` has
 weak derivatives `∂_{e_j} g ∈ L_2(O)` on `O = interior Ω` along the basis vectors
 `e_j = Rd.gridBasis V j`. The extension property of `Ω` gives `F` on `V` with `F = g` on `Ω`
-and finite `B^1_{2,2}(V)` quasi-norm, so `F ∈ W^1_2(V)` (`Rd.memWSobolev_one_iff_modulus`); its
+and finite `B^1_{2,2}(V)` quasi-norm, so `F ∈ W^1_2(V)` (`Rd.memSobolevW_one_iff_modulus`); its
 weak derivatives restrict to `O` (`Rd.HasWeakLineDeriv.mono`, `Rd.HasWeakLineDeriv.congr_ae`). -/
 theorem exists_hasWeakLineDeriv_of_modNormOn_lt_top {r : ℕ} (hr : 2 ≤ r)
     {g : Lp ℂ 2 (volume : Measure V)} (hg : modNormOn (measurableSet Ω) r 1 2 g < ∞) :
@@ -168,7 +168,7 @@ theorem exists_hasWeakLineDeriv_of_modNormOn_lt_top {r : ℕ} (hr : 2 ≤ r)
   have hr' : (1 : ℝ) < r := by exact_mod_cast Nat.lt_of_lt_of_le one_lt_two hr
   obtain ⟨C, hC, hext⟩ := hasBesovExtension Ω 2 two_ne_top r 1 one_pos hr' 2 one_le_two
   obtain ⟨F, hFg, hFle⟩ := hext g hg
-  have hF : MemWSobolev 1 F := (memWSobolev_one_iff_modulus hr F).2
+  have hF : MemSobolevW 1 F := (memSobolevW_one_iff_modulus hr F).2
     (hFle.trans_lt (ENNReal.mul_lt_top hC.lt_top hg))
   have hFg' : (F : V → ℂ) =ᵐ[volume.restrict (interior Ω)] g :=
     ae_mono (Measure.restrict_mono interior_subset le_rfl)

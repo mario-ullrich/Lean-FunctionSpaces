@@ -142,15 +142,17 @@ theorem tendsto_sum_periodicEconvLp_dualKernel_meansKernel (hp : p ≠ ∞) {L :
 theorem periodicEconvLp_meansKernel_periodicLpBlock (hp : p ≠ ∞) (L i j : ℕ)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     periodicEconvLp hp (b.integrable_meansKernel L j) (periodicLpBlock hp i f) =
-      periodicEconvLp hp (Rd.integrable_conv (b.integrable_meansKernel L j) (Rd.integrable_Theta i))
+      periodicEconvLp hp
+        (Rd.integrable_conv (b.integrable_meansKernel L j) (Rd.integrable_dilatedBandKernel i))
         (periodicLpBlock hp i f) := by
-  have hT : periodicEconvLp hp (Rd.integrable_Theta i) (periodicLpBlock hp i f) =
+  have hT : periodicEconvLp hp (Rd.integrable_dilatedBandKernel i) (periodicLpBlock hp i f) =
       periodicLpBlock hp i f :=
     periodicEconvLp_comp_periodicEconvLp_of_eq hp _ _ (Rd.integrable_lpBlockKernel i)
-      (Rd.conv_Theta_lpBlockKernel i) f
+      (Rd.conv_dilatedBandKernel_lpBlockKernel i) f
   calc periodicEconvLp hp (b.integrable_meansKernel L j) (periodicLpBlock hp i f)
       = periodicEconvLp hp (b.integrable_meansKernel L j)
-          (periodicEconvLp hp (Rd.integrable_Theta i) (periodicLpBlock hp i f)) := by rw [hT]
+          (periodicEconvLp hp (Rd.integrable_dilatedBandKernel i)
+            (periodicLpBlock hp i f)) := by rw [hT]
     _ = _ := periodicEconvLp_comp_periodicEconvLp hp _ _ _
 
 /-! ### Limits on the lift -/
@@ -275,8 +277,9 @@ theorem periodicEconvLp_meansKernel_sum_periodicLpBlock_ae (hp : p ≠ ∞) (L J
     ∀ᵐ t ∂volume,
       periodicEconvLp hp (b.integrable_meansKernel L j)
         (∑ i ∈ Finset.range J, periodicLpBlock hp i f) t =
-      ∑ i ∈ Finset.range J, periodicEconv (Rd.conv (b.meansKernel L j) (Rd.Theta i) volume)
-        (periodicLpBlock hp i f) t := by
+      ∑ i ∈ Finset.range J,
+        periodicEconv (Rd.conv (b.meansKernel L j) (Rd.dilatedBandKernel i) volume)
+          (periodicLpBlock hp i f) t := by
   simp only [map_sum, periodicEconvLp_meansKernel_periodicLpBlock b hp L _ j f]
   exact coeFn_sum_periodicEconvLp_ae hp _ _ _
 
@@ -301,7 +304,7 @@ theorem ae_enorm_periodicEconvLp_meansKernel_sum_quotientProj_le (hp : p ≠ ∞
           else 1) * Rd.maximalFunction (fun y => ‖periodicBlockFun i f (quotientProj y)‖ₑ) x := by
   filter_upwards [ae_comp_quotientProj
     (periodicEconvLp_meansKernel_sum_periodicLpBlock_ae b hp L J j f)] with x hx
-  have hterm : ∀ i, ‖periodicEconv (Rd.conv (b.meansKernel L j) (Rd.Theta i) volume)
+  have hterm : ∀ i, ‖periodicEconv (Rd.conv (b.meansKernel L j) (Rd.dilatedBandKernel i) volume)
       (periodicLpBlock hp i f) (quotientProj x)‖ₑ ≤
         b.localMeansByBlockConst L * ((if i ≤ j then dyadicWeight (-(L : ℝ)) (j - i)
           else 1) * Rd.maximalFunction
