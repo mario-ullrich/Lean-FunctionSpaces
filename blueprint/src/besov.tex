@@ -2102,7 +2102,7 @@ $h \geq 0$. The two suprema agree since the steps $h$ and $-h$ give the same nor
 (\Cref{lem:rd-modulus-on}).
 \end{definition}
 
-\begin{lemma}[Properties of the modulus]
+\begin{lemma}[Properties of the modulus on an interval]
 \label{lem:interval-modulus}
 \lean{Interval.eLpNorm_higherDiff_le_of_forall, Interval.eLpNorm_comp_add_mul_le,
   Interval.interval_eLpNorm_higherDiff_le, Interval.intervalModulus_le,
@@ -2774,7 +2774,8 @@ $V_0 \subseteq V_1 \subseteq \cdots$ (\Cref{def:complexity-couple}) with the fir
 $\|\cdot\|_p$; its spaces $E_{s, q}$ are the approximation spaces of dyadic step functions.
 \end{definition}
 
-The couple uses the group structure and the quasi-norm of $L_p$, which exist for every $p$.
+The couple uses only the group structure and the quasi-norm of $L_p$, so it covers
+$0 < p < 1$, where $L_p$ is not a normed space.
 
 \begin{lemma}[The step couple]
 \label{lem:step-couple}
@@ -3052,8 +3053,8 @@ union of such intervals. Then
 \[
   \int_{S \cap [0, 1]} |G| \leq 2^{j(1/p - 1)} \Bigl( \int_{S \cap [0, 1]} |G|^p \Bigr)^{1/p} .
 \]
-Every $\mathcal{F}_j$-measurable $a \in L_p[0, 1]$ lies in $L_r[0, 1]$ for every $r$, and
-$\|a\|_1 \leq 2^{j(1/p - 1)} \|a\|_p$.
+Every $\mathcal{F}_j$-measurable $a \in L_p[0, 1]$ lies in $L_r[0, 1]$ for every
+$0 < r \leq \infty$, and $\|a\|_1 \leq 2^{j(1/p - 1)} \|a\|_p$.
 \end{lemma}
 
 \begin{proof}
@@ -4660,7 +4661,7 @@ coefficients of that form. Starting from $g$ itself with $S = \emptyset$, induct
 coordinates ends with $S = \{1, \dots, d\}$, where $c$ is constant.
 \end{proof}
 
-\begin{lemma}[Telescoping over the coordinates]
+\begin{lemma}[Telescoping over the coordinates of the cube]
 \label{lem:kernel-telescoping}
 \lean{Cube.KernelOp.eLpNorm_slicewise_le, Cube.KernelOp.eLpNorm_sub_foldSlicewise_le}
 \leanok
@@ -5523,7 +5524,7 @@ With the Besov space $\Besov{s}{p}{q}(V)$ defined through Littlewood--Paley bloc
 \leanok
 For $f : V \to \C$, $h \in V$ and $r \in \N$ let $\Delta_h f = f(\cdot + h) - f$ and
 $\Delta_h^r = (\Delta_h)^r$, so that
-$\Delta_h^r f(x) = \sum_{l=0}^r (-1)^{r-l} \binom{r}{l} f(x + l h)$. For $1 \leq p < \infty$ and
+$\Delta_h^r f(x) = \sum_{l=0}^r (-1)^{r-l} \binom{r}{l} f(x + l h)$. For $0 < p \leq \infty$ and
 $t \in \R$, the modulus of smoothness is
 $\omega_r(f, t)_p = \sup_{\|h\| \leq t} \|\Delta_h^r f\|_p$.
 \end{definition}
@@ -5561,7 +5562,7 @@ and \Cref{lem:conv-assoc} gives the linearity in the kernel. Part (5) reflects t
 sum is a finite sum of measurable functions of $(x, v)$.
 \end{proof}
 
-\begin{lemma}[Properties of the modulus]
+\begin{lemma}[Properties of the modulus on $\R^d$]
 \label{lem:rd-modulus}
 \lean{Rd.eLpNorm_higherDiff_nsmul_higherDiff_le, Rd.eLpNorm_higherDiff_le_smoothnessModulus,
   Rd.smoothnessModulus_mono, Rd.smoothnessModulus_add_le, Rd.smoothnessModulus_le,
@@ -5643,8 +5644,8 @@ Let $V$ and $W$ be finite-dimensional real normed spaces with additive Haar meas
 $\nu$, and let $e : V \to W$ be linear and continuous with $\nu(B) = \mu(e^{-1}(B))$ for every
 Borel set $B$. For every $f : W \to \C$ and $r \in \N$,
 $\Delta_h^r (f \circ e) = (\Delta_{e h}^r f) \circ e$ for every $h \in V$, and for measurable $f$,
-every exponent $p$ and every $t$, $\omega_r(f \circ e, t)_p \leq \omega_r(f, \|e\| t)_p$. Let
-$1 \leq p \leq \infty$, $s \in \R$, $1 \leq q \leq \infty$ and $F \in L_p(\nu)$. Then
+every $0 < p \leq \infty$ and every $t$, $\omega_r(f \circ e, t)_p \leq \omega_r(f, \|e\| t)_p$.
+Let $1 \leq p \leq \infty$, $s \in \R$, $1 \leq q \leq \infty$ and $F \in L_p(\nu)$. Then
 $\|F \circ e\|_{L_p(\mu)} = \|F\|_{L_p(\nu)}$ and
 \begin{align*}
   &\|F \circ e\|_p
@@ -5676,7 +5677,7 @@ $(F \circ e) \circ e^{-1} = F$, so the bound for $e^{-1}$ gives the converse.
 \uses{def:rd-modulus}
 For $U \subseteq V$, $h \in V$ and $r \in \N$ let
 $U_{rh} = \{x \in V : x, x + h, \dots, x + rh \in U\}$, so that $U_{rh} \subseteq U$ and
-$V_{rh} = V$. For $f : V \to \C$, $1 \leq p < \infty$ and $t \in \R$, the modulus of smoothness
+$V_{rh} = V$. For $f : V \to \C$, $0 < p \leq \infty$ and $t \in \R$, the modulus of smoothness
 on $U$ is
 \[
   \omega_r(f, t, U)_p = \sup_{\|h\| \leq t} \|\Delta_h^r f\|_{L_p(U_{rh})} .
@@ -5782,7 +5783,7 @@ The step sets are intersections of translates, and translations preserve the Leb
 \uses{def:rd-modulus-on, lem:modulus-linear-equiv}
 Let $V$, $W$, $\mu$, $\nu$ and $e$ be as in \Cref{lem:modulus-linear-equiv}, and let
 $U \subseteq W$ be measurable. Then $(e^{-1}U)_{rh} = e^{-1}(U_{r\,eh})$ for every $h \in V$ and
-$r \in \N$, and for every measurable $f : W \to \C$, every exponent $p$ and every $t$,
+$r \in \N$, and for every measurable $f : W \to \C$, every $0 < p \leq \infty$ and every $t$,
 \[
   \omega_r(f \circ e, t, e^{-1}U)_{L_p(\mu)} \leq \omega_r(f, \|e\| t, U)_{L_p(\nu)} .
 \]
@@ -6017,7 +6018,7 @@ $N$. By \Cref{lem:weighted-jensen},
 \end{align*}
 \end{proof}
 
-\begin{theorem}[Jackson's inequality]
+\begin{theorem}[Jackson's inequality for band-limited functions]
 \label{thm:band-jackson}
 \lean{Rd.enorm_sub_jacksonApprox_le, Rd.approxError_bandScheme_le}
 \leanok
@@ -6262,7 +6263,7 @@ $L_2$ norm on the product, which gives $W^{s,2}(V)$ an inner product.
 
 \paragraph{Dyadic annuli and radial integrals.}
 
-\begin{lemma}[Dyadic annuli]
+\begin{lemma}[Dyadic annuli of a ball]
 \label{lem:dyadic-annuli}
 \lean{Rd.dyadicAnnulus, Rd.measurableSet_dyadicAnnulus, Rd.pairwise_disjoint_dyadicAnnulus,
   Rd.closedBall_subset_union_iUnion_dyadicAnnulus,
@@ -6472,7 +6473,7 @@ For $1 \leq p < \infty$, $s \in \R$, $1 \leq q \leq \infty$ and $f \in L_p$, the
 quasi-norm is $\|(2^{js} \|k_j * f\|_p)_j\|_{\ell_q}$.
 \end{definition}
 
-\begin{lemma}[The reproducing formula]
+\begin{lemma}[The reproducing formula of local means]
 \label{lem:reproducing-formula}
 \lean{Rd.LocalMeansBump.sum_dual_localMean, Rd.LocalMeansBump.tendsto_sum_dual_localMean,
   Rd.tendsto_apply_apply_of_tendsto}
@@ -6922,7 +6923,7 @@ $\Delta_h^r f = \sum_m \lambda_m \Delta_h^r a_m$ with $(2^j \|h\|)^\sigma \leq 2
 $j > k$, $\omega_r(f, t)_p \leq 2^r \|f\|_p$.
 \end{proof}
 
-\begin{theorem}[Atomic synthesis]
+\begin{theorem}[Atomic synthesis on $\R^d$]
 \label{thm:rd-atomic-synthesis}
 \lean{Rd.atomSynthConst, Rd.atomSynthConst_ne_top, Rd.modNorm_le_coeffNorm,
   Rd.eLpNorm_indicator_le_tsum, Rd.lpModulusOn_le_tsum, Rd.modNormOn_le_coeffNorm}

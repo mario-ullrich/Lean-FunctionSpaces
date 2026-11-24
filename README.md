@@ -421,7 +421,9 @@ block documents state every result with its Lean name and list the files:
 * Triebel–Lizorkin spaces on Lipschitz domains and their traces onto `B^{s-1/p}_{p,p}(Γ)`.
 * Sobolev spaces: Jawerth–Franke with Besov targets, Hardy–Littlewood–Sobolev, Trudinger, Mihlin
   multipliers with finitely many derivatives (Riesz transforms).
-* Manifolds with corners: the cube as an example, traces on faces, products of models.
+* Manifolds: the cube as a manifold with corners, traces on faces, products of models, and the
+  comparison of the chart-defined Besov spaces and traces on smooth boundaries with the Lipschitz
+  ones.
 * Higher smoothness: Marchaud's inequality, sharp Daubechies exponents, and spline
   approximation on domains described intrinsically.
 * Extension operators for `W^m_p` of every order, and Stein's universal operator.

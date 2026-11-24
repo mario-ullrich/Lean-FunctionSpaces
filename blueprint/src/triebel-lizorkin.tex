@@ -128,7 +128,7 @@ hence for all $j$ at once outside a countable union of null sets. Convolutions d
 the class of a function (\Cref{def:conv}).
 \end{proof}
 
-\begin{proposition}[Elementary properties]
+\begin{proposition}[Elementary properties of $\TL{s}{p}{q}$]
 \label{prop:tl-elementary}
 \lean{Rd.triebelLizorkinNorm_add_le, Rd.triebelLizorkinNorm_smul, Rd.triebelLizorkinNorm_zero,
   Rd.triebelLizorkinNorm_zero_left, Rd.triebelLizorkinNorm_mono_exponent,
@@ -468,7 +468,7 @@ For $f \in L_p(V)$,
 \]
 \end{definition}
 
-\begin{lemma}[The quasi-norm of an admissible kernel on $L_p$]
+\begin{lemma}[Agreement of the quasi-norms of an admissible kernel]
 \label{lem:lp-kernel-tl-norm-basic}
 \lean{Rd.LPKernel.kernelTriebelLizorkinNormDistr_toTemperedDistribution,
   Rd.LPKernel.standardKernel_kernelTriebelLizorkinNorm}
@@ -520,8 +520,9 @@ This is \Cref{lem:lp-kernel-tl-norm-basic} for the standard kernel.
 \uses{def:tl-distr, lem:tl-distr-eq, lem:mixed-norm-dyadic-family}
 Let $K$ be an admissible kernel, $1 \leq p \leq \infty$ and $u$ a tempered distribution. For all
 $1 \leq q \leq r \leq \infty$ and every real $s$, $\|u\|_{F^s_{p,r}, K} \leq \|u\|_{F^s_{p,q}, K}$,
-so $\TL{s}{p}{q} \subseteq \TL{s}{p}{r}$. For all reals $s \leq t$ and every $q$,
-$\|u\|_{F^s_{p,q}, K} \leq \|u\|_{F^t_{p,q}, K}$, so $\TL{t}{p}{q} \subseteq \TL{s}{p}{q}$.
+so $\TL{s}{p}{q} \subseteq \TL{s}{p}{r}$. For all reals $s \leq t$ and every
+$1 \leq q \leq \infty$, $\|u\|_{F^s_{p,q}, K} \leq \|u\|_{F^t_{p,q}, K}$, so
+$\TL{t}{p}{q} \subseteq \TL{s}{p}{q}$.
 \end{proposition}
 
 \begin{proof}
@@ -1482,7 +1483,7 @@ fourierMultiplierCLM\_\allowbreak apply} and \texttt{fourierMultiplierCLM\_\allo
 The last claim follows with \Cref{lem:conv-fourier-multiplier}.
 \end{proof}
 
-\begin{lemma}[The pointwise bound]
+\begin{lemma}[The pointwise bound of an admissible kernel]
 \label{lem:lp-kernel-pointwise}
 \lean{Rd.LPKernel.dyadicWeight_mul_enorm_sum_conv_le, Rd.LPKernel.comparisonConst,
   Rd.LPKernel.comparisonConst_ne_top}
@@ -1631,7 +1632,7 @@ For every $a \in \R^d$ and every $u : \T^d \to [0, \infty]$,
   \int_{P_a} u(\pi x) \, dx = \int_{\T^d} u ,
 \]
 so $\pi$ maps the Lebesgue measure on $P_a$ to the Haar measure of $\T^d$, $|P_a| = 1$, and
-$\|F \circ \pi\|_{L_p(P_a)} = \|F\|_{L_p(\T^d)}$ for every $p \in [0, \infty]$ and every almost
+$\|F \circ \pi\|_{L_p(P_a)} = \|F\|_{L_p(\T^d)}$ for every $0 < p \leq \infty$ and every almost
 everywhere measurable $F$ on $\T^d$. For every null set $N \subseteq \T^d$, $\pi^{-1}(N)$ is a
 null set; hence for every property $P$ that holds at almost every point of $\T^d$, $P(\pi x)$
 holds for almost every $x \in \R^d$.
@@ -1815,7 +1816,7 @@ and the local means quasi-norm of Triebel--Lizorkin type on the torus is
 \]
 \end{definition}
 
-\begin{lemma}[The reproducing formula on the torus]
+\begin{lemma}[The reproducing formula of local means on the torus]
 \label{lem:torus-reproducing-formula}
 \lean{Torus.sum_periodicEconvLp_dualKernel_meansKernel,
   Torus.tendsto_sum_periodicEconvLp_dualKernel_meansKernel,
@@ -2548,7 +2549,7 @@ For every almost everywhere strongly measurable $u : V \to \C$, every $j \in \N$
 $m \in \Z^n$, the coefficient $\lambda_{j,m}$ of $u$ with exponent $p = 1$
 (\Cref{def:cell-atoms}) satisfies $|\lambda_{j,m}| \leq 2^{jn} \int_{P_{j,m}} |u|$. For all
 almost everywhere strongly measurable $u_j : V \to \C$, $j \in \N$, the coefficients
-$\lambda_{j,m}$ of $u_j$ with exponent one satisfy, for every $q$, every
+$\lambda_{j,m}$ of $u_j$ with exponent one satisfy, for every $0 < q \leq \infty$, every
 $s \in \R$ and every $x \in V$,
 \[
   \|(2^{js} \lambda_j(x))_j\|_{\ell_q} \leq (2n + 1)^n |B_1| \,
@@ -4233,7 +4234,7 @@ constant $4 H_{A^{\psi}}$ (\Cref{thm:cz-family-psi}), and \Cref{thm:vector-value
 bounds its analysis operator.
 \end{proof}
 
-\begin{lemma}[The reproducing formula]
+\begin{lemma}[The reproducing formula of Littlewood--Paley blocks]
 \label{lem:square-function-reproducing}
 \lean{Rd.conv_dualLpBlockKernel_blockFun_ae, Rd.sum_conv_dualLpBlockKernel_blockFun_ae,
   Rd.tendsto_eLpNorm_sum_conv_dualLpBlockKernel_blockFun_sub}
@@ -4576,7 +4577,7 @@ $2 T_{A^\psi,0,1}$ (\Cref{lem:torus-far-mass-dilate}), and
 \Cref{thm:torus-vector-valued-strong-type} bounds its analysis operator.
 \end{proof}
 
-\begin{lemma}[The reproducing formula on the torus]
+\begin{lemma}[The reproducing formula of Littlewood--Paley blocks on the torus]
 \label{lem:torus-square-function-reproducing}
 \lean{Torus.periodicEconvLp_dualLpBlockKernel_periodicLpBlock,
   Torus.sum_periodicEconv_dualLpBlockKernel_periodicLpBlock_ae}

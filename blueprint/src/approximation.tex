@@ -44,7 +44,7 @@ subspaces: in the $n$-term scheme of \Cref{def:nterm} they are unions of subspac
 indexed by a degree enters with a strict inequality, $A_n = \{\text{degree} < n\}$, so that
 $A_0 = \{0\}$ holds.
 
-\begin{lemma}[Elementary properties]
+\begin{lemma}[Elementary properties of approximation schemes]
 \label{lem:scheme-basic}
 \lean{ApproximationScheme.zero_mem, ApproximationScheme.nonempty, ApproximationScheme.neg_mem,
   ApproximationScheme.sub_mem, ApproximationScheme.sum_mem, ApproximationScheme.smul_set_eq,
@@ -525,7 +525,7 @@ $\ell_q$ norms.
 \lean{MeasureTheory.eLpNorm_fun_rpow}
 \leanok
 For every measure space $(X, \mu)$, every measurable $h : X \to [0, \infty]$, every
-$c \in [0, \infty]$, every $p \in [0, \infty]$ and every $r > 0$,
+$c \in [0, \infty]$, every $0 < p \leq \infty$ and every $r > 0$,
 \[
   \|c h\|_p = c \, \|h\|_p, \qquad \|h^r\|_p = \|h\|_{pr}^r .
 \]
@@ -544,7 +544,7 @@ $p = \infty$ the essential supremum is homogeneous; this is Mathlib's
 \lean{MeasureTheory.eLpNorm_iSup_of_directed, MeasureTheory.eLpNorm_tsum_le}
 \leanok
 For every measure space $(X, \mu)$, every countable directed family $(F_b)_b$ of measurable
-functions $F_b : X \to [0, \infty]$ and every $p \in [0, \infty]$,
+functions $F_b : X \to [0, \infty]$ and every $0 < p \leq \infty$,
 $\|\sup_b F_b\|_p = \sup_b \|F_b\|_p$. For every countable set $I$, every family
 $(g_i)_{i \in I}$ of functions $g_i : X \to [0, \infty]$ and every $1 \leq p \leq \infty$,
 \[
@@ -3898,7 +3898,7 @@ $\delta = d/p$. The size bound expresses the normalisation and the bounded overl
 supports, the decay bound the smoothness $\sigma$ of the atoms relative to the scheme, and
 $b^s_{p,q}$ is the sequence space of Schneider and Vyb\'{\i}ral~\cite{SchneiderVybiral}.
 
-\begin{theorem}[Atomic synthesis]
+\begin{theorem}[Atomic synthesis in approximation spaces]
 \label{thm:atomic-synthesis}
 \lean{ApproximationScheme.AtomicSystem.approxNormDyadic_le_bNorm,
   ApproximationScheme.AtomicSystem.memApprox_of_bNorm_lt_top,
@@ -4710,7 +4710,7 @@ $E_n(\iota v)_p \leq C n^{-s} \|v\|$ and Bernstein's inequality, every $a \in S^
 $\iota v$ with $\|v\| \leq C n^s \|a\|_p$.
 \end{definition}
 
-\begin{theorem}[Sobolev embeddings]
+\begin{theorem}[Sobolev embeddings for function schemes]
 \label{thm:sobolev-embedding}
 \lean{FunctionScheme.SobolevSpace.exists_eq_inclusion,
   FunctionScheme.SobolevSpace.exists_eq_inclusion',
@@ -5405,10 +5405,11 @@ manifold the eigenfunctions of the Laplace--Beltrami operator form an orthonorma
 $L_2(M)$; they are continuous by elliptic regularity, and the eigenvalues $\lambda_i$ tend to
 infinity. The Dirichlet eigenbasis of a bounded open set is a spectral scheme
 (\Cref{thm:dirichlet-eigenbasis}), and so is the Neumann eigenbasis of a bounded Lipschitz domain
-(\Cref{thm:neumann-eigenbasis}); the boundedness and continuity of their elements is elliptic
-regularity, a later goal. The statements below therefore assume
-an orthonormal basis of continuous functions with levels, and every one of them is proved from
-this assumption; the torus satisfies it (\Cref{prop:fourier-eigenbasis}). The assumption
+(\Cref{thm:neumann-eigenbasis}); by elliptic regularity the Dirichlet eigenfunctions are smooth
+inside the set \cite[Theorem~9.31, p.~311]{Brezis2011}. The statements below assume an
+orthonormal basis of bounded continuous functions with levels, and every one of them is proved
+from this assumption; the torus is the instance formalised here
+(\Cref{prop:fourier-eigenbasis}). The assumption
 consists of the basis, its levels and its continuous representatives alone.
 
 \begin{definition}[Continuous spectral basis]

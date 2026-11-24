@@ -718,7 +718,7 @@ For every almost everywhere strongly measurable $g$ on $X$ with values in a norm
 $[0, \infty]$ and every $0 < p < \infty$, $\|g\|_p^p = \int \|g\|^p \, d\mu$; in particular
 $\|h\|_p^p = \int h^p \, d\mu$ for every measurable $h : X \to [0, \infty]$.
 
-For every family $a$ in $[0, \infty]$ indexed by $I$, every $u \in [0, \infty]$ and every
+For every family $a$ in $[0, \infty]$ indexed by $I$, every $0 < u \leq \infty$ and every
 $r > 0$, $\|(a_i^r)_i\|_{\ell_u} = \|a\|_{\ell_{ur}}^r$.
 
 For every $0 < q \leq \infty$ the function $x \mapsto \|(g_i(x))_i\|_{\ell_q}$ is measurable.
@@ -828,7 +828,7 @@ For all $1 \leq p < \infty$ and $1 \leq q \leq \infty$,
 \]
 For every normed group $E$, all measurable functions $u_j : X \to E$ and all weights
 $w_j \in [0, \infty]$, indexed by $j \in I$, the family $g_j = w_j \|u_j(\cdot)\|_E$ satisfies
-$\|g_j\|_p = w_j \|u_j\|_p$ for every $p$, the two inequalities above, and
+$\|g_j\|_p = w_j \|u_j\|_p$ for every $0 < p \leq \infty$, the two inequalities above, and
 $\|g\|_{L_p(\ell_p)} = \|g\|_{\ell_p(L_p)}$ for $0 < p < \infty$. This holds in particular for
 $I = \N$ and the weights $w_j = 2^{js}$ with $s \in \R$.
 \end{corollary}
@@ -891,8 +891,8 @@ on $T G_J$ passes to $T f$.
   MeasureTheory.enorm_le_dyadicWeight_neg_mul_eLpNorm_lqNorm}
 \leanok
 \uses{lem:lq-basic}
-For every measure space $(X, \mu)$, every normed group $E$, all $p, q \in [0, \infty]$ with
-$q \neq 0$, every $s \in \R$, every family $h_i \in L_p(X; E)$, $i \in \N$, and every $j \in \N$,
+For every measure space $(X, \mu)$, every normed group $E$, all $0 < p, q \leq \infty$, every
+$s \in \R$, every family $h_i \in L_p(X; E)$, $i \in \N$, and every $j \in \N$,
 \[
   2^{js} \|h_j\|_p \leq \bigl\| x \mapsto \|(2^{is} |h_i(x)|)_i\|_{\ell_q} \bigr\|_p
 \]
@@ -915,7 +915,7 @@ Pointwise $2^{js} |h_j(x)| \leq \|(2^{is} |h_i(x)|)_i\|_{\ell_q}$ (\Cref{lem:lq-
   MeasureTheory.tendsto_eLpNorm_lqNorm_ite_le}
 \leanok
 \uses{lem:lq-basic, lem:lp-norm-nonnegative}
-For every measure space $(X, \mu)$, every $p \in [0, \infty]$, every $0 < q \leq \infty$, every
+For every measure space $(X, \mu)$, every $0 < p \leq \infty$, every $0 < q \leq \infty$, every
 set $P \subseteq \N$ and all measurable $g_j \colon X \to [0, \infty]$, $j \in \N$, the function
 $x \mapsto \|(\mathbf 1_P(j) \, g_j(x))_j\|_{\ell_q}$ is measurable and
 \[
@@ -961,7 +961,7 @@ $\|G_N\|_p = (\int G_N^p)^{1/p}$ (\Cref{lem:lp-norm-nonnegative}).
 \uses{lem:mixed-norm-tails, lem:lq-basic, lem:lp-norm-nonnegative, lem:countable-minkowski}
 Let $(X, \mu)$ be a measure space and $g_j, b_j \colon X \to [0, \infty]$, $j \in \N$, measurable.
 \begin{enumerate}
-  \item For all sets $P \subseteq Q \subseteq \N$ and all $p, q$,
+  \item For all sets $P \subseteq Q \subseteq \N$ and all $0 < p, q \leq \infty$,
     $\bigl\| x \mapsto \|(\mathbf 1_P(j) g_j(x))_j\|_{\ell_q} \bigr\|_p
     \leq \bigl\| x \mapsto \|(\mathbf 1_Q(j) g_j(x))_j\|_{\ell_q} \bigr\|_p$.
   \item Let $0 < p, q < \infty$, $\bigl\| x \mapsto \|(g_j(x))_j\|_{\ell_q} \bigr\|_p < \infty$
@@ -1008,7 +1008,7 @@ families with values in $[0, \infty]$; only (3) and (5) below involve the weight
   MeasureTheory.eLpNorm_lqNorm_dyadicWeight_mono_smoothness}
 \leanok
 \uses{lem:lq-basic, lem:lp-norm-nonnegative, lem:lp-norm-homogeneity}
-Let $(X, \mu)$ be a measure space, $p \in [0, \infty]$, $0 < q \leq \infty$, $s \leq t$ in $\R$ and
+Let $(X, \mu)$ be a measure space, $0 < p \leq \infty$, $0 < q \leq \infty$, $s \leq t$ in $\R$ and
 $u_j, v_j, w_j \colon X \to [0, \infty]$, $j \in \N$, with $u_j$ and $w_j$ measurable, and write
 $N_q(w) = \bigl\| x \mapsto \|(w_j(x))_j\|_{\ell_q} \bigr\|_p$ and
 $2^{\cdot s} u = (2^{js} u_j)_j$.
@@ -2174,23 +2174,20 @@ $d_f(t) = \mu\{x \in X : \|f(x)\| > t\}$. For every real $q \neq 0$,
 \[
   w_q(f) = \sup_{t \geq 0} t \, d_f(t)^{1/q} ;
 \]
-for $p \in (0, \infty)$ the weak $L_p$ norm is $\|f\|_{p, \infty} = w_p(f)$,
-$\|f\|_{\infty, \infty}$ is the essential supremum of $\|f\|$, and $\|f\|_{0, \infty} = \infty$;
-the function $f$ lies in weak $L_p(\mu)$ if it is almost everywhere strongly measurable and
-$\|f\|_{p, \infty} < \infty$. For all $p, q, C \in [0, \infty]$, an operator $T$ has weak type
-$(p, q)$ with constant $C$ if for every $f \in L_p(\mu)$ the function $T f$ is almost everywhere
-strongly measurable and $\|T f\|_{q, \infty} \leq C \|f\|_p$, and strong type $(p, q)$ with
-constant $C$ if for every $f \in L_p(\mu)$ the function $T f$ is almost everywhere strongly
-measurable and $\|T f\|_q \leq C \|f\|_p$. For every property $P$ of functions on $X$ and every
-$A \in [0, \infty]$, $T$ is almost everywhere subadditive on $P$ with constant $A$ if for all
-$f, g$ with property $P$,
+for $p \in (0, \infty)$ the weak $L_p$ norm is $\|f\|_{p, \infty} = w_p(f)$, and
+$\|f\|_{\infty, \infty}$ is the essential supremum of $\|f\|$; for $p \in (0, \infty]$ the
+function $f$ lies in weak $L_p(\mu)$ if it is almost everywhere strongly measurable and
+$\|f\|_{p, \infty} < \infty$. For all $p, q \in (0, \infty]$ and $C \in [0, \infty]$, an
+operator $T$ has weak type $(p, q)$ with constant $C$ if for every $f \in L_p(\mu)$ the function
+$T f$ is almost everywhere strongly measurable and $\|T f\|_{q, \infty} \leq C \|f\|_p$, and
+strong type $(p, q)$ with constant $C$ if for every $f \in L_p(\mu)$ the function $T f$ is almost
+everywhere strongly measurable and $\|T f\|_q \leq C \|f\|_p$. For every property $P$ of
+functions on $X$ and every $A \in [0, \infty]$, $T$ is almost everywhere subadditive on $P$ with
+constant $A$ if for all $f, g$ with property $P$,
 $\|T(f + g)(y)\| \leq A (\|T f(y)\| + \|T g(y)\|)$ for $\nu$-almost every $y \in Y$.
 \end{definition}
 
-The value $\|f\|_{0, \infty} = \infty$ comes from Lean's convention $1/0 = 0$, under which
-$\|f\|_{0, \infty} = \sup_{t \geq 0} t \, d_f(t)^0 = \sup_{t \geq 0} t$.
-
-\begin{lemma}[Elementary properties]
+\begin{lemma}[Elementary properties of distribution functions and weak type]
 \label{lem:distribution-weak-norm-basic}
 \lean{MeasureTheory.distribution_top, MeasureTheory.distribution_mono_left,
   MeasureTheory.distribution_mono_right, MeasureTheory.distribution_add_le_of_enorm,
@@ -2215,10 +2212,10 @@ $\|f\|_{p, \infty} = w_p(f)$, and for $t > 0$,
 \]
 For every almost everywhere strongly measurable $f$ and every $p \in (0, \infty]$,
 $\|f\|_{p, \infty} \leq \|f\|_p$, so $L_p(\mu)$ lies in weak $L_p(\mu)$. For all
-$p, q, C \in [0, \infty]$ with $C < \infty$, an operator of weak type $(p, q)$ with constant $C$
-maps $L_p(\mu)$ into weak $L_q(\nu)$, and one of strong type $(p, q)$ maps $L_p(\mu)$ into
-$L_q(\nu)$; for $q > 0$, strong type $(p, q)$ with constant $C$ implies weak type $(p, q)$ with
-constant $C$.
+$p, q \in (0, \infty]$ and $C \in [0, \infty)$, an operator of weak type $(p, q)$ with constant
+$C$ maps $L_p(\mu)$ into weak $L_q(\nu)$, and one of strong type $(p, q)$ maps $L_p(\mu)$ into
+$L_q(\nu)$; strong type $(p, q)$ with constant $C$ implies weak type $(p, q)$ with constant
+$C$.
 \end{lemma}
 
 \begin{proof}

@@ -129,7 +129,7 @@ $\partial^v f(\varphi) = (-1)^k f(\partial^v \varphi)$ by \Cref{lem:distribution
 For every $v \in V^k$, all functions $f, f', g, g'$ and every $c \in \C$:
 \begin{enumerate}
   \item if $g$ and $g'$ are weak derivatives $\partial^v f$ on $\Omega$, then $g = g'$ almost
-    everywhere on $\Omega$; for $\Omega = V$, every $r \in [0, \infty]$ and
+    everywhere on $\Omega$; for $\Omega = V$, every $0 < r \leq \infty$ and
     $g, g' \in L_r(V)$, $g = g'$ in $L_r(V)$;
   \item for $k = 0$, every locally integrable $f$ on $\Omega$ is its own weak derivative;
   \item if $g = \partial^v f$ and $g' = \partial^v f'$ weakly on $\Omega$, then
@@ -583,7 +583,7 @@ $\Omega$ for every $v$, and $f$ is its own derivative of order $0$
 \label{lem:bounded-multiplier-lp}
 \lean{MeasureTheory.eLpNorm_mul_le_of_forall_norm_le}
 \leanok
-For every measure space $(X, \mu)$, every $0 \leq p \leq \infty$, every $C \geq 0$, every almost
+For every measure space $(X, \mu)$, every $0 < p \leq \infty$, every $C \geq 0$, every almost
 everywhere strongly measurable $c \colon X \to \C$ with $|c| \leq C$ and every $u \colon X \to \C$,
 $\|c u\|_{L_p(\mu)} \leq C \, \|u\|_{L_p(\mu)}$.
 \end{lemma}
@@ -613,7 +613,7 @@ For all open $O, B \subseteq V$:
       \|\chi g + (\partial_w \chi) f\|_{L_p(O)} \leq C \, \|g\|_{L_p(O \cap B)}
         + C' \, \|f\|_{L_p(O \cap B)} ;
     \]
-  \item for every $0 \leq p \leq \infty$, every $h$ that vanishes outside $B$ has
+  \item for every $0 < p \leq \infty$, every $h$ that vanishes outside $B$ has
     $\|h\|_{L_p(O)} = \|h\|_{L_p(O \cap B)}$, and for every continuous real $\chi$ with closed
     support in $B$ and $|\chi| \leq C$ and every $f$,
     $\|\chi f\|_{L_p(O)} \leq C \, \|f\|_{L_p(O \cap B)}$.
@@ -753,7 +753,7 @@ For all measure spaces $(X, \mu)$ and $(Y, \nu)$, every measurable $\Phi \colon 
 $\Phi_* \mu = \nu$, every $U \subseteq X$ and every measurable $O \subseteq Y$ with
 $\Phi(U) \subseteq O$, every normed group $E$ and every $h \colon Y \to E$: if $h$ is almost
 everywhere strongly measurable on $O$, then $h \circ \Phi$ is almost everywhere strongly
-measurable on $U$; and for every $0 \leq p \leq \infty$,
+measurable on $U$; and for every $0 < p \leq \infty$,
 $\|h \circ \Phi\|_{L_p(U)} \leq \|h\|_{L_p(O)}$.
 \end{lemma}
 
@@ -3624,7 +3624,7 @@ almost everywhere by \Cref{lem:blocks-ae-convergence}.
 
 \paragraph{Sobolev embeddings.}
 
-\begin{corollary}[Sobolev embeddings]
+\begin{corollary}[Sobolev embeddings of $\Sob{m}{p}(V)$]
 \label{cor:sobolev-embedding}
 \lean{Rd.exists_memLp_ae_eq_of_hasWeakLineDeriv,
   Rd.exists_boundedContinuous_ae_eq_of_hasWeakLineDeriv, Rd.exists_memLp_ae_eq_of_memSobolevW,
@@ -3707,7 +3707,7 @@ $2^{j(s - n/p)} |(\psi_j * f)(x)| \leq N_p \, 2^{js} \|\psi_j * f\|_p
 \leq N_p \|f\|^{\mathrm{LP}}_{s,\infty}$ for every $j$.
 \end{proof}
 
-\begin{lemma}[The pointwise bound]
+\begin{lemma}[The pointwise bound of the critical embedding]
 \label{lem:critical-pointwise-bound}
 \lean{ENNReal.toReal_div_toReal_mem_Ioo, nikolskiiExponent_interp_eq,
   Rd.tsum_dyadicWeight_enorm_blockFun_le}
@@ -3854,8 +3854,8 @@ decreasing rearrangements; Vyb\'{\i}ral~\cite{VybiralJF2008} gives a short proof
   cor:triebel-lizorkin-into-lp-le}
 Let $n \geq 1$ and $1 < p < \infty$.
 \begin{enumerate}
-  \item For every $m \in \N$ with $m \geq 1$, every $r < \infty$ with $m = n(1/p - 1/r)$, that is
-    $1/r = 1/p - m/n$, and every $f \in L_p(V)$ with weak derivatives
+  \item For every $m \in \N$ with $m \geq 1$, every $0 < r < \infty$ with $m = n(1/p - 1/r)$,
+    that is $1/r = 1/p - m/n$, and every $f \in L_p(V)$ with weak derivatives
     $g_\alpha = \partial^{e_\alpha} f \in L_p(V)$ for every multi-index $\alpha$ of order $m$, as
     in \Cref{thm:sobolev-to-triebel-lizorkin}, there is $u \in L_r(V)$ with $u = f$ almost
     everywhere and
@@ -3865,7 +3865,7 @@ Let $n \geq 1$ and $1 < p < \infty$.
     \]
   \item For every $m \in \N$, every $p \leq r < \infty$ with $n(1/p - 1/r) \leq m$ and every
     $f \in \Sob{m}{p}(V)$ there is $g \in L_r(V)$ with $g = f$ almost everywhere. In particular,
-    this holds for every $r < \infty$ with $n(1/p - 1/r) = m$.
+    this holds for every $0 < r < \infty$ with $n(1/p - 1/r) = m$.
 \end{enumerate}
 \end{theorem}
 
@@ -3882,10 +3882,11 @@ $f \in \TL{m}{p}{2} \subseteq \TL{\alpha(n, p, r)}{p}{\infty}$
 (\Cref{def:nikolskii-property}).
 \end{proof}
 
-In Lean, $1/0 = 0$, so the exponent $r = 0$ satisfies $n(1/p - 1/r) = n/p$; there every
-$f \in L_p(V)$ is a class of $L_0(V)$ of norm $0$. For $p = 1$ the space $\Sob{m}{1}(V)$ is larger
-than $\TL{m}{1}{2}$, and the argument above starts from $\TL{m}{p}{2}$;
-\Cref{sec:gagliardo-nirenberg-sobolev} treats $p = 1$.
+The Lean statements also admit $r = 0$: Lean reads $1/0 = 0$ in $\R$, so $r = 0$ satisfies
+$n(1/p - 1/r) = n/p$, and the Lean space of exponent $0$ holds every $f \in L_p(V)$, with norm $0$
+(\texttt{Rd.\allowbreak exists\_\allowbreak lp\_\allowbreak zero\_\allowbreak ae\_\allowbreak eq}).
+For $p = 1$ the space $\Sob{m}{1}(V)$ is larger than $\TL{m}{1}{2}$, and the argument above
+starts from $\TL{m}{p}{2}$; \Cref{sec:gagliardo-nirenberg-sobolev} treats $p = 1$.
 
 \section{The Gagliardo--Nirenberg--Sobolev inequality}
 \label{sec:gagliardo-nirenberg-sobolev}
@@ -3897,8 +3898,8 @@ Gagliardo~\cite{Gagliardo1958} and, independently, Nirenberg~\cite{Nirenberg1959
 $|u|^\gamma$ it gives $1 < p < n$. Mathlib proves the inequality for compactly supported $C^1$
 functions: for every $1 \leq p < \infty$ there is a constant $C_{V,p} < \infty$
 (\texttt{MeasureTheory.\allowbreak eLpNormLESNormFDerivOfEqInnerConst}) such that
-$\|u\|_{p'} \leq C_{V,p} \|Du\|_p$ for every $p' \geq 0$ with $1/p' = 1/p - 1/n$, every real
-inner product space $H$ and every $C^1$ function $u \colon V \to H$ with compact support
+$\|u\|_{p'} \leq C_{V,p} \|Du\|_p$ for every $0 < p' < \infty$ with $1/p' = 1/p - 1/n$, every
+real inner product space $H$ and every $C^1$ function $u \colon V \to H$ with compact support
 (\texttt{MeasureTheory.\allowbreak eLpNorm\_\allowbreak le\_\allowbreak eLpNorm\_\allowbreak
 fderiv\_\allowbreak of\_\allowbreak eq\_\allowbreak inner}), by the grid-lines argument of
 Gagliardo and Nirenberg for $p = 1$ and by applying it to $|u|^\gamma$ for $p > 1$. This section
@@ -3909,9 +3910,9 @@ $\chi_R f$ have compact support and converge to $f$ pointwise, and Fatou's lemma
 bounds to $f$. The result is the Sobolev embedding $\Sob{1}{p}(V) \hookrightarrow L_r(V)$ for
 $1/r = 1/p - 1/n$ and every $1 \leq p$, $p = 1$ included, where
 \Cref{sec:critical-sobolev-embedding} needs $1 < p$, and with it
-$\Sob{m}{1}(V) \hookrightarrow L_r(V)$ for $1/r = 1 - m/n$. In Lean $1/0 = 0$, so the exponent
-$p' = 0$ satisfies $1/p' = 1/p - 1/n$ for $p = n$; there the left side is the norm of exponent
-$0$, which is $0$.
+$\Sob{m}{1}(V) \hookrightarrow L_r(V)$ for $1/r = 1 - m/n$. The Lean statements also admit
+$p' = 0$: Lean reads $1/0 = 0$ in $\R$, so $p' = 0$ satisfies $1/p' = 1/p - 1/n$ for $p = n$,
+and the left side is then the norm of exponent $0$, which is $0$.
 
 \paragraph{Fatou's lemma and bases.}
 
@@ -3919,7 +3920,7 @@ $0$, which is $0$.
 \label{lem:fatou-bounded-norms}
 \lean{MeasureTheory.eLpNorm_le_of_ae_tendsto_of_tendsto}
 \leanok
-For every measure space, every $0 \leq p \leq \infty$, all almost everywhere strongly measurable
+For every measure space, every $0 < p \leq \infty$, all almost everywhere strongly measurable
 $u_i$ ($i \in \N$), every $f$ with $u_i \to f$ almost everywhere, and all
 $B_i, b \in [0, \infty]$ with $\|u_i\|_p \leq B_i$ for every $i$ and $B_i \to b$,
 $\|f\|_p \leq b$.
@@ -3965,9 +3966,9 @@ inequality in $L_p$.
 \leanok
 \uses{lem:mollification-weak-derivative, lem:derivative-basis-bound, lem:conv-derivatives,
   thm:young, lem:weak-derivative-basic}
-Let $n \geq 1$. For every $1 \leq p < \infty$, every $p' \geq 0$ with $1/p' = 1/p - 1/n$, every
-smooth $K \colon V \to \C$ with compact support, and all $h$ with compact support and $g_k$ with
-$g_k = \partial_{e_k} h$ weakly on $V$ for every $k$,
+Let $n \geq 1$. For every $1 \leq p < \infty$, every $0 < p' < \infty$ with
+$1/p' = 1/p - 1/n$, every smooth $K \colon V \to \C$ with compact support, and all $h$ with
+compact support and $g_k$ with $g_k = \partial_{e_k} h$ weakly on $V$ for every $k$,
 \[
   \|K * h\|_{p'} \leq C_{V,p} \, \|K\|_1 \sum_k \|g_k\|_p .
 \]
@@ -3988,8 +3989,9 @@ gives $\|K * g_k\|_p \leq \|K\|_1 \|g_k\|_p$.
 \leanok
 \uses{lem:gns-mollification, thm:smooth-atomic-decomposition, lem:dilate, thm:approx-identity,
   lem:weak-derivative-basic, lem:conv-derivatives, lem:dual-kernel-derivatives}
-Let $n \geq 1$. For every $1 \leq p < \infty$, every $p' \geq 0$ with $1/p' = 1/p - 1/n$, and
-all $h$ with compact support and $g_k$ with $g_k = \partial_{e_k} h$ weakly on $V$ for every $k$,
+Let $n \geq 1$. For every $1 \leq p < \infty$, every $0 < p' < \infty$ with
+$1/p' = 1/p - 1/n$, and all $h$ with compact support and $g_k$ with $g_k = \partial_{e_k} h$
+weakly on $V$ for every $k$,
 \[
   \|h\|_{p'} \leq C_{V,p} \sum_k \|g_k\|_p .
 \]
@@ -4051,8 +4053,9 @@ the triangle inequality in $L_p$.
 \leanok
 \uses{lem:gns-compact-support, lem:real-cutoff, lem:weak-derivative-product,
   lem:fatou-bounded-norms, lem:weak-derivative-basic, def:schwartz-cutoff}
-Let $n \geq 1$. For every $1 \leq p < \infty$, every $p' \geq 0$ with $1/p' = 1/p - 1/n$, every
-$f \in L_p(V)$ and all $g_k$ with $g_k = \partial_{e_k} f$ weakly on $V$ for every $k$,
+Let $n \geq 1$. For every $1 \leq p < \infty$, every $0 < p' < \infty$ with
+$1/p' = 1/p - 1/n$, every $f \in L_p(V)$ and all $g_k$ with $g_k = \partial_{e_k} f$ weakly on
+$V$ for every $k$,
 \[
   \|f\|_{p'} \leq C_{V,p} \sum_k \|g_k\|_p .
 \]
@@ -4072,17 +4075,13 @@ as soon as $R_i \geq \|x\|$, and \Cref{lem:fatou-bounded-norms} gives the bound.
 
 \paragraph{Sobolev embeddings.}
 
-Inside the exponent $n(1/p - 1/r)$ of \Cref{def:nikolskii-property}, Lean reads
-$1/0 = 1/\infty = 0$, and the statements below follow this convention.
-
 \begin{lemma}[Exponents]
 \label{lem:gns-exponents}
 \lean{toReal_inv_eq_of_nikolskiiExponent_eq_one, nikolskiiExponent_eq_one_of_inv_add_inv,
   one_lt_of_nikolskiiExponent_one_eq, nikolskiiExponent_conjExponent_of_eq}
 \leanok
 \uses{def:nikolskii-property}
-For every $D \geq 0$, every $n \in \N$ and all $p, r \in [0, \infty]$, with $1/0 = 1/\infty = 0$
-in $D(1/p - 1/r)$ as in Lean:
+For every $D \geq 0$, every $n \in \N$ and all $0 < p, r \leq \infty$, with $1/\infty = 0$:
 \begin{enumerate}
   \item if $D(1/p - 1/r) = 1$, then $D > 0$, $p < \infty$ and $1/r = 1/p - 1/D$;
   \item if $1 \leq p$ and $1/r + 1/n = 1/p$ in $[0, \infty]$, where $1/0 = \infty$, then
@@ -4096,8 +4095,8 @@ in $D(1/p - 1/r)$ as in Lean:
 \begin{proof}
 \leanok
 (1) For $D = 0$ the left side is $0$, and for $p = \infty$ it is $-D/r \leq 0$. (2) Since
-$1/p \leq 1$, both $1/r$ and $1/n$ are finite, so $n \geq 1$ and $r > 0$, and $p = \infty$ would
-force $1/n = 0$. (3) $n - n/r = m \geq 2$ and $1/r \geq 0$ give $n > 1$, so $1 < q < \infty$.
+$1/p \leq 1$, $1/n$ is finite, so $n \geq 1$, and $p = \infty$ would force $1/n = 0$.
+(3) $n - n/r = m \geq 2$ and $1/r \geq 0$ give $n > 1$, so $1 < q < \infty$.
 Hölder conjugacy (Mathlib's \texttt{ENNReal.\allowbreak conjExponent}) gives $1/q + 1/n = 1$,
 hence $n(1 - 1/q) = 1$ by (2) with $p = 1$, and $n(1/q - 1/r) = n(1 - 1/r) - 1 = m - 1$.
 \end{proof}
@@ -4109,15 +4108,15 @@ hence $n(1 - 1/q) = 1$ by (2) with $p = 1$, and $n(1/q - 1/r) = n(1 - 1/r) - 1 =
 \leanok
 \uses{thm:gns-weak, lem:gns-exponents, def:weak-line-derivative, lem:weak-derivative-basic}
 \begin{enumerate}
-  \item For every $1 \leq p \leq \infty$, every $r < \infty$ with $n(1/p - 1/r) = 1$, every
+  \item For every $1 \leq p \leq \infty$, every $0 < r < \infty$ with $n(1/p - 1/r) = 1$, every
     $f \in L_p(V)$ and all $g_k \in L_p(V)$ with $g_k = \partial_{e_k} f$ weakly on $V$ for
     every $k$, there is $u \in L_r(V)$ with $u = f$ almost everywhere and
     $\|u\|_r \leq C_{V,p} \sum_k \|g_k\|_p$.
-  \item For every $1 \leq p \leq \infty$, every $r < \infty$ with $n(1/p - 1/r) = 1$ and every
-    $f \in \Sob{1}{p}(V)$ there are $g_k \in L_p(V)$ with $g_k = \partial_{e_k} f$ weakly on $V$
-    for every $k$ and $u \in L_r(V)$ with $u = f$ almost everywhere and
+  \item For every $1 \leq p \leq \infty$, every $0 < r < \infty$ with $n(1/p - 1/r) = 1$ and
+    every $f \in \Sob{1}{p}(V)$ there are $g_k \in L_p(V)$ with $g_k = \partial_{e_k} f$ weakly
+    on $V$ for every $k$ and $u \in L_r(V)$ with $u = f$ almost everywhere and
     $\|u\|_r \leq C_{V,p} \sum_k \|g_k\|_p$.
-  \item For every $1 \leq p \leq \infty$, every $r < \infty$ with $1/r + 1/n = 1/p$ in
+  \item For every $1 \leq p \leq \infty$, every $0 < r < \infty$ with $1/r + 1/n = 1/p$ in
     $[0, \infty]$, where $1/0 = \infty$, and every $f \in \Sob{1}{p}(V)$ the conclusion of (2)
     holds.
 \end{enumerate}
@@ -4141,9 +4140,9 @@ so this case lies outside \Cref{thm:critical-sobolev-embedding}.
 \lean{Rd.exists_hasWeakLineDeriv_memLp_of_memSobolevW_of_lt}
 \leanok
 \uses{thm:sobolev-one-embedding, lem:weak-derivative-basic}
-For every $m \in \N$, every $f \in \Sob{m}{1}(V)$, every $q < \infty$ with $n(1 - 1/q) = 1$,
-every $k < m$ and every $v \in V^k$, there is $u \in L_q(V)$ with $u = \partial^v f$ weakly on
-$V$.
+For every $m \in \N$, every $f \in \Sob{m}{1}(V)$, every $0 < q < \infty$ with
+$n(1 - 1/q) = 1$, every $k < m$ and every $v \in V^k$, there is $u \in L_q(V)$ with
+$u = \partial^v f$ weakly on $V$.
 \end{lemma}
 
 \begin{proof}
@@ -4160,8 +4159,8 @@ everywhere.
 \leanok
 \uses{thm:sobolev-one-embedding, lem:sobolev-l1-derivatives, lem:gns-exponents,
   thm:critical-sobolev-embedding, lem:weak-derivative-basic}
-For every $m \geq 1$, every $r < \infty$ with $n(1 - 1/r) = m$, that is $1/r = 1 - m/n$, and
-every $f \in \Sob{m}{1}(V)$ there is $g \in L_r(V)$ with $g = f$ almost everywhere.
+For every $m \geq 1$, every $0 < r < \infty$ with $n(1 - 1/r) = m$, that is $1/r = 1 - m/n$,
+and every $f \in \Sob{m}{1}(V)$ there is $g \in L_r(V)$ with $g = f$ almost everywhere.
 \end{theorem}
 
 \begin{proof}
@@ -4723,7 +4722,7 @@ of $\varphi$ is the map $L_p(\T^d) \to \C$,
 
 The pairing evaluates the lift $h \circ \pi$, as a distribution on $\R^d$, at $\varphi$.
 
-\begin{lemma}[The periodic pairing]
+\begin{lemma}[Properties of the periodic pairing]
 \label{lem:torus-periodic-pairing}
 \lean{Torus.locallyIntegrable_comp_quotientProj_Lp, Torus.integrable_mul_comp_quotientProj,
   Torus.enorm_integral_mul_comp_quotientProj_le,
@@ -5934,7 +5933,7 @@ $J_s f = h$.
 
 \paragraph{Bessel potential spaces in Triebel--Lizorkin spaces.}
 
-\begin{lemma}[The blocks of a Bessel potential]
+\begin{lemma}[The blocks of a Bessel potential of an $L_r$ function]
 \label{lem:bessel-potential-blocks}
 \lean{Rd.dyadicWeight_mul_enorm_blockFun_eq}
 \leanok
@@ -6099,7 +6098,7 @@ norm at most $C \, \| x \mapsto \| (2^{j\sigma} |g_j(x)|)_j \|_{\ell_2} \|_p$, a
 
 For the blocks $g_j = \psi_j * f$ of $f \in L_p(V)$ this is \Cref{lem:synthesis-sums-convergent}.
 
-\begin{lemma}[The blocks of a Bessel potential]
+\begin{lemma}[The blocks of a Bessel potential of a tempered distribution]
 \label{lem:bessel-potential-distrib-blocks}
 \lean{Rd.distribBlock_besselPotential}
 \leanok

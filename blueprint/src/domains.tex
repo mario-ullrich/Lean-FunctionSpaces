@@ -8206,7 +8206,7 @@ Let $G$ be a Lipschitz graph domain with $M$-Lipschitz $\varphi$ and $g_i \colon
     $w \in V$, $D_w = \partial_w (f \circ F^{-1})$ weakly on $H_+$.
   \item For every $1 \leq p \leq \infty$ and every $w \in V$,
     $\|D_w\|_{L_p(H_+)} \leq (1 + M) \|w\| \sum_{i \in I} \|g_i\|_{L_p(G)}$, so $D_w \in L_p(H_+)$
-    if every $g_i \in L_p(G)$; for every $0 \leq p \leq \infty$ and every $f \in L_p(G)$,
+    if every $g_i \in L_p(G)$; for every $0 < p \leq \infty$ and every $f \in L_p(G)$,
     $f \circ F^{-1} \in L_p(H_+)$.
   \item For every $f$ integrable on $G \cap B(0, R)$ for every $R$, $f \circ F^{-1}$ is integrable
     on $H_+ \cap B(0, R)$ for every $R$; if every $g_i$ is integrable on $G \cap B(0, R)$ for
@@ -8318,7 +8318,7 @@ For every bounded Lipschitz domain $\Omega$ and every $j$, $\Omega_j \cap B(c_j,
 \begin{enumerate}
   \item for every $w \in V$ and all $f$, $g$ with $g = \partial_w f$ weakly on $\Omega$,
     $\chi g + (\partial_w \chi) f = \partial_w (\chi f)$ weakly on $\Omega_j$;
-  \item for every $C \geq 0$ with $|\chi| \leq C$, every $f$ and every $0 \leq p \leq \infty$,
+  \item for every $C \geq 0$ with $|\chi| \leq C$, every $f$ and every $0 < p \leq \infty$,
     $\|\chi f\|_{L_p(\Omega_j)} \leq C \|f\|_{L_p(\Omega)}$;
   \item for every $1 \leq p \leq \infty$, every $w \in V$, all $C, C' \geq 0$ with
     $|\chi| \leq C$ and $|\partial_w \chi| \leq C'$ and all $f$, $g$,
@@ -12421,9 +12421,6 @@ pieces of $\operatorname{Tr}_A f$ and of $g$ agree almost everywhere.
 \Cref{thm:manifold-trace} and \Cref{cor:manifold-trace-continuous} for
 $M = \overline{\Omega}$ (\Cref{thm:smooth-domain-manifold}).
 \end{proof}
-
-The relation of these chart-defined spaces and traces to the Besov spaces and traces on Lipschitz
-boundaries of \Cref{ch:traces-lipschitz} is a later goal.
 
 \section{Smooth bounded domains from local graphs}
 \label{sec:smooth-local-graphs}

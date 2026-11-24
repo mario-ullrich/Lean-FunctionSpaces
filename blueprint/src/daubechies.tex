@@ -1302,7 +1302,7 @@ $[-2^n/2, 2^n/2]$, which equals the first integral by \Cref{prop:daub-transfer-p
 Under a growth bound the integrals of $|\Phi|^2$ over the dyadic annuli decay geometrically,
 since $\operatorname{sinc}(\pi\xi)^{2N}$ is at most $(\pi |\xi|)^{-2N}$.
 
-\begin{definition}[Dyadic annuli]
+\begin{definition}[Dyadic frequency annuli]
 \label{def:daub-annulus}
 \lean{Daubechies.annulus, Daubechies.measurableSet_annulus, Daubechies.annulus_subset_Icc,
   Daubechies.exists_mem_annulus, Daubechies.univ_subset_Icc_union_annulus}
@@ -1568,7 +1568,7 @@ and its inverse transform is $\mathcal F^{-1} f(x) = \int_\R f(\xi) e^{2\pi i x 
 Lean reads the integral of a function that is not integrable as $0$; with this convention the
 statements below without integrability hypotheses hold for every $f$.
 
-\begin{lemma}[Continuity and the uniform bound]
+\begin{lemma}[Continuity and the uniform bound of the Fourier transform]
 \label{lem:daub-fourier-continuous}
 \lean{Real.real_continuous_fourier_of_integrable, Real.real_continuous_fourierInv_of_integrable,
   Real.real_norm_fourierInv_le_integral_norm}
@@ -1811,7 +1811,7 @@ product,
 For order $N \geq 2$ the symbol product is integrable
 (\Cref{prop:daub-symbol-product-integrable}), and the integral converges absolutely.
 
-\begin{proposition}[Continuity and the uniform bound]
+\begin{proposition}[Continuity and the uniform bound of the scaling function]
 \label{prop:daub-scaling-continuous}
 \lean{Daubechies.continuous_scalingFun, Daubechies.norm_scalingFun_le}
 \leanok
@@ -2040,7 +2040,7 @@ closed, so it also contains the closure $\R \setminus (0, 2N - 1)$ of $U$.
 \leanok
 \uses{def:daub-scaling-function}
 For every Daubechies mask of order $N \geq 2$ the scaling function $\varphi$ is integrable, and
-$\varphi \in L_p(\R)$ for every $p \in [0, \infty]$.
+$\varphi \in L_p(\R)$ for every $0 < p \leq \infty$.
 \end{proposition}
 
 \begin{proof}
@@ -3618,7 +3618,7 @@ $\sum_k \lambda_k \gamma_{j,k}$ are measurable, and for every $z \in \C$
 \]
 For $1 \leq p \leq \infty$, $1/p' = 1 - 1/p$ and
 $\|\gamma_{j,k}\|_{p'} = 2^{-j(1/2 - 1/p)} \|\gamma\|_{p'}$. A continuous function that vanishes
-outside $[a, b]$ lies in $L_p(\R)$ for every $p$.
+outside $[a, b]$ lies in $L_p(\R)$ for every $0 < p \leq \infty$.
 \end{lemma}
 
 \begin{proof}
@@ -4873,7 +4873,7 @@ Both sides depend only on the class of $f$ (\Cref{lem:daub-proj-fun-basic} and
 \Cref{lem:rd-modulus}).
 \end{proof}
 
-\begin{theorem}[Jackson's inequality]
+\begin{theorem}[Jackson's inequality in \texorpdfstring{$L_p(\R)$}{Lp(R)}]
 \label{thm:daub-jackson}
 \lean{Daubechies.approxError_daubechiesScheme_le_daubechiesJacksonConst_mul,
   Daubechies.approxError_daubechiesScheme_le, Daubechies.enorm_sub_daubechiesProj_le}
@@ -6013,7 +6013,7 @@ with $e \neq \emptyset$ are the \emph{tensor wavelets}.
 Let $N \geq 2$. Then $\varphi$ and $\psi$ vanish outside $[1 - N, 2N - 1]$, and for every
 $e \subseteq \{1, \dots, d\}$ and every $x \in \R^d$ with $x_i \notin [1 - N, 2N - 1]$ for some
 $i$, $\Psi^e(x) = 0$. Every $\Psi^e$ is continuous, has compact support and lies in
-$L_p(\R^d)$ for every $p \in [0, \infty]$.
+$L_p(\R^d)$ for every $0 < p \leq \infty$.
 \end{lemma}
 
 \begin{proof}
@@ -7199,9 +7199,9 @@ norm $\|x\| = \max_i |x_i|$, and $f_{x,i}$ is the slice of $f$ through $x$ in co
   Cube.eLpNorm_cubeSteklovSmoothDeriv_le_smoothnessModulus}
 \leanok
 \uses{lem:cube-smoothing, def:rd-modulus}
-Let $f : \R^d \to \C$, $r \in \N$ and $i$ a coordinate. For every $p$ and all $h, t \in \R$ with
-$|h| \leq t$, $\|\Delta^r_{h e_i} f\|_p \leq \omega_r(f, t)_p$. Let $f$ be continuous and
-$\delta > 0$, and let $S^{(i)}_\delta f$ be the smoothing in coordinate $i$ of
+Let $f : \R^d \to \C$, $r \in \N$ and $i$ a coordinate. For every $0 < p \leq \infty$ and all
+$h, t \in \R$ with $|h| \leq t$, $\|\Delta^r_{h e_i} f\|_p \leq \omega_r(f, t)_p$. Let $f$ be
+continuous and $\delta > 0$, and let $S^{(i)}_\delta f$ be the smoothing in coordinate $i$ of
 \Cref{lem:cube-smoothing}. For $1 \leq p < \infty$,
 \[
   \|f - S^{(i)}_\delta f\|_{L_p(\R^d)} \leq \omega_r(f, r\delta)_p ,
@@ -7216,7 +7216,8 @@ and for $1 \leq p \leq \infty$,
 \leanok
 \uses{def:iso-diff, lem:rd-modulus, lem:minkowski-avg, thm:steklov-smoothing}
 The coordinate difference $\Delta^r_{h e_i} f$ is the isotropic difference with the step
-$h e_i$ (\Cref{def:iso-diff}) with $\|h e_i\| = |h|$, so \Cref{lem:rd-modulus} applies. As in
+$h e_i$ (\Cref{def:iso-diff}) with $\|h e_i\| = |h|$, so the first bound follows from
+\Cref{def:rd-modulus}. As in
 \Cref{lem:cube-smoothing}, $f - S^{(i)}_\delta f$ is $(-1)^r$ times an average of coordinate
 differences with steps in $[0, r\delta]$, which Minkowski's inequality for averages
 (\Cref{lem:minkowski-avg}) bounds by the largest of their norms; the derivative is
@@ -7334,7 +7335,7 @@ $(i, l)$ with $i$ in front of $l$. If $f$ is continuous, so is $R_{j,l} f$. For 
 $(1, \dots, d)$ of all coordinates write $R_j f$.
 \end{definition}
 
-\begin{lemma}[Telescoping over the coordinates]
+\begin{lemma}[Telescoping over the coordinates on \texorpdfstring{$\R^d$}{R\^{}d}]
 \label{lem:daub-rd-telescoping}
 \lean{Daubechies.eLpNorm_foldSliceProj_le, Daubechies.memLp_foldSliceProj,
   Daubechies.eLpNorm_sub_foldSliceProj_le}
