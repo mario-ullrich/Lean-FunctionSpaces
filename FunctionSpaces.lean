@@ -13,6 +13,7 @@ public import FunctionSpaces.Analysis.Lp.Inclusion
 public import FunctionSpaces.Analysis.Lp.BoundedContinuous
 public import FunctionSpaces.Analysis.Lp.MixedNorms
 public import FunctionSpaces.Analysis.Lp.Interpolation
+public import FunctionSpaces.Analysis.Lp.QuasiNorm
 public import FunctionSpaces.Analysis.Lp.WeakType
 public import FunctionSpaces.Analysis.Lp.LayerCake
 public import FunctionSpaces.Analysis.Lp.Marcinkiewicz

@@ -8,20 +8,21 @@ and their embeddings*, *Polynomial approximation on intervals*, *Approximation o
 Lipschitz domains* and *Fractional Sobolev spaces on Lipschitz domains*.
 
 This block holds the folder `FunctionSpaces/Analysis/`, whose files import only Mathlib,
-`ApproximationSpaces` and each other: `L_p` norms, the inclusion `L_r ↪ L_p` and bounded
-continuous functions on finite measure spaces, Young's inequality on measurable groups, mixed
-norms `L_p(ℓ_q)` and `ℓ_q(L_p)` on every measure space, weak type, the layer cake formula,
-Marcinkiewicz interpolation, `L_p` norms by duality, `L_p` norms on `ℝ^d` through slices in one
-coordinate and a fractional Hardy inequality on `(0, 1]`; differences on additive monoids, the
-translation algebra, moduli of smoothness on subsets and under linear and affine changes of
-variables; convolution, approximate identities, the Littlewood–Paley kernels and test functions on
-`ℝ^d`; dyadic cubes and cells, the Hardy–Littlewood maximal function, the Calderón–Zygmund
-decomposition, also for functions with values in a normed space, and the Fefferman–Stein
-inequality; the pivot dual of a bounded operator between Hilbert spaces, which makes `L_2` the
-pivot space of the Gelfand triples of Sobolev spaces, and a test for dense range in `L_2(μ)`;
-componentwise operators on finite `L_2` sums of normed and Hilbert spaces, with their kernels,
-ranges, orthogonal complements and duals, on which the vector-valued Sobolev spaces rest. The
-`L_p` norms are handled through integrals of powers (`MeasureTheory.eLpNorm_rpow_eq`).
+`ApproximationSpaces` and each other: `L_p` norms, the quasi-norms of `L_p` for every
+`0 < p ≤ ∞`, the inclusion `L_r ↪ L_p` and bounded continuous functions on finite measure
+spaces, Young's inequality on measurable groups, mixed norms `L_p(ℓ_q)` and `ℓ_q(L_p)` on every
+measure space, weak type, the layer cake formula, Marcinkiewicz interpolation, `L_p` norms by
+duality, `L_p` norms on `ℝ^d` through slices in one coordinate and a fractional Hardy inequality
+on `(0, 1]`; differences on additive monoids, the translation algebra, moduli of smoothness on
+subsets and under linear and affine changes of variables; convolution, approximate identities,
+the Littlewood–Paley kernels and test functions on `ℝ^d`; dyadic cubes and cells, the
+Hardy–Littlewood maximal function, the Calderón–Zygmund decomposition, also for functions with
+values in a normed space, and the Fefferman–Stein inequality; the pivot dual of a bounded
+operator between Hilbert spaces, which makes `L_2` the pivot space of the Gelfand triples of
+Sobolev spaces, and a test for dense range in `L_2(μ)`; componentwise operators on finite `L_2`
+sums of normed and Hilbert spaces, with their kernels, ranges, orthogonal complements and duals,
+on which the vector-valued Sobolev spaces rest. The `L_p` norms are handled through integrals of
+powers (`MeasureTheory.eLpNorm_rpow_eq`).
 
 ## Main results
 
@@ -117,8 +118,9 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 |---|---|---|---|
 | `L_p` norms through integrals of powers | ✅ | ✗ | `Analysis/Lp/LintegralForm` |
 | Multiplication by an indicator as an operator on `L_p`, its idempotence, integrals over a set as `L_2` pairings, zero extension from `L_p(μ|_s)`, restriction to a smaller set | ✅ | ✗ | `Analysis/Lp/IndicatorOperator` |
-| Inclusion `L_r ↪ L_p`, bounded continuous functions in `L_p` | ✅ | ✗ | `Analysis/Lp/Inclusion`, `Analysis/Lp/BoundedContinuous` |
+| Inclusion `L_r ↪ L_p`, as a linear map for every `0 < p ≤ r ≤ ∞` (injective, composing, keeping every quasi-norm; the inclusion `L_∞ ↪ L_p`) and as a bounded map for `p ≥ 1`, bounded continuous functions in `L_p` | ✅ | ✗ | `Analysis/Lp/Inclusion`, `Analysis/Lp/BoundedContinuous` |
 | Interpolation `L_p`–`L_∞` | ✅ | ✗ | `Analysis/Lp/Interpolation` |
+| `L_p` for every `0 < p ≤ ∞`: the `ρ`-triangle inequality with `ρ = min(1, p)` and Mathlib's `inhmgELpNorm`, Fatou's lemma for telescoping sums in every `L_r`, series in `L_p` and their absolute convergence almost everywhere, the sup-norm bootstrap of Ditzian–Prymak, the quasi-norm facts of `Lp` and the first moment method | ✅ | ✗ | `Analysis/Lp/QuasiNorm` |
 | Young's inequality on measurable groups, weighted Jensen inequality, weighted averages in `L_p` | ✅ | ✗ | `Analysis/Lp/Young` |
 | Mixed norms `L_p(ℓ_q)` and `ℓ_q(L_p)`: Minkowski's inequality for `ℓ_u`-valued functions, comparison, limits of pointwise bounds, terms set to zero and tails, Cauchy sequences from tails, the first weighted term split off, triangle inequality, homogeneity and monotonicity of mixed norms of families and of dyadically weighted families, cancellation in Hölder's inequality and conjugate exponents | ✅ | ✗ | `Analysis/Lp/MixedNorms` |
 | The distribution function, weak `L_p` norms, operators of weak and strong type and almost everywhere subadditive operators, with the definitions of the Carleson project, and their elementary properties | ✅ | ✗ | `Analysis/Lp/WeakType` |

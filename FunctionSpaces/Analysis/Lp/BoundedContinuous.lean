@@ -17,7 +17,8 @@ Mathlib's `BoundedContinuousFunction.toLp p μ 𝕜` regards a bounded continuou
 finite measure space as an element of `L_p(μ)`.  This file adds:
 
 * compatibility with the inclusion `L_r ↪ L_p`: including the `L_r` class of `a` gives its
-  `L_p` class (`BoundedContinuousFunction.inclusionOfExponentLe_toLp`);
+  `L_p` class (`BoundedContinuousFunction.inclusionOfExponentLe_toLp`, and for the linear map
+  `BoundedContinuousFunction.inclusionOfExponentLeLinear_toLp`);
 * `‖toLp p μ 𝕜 a‖ = ‖a‖_{L_p}` written with `eLpNorm` (`norm_toLp_eq_toReal_eLpNorm`);
 * for a measure giving positive mass to nonempty open sets, the sup norm equals the `L_∞`
   norm (`norm_toLp_top`), so `toLp ∞` is an isometry and its range is closed
@@ -47,6 +48,15 @@ theorem inclusionOfExponentLe_toLp (hpr : p ≤ r) (a : α →ᵇ E) :
   filter_upwards [Lp.coeFn_inclusionOfExponentLe (𝕜 := 𝕜) hpr (toLp (E := E) r μ 𝕜 a),
     coeFn_toLp (E := E) r μ 𝕜 a, coeFn_toLp (E := E) p μ 𝕜 a] with x h1 h2 h3
   rw [h1, h2, h3]
+
+/-- The `L_p` class of `a` is the image of its `L_r` class under the linear inclusion
+`MeasureTheory.Lp.inclusionOfExponentLeLinear`, which agrees with the bounded inclusion for
+`1 ≤ p` (`MeasureTheory.Lp.inclusionOfExponentLe_apply`). -/
+@[simp]
+theorem inclusionOfExponentLeLinear_toLp (hpr : p ≤ r) (a : α →ᵇ E) :
+    Lp.inclusionOfExponentLeLinear (𝕜 := 𝕜) μ hpr (toLp (E := E) r μ 𝕜 a) =
+      toLp (E := E) p μ 𝕜 a :=
+  inclusionOfExponentLe_toLp hpr a
 
 /-- The `L_p` norm of the class of a bounded continuous function is its `eLpNorm`: the bounded
 continuous analogue of Mathlib's `MeasureTheory.Lp.norm_toLp`, proved from

@@ -4576,9 +4576,10 @@ Jackson and inverse inequalities directly, as in the proof of~\cite[Theorem~4.8]
 \label{ch:besov}
 
 Throughout, $\Omega$ is a topological space with its Borel $\sigma$-algebra and $\mu$ is a
-finite measure on it. For $1 \leq p \leq \infty$, $L_p = L_p(\mu)$ is the space of
-complex-valued $p$-integrable functions, and $C_b(\Omega)$ is the space of bounded continuous
-complex-valued functions with the supremum norm.
+finite measure on it. For $0 < p \leq \infty$, $L_p = L_p(\mu)$ is the space of classes of
+complex-valued measurable functions $f$ with $\|f\|_p < \infty$, normed for $p \geq 1$ and
+quasi-normed for $p < 1$ (\Cref{sec:lp-quasi}), and $C_b(\Omega)$ is the space of bounded
+continuous complex-valued functions with the supremum norm.
 
 \section{Three facts on \texorpdfstring{$L_p$}{L\_p}}
 
@@ -4588,22 +4589,23 @@ complex-valued functions with the supremum norm.
   MeasureTheory.Lp.coeFn_inclusionOfExponentLe, MeasureTheory.Lp.norm_inclusionOfExponentLe_le,
   MeasureTheory.Lp.norm_inclusionOfExponentLe_apply_le_of_prob,
   MeasureTheory.Lp.inclusionOfExponentLe_injective, MeasureTheory.Lp.inclusionOfExponentLe_comp,
-  MeasureTheory.Lp.inclusionOfExponentLeLinear, MeasureTheory.Lp.coeFn_inclusionOfExponentLeLinear,
   MeasureTheory.Lp.inclusionConst_nonneg, MeasureTheory.Lp.inclusionConst_of_isProbabilityMeasure,
   MeasureTheory.Lp.norm_inclusionOfExponentLeLinear_apply_le,
   MeasureTheory.Lp.norm_inclusionOfExponentLe_apply_le,
-  MeasureTheory.Lp.inclusionOfExponentLe_self}
+  MeasureTheory.Lp.inclusionOfExponentLe_self, MeasureTheory.Lp.inclusionOfExponentLe_apply}
 \leanok
+\uses{lem:inclusion-linear}
 Let $1 \leq p \leq r \leq \infty$. The identity of functions defines an injective bounded
 linear map $\iota_{r,p} : L_r \to L_p$ with $\|\iota_{r,p}\| \leq
 \mu(\Omega)^{1/p - 1/r}$, and $\iota_{t,p} \circ \iota_{r,t} = \iota_{r,p}$ for every
-$p \leq t \leq r$.
+$p \leq t \leq r$. As a linear map, $\iota_{r,p}$ is the inclusion of
+\Cref{lem:inclusion-linear}.
 \end{lemma}
 
 \begin{proof}
 \leanok
-H\"older's inequality gives $\|f\|_p \leq \mu(\Omega)^{1/p - 1/r} \|f\|_r$. A function that
-vanishes almost everywhere does so in both spaces.
+The inclusion of \Cref{lem:inclusion-linear} is injective, and the inclusions compose.
+H\"older's inequality $\|f\|_p \leq \mu(\Omega)^{1/p - 1/r} \|f\|_r$ makes it bounded.
 \end{proof}
 
 \begin{lemma}[Interpolation between $L_p$ and $L_\infty$]
@@ -4641,6 +4643,159 @@ of bounded continuous functions form a closed subspace of $L_\infty$.
 If $|a(x)| > c$ for some $x$, the open set $\{|a| > c\}$ has positive measure, so
 $\|a\|_{L_\infty} \geq c$. The map $C_b(\Omega) \to L_\infty$ is therefore an isometry, and
 its range is complete, hence closed.
+\end{proof}
+
+\section{\texorpdfstring{$L_p$ for $0 < p \leq \infty$}{L\_p for 0 < p <= infinity}}
+\label{sec:lp-quasi}
+
+For $0 < p < 1$ the quasi-norm $\|f\|_p = (\int |f|^p \, d\mu)^{1/p}$ satisfies only
+$\|f + g\|_p^p \leq \|f\|_p^p + \|g\|_p^p$. With $\rho = \min(1, p)$, one inequality covers
+every exponent (\Cref{lem:lp-quasi-triangle}). Mathlib provides the metric and the completeness
+of $L_p$ only for $p \geq 1$; here limits are identified through convergence in measure and
+Fatou's lemma (\Cref{lem:limit-telescoping,lem:lp-series-every-exponent}), and $L_p$ enters as
+an abelian group with its quasi-norm, which is all that the couples of \Cref{sec:e-functional}
+need. On $[0, 1]$ with Lebesgue measure, the only continuous linear functional on $L_p$,
+$p < 1$, is $0$~\cite{Day1940}, so $L_p$ has no bounded linear projections onto nonzero
+finite-dimensional subspaces; near-best approximants take their place. The inclusions between
+the $L_p$ hold for every exponent (\Cref{lem:inclusion-linear}), and a bound of the supremum by
+one $L_{p_0}$ quasi-norm gives one by every $L_p$ quasi-norm with $0 < p \leq p_0$, and with it
+bounds of every $\|f\|_r$, $p \leq r \leq \infty$ (\Cref{lem:sup-bound-exponents}).
+
+\begin{lemma}[The $\rho$-triangle inequality]
+\label{lem:lp-quasi-triangle}
+\lean{ENNReal.toReal_min_one_pos, ENNReal.toReal_min_one_le_one, ENNReal.toReal_min_one_of_le_one,
+  ENNReal.toReal_min_one_of_one_le, MeasureTheory.inhmgELpNorm_eq_eLpNorm_rpow_min,
+  MeasureTheory.eLpNorm_add_rpow_min_le}
+\leanok
+\uses{lem:lp-rho-triangle}
+Let $\mu$ be a measure on a measurable space $\Omega$, let $0 < p \leq \infty$ and
+$\rho = \min(1, p)$. Then $0 < \rho \leq 1$, and for all functions $f, g$ on $\Omega$ with values
+in a normed group or in $[0, \infty]$,
+\[
+  \|f + g\|_{L_p(\mu)}^\rho \leq \|f\|_{L_p(\mu)}^\rho + \|g\|_{L_p(\mu)}^\rho .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $p \leq 1$ this is \Cref{lem:lp-rho-triangle}, for $p \geq 1$ the triangle inequality of
+$L_p(\mu)$. Both are the triangle inequality of Mathlib's inhomogeneous quasi-norm
+\texttt{inhmgELpNorm}, which equals $\|f\|_p^\rho$.
+\end{proof}
+
+\begin{lemma}[Limits in measure of telescoping sums]
+\label{lem:limit-telescoping}
+\lean{MeasureTheory.eLpNorm_sub_rpow_min_le_sum, MeasureTheory.eLpNorm_sub_rpow_min_le_tsum,
+  MeasureTheory.eLpNorm_sub_le_tsum}
+\leanok
+\uses{lem:telescoping-fatou, lem:lp-quasi-triangle}
+Let $\mu$ be a measure, $0 < r \leq \infty$ and $\rho = \min(1, r)$, and let $u_0, u_1, \dots$
+be almost everywhere strongly measurable functions with values in a normed group that converge
+in measure to a function $g$. Then for every $k \in \N$
+\[
+  \|g - u_k\|_{L_r(\mu)}^\rho \leq \sum_{i=0}^\infty \|u_{k+i+1} - u_{k+i}\|_{L_r(\mu)}^\rho .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+As in \Cref{lem:telescoping-fatou}: by \Cref{lem:lp-quasi-triangle},
+$\|u_{k+n} - u_k\|_r^\rho \leq \sum_{i<n} \|u_{k+i+1} - u_{k+i}\|_r^\rho$ for every $n$, and a
+bound of the $L_r$ quasi-norms passes to the limit in measure, also for $r = \infty$.
+\end{proof}
+
+\begin{lemma}[Series in $L_p$]
+\label{lem:lp-series-every-exponent}
+\lean{MeasureTheory.eLpNorm_tsum_rpow_le_of_le_one, MeasureTheory.eLpNorm_tsum_rpow_min_le,
+  MeasureTheory.ae_lt_top_of_eLpNorm_ne_top,
+  MeasureTheory.summable_norm_of_tsum_eLpNorm_rpow_min_ne_top}
+\leanok
+\uses{lem:lp-quasi-triangle, lem:lp-series-minkowski}
+Let $\mu$ be a measure on $\Omega$, let $0 < p \leq \infty$ and $\rho = \min(1, p)$, and let $I$
+be a countable set.
+\begin{enumerate}
+  \item For every family of functions $g_i : \Omega \to [0, \infty]$, $i \in I$,
+    $\bigl\| \sum_{i \in I} g_i \bigr\|_p^\rho \leq \sum_{i \in I} \|g_i\|_p^\rho$.
+  \item Every function $F : \Omega \to [0, \infty]$ with $\|F\|_p < \infty$ is finite almost
+    everywhere.
+  \item For every family of functions $g_i$, $i \in I$, with values in a normed group and
+    $\sum_{i \in I} \|g_i\|_p^\rho < \infty$, the series $\sum_{i \in I} |g_i(x)|$ converges for
+    almost every $x \in \Omega$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) If some $g_i$ is not almost everywhere measurable, then $\|g_i\|_p = \infty$. Otherwise,
+for $p \leq 1$, $(\sum_i g_i)^p \leq \sum_i g_i^p$ pointwise, and integrating term by term gives
+the claim; for $p \geq 1$ it is \Cref{lem:lp-series-minkowski}. (2) For $p < \infty$,
+$\int F^p \, d\mu < \infty$; for $p = \infty$, $F \leq \|F\|_\infty$ almost everywhere.
+(3) A function with $\|g_i\|_p < \infty$ is almost everywhere measurable, so (1) for the
+functions $|g_i|$ and (2) apply to $\sum_i |g_i|$. For $p \geq 1$ this is Mathlib's
+\texttt{summable\_\allowbreak norm\_\allowbreak of\_\allowbreak tsum\_\allowbreak
+eLpNorm\_\allowbreak ne\_\allowbreak top}.
+\end{proof}
+
+\begin{lemma}[Supremum bounds at different exponents]
+\label{lem:sup-bound-exponents}
+\lean{MeasureTheory.le_rpow_mul_eLpNorm_of_ae_enorm_le, MeasureTheory.eLpNorm_le_of_eLpNorm_top_le}
+\leanok
+\uses{lem:lp-interpolation}
+Let $\mu$ be a measure, let $f$ be a function with values in a normed group and
+$M \in [0, \infty]$.
+\begin{enumerate}
+  \item Let $0 < p \leq p_0 < \infty$ and $N \in [0, \infty)$ with $|f| \leq N$ almost
+    everywhere. If $N \leq M \|f\|_{p_0}$, then $N \leq M^{p_0/p} \|f\|_p$.
+  \item Let $0 < p \leq r \leq \infty$. If $\|f\|_\infty \leq M \|f\|_p$, then
+    $\|f\|_r \leq M^{1 - p/r} \|f\|_p$, with $p/\infty = 0$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+This is~\cite[Theorem~2.1]{DitzianPrymak2016}. A function that is not almost everywhere
+strongly measurable has all its quasi-norms infinite, and both claims hold for it; let $f$ be
+almost everywhere strongly measurable. (1) Let $\theta = p/p_0 \in (0, 1]$. By
+\Cref{lem:lp-interpolation}, $\|f\|_{p_0} \leq N^{1-\theta} \|f\|_p^\theta$, so
+$N \leq M N^{1-\theta} \|f\|_p^\theta$. For $N = 0$ there is nothing to prove; otherwise divide
+by $N^{1-\theta} \in (0, \infty)$ and take the power $1/\theta$. (2) For $r = \infty$ this is
+the hypothesis. For $r < \infty$ and $\theta = p/r$, the interpolation inequality of
+\Cref{lem:lp-interpolation} with the bound $\|f\|_\infty$ of $|f|$ gives
+$\|f\|_r \leq \|f\|_\infty^{1-\theta} \|f\|_p^\theta
+\leq (M \|f\|_p)^{1-\theta} \|f\|_p^\theta = M^{1-\theta} \|f\|_p$.
+\end{proof}
+
+With (1) a Nikolskii inequality $\|a\|_\infty \leq M \|a\|_{p_0}$ at one exponent gives one at
+every smaller exponent, and (2) passes from the supremum to every $L_r$.
+
+\begin{lemma}[The inclusions for every exponent]
+\label{lem:inclusion-linear}
+\lean{MeasureTheory.Lp.inclusionOfExponentLeLinear,
+  MeasureTheory.Lp.coeFn_inclusionOfExponentLeLinear,
+  MeasureTheory.Lp.inclusionOfExponentLeLinear_self,
+  MeasureTheory.Lp.inclusionOfExponentLeLinear_injective,
+  MeasureTheory.Lp.inclusionOfExponentLeLinear_comp,
+  MeasureTheory.Lp.eLpNorm_inclusionOfExponentLeLinear, MeasureTheory.Lp.topInclusion,
+  MeasureTheory.Lp.coeFn_topInclusion, MeasureTheory.Lp.topInclusion_injective,
+  MeasureTheory.Lp.inclusionOfExponentLeLinear_topInclusion,
+  BoundedContinuousFunction.inclusionOfExponentLeLinear_toLp}
+\leanok
+Let $\mu$ be a finite measure and $0 < p \leq r \leq \infty$. The identity of functions defines
+an injective linear map $\iota_{r,p} : L_r \to L_p$, and $\|\iota_{r,p} f\|_t = \|f\|_t$ for every
+$f \in L_r$ and every exponent $t$. Moreover $\iota_{p,p}$ is the identity and
+$\iota_{s,p} \circ \iota_{r,s} = \iota_{r,p}$ for every $p \leq s \leq r$; in particular the
+inclusions $\iota_{\infty,p}$ of the essentially bounded functions satisfy
+$\iota_{r,p} \circ \iota_{\infty,r} = \iota_{\infty,p}$. For $p \geq 1$, $\iota_{r,p}$ maps the
+class in $L_r$ of every $a \in C_b(\Omega)$ to its class in $L_p$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+H\"older's inequality $\|f\|_p \leq \mu(\Omega)^{1/p - 1/r} \|f\|_r$ holds for every
+$0 < p \leq r$, so $\iota_{r,p}$ is defined. It does not change the function up to null sets.
+So two elements of $L_r$ with the same image agree almost everywhere, $\iota_{r,p} f$ and $f$
+have the same quasi-norms, and the two sides of each identity agree almost everywhere, hence
+in $L_p$.
 \end{proof}
 
 \section{Schemes of functions and Besov spaces}

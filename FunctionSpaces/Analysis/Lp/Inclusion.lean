@@ -23,7 +23,13 @@ not as a map between the normed spaces `Lp E r μ` and `Lp E p μ`, which are di
 This file provides that map, `MeasureTheory.Lp.inclusionOfExponentLe`, as a bounded linear
 map; it is injective, and for a probability measure it has norm at most `1`.
 
-Every embedding theorem between different `L_p` spaces is stated through this map: "`f ∈ L_p`
+The underlying linear map `MeasureTheory.Lp.inclusionOfExponentLeLinear` needs no `Fact (1 ≤ p)`,
+so it serves every `0 < p ≤ r ≤ ∞`: it is injective, the inclusions compose, it keeps every
+quasi-norm `eLpNorm · t μ`, and `MeasureTheory.Lp.topInclusion μ p` is the inclusion
+`L_∞ ↪ L_p` of the essentially bounded functions. For `1 ≤ p` the two maps agree
+(`MeasureTheory.Lp.inclusionOfExponentLe_apply`, by definition).
+
+Every embedding theorem between different `L_p` spaces is stated through these maps: "`f ∈ L_p`
 lies in `L_r`" becomes "`f = inclusionOfExponentLe μ hpr g` for some `g ∈ L_r`".
 -/
 
@@ -56,6 +62,62 @@ noncomputable def inclusionOfExponentLeLinear (μ : Measure α) [IsFiniteMeasure
 theorem coeFn_inclusionOfExponentLeLinear (hpr : p ≤ r) (f : Lp E r μ) :
     inclusionOfExponentLeLinear (𝕜 := 𝕜) μ hpr f =ᵐ[μ] f :=
   MemLp.coeFn_toLp ((Lp.memLp f).mono_exponent hpr)
+
+/-- The identity case `p = r` of the inclusion, for every exponent `p`. -/
+@[simp]
+theorem inclusionOfExponentLeLinear_self (f : Lp E p μ) :
+    inclusionOfExponentLeLinear (𝕜 := 𝕜) μ le_rfl f = f := by
+  ext1; exact coeFn_inclusionOfExponentLeLinear le_rfl f
+
+/-- The inclusion `L_r → L_p` is injective for all exponents `p ≤ r`: an `L_r` class is
+determined by its `L_p` class. -/
+theorem inclusionOfExponentLeLinear_injective (hpr : p ≤ r) :
+    Function.Injective (inclusionOfExponentLeLinear (E := E) (𝕜 := 𝕜) μ hpr) := fun f g h => by
+  ext
+  have := congrArg (fun F : Lp E p μ => (F : α → E)) h
+  filter_upwards [coeFn_inclusionOfExponentLeLinear (𝕜 := 𝕜) hpr f,
+    coeFn_inclusionOfExponentLeLinear (𝕜 := 𝕜) hpr g] with x hf hg
+  rw [← hf, ← hg]
+  exact congrFun this x
+
+/-- Two inclusions compose to an inclusion, `ι_{s,p} ∘ ι_{r,s} = ι_{r,p}` for all exponents
+`p ≤ s ≤ r`. -/
+theorem inclusionOfExponentLeLinear_comp {s : ℝ≥0∞} (hps : p ≤ s) (hsr : s ≤ r) (f : Lp E r μ) :
+    inclusionOfExponentLeLinear (𝕜 := 𝕜) μ hps (inclusionOfExponentLeLinear (𝕜 := 𝕜) μ hsr f) =
+      inclusionOfExponentLeLinear (𝕜 := 𝕜) μ (hps.trans hsr) f := by
+  ext1
+  filter_upwards [coeFn_inclusionOfExponentLeLinear (𝕜 := 𝕜) hps
+      (inclusionOfExponentLeLinear (𝕜 := 𝕜) μ hsr f),
+    coeFn_inclusionOfExponentLeLinear (𝕜 := 𝕜) hsr f,
+    coeFn_inclusionOfExponentLeLinear (𝕜 := 𝕜) (hps.trans hsr) f] with x h1 h2 h3
+  rw [h1, h2, h3]
+
+/-- The inclusion keeps every quasi-norm: `‖ι_{r,p} f‖_t = ‖f‖_t` for every exponent `t`, since
+`ι_{r,p} f` and `f` agree almost everywhere. -/
+theorem eLpNorm_inclusionOfExponentLeLinear (hpr : p ≤ r) (f : Lp E r μ) (t : ℝ≥0∞) :
+    eLpNorm (inclusionOfExponentLeLinear (𝕜 := 𝕜) μ hpr f) t μ = eLpNorm f t μ :=
+  eLpNorm_congr_ae (coeFn_inclusionOfExponentLeLinear hpr f)
+
+/-- The inclusion `L_∞ → L_p` of the essentially bounded functions, for every exponent `p` and a
+finite measure `μ`, as a linear map: `ι_{∞,p}`. -/
+noncomputable abbrev topInclusion (μ : Measure α) [IsFiniteMeasure μ] (p : ℝ≥0∞) :
+    Lp E ∞ μ →ₗ[𝕜] Lp E p μ :=
+  inclusionOfExponentLeLinear μ le_top
+
+/-- The inclusion `L_∞ → L_p` does not change the function, up to null sets. -/
+theorem coeFn_topInclusion (f : Lp E ∞ μ) : topInclusion (𝕜 := 𝕜) μ p f =ᵐ[μ] f :=
+  coeFn_inclusionOfExponentLeLinear le_top f
+
+/-- The inclusion `L_∞ → L_p` is injective, for every exponent `p`. -/
+theorem topInclusion_injective : Function.Injective (topInclusion (E := E) (𝕜 := 𝕜) μ p) :=
+  inclusionOfExponentLeLinear_injective le_top
+
+/-- The inclusions of `L_∞` are compatible with the inclusions between the `L_p`:
+`ι_{r,p} (ι_{∞,r} f) = ι_{∞,p} f` for all exponents `p ≤ r`. -/
+theorem inclusionOfExponentLeLinear_topInclusion (hpr : p ≤ r) (f : Lp E ∞ μ) :
+    inclusionOfExponentLeLinear (𝕜 := 𝕜) μ hpr (topInclusion (𝕜 := 𝕜) μ r f) =
+      topInclusion (𝕜 := 𝕜) μ p f :=
+  inclusionOfExponentLeLinear_comp hpr le_top f
 
 end Linear
 
@@ -100,6 +162,13 @@ noncomputable def inclusionOfExponentLe (μ : Measure α) [IsFiniteMeasure μ] (
   LinearMap.mkContinuous (inclusionOfExponentLeLinear μ hpr) (inclusionConst μ p r)
     (norm_inclusionOfExponentLeLinear_apply_le hpr)
 
+/-- The bounded inclusion and the linear inclusion agree: both send `f ∈ L_r` to its class in
+`L_p`. -/
+@[simp]
+theorem inclusionOfExponentLe_apply (hpr : p ≤ r) (f : Lp E r μ) :
+    inclusionOfExponentLe (𝕜 := 𝕜) μ hpr f = inclusionOfExponentLeLinear (𝕜 := 𝕜) μ hpr f :=
+  rfl
+
 /-- The inclusion does not change the function: `inclusionOfExponentLe μ hpr f = f` a.e. -/
 theorem coeFn_inclusionOfExponentLe (hpr : p ≤ r) (f : Lp E r μ) :
     inclusionOfExponentLe (𝕜 := 𝕜) μ hpr f =ᵐ[μ] f :=
@@ -122,29 +191,19 @@ theorem norm_inclusionOfExponentLe_apply_le_of_prob [IsProbabilityMeasure μ] (h
 
 /-- The inclusion is injective: an `L_r` class is determined by its `L_p` class. -/
 theorem inclusionOfExponentLe_injective (hpr : p ≤ r) :
-    Function.Injective (inclusionOfExponentLe (E := E) (𝕜 := 𝕜) μ hpr) := fun f g h => by
-  ext
-  have := congrArg (fun F : Lp E p μ => (F : α → E)) h
-  filter_upwards [coeFn_inclusionOfExponentLe (𝕜 := 𝕜) hpr f,
-    coeFn_inclusionOfExponentLe (𝕜 := 𝕜) hpr g] with x hf hg
-  rw [← hf, ← hg]
-  exact congrFun this x
+    Function.Injective (inclusionOfExponentLe (E := E) (𝕜 := 𝕜) μ hpr) :=
+  inclusionOfExponentLeLinear_injective hpr
 
 /-- The identity case `p = r`. -/
-@[simp]
 theorem inclusionOfExponentLe_self (f : Lp E p μ) :
-    inclusionOfExponentLe (𝕜 := 𝕜) μ le_rfl f = f := by
-  ext1; exact coeFn_inclusionOfExponentLe le_rfl f
+    inclusionOfExponentLe (𝕜 := 𝕜) μ le_rfl f = f :=
+  inclusionOfExponentLeLinear_self f
 
 /-- Two inclusions compose to an inclusion. -/
 theorem inclusionOfExponentLe_comp {s : ℝ≥0∞} [Fact (1 ≤ s)] (hps : p ≤ s) (hsr : s ≤ r)
     (f : Lp E r μ) :
     inclusionOfExponentLe (𝕜 := 𝕜) μ hps (inclusionOfExponentLe (𝕜 := 𝕜) μ hsr f) =
-      inclusionOfExponentLe (𝕜 := 𝕜) μ (hps.trans hsr) f := by
-  ext1
-  filter_upwards [coeFn_inclusionOfExponentLe (𝕜 := 𝕜) hps (inclusionOfExponentLe (𝕜 := 𝕜) μ hsr f),
-    coeFn_inclusionOfExponentLe (𝕜 := 𝕜) hsr f,
-    coeFn_inclusionOfExponentLe (𝕜 := 𝕜) (hps.trans hsr) f] with x h1 h2 h3
-  rw [h1, h2, h3]
+      inclusionOfExponentLe (𝕜 := 𝕜) μ (hps.trans hsr) f :=
+  inclusionOfExponentLeLinear_comp hps hsr f
 
 end MeasureTheory.Lp

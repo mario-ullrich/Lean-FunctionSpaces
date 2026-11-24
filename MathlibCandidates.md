@@ -79,25 +79,48 @@ declarations.
   `ApproximationSpaces/Sequences/Lq.lean`; the counting-measure versions `ENNReal.lqNorm_iSup`
   and `ENNReal.lqNorm_tsum_le` are in `ApproximationSpaces/Sequences/Hardy.lean`. Mathlib has only
   the finite version `eLpNorm_sum_le`.
-* **Subadditivity of `‖·‖_p^p` for `0 < p ≤ 1`** (`ApproximationSpaces/Sequences/Lq.lean`): on
+* **Subadditivity of `‖·‖_p^ρ`, `ρ = min(1, p)`, and Fatou's lemma for telescoping sums**: on
   any measure space and for all functions with values in an `ESeminormedAddMonoid` with
   continuous addition, at the generality of Mathlib's lemmas (a normed group, or `[0, ∞]`),
-  `‖f + g‖_p^p ≤ ‖f‖_p^p + ‖g‖_p^p` (`MeasureTheory.eLpNorm_add_rpow_le_of_le_one`), from
-  Mathlib's `inhmgELpNorm_add_le` and `inhmgELpNorm_eq_eLpNorm_pow`, and for elements of
-  `Lp E p μ`, whose `NormedAddCommGroup` instance needs `Fact (1 ≤ p)`
-  (`MeasureTheory.Lp.enorm_add_rpow_le_of_le_one`, in
-  `FunctionSpaces/Wavelets/Examples/DyadicStepsQuasiBanach.lean`, beside `‖0‖ₑ = 0` and
-  `‖-f‖ₑ = ‖f‖ₑ` for every `p`, `MeasureTheory.Lp.enorm_zero` and `MeasureTheory.Lp.enorm_neg`,
-  which Mathlib states for `‖·‖` and `‖·‖₊`). Mathlib states the power form only for
-  `inhmgELpNorm`; for `eLpNorm` it has the bounds with the constant `2^(1/p - 1)`
-  (`eLpNorm'_add_le_of_le_one`, `eLpNorm_add_le'`). With it, **Fatou's lemma for telescoping
-  sums**: if `u_n → g` in measure, with a.e. strongly measurable `u_n` with values in a seminormed
-  group, and `0 < r ≤ 1`, then `‖g - u_k‖_r^r ≤ ∑_{i ≥ 0} ‖u_{k+i+1} - u_{k+i}‖_r^r`
+  `‖f + g‖_p^p ≤ ‖f‖_p^p + ‖g‖_p^p` for `0 < p ≤ 1`
+  (`MeasureTheory.eLpNorm_add_rpow_le_of_le_one`, in `ApproximationSpaces/Sequences/Lq.lean`),
+  from Mathlib's `inhmgELpNorm_add_le` and `inhmgELpNorm_eq_eLpNorm_pow`; for every `0 < p ≤ ∞` with
+  `ρ = min(1, p)`, `‖f + g‖_p^ρ ≤ ‖f‖_p^ρ + ‖g‖_p^ρ` (`MeasureTheory.eLpNorm_add_rpow_min_le`),
+  since `inhmgELpNorm f p μ = ‖f‖_p^ρ` (`MeasureTheory.inhmgELpNorm_eq_eLpNorm_rpow_min`); and
+  for elements of `Lp E p μ`, whose `NormedAddCommGroup` instance needs `Fact (1 ≤ p)`
+  (`MeasureTheory.Lp.enorm_add_rpow_le_of_le_one`, beside `‖0‖ₑ = 0` and `‖-f‖ₑ = ‖f‖ₑ` for
+  every `p`, `MeasureTheory.Lp.enorm_zero` and `MeasureTheory.Lp.enorm_neg`, which Mathlib states
+  for `‖·‖` and `‖·‖₊`), these in `FunctionSpaces/Analysis/Lp/QuasiNorm.lean`. Mathlib states
+  the power form only for `inhmgELpNorm`; for `eLpNorm` it has the bounds with the constant
+  `2^(1/p - 1)` (`eLpNorm'_add_le_of_le_one`, `eLpNorm_add_le'`). With it, Fatou's lemma for
+  telescoping sums: if `u_n → g` in measure, with a.e. strongly measurable `u_n` with values in
+  a seminormed group, and `0 < r ≤ 1`, then `‖g - u_k‖_r^r ≤ ∑_{i ≥ 0} ‖u_{k+i+1} - u_{k+i}‖_r^r`
   (`MeasureTheory.eLpNorm_sub_rpow_le_tsum`, from its finite version
   `MeasureTheory.eLpNorm_sub_rpow_le_sum` in `ApproximationSpaces/Sequences/Lq.lean` and Mathlib's
   `eLpNorm_le_of_tendstoInMeasure`), and the invariance of convergence in measure under
   subtracting a function (`MeasureTheory.TendstoInMeasure.sub_right`), both in
-  `FunctionSpaces/Analysis/Lp/MixedNorms.lean`.
+  `FunctionSpaces/Analysis/Lp/MixedNorms.lean`; for every `0 < r ≤ ∞` with `ρ = min(1, r)`,
+  `‖g - u_k‖_r^ρ ≤ ∑_{i ≥ 0} ‖u_{k+i+1} - u_{k+i}‖_r^ρ`
+  (`MeasureTheory.eLpNorm_sub_rpow_min_le_tsum`), and for `1 ≤ r` the triangle inequality
+  `‖g - u_k‖_r ≤ ∑_{i ≥ 0} ‖u_{k+i+1} - u_{k+i}‖_r` for every limit in measure, of finite or
+  infinite quasi-norm (`MeasureTheory.eLpNorm_sub_le_tsum`), both in
+  `FunctionSpaces/Analysis/Lp/QuasiNorm.lean`.
+* **Series in `L_p` for every `0 < p ≤ ∞` and finiteness almost everywhere**
+  (`FunctionSpaces/Analysis/Lp/QuasiNorm.lean`): for `0 < p ≤ 1` and countably many
+  `g_i : α → [0, ∞]`, `‖∑_i g_i‖_p^p ≤ ∑_i ‖g_i‖_p^p`
+  (`MeasureTheory.eLpNorm_tsum_rpow_le_of_le_one`), the series form of
+  `MeasureTheory.eLpNorm_add_rpow_le_of_le_one`, and `‖∑_i g_i‖_p^ρ ≤ ∑_i ‖g_i‖_p^ρ` with
+  `ρ = min(1, p)` for every `p ≠ 0` (`MeasureTheory.eLpNorm_tsum_rpow_min_le`); a function
+  `F : α → [0, ∞]` with finite `eLpNorm F p μ`, `p ≠ 0`, is finite almost everywhere
+  (`MeasureTheory.ae_lt_top_of_eLpNorm_ne_top`); and for every `p ≠ 0` and `ρ = min(1, p)`,
+  `∑_i ‖g_i‖_p^ρ < ∞` gives `∑_i ‖g_i(x)‖ < ∞` almost everywhere
+  (`MeasureTheory.summable_norm_of_tsum_eLpNorm_rpow_min_ne_top`), which extends Mathlib's
+  `summable_norm_of_tsum_eLpNorm_ne_top` (`1 ≤ p`) below `1`.
+* **The Ditzian–Prymak bootstrap** (`FunctionSpaces/Analysis/Lp/QuasiNorm.lean`): an almost
+  everywhere bound `N < ∞` of `‖f‖` with `N ≤ M ‖f‖_{p₀}` gives `N ≤ M^(p₀/p) ‖f‖_p` for every
+  `0 < p ≤ p₀ < ∞` (`MeasureTheory.le_rpow_mul_eLpNorm_of_ae_enorm_le`), and
+  `‖f‖_∞ ≤ M ‖f‖_p` gives `‖f‖_r ≤ M^(1 - p/r) ‖f‖_p` for every `p ≤ r ≤ ∞`
+  (`MeasureTheory.eLpNorm_le_of_eLpNorm_top_le`); Ditzian–Prymak 2016, Theorem 2.1.
 * **Mixed norms `L_p(ℓ_q)` and `ℓ_q(L_p)`** (`FunctionSpaces/Analysis/Lp/MixedNorms.lean`):
   Minkowski's integral inequality for `ℓ_u`-valued functions,
   `‖(∫ g_i)_i‖_{ℓ_u} ≤ ∫ ‖(g_i(x))_i‖_{ℓ_u}` for `1 ≤ u ≤ ∞` (`MeasureTheory.lqNorm_lintegral_le`);
@@ -182,8 +205,10 @@ declarations.
   (`HasSum.enorm_sub_sum_range_le`).
 * **The inclusion `L_r ↪ L_p`** (`FunctionSpaces/Analysis/Lp/Inclusion.lean`): for a finite measure
   and `p ≤ r`, the bounded linear injection `MeasureTheory.Lp.inclusionOfExponentLe`, with
-  its norm bound and compatibility with `BoundedContinuousFunction.toLp`. Mathlib has the
-  subgroup inclusion `MeasureTheory.Lp.antitone` but no bundled map.
+  its norm bound and compatibility with `BoundedContinuousFunction.toLp`; the linear map
+  underneath, `MeasureTheory.Lp.inclusionOfExponentLeLinear`, needs no `Fact (1 ≤ p)` and is
+  injective for all exponents (`MeasureTheory.Lp.inclusionOfExponentLeLinear_injective`). Mathlib
+  has the subgroup inclusion `MeasureTheory.Lp.antitone` but no bundled map.
 * **Interpolation between `L_p` and `L_∞`** (`FunctionSpaces/Analysis/Lp/Interpolation.lean`):
   `eLpNorm f r μ ≤ M^(1-p/r) eLpNorm f p μ^(p/r)` for `‖f‖ ≤ M` a.e.
   (`MeasureTheory.eLpNorm_le_rpow_mul_eLpNorm_rpow`), and its consequence that a bounded
