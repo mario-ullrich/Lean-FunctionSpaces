@@ -57,7 +57,7 @@ theorem exists_uniform_inclusion_eq_of_nikolskii (h : S.HasNikolskii μ D) (hD :
   refine ⟨ApproximationScheme.nikolskiiConst C (nikolskiiExponent D p r) s,
     ApproximationScheme.nikolskiiConst_ne_top C hs, fun f hf => ?_⟩
   obtain ⟨g, hg, hle⟩ := ApproximationScheme.exists_preimage_approxNormDyadic_le_of_nikolskii
-    (Lp.inclusionOfExponentLe_injective hpr) hN hC hα hs hq hf
+    (Lp.inclusionOfExponentLe_injective hpr) hN hC hα hs hq (memBesov_iff_memApprox.1 hf)
   refine ⟨g, hg, ?_⟩
   rwa [comap_toLp_of_le hpr] at hle
 
@@ -72,8 +72,9 @@ theorem MemBesov.exists_inclusion_eq_of_nikolskii (h : S.HasNikolskii μ D) (hD 
   obtain ⟨C, hC, hN⟩ := h.liftBound hpr
   have hα := nikolskiiExponent_nonneg hD (Fact.out : 1 ≤ p) hpr
   obtain ⟨g, hg, hmem⟩ := ApproximationScheme.MemApprox.exists_preimage_of_nikolskii
-    (Lp.inclusionOfExponentLe_injective hpr) hN hC hα hs hq hf
+    (Lp.inclusionOfExponentLe_injective hpr) hN hC hα hs hq (memBesov_iff_memApprox.1 hf)
   refine ⟨g, hg, ?_⟩
+  rw [memBesov_iff_memApprox]
   rwa [comap_toLp_of_le hpr] at hmem
 
 /-- **Embedding into `L_∞`**: for `s > D/p`, every `f ∈ B^s_{p,q}` is the inclusion of some
@@ -95,7 +96,8 @@ theorem MemBesov.exists_boundedContinuous_of_nikolskii [μ.IsOpenPosMeasure] (h 
       (BoundedContinuousFunction.toLp (E := ℂ) ∞ μ ℝ a) = f := by
   obtain ⟨g, hg, hmem⟩ := hf.exists_inclusion_eq_top h hD hs hq
   have hcl : g ∈ closure (⋃ n, S.toLp μ ∞ n) :=
-    ApproximationScheme.mem_closure_iUnion_of_memApprox hq (sub_pos.2 hs) hmem
+    ApproximationScheme.mem_closure_iUnion_of_memApprox hq (sub_pos.2 hs)
+      (memBesov_iff_memApprox.1 hmem)
   have hsub : (⋃ n, S.toLp μ ∞ n) ⊆
       Set.range (BoundedContinuousFunction.toLp (E := ℂ) ∞ μ ℝ : (Ω →ᵇ ℂ) → Lp ℂ ∞ μ) := by
     rintro _ ⟨_, ⟨n, rfl⟩, a, -, rfl⟩

@@ -61,14 +61,16 @@ theorem memKMethod_besovCouple_iff (hs₀ : 0 < s₀) (hs : s₀ < s₁) (hη : 
     (hq₀ : 1 ≤ q₀) (hq₁ : 1 ≤ q₁) (hq : 1 ≤ q) {f : Lp ℂ p μ} :
     (S.besovCouple μ p s₀ q₀ s₁ q₁).MemKMethod η q f ↔
       S.MemBesov μ p ((1 - η) * s₀ + η * s₁) q f :=
-  ApproximationScheme.memKMethod_approxCouple_iff hs₀ hs hη hη' hq₀ hq₁ hq
+  (ApproximationScheme.memKMethod_approxCouple_iff hs₀ hs hη hη' hq₀ hq₁ hq).trans
+    memBesov_iff_memApprox.symm
 
 /-- **`L_p` and a Besov space interpolate**: for every scheme of functions, `1 ≤ p ≤ ∞`,
 `s₁ > 0`, `0 < η < 1` and `1 ≤ q₁, q ≤ ∞`, `(L_p, B^{s₁}_{p,q₁})_{η,q} = B^{ηs₁}_{p,q}`. -/
 theorem memKMethod_lpBesovCouple_iff (hs₁ : 0 < s₁) (hη : 0 < η) (hη' : η < 1) (hq₁ : 1 ≤ q₁)
     (hq : 1 ≤ q) {f : Lp ℂ p μ} :
     (S.lpBesovCouple μ p s₁ q₁).MemKMethod η q f ↔ S.MemBesov μ p (η * s₁) q f :=
-  ApproximationScheme.memKMethod_approxCouple_zero_iff hs₁ hη hη' hq₁ hq
+  (ApproximationScheme.memKMethod_approxCouple_zero_iff hs₁ hη hη' hq₁ hq).trans
+    memBesov_iff_memApprox.symm
 
 /-- **Besov spaces interpolate**, as an equality of subspaces of `L_p(μ)`: for `0 < s₀ < s₁`,
 `0 < η < 1` and `1 ≤ q₀, q₁, q ≤ ∞`, the real interpolation space
@@ -81,7 +83,8 @@ theorem kMethodSpace_besovCouple (hs₀ : 0 < s₀) (hs : s₀ < s₁) (hη : 0 
         ApproximationScheme.isHomogeneousCouple_approxCouple η q =
       S.besovSpace μ p ((1 - η) * s₀ + η * s₁) q
         (ApproximationScheme.reiterationExponent_pos hs₀ hs hη hη').le hq :=
-  ApproximationScheme.kMethodSpace_approxCouple hs₀ hs hη hη' hq₀ hq₁ hq
+  Submodule.ext fun _ =>
+    (memKMethod_besovCouple_iff hs₀ hs hη hη' hq₀ hq₁ hq).trans mem_besovSpace.symm
 
 /-- **`L_p` and a Besov space interpolate**, as an equality of subspaces of `L_p(μ)`: for
 `s₁ > 0`, `0 < η < 1` and `1 ≤ q₁, q ≤ ∞`, the real interpolation space
@@ -92,7 +95,7 @@ theorem kMethodSpace_lpBesovCouple (hs₁ : 0 < s₁) (hη : 0 < η) (hη' : η 
         (ApproximationScheme.isQuasiNormed_leftApproxCouple (A := S.toLp μ p) hs₁.le hq₁)
         ApproximationScheme.isHomogeneousCouple_leftApproxCouple η q =
       S.besovSpace μ p (η * s₁) q (mul_pos hη hs₁).le hq :=
-  ApproximationScheme.kMethodSpace_approxCouple_zero hs₁ hη hη' hq₁ hq
+  Submodule.ext fun _ => (memKMethod_lpBesovCouple_iff hs₁ hη hη' hq₁ hq).trans mem_besovSpace.symm
 
 /-- **Besov spaces interpolate, with Pietsch's quasi-norms**: for `0 < s₀ < s₁`, `0 < η < 1` and
 `1 ≤ q₀, q₁, q ≤ ∞`, the real interpolation space of the couple of the Besov quasi-norms
@@ -103,8 +106,13 @@ times Pietsch's (`ApproximationScheme.approxNorm_le_approxNormDyadic`,
 theorem memKMethod_besovNormCouple_iff (hs₀ : 0 < s₀) (hs : s₀ < s₁) (hη : 0 < η) (hη' : η < 1)
     (hq₀ : 1 ≤ q₀) (hq₁ : 1 ≤ q₁) (hq : 1 ≤ q) {f : Lp ℂ p μ} :
     (⟨S.besovNorm μ p s₀ q₀, S.besovNorm μ p s₁ q₁⟩ : InterpCouple (Lp ℂ p μ)).MemKMethod η q f ↔
-      S.MemBesov μ p ((1 - η) * s₀ + η * s₁) q f :=
-  ApproximationScheme.memKMethod_iff_memApprox_of_two_sandwiches
+      S.MemBesov μ p ((1 - η) * s₀ + η * s₁) q f := by
+  have h₀ : S.besovNorm μ p s₀ q₀ = (S.toLp μ p).approxNorm s₀ q₀ :=
+    funext (besovNorm_eq_approxNorm s₀ q₀)
+  have h₁ : S.besovNorm μ p s₁ q₁ = (S.toLp μ p).approxNorm s₁ q₁ :=
+    funext (besovNorm_eq_approxNorm s₁ q₁)
+  rw [h₀, h₁, memBesov_iff_memApprox]
+  exact ApproximationScheme.memKMethod_iff_memApprox_of_two_sandwiches
     (ENNReal.two_rpow_ne_top s₀)
     (ENNReal.mul_ne_top (by norm_num) (ENNReal.two_rpow_ne_top s₀))
     (ENNReal.two_rpow_ne_top s₁)
@@ -122,8 +130,11 @@ theorem memKMethod_besovNormCouple_iff (hs₀ : 0 < s₀) (hs : s₀ < s₁) (h�
 theorem memKMethod_lpBesovNormCouple_iff (hs₁ : 0 < s₁) (hη : 0 < η) (hη' : η < 1)
     (hq₁ : 1 ≤ q₁) (hq : 1 ≤ q) {f : Lp ℂ p μ} :
     (⟨fun f => ‖f‖ₑ, S.besovNorm μ p s₁ q₁⟩ : InterpCouple (Lp ℂ p μ)).MemKMethod η q f ↔
-      S.MemBesov μ p (η * s₁) q f :=
-  ApproximationScheme.memKMethod_iff_memApprox_of_sandwich
+      S.MemBesov μ p (η * s₁) q f := by
+  have h₁ : S.besovNorm μ p s₁ q₁ = (S.toLp μ p).approxNorm s₁ q₁ :=
+    funext (besovNorm_eq_approxNorm s₁ q₁)
+  rw [h₁, memBesov_iff_memApprox]
+  exact ApproximationScheme.memKMethod_iff_memApprox_of_sandwich
     (ENNReal.two_rpow_ne_top s₁)
     (ENNReal.mul_ne_top (by norm_num) (ENNReal.two_rpow_ne_top s₁))
     hq₁ hq₁ hs₁ hη hη' hq

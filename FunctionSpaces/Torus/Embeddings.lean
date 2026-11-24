@@ -76,13 +76,13 @@ theorem memBesov_exists_continuous (hs : (Fintype.card d : ℝ) * p.toReal⁻¹ 
 /-- **`H^s(𝕋^d) ⊆ B^s_{2,∞}(𝕋^d)`**, from Jackson's inequality. -/
 theorem periodic_sobolev_memBesov_top (hs : 0 < s) (c : ℓ²(d → ℤ, ℂ)) :
     (trigScheme d).MemBesov volume 2 s ∞ ((periodicSobolevSpace s hs).incl c) :=
-  (periodicSobolevSpace s hs).memApprox_top c
+  FunctionScheme.memBesov_iff_memApprox.2 ((periodicSobolevSpace s hs).memApprox_top c)
 
 /-- **`B^t_{2,q}(𝕋^d) ⊆ H^s(𝕋^d)` for `t > s`**, from Bernstein's inequality. -/
 theorem periodic_exists_sobolev_of_memBesov (hs : 0 < s) {t : ℝ} (hst : s < t) (hq : 1 ≤ q)
     {f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))} (hf : (trigScheme d).MemBesov volume 2 t q f) :
     ∃ c : ℓ²(d → ℤ, ℂ), (periodicSobolevSpace s hs).incl c = f :=
-  (periodicSobolevSpace s hs).exists_eq_of_lt hst hq hf
+  (periodicSobolevSpace s hs).exists_eq_of_lt hst hq (FunctionScheme.memBesov_iff_memApprox.1 hf)
 
 /-- **The Sobolev embedding into `L_r`** on the torus: for `2 ≤ r ≤ ∞` and
 `s > d(1/2 - 1/r)`, every element of `H^s(𝕋^d)` lies in `L_r` and in

@@ -207,6 +207,7 @@ theorem periodicTraceBound_limitTrace_eq_restrictFace (hp : p ≠ ∞)
     (hf : (trigScheme (Fin (n + 1))).MemBesov volume p p.toReal⁻¹ 1 (toLpR p (Fin (n + 1)) f)) :
     (periodicTraceBound p n hp).limitTrace (toLpR p (Fin (n + 1)) f) =
       toLpR p (Fin n) (restrictFace n f) := by
+  rw [FunctionScheme.memBesov_iff_memApprox] at hf
   have hβ : 0 ≤ p.toReal⁻¹ := by positivity
   have hrate : Tendsto (fun k => dyadicWeight p.toReal⁻¹ k *
       ‖toLpR p (Fin (n + 1)) f - toLpR p (Fin (n + 1)) (valleePoussinBCF k f)‖ₑ) atTop
@@ -234,8 +235,9 @@ theorem trace_besov_eq_restrictFace (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s) {q :
       (toLpR p (Fin (n + 1)) f)) :
     (periodicTraceBound p n hp).limitTrace (toLpR p (Fin (n + 1)) f) =
       toLpR p (Fin n) (restrictFace n f) :=
-  periodicTraceBound_limitTrace_eq_restrictFace hp f (ApproximationScheme.MemApprox.mono hq le_rfl
-    (by positivity) (Or.inl (by linarith)) hf)
+  periodicTraceBound_limitTrace_eq_restrictFace hp f (FunctionScheme.memBesov_iff_memApprox.2
+    (ApproximationScheme.MemApprox.mono hq le_rfl (by positivity) (Or.inl (by linarith))
+      (FunctionScheme.memBesov_iff_memApprox.1 hf)))
 
 /-- **The trace of a continuous function, almost everywhere**: under the hypotheses of
 `Torus.periodicTraceBound_limitTrace_eq_restrictFace`, the trace of `f` is `x' ↦ f(0, x')` almost

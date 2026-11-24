@@ -44,8 +44,7 @@ theorem periodic_memBesov_two_two_iff (hs : 0 < s)
       Memℓp (fun k => ((((1 + trigDeg k : ℕ) : ℝ) ^ s : ℝ) : ℂ) * mFourierCoeff f k) 2 := by
   have h := (fourierScheme d).memApprox_two_iff_levelWeight hs f
   simp only [fourierScheme, mFourierBasis_repr] at h
-  change ((trigScheme d).toLp volume 2).MemApprox s 2 f ↔ _
-  rw [toLp_trigScheme_eq]
+  rw [FunctionScheme.memBesov_iff_memApprox, toLp_trigScheme_eq]
   exact h
 
 /-- The **dyadic Fourier block** `Δ_k f = ∑_{2^k ≤ max_i |k_i| < 2^(k+1)} f̂(k) e_k`. -/
@@ -70,8 +69,7 @@ theorem periodic_memBesov_two_iff_blockNorm_lt_top (hs : 0 < s) (hq : 1 ≤ q)
     (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
     (trigScheme d).MemBesov volume 2 s q f ↔
       (fourierScheme d).spectralProjectionScheme.blockNorm s q f < ∞ := by
-  change ((trigScheme d).toLp volume 2).MemApprox s q f ↔ _
-  rw [toLp_trigScheme_eq]
+  rw [FunctionScheme.memBesov_iff_memApprox, toLp_trigScheme_eq]
   exact (fourierScheme d).memApprox_iff_blockNorm_lt_top hs hq
 
 end Torus

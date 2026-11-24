@@ -87,6 +87,7 @@ theorem memBesov_iff_modNorm_lt_top_lp (hp : p ≠ ∞) {r : ℕ} {s : ℝ} (hs 
     {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     (trigScheme d).MemBesov volume p s q f ↔
       ‖f‖ₑ + lqNorm q (fun k => dyadicWeight s k * Rd.lpModulus p r f k) < ∞ :=
-  (trigLpModulusData d hp r).memApprox_iff_modNorm_lt_top hq hs.le hsr f
+  FunctionScheme.memBesov_iff_memApprox.trans
+    ((trigLpModulusData d hp r).memApprox_iff_modNorm_lt_top hq hs.le hsr f)
 
 end Torus

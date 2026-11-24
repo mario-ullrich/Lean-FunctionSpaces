@@ -4985,13 +4985,15 @@ $A^s_q(L_p, \iota_{\infty,p}(S))$.
 \begin{definition}[Besov space]
 \label{def:besov}
 \lean{FunctionScheme.besovNorm, FunctionScheme.MemBesov, FunctionScheme.besovSpace,
-  FunctionScheme.besovSpaceSup}
+  FunctionScheme.besovSpaceSup, FunctionScheme.besovNorm_eq_approxNorm,
+  FunctionScheme.memBesov_iff_memApprox, FunctionScheme.mem_besovSpace}
 \leanok
 \uses{def:function-scheme, def:approx-space, prop:approx-linear}
 Let $S$ be a scheme of functions, $s \geq 0$ and $1 \leq p, q \leq \infty$. The
 \emph{Besov space} is $\Besov{s}{p}{q}(\Omega, S) = A^s_q(L_p, S^{(p)})$, the approximation
-space of $L_p$ for the scheme $S^{(p)}$. Its errors $E_n(f)_p$ are the errors of best
-approximation of \Cref{def:error} for the scheme $S^{(p)}$.
+space of $L_p$ for the scheme $S^{(p)}$, with the quasi-norm
+$\|f\|_{\Besov{s}{p}{q}} = \|f\|_{A^s_q}$ of \Cref{def:approx-space}. Its errors $E_n(f)_p$ are
+the errors of best approximation of \Cref{def:error} for the scheme $S^{(p)}$.
 \end{definition}
 
 On the torus $\T^d$ with $S_n$ the trigonometric polynomials of degree $< n$, these are the
