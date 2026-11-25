@@ -3960,7 +3960,7 @@ couple the larger of the two constants serves both norms. (4) The dyadic norm is
 \Cref{lem:e-method-calculus}.
 \end{proof}
 
-\begin{lemma}[Jackson's half]
+\begin{lemma}[Jackson's half for $E$-spaces]
 \label{lem:e-couple-jackson}
 \lean{InterpCouple.eFunctional_two_pow_le_dyadicWeight_mul,
   InterpCouple.eFunctional_succ_le_kFunctional, InterpCouple.eJacksonConst,
@@ -4015,6 +4015,210 @@ $N_0(x, y) = |x| + |y|$, $N_1(0) = 0$ and $N_1 = \infty$ off $0$, and $N(x, 0) =
 $N(x, y) = |y|$ for $y \neq 0$, the bound $E(2^k, g) \leq \infty \cdot 2^{-kr} N(g)$ holds, and
 $K(t, (1, 0)) = 0$ along $g = (1, 1/n)$, while $E(2^{k+1}, (1, 0)) = 1$. In the second bound it
 keeps the constant finite.
+
+Bernstein's half replaces the lifts of the normed case by near-best approximants: their
+$E$-functionals vanish from level $k$ on, so their dyadic norms are bounded by finite sums.
+
+\begin{theorem}[Bernstein's half for $E$-spaces]
+\label{thm:e-couple-bernstein}
+\lean{InterpCouple.eFunctional_two_pow_le_of_nearBest, InterpCouple.eNormDyadic_le_of_nearBest,
+  InterpCouple.lqNorm_kFunctional_le_of_le,
+  InterpCouple.kFunctional_leftECouple_le_of_nearBest,
+  InterpCouple.lqNorm_kFunctional_leftECouple_le_of_nearBest, InterpCouple.eReprConst,
+  InterpCouple.eReprConst_ne_top, InterpCouple.interpNorm_leftECouple_le_eNormDyadic}
+\leanok
+\uses{def:e-couples, def:couple-k-functional, def:lq-norm, prop:couple-natural-grid,
+  lem:lq-quasi-triangle, lem:lq-reindex, lem:hardy-every-exponent}
+Let $q, q_1 \in (0, \infty]$ and $\rho_1 = \min(1, q_1)$, and let $C_q$, $\gamma_{\alpha, q}$ and
+$H_{\alpha, q}$ be the constants of \Cref{lem:lq-quasi-triangle}, \Cref{lem:lq-reindex} and
+\Cref{lem:hardy-every-exponent}.
+\begin{enumerate}
+  \item Let $B$ be a couple on $U$ with the $K$-functional $K_B$, let $r, s \in \R$ with
+    $s \leq r$, let $u \in U$, $a, b \in [0, \infty]$, and let $(e_k)_k$, $(x_k)_k$ be sequences
+    in $[0, \infty]$ with $K_B(2^{-kr}, u) \leq a e_k + b \, 2^{-kr} + x_k$ for every $k \in \N$.
+    Then, with $L_e = \|(2^{ks} e_k)_k\|_{\ell_q}$ and $L_x = \|(2^{ks} x_k)_k\|_{\ell_q}$,
+    \[
+      \|(2^{ks} K_B(2^{-kr}, u))_k\|_{\ell_q}
+      \leq C_q \bigl( C_q ( a L_e + b \, \gamma_{r-s, q} ) + L_x \bigr) .
+    \]
+  \item Let $A$ be quasi-normed with constant $C$, let $u \in U$, let $b_k \in U$ with
+    $N_1(b_k) \leq 2^k$, and let $(e_k)_k$ be a decreasing sequence in $[0, \infty]$ with
+    $N_0(u - b_k) \leq e_k$ for every $k \in \N$. Then for all $j, k \in \N$,
+    $E(2^j, b_k) = 0$ if $j \geq k$ and $E(2^j, b_k) \leq 2 C e_j$ if $j < k$, and for every
+    $r \in \R$ and $k \in \N$,
+    \[
+      \|b_k\|^{\mathrm{dy}}_{E, r, q_1} \leq C \bigl(e_k + N_0(u)\bigr) + 2 C \, S_k ,
+      \qquad S_k = \Bigl( \sum_{j < k} (2^{jr} e_j)^{\rho_1} \Bigr)^{1/\rho_1} .
+    \]
+  \item Under the hypotheses of (2), let $r \geq 0$ and let $K$ be the $K$-functional of
+    $(N_0, E_{r, q_1})$. Then
+    $K(2^{-kr}, u) \leq (1 + C) e_k + C N_0(u) \, 2^{-kr} + 2^{-kr} \cdot 2 C \, S_k$ for every
+    $k \in \N$, and for every $s \leq r$, with $L = \|(2^{ks} e_k)_k\|_{\ell_q}$ and
+    $T = ((2C)^{\rho_1} H_{(r-s)\rho_1, q/\rho_1})^{1/\rho_1}$,
+    \[
+      \|(2^{ks} K(2^{-kr}, u))_k\|_{\ell_q}
+      \leq C_q \bigl( C_q ( (1 + C) L + C N_0(u) \, \gamma_{r-s, q} ) + T L \bigr) .
+    \]
+  \item Let $A$ be quasi-normed with constant $C$ and let $0 \leq s < r$. Then for every
+    $u \in U$, with the norm $\|\cdot\|_{s/r, r, q}$ of \Cref{prop:couple-natural-grid} of the
+    couple $(N_0, E_{r, q_1})$,
+    \[
+      \|u\|_{s/r, r, q} \leq c \, \|u\|^{\mathrm{dy}}_{E, s, q} ,
+    \]
+    where $M = C_q (1 + \gamma_{1, q})$ and
+    $c = 1 + C_q \bigl( C_q ((1 + C) M + C \gamma_{r-s, q}) + ((2C)^{\rho_1}
+    H_{(r-s)\rho_1, q/\rho_1})^{1/\rho_1} M \bigr)$ is finite.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{lem:e-near-best, lem:weighted-tails, lem:lq-basic, lem:e-couples}
+(1) Since $2^{ks} 2^{-kr} = 2^{-k(r-s)}$, the sequence $2^{ks} K_B(2^{-kr}, u)$ is bounded by
+$a \, 2^{ks} e_k + b \, 2^{-k(r-s)} + 2^{ks} x_k$. Apply the quasi-triangle inequality of
+\Cref{lem:lq-quasi-triangle} twice, the homogeneity of the $\ell_q$ norm (\Cref{lem:lq-basic})
+and $\|(2^{-k(r-s)})_k\|_{\ell_q} \leq \gamma_{r-s, q}$ for $r - s \geq 0$
+(\Cref{lem:lq-reindex}).
+
+(2) For $j \geq k$, $N_1(b_k) \leq 2^k \leq 2^j$, so $b_k$ is admissible in
+\Cref{def:e-functional} and $E(2^j, b_k) \leq N_0(0) = 0$. For $j < k$, $b_j$ is admissible and
+$b_k - b_j = (u - b_j) - (u - b_k)$, so
+$E(2^j, b_k) \leq C (e_j + e_k) \leq 2 C e_j$, as $e$ decreases. Further
+$N_0(b_k) \leq C (N_0(u - b_k) + N_0(u)) \leq C (e_k + N_0(u))$. The sequence
+$(2^{jr} E(2^j, b_k))_j$ vanishes for $j \geq k$, and its $\ell_{q_1}$ norm is at most its
+$\ell_{\rho_1}$ norm since $\rho_1 \leq q_1$ (\Cref{lem:lq-basic}); that norm is the finite sum of
+\Cref{def:lq-norm}, at most $2 C S_k$.
+
+(3) $K(2^{-kr}, u) \leq N_0(u - b_k) + 2^{-kr} \|b_k\|^{\mathrm{dy}}_{E, r, q_1}$, and (2) with
+$2^{-kr} \leq 1$ gives the first bound. Its last term $x_k = 2^{-kr} \cdot 2 C S_k$ satisfies
+\[
+  x_k^{\rho_1} = (2C)^{\rho_1} \sum_{j < k} 2^{-(k-j) r \rho_1} e_j^{\rho_1}
+  \leq (2C)^{\rho_1} \sum_{j \leq k} 2^{-(k-j) r \rho_1} e_j^{\rho_1} ,
+\]
+so (4) of \Cref{lem:weighted-tails} with $\rho = \rho_1$ and $\beta = r \rho_1$ bounds
+$\|(2^{ks} x_k)_k\|_{\ell_q}$ by $T L$, and (1) with $a = 1 + C$ and $b = C N_0(u)$ gives the
+second bound.
+
+(4) Choose $b_k$ and $e_k$ by (4) of \Cref{lem:e-near-best} with $s \geq 0 \geq -1$, so that
+$L \leq M \|u\|^{\mathrm{dy}}_{E, s, q}$. Since $r > 0$, $2^{k r \cdot s/r} = 2^{ks}$, and
+$N_0(u) \leq \|u\|^{\mathrm{dy}}_{E, s, q}$ by (2) of \Cref{lem:e-couples}. Add $N_0(u)$ to the
+bound of (3); the constant is finite by \Cref{lem:lq-reindex} and
+\Cref{lem:hardy-every-exponent}, since $r - s > 0$ and $(r - s) \rho_1 > 0$.
+\end{proof}
+
+The quasi-triangle inequality of $N_0$ enters only in (2); the $\ell_{q_1}$ norm of the
+finite sequence is estimated in $\ell_{\rho_1}$ and the partial sums are summed with Hardy's
+inequality in $\rho_1$-th powers. The representation below holds for every fine index $q_1$, as
+in~\cite[\S 4.3, Theorem~2]{DeVore1998}, which attributes it to~\cite{DeVorePopovLNM}.
+
+\begin{theorem}[$E$-spaces are interpolation spaces]
+\label{thm:e-spaces-interpolate}
+\lean{InterpCouple.memKMethod_leftECouple_iff}
+\leanok
+\uses{def:e-couples, def:couple-k-method}
+Let $A$ be quasi-normed with constant $C$ and let $N_1$ be subadditive. Let $r > 0$,
+$0 < \eta < 1$ and $q, q_1 \in (0, \infty]$. For every $u \in U$,
+$u \in (N_0, E_{r, q_1})_{\eta, q}$, the space of the continuous $K$-method of the couple
+$(N_0, E_{r, q_1})$, if and only if $\|u\|^{\mathrm{dy}}_{E, \eta r, q} < \infty$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{lem:e-couple-jackson, thm:e-couple-bernstein, lem:e-couples, prop:couple-natural-grid}
+The couple $(N_0, E_{r, q_1})$ is quasi-normed and
+$N_0 \leq 1 \cdot \|\cdot\|^{\mathrm{dy}}_{E, r, q_1}$ (\Cref{lem:e-couples}), so by (3) of
+\Cref{prop:couple-natural-grid} with $\theta = \eta > 0$ and $\rho = r > 0$,
+$u \in (N_0, E_{r, q_1})_{\eta, q}$ if and only if $\|u\|_{\eta, r, q} < \infty$. With
+$s = \eta r$, so that $0 \leq s < r$ and $s / r = \eta$, \Cref{lem:e-couple-jackson} (2) for
+$N = \|\cdot\|^{\mathrm{dy}}_{E, r, q_1}$ and $C_J = 1$ and (4) of \Cref{thm:e-couple-bernstein}
+bound each of $\|u\|^{\mathrm{dy}}_{E, \eta r, q}$ and $\|u\|_{\eta, r, q}$ by a finite multiple
+of the other.
+\end{proof}
+
+For a scheme in a normed space and $q \geq 1$ this is
+\Cref{thm:approximation-spaces-interpolate} for $q_1 = \infty$, and (2) of
+\Cref{thm:approximation-spaces-reiteration} for $q_1 \geq 1$.
+
+\begin{lemma}[The discrete $K$-norms of the couple $(N_0, E_{r, \infty})$]
+\label{lem:e-couple-norms}
+\lean{InterpCouple.eReprLowerConst, InterpCouple.eReprLowerConst_ne_top,
+  InterpCouple.eNormDyadic_le_discreteKMethodNorm_leftECouple, InterpCouple.eReprUpperConst,
+  InterpCouple.eReprUpperConst_ne_top,
+  InterpCouple.discreteKMethodNorm_leftECouple_le_eNormDyadic}
+\leanok
+\uses{def:e-couples, def:couple-k-method, lem:lq-quasi-triangle}
+Let $A$ be quasi-normed with constant $C$, let $r > 0$ and $q \in (0, \infty]$, and write
+$\|\cdot\|^{\Z}_{\theta, 1, q}$ for the discrete $K$-norm on the grid $t = 2^n$ of the couple
+$(N_0, E_{r, \infty})$. For every $u \in U$:
+\begin{enumerate}
+  \item if $N_1$ is subadditive and $s \geq 0$, then
+    $\|u\|^{\mathrm{dy}}_{E, s, q} \leq c \, \|u\|^{\Z}_{s/r, 1, q}$ with
+    \[
+      c = \bigl(1 + C_q (1 + 2^s C)\bigr) (1 + K_{r, \infty}) \, 2^s (r \log 2)^{-1/q}
+      (\log 2)^{1/q} \, 2^{s/r} ,
+    \]
+    where $C_q$ is the constant of \Cref{lem:lq-quasi-triangle} and $K_{r, \infty}$ the
+    constant of (3) of \Cref{lem:e-couples};
+  \item if $0 < s < r$, then
+    \[
+      \|u\|^{\Z}_{s/r, 1, q} \leq c' \, \|u\|^{\mathrm{dy}}_{E, s, q}
+      \qquad \text{with} \qquad
+      c' = \bigl((\log 2)^{1/q} 2^{-s/r}\bigr)^{-1} M_1 c_B ,
+    \]
+    where $M_1$ is the constant of \Cref{thm:discrete-continuous-k-method} for $\theta = s/r$
+    and $\rho = r$, and $c_B$ the constant of (4) of \Cref{thm:e-couple-bernstein} for
+    $q_1 = \infty$.
+\end{enumerate}
+Both constants are finite.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:e-couple-jackson, thm:e-couple-bernstein, lem:e-couples, prop:couple-natural-grid,
+  thm:couple-discrete-continuous, thm:discrete-continuous-k-method}
+(1) \Cref{lem:e-couple-jackson} (2) with $N = \|\cdot\|^{\mathrm{dy}}_{E, r, \infty}$ and
+$C_J = 1$ bounds $\|u\|^{\mathrm{dy}}_{E, s, q}$ by $(1 + C_q (1 + 2^s C)) \|u\|_{s/r, r, q}$;
+(4) of \Cref{prop:couple-natural-grid}, for the quasi-normed couple $(N_0, E_{r, \infty})$ with
+$N_0 \leq 1 \cdot \|\cdot\|^{\mathrm{dy}}_{E, r, \infty}$ (\Cref{lem:e-couples}), bounds that by
+the continuous $K$-norm, and \Cref{thm:couple-discrete-continuous} for $\rho = 1$ bounds the
+continuous by the discrete $K$-norm. (2) In the other direction,
+\Cref{thm:couple-discrete-continuous}, then (4) of \Cref{prop:couple-natural-grid} with the
+constant of \Cref{thm:discrete-continuous-k-method}, and (4) of \Cref{thm:e-couple-bernstein}
+for $q_1 = \infty$.
+\end{proof}
+
+\begin{theorem}[Reiteration of $E$-spaces]
+\label{thm:e-spaces-reiteration}
+\lean{InterpCouple.memKMethod_eCouple_iff}
+\leanok
+\uses{def:e-couples, def:couple-k-method, def:k-space-couples}
+Let $A$ be quasi-normed with constant $C$ and let $N_1$ be subadditive. Let $0 < s_0 < s_1$,
+$0 < \eta < 1$ and $q_0, q_1, q \in [1, \infty]$. For every $u \in U$,
+$u \in (E_{s_0, q_0}, E_{s_1, q_1})_{\eta, q}$, the space of the continuous $K$-method of the
+couple $(E_{s_0, q_0}, E_{s_1, q_1})$, if and only if
+$\|u\|^{\mathrm{dy}}_{E, (1-\eta)s_0 + \eta s_1, q} < \infty$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{thm:reiteration, thm:e-spaces-interpolate, lem:e-couple-norms, lem:e-couples,
+  cor:comparable-couples, lem:reiteration-exponent}
+Put $r = s_1 + 1$ and let $B$ be the couple $(N_0, E_{r, \infty})$, quasi-normed by
+\Cref{lem:e-couples}. By \Cref{lem:e-couple-norms}, $\|\cdot\|^{\mathrm{dy}}_{E, s_i, q_i}$ and
+the discrete $K$-norm $\|\cdot\|^{\Z}_{s_i/r, 1, q_i}$ of $B$ are comparable with finite
+constants, so by \Cref{cor:comparable-couples} the couple $(E_{s_0, q_0}, E_{s_1, q_1})$ has the
+same spaces as the couple of $K$-spaces of $B$ for $(s_0/r, q_0)$ and $(s_1/r, q_1)$
+(\Cref{def:k-space-couples}). Since $0 < s_0/r < s_1/r < 1$, \Cref{thm:reiteration} (1)
+identifies these spaces with the spaces of $B$ for $(1 - \eta) s_0/r + \eta s_1/r$. By
+\Cref{lem:reiteration-exponent}, $0 < (1 - \eta) s_0 + \eta s_1 < r$, and
+\Cref{thm:e-spaces-interpolate} identifies them with $E_{(1-\eta)s_0 + \eta s_1, q}$.
+\end{proof}
+
+The fine indices $q_0, q_1, q \geq 1$ are those of \Cref{thm:reiteration}, whose proof uses
+Holmstedt's formula in $\ell_1$ form (\Cref{thm:holmstedt}); fine indices below $1$ need it with
+$\ell_q$ sums. The reiteration theorem for quasi-normed couples
+is~\cite[Theorem~3.11.5]{BerghLofstrom}, and the reiteration of Besov spaces for all fine
+indices is~\cite[Corollary~6.2]{DeVorePopovTAMS}.
 
 \chapter{Block decompositions and projections}
 \label{ch:decompositions}

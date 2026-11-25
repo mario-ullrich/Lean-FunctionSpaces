@@ -191,6 +191,13 @@ theory.
   Trans. Amer. Math. Soc. 305 (1988), proof of Theorem 4.8;
   `InterpCouple.CoupleModulusData.memEMethod_iff_coupleModNorm_lt_top`). The telescoping sums
   are estimated in the `ρ`-th power, with Hardy's inequality in `ℓ_{q/ρ}`.
+* **E-spaces as interpolation spaces.** For a couple quasi-normed with constant `C` whose
+  complexity is subadditive, `r > 0`, `0 < η < 1` and `0 < q, q₁ ≤ ∞`,
+  `u ∈ (N₀, E_{r,q₁})_{η,q}` iff `N₀(u) + ‖(2^(kηr) E(2^k, u))_k‖_{ℓ_q} < ∞` (DeVore, Acta Numer.
+  7 (1998), §4.3, Theorem 2; `InterpCouple.memKMethod_leftECouple_iff`). Near-best approximants
+  take the place of the lifts, and only the quasi-triangle inequality of `N₀` is used. For
+  `1 ≤ q₀, q₁, q ≤ ∞` and `0 < s₀ < s₁`, `(E_{s₀,q₀}, E_{s₁,q₁})_{η,q} = E_{(1-η)s₀+ηs₁,q}`
+  (`InterpCouple.memKMethod_eCouple_iff`).
 * **Block decompositions.** In a Banach space, for `s > 0` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q` iff
   `f = ∑_k g_k` with blocks `g_k ∈ A_{2^k}` and `(2^(ks) ‖g_k‖)_k ∈ ℓ_q`; the infimum over
   such decompositions is an equivalent quasi-norm
@@ -296,7 +303,7 @@ Paths are relative to `ApproximationSpaces/`, without `.lean`.
 | The E-functional of a couple, near-best sequences, the spaces `E_{α,q}` and their dyadic norm, complexity couples, `E_{s,q} = A^s_q` for schemes | ✅ | ✗ | `Interpolation/EFunctional` |
 | The blocks of near-best sequences, near-best sequences with their tolerances, moduli compatible with a `ρ`-normed couple, coincidence of `E_{s,q}` with the classical space | ✅ | ✗ | `Interpolation/EFunctionalModuli` |
 | Homogeneity of the E-functional, embeddings of the dyadic norms in the smoothness and the fine index, additive maps, Pietsch's form of a couple and its equivalence with the dyadic norm | ✅ | ✗ | `Interpolation/EFunctionalSpaces` |
-| Couples of E-spaces `(N₀, E_{r,q₁})` and `(E_{s₀,q₀}, E_{s₁,q₁})`, quasi-normed for every fine index, Jackson's half of `E_{s,q} = (N₀, E_{r,q₁})_{s/r,q}` | ✅ | ✗ | `Interpolation/EFunctionalRepresentation` |
+| Couples of E-spaces, Jackson's and Bernstein's half, `E_{s,q} = (N₀, E_{r,q₁})_{s/r,q}` for every fine index, reiteration of E-spaces for fine indices ≥ 1 | ✅ | ✗ | `Interpolation/EFunctionalRepresentation` |
 | Moduli compatible with a scheme, coincidence with the classical space, interpolation of the classical spaces | ✅ | ✗ | `Moduli` |
 | Block decompositions, series moved up by a number of levels, projection schemes and dyadic blocks | ✅ | ✗ | `Decompositions/Blocks`, `Decompositions/Projection` |
 | Block decompositions of the spaces `E_{s,q}` of a quasi-normed couple with subadditive `N₀^ρ`, the blocks of near-best sequences, partial sums and tails in every abelian group | ✅ | ✗ | `Decompositions/EFunctionalBlocks` |

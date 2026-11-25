@@ -219,9 +219,14 @@ in the root namespace.
   complexity couple of a scheme (`ApproximationScheme.eNormPietsch_complexityCouple`).
 * `ApproximationSpaces.Interpolation.EFunctionalRepresentation`: the couples of E-spaces
   `(N₀, E_{r,q₁})` and `(E_{s₀,q₀}, E_{s₁,q₁})` (`InterpCouple.leftECouple`,
-  `InterpCouple.eCouple`), quasi-normed for every smoothness and every fine index, and Jackson's
+  `InterpCouple.eCouple`), quasi-normed for every smoothness and every fine index; Jackson's
   half of `E_{s,q} = (N₀, E_{r,q₁})_{s/r,q}` for every Jackson inequality
-  (`InterpCouple.eNormDyadic_le_interpNorm_of_jackson`).
+  (`InterpCouple.eNormDyadic_le_interpNorm_of_jackson`), Bernstein's half through near-best
+  approximants (`InterpCouple.interpNorm_leftECouple_le_eNormDyadic`), the representation
+  `(N₀, E_{r,q₁})_{η,q} = E_{ηr,q}` for all fine indices
+  (`InterpCouple.memKMethod_leftECouple_iff`) and the reiteration
+  `(E_{s₀,q₀}, E_{s₁,q₁})_{η,q} = E_{(1-η)s₀+ηs₁,q}` for `q₀, q₁, q ≥ 1`
+  (`InterpCouple.memKMethod_eCouple_iff`).
 
 ### Decompositions (`Decompositions/`)
 
