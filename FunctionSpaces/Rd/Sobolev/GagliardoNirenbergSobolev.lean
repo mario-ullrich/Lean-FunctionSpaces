@@ -393,8 +393,9 @@ theorem exists_memLp_ae_eq_of_memSobolevW_one_of_inv_add_inv {p r : ℝ≥0∞} 
       ∃ u : Lp ℂ r (volume : Measure V), (u : V → ℂ) =ᵐ[volume] f ∧
         ‖u‖ₑ ≤ eLpNormLESNormFDerivOfEqInnerConst (volume : Measure V) p.toReal *
           ∑ k, ‖G k‖ₑ :=
-  exists_memLp_ae_eq_of_memSobolevW_one hr (nikolskiiExponent_eq_one_of_inv_add_inv Fact.out hexp).2
-    hf
+  exists_memLp_ae_eq_of_memSobolevW_one hr
+    (nikolskiiExponent_eq_one_of_inv_add_inv (zero_lt_one.trans_le (Fact.out : 1 ≤ p)).ne'
+      hexp).2 hf
 
 /-! ### The Sobolev embedding of `W^m_1` -/
 

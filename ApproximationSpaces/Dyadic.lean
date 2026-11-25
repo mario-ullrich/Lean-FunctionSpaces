@@ -30,9 +30,8 @@ quasi-triangle inequality, `2^(1/q - 1)` for `0 < q < 1` and `1` otherwise
 `memApprox_iff_approxNormDyadic_lt_top'`, `memApprox_iff_lqNorm_dyadic_lt_top'`); the statements
 for `q ≥ 1` are their cases `C_q = 1`. The bounds are the case `e_n = E_n(f)` of the comparison
 for decreasing sequences `e` in `[0, ∞]` (`ENNReal.lqNorm_pow_mul_le_dyadic`,
-`ENNReal.dyadic_le_lqNorm_pow_mul`). The primed statements assume `q ≠ 0`, the range `(0, ∞]`
-of Pietsch's definition; the bound of the dyadic quasi-norm by Pietsch's needs it, since
-`lqNorm 0 = 0`.
+`ENNReal.dyadic_le_lqNorm_pow_mul`). The bounds of Pietsch's quasi-norm hold for every `q`; the
+bound of the dyadic quasi-norm by Pietsch's assumes `q ≠ 0`, since `lqNorm 0 = 0`.
 
 **Why the dyadic form is the working norm.** Its weights `2^(ks)` do not depend on `q`, so
 comparing different `q` is monotonicity of `ℓ_q` norms, and a shift `k ↦ k + 1` multiplies the
@@ -114,13 +113,12 @@ theorem approxNormDyadic_neg (f : X) : A.approxNormDyadic s q (-f) = A.approxNor
     rw [approxSeqDyadic, approxSeqDyadic, approxError_neg]
   rw [approxNormDyadic, approxNormDyadic, h, enorm_neg]
 
-/-- **Pietsch's quasi-norm is dominated by the dyadic one**, for `q ∈ (0, ∞]`, the range of
-Pietsch's definition: for `s ≥ 0`, `‖f‖_{A^s_q} ≤ C_q 2^s (‖f‖ + ‖(2^(ks) E_{2^k}(f))_k‖_q)` with
-Mathlib's constant `C_q = LpAddConst q` of the quasi-triangle inequality (`1` for `q ≥ 1`). This
-is the comparison of Pietsch's weights with the dyadic ones for the decreasing sequence `E_n(f)`
-(`ENNReal.lqNorm_pow_mul_le_dyadic`), whose first term is `E_0(f) = ‖f‖`; that sequence lemma
-holds for every `q`. -/
-theorem approxNorm_le_approxNormDyadic' (_hq0 : q ≠ 0) (hs : 0 ≤ s) (f : X) :
+/-- **Pietsch's quasi-norm is dominated by the dyadic one**, for every `q`: for `s ≥ 0`,
+`‖f‖_{A^s_q} ≤ C_q 2^s (‖f‖ + ‖(2^(ks) E_{2^k}(f))_k‖_q)` with Mathlib's constant
+`C_q = LpAddConst q` of the quasi-triangle inequality (`1` for `q ≥ 1`). This is the comparison
+of Pietsch's weights with the dyadic ones for the decreasing sequence `E_n(f)`
+(`ENNReal.lqNorm_pow_mul_le_dyadic`), whose first term is `E_0(f) = ‖f‖`. -/
+theorem approxNorm_le_approxNormDyadic' (hs : 0 ≤ s) (f : X) :
     A.approxNorm s q f ≤ LpAddConst q * 2 ^ s * A.approxNormDyadic s q f := by
   have h := ENNReal.lqNorm_pow_mul_le_dyadic (q := q) (approxError_anti (A := A) f) hs
   rwa [approxError_zero_right] at h
@@ -130,14 +128,12 @@ theorem approxNorm_le_approxNormDyadic' (_hq0 : q ≠ 0) (hs : 0 ≤ s) (f : X) 
 `ApproximationScheme.approxNorm_le_approxNormDyadic'`. -/
 theorem approxNorm_le_approxNormDyadic (hq : 1 ≤ q) (hs : 0 ≤ s) (f : X) :
     A.approxNorm s q f ≤ 2 ^ s * A.approxNormDyadic s q f := by
-  simpa [LpAddConst_of_one_le hq] using
-    approxNorm_le_approxNormDyadic' (zero_lt_one.trans_le hq).ne' hs f
+  simpa [LpAddConst_of_one_le hq] using approxNorm_le_approxNormDyadic' (A := A) (q := q) hs f
 
-/-- **The shifted dyadic sequence**, for `q ∈ (0, ∞]`, the range of Pietsch's definition:
-`(2^(ks) E_{2^(k+1)}(f))_k` has `ℓ_q` norm at most `2 C_q ‖f‖_{A^s_q}` for `s ≥ 0`, with Mathlib's
-constant `C_q = LpAddConst q`. This is the case of the decreasing sequence `E_n(f)` of
-`ENNReal.lqNorm_dyadic_succ_le_lqNorm_pow_mul`; that sequence lemma holds for every `q`. -/
-theorem lqNorm_dyadic_succ_le' (_hq0 : q ≠ 0) (hs : 0 ≤ s) (f : X) :
+/-- **The shifted dyadic sequence**, for every `q`: `(2^(ks) E_{2^(k+1)}(f))_k` has `ℓ_q` norm at
+most `2 C_q ‖f‖_{A^s_q}` for `s ≥ 0`, with Mathlib's constant `C_q = LpAddConst q`. This is the
+case of the decreasing sequence `E_n(f)` of `ENNReal.lqNorm_dyadic_succ_le_lqNorm_pow_mul`. -/
+theorem lqNorm_dyadic_succ_le' (hs : 0 ≤ s) (f : X) :
     lqNorm q (fun k => dyadicWeight s k * A.approxError f (2 ^ (k + 1))) ≤
       2 * LpAddConst q * A.approxNorm s q f :=
   ENNReal.lqNorm_dyadic_succ_le_lqNorm_pow_mul (approxError_anti f) hs
@@ -148,7 +144,7 @@ quasi-norm for `1 ≤ q ≤ ∞`, the case `LpAddConst q = 1` of
 theorem lqNorm_dyadic_succ_le (hq : 1 ≤ q) (hs : 0 ≤ s) (f : X) :
     lqNorm q (fun k => dyadicWeight s k * A.approxError f (2 ^ (k + 1))) ≤
       2 * A.approxNorm s q f := by
-  simpa [LpAddConst_of_one_le hq] using lqNorm_dyadic_succ_le' (zero_lt_one.trans_le hq).ne' hs f
+  simpa [LpAddConst_of_one_le hq] using lqNorm_dyadic_succ_le' (A := A) (q := q) hs f
 
 /-- **The dyadic quasi-norm is dominated by Pietsch's**, for every `q ≠ 0`: for `s ≥ 0`,
 `‖f‖ + ‖(2^(ks) E_{2^k}(f))_k‖_q ≤ 4 C_q² 2^s ‖f‖_{A^s_q}` with Mathlib's constant
@@ -178,7 +174,7 @@ theorem memApprox_iff_approxNormDyadic_lt_top' (hq0 : q ≠ 0) (hs : 0 ≤ s) {f
     exact ENNReal.mul_lt_top (ENNReal.mul_lt_top (ENNReal.pow_ne_top hC.ne).lt_top (by norm_num))
       (ENNReal.two_rpow_ne_top s).lt_top
   · intro hf
-    exact (approxNorm_le_approxNormDyadic' hq0 hs f).trans_lt
+    exact (approxNorm_le_approxNormDyadic' hs f).trans_lt
       (ENNReal.mul_lt_top (ENNReal.mul_lt_top hC (ENNReal.two_rpow_ne_top s).lt_top) hf)
 
 /-- For `s ≥ 0` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q` iff its dyadic quasi-norm is finite. -/

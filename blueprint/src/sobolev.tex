@@ -4084,7 +4084,7 @@ as soon as $R_i \geq \|x\|$, and \Cref{lem:fatou-bounded-norms} gives the bound.
 For every $D \geq 0$, every $n \in \N$ and all $0 < p, r \leq \infty$, with $1/\infty = 0$:
 \begin{enumerate}
   \item if $D(1/p - 1/r) = 1$, then $D > 0$, $p < \infty$ and $1/r = 1/p - 1/D$;
-  \item if $1 \leq p$ and $1/r + 1/n = 1/p$ in $[0, \infty]$, where $1/0 = \infty$, then
+  \item if $1/r + 1/n = 1/p$ in $[0, \infty]$, where $1/0 = \infty$, then
     $p < \infty$ and $n(1/p - 1/r) = 1$;
   \item for every $m \geq 2$ with $n(1 - 1/r) = m$, $n > 1$, and the conjugate exponent
     $q = n/(n - 1)$ of $n$ satisfies $1 < q < \infty$, $n(1 - 1/q) = 1$ and
@@ -4095,7 +4095,7 @@ For every $D \geq 0$, every $n \in \N$ and all $0 < p, r \leq \infty$, with $1/\
 \begin{proof}
 \leanok
 (1) For $D = 0$ the left side is $0$, and for $p = \infty$ it is $-D/r \leq 0$. (2) Since
-$1/p \leq 1$, $1/n$ is finite, so $n \geq 1$, and $p = \infty$ would force $1/n = 0$.
+$1/p < \infty$, $1/n$ is finite, so $n \geq 1$, and $p = \infty$ would force $1/n = 0$.
 (3) $n - n/r = m \geq 2$ and $1/r \geq 0$ give $n > 1$, so $1 < q < \infty$.
 Hölder conjugacy (Mathlib's \texttt{ENNReal.\allowbreak conjExponent}) gives $1/q + 1/n = 1$,
 hence $n(1 - 1/q) = 1$ by (2) with $p = 1$, and $n(1/q - 1/r) = n(1 - 1/r) - 1 = m - 1$.

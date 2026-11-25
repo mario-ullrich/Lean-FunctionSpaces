@@ -582,7 +582,7 @@ kernels: it passes to a power of the polynomial and uses \Cref{lem:trig-sup-l2} 
 \lean{Torus.norm_le_rpow_mul_eLpNorm, Torus.norm_rpow_le_card_mul_eLpNorm_rpow,
   Torus.norm_pow_le_norm_pow, Torus.norm_toLp_two_pow, Torus.trigScheme_hasNikolskii}
 \leanok
-\uses{lem:trig-products, lem:trig-sup-l2, def:nikolskii-property}
+\uses{def:trig-poly, def:nikolskii-property}
 For all $n \geq 1$, $T \in \mathcal{T}_n$ and $1 \leq p < \infty$,
 \[
   \sup |T| \leq \bigl(2 \lceil p/2 \rceil\bigr)^{d/p} \, n^{d/p} \, \|T\|_{L_p} .
@@ -592,6 +592,7 @@ The trigonometric scheme has the Nikolskii property of dimension $d$.
 
 \begin{proof}
 \leanok
+\uses{lem:trig-products, lem:trig-sup-l2, lem:continuous-scheme-sup-bound}
 Let $m = \lceil p/2 \rceil$, so $2m \geq p$, and $T \neq 0$. By \Cref{lem:trig-products},
 $T^m \in \mathcal{T}_{mn}$, and \Cref{lem:trig-sup-l2} gives
 \[
@@ -599,8 +600,8 @@ $T^m \in \mathcal{T}_{mn}$, and \Cref{lem:trig-sup-l2} gives
 \]
 and $\int |T|^{2m} \leq (\sup|T|)^{2m-p} \int |T|^p$.
 Divide by $(\sup|T|)^{2m-p}$ and take $p$-th roots. The trigonometric scheme is the scheme of
-the uniform trigonometric scheme, so by \Cref{def:nikolskii-property} this bound for every
-$1 \leq p < \infty$ gives its Nikolskii property.
+the uniform trigonometric scheme, so \Cref{lem:continuous-scheme-sup-bound} turns this bound
+for every $1 \leq p < \infty$ into its Nikolskii property.
 \end{proof}
 
 \begin{definition}[Sobolev space $H^s(\T^d)$]

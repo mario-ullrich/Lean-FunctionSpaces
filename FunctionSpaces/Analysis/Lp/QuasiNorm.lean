@@ -30,16 +30,21 @@ arbitrary measure space.
   element are close (`MeasureTheory.Lp.enorm_sub_rpow_le_two_mul`).
 * **Limits in measure.** If `u_n → g` in measure, then
   `‖g - u_k‖_r^ρ ≤ ∑_{i ≥ 0} ‖u_{k+i+1} - u_{k+i}‖_r^ρ` with `ρ = min(1, r)`, for every
-  `0 < r ≤ ∞` (`MeasureTheory.eLpNorm_sub_rpow_min_le_tsum`; for `1 ≤ r` the triangle inequality
-  of a series, `MeasureTheory.eLpNorm_sub_le_tsum`). Fatou's lemma along an almost everywhere
-  convergent subsequence identifies the limit.
+  `0 < r ≤ ∞` (`MeasureTheory.eLpNorm_sub_rpow_min_le_tsum`, from the finite telescoping sums
+  `MeasureTheory.eLpNorm_sub_rpow_min_le_sum`); for `1 ≤ r` this is the triangle inequality of a
+  series (`MeasureTheory.eLpNorm_sub_le_tsum`), for `r ≤ 1` the bound in the `r`-th power
+  (`MeasureTheory.eLpNorm_sub_rpow_le_tsum`, finite sums `MeasureTheory.eLpNorm_sub_rpow_le_sum`).
+  Fatou's lemma along an almost everywhere convergent subsequence identifies the limit, and
+  convergence in measure is unaffected by subtracting one function
+  (`MeasureTheory.TendstoInMeasure.sub_right`).
 * **Series.** `‖∑_i g_i‖_p^ρ ≤ ∑_i ‖g_i‖_p^ρ` for countably many `g_i : α → [0, ∞]`
   (`MeasureTheory.eLpNorm_tsum_rpow_le_of_le_one`, `MeasureTheory.eLpNorm_tsum_rpow_min_le`); a
   function with finite `L_p` quasi-norm is finite almost everywhere
   (`MeasureTheory.ae_lt_top_of_eLpNorm_ne_top`); and `∑_i ‖g_i‖_p^ρ < ∞` makes `∑_i |g_i(x)|`
   finite for almost every `x` (`MeasureTheory.summable_norm_of_tsum_eLpNorm_rpow_min_ne_top`).
-* **The sup-norm bootstrap.** A bound `N ≤ M ‖f‖_{p₀}` of an almost everywhere bound `N` of `|f|`
-  gives `N ≤ M^(p₀/p) ‖f‖_p` for every `0 < p ≤ p₀`
+* **The sup-norm bootstrap.** Every function satisfies `|f| ≤ ‖f‖_∞` almost everywhere
+  (`MeasureTheory.ae_enorm_le_eLpNorm_top`). A bound `N ≤ M ‖f‖_{p₀}`, `p₀ < ∞`, of a finite
+  almost everywhere bound `N` of `|f|` gives `N ≤ M^(p₀/p) ‖f‖_p` for every `0 < p ≤ p₀`
   (`MeasureTheory.le_rpow_mul_eLpNorm_of_ae_enorm_le`), and `‖f‖_∞ ≤ M ‖f‖_p` gives
   `‖f‖_r ≤ M^(1 - p/r) ‖f‖_p` for every `p ≤ r ≤ ∞` (`MeasureTheory.eLpNorm_le_of_eLpNorm_top_le`)
   (Z. Ditzian, A. Prymak, *On Nikol'skii inequalities for domains in `ℝ^d`*, Constr. Approx. 44
@@ -54,7 +59,10 @@ arbitrary measure space.
   satisfy `‖b_{k+1} - b_k‖_r ≤ C 2^(kβ) ‖b_{k+1} - b_k‖_p`, then
   `‖f - b_k‖_r^(ρ_r) ≤ (C 2^(1/ρ_p))^(ρ_r) ∑_{i ≥ 0} (2^((k+i)β) e_{k+i})^(ρ_r)` for every
   `0 < p, r ≤ ∞` (`MeasureTheory.eLpNorm_sub_rpow_min_le_tsum_of_nearBest`): the step from `L_p`
-  to `L_r` in the proofs of embedding theorems.
+  to `L_r` in the proofs of embedding theorems. Hardy's inequality for tails turns it into the
+  weighted `ℓ_q` bound
+  `‖(2^(k(s-β)) ‖f - b_k‖_r)_k‖_{ℓ_q} ≤ C 2^(1/ρ_p) H^(1/ρ_r) ‖(2^(ks) e_k)_k‖_{ℓ_q}`, with Hardy's
+  constant `H`, finite for `s > β` (`MeasureTheory.lqNorm_eLpNorm_sub_le_of_nearBest`).
 
 On `[0, 1]` with Lebesgue measure and for `p < 1`, the only continuous linear functional on
 `L_p` is `0` (M. M. Day, *The spaces `L^p` with `0 < p < 1`*, Bull. Amer. Math. Soc. 46 (1940)),
@@ -202,12 +210,29 @@ theorem eLpNorm_sub_rpow_min_le_sum {E : Type*} [SeminormedAddCommGroup E] (hr0 
             eLpNorm (u (k + n) - u k) r μ ^ (min 1 r).toReal := eLpNorm_add_rpow_min_le hr0 _ _
       _ ≤ _ := by rw [add_comm]; gcongr
 
+/-- **Telescoping in `L_r`, `0 < r ≤ 1`**:
+`‖u_{k+n} - u_k‖_r^r ≤ ∑_{i<n} ‖u_{k+i+1} - u_{k+i}‖_r^r` for functions with values in a
+seminormed group, since the `r`-th power of the quasi-norm is subadditive: the case `ρ = r` of
+`MeasureTheory.eLpNorm_sub_rpow_min_le_sum`. -/
+theorem eLpNorm_sub_rpow_le_sum {E : Type*} [SeminormedAddCommGroup E] (hr0 : r ≠ 0)
+    (hr1 : r ≤ 1) (u : ℕ → α → E) (k n : ℕ) :
+    eLpNorm (u (k + n) - u k) r μ ^ r.toReal ≤
+      ∑ i ∈ Finset.range n, eLpNorm (u (k + i + 1) - u (k + i)) r μ ^ r.toReal := by
+  simpa only [ENNReal.toReal_min_one_of_le_one hr1] using eLpNorm_sub_rpow_min_le_sum hr0 u k n
+
+/-- Convergence in measure is unaffected by subtracting one function from every term and from
+the limit. -/
+theorem TendstoInMeasure.sub_right {E : Type*} [SeminormedAddCommGroup E] {ι : Type*}
+    {l : Filter ι} {u : ι → α → E} {g : α → E} (hu : TendstoInMeasure μ u l g) (c : α → E) :
+    TendstoInMeasure μ (fun n => u n - c) l (g - c) := fun ε hε => by
+  simpa only [Pi.sub_apply, edist_sub_right] using hu ε hε
+
 /-- **Fatou's lemma for telescoping sums in `L_r`, `0 < r ≤ ∞`**: if `u_n → g` in measure, with
 almost everywhere strongly measurable `u_n`, then, with `ρ = min(1, r)`,
 `‖g - u_k‖_r^ρ ≤ ∑_{i ≥ 0} ‖u_{k+i+1} - u_{k+i}‖_r^ρ`. The finite telescoping sums bound
 `‖u_{k+n} - u_k‖_r^ρ` (`MeasureTheory.eLpNorm_sub_rpow_min_le_sum`), and Mathlib's
-`eLpNorm_le_of_tendstoInMeasure`, valid for every exponent, passes the bound to the limit. For
-`r ≤ 1` this is `MeasureTheory.eLpNorm_sub_rpow_le_tsum`. -/
+`eLpNorm_le_of_tendstoInMeasure`, valid for every exponent, passes the bound to the limit. Its
+case `r ≤ 1` is `MeasureTheory.eLpNorm_sub_rpow_le_tsum`. -/
 theorem eLpNorm_sub_rpow_min_le_tsum {E : Type*} [SeminormedAddCommGroup E] (hr0 : r ≠ 0)
     {u : ℕ → α → E} {g : α → E} (hu : TendstoInMeasure μ u atTop g)
     (hum : ∀ n, AEStronglyMeasurable (u n) μ) (k : ℕ) :
@@ -236,6 +261,18 @@ theorem eLpNorm_sub_le_tsum {E : Type*} [SeminormedAddCommGroup E] (hr1 : 1 ≤ 
     eLpNorm (g - u k) r μ ≤ ∑' i, eLpNorm (u (k + i + 1) - u (k + i)) r μ := by
   have h := eLpNorm_sub_rpow_min_le_tsum (zero_lt_one.trans_le hr1).ne' hu hum k
   simpa only [ENNReal.toReal_min_one_of_one_le hr1, ENNReal.rpow_one] using h
+
+/-- **Fatou's lemma for telescoping sums in `L_r`, `0 < r ≤ 1`**: if `u_n → g` in measure, with
+almost everywhere strongly measurable `u_n`, then
+`‖g - u_k‖_r^r ≤ ∑_{i ≥ 0} ‖u_{k+i+1} - u_{k+i}‖_r^r`: the case `ρ = r` of
+`MeasureTheory.eLpNorm_sub_rpow_min_le_tsum`. For `r = 1` this is the triangle inequality for a
+series in `L_1`. -/
+theorem eLpNorm_sub_rpow_le_tsum {E : Type*} [SeminormedAddCommGroup E] (hr0 : r ≠ 0)
+    (hr1 : r ≤ 1) {u : ℕ → α → E} {g : α → E} (hu : TendstoInMeasure μ u atTop g)
+    (hum : ∀ n, AEStronglyMeasurable (u n) μ) (k : ℕ) :
+    eLpNorm (g - u k) r μ ^ r.toReal ≤
+      ∑' i, eLpNorm (u (k + i + 1) - u (k + i)) r μ ^ r.toReal := by
+  simpa only [ENNReal.toReal_min_one_of_le_one hr1] using eLpNorm_sub_rpow_min_le_tsum hr0 hu hum k
 
 /-! ### Series in `L_p` -/
 
@@ -281,16 +318,24 @@ theorem eLpNorm_tsum_rpow_min_le {ι : Type*} [Countable ι] {g : ι → α → 
   · simp only [ENNReal.toReal_min_one_of_one_le hp1, ENNReal.rpow_one]
     exact eLpNorm_tsum_le hp1
 
+/-- **A function is bounded almost everywhere by its `L_∞` quasi-norm**: `‖f(x)‖ ≤ ‖f‖_∞` for
+almost every `x`, for every function, measurable or not (Mathlib's `ae_le_eLpNormEssSup` with
+`eLpNormEssSup_le_eLpNorm_top`). -/
+theorem ae_enorm_le_eLpNorm_top {ε : Type*} [TopologicalSpace ε] [ENorm ε] (f : α → ε) :
+    ∀ᵐ x ∂μ, ‖f x‖ₑ ≤ eLpNorm f ∞ μ :=
+  ae_le_eLpNormEssSup.mono fun _ hx => hx.trans eLpNormEssSup_le_eLpNorm_top
+
 /-- **A function with finite `L_p` quasi-norm is finite almost everywhere**, for every
 `0 < p ≤ ∞` and every `F : α → [0, ∞]`: for `p < ∞` the integral of `F^p` is finite (Mathlib's
-`ae_lt_top'`), for `p = ∞` the essential supremum bounds `F` (Mathlib's `ae_le_eLpNormEssSup`). A
-function that is not almost everywhere measurable has infinite quasi-norm. -/
+`ae_lt_top'`), for `p = ∞` the `L_∞` quasi-norm bounds `F` almost everywhere
+(`MeasureTheory.ae_enorm_le_eLpNorm_top`). A function that is not almost everywhere measurable
+has infinite quasi-norm. -/
 theorem ae_lt_top_of_eLpNorm_ne_top {F : α → ℝ≥0∞} (hp0 : p ≠ 0) (h : eLpNorm F p μ ≠ ∞) :
     ∀ᵐ x ∂μ, F x < ∞ := by
   rcases eq_or_ne p ∞ with rfl | hp
-  · filter_upwards [ae_le_eLpNormEssSup (f := F) (μ := μ)] with x hx
+  · filter_upwards [ae_enorm_le_eLpNorm_top (μ := μ) F] with x hx
     rw [enorm_eq_self] at hx
-    exact (hx.trans eLpNormEssSup_le_eLpNorm_top).trans_lt h.lt_top
+    exact hx.trans_lt h.lt_top
   have hF : AEMeasurable F μ := by
     by_contra hF
     exact h (eLpNorm_of_not_aestronglyMeasurable fun h' => hF h'.aemeasurable)
@@ -392,9 +437,7 @@ theorem eLpNorm_le_of_eLpNorm_top_le {E : Type*} [NormedAddCommGroup E] {f : α 
       exact ENNReal.top_ne_zero (le_zero_iff.1 h)
     simp only [eLpNorm_of_not_aestronglyMeasurable hf,
       ENNReal.mul_top (ENNReal.rpow_pos_of_nonneg (pos_iff_ne_zero.2 hM) h1θ).ne', le_refl]
-  have hN : ∀ᵐ x ∂μ, ‖f x‖ₑ ≤ eLpNorm f ∞ μ := by
-    filter_upwards [ae_le_eLpNormEssSup (f := f) (μ := μ)] with x hx
-    exact hx.trans eLpNormEssSup_le_eLpNorm_top
+  have hN := ae_enorm_le_eLpNorm_top (μ := μ) f
   calc eLpNorm f r μ
       ≤ eLpNorm f ∞ μ ^ (1 - p.toReal / r.toReal) * eLpNorm f p μ ^ (p.toReal / r.toReal) :=
         eLpNorm_le_rpow_mul_eLpNorm_rpow hf hN hp0 hpr hr
@@ -488,6 +531,45 @@ theorem eLpNorm_sub_rpow_min_le_tsum_of_nearBest (hp0 : p ≠ 0) (hr0 : r ≠ 0)
           (ENNReal.dyadicWeight β (k + i) * e (k + i)) ^ (min 1 r).toReal :=
         tsum_congr fun i => ENNReal.mul_rpow_of_nonneg _ _ hρ
     _ = _ := ENNReal.tsum_mul_left
+
+/-- **Near-best sequences in weighted `ℓ_q`, `0 < p, r ≤ ∞`**: let `ρ_p = min(1, p)`,
+`ρ_r = min(1, r)`, and let `b_k` be almost everywhere strongly measurable functions with
+`‖f - b_k‖_p ≤ e_k`, where `e` decreases to `0`, and blocks with
+`‖b_{k+1} - b_k‖_r ≤ C 2^(kβ) ‖b_{k+1} - b_k‖_p`. Then for every `s ∈ ℝ` and every `q`,
+`‖(2^(k(s-β)) ‖f - b_k‖_r)_k‖_{ℓ_q} ≤ C 2^(1/ρ_p) H^(1/ρ_r) ‖(2^(ks) e_k)_k‖_{ℓ_q}` with Hardy's
+constant `H = hardyConst ((s - β) ρ_r) (q/ρ_r)`, finite for `s > β`. The transfer of near-best
+sequences (`MeasureTheory.eLpNorm_sub_rpow_min_le_tsum_of_nearBest`) bounds
+`‖f - b_k‖_r^(ρ_r)` by a tail of `(2^(jβ) e_j)^(ρ_r)`, the tail inequality in `ρ_r`-th powers
+(`ENNReal.lqNorm_rpow_le_of_rpow_le_tsum`) turns this into a bound of the `ρ_r`-th power of the
+left side, and `2^(k(s-β)) 2^(kβ) = 2^(ks)`. -/
+theorem lqNorm_eLpNorm_sub_le_of_nearBest (hp0 : p ≠ 0) (hr0 : r ≠ 0) {f : α → E}
+    {b : ℕ → α → E} {e : ℕ → ℝ≥0∞} {β : ℝ} {C : ℝ≥0∞}
+    (hb : ∀ k, AEStronglyMeasurable (b k) μ) (hbe : ∀ k, eLpNorm (f - b k) p μ ≤ e k)
+    (he : Antitone e) (he0 : Tendsto e atTop (𝓝 0))
+    (hN : ∀ k, eLpNorm (b (k + 1) - b k) r μ ≤
+      C * ENNReal.dyadicWeight β k * eLpNorm (b (k + 1) - b k) p μ) (s : ℝ) (q : ℝ≥0∞) :
+    ENNReal.lqNorm q (fun k => ENNReal.dyadicWeight (s - β) k * eLpNorm (f - b k) r μ) ≤
+      C * 2 ^ (1 / (min 1 p).toReal) *
+        ENNReal.hardyConst ((s - β) * (min 1 r).toReal) (q / ENNReal.ofReal (min 1 r).toReal) ^
+          (1 / (min 1 r).toReal) *
+        ENNReal.lqNorm q (fun k => ENNReal.dyadicWeight s k * e k) := by
+  have hρ : 0 < (min 1 r).toReal := ENNReal.toReal_min_one_pos hr0
+  have htail : ∀ k, eLpNorm (f - b k) r μ ^ (min 1 r).toReal ≤
+      (C * 2 ^ (1 / (min 1 p).toReal)) ^ (min 1 r).toReal * ∑' i, ENNReal.dyadicWeight 0 i *
+        (ENNReal.dyadicWeight β (k + i) * e (k + i)) ^ (min 1 r).toReal :=
+    fun k => by
+      simpa only [ENNReal.dyadicWeight_zero_left, one_mul] using
+        eLpNorm_sub_rpow_min_le_tsum_of_nearBest hp0 hr0 hb hbe he he0 hN k
+  have hw : ∀ k, ENNReal.dyadicWeight (s - β) k * (ENNReal.dyadicWeight β k * e k) =
+      ENNReal.dyadicWeight s k * e k :=
+    fun k => by rw [← mul_assoc, ← ENNReal.dyadicWeight_add, sub_add_cancel]
+  have h := ENNReal.lqNorm_rpow_le_of_rpow_le_tsum
+    (y := fun j => ENNReal.dyadicWeight β j * e j) hρ htail (s - β) q
+  simp only [sub_zero, hw] at h
+  rw [← ENNReal.rpow_le_rpow_iff hρ, ENNReal.mul_rpow_of_nonneg _ _ hρ.le,
+    ENNReal.mul_rpow_of_nonneg _ _ hρ.le, ← ENNReal.rpow_mul, one_div_mul_cancel hρ.ne',
+    ENNReal.rpow_one]
+  exact h
 
 end NearBest
 

@@ -4756,7 +4756,39 @@ complex-valued measurable functions $f$ with $\|f\|_p < \infty$, normed for $p \
 quasi-normed for $p < 1$ (\Cref{sec:lp-quasi}), and $C_b(\Omega)$ is the space of bounded
 continuous complex-valued functions with the supremum norm.
 
-\section{Three facts on \texorpdfstring{$L_p$}{L\_p}}
+\section{Facts on \texorpdfstring{$L_p$}{L\_p}}
+
+\begin{lemma}[The inclusions for every exponent]
+\label{lem:inclusion-linear}
+\lean{MeasureTheory.Lp.inclusionOfExponentLeLinear,
+  MeasureTheory.Lp.coeFn_inclusionOfExponentLeLinear,
+  MeasureTheory.Lp.inclusionOfExponentLeLinear_self,
+  MeasureTheory.Lp.inclusionOfExponentLeLinear_injective,
+  MeasureTheory.Lp.inclusionOfExponentLeLinear_comp,
+  MeasureTheory.Lp.eLpNorm_inclusionOfExponentLeLinear, MeasureTheory.Lp.topInclusion,
+  MeasureTheory.Lp.coeFn_topInclusion, MeasureTheory.Lp.topInclusion_injective,
+  MeasureTheory.Lp.inclusionOfExponentLeLinear_topInclusion,
+  MeasureTheory.Lp.eLpNorm_sub_topInclusion, ENNReal.one_div_toReal_sub_one_div_toReal_nonneg}
+\leanok
+Let $\mu$ be a finite measure and $0 < p \leq r \leq \infty$. Then $1/p - 1/r \geq 0$, with
+$1/\infty = 0$. The identity of functions defines an injective linear map
+$\iota_{r,p} : L_r \to L_p$, and $\|\iota_{r,p} f\|_t = \|f\|_t$ for every $f \in L_r$ and every
+exponent $t$. Moreover $\iota_{p,p}$ is the identity and
+$\iota_{s,p} \circ \iota_{r,s} = \iota_{r,p}$ for every $p \leq s \leq r$; in particular the
+inclusions $\iota_{\infty,p}$ of the essentially bounded functions satisfy
+$\iota_{r,p} \circ \iota_{\infty,r} = \iota_{\infty,p}$. For every $f \in L_p$, $a \in L_\infty$
+and every exponent $t$, $\|f - \iota_{\infty,p} a\|_t = \|f - a\|_t$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+If $r < \infty$, then $p < \infty$ and $1/r \leq 1/p$; for $r = \infty$, $1/r = 0$.
+H\"older's inequality $\|f\|_p \leq \mu(\Omega)^{1/p - 1/r} \|f\|_r$ holds for every
+$0 < p \leq r$, so $\iota_{r,p}$ is defined. It agrees with the function almost everywhere.
+So two elements of $L_r$ with the same image agree almost everywhere, $\iota_{r,p} f$ and $f$
+have the same quasi-norms, and the two sides of each identity agree almost everywhere, hence
+in $L_p$.
+\end{proof}
 
 \begin{lemma}[The inclusion $L_r \hookrightarrow L_p$]
 \label{lem:inclusion}
@@ -4769,6 +4801,7 @@ continuous complex-valued functions with the supremum norm.
   MeasureTheory.Lp.norm_inclusionOfExponentLe_apply_le,
   MeasureTheory.Lp.inclusionOfExponentLe_self, MeasureTheory.Lp.inclusionOfExponentLe_apply,
   BoundedContinuousFunction.inclusionOfExponentLe_toLp,
+  BoundedContinuousFunction.inclusionOfExponentLeLinear_toLp,
   BoundedContinuousFunction.norm_toLp_eq_toReal_eLpNorm}
 \leanok
 \uses{lem:inclusion-linear}
@@ -4809,17 +4842,25 @@ side is finite for $f \in L_p$; for $r = \infty$, $\|f\|_\infty \leq M$.
 
 \begin{lemma}[Bounded continuous functions in $L_\infty$]
 \label{lem:bc-linfty}
-\lean{BoundedContinuousFunction.norm_toLp_top, BoundedContinuousFunction.isometry_toLp_top,
-  BoundedContinuousFunction.isClosed_range_toLp_top}
+\lean{BoundedContinuousFunction.eLpNorm_top_le_enorm,
+  BoundedContinuousFunction.toReal_eLpNorm_top_le_norm,
+  BoundedContinuousFunction.eLpNorm_topInclusion_toLp_le, BoundedContinuousFunction.norm_toLp_top,
+  BoundedContinuousFunction.isometry_toLp_top, BoundedContinuousFunction.isClosed_range_toLp_top}
 \leanok
-Assume that $\mu(U) > 0$ for every nonempty open $U \subseteq \Omega$. Then
+For every $a \in C_b(\Omega)$, $\|a\|_{L_\infty} \leq \sup_{x \in \Omega} |a(x)|$, and the class
+of $a$ in $L_\infty$ satisfies $\|\iota_{\infty,p} a\|_p \leq \mu(\Omega)^{1/p}
+\sup_{x \in \Omega} |a(x)|$ for every $0 < p \leq \infty$, with $1/\infty = 0$. If moreover
+$\mu(U) > 0$ for every nonempty open $U \subseteq \Omega$, then
 $\|a\|_{L_\infty} = \sup_{x \in \Omega} |a(x)|$ for every $a \in C_b(\Omega)$, and the classes
 of bounded continuous functions form a closed subspace of $L_\infty$.
 \end{lemma}
 
 \begin{proof}
 \leanok
-If $|a(x)| > c$ for some $x$, the open set $\{|a| > c\}$ has positive measure, so
+\uses{lem:inclusion-linear}
+The first two bounds hold since $|a| \leq \sup_{x \in \Omega} |a(x)|$ everywhere and
+$\iota_{\infty,p} a = a$ almost everywhere (\Cref{lem:inclusion-linear}). If $|a(x)| > c$ for
+some $x$, the open set $\{|a| > c\}$ has positive measure, so
 $\|a\|_{L_\infty} \geq c$. The map $C_b(\Omega) \to L_\infty$ is therefore an isometry, and
 its range is complete, hence closed.
 \end{proof}
@@ -4837,9 +4878,10 @@ need. On $[0, 1]$ with Lebesgue measure, the only continuous linear functional o
 $p < 1$, is $0$~\cite{Day1940}, so $L_p$ has no bounded linear projections onto nonzero
 finite-dimensional subspaces; near-best approximants take their place
 (\Cref{lem:near-best-transfer}). The inclusions between
-the $L_p$ hold for every exponent (\Cref{lem:inclusion-linear}), and a bound of the supremum by
-one $L_{p_0}$ quasi-norm gives one by every $L_p$ quasi-norm with $0 < p \leq p_0$, and with it
-bounds of every $\|f\|_r$, $p \leq r \leq \infty$ (\Cref{lem:sup-bound-exponents}).
+the $L_p$ hold for every exponent (\Cref{lem:inclusion-linear}), and for an essentially bounded
+function a bound of the supremum by one $L_{p_0}$ quasi-norm, $p_0 < \infty$, gives one by every
+$L_p$ quasi-norm with $0 < p \leq p_0$, and with it bounds of every $\|f\|_r$,
+$p \leq r \leq \infty$ (\Cref{lem:sup-bound-exponents}).
 
 \begin{lemma}[The $\rho$-triangle inequality]
 \label{lem:lp-quasi-triangle}
@@ -4847,7 +4889,6 @@ bounds of every $\|f\|_r$, $p \leq r \leq \infty$ (\Cref{lem:sup-bound-exponents
   ENNReal.toReal_min_one_of_one_le, MeasureTheory.inhmgELpNorm_eq_eLpNorm_rpow_min,
   MeasureTheory.eLpNorm_add_rpow_min_le}
 \leanok
-\uses{lem:lp-rho-triangle}
 Let $\mu$ be a measure on a measurable space $\Omega$, let $0 < p \leq \infty$ and
 $\rho = \min(1, p)$. Then $0 < \rho \leq 1$, and for all functions $f, g$ on $\Omega$ with values
 in a normed group or in $[0, \infty]$,
@@ -4858,6 +4899,7 @@ in a normed group or in $[0, \infty]$,
 
 \begin{proof}
 \leanok
+\uses{lem:lp-rho-triangle}
 For $p \leq 1$ this is \Cref{lem:lp-rho-triangle}, for $p \geq 1$ the triangle inequality of
 $L_p(\mu)$. Both are the triangle inequality of Mathlib's inhomogeneous quasi-norm
 \texttt{inhmgELpNorm}, which equals $\|f\|_p^\rho$.
@@ -4868,7 +4910,6 @@ $L_p(\mu)$. Both are the triangle inequality of Mathlib's inhomogeneous quasi-no
 \lean{MeasureTheory.eLpNorm_sub_rpow_min_le_sum, MeasureTheory.eLpNorm_sub_rpow_min_le_tsum,
   MeasureTheory.eLpNorm_sub_le_tsum}
 \leanok
-\uses{lem:telescoping-fatou, lem:lp-quasi-triangle}
 Let $\mu$ be a measure, $0 < r \leq \infty$ and $\rho = \min(1, r)$, and let $u_0, u_1, \dots$
 be almost everywhere strongly measurable functions with values in a normed group that converge
 in measure to a function $g$. Then for every $k \in \N$
@@ -4879,9 +4920,12 @@ in measure to a function $g$. Then for every $k \in \N$
 
 \begin{proof}
 \leanok
-As in \Cref{lem:telescoping-fatou}: by \Cref{lem:lp-quasi-triangle},
-$\|u_{k+n} - u_k\|_r^\rho \leq \sum_{i<n} \|u_{k+i+1} - u_{k+i}\|_r^\rho$ for every $n$, and a
-bound of the $L_r$ quasi-norms passes to the limit in measure, also for $r = \infty$.
+\uses{lem:lp-quasi-triangle}
+By \Cref{lem:lp-quasi-triangle},
+$\|u_{k+n} - u_k\|_r^\rho \leq \sum_{i<n} \|u_{k+i+1} - u_{k+i}\|_r^\rho$ for every $n$. The
+functions $u_{k+n} - u_k$ converge in measure to $g - u_k$, and a bound of their $L_r$
+quasi-norms passes to the limit in measure (Mathlib's \texttt{eLpNorm\_\allowbreak
+le\_\allowbreak of\_\allowbreak tendstoInMeasure}), also for $r = \infty$.
 \end{proof}
 
 \begin{lemma}[Series in $L_p$]
@@ -4890,7 +4934,6 @@ bound of the $L_r$ quasi-norms passes to the limit in measure, also for $r = \in
   MeasureTheory.ae_lt_top_of_eLpNorm_ne_top,
   MeasureTheory.summable_norm_of_tsum_eLpNorm_rpow_min_ne_top}
 \leanok
-\uses{lem:lp-quasi-triangle, lem:lp-series-minkowski}
 Let $\mu$ be a measure on $\Omega$, let $0 < p \leq \infty$ and $\rho = \min(1, p)$, and let $I$
 be a countable set.
 \begin{enumerate}
@@ -4906,6 +4949,7 @@ be a countable set.
 
 \begin{proof}
 \leanok
+\uses{lem:lp-quasi-triangle, lem:lp-series-minkowski}
 (1) If some $g_i$ is not almost everywhere measurable, then $\|g_i\|_p = \infty$. Otherwise,
 for $p \leq 1$, $(\sum_i g_i)^p \leq \sum_i g_i^p$ pointwise, and integrating term by term gives
 the claim; for $p \geq 1$ it is \Cref{lem:lp-series-minkowski}. (2) For $p < \infty$,
@@ -4918,11 +4962,11 @@ eLpNorm\_\allowbreak ne\_\allowbreak top}.
 
 \begin{lemma}[Supremum bounds at different exponents]
 \label{lem:sup-bound-exponents}
-\lean{MeasureTheory.le_rpow_mul_eLpNorm_of_ae_enorm_le, MeasureTheory.eLpNorm_le_of_eLpNorm_top_le}
+\lean{MeasureTheory.ae_enorm_le_eLpNorm_top, MeasureTheory.le_rpow_mul_eLpNorm_of_ae_enorm_le,
+  MeasureTheory.eLpNorm_le_of_eLpNorm_top_le}
 \leanok
-\uses{lem:lp-interpolation}
 Let $\mu$ be a measure, let $f$ be a function with values in a normed group and
-$M \in [0, \infty]$.
+$M \in [0, \infty]$. Then $|f| \leq \|f\|_\infty$ almost everywhere.
 \begin{enumerate}
   \item Let $0 < p \leq p_0 < \infty$ and $N \in [0, \infty)$ with $|f| \leq N$ almost
     everywhere. If $N \leq M \|f\|_{p_0}$, then $N \leq M^{p_0/p} \|f\|_p$.
@@ -4933,9 +4977,12 @@ $M \in [0, \infty]$.
 
 \begin{proof}
 \leanok
-This is~\cite[Theorem~2.1]{DitzianPrymak2016}. A function that is not almost everywhere
-strongly measurable has all its quasi-norms infinite, and both claims hold for it; let $f$ be
-almost everywhere strongly measurable. (1) Let $\theta = p/p_0 \in (0, 1]$. By
+\uses{lem:lp-interpolation}
+The bound $|f| \leq \|f\|_\infty$ almost everywhere holds since $\|f\|_\infty$ is at least the
+essential supremum of $|f|$. Parts (1) and (2) are~\cite[Theorem~2.1]{DitzianPrymak2016}. A
+function that is not almost everywhere strongly measurable has all its quasi-norms infinite, and
+both claims hold for it; let $f$ be almost everywhere strongly measurable. (1) Let
+$\theta = p/p_0 \in (0, 1]$. By
 \Cref{lem:lp-interpolation}, $\|f\|_{p_0} \leq N^{1-\theta} \|f\|_p^\theta$, so
 $N \leq M N^{1-\theta} \|f\|_p^\theta$. For $N = 0$ there is nothing to prove; otherwise divide
 by $N^{1-\theta} \in (0, \infty)$ and take the power $1/\theta$. (2) For $r = \infty$ this is
@@ -4954,7 +5001,6 @@ every smaller exponent, and (2) passes from the supremum to every $L_r$.
   MeasureTheory.tendstoInMeasure_of_eLpNorm_sub_le,
   MeasureTheory.eLpNorm_sub_rpow_min_le_tsum_of_nearBest}
 \leanok
-\uses{lem:limit-telescoping, lem:lp-quasi-triangle}
 Let $\mu$ be a measure on $\Omega$, let $0 < p, r \leq \infty$, $\rho_p = \min(1, p)$ and
 $\rho_r = \min(1, r)$, and let $f, g, h$ be functions on $\Omega$ with values in a normed group
 $E$.
@@ -4983,6 +5029,7 @@ $E$.
 
 \begin{proof}
 \leanok
+\uses{lem:limit-telescoping, lem:lp-quasi-triangle}
 (1) Since $g - h = (f - h) - (f - g)$, \Cref{lem:lp-quasi-triangle} gives
 $\|g - h\|_p^{\rho_p} \leq 2 e^{\rho_p}$, and its $\rho_p$-th root is the second bound. (2) The
 quasi-norms $\|b_i - f\|_p$ tend to $0$ along $\mathcal{F}$, and convergence in $L_p$ implies
@@ -4994,57 +5041,58 @@ $\|f - b_k\|_r^{\rho_r} \leq \sum_{i \geq 0} \|b_{k+i+1} - b_{k+i}\|_r^{\rho_r}$
 \end{proof}
 
 In (3) the measure and $\|f\|_r$ may be infinite. With a Nikolskii inequality for the blocks,
-(3) is the step from $L_p$ to $L_r$ in the embedding theorems of Besov spaces.
+(3) is the step from $L_p$ to $L_r$ in the embedding theorems of Besov spaces; Hardy's
+inequality for tails turns it into a bound in weighted $\ell_q$.
 
-\begin{lemma}[The inclusions for every exponent]
-\label{lem:inclusion-linear}
-\lean{MeasureTheory.Lp.inclusionOfExponentLeLinear,
-  MeasureTheory.Lp.coeFn_inclusionOfExponentLeLinear,
-  MeasureTheory.Lp.inclusionOfExponentLeLinear_self,
-  MeasureTheory.Lp.inclusionOfExponentLeLinear_injective,
-  MeasureTheory.Lp.inclusionOfExponentLeLinear_comp,
-  MeasureTheory.Lp.eLpNorm_inclusionOfExponentLeLinear, MeasureTheory.Lp.topInclusion,
-  MeasureTheory.Lp.coeFn_topInclusion, MeasureTheory.Lp.topInclusion_injective,
-  MeasureTheory.Lp.inclusionOfExponentLeLinear_topInclusion,
-  BoundedContinuousFunction.inclusionOfExponentLeLinear_toLp}
+\begin{lemma}[Near-best sequences in weighted $\ell_q$]
+\label{lem:near-best-lq}
+\lean{MeasureTheory.lqNorm_eLpNorm_sub_le_of_nearBest}
 \leanok
-Let $\mu$ be a finite measure and $0 < p \leq r \leq \infty$. The identity of functions defines
-an injective linear map $\iota_{r,p} : L_r \to L_p$, and $\|\iota_{r,p} f\|_t = \|f\|_t$ for every
-$f \in L_r$ and every exponent $t$. Moreover $\iota_{p,p}$ is the identity and
-$\iota_{s,p} \circ \iota_{r,s} = \iota_{r,p}$ for every $p \leq s \leq r$; in particular the
-inclusions $\iota_{\infty,p}$ of the essentially bounded functions satisfy
-$\iota_{r,p} \circ \iota_{\infty,r} = \iota_{\infty,p}$. For $p \geq 1$, $\iota_{r,p}$ maps the
-class in $L_r$ of every $a \in C_b(\Omega)$ to its class in $L_p$.
+\uses{lem:near-best-transfer, lem:hardy-every-exponent}
+Let $\mu$, $p$, $r$, $\rho_p$, $\rho_r$, $f$, $b_k$, $e_k$, $C$ and $\beta$ satisfy the
+hypotheses of \Cref{lem:near-best-transfer}(3), let $s \in \R$ and $q \in (0, \infty]$, and let
+$H = H_{(s - \beta)\rho_r, q/\rho_r}$ be the constant of \Cref{lem:hardy-every-exponent}, finite
+for $s > \beta$. Then
+\[
+  \bigl\| \bigl(2^{k(s-\beta)} \|f - b_k\|_r\bigr)_k \bigr\|_{\ell_q}
+  \leq C \, 2^{1/\rho_p} H^{1/\rho_r} \, \bigl\| (2^{ks} e_k)_k \bigr\|_{\ell_q} .
+\]
 \end{lemma}
 
 \begin{proof}
 \leanok
-H\"older's inequality $\|f\|_p \leq \mu(\Omega)^{1/p - 1/r} \|f\|_r$ holds for every
-$0 < p \leq r$, so $\iota_{r,p}$ is defined. It does not change the function up to null sets.
-So two elements of $L_r$ with the same image agree almost everywhere, $\iota_{r,p} f$ and $f$
-have the same quasi-norms, and the two sides of each identity agree almost everywhere, hence
-in $L_p$.
+\uses{lem:weighted-tails}
+With $y_j = 2^{j\beta} e_j$, \Cref{lem:near-best-transfer}(3) says that $x_k = \|f - b_k\|_r$
+satisfies
+\[
+  x_k^{\rho_r} \leq \bigl(C \, 2^{1/\rho_p}\bigr)^{\rho_r} \sum_{i \geq 0} y_{k+i}^{\rho_r}
+  \qquad (k \in \N) .
+\]
+Part (2) of \Cref{lem:weighted-tails} with $\rho = \rho_r$, the exponent $0$ in place of $\beta$
+and the weights $2^{k(s - \beta)}$ gives
+$\|(2^{k(s-\beta)} x_k)_k\|_{\ell_q}^{\rho_r} \leq (C \, 2^{1/\rho_p})^{\rho_r} H \,
+\|(2^{k(s-\beta)} y_k)_k\|_{\ell_q}^{\rho_r}$, and $2^{k(s-\beta)} y_k = 2^{ks} e_k$. Take the
+$\rho_r$-th root.
 \end{proof}
 
 \section{Schemes of functions and Besov spaces}
 
 \begin{definition}[Scheme of functions]
 \label{def:function-scheme}
-\lean{FunctionScheme, FunctionScheme.toLp, FunctionScheme.mem_toLp, FunctionScheme.toLp_mem_toLp,
-  FunctionScheme.inclusion_mem_toLp, FunctionScheme.ofContinuous, FunctionScheme.mem_ofContinuous,
-  FunctionScheme.toLp_ofContinuous, FunctionScheme.mem_toLp_ofContinuous,
-  FunctionScheme.toLp_mem_toLp_ofContinuous, FunctionScheme.HasContinuousApproximants,
-  FunctionScheme.hasContinuousApproximants_ofContinuous}
+\lean{FunctionScheme, FunctionScheme.lpSets, FunctionScheme.mem_lpSets,
+  FunctionScheme.topInclusion_mem_lpSets, FunctionScheme.toLp, FunctionScheme.toLp_sets,
+  FunctionScheme.mem_toLp, FunctionScheme.topInclusion_mem_toLp, FunctionScheme.ofContinuous,
+  FunctionScheme.mem_ofContinuous, FunctionScheme.HasContinuousApproximants}
 \leanok
 \uses{def:scheme, def:comap, lem:inclusion, lem:inclusion-linear}
 A \emph{scheme of functions} on $(\Omega, \mu)$ is an approximation scheme $S$ in $L_\infty$.
-For $1 \leq p \leq \infty$, the sets $S^{(p)}_n = \iota_{\infty,p}(S_n)$, $n \in \N$, form an
-approximation scheme $S^{(p)}$ in $L_p$. Let $\Omega$ moreover be a topological space with its
-Borel $\sigma$-algebra. For an approximation scheme $T$ in $C_b(\Omega)$, the classes in
-$L_\infty$ of the elements of $T_n$, $n \in \N$, form a scheme of functions, the \emph{scheme
-of $T$}; for $1 \leq p \leq \infty$, its sets $S^{(p)}_n$ consist of the classes in $L_p$ of
-the elements of $T_n$. A scheme of functions has \emph{continuous approximants} if every element
-of every $S_n$ is the class of a bounded continuous function.
+For every $0 < p \leq \infty$ the \emph{approximants of $S$ in $L_p$} are the sets
+$S^{(p)}_n = \iota_{\infty,p}(S_n)$, $n \in \N$ (\Cref{lem:inclusion-linear}); for
+$1 \leq p \leq \infty$ they form an approximation scheme $S^{(p)}$ in $L_p$. Let $\Omega$
+moreover be a topological space with its Borel $\sigma$-algebra. For an approximation scheme $T$
+in $C_b(\Omega)$, the classes in $L_\infty$ of the elements of $T_n$, $n \in \N$, form a scheme
+of functions, the \emph{scheme of $T$}. A scheme of functions has \emph{continuous approximants}
+if every element of every $S_n$ is the class of a bounded continuous function.
 \end{definition}
 
 The approximants are essentially bounded, so that they lie in every $L_p$ at once and one scheme
@@ -5058,19 +5106,27 @@ that a function has a continuous representative.
 
 \begin{lemma}[Compatibility with the inclusions]
 \label{lem:function-scheme-inclusion}
-\lean{FunctionScheme.image_toLp_of_le, FunctionScheme.comap_toLp_of_le,
-  FunctionScheme.mem_toLp_of_inclusion_mem, FunctionScheme.exists_toLp_of_mem}
+\lean{FunctionScheme.inclusion_mem_toLp, FunctionScheme.image_toLp_of_le,
+  FunctionScheme.comap_toLp_of_le, FunctionScheme.mem_toLp_of_inclusion_mem,
+  FunctionScheme.exists_toLp_of_mem, FunctionScheme.toLp_ofContinuous,
+  FunctionScheme.mem_toLp_ofContinuous, FunctionScheme.toLp_mem_toLp_ofContinuous,
+  FunctionScheme.hasContinuousApproximants_ofContinuous}
 \leanok
 \uses{def:function-scheme, lem:inclusion}
 Let $S$ be a scheme of functions and $1 \leq p \leq r \leq \infty$. For every $n \in \N$,
-$\iota_{r,p}(S^{(r)}_n) = S^{(p)}_n$ and $\iota_{r,p}^{-1}(S^{(p)}_n) = S^{(r)}_n$.
+$\iota_{r,p}(S^{(r)}_n) = S^{(p)}_n$ and $\iota_{r,p}^{-1}(S^{(p)}_n) = S^{(r)}_n$. Let
+$\Omega$ moreover be a topological space with its Borel $\sigma$-algebra and $T$ an
+approximation scheme in $C_b(\Omega)$. The scheme of $T$ has continuous approximants, and for
+$1 \leq p \leq \infty$ its sets $S^{(p)}_n$ consist of the classes in $L_p$ of the elements of
+$T_n$.
 \end{lemma}
 
 \begin{proof}
 \leanok
 \uses{lem:inclusion-linear}
 By \Cref{lem:inclusion-linear}, $\iota_{r,p} \circ \iota_{\infty,r} = \iota_{\infty,p}$, and
-$\iota_{r,p}$ is injective.
+$\iota_{r,p}$ is injective. By \Cref{lem:inclusion}, $\iota_{\infty,p}$ maps the class in
+$L_\infty$ of every $a \in C_b(\Omega)$ to its class in $L_p$.
 \end{proof}
 
 A scheme of functions defines a couple on $L_p$ for every exponent $0 < p \leq \infty$, through
@@ -5079,37 +5135,32 @@ $S^{(p)}$ in the normed space $L_p$.
 
 \begin{definition}[The couple of a scheme in $L_p$]
 \label{def:scheme-lp-couple}
-\lean{FunctionScheme.lpSets, FunctionScheme.mem_lpSets, FunctionScheme.topInclusion_mem_lpSets,
-  FunctionScheme.lpCouple, FunctionScheme.lpCouple_norm0}
+\lean{FunctionScheme.lpCouple, FunctionScheme.lpCouple_norm0}
 \leanok
-\uses{def:function-scheme, def:complexity-couple, lem:inclusion-linear}
-Let $S$ be a scheme of functions and $0 < p \leq \infty$. The \emph{approximants of $S$ in $L_p$}
-are the sets $S^{(p)}_n = \iota_{\infty,p}(S_n) \subseteq L_p$, $n \in \N$, with the inclusion
-$\iota_{\infty,p}$ of \Cref{lem:inclusion-linear}. The \emph{couple of $S$ in $L_p$} is the
-complexity couple of the quasi-norm $\|\cdot\|_p$ and the sets $S^{(p)}_n$
+\uses{def:function-scheme, def:complexity-couple}
+Let $S$ be a scheme of functions and $0 < p \leq \infty$, and let $S^{(p)}_n$ be the
+approximants of $S$ in $L_p$ (\Cref{def:function-scheme}). The \emph{couple of $S$ in $L_p$} is
+the complexity couple of the quasi-norm $\|\cdot\|_p$ and the sets $S^{(p)}_n$
 (\Cref{def:complexity-couple}):
 \[
   N_0(f) = \|f\|_p , \qquad N_1(f) = \inf \{ n \in \N : f \in S^{(p)}_n \} , \qquad f \in L_p .
 \]
 \end{definition}
 
-For $p \geq 1$ the sets $S^{(p)}_n$ are those of the scheme $S^{(p)}$ of
-\Cref{def:function-scheme}.
-
 \begin{lemma}[Properties of the couple of a scheme in $L_p$]
 \label{lem:scheme-lp-couple}
 \lean{FunctionScheme.lpSets_zero, FunctionScheme.monotone_lpSets,
   FunctionScheme.smul_mem_lpSets, FunctionScheme.neg_mem_lpSets,
   FunctionScheme.lpSets_add_subset, FunctionScheme.inclusion_mem_lpSets,
-  FunctionScheme.lpCouple_norm0_add_rpow_le, FunctionScheme.lpCouple_norm0_smul,
+  FunctionScheme.lpCouple_norm0_add_rpow_min_le, FunctionScheme.lpCouple_norm0_smul,
   FunctionScheme.lpCouple_norm1_le_of_mem, FunctionScheme.mem_lpSets_of_lpCouple_norm1_le,
   FunctionScheme.lpCouple_norm1_zero, FunctionScheme.lpCouple_norm1_neg,
   FunctionScheme.lpCouple_norm1_add_le, FunctionScheme.lpCouple_norm1_smul_le,
   FunctionScheme.eq_zero_of_lpCouple_norm1_lt_one, FunctionScheme.isQuasiNormed_lpCouple,
-  MeasureTheory.Lp.eLpNorm_sub_topInclusion, FunctionScheme.eFunctional_lpCouple_natCast,
-  FunctionScheme.exists_nearBest_lpCouple, FunctionScheme.lpCouple_norm1_inclusion_le}
+  FunctionScheme.eFunctional_lpCouple_natCast, FunctionScheme.exists_nearBest_lpCouple,
+  FunctionScheme.lpCouple_norm1_inclusion_le, FunctionScheme.exists_inclusion_eq_eNormDyadic_le}
 \leanok
-\uses{def:scheme-lp-couple, def:couple, def:e-functional, lem:lq-quasi-triangle,
+\uses{def:scheme-lp-couple, def:couple, def:e-functional, def:e-method, lem:lq-quasi-triangle,
   lem:inclusion-linear}
 Let $S$ be a scheme of functions, let $0 < p \leq \infty$ and $\rho = \min(1, p)$, let $C_p$ be
 the constant of \Cref{lem:lq-quasi-triangle}, and let $(N_0, N_1)$ be the couple of $S$ in
@@ -5127,20 +5178,24 @@ $L_p$, with $E$-functional $E$.
     Moreover, for all $f, g \in L_p$, $c \in \R$ and $n \in \N$,
     $N_1(f + g) \leq N_1(f) + N_1(g)$ and $N_1(cf) \leq N_1(f)$; $N_1(f) \leq n$ if and only if
     $f \in S^{(p)}_n$; and $N_1(f) < 1$ implies $f = 0$.
-  \item For all $f \in L_p$, $a \in L_\infty$ and every exponent $t$,
-    $\|f - \iota_{\infty,p} a\|_t = \|f - a\|_t$. For all $n \in \N$ and $f \in L_p$,
-    $E(n, f) = \inf_{a \in S_n} \|f - a\|_p$.
+  \item For all $n \in \N$ and $f \in L_p$, $E(n, f) = \inf_{a \in S_n} \|f - a\|_p$.
   \item For all $f \in L_p$ and $s \in \R$ there are $b_k \in S_{2^k}$, $k \in \N$, with
     $\|f - b_k\|_p \leq E(2^k, f) + \|f\|_p \, 2^{-k(s+1)}$ for every $k$.
   \item Let $p \leq r \leq \infty$, and let $N_1^{(p)}$ and $N_1^{(r)}$ be the complexities of the
     couples of $S$ in $L_p$ and in $L_r$. Then $N_1^{(p)}(\iota_{r,p} f) \leq N_1^{(r)}(f)$ for
     every $f \in L_r$.
+  \item Let $p \leq r \leq \infty$, $0 < q \leq \infty$ and $t \in \R$, let $C_r$ be the constant
+    of \Cref{lem:lq-quasi-triangle}, let $b_k \in S_{2^k}$ for $k \in \N$, and let $f \in L_p$
+    with $X = \|(2^{kt} \|f - b_k\|_r)_k\|_{\ell_q} < \infty$. Then $f = \iota_{r,p} g$ for some
+    $g \in L_r$ whose dyadic norm $\|g\|^{\mathrm{dy}}_{E', t, q}$ (\Cref{def:e-method}) in the
+    couple of $S$ in $L_r$, with $E$-functional $E'$, satisfies
+    $\|g\|^{\mathrm{dy}}_{E', t, q} \leq C_r (X + \|b_0\|_r) + X$.
 \end{enumerate}
 \end{lemma}
 
 \begin{proof}
 \leanok
-\uses{lem:complexity-couple, lem:lp-quasi-triangle, lem:e-near-best}
+\uses{lem:complexity-couple, lem:lp-quasi-triangle, lem:e-near-best, lem:lq-basic}
 (1) The inclusion $\iota_{\infty,p}$ is linear and maps $S_n$ onto $S^{(p)}_n$, so the axioms of
 $S$ pass to the sets $S^{(p)}_n$; and $\iota_{r,p} \circ \iota_{\infty,r} = \iota_{\infty,p}$
 (\Cref{lem:inclusion-linear}). (2) The quasi-triangle inequality of $\|\cdot\|_p$ with the
@@ -5148,13 +5203,19 @@ constant $C_p$ is Mathlib's \texttt{eLpNorm\_\allowbreak add\_\allowbreak le'}, 
 $\rho$-triangle inequality is \Cref{lem:lp-quasi-triangle}, and $\|cf\|_p = |c| \, \|f\|_p$. The
 properties of $N_1$ follow from (1) by \Cref{lem:complexity-couple}, which gives subadditivity,
 so the quasi-triangle inequality for $N_1$ holds with $C_p \geq 1$; for $N_1(cf) \leq N_1(f)$
-apply its part (4) to $f \mapsto cf$. (3) The first identity holds since
-$\iota_{\infty,p} a = a$ almost everywhere. By \Cref{lem:complexity-couple},
-$E(n, f) = \inf_{b \in S^{(p)}_n} \|f - b\|_p$, and the first identity for $t = p$ gives the
-second.
+apply its part (4) to $f \mapsto cf$. (3) By \Cref{lem:complexity-couple},
+$E(n, f) = \inf_{b \in S^{(p)}_n} \|f - b\|_p$, and
+$\|f - \iota_{\infty,p} a\|_p = \|f - a\|_p$ for every $a \in L_\infty$
+(\Cref{lem:inclusion-linear}).
 (4) Part (1) of \Cref{lem:e-near-best} gives $b_k' \in L_p$ with $N_1(b_k') \leq 2^k$ and this
 bound; by (2) $b_k' \in S^{(p)}_{2^k}$, so $b_k' = \iota_{\infty,p} b_k$ for some
 $b_k \in S_{2^k}$. (5) Part (4) of \Cref{lem:complexity-couple} for $T = \iota_{r,p}$ and (1).
+(6) The term $k = 0$ of the sequence gives $\|f - b_0\|_r \leq X$, and
+$b_0 \in L_\infty \subseteq L_r$, so $f \in L_r$, that is $f = \iota_{r,p} g$ for some
+$g \in L_r$ (\Cref{lem:inclusion-linear}). By (3) in $L_r$,
+$E'(2^k, g) \leq \|g - b_k\|_r = \|f - b_k\|_r$, so the $\ell_q$ part of
+$\|g\|^{\mathrm{dy}}_{E', t, q}$ is at most $X$, and
+$\|g\|_r \leq C_r (\|f - b_0\|_r + \|b_0\|_r)$.
 \end{proof}
 
 \begin{lemma}[The couple of a scheme for $p \geq 1$]
@@ -5210,9 +5271,10 @@ are the classical periodic Besov spaces (\Cref{thm:torus-lp-moduli}, and
   FunctionScheme.MemBesov.of_eNormDyadic_lt_top,
   FunctionScheme.besovNorm_zero, FunctionScheme.memBesov_zero, FunctionScheme.MemBesov.add,
   FunctionScheme.besovNorm_smul_le, FunctionScheme.besovNorm_smul, FunctionScheme.MemBesov.smul,
-  FunctionScheme.besovSpace, FunctionScheme.mem_besovSpace}
+  FunctionScheme.besovSpace, FunctionScheme.mem_besovSpace,
+  FunctionScheme.memBesov_iff_memEMethod}
 \leanok
-\uses{def:besov, def:e-method, lem:scheme-lp-couple}
+\uses{def:besov, def:e-method}
 Let $S$ be a scheme of functions and $0 < p \leq \infty$.
 \begin{enumerate}
   \item For all $s, c \in \R$, $q \in (0, \infty]$ and $f \in L_p$,
@@ -5221,13 +5283,15 @@ Let $S$ be a scheme of functions and $0 < p \leq \infty$.
   \item Let $s \geq 0$ and $0 < q \leq \infty$. A function $f \in L_p$ lies in
     $\Besov{s}{p}{q}$ if and only if its dyadic norm
     $\|f\|_p + \|(2^{ks} E_{2^k}(f)_p)_{k \in \N}\|_{\ell_q}$ of the couple of $S$ in $L_p$
-    (\Cref{def:e-method}) is finite, and $\Besov{s}{p}{q}$ is a linear subspace of $L_p$.
+    (\Cref{def:e-method}) is finite, and $\Besov{s}{p}{q}$ is a linear subspace of $L_p$. If
+    moreover $s > 0$ or $q = \infty$, then $f \in \Besov{s}{p}{q}$ if and only if
+    $f \in E_{s,q}$ for the couple of $S$ in $L_p$ (\Cref{def:e-method}).
 \end{enumerate}
 \end{lemma}
 
 \begin{proof}
 \leanok
-\uses{lem:e-pietsch-norm, lem:e-method-dyadic}
+\uses{lem:scheme-lp-couple, lem:e-pietsch-norm, lem:e-method-dyadic}
 By \Cref{lem:scheme-lp-couple} the couple is quasi-normed, $N_1$ is subadditive,
 $N_0(ca) = |c| \, N_0(a)$, $N_1(ca) \leq N_1(a)$ and $N_1(0) = 0$, and only $0$ has complexity
 below $1$. (1) Part (4) of \Cref{lem:e-pietsch-norm} for $T f = cf$ and $M = |c|$ gives
@@ -5236,7 +5300,8 @@ for $c^{-1}$ and $cf$ gives the reverse inequality. Part (2) of \Cref{lem:e-piet
 $\|0\|_{\Besov{s}{p}{q}} = 0$, which is the case $c = 0$. (2) Pietsch's form and the dyadic
 norm are finite together by part (3) of \Cref{lem:e-pietsch-norm}. The dyadic norm satisfies a
 quasi-triangle inequality with a finite constant (\Cref{lem:e-method-dyadic}(4)), so sums stay
-in $\Besov{s}{p}{q}$; multiples stay by (1).
+in $\Besov{s}{p}{q}$; multiples stay by (1). For $s > 0$ or $q = \infty$ the space $E_{s,q}$ is
+described by the same dyadic norm (\Cref{lem:e-method-dyadic}(3)).
 \end{proof}
 
 \begin{lemma}[Besov spaces as approximation spaces]
@@ -5264,9 +5329,7 @@ So for $p \geq 1$ every result on approximation spaces applies to Besov spaces o
 \begin{proposition}[Elementary embeddings]
 \label{prop:besov-elementary}
 \lean{FunctionScheme.MemBesov.mono, FunctionScheme.besovNorm_inclusion_le,
-  FunctionScheme.MemBesov.inclusion, FunctionScheme.MemBesov.of_sup,
-  ENNReal.one_div_toReal_sub_one_div_toReal_nonneg,
-  BoundedContinuousFunction.eLpNorm_topInclusion_toLp_le}
+  FunctionScheme.MemBesov.inclusion, FunctionScheme.MemBesov.of_sup}
 \leanok
 \uses{def:besov, lem:inclusion-linear, def:approx-space}
 Let $S$ be a scheme of functions, $0 < p \leq \infty$, $s, t \in \R$ and
@@ -5274,7 +5337,7 @@ $0 < q, q' \leq \infty$, with $1/\infty = 0$.
 \begin{enumerate}
   \item If $0 \leq t$, and $t < s$ or $t = s$ and $q \leq q'$, then
     $\Besov{s}{p}{q} \subseteq \Besov{t}{p}{q'}$.
-  \item If $p \leq r \leq \infty$, then $1/r \leq 1/p$, and for every $f \in L_r$,
+  \item If $p \leq r \leq \infty$, then for every $f \in L_r$,
     \[
       \|\iota_{r,p} f\|_{\Besov{s}{p}{q}} \leq \mu(\Omega)^{1/p - 1/r} \, \|f\|_{\Besov{s}{r}{q}} .
     \]
@@ -5288,17 +5351,17 @@ $0 < q, q' \leq \infty$, with $1/\infty = 0$.
 \begin{proof}
 \leanok
 \uses{lem:besov-linear, lem:e-method-calculus, lem:e-pietsch-norm, lem:scheme-lp-couple,
-  lem:complexity-couple, thm:complexity-couple-approx}
+  lem:complexity-couple, thm:complexity-couple-approx, lem:bc-linfty}
 (1) Here $s \geq t \geq 0$, so by (2) of \Cref{lem:besov-linear} both spaces are described by
 the dyadic norms of the couple of $S$ in $L_p$, which compare by (3) and (4) of
-\Cref{lem:e-method-calculus}. (2) If $r < \infty$, then $p < \infty$ and
-$1/r \leq 1/p$; for $r = \infty$, $1/r = 0$. H\"older's inequality
+\Cref{lem:e-method-calculus}. (2) The exponent $1/p - 1/r$ is nonnegative
+(\Cref{lem:inclusion-linear}). H\"older's inequality
 $\|g\|_p \leq \mu(\Omega)^{1/p - 1/r} \|g\|_r$ holds for every $g \in L_r$, the constant is
 finite, and $\iota_{r,p}$ does not increase the complexity (\Cref{lem:scheme-lp-couple}(5)); so
 part (4) of \Cref{lem:e-pietsch-norm} applies with $T = \iota_{r,p}$ and
 $M = \mu(\Omega)^{1/p - 1/r}$. (3) The map $a \mapsto \iota_{\infty,p}(a)$ from $C_b(\Omega)$ to
 $L_p$ satisfies $\|\iota_{\infty,p}(a)\|_p \leq \mu(\Omega)^{1/p} \|a\|$ for every exponent
-$p$, since $|a| \leq \|a\|$ everywhere, and it maps $T_n$ into
+$p$ (\Cref{lem:bc-linfty}), and it maps $T_n$ into
 $S^{(p)}_n$ for the scheme $S$ of $T$, so it does not increase the complexity
 (\Cref{lem:complexity-couple}(4)). Part (4) of \Cref{lem:e-pietsch-norm} for the complexity
 couple of $T$ and the couple of $S$ in $L_p$, with $M = \mu(\Omega)^{1/p}$, and
@@ -5312,21 +5375,17 @@ couple of $T$ and the couple of $S$ in $L_p$, with $M = \mu(\Omega)^{1/p}$, and
 \lean{FunctionScheme.HasNikolskii, nikolskiiExponent, nikolskiiExponent_nonneg,
   one_le_of_nikolskiiExponent_lt, nikolskiiExponent_pos, lt_of_nikolskiiExponent_pos,
   le_of_nikolskiiExponent_nonneg, nikolskiiExponent_top, nikolskiiExponent_self,
-  nikolskiiExponent_eq_mul_one_sub_div, FunctionScheme.toReal_eLpNorm_top_le_norm,
-  FunctionScheme.hasNikolskii_ofContinuous}
+  nikolskiiExponent_eq_mul_one_sub_div}
 \leanok
 \uses{def:function-scheme}
 Let $S$ be a scheme of functions and $D \in \R$. The scheme has the \emph{Nikolskii property}
-of dimension $D$ if for every $1 \leq p \leq \infty$ there is $C \geq 0$ with
+of dimension $D$ if for every $1 \leq p \leq \infty$ there is a real number $C \geq 0$ with
 \[
   \|a\|_{L_\infty} \leq C \, n^{D/p} \, \|a\|_{L_p}
-  \qquad \text{for all } n \geq 1 \text{ and } a \in S_n .
+  \qquad \text{for all } n \geq 1 \text{ and } a \in S_n ,
 \]
-Let $\Omega$ be a topological space with its Borel $\sigma$-algebra and $T$ an approximation
-scheme in $C_b(\Omega)$ such that for every $1 \leq p < \infty$ there is $C \geq 0$ with
-$\sup_{x \in \Omega} |a(x)| \leq C \, n^{D/p} \, \|a\|_{L_p}$ for all $n \geq 1$ and
-$a \in T_n$. Then the scheme of $T$ has the Nikolskii property of dimension $D$. For
-$0 < p, r \leq \infty$ put $\alpha(D, p, r) = D(1/p - 1/r)$, with $1/\infty = 0$.
+an inequality between real numbers. For $0 < p, r \leq \infty$ put
+$\alpha(D, p, r) = D(1/p - 1/r)$, with $1/\infty = 0$.
 \end{definition}
 
 For $D > 0$, $0 < p < \infty$ and $0 < r \leq \infty$, $\alpha(D, p, r) > 0$ if and only if $p < r$,
@@ -5337,34 +5396,59 @@ The property asks $p \geq 1$ only: its bound at $p = 1$ gives the bound for ever
 $0 < p < 1$ (\Cref{lem:nikolskii-inequality}).
 
 For $p = \infty$ the bound reads $\|a\|_{L_\infty} \leq C \|a\|_{L_\infty}$ and holds with
-$C = 1$ for every scheme. For the scheme of $T$ the bound with the supremum norm suffices,
-since $\|a\|_{L_\infty} \leq \sup_{x \in \Omega} |a(x)|$ for every $a \in C_b(\Omega)$.
+$C = 1$ for every scheme.
 
-The Nikolskii property enters the theorems below as a hypothesis on the scheme; the
-trigonometric polynomials on the torus have it (\Cref{thm:torus-nikolskii}).
-
-\begin{lemma}[Nikolskii inequality]
-\label{lem:nikolskii-inequality}
-\lean{FunctionScheme.HasNikolskii.exists_eLpNorm_top_le_of_one_le,
-  FunctionScheme.HasNikolskii.exists_eLpNorm_top_le,
-  FunctionScheme.HasNikolskii.exists_eLpNorm_le_of_le, FunctionScheme.HasNikolskii.eLpNorm_le,
-  FunctionScheme.HasNikolskii.liftBound}
+\begin{lemma}[The Nikolskii property from the supremum norm]
+\label{lem:continuous-scheme-sup-bound}
+\lean{FunctionScheme.hasNikolskii_ofContinuous}
 \leanok
-\uses{def:nikolskii-property, lem:sup-bound-exponents, def:lift-bound,
-  lem:function-scheme-inclusion}
-Let $S$ have the Nikolskii property of dimension $D$, and let $0 < p \leq r \leq \infty$.
-There is $C < \infty$ with $\|a\|_{L_r} \leq C \, n^{\alpha(D,p,r)} \|a\|_{L_p}$ for all
-$n \geq 1$ and $a \in S_n$; for $r = \infty$ the bound reads
-$\|a\|_{L_\infty} \leq C \, n^{D/p} \|a\|_{L_p}$. If $\mu$ is finite, then, for
-$1 \leq p \leq r$, the inclusion $\iota_{r,p}$ satisfies the lifting bound of exponent
-$\alpha(D, p, r)$ for $S^{(p)}$.
+\uses{def:nikolskii-property, def:function-scheme}
+Let $\Omega$ be a topological space with its Borel $\sigma$-algebra, $D \in \R$ and $T$ an
+approximation scheme in $C_b(\Omega)$ such that for every $1 \leq p < \infty$ there is
+$C \geq 0$ with $\sup_{x \in \Omega} |a(x)| \leq C \, n^{D/p} \, \|a\|_{L_p}$ for all
+$n \geq 1$ and $a \in T_n$. Then the scheme of $T$ has the Nikolskii property of dimension $D$.
 \end{lemma}
 
 \begin{proof}
 \leanok
-\uses{lem:inclusion-linear}
+\uses{lem:bc-linfty}
+For $p = \infty$ the bound holds with $C = 1$ for every scheme. For $p < \infty$,
+$\|a\|_{L_\infty} \leq \sup_{x \in \Omega} |a(x)|$ for every $a \in C_b(\Omega)$
+(\Cref{lem:bc-linfty}).
+\end{proof}
+
+The Nikolskii property enters the theorems below as a hypothesis on the scheme; the
+trigonometric polynomials on the torus (\Cref{thm:torus-nikolskii}) and the dyadic step
+functions on $[0, 1)$ (\Cref{cor:steps-embedding}) have it.
+
+\begin{lemma}[Nikolskii inequality]
+\label{lem:nikolskii-inequality}
+\lean{FunctionScheme.HasNikolskii.exists_eLpNorm_top_le_of_one_le,
+  FunctionScheme.HasNikolskii.of_eLpNorm_top_le,
+  FunctionScheme.HasNikolskii.exists_eLpNorm_top_le,
+  FunctionScheme.HasNikolskii.exists_eLpNorm_le_of_le, FunctionScheme.HasNikolskii.eLpNorm_le,
+  FunctionScheme.eLpNorm_sub_succ_le_of_nikolskii, FunctionScheme.HasNikolskii.liftBound}
+\leanok
+\uses{def:nikolskii-property, def:lift-bound}
+Let $S$ have the Nikolskii property of dimension $D$, and let $0 < p \leq r \leq \infty$.
+There is $C < \infty$ with $\|a\|_{L_r} \leq C \, n^{\alpha(D,p,r)} \|a\|_{L_p}$ for all
+$n \geq 1$ and $a \in S_n$. For every sequence $b_k \in S_{2^k}$, $k \in \N$, the blocks then
+satisfy $\|b_{k+1} - b_k\|_{L_r} \leq C \, 2^{2\alpha} \, 2^{k\alpha} \, \|b_{k+1} - b_k\|_{L_p}$
+with $\alpha = \alpha(D, p, r)$. For $1 \leq p \leq r$, the inclusion $\iota_{r,p}$ satisfies
+the lifting bound of exponent $\alpha(D, p, r)$ for $S^{(p)}$. Conversely, a scheme of
+functions $S$ such that for every $1 \leq p < \infty$ there is $C < \infty$ with
+$\|a\|_{L_\infty} \leq C \, n^{D/p} \, \|a\|_{L_p}$ in $[0, \infty]$ for all $n \geq 1$ and
+$a \in S_n$ has the Nikolskii property of dimension $D$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:sup-bound-exponents, lem:function-scheme-inclusion, lem:inclusion-linear}
 First let $r = \infty$. For $p \geq 1$ this is the Nikolskii property, read in $[0, \infty]$,
-since $\|a\|_{L_\infty} < \infty$. For $0 < p < 1$ the property at $p_0 = 1$ gives
+since $\|a\|_{L_\infty} < \infty$; conversely, since $\|a\|_{L_p} < \infty$ for the finite
+measure $\mu$, a bound in $[0, \infty]$ is one between real numbers, and for $p = \infty$ the
+property holds with $C = 1$ (\Cref{def:nikolskii-property}). For $0 < p < 1$ the
+property at $p_0 = 1$ gives
 $\|a\|_{L_\infty} \leq C_1 n^D \|a\|_{L_1}$, and \Cref{lem:sup-bound-exponents}(1) with the
 bound $N = \|a\|_{L_\infty} < \infty$ of $|a|$ gives
 $\|a\|_{L_\infty} \leq (C_1 n^D)^{1/p} \|a\|_{L_p} = C_1^{1/p} n^{D/p} \|a\|_{L_p}$, as
@@ -5372,55 +5456,29 @@ in~\cite[Theorem~2.1]{DitzianPrymak2016}. In both cases there is $C_0 < \infty$ 
 $\|a\|_{L_\infty} \leq C_0 n^{D/p} \|a\|_{L_p}$ for all $n \geq 1$ and $a \in S_n$. For
 $r < \infty$, \Cref{lem:sup-bound-exponents}(2) with $M = C_0 n^{D/p}$ gives
 $\|a\|_{L_r} \leq C_0^{1-p/r} n^{(D/p)(1-p/r)} \|a\|_{L_p}$, and
-$(D/p)(1 - p/r) = \alpha(D, p, r)$. For finite $\mu$, the element $\iota_{\infty,r} a$ of
+$(D/p)(1 - p/r) = \alpha(D, p, r)$. The block $b_{k+1} - b_k$ lies in $S_{2^{k+2}}$, and
+$(2^{k+2})^\alpha = 2^{2\alpha} 2^{k\alpha}$. The element $\iota_{\infty,r} a$ of
 $S^{(r)}_n$ lifts $\iota_{\infty,p} a$, since $\iota_{r,p} \circ \iota_{\infty,r} =
 \iota_{\infty,p}$.
 \end{proof}
 
-The bound holds for every measure $\mu$, as an inequality in $[0, \infty]$. If $\mu$ is finite,
-then $\|a\|_{L_p} < \infty$ for every $a \in S_n$, and the bound holds between real numbers.
+For $r = \infty$ the bound reads $\|a\|_{L_\infty} \leq C \, n^{D/p} \|a\|_{L_p}$. The bound is
+an inequality in $[0, \infty]$, and its proof uses no finiteness of $\mu$; since $\mu$ is finite,
+$\|a\|_{L_p} < \infty$ for every $a \in S_n$, and the bound holds between real numbers. The
+Nikolskii property is stated between real numbers, which fits a finite measure: on an infinite
+measure it would force every approximant to lie in every $L_p$, $1 \leq p < \infty$.
 
 For every $0 < p \leq r \leq \infty$ the embeddings below are proved through the blocks of
-near-best approximants, whose quasi-norms in $L_r$ the Nikolskii inequality bounds; the next
-lemma gives the resulting tail bound for functions on any measure space.
-
-\begin{lemma}[Near-best sequences in weighted $\ell_q$]
-\label{lem:near-best-lq}
-\lean{MeasureTheory.lqNorm_eLpNorm_sub_le_of_nearBest}
-\leanok
-\uses{lem:near-best-transfer, lem:weighted-tails, lem:hardy-every-exponent}
-Let $\mu$, $p$, $r$, $\rho_p$, $\rho_r$, $f$, $b_k$, $e_k$, $C$ and $\beta$ satisfy the
-hypotheses of \Cref{lem:near-best-transfer}(3), let $s \in \R$ and $q \in (0, \infty]$, and let
-$H = H_{(s - \beta)\rho_r, q/\rho_r}$ be the constant of \Cref{lem:hardy-every-exponent}, finite
-for $s > \beta$. Then
-\[
-  \bigl\| \bigl(2^{k(s-\beta)} \|f - b_k\|_r\bigr)_k \bigr\|_{\ell_q}
-  \leq C \, 2^{1/\rho_p} H^{1/\rho_r} \, \bigl\| (2^{ks} e_k)_k \bigr\|_{\ell_q} .
-\]
-\end{lemma}
-
-\begin{proof}
-\leanok
-With $y_j = 2^{j\beta} e_j$, \Cref{lem:near-best-transfer}(3) says that $x_k = \|f - b_k\|_r$
-satisfies
-\[
-  x_k^{\rho_r} \leq \bigl(C \, 2^{1/\rho_p}\bigr)^{\rho_r} \sum_{i \geq 0} y_{k+i}^{\rho_r}
-  \qquad (k \in \N) .
-\]
-Part (2) of \Cref{lem:weighted-tails} with $\rho = \rho_r$, the exponent $0$ in place of $\beta$
-and the weights $2^{k(s - \beta)}$ gives
-$\|(2^{k(s-\beta)} x_k)_k\|_{\ell_q}^{\rho_r} \leq (C \, 2^{1/\rho_p})^{\rho_r} H \,
-\|(2^{k(s-\beta)} y_k)_k\|_{\ell_q}^{\rho_r}$, and $2^{k(s-\beta)} y_k = 2^{ks} e_k$. Take the
-$\rho_r$-th root.
-\end{proof}
+near-best approximants, whose quasi-norms in $L_r$ the Nikolskii inequality bounds, with the
+tail bound of \Cref{lem:near-best-lq} for functions on any measure space.
 
 \begin{theorem}[Besov embeddings]
 \label{thm:besov-embedding}
-\lean{FunctionScheme.eLpNorm_sub_succ_le_of_nikolskii,
-  FunctionScheme.exists_inclusion_eq_eNormDyadic_le, FunctionScheme.nikolskiiTransferConst,
+\lean{FunctionScheme.nikolskiiTransferConst,
   FunctionScheme.nikolskiiTransferConst_hardy_ne_top, FunctionScheme.nikolskiiTransferConst_ne_top,
   FunctionScheme.exists_inclusion_eq_eNormDyadic_le_of_nearBest,
   FunctionScheme.exists_uniform_inclusion_eq_of_nikolskii,
+  FunctionScheme.exists_eLpNorm_le_eNormDyadic_of_nikolskii,
   FunctionScheme.MemBesov.exists_inclusion_eq_of_nikolskii,
   FunctionScheme.MemBesov.exists_inclusion_eq_top,
   FunctionScheme.MemBesov.exists_boundedContinuous_of_nikolskii}
@@ -5434,7 +5492,8 @@ Let $S$ have the Nikolskii property of dimension $D \geq 0$.
     norm $\|\cdot\|^{\mathrm{dy}}_{E, \sigma, q}$ (\Cref{def:e-method}) of the couple of $S$ in
     $L_t$ (\Cref{def:scheme-lp-couple}). There is $K < \infty$ such that every $f \in L_p$ with
     $\|f\|^{(p)}_{s, q} < \infty$ is $f = \iota_{r,p} g$ for some $g \in L_r$ with
-    $\|g\|^{(r)}_{s - \alpha, q} \leq K \|f\|^{(p)}_{s, q}$.
+    $\|g\|^{(r)}_{s - \alpha, q} \leq K \|f\|^{(p)}_{s, q}$, and there is $K' < \infty$ with
+    $\|f\|_r \leq K' \|f\|^{(p)}_{s, q}$ for every $f \in L_p$.
   \item Let $0 < p \leq r \leq \infty$, $0 < q \leq \infty$ and
     $s > \alpha = \alpha(D, p, r)$. Every $f \in \Besov{s}{p}{q}$ is $f = \iota_{r,p} g$ for some
     $g \in \Besov{s-\alpha}{r}{q}$.
@@ -5461,19 +5520,17 @@ $\|f - b_k\|_p \leq e_k = E(2^k, f) + \|f\|_p \, 2^{-k(s+1)}$. The sequence $(e_
 (\Cref{lem:e-near-best}(2)), $e_0 \geq \|f\|_p$, and
 $Y = \|(2^{ks} e_k)_k\|_{\ell_q} \leq C_q (1 + \gamma_{1,q}) N$, since
 $2^{ks} \|f\|_p \, 2^{-k(s+1)} = \|f\|_p \, 2^{-k}$ (\Cref{lem:lq-quasi-triangle,lem:lq-reindex}).
-As $s > \alpha \geq 0$, $e_k \to 0$ (\Cref{lem:weighted-tails}(1)). The block $b_{k+1} - b_k$ lies
-in $S_{2^{k+2}}$, so $\|b_{k+1} - b_k\|_r \leq C \, 2^{2\alpha} 2^{k\alpha} \|b_{k+1} - b_k\|_p$,
-and \Cref{lem:near-best-lq} with $\beta = \alpha$ and $C \, 2^{2\alpha}$ in place of $C$ gives
+As $s > \alpha \geq 0$, $e_k \to 0$ (\Cref{lem:weighted-tails}(1)). By
+\Cref{lem:nikolskii-inequality} the blocks satisfy
+$\|b_{k+1} - b_k\|_r \leq C \, 2^{2\alpha} 2^{k\alpha} \|b_{k+1} - b_k\|_p$, and
+\Cref{lem:near-best-lq} with $\beta = \alpha$ and $C \, 2^{2\alpha}$ in place of $C$ gives
 \[
   X = \bigl\|\bigl(2^{k(s-\alpha)} \|f - b_k\|_r\bigr)_k\bigr\|_{\ell_q}
   \leq C \, 2^{2\alpha} \, 2^{1/\rho_p} H^{1/\rho_r} \, Y < \infty ,
 \]
-with $H = H_{(s-\alpha)\rho_r, q/\rho_r}$, finite since $s > \alpha$. In particular
-$\|f - b_0\|_r \leq X$ and $b_0 \in L_\infty \subseteq L_r$, so $f = \iota_{r,p} g$ for some
-$g \in L_r$ (\Cref{lem:inclusion-linear}). The $E$-functional $E'$ of the couple of $S$ in $L_r$
-satisfies $E'(2^k, g) \leq \|g - b_k\|_r = \|f - b_k\|_r$ (\Cref{lem:scheme-lp-couple}(3)), so
-the $\ell_q$ part of $\|g\|^{(r)}_{s - \alpha, q}$ is at most $X$. Moreover
-$\|g\|_r \leq C_r (\|f - b_0\|_r + \|b_0\|_r)$ (\Cref{lem:scheme-lp-couple}(2)), and
+with $H = H_{(s-\alpha)\rho_r, q/\rho_r}$, finite since $s > \alpha$. By
+\Cref{lem:scheme-lp-couple}(6) with $t = s - \alpha$, $f = \iota_{r,p} g$ for some $g \in L_r$
+with $\|g\|^{(r)}_{s - \alpha, q} \leq C_r (X + \|b_0\|_r) + X$, and
 $\|b_0\|_r \leq C \|b_0\|_p \leq C \, 2^{1/\rho_p} e_0 \leq C \, 2^{1/\rho_p} \, Y$ by
 \Cref{lem:near-best-transfer}(1) with $g = 0$, since $\|f - 0\|_p \leq e_0$ and
 $\|f - b_0\|_p \leq e_0$. Altogether, with
@@ -5482,6 +5539,9 @@ $K_0 = \bigl((1 + C_r) \, C \, 2^{2\alpha} H^{1/\rho_r} + C_r C\bigr) 2^{1/\rho_
   \|g\|^{(r)}_{s - \alpha, q} \leq C_r \bigl(X + \|b_0\|_r\bigr) + X \leq K_0 Y
   \leq K_0 \, C_q (1 + \gamma_{1,q}) \, N .
 \]
+For the bound of $\|f\|_r$ take $K' = \max(K, 1)$: if $\|f\|^{(p)}_{s, q} = \infty$ there is
+nothing to prove, and otherwise $\|f\|_r = \|g\|_r \leq \|g\|^{(r)}_{s - \alpha, q}$
+(\Cref{lem:inclusion-linear}).
 (2) Here $s > \alpha \geq 0$, since $p \leq r$ (\Cref{def:nikolskii-property}). By
 \Cref{lem:besov-linear}(2), $f \in \Besov{s}{p}{q}$ means $\|f\|^{(p)}_{s, q} < \infty$, so (1)
 gives $f = \iota_{r,p} g$ with $\|g\|^{(r)}_{s - \alpha, q} \leq K \|f\|^{(p)}_{s, q} < \infty$,
@@ -6407,7 +6467,8 @@ $\mathcal{E}_{mn}$ (\Cref{lem:trig-products}); for a general basis, products of 
 $\mathcal{E}_n$ need not lie in any $\mathcal{E}_m$. The embeddings of \Cref{thm:besov-embedding}
 hold for the scheme of the basis whenever it has the Nikolskii property of
 \Cref{def:nikolskii-property}, in particular whenever the spaces $\mathcal{E}_n$ satisfy its
-bound with the supremum norm for every $1 \leq p < \infty$.
+bound with the supremum norm for every $1 \leq p < \infty$
+(\Cref{lem:continuous-scheme-sup-bound}).
 The embedding into continuous functions needs only the local Weyl bound.
 
 \begin{theorem}[Continuity of $H^s(M)$]
