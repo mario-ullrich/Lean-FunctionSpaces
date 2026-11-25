@@ -20,7 +20,8 @@ by dyadic step functions is described by the **step couple** `Haar.stepCouple p`
 the quasi-norm and of the increasing subgroups `V_j` of `ℱ_j`-measurable elements, the step
 functions of level `j` (`InterpCouple.ofMonotoneSubgroups`): its E-functional at `t = 2^j` is the
 error of best approximation from `V_j` (`Haar.eFunctional_stepCouple_two_pow`), and its spaces
-`E_{s,q}` are the approximation spaces `A^s_q(L_p, steps)`. For `1 ≤ p` the step couple is the
+`E_{s,q}` are the approximation spaces `A^s_q(L_p, steps)`. For `1 ≤ p` the sets of the Haar
+scheme are the dyadic levels of the `V_j` (`Haar.sets_haarScheme`), so the step couple is the
 complexity couple of the Haar scheme (`Haar.stepCouple_eq_complexityCouple`,
 `Haar.memEMethod_stepCouple_iff_memApprox`).
 
@@ -356,7 +357,8 @@ variable (p) in
 functions on the dyadic intervals of level `j`, with `V_j` at complexity `2^j`
 (`InterpCouple.ofMonotoneSubgroups`). It uses the group structure and the quasi-norm `‖·‖ₑ` of
 `Lp`, which exist for every `p`; for `1 ≤ p` it is the complexity couple of the Haar scheme
-`Haar.haarScheme` (`Haar.stepCouple_eq_complexityCouple`). -/
+`Haar.haarScheme` (`Haar.stepCouple_eq_complexityCouple`), and for every `p` it is the couple in
+`L_p` of the Haar scheme in `L_∞[0, 1]` (`Haar.stepCouple_eq_lpCouple`). -/
 noncomputable def stepCouple : InterpCouple (Lp ℂ p vol) :=
   InterpCouple.ofMonotoneSubgroups (fun f => ‖f‖ₑ)
     (fun j => lpMeasSubgroup ℂ (dyadicFiltration j) p vol)
@@ -379,23 +381,27 @@ theorem mem_lpMeas_of_stepCouple_norm1_le {j : ℕ} {a : Lp ℂ p vol}
   rw [InterpCouple.dyadicLevels_two_pow] at h
   exact h
 
+/-- **The sets of the Haar scheme in `L_p`**, `1 ≤ p ≤ ∞`, are the dyadic levels of the
+subgroups `V_j` of `ℱ_j`-measurable elements of `L_p[0, 1]`: `{0}` at complexity `0` and
+`V_⌊log₂ n⌋` at complexity `n ≥ 1` (`MeasureTheory.Filtration.mem_filtrationScheme`). -/
+theorem sets_haarScheme [Fact (1 ≤ p)] :
+    (haarScheme p).sets =
+      InterpCouple.dyadicLevels (fun j => lpMeasSubgroup ℂ (dyadicFiltration j) p vol) := by
+  funext n
+  ext f
+  rcases eq_or_ne n 0 with rfl | hn
+  · rw [InterpCouple.dyadicLevels_zero, (haarScheme p).sets_zero]
+  · rw [InterpCouple.dyadicLevels_of_ne_zero hn, SetLike.mem_coe,
+      mem_lpMeasSubgroup_iff_aestronglyMeasurable]
+    exact (dyadicFiltration.mem_filtrationScheme hn).trans mem_lpMeas_iff_aestronglyMeasurable
+
 /-- **For `1 ≤ p` the step couple is the complexity couple of the Haar scheme**: both are the
 complexity couple of the norm of `L_p[0, 1]` and of the sets `{0}` at complexity `0` and the
-`ℱ_⌊log₂ n⌋`-measurable elements at complexity `n ≥ 1`. -/
+`ℱ_⌊log₂ n⌋`-measurable elements at complexity `n ≥ 1` (`Haar.sets_haarScheme`). -/
 theorem stepCouple_eq_complexityCouple [Fact (1 ≤ p)] :
     stepCouple p = (haarScheme p).complexityCouple := by
-  have hS : InterpCouple.dyadicLevels (fun j => lpMeasSubgroup ℂ (dyadicFiltration j) p vol) =
-      (haarScheme p).sets := by
-    funext n
-    ext f
-    rcases eq_or_ne n 0 with rfl | hn
-    · rw [InterpCouple.dyadicLevels_zero, (haarScheme p).sets_zero]
-    · simp only [InterpCouple.dyadicLevels, hn, ↓reduceIte, SetLike.mem_coe]
-      rw [mem_lpMeasSubgroup_iff_aestronglyMeasurable]
-      exact mem_lpMeas_iff_aestronglyMeasurable.symm.trans
-        (dyadicFiltration.mem_filtrationScheme hn).symm
   show InterpCouple.complexity _ _ = InterpCouple.complexity _ _
-  rw [hS]
+  rw [sets_haarScheme]
 
 /-- **For `1 ≤ p` the spaces of the step couple are the approximation spaces of the Haar
 scheme**: for `s ≥ 0` and `q ≠ 0` with `s > 0` or `q = ∞`, `f ∈ E_{s,q}` iff

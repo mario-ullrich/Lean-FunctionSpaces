@@ -1048,6 +1048,38 @@ $\|f + g\|_{L_p} \leq 2^{1/p - 1} \bigl(\|f\|_{L_p} + \|g\|_{L_p}\bigr)$; its $p
 subadditive, so sums of unboundedly many terms are estimated in the $p$-th power, where no
 constant accumulates. \Cref{sec:moduli-quasi} uses this with Hardy's inequality in $\ell_{q/p}$.
 
+\begin{lemma}[Weighted tails]
+\label{lem:weighted-tails}
+\lean{ENNReal.le_dyadicWeight_neg_mul_lqNorm, ENNReal.tendsto_zero_of_lqNorm_dyadicWeight_ne_top,
+  ENNReal.lqNorm_rpow_le_of_rpow_le_tsum, ENNReal.le_two_rpow_mul_of_rpow_le}
+\leanok
+\uses{def:lq-norm, lem:hardy-every-exponent}
+Let $q \in (0, \infty]$, $s \in \R$ and let $e$, $x$, $y$ be sequences in $[0, \infty]$.
+\begin{enumerate}
+  \item $e_j \leq 2^{-js} \|(2^{ks} e_k)_k\|_{\ell_q}$ for every $j$; if $s > 0$ and the norm is
+    finite, then $e_j \to 0$.
+  \item Let $\rho > 0$, $\beta \in \R$ and $c \in [0, \infty]$. If
+    $x_k^\rho \leq c \sum_{i \geq 0} 2^{i\beta} y_{k+i}^\rho$ for every $k$, then
+    \[
+      \|(2^{ks} x_k)_k\|_{\ell_q}^\rho \leq c \, H_{s\rho - \beta, q/\rho} \,
+      \|(2^{ks} y_k)_k\|_{\ell_q}^\rho ,
+    \]
+    with $H$ as in \Cref{lem:hardy-every-exponent}.
+  \item For $0 < p < \infty$ and $a, b \in [0, \infty]$, $a^p \leq 2 b^p$ implies
+    $a \leq 2^{1/p} b$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:lq-basic, lem:lp-rho-triangle}
+(1) $2^{js} e_j$ is one term of the sequence. (2) Multiply by $2^{ks\rho}$: with
+$\alpha = s\rho - \beta$ and $b_j = 2^{j\beta} y_j^\rho$ the right side is
+$c \, 2^{k\alpha} \sum_{i \geq 0} b_{k+i}$, and \Cref{lem:hardy-every-exponent} in
+$\ell_{q/\rho}$ applies, since $\|(z_k^\rho)_k\|_{\ell_{q/\rho}} = \|z\|_{\ell_q}^\rho$
+(\Cref{lem:lp-rho-triangle}).
+\end{proof}
+
 \chapter{Approximation spaces}
 \label{ch:approximation-spaces}
 

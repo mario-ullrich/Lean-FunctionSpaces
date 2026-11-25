@@ -14,13 +14,16 @@ public import FunctionSpaces.Wavelets.Examples.HaarBasis
 
 For `0 < p ≤ 1` the approximation spaces `E_{s,q}` of the step couple `Haar.stepCouple p`
 (approximation by dyadic step functions in the quasi-Banach space `L_p[0, 1]`) are described by
-Haar coefficients when `s > 1/p - 1`.
+Haar coefficients when `s > 1/p - 1`. The step couple is the couple in `L_p` of the Haar scheme
+of essentially bounded functions on `[0, 1]` (`Haar.stepCouple_eq_lpCouple`).
 
-* **Steps lie in `L_1`**: a step function `a` of level `j` has
-  `‖a‖_1 ≤ 2^(j(1/p - 1)) ‖a‖_p` (`Haar.eLpNorm_one_le_of_mem_lpMeas`), and locally on every
-  union of dyadic intervals of level `j` (`Haar.setLIntegral_enorm_le_of_dyadicIndex`).
-* **The sup bound of steps**: for every `0 < p ≤ ∞`, a step function `a` of level `j` has
-  `‖a‖_∞ ≤ 2^(j/p) ‖a‖_p` (`Haar.eLpNorm_top_le_of_mem_lpMeas`).
+* **The Nikolskii inequality of steps**: for every `0 < p ≤ ∞`, a step function `a` of level `j`
+  has `‖a‖_∞ ≤ 2^(j/p) ‖a‖_p` (`Haar.eLpNorm_top_le_of_mem_lpMeas`), and hence
+  `‖a‖_r ≤ 2^(j(1/p - 1/r)) ‖a‖_p` for every `p ≤ r ≤ ∞` (`Haar.eLpNorm_le_of_mem_lpMeas`).
+* **Steps lie in `L_1`**: for `p ≤ 1` the case `r = 1` is
+  `‖a‖_1 ≤ 2^(j(1/p - 1)) ‖a‖_p` (`Haar.eLpNorm_one_le_of_mem_lpMeas`); the bound holds also
+  locally on every union of dyadic intervals of level `j`
+  (`Haar.setLIntegral_enorm_le_of_dyadicIndex`).
 * **The approximation spaces embed into `L_1` for `s > 1/p - 1`**: near-best steps `b_j` converge
   in measure to `f` (`Haar.tendstoInMeasure_of_nearBest`), and Fatou's lemma for telescoping sums
   (`MeasureTheory.eLpNorm_sub_rpow_le_tsum`) adds their differences in `L_1`, so
@@ -165,22 +168,6 @@ theorem setLIntegral_enorm_le_of_dyadicIndex (hp0 : p ≠ 0) (hp1 : p ≤ 1) {j 
         congr 2 <;> field_simp
         ring
 
-/-- **Steps of level `j` lie in `L_1`**: for `0 < p ≤ 1` and an `ℱ_j`-measurable `a ∈ L_p[0, 1]`,
-`‖a‖_1 ≤ 2^(j(1/p - 1)) ‖a‖_p` (`Haar.setLIntegral_enorm_le_of_dyadicIndex` on `[0, 1]`). With
-the values `c_n` of `a`, this is `2^(-j) ∑ |c_n| ≤ 2^(-j) (∑ |c_n|^p)^(1/p)`. -/
-theorem eLpNorm_one_le_of_mem_lpMeas (hp0 : p ≠ 0) (hp1 : p ≤ 1) {j : ℕ} {a : Lp ℂ p vol}
-    (ha : a ∈ lpMeas ℂ ℝ (dyadicFiltration j) p vol) :
-    eLpNorm a 1 vol ≤ dyadicWeight (1 / p.toReal - 1) j * ‖a‖ₑ := by
-  have hp : p ≠ ∞ := ne_top_of_le_ne_top ENNReal.one_ne_top hp1
-  obtain ⟨g, hg, hag⟩ := mem_lpMeas_iff_aestronglyMeasurable.1 ha
-  have hgm : AEStronglyMeasurable g vol := (hg.mono (dyadicFiltration.le j)).aestronglyMeasurable
-  have h := setLIntegral_enorm_le_of_dyadicIndex hp0 hp1 (fun x y h => eq_of_dyadicIndex_eq hg h)
-    MeasurableSet.univ fun _ _ => subset_univ _
-  rw [Measure.restrict_univ] at h
-  rw [eLpNorm_congr_ae hag, Lp.enorm_def, eLpNorm_congr_ae hag, eLpNorm_one_eq_lintegral_enorm hgm,
-    eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hgm]
-  exact h
-
 /-- **The sup norm of a step of level `j`**: for `0 < p ≤ ∞` and an `ℱ_j`-measurable
 `a ∈ L_t[0, 1]`, `‖a‖_∞ ≤ 2^(j/p) ‖a‖_p`, with `1/∞ = 0`. For `p < ∞`, the representative of `a`
 that is constant on the dyadic intervals of level `j` has `|a(x)|^p ≤ 2^j ∫_0^1 |a|^p` for
@@ -210,6 +197,33 @@ theorem eLpNorm_top_le_of_mem_lpMeas (hp0 : p ≠ 0) {t : ℝ≥0∞} {j : ℕ} 
         ENNReal.rpow_le_rpow h (by positivity)
     _ = dyadicWeight (1 / p.toReal) j * (∫⁻ y, ‖g y‖ₑ ^ p.toReal ∂vol) ^ (1 / p.toReal) := by
         rw [ENNReal.mul_rpow_of_nonneg _ _ (by positivity), ENNReal.dyadicWeight_rpow, one_mul]
+
+/-- **The Nikolskii inequality of steps**: for `0 < p ≤ r ≤ ∞` and an `ℱ_j`-measurable
+`a ∈ L_t[0, 1]`, `‖a‖_r ≤ 2^(j(1/p - 1/r)) ‖a‖_p`, with `1/∞ = 0`. The sup bound
+`‖a‖_∞ ≤ 2^(j/p) ‖a‖_p` (`Haar.eLpNorm_top_le_of_mem_lpMeas`) passes to `L_r` by
+`MeasureTheory.eLpNorm_le_of_eLpNorm_top_le`, since `(j/p)(1 - p/r) = j(1/p - 1/r)`. -/
+theorem eLpNorm_le_of_mem_lpMeas (hp0 : p ≠ 0) {r t : ℝ≥0∞} (hpr : p ≤ r) {j : ℕ}
+    {a : Lp ℂ t vol} (ha : a ∈ lpMeas ℂ ℝ (dyadicFiltration j) t vol) :
+    eLpNorm a r vol ≤ dyadicWeight (1 / p.toReal - 1 / r.toReal) j * eLpNorm a p vol := by
+  refine (eLpNorm_le_of_eLpNorm_top_le hp0 hpr
+    (eLpNorm_top_le_of_mem_lpMeas hp0 ha)).trans_eq ?_
+  rw [ENNReal.dyadicWeight_rpow]
+  congr 2
+  rcases eq_or_ne r ∞ with rfl | hr
+  · simp
+  have hp : p.toReal ≠ 0 := (ENNReal.toReal_pos hp0 (ne_top_of_le_ne_top hr hpr)).ne'
+  have hr0 : r.toReal ≠ 0 :=
+    (ENNReal.toReal_pos ((pos_iff_ne_zero.2 hp0).trans_le hpr).ne' hr).ne'
+  field_simp
+
+/-- **Steps of level `j` lie in `L_1`**: for `0 < p ≤ 1` and an `ℱ_j`-measurable `a ∈ L_p[0, 1]`,
+`‖a‖_1 ≤ 2^(j(1/p - 1)) ‖a‖_p`, the case `r = 1` of `Haar.eLpNorm_le_of_mem_lpMeas`. With the
+values `c_n` of `a`, this is `2^(-j) ∑ |c_n| ≤ 2^(-j) (∑ |c_n|^p)^(1/p)`. -/
+theorem eLpNorm_one_le_of_mem_lpMeas (hp0 : p ≠ 0) (hp1 : p ≤ 1) {j : ℕ} {a : Lp ℂ p vol}
+    (ha : a ∈ lpMeas ℂ ℝ (dyadicFiltration j) p vol) :
+    eLpNorm a 1 vol ≤ dyadicWeight (1 / p.toReal - 1) j * ‖a‖ₑ := by
+  simpa only [ENNReal.toReal_one, div_one, ← Lp.enorm_def] using
+    eLpNorm_le_of_mem_lpMeas hp0 hp1 ha
 
 /-! ### Haar coefficients -/
 
@@ -429,18 +443,21 @@ theorem eLpNorm_one_sub_le_of_nearBest (hp0 : p ≠ 0) (hp1 : p ≤ 1)
   exact ENNReal.le_two_rpow_mul_of_rpow_le hp0 hp (enorm_sub_rpow_le_of_nearBest hp1 hbe he j)
 
 /-- **Near-best steps converge in measure**: if `‖f - b_j‖_p ≤ e_j → 0`, then `b_j → f` in
-measure (Mathlib's `tendstoInMeasure_of_tendsto_eLpNorm`). -/
+measure, the case of elements of `L_p` of `MeasureTheory.tendstoInMeasure_of_eLpNorm_sub_le`. -/
 theorem tendstoInMeasure_of_nearBest (hp0 : p ≠ 0) (hbe : ∀ j, ‖f - b j‖ₑ ≤ e j)
     (he0 : Tendsto e atTop (𝓝 0)) : TendstoInMeasure vol (fun n => ⇑(b n)) atTop ⇑f := by
-  refine tendstoInMeasure_of_tendsto_eLpNorm hp0 (tendsto_of_tendsto_of_tendsto_of_le_of_le
-    tendsto_const_nhds he0 (fun _ => zero_le) fun n => ?_)
-  rw [← eLpNorm_congr_ae (Lp.coeFn_sub _ _), ← Lp.enorm_def, ← neg_sub, Lp.enorm_neg]
-  exact hbe n
+  have hbe' : ∀ᶠ n in atTop, eLpNorm (⇑f - ⇑(b n)) p vol ≤ e n := Eventually.of_forall fun n => by
+    rw [← eLpNorm_congr_ae (Lp.coeFn_sub _ _), ← Lp.enorm_def]
+    exact hbe n
+  exact tendstoInMeasure_of_eLpNorm_sub_le hp0 hbe' he0
 
 /-- **The `L_1` distance to a near-best step**: if `b_j` are `ℱ_j`-measurable with
 `‖f - b_j‖_p ≤ e_j`, `e` decreasing to `0`, then
-`‖f - b_k‖_1 ≤ ∑_{i ≥ 0} 2^((k+i+1)(1/p - 1)) 2^(1/p) e_{k+i}`
-(`MeasureTheory.eLpNorm_sub_rpow_le_tsum` with `r = 1`). -/
+`‖f - b_k‖_1 ≤ ∑_{i ≥ 0} 2^((k+i+1)(1/p - 1)) 2^(1/p) e_{k+i}`. It is the case `r = 1`,
+`C = 2^(1/p - 1)`, `β = 1/p - 1` of `MeasureTheory.eLpNorm_sub_rpow_min_le_tsum_of_nearBest`,
+proved here by Fatou's lemma for telescoping sums in `L_1`
+(`MeasureTheory.eLpNorm_sub_rpow_le_tsum`) and the bound of each difference `b_{j+1} - b_j`
+(`Haar.eLpNorm_one_sub_le_of_nearBest`). -/
 theorem eLpNorm_one_sub_le_tsum_of_nearBest (hp0 : p ≠ 0) (hp1 : p ≤ 1)
     (hb : ∀ j, b j ∈ lpMeas ℂ ℝ (dyadicFiltration j) p vol) (hbe : ∀ j, ‖f - b j‖ₑ ≤ e j)
     (he : Antitone e) (he0 : Tendsto e atTop (𝓝 0)) (k : ℕ) :
@@ -573,21 +590,15 @@ end NearBest
 variable {s : ℝ} {q : ℝ≥0∞}
 
 /-- **Near-best steps exist**: for every `f ∈ L_p[0, 1]` and `s` there are `ℱ_j`-measurable
-`b_j ∈ L_p` with `‖f - b_j‖_p ≤ E(2^j, f) + ‖f‖_p 2^(-j(s+1))` in the step couple
-(`InterpCouple.exists_norm0_sub_le_eFunctional_add`); for `‖f‖_p = 0` take `b_j = 0`. This is
+`b_j ∈ L_p` with `‖f - b_j‖_p ≤ E(2^j, f) + ‖f‖_p 2^(-j(s+1))` in the step couple. This is
 `InterpCouple.exists_nearBest_eFunctional` for the step couple, with the complexity bound
-`N₁(b_j) ≤ 2^j` read as `ℱ_j`-measurability. -/
+`N₁(b_j) ≤ 2^j` read as `ℱ_j`-measurability (`Haar.mem_lpMeas_of_stepCouple_norm1_le`). -/
 theorem exists_nearBest_stepCouple (f : Lp ℂ p vol) (s : ℝ) :
     ∃ b : ℕ → Lp ℂ p vol, (∀ j, b j ∈ lpMeas ℂ ℝ (dyadicFiltration j) p vol) ∧
       ∀ j, ‖f - b j‖ₑ ≤
         (stepCouple p).eFunctional ((2 ^ j : ℕ) : ℝ≥0∞) f + ‖f‖ₑ * dyadicWeight (-(s + 1)) j := by
-  rcases eq_or_ne ‖f‖ₑ 0 with hf0 | hf0
-  · exact ⟨fun _ => 0, fun _ => zero_mem _, fun j => by rw [sub_zero, hf0]; exact zero_le⟩
-  have hE : ∀ j, (stepCouple p).eFunctional ((2 ^ j : ℕ) : ℝ≥0∞) f ≠ ∞ := fun j =>
-    ne_top_of_le_ne_top (by show ‖f‖ₑ ≠ ∞; rw [Lp.enorm_def]; exact Lp.eLpNorm_ne_top f)
-      (InterpCouple.eFunctional_le_norm0 InterpCouple.ofMonotoneSubgroups_norm1_zero f)
-  choose b hb1 hb0 using fun j => InterpCouple.exists_norm0_sub_le_eFunctional_add (hE j)
-    (mul_ne_zero hf0 (ENNReal.dyadicWeight_ne_zero (-(s + 1)) j))
+  obtain ⟨b, hb1, hb0⟩ := InterpCouple.exists_nearBest_eFunctional (A := stepCouple p)
+    InterpCouple.ofMonotoneSubgroups_norm1_zero f s
   exact ⟨b, fun j => mem_lpMeas_of_stepCouple_norm1_le (hb1 j), hb0⟩
 
 /-- The tolerances `e_j = E(2^j, f) + ‖f‖_p 2^(-j(s+1))` decrease for `s ≥ -1`, the step couple's
@@ -595,9 +606,7 @@ case of `InterpCouple.antitone_eFunctional_add_dyadicWeight`. -/
 theorem antitone_eFunctional_stepCouple_add (hs : -1 ≤ s) (f : Lp ℂ p vol) :
     Antitone fun j : ℕ =>
       (stepCouple p).eFunctional ((2 ^ j : ℕ) : ℝ≥0∞) f + ‖f‖ₑ * dyadicWeight (-(s + 1)) j :=
-  fun _ _ hij => add_le_add
-    (InterpCouple.eFunctional_anti f (Nat.cast_le.2 (Nat.pow_le_pow_right two_pos hij)))
-    (mul_le_mul_right (ENNReal.dyadicWeight_anti (by linarith) hij) _)
+  (stepCouple p).antitone_eFunctional_add_dyadicWeight hs f
 
 /-- **The sum of the `L_1` bounds**: for `q ≠ 0`, with `δ = s - (1/p - 1)`,
 `∑_i 2^((i+1)(1/p - 1)) 2^(1/p) e_i ≤ 2^(1/p) 2^(1/p - 1) (1 - 2^(-δ))⁻¹ ‖(2^(ks) e_k)_k‖_{ℓ_q}`,

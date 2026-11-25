@@ -29,6 +29,14 @@ on the dyadic intervals of level `⌊log₂ n⌋`, the `ℱ_⌊log₂ n⌋`-meas
   results on the couple of a scheme of essentially bounded functions in `L_p`
   (`FunctionScheme.lpCouple`) apply to the step couple, and the dyadic steps are a test case of
   the Besov spaces of such a scheme for `0 < p ≤ ∞`.
+* **The Haar scheme in `L_p`.** For `1 ≤ p ≤ ∞` the scheme `S^(p)` of `Haar.haarScheme ∞` in
+  `L_p` is the Haar scheme `Haar.haarScheme p` (`Haar.toLp_haarScheme`), so for these `p` the
+  Besov spaces of the steps are the approximation spaces of the Haar scheme in `L_p`
+  (`FunctionScheme.memBesov_iff_memApprox`).
+* **The Besov spaces of the steps.** For `0 < p ≤ 1`, `0 < q ≤ ∞` and `0 ≤ s < 1/p`, the Besov
+  space `B^s_{p,q}` of `Haar.haarScheme ∞` is the space `B^s_{p,q,1}[0, 1]` of the first modulus:
+  `f` lies in it iff `‖f‖_p + ‖(2^(ks) ω_1(f, 2^(-k), [0, 1])_p)_k‖_{ℓ_q} < ∞`
+  (`Haar.memBesov_haarScheme_iff_modulus`).
 * **The Nikolskii property.** An approximant `a` of complexity `n ≥ 1` has
   `‖a‖_∞ ≤ n^(1/p) ‖a‖_p` for every `0 < p ≤ ∞` (`Haar.eLpNorm_top_le_of_mem_haarScheme`), so
   the Haar scheme in `L_∞[0, 1]` has the Nikolskii property of dimension `1`
@@ -85,9 +93,8 @@ theorem lpSets_haarScheme (n : ℕ) :
   rcases eq_or_ne n 0 with rfl | hn
   · rw [FunctionScheme.lpSets_zero, InterpCouple.dyadicLevels_zero]
   ext f
-  simp only [InterpCouple.dyadicLevels, hn, ↓reduceIte, SetLike.mem_coe]
-  rw [FunctionScheme.mem_lpSets, mem_lpMeasSubgroup_iff_aestronglyMeasurable,
-    ← mem_lpMeas_iff_aestronglyMeasurable (𝕜 := ℝ)]
+  rw [InterpCouple.dyadicLevels_of_ne_zero hn, SetLike.mem_coe, FunctionScheme.mem_lpSets,
+    mem_lpMeasSubgroup_iff_aestronglyMeasurable, ← mem_lpMeas_iff_aestronglyMeasurable (𝕜 := ℝ)]
   constructor
   · rintro ⟨a, ha, rfl⟩
     have ha' := mem_lpMeas_iff_aestronglyMeasurable.1
@@ -112,6 +119,28 @@ theorem stepCouple_eq_lpCouple : stepCouple p = FunctionScheme.lpCouple (haarSch
     funext fun n => (lpSets_haarScheme p n).symm
   show InterpCouple.complexity _ _ = InterpCouple.complexity _ _
   rw [hN, hS]
+
+/-- **For `1 ≤ p` the Haar scheme in `L_p` is the image of the Haar scheme in `L_∞`**: the
+scheme `S^(p)` of `Haar.haarScheme ∞` is `Haar.haarScheme p`, since both have the sets `{0}` and
+`V_⌊log₂ n⌋` (`Haar.lpSets_haarScheme`, `Haar.sets_haarScheme`). -/
+theorem toLp_haarScheme [Fact (1 ≤ p)] :
+    FunctionScheme.toLp (haarScheme ∞) p = haarScheme p :=
+  ApproximationScheme.ext fun n =>
+    (lpSets_haarScheme p n).trans (congrFun sets_haarScheme n).symm
+
+/-- **The Besov spaces of the dyadic steps are `B^s_{p,q,1}[0, 1]`**: for `0 < p ≤ 1`,
+`0 < q ≤ ∞` and `0 ≤ s < 1/p`, `f ∈ L_p[0, 1]` lies in the Besov space of the Haar scheme in
+`L_∞[0, 1]` iff `‖f‖_p + ‖(2^(ks) ω_1(f, 2^(-k), [0, 1])_p)_k‖_{ℓ_q} < ∞`. Both conditions say
+that the dyadic norm of `f` in the step couple is finite
+(`FunctionScheme.memBesov_iff_eNormDyadic_lt_top`, `Haar.stepCouple_eq_lpCouple`,
+`Haar.eNormDyadic_stepCouple_lt_top_iff_modulus`). -/
+theorem memBesov_haarScheme_iff_modulus (hp0 : p ≠ 0) (hp1 : p ≤ 1) {s : ℝ} {q : ℝ≥0∞}
+    (hq0 : q ≠ 0) (hs : 0 ≤ s) (hsp : s < 1 / p.toReal) (f : Lp ℂ p vol) :
+    FunctionScheme.MemBesov (haarScheme ∞) p s q f ↔
+      ‖f‖ₑ + ENNReal.lqNorm q (fun k => ENNReal.dyadicWeight s k *
+        Interval.intervalLpModulus p 1 f k) < ∞ := by
+  rw [FunctionScheme.memBesov_iff_eNormDyadic_lt_top hq0 hs, ← stepCouple_eq_lpCouple p]
+  exact eNormDyadic_stepCouple_lt_top_iff_modulus hp0 hp1 hs hsp f
 
 /-! ### The Nikolskii property and the Besov embeddings of the steps -/
 

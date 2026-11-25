@@ -25,7 +25,8 @@ Let `V` have dimension `n`, `1 ≤ p < ∞` and `α(n, p, r) = n (1/p - 1/r)` fo
   is continuous (`Rd.continuous_blockFun`).
 * **The Nikolskii inequality for blocks** (`Rd.enorm_blockFun_le_nikolskii`,
   `Rd.eLpNorm_blockFun_le_nikolskii`): the block is band-limited, `Θ_j ⋆ (ψ_j ⋆ f) = ψ_j ⋆ f`,
-  so `|(ψ_j ⋆ f)(x)| ≤ N_p 2^(jn/p) ‖ψ_j ⋆ f‖_p` at every point, and interpolation gives
+  so `|(ψ_j ⋆ f)(x)| ≤ N_p 2^(jn/p) ‖ψ_j ⋆ f‖_p` at every point, and interpolation
+  (`MeasureTheory.eLpNorm_le_of_eLpNorm_top_le`) gives
   `‖ψ_j ⋆ f‖_r ≤ N_p^(1-p/r) 2^(j α(n,p,r)) ‖ψ_j ⋆ f‖_p` (`Rd.nikolskiiBlockConst`).
 * **Besov into `L_r`** (`Rd.exists_memLp_ae_eq_of_memApprox`): for `1 ≤ q ≤ ∞` and
   `s > α(n, p, r)` every `f ∈ B^s_{p,q}` has a representative `g ∈ L_r` with
@@ -220,38 +221,23 @@ theorem enorm_blockFun_le_nikolskii (hp : p ≠ ∞) (j : ℕ) (f : Lp ℂ p (vo
         ring
 
 /-- **The Nikolskii inequality for blocks**: for `1 ≤ p ≤ r ≤ ∞`, `p < ∞` and `f ∈ L_p(V)`,
-`‖ψ_j ⋆ f‖_r ≤ N_p^(1-p/r) 2^(j α) ‖ψ_j ⋆ f‖_p` with `α = n(1/p - 1/r)`. For `r = ∞` this is
-`Rd.enorm_blockFun_le_nikolskii`; for `r < ∞` interpolation
-(`MeasureTheory.eLpNorm_le_rpow_mul_eLpNorm_rpow`) gives the exponent `(n/p)(1 - p/r) = α`
-(`nikolskiiExponent_eq_mul_one_sub_div`). -/
+`‖ψ_j ⋆ f‖_r ≤ N_p^(1-p/r) 2^(j α) ‖ψ_j ⋆ f‖_p` with `α = n(1/p - 1/r)`. The pointwise bound
+`Rd.enorm_blockFun_le_nikolskii` bounds `‖ψ_j ⋆ f‖_∞`, and
+`MeasureTheory.eLpNorm_le_of_eLpNorm_top_le` passes to `L_r` with the exponent
+`(n/p)(1 - p/r) = α` (`nikolskiiExponent_eq_mul_one_sub_div`). -/
 theorem eLpNorm_blockFun_le_nikolskii (hp : p ≠ ∞) {r : ℝ≥0∞} (hpr : p ≤ r) (j : ℕ)
     (f : Lp ℂ p (volume : Measure V)) :
     eLpNorm (blockFun j f) r volume ≤ nikolskiiBlockConst V p ^ (1 - p.toReal / r.toReal) *
       dyadicWeight (nikolskiiExponent (finrank ℝ V) p r) j * eLpNorm (blockFun j f) p volume := by
-  have hb := enorm_blockFun_le_nikolskii hp j f
-  rcases eq_or_ne r ∞ with rfl | hr
-  · rw [ENNReal.toReal_top, div_zero, sub_zero, ENNReal.rpow_one,
-      eLpNorm_exponent_top (aestronglyMeasurable_blockFun j f)]
-    exact eLpNormEssSup_le_of_ae_enorm_bound (ae_of_all _ hb)
   have hp0 : p ≠ 0 := (zero_lt_one.trans_le Fact.out).ne'
   have h1 : 0 ≤ 1 - p.toReal / r.toReal := ENNReal.one_sub_toReal_div_nonneg hpr
-  have hθ : 0 ≤ p.toReal / r.toReal := by positivity
-  calc eLpNorm (blockFun j f) r volume
-      ≤ (nikolskiiBlockConst V p * dyadicWeight (nikolskiiExponent (finrank ℝ V) p ∞) j *
-          eLpNorm (blockFun j f) p volume) ^ (1 - p.toReal / r.toReal) *
-          eLpNorm (blockFun j f) p volume ^ (p.toReal / r.toReal) :=
-        eLpNorm_le_rpow_mul_eLpNorm_rpow (aestronglyMeasurable_blockFun j f) (ae_of_all _ hb)
-          hp0 hpr hr
-    _ = nikolskiiBlockConst V p ^ (1 - p.toReal / r.toReal) *
-          dyadicWeight (nikolskiiExponent (finrank ℝ V) p ∞) j ^ (1 - p.toReal / r.toReal) *
-          (eLpNorm (blockFun j f) p volume ^ (1 - p.toReal / r.toReal) *
-            eLpNorm (blockFun j f) p volume ^ (p.toReal / r.toReal)) := by
-        rw [ENNReal.mul_rpow_of_nonneg _ _ h1, ENNReal.mul_rpow_of_nonneg _ _ h1]
-        ring
-    _ = _ := by
-        rw [← ENNReal.rpow_add_of_nonneg _ _ h1 hθ, sub_add_cancel, ENNReal.rpow_one,
-          ENNReal.dyadicWeight_rpow, nikolskiiExponent_top,
-          ← nikolskiiExponent_eq_mul_one_sub_div (finrank ℝ V : ℝ) hp0 hpr]
+  have htop : eLpNorm (blockFun j f) ∞ volume ≤ nikolskiiBlockConst V p *
+      dyadicWeight (nikolskiiExponent (finrank ℝ V) p ∞) j * eLpNorm (blockFun j f) p volume := by
+    rw [eLpNorm_exponent_top (aestronglyMeasurable_blockFun j f)]
+    exact eLpNormEssSup_le_of_ae_enorm_bound (ae_of_all _ (enorm_blockFun_le_nikolskii hp j f))
+  refine (eLpNorm_le_of_eLpNorm_top_le hp0 hpr htop).trans_eq ?_
+  rw [ENNReal.mul_rpow_of_nonneg _ _ h1, ENNReal.dyadicWeight_rpow, nikolskiiExponent_top,
+    ← nikolskiiExponent_eq_mul_one_sub_div (finrank ℝ V : ℝ) hp0 hpr]
 
 /-- **The blocks lie in `L_r`** for `1 ≤ p ≤ r ≤ ∞`, `p < ∞` and `f ∈ L_p(V)`, by the Nikolskii
 inequality for blocks (`Rd.eLpNorm_blockFun_le_nikolskii`). -/
