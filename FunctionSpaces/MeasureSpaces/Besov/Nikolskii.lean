@@ -6,33 +6,40 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.MeasureSpaces.Besov.ElementaryEmbeddings
-public import FunctionSpaces.Analysis.Lp.Interpolation
+public import FunctionSpaces.Analysis.Lp.QuasiNorm
 public import ApproximationSpaces.Lift
 
 /-!
 # The Nikolskii inequality of a scheme
 
-A scheme of functions `S` on a finite measure space `(Ω, μ)` has the **Nikolskii property of
+A scheme of functions `S` on a measure space `(Ω, μ)` has the **Nikolskii property of
 dimension `D`** if for every `1 ≤ p ≤ ∞` there is `C` with
 
 `‖a‖_∞ ≤ C n^(D/p) ‖a‖_p`   for all `a ∈ S n`, `n ≥ 1`
 
 (`FunctionScheme.HasNikolskii`), a hypothesis on the scheme; here `‖a‖_∞` is the norm of the
-class `a` in `L_∞(μ)`. At `p = ∞` the bound holds with `C = 1` for every scheme. For the
-scheme of an approximation scheme `T` of bounded continuous functions the same bound with the
-sup norm of the elements of `T` for every `1 ≤ p < ∞` suffices
+class `a` in `L_∞(μ)`. At `p = ∞` the bound holds with `C = 1` for every scheme. On a finite
+measure space, for the scheme of an approximation scheme `T` of bounded continuous functions the
+same bound with the sup norm of the elements of `T` for every `1 ≤ p < ∞` suffices
 (`FunctionScheme.hasNikolskii_ofContinuous`), since the `L_∞` norm of a bounded continuous
 function is at most its sup norm (`FunctionScheme.toReal_eLpNorm_top_le_norm`). For
 trigonometric polynomials of degree `< n` on `𝕋^d` the property holds with `D = d`
 (`Torus.trigScheme_hasNikolskii`, `Torus.hasNikolskii_fourierEigenbasis`); these torus instances
-are the ones proved in this library.  The property is stated against `L_∞` only; the general
-**Nikolskii inequality**
+are the ones proved in this library.
 
-`‖a‖_r ≤ C' n^(D (1/p - 1/r)) ‖a‖_p`,   `p ≤ r`
+The property asks `p ≥ 1` only, and yet it controls every `0 < p ≤ ∞`: for `0 < p < 1` the
+bound `‖a‖_∞ ≤ C₁ n^D ‖a‖_1` at `p = 1` gives `‖a‖_∞ ≤ C₁^(1/p) n^(D/p) ‖a‖_p`
+(Ditzian–Prymak 2016, Theorem 2.1; `HasNikolskii.exists_eLpNorm_top_le`). The property is
+stated against `L_∞` only; the general **Nikolskii inequality**
+
+`‖a‖_r ≤ C' n^(D (1/p - 1/r)) ‖a‖_p`,   `0 < p ≤ r ≤ ∞`
 
 follows by interpolation, `‖a‖_r ≤ ‖a‖_∞^(1 - p/r) ‖a‖_p^(p/r)`
-(`HasNikolskii.eLpNorm_le`).  The exponent `D (1/p - 1/r)` is `nikolskiiExponent D p r`; for
-`D > 0`, `1 ≤ p < ∞` and `r > 0` it is positive iff `p < r` and nonnegative iff `p ≤ r`
+(`HasNikolskii.exists_eLpNorm_le_of_le`). In `[0, ∞]` it holds for every measure `μ`; the real
+form `HasNikolskii.eLpNorm_le` and the lifting bound below take `μ` finite. The
+exponent `D (1/p - 1/r)` is `nikolskiiExponent D p r`, equal to `(D/p)(1 - p/r)` for
+`0 < p ≤ r` (`nikolskiiExponent_eq_mul_one_sub_div`); for `D > 0`, `0 < p < ∞` and `r > 0` it is
+positive iff `p < r` and nonnegative iff `p ≤ r`
 (`nikolskiiExponent_pos`, `lt_of_nikolskiiExponent_pos`, `le_of_nikolskiiExponent_nonneg`).
 With `θ = p₀/p₁` and `s₀ - s₁ = D(1/p₀ - 1/p₁)`, `θ s₀ + (1 - θ)(s₀ - D/p₀) = s₁`
 (`nikolskiiExponent_interp_eq`). For the Gagliardo–Nirenberg–Sobolev inequality,
@@ -41,9 +48,10 @@ With `θ = p₀/p₁` and `s₀ - s₁ = D(1/p₀ - 1/p₁)`, `θ s₀ + (1 - θ
 (`nikolskiiExponent_eq_one_of_inv_add_inv`), and `n(1 - 1/r) = m ≥ 2` passes through the
 conjugate exponent `n/(n - 1)` (`nikolskiiExponent_conjExponent_of_eq`).
 
-In the language of `ApproximationSpaces.Lift` this is a lifting bound for the inclusion
-`L_r ↪ L_p` and the scheme in `L_p` (`HasNikolskii.liftBound`): the approximant `a` in `L_p` is
-the inclusion of the same function in `L_r`, of norm at most `C' n^(D(1/p - 1/r)) ‖a‖_p`.
+In the language of `ApproximationSpaces.Lift` this is, for `1 ≤ p ≤ r`, a lifting bound for the
+inclusion `L_r ↪ L_p` and the scheme in `L_p` (`HasNikolskii.liftBound`): the approximant `a` in
+`L_p` is the inclusion of the same function in `L_r`, of norm at most
+`C' n^(D(1/p - 1/r)) ‖a‖_p`.
 
 The norms are written with `eLpNorm`, so that the hypothesis does not need an `L_p` space, and
 hence no instance `Fact (1 ≤ p)`, for every `p` at once.
@@ -58,35 +66,34 @@ open scoped ENNReal BoundedContinuousFunction
 `0⁻¹ = 0`) it is `D/p` for `r = ∞`. -/
 noncomputable def nikolskiiExponent (D : ℝ) (p r : ℝ≥0∞) : ℝ := D * (p.toReal⁻¹ - r.toReal⁻¹)
 
-/-- `D(1/p - 1/r) ≥ 0` for `D ≥ 0` and `1 ≤ p ≤ r`. -/
-theorem nikolskiiExponent_nonneg {D : ℝ} (hD : 0 ≤ D) {p r : ℝ≥0∞} (hp : 1 ≤ p) (hpr : p ≤ r) :
+/-- `D(1/p - 1/r) ≥ 0` for `D ≥ 0` and `0 < p ≤ r ≤ ∞`, since then `1/r ≤ 1/p`. -/
+theorem nikolskiiExponent_nonneg {D : ℝ} (hD : 0 ≤ D) {p r : ℝ≥0∞} (hp0 : p ≠ 0) (hpr : p ≤ r) :
     0 ≤ nikolskiiExponent D p r := by
   unfold nikolskiiExponent
   refine mul_nonneg hD (sub_nonneg.2 ?_)
   rcases eq_or_ne r ∞ with rfl | hr
   · simp
   have hp' : p ≠ ∞ := ne_top_of_le_ne_top hr hpr
-  exact inv_anti₀ (ENNReal.toReal_pos (zero_lt_one.trans_le hp).ne' hp')
-    (ENNReal.toReal_mono hr hpr)
+  exact inv_anti₀ (ENNReal.toReal_pos hp0 hp') (ENNReal.toReal_mono hr hpr)
 
 /-- A natural number `m` above the Nikolskii exponent is at least `1`: for `D ≥ 0`,
-`1 ≤ p ≤ r` and `m ∈ ℕ` with `m > D(1/p - 1/r)`, `m ≥ 1`, since the exponent is nonnegative
-(`nikolskiiExponent_nonneg`). -/
-theorem one_le_of_nikolskiiExponent_lt {D : ℝ} (hD : 0 ≤ D) {p r : ℝ≥0∞} (hp : 1 ≤ p)
+`0 < p ≤ r ≤ ∞` and `m ∈ ℕ` with `m > D(1/p - 1/r)`, `m ≥ 1`, since the exponent is
+nonnegative (`nikolskiiExponent_nonneg`). -/
+theorem one_le_of_nikolskiiExponent_lt {D : ℝ} (hD : 0 ≤ D) {p r : ℝ≥0∞} (hp0 : p ≠ 0)
     (hpr : p ≤ r) {m : ℕ} (hm : nikolskiiExponent D p r < m) : 1 ≤ m :=
-  Nat.one_le_iff_ne_zero.2 (Nat.cast_pos.1 ((nikolskiiExponent_nonneg hD hp hpr).trans_lt hm)).ne'
+  Nat.one_le_iff_ne_zero.2
+    (Nat.cast_pos.1 ((nikolskiiExponent_nonneg hD hp0 hpr).trans_lt hm)).ne'
 
-/-- **The Nikolskii exponent is positive** for `D > 0` and `1 ≤ p < r ≤ ∞`, since then
+/-- **The Nikolskii exponent is positive** for `D > 0` and `0 < p < r ≤ ∞`, since then
 `1/r < 1/p`. -/
-theorem nikolskiiExponent_pos {D : ℝ} (hD : 0 < D) {p r : ℝ≥0∞} (hp : 1 ≤ p) (hpr : p < r) :
+theorem nikolskiiExponent_pos {D : ℝ} (hD : 0 < D) {p r : ℝ≥0∞} (hp0 : p ≠ 0) (hpr : p < r) :
     0 < nikolskiiExponent D p r := by
   unfold nikolskiiExponent
   refine mul_pos hD (sub_pos.2 ?_)
-  have hp0 : 0 < p.toReal :=
-    ENNReal.toReal_pos (zero_lt_one.trans_le hp).ne' (hpr.trans_le le_top).ne
+  have hpp : 0 < p.toReal := ENNReal.toReal_pos hp0 (hpr.trans_le le_top).ne
   rcases eq_or_ne r ∞ with rfl | hr
-  · simpa using hp0
-  exact inv_strictAnti₀ hp0 (ENNReal.toReal_strict_mono hr hpr)
+  · simpa using hpp
+  exact inv_strictAnti₀ hpp (ENNReal.toReal_strict_mono hr hpr)
 
 /-- **A positive Nikolskii exponent forces `p < r`**: for `D ≥ 0`, `p < ∞` and `r > 0`, if
 `D(1/p - 1/r) > 0`, then `p < r`; for `r ≤ p` the exponent is `≤ 0`. -/
@@ -132,6 +139,18 @@ theorem nikolskiiExponent_top (D : ℝ) (p : ℝ≥0∞) : nikolskiiExponent D p
 @[simp]
 theorem nikolskiiExponent_self (D : ℝ) (p : ℝ≥0∞) : nikolskiiExponent D p p = 0 := by
   simp [nikolskiiExponent]
+
+/-- **The Nikolskii exponent as an interpolated exponent**: for `0 < p ≤ r ≤ ∞`,
+`D(1/p - 1/r) = (D/p)(1 - p/r)`, with `1/∞ = 0` and `p/∞ = 0`. This is the exponent of `n` that
+interpolation between `L_p` and `L_∞` produces from a bound `‖a‖_∞ ≤ C n^(D/p) ‖a‖_p`. -/
+theorem nikolskiiExponent_eq_mul_one_sub_div (D : ℝ) {p r : ℝ≥0∞} (hp0 : p ≠ 0) (hpr : p ≤ r) :
+    nikolskiiExponent D p r = D * p.toReal⁻¹ * (1 - p.toReal / r.toReal) := by
+  unfold nikolskiiExponent
+  rcases eq_or_ne r ∞ with rfl | hr
+  · simp
+  have hpp : 0 < p.toReal := ENNReal.toReal_pos hp0 (ne_top_of_le_ne_top hr hpr)
+  have hrr : 0 < r.toReal := hpp.trans_le (ENNReal.toReal_mono hr hpr)
+  field_simp
 
 /-- **The Nikolskii exponent `1`**: for `D ≥ 0`, `D(1/p - 1/r) = 1` forces `D > 0`, `p < ∞` and
 `1/r = 1/p - 1/D`; for `p = ∞` the exponent is `-D/r ≤ 0`. -/
@@ -214,7 +233,8 @@ variable {Ω : Type*} [MeasurableSpace Ω] {μ : Measure Ω}
 /-- The **Nikolskii property of dimension `D`**: for every `1 ≤ p ≤ ∞`,
 `‖a‖_∞ ≤ C n^(D/p) ‖a‖_p` for all approximants `a ∈ S n`, `n ≥ 1`, with the norm `‖a‖_∞` of the
 class `a` in `L_∞(μ)`. A hypothesis on the scheme; the torus has it
-(`Torus.trigScheme_hasNikolskii`). -/
+(`Torus.trigScheme_hasNikolskii`). The property asks `p ≥ 1` only, since the bound at `p = 1`
+gives the bound for every `0 < p < 1` (`FunctionScheme.HasNikolskii.exists_eLpNorm_top_le`). -/
 structure HasNikolskii (S : FunctionScheme μ) (D : ℝ) : Prop where
   exists_const : ∀ p : ℝ≥0∞, 1 ≤ p → ∃ C : ℝ, 0 ≤ C ∧ ∀ n : ℕ, 1 ≤ n → ∀ a ∈ S n,
     (eLpNorm a ∞ μ).toReal ≤ C * (n : ℝ) ^ (D * p.toReal⁻¹) * (eLpNorm a p μ).toReal
@@ -229,14 +249,14 @@ theorem toReal_eLpNorm_top_le_norm [TopologicalSpace Ω] [OpensMeasurableSpace �
   rw [← toReal_enorm]
   exact ENNReal.toReal_mono enorm_ne_top this
 
-variable [IsFiniteMeasure μ] {S : FunctionScheme μ} {D : ℝ}
+variable {S : FunctionScheme μ} {D : ℝ}
 
 /-- **The Nikolskii property of the scheme of a scheme of bounded continuous functions**: if an
 approximation scheme `T` of bounded continuous functions satisfies, for every `1 ≤ p < ∞`,
 `sup |a| ≤ C n^(D/p) ‖a‖_p` for all `a ∈ T n`, `n ≥ 1`, then its scheme of functions has the
 Nikolskii property of dimension `D`, since `‖a‖_∞ ≤ sup |a|`. At `p = ∞` the bound of the
 Nikolskii property reads `‖a‖_∞ ≤ C ‖a‖_∞` and holds with `C = 1` for every scheme. -/
-theorem hasNikolskii_ofContinuous [TopologicalSpace Ω] [BorelSpace Ω]
+theorem hasNikolskii_ofContinuous [IsFiniteMeasure μ] [TopologicalSpace Ω] [BorelSpace Ω]
     {T : ApproximationScheme (Ω →ᵇ ℂ)}
     (h : ∀ p : ℝ≥0∞, 1 ≤ p → p ≠ ∞ → ∃ C : ℝ, 0 ≤ C ∧ ∀ n : ℕ, 1 ≤ n → ∀ a ∈ T n,
       ‖a‖ ≤ C * (n : ℝ) ^ (D * p.toReal⁻¹) * (eLpNorm a p μ).toReal) :
@@ -251,56 +271,101 @@ theorem hasNikolskii_ofContinuous [TopologicalSpace Ω] [BorelSpace Ω]
   rw [eLpNorm_congr_ae hae, eLpNorm_congr_ae hae]
   exact (toReal_eLpNorm_top_le_norm a).trans (hCa n hn a ha)
 
-/-- **The Nikolskii inequality**: under the Nikolskii property of dimension `D`, for
-`1 ≤ p ≤ r ≤ ∞` there is `C` with `‖a‖_r ≤ C n^(D(1/p - 1/r)) ‖a‖_p` for all `a ∈ S n`,
-`n ≥ 1`. -/
-theorem HasNikolskii.eLpNorm_le (h : S.HasNikolskii D) {p r : ℝ≥0∞} (hp : 1 ≤ p)
+/-- **The Nikolskii bound for one exponent `1 ≤ p ≤ ∞`, in `[0, ∞]`**: under the Nikolskii
+property of dimension `D` there is `C < ∞` with `‖a‖_∞ ≤ C n^(D/p) ‖a‖_p` for all `a ∈ S n`,
+`n ≥ 1`, as an inequality of extended nonnegative reals. The real bound of the property passes
+to `[0, ∞]` because `‖a‖_∞ < ∞` for the class `a ∈ L_∞`. -/
+theorem HasNikolskii.exists_eLpNorm_top_le_of_one_le (h : S.HasNikolskii D) {p : ℝ≥0∞}
+    (hp : 1 ≤ p) : ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ n : ℕ, 1 ≤ n → ∀ a ∈ S n,
+      eLpNorm a ∞ μ ≤ C * (n : ℝ≥0∞) ^ (D * p.toReal⁻¹) * eLpNorm a p μ := by
+  obtain ⟨C, hC, hCa⟩ := h.exists_const p hp
+  refine ⟨ENNReal.ofReal C, ENNReal.ofReal_ne_top, fun n hn a ha => ?_⟩
+  have hn0 : (0 : ℝ) < n := Nat.cast_pos.2 hn
+  calc eLpNorm a ∞ μ
+      ≤ ENNReal.ofReal (C * (n : ℝ) ^ (D * p.toReal⁻¹) * (eLpNorm a p μ).toReal) :=
+        (ENNReal.le_ofReal_iff_toReal_le (Lp.eLpNorm_ne_top a) (by positivity)).2
+          (hCa n hn a ha)
+    _ ≤ ENNReal.ofReal C * (n : ℝ≥0∞) ^ (D * p.toReal⁻¹) * eLpNorm a p μ := by
+        rw [ENNReal.ofReal_mul (by positivity), ENNReal.ofReal_mul hC,
+          ← ENNReal.ofReal_rpow_of_pos hn0, ENNReal.ofReal_natCast]
+        gcongr
+        exact ENNReal.ofReal_toReal_le
+
+/-- **The Nikolskii bound for every `0 < p ≤ ∞`** (Ditzian–Prymak 2016, Theorem 2.1, (2.2)):
+under the Nikolskii property of dimension `D`, for every `0 < p ≤ ∞` there is `C < ∞` with
+`‖a‖_∞ ≤ C n^(D/p) ‖a‖_p` for all `a ∈ S n`, `n ≥ 1`. For `p ≥ 1` this is the property itself
+(`FunctionScheme.HasNikolskii.exists_eLpNorm_top_le_of_one_le`). For `p < 1` the property at
+`p₀ = 1` gives `‖a‖_∞ ≤ C₁ n^D ‖a‖_1`, and the bootstrap
+`MeasureTheory.le_rpow_mul_eLpNorm_of_ae_enorm_le` with the almost everywhere bound
+`N = ‖a‖_∞ < ∞` of `|a|` turns it into `‖a‖_∞ ≤ (C₁ n^D)^(1/p) ‖a‖_p = C₁^(1/p) n^(D/p) ‖a‖_p`. -/
+theorem HasNikolskii.exists_eLpNorm_top_le (h : S.HasNikolskii D) {p : ℝ≥0∞} (hp0 : p ≠ 0) :
+    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ n : ℕ, 1 ≤ n → ∀ a ∈ S n,
+      eLpNorm a ∞ μ ≤ C * (n : ℝ≥0∞) ^ (D * p.toReal⁻¹) * eLpNorm a p μ := by
+  rcases le_or_gt 1 p with hp1 | hp1
+  · exact h.exists_eLpNorm_top_le_of_one_le hp1
+  obtain ⟨C, hC, hCa⟩ := h.exists_eLpNorm_top_le_of_one_le le_rfl
+  have hpp : 0 < p.toReal := ENNReal.toReal_pos hp0 (hp1.trans ENNReal.one_lt_top).ne
+  refine ⟨C ^ p.toReal⁻¹, ENNReal.rpow_ne_top_of_nonneg (inv_nonneg.2 hpp.le) hC,
+    fun n hn a ha => ?_⟩
+  have h1 := hCa n hn a ha
+  rw [ENNReal.toReal_one, inv_one, mul_one] at h1
+  have hN : ∀ᵐ x ∂μ, ‖a x‖ₑ ≤ eLpNorm a ∞ μ :=
+    ae_le_eLpNormEssSup.mono fun x hx => hx.trans eLpNormEssSup_le_eLpNorm_top
+  calc eLpNorm a ∞ μ
+      ≤ (C * (n : ℝ≥0∞) ^ D) ^ ((1 : ℝ≥0∞).toReal / p.toReal) * eLpNorm a p μ :=
+        le_rpow_mul_eLpNorm_of_ae_enorm_le hN (Lp.eLpNorm_ne_top a) hp0 hp1.le
+          ENNReal.one_ne_top h1
+    _ = C ^ p.toReal⁻¹ * (n : ℝ≥0∞) ^ (D * p.toReal⁻¹) * eLpNorm a p μ := by
+        rw [ENNReal.toReal_one, one_div, ENNReal.mul_rpow_of_nonneg _ _ (inv_nonneg.2 hpp.le),
+          ← ENNReal.rpow_mul]
+
+/-- **The Nikolskii inequality for `0 < p ≤ r ≤ ∞`, in `[0, ∞]`** (Ditzian–Prymak 2016,
+Theorem 2.1, (2.2) and (2.3)): under the Nikolskii property of dimension `D` there is `C < ∞` with
+`‖a‖_r ≤ C n^(D(1/p - 1/r)) ‖a‖_p` for all `a ∈ S n`, `n ≥ 1`. From
+`‖a‖_∞ ≤ C₀ n^(D/p) ‖a‖_p` (`FunctionScheme.HasNikolskii.exists_eLpNorm_top_le`), interpolation
+between `L_p` and `L_∞` gives `‖a‖_r ≤ (C₀ n^(D/p))^(1 - p/r) ‖a‖_p`
+(`MeasureTheory.eLpNorm_le_of_eLpNorm_top_le`), and `(D/p)(1 - p/r) = D(1/p - 1/r)`
+(`nikolskiiExponent_eq_mul_one_sub_div`). -/
+theorem HasNikolskii.exists_eLpNorm_le_of_le (h : S.HasNikolskii D) {p r : ℝ≥0∞} (hp0 : p ≠ 0)
+    (hpr : p ≤ r) : ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ n : ℕ, 1 ≤ n → ∀ a ∈ S n,
+      eLpNorm a r μ ≤ C * (n : ℝ≥0∞) ^ nikolskiiExponent D p r * eLpNorm a p μ := by
+  obtain ⟨C, hC, hCa⟩ := h.exists_eLpNorm_top_le hp0
+  have h1 : 0 ≤ 1 - p.toReal / r.toReal := ENNReal.one_sub_toReal_div_nonneg hpr
+  refine ⟨C ^ (1 - p.toReal / r.toReal), ENNReal.rpow_ne_top_of_nonneg h1 hC,
+    fun n hn a ha => (eLpNorm_le_of_eLpNorm_top_le hp0 hpr (hCa n hn a ha)).trans_eq ?_⟩
+  rw [ENNReal.mul_rpow_of_nonneg _ _ h1, ← ENNReal.rpow_mul,
+    ← nikolskiiExponent_eq_mul_one_sub_div D hp0 hpr]
+
+variable [IsFiniteMeasure μ]
+
+/-- **The Nikolskii inequality** in real numbers: on a finite measure space, under the Nikolskii
+property of dimension `D`, for `0 < p ≤ r ≤ ∞` there is `C ≥ 0` with
+`‖a‖_r ≤ C n^(D(1/p - 1/r)) ‖a‖_p` for all `a ∈ S n`, `n ≥ 1`. This is
+`FunctionScheme.HasNikolskii.exists_eLpNorm_le_of_le` in real numbers, since on a finite measure
+space every class `a ∈ L_∞` has `‖a‖_p < ∞`. -/
+theorem HasNikolskii.eLpNorm_le (h : S.HasNikolskii D) {p r : ℝ≥0∞} (hp0 : p ≠ 0)
     (hpr : p ≤ r) : ∃ C : ℝ, 0 ≤ C ∧ ∀ n : ℕ, 1 ≤ n → ∀ a ∈ S n,
       (eLpNorm a r μ).toReal ≤ C * (n : ℝ) ^ nikolskiiExponent D p r * (eLpNorm a p μ).toReal := by
-  obtain ⟨C, hC, hCa⟩ := h.exists_const p hp
-  rcases eq_or_ne r ∞ with rfl | hr
-  · refine ⟨C, hC, fun n hn a ha => ?_⟩
-    rw [nikolskiiExponent_top]
-    exact hCa n hn a ha
-  have hp0 : p ≠ 0 := (zero_lt_one.trans_le hp).ne'
-  have hp' : p ≠ ∞ := ne_top_of_le_ne_top hr hpr
-  have hr0 : r ≠ 0 := (zero_lt_one.trans_le (hp.trans hpr)).ne'
-  have hpp : 0 < p.toReal := ENNReal.toReal_pos hp0 hp'
-  have hrr : 0 < r.toReal := ENNReal.toReal_pos hr0 hr
-  set θ := p.toReal / r.toReal
-  have hθ1 : 0 ≤ 1 - θ := ENNReal.one_sub_toReal_div_nonneg hpr
-  refine ⟨C ^ (1 - θ), Real.rpow_nonneg hC _, fun n hn a ha => ?_⟩
-  have hn0 : (0 : ℝ) ≤ n := Nat.cast_nonneg n
-  set Np := (eLpNorm a p μ).toReal
-  have hNp : 0 ≤ Np := ENNReal.toReal_nonneg
-  set Ninf := (eLpNorm a ∞ μ).toReal
-  -- the class `a ∈ L_∞` is bounded almost everywhere by its `L_∞` norm
-  have hbd : ∀ᵐ x ∂μ, ‖a x‖ ≤ Ninf := by
-    filter_upwards [ae_le_eLpNormEssSup (f := (a : Ω → ℂ)) (μ := μ)] with x hx
-    rw [← toReal_enorm]
-    exact ENNReal.toReal_mono (Lp.eLpNorm_ne_top a) (hx.trans eLpNormEssSup_le_eLpNorm_top)
-  have hint := toReal_eLpNorm_le_rpow_mul (μ := μ) (Lp.aestronglyMeasurable a)
-    ENNReal.toReal_nonneg hbd hp0 hpr hr
-  calc (eLpNorm a r μ).toReal ≤ Ninf ^ (1 - θ) * Np ^ θ := hint
-    _ ≤ (C * (n : ℝ) ^ (D * p.toReal⁻¹) * Np) ^ (1 - θ) * Np ^ θ := by
-        gcongr; exact hCa n hn a ha
-    _ = C ^ (1 - θ) * (n : ℝ) ^ nikolskiiExponent D p r * (Np ^ (1 - θ) * Np ^ θ) := by
-        rw [Real.mul_rpow (by positivity) hNp, Real.mul_rpow hC (by positivity),
-          ← Real.rpow_mul hn0]
-        have : D * p.toReal⁻¹ * (1 - θ) = nikolskiiExponent D p r := by
-          simp only [nikolskiiExponent, θ]; field_simp
-        rw [this]; ring
-    _ = C ^ (1 - θ) * (n : ℝ) ^ nikolskiiExponent D p r * Np := by
-        rw [← Real.rpow_add' hNp (by norm_num), sub_add_cancel, Real.rpow_one]
+  obtain ⟨C, hC, hCa⟩ := h.exists_eLpNorm_le_of_le hp0 hpr
+  refine ⟨C.toReal, ENNReal.toReal_nonneg, fun n hn a ha => ?_⟩
+  have hfin : C * (n : ℝ≥0∞) ^ nikolskiiExponent D p r * eLpNorm a p μ ≠ ∞ :=
+    ENNReal.mul_ne_top (ENNReal.mul_ne_top hC (ENNReal.rpow_ne_top_of_ne_zero
+      (Nat.cast_ne_zero.2 (Nat.one_le_iff_ne_zero.1 hn)) (ENNReal.natCast_ne_top n)))
+      ((Lp.memLp a).mono_exponent le_top).eLpNorm_ne_top
+  calc (eLpNorm a r μ).toReal
+      ≤ (C * (n : ℝ≥0∞) ^ nikolskiiExponent D p r * eLpNorm a p μ).toReal :=
+        ENNReal.toReal_mono hfin (hCa n hn a ha)
+    _ = C.toReal * (n : ℝ) ^ nikolskiiExponent D p r * (eLpNorm a p μ).toReal := by
+        rw [ENNReal.toReal_mul, ENNReal.toReal_mul, ← ENNReal.toReal_rpow, ENNReal.toReal_natCast]
 
-/-- **The Nikolskii inequality as a lifting bound** for the inclusion `L_r ↪ L_p`: every
-approximant of the scheme in `L_p` is the inclusion of an approximant in `L_r` whose norm is at
-most `C n^(D(1/p - 1/r))` times its `L_p` norm. -/
+/-- **The Nikolskii inequality as a lifting bound** for the inclusion `L_r ↪ L_p` of a finite
+measure space, `1 ≤ p ≤ r ≤ ∞`: every approximant of the scheme in `L_p` is the inclusion of an
+approximant in `L_r` whose norm is at most `C n^(D(1/p - 1/r))` times its `L_p` norm. -/
 theorem HasNikolskii.liftBound (h : S.HasNikolskii D) {p r : ℝ≥0∞} [Fact (1 ≤ p)]
     [Fact (1 ≤ r)] (hpr : p ≤ r) : ∃ C : ℝ, 0 ≤ C ∧
       ApproximationScheme.LiftBound (Lp.inclusionOfExponentLe (E := ℂ) (𝕜 := ℝ) μ hpr)
         (S.toLp p) (nikolskiiExponent D p r) C := by
-  obtain ⟨C, hC, hCa⟩ := h.eLpNorm_le (Fact.out : 1 ≤ p) hpr
+  obtain ⟨C, hC, hCa⟩ := h.eLpNorm_le (zero_lt_one.trans_le (Fact.out : 1 ≤ p)).ne' hpr
   refine ⟨C, hC, fun n hn g hg => ?_⟩
   obtain ⟨a, ha, rfl⟩ := hg
   refine ⟨Lp.topInclusion (𝕜 := ℝ) μ r a, Lp.inclusionOfExponentLeLinear_topInclusion hpr a, ?_⟩

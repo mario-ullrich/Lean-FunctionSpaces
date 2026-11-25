@@ -5054,7 +5054,8 @@ $S^{(p)}_n$ of the scheme of $T$ (\Cref{def:function-scheme}).
 \lean{FunctionScheme.HasNikolskii, nikolskiiExponent, nikolskiiExponent_nonneg,
   one_le_of_nikolskiiExponent_lt, nikolskiiExponent_pos, lt_of_nikolskiiExponent_pos,
   le_of_nikolskiiExponent_nonneg, nikolskiiExponent_top, nikolskiiExponent_self,
-  FunctionScheme.toReal_eLpNorm_top_le_norm, FunctionScheme.hasNikolskii_ofContinuous}
+  nikolskiiExponent_eq_mul_one_sub_div, FunctionScheme.toReal_eLpNorm_top_le_norm,
+  FunctionScheme.hasNikolskii_ofContinuous}
 \leanok
 \uses{def:function-scheme}
 Let $S$ be a scheme of functions and $D \in \R$. The scheme has the \emph{Nikolskii property}
@@ -5067,13 +5068,15 @@ Let $\Omega$ be a topological space with its Borel $\sigma$-algebra and $T$ an a
 scheme in $C_b(\Omega)$ such that for every $1 \leq p < \infty$ there is $C \geq 0$ with
 $\sup_{x \in \Omega} |a(x)| \leq C \, n^{D/p} \, \|a\|_{L_p}$ for all $n \geq 1$ and
 $a \in T_n$. Then the scheme of $T$ has the Nikolskii property of dimension $D$. For
-$1 \leq p \leq r \leq \infty$ put $\alpha(D, p, r) = D(1/p - 1/r)$.
+$0 < p, r \leq \infty$ put $\alpha(D, p, r) = D(1/p - 1/r)$, with $1/\infty = 0$.
 \end{definition}
 
-With $1/\infty = 0$ the exponent $\alpha(D, p, r)$ is defined for all $p, r \in (0, \infty]$. For
-$D > 0$, $1 \leq p < \infty$ and $0 < r \leq \infty$, $\alpha(D, p, r) > 0$ if and only if $p < r$,
+For $D > 0$, $0 < p < \infty$ and $0 < r \leq \infty$, $\alpha(D, p, r) > 0$ if and only if $p < r$,
 and $\alpha(D, p, r) \geq 0$ if and only if $p \leq r$, since $1/r < 1/p$ if and only if
-$p < r$.
+$p < r$. For $0 < p \leq r \leq \infty$, $\alpha(D, p, r) = (D/p)(1 - p/r)$ with $p/\infty = 0$.
+
+The property asks $p \geq 1$ only: its bound at $p = 1$ gives the bound for every
+$0 < p < 1$ (\Cref{lem:nikolskii-inequality}).
 
 For $p = \infty$ the bound reads $\|a\|_{L_\infty} \leq C \|a\|_{L_\infty}$ and holds with
 $C = 1$ for every scheme. For the scheme of $T$ the bound with the supremum norm suffices,
@@ -5084,25 +5087,40 @@ trigonometric polynomials on the torus have it (\Cref{thm:torus-nikolskii}).
 
 \begin{lemma}[Nikolskii inequality]
 \label{lem:nikolskii-inequality}
-\lean{FunctionScheme.HasNikolskii.eLpNorm_le, FunctionScheme.HasNikolskii.liftBound}
+\lean{FunctionScheme.HasNikolskii.exists_eLpNorm_top_le_of_one_le,
+  FunctionScheme.HasNikolskii.exists_eLpNorm_top_le,
+  FunctionScheme.HasNikolskii.exists_eLpNorm_le_of_le, FunctionScheme.HasNikolskii.eLpNorm_le,
+  FunctionScheme.HasNikolskii.liftBound}
 \leanok
-\uses{def:nikolskii-property, lem:lp-interpolation, def:lift-bound,
+\uses{def:nikolskii-property, lem:sup-bound-exponents, def:lift-bound,
   lem:function-scheme-inclusion}
-Let $S$ have the Nikolskii property of dimension $D$, and let $1 \leq p \leq r \leq \infty$.
-There is $C \geq 0$ with $\|a\|_{L_r} \leq C \, n^{\alpha(D,p,r)} \|a\|_{L_p}$ for all
-$n \geq 1$ and $a \in S_n$. In particular $\iota_{r,p}$ satisfies the lifting bound of
-exponent $\alpha(D, p, r)$ for $S^{(p)}$.
+Let $S$ have the Nikolskii property of dimension $D$, and let $0 < p \leq r \leq \infty$.
+There is $C < \infty$ with $\|a\|_{L_r} \leq C \, n^{\alpha(D,p,r)} \|a\|_{L_p}$ for all
+$n \geq 1$ and $a \in S_n$; for $r = \infty$ the bound reads
+$\|a\|_{L_\infty} \leq C \, n^{D/p} \|a\|_{L_p}$. If $\mu$ is finite, then, for
+$1 \leq p \leq r$, the inclusion $\iota_{r,p}$ satisfies the lifting bound of exponent
+$\alpha(D, p, r)$ for $S^{(p)}$.
 \end{lemma}
 
 \begin{proof}
 \leanok
 \uses{lem:inclusion-linear}
-For $r = \infty$ this is the Nikolskii property. For $r < \infty$, \Cref{lem:lp-interpolation}
-with $M = \|a\|_{L_\infty} \leq C n^{D/p} \|a\|_p$ gives $\|a\|_r \leq C^{1-p/r}
-n^{(D/p)(1-p/r)} \|a\|_p$, and $(D/p)(1 - p/r) = \alpha(D, p, r)$. The element
-$\iota_{\infty,r} a$ of $S^{(r)}_n$ lifts $\iota_{\infty,p} a$, since
-$\iota_{r,p} \circ \iota_{\infty,r} = \iota_{\infty,p}$.
+First let $r = \infty$. For $p \geq 1$ this is the Nikolskii property, read in $[0, \infty]$,
+since $\|a\|_{L_\infty} < \infty$. For $0 < p < 1$ the property at $p_0 = 1$ gives
+$\|a\|_{L_\infty} \leq C_1 n^D \|a\|_{L_1}$, and \Cref{lem:sup-bound-exponents}(1) with the
+bound $N = \|a\|_{L_\infty} < \infty$ of $|a|$ gives
+$\|a\|_{L_\infty} \leq (C_1 n^D)^{1/p} \|a\|_{L_p} = C_1^{1/p} n^{D/p} \|a\|_{L_p}$, as
+in~\cite[Theorem~2.1]{DitzianPrymak2016}. In both cases there is $C_0 < \infty$ with
+$\|a\|_{L_\infty} \leq C_0 n^{D/p} \|a\|_{L_p}$ for all $n \geq 1$ and $a \in S_n$. For
+$r < \infty$, \Cref{lem:sup-bound-exponents}(2) with $M = C_0 n^{D/p}$ gives
+$\|a\|_{L_r} \leq C_0^{1-p/r} n^{(D/p)(1-p/r)} \|a\|_{L_p}$, and
+$(D/p)(1 - p/r) = \alpha(D, p, r)$. For finite $\mu$, the element $\iota_{\infty,r} a$ of
+$S^{(r)}_n$ lifts $\iota_{\infty,p} a$, since $\iota_{r,p} \circ \iota_{\infty,r} =
+\iota_{\infty,p}$.
 \end{proof}
+
+The bound holds for every measure $\mu$, as an inequality in $[0, \infty]$. If $\mu$ is finite,
+then $\|a\|_{L_p} < \infty$ for every $a \in S_n$, and the bound holds between real numbers.
 
 \begin{theorem}[Besov embeddings]
 \label{thm:besov-embedding}
@@ -6004,21 +6022,23 @@ hypothesis; the Fourier basis of the torus satisfies it (\Cref{prop:fourier-eige
 \leanok
 \uses{def:local-weyl, lem:lp-interpolation}
 Let the continuous spectral basis satisfy the local Weyl bound of dimension $D$ with constant
-$C$. For every $n \geq 1$, every $a \in \mathcal{E}_n$ and every $1 \leq p \leq 2$,
+$C$. For every $n \geq 1$, every $a \in \mathcal{E}_n$ and every $0 < p \leq 2$,
 \[
   \|a\|_\infty^2 \leq C n^D \|a\|_2^2 ,
   \qquad
   \|a\|_\infty^p \leq C n^D \|a\|_p^p .
 \]
+Equivalently $\|a\|_\infty \leq C^{1/p} n^{D/p} \|a\|_p$; for $p = 2$ the factor is
+$(C n^D)^{1/2}$.
 \end{theorem}
 
 \begin{proof}
 \leanok
 Write $a = \sum_{\lambda(i) < n} c_i \tilde e_i$. By the Cauchy--Schwarz inequality and the local
 Weyl bound, $|a(x)|^2 \leq \sum_i |c_i|^2 \sum_{\lambda(i) < n} |\tilde e_i(x)|^2 \leq C n^D
-\sum_i |c_i|^2$, and $\sum_i |c_i|^2 = \|a\|_2^2$ by Parseval's identity. For $p \leq 2$,
+\sum_i |c_i|^2$, and $\sum_i |c_i|^2 = \|a\|_2^2$ by Parseval's identity. For $0 < p \leq 2$,
 $\|a\|_2^2 \leq \|a\|_\infty^{2-p} \|a\|_p^p$ (\Cref{lem:lp-interpolation}); dividing by
-$\|a\|_\infty^{2-p}$ gives the second inequality.
+$\|a\|_\infty^{2-p}$ gives the second inequality, and its $p$-th root the unpowered form.
 \end{proof}
 
 For $p > 2$ the inequality $\|a\|_\infty \leq C' n^{D/p} \|a\|_p$ does not follow in this way:

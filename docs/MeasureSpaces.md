@@ -86,7 +86,7 @@ The `L_p` tools are in [Tools from analysis](Analysis.md).
   `∑_i (1 + λ(i))^(2s) |⟨e_i, f⟩|² < ∞` (`ContinuousSpectralBasis.memBesov_two_two_iff`). If
   moreover `∑_{λ(i) < n} |e_i(x)|² ≤ C n^D` for all `x` and `n ≥ 1` (the local Weyl bound, the
   hypothesis `ContinuousSpectralBasis.LocalWeylBound`, proved on the torus), then
-  `‖a‖_∞^p ≤ C n^D ‖a‖_p^p` for `1 ≤ p ≤ 2` and `a` in the span of level `< n`
+  `‖a‖_∞^p ≤ C n^D ‖a‖_p^p` for `0 < p ≤ 2` and `a` in the span of level `< n`
   (`ContinuousSpectralBasis.norm_rpow_le_of_localWeyl`), and for `2s > D` every such `f` has a
   bounded continuous representative (`ContinuousSpectralBasis.exists_continuous_of_localWeyl`).
 * **Martingale differences.** For a filtration `ℱ_0 ≤ ℱ_1 ≤ ⋯` on a finite measure space,
@@ -105,14 +105,14 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 |---|---|---|---|
 | Schemes of functions, Besov spaces, elementary embeddings | ✅ | ✗ | `MeasureSpaces/Scheme`, `MeasureSpaces/Besov/Basic`, `MeasureSpaces/Besov/ElementaryEmbeddings` |
 | The couple of a scheme of essentially bounded functions in `L_p`, `0 < p ≤ ∞`: approximants, quasi-triangle and `ρ`-triangle inequality, homogeneity, errors of best approximation, near-best approximants, the inclusions `L_r ↪ L_p`, the complexity couple of the image scheme for `p ≥ 1` | ✅ | ✗ | `MeasureSpaces/SchemeLpCouple` |
-| Nikolskii property, the sign of the Nikolskii exponent, Besov embeddings | ✅ | ✗ | `MeasureSpaces/Besov/Nikolskii`, `MeasureSpaces/Besov/Embeddings` |
+| Nikolskii property, the Nikolskii inequality for `0 < p ≤ r ≤ ∞`, the sign of the Nikolskii exponent, Besov embeddings | ✅ | ✗ | `MeasureSpaces/Besov/Nikolskii`, `MeasureSpaces/Besov/Embeddings` |
 | Besov spaces as interpolation spaces | ✅ | ✗ | `MeasureSpaces/Besov/Interpolation` |
 | Sobolev spaces as a hypothesis structure, Sobolev embeddings | ✅ | ✗ | `MeasureSpaces/Sobolev/Embeddings` |
 | Spectral schemes and `L_2` Sobolev spaces, Jackson and Bernstein | ✅ | ✗ | `MeasureSpaces/Spectral/Basic` |
 | Coefficient characterisations of spectral schemes, `H^s = B^s_{2,2}` | ✅ | ✗ | `MeasureSpaces/Spectral/Blocks` |
 | Hilbert bases of eigenvectors of compact self-adjoint operators | ✅ | ✗ | `MeasureSpaces/Spectral/CompactEigenbasis` |
 | Compact dense embeddings: singular basis, eigenvalues of `J J†` and the singular value `1`, spectral scheme, Jackson and Bernstein, `(H, J(V))_{θ,q} = A^θ_q`, `A^s_2` by the singular values | ✅ | ✗ | `MeasureSpaces/Spectral/CompactEmbedding` |
-| Continuous spectral bases (hypothesis), `B^s_{2,2} = H^s`, local Weyl bound, Nikolskii for `p ≤ 2`, continuity of `H^s` for `s > D/2` | ✅ | ✗ | `MeasureSpaces/Spectral/ContinuousSpectralBasis`, `MeasureSpaces/Spectral/LocalWeyl` |
+| Continuous spectral bases (hypothesis), `B^s_{2,2} = H^s`, local Weyl bound, Nikolskii for `0 < p ≤ 2`, continuity of `H^s` for `s > D/2` | ✅ | ✗ | `MeasureSpaces/Spectral/ContinuousSpectralBasis`, `MeasureSpaces/Spectral/LocalWeyl` |
 | Conditional expectations on `L_p`, filtration schemes (Haar), martingale-difference characterisation | ✅ | ✗ | `MeasureSpaces/Martingales/Filtration` |
 | The conditional expectation onto a countable partition as the average over the cells | ✅ | ✗ | `MeasureSpaces/Martingales/Partition` |
 

@@ -55,7 +55,7 @@ theorem exists_uniform_inclusion_eq_of_nikolskii (h : S.HasNikolskii D) (hD : 0 
         (S.toLp r).approxNormDyadic (s - nikolskiiExponent D p r) q g ≤
           K * (S.toLp p).approxNormDyadic s q f := by
   obtain ⟨C, hC, hN⟩ := h.liftBound hpr
-  have hα := nikolskiiExponent_nonneg hD (Fact.out : 1 ≤ p) hpr
+  have hα := nikolskiiExponent_nonneg hD (zero_lt_one.trans_le (Fact.out : 1 ≤ p)).ne' hpr
   refine ⟨ApproximationScheme.nikolskiiConst C (nikolskiiExponent D p r) s,
     ApproximationScheme.nikolskiiConst_ne_top C hs, fun f hf => ?_⟩
   obtain ⟨g, hg, hle⟩ := ApproximationScheme.exists_preimage_approxNormDyadic_le_of_nikolskii
@@ -72,7 +72,7 @@ theorem MemBesov.exists_inclusion_eq_of_nikolskii (h : S.HasNikolskii D) (hD : 0
     ∃ g : Lp ℂ r μ, Lp.inclusionOfExponentLe (𝕜 := ℝ) μ hpr g = f ∧
       S.MemBesov r (s - nikolskiiExponent D p r) q g := by
   obtain ⟨C, hC, hN⟩ := h.liftBound hpr
-  have hα := nikolskiiExponent_nonneg hD (Fact.out : 1 ≤ p) hpr
+  have hα := nikolskiiExponent_nonneg hD (zero_lt_one.trans_le (Fact.out : 1 ≤ p)).ne' hpr
   obtain ⟨g, hg, hmem⟩ := ApproximationScheme.MemApprox.exists_preimage_of_nikolskii
     (Lp.inclusionOfExponentLe_injective hpr) hN hC hα hs hq (memBesov_iff_memApprox.1 hf)
   refine ⟨g, hg, ?_⟩

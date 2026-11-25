@@ -222,7 +222,8 @@ theorem enorm_blockFun_le_nikolskii (hp : p ≠ ∞) (j : ℕ) (f : Lp ℂ p (vo
 /-- **The Nikolskii inequality for blocks**: for `1 ≤ p ≤ r ≤ ∞`, `p < ∞` and `f ∈ L_p(V)`,
 `‖ψ_j ⋆ f‖_r ≤ N_p^(1-p/r) 2^(j α) ‖ψ_j ⋆ f‖_p` with `α = n(1/p - 1/r)`. For `r = ∞` this is
 `Rd.enorm_blockFun_le_nikolskii`; for `r < ∞` interpolation
-(`MeasureTheory.eLpNorm_le_rpow_mul_eLpNorm_rpow`) gives the exponent `(n/p)(1 - p/r) = α`. -/
+(`MeasureTheory.eLpNorm_le_rpow_mul_eLpNorm_rpow`) gives the exponent `(n/p)(1 - p/r) = α`
+(`nikolskiiExponent_eq_mul_one_sub_div`). -/
 theorem eLpNorm_blockFun_le_nikolskii (hp : p ≠ ∞) {r : ℝ≥0∞} (hpr : p ≤ r) (j : ℕ)
     (f : Lp ℂ p (volume : Measure V)) :
     eLpNorm (blockFun j f) r volume ≤ nikolskiiBlockConst V p ^ (1 - p.toReal / r.toReal) *
@@ -233,15 +234,8 @@ theorem eLpNorm_blockFun_le_nikolskii (hp : p ≠ ∞) {r : ℝ≥0∞} (hpr : p
       eLpNorm_exponent_top (aestronglyMeasurable_blockFun j f)]
     exact eLpNormEssSup_le_of_ae_enorm_bound (ae_of_all _ hb)
   have hp0 : p ≠ 0 := (zero_lt_one.trans_le Fact.out).ne'
-  have hpp : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
-  have hrr : 0 < r.toReal :=
-    ENNReal.toReal_pos (zero_lt_one.trans_le ((Fact.out : 1 ≤ p).trans hpr)).ne' hr
   have h1 : 0 ≤ 1 - p.toReal / r.toReal := ENNReal.one_sub_toReal_div_nonneg hpr
   have hθ : 0 ≤ p.toReal / r.toReal := by positivity
-  have hexp : (finrank ℝ V : ℝ) * p.toReal⁻¹ * (1 - p.toReal / r.toReal) =
-      nikolskiiExponent (finrank ℝ V) p r := by
-    unfold nikolskiiExponent
-    field_simp
   calc eLpNorm (blockFun j f) r volume
       ≤ (nikolskiiBlockConst V p * dyadicWeight (nikolskiiExponent (finrank ℝ V) p ∞) j *
           eLpNorm (blockFun j f) p volume) ^ (1 - p.toReal / r.toReal) *
@@ -256,7 +250,8 @@ theorem eLpNorm_blockFun_le_nikolskii (hp : p ≠ ∞) {r : ℝ≥0∞} (hpr : p
         ring
     _ = _ := by
         rw [← ENNReal.rpow_add_of_nonneg _ _ h1 hθ, sub_add_cancel, ENNReal.rpow_one,
-          ENNReal.dyadicWeight_rpow, nikolskiiExponent_top, hexp]
+          ENNReal.dyadicWeight_rpow, nikolskiiExponent_top,
+          ← nikolskiiExponent_eq_mul_one_sub_div (finrank ℝ V : ℝ) hp0 hpr]
 
 /-- **The blocks lie in `L_r`** for `1 ≤ p ≤ r ≤ ∞`, `p < ∞` and `f ∈ L_p(V)`, by the Nikolskii
 inequality for blocks (`Rd.eLpNorm_blockFun_le_nikolskii`). -/
@@ -352,8 +347,8 @@ theorem exists_memLp_ae_eq_of_memApprox (hp : p ≠ ∞) {r : ℝ≥0∞} (hpr :
     ∃ g : Lp ℂ r (volume : Measure V), (g : V → ℂ) =ᵐ[volume] f ∧
       ‖g‖ₑ ≤ besovEmbeddingConst V p r s * littlewoodPaleyNorm hp s q f := by
   have : Fact (1 ≤ r) := ⟨(Fact.out : 1 ≤ p).trans hpr⟩
-  have hs0 : 0 < s :=
-    (nikolskiiExponent_nonneg (Nat.cast_nonneg _) Fact.out hpr).trans_lt hs
+  have hs0 : 0 < s := (nikolskiiExponent_nonneg (Nat.cast_nonneg _)
+    (zero_lt_one.trans_le Fact.out).ne' hpr).trans_lt hs
   have hLP : littlewoodPaleyNorm hp s q f < ∞ := (memApprox_bandScheme_iff hp hs0 hq).1 hf
   set u : ℕ → Lp ℂ r (volume : Measure V) := fun j => (memLp_blockFun_of_le hp hpr j f).toLp _
   have htsum : ∑' j, ‖u j‖ₑ ≤ besovEmbeddingConst V p r s * littlewoodPaleyNorm hp s q f := by
@@ -385,7 +380,8 @@ theorem exists_boundedContinuous_ae_eq_of_memApprox (hp : p ≠ ∞) {s : ℝ}
       ‖a‖ₑ ≤ besovEmbeddingConst V p ∞ s * littlewoodPaleyNorm hp s q f := by
   have hα : nikolskiiExponent (finrank ℝ V) p ∞ < s := by
     rwa [nikolskiiExponent_top, ← div_eq_mul_inv]
-  have hs0 : 0 < s := (nikolskiiExponent_nonneg (Nat.cast_nonneg _) Fact.out le_top).trans_lt hα
+  have hs0 : 0 < s := (nikolskiiExponent_nonneg (Nat.cast_nonneg _)
+    (zero_lt_one.trans_le Fact.out).ne' le_top).trans_lt hα
   have hLP : littlewoodPaleyNorm hp s q f < ∞ := (memApprox_bandScheme_iff hp hs0 hq).1 hf
   set b : ℕ → ℝ≥0∞ := fun j => nikolskiiBlockConst V p ^ (1 - p.toReal / (∞ : ℝ≥0∞).toReal) *
     dyadicWeight (nikolskiiExponent (finrank ℝ V) p ∞) j * eLpNorm (blockFun j f) p volume
@@ -432,7 +428,8 @@ theorem exists_memLp_ae_eq_of_hasWeakLineDeriv [Nontrivial V] (hp1 : 1 < p) (hp 
     ∃ u : Lp ℂ r (volume : Measure V), (u : V → ℂ) =ᵐ[volume] f ∧
       ‖u‖ₑ ≤ besovEmbeddingConst V p r m * (eLpNorm (lpKernel (V := V)) 1 volume * ‖f‖ₑ +
         2 ^ m * ∑ i, sobolevToTLConst V p i * ‖g i‖ₑ) := by
-  have hm : 1 ≤ m := one_le_of_nikolskiiExponent_lt (Nat.cast_nonneg _) Fact.out hpr hs
+  have hm : 1 ≤ m := one_le_of_nikolskiiExponent_lt (Nat.cast_nonneg _)
+    (zero_lt_one.trans_le Fact.out).ne' hpr hs
   obtain ⟨u, hu, hn⟩ := exists_memLp_ae_eq_of_memApprox hp hpr hs
     (one_le_two.trans (le_max_right _ _)) (memApprox_of_memTriebelLizorkin hp
       (Nat.cast_pos.2 hm) one_le_two (memTriebelLizorkin_of_hasWeakLineDeriv hp1 hp hg))
@@ -459,7 +456,8 @@ theorem exists_boundedContinuous_ae_eq_of_hasWeakLineDeriv [Nontrivial V] (hp1 :
         2 ^ m * ∑ i, sobolevToTLConst V p i * ‖g i‖ₑ) := by
   have hα : nikolskiiExponent (finrank ℝ V) p ∞ < m := by
     rwa [nikolskiiExponent_top, ← div_eq_mul_inv]
-  have hm : 1 ≤ m := one_le_of_nikolskiiExponent_lt (Nat.cast_nonneg _) Fact.out le_top hα
+  have hm : 1 ≤ m := one_le_of_nikolskiiExponent_lt (Nat.cast_nonneg _)
+    (zero_lt_one.trans_le Fact.out).ne' le_top hα
   obtain ⟨a, ha, hn⟩ := exists_boundedContinuous_ae_eq_of_memApprox hp hs
     (one_le_two.trans (le_max_right _ _)) (memApprox_of_memTriebelLizorkin hp
       (Nat.cast_pos.2 hm) one_le_two (memTriebelLizorkin_of_hasWeakLineDeriv hp1 hp hg))
@@ -480,7 +478,8 @@ theorem exists_memLp_ae_eq_of_memSobolevW [Nontrivial V] (hp1 : 1 < p) (hp : p �
     {r : ℝ≥0∞} (hpr : p ≤ r) {m : ℕ}
     (hs : nikolskiiExponent (finrank ℝ V) p r < m) {f : Lp ℂ p (volume : Measure V)}
     (hf : MemSobolevW m f) : ∃ g : Lp ℂ r (volume : Measure V), (g : V → ℂ) =ᵐ[volume] f := by
-  have hm : 1 ≤ m := one_le_of_nikolskiiExponent_lt (Nat.cast_nonneg _) Fact.out hpr hs
+  have hm : 1 ≤ m := one_le_of_nikolskiiExponent_lt (Nat.cast_nonneg _)
+    (zero_lt_one.trans_le Fact.out).ne' hpr hs
   obtain ⟨g, hg, -⟩ := exists_memLp_ae_eq_of_memApprox hp hpr hs
     (one_le_two.trans (le_max_right _ _)) (memApprox_of_memSobolevW hp1 hp hm hf)
   exact ⟨g, hg⟩
@@ -495,7 +494,8 @@ theorem exists_boundedContinuous_ae_eq_of_memSobolevW [Nontrivial V] (hp1 : 1 < 
     (hf : MemSobolevW m f) : ∃ a : V →ᵇ ℂ, (a : V → ℂ) =ᵐ[volume] f := by
   have hα : nikolskiiExponent (finrank ℝ V) p ∞ < m := by
     rwa [nikolskiiExponent_top, ← div_eq_mul_inv]
-  have hm : 1 ≤ m := one_le_of_nikolskiiExponent_lt (Nat.cast_nonneg _) Fact.out le_top hα
+  have hm : 1 ≤ m := one_le_of_nikolskiiExponent_lt (Nat.cast_nonneg _)
+    (zero_lt_one.trans_le Fact.out).ne' le_top hα
   obtain ⟨a, ha, -⟩ := exists_boundedContinuous_ae_eq_of_memApprox hp hs
     (one_le_two.trans (le_max_right _ _)) (memApprox_of_memSobolevW hp1 hp hm hf)
   exact ⟨a, ha⟩
