@@ -44,10 +44,16 @@ inequality `‖a + b‖_q ≤ C_q (‖a‖_q + ‖b‖_q)` with Mathlib's consta
 (`ENNReal.lqNorm_add_le'`, `ENNReal.lqNorm_le_head_add_shift'`); `C_q = 2^(1/q - 1)` for
 `0 < q < 1` and `C_q = 1` otherwise, with `1 ≤ C_q`, `2^(1/q) ≤ 2 C_q` and
 `(x^q + y^q)^(1/q) ≤ C_q (x + y)` (`ENNReal.one_le_LpAddConst`,
-`ENNReal.two_rpow_one_div_le_two_mul_LpAddConst`, `ENNReal.rpow_add_rpow_le_LpAddConst_mul`).
+`ENNReal.two_rpow_one_div_le_two_mul_LpAddConst`, `ENNReal.rpow_add_rpow_le_LpAddConst_mul`);
+hence `x^ρ ≤ a^ρ + b^ρ` implies `x ≤ C_ρ (a + b)` for every real `ρ > 0`
+(`ENNReal.le_mul_add_of_rpow_le_add_rpow`), and `x^ρ ≤ c y^ρ` implies `x ≤ c^(1/ρ) y`
+(`ENNReal.le_rpow_one_div_mul_of_rpow_le`).
 On any measure space the `p`-th power of the `L_p` quasi-norm, `0 < p ≤ 1`, is subadditive,
 `‖f + g‖_p^p ≤ ‖f‖_p^p + ‖g‖_p^p` (`MeasureTheory.eLpNorm_add_rpow_le_of_le_one`), so sums of
-many terms are estimated in the `p`-th power with constant `1`.
+many terms are estimated in the `p`-th power with constant `1`. A sequence with finite weighted
+norm `‖(2^(ks) a_k)_k‖_{ℓ_q}`, `q ≠ 0`, `s > 0`, has summable powers `∑_k a_k^ρ < ∞` for every
+`ρ > 0` (`ENNReal.tsum_rpow_le_lqNorm_dyadicWeight`,
+`ENNReal.tsum_rpow_ne_top_of_lqNorm_dyadicWeight_ne_top`).
 
 The file adds what Mathlib lacks: the explicit formulas, homogeneity for `ℝ≥0∞` scalars,
 **monotonicity in `q`** (`lqNorm r a ≤ lqNorm q a` for `0 < q ≤ r`; Mathlib has only the
@@ -1077,15 +1083,40 @@ theorem tendsto_zero_of_lqNorm_dyadicWeight_ne_top {q : ℝ≥0∞} (hq0 : q ≠
   exact tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds h (fun _ => zero_le)
     fun j => (le_dyadicWeight_neg_mul_lqNorm hq0 s e j).trans_eq (by rw [dyadicWeight_eq_pow])
 
-/-- **Weighted sequences are summable**: `∑_j a_j ≤ (1 - 2^(-s))⁻¹ ‖(2^(js) a_j)_j‖_{ℓ_q}`,
-since `a_j ≤ 2^(-js) ‖(2^(js) a_j)_j‖_{ℓ_q}` (`ENNReal.le_dyadicWeight_neg_mul_lqNorm`). -/
+/-- **The sum of powers by the weighted `ℓ_q` norm**: for `q ≠ 0`, every `s` and every `ρ ≥ 0`,
+`∑_j a_j^ρ ≤ (1 - 2^(-sρ))⁻¹ ‖(2^(js) a_j)_j‖_{ℓ_q}^ρ`, since
+`a_j ≤ 2^(-js) ‖(2^(ks) a_k)_k‖_{ℓ_q}` (`ENNReal.le_dyadicWeight_neg_mul_lqNorm`) and
+`∑_j 2^(-jsρ) = (1 - 2^(-sρ))⁻¹`. The constant is finite for `sρ > 0`. -/
+theorem tsum_rpow_le_lqNorm_dyadicWeight {q : ℝ≥0∞} (hq0 : q ≠ 0) (s : ℝ) {ρ : ℝ} (hρ : 0 ≤ ρ)
+    (a : ℕ → ℝ≥0∞) :
+    ∑' j, a j ^ ρ ≤
+      (1 - (2 : ℝ≥0∞) ^ (-(s * ρ)))⁻¹ * lqNorm q (fun j => dyadicWeight s j * a j) ^ ρ := by
+  set X := lqNorm q (fun j => dyadicWeight s j * a j)
+  have hterm : ∀ j, a j ^ ρ ≤ dyadicWeight (-(s * ρ)) j * X ^ ρ := fun j => by
+    calc a j ^ ρ ≤ (dyadicWeight (-s) j * X) ^ ρ :=
+          ENNReal.rpow_le_rpow (le_dyadicWeight_neg_mul_lqNorm hq0 s a j) hρ
+      _ = dyadicWeight (-(s * ρ)) j * X ^ ρ := by
+          rw [mul_rpow_of_nonneg _ _ hρ, dyadicWeight_rpow, neg_mul]
+  calc ∑' j, a j ^ ρ ≤ ∑' j, dyadicWeight (-(s * ρ)) j * X ^ ρ := ENNReal.tsum_le_tsum hterm
+    _ = (1 - (2 : ℝ≥0∞) ^ (-(s * ρ)))⁻¹ * X ^ ρ := by
+        rw [ENNReal.tsum_mul_right, tsum_dyadicWeight_neg]
+
+/-- **Weighted sequences are summable**: `∑_j a_j ≤ (1 - 2^(-s))⁻¹ ‖(2^(js) a_j)_j‖_{ℓ_q}` for
+`q ≥ 1`, the case `ρ = 1` of `ENNReal.tsum_rpow_le_lqNorm_dyadicWeight`. -/
 theorem tsum_le_lqNorm_dyadicWeight {q : ℝ≥0∞} (hq : 1 ≤ q) (s : ℝ) (a : ℕ → ℝ≥0∞) :
     ∑' j, a j ≤ (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * lqNorm q (fun j => dyadicWeight s j * a j) := by
-  set X := lqNorm q (fun j => dyadicWeight s j * a j)
-  calc ∑' j, a j ≤ ∑' j, dyadicWeight (-s) j * X := ENNReal.tsum_le_tsum fun j =>
-        le_dyadicWeight_neg_mul_lqNorm (zero_lt_one.trans_le hq).ne' s a j
-    _ = (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * X := by
-        rw [ENNReal.tsum_mul_right, tsum_dyadicWeight_neg]
+  simpa only [ENNReal.rpow_one, mul_one] using
+    tsum_rpow_le_lqNorm_dyadicWeight (zero_lt_one.trans_le hq).ne' s zero_le_one a
+
+/-- **Summable powers of a weighted `ℓ_q` sequence**: for `q ≠ 0`, `s > 0` and `ρ > 0`, if
+`‖(2^(ks) a_k)_k‖_{ℓ_q} < ∞`, then `∑_k a_k^ρ < ∞`, by
+`ENNReal.tsum_rpow_le_lqNorm_dyadicWeight`, whose constant `(1 - 2^(-sρ))⁻¹` is finite for
+`sρ > 0`. -/
+theorem tsum_rpow_ne_top_of_lqNorm_dyadicWeight_ne_top {q : ℝ≥0∞} (hq0 : q ≠ 0) {s ρ : ℝ}
+    (hs : 0 < s) (hρ : 0 < ρ) {a : ℕ → ℝ≥0∞}
+    (hL : lqNorm q (fun k => dyadicWeight s k * a k) ≠ ∞) : ∑' k, a k ^ ρ ≠ ∞ :=
+  ne_top_of_le_ne_top (mul_ne_top (one_sub_two_rpow_neg_inv_ne_top (_root_.mul_pos hs hρ))
+    (rpow_ne_top_of_nonneg hρ.le hL)) (tsum_rpow_le_lqNorm_dyadicWeight hq0 s hρ.le a)
 
 /-- **A series with weighted bounds**: if the partial sums of `∑ u_j` converge to `F` and
 `‖u_j‖ ≤ K b_j`, then `‖F‖ ≤ K (1 - 2^(-s))⁻¹ ‖(2^(js) b_j)_j‖_{ℓ_q}`
@@ -1267,12 +1298,19 @@ theorem rpow_mul_rpow_ne_top {a b : ℝ≥0∞} (ha0 : a ≠ 0) (ha : a ≠ ∞)
     (θ : ℝ) : a ^ (1 - θ) * b ^ θ ≠ ∞ :=
   ENNReal.mul_ne_top (ENNReal.rpow_ne_top_of_ne_zero ha0 ha) (ENNReal.rpow_ne_top_of_ne_zero hb0 hb)
 
-/-- From `x^p ≤ 2 y^p` to `x ≤ 2^(1/p) y`, for `0 < p < ∞`. -/
-theorem le_two_rpow_mul_of_rpow_le {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞) {x y : ℝ≥0∞}
-    (h : x ^ p.toReal ≤ 2 * y ^ p.toReal) : x ≤ 2 ^ (1 / p.toReal) * y := by
-  have hρ : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
+/-- **From a bound in `ρ`-th powers to the bound itself**: `x^ρ ≤ c y^ρ` implies
+`x ≤ c^(1/ρ) y`, for every real `ρ > 0` and all `x, y, c ∈ [0, ∞]`, since `t ↦ t^ρ` is an order
+isomorphism of `[0, ∞]` (Mathlib's `ENNReal.rpow_le_rpow_iff`). -/
+theorem le_rpow_one_div_mul_of_rpow_le {ρ : ℝ} (hρ : 0 < ρ) {x y c : ℝ≥0∞}
+    (h : x ^ ρ ≤ c * y ^ ρ) : x ≤ c ^ (1 / ρ) * y := by
   rwa [← ENNReal.rpow_le_rpow_iff hρ, ENNReal.mul_rpow_of_nonneg _ _ hρ.le, ← ENNReal.rpow_mul,
     one_div_mul_cancel hρ.ne', ENNReal.rpow_one]
+
+/-- From `x^p ≤ 2 y^p` to `x ≤ 2^(1/p) y`, for `0 < p < ∞`: the case `ρ = p.toReal`, `c = 2` of
+`ENNReal.le_rpow_one_div_mul_of_rpow_le`. -/
+theorem le_two_rpow_mul_of_rpow_le {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞) {x y : ℝ≥0∞}
+    (h : x ^ p.toReal ≤ 2 * y ^ p.toReal) : x ≤ 2 ^ (1 / p.toReal) * y :=
+  le_rpow_one_div_mul_of_rpow_le (ENNReal.toReal_pos hp0 hp) h
 
 /-! ### The constant of the quasi-triangle inequality -/
 
@@ -1317,6 +1355,21 @@ theorem rpow_add_rpow_le_LpAddConst_mul {q : ℝ≥0∞} (hq0 : q ≠ 0) (hq : q
   have hp : q.toReal ≠ 0 := (ENNReal.toReal_pos hq0 hq).ne'
   have h := rpow_add_le_mul_rpow_add_rpow'' (x ^ q.toReal) (y ^ q.toReal) (p := q)
   rwa [rpow_rpow_inv hp, rpow_rpow_inv hp, ← one_div] at h
+
+/-- **The quasi-triangle inequality from the `ρ`-triangle inequality**: for every real `ρ > 0`
+and `x, a, b ∈ [0, ∞]`, `x^ρ ≤ a^ρ + b^ρ` implies `x ≤ C_ρ (a + b)` with Mathlib's constant
+`C_ρ = LpAddConst ρ`, which is `2^(1/ρ - 1)` for `ρ < 1` and `1` for `ρ ≥ 1`: take the `ρ`-th root
+(Mathlib's `ENNReal.le_rpow_inv_iff`) and apply `ENNReal.rpow_add_rpow_le_LpAddConst_mul` at the
+exponent `ρ`. -/
+theorem le_mul_add_of_rpow_le_add_rpow {ρ : ℝ} (hρ : 0 < ρ) {x a b : ℝ≥0∞}
+    (h : x ^ ρ ≤ a ^ ρ + b ^ ρ) : x ≤ LpAddConst (ENNReal.ofReal ρ) * (a + b) := by
+  have h' := rpow_add_rpow_le_LpAddConst_mul (ENNReal.ofReal_pos.2 hρ).ne' ENNReal.ofReal_ne_top
+    a b
+  rw [ENNReal.toReal_ofReal hρ.le] at h'
+  calc x ≤ (a ^ ρ + b ^ ρ) ^ (1 / ρ) := by
+        rw [one_div]
+        exact (ENNReal.le_rpow_inv_iff hρ).2 h
+    _ ≤ LpAddConst (ENNReal.ofReal ρ) * (a + b) := h'
 
 end ENNReal
 

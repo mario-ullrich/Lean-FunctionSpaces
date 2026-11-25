@@ -392,8 +392,8 @@ $p \in (0, \infty)$, every countable set $K$ and countable sets $N_k$, $k \in K$
 $(b_{k,n})_{k \in K, n \in N_k}$ in $[0, \infty]$ has
 $\bigl\|\bigl(\|(b_{k,n})_{n \in N_k}\|_{\ell_p}\bigr)_{k \in K}\bigr\|_{\ell_p}^p
 = \sum_{k \in K} \sum_{n \in N_k} b_{k,n}^p$.
-The bound $\|a\|_{\ell_r} \leq \|a\|_{\ell_q}$ of the fourth item and the sequence with one
-nonzero term of the seventh hold for all $0 < q \leq r \leq \infty$.
+The first two items, the bound $\|a\|_{\ell_r} \leq \|a\|_{\ell_q}$ of the fourth item and the
+sequence with one nonzero term of the seventh hold for all $0 < q \leq r \leq \infty$.
 \end{lemma}
 
 \begin{proof}
@@ -926,12 +926,14 @@ The three finite inequalities copy Mathlib pull request~\#44783.
 \lean{ENNReal.lqNorm_add_le', ENNReal.lqNorm_le_head_add_shift',
   ENNReal.lqNorm_le_rpow_mul_of_tsum_rpow_le,
   ENNReal.one_le_LpAddConst, ENNReal.two_rpow_one_div_le_two_mul_LpAddConst,
-  ENNReal.rpow_add_rpow_le_LpAddConst_mul}
+  ENNReal.rpow_add_rpow_le_LpAddConst_mul, ENNReal.le_mul_add_of_rpow_le_add_rpow}
 \leanok
 \uses{def:lq-norm, lem:lq-basic, lem:lq-reindex}
 For $q \in (0, \infty]$ let $C_q = 2^{1/q - 1}$ for $q < 1$ and $C_q = 1$ for $q \geq 1$. Then
 $C_q \geq 1$ and $2^{1/q} \leq 2 C_q$, with $1/\infty = 0$, and
-$(x^q + y^q)^{1/q} \leq C_q (x + y)$ for all $x, y \in [0, \infty]$ if $q < \infty$. For every
+$(x^q + y^q)^{1/q} \leq C_q (x + y)$ for all $x, y \in [0, \infty]$ if $q < \infty$; hence for
+every real $\rho > 0$ and all $x, a, b \in [0, \infty]$, $x^\rho \leq a^\rho + b^\rho$ implies
+$x \leq C_\rho (a + b)$. For every
 $q \in (0, \infty]$, all families $a, b$ in $[0, \infty]$ on a countable set and every sequence
 $c$ in $[0, \infty]$,
 \[
@@ -950,7 +952,9 @@ For $0 < q < 1$, $1/q - 1 > 0$ gives $C_q \geq 1$, and $2 C_q = 2^{1/q}$; for $q
 $2^{1/q} \leq 2$. The bound for two numbers is the power mean inequality
 $(u + v)^{t} \leq C_q (u^{t} + v^{t})$ with $t = 1/q$ (Mathlib's
 \texttt{ENNReal.\allowbreak rpow\_\allowbreak add\_\allowbreak le\_\allowbreak mul\_\allowbreak
-rpow\_\allowbreak add\_\allowbreak rpow''}) for $u = x^q$ and $v = y^q$. The quasi-triangle
+rpow\_\allowbreak add\_\allowbreak rpow''}) for $u = x^q$ and $v = y^q$; for the consequence take
+the $\rho$-th root, $x \leq (a^\rho + b^\rho)^{1/\rho}$, and apply this bound with $q = \rho$. The
+quasi-triangle
 inequality is Mathlib's \texttt{eLpNorm\_\allowbreak add\_\allowbreak le'} for the counting
 measure; applied to $c = c_0 \delta_0 + (0, c_1, c_2, \dots)$ it gives the second bound, since the
 first summand has the norm $c_0$ (\Cref{lem:lq-basic}) and the second is $(c_{k+1})_k$ extended
@@ -997,14 +1001,15 @@ sequence $(a_j^q)_j$ applies.
 
 \begin{lemma}[Hardy inequalities for every exponent]
 \label{lem:hardy-every-exponent}
-\lean{ENNReal.hardyConst, ENNReal.hardyConst_ne_top, ENNReal.hardy_tail_le',
-  ENNReal.hardy_sum_le'}
+\lean{ENNReal.hardyConst, ENNReal.hardyConst_ne_top, ENNReal.one_le_hardyConst,
+  ENNReal.hardyConst_rpow_ne_top, ENNReal.hardy_tail_le', ENNReal.hardy_sum_le'}
 \leanok
 \uses{lem:hardy, lem:hardy-below-one}
 For $\alpha \in \R$ and $q \in (0, \infty]$ let $H_{\alpha, q} = (1 - 2^{-\alpha})^{-1}$ for
 $q \geq 1$ and $H_{\alpha, q} = \gamma_{\alpha, q}$ for $q < 1$, with $\gamma_{\alpha, q}$ as in
-\Cref{lem:hardy-below-one}; $H_{\alpha, q}$ is finite for $\alpha > 0$. For every sequence $b$ in
-$[0, \infty]$,
+\Cref{lem:hardy-below-one}. Then $H_{\alpha, q} \geq 1$, and for $\alpha > 0$ the constant
+$H_{\alpha, q}$ and its powers $H_{\alpha, q}^t$, $t \geq 0$, are finite. For every sequence $b$
+in $[0, \infty]$,
 \begin{align*}
   \Bigl\| \Bigl(2^{k\alpha} \sum_{i=0}^\infty b_{k+i}\Bigr)_k \Bigr\|_{\ell_q}
   &\leq H_{\alpha, q} \, \|(2^{k\alpha} b_k)_k\|_{\ell_q} , \\
@@ -1015,7 +1020,11 @@ $[0, \infty]$,
 
 \begin{proof}
 \leanok
-\Cref{lem:hardy} for $q \geq 1$ and \Cref{lem:hardy-below-one} for $q < 1$.
+\uses{def:lq-norm, lem:lq-reindex}
+\Cref{lem:hardy} for $q \geq 1$ and \Cref{lem:hardy-below-one} for $q < 1$. Both constants are
+at least $1$: in $[0, \infty]$ the numbers $1 - 2^{-\alpha}$ and $1 - 2^{-\alpha q}$ lie in
+$[0, 1]$, so their inverses, and the positive powers of these, are at least $1$
+(\Cref{def:lq-norm}, \Cref{lem:lq-reindex}).
 \end{proof}
 
 \begin{lemma}[Powers of $L_p$ quasi-norms]
@@ -1056,7 +1065,10 @@ constant accumulates. \Cref{sec:moduli-quasi} uses this with Hardy's inequality 
 \begin{lemma}[Weighted tails]
 \label{lem:weighted-tails}
 \lean{ENNReal.le_dyadicWeight_neg_mul_lqNorm, ENNReal.tendsto_zero_of_lqNorm_dyadicWeight_ne_top,
-  ENNReal.lqNorm_rpow_le_of_rpow_le_tsum, ENNReal.le_two_rpow_mul_of_rpow_le}
+  ENNReal.lqNorm_rpow_le_of_rpow_le_tsum, ENNReal.lqNorm_le_of_rpow_le_tsum,
+  ENNReal.le_rpow_one_div_mul_of_rpow_le, ENNReal.le_two_rpow_mul_of_rpow_le,
+  ENNReal.lqNorm_rpow_le_of_rpow_le_sum, ENNReal.lqNorm_le_of_rpow_le_sum,
+  ENNReal.tsum_rpow_le_lqNorm_dyadicWeight, ENNReal.tsum_rpow_ne_top_of_lqNorm_dyadicWeight_ne_top}
 \leanok
 \uses{def:lq-norm, lem:hardy-every-exponent}
 Let $q \in (0, \infty]$, $s \in \R$ and let $e$, $x$, $y$ be sequences in $[0, \infty]$.
@@ -1069,20 +1081,46 @@ Let $q \in (0, \infty]$, $s \in \R$ and let $e$, $x$, $y$ be sequences in $[0, \
       \|(2^{ks} x_k)_k\|_{\ell_q}^\rho \leq c \, H_{s\rho - \beta, q/\rho} \,
       \|(2^{ks} y_k)_k\|_{\ell_q}^\rho ,
     \]
-    with $H$ as in \Cref{lem:hardy-every-exponent}.
-  \item For $0 < p < \infty$ and $a, b \in [0, \infty]$, $a^p \leq 2 b^p$ implies
+    with $H$ as in \Cref{lem:hardy-every-exponent}, hence
+    \[
+      \|(2^{ks} x_k)_k\|_{\ell_q} \leq (c \, H_{s\rho - \beta, q/\rho})^{1/\rho} \,
+      \|(2^{ks} y_k)_k\|_{\ell_q} .
+    \]
+  \item For real $\rho > 0$ and $a, b, c \in [0, \infty]$, $a^\rho \leq c \, b^\rho$ implies
+    $a \leq c^{1/\rho} b$; in particular, for $0 < p < \infty$, $a^p \leq 2 b^p$ implies
     $a \leq 2^{1/p} b$.
+  \item Let $\rho > 0$, $\beta \in \R$ and $c \in [0, \infty]$. If
+    $x_k^\rho \leq c \sum_{j \leq k} 2^{-(k-j)\beta} y_j^\rho$ for every $k$, then
+    \[
+      \|(2^{ks} x_k)_k\|_{\ell_q}^\rho \leq c \, H_{\beta - s\rho, q/\rho} \,
+      \|(2^{ks} y_k)_k\|_{\ell_q}^\rho ,
+    \]
+    hence
+    \[
+      \|(2^{ks} x_k)_k\|_{\ell_q} \leq (c \, H_{\beta - s\rho, q/\rho})^{1/\rho} \,
+      \|(2^{ks} y_k)_k\|_{\ell_q} .
+    \]
+  \item $\sum_k e_k^\rho \leq (1 - 2^{-s\rho})^{-1} \|(2^{ks} e_k)_k\|_{\ell_q}^\rho$ for every
+    $\rho > 0$; for $\rho = 1$ and $q \geq 1$ this is the last bound of \Cref{lem:hardy}. In
+    particular, if $s > 0$ and $\|(2^{ks} e_k)_k\|_{\ell_q} < \infty$, then
+    $\sum_k e_k^\rho < \infty$ for every $\rho > 0$.
 \end{enumerate}
 \end{lemma}
 
 \begin{proof}
 \leanok
-\uses{lem:lq-basic, lem:lp-rho-triangle}
+\uses{lem:lq-basic, lem:lp-rho-triangle, lem:hardy}
 (1) $2^{js} e_j$ is one term of the sequence. (2) Multiply by $2^{ks\rho}$: with
 $\alpha = s\rho - \beta$ and $b_j = 2^{j\beta} y_j^\rho$ the right side is
 $c \, 2^{k\alpha} \sum_{i \geq 0} b_{k+i}$, and \Cref{lem:hardy-every-exponent} in
 $\ell_{q/\rho}$ applies, since $\|(z_k^\rho)_k\|_{\ell_{q/\rho}} = \|z\|_{\ell_q}^\rho$
-(\Cref{lem:lp-rho-triangle}).
+(\Cref{lem:lp-rho-triangle}). The second bound is (3) for this bound. (3) The map
+$t \mapsto t^\rho$ is an increasing bijection of $[0, \infty]$, and
+$(c^{1/\rho} b)^\rho = c \, b^\rho$. (4) As (2), with
+$2^{ks\rho} \, 2^{-(k-j)\beta} = 2^{-k\alpha} \, 2^{j\beta}$ for $j \leq k$ and
+$\alpha = \beta - s\rho$, and Hardy's inequality for partial sums in place of tails. (5) By (1),
+$e_k^\rho \leq 2^{-ks\rho} \|(2^{js} e_j)_j\|_{\ell_q}^\rho$, and
+$\sum_k 2^{-ks\rho} = (1 - 2^{-s\rho})^{-1}$ (\Cref{lem:hardy}), which is finite for $s\rho > 0$.
 \end{proof}
 
 \chapter{Approximation spaces}
@@ -3664,32 +3702,51 @@ since $N_1(0) = 0$, and $E'(t, Tu) \leq N_0'(Tu) \leq 0$.
 \begin{lemma}[Near-best sequences]
 \label{lem:e-near-best}
 \lean{InterpCouple.exists_nearBest_eFunctional, InterpCouple.antitone_eFunctional_add_dyadicWeight,
-  InterpCouple.norm0_sub_succ_rpow_le_of_nearBest}
+  InterpCouple.norm0_sub_rpow_le, InterpCouple.norm0_sub_succ_rpow_le_of_nearBest,
+  InterpCouple.norm1_sub_le, InterpCouple.norm1_sub_le_pow_add_two,
+  InterpCouple.lqNorm_dyadicWeight_mul_eFunctional_add_le, InterpCouple.exists_nearBest_tolerances}
 \leanok
-\uses{def:e-functional}
+\uses{def:e-functional, def:e-method, lem:lq-quasi-triangle, lem:lq-reindex}
 Let $A = (N_0, N_1)$ be a couple on $U$, let $u \in U$ and $s \in \R$, and put
 $e_k = E(2^k, u) + N_0(u) \, 2^{-k(s+1)}$ for $k \in \N$.
 \begin{enumerate}
   \item If $N_1(0) = 0$, there are $b_k \in U$, $k \in \N$, with $N_1(b_k) \leq 2^k$ and
     $N_0(u - b_k) \leq e_k$ for every $k$.
   \item If $s \geq -1$, the sequence $(e_k)_k$ decreases.
-  \item Let $N_0$ be even, let $\rho \geq 0$ and let
-    $N_0(a + b)^\rho \leq N_0(a)^\rho + N_0(b)^\rho$ for all $a, b \in U$. If $b_k \in U$ and a
-    decreasing sequence $(d_k)_k$ in $[0, \infty]$ satisfy $N_0(u - b_k) \leq d_k$ for every
-    $k$, then $N_0(b_{k+1} - b_k)^\rho \leq 2 d_k^\rho$ for every $k$.
+  \item If $N_0$ is even and $N_0(a + b)^\rho \leq N_0(a)^\rho + N_0(b)^\rho$ for all
+    $a, b \in U$ and some $\rho \geq 0$, then $N_0(a - b)^\rho \leq N_0(a)^\rho + N_0(b)^\rho$
+    for all $a, b \in U$; if moreover $b_k \in U$ and a decreasing sequence $(d_k)_k$ in
+    $[0, \infty]$ satisfy $N_0(u - b_k) \leq d_k$ for every $k$, then
+    $N_0(b_{k+1} - b_k)^\rho \leq 2 d_k^\rho$ for every $k$. If $N_1$ is even and subadditive,
+    then $N_1(a - b) \leq N_1(a) + N_1(b)$ for all $a, b \in U$, and $N_1(b' - b) \leq 2^{j+2}$
+    for all $b, b' \in U$ and $j \in \N$ with $N_1(b) \leq 2^j$ and $N_1(b') \leq 2^{j+1}$.
+  \item $\|(2^{ks} e_k)_k\|_{\ell_q} \leq C_q (1 + \gamma_{1, q}) \,
+    \|u\|^{\mathrm{dy}}_{E, s, q}$ for every $q \in (0, \infty]$, with the constants $C_q$ of
+    \Cref{lem:lq-quasi-triangle} and $\gamma_{1, q}$ of \Cref{lem:lq-reindex}. Consequently, if
+    $N_1(0) = 0$ and $s \geq -1$, there are $b_k \in U$ with $N_1(b_k) \leq 2^k$ and a
+    decreasing sequence $(e_k')_k$ in $[0, \infty]$ with $N_0(u - b_k) \leq e_k'$ for every $k$,
+    $N_0(u) \leq e_0'$ and
+    $\|(2^{ks} e_k')_k\|_{\ell_q} \leq C_q (1 + \gamma_{1, q}) \|u\|^{\mathrm{dy}}_{E, s, q}$ for
+    every $q \in (0, \infty]$.
 \end{enumerate}
 \end{lemma}
 
 \begin{proof}
 \leanok
-\uses{lem:e-functional}
+\uses{lem:e-functional, lem:lq-basic}
 (1) If $N_0(u) = 0$ or $N_0(u) = \infty$, take $b_k = 0$: it is admissible since $N_1(0) = 0$,
 and $N_0(u - 0) = N_0(u) \leq e_k$. Otherwise $E(2^k, u) \leq N_0(u) < \infty$, the tolerance
 $N_0(u) \, 2^{-k(s+1)}$ is positive, and (3) of \Cref{lem:e-functional} gives $b_k$.
 (2) $E(t, u)$ decreases in $t$ (\Cref{lem:e-functional}), and $2^{-k(s+1)}$ decreases in $k$ for
-$s + 1 \geq 0$. (3) Write $b_{k+1} - b_k = (u - b_k) - (u - b_{k+1})$; evenness and the
-subadditivity of $N_0^\rho$ give
-$N_0(b_{k+1} - b_k)^\rho \leq d_k^\rho + d_{k+1}^\rho \leq 2 d_k^\rho$.
+$s + 1 \geq 0$. (3) Write $a - b = a + (-b)$ and use $N_0(-b) = N_0(b)$; then
+$b_{k+1} - b_k = (u - b_k) - (u - b_{k+1})$ gives
+$N_0(b_{k+1} - b_k)^\rho \leq d_k^\rho + d_{k+1}^\rho \leq 2 d_k^\rho$. In the same way
+$N_1(a - b) \leq N_1(a) + N_1(b)$, and $2^{j+1} + 2^j \leq 2^{j+2}$. (4) Since
+$2^{ks} N_0(u) \, 2^{-k(s+1)} = N_0(u) \, 2^{-k}$, the quasi-triangle inequality gives
+$\|(2^{ks} e_k)_k\|_{\ell_q} \leq C_q \bigl(\|(2^{ks} E(2^k, u))_k\|_{\ell_q} + N_0(u) \,
+\|(2^{-k})_k\|_{\ell_q}\bigr)$, and $\|(2^{-k})_k\|_{\ell_q} \leq \gamma_{1, q}$, $1 \leq
+1 + \gamma_{1, q}$. The near-best elements of (1) with $e_k' = e_k$ satisfy the rest by (2) and
+$N_0(u) \leq e_0$.
 \end{proof}
 
 In $L_p$ with $0 < p < 1$, near-best sequences take the role of bounded projections onto the
@@ -3839,6 +3896,122 @@ For approximation schemes this is the $E$-method of~\cite[Section~7.1]{BerghLofs
 couple needs only an abelian group, so it applies to quasi-normed spaces such as $L_p$ with
 $p < 1$, where \Cref{sec:moduli-quasi} identifies the approximation spaces with classical
 spaces.
+
+\section{\texorpdfstring{$E$}{E}-spaces as interpolation spaces}
+\label{sec:e-spaces-interpolate}
+
+In this section $A = (N_0, N_1)$ is a couple on an abelian group $U$, with the $E$-functional and
+the spaces $E_{s, q}$ of \Cref{sec:e-functional}. As in
+\Cref{sec:approximation-spaces-interpolate} for a scheme in a normed space, the spaces
+$E_{s, q}$ are compared with the interpolation spaces of the couple $(N_0, E_{r, q_1})$,
+following the representation $A^s_q = (X, A^r_{q_1})_{s/r, q}$ of~\cite{Pietsch, DeVorePopovLNM}
+and~\cite[\S 4.3, Theorem~2]{DeVore1998}. The dyadic norm of $E_{r, q_1}$ satisfies Jackson's
+inequality by definition, and the couples need only the quasi-triangle inequality of $N_0$, so
+they include $L_p$ with $p < 1$.
+
+\begin{definition}[Couples of $E$-spaces]
+\label{def:e-couples}
+\lean{InterpCouple.leftECouple, InterpCouple.eCouple, InterpCouple.leftECouple_norm0,
+  InterpCouple.leftECouple_norm1, InterpCouple.eCouple_norm0, InterpCouple.eCouple_norm1}
+\leanok
+\uses{def:couple, def:e-method}
+Let $r, s_0, s_1 \in \R$ and $q_0, q_1 \in (0, \infty]$. The couple $(N_0, E_{r, q_1})$ on $U$
+has the norms $N_0$ and $\|\cdot\|^{\mathrm{dy}}_{E, r, q_1}$. The couple
+$(E_{s_0, q_0}, E_{s_1, q_1})$ on $U$ has the norms $\|\cdot\|^{\mathrm{dy}}_{E, s_0, q_0}$ and
+$\|\cdot\|^{\mathrm{dy}}_{E, s_1, q_1}$.
+\end{definition}
+
+\begin{lemma}[Couples of $E$-spaces are quasi-normed]
+\label{lem:e-couples}
+\lean{InterpCouple.eNormDyadic_neg, InterpCouple.norm0_le_leftECouple_norm1,
+  InterpCouple.le_eAddConst, InterpCouple.isQuasiNormed_leftECouple,
+  InterpCouple.isQuasiNormed_eCouple, InterpCouple.isHomogeneousCouple_leftECouple,
+  InterpCouple.isHomogeneousCouple_eCouple}
+\leanok
+\uses{def:e-couples, def:couple, lem:lq-quasi-triangle}
+Let $s, r, s_0, s_1 \in \R$ and $q, q_0, q_1 \in (0, \infty]$, let $C_q$ be the constant of
+\Cref{lem:lq-quasi-triangle}, and let $u \in U$.
+\begin{enumerate}
+  \item If $N_0$ and $N_1$ are even, then
+    $\|{-u}\|^{\mathrm{dy}}_{E, s, q} = \|u\|^{\mathrm{dy}}_{E, s, q}$.
+  \item $N_0(u) \leq \|u\|^{\mathrm{dy}}_{E, r, q_1}$.
+  \item Let $A$ be quasi-normed with constant $C$, let $N_1$ be subadditive, and put
+    $K_{s, q} = C \, C_q (2 + 2^s C_q)$. Then $K_{s, q} \geq C$, $(N_0, E_{r, q_1})$ is
+    quasi-normed with constant $K_{r, q_1}$, and $(E_{s_0, q_0}, E_{s_1, q_1})$ is quasi-normed
+    with constant $\max(K_{s_0, q_0}, K_{s_1, q_1})$.
+  \item Let $U$ be a real vector space, let $N_1(0) = 0$, let $N_0(ca) \leq |c| \, N_0(a)$ for all
+    $c \in \R$ and $a \in U$, and let $N_1(ca) \leq N_1(a)$ for all $c \neq 0$ and $a \in U$.
+    Then $(N_0, E_{r, q_1})$ and $(E_{s_0, q_0}, E_{s_1, q_1})$ are homogeneous.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:e-functional, lem:e-method-dyadic, lem:e-method-calculus}
+(1) $E(t, -u) = E(t, u)$ by \Cref{lem:e-functional}. (2) $N_0(u)$ is the first term of the
+dyadic norm. (3) The dyadic norm vanishes at $0$ (\Cref{lem:e-method-calculus}), it is even by
+(1), and it satisfies the quasi-triangle inequality with the constant $K_{s, q}$
+(\Cref{lem:e-method-dyadic}). Since $C_q \geq 1$ (\Cref{lem:lq-quasi-triangle}),
+$K_{s, q} \geq C \cdot 1 \cdot 2 \geq C$, so $K_{r, q_1}$ serves $N_0$ as well; for the second
+couple the larger of the two constants serves both norms. (4) The dyadic norm is homogeneous by
+\Cref{lem:e-method-calculus}.
+\end{proof}
+
+\begin{lemma}[Jackson's half]
+\label{lem:e-couple-jackson}
+\lean{InterpCouple.eFunctional_two_pow_le_dyadicWeight_mul,
+  InterpCouple.eFunctional_succ_le_kFunctional, InterpCouple.eJacksonConst,
+  InterpCouple.eJacksonConst_ne_top, InterpCouple.eNormDyadic_le_interpNorm_of_jackson}
+\leanok
+\uses{def:e-couples, def:couple-k-functional, prop:couple-natural-grid, lem:lq-quasi-triangle}
+Let $r \in \R$.
+\begin{enumerate}
+  \item For every $q_1 \in (0, \infty]$, every $k \in \N$ and every $g \in U$,
+    $E(2^k, g) \leq 2^{-kr} \|g\|^{\mathrm{dy}}_{E, r, q_1}$.
+  \item Let $A$ be quasi-normed with constant $C$ and let $N_1$ be subadditive. Let
+    $N : U \to [0, \infty]$ and $C_J \in [0, \infty)$ satisfy
+    $E(2^k, g) \leq C_J \, 2^{-kr} N(g)$ for all $k \in \N$ and $g \in U$, and let $K$ be the
+    $K$-functional of the couple $(N_0, N)$. Then for every $k \in \N$ and every $u \in U$,
+    \[
+      E(2^{k+1}, u) \leq C \max(1, C_J) \, K(2^{-kr}, u) .
+    \]
+    If $r \neq 0$, then for every $s \in \R$, every $q \in (0, \infty]$ and every $u \in U$,
+    with the norm $\|\cdot\|_{s/r, r, q}$ of \Cref{prop:couple-natural-grid} of $(N_0, N)$ and
+    the constant $C_q$ of \Cref{lem:lq-quasi-triangle},
+    \[
+      \|u\|^{\mathrm{dy}}_{E, s, q} \leq \bigl(1 + C_q (1 + 2^s C \max(1, C_J))\bigr)
+      \|u\|_{s/r, r, q} .
+    \]
+\end{enumerate}
+In particular, (2) applies to $N = \|\cdot\|^{\mathrm{dy}}_{E, r, q_1}$ with $C_J = 1$, the
+couple $(N_0, E_{r, q_1})$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:weighted-tails, lem:e-functional, lem:couple-k-functional, lem:lq-basic}
+(1) $2^{kr} E(2^k, g)$ is one term of the $\ell_{q_1}$ part of the dyadic norm; apply (1) of
+\Cref{lem:weighted-tails}. (2) For every $g \in U$, since $2^{k+1} = 2^k + 2^k$,
+\begin{align*}
+  E(2^{k+1}, u) &\leq C \bigl(E(2^k, u - g) + E(2^k, g)\bigr)
+  \leq C \bigl(N_0(u - g) + C_J \, 2^{-kr} N(g)\bigr) \\
+  &\leq C \max(1, C_J) \bigl(N_0(u - g) + 2^{-kr} N(g)\bigr)
+\end{align*}
+by \Cref{lem:e-functional}, and (5) of \Cref{lem:couple-k-functional} passes to the infimum over
+$g$, as $C \max(1, C_J) < \infty$. For the second bound, $2^{kr \cdot s/r} = 2^{ks}$ for
+$r \neq 0$. Split off the first term $E(1, u) \leq N_0(u)$ of the $\ell_q$ norm at the cost $C_q$
+(\Cref{lem:lq-quasi-triangle}), and bound the other terms by
+$2^{(k+1)s} E(2^{k+1}, u) \leq 2^s C \max(1, C_J) \, 2^{ks} K(2^{-kr}, u)$; the $\ell_q$ norm is
+monotone and homogeneous (\Cref{lem:lq-basic}). Then
+$\|u\|^{\mathrm{dy}}_{E, s, q} \leq (1 + C_q) N_0(u) + C_q \, 2^s C \max(1, C_J) \,
+\|(2^{ks} K(2^{-kr}, u))_k\|_{\ell_q}$, and both coefficients are at most the constant.
+\end{proof}
+
+The hypothesis $C_J < \infty$ is needed in the first bound of (2): on $U = \R^2$ with
+$N_0(x, y) = |x| + |y|$, $N_1(0) = 0$ and $N_1 = \infty$ off $0$, and $N(x, 0) = |x|$,
+$N(x, y) = |y|$ for $y \neq 0$, the bound $E(2^k, g) \leq \infty \cdot 2^{-kr} N(g)$ holds, and
+$K(t, (1, 0)) = 0$ along $g = (1, 1/n)$, while $E(2^{k+1}, (1, 0)) = 1$. In the second bound it
+keeps the constant finite.
 
 \chapter{Block decompositions and projections}
 \label{ch:decompositions}
@@ -4197,7 +4370,7 @@ describe the spaces $E_{s,q}$ of the couple, on every abelian group $U$.
 
 \begin{definition}[Block decompositions in a couple]
 \label{def:e-block-decomposition}
-\lean{InterpCouple.eBlockDecompNorm, InterpCouple.eBlockDecompNorm_le_of_tendsto,
+\lean{InterpCouple.eBlockDecompNorm, InterpCouple.eBlockDecompNorm_le_of_tendsto_sum,
   InterpCouple.nearBestBlocks}
 \leanok
 \uses{def:couple, def:lq-norm}
@@ -4238,11 +4411,13 @@ Let $u \in U$ and let $(g_k)_k$ be the blocks of a sequence $(b_k)_k$ in $U$.
 
 \begin{proof}
 \leanok
+\uses{lem:e-near-best}
 (1) By induction on $k$, since $b_k + (b_{k+1} - b_k) = b_{k+1}$; additive maps preserve $0$ and
 differences; the partial sum of index $k + 2$ is $b_k$. (2) $N_1(g_0) = N_1(0) = 0$,
-$N_1(g_1) = N_1(b_0) \leq 1$, and $N_1(b_{k+1} - b_k) \leq 2^{k+1} + 2^k \leq 2^{k+2}$, since
-$N_1$ is even and subadditive. (3) $N_1\bigl(\sum_{k<n} h_k\bigr) \leq \sum_{k<n} 2^k < 2^n$.
-(4) For $m \in \N$, $u - S_n = (u - S_{n+m}) + \sum_{i<m} h_{n+i}$, so
+$N_1(g_1) = N_1(b_0) \leq 1$, and $N_1(b_{k+1} - b_k) \leq 2^{k+2}$ by (3) of
+\Cref{lem:e-near-best}, since $N_1$ is even and subadditive. (3)
+$N_1\bigl(\sum_{k<n} h_k\bigr) \leq \sum_{k<n} 2^k < 2^n$. (4) For $m \in \N$,
+$u - S_n = (u - S_{n+m}) + \sum_{i<m} h_{n+i}$, so
 \begin{align*}
   N_0(u - S_n)^\rho &\leq N_0(u - S_{n+m})^\rho + \sum_{i<m} N_0(h_{n+i})^\rho \\
   &\leq N_0(u - S_{n+m})^\rho + \sum_{i \geq 0} N_0(h_{n+i})^\rho ,
@@ -4321,10 +4496,9 @@ $N_1(S_n) \leq 2^n$, so $E(2^n, u) \leq x_n$, and $N_0(u) = x_0 \leq \|(2^{ns} x
 By (4) of \Cref{lem:e-block-partial-sums} and (2) of \Cref{lem:weighted-tails} with $\beta = 0$
 and $c = 1$, $\|(2^{ns} x_n)_n\|_{\ell_q}^\rho \leq H_{s\rho, q/\rho} \,
 \|(2^{ks} N_0(g_k))_k\|_{\ell_q}^\rho$. For $s > 0$ the constant $2 H_{s\rho, q/\rho}^{1/\rho}$
-lies in $[2, \infty)$, so it passes through the infimum over block decompositions. (3) Take $b_k$
-with $N_1(b_k) \leq 2^k$ and $N_0(u - b_k) \leq e_k = E(2^k, u) + N_0(u) \, 2^{-k(s+1)}$ (by (1)
-of \Cref{lem:e-near-best}); the $e_k$ decrease and $N_0(u) \leq e_0$. Since
-$2^{ks} N_0(u) \, 2^{-k(s+1)} = N_0(u) \, 2^{-k}$,
+lies in $[2, \infty)$, so it passes through the infimum over block decompositions. (3) By (4) of
+\Cref{lem:e-near-best} there are $b_k$ with $N_1(b_k) \leq 2^k$ and a decreasing sequence
+$(e_k)_k$ with $N_0(u - b_k) \leq e_k$, $N_0(u) \leq e_0$ and
 $\|(2^{ks} e_k)_k\|_{\ell_q} \leq C_q (1 + \gamma_{1,q}) \|u\|^{\mathrm{dy}}_{E, s, q}$, which is
 finite, so $e_k \to 0$ for $s > 0$ by (1) of \Cref{lem:weighted-tails}. Part (1) bounds the
 blocks. The blocks of the near-best approximants form a block decomposition by (1) and (2) of
@@ -4651,8 +4825,7 @@ for the $E$-functional of a couple (\Cref{sec:e-functional}).
 \label{def:couple-modulus-data}
 \lean{InterpCouple.CoupleModulusData, InterpCouple.CoupleModulusData.ofExists,
   InterpCouple.CoupleModulusData.coupleModNorm, InterpCouple.CoupleModulusData.modulus_zero,
-  InterpCouple.CoupleModulusData.modulus_sum_rpow_le, InterpCouple.norm0_sub_rpow_le,
-  InterpCouple.norm1_sub_le}
+  InterpCouple.CoupleModulusData.modulus_sum_rpow_le}
 \leanok
 \uses{def:couple, def:e-functional}
 Let $A = (N_0, N_1)$ be a couple on $U$, let $\rho > 0$ and $\theta \in \R$. A \emph{modulus
@@ -4678,9 +4851,7 @@ $\|f\|^{\omega}_{s,q} = N_0(f) + \|(2^{ks} \omega(f, k))_k\|_{\ell_q}$.
 \end{definition}
 
 Jackson's inequality is asked at every level $k \geq 0$. Then $\omega(0, k) = 0$, and the
-$\rho$-th power of $\omega(\cdot, k)$ is subadditive on finite sums. For every couple with even
-$N_0$ and $N_1$, subadditive $N_0^\rho$ and subadditive $N_1$,
-$N_0(a - b)^\rho \leq N_0(a)^\rho + N_0(b)^\rho$ and $N_1(a - b) \leq N_1(a) + N_1(b)$.
+$\rho$-th power of $\omega(\cdot, k)$ is subadditive on finite sums.
 
 \begin{lemma}[The modulus from near-best elements]
 \label{lem:couple-modulus-telescoping}
@@ -4712,9 +4883,10 @@ constant $C_r$ of \Cref{lem:lq-quasi-triangle} and $H_{\alpha, r}$ of
 
 \begin{proof}
 \leanok
+\uses{lem:e-near-best}
 Write $f = (f - b_k) + b_0 + \sum_{j < k} (b_{j+1} - b_j)$. Here
-$\omega(f - b_k, k) \leq C_0 \, e_k$. The block $b_{j+1} - b_j$ has complexity at most
-$2^{j+1} + 2^j \leq 2^{j+2}$ and
+$\omega(f - b_k, k) \leq C_0 \, e_k$. By (3) of \Cref{lem:e-near-best}, the block
+$b_{j+1} - b_j$ has complexity at most $2^{j+2}$ and
 $N_0(b_{j+1} - b_j)^\rho \leq N_0(f - b_j)^\rho + N_0(f - b_{j+1})^\rho \leq 2 e_j^\rho$, so the
 inverse inequality at level $j + 2$ and $2^{-(k - j - 2)_+\theta\rho} \leq
 4^{\theta\rho} 2^{-(k - j)\theta\rho}$ give
@@ -4732,8 +4904,7 @@ terms.
 
 \begin{theorem}[Coincidence for $\rho$-normed couples]
 \label{thm:couple-modulus-coincidence}
-\lean{InterpCouple.lqNorm_dyadicWeight_mul_eFunctional_add_le,
-  InterpCouple.CoupleModulusData.coupleInverseConst,
+\lean{InterpCouple.CoupleModulusData.coupleInverseConst,
   InterpCouple.CoupleModulusData.coupleInverseConst_ne_top,
   InterpCouple.CoupleModulusData.eNormDyadic_le_coupleModNorm,
   InterpCouple.CoupleModulusData.coupleModNorm_le_eNormDyadic,
@@ -4761,15 +4932,14 @@ $\|f\|^{\omega}_{s,q} < \infty$.
 \begin{proof}
 \leanok
 \uses{lem:e-near-best}
-The first bound is Jackson's inequality at every level. For the second, (1) and (2) of
-\Cref{lem:e-near-best} give $b_k$ with $N_1(b_k) \leq 2^k$ and
-$N_0(f - b_k) \leq e_k = E(2^k, f) + N_0(f) \, 2^{-k(s+1)}$, where the $e_k$ decrease since
-$s \geq 0$, and $N_0(f) \leq e_0$. \Cref{lem:couple-modulus-telescoping} with $r = q/\rho$ and
+The first bound is Jackson's inequality at every level. For the second, (4) of
+\Cref{lem:e-near-best} gives $b_k$ with $N_1(b_k) \leq 2^k$ and a decreasing sequence $(e_k)_k$
+with $N_0(f - b_k) \leq e_k$, $N_0(f) \leq e_0$ and
+$\|(2^{ks} e_k)_k\|_{\ell_q} \leq C_q (1 + \gamma_{1, q}) \|f\|^{\mathrm{dy}}_{E, s, q}$, since
+$s \geq 0$. \Cref{lem:couple-modulus-telescoping} with $r = q/\rho$ and
 $\|(a_k^\rho)_k\|_{\ell_{q/\rho}} = \|a\|_{\ell_q}^\rho$ (\Cref{lem:lp-rho-triangle}) bound
-$\|(2^{ks} \omega(f, k))_k\|_{\ell_q}$ by $(C_r (\dots))^{1/\rho} \, \|(2^{ks} e_k)_k\|_{\ell_q}$,
-and $\|(2^{ks} e_k)_k\|_{\ell_q} \leq C_q (1 + \gamma_{1, q}) \|f\|^{\mathrm{dy}}_{E, s, q}$
-since $2^{ks} N_0(f) \, 2^{-k(s+1)} = N_0(f) \, 2^{-k}$. The last claim follows with (3) of
-\Cref{lem:e-method-dyadic}.
+$\|(2^{ks} \omega(f, k))_k\|_{\ell_q}$ by $(C_r (\dots))^{1/\rho} \, \|(2^{ks} e_k)_k\|_{\ell_q}$.
+The last claim follows with (3) of \Cref{lem:e-method-dyadic}.
 \end{proof}
 
 For $0 < p < 1$ the $K$-functional of $L_p$ and the Sobolev space $W^r_p$ on an interval
