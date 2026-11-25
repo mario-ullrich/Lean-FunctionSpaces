@@ -5405,10 +5405,10 @@ couple of $T$ and the couple of $S$ in $L_p$, with $M = \mu(\Omega)^{1/p}$, and
 
 \begin{definition}[Nikolskii property]
 \label{def:nikolskii-property}
-\lean{FunctionScheme.HasNikolskii, nikolskiiExponent, nikolskiiExponent_nonneg,
-  one_le_of_nikolskiiExponent_lt, nikolskiiExponent_pos, lt_of_nikolskiiExponent_pos,
-  le_of_nikolskiiExponent_nonneg, nikolskiiExponent_top, nikolskiiExponent_self,
-  nikolskiiExponent_eq_mul_one_sub_div}
+\lean{FunctionScheme.HasNikolskii, FunctionScheme.HasNikolskiiAt, nikolskiiExponent,
+  nikolskiiExponent_nonneg, one_le_of_nikolskiiExponent_lt, nikolskiiExponent_pos,
+  lt_of_nikolskiiExponent_pos, le_of_nikolskiiExponent_nonneg, nikolskiiExponent_top,
+  nikolskiiExponent_self, nikolskiiExponent_eq_mul_one_sub_div}
 \leanok
 \uses{def:function-scheme}
 Let $S$ be a scheme of functions and $D \in \R$. The scheme has the \emph{Nikolskii property}
@@ -5417,8 +5417,11 @@ of dimension $D$ if for every $1 \leq p \leq \infty$ there is a real number $C \
   \|a\|_{L_\infty} \leq C \, n^{D/p} \, \|a\|_{L_p}
   \qquad \text{for all } n \geq 1 \text{ and } a \in S_n ,
 \]
-an inequality between real numbers. For $0 < p, r \leq \infty$ put
-$\alpha(D, p, r) = D(1/p - 1/r)$, with $1/\infty = 0$.
+an inequality between real numbers. For $0 < p \leq \infty$ the scheme satisfies the
+\emph{Nikolskii bound} of dimension $D$ at the exponent $p$ if there is $C < \infty$ with
+$\|a\|_{L_\infty} \leq C \, n^{D/p} \, \|a\|_{L_p}$ in $[0, \infty]$ for all $n \geq 1$ and
+$a \in S_n$. For $0 < p, r \leq \infty$ put $\alpha(D, p, r) = D(1/p - 1/r)$, with
+$1/\infty = 0$.
 \end{definition}
 
 For $D > 0$, $0 < p < \infty$ and $0 < r \leq \infty$, $\alpha(D, p, r) > 0$ if and only if $p < r$,
@@ -5426,59 +5429,68 @@ and $\alpha(D, p, r) \geq 0$ if and only if $p \leq r$, since $1/r < 1/p$ if and
 $p < r$. For $0 < p \leq r \leq \infty$, $\alpha(D, p, r) = (D/p)(1 - p/r)$ with $p/\infty = 0$.
 
 The property asks $p \geq 1$ only: its bound at $p = 1$ gives the bound for every
-$0 < p < 1$ (\Cref{lem:nikolskii-inequality}).
+$0 < p < 1$, so a scheme with the Nikolskii property satisfies the Nikolskii bound at every
+$0 < p \leq \infty$ (\Cref{lem:nikolskii-inequality}). The Besov embeddings
+(\Cref{thm:besov-embedding}) need only the Nikolskii bound at the source exponent; the local
+Weyl bound of a continuous spectral basis gives it for $0 < p \leq 2$
+(\Cref{thm:local-weyl-nikolskii}).
 
 For $p = \infty$ the bound reads $\|a\|_{L_\infty} \leq C \|a\|_{L_\infty}$ and holds with
 $C = 1$ for every scheme.
 
 \begin{lemma}[The Nikolskii property from the supremum norm]
 \label{lem:continuous-scheme-sup-bound}
-\lean{FunctionScheme.hasNikolskii_ofContinuous}
+\lean{FunctionScheme.hasNikolskii_ofContinuous, FunctionScheme.hasNikolskiiAt_ofContinuous}
 \leanok
 \uses{def:nikolskii-property, def:function-scheme}
 Let $\Omega$ be a topological space with its Borel $\sigma$-algebra, $D \in \R$ and $T$ an
 approximation scheme in $C_b(\Omega)$ such that for every $1 \leq p < \infty$ there is
 $C \geq 0$ with $\sup_{x \in \Omega} |a(x)| \leq C \, n^{D/p} \, \|a\|_{L_p}$ for all
 $n \geq 1$ and $a \in T_n$. Then the scheme of $T$ has the Nikolskii property of dimension $D$.
+If this bound holds for one $0 < p \leq \infty$, the scheme of $T$ satisfies the Nikolskii
+bound of dimension $D$ at $p$.
 \end{lemma}
 
 \begin{proof}
 \leanok
 \uses{lem:bc-linfty}
-For $p = \infty$ the bound holds with $C = 1$ for every scheme. For $p < \infty$,
-$\|a\|_{L_\infty} \leq \sup_{x \in \Omega} |a(x)|$ for every $a \in C_b(\Omega)$
-(\Cref{lem:bc-linfty}).
+For $p = \infty$ the bound of the Nikolskii property holds with $C = 1$ for every scheme. For
+the other exponents, $\|a\|_{L_\infty} \leq \sup_{x \in \Omega} |a(x)|$ for every
+$a \in C_b(\Omega)$ (\Cref{lem:bc-linfty}).
 \end{proof}
 
-The Nikolskii property enters the theorems below as a hypothesis on the scheme; the
-trigonometric polynomials on the torus (\Cref{thm:torus-nikolskii}) and the dyadic step
-functions on $[0, 1)$ (\Cref{cor:steps-embedding}) have it.
+The Nikolskii property and the Nikolskii bound at one exponent enter the theorems below as
+hypotheses on the scheme; the trigonometric polynomials on the torus (\Cref{thm:torus-nikolskii})
+and the dyadic step functions on $[0, 1)$ (\Cref{cor:steps-embedding}) have the property.
 
 \begin{lemma}[Nikolskii inequality]
 \label{lem:nikolskii-inequality}
 \lean{FunctionScheme.HasNikolskii.exists_eLpNorm_top_le_of_one_le,
   FunctionScheme.HasNikolskii.of_eLpNorm_top_le,
-  FunctionScheme.HasNikolskii.exists_eLpNorm_top_le,
+  FunctionScheme.HasNikolskii.exists_eLpNorm_top_le, FunctionScheme.HasNikolskii.hasNikolskiiAt,
+  FunctionScheme.HasNikolskiiAt.exists_eLpNorm_le_mul,
   FunctionScheme.HasNikolskii.exists_eLpNorm_le_of_le, FunctionScheme.HasNikolskii.eLpNorm_le,
   FunctionScheme.eLpNorm_sub_succ_le_of_nikolskii, FunctionScheme.HasNikolskii.liftBound}
 \leanok
 \uses{def:nikolskii-property, def:lift-bound}
-Let $S$ have the Nikolskii property of dimension $D$, and let $0 < p \leq r \leq \infty$.
-There is $C < \infty$ with $\|a\|_{L_r} \leq C \, n^{\alpha(D,p,r)} \|a\|_{L_p}$ for all
-$n \geq 1$ and $a \in S_n$. For every sequence $b_k \in S_{2^k}$, $k \in \N$, the blocks then
-satisfy $\|b_{k+1} - b_k\|_{L_r} \leq C \, 2^{2\alpha} \, 2^{k\alpha} \, \|b_{k+1} - b_k\|_{L_p}$
-with $\alpha = \alpha(D, p, r)$. For $1 \leq p \leq r$, the inclusion $\iota_{r,p}$ satisfies
-the lifting bound of exponent $\alpha(D, p, r)$ for $S^{(p)}$. Conversely, a scheme of
-functions $S$ such that for every $1 \leq p < \infty$ there is $C < \infty$ with
-$\|a\|_{L_\infty} \leq C \, n^{D/p} \, \|a\|_{L_p}$ in $[0, \infty]$ for all $n \geq 1$ and
-$a \in S_n$ has the Nikolskii property of dimension $D$.
+Let $D \in \R$ and $0 < p \leq r \leq \infty$. A scheme of functions $S$ with the Nikolskii
+property of dimension $D$ satisfies the Nikolskii bound of dimension $D$ at $p$. If $S$
+satisfies the Nikolskii bound of dimension $D$ at $p$, there is $C < \infty$ with
+$\|a\|_{L_r} \leq C \, n^{\alpha(D,p,r)} \|a\|_{L_p}$ for all $n \geq 1$ and $a \in S_n$. For
+every sequence $b_k \in S_{2^k}$, $k \in \N$, the blocks then satisfy
+$\|b_{k+1} - b_k\|_{L_r} \leq C \, 2^{2\alpha} \, 2^{k\alpha} \, \|b_{k+1} - b_k\|_{L_p}$ with
+$\alpha = \alpha(D, p, r)$. If $S$ has the Nikolskii property and $1 \leq p \leq r$, the
+inclusion $\iota_{r,p}$ satisfies the lifting bound of exponent $\alpha(D, p, r)$ for
+$S^{(p)}$. Conversely, a scheme of functions $S$ that satisfies the Nikolskii bound of
+dimension $D$ at every $1 \leq p < \infty$ has the Nikolskii property of dimension $D$.
 \end{lemma}
 
 \begin{proof}
 \leanok
 \uses{lem:sup-bound-exponents, lem:function-scheme-inclusion, lem:inclusion-linear,
   lem:scheme-basic}
-First let $r = \infty$. For $p \geq 1$ this is the Nikolskii property, read in $[0, \infty]$,
+First the Nikolskii bound at $p$, the case $r = \infty$. For $p \geq 1$ this is the Nikolskii
+property, read in $[0, \infty]$,
 since $\|a\|_{L_\infty} < \infty$; conversely, since $\|a\|_{L_p} < \infty$ for the finite
 measure $\mu$, a bound in $[0, \infty]$ is one between real numbers, and for $p = \infty$ the
 property holds with $C = 1$ (\Cref{def:nikolskii-property}). For $0 < p < 1$ the
@@ -5487,7 +5499,8 @@ $\|a\|_{L_\infty} \leq C_1 n^D \|a\|_{L_1}$, and \Cref{lem:sup-bound-exponents}(
 bound $N = \|a\|_{L_\infty} < \infty$ of $|a|$ gives
 $\|a\|_{L_\infty} \leq (C_1 n^D)^{1/p} \|a\|_{L_p} = C_1^{1/p} n^{D/p} \|a\|_{L_p}$, as
 in~\cite[Theorem~2.1]{DitzianPrymak2016}. In both cases there is $C_0 < \infty$ with
-$\|a\|_{L_\infty} \leq C_0 n^{D/p} \|a\|_{L_p}$ for all $n \geq 1$ and $a \in S_n$. For
+$\|a\|_{L_\infty} \leq C_0 n^{D/p} \|a\|_{L_p}$ for all $n \geq 1$ and $a \in S_n$, which is
+the Nikolskii bound at $p$. From this bound alone, for
 $r < \infty$, \Cref{lem:sup-bound-exponents}(2) with $M = C_0 n^{D/p}$ gives
 $\|a\|_{L_r} \leq C_0^{1-p/r} n^{(D/p)(1-p/r)} \|a\|_{L_p}$, and
 $(D/p)(1 - p/r) = \alpha(D, p, r)$. The block $b_{k+1} - b_k$ lies in $S_{2^{k+2}}$ by (5) of
@@ -5519,7 +5532,8 @@ tail bound of \Cref{lem:near-best-lq} for functions on any measure space.
 \leanok
 \uses{def:nikolskii-property, def:function-scheme, def:scheme-lp-couple, def:e-method, def:besov,
   lem:inclusion-linear}
-Let $S$ have the Nikolskii property of dimension $D \geq 0$.
+Let $D \geq 0$ and let $S$ satisfy the Nikolskii bound of dimension $D$ at the exponent $p$ of
+each item (\Cref{def:nikolskii-property}), for instance by having the Nikolskii property.
 \begin{enumerate}
   \item Let $0 < p \leq r \leq \infty$, $0 < q \leq \infty$ and $s > \alpha = \alpha(D, p, r)$,
     and for $t \in \{p, r\}$ and $\sigma \in \R$ let $\|\cdot\|^{(t)}_{\sigma, q}$ be the dyadic
@@ -5705,10 +5719,11 @@ Let $S$ have the Nikolskii property of dimension $D \geq 0$, and let $1 \leq p \
 
 \begin{proof}
 \leanok
-\uses{lem:besov-bridge}
+\uses{lem:besov-bridge, lem:nikolskii-inequality}
 The condition $t - D/r < s - D/p$ is $t < s - \alpha(D, p, r)$, and it implies $s > \alpha$
 since $t > 0$. By \Cref{prop:smoothness} and \Cref{lem:besov-bridge},
-$\iota v \in \Besov{s}{p}{\infty}$. By \Cref{thm:besov-embedding}, $\iota v = \iota_{r,p} g$ with
+$\iota v \in \Besov{s}{p}{\infty}$. The Nikolskii property gives the Nikolskii bound at $p$
+(\Cref{lem:nikolskii-inequality}), so by \Cref{thm:besov-embedding}, $\iota v = \iota_{r,p} g$ with
 $g \in \Besov{s-\alpha}{r}{\infty}$, and $g \in \iota'(V')$ by \Cref{prop:smoothness}, as
 $s - \alpha > t$. The second item is \Cref{thm:besov-embedding}(3) with $q = \infty$.
 \end{proof}
@@ -6471,9 +6486,10 @@ hypothesis; the Fourier basis of the torus satisfies it (\Cref{prop:fourier-eige
 \lean{ContinuousSpectralBasis.norm_sq_le_of_localWeyl,
   ContinuousSpectralBasis.norm_le_sqrt_mul_of_localWeyl,
   ContinuousSpectralBasis.norm_rpow_le_of_localWeyl, ContinuousSpectralBasis.norm_le_of_localWeyl,
-  ContinuousSpectralBasis.exists_sum_of_mem_basisSpan, ContinuousSpectralBasis.norm_toLp_sum_sq}
+  ContinuousSpectralBasis.exists_sum_of_mem_basisSpan, ContinuousSpectralBasis.norm_toLp_sum_sq,
+  ContinuousSpectralBasis.hasNikolskiiAt_basisScheme}
 \leanok
-\uses{def:local-weyl, lem:lp-interpolation}
+\uses{def:local-weyl, lem:lp-interpolation, def:nikolskii-property}
 Let the continuous spectral basis satisfy the local Weyl bound of dimension $D$ with constant
 $C$. For every $n \geq 1$, every $a \in \mathcal{E}_n$ and every $0 < p \leq 2$,
 \[
@@ -6482,27 +6498,65 @@ $C$. For every $n \geq 1$, every $a \in \mathcal{E}_n$ and every $0 < p \leq 2$,
   \|a\|_\infty^p \leq C n^D \|a\|_p^p .
 \]
 Equivalently $\|a\|_\infty \leq C^{1/p} n^{D/p} \|a\|_p$; for $p = 2$ the factor is
-$(C n^D)^{1/2}$.
+$(C n^D)^{1/2}$. So the scheme of the basis satisfies the Nikolskii bound of dimension $D$ at
+every exponent $0 < p \leq 2$ (\Cref{def:nikolskii-property}).
 \end{theorem}
 
 \begin{proof}
 \leanok
+\uses{lem:continuous-scheme-sup-bound}
 Write $a = \sum_{\lambda(i) < n} c_i \tilde e_i$. By the Cauchy--Schwarz inequality and the local
 Weyl bound, $|a(x)|^2 \leq \sum_i |c_i|^2 \sum_{\lambda(i) < n} |\tilde e_i(x)|^2 \leq C n^D
 \sum_i |c_i|^2$, and $\sum_i |c_i|^2 = \|a\|_2^2$ by Parseval's identity. For $0 < p \leq 2$,
 $\|a\|_2^2 \leq \|a\|_\infty^{2-p} \|a\|_p^p$ (\Cref{lem:lp-interpolation}); dividing by
-$\|a\|_\infty^{2-p}$ gives the second inequality, and its $p$-th root the unpowered form.
+$\|a\|_\infty^{2-p}$ gives the second inequality, and its $p$-th root the unpowered form. Since
+the $L_\infty$ norm of the class of $a$ is at most $\|a\|_\infty$, the unpowered form gives the
+Nikolskii bound with the constant $C^{1/p}$ (\Cref{lem:continuous-scheme-sup-bound}).
 \end{proof}
 
-For $p > 2$ the inequality $\|a\|_\infty \leq C' n^{D/p} \|a\|_p$ does not follow in this way:
+With the Besov embeddings of a scheme, the Nikolskii bound for $0 < p \leq 2$ gives the
+embeddings of the Besov spaces $\Besov{s}{p}{q}(M)$ of the scheme of the basis.
+
+\begin{theorem}[Besov embeddings of a continuous spectral basis]
+\label{thm:local-weyl-embedding}
+\lean{ContinuousSpectralBasis.memBesov_exists_inclusion_eq_of_localWeyl,
+  ContinuousSpectralBasis.memBesov_exists_boundedContinuous_of_localWeyl}
+\leanok
+\uses{def:local-weyl, def:besov, lem:inclusion-linear}
+Let the continuous spectral basis satisfy the local Weyl bound of dimension $D \geq 0$, and let
+$0 < p \leq 2$ and $0 < q \leq \infty$.
+\begin{enumerate}
+  \item If $p \leq r \leq \infty$ and $s > \alpha = D(1/p - 1/r)$, then every
+    $f \in \Besov{s}{p}{q}(M)$ is $f = \iota_{r,p} g$ for some $g \in \Besov{s - \alpha}{r}{q}(M)$.
+  \item If $\mu(U) > 0$ for every nonempty open $U \subseteq M$ and $s > D/p$, then every
+    $f \in \Besov{s}{p}{q}(M)$ is the class of a bounded continuous function.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{thm:local-weyl-nikolskii, thm:besov-embedding, lem:function-scheme-inclusion}
+By \Cref{thm:local-weyl-nikolskii} the scheme of the basis satisfies the Nikolskii bound of
+dimension $D$ at $p$, so (1) is \Cref{thm:besov-embedding}(2). The scheme of the basis is the
+scheme of an approximation scheme in $C_b(M)$, so it has continuous approximants
+(\Cref{lem:function-scheme-inclusion}), and (2) is \Cref{thm:besov-embedding}(3).
+\end{proof}
+
+For $p > 2$ the inequality $\|a\|_\infty \leq C' n^{D/p} \|a\|_p$ does not follow as in the proof
+of \Cref{thm:local-weyl-nikolskii}:
 the proof on the torus raises polynomials to powers (\Cref{thm:torus-nikolskii}), which lie in
 $\mathcal{E}_{mn}$ (\Cref{lem:trig-products}); for a general basis, products of functions of
-$\mathcal{E}_n$ need not lie in any $\mathcal{E}_m$. The embeddings of \Cref{thm:besov-embedding}
-hold for the scheme of the basis whenever it has the Nikolskii property of
-\Cref{def:nikolskii-property}, in particular whenever the spaces $\mathcal{E}_n$ satisfy its
-bound with the supremum norm for every $1 \leq p < \infty$
-(\Cref{lem:continuous-scheme-sup-bound}).
-The embedding into continuous functions needs only the local Weyl bound.
+$\mathcal{E}_n$ need not lie in any $\mathcal{E}_m$. For $p > 2$ the embeddings of
+\Cref{thm:besov-embedding} hold for the scheme of the basis whenever it satisfies the Nikolskii
+bound at $p$ (\Cref{def:nikolskii-property}), for instance when the spaces $\mathcal{E}_n$
+satisfy that bound with the supremum norm (\Cref{lem:continuous-scheme-sup-bound}), or when the
+scheme has the Nikolskii property.
+If $D \geq 0$ and $\mu(U) > 0$ for every nonempty open $U \subseteq M$, the continuity of
+$H^s(M)$ for $s > D/2$ also follows from \Cref{thm:local-weyl-embedding}(2) with $p = 2$ and
+$q = \infty$,
+since $H^s(M) \subseteq \Besov{s}{2}{\infty}(M)$ (\Cref{thm:continuous-spectral-basis-besov}).
+The next theorem proves it from the local Weyl bound alone, through the partial sums of the
+expansion.
 
 \begin{theorem}[Continuity of $H^s(M)$]
 \label{thm:local-weyl-continuity}

@@ -673,8 +673,9 @@ Let $0 < p \leq r \leq \infty$ and $0 < q \leq \infty$.
 \begin{proof}
 \leanok
 \uses{thm:torus-nikolskii, thm:besov-embedding, prop:smoothness, lem:besov-bridge,
-  prop:besov-elementary, lem:function-scheme-inclusion}
-The first two items are \Cref{thm:besov-embedding} with \Cref{thm:torus-nikolskii}, the
+  prop:besov-elementary, lem:function-scheme-inclusion, lem:nikolskii-inequality}
+The first two items are \Cref{thm:besov-embedding} with \Cref{thm:torus-nikolskii}, whose
+Nikolskii property gives the Nikolskii bound at $p$ (\Cref{lem:nikolskii-inequality}), the
 third is \Cref{prop:smoothness} for $H^s(\T^d)$ with \Cref{lem:besov-bridge}, after
 $\Besov{t}{2}{q}(\T^d) \subseteq \Besov{t}{2}{\infty}(\T^d)$
 (\Cref{prop:besov-elementary}(1)), and the last two combine both. For the second and the last

@@ -40,10 +40,15 @@ The `L_p` tools are in [Tools from analysis](Analysis.md).
   `Haar.hasNikolskii_haarScheme`). Then such a bound holds for every `0 < p ≤ ∞`, and
   `‖a‖_r ≤ C' n^(D(1/p - 1/r)) ‖a‖_p` for `0 < p ≤ r ≤ ∞` (Ditzian–Prymak;
   `FunctionScheme.HasNikolskii.exists_eLpNorm_top_le`,
-  `FunctionScheme.HasNikolskii.exists_eLpNorm_le_of_le`). Let `0 < p ≤ r ≤ ∞`, `0 < q ≤ ∞` and
-  `α = D (1/p - 1/r) < s`, and write `‖f‖^(p)_{s,q} = ‖f‖_p + ‖(2^(ks) E_{2^k}(f)_p)_k‖_{ℓ_q}`
-  for the dyadic norm of the couple of `S` in `L_p`. There is `K < ∞` such that every `f ∈ L_p`
-  with `‖f‖^(p)_{s,q} < ∞` is the inclusion of some `g ∈ L_r` with
+  `FunctionScheme.HasNikolskii.exists_eLpNorm_le_of_le`). The embeddings use only the bound at
+  the source exponent `p`, the Nikolskii bound at `p` (`FunctionScheme.HasNikolskiiAt`, given by
+  the property through `FunctionScheme.HasNikolskii.hasNikolskiiAt`), from which the inequality
+  from `L_p` to every `L_r`, `p ≤ r ≤ ∞`, follows by interpolation
+  (`FunctionScheme.HasNikolskiiAt.exists_eLpNorm_le_mul`); the theorems below take this bound as
+  their hypothesis. Let `0 < p ≤ r ≤ ∞`, `0 < q ≤ ∞` and `α = D (1/p - 1/r) < s`, and write
+  `‖f‖^(p)_{s,q} = ‖f‖_p + ‖(2^(ks) E_{2^k}(f)_p)_k‖_{ℓ_q}` for the dyadic norm of the couple of
+  `S` in `L_p`. There is `K < ∞` such that every `f ∈ L_p` with `‖f‖^(p)_{s,q} < ∞` is the
+  inclusion of some `g ∈ L_r` with
   `‖g‖^(r)_{s-α,q} ≤ K ‖f‖^(p)_{s,q}` (the method of DeVore–Popov, and Kerkyacharian–Petrushev
   for Dirichlet spaces; `FunctionScheme.exists_uniform_inclusion_eq_of_nikolskii`). Hence every
   `f ∈ B^s_{p,q}` belongs to `L_r` and to `B^{s-α}_{r,q}`
@@ -104,8 +109,15 @@ The `L_p` tools are in [Tools from analysis](Analysis.md).
   moreover `∑_{λ(i) < n} |e_i(x)|² ≤ C n^D` for all `x` and `n ≥ 1` (the local Weyl bound, the
   hypothesis `ContinuousSpectralBasis.LocalWeylBound`, proved on the torus), then
   `‖a‖_∞^p ≤ C n^D ‖a‖_p^p` for `0 < p ≤ 2` and `a` in the span of level `< n`
-  (`ContinuousSpectralBasis.norm_rpow_le_of_localWeyl`), and for `2s > D` every such `f` has a
-  bounded continuous representative (`ContinuousSpectralBasis.exists_continuous_of_localWeyl`).
+  (`ContinuousSpectralBasis.norm_rpow_le_of_localWeyl`), so the scheme of the basis satisfies
+  the Nikolskii bound at every `0 < p ≤ 2` (`ContinuousSpectralBasis.hasNikolskiiAt_basisScheme`).
+  Hence, if `D ≥ 0`, for `0 < p ≤ 2`, `p ≤ r ≤ ∞`, `0 < q ≤ ∞` and `s > D(1/p - 1/r)`,
+  `B^s_{p,q} ⊆ B^{s-D(1/p-1/r)}_{r,q}`, and, if moreover `μ` charges every nonempty open set, for
+  `s > D/p` every element of `B^s_{p,q}` has a bounded continuous representative
+  (`ContinuousSpectralBasis.memBesov_exists_inclusion_eq_of_localWeyl`,
+  `ContinuousSpectralBasis.memBesov_exists_boundedContinuous_of_localWeyl`). For `s > 0` with
+  `2s > D` every `f` with `∑_i (1 + λ(i))^(2s) |⟨e_i, f⟩|² < ∞` has a bounded continuous
+  representative (`ContinuousSpectralBasis.exists_continuous_of_localWeyl`).
 * **Martingale differences.** For a filtration `ℱ_0 ≤ ℱ_1 ≤ ⋯` on a finite measure space,
   let `A_n ⊆ L_p` be the `ℱ_⌊log₂ n⌋`-measurable functions (for the dyadic filtration of
   `[0, 1)`, the step functions of the Haar system). If these are dense in `L_p`, then for
@@ -122,14 +134,14 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 |---|---|---|---|
 | Schemes of functions and their approximants in every `L_p`, Besov spaces and their elementary embeddings for `0 < p ≤ ∞`, the identity with the spaces `E_{s,q}` of the couples for `s > 0` or `q = ∞` and, for `p ≥ 1`, with the approximation spaces | ✅ | ✗ | `MeasureSpaces/Scheme`, `MeasureSpaces/Besov/Basic`, `MeasureSpaces/Besov/ElementaryEmbeddings` |
 | The couple of a scheme of essentially bounded functions in `L_p`, `0 < p ≤ ∞`: quasi-triangle and `ρ`-triangle inequality, homogeneity, errors of best approximation, near-best approximants, the inclusions `L_r ↪ L_p` and membership in `L_r` along approximants, the complexity couple of the image scheme for `p ≥ 1` | ✅ | ✗ | `MeasureSpaces/SchemeLpCouple` |
-| Nikolskii property, from bounds in `[0, ∞]` and from the sup norm, the Nikolskii inequality for `0 < p ≤ r ≤ ∞` and on dyadic blocks, the sign of the Nikolskii exponent, Besov embeddings, for `0 < p ≤ r ≤ ∞` in the dyadic norms of the couples through near-best sequences, and into `L_r` | ✅ | ✗ | `MeasureSpaces/Besov/Nikolskii`, `MeasureSpaces/Besov/Embeddings` |
+| Nikolskii property, from bounds in `[0, ∞]` and from the sup norm, the Nikolskii bound at one exponent, the Nikolskii inequality for `0 < p ≤ r ≤ ∞` and on dyadic blocks, the sign of the Nikolskii exponent, Besov embeddings, for `0 < p ≤ r ≤ ∞` in the dyadic norms of the couples through near-best sequences, and into `L_r` | ✅ | ✗ | `MeasureSpaces/Besov/Nikolskii`, `MeasureSpaces/Besov/Embeddings` |
 | Besov spaces as interpolation spaces | ✅ | ✗ | `MeasureSpaces/Besov/Interpolation` |
 | Sobolev spaces as a hypothesis structure, Sobolev embeddings | ✅ | ✗ | `MeasureSpaces/Sobolev/Embeddings` |
 | Spectral schemes and `L_2` Sobolev spaces, Jackson and Bernstein | ✅ | ✗ | `MeasureSpaces/Spectral/Basic` |
 | Coefficient characterisations of spectral schemes, `H^s = B^s_{2,2}` | ✅ | ✗ | `MeasureSpaces/Spectral/Blocks` |
 | Hilbert bases of eigenvectors of compact self-adjoint operators | ✅ | ✗ | `MeasureSpaces/Spectral/CompactEigenbasis` |
 | Compact dense embeddings: singular basis, eigenvalues of `J J†` and the singular value `1`, spectral scheme, Jackson and Bernstein, `(H, J(V))_{θ,q} = A^θ_q`, `A^s_2` by the singular values | ✅ | ✗ | `MeasureSpaces/Spectral/CompactEmbedding` |
-| Continuous spectral bases (hypothesis), `B^s_{2,2} = H^s`, local Weyl bound, Nikolskii for `0 < p ≤ 2`, continuity of `H^s` for `s > D/2` | ✅ | ✗ | `MeasureSpaces/Spectral/ContinuousSpectralBasis`, `MeasureSpaces/Spectral/LocalWeyl` |
+| Continuous spectral bases (hypothesis), `B^s_{2,2} = H^s`, local Weyl bound, Nikolskii for `0 < p ≤ 2`, Besov embeddings for `0 < p ≤ 2`, continuity of `H^s` for `s > D/2` | ✅ | ✗ | `MeasureSpaces/Spectral/ContinuousSpectralBasis`, `MeasureSpaces/Spectral/LocalWeyl` |
 | Conditional expectations on `L_p`, filtration schemes (Haar), martingale-difference characterisation | ✅ | ✗ | `MeasureSpaces/Martingales/Filtration` |
 | The conditional expectation onto a countable partition as the average over the cells | ✅ | ✗ | `MeasureSpaces/Martingales/Partition` |
 

@@ -376,9 +376,10 @@ For a general scheme the project describes `A^s_q`
   property of dimension `D`: for every `1 ≤ p ≤ ∞` there is `C` with `‖a‖_∞ ≤ C n^(D/p) ‖a‖_p`
   for all `n ≥ 1` and `a ∈ S_n` (`FunctionScheme.HasNikolskii`). Then for `0 < p ≤ r ≤ ∞` there
   is `C'` with `‖a‖_r ≤ C' n^(D(1/p - 1/r)) ‖a‖_p` for all such `a` (Ditzian–Prymak;
-  `FunctionScheme.HasNikolskii.exists_eLpNorm_le_of_le`). Let `0 < p ≤ r ≤ ∞`, `0 < q ≤ ∞` and
-  `α = D(1/p - 1/r) < s`. There is `K < ∞` such that every `f ∈ B^s_{p,q}(S)` is the class in
-  `L_p(μ)` of some `g ∈ L_r(μ)` with
+  `FunctionScheme.HasNikolskii.exists_eLpNorm_le_of_le`); the embeddings below need only the
+  bound `‖a‖_∞ ≤ C n^(D/p) ‖a‖_p` at the source exponent `p` (`FunctionScheme.HasNikolskiiAt`).
+  Let `0 < p ≤ r ≤ ∞`, `0 < q ≤ ∞` and `α = D(1/p - 1/r) < s`. There is `K < ∞` such that
+  every `f ∈ B^s_{p,q}(S)` is the class in `L_p(μ)` of some `g ∈ L_r(μ)` with
   `‖g‖_r + ‖(2^(k(s-α)) E_{2^k}(g)_r)_k‖_{ℓ_q} ≤ K (‖f‖_p + ‖(2^(ks) E_{2^k}(f)_p)_k‖_{ℓ_q})`,
   so `g ∈ B^{s-α}_{r,q}(S)` (the method of DeVore–Popov, and Kerkyacharian–Petrushev for
   Dirichlet spaces; `FunctionScheme.exists_uniform_inclusion_eq_of_nikolskii`,
@@ -391,7 +392,12 @@ For a general scheme the project describes `A^s_q`
   `Torus.memBesov_exists_continuous`). The dyadic step functions on `[0, 1)` have the Nikolskii
   property with `D = 1` (`Haar.hasNikolskii_haarScheme`), so the embedding into `L_r` and
   `B^{s-α}_{r,q}` holds for them, in the dyadic norms of the step couples
-  (`Haar.exists_uniform_inclusion_eq_stepCouple`).
+  (`Haar.exists_uniform_inclusion_eq_stepCouple`). The embedding into `L_r` and `B^{s-α}_{r,q}`,
+  and, when `μ` charges every nonempty open set, the embedding into bounded continuous functions
+  hold for the scheme of a continuous spectral basis with the local Weyl bound
+  `∑_{λ(i) < n} |e_i(x)|² ≤ C n^D` of dimension `D ≥ 0` and `0 < p ≤ 2`
+  (`ContinuousSpectralBasis.memBesov_exists_inclusion_eq_of_localWeyl`,
+  `ContinuousSpectralBasis.memBesov_exists_boundedContinuous_of_localWeyl`).
 * **Besov spaces for `0 < p < 1` on `[0, 1]`.** Let `0 < p ≤ 1` and `0 < q ≤ ∞`, and let
   `E_k(f)` be the error of best approximation of `f ∈ L_p[0, 1]` by step functions on the dyadic
   intervals of length `2^(-k)`. For `0 ≤ s < 1/p`, `‖f‖_p + ‖(2^(ks) E_k(f))_k‖_{ℓ_q} < ∞` iff
@@ -469,9 +475,9 @@ block documents state every result with its Lean name and list the files:
 * Higher smoothness: Marchaud's inequality, sharp Daubechies exponents, and spline
   approximation on domains described intrinsically.
 * Extension operators for `W^m_p` of every order, and Stein's universal operator.
-* Eigenbases: elliptic regularity, the local Weyl law, spectral `B^s_{p,q}` for `p ≠ 2` or
-  `s ≥ 1`, the two-sided description of the Dirichlet approximation spaces, and the
-  Laplace–Beltrami operator.
+* Eigenbases: elliptic regularity, the local Weyl law, the identification of the spectral
+  `B^s_{p,q}` with the classical spaces for `p ≠ 2` or `s ≥ 1`, the two-sided description of the
+  Dirichlet approximation spaces, and the Laplace–Beltrami operator.
 
 ## Building
 
