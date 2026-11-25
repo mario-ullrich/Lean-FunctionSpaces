@@ -5122,41 +5122,130 @@ $S^{(r)}_n$ lifts $\iota_{\infty,p} a$, since $\iota_{r,p} \circ \iota_{\infty,r
 The bound holds for every measure $\mu$, as an inequality in $[0, \infty]$. If $\mu$ is finite,
 then $\|a\|_{L_p} < \infty$ for every $a \in S_n$, and the bound holds between real numbers.
 
+For every $0 < p \leq r \leq \infty$ the first embedding below is proved through the blocks of
+near-best approximants, whose quasi-norms in $L_r$ the Nikolskii inequality bounds; the next
+lemma gives the resulting tail bound for functions on any measure space.
+
+\begin{lemma}[Near-best sequences in weighted $\ell_q$]
+\label{lem:near-best-lq}
+\lean{MeasureTheory.lqNorm_eLpNorm_sub_le_of_nearBest}
+\leanok
+\uses{lem:near-best-transfer, lem:weighted-tails, lem:hardy-every-exponent}
+Let $\mu$, $p$, $r$, $\rho_p$, $\rho_r$, $f$, $b_k$, $e_k$, $C$ and $\beta$ satisfy the
+hypotheses of \Cref{lem:near-best-transfer}(3), let $s \in \R$ and $q \in (0, \infty]$, and let
+$H = H_{(s - \beta)\rho_r, q/\rho_r}$ be the constant of \Cref{lem:hardy-every-exponent}, finite
+for $s > \beta$. Then
+\[
+  \bigl\| \bigl(2^{k(s-\beta)} \|f - b_k\|_r\bigr)_k \bigr\|_{\ell_q}
+  \leq C \, 2^{1/\rho_p} H^{1/\rho_r} \, \bigl\| (2^{ks} e_k)_k \bigr\|_{\ell_q} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+With $y_j = 2^{j\beta} e_j$, \Cref{lem:near-best-transfer}(3) says that $x_k = \|f - b_k\|_r$
+satisfies
+\[
+  x_k^{\rho_r} \leq \bigl(C \, 2^{1/\rho_p}\bigr)^{\rho_r} \sum_{i \geq 0} y_{k+i}^{\rho_r}
+  \qquad (k \in \N) .
+\]
+Part (2) of \Cref{lem:weighted-tails} with $\rho = \rho_r$, the exponent $0$ in place of $\beta$
+and the weights $2^{k(s - \beta)}$ gives
+$\|(2^{k(s-\beta)} x_k)_k\|_{\ell_q}^{\rho_r} \leq (C \, 2^{1/\rho_p})^{\rho_r} H \,
+\|(2^{k(s-\beta)} y_k)_k\|_{\ell_q}^{\rho_r}$, and $2^{k(s-\beta)} y_k = 2^{ks} e_k$. Take the
+$\rho_r$-th root.
+\end{proof}
+
 \begin{theorem}[Besov embeddings]
 \label{thm:besov-embedding}
-\lean{FunctionScheme.exists_uniform_inclusion_eq_of_nikolskii,
+\lean{FunctionScheme.eLpNorm_sub_succ_le_of_nikolskii,
+  FunctionScheme.exists_inclusion_eq_eNormDyadic_le, FunctionScheme.nikolskiiTransferConst,
+  FunctionScheme.nikolskiiTransferConst_hardy_ne_top, FunctionScheme.nikolskiiTransferConst_ne_top,
+  FunctionScheme.exists_inclusion_eq_eNormDyadic_le_of_nearBest,
+  FunctionScheme.exists_uniform_inclusion_eq_of_nikolskii,
   FunctionScheme.MemBesov.exists_inclusion_eq_of_nikolskii,
   FunctionScheme.MemBesov.exists_inclusion_eq_top,
   FunctionScheme.MemBesov.exists_boundedContinuous_of_nikolskii}
 \leanok
-\uses{lem:nikolskii-inequality, thm:nikolskii-transfer, lem:function-scheme-inclusion,
-  lem:approx-closure, lem:bc-linfty}
-Let $S$ have the Nikolskii property of dimension $D \geq 0$, let $1 \leq p \leq r \leq
-\infty$ and $1 \leq q \leq \infty$, and let $s > \alpha = \alpha(D, p, r)$.
+\uses{lem:nikolskii-inequality, def:scheme-lp-couple, def:e-method, lem:scheme-lp-couple,
+  lem:e-near-best, lem:near-best-transfer, lem:near-best-lq, lem:weighted-tails,
+  lem:lq-quasi-triangle, lem:lq-reindex, lem:inclusion-linear, thm:nikolskii-transfer,
+  lem:function-scheme-inclusion, lem:approx-closure, lem:bc-linfty}
+Let $S$ have the Nikolskii property of dimension $D \geq 0$.
 \begin{enumerate}
-  \item There is $K < \infty$ such that for every $f \in \Besov{s}{p}{q}$ there is $g \in L_r$
-    with $\iota_{r,p} g = f$ and $\|g\|^{\mathrm{dy}}_{\Besov{s-\alpha}{r}{q}} \leq K
-    \|f\|^{\mathrm{dy}}_{\Besov{s}{p}{q}}$.
-  \item Let $\Omega$ be a topological space with its Borel $\sigma$-algebra, let $S$ have
-    continuous approximants, and let $\mu(U) > 0$ for every nonempty open $U \subseteq \Omega$.
-    If $s > D/p$, then every $f \in \Besov{s}{p}{q}$ is the class of a bounded continuous
-    function.
+  \item Let $0 < p \leq r \leq \infty$, $0 < q \leq \infty$ and $s > \alpha = \alpha(D, p, r)$,
+    and for $t \in \{p, r\}$ and $\sigma \in \R$ let $\|\cdot\|^{(t)}_{\sigma, q}$ be the dyadic
+    norm $\|\cdot\|^{\mathrm{dy}}_{E, \sigma, q}$ (\Cref{def:e-method}) of the couple of $S$ in
+    $L_t$ (\Cref{def:scheme-lp-couple}). There is $K < \infty$ such that every $f \in L_p$ with
+    $\|f\|^{(p)}_{s, q} < \infty$ is $f = \iota_{r,p} g$ for some $g \in L_r$ with
+    $\|g\|^{(r)}_{s - \alpha, q} \leq K \|f\|^{(p)}_{s, q}$.
+  \item Let $1 \leq p \leq r \leq \infty$, $1 \leq q \leq \infty$ and
+    $s > \alpha = \alpha(D, p, r)$. Every $f \in \Besov{s}{p}{q}$ is $f = \iota_{r,p} g$ for some
+    $g \in \Besov{s-\alpha}{r}{q}$.
+  \item Let $1 \leq p \leq \infty$ and $1 \leq q \leq \infty$, let $\Omega$ be a topological
+    space with its Borel $\sigma$-algebra, let $S$ have continuous approximants, and let
+    $\mu(U) > 0$ for every nonempty open $U \subseteq \Omega$. If $s > D/p$, then every
+    $f \in \Besov{s}{p}{q}$ is the class of a bounded continuous function.
 \end{enumerate}
 \end{theorem}
 
 \begin{proof}
 \leanok
-For the first item apply \Cref{thm:nikolskii-transfer} to $\iota = \iota_{r,p}$, which is
+(1) Let $\rho_p = \min(1, p)$ and $\rho_r = \min(1, r)$, let $C_r$, $C_q$ be the constants of
+\Cref{lem:lq-quasi-triangle} and $\gamma_{1,q}$ that of \Cref{lem:lq-reindex}(3). By
+\Cref{lem:nikolskii-inequality} there is $C < \infty$ with
+$\|a\|_{L_r} \leq C n^\alpha \|a\|_{L_p}$ for all $n \geq 1$ and $a \in S_n$. Let $f \in L_p$
+with $N = \|f\|^{(p)}_{s, q} < \infty$, and let $E$ be the $E$-functional of the couple of $S$ in
+$L_p$. By \Cref{lem:scheme-lp-couple}(4) there are $b_k \in S_{2^k}$ with
+$\|f - b_k\|_p \leq e_k = E(2^k, f) + \|f\|_p \, 2^{-k(s+1)}$. The sequence $(e_k)_k$ decreases
+(\Cref{lem:e-near-best}(2)), $e_0 \geq \|f\|_p$, and
+$Y = \|(2^{ks} e_k)_k\|_{\ell_q} \leq C_q (1 + \gamma_{1,q}) N$, since
+$2^{ks} \|f\|_p \, 2^{-k(s+1)} = \|f\|_p \, 2^{-k}$ (\Cref{lem:lq-quasi-triangle,lem:lq-reindex}).
+As $s > \alpha \geq 0$, $e_k \to 0$ (\Cref{lem:weighted-tails}(1)). The block $b_{k+1} - b_k$ lies
+in $S_{2^{k+2}}$, so $\|b_{k+1} - b_k\|_r \leq C \, 2^{2\alpha} 2^{k\alpha} \|b_{k+1} - b_k\|_p$,
+and \Cref{lem:near-best-lq} with $\beta = \alpha$ and $C \, 2^{2\alpha}$ in place of $C$ gives
+\[
+  X = \bigl\|\bigl(2^{k(s-\alpha)} \|f - b_k\|_r\bigr)_k\bigr\|_{\ell_q}
+  \leq C \, 2^{2\alpha} \, 2^{1/\rho_p} H^{1/\rho_r} \, Y < \infty ,
+\]
+with $H = H_{(s-\alpha)\rho_r, q/\rho_r}$, finite since $s > \alpha$. In particular
+$\|f - b_0\|_r \leq X$ and $b_0 \in L_\infty \subseteq L_r$, so $f = \iota_{r,p} g$ for some
+$g \in L_r$ (\Cref{lem:inclusion-linear}). The $E$-functional $E'$ of the couple of $S$ in $L_r$
+satisfies $E'(2^k, g) \leq \|g - b_k\|_r = \|f - b_k\|_r$ (\Cref{lem:scheme-lp-couple}(3)), so
+the $\ell_q$ part of $\|g\|^{(r)}_{s - \alpha, q}$ is at most $X$. Moreover
+$\|g\|_r \leq C_r (\|f - b_0\|_r + \|b_0\|_r)$ (\Cref{lem:scheme-lp-couple}(2)), and
+$\|b_0\|_r \leq C \|b_0\|_p \leq C \, 2^{1/\rho_p} e_0 \leq C \, 2^{1/\rho_p} \, Y$ by
+\Cref{lem:near-best-transfer}(1) with $g = 0$, since $\|f - 0\|_p \leq e_0$ and
+$\|f - b_0\|_p \leq e_0$. Altogether, with
+$K_0 = \bigl((1 + C_r) \, C \, 2^{2\alpha} H^{1/\rho_r} + C_r C\bigr) 2^{1/\rho_p}$,
+\[
+  \|g\|^{(r)}_{s - \alpha, q} \leq C_r \bigl(X + \|b_0\|_r\bigr) + X \leq K_0 Y
+  \leq K_0 \, C_q (1 + \gamma_{1,q}) \, N .
+\]
+(2) Apply \Cref{thm:nikolskii-transfer} to $\iota = \iota_{r,p}$, which is
 injective and satisfies the lifting bound of exponent $\alpha$ by
 \Cref{lem:nikolskii-inequality}; the preimage scheme is $S^{(r)}$ by
-\Cref{lem:function-scheme-inclusion}, and $L_r$ is complete. For the second take
-$r = \infty$: then $g \in \Besov{s - D/p}{\infty}{q}$ with $s - D/p > 0$, so $g$ lies in the
+\Cref{lem:function-scheme-inclusion}, and $L_r$ is complete. (3) Take
+$r = \infty$ in (2): then $g \in \Besov{s - D/p}{\infty}{q}$ with $s - D/p > 0$, so $g$ lies in the
 closure of $\bigcup_n S^{(\infty)}_n$ (\Cref{lem:approx-closure}). The approximants are classes
 of bounded continuous functions, and these classes form a closed set (\Cref{lem:bc-linfty}).
 \end{proof}
 
-The limiting case $s = \alpha$ is out of reach of this method, since the Nikolskii transfer
-theorem needs $\alpha < s$.
+Part (1) follows the method of the proof of~\cite[Theorem~7.1]{DeVorePopovTAMS} in its case of a
+target exponent at most $1$, which sums the blocks of a dyadic spline decomposition with the
+$\rho$-triangle inequality and a Nikolskii inequality for splines. For the Besov spaces of a
+Dirichlet space, defined through its spectral decomposition, the embedding
+$\Besov{s}{p}{q} \subseteq \Besov{s - \alpha}{r}{q}$, $0 < p \leq r < \infty$, with
+$\alpha = d(1/p - 1/r)$ for the doubling dimension $d$, is part
+of~\cite[Proposition~6.14]{KerkyacharianPetrushev2015}, under the non-collapsing condition. For
+$p, q \geq 1$ the dyadic norms of (1) are the dyadic quasi-norms of the Besov spaces
+(\Cref{lem:scheme-lp-couple-bridge}, \Cref{thm:complexity-couple-approx}).
+
+The limiting case $s = \alpha$ is not covered: the proof of (1) needs Hardy's constant
+$H_{(s-\alpha)\rho_r, q/\rho_r}$, finite only for $s > \alpha$, and \Cref{thm:nikolskii-transfer}
+needs $\alpha < s$. \cite[Theorem~7.1]{DeVorePopovTAMS} is a limiting case for the Besov spaces
+of the unit cube in $\R^d$, into $L_r$ alone and with the third index equal to the integrability
+exponent: $\Besov{\alpha}{p}{p} \subseteq L_r$ for $0 < r < \infty$ and $\alpha = d(1/p - 1/r) > 0$.
 
 \section{Interpolation of Besov spaces}
 \label{sec:besov-interpolation}
