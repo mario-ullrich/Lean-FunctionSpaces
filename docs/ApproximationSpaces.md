@@ -18,12 +18,13 @@ block, projection and atomic decompositions, abstract trace and retract theorems
 comparison with spaces defined by moduli of smoothness (`ModulusData`), and best `n`-term
 approximation from a Hilbert basis with the theorem of Stechkin and DeVore. The E-functional of a
 couple, the error of best approximation under a bound on the complexity, gives approximation
-spaces on abelian groups with a quasi-norm, such as `L_p` for `0 < p < 1`, and a comparison with
-moduli of smoothness that needs only the subadditivity of a power of the quasi-norm. A
-smoothness space of order `r` is a Banach space with an injective bounded map into `X` satisfying
-Jackson's and Bernstein's inequalities of order `r` (`ApproximationScheme.JacksonBound`,
-`ApproximationScheme.SmoothnessSpace`, a hypothesis structure whose fields are the embedding, the
-order and Jackson's and Bernstein's inequalities); Sobolev spaces are the motivating examples.
+spaces on abelian groups with a quasi-norm, such as `L_p` for `0 < p < 1`. Their comparison with
+moduli of smoothness and their description by block decompositions rest on the subadditivity of
+a power of the quasi-norm. A smoothness space of order `r` is a Banach space with an injective
+bounded map into `X` satisfying Jackson's and Bernstein's inequalities of order `r`
+(`ApproximationScheme.JacksonBound`, `ApproximationScheme.SmoothnessSpace`, a hypothesis
+structure whose fields are the embedding, the order and Jackson's and Bernstein's inequalities);
+Sobolev spaces are the motivating examples.
 The schemes live in real normed spaces and the couples on abelian groups; the measures are the
 counting measure behind the `ℓ_q` norms, Lebesgue measure on `(0, ∞)` in the layer cake formula
 for sums, and `dt/t` on `(0, ∞)` of the continuous K-method. The other blocks instantiate the
@@ -297,7 +298,7 @@ Paths are relative to `ApproximationSpaces/`, without `.lean`.
 | Homogeneity of the E-functional, embeddings of the dyadic norms in the smoothness and the fine index, additive maps, Pietsch's form of a couple and its equivalence with the dyadic norm | ✅ | ✗ | `Interpolation/EFunctionalSpaces` |
 | Moduli compatible with a scheme, coincidence with the classical space, interpolation of the classical spaces | ✅ | ✗ | `Moduli` |
 | Block decompositions, series moved up by a number of levels, projection schemes and dyadic blocks | ✅ | ✗ | `Decompositions/Blocks`, `Decompositions/Projection` |
-| Block decompositions of the spaces `E_{s,q}` of a quasi-normed couple with subadditive `N₀^ρ`, the blocks of near-best sequences, partial sums and tails without completeness | ✅ | ✗ | `Decompositions/EFunctionalBlocks` |
+| Block decompositions of the spaces `E_{s,q}` of a quasi-normed couple with subadditive `N₀^ρ`, the blocks of near-best sequences, partial sums and tails in every abelian group | ✅ | ✗ | `Decompositions/EFunctionalBlocks` |
 | Synthesis with decay, atomic systems, `b^s_{p,q}`, atomic characterisation | ✅ | ✗ | `Decompositions/Synthesis`, `Decompositions/Atomic` |
 | Trace theorem: extension, transfer, surjectivity | ✅ | ✗ | `Trace` |
 | Intrinsic and restriction quasi-norms (retract theorem) | ✅ | ✗ | `Retract` |

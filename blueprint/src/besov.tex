@@ -655,7 +655,7 @@ $\sum_{\deg k < n} |e_k(x)|^2 \leq 2^d n^d$. The Nikolskii property is \Cref{thm
   Torus.periodic_sobolev_memBesov_top, Torus.periodic_exists_sobolev_of_memBesov,
   Torus.sobolev_exists_inclusion_eq, Torus.sobolev_exists_continuous, Torus.toLp_toContinuousMap}
 \leanok
-\uses{thm:torus-nikolskii, thm:besov-embedding, def:torus-sobolev, prop:smoothness}
+\uses{def:besov, def:trig-poly, def:torus-sobolev, lem:inclusion-linear}
 Let $0 < p \leq r \leq \infty$ and $0 < q \leq \infty$.
 \begin{enumerate}
   \item If $s > d(1/p - 1/r)$, then every $f \in \Besov{s}{p}{q}(\T^d)$ is $\iota_{r,p} g$ for
@@ -672,7 +672,8 @@ Let $0 < p \leq r \leq \infty$ and $0 < q \leq \infty$.
 
 \begin{proof}
 \leanok
-\uses{lem:besov-bridge, prop:besov-elementary}
+\uses{thm:torus-nikolskii, thm:besov-embedding, prop:smoothness, lem:besov-bridge,
+  prop:besov-elementary, def:function-scheme}
 The first two items are \Cref{thm:besov-embedding} with \Cref{thm:torus-nikolskii}, the
 third is \Cref{prop:smoothness} for $H^s(\T^d)$ with \Cref{lem:besov-bridge}, after
 $\Besov{t}{2}{q}(\T^d) \subseteq \Besov{t}{2}{\infty}(\T^d)$
@@ -917,16 +918,15 @@ $\|f - V_k f\|_p \leq C_V \|f - a_k\|_p$.
   Torus.periodicTraceBound_limitTrace_eq_restrictFace, Torus.trace_besov_eq_restrictFace,
   Torus.ae_trace_eq_restrictFace, Torus.exists_trace_eq_restrictFace}
 \leanok
-\uses{thm:trace-torus, lem:trace-ext, lem:torus-vallee-poussin, thm:torus-embeddings,
-  thm:approx-embedding}
+\uses{thm:trace-torus, lem:trace-ext}
 Let $1 \leq p < \infty$ and let $\operatorname{Tr}$ be the trace of \Cref{lem:trace-ext} for the
 restriction to the face, as in \Cref{thm:trace-torus}.
 \begin{enumerate}
   \item For every bounded continuous $f$ on $\T^{n+1}$ with
     $f \in \Besov{1/p}{p}{1}(\T^{n+1})$, $\operatorname{Tr} f = f(0, \cdot)$. In particular,
-    $\operatorname{Tr} f = f(0, \cdot)$ for all $s > 0$, $1 \leq q \leq \infty$ and bounded
+    $\operatorname{Tr} f = f(0, \cdot)$ for all $s > 0$, $0 < q \leq \infty$ and bounded
     continuous $f \in \Besov{s+1/p}{p}{q}(\T^{n+1})$.
-  \item For all $s > n/p$, $1 \leq q \leq \infty$ and $f \in \Besov{s+1/p}{p}{q}(\T^{n+1})$
+  \item For all $s > n/p$, $0 < q \leq \infty$ and $f \in \Besov{s+1/p}{p}{q}(\T^{n+1})$
     there is a bounded continuous $g$ on $\T^{n+1}$ with $f = g$ almost everywhere and
     $\operatorname{Tr} f = g(0, \cdot)$.
 \end{enumerate}
@@ -934,13 +934,14 @@ restriction to the face, as in \Cref{thm:trace-torus}.
 
 \begin{proof}
 \leanok
-\uses{lem:besov-bridge}
-By \Cref{lem:torus-vallee-poussin}, $V_k f$ lies in $\mathcal{T}_{2^{k+n+3}}$ and
+\uses{lem:besov-bridge, lem:torus-vallee-poussin, thm:torus-embeddings, prop:besov-elementary}
+By \Cref{lem:besov-bridge}, $f$ lies in $A^{1/p}_1$ of the trigonometric scheme in
+$L_p(\T^{n+1})$. By \Cref{lem:torus-vallee-poussin}, $V_k f$ lies in $\mathcal{T}_{2^{k+n+3}}$ and
 $2^{k/p} \|f - V_k f\|_p \to 0$, so \Cref{lem:trace-ext} gives
 $(V_k f)(0, \cdot) \to \operatorname{Tr} f$ in $L_p(\T^n)$. Since $V_k f \to f$ uniformly,
 also $(V_k f)(0, \cdot) \to f(0, \cdot)$ uniformly, hence in $L_p(\T^n)$. For $s > 0$,
-$\Besov{s+1/p}{p}{q}(\T^{n+1}) \subseteq \Besov{1/p}{p}{1}(\T^{n+1})$ by
-\Cref{thm:approx-embedding} and \Cref{lem:besov-bridge}. For the second item,
+$\Besov{s+1/p}{p}{q}(\T^{n+1}) \subseteq \Besov{1/p}{p}{1}(\T^{n+1})$ by (1) of
+\Cref{prop:besov-elementary}. For the second item,
 $s + 1/p > (n+1)/p$, and \Cref{thm:torus-embeddings} gives the continuous representative $g$.
 \end{proof}
 
@@ -1826,8 +1827,8 @@ with $\lfloor 2^j x \rfloor = n$. Let $\mathcal{F}_j$ be the $\sigma$-algebra ge
 intervals $I_{j,n}$, $n \in \Z$. Then $I_{j,n} = I_{j+1,2n} \cup I_{j+1,2n+1}$, so
 $\mathcal{F}_0 \subseteq \mathcal{F}_1 \subseteq \cdots$ is a filtration, and
 $|I_{j,n}| = 2^{-j}$. For $n \in \N$ these intervals reappear as the dyadic intervals of the
-piecewise polynomials (\Cref{def:pp-scheme}). The \emph{Haar scheme} in $L_p[0, 1]$ is its
-filtration scheme.
+piecewise polynomials (\Cref{def:pp-scheme}). For $1 \leq p \leq \infty$, the \emph{Haar scheme}
+in $L_p[0, 1]$ is its filtration scheme.
 \end{definition}
 
 \begin{lemma}[Dyadic conditional expectations]
@@ -2803,16 +2804,18 @@ $0 < p < 1$, where $L_p$ is not a normed space.
 \begin{lemma}[The step couple]
 \label{lem:step-couple}
 \lean{MeasureTheory.Filtration.monotone_lpMeasSubgroup, Haar.eFunctional_stepCouple_two_pow,
-  Haar.mem_lpMeas_of_stepCouple_norm1_le, Haar.stepCouple_eq_complexityCouple,
-  Haar.memEMethod_stepCouple_iff_memApprox}
+  Haar.mem_lpMeas_of_stepCouple_norm1_le, Haar.sets_haarScheme,
+  Haar.stepCouple_eq_complexityCouple, Haar.memEMethod_stepCouple_iff_memApprox}
 \leanok
 \uses{def:step-couple, lem:complexity-couple, def:filtration-scheme,
   thm:complexity-couple-approx}
 Let $0 < p \leq \infty$. The subgroups $V_j$ increase with $j$. In the step couple an element of
 complexity at most $2^j$ lies in $V_j$, and $E(2^j, f) = \inf_{b \in V_j} \|f - b\|_p$ for every
-$f \in L_p[0, 1]$. For $1 \leq p \leq \infty$ the step couple is the complexity couple of the Haar
-scheme, so for $0 < q \leq \infty$ and $s > 0$, and for $s = 0$ and $q = \infty$, its space
-$E_{s, q}$ is the approximation space $A^s_q$ of the Haar scheme.
+$f \in L_p[0, 1]$. For $1 \leq p \leq \infty$ the Haar scheme in $L_p[0, 1]$ has the sets $\{0\}$
+at complexity $0$ and $V_{\lfloor \log_2 n \rfloor}$ at complexity $n \geq 1$, so the step couple
+is the complexity couple of the Haar scheme, and for $0 < q \leq \infty$ and $s > 0$, and for
+$s = 0$ and $q = \infty$, its space $E_{s, q}$ is the approximation space $A^s_q$ of the Haar
+scheme.
 \end{lemma}
 
 \begin{proof}
@@ -3016,9 +3019,9 @@ $E$-functional of the step couple (\Cref{def:step-couple}).
 \lean{MeasureTheory.TendstoInMeasure.sub_right, MeasureTheory.eLpNorm_sub_rpow_le_sum,
   MeasureTheory.eLpNorm_sub_rpow_le_tsum}
 \leanok
-\uses{lem:lp-rho-triangle}
-Let $\mu$ be a measure, $0 < r \leq 1$, and let $u_0, u_1, \dots$ and $g$ be strongly measurable
-functions with values in a normed group such that $u_n \to g$ in measure. Then for every $k \in \N$
+Let $\mu$ be a measure, $0 < r \leq 1$, and let $u_0, u_1, \dots$ be almost everywhere strongly
+measurable functions with values in a normed group that converge in measure to a function $g$.
+Then for every $k \in \N$
 \[
   \|g - u_k\|_{L_r(\mu)}^r \leq \sum_{i=0}^\infty \|u_{k+i+1} - u_{k+i}\|_{L_r(\mu)}^r .
 \]
@@ -3026,52 +3029,19 @@ functions with values in a normed group such that $u_n \to g$ in measure. Then f
 
 \begin{proof}
 \leanok
-By \Cref{lem:lp-rho-triangle}, $\|u_{k+n} - u_k\|_r^r \leq \sum_{i<n} \|u_{k+i+1} - u_{k+i}\|_r^r$
-for every $n$. The functions $u_{k+n} - u_k$ converge in measure to $g - u_k$, and a bound of the
-$L_r$ quasi-norms passes to the limit (Mathlib's
-\texttt{eLpNorm\_\allowbreak le\_\allowbreak of\_\allowbreak tendstoInMeasure}, Fatou's lemma
-along an almost everywhere convergent subsequence).
+\uses{lem:limit-telescoping}
+This is the case $\rho = r$ of \Cref{lem:limit-telescoping}, since $\min(1, r) = r$ for
+$r \leq 1$.
 \end{proof}
 
 For $r = 1$ this is the triangle inequality for a series in $L_1(\mu)$.
-
-\begin{lemma}[Weighted tails]
-\label{lem:weighted-tails}
-\lean{ENNReal.le_dyadicWeight_neg_mul_lqNorm, ENNReal.tendsto_zero_of_lqNorm_dyadicWeight_ne_top,
-  ENNReal.lqNorm_rpow_le_of_rpow_le_tsum, ENNReal.le_two_rpow_mul_of_rpow_le}
-\leanok
-\uses{def:lq-norm, lem:lq-basic, lem:hardy-every-exponent, lem:lp-rho-triangle}
-Let $q \in (0, \infty]$, $s \in \R$ and let $e$, $x$, $y$ be sequences in $[0, \infty]$.
-\begin{enumerate}
-  \item $e_j \leq 2^{-js} \|(2^{ks} e_k)_k\|_{\ell_q}$ for every $j$; if $s > 0$ and the norm is
-    finite, then $e_j \to 0$.
-  \item Let $\rho > 0$, $\beta \in \R$ and $c \in [0, \infty]$. If
-    $x_k^\rho \leq c \sum_{i \geq 0} 2^{i\beta} y_{k+i}^\rho$ for every $k$, then
-    \[
-      \|(2^{ks} x_k)_k\|_{\ell_q}^\rho \leq c \, H_{s\rho - \beta, q/\rho} \,
-      \|(2^{ks} y_k)_k\|_{\ell_q}^\rho ,
-    \]
-    with $H$ as in \Cref{lem:hardy-every-exponent}.
-  \item For $0 < p < \infty$ and $a, b \in [0, \infty]$, $a^p \leq 2 b^p$ implies
-    $a \leq 2^{1/p} b$.
-\end{enumerate}
-\end{lemma}
-
-\begin{proof}
-\leanok
-(1) $2^{js} e_j$ is one term of the sequence. (2) Multiply by $2^{ks\rho}$: with
-$\alpha = s\rho - \beta$ and $b_j = 2^{j\beta} y_j^\rho$ the right side is
-$c \, 2^{k\alpha} \sum_{i \geq 0} b_{k+i}$, and \Cref{lem:hardy-every-exponent} in
-$\ell_{q/\rho}$ applies, since $\|(z_k^\rho)_k\|_{\ell_{q/\rho}} = \|z\|_{\ell_q}^\rho$
-(\Cref{lem:lp-rho-triangle}).
-\end{proof}
 
 \begin{lemma}[Steps in $L_1$]
 \label{lem:steps-into-l1}
 \lean{Haar.eq_of_dyadicIndex_eq, Haar.memLp_of_stronglyMeasurable_dyadicFiltration,
   Haar.memLp_of_mem_lpMeas, Haar.mem_lpMeas_of_le, Haar.sum_setLIntegral_haarDyadicInterval,
   Haar.le_dyadicWeight_mul_setLIntegral_of_dyadicIndex,
-  Haar.setLIntegral_enorm_le_of_dyadicIndex, Haar.eLpNorm_one_le_of_mem_lpMeas}
+  Haar.setLIntegral_enorm_le_of_dyadicIndex}
 \leanok
 \uses{def:dyadic-filtration, lem:condexp-partition, cor:haar-besov, def:pp-scheme,
   lem:pp-bookkeeping, def:step-couple}
@@ -3086,8 +3056,7 @@ intervals. Then
   \int_{S \cap [0, 1]} |G| \leq 2^{j(1/p - 1)} \Bigl( \int_{S \cap [0, 1]} |G|^p \Bigr)^{1/p} .
 \]
 For every $0 < t \leq \infty$, every $\mathcal{F}_j$-measurable $a \in L_t[0, 1]$ lies in
-$L_r[0, 1]$ for every $0 < r \leq \infty$; and $\|a\|_1 \leq 2^{j(1/p - 1)} \|a\|_p$ for every
-$\mathcal{F}_j$-measurable $a \in L_p[0, 1]$.
+$L_r[0, 1]$ for every $0 < r \leq \infty$.
 \end{lemma}
 
 \begin{proof}
@@ -3101,38 +3070,43 @@ $\mathcal{F}_j$-measurable function is constant on every $I_{j,n}$
 $2^j$ values (\Cref{cor:haar-besov}).
 \end{proof}
 
-With the values $c_n$ of $a$ on the intervals of level $j$, the last inequality reads
-$2^{-j} \sum_n |c_n| \leq 2^{-j} (\sum_n |c_n|^p)^{1/p}$.
+With the values $c_n$ of $G$ on the intervals of level $j$ in $S \cap [0, 1)$, the second
+inequality reads $2^{-j} \sum_n |c_n| \leq 2^{-j} (\sum_n |c_n|^p)^{1/p}$.
 
-\begin{lemma}[Sup norm of steps]
+\begin{lemma}[The Nikolskii inequality of steps]
 \label{lem:steps-sup-bound}
-\lean{Haar.eLpNorm_top_le_of_mem_lpMeas}
+\lean{Haar.eLpNorm_top_le_of_mem_lpMeas, Haar.eLpNorm_le_of_mem_lpMeas,
+  Haar.eLpNorm_one_le_of_mem_lpMeas}
 \leanok
-\uses{def:dyadic-filtration, lem:condexp-partition, lem:steps-into-l1}
-Let $j \in \N$. For every $\mathcal{F}_j$-measurable function $a$ on $[0, 1]$ and every
+\uses{def:dyadic-filtration}
+Let $j \in \N$ and let $a$ be an $\mathcal{F}_j$-measurable function on $[0, 1]$. For every
 $0 < r \leq \infty$,
 \[
   \|a\|_\infty \leq 2^{j/r} \|a\|_r ,
 \]
-with $1/\infty = 0$.
+and for every $r \leq t \leq \infty$, $\|a\|_t \leq 2^{j(1/r - 1/t)} \|a\|_r$, with
+$1/\infty = 0$. In particular $\|a\|_1 \leq 2^{j(1/r - 1)} \|a\|_r$ for $r \leq 1$.
 \end{lemma}
 
 \begin{proof}
 \leanok
+\uses{lem:condexp-partition, lem:steps-into-l1, lem:sup-bound-exponents}
 For $r = \infty$ both sides agree. For $r < \infty$, $a$ has a representative constant on every
 $I_{j,n}$ (\Cref{lem:condexp-partition}), and the first inequality of \Cref{lem:steps-into-l1}
-with $F = |a|^r$ and $S = \R$ gives $|a(x)|^r \leq 2^j \|a\|_r^r$ for every $x \in [0, 1)$.
+with $F = |a|^r$ and $S = \R$ gives $|a(x)|^r \leq 2^j \|a\|_r^r$ for every $x \in [0, 1)$. The
+second bound is \Cref{lem:sup-bound-exponents}(2) with $M = 2^{j/r}$, since
+$(j/r)(1 - r/t) = j(1/r - 1/t)$.
 \end{proof}
 
-For $r < \infty$, with the values $c_n$ of $a$ on the intervals of level $j$, the inequality reads
-$\max_n |c_n| \leq (\sum_n |c_n|^r)^{1/r}$.
+For $r < \infty$, with the values $c_n$ of $a$ on the intervals of level $j$, the first inequality
+reads $\max_n |c_n| \leq (\sum_n |c_n|^r)^{1/r}$.
 
 \begin{lemma}[Steps as a scheme of essentially bounded functions]
 \label{lem:steps-function-scheme}
 \lean{Haar.exists_topInclusion_eq_of_mem_lpMeas, Haar.lpSets_haarScheme,
-  Haar.stepCouple_eq_lpCouple}
+  Haar.stepCouple_eq_lpCouple, Haar.toLp_haarScheme}
 \leanok
-\uses{def:dyadic-filtration, def:step-couple, def:scheme-lp-couple}
+\uses{def:dyadic-filtration, def:step-couple, def:scheme-lp-couple, def:function-scheme}
 Let $0 < r \leq \infty$, let $S$ be the Haar scheme in $L_\infty[0, 1]$
 (\Cref{def:dyadic-filtration}), and for $j \in \N$ let $V_j$ be the subgroup of the
 $\mathcal{F}_j$-measurable elements of $L_r[0, 1]$.
@@ -3143,26 +3117,57 @@ $\mathcal{F}_j$-measurable elements of $L_r[0, 1]$.
     $S^{(r)}_n = V_{\lfloor \log_2 n \rfloor}$ for every $n \geq 1$.
   \item The step couple in $L_r[0, 1]$ (\Cref{def:step-couple}) is the couple of $S$ in $L_r$
     (\Cref{def:scheme-lp-couple}).
+  \item For $1 \leq r \leq \infty$, the scheme $S^{(r)}$ of \Cref{def:function-scheme} is the
+    Haar scheme in $L_r$.
 \end{enumerate}
 \end{lemma}
 
 \begin{proof}
 \leanok
-\uses{lem:steps-into-l1, lem:inclusion-linear, def:filtration-scheme, lem:scheme-lp-couple}
+\uses{lem:steps-into-l1, lem:inclusion-linear, def:filtration-scheme, lem:scheme-lp-couple,
+  lem:step-couple}
 (1) By \Cref{lem:steps-into-l1}, $f$ lies in $L_\infty[0, 1]$; its class $a$ there is
 $\mathcal{F}_j$-measurable, and $\iota_{\infty,r} a = f$, since both agree with $f$ almost
 everywhere. (2) For $n = 0$ both sets are $\{0\}$ (\Cref{lem:scheme-lp-couple}). For
 $n \geq 1$ and $j = \lfloor \log_2 n \rfloor$, the approximants of $S$ of complexity $n$ are the
 $\mathcal{F}_j$-measurable elements of $L_\infty[0, 1]$ (\Cref{def:filtration-scheme}). The
-inclusion $\iota_{\infty,r}$ does not change a function up to null sets
-(\Cref{lem:inclusion-linear}), so it maps them into $V_j$, and onto $V_j$ by (1). (3) Both
-couples are complexity couples of the quasi-norm $\|\cdot\|_r$: the step couple of the sets
-$\{0\}$ at complexity $0$ and $V_{\lfloor \log_2 n \rfloor}$ at complexity $n \geq 1$, which are
-the sets $S^{(r)}_n$ by (2).
+image of a function under $\iota_{\infty,r}$ agrees with the function almost everywhere
+(\Cref{lem:inclusion-linear}), so $\iota_{\infty,r}$ maps them into $V_j$, and onto $V_j$ by (1).
+(3) Both couples are complexity couples of the quasi-norm $\|\cdot\|_r$: the step couple of the
+sets $\{0\}$ at complexity $0$ and $V_{\lfloor \log_2 n \rfloor}$ at complexity $n \geq 1$, which
+are the sets $S^{(r)}_n$ by (2). (4) By (2) and \Cref{def:filtration-scheme}, both schemes have
+the sets $\{0\}$ and $V_{\lfloor \log_2 n \rfloor}$, $n \geq 1$ (\Cref{lem:step-couple}).
 \end{proof}
 
 So the properties of the couple of a scheme in $L_r$ (\Cref{lem:scheme-lp-couple}) hold for the
-step couple, for every $0 < r \leq \infty$.
+step couple, for every $0 < r \leq \infty$, and for $r \geq 1$ the Besov spaces of $S$ are the
+approximation spaces of the Haar scheme in $L_r$, by (4) and \Cref{lem:besov-bridge}.
+
+\begin{corollary}[The Besov spaces of the dyadic steps]
+\label{cor:steps-besov-space}
+\lean{Haar.memBesov_haarScheme_iff_modulus}
+\leanok
+\uses{def:besov, def:dyadic-filtration, def:interval-modulus}
+Let $S$ be the Haar scheme in $L_\infty[0, 1]$, $0 < p \leq 1$, $0 < q \leq \infty$ and
+$0 \leq s < 1/p$. A function $f \in L_p[0, 1]$ lies in the Besov space
+$\Besov{s}{p}{q}([0, 1], S)$ of \Cref{def:besov} if and only if
+\[
+  \|f\|_p + \bigl\| \bigl( 2^{ks} \omega_1(f, 2^{-k}, [0, 1])_p \bigr)_k \bigr\|_{\ell_q}
+  < \infty .
+\]
+\end{corollary}
+
+\begin{proof}
+\leanok
+\uses{lem:besov-linear, lem:steps-function-scheme, thm:steps-besov-below-one}
+By \Cref{lem:besov-linear}(2), $f$ lies in $\Besov{s}{p}{q}([0, 1], S)$ if and only if its
+dyadic norm in the couple of $S$ in $L_p$ is finite. That couple is the step couple
+(\Cref{lem:steps-function-scheme}(3)), and \Cref{thm:steps-besov-below-one} turns the finiteness
+of its dyadic norm into the condition on the modulus.
+\end{proof}
+
+So $\Besov{s}{p}{q}([0, 1], S) = B^s_{p,q,1}[0, 1]$ for $0 \leq s < 1/p$: the Besov space of the
+scheme of dyadic steps is the Besov space of the first modulus.
 
 \begin{definition}[Level norms of the Haar expansion]
 \label{def:haar-level-norm}
@@ -3223,7 +3228,8 @@ $I_{k,m}$ gives $(\int_{I_{k,m}} |a|)^p \leq 2^{j(1-p)} \int_{I_{k,m}} |a|^p$; s
   Haar.antitone_eFunctional_stepCouple_add}
 \leanok
 \uses{lem:steps-into-l1, lem:haar-level-norm, lem:telescoping-fatou, lem:weighted-tails,
-  lem:lp-rho-triangle, lem:step-couple, lem:e-functional}
+  lem:lp-rho-triangle, lem:step-couple, lem:e-near-best, lem:near-best-transfer,
+  lem:steps-sup-bound}
 Let $f \in L_p[0, 1]$ and $s \geq -1$. There are $\mathcal{F}_j$-measurable $b_j \in L_p[0, 1]$
 with $\|f - b_j\|_p \leq e_j = E(2^j, f) + \|f\|_p 2^{-j(s+1)}$, and $e$ decreases. Let
 $b_j$ be $\mathcal{F}_j$-measurable with $\|f - b_j\|_p \leq e_j$ for a decreasing sequence $e$
@@ -3242,11 +3248,14 @@ converges, then $f$ is integrable and for every $k$
 
 \begin{proof}
 \leanok
-Near-best elements exist by \Cref{lem:e-functional}; for $\|f\|_p = 0$ take $b_j = 0$. The
-difference $b_{j+1} - b_j = (f - b_j) - (f - b_{j+1})$ is $\mathcal{F}_{j+1}$-measurable, so
-\Cref{lem:steps-into-l1} bounds its $L_1$ norm, and \Cref{lem:telescoping-fatou} with $r = 1$
-gives the bound of $\|f - b_k\|_1$; at $k = 0$ it shows $f - b_0 \in L_1$, so $f$ is integrable
-when the series converges. For the level norms, telescope
+Near-best elements exist and $e$ decreases by (1) and (2) of \Cref{lem:e-near-best}, and an
+element of complexity at most $2^j$ lies in $V_j$ (\Cref{lem:step-couple}). Since
+$\|f - b_{j+1}\|_p \leq e_{j+1} \leq e_j$, \Cref{lem:lp-rho-triangle} gives
+$\|b_{j+1} - b_j\|_p^p \leq 2 e_j^p$, and $b_j \to f$ in measure
+(\Cref{lem:near-best-transfer}). The difference $b_{j+1} - b_j = (f - b_j) - (f - b_{j+1})$ is
+$\mathcal{F}_{j+1}$-measurable, so \Cref{lem:steps-sup-bound} bounds its $L_1$ norm, and
+\Cref{lem:telescoping-fatou} with $r = 1$ gives the bound of $\|f - b_k\|_1$; at $k = 0$ it shows
+$f - b_0 \in L_1$, so $f$ is integrable when the series converges. For the level norms, telescope
 $b_{k+n} = b_k + \sum_{i<n} (b_{k+i+1} - b_{k+i})$ with $H_k(b_k) = 0$ and
 \Cref{lem:haar-level-norm} for each block, which is $\mathcal{F}_{k+i+1}$-measurable; then
 $H_k(f)^p \leq H_k(f - b_{k+n})^p + H_k(b_{k+n})^p$, and
@@ -3283,8 +3292,8 @@ $e_0 \leq L$, \Cref{lem:near-best-steps} gives the bound.
 \end{proof}
 
 Through the Nikolskii property of the steps, the Besov embedding of a scheme of functions
-(\Cref{thm:besov-embedding}) reproduces this embedding up to the constant and gives embeddings
-into every $L_r[0, 1]$, for every $0 < p \leq r \leq \infty$.
+(\Cref{thm:besov-embedding}) gives embeddings into every $L_r[0, 1]$, for every
+$0 < p \leq r \leq \infty$.
 
 \begin{corollary}[Besov embeddings of steps]
 \label{cor:steps-embedding}
@@ -3324,10 +3333,12 @@ For the second take $K \geq 1$, so that the bound holds when $\|f\|^{(p)}_{s, q}
 otherwise $\|f\|_r = \|g\|_r$, the first term of $\|g\|^{(r)}_{s - (1/p - 1/r), q}$.
 \end{proof}
 
-For $r = 1$ and $p \leq 1$ the second bound is \Cref{thm:besov-into-l1}, which gives $K$
-explicitly; their agreement is a check of \Cref{thm:besov-embedding}(1) for $p < 1$. With
-\Cref{thm:steps-besov-below-one}, for $0 < p \leq 1$, $p \leq r < \infty$ and
-$1/p - 1/r < s < 1/p$ it is the embedding $B^s_{p,q,1}[0, 1] \subseteq L_r[0, 1]$.
+For $r = 1$ and $p \leq 1$ the second bound holds with an explicit $K$, proved directly
+(\Cref{thm:besov-into-l1}); the agreement of the two proofs is a check of
+\Cref{thm:besov-embedding}(1) for $p < 1$. With \Cref{thm:steps-besov-below-one} and
+\Cref{cor:steps-besov-space}, for $0 < p \leq 1$, $p \leq r < \infty$ and $1/p - 1/r < s < 1/p$
+the second bound of \Cref{cor:steps-embedding} is the embedding
+$B^s_{p,q,1}[0, 1] \subseteq L_r[0, 1]$.
 
 \begin{lemma}[Martingale convergence in $L_1$]
 \label{lem:haar-martingale-l1}

@@ -173,7 +173,12 @@ For a general scheme the project describes `A^s_q`
 * by a [modulus of smoothness](https://mario-ullrich.github.io/Lean-FunctionSpaces/ch-moduli-abstract.html#thm:modulus-coincidence), under Jackson's and an inverse
   inequality of order `θ` (`0 ≤ s < θ`), also in quasi-normed groups, through the E-functional
   (`InterpCouple.CoupleModulusData.eNormDyadic_lt_top_iff`);
-* by [block decompositions](https://mario-ullrich.github.io/Lean-FunctionSpaces/ch-decompositions.html#thm:block-decomposition), in a Banach space (`s > 0`);
+* by [block decompositions](https://mario-ullrich.github.io/Lean-FunctionSpaces/ch-decompositions.html#thm:block-decomposition), in a Banach space (`s > 0`, `1 ≤ q ≤ ∞`), also
+  [in quasi-normed couples](
+  https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-e-block-decompositions.html#thm:e-block-decomposition)
+  with a `ρ`-triangle inequality, such as the couple of a scheme of functions in `L_p` for
+  `p < 1`, through the E-functional
+  (`InterpCouple.eNormDyadic_lt_top_iff_eBlockDecompNorm_lt_top`), for `s > 0` and `0 < q ≤ ∞`;
 * by [dyadic blocks of coefficients](https://mario-ullrich.github.io/Lean-FunctionSpaces/ch-spectral.html#thm:spectral-coefficients), for a Hilbert basis with
   levels (`s > 0`);
 * by [coefficients in `ℓ_τ`](
@@ -385,13 +390,15 @@ For a general scheme the project describes `A^s_q`
   approximants, so both embeddings hold on the torus (`Torus.memBesov_exists_inclusion_eq`,
   `Torus.memBesov_exists_continuous`). The dyadic step functions on `[0, 1)` have the Nikolskii
   property with `D = 1` (`Haar.hasNikolskii_haarScheme`), so the embedding into `L_r` and
-  `B^{s-α}_{r,q}` holds for them (`Haar.exists_uniform_inclusion_eq_stepCouple`).
+  `B^{s-α}_{r,q}` holds for them, in the dyadic norms of the step couples
+  (`Haar.exists_uniform_inclusion_eq_stepCouple`).
 * **Besov spaces for `0 < p < 1` on `[0, 1]`.** Let `0 < p ≤ 1` and `0 < q ≤ ∞`, and let
   `E_k(f)` be the error of best approximation of `f ∈ L_p[0, 1]` by step functions on the dyadic
   intervals of length `2^(-k)`. For `0 ≤ s < 1/p`, `‖f‖_p + ‖(2^(ks) E_k(f))_k‖_{ℓ_q} < ∞` iff
   `‖f‖_p + ‖(2^(ks) ω_1(f, 2^(-k), [0, 1])_p)_k‖_{ℓ_q} < ∞`, that is, iff `f ∈ B^s_{p,q,1}[0, 1]`
-  (`Haar.eNormDyadic_stepCouple_lt_top_iff_modulus`). For `p ≤ r < ∞` and `1/p - 1/r < s < 1/p`,
-  `B^s_{p,q,1}[0, 1] ⊆ L_r[0, 1]`: there is `K < ∞` with
+  (`Haar.eNormDyadic_stepCouple_lt_top_iff_modulus`), and this space is the Besov space of the
+  scheme of dyadic steps (`Haar.memBesov_haarScheme_iff_modulus`). For `p ≤ r < ∞` and
+  `1/p - 1/r < s < 1/p`, `B^s_{p,q,1}[0, 1] ⊆ L_r[0, 1]`: there is `K < ∞` with
   `‖f‖_r ≤ K (‖f‖_p + ‖(2^(ks) E_k(f))_k‖_{ℓ_q})` for every `f ∈ L_p[0, 1]`, by the Besov
   embedding of a scheme of functions with the Nikolskii property of dimension `1`
   (`Haar.exists_eLpNorm_le_eNormDyadic_stepCouple`). For `1/p - 1 < s < 1/p`,

@@ -58,12 +58,12 @@ restriction to a face of `𝕋^(n+1)` is the model case of the trace theorem.
   `‖a(0, ·)‖_p ≤ (2⌈p/2⌉ m)^(1/p) ‖a‖_p` for polynomials of degree `< m`
   (`Torus.eLpNorm_restrictFace_le`) and an extension by the normalised Fejér kernel. For
   continuous `f ∈ B^{1/p}_{p,1}(𝕋^(n+1))`, in particular for continuous
-  `f ∈ B^{s+1/p}_{p,q}(𝕋^(n+1))` with `s > 0`, the trace is `f(0, ·)`
+  `f ∈ B^{s+1/p}_{p,q}(𝕋^(n+1))` with `s > 0` and `0 < q ≤ ∞`, the trace is `f(0, ·)`
   (`Torus.periodicTraceBound_limitTrace_eq_restrictFace`, `Torus.trace_besov_eq_restrictFace`); for
-  `s > n/p` every `f ∈ B^{s+1/p}_{p,q}(𝕋^(n+1))` has a continuous representative whose restriction
-  is its trace (`Torus.exists_trace_eq_restrictFace`). The approximants in this proof are the
-  de la Vallée Poussin means `V_k f = Θ_{k+n+1} ⋆ f`, near-best both in `L_p` and in the sup
-  norm.
+  `s > n/p` and `0 < q ≤ ∞` every `f ∈ B^{s+1/p}_{p,q}(𝕋^(n+1))` has a continuous representative
+  whose restriction is its trace (`Torus.exists_trace_eq_restrictFace`). The approximants in this
+  proof are the de la Vallée Poussin means `V_k f = Θ_{k+n+1} ⋆ f`, near-best both in `L_p` and
+  in the sup norm.
 * **Sobolev spaces through weak derivatives.** For `1 ≤ p ≤ ∞` call `g ∈ L_p(𝕋^d)` the weak
   derivative `∂^α f` of `f ∈ L_p(𝕋^d)` if `ĝ(k) = (2πi k)^α f̂(k)` for all `k ∈ ℤ^d`
   (`Torus.HasPeriodicWeakDeriv`), and let `W^m_p(𝕋^d)` consist of the `f` all of whose weak

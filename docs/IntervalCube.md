@@ -145,8 +145,18 @@ the quasi-Banach space `L_τ`.
   For `1 ≤ p` the step couple is the complexity couple of the Haar scheme
   (`Haar.memEMethod_stepCouple_iff_memApprox`). For every `0 < p ≤ ∞` it is the couple in `L_p` of
   the Haar scheme `Haar.haarScheme ∞` in `L_∞[0, 1]`, a scheme of essentially bounded functions
-  (`Haar.stepCouple_eq_lpCouple`). For `0 < p ≤ 1`, `s > 1/p - 1` and `0 < q ≤ ∞` the space
-  `E_{s,q}` embeds into `L_1[0, 1]` (`Haar.eLpNorm_one_le_eNormDyadic`), and `f ∈ E_{s,q}` iff
+  (`Haar.stepCouple_eq_lpCouple`); for `1 ≤ p` the scheme in `L_p` of the Haar scheme in
+  `L_∞[0, 1]` is `Haar.haarScheme p` (`Haar.toLp_haarScheme`). A step `a` of level `j` satisfies
+  the Nikolskii inequality `‖a‖_r ≤ 2^(j(1/p - 1/r)) ‖a‖_p` for `0 < p ≤ r ≤ ∞`
+  (`Haar.eLpNorm_le_of_mem_lpMeas`); its case `r = ∞` gives the Haar scheme in `L_∞[0, 1]` the
+  Nikolskii property of dimension `1` (`Haar.hasNikolskii_haarScheme`), and the Besov embedding of
+  a scheme of functions gives, for `0 < q ≤ ∞` and `s > 1/p - 1/r`, the embeddings of the step
+  couple in `L_p` into the step couple in `L_r` with smoothness `s - (1/p - 1/r)` and into
+  `L_r[0, 1]` (`Haar.exists_uniform_inclusion_eq_stepCouple`,
+  `Haar.exists_eLpNorm_le_eNormDyadic_stepCouple`). For `0 < p ≤ 1`, `0 < q ≤ ∞` and
+  `0 ≤ s < 1/p` the Besov space of the Haar scheme in `L_∞[0, 1]` is `B^s_{p,q,1}[0, 1]`
+  (`Haar.memBesov_haarScheme_iff_modulus`). For `0 < p ≤ 1`, `s > 1/p - 1` and `0 < q ≤ ∞` the
+  space `E_{s,q}` embeds into `L_1[0, 1]` (`Haar.eLpNorm_one_le_eNormDyadic`), and `f ∈ E_{s,q}` iff
   `f ∈ L_1[0, 1]` and `|∫_0^1 f| + ‖(2^(k(s+1/2-1/p)) ‖(⟨f, h_{k,m}⟩)_{m<2^k}‖_{ℓ_p})_k‖_{ℓ_q} < ∞`
   (`Haar.memEMethod_stepCouple_iff_haarCoeff`); for `1/p - 1 < s < 1/p` this describes
   `B^s_{p,q,1}[0, 1]` by Haar coefficients (`Haar.lqNorm_modulus_lt_top_iff_haarCoeff_of_le_one`).
@@ -206,8 +216,8 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Haar coefficients and Besov spaces on the interval and the circle for `0 < s < 1/p` | ✅ | ✗ | `Wavelets/Examples/HaarBesov` |
 | The Haar basis of `L_2[0, 1]`, `n`-term approximation | ✅ | ✗ | `Wavelets/Examples/HaarBasis` |
 | Dyadic step functions in `L_p[0, 1]`, `0 < p ≤ 1`: the step couple, Jackson's inequality by averaging, inverse inequality of order `1/p`, `A^s_q = B^s_{p,q,1}[0, 1]` for `0 < s < 1/p` | ✅ | ✗ | `Wavelets/Examples/DyadicStepsQuasiBanach` |
-| The Haar system for `0 < p ≤ 1`: steps in `L_1`, sup bound of steps for `0 < p ≤ ∞`, level norms, embedding of `A^s_q(L_p, steps)` into `L_1` for `s > 1/p - 1`, martingale convergence in `L_1`, Haar coefficient characterisation, `B^s_{p,q,1}[0, 1]` by Haar coefficients for `1/p - 1 < s < 1/p` | ✅ | ✗ | `Wavelets/Examples/HaarQuasiBanach` |
-| Dyadic steps as a scheme of essentially bounded functions: steps are bounded, the approximants in `L_p`, the step couple as the couple of the Haar scheme in `L_p` for `0 < p ≤ ∞`, Nikolskii property of dimension `1`, Besov embeddings of steps for `0 < p ≤ r ≤ ∞` and `s > 1/p - 1/r` (from the dyadic norm of the step couple in `L_p` to that in `L_r` with smoothness `s - (1/p - 1/r)`, and into `L_r`) | ✅ | ✗ | `Wavelets/Examples/HaarFunctionScheme` |
+| The Haar system for `0 < p ≤ 1`: steps in `L_1`, sup bound and Nikolskii inequality of steps for `0 < p ≤ r ≤ ∞`, level norms, embedding of `A^s_q(L_p, steps)` into `L_1` for `s > 1/p - 1`, martingale convergence in `L_1`, Haar coefficient characterisation, `B^s_{p,q,1}[0, 1]` by Haar coefficients for `1/p - 1 < s < 1/p` | ✅ | ✗ | `Wavelets/Examples/HaarQuasiBanach` |
+| Dyadic steps as a scheme of essentially bounded functions: steps are bounded, the approximants in `L_p`, the step couple as the couple of the Haar scheme in `L_p` for `0 < p ≤ ∞`, the Haar scheme in `L_p` as the image scheme for `p ≥ 1`, Nikolskii property of dimension `1`, Besov embeddings of steps for `0 < p ≤ r ≤ ∞` and `s > 1/p - 1/r` (from the dyadic norm of the step couple in `L_p` to that in `L_r` with smoothness `s - (1/p - 1/r)`, and into `L_r`), the Besov space of the steps is `B^s_{p,q,1}[0, 1]` for `0 < p ≤ 1` and `0 ≤ s < 1/p` | ✅ | ✗ | `Wavelets/Examples/HaarFunctionScheme` |
 | Haar partial sums for `0 < p ≤ 1`: convergence in `A^s_q(L_p, steps)` for `s > 1/p - 1` and `q < ∞`, uniqueness of the coefficients (Schauder basis) | ✅ | ✗ | `Wavelets/Examples/HaarSchauderBasis` |
 | `n`-term Haar approximation in `L_2` for every `0 < τ < 2`: approximation by steps in `L_τ`, `τ ≤ 1`, and the Besov space of the first modulus | ✅ | ✗ | `Wavelets/Examples/HaarNTermBesov` |
 
