@@ -39,9 +39,12 @@ applies:
   (`ContinuousSpectralBasis.sobolevSpace`), with Jackson's and Bernstein's inequalities of
   constant `1`.
 
-The Besov spaces `B^s_{p,q}` of the scheme are defined for every `1 ≤ p ≤ ∞` by
-`FunctionScheme.MemBesov`; their embeddings need the Nikolskii property
-`FunctionScheme.HasNikolskii`, which the torus has (`Torus.hasNikolskii_fourierEigenbasis`).
+The Besov spaces `B^s_{p,q}` of the scheme are defined for every `0 < p ≤ ∞`
+(`FunctionScheme.MemBesov`); their embeddings need the Nikolskii bound at the source exponent
+(`FunctionScheme.HasNikolskiiAt`), which the local Weyl bound gives for `0 < p ≤ 2`
+(`ContinuousSpectralBasis.hasNikolskiiAt_basisScheme`) and the torus has for every `0 < p ≤ ∞`
+through its Nikolskii property (`Torus.hasNikolskii_fourierEigenbasis`,
+`FunctionScheme.HasNikolskii.hasNikolskiiAt`).
 -/
 
 @[expose] public section

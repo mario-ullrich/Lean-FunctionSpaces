@@ -61,8 +61,8 @@ theorem memBesov_exists_inclusion_eq (hp0 : p ≠ 0) (hpr : p ≤ r)
     ∃ g : Lp ℂ r (volume : Measure (UnitAddTorus d)),
       Lp.inclusionOfExponentLeLinear (𝕜 := ℝ) volume hpr g = f ∧
         (trigScheme d).MemBesov r (s - Fintype.card d * (p.toReal⁻¹ - r.toReal⁻¹)) q g :=
-  MemBesov.exists_inclusion_eq_of_nikolskii trigScheme_hasNikolskii (Nat.cast_nonneg _) hp0 hpr
-    hs hq0 hf
+  MemBesov.exists_inclusion_eq_of_nikolskii (trigScheme_hasNikolskii.hasNikolskiiAt hp0)
+    (Nat.cast_nonneg _) hp0 hpr hs hq0 hf
 
 /-- **Besov functions are continuous** for `s > d/p`, `0 < p ≤ ∞` and `0 < q ≤ ∞`: every
 `f ∈ B^s_{p,q}(𝕋^d)` has a continuous representative. The trigonometric polynomials have
@@ -76,7 +76,7 @@ theorem memBesov_exists_continuous (hp0 : p ≠ 0) (hs : (Fintype.card d : ℝ) 
       Lp.topInclusion (𝕜 := ℝ) volume p (ContinuousMap.toLp (E := ℂ) ∞ volume ℝ g) = f := by
   obtain ⟨a, ha⟩ :=
     MemBesov.exists_boundedContinuous_of_nikolskii (hasContinuousApproximants_ofContinuous _)
-      trigScheme_hasNikolskii (Nat.cast_nonneg _) hp0 hs hq0 hf
+      (trigScheme_hasNikolskii.hasNikolskiiAt hp0) (Nat.cast_nonneg _) hp0 hs hq0 hf
   exact ⟨a.toContinuousMap, by rw [toLp_toContinuousMap, ha]⟩
 
 /-- **`H^s(𝕋^d) ⊆ B^s_{2,∞}(𝕋^d)`**, from Jackson's inequality. -/

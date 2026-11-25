@@ -319,11 +319,11 @@ theorem eLpNorm_tsum_rpow_min_le {ι : Type*} [Countable ι] {g : ι → α → 
     exact eLpNorm_tsum_le hp1
 
 /-- **A function is bounded almost everywhere by its `L_∞` quasi-norm**: `‖f(x)‖ ≤ ‖f‖_∞` for
-almost every `x`, for every function, measurable or not (Mathlib's `ae_le_eLpNormEssSup` with
-`eLpNormEssSup_le_eLpNorm_top`). -/
-theorem ae_enorm_le_eLpNorm_top {ε : Type*} [TopologicalSpace ε] [ENorm ε] (f : α → ε) :
-    ∀ᵐ x ∂μ, ‖f x‖ₑ ≤ eLpNorm f ∞ μ :=
-  ae_le_eLpNormEssSup.mono fun _ hx => hx.trans eLpNormEssSup_le_eLpNorm_top
+almost every `x`, for every function, measurable or not (Mathlib's
+`enorm_ae_le_eLpNormEssSup` with `eLpNormEssSup_le_eLpNorm_top`). -/
+theorem ae_enorm_le_eLpNorm_top {ε : Type*} [TopologicalSpace ε] [ENorm ε] (f : α → ε)
+    (μ : Measure α) : ∀ᵐ x ∂μ, ‖f x‖ₑ ≤ eLpNorm f ∞ μ :=
+  (enorm_ae_le_eLpNormEssSup f μ).mono fun _ hx => hx.trans eLpNormEssSup_le_eLpNorm_top
 
 /-- **A function with finite `L_p` quasi-norm is finite almost everywhere**, for every
 `0 < p ≤ ∞` and every `F : α → [0, ∞]`: for `p < ∞` the integral of `F^p` is finite (Mathlib's
@@ -333,7 +333,7 @@ has infinite quasi-norm. -/
 theorem ae_lt_top_of_eLpNorm_ne_top {F : α → ℝ≥0∞} (hp0 : p ≠ 0) (h : eLpNorm F p μ ≠ ∞) :
     ∀ᵐ x ∂μ, F x < ∞ := by
   rcases eq_or_ne p ∞ with rfl | hp
-  · filter_upwards [ae_enorm_le_eLpNorm_top (μ := μ) F] with x hx
+  · filter_upwards [ae_enorm_le_eLpNorm_top F μ] with x hx
     rw [enorm_eq_self] at hx
     exact hx.trans_lt h.lt_top
   have hF : AEMeasurable F μ := by
@@ -437,7 +437,7 @@ theorem eLpNorm_le_of_eLpNorm_top_le {E : Type*} [NormedAddCommGroup E] {f : α 
       exact ENNReal.top_ne_zero (le_zero_iff.1 h)
     simp only [eLpNorm_of_not_aestronglyMeasurable hf,
       ENNReal.mul_top (ENNReal.rpow_pos_of_nonneg (pos_iff_ne_zero.2 hM) h1θ).ne', le_refl]
-  have hN := ae_enorm_le_eLpNorm_top (μ := μ) f
+  have hN := ae_enorm_le_eLpNorm_top f μ
   calc eLpNorm f r μ
       ≤ eLpNorm f ∞ μ ^ (1 - p.toReal / r.toReal) * eLpNorm f p μ ^ (p.toReal / r.toReal) :=
         eLpNorm_le_rpow_mul_eLpNorm_rpow hf hN hp0 hpr hr

@@ -9,7 +9,7 @@ public import FunctionSpaces.MeasureSpaces.Spectral.ContinuousSpectralBasis
 public import FunctionSpaces.Analysis.Lp.Interpolation
 
 /-!
-# The local Weyl bound, the Nikolskii inequality and continuity
+# The local Weyl bound, the Nikolskii inequality, Besov embeddings and continuity
 
 A continuous spectral basis `(e_i)` on `M` (`ContinuousSpectralBasis`), with continuous basis
 functions `ẽ_i`, satisfies the **local Weyl bound** of dimension `D` with constant `C`
@@ -27,11 +27,20 @@ frequencies of degree `< n` (`Torus.localWeylBound_fourierEigenbasis`).
   `a(x) = ∑_i c_i ẽ_i(x)` and Parseval's identity `‖a‖_2² = ∑_i |c_i|²`.
 * **The Nikolskii inequality for `0 < p ≤ 2`**
   (`ContinuousSpectralBasis.norm_rpow_le_of_localWeyl`): `‖a‖_∞^p ≤ C n^D ‖a‖_p^p`, since
-  `‖a‖_2² ≤ ‖a‖_∞^(2-p) ‖a‖_p^p`. For `p > 2` the inequality with `n^(D/p)` does not follow this
-  way: the proof on the torus raises trigonometric polynomials of degree `< n` to the power `m`,
-  which have degree `< mn`; for a general basis, products of functions of `basisSpan n` need not lie
-  in any `basisSpan m`. The embedding theorems of `FunctionSpaces.MeasureSpaces.Besov.Embeddings`
-  apply to the scheme of the basis functions under the hypothesis `FunctionScheme.HasNikolskii`.
+  `‖a‖_2² ≤ ‖a‖_∞^(2-p) ‖a‖_p^p`. So the scheme of the basis functions satisfies the Nikolskii
+  bound at every `0 < p ≤ 2` (`ContinuousSpectralBasis.hasNikolskiiAt_basisScheme`). For `p > 2`
+  the inequality with `n^(D/p)` does not follow this way: the proof on the torus raises
+  trigonometric polynomials of degree `< n` to the power `m`, which have degree `< mn`; for a
+  general basis, products of functions of `basisSpan n` need not lie in any `basisSpan m`.
+* **The Besov embeddings for `0 < p ≤ 2`**
+  (`ContinuousSpectralBasis.memBesov_exists_inclusion_eq_of_localWeyl`,
+  `ContinuousSpectralBasis.memBesov_exists_boundedContinuous_of_localWeyl`): for `D ≥ 0`,
+  `p ≤ r ≤ ∞`, `0 < q ≤ ∞` and `s > D(1/p - 1/r)`, `B^s_{p,q} ⊆ B^{s - D(1/p - 1/r)}_{r,q}`,
+  and, if `μ` charges every nonempty open set, for `s > D/p` every element of `B^s_{p,q}` has a
+  bounded continuous representative. The embedding theorems of
+  `FunctionSpaces.MeasureSpaces.Besov.Embeddings` need only the Nikolskii bound at the source
+  exponent (`FunctionScheme.HasNikolskiiAt`); for `p > 2` they apply to the scheme of the basis
+  functions whenever it satisfies that bound.
 * **Continuity of `H^s` for `s > D/2`**
   (`ContinuousSpectralBasis.exists_continuous_of_localWeyl`): every `f ∈ L_2(μ)` with
   `∑_i (1 + λ(i))^(2s) |⟨e_i, f⟩|² < ∞` has a bounded continuous representative. The partial
@@ -195,6 +204,50 @@ theorem norm_le_of_localWeyl {D C : ℝ} (hW : B.LocalWeylBound D C) {n : ℕ} (
     _ = C ^ P⁻¹ * (n : ℝ) ^ (D * P⁻¹) * N := by
         rw [Real.mul_rpow (by positivity) (by positivity), Real.rpow_rpow_inv hN hP0.ne',
           Real.mul_rpow hC (by positivity), ← Real.rpow_mul (by positivity)]
+
+/-- **The scheme of the basis satisfies the Nikolskii bound at every `0 < p ≤ 2`** under the
+local Weyl bound of dimension `D` with constant `C`: `‖a‖_∞ ≤ C^(1/p) n^(D/p) ‖a‖_p` for every
+approximant `a` of complexity `n ≥ 1` of `ContinuousSpectralBasis.basisScheme`, in `[0, ∞]`
+(`FunctionScheme.HasNikolskiiAt`). The approximant is the class of some `g` in the span of the
+basis functions of level `< n`, whose sup norm `ContinuousSpectralBasis.norm_le_of_localWeyl`
+bounds, and the sup-norm bound gives the bound in `L_∞`
+(`FunctionScheme.hasNikolskiiAt_ofContinuous`). -/
+theorem hasNikolskiiAt_basisScheme {D C : ℝ} (hW : B.LocalWeylBound D C) {p : ℝ≥0∞}
+    (hp0 : p ≠ 0) (hp2 : p ≤ 2) : B.basisScheme.HasNikolskiiAt D p :=
+  FunctionScheme.hasNikolskiiAt_ofContinuous (Real.rpow_nonneg hW.nonneg _)
+    fun _ hn _ hg => norm_le_of_localWeyl hW hn hg hp0 hp2
+
+/-! ### The Besov embeddings for `0 < p ≤ 2` -/
+
+/-- **The Besov embedding of a continuous spectral basis**, for `0 < p ≤ 2`: under the local
+Weyl bound of dimension `D ≥ 0`, for `p ≤ r ≤ ∞`, `0 < q ≤ ∞` and `s > α = D(1/p - 1/r)`, every
+`f ∈ B^s_{p,q}` of the scheme of the basis is the inclusion of some `g ∈ L_r` lying in
+`B^{s - α}_{r,q}`. This is `FunctionScheme.MemBesov.exists_inclusion_eq_of_nikolskii` with the
+Nikolskii bound at `p` of `ContinuousSpectralBasis.hasNikolskiiAt_basisScheme`. -/
+theorem memBesov_exists_inclusion_eq_of_localWeyl {D C : ℝ} (hW : B.LocalWeylBound D C)
+    (hD : 0 ≤ D) {p r : ℝ≥0∞} (hp0 : p ≠ 0) (hp2 : p ≤ 2) (hpr : p ≤ r) {s : ℝ}
+    (hs : nikolskiiExponent D p r < s) {q : ℝ≥0∞} (hq0 : q ≠ 0) {f : Lp ℂ p μ}
+    (hf : B.basisScheme.MemBesov p s q f) :
+    ∃ g : Lp ℂ r μ, Lp.inclusionOfExponentLeLinear (𝕜 := ℝ) μ hpr g = f ∧
+      B.basisScheme.MemBesov r (s - nikolskiiExponent D p r) q g :=
+  hf.exists_inclusion_eq_of_nikolskii (hasNikolskiiAt_basisScheme hW hp0 hp2) hD hp0 hpr hs hq0
+
+/-- **Besov functions of a continuous spectral basis are continuous**, for `0 < p ≤ 2`: if `μ`
+charges every nonempty open set and the basis satisfies the local Weyl bound of dimension
+`D ≥ 0`, then for `0 < q ≤ ∞` and `s > D/p` every `f ∈ B^s_{p,q}` of the scheme of the basis has
+a bounded continuous representative. The scheme of the basis has continuous approximants
+(`FunctionScheme.hasContinuousApproximants_ofContinuous`) and the Nikolskii bound at `p`
+(`ContinuousSpectralBasis.hasNikolskiiAt_basisScheme`), so
+`FunctionScheme.MemBesov.exists_boundedContinuous_of_nikolskii` applies. -/
+theorem memBesov_exists_boundedContinuous_of_localWeyl [μ.IsOpenPosMeasure] {D C : ℝ}
+    (hW : B.LocalWeylBound D C) (hD : 0 ≤ D) {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp2 : p ≤ 2) {s : ℝ}
+    (hs : D * p.toReal⁻¹ < s) {q : ℝ≥0∞} (hq0 : q ≠ 0) {f : Lp ℂ p μ}
+    (hf : B.basisScheme.MemBesov p s q f) :
+    ∃ a : M →ᵇ ℂ,
+      Lp.topInclusion (𝕜 := ℝ) μ p (BoundedContinuousFunction.toLp (E := ℂ) ∞ μ ℝ a) = f :=
+  hf.exists_boundedContinuous_of_nikolskii
+    (FunctionScheme.hasContinuousApproximants_ofContinuous _)
+    (hasNikolskiiAt_basisScheme hW hp0 hp2) hD hp0 hs hq0
 
 /-! ### Continuity of `H^s` for `s > D/2` -/
 
