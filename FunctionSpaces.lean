@@ -253,6 +253,7 @@ public import FunctionSpaces.Wavelets.Examples.HaarBesov
 public import FunctionSpaces.Wavelets.Examples.HaarBasis
 public import FunctionSpaces.Wavelets.Examples.DyadicStepsQuasiBanach
 public import FunctionSpaces.Wavelets.Examples.HaarQuasiBanach
+public import FunctionSpaces.Wavelets.Examples.HaarFunctionScheme
 public import FunctionSpaces.Wavelets.Examples.HaarSchauderBasis
 public import FunctionSpaces.Wavelets.Examples.HaarNTermBesov
 public import FunctionSpaces.Wavelets.Examples.Multiscale
