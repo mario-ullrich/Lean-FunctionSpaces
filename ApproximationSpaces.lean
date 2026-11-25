@@ -33,6 +33,7 @@ public import ApproximationSpaces.Interpolation.EFunctional
 public import ApproximationSpaces.Interpolation.EFunctionalModuli
 public import ApproximationSpaces.Interpolation.EFunctionalSpaces
 public import ApproximationSpaces.Interpolation.EFunctionalRepresentation
+public import ApproximationSpaces.Interpolation.EFunctionalJacksonBernstein
 public import ApproximationSpaces.Decompositions.Projection
 public import ApproximationSpaces.Decompositions.Blocks
 public import ApproximationSpaces.Decompositions.EFunctionalBlocks
@@ -219,9 +220,21 @@ in the root namespace.
   complexity couple of a scheme (`ApproximationScheme.eNormPietsch_complexityCouple`).
 * `ApproximationSpaces.Interpolation.EFunctionalRepresentation`: the couples of E-spaces
   `(N₀, E_{r,q₁})` and `(E_{s₀,q₀}, E_{s₁,q₁})` (`InterpCouple.leftECouple`,
-  `InterpCouple.eCouple`), quasi-normed for every smoothness and every fine index, and Jackson's
+  `InterpCouple.eCouple`), quasi-normed for every smoothness and every fine index; Jackson's
   half of `E_{s,q} = (N₀, E_{r,q₁})_{s/r,q}` for every Jackson inequality
-  (`InterpCouple.eNormDyadic_le_interpNorm_of_jackson`).
+  (`InterpCouple.eNormDyadic_le_interpNorm_of_jackson`), Bernstein's half through near-best
+  approximants (`InterpCouple.interpNorm_leftECouple_le_eNormDyadic`), the representation
+  `(N₀, E_{r,q₁})_{η,q} = E_{ηr,q}` for all fine indices
+  (`InterpCouple.memKMethod_leftECouple_iff`) and the reiteration
+  `(E_{s₀,q₀}, E_{s₁,q₁})_{η,q} = E_{(1-η)s₀+ηs₁,q}` for `q₀, q₁, q ≥ 1`
+  (`InterpCouple.memKMethod_eCouple_iff`).
+* `ApproximationSpaces.Interpolation.EFunctionalJacksonBernstein`: the Jackson–Bernstein theorem
+  for a quasi-normed couple with subadditive complexity: an even function `Y` with `Y^ρ`
+  subadditive for some `ρ > 0`, Jackson's inequality `E(2^k, u) ≤ C_J 2^(-kr) Y(u)` and
+  Bernstein's inequality `Y(a) ≤ C_B 2^(kr) N₀(a)` for `N₁(a) ≤ 2^k`, with `C_J, C_B < ∞`
+  (`InterpCouple.JacksonBernsteinData`), give `E_{s,q} = (N₀, N₀ + Y)_{s/r,q}` for
+  `0 < s < r` and `0 < q ≤ ∞`
+  (`InterpCouple.JacksonBernsteinData.memKMethod_smoothnessCouple_iff`).
 
 ### Decompositions (`Decompositions/`)
 
