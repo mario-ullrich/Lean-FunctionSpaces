@@ -655,7 +655,7 @@ $\sum_{\deg k < n} |e_k(x)|^2 \leq 2^d n^d$. The Nikolskii property is \Cref{thm
   Torus.sobolev_exists_inclusion_eq, Torus.sobolev_exists_continuous, Torus.toLp_toContinuousMap}
 \leanok
 \uses{thm:torus-nikolskii, thm:besov-embedding, def:torus-sobolev, prop:smoothness}
-Let $1 \leq p \leq r \leq \infty$ and $1 \leq q \leq \infty$.
+Let $0 < p \leq r \leq \infty$ and $0 < q \leq \infty$.
 \begin{enumerate}
   \item If $s > d(1/p - 1/r)$, then every $f \in \Besov{s}{p}{q}(\T^d)$ is $\iota_{r,p} g$ for
     some $g \in \Besov{s - d(1/p - 1/r)}{r}{q}(\T^d)$.
@@ -671,11 +671,13 @@ Let $1 \leq p \leq r \leq \infty$ and $1 \leq q \leq \infty$.
 
 \begin{proof}
 \leanok
-\uses{lem:besov-bridge}
+\uses{lem:besov-bridge, prop:besov-elementary}
 The first two items are \Cref{thm:besov-embedding} with \Cref{thm:torus-nikolskii}, the
-third is \Cref{prop:smoothness} for $H^s(\T^d)$ with \Cref{lem:besov-bridge}, and the last two
-combine both. For the second and the last item, the trigonometric scheme, the scheme of a
-scheme in $C_b(\T^d)$, has continuous approximants (\Cref{def:function-scheme}).
+third is \Cref{prop:smoothness} for $H^s(\T^d)$ with \Cref{lem:besov-bridge}, after
+$\Besov{t}{2}{q}(\T^d) \subseteq \Besov{t}{2}{\infty}(\T^d)$
+(\Cref{prop:besov-elementary}(1)), and the last two combine both. For the second and the last
+item, the trigonometric scheme, the scheme of a scheme in $C_b(\T^d)$, has continuous
+approximants (\Cref{def:function-scheme}).
 \end{proof}
 
 The next theorem is the Littlewood--Paley characterisation of $\Besov{s}{2}{q}(\T^d)$ with

@@ -9,9 +9,14 @@ inequalities with the Nikolskii transfer theorem, the representation of $A^s_q$ 
 interpolation space of the discrete $K$-method, real interpolation of couples of quasi-normed
 abelian groups, block decompositions and projections, traces and intrinsic norms, and moduli of
 smoothness. Its last three chapters apply the theory to schemes of functions on a
-finite measure space, whose approximation spaces are Besov spaces with embeddings from a
-Nikolskii inequality, and to spectral schemes in a Hilbert space, among them the eigenbases of
-compact self-adjoint operators and the eigenbases of $J J^*$ for compact dense embeddings $J$.
+finite measure space and to spectral schemes in a Hilbert space. The Besov spaces of a scheme of
+functions are defined for every $0 < p \leq \infty$ through the $E$-functional of the couple of
+the scheme in $L_p$; for $p \geq 1$ they are its approximation spaces. Under a Nikolskii
+inequality of dimension $D \geq 0$ for the scheme, $\Besov{s}{p}{q}$ embeds into
+$\Besov{s - D(1/p - 1/r)}{r}{q}$ for $0 < p \leq r \leq \infty$, $0 < q \leq \infty$ and
+$s > D(1/p - 1/r)$, through the blocks of near-best approximants. The spectral schemes include
+the eigenbases of compact self-adjoint operators and the eigenbases of $J J^*$ for compact dense
+embeddings $J$.
 The characterisations proved here are the abstract ones: by the error of best approximation, by
 blocks, by real interpolation (the discrete $K$-method) and by moduli of smoothness.
 
@@ -5407,7 +5412,7 @@ $S^{(r)}_n$ lifts $\iota_{\infty,p} a$, since $\iota_{r,p} \circ \iota_{\infty,r
 The bound holds for every measure $\mu$, as an inequality in $[0, \infty]$. If $\mu$ is finite,
 then $\|a\|_{L_p} < \infty$ for every $a \in S_n$, and the bound holds between real numbers.
 
-For every $0 < p \leq r \leq \infty$ the first embedding below is proved through the blocks of
+For every $0 < p \leq r \leq \infty$ the embeddings below are proved through the blocks of
 near-best approximants, whose quasi-norms in $L_r$ the Nikolskii inequality bounds; the next
 lemma gives the resulting tail bound for functions on any measure space.
 
@@ -5452,10 +5457,8 @@ $\rho_r$-th root.
   FunctionScheme.MemBesov.exists_inclusion_eq_top,
   FunctionScheme.MemBesov.exists_boundedContinuous_of_nikolskii}
 \leanok
-\uses{lem:nikolskii-inequality, def:scheme-lp-couple, def:e-method, lem:scheme-lp-couple,
-  lem:e-near-best, lem:near-best-transfer, lem:near-best-lq, lem:weighted-tails,
-  lem:lq-quasi-triangle, lem:lq-reindex, lem:inclusion-linear, thm:nikolskii-transfer,
-  lem:function-scheme-inclusion, lem:approx-closure, lem:bc-linfty}
+\uses{def:nikolskii-property, def:function-scheme, def:scheme-lp-couple, def:e-method, def:besov,
+  lem:inclusion-linear}
 Let $S$ have the Nikolskii property of dimension $D \geq 0$.
 \begin{enumerate}
   \item Let $0 < p \leq r \leq \infty$, $0 < q \leq \infty$ and $s > \alpha = \alpha(D, p, r)$,
@@ -5464,18 +5467,22 @@ Let $S$ have the Nikolskii property of dimension $D \geq 0$.
     $L_t$ (\Cref{def:scheme-lp-couple}). There is $K < \infty$ such that every $f \in L_p$ with
     $\|f\|^{(p)}_{s, q} < \infty$ is $f = \iota_{r,p} g$ for some $g \in L_r$ with
     $\|g\|^{(r)}_{s - \alpha, q} \leq K \|f\|^{(p)}_{s, q}$.
-  \item Let $1 \leq p \leq r \leq \infty$, $1 \leq q \leq \infty$ and
+  \item Let $0 < p \leq r \leq \infty$, $0 < q \leq \infty$ and
     $s > \alpha = \alpha(D, p, r)$. Every $f \in \Besov{s}{p}{q}$ is $f = \iota_{r,p} g$ for some
     $g \in \Besov{s-\alpha}{r}{q}$.
-  \item Let $1 \leq p \leq \infty$ and $1 \leq q \leq \infty$, let $\Omega$ be a topological
+  \item Let $0 < p \leq \infty$ and $0 < q \leq \infty$, let $\Omega$ be a topological
     space with its Borel $\sigma$-algebra, let $S$ have continuous approximants, and let
-    $\mu(U) > 0$ for every nonempty open $U \subseteq \Omega$. If $s > D/p$, then every
-    $f \in \Besov{s}{p}{q}$ is the class of a bounded continuous function.
+    $\mu(U) > 0$ for every nonempty open $U \subseteq \Omega$. If $s > D/p$, with
+    $1/\infty = 0$, then every $f \in \Besov{s}{p}{q}$ is the class of a bounded continuous
+    function.
 \end{enumerate}
 \end{theorem}
 
 \begin{proof}
 \leanok
+\uses{lem:nikolskii-inequality, lem:scheme-lp-couple, lem:e-near-best, lem:near-best-transfer,
+  lem:near-best-lq, lem:weighted-tails, lem:lq-quasi-triangle, lem:lq-reindex, lem:besov-linear,
+  prop:besov-elementary, lem:besov-bridge, lem:approx-closure, lem:bc-linfty}
 (1) Let $\rho_p = \min(1, p)$ and $\rho_r = \min(1, r)$, let $C_r$, $C_q$ be the constants of
 \Cref{lem:lq-quasi-triangle} and $\gamma_{1,q}$ that of \Cref{lem:lq-reindex}(3). By
 \Cref{lem:nikolskii-inequality} there is $C < \infty$ with
@@ -5507,13 +5514,17 @@ $K_0 = \bigl((1 + C_r) \, C \, 2^{2\alpha} H^{1/\rho_r} + C_r C\bigr) 2^{1/\rho_
   \|g\|^{(r)}_{s - \alpha, q} \leq C_r \bigl(X + \|b_0\|_r\bigr) + X \leq K_0 Y
   \leq K_0 \, C_q (1 + \gamma_{1,q}) \, N .
 \]
-(2) Apply \Cref{thm:nikolskii-transfer} to $\iota = \iota_{r,p}$, which is
-injective and satisfies the lifting bound of exponent $\alpha$ by
-\Cref{lem:nikolskii-inequality}; the preimage scheme is $S^{(r)}$ by
-\Cref{lem:function-scheme-inclusion}, and $L_r$ is complete. (3) Take
-$r = \infty$ in (2): then $g \in \Besov{s - D/p}{\infty}{q}$ with $s - D/p > 0$, so $g$ lies in the
-closure of $\bigcup_n S^{(\infty)}_n$ (\Cref{lem:approx-closure}). The approximants are classes
-of bounded continuous functions, and these classes form a closed set (\Cref{lem:bc-linfty}).
+(2) Here $s > \alpha \geq 0$, since $p \leq r$ (\Cref{def:nikolskii-property}). By
+\Cref{lem:besov-linear}(2), $f \in \Besov{s}{p}{q}$ means $\|f\|^{(p)}_{s, q} < \infty$, so (1)
+gives $f = \iota_{r,p} g$ with $\|g\|^{(r)}_{s - \alpha, q} \leq K \|f\|^{(p)}_{s, q} < \infty$,
+and $g \in \Besov{s-\alpha}{r}{q}$ by \Cref{lem:besov-linear}(2), as $s - \alpha > 0$. (3) Take
+$r = \infty$ in (2), where $\alpha(D, p, \infty) = D/p$: then $f = \iota_{\infty,p} g$ with
+$g \in \Besov{s - D/p}{\infty}{q} \subseteq \Besov{s - D/p}{\infty}{\infty}$
+(\Cref{prop:besov-elementary}(1)). The last space is the approximation space
+$A^{s - D/p}_\infty(L_\infty, S^{(\infty)})$ (\Cref{lem:besov-bridge}), where
+$S^{(\infty)}_n = S_n$, and $s - D/p > 0$, so $g$ lies in the closure of $\bigcup_n S_n$ in
+$L_\infty$ (\Cref{lem:approx-closure}). The approximants are classes of bounded continuous
+functions, and these classes form a closed set (\Cref{lem:bc-linfty}).
 \end{proof}
 
 Part (1) follows the method of the proof of~\cite[Theorem~7.1]{DeVorePopovTAMS} in its case of a
@@ -5527,10 +5538,10 @@ $p, q \geq 1$ the dyadic norms of (1) are the dyadic quasi-norms of the Besov sp
 (\Cref{lem:scheme-lp-couple-bridge}, \Cref{thm:complexity-couple-approx}).
 
 The limiting case $s = \alpha$ is not covered: the proof of (1) needs Hardy's constant
-$H_{(s-\alpha)\rho_r, q/\rho_r}$, finite only for $s > \alpha$, and \Cref{thm:nikolskii-transfer}
-needs $\alpha < s$. \cite[Theorem~7.1]{DeVorePopovTAMS} is a limiting case for the Besov spaces
-of the unit cube in $\R^d$, into $L_r$ alone and with the third index equal to the integrability
-exponent: $\Besov{\alpha}{p}{p} \subseteq L_r$ for $0 < r < \infty$ and $\alpha = d(1/p - 1/r) > 0$.
+$H_{(s-\alpha)\rho_r, q/\rho_r}$, finite only for $s > \alpha$.
+\cite[Theorem~7.1]{DeVorePopovTAMS} is a limiting case for the Besov spaces of the unit cube in
+$\R^d$, into $L_r$ alone and with the third index equal to the integrability exponent:
+$\Besov{\alpha}{p}{p} \subseteq L_r$ for $0 < r < \infty$ and $\alpha = d(1/p - 1/r) > 0$.
 
 \section{Interpolation of Besov spaces}
 \label{sec:besov-interpolation}
@@ -5638,7 +5649,7 @@ The condition $t - D/r < s - D/p$ is $t < s - \alpha(D, p, r)$, and it implies $
 since $t > 0$. By \Cref{prop:smoothness} and \Cref{lem:besov-bridge},
 $\iota v \in \Besov{s}{p}{\infty}$. By \Cref{thm:besov-embedding}, $\iota v = \iota_{r,p} g$ with
 $g \in \Besov{s-\alpha}{r}{\infty}$, and $g \in \iota'(V')$ by \Cref{prop:smoothness}, as
-$s - \alpha > t$. The second item is \Cref{thm:besov-embedding}(2) with $q = \infty$.
+$s - \alpha > t$. The second item is \Cref{thm:besov-embedding}(3) with $q = \infty$.
 \end{proof}
 
 The limiting cases $t - D/r = s - D/p$ and $s = D/p$ are not reached: the passage from $V$

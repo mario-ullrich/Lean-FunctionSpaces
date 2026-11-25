@@ -101,14 +101,18 @@ restriction to a face of `𝕋^(n+1)` is the model case of the trace theorem.
   degree `< n` on `𝕋^d`, `n ≥ 1`, and `1 ≤ p < ∞`, `‖T‖_∞ ≤ (2⌈p/2⌉)^(d/p) n^(d/p) ‖T‖_p`
   (`Torus.norm_le_rpow_mul_eLpNorm`). Hence the trigonometric polynomials have the
   Nikolskii property of dimension `d` (`Torus.trigScheme_hasNikolskii`), and all the Besov
-  embeddings of [Besov and Sobolev spaces on measure spaces](MeasureSpaces.md) hold on
-  `𝕋^d` with `α = d (1/p - 1/r)`
-  (`Torus.memBesov_exists_inclusion_eq`, `Torus.memBesov_exists_continuous`).
+  embeddings of [Besov and Sobolev spaces on measure spaces](MeasureSpaces.md) hold on `𝕋^d`,
+  for `0 < p ≤ r ≤ ∞`, `0 < q ≤ ∞` and `α = d (1/p - 1/r)`: every `f ∈ B^s_{p,q}(𝕋^d)` with
+  `s > α` lies in `L_r(𝕋^d)` and in `B^{s-α}_{r,q}(𝕋^d)`, and for `s > d/p` it has a continuous
+  representative (`Torus.memBesov_exists_inclusion_eq`, `Torus.memBesov_exists_continuous`). For
+  every `0 < p ≤ ∞`, `B^s_{p,q}(𝕋^d)` is the Besov space of the trigonometric polynomials,
+  defined by best approximation in `L_p(𝕋^d)`; for `1 ≤ p < ∞`, `1 ≤ q ≤ ∞` and `s > 0` moduli
+  of smoothness describe it as well.
 * **The Sobolev embedding on the torus.** Let `s > d/2` and `f ∈ L_2(𝕋^d)` with
   `∑_{k ∈ ℤ^d} (1 + max_i |k_i|)^(2s) |f̂(k)|² < ∞`. Then `f` has a continuous representative
   (`Torus.sobolev_exists_continuous`). The space `H^s(𝕋^d)` of these functions satisfies
   Jackson's and Bernstein's inequalities with constant `1` (`Torus.periodicSobolevSpace`), so
-  `H^s(𝕋^d) ⊆ B^s_{2,∞}(𝕋^d)`, `B^t_{2,q}(𝕋^d) ⊆ H^s(𝕋^d)` for `t > s`, and
+  `H^s(𝕋^d) ⊆ B^s_{2,∞}(𝕋^d)`, `B^t_{2,q}(𝕋^d) ⊆ H^s(𝕋^d)` for `t > s` and `0 < q ≤ ∞`, and
   `H^s(𝕋^d) ⊆ L_r(𝕋^d)` for `2 ≤ r ≤ ∞` and `s > d(1/2 - 1/r)`
   (`Torus.periodic_sobolev_memBesov_top`, `Torus.periodic_exists_sobolev_of_memBesov`,
   `Torus.sobolev_exists_inclusion_eq`).
@@ -132,7 +136,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Result | Lean | Human-checked | Files |
 |---|---|---|---|
 | The torus: trigonometric polynomials and their uniform density, Nikolskii inequality | ✅ | ✗ | `Torus/HaarMeasure`, `Torus/TrigPolynomials`, `Torus/Nikolskii` |
-| The torus: `H^s(𝕋^d)`, Besov and Sobolev embeddings, `H^s(𝕋^d) ↪ C(𝕋^d)` | ✅ | ✗ | `Torus/Sobolev`, `Torus/Embeddings` |
+| The torus: `H^s(𝕋^d)`, Besov embeddings for `0 < p ≤ r ≤ ∞`, Sobolev embeddings, `H^s(𝕋^d) ↪ C(𝕋^d)` | ✅ | ✗ | `Torus/Sobolev`, `Torus/Embeddings` |
 | Fourier-coefficient characterisations, `H^s(𝕋^d) = B^s_{2,2}(𝕋^d)` | ✅ | ✗ | `Torus/Coefficients` |
 | The Fourier basis as a continuous spectral basis with the local Weyl bound | ✅ | ✗ | `Torus/FourierSpectralBasis` |
 | Moduli of smoothness in `L_2(𝕋^d)`, Jackson's theorem, coincidence for `0 < s < 1` | ✅ | ✗ | `Torus/Translation`, `Torus/Modulus`, `Torus/BesovModuli` |

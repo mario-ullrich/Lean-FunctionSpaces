@@ -20,7 +20,9 @@ inequalities with their constants; its instances in this library are the spaces 
 (`ContinuousSpectralBasis.sobolevSpace`).
 
 If the scheme has the Nikolskii property of dimension `D` (the hypothesis
-`FunctionScheme.HasNikolskii`, proved on the torus), then:
+`FunctionScheme.HasNikolskii`, proved for the trigonometric polynomials on the torus,
+`Torus.trigScheme_hasNikolskii`, and for the dyadic steps on `[0, 1)`,
+`Haar.hasNikolskii_haarScheme`), then:
 
 * **the Sobolev embedding** `W^s_p ↪ W^t_r` for `p ≤ r` and `t < s - D(1/p - 1/r)`
   (`SobolevSpace.exists_eq_inclusion`): every element of `W` is, as an `L_p` function, the
@@ -72,10 +74,11 @@ theorem SobolevSpace.exists_eq_inclusion (h : S.HasNikolskii D) (hD : 0 ≤ D)
     (hst : V'.order < V.order - nikolskiiExponent D p r) (y : W) :
     ∃ y' : W', Lp.inclusionOfExponentLe (𝕜 := ℝ) μ hpr (V'.incl y') = V.incl y := by
   have hα : nikolskiiExponent D p r < V.order := by linarith [V'.order_pos]
-  obtain ⟨g, hg, hmem⟩ := MemBesov.exists_inclusion_eq_of_nikolskii h hD hpr hα le_top
+  obtain ⟨g, hg, hmem⟩ := MemBesov.exists_inclusion_eq_of_nikolskii h hD
+    (zero_lt_one.trans_le (Fact.out : 1 ≤ p)).ne' hpr hα ENNReal.top_ne_zero
     (memBesov_iff_memApprox.2 (V.memApprox_top y))
   obtain ⟨y', hy'⟩ := V'.exists_eq_of_lt hst le_top (memBesov_iff_memApprox.1 hmem)
-  exact ⟨y', by rw [hy', hg]⟩
+  exact ⟨y', by rw [hy', Lp.inclusionOfExponentLe_apply, hg]⟩
 
 /-- **The Sobolev embedding** in the classical form of the exponents: `t - D/r < s - D/p`. -/
 theorem SobolevSpace.exists_eq_inclusion' (h : S.HasNikolskii D) (hD : 0 ≤ D)
@@ -92,8 +95,10 @@ theorem SobolevSpace.exists_boundedContinuous [TopologicalSpace Ω] [BorelSpace 
     [μ.IsOpenPosMeasure] (hS : S.HasContinuousApproximants) (h : S.HasNikolskii D)
     (hD : 0 ≤ D) (V : S.SobolevSpace p W) (hs : D * p.toReal⁻¹ < V.order) (y : W) :
     ∃ a : Ω →ᵇ ℂ, Lp.inclusionOfExponentLe (𝕜 := ℝ) μ le_top
-      (BoundedContinuousFunction.toLp (E := ℂ) ∞ μ ℝ a) = V.incl y :=
-  MemBesov.exists_boundedContinuous_of_nikolskii hS h hD hs le_top
+      (BoundedContinuousFunction.toLp (E := ℂ) ∞ μ ℝ a) = V.incl y := by
+  obtain ⟨a, ha⟩ := MemBesov.exists_boundedContinuous_of_nikolskii hS h hD
+    (zero_lt_one.trans_le (Fact.out : 1 ≤ p)).ne' hs ENNReal.top_ne_zero
     (memBesov_iff_memApprox.2 (V.memApprox_top y))
+  exact ⟨a, by rw [Lp.inclusionOfExponentLe_apply]; exact ha⟩
 
 end FunctionScheme
