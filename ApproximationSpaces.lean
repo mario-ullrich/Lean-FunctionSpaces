@@ -139,7 +139,9 @@ in the root namespace.
   (`lp.enorm_sq_eq_tsum`).
 * `ApproximationSpaces.Sequences.Dyadic`: Cauchy condensation with power weights
   (`ENNReal.tsum_pow_mul_le_dyadic`) and for capped sequences (`ENNReal.tsum_min_le_dyadic`),
-  three sums over dyadic scales, and the interpolation inequality for dyadic suprema
+  Pietsch's weights against the dyadic ones for a decreasing sequence
+  (`ENNReal.lqNorm_pow_mul_le_dyadic`, `ENNReal.dyadic_le_lqNorm_pow_mul`), three sums over
+  dyadic scales, and the interpolation inequality for dyadic suprema
   (`ENNReal.tsum_dyadicWeight_mul_le_iSup`).
 * `ApproximationSpaces.Sequences.Rearrangement`: the decreasing rearrangement
   `decreasingRearrangement` of a nonnegative null family (copied from TauCeti), the layer cake
@@ -194,11 +196,14 @@ in the root namespace.
 * `ApproximationSpaces.Interpolation.EFunctional`: the E-functional
   `E(t, u) = inf {N₀(u - b) : N₁(b) ≤ t}` of a couple (`InterpCouple.eFunctional`), its
   approximation spaces `E_{α,q}` (`InterpCouple.eMethodNorm`, `InterpCouple.MemEMethod`) and their
-  dyadic norm `InterpCouple.eNormDyadic` (Bergh–Löfström, Section 7.1), the complexity couple of a
+  dyadic norm `InterpCouple.eNormDyadic` (Bergh–Löfström, Section 7.1), near-best sequences with
+  decreasing tolerances (`InterpCouple.exists_nearBest_eFunctional`), the complexity couple of a
   sequence of sets and of increasing subgroups (`InterpCouple.ofMonotoneSubgroups`), and
   `E_{s,q} = A^s_q` for the complexity couple of a scheme
   (`memEMethod_complexityCouple_iff`).
-* `ApproximationSpaces.Interpolation.EFunctionalModuli`: moduli of smoothness compatible with a
+* `ApproximationSpaces.Interpolation.EFunctionalModuli`: the block bound
+  `N₀(b_{k+1} - b_k)^ρ ≤ 2 e_k^ρ` of near-best sequences
+  (`InterpCouple.norm0_sub_succ_rpow_le_of_nearBest`), moduli of smoothness compatible with a
   couple whose first norm has a subadditive `ρ`-th power (`InterpCouple.CoupleModulusData`),
   and the coincidence of `E_{s,q}` with the classical space for `0 < s < θ`
   (`InterpCouple.CoupleModulusData.memEMethod_iff_coupleModNorm_lt_top`), as for `L_p`,
@@ -207,12 +212,9 @@ in the root namespace.
   the Besov spaces of a scheme of functions in `L_p`, `0 < p ≤ ∞`, need: homogeneity
   (`InterpCouple.eNormDyadic_smul_le`), the embeddings of the dyadic norms in the fine index and
   the smoothness (`InterpCouple.eNormDyadic_le_of_lt`), additive maps
-  (`InterpCouple.eFunctional_map_le`), near-best sequences with decreasing tolerances
-  (`InterpCouple.exists_nearBest_eFunctional`) and the block bound
-  `N₀(b_{k+1} - b_k)^ρ ≤ 2 e_k^ρ` (`InterpCouple.norm0_sub_succ_rpow_le_of_nearBest`), and
-  Pietsch's form `InterpCouple.eNormPietsch`, equivalent to the dyadic norm for `s ≥ 0` and
-  `q ∈ (0, ∞]` and equal to `‖f‖_{A^s_q}` for the complexity couple of a scheme
-  (`ApproximationScheme.eNormPietsch_complexityCouple`).
+  (`InterpCouple.eFunctional_map_le`), and Pietsch's form `InterpCouple.eNormPietsch`,
+  equivalent to the dyadic norm for `s ≥ 0` and `q ∈ (0, ∞]` and equal to `‖f‖_{A^s_q}` for the
+  complexity couple of a scheme (`ApproximationScheme.eNormPietsch_complexityCouple`).
 
 ### Decompositions (`Decompositions/`)
 

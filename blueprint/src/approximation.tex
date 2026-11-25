@@ -1093,6 +1093,43 @@ For every $c \in \R$ and $f \in X$, $\|c f\|^{\mathrm{dy}}_{A^s_q} = |c| \,
 \|f\|^{\mathrm{dy}}_{A^s_q}$; in particular the dyadic quasi-norm is even. For $s \geq 0$,
 $1 \leq 2^s \leq 2 \cdot 2^s$.
 
+For a decreasing sequence $(e_n)_{n \in \N}$ in $[0, \infty]$ and $s \geq 0$, Pietsch's weights
+$(n+1)^{s - 1/q}$ and the dyadic weights $2^{ks}$, together with the term $e_0$, give comparable
+$\ell_q$ norms, by Cauchy condensation (\Cref{lem:condensation}).
+
+\begin{lemma}[Pietsch's weights against the dyadic ones]
+\label{lem:dyadic-form-decreasing}
+\lean{ENNReal.lqNorm_pow_mul_rpow, ENNReal.lqNorm_pow_mul_le_dyadic,
+  ENNReal.lqNorm_dyadic_succ_le_lqNorm_pow_mul, ENNReal.dyadic_le_lqNorm_pow_mul}
+\leanok
+\uses{def:lq-norm, lem:lq-quasi-triangle}
+Let $q \in (0, \infty]$, let $C_q$ be the constant of \Cref{lem:lq-quasi-triangle}, and
+$1/\infty = 0$. Let $s \in \R$, let $(e_n)_{n \in \N}$ be a sequence in $[0, \infty]$ and put
+$P = \|((n+1)^{s - 1/q} e_n)_n\|_{\ell_q}$. If $q < \infty$, then
+$P^q = \sum_n (n+1)^{sq - 1} e_n^q$. If $s \geq 0$ and $(e_n)_n$ decreases, then with
+$D = \|(2^{ks} e_{2^k})_k\|_{\ell_q}$,
+\[
+  P \leq C_q \, 2^s (e_0 + D) , \qquad e_0 + D \leq 4 C_q^2 \, 2^s P , \qquad
+  \|(2^{ks} e_{2^{k+1}})_k\|_{\ell_q} \leq 2 C_q P .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:condensation, lem:lq-basic}
+The identity for $P^q$ holds termwise. For $q = \infty$, $C_\infty = 1$ and the supremum form
+of \Cref{lem:condensation} gives the bounds. For $q < \infty$, \Cref{lem:condensation} with
+$\gamma = sq - 1$ and $b_n = e_n^q$ gives
+$P^q \leq e_0^q + 2^{\max(sq - 1, 0)} D^q \leq 2^{sq} (e_0^q + D^q)$, and
+$(e_0^q + D^q)^{1/q} \leq C_q (e_0 + D)$ by \Cref{lem:lq-quasi-triangle}; this is the first
+bound. In the other direction it bounds the shifted sum $\sum_k 2^{ksq} e_{2^{k+1}}^q$ by
+$2^{\max(1 - sq, 0)} P^q$, and $2^{\max(1 - sq, 0)} \leq 2 \leq (2 C_q)^q$; this is the third
+bound. For the second bound, the term $n = 0$ gives $e_0 \leq P$, the first dyadic term is
+$e_1 \leq e_0$, splitting it off costs $C_q$ (\Cref{lem:lq-quasi-triangle}), the others are
+bounded by the third bound and $2^{(k+1)s} = 2^s 2^{ks}$, and
+$1 + C_q + 2 C_q^2 2^s \leq 4 C_q^2 2^s$, since $C_q \geq 1$ and $2^s \geq 1$.
+\end{proof}
+
 The term $\|f\| = E_0(f)$ is needed because the dyadic sequence starts at $E_1$. The dyadic
 form is the working norm: every later theorem is stated for it, and the next lemma transports
 it to Pietsch's definition for every $q \in (0, \infty]$; the theorem after it is the case
@@ -1106,7 +1143,7 @@ $q \geq 1$.
   ApproximationScheme.memApprox_iff_approxNormDyadic_lt_top',
   ApproximationScheme.memApprox_iff_lqNorm_dyadic_lt_top'}
 \leanok
-\uses{def:approx-space, def:dyadic-norm, lem:condensation, lem:lq-basic, lem:lq-quasi-triangle}
+\uses{def:approx-space, def:dyadic-norm, lem:lq-quasi-triangle}
 Let $s \geq 0$, $q \in (0, \infty]$ and let $C_q$ be the constant of
 \Cref{lem:lq-quasi-triangle}. For every $f \in X$,
 $\|(2^{ks} E_{2^{k+1}}(f))_k\|_{\ell_q} \leq 2 C_q \|f\|_{A^s_q}$, and
@@ -1121,20 +1158,11 @@ only if $(2^{ks} E_{2^k}(f))_k \in \ell_q$.
 
 \begin{proof}
 \leanok
-\uses{lem:error-basic}
-The term $n = 0$ of Pietsch's sequence is $E_0(f) = \|f\|$, so $\|f\| \leq \|f\|_{A^s_q}$. For
-$q = \infty$, $C_\infty = 1$ and the supremum form of \Cref{lem:condensation} gives the bounds.
-For $q < \infty$ raise both sides to the power $q$:
-$\|f\|_{A^s_q}^q = \sum_n (n+1)^{sq-1} E_n(f)^q$. The errors decrease, so
-\Cref{lem:condensation} with $\gamma = sq - 1$ and $b_n = E_n(f)^q$ compares this series with
-$E_0(f)^q + \sum_k 2^{ksq} E_{2^k}(f)^q$ in both directions. With
-$D = \|(2^{ks} E_{2^k}(f))_k\|_{\ell_q}$ this gives
-$\|f\|_{A^s_q}^q \leq 2^{sq} (\|f\|^q + D^q)$, and $(\|f\|^q + D^q)^{1/q} \leq C_q (\|f\| + D)$
-by \Cref{lem:lq-quasi-triangle}. For the shifted sequence the factor of \Cref{lem:condensation}
-is $2^{\max(1 - sq, 0)} \leq 2 \leq (2 C_q)^q$. For the last bound, split off the first dyadic
-term at the cost $C_q$ (\Cref{lem:lq-quasi-triangle}), use $E_1(f) \leq \|f\| \leq \|f\|_{A^s_q}$
-and $2^{(k+1)s} = 2^s 2^{ks}$, and $1 + C_q + 2 C_q^2 2^s \leq 4 C_q^2 2^s$, since $C_q \geq 1$
-and $2^s \geq 1$.
+\uses{lem:error-basic, lem:dyadic-form-decreasing}
+The errors $E_n(f)$ decrease and $E_0(f) = \|f\|$ (\Cref{lem:error-basic}). For $e_n = E_n(f)$,
+the norms $P$ and $e_0 + D$ of \Cref{lem:dyadic-form-decreasing} are $\|f\|_{A^s_q}$ and
+$\|f\|^{\mathrm{dy}}_{A^s_q}$, so that lemma gives the three bounds. The constants are finite and
+$\|f\| < \infty$, which gives the last claim.
 \end{proof}
 
 \begin{theorem}[Dyadic form of the quasi-norm]
@@ -3397,8 +3425,9 @@ with $E(t, u) = \infty$ if no $b$ has $N_1(b) \leq t$.
 
 \begin{lemma}[Properties of the $E$-functional]
 \label{lem:e-functional}
-\lean{InterpCouple.eFunctional_anti, InterpCouple.eFunctional_le_norm0,
-  InterpCouple.eFunctional_zero_right, InterpCouple.norm0_le_eFunctional_of_lt_one,
+\lean{InterpCouple.eFunctional_anti, InterpCouple.antitone_eFunctional_natCast,
+  InterpCouple.eFunctional_le_norm0, InterpCouple.eFunctional_zero_right,
+  InterpCouple.norm0_le_eFunctional_of_lt_one, InterpCouple.eFunctional_zero_left,
   InterpCouple.eFunctional_neg, InterpCouple.exists_norm0_sub_le_eFunctional_add,
   InterpCouple.eFunctional_add_le_of_le, InterpCouple.eFunctional_add_le,
   InterpCouple.eFunctional_add_rpow_le}
@@ -3406,9 +3435,10 @@ with $E(t, u) = \infty$ if no $b$ has $N_1(b) \leq t$.
 \uses{def:e-functional}
 Let $A = (N_0, N_1)$ be a couple on $U$, let $t, s \in [0, \infty]$ and $u, v \in U$.
 \begin{enumerate}
-  \item $E(t, u)$ decreases in $t$. If $N_1(0) = 0$, then $E(t, u) \leq N_0(u)$; if also
-    $N_0(0) = 0$, then $E(t, 0) = 0$. If every $b$ with $N_1(b) < 1$ is $0$, then
-    $N_0(u) \leq E(t, u)$ for every $t < 1$.
+  \item $E(t, u)$ decreases in $t$; in particular $(E(n, u))_{n \in \N}$ decreases. If
+    $N_1(0) = 0$, then $E(t, u) \leq N_0(u)$; if also $N_0(0) = 0$, then $E(t, 0) = 0$. If every
+    $b$ with $N_1(b) < 1$ is $0$, then $N_0(u) \leq E(t, u)$ for every $t < 1$. Under both
+    hypotheses on $N_1$, $E(0, u) = N_0(u)$.
   \item If $N_0$ and $N_1$ are even, then $E(t, -u) = E(t, u)$.
   \item If $E(t, u) < \infty$, then for every $\varepsilon > 0$ some $b$ with $N_1(b) \leq t$ has
     $N_0(u - b) \leq E(t, u) + \varepsilon$.
@@ -3423,8 +3453,9 @@ Let $A = (N_0, N_1)$ be a couple on $U$, let $t, s \in [0, \infty]$ and $u, v \i
 \begin{proof}
 \leanok
 (1) A larger $t$ admits more elements $b$; take $b = 0$ for the bounds by $N_0(u)$, and for
-$t < 1$ the only admissible element is $b = 0$. (2) Substitute $b \mapsto -b$. (3) The infimum is
-finite. For (4) and (5), if $N_1(b) \leq t$ and $N_1(b') \leq s$, then
+$t < 1$ the only admissible element is $b = 0$. At $t = 0$ the two bounds give
+$E(0, u) = N_0(u)$. (2) Substitute $b \mapsto -b$. (3) The infimum is finite. For (4) and (5),
+if $N_1(b) \leq t$ and $N_1(b') \leq s$, then
 $N_1(b + b') \leq t + s$ and $u + v - (b + b') = (u - b) + (v - b')$; take the infimum over $b$
 and $b'$, in (5) after raising to the power $\rho$, which preserves infima. In (4) for $C = 0$,
 $N_0$ vanishes and $b = 0$ is admissible, so both sides are $0$.
@@ -3542,7 +3573,7 @@ Part (4) is~\cite[Lemma~7.1.6]{BerghLofstrom} in dyadic form.
 The next three lemmas and Pietsch's form of \Cref{def:e-pietsch-norm} collect what the Besov
 spaces of a scheme of functions in $L_p$, $0 < p \leq \infty$, need from the $E$-functional. Their
 hypotheses on $N_0$ are homogeneity and, for the blocks of near-best sequences, evenness and the
-$\rho$-triangle inequality, which $\|\cdot\|_p$ satisfies with $\rho = \min(p, 1)$.
+$\rho$-triangle inequality, which $\|\cdot\|_p$ satisfies with $\rho = \min(1, p)$.
 
 \begin{lemma}[Homogeneity, embeddings and maps]
 \label{lem:e-method-calculus}
@@ -3625,7 +3656,9 @@ $N_0(b_{k+1} - b_k)^\rho \leq d_k^\rho + d_{k+1}^\rho \leq 2 d_k^\rho$.
 \end{proof}
 
 In $L_p$ with $0 < p < 1$, near-best sequences take the role of bounded projections onto the
-approximants.
+approximants: on $[0, 1]$ with Lebesgue measure the only continuous linear functional on $L_p$
+is $0$~\cite{Day1940}, so $L_p$ has no bounded linear projections onto nonzero
+finite-dimensional subspaces.
 
 \begin{definition}[Pietsch's form]
 \label{def:e-pietsch-norm}
@@ -3642,31 +3675,22 @@ $1/\infty = 0$. \emph{Pietsch's form} of the norm of $E_{s, q}$ is
 
 \begin{lemma}[Pietsch's form against the dyadic norm]
 \label{lem:e-pietsch-norm}
-\lean{InterpCouple.antitone_eFunctional_natCast,
-  InterpCouple.eFunctional_zero_left, InterpCouple.eNormPietsch_zero,
-  InterpCouple.eNormPietsch_le_eNormDyadic, InterpCouple.eNormDyadic_le_eNormPietsch,
-  InterpCouple.eNormPietsch_lt_top_iff, InterpCouple.eNormPietsch_map_le,
-  ENNReal.lqNorm_pow_mul_rpow, ENNReal.lqNorm_pow_mul_le_dyadic,
-  ENNReal.lqNorm_dyadic_succ_le_lqNorm_pow_mul, ENNReal.dyadic_le_lqNorm_pow_mul}
+\lean{InterpCouple.eNormPietsch_zero, InterpCouple.eNormPietsch_le_eNormDyadic,
+  InterpCouple.eNormDyadic_le_eNormPietsch, InterpCouple.eNormPietsch_lt_top_iff,
+  InterpCouple.eNormPietsch_map_le}
 \leanok
 \uses{def:e-pietsch-norm, def:e-method, lem:lq-quasi-triangle, lem:e-method-calculus}
 Let $q \in (0, \infty]$, let $C_q$ be the constant of \Cref{lem:lq-quasi-triangle}, and
 $1/\infty = 0$. Let $A = (N_0, N_1)$ be a couple on $U$, let $s \in \R$ and $u \in U$.
 \begin{enumerate}
-  \item Let $(e_n)_{n \in \N}$ be a sequence in $[0, \infty]$ and put
-    $P = \|((n+1)^{s - 1/q} e_n)_n\|_{\ell_q}$. If $q < \infty$, then
-    $P^q = \sum_n (n+1)^{sq - 1} e_n^q$. If $s \geq 0$ and $(e_n)_n$ decreases, then with
-    $D = \|(2^{ks} e_{2^k})_k\|_{\ell_q}$,
-    \[
-      P \leq C_q \, 2^s (e_0 + D) , \qquad e_0 + D \leq 4 C_q^2 \, 2^s P , \qquad
-      \|(2^{ks} e_{2^{k+1}})_k\|_{\ell_q} \leq 2 C_q P .
-    \]
+  \item The sequence $(E(n, u))_{n \in \N}$ decreases. If $N_1(0) = 0$, then
+    $E(0, u) \leq N_0(u)$; if every $b$ with $N_1(b) < 1$ is $0$, then $N_0(u) \leq E(0, u)$.
   \item If $N_0(0) = N_1(0) = 0$, then $\|0\|^{\mathrm{P}}_{E, s, q} = 0$.
-  \item The sequence $(E(n, u))_{n \in \N}$ decreases. Let $s \geq 0$. If $N_1(0) = 0$, then
+  \item Let $s \geq 0$. If $N_1(0) = 0$, then
     $\|u\|^{\mathrm{P}}_{E, s, q} \leq C_q \, 2^s \, \|u\|^{\mathrm{dy}}_{E, s, q}$. If every $b$
     with $N_1(b) < 1$ is $0$, then
     $\|u\|^{\mathrm{dy}}_{E, s, q} \leq 4 C_q^2 \, 2^s \, \|u\|^{\mathrm{P}}_{E, s, q}$. Under both
-    hypotheses, $E(0, u) = N_0(u)$, and $\|u\|^{\mathrm{P}}_{E, s, q} < \infty$ if and only if
+    hypotheses, $\|u\|^{\mathrm{P}}_{E, s, q} < \infty$ if and only if
     $\|u\|^{\mathrm{dy}}_{E, s, q} < \infty$.
   \item Under the hypotheses of (5) of \Cref{lem:e-method-calculus},
     $\|Tu\|^{\mathrm{P}}_{E', s, q} \leq M \, \|u\|^{\mathrm{P}}_{E, s, q}$, with $E'$ the
@@ -3676,24 +3700,14 @@ $1/\infty = 0$. Let $A = (N_0, N_1)$ be a couple on $U$, let $s \in \R$ and $u \
 
 \begin{proof}
 \leanok
-\uses{lem:condensation, lem:lq-basic, lem:e-functional}
-(1) The identity for $P^q$ holds termwise. The bounds follow the steps of
-\Cref{lem:dyadic-norm-below-one}, with $e_0$ in place of $E_0(f) = \|f\|$. For $q = \infty$ use
-the supremum form of \Cref{lem:condensation}. For $q < \infty$, \Cref{lem:condensation} with
-$\gamma = sq - 1$ and $b_n = e_n^q$ gives
-$P^q \leq e_0^q + 2^{\max(sq - 1, 0)} D^q \leq 2^{sq} (e_0^q + D^q)$, and
-$(x^q + y^q)^{1/q} \leq C_q (x + y)$; this is the first bound. In the other direction it bounds
-the shifted sum $\sum_k 2^{ksq} e_{2^{k+1}}^q$ by $2^{\max(1 - sq, 0)} P^q$, and for the shifted
-sequence the factor of \Cref{lem:condensation} is $2^{\max(1 - sq, 0)} \leq 2 \leq (2 C_q)^q$;
-this is the third bound. For the second bound, the term $n = 0$ gives $e_0 \leq P$, the first
-dyadic term is $e_1 \leq e_0$, splitting it off costs $C_q$, the others are bounded by the third
-bound and $2^{(k+1)s} = 2^s 2^{ks}$, and $1 + C_q + 2 C_q^2 2^s \leq 4 C_q^2 2^s$.
-(2) $E(n, 0) = 0$ by \Cref{lem:e-functional}. (3) $E(t, u)$ decreases in $t$
-(\Cref{lem:e-functional}); apply (1) to $e_n = E(n, u)$. If $N_1(0) = 0$, then
-$E(0, u) \leq N_0(u)$, since $b = 0$ is admissible; this gives the first bound. If every $b$ with
-$N_1(b) < 1$ is $0$, every admissible $b$ at $t = 0$ is $0$, so $E(0, u) \geq N_0(u)$; this gives
-the second bound. The constants are finite, so the two forms are finite together.
-(4) Termwise by (5) of \Cref{lem:e-method-calculus}.
+\uses{lem:dyadic-form-decreasing, lem:e-functional}
+(1) This is (1) of \Cref{lem:e-functional} at $t = n$ and $t = 0$. (2) $E(n, 0) = 0$ by
+\Cref{lem:e-functional}. (3) Apply \Cref{lem:dyadic-form-decreasing} to the decreasing sequence
+$e_n = E(n, u)$, whose norm $P$ is $\|u\|^{\mathrm{P}}_{E, s, q}$, and use
+$E(0, u) \leq N_0(u)$ if $N_1(0) = 0$, and $N_0(u) \leq E(0, u)$ if every $b$ with
+$N_1(b) < 1$ is $0$ ((1) of \Cref{lem:e-functional} with $t = 0$), in place of $e_0$. The
+constants are finite, so the two forms are finite together. (4) Termwise by (5) of
+\Cref{lem:e-method-calculus}.
 \end{proof}
 
 \paragraph{The complexity couple.}
@@ -3701,6 +3715,7 @@ the second bound. The constants are finite, so the two forms are finite together
 \begin{definition}[Complexity couple]
 \label{def:complexity-couple}
 \lean{InterpCouple.complexity, InterpCouple.complexity_norm0, InterpCouple.dyadicLevels,
+  InterpCouple.dyadicLevels_of_ne_zero,
   InterpCouple.ofMonotoneSubgroups, InterpCouple.ofMonotoneSubgroups_norm0,
   ApproximationScheme.complexityCouple}
 \leanok
@@ -4533,9 +4548,8 @@ terms.
   InterpCouple.CoupleModulusData.eNormDyadic_lt_top_iff,
   InterpCouple.CoupleModulusData.memEMethod_iff_coupleModNorm_lt_top}
 \leanok
-\uses{def:couple-modulus-data, lem:couple-modulus-telescoping, lem:e-functional,
-  lem:e-method-dyadic, lem:lp-rho-triangle, lem:lq-quasi-triangle, lem:lq-reindex,
-  thm:modulus-coincidence}
+\uses{def:couple-modulus-data, lem:couple-modulus-telescoping, lem:e-method-dyadic,
+  lem:lp-rho-triangle, lem:lq-quasi-triangle, lem:lq-reindex, thm:modulus-coincidence}
 Let $\omega$ be a modulus compatible with $A$ of exponent $\rho$ and inverse order $\theta$, let
 $q \in (0, \infty]$ and $f \in U$, and let $r = q/\rho$. For every $s \in \R$,
 $\|f\|^{\mathrm{dy}}_{E, s, q} \leq \max(1, C_J) \, \|f\|^{\omega}_{s,q}$, and for
@@ -4554,11 +4568,11 @@ $\|f\|^{\omega}_{s,q} < \infty$.
 
 \begin{proof}
 \leanok
-The first bound is Jackson's inequality at every level. For the second we may assume
-$0 < N_0(f) < \infty$: for $N_0(f) = 0$ the modulus of $f$ vanishes. By (1) and (3) of
-\Cref{lem:e-functional} there are $b_k$ with $N_1(b_k) \leq 2^k$ and
-$N_0(f - b_k) \leq e_k = E(2^k, f) + N_0(f) \, 2^{-k(s+1)}$; the $e_k$ decrease and
-$N_0(f) \leq e_0$. \Cref{lem:couple-modulus-telescoping} with $r = q/\rho$ and
+\uses{lem:e-near-best}
+The first bound is Jackson's inequality at every level. For the second, (1) and (2) of
+\Cref{lem:e-near-best} give $b_k$ with $N_1(b_k) \leq 2^k$ and
+$N_0(f - b_k) \leq e_k = E(2^k, f) + N_0(f) \, 2^{-k(s+1)}$, where the $e_k$ decrease since
+$s \geq 0$, and $N_0(f) \leq e_0$. \Cref{lem:couple-modulus-telescoping} with $r = q/\rho$ and
 $\|(a_k^\rho)_k\|_{\ell_{q/\rho}} = \|a\|_{\ell_q}^\rho$ (\Cref{lem:lp-rho-triangle}) bound
 $\|(2^{ks} \omega(f, k))_k\|_{\ell_q}$ by $(C_r (\dots))^{1/\rho} \, \|(2^{ks} e_k)_k\|_{\ell_q}$,
 and $\|(2^{ks} e_k)_k\|_{\ell_q} \leq C_q (1 + \gamma_{1, q}) \|f\|^{\mathrm{dy}}_{E, s, q}$
