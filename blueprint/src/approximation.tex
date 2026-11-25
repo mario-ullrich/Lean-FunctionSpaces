@@ -4661,7 +4661,8 @@ Fatou's lemma (\Cref{lem:limit-telescoping,lem:lp-series-every-exponent}), and $
 an abelian group with its quasi-norm, which is all that the couples of \Cref{sec:e-functional}
 need. On $[0, 1]$ with Lebesgue measure, the only continuous linear functional on $L_p$,
 $p < 1$, is $0$~\cite{Day1940}, so $L_p$ has no bounded linear projections onto nonzero
-finite-dimensional subspaces; near-best approximants take their place. The inclusions between
+finite-dimensional subspaces; near-best approximants take their place
+(\Cref{lem:near-best-transfer}). The inclusions between
 the $L_p$ hold for every exponent (\Cref{lem:inclusion-linear}), and a bound of the supremum by
 one $L_{p_0}$ quasi-norm gives one by every $L_p$ quasi-norm with $0 < p \leq p_0$, and with it
 bounds of every $\|f\|_r$, $p \leq r \leq \infty$ (\Cref{lem:sup-bound-exponents}).
@@ -4772,6 +4773,54 @@ $\|f\|_r \leq \|f\|_\infty^{1-\theta} \|f\|_p^\theta
 
 With (1) a Nikolskii inequality $\|a\|_\infty \leq M \|a\|_{p_0}$ at one exponent gives one at
 every smaller exponent, and (2) passes from the supremum to every $L_r$.
+
+\begin{lemma}[Transfer of near-best sequences]
+\label{lem:near-best-transfer}
+\lean{MeasureTheory.eLpNorm_sub_rpow_min_le_two_mul, MeasureTheory.eLpNorm_sub_le_two_rpow_mul,
+  MeasureTheory.tendstoInMeasure_of_eLpNorm_sub_le,
+  MeasureTheory.eLpNorm_sub_rpow_min_le_tsum_of_nearBest}
+\leanok
+\uses{lem:limit-telescoping, lem:lp-quasi-triangle}
+Let $\mu$ be a measure on $\Omega$, let $0 < p, r \leq \infty$, $\rho_p = \min(1, p)$ and
+$\rho_r = \min(1, r)$, and let $f, g, h$ be functions on $\Omega$ with values in a normed group
+$E$.
+\begin{enumerate}
+  \item Let $e \in [0, \infty]$. If $\|f - g\|_p \leq e$ and $\|f - h\|_p \leq e$, then
+    $\|g - h\|_p^{\rho_p} \leq 2 e^{\rho_p}$ and $\|g - h\|_p \leq 2^{1/\rho_p} e$.
+  \item Let $(b_i)_{i \in I}$ be functions on $\Omega$ with values in $E$, let
+    $(e_i)_{i \in I}$ be numbers in $[0, \infty]$, and let $\mathcal{F}$ be a filter on $I$. If
+    $e_i \to 0$ along $\mathcal{F}$ and $\|f - b_i\|_p \leq e_i$ for every $i$ in some set of
+    $\mathcal{F}$, then $b_i \to f$ in measure along $\mathcal{F}$.
+  \item Let $b_0, b_1, \dots$ be almost everywhere strongly measurable functions on $\Omega$ with
+    values in $E$, and let $e_0 \geq e_1 \geq \dots$ be numbers in $[0, \infty]$ with
+    $e_k \to 0$ and $\|f - b_k\|_p \leq e_k$ for every $k \in \N$. Let $C \in [0, \infty]$ and
+    $\beta \in \R$ with
+    \[
+      \|b_{k+1} - b_k\|_r \leq C \, 2^{k\beta} \, \|b_{k+1} - b_k\|_p
+      \qquad (k \in \N).
+    \]
+    Then for every $k \in \N$
+    \[
+      \|f - b_k\|_r^{\rho_r} \leq \bigl( C \, 2^{1/\rho_p} \bigr)^{\rho_r}
+        \sum_{i=0}^\infty \bigl( 2^{(k+i)\beta} e_{k+i} \bigr)^{\rho_r} .
+    \]
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) Since $g - h = (f - h) - (f - g)$, \Cref{lem:lp-quasi-triangle} gives
+$\|g - h\|_p^{\rho_p} \leq 2 e^{\rho_p}$, and its $\rho_p$-th root is the second bound. (2) The
+quasi-norms $\|b_i - f\|_p$ tend to $0$ along $\mathcal{F}$, and convergence in $L_p$ implies
+convergence in measure for every $0 < p \leq \infty$. (3) By (1)
+with $\|f - b_{k+1}\|_p \leq e_{k+1} \leq e_k$, $\|b_{k+1} - b_k\|_p \leq 2^{1/\rho_p} e_k$, so
+$\|b_{k+1} - b_k\|_r \leq C \, 2^{1/\rho_p} \, 2^{k\beta} e_k$. By (2) the $b_k$ converge to $f$
+in measure, and \Cref{lem:limit-telescoping} in $L_r$ gives
+$\|f - b_k\|_r^{\rho_r} \leq \sum_{i \geq 0} \|b_{k+i+1} - b_{k+i}\|_r^{\rho_r}$.
+\end{proof}
+
+In (3) the measure and $\|f\|_r$ may be infinite. With a Nikolskii inequality for the blocks,
+(3) is the step from $L_p$ to $L_r$ in the embedding theorems of Besov spaces.
 
 \begin{lemma}[The inclusions for every exponent]
 \label{lem:inclusion-linear}

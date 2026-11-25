@@ -2807,6 +2807,9 @@ of the filtration scheme (\Cref{def:filtration-scheme}), and \Cref{thm:complexit
 identifies the spaces.
 \end{proof}
 
+For every $0 < p \leq \infty$ the step couple is the couple in $L_p$ of the Haar scheme in
+$L_\infty[0, 1]$ (\Cref{lem:steps-function-scheme}).
+
 \begin{lemma}[Moduli for $0 < p \leq 1$]
 \label{lem:modulus-below-one}
 \lean{Interval.intervalModulus_add_rpow_le, Interval.eLpNorm_higherDiff_le_of_forall_of_le_one,
@@ -3065,8 +3068,9 @@ intervals. Then
 \[
   \int_{S \cap [0, 1]} |G| \leq 2^{j(1/p - 1)} \Bigl( \int_{S \cap [0, 1]} |G|^p \Bigr)^{1/p} .
 \]
-Every $\mathcal{F}_j$-measurable $a \in L_p[0, 1]$ lies in $L_r[0, 1]$ for every
-$0 < r \leq \infty$, and $\|a\|_1 \leq 2^{j(1/p - 1)} \|a\|_p$.
+For every $0 < t \leq \infty$, every $\mathcal{F}_j$-measurable $a \in L_t[0, 1]$ lies in
+$L_r[0, 1]$ for every $0 < r \leq \infty$; and $\|a\|_1 \leq 2^{j(1/p - 1)} \|a\|_p$ for every
+$\mathcal{F}_j$-measurable $a \in L_p[0, 1]$.
 \end{lemma}
 
 \begin{proof}
@@ -3076,8 +3080,8 @@ $F(x) 2^{-j} = \int_I F \leq \int_{S \cap [0, 1]} F$. For $x \in S \cap [0, 1)$ 
 lies in $S$, so $|G(x)|^p \leq 2^j J$ with $J = \int_{S \cap [0, 1]} |G|^p$. Hence
 $|G| = |G|^p |G|^{1-p} \leq |G|^p (2^j J)^{(1-p)/p}$ on $S \cap [0, 1)$; integrate. An
 $\mathcal{F}_j$-measurable function is constant on every $I_{j,n}$
-(\Cref{lem:condexp-partition}), and on $[0, 1]$ it is a step function with $2^j$ values
-(\Cref{cor:haar-besov}).
+(\Cref{lem:condexp-partition}), and almost everywhere on $[0, 1]$ it equals a step function with
+$2^j$ values (\Cref{cor:haar-besov}).
 \end{proof}
 
 With the values $c_n$ of $a$ on the intervals of level $j$, the last inequality reads
@@ -3105,6 +3109,43 @@ with $F = |a|^r$ and $S = \R$ gives $|a(x)|^r \leq 2^j \|a\|_r^r$ for every $x \
 
 For $r < \infty$, with the values $c_n$ of $a$ on the intervals of level $j$, the inequality reads
 $\max_n |c_n| \leq (\sum_n |c_n|^r)^{1/r}$.
+
+\begin{lemma}[Steps as a scheme of essentially bounded functions]
+\label{lem:steps-function-scheme}
+\lean{Haar.exists_topInclusion_eq_of_mem_lpMeas, Haar.lpSets_haarScheme,
+  Haar.stepCouple_eq_lpCouple}
+\leanok
+\uses{def:dyadic-filtration, def:step-couple, def:scheme-lp-couple}
+Let $0 < r \leq \infty$, let $S$ be the Haar scheme in $L_\infty[0, 1]$
+(\Cref{def:dyadic-filtration}), and for $j \in \N$ let $V_j$ be the subgroup of the
+$\mathcal{F}_j$-measurable elements of $L_r[0, 1]$.
+\begin{enumerate}
+  \item For every $j \in \N$ and $f \in V_j$ there is an $\mathcal{F}_j$-measurable
+    $a \in L_\infty[0, 1]$ with $f = \iota_{\infty,r} a$.
+  \item The approximants of $S$ in $L_r$ are $S^{(r)}_0 = \{0\}$ and
+    $S^{(r)}_n = V_{\lfloor \log_2 n \rfloor}$ for every $n \geq 1$.
+  \item The step couple in $L_r[0, 1]$ (\Cref{def:step-couple}) is the couple of $S$ in $L_r$
+    (\Cref{def:scheme-lp-couple}).
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:steps-into-l1, lem:inclusion-linear, def:filtration-scheme, lem:scheme-lp-couple}
+(1) By \Cref{lem:steps-into-l1}, $f$ lies in $L_\infty[0, 1]$; its class $a$ there is
+$\mathcal{F}_j$-measurable, and $\iota_{\infty,r} a = f$, since both agree with $f$ almost
+everywhere. (2) For $n = 0$ both sets are $\{0\}$ (\Cref{lem:scheme-lp-couple}). For
+$n \geq 1$ and $j = \lfloor \log_2 n \rfloor$, the approximants of $S$ of complexity $n$ are the
+$\mathcal{F}_j$-measurable elements of $L_\infty[0, 1]$ (\Cref{def:filtration-scheme}). The
+inclusion $\iota_{\infty,r}$ does not change a function up to null sets
+(\Cref{lem:inclusion-linear}), so it maps them into $V_j$, and onto $V_j$ by (1). (3) Both
+couples are complexity couples of the quasi-norm $\|\cdot\|_r$: the step couple of the sets
+$\{0\}$ at complexity $0$ and $V_{\lfloor \log_2 n \rfloor}$ at complexity $n \geq 1$, which are
+the sets $S^{(r)}_n$ by (2).
+\end{proof}
+
+So the properties of the couple of a scheme in $L_r$ (\Cref{lem:scheme-lp-couple}) hold for the
+step couple, for every $0 < r \leq \infty$.
 
 \begin{definition}[Level norms of the Haar expansion]
 \label{def:haar-level-norm}
