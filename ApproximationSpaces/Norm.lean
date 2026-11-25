@@ -6,7 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import ApproximationSpaces.Error
-public import ApproximationSpaces.Sequences.Lq
+public import ApproximationSpaces.Sequences.Dyadic
 
 /-!
 # The approximation spaces `A^s_q`
@@ -66,16 +66,12 @@ theorem approxNorm_top (s : ℝ) (f : X) :
     A.approxNorm s ∞ f = ⨆ n, ((n + 1 : ℕ) : ℝ≥0∞) ^ s * A.approxError f n := by
   simp [approxNorm, ENNReal.lqNorm_top]
 
-/-- For `q < ∞` the `q`-th power of the quasi-norm is `∑ₙ (n + 1)^(sq - 1) E_n(f)^q`. -/
+/-- For `0 < q < ∞` the `q`-th power of the quasi-norm is `∑ₙ (n + 1)^(sq - 1) E_n(f)^q`, the
+identity `ENNReal.lqNorm_pow_mul_rpow` for Pietsch's weights. -/
 theorem approxNorm_rpow (hq0 : q ≠ 0) (hq : q ≠ ∞) (s : ℝ) (f : X) :
     A.approxNorm s q f ^ q.toReal =
-      ∑' n, ((n + 1 : ℕ) : ℝ≥0∞) ^ (s * q.toReal - 1) * A.approxError f n ^ q.toReal := by
-  have hp : 0 < q.toReal := ENNReal.toReal_pos hq0 hq
-  rw [approxNorm, ENNReal.lqNorm_rpow hq0 hq]
-  congr 1; funext n
-  rw [ENNReal.mul_rpow_of_nonneg _ _ hp.le, ← ENNReal.rpow_mul]
-  congr 2
-  field_simp
+      ∑' n, ((n + 1 : ℕ) : ℝ≥0∞) ^ (s * q.toReal - 1) * A.approxError f n ^ q.toReal :=
+  ENNReal.lqNorm_pow_mul_rpow hq0 hq s (A.approxError f)
 
 /-- `‖0‖_{A^s_q} = 0`. -/
 @[simp]

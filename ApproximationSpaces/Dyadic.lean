@@ -28,7 +28,9 @@ The equivalence holds for every `q ∈ (0, ∞]`, also below `1`, with the const
 quasi-triangle inequality, `2^(1/q - 1)` for `0 < q < 1` and `1` otherwise
 (`approxNorm_le_approxNormDyadic'`, `approxNormDyadic_le_approxNorm'`,
 `memApprox_iff_approxNormDyadic_lt_top'`, `memApprox_iff_lqNorm_dyadic_lt_top'`); the statements
-for `q ≥ 1` are their cases `C_q = 1`. The primed statements assume `q ≠ 0`, the range `(0, ∞]`
+for `q ≥ 1` are their cases `C_q = 1`. The bounds are the case `e_n = E_n(f)` of the comparison
+for decreasing sequences `e` in `[0, ∞]` (`ENNReal.lqNorm_pow_mul_le_dyadic`,
+`ENNReal.dyadic_le_lqNorm_pow_mul`). The primed statements assume `q ≠ 0`, the range `(0, ∞]`
 of Pietsch's definition; the bound of the dyadic quasi-norm by Pietsch's needs it, since
 `lqNorm 0 = 0`.
 
@@ -112,56 +114,16 @@ theorem approxNormDyadic_neg (f : X) : A.approxNormDyadic s q (-f) = A.approxNor
     rw [approxSeqDyadic, approxSeqDyadic, approxError_neg]
   rw [approxNormDyadic, approxNormDyadic, h, enorm_neg]
 
-/-- **Pietsch's quasi-norm is dominated by the dyadic one**, for every `q ≠ 0`: for `s ≥ 0`,
-`‖f‖_{A^s_q} ≤ C_q 2^s (‖f‖ + ‖(2^(ks) E_{2^k}(f))_k‖_q)` with Mathlib's constant
-`C_q = LpAddConst q` of the quasi-triangle inequality (`1` for `q ≥ 1`). Cauchy condensation
-compares the `q`-th powers, and `(x^q + y^q)^(1/q) ≤ C_q (x + y)`
-(`ENNReal.rpow_add_rpow_le_LpAddConst_mul`). -/
-theorem approxNorm_le_approxNormDyadic' (hq0 : q ≠ 0) (hs : 0 ≤ s) (f : X) :
+/-- **Pietsch's quasi-norm is dominated by the dyadic one**, for `q ∈ (0, ∞]`, the range of
+Pietsch's definition: for `s ≥ 0`, `‖f‖_{A^s_q} ≤ C_q 2^s (‖f‖ + ‖(2^(ks) E_{2^k}(f))_k‖_q)` with
+Mathlib's constant `C_q = LpAddConst q` of the quasi-triangle inequality (`1` for `q ≥ 1`). This
+is the comparison of Pietsch's weights with the dyadic ones for the decreasing sequence `E_n(f)`
+(`ENNReal.lqNorm_pow_mul_le_dyadic`), whose first term is `E_0(f) = ‖f‖`; that sequence lemma
+holds for every `q`. -/
+theorem approxNorm_le_approxNormDyadic' (_hq0 : q ≠ 0) (hs : 0 ≤ s) (f : X) :
     A.approxNorm s q f ≤ LpAddConst q * 2 ^ s * A.approxNormDyadic s q f := by
-  have h2s := ENNReal.one_le_two_rpow hs
-  rcases eq_or_ne q ∞ with rfl | hq'
-  · rw [LpAddConst_of_one_le le_top, one_mul, approxNorm_top, approxNormDyadic,
-      ENNReal.lqNorm_top]
-    calc ⨆ n, ((n + 1 : ℕ) : ℝ≥0∞) ^ s * A.approxError f n
-        ≤ A.approxError f 0 + 2 ^ s * ⨆ k, dyadicWeight s k * A.approxError f (2 ^ k) :=
-          ENNReal.iSup_pow_mul_le_dyadic (approxError_anti f) hs
-      _ ≤ 2 ^ s * ‖f‖ₑ + 2 ^ s * ⨆ k, A.approxSeqDyadic s f k := by
-          rw [approxError_zero_right]
-          exact add_le_add (le_mul_of_one_le_left' h2s) le_rfl
-      _ = 2 ^ s * (‖f‖ₑ + ⨆ k, A.approxSeqDyadic s f k) := by rw [mul_add]
-  have hp : 0 < q.toReal := ENNReal.toReal_pos hq0 hq'
-  have hD : lqNorm q (A.approxSeqDyadic s f) ^ q.toReal =
-      ∑' k, dyadicWeight (s * q.toReal) k * A.approxError f (2 ^ k) ^ q.toReal := by
-    rw [ENNReal.lqNorm_rpow hq0 hq']
-    simp_rw [approxSeqDyadic_rpow hp.le]
-  set p := q.toReal
-  have hb : Antitone fun n => A.approxError f n ^ p := fun m n h =>
-    ENNReal.rpow_le_rpow (approxError_anti f h) hp.le
-  set D := lqNorm q (A.approxSeqDyadic s f)
-  have hpow : A.approxNorm s q f ^ p ≤ (2 ^ s) ^ p * (‖f‖ₑ ^ p + D ^ p) := by
-    rw [approxNorm_rpow hq0 hq']
-    calc ∑' n, ((n + 1 : ℕ) : ℝ≥0∞) ^ (s * p - 1) * A.approxError f n ^ p
-        ≤ A.approxError f 0 ^ p + 2 ^ max (s * p - 1) 0 *
-            ∑' k, dyadicWeight (s * p - 1 + 1) k * A.approxError f (2 ^ k) ^ p :=
-          ENNReal.tsum_pow_mul_le_dyadic hb (s * p - 1)
-      _ = ‖f‖ₑ ^ p + 2 ^ max (s * p - 1) 0 * D ^ p := by
-          rw [sub_add_cancel, hD, approxError_zero_right]
-      _ ≤ (2 ^ s) ^ p * ‖f‖ₑ ^ p + (2 ^ s) ^ p * D ^ p := by
-          gcongr
-          · exact le_mul_of_one_le_left' (ENNReal.one_le_rpow h2s hp |>.trans_eq' rfl)
-          · rw [← ENNReal.rpow_mul]
-            exact ENNReal.rpow_le_rpow_of_exponent_le one_le_two
-              (max_le (by linarith) (by positivity))
-      _ = (2 ^ s) ^ p * (‖f‖ₑ ^ p + D ^ p) := by rw [mul_add]
-  calc A.approxNorm s q f = (A.approxNorm s q f ^ p) ^ (1 / p) := by
-        rw [one_div, ENNReal.rpow_rpow_inv hp.ne']
-    _ ≤ ((2 ^ s) ^ p * (‖f‖ₑ ^ p + D ^ p)) ^ (1 / p) := by gcongr
-    _ = 2 ^ s * (‖f‖ₑ ^ p + D ^ p) ^ (1 / p) := by
-        rw [ENNReal.mul_rpow_of_nonneg _ _ (by positivity), one_div, ENNReal.rpow_rpow_inv hp.ne']
-    _ ≤ 2 ^ s * (LpAddConst q * (‖f‖ₑ + D)) := by
-        gcongr; exact ENNReal.rpow_add_rpow_le_LpAddConst_mul hq0 hq' _ _
-    _ = LpAddConst q * 2 ^ s * A.approxNormDyadic s q f := by rw [approxNormDyadic]; ring
+  have h := ENNReal.lqNorm_pow_mul_le_dyadic (q := q) (approxError_anti (A := A) f) hs
+  rwa [approxError_zero_right] at h
 
 /-- **Pietsch's quasi-norm is dominated by the dyadic one**: for `s ≥ 0` and `1 ≤ q ≤ ∞`,
 `‖f‖_{A^s_q} ≤ 2^s (‖f‖ + ‖(2^(ks) E_{2^k}(f))_k‖_q)`, the case `LpAddConst q = 1` of
@@ -171,47 +133,14 @@ theorem approxNorm_le_approxNormDyadic (hq : 1 ≤ q) (hs : 0 ≤ s) (f : X) :
   simpa [LpAddConst_of_one_le hq] using
     approxNorm_le_approxNormDyadic' (zero_lt_one.trans_le hq).ne' hs f
 
-/-- **The shifted dyadic sequence**, for every `q ≠ 0`: `(2^(ks) E_{2^(k+1)}(f))_k` has `ℓ_q` norm
-at most `2 C_q ‖f‖_{A^s_q}` for `s ≥ 0`, with Mathlib's constant `C_q = LpAddConst q`. Cauchy
-condensation bounds the `q`-th power by `2^(max(1 - sq, 0)) ≤ 2 ≤ (2 C_q)^q` times
-`‖f‖_{A^s_q}^q` (`ENNReal.two_rpow_one_div_le_two_mul_LpAddConst`). -/
-theorem lqNorm_dyadic_succ_le' (hq0 : q ≠ 0) (hs : 0 ≤ s) (f : X) :
+/-- **The shifted dyadic sequence**, for `q ∈ (0, ∞]`, the range of Pietsch's definition:
+`(2^(ks) E_{2^(k+1)}(f))_k` has `ℓ_q` norm at most `2 C_q ‖f‖_{A^s_q}` for `s ≥ 0`, with Mathlib's
+constant `C_q = LpAddConst q`. This is the case of the decreasing sequence `E_n(f)` of
+`ENNReal.lqNorm_dyadic_succ_le_lqNorm_pow_mul`; that sequence lemma holds for every `q`. -/
+theorem lqNorm_dyadic_succ_le' (_hq0 : q ≠ 0) (hs : 0 ≤ s) (f : X) :
     lqNorm q (fun k => dyadicWeight s k * A.approxError f (2 ^ (k + 1))) ≤
-      2 * LpAddConst q * A.approxNorm s q f := by
-  rcases eq_or_ne q ∞ with rfl | hq'
-  · rw [ENNReal.lqNorm_top, LpAddConst_of_one_le le_top, mul_one]
-    calc ⨆ k, dyadicWeight s k * A.approxError f (2 ^ (k + 1))
-        ≤ ⨆ k, dyadicWeight s k * A.approxError f (2 ^ k) := iSup_mono fun k => by
-          gcongr
-          exact approxError_anti f (Nat.pow_le_pow_right two_pos (Nat.le_succ k))
-      _ ≤ ⨆ n, ((n + 1 : ℕ) : ℝ≥0∞) ^ s * A.approxError f n := ENNReal.dyadic_le_iSup_pow_mul hs
-      _ = A.approxNorm s ∞ f := (approxNorm_top s f).symm
-      _ ≤ 2 * A.approxNorm s ∞ f := le_mul_of_one_le_left' one_le_two
-  have hp : 0 < q.toReal := ENNReal.toReal_pos hq0 hq'
-  set p := q.toReal
-  have hb : Antitone fun n => A.approxError f n ^ p := fun m n h =>
-    ENNReal.rpow_le_rpow (approxError_anti f h) hp.le
-  have h2 : (2 : ℝ≥0∞) ≤ (2 * LpAddConst q) ^ p := by
-    calc (2 : ℝ≥0∞) = ((2 : ℝ≥0∞) ^ (1 / p)) ^ p := by
-          rw [← ENNReal.rpow_mul, one_div_mul_cancel hp.ne', ENNReal.rpow_one]
-      _ ≤ (2 * LpAddConst q) ^ p :=
-          ENNReal.rpow_le_rpow (ENNReal.two_rpow_one_div_le_two_mul_LpAddConst q) hp.le
-  rw [← ENNReal.rpow_le_rpow_iff hp, ENNReal.lqNorm_rpow hq0 hq']
-  calc ∑' k, (dyadicWeight s k * A.approxError f (2 ^ (k + 1))) ^ p
-      = ∑' k, dyadicWeight (s * p - 1 + 1) k * A.approxError f (2 ^ (k + 1)) ^ p := by
-        congr 1; funext k
-        rw [ENNReal.mul_rpow_of_nonneg _ _ hp.le, ENNReal.dyadicWeight_rpow, sub_add_cancel]
-    _ ≤ 2 ^ max (-(s * p - 1)) 0 * ∑' n, ((n + 1 : ℕ) : ℝ≥0∞) ^ (s * p - 1) *
-          A.approxError f n ^ p := ENNReal.dyadic_le_tsum_pow_mul hb _
-    _ = 2 ^ max (-(s * p - 1)) 0 * A.approxNorm s q f ^ p := by rw [approxNorm_rpow hq0 hq']
-    _ ≤ (2 * LpAddConst q) ^ p * A.approxNorm s q f ^ p := by
-        have hsp : 0 ≤ s * p := mul_nonneg hs hp.le
-        gcongr ?_ * _
-        refine le_trans ?_ h2
-        calc (2 : ℝ≥0∞) ^ max (-(s * p - 1)) 0 ≤ 2 ^ (1 : ℝ) :=
-              ENNReal.rpow_le_rpow_of_exponent_le one_le_two (max_le (by linarith) zero_le_one)
-          _ = 2 := ENNReal.rpow_one 2
-    _ = (2 * LpAddConst q * A.approxNorm s q f) ^ p := (ENNReal.mul_rpow_of_nonneg _ _ hp.le).symm
+      2 * LpAddConst q * A.approxNorm s q f :=
+  ENNReal.lqNorm_dyadic_succ_le_lqNorm_pow_mul (approxError_anti f) hs
 
 /-- The shifted dyadic sequence `(2^(ks) E_{2^(k+1)}(f))_k` is dominated by twice Pietsch's
 quasi-norm for `1 ≤ q ≤ ∞`, the case `LpAddConst q = 1` of
@@ -223,38 +152,13 @@ theorem lqNorm_dyadic_succ_le (hq : 1 ≤ q) (hs : 0 ≤ s) (f : X) :
 
 /-- **The dyadic quasi-norm is dominated by Pietsch's**, for every `q ≠ 0`: for `s ≥ 0`,
 `‖f‖ + ‖(2^(ks) E_{2^k}(f))_k‖_q ≤ 4 C_q² 2^s ‖f‖_{A^s_q}` with Mathlib's constant
-`C_q = LpAddConst q` of the quasi-triangle inequality (`1` for `q ≥ 1`). The first dyadic term is
-`E_1(f) ≤ ‖f‖`, and the shifted ones are bounded by `ApproximationScheme.lqNorm_dyadic_succ_le'`;
-splitting off the first term costs `C_q` (`ENNReal.lqNorm_le_head_add_shift'`). -/
+`C_q = LpAddConst q` of the quasi-triangle inequality (`1` for `q ≥ 1`). This is the comparison
+of the dyadic weights with Pietsch's for the decreasing sequence `E_n(f)`
+(`ENNReal.dyadic_le_lqNorm_pow_mul`), whose first term is `E_0(f) = ‖f‖`. -/
 theorem approxNormDyadic_le_approxNorm' (hq0 : q ≠ 0) (hs : 0 ≤ s) (f : X) :
     A.approxNormDyadic s q f ≤ LpAddConst q ^ 2 * 4 * 2 ^ s * A.approxNorm s q f := by
-  set P := A.approxNorm s q f
-  set C := LpAddConst q
-  have h2s := ENNReal.one_le_two_rpow hs
-  have hC : 1 ≤ C := ENNReal.one_le_LpAddConst q
-  have h1 : 1 ≤ C ^ 2 * 2 ^ s :=
-    (one_mul (1 : ℝ≥0∞)).symm.le.trans (mul_le_mul' (one_le_pow₀ hC) h2s)
-  have hC2 : C ≤ C ^ 2 * 2 ^ s :=
-    calc C = C * 1 * 1 := by ring
-      _ ≤ C * C * 2 ^ s := by gcongr
-      _ = C ^ 2 * 2 ^ s := by ring
-  have hfP : ‖f‖ₑ ≤ P := enorm_le_approxNorm hq0 f
-  have hhead : A.approxSeqDyadic s f 0 ≤ P := by
-    rw [approxSeqDyadic_zero]; exact (approxError_le_enorm f 1).trans hfP
-  have hshift : lqNorm q (fun k => A.approxSeqDyadic s f (k + 1)) ≤ 2 ^ s * (2 * C * P) := by
-    have : (fun k => A.approxSeqDyadic s f (k + 1)) =
-        fun k => 2 ^ s * (dyadicWeight s k * A.approxError f (2 ^ (k + 1))) := by
-      funext k; rw [approxSeqDyadic, ENNReal.dyadicWeight_succ, mul_assoc]
-    rw [this, ENNReal.lqNorm_const_mul]
-    gcongr
-    exact lqNorm_dyadic_succ_le' hq0 hs f
-  calc A.approxNormDyadic s q f = ‖f‖ₑ + lqNorm q (A.approxSeqDyadic s f) := rfl
-    _ ≤ P + C * (P + 2 ^ s * (2 * C * P)) := by
-        gcongr
-        exact (ENNReal.lqNorm_le_head_add_shift' q _).trans (by gcongr)
-    _ = (1 + C + 2 * C ^ 2 * 2 ^ s) * P := by ring
-    _ ≤ (C ^ 2 * 2 ^ s + C ^ 2 * 2 ^ s + 2 * C ^ 2 * 2 ^ s) * P := by gcongr
-    _ = C ^ 2 * 4 * 2 ^ s * P := by ring
+  have h := ENNReal.dyadic_le_lqNorm_pow_mul (approxError_anti (A := A) f) hq0 hs
+  rwa [approxError_zero_right] at h
 
 /-- **The dyadic quasi-norm is dominated by Pietsch's**: for `s ≥ 0` and `1 ≤ q ≤ ∞`,
 `‖f‖ + ‖(2^(ks) E_{2^k}(f))_k‖_q ≤ 4 · 2^s ‖f‖_{A^s_q}`, the case `LpAddConst q = 1` of

@@ -24,8 +24,10 @@ continuous K-method are
 (`FunctionScheme.memKMethod_besovCouple_iff`, `FunctionScheme.memKMethod_lpBesovCouple_iff`),
 for every scheme.  Both are also equalities of subspaces of `L_p(μ)`
 (`FunctionScheme.kMethodSpace_besovCouple`, `FunctionScheme.kMethodSpace_lpBesovCouple`).  Since
-`B^s_{p,q}` is the approximation space `A^s_q(L_p(μ), S)`, they are the reiteration theorem for
-approximation spaces and its endpoint case (`ApproximationScheme.memKMethod_approxCouple_iff`,
+for `1 ≤ p ≤ ∞` the Besov space `B^s_{p,q}` is the approximation space `A^s_q(L_p(μ), S^(p))` of
+the scheme `S^(p) = S.toLp p` (`FunctionScheme.memBesov_iff_memApprox`,
+`FunctionScheme.besovNorm_eq_approxNorm`), they are the reiteration theorem for approximation
+spaces and its endpoint case (`ApproximationScheme.memKMethod_approxCouple_iff`,
 `ApproximationScheme.memKMethod_approxCouple_zero_iff`).  The same interpolation spaces arise
 from the couples of Pietsch's quasi-norms `FunctionScheme.besovNorm`, which are equivalent to the
 dyadic ones (`FunctionScheme.memKMethod_besovNormCouple_iff`,
@@ -43,13 +45,14 @@ variable {Ω : Type*} [MeasurableSpace Ω] {μ : Measure Ω} [IsFiniteMeasure μ
   (S : FunctionScheme μ) (p : ℝ≥0∞) [Fact (1 ≤ p)]
 
 /-- The **couple `(B^{s₀}_{p,q₀}, B^{s₁}_{p,q₁})`** of two Besov spaces of the scheme, on
-`L_p(μ)`, with the dyadic quasi-norms of the approximation spaces `A^{s_i}_{q_i}(L_p(μ), S)`. -/
+`L_p(μ)`, with the dyadic quasi-norms of the approximation spaces `A^{s_i}_{q_i}(L_p(μ), S^(p))`
+of the scheme `S^(p) = S.toLp p`. -/
 noncomputable abbrev besovCouple (s₀ : ℝ) (q₀ : ℝ≥0∞) (s₁ : ℝ) (q₁ : ℝ≥0∞) :
     InterpCouple (Lp ℂ p μ) :=
   (S.toLp p).approxCouple s₀ q₀ s₁ q₁
 
 /-- The **couple `(L_p, B^{s₁}_{p,q₁})`** of the scheme: the norm of `L_p(μ)` and the dyadic
-quasi-norm of the Besov space `B^{s₁}_{p,q₁}`. -/
+quasi-norm of the Besov space `B^{s₁}_{p,q₁} = A^{s₁}_{q₁}(L_p(μ), S^(p))`. -/
 noncomputable abbrev lpBesovCouple (s₁ : ℝ) (q₁ : ℝ≥0∞) : InterpCouple (Lp ℂ p μ) :=
   (S.toLp p).leftApproxCouple s₁ q₁
 
@@ -83,7 +86,8 @@ theorem kMethodSpace_besovCouple (hs₀ : 0 < s₀) (hs : s₀ < s₁) (hη : 0 
           (hs₀.trans hs).le hq₀ hq₁)
         ApproximationScheme.isHomogeneousCouple_approxCouple η q =
       S.besovSpace p ((1 - η) * s₀ + η * s₁) q
-        (ApproximationScheme.reiterationExponent_pos hs₀ hs hη hη').le hq :=
+        (ApproximationScheme.reiterationExponent_pos hs₀ hs hη hη').le
+        (zero_lt_one.trans_le hq).ne' :=
   Submodule.ext fun _ =>
     (memKMethod_besovCouple_iff hs₀ hs hη hη' hq₀ hq₁ hq).trans mem_besovSpace.symm
 
@@ -95,7 +99,7 @@ theorem kMethodSpace_lpBesovCouple (hs₁ : 0 < s₁) (hη : 0 < η) (hη' : η 
     InterpCouple.kMethodSpace
         (ApproximationScheme.isQuasiNormed_leftApproxCouple (A := S.toLp p) hs₁.le hq₁)
         ApproximationScheme.isHomogeneousCouple_leftApproxCouple η q =
-      S.besovSpace p (η * s₁) q (mul_pos hη hs₁).le hq :=
+      S.besovSpace p (η * s₁) q (mul_pos hη hs₁).le (zero_lt_one.trans_le hq).ne' :=
   Submodule.ext fun _ => (memKMethod_lpBesovCouple_iff hs₁ hη hη' hq₁ hq).trans mem_besovSpace.symm
 
 /-- **Besov spaces interpolate, with Pietsch's quasi-norms**: for `0 < s₀ < s₁`, `0 < η < 1` and

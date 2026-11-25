@@ -2778,11 +2778,13 @@ Let $1 \leq p < \infty$, $0 < \eta < 1$, $q_0, q_1, q \in [1, \infty]$ and $f \i
 
 \begin{proof}
 \leanok
+\uses{lem:besov-bridge}
 By \Cref{thm:torus-tl-besov-sandwich}, for $s > 0$ the quasi-norm of $\TL{s}{p}{q_i}(\T^d)$ is at
 most $K_{d,s}$ times the dyadic quasi-norm of $A^s_{\min(p,q_i)}$ and at least $(K'_s)^{-1}$
 times that of $A^s_{\max(p,q_i)}$, for the scheme $A$ of trigonometric polynomials, with finite
 constants (\Cref{lem:torus-tl-sandwich-consts-finite}). Apply
-\Cref{cor:approximation-space-sandwich}.
+\Cref{cor:approximation-space-sandwich}; the approximation spaces of $A$ are the Besov spaces
+$\Besov{s}{p}{q}(\T^d)$ (\Cref{lem:besov-bridge}).
 \end{proof}
 
 \chapter{Vector-valued singular integrals}

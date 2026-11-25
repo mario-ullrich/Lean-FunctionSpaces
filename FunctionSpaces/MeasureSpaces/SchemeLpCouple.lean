@@ -6,18 +6,19 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Analysis.Lp.QuasiNorm
+public import FunctionSpaces.MeasureSpaces.Scheme
 public import ApproximationSpaces.Interpolation.EFunctionalSpaces
 
 /-!
-# The couple of a scheme of essentially bounded functions in `L_p`, `0 < p ≤ ∞`
+# The couple of a scheme of functions in `L_p`, `0 < p ≤ ∞`
 
-Let `μ` be a finite measure on `Ω` and `S` an approximation scheme in `L_∞(μ)`: an increasing
-sequence of sets `S_n` of essentially bounded functions with `S_0 = {0}`, `c S_n ⊆ S_n` and
-`S_m + S_n ⊆ S_{m+n}`. Since `μ` is finite, every `S_n` lies in every `L_p(μ)`, and one scheme
-measures errors in all `L_p` at once. Mathlib makes `Lp ℂ p μ` a normed space for `p ≥ 1` only,
-and an `ApproximationScheme` lives in a normed space; this file describes the image of `S` in
-`L_p(μ)` for every `p` through the complexity couple of `InterpCouple`, which needs only the
-abelian group `Lp ℂ p μ` and the quasi-norm `‖·‖_p`.
+Let `μ` be a finite measure on `Ω` and `S` a scheme of functions on `(Ω, μ)` (`FunctionScheme μ`):
+an increasing sequence of sets `S_n` of essentially bounded functions with `S_0 = {0}`,
+`c S_n ⊆ S_n` and `S_m + S_n ⊆ S_{m+n}`. Since `μ` is finite, every `S_n` lies in every
+`L_p(μ)`, and one scheme measures errors in all `L_p` at once. Mathlib makes `Lp ℂ p μ` a normed
+space for `p ≥ 1` only, and an `ApproximationScheme` lives in a normed space; this file describes
+the image of `S` in `L_p(μ)` for every `p` through the complexity couple of `InterpCouple`, which
+needs only the abelian group `Lp ℂ p μ` and the quasi-norm `‖·‖_p`.
 
 * **The approximants in `L_p`.** The sets `S^(p)_n = ι_{∞,p}(S_n)` with the inclusion
   `ι_{∞,p} = MeasureTheory.Lp.topInclusion μ p` (`FunctionScheme.lpSets`) increase, start with
@@ -47,9 +48,12 @@ abelian group `Lp ℂ p μ` and the quasi-norm `‖·‖_p`.
 * **Different exponents.** The inclusion `L_r ↪ L_p`, `p ≤ r`, does not increase the complexity
   (`FunctionScheme.lpCouple_norm1_inclusion_le`).
 * **The normed case.** For `p ≥ 1` the couple is the complexity couple of the approximation
-  scheme `ι_{∞,p}(S)` in the normed space `L_p(μ)`
+  scheme `S^(p) = S.toLp p` in the normed space `L_p(μ)`
   (`FunctionScheme.lpCouple_eq_complexityCouple`), so its E-functional and Pietsch's form give
   the errors and the quasi-norms of the approximation spaces of that scheme.
+
+The Besov spaces of `S` for every `0 < p ≤ ∞` are defined through this couple
+(`FunctionSpaces.MeasureSpaces.Besov.Basic`).
 -/
 
 @[expose] public section
@@ -80,13 +84,13 @@ end MeasureTheory.Lp
 namespace FunctionScheme
 
 variable {Ω : Type*} [MeasurableSpace Ω] {μ : Measure Ω} [IsFiniteMeasure μ]
-  (S : ApproximationScheme (Lp ℂ ∞ μ))
+  (S : FunctionScheme μ)
 
 /-! ### The approximants in `L_p` -/
 
-/-- The **approximants of a scheme of essentially bounded functions in `L_p`**: for an
-approximation scheme `S` in `L_∞(μ)` and every exponent `p`, the sets `S^(p)_n = ι_{∞,p}(S_n)` of
-the classes in `L_p(μ)` of the elements of `S_n`. -/
+/-- The **approximants of a scheme of functions in `L_p`**: for a scheme `S` of essentially
+bounded functions and every exponent `p`, the sets `S^(p)_n = ι_{∞,p}(S_n)` of the classes in
+`L_p(μ)` of the elements of `S_n`. -/
 def lpSets (p : ℝ≥0∞) (n : ℕ) : Set (Lp ℂ p μ) :=
   Lp.topInclusion (𝕜 := ℝ) μ p '' S n
 
@@ -141,8 +145,8 @@ theorem inclusion_mem_lpSets (hpr : p ≤ r) {n : ℕ} {f : Lp ℂ r μ} (hf : f
 /-! ### The couple in `L_p` -/
 
 variable (S p) in
-/-- The **couple of a scheme of essentially bounded functions in `L_p`**, for every exponent
-`p`: the complexity couple of the quasi-norm `N₀(f) = ‖f‖_p` and the approximants `S^(p)_n`, so
+/-- The **couple of a scheme of functions in `L_p`**, for every exponent `p`: the complexity
+couple of the quasi-norm `N₀(f) = ‖f‖_p` and the approximants `S^(p)_n`, so
 that `N₁(f) = inf {n : f ∈ S^(p)_n}`, the least such `n`, and `∞` if `f` lies in no `S^(p)_n`.
 It needs only the group structure of `Lp ℂ p μ`, which exists also for `p < 1`. -/
 noncomputable def lpCouple : InterpCouple (Lp ℂ p μ) :=
@@ -257,11 +261,11 @@ theorem lpCouple_norm1_inclusion_le (hpr : p ≤ r) (f : Lp ℂ r μ) :
   InterpCouple.complexity_norm1_map_le _ (fun _ _ hb => inclusion_mem_lpSets hpr hb) f
 
 /-- **For `p ≥ 1` the couple in `L_p` is a complexity couple of an approximation scheme**: the
-couple of `S` in `L_p` is the complexity couple of the image scheme `ι_{∞,p}(S)` in the normed
-space `L_p(μ)`. The sets agree by definition, and the first norms since `‖f‖ₑ = ‖f‖_p` on `Lp`
-(`MeasureTheory.Lp.enorm_def`). -/
+couple of `S` in `L_p` is the complexity couple of the scheme `S^(p) = S.toLp p`, the image of
+`S` in the normed space `L_p(μ)`. The sets agree by definition, and the first norms since
+`‖f‖ₑ = ‖f‖_p` on `Lp` (`MeasureTheory.Lp.enorm_def`). -/
 theorem lpCouple_eq_complexityCouple [Fact (1 ≤ p)] :
-    lpCouple S p = (S.map (Lp.topInclusion (𝕜 := ℝ) μ p)).complexityCouple := by
+    lpCouple S p = (S.toLp p).complexityCouple := by
   have hN : (fun f : Lp ℂ p μ => eLpNorm f p μ) = fun f => ‖f‖ₑ :=
     funext fun f => (Lp.enorm_def f).symm
   rw [lpCouple, ApproximationScheme.complexityCouple, hN]

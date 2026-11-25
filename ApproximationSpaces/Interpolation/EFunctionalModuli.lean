@@ -37,11 +37,14 @@ With the classical quasi-norm `‖f‖^ω_{s,q} = N₀(f) + ‖(2^(ks) ω(f, k))
   (`InterpCouple.CoupleModulusData.eNormDyadic_le_coupleModNorm`);
 * `‖f‖^ω_{s,q} ≤ K ‖f‖_E` for `0 ≤ s < θ` and every `q`
   (`InterpCouple.CoupleModulusData.coupleModNorm_le_eNormDyadic`). The proof follows
-  DeVore–Popov, proof of Theorem 4.8: near-best `b_k` with `N₁(b_k) ≤ 2^k`, the telescoping
+  DeVore–Popov, proof of Theorem 4.8: near-best `b_k` with `N₁(b_k) ≤ 2^k`
+  (`InterpCouple.exists_nearBest_eFunctional`), the telescoping
   `f = (f - b_k) + b_0 + ∑_{j<k} (b_{j+1} - b_j)`, the inverse inequality for each block in
-  `ρ`-th powers, and Hardy's inequality in `ℓ_{q/ρ}` with the exponent `(θ - s)ρ`
-  (`ENNReal.hardy_sum_le'`), since `‖(a_k^ρ)_k‖_{ℓ_{q/ρ}} = ‖a‖_{ℓ_q}^ρ`
-  (`ENNReal.lqNorm_div_fun_rpow`).
+  `ρ`-th powers, where `N₀(b_{j+1} - b_j)^ρ ≤ 2 e_j^ρ` for decreasing tolerances `e_j`
+  (`InterpCouple.CoupleModulusData.modulus_sub_rpow_le`; the same bound for a whole sequence is
+  `InterpCouple.norm0_sub_succ_rpow_le_of_nearBest`), and Hardy's inequality in `ℓ_{q/ρ}`
+  with the exponent `(θ - s)ρ` (`ENNReal.hardy_sum_le'`), since
+  `‖(a_k^ρ)_k‖_{ℓ_{q/ρ}} = ‖a‖_{ℓ_q}^ρ` (`ENNReal.lqNorm_div_fun_rpow`).
 
 So, if only `0` has complexity below `1`, then for `0 < s < θ` and `q ≠ 0` the approximation
 space `E_{s,q}` of the couple is the classical space
@@ -68,6 +71,22 @@ theorem norm0_sub_rpow_le {A : InterpCouple U} {ρ : ℝ} (hneg : ∀ a, A.norm0
     A.norm0 (a - b) ^ ρ ≤ A.norm0 a ^ ρ + A.norm0 b ^ ρ := by
   rw [sub_eq_add_neg, ← hneg b]
   exact hadd a (-b)
+
+/-- **Two near-best elements are close**: if `N₀` is even, `N₀^ρ` is subadditive for some
+`ρ ≥ 0`, `N₀(u - b_k) ≤ e_k` for every `k` and `e` decreases, then
+`N₀(b_{k+1} - b_k)^ρ ≤ 2 e_k^ρ`, from `b_{k+1} - b_k = (u - b_k) - (u - b_{k+1})` and
+`e_{k+1} ≤ e_k`. -/
+theorem norm0_sub_succ_rpow_le_of_nearBest {A : InterpCouple U} {ρ : ℝ} (hρ : 0 ≤ ρ)
+    (hneg : ∀ a, A.norm0 (-a) = A.norm0 a)
+    (hadd : ∀ a b, A.norm0 (a + b) ^ ρ ≤ A.norm0 a ^ ρ + A.norm0 b ^ ρ) {u : U} {b : ℕ → U}
+    {e : ℕ → ℝ≥0∞} (hbe : ∀ k, A.norm0 (u - b k) ≤ e k) (he : Antitone e) (k : ℕ) :
+    A.norm0 (b (k + 1) - b k) ^ ρ ≤ 2 * e k ^ ρ := by
+  rw [show b (k + 1) - b k = (u - b k) - (u - b (k + 1)) by abel]
+  calc A.norm0 ((u - b k) - (u - b (k + 1))) ^ ρ
+      ≤ A.norm0 (u - b k) ^ ρ + A.norm0 (u - b (k + 1)) ^ ρ := norm0_sub_rpow_le hneg hadd _ _
+    _ ≤ e k ^ ρ + e k ^ ρ := add_le_add (ENNReal.rpow_le_rpow (hbe k) hρ)
+        (ENNReal.rpow_le_rpow ((hbe (k + 1)).trans (he k.le_succ)) hρ)
+    _ = 2 * e k ^ ρ := (two_mul _).symm
 
 /-- `N₁(a - b) ≤ N₁(a) + N₁(b)` if `N₁` is even and subadditive. -/
 theorem norm1_sub_le {A : InterpCouple U} (hneg : ∀ a, A.norm1 (-a) = A.norm1 a)
@@ -425,33 +444,20 @@ theorem eNormDyadic_le_coupleModNorm (f : U) :
 
 /-- **The inverse direction**: for `0 ≤ s < θ` and every `q`,
 `‖f‖^ω_{s,q} ≤ K (N₀(f) + ‖(2^(ks) E(2^k, f))_k‖_{ℓ_q})` with `K = M.coupleInverseConst s q`. The
-near-best elements `b_k` have the tolerances `N₀(f) 2^(-k(s+1))`. -/
+near-best elements `b_k` have the tolerances `N₀(f) 2^(-k(s+1))`
+(`InterpCouple.exists_nearBest_eFunctional`). -/
 theorem coupleModNorm_le_eNormDyadic (hs : 0 ≤ s) (hsθ : s < θ) (f : U) :
     M.coupleModNorm s q f ≤ M.coupleInverseConst s q * A.eNormDyadic s q f := by
   have hθ : 0 ≤ θ := hs.trans hsθ.le
   have hρ := M.rho_pos
-  have hone : 1 ≤ M.coupleInverseConst s q := le_self_add
   have hfN : A.norm0 f ≤ A.eNormDyadic s q f := le_self_add
-  rcases eq_or_ne (A.norm0 f) ∞ with hf | hf
-  · rw [hf, top_le_iff] at hfN
-    rw [hfN, ENNReal.mul_top (one_pos.trans_le hone).ne']
-    exact le_top
-  rcases eq_or_ne (A.norm0 f) 0 with hf0 | hf0
-  · have hω : ∀ k, M.modulus f k = 0 := fun k =>
-      le_antisymm ((M.le_norm0 f k).trans_eq (by rw [hf0, mul_zero])) bot_le
-    simp [coupleModNorm, hf0, hω]
-  have hE : ∀ k, A.eFunctional ((2 ^ k : ℕ) : ℝ≥0∞) f ≠ ∞ := fun k =>
-    ne_top_of_le_ne_top hf (eFunctional_le_norm0 M.norm1_zero f)
-  choose b hb1 hb0 using fun k => exists_norm0_sub_le_eFunctional_add (hE k)
-    (mul_ne_zero hf0 (ENNReal.dyadicWeight_ne_zero (-(s + 1)) k))
+  obtain ⟨b, hb1, hb0⟩ := exists_nearBest_eFunctional M.norm1_zero f s
   obtain ⟨e, he_eq⟩ : ∃ e : ℕ → ℝ≥0∞, e = fun k =>
       A.eFunctional ((2 ^ k : ℕ) : ℝ≥0∞) f + A.norm0 f * dyadicWeight (-(s + 1)) k := ⟨_, rfl⟩
   have hbe : ∀ j, A.norm0 (f - b j) ≤ e j := fun j => by rw [he_eq]; exact hb0 j
   have he : Antitone e := by
     rw [he_eq]
-    intro i j hij
-    exact add_le_add (eFunctional_anti f (Nat.cast_le.2 (Nat.pow_le_pow_right two_pos hij)))
-      (mul_le_mul_right (ENNReal.dyadicWeight_anti (by linarith) hij) _)
+    exact antitone_eFunctional_add_dyadicWeight (by linarith) f
   have hfe : A.norm0 f ≤ e 0 := by
     rw [he_eq]
     exact le_add_left (le_of_eq (by rw [ENNReal.dyadicWeight_zero_right, mul_one]))

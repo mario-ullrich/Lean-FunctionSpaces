@@ -37,7 +37,13 @@ For `γ = 0` this is Cauchy's condensation test (Mathlib: `ENNReal.le_tsum_conde
 `ENNReal.tsum_condensed_le`).  The weight `(n + 1) ^ γ` is in general increasing, so the
 weighted sequence is not decreasing and Mathlib's version does not apply to it directly.
 These estimates are what makes Pietsch's quasi-norm `‖(n^(s - 1/q) E_{n-1})ₙ‖_q` equivalent to
-the dyadic one `‖(2^(ks) E_{2^k})ₖ‖_q`.
+the dyadic one `‖(2^(ks) E_{2^k})ₖ‖_q`. For a decreasing sequence `e` in `[0, ∞]`, `s ≥ 0` and
+`q ∈ (0, ∞]` the comparison reads
+`‖((n + 1)^(s - 1/q) e_n)_n‖_{ℓ_q} ≤ C_q 2^s (e_0 + ‖(2^(ks) e_{2^k})_k‖_{ℓ_q})` and
+`e_0 + ‖(2^(ks) e_{2^k})_k‖_{ℓ_q} ≤ 4 C_q² 2^s ‖((n + 1)^(s - 1/q) e_n)_n‖_{ℓ_q}`, with Mathlib's
+constant `C_q = LpAddConst q` of the quasi-triangle inequality (`lqNorm_pow_mul_le_dyadic`,
+`dyadic_le_lqNorm_pow_mul`). The errors `E_n(f)` of an approximation scheme and the E-functional
+`E(n, u)` of a couple are such sequences.
 
 Three sums over dyadic scales follow:
 
@@ -256,6 +262,182 @@ theorem dyadic_le_iSup_pow_mul {s : ℝ} (hs : 0 ≤ s) :
   calc dyadicWeight s k * b (2 ^ k) ≤ ((2 ^ k + 1 : ℕ) : ℝ≥0∞) ^ s * b (2 ^ k) := by
         rw [← natCast_two_pow_rpow]; gcongr; exact_mod_cast Nat.le_succ _
     _ ≤ _ := le_iSup (fun n => ((n + 1 : ℕ) : ℝ≥0∞) ^ s * b n) (2 ^ k)
+
+/-! ### Pietsch's weights against the dyadic ones, for a decreasing sequence -/
+
+section PietschWeights
+
+variable {q : ℝ≥0∞}
+
+/-- **The `q`-th power of Pietsch's weighted `ℓ_q` norm**: for `0 < q < ∞`,
+`‖((n + 1)^(s - 1/q) e_n)_n‖_{ℓ_q}^q = ∑_n (n + 1)^(sq - 1) e_n^q`. -/
+theorem lqNorm_pow_mul_rpow (hq0 : q ≠ 0) (hq : q ≠ ∞) (s : ℝ) (e : ℕ → ℝ≥0∞) :
+    lqNorm q (fun n : ℕ => ((n + 1 : ℕ) : ℝ≥0∞) ^ (s - 1 / q.toReal) * e n) ^ q.toReal =
+      ∑' n : ℕ, ((n + 1 : ℕ) : ℝ≥0∞) ^ (s * q.toReal - 1) * e n ^ q.toReal := by
+  have hp : 0 < q.toReal := ENNReal.toReal_pos hq0 hq
+  rw [ENNReal.lqNorm_rpow hq0 hq]
+  congr 1
+  funext n
+  rw [ENNReal.mul_rpow_of_nonneg _ _ hp.le, ← ENNReal.rpow_mul]
+  congr 2
+  field_simp
+
+variable {s : ℝ} {e : ℕ → ℝ≥0∞}
+
+/-- **Pietsch's weighted `ℓ_q` norm by the dyadic one, for a decreasing sequence**: for
+`e_0 ≥ e_1 ≥ ⋯` in `[0, ∞]`, `s ≥ 0` and `q ∈ (0, ∞]`,
+`‖((n + 1)^(s - 1/q) e_n)_n‖_{ℓ_q} ≤ C_q 2^s (e_0 + ‖(2^(ks) e_{2^k})_k‖_{ℓ_q})` with Mathlib's
+constant `C_q = LpAddConst q` (`1` for `q ≥ 1`); for `q = 0` the left side is `lqNorm 0 = 0`.
+Cauchy condensation (`ENNReal.tsum_pow_mul_le_dyadic`, `ENNReal.iSup_pow_mul_le_dyadic`)
+compares the `q`-th powers, and `(x^q + y^q)^(1/q) ≤ C_q (x + y)`. For `e_n = E_n(f)` this is
+`ApproximationScheme.approxNorm_le_approxNormDyadic'`. -/
+theorem lqNorm_pow_mul_le_dyadic (he : Antitone e) (hs : 0 ≤ s) :
+    lqNorm q (fun n : ℕ => ((n + 1 : ℕ) : ℝ≥0∞) ^ (s - 1 / q.toReal) * e n) ≤
+      LpAddConst q * 2 ^ s * (e 0 + lqNorm q fun k => dyadicWeight s k * e (2 ^ k)) := by
+  rcases eq_or_ne q 0 with rfl | hq0
+  · rw [lqNorm_zero_left]
+    exact zero_le
+  have h2s := ENNReal.one_le_two_rpow hs
+  rcases eq_or_ne q ∞ with rfl | hq'
+  · rw [LpAddConst_of_one_le le_top, one_mul, lqNorm_top, lqNorm_top, toReal_top,
+      _root_.div_zero, sub_zero]
+    calc ⨆ n : ℕ, ((n + 1 : ℕ) : ℝ≥0∞) ^ s * e n
+        ≤ e 0 + 2 ^ s * ⨆ k, dyadicWeight s k * e (2 ^ k) := iSup_pow_mul_le_dyadic he hs
+      _ ≤ 2 ^ s * e 0 + 2 ^ s * ⨆ k, dyadicWeight s k * e (2 ^ k) :=
+          add_le_add (le_mul_of_one_le_left' h2s) le_rfl
+      _ = 2 ^ s * (e 0 + ⨆ k, dyadicWeight s k * e (2 ^ k)) := by rw [mul_add]
+  have hp : 0 < q.toReal := ENNReal.toReal_pos hq0 hq'
+  have hpow := lqNorm_pow_mul_rpow hq0 hq' s e
+  set p := q.toReal
+  set D := lqNorm q fun k => dyadicWeight s k * e (2 ^ k)
+  set P := lqNorm q (fun n : ℕ => ((n + 1 : ℕ) : ℝ≥0∞) ^ (s - 1 / p) * e n)
+  have hD : D ^ p = ∑' k, dyadicWeight (s * p) k * e (2 ^ k) ^ p := by
+    rw [ENNReal.lqNorm_rpow hq0 hq']
+    congr 1
+    funext k
+    rw [ENNReal.mul_rpow_of_nonneg _ _ hp.le, ENNReal.dyadicWeight_rpow]
+  have hb : Antitone fun n => e n ^ p := fun m n h => ENNReal.rpow_le_rpow (he h) hp.le
+  have hPp : P ^ p ≤ (2 ^ s) ^ p * (e 0 ^ p + D ^ p) := by
+    rw [hpow]
+    calc ∑' n : ℕ, ((n + 1 : ℕ) : ℝ≥0∞) ^ (s * p - 1) * e n ^ p
+        ≤ e 0 ^ p + 2 ^ max (s * p - 1) 0 *
+            ∑' k, dyadicWeight (s * p - 1 + 1) k * e (2 ^ k) ^ p :=
+          ENNReal.tsum_pow_mul_le_dyadic hb (s * p - 1)
+      _ = e 0 ^ p + 2 ^ max (s * p - 1) 0 * D ^ p := by rw [sub_add_cancel, hD]
+      _ ≤ (2 ^ s) ^ p * e 0 ^ p + (2 ^ s) ^ p * D ^ p := by
+          gcongr
+          · exact le_mul_of_one_le_left' (ENNReal.one_le_rpow h2s hp |>.trans_eq' rfl)
+          · rw [← ENNReal.rpow_mul]
+            exact ENNReal.rpow_le_rpow_of_exponent_le one_le_two
+              (max_le (by linarith) (by positivity))
+      _ = (2 ^ s) ^ p * (e 0 ^ p + D ^ p) := by rw [mul_add]
+  calc P = (P ^ p) ^ (1 / p) := by rw [one_div, ENNReal.rpow_rpow_inv hp.ne']
+    _ ≤ ((2 ^ s) ^ p * (e 0 ^ p + D ^ p)) ^ (1 / p) := by gcongr
+    _ = 2 ^ s * (e 0 ^ p + D ^ p) ^ (1 / p) := by
+        rw [ENNReal.mul_rpow_of_nonneg _ _ (by positivity), one_div, ENNReal.rpow_rpow_inv hp.ne']
+    _ ≤ 2 ^ s * (LpAddConst q * (e 0 + D)) := by
+        gcongr
+        exact ENNReal.rpow_add_rpow_le_LpAddConst_mul hq0 hq' _ _
+    _ = LpAddConst q * 2 ^ s * (e 0 + D) := by ring
+
+/-- **The shifted dyadic sequence by Pietsch's weighted norm, for a decreasing sequence**: for
+`e_0 ≥ e_1 ≥ ⋯` in `[0, ∞]`, `s ≥ 0` and `q ∈ (0, ∞]`,
+`‖(2^(ks) e_{2^(k+1)})_k‖_{ℓ_q} ≤ 2 C_q P` with `P = ‖((n + 1)^(s - 1/q) e_n)_n‖_{ℓ_q}` Pietsch's
+weighted norm; for `q = 0` the left side is `lqNorm 0 = 0`. Cauchy condensation
+(`ENNReal.dyadic_le_tsum_pow_mul`) bounds the `q`-th power of the left side by
+`2^(max(1 - sq, 0)) P^q`, and `2^(max(1 - sq, 0)) ≤ 2 ≤ (2 C_q)^q`. For `e_n = E_n(f)` this is
+`ApproximationScheme.lqNorm_dyadic_succ_le'`. -/
+theorem lqNorm_dyadic_succ_le_lqNorm_pow_mul (he : Antitone e) (hs : 0 ≤ s) :
+    lqNorm q (fun k => dyadicWeight s k * e (2 ^ (k + 1))) ≤
+      2 * LpAddConst q *
+        lqNorm q (fun n : ℕ => ((n + 1 : ℕ) : ℝ≥0∞) ^ (s - 1 / q.toReal) * e n) := by
+  rcases eq_or_ne q 0 with rfl | hq0
+  · rw [lqNorm_zero_left]
+    exact zero_le
+  rcases eq_or_ne q ∞ with rfl | hq'
+  · rw [lqNorm_top, LpAddConst_of_one_le le_top, mul_one, lqNorm_top, toReal_top,
+      _root_.div_zero, sub_zero]
+    calc ⨆ k, dyadicWeight s k * e (2 ^ (k + 1))
+        ≤ ⨆ k, dyadicWeight s k * e (2 ^ k) := iSup_mono fun k => by
+          gcongr
+          exact he (Nat.pow_le_pow_right two_pos (Nat.le_succ k))
+      _ ≤ ⨆ n : ℕ, ((n + 1 : ℕ) : ℝ≥0∞) ^ s * e n := dyadic_le_iSup_pow_mul hs
+      _ ≤ 2 * ⨆ n : ℕ, ((n + 1 : ℕ) : ℝ≥0∞) ^ s * e n := le_mul_of_one_le_left' one_le_two
+  have hp : 0 < q.toReal := ENNReal.toReal_pos hq0 hq'
+  have hpow := lqNorm_pow_mul_rpow hq0 hq' s e
+  set p := q.toReal
+  set P := lqNorm q (fun n : ℕ => ((n + 1 : ℕ) : ℝ≥0∞) ^ (s - 1 / p) * e n)
+  have hb : Antitone fun n => e n ^ p := fun m n h => ENNReal.rpow_le_rpow (he h) hp.le
+  have h2 : (2 : ℝ≥0∞) ≤ (2 * LpAddConst q) ^ p := by
+    calc (2 : ℝ≥0∞) = ((2 : ℝ≥0∞) ^ (1 / p)) ^ p := by
+          rw [← ENNReal.rpow_mul, one_div_mul_cancel hp.ne', ENNReal.rpow_one]
+      _ ≤ (2 * LpAddConst q) ^ p :=
+          ENNReal.rpow_le_rpow (ENNReal.two_rpow_one_div_le_two_mul_LpAddConst q) hp.le
+  have hsp : 0 ≤ s * p := mul_nonneg hs hp.le
+  rw [← ENNReal.rpow_le_rpow_iff hp, ENNReal.lqNorm_rpow hq0 hq']
+  calc ∑' k, (dyadicWeight s k * e (2 ^ (k + 1))) ^ p
+      = ∑' k, dyadicWeight (s * p - 1 + 1) k * e (2 ^ (k + 1)) ^ p := by
+        congr 1
+        funext k
+        rw [ENNReal.mul_rpow_of_nonneg _ _ hp.le, ENNReal.dyadicWeight_rpow, sub_add_cancel]
+    _ ≤ 2 ^ max (-(s * p - 1)) 0 * ∑' n : ℕ, ((n + 1 : ℕ) : ℝ≥0∞) ^ (s * p - 1) * e n ^ p :=
+        ENNReal.dyadic_le_tsum_pow_mul hb _
+    _ = 2 ^ max (-(s * p - 1)) 0 * P ^ p := by rw [hpow]
+    _ ≤ (2 * LpAddConst q) ^ p * P ^ p := by
+        gcongr ?_ * _
+        refine le_trans ?_ h2
+        calc (2 : ℝ≥0∞) ^ max (-(s * p - 1)) 0 ≤ 2 ^ (1 : ℝ) :=
+              ENNReal.rpow_le_rpow_of_exponent_le one_le_two (max_le (by linarith) zero_le_one)
+          _ = 2 := ENNReal.rpow_one 2
+    _ = (2 * LpAddConst q * P) ^ p := (ENNReal.mul_rpow_of_nonneg _ _ hp.le).symm
+
+/-- **The dyadic norm by Pietsch's weighted norm, for a decreasing sequence**: for
+`e_0 ≥ e_1 ≥ ⋯` in `[0, ∞]`, `s ≥ 0` and `q ∈ (0, ∞]`,
+`e_0 + ‖(2^(ks) e_{2^k})_k‖_{ℓ_q} ≤ 4 C_q² 2^s ‖((n + 1)^(s - 1/q) e_n)_n‖_{ℓ_q}` with Mathlib's
+constant `C_q = LpAddConst q`. The term `n = 0` gives `e_0`; the first dyadic term is `e_1 ≤ e_0`,
+and splitting it off costs `C_q` (`ENNReal.lqNorm_le_head_add_shift'`); the others are bounded by
+`ENNReal.lqNorm_dyadic_succ_le_lqNorm_pow_mul`. For `e_n = E_n(f)` this is
+`ApproximationScheme.approxNormDyadic_le_approxNorm'`. -/
+theorem dyadic_le_lqNorm_pow_mul (he : Antitone e) (hq0 : q ≠ 0) (hs : 0 ≤ s) :
+    e 0 + lqNorm q (fun k => dyadicWeight s k * e (2 ^ k)) ≤
+      LpAddConst q ^ 2 * 4 * 2 ^ s *
+        lqNorm q (fun n : ℕ => ((n + 1 : ℕ) : ℝ≥0∞) ^ (s - 1 / q.toReal) * e n) := by
+  have he0 : e 0 ≤ lqNorm q (fun n : ℕ => ((n + 1 : ℕ) : ℝ≥0∞) ^ (s - 1 / q.toReal) * e n) := by
+    have h := ENNReal.le_lqNorm hq0
+      (fun n : ℕ => ((n + 1 : ℕ) : ℝ≥0∞) ^ (s - 1 / q.toReal) * e n) 0
+    simp only [zero_add, Nat.cast_one, ENNReal.one_rpow, one_mul] at h
+    exact h
+  set P := lqNorm q (fun n : ℕ => ((n + 1 : ℕ) : ℝ≥0∞) ^ (s - 1 / q.toReal) * e n)
+  set C := LpAddConst q
+  have h2s := ENNReal.one_le_two_rpow hs
+  have hC : 1 ≤ C := ENNReal.one_le_LpAddConst q
+  have h1 : 1 ≤ C ^ 2 * 2 ^ s :=
+    (one_mul (1 : ℝ≥0∞)).symm.le.trans (mul_le_mul' (one_le_pow₀ hC) h2s)
+  have hC2 : C ≤ C ^ 2 * 2 ^ s :=
+    calc C = C * 1 * 1 := by ring
+      _ ≤ C * C * 2 ^ s := by gcongr
+      _ = C ^ 2 * 2 ^ s := by ring
+  have hhead : dyadicWeight s 0 * e (2 ^ 0) ≤ P := by
+    rw [ENNReal.dyadicWeight_zero_right, one_mul, pow_zero]
+    exact (he zero_le_one).trans he0
+  have hshift : lqNorm q (fun k => dyadicWeight s (k + 1) * e (2 ^ (k + 1))) ≤
+      2 ^ s * (2 * C * P) := by
+    have h : (fun k => dyadicWeight s (k + 1) * e (2 ^ (k + 1))) =
+        fun k => 2 ^ s * (dyadicWeight s k * e (2 ^ (k + 1))) := by
+      funext k
+      rw [ENNReal.dyadicWeight_succ, mul_assoc]
+    rw [h, ENNReal.lqNorm_const_mul]
+    gcongr
+    exact lqNorm_dyadic_succ_le_lqNorm_pow_mul he hs
+  calc e 0 + lqNorm q (fun k => dyadicWeight s k * e (2 ^ k))
+      ≤ P + C * (P + 2 ^ s * (2 * C * P)) := by
+        gcongr
+        exact (ENNReal.lqNorm_le_head_add_shift' q _).trans (by gcongr)
+    _ = (1 + C + 2 * C ^ 2 * 2 ^ s) * P := by ring
+    _ ≤ (C ^ 2 * 2 ^ s + C ^ 2 * 2 ^ s + 2 * C ^ 2 * 2 ^ s) * P := by gcongr
+    _ = C ^ 2 * 4 * 2 ^ s * P := by ring
+
+end PietschWeights
 
 /-- `1 + ∑_{j < m} 2^j = 2^m` in `[0, ∞]`, Mathlib's geometric sum `geom_sum_mul_add` for
 `x = 1`. -/

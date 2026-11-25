@@ -24,6 +24,10 @@ a finite constant `C` (Bergh–Löfström, Lemma 7.1.1;
 `InterpCouple.eFunctional_add_le`), and `E(t + s, u + v)^ρ ≤ E(t, u)^ρ + E(s, v)^ρ` when `N₀^ρ`
 is subadditive (`InterpCouple.eFunctional_add_rpow_le`). No triangle inequality and no
 homogeneity is needed, so the couple may consist of quasi-norms such as `‖·‖_p` for `p < 1`.
+If `N₁(0) = 0`, then for every real `s` every `u` has **near-best sequences** `b_k` with
+`N₁(b_k) ≤ 2^k` and `N₀(u - b_k) ≤ E(2^k, u) + N₀(u) 2^(-k(s+1))`, whose tolerances decrease for
+`s ≥ -1` (`InterpCouple.exists_nearBest_eFunctional`,
+`InterpCouple.antitone_eFunctional_add_dyadicWeight`).
 
 The **approximation space** `E_{α,q}` consists of the `u` with
 `‖u‖_{α,q;E} = Φ_{-α,q}(E(·, u)) = (∫_0^∞ (t^α E(t, u))^q dt/t)^(1/q) < ∞`
@@ -39,7 +43,9 @@ quasi-triangle inequality (Bergh–Löfström, Lemma 7.1.6, in dyadic form;
 
 The **complexity couple** of a sequence of sets `S n` is `(N, min {n : b ∈ S n})`
 (`InterpCouple.complexity`); for increasing sets its E-functional at `t = n` is the error of best
-approximation from `S n` (`InterpCouple.eFunctional_complexity_natCast`). The couple
+approximation from `S n` (`InterpCouple.eFunctional_complexity_natCast`), and a map `T` that
+sends every `S n` into the set `S' n` of a second complexity couple gives `T b` at most the
+complexity of `b` (`InterpCouple.complexity_norm1_map_le`). The couple
 `InterpCouple.ofMonotoneSubgroups` puts an increasing sequence of subgroups `V_j` at the
 complexities `2^j`. For an approximation scheme in a normed space the complexity couple
 (`ApproximationScheme.complexityCouple`) has `E(n, f) = E_n(f)`, and `E_{s,q}` is the
@@ -246,6 +252,16 @@ theorem norm0_le_eFunctional_of_lt_one (hdisc : ∀ b, A.norm1 b < 1 → b = 0) 
     (u : U) : A.norm0 u ≤ A.eFunctional t u :=
   le_eFunctional fun b hb => le_of_eq (by rw [hdisc b (hb.trans_lt ht), sub_zero])
 
+/-- The E-functional at the integers decreases: `E(n, u) ≥ E(m, u)` for `n ≤ m`. -/
+theorem antitone_eFunctional_natCast (u : U) : Antitone fun n : ℕ => A.eFunctional n u :=
+  fun _ _ h => eFunctional_anti u (Nat.cast_le.2 h)
+
+/-- **`E(0, u) = N₀(u)`** if `N₁(0) = 0` and every `b` with `N₁(b) < 1` is `0`: then `b = 0` is
+the only admissible element at `t = 0`. -/
+theorem eFunctional_zero_left (h10 : A.norm1 0 = 0) (hdisc : ∀ b, A.norm1 b < 1 → b = 0) (u : U) :
+    A.eFunctional 0 u = A.norm0 u :=
+  le_antisymm (eFunctional_le_norm0 h10 u) (norm0_le_eFunctional_of_lt_one hdisc zero_lt_one u)
+
 /-- The E-functional of a couple of even functions is even: `E(t, -u) = E(t, u)`, by the
 substitution `b ↦ -b`. -/
 theorem eFunctional_neg (h0 : ∀ a, A.norm0 (-a) = A.norm0 a) (h1 : ∀ a, A.norm1 (-a) = A.norm1 a)
@@ -261,6 +277,38 @@ theorem exists_norm0_sub_le_eFunctional_add {u : U} {ε : ℝ≥0∞} (h : A.eFu
     (hε : ε ≠ 0) : ∃ b, A.norm1 b ≤ t ∧ A.norm0 (u - b) ≤ A.eFunctional t u + ε := by
   obtain ⟨b, hb⟩ := iInf_lt_iff.1 (ENNReal.lt_add_right h hε)
   exact ⟨b, b.2, hb.le⟩
+
+/-- **Near-best sequences**: if `N₁(0) = 0`, then for every `u` and `s` there are `b_k` with
+`N₁(b_k) ≤ 2^k` and `N₀(u - b_k) ≤ E(2^k, u) + N₀(u) 2^(-k(s+1))`. For `N₀(u) ∈ (0, ∞)` the
+tolerance is positive and `E(2^k, u) ≤ N₀(u)` is finite
+(`InterpCouple.exists_norm0_sub_le_eFunctional_add`); for `N₀(u) = 0` and for `N₀(u) = ∞` the
+element `b_k = 0` is admissible and near-best. Near-best sequences take the role of bounded
+linear projections onto the approximants. -/
+theorem exists_nearBest_eFunctional (h10 : A.norm1 0 = 0) (u : U) (s : ℝ) :
+    ∃ b : ℕ → U, (∀ k, A.norm1 (b k) ≤ ((2 ^ k : ℕ) : ℝ≥0∞)) ∧ ∀ k,
+      A.norm0 (u - b k) ≤
+        A.eFunctional ((2 ^ k : ℕ) : ℝ≥0∞) u + A.norm0 u * dyadicWeight (-(s + 1)) k := by
+  have hzero : ∀ k : ℕ, A.norm1 0 ≤ ((2 ^ k : ℕ) : ℝ≥0∞) := fun k => h10.trans_le zero_le
+  rcases eq_or_ne (A.norm0 u) 0 with hu0 | hu0
+  · exact ⟨fun _ => 0, hzero, fun k => by rw [sub_zero, hu0]; exact zero_le⟩
+  rcases eq_or_ne (A.norm0 u) ∞ with hut | hut
+  · refine ⟨fun _ => 0, hzero, fun k => ?_⟩
+    rw [hut, ENNReal.top_mul (ENNReal.dyadicWeight_ne_zero _ k), add_top]
+    exact le_top
+  have hE : ∀ k, A.eFunctional ((2 ^ k : ℕ) : ℝ≥0∞) u ≠ ∞ := fun k =>
+    ne_top_of_le_ne_top hut (eFunctional_le_norm0 h10 u)
+  choose b hb1 hb0 using fun k => exists_norm0_sub_le_eFunctional_add (hE k)
+    (mul_ne_zero hu0 (ENNReal.dyadicWeight_ne_zero (-(s + 1)) k))
+  exact ⟨b, hb1, hb0⟩
+
+/-- **The tolerances decrease**: `e_k = E(2^k, u) + N₀(u) 2^(-k(s+1))` decreases in `k` for
+`s ≥ -1`, since `E(t, u)` decreases in `t` and `2^(-k(s+1))` in `k`. -/
+theorem antitone_eFunctional_add_dyadicWeight {s : ℝ} (hs : -1 ≤ s) (u : U) :
+    Antitone fun k : ℕ =>
+      A.eFunctional ((2 ^ k : ℕ) : ℝ≥0∞) u + A.norm0 u * dyadicWeight (-(s + 1)) k :=
+  fun _ _ hij => add_le_add
+    (eFunctional_anti u (Nat.cast_le.2 (Nat.pow_le_pow_right two_pos hij)))
+    (mul_le_mul_right (ENNReal.dyadicWeight_anti (by linarith) hij) _)
 
 /-- The decomposition bound behind the subadditivity of the E-functional: if `N₀` satisfies the
 quasi-triangle inequality with constant `C`, `N₁` is subadditive, `N₁(b) ≤ t` and `N₁(b') ≤ s`,
@@ -493,6 +541,11 @@ theorem eNormDyadic_add_le (hA : A.IsQuasiNormed C)
         ring
     _ = eAddConst C s q * (A.eNormDyadic s q u + A.eNormDyadic s q v) := rfl
 
+/-- **The dyadic norm of `0`** is `0` if both norms vanish at `0`, since then `E(t, 0) = 0`. -/
+theorem eNormDyadic_zero (h00 : A.norm0 0 = 0) (h10 : A.norm1 0 = 0) (s : ℝ) (q : ℝ≥0∞) :
+    A.eNormDyadic s q 0 = 0 := by
+  simp [eNormDyadic, h00, eFunctional_zero_right h00 h10, ENNReal.lqNorm_zero_right]
+
 /-! ### The complexity couple -/
 
 /-- The **complexity couple** of a function `N : U → [0, ∞]` and a sequence of sets `S n`:
@@ -553,6 +606,14 @@ theorem complexity_norm1_add_le (hadd : ∀ m n, S m + S n ⊆ S (m + n)) (a b :
   ENNReal.le_iInf_add_iInf fun m n =>
     (complexity_norm1_le_of_mem (hadd m n (Set.add_mem_add m.2 n.2))).trans_eq (Nat.cast_add _ _)
 
+/-- **The complexity of an image**: for any first norms `N` on `U` and `N'` on `V`, if a map
+`T : U → V` sends every set `S n` into `S' n`, the complexity in the complexity couple of the
+sets `S'` of `T b` is at most the complexity of `b` in that of the sets `S`. -/
+theorem complexity_norm1_map_le {V : Type*} [AddCommGroup V] {N : U → ℝ≥0∞} {N' : V → ℝ≥0∞}
+    {S : ℕ → Set U} {S' : ℕ → Set V} (T : U → V) (hT : ∀ n, ∀ b ∈ S n, T b ∈ S' n) (b : U) :
+    (complexity N' S').norm1 (T b) ≤ (complexity N S).norm1 b :=
+  le_iInf fun n => complexity_norm1_le_of_mem (hT n b n.2)
+
 /-- If `S 0 = {0}`, every `b` with complexity below `1` is `0`. -/
 theorem eq_zero_of_complexity_norm1_lt_one (hS0 : S 0 = {0}) {b : U}
     (hb : (complexity N S).norm1 b < 1) : b = 0 := by
@@ -574,17 +635,22 @@ variable {V : ℕ → AddSubgroup U}
 /-- The dyadic level `0` is `{0}`. -/
 theorem dyadicLevels_zero : dyadicLevels V 0 = {0} := by simp [dyadicLevels]
 
+/-- The dyadic level `n ≥ 1` is `V_{⌊log₂ n⌋}`. -/
+theorem dyadicLevels_of_ne_zero {n : ℕ} (hn : n ≠ 0) :
+    dyadicLevels V n = (V (Nat.log 2 n) : Set U) := by
+  simp only [dyadicLevels, hn, ↓reduceIte]
+
 /-- The dyadic level `2^j` is `V_j`. -/
 theorem dyadicLevels_two_pow (j : ℕ) : dyadicLevels V (2 ^ j) = V j := by
-  have h : (2 ^ j : ℕ) ≠ 0 := pow_ne_zero j two_ne_zero
-  simp only [dyadicLevels, h, ↓reduceIte, Nat.log_pow Nat.one_lt_two]
+  rw [dyadicLevels_of_ne_zero (pow_ne_zero j two_ne_zero), Nat.log_pow Nat.one_lt_two]
 
 /-- Every dyadic level contains `0`. -/
 theorem zero_mem_dyadicLevels (n : ℕ) : (0 : U) ∈ dyadicLevels V n := by
-  unfold dyadicLevels
-  split_ifs
-  · exact Set.mem_singleton 0
-  · exact SetLike.mem_coe.2 (zero_mem _)
+  rcases eq_or_ne n 0 with rfl | hn
+  · rw [dyadicLevels_zero]
+    exact Set.mem_singleton 0
+  · rw [dyadicLevels_of_ne_zero hn]
+    exact SetLike.mem_coe.2 (zero_mem _)
 
 /-- For increasing subgroups the dyadic levels increase. -/
 theorem monotone_dyadicLevels (hV : Monotone V) : Monotone (dyadicLevels V) := by
@@ -593,18 +659,18 @@ theorem monotone_dyadicLevels (hV : Monotone V) : Monotone (dyadicLevels V) := b
   · rw [dyadicLevels_zero, Set.mem_singleton_iff] at hb
     rw [hb]
     exact zero_mem_dyadicLevels n
-  have hn : n ≠ 0 := by omega
-  simp only [dyadicLevels, hm, hn, ↓reduceIte, SetLike.mem_coe] at hb ⊢
+  rw [dyadicLevels_of_ne_zero hm, SetLike.mem_coe] at hb
+  rw [dyadicLevels_of_ne_zero (by omega : n ≠ 0), SetLike.mem_coe]
   exact hV (Nat.log_mono_right hmn) hb
 
 /-- The dyadic levels are symmetric. -/
 theorem neg_mem_dyadicLevels {n : ℕ} {b : U} (hb : b ∈ dyadicLevels V n) :
     -b ∈ dyadicLevels V n := by
-  unfold dyadicLevels at hb ⊢
-  split_ifs at hb ⊢
-  · rw [Set.mem_singleton_iff] at hb ⊢
+  rcases eq_or_ne n 0 with rfl | hn
+  · rw [dyadicLevels_zero, Set.mem_singleton_iff] at hb ⊢
     rw [hb, neg_zero]
-  · exact SetLike.mem_coe.2 (neg_mem (SetLike.mem_coe.1 hb))
+  · rw [dyadicLevels_of_ne_zero hn, SetLike.mem_coe] at hb ⊢
+    exact neg_mem hb
 
 /-- For increasing subgroups, `S m + S n ⊆ S (m + n)` for the dyadic levels. -/
 theorem dyadicLevels_add_subset (hV : Monotone V) (m n : ℕ) :
@@ -617,8 +683,9 @@ theorem dyadicLevels_add_subset (hV : Monotone V) (m n : ℕ) :
   rcases eq_or_ne n 0 with rfl | hn
   · rw [dyadicLevels_zero, Set.mem_singleton_iff] at hb
     rwa [hb, add_zero, add_zero]
-  have hmn : m + n ≠ 0 := by omega
-  simp only [dyadicLevels, hm, hn, hmn, ↓reduceIte, SetLike.mem_coe] at ha hb ⊢
+  rw [dyadicLevels_of_ne_zero hm, SetLike.mem_coe] at ha
+  rw [dyadicLevels_of_ne_zero hn, SetLike.mem_coe] at hb
+  rw [dyadicLevels_of_ne_zero (by omega : m + n ≠ 0), SetLike.mem_coe]
   exact add_mem (hV (Nat.log_mono_right (by omega)) ha) (hV (Nat.log_mono_right (by omega)) hb)
 
 /-- The **couple of an increasing sequence of subgroups** `V_0 ⊆ V_1 ⊆ ⋯` of `U` with the first
