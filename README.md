@@ -360,7 +360,11 @@ For a general scheme the project describes `A^s_q`
   `E_k(f)` be the error of best approximation of `f ∈ L_p[0, 1]` by step functions on the dyadic
   intervals of length `2^(-k)`. For `0 ≤ s < 1/p`, `‖f‖_p + ‖(2^(ks) E_k(f))_k‖_{ℓ_q} < ∞` iff
   `‖f‖_p + ‖(2^(ks) ω_1(f, 2^(-k), [0, 1])_p)_k‖_{ℓ_q} < ∞`, that is, iff `f ∈ B^s_{p,q,1}[0, 1]`
-  (`Haar.eNormDyadic_stepCouple_lt_top_iff_modulus`). For `1/p - 1 < s < 1/p`,
+  (`Haar.eNormDyadic_stepCouple_lt_top_iff_modulus`). For `p ≤ r < ∞` and `1/p - 1/r < s < 1/p`,
+  `B^s_{p,q,1}[0, 1] ⊆ L_r[0, 1]`: there is `K < ∞` with
+  `‖f‖_r ≤ K (‖f‖_p + ‖(2^(ks) E_k(f))_k‖_{ℓ_q})` for every `f ∈ L_p[0, 1]`, by the Besov
+  embedding of a scheme of functions with the Nikolskii property of dimension `1`
+  (`Haar.exists_eLpNorm_le_eNormDyadic_stepCouple`). For `1/p - 1 < s < 1/p`,
   `f ∈ B^s_{p,q,1}[0, 1]` iff `f ∈ L_1[0, 1]` and
   `|∫_0^1 f| + ‖(2^(k(s+1/2-1/p)) ‖(⟨f, h_{k,m}⟩)_{m<2^k}‖_{ℓ_p})_k‖_{ℓ_q} < ∞`
   (`Haar.lqNorm_modulus_lt_top_iff_haarCoeff_of_le_one`), and for `q < ∞` the partial sums of the
