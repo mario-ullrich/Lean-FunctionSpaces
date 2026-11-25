@@ -28,7 +28,7 @@ arbitrary measure space.
   (`MeasureTheory.Lp.enorm_zero`, `MeasureTheory.Lp.enorm_neg`), `‖f + g‖ₑ^p ≤ ‖f‖ₑ^p + ‖g‖ₑ^p`
   for `p ≤ 1` (`MeasureTheory.Lp.enorm_add_rpow_le_of_le_one`), and two approximants of one
   element are close (`MeasureTheory.Lp.enorm_sub_rpow_le_two_mul`).
-* **Limits in measure.** If `u_n → g` in measure, then
+* **Limits in measure and almost everywhere.** If `u_n → g` in measure, then
   `‖g - u_k‖_r^ρ ≤ ∑_{i ≥ 0} ‖u_{k+i+1} - u_{k+i}‖_r^ρ` with `ρ = min(1, r)`, for every
   `0 < r ≤ ∞` (`MeasureTheory.eLpNorm_sub_rpow_min_le_tsum`, from the finite telescoping sums
   `MeasureTheory.eLpNorm_sub_rpow_min_le_sum`); for `1 ≤ r` this is the triangle inequality of a
@@ -36,12 +36,21 @@ arbitrary measure space.
   (`MeasureTheory.eLpNorm_sub_rpow_le_tsum`, finite sums `MeasureTheory.eLpNorm_sub_rpow_le_sum`).
   Fatou's lemma along an almost everywhere convergent subsequence identifies the limit, and
   convergence in measure is unaffected by subtracting one function
-  (`MeasureTheory.TendstoInMeasure.sub_right`).
+  (`MeasureTheory.TendstoInMeasure.sub_right`). The same bound holds if `u_n → g` almost
+  everywhere (`MeasureTheory.eLpNorm_sub_rpow_min_le_tsum_of_ae_tendsto`).
 * **Series.** `‖∑_i g_i‖_p^ρ ≤ ∑_i ‖g_i‖_p^ρ` for countably many `g_i : α → [0, ∞]`
   (`MeasureTheory.eLpNorm_tsum_rpow_le_of_le_one`, `MeasureTheory.eLpNorm_tsum_rpow_min_le`); a
   function with finite `L_p` quasi-norm is finite almost everywhere
-  (`MeasureTheory.ae_lt_top_of_eLpNorm_ne_top`); and `∑_i ‖g_i‖_p^ρ < ∞` makes `∑_i |g_i(x)|`
-  finite for almost every `x` (`MeasureTheory.summable_norm_of_tsum_eLpNorm_rpow_min_ne_top`).
+  (`MeasureTheory.ae_lt_top_of_eLpNorm_ne_top`); `∑_i ‖g_i‖_p^c < ∞` for some `c > 0` makes every
+  `g_i` almost everywhere strongly measurable
+  (`MeasureTheory.aestronglyMeasurable_of_tsum_eLpNorm_rpow_ne_top`); and `∑_i ‖g_i‖_p^ρ < ∞`
+  makes `∑_i |g_i(x)|` finite for almost every `x`
+  (`MeasureTheory.summable_norm_of_tsum_eLpNorm_rpow_min_ne_top`). If `∑_k g_k = f` almost
+  everywhere, then `‖f - ∑_{k<n} g_k‖_p^ρ ≤ ∑_{i ≥ 0} ‖g_{n+i}‖_p^ρ`
+  (`MeasureTheory.eLpNorm_sub_sum_rpow_min_le_tsum_of_ae_hasSum`), so the partial sums converge
+  to `f` in `L_p` when `∑_k ‖g_k‖_p^ρ < ∞` (`MeasureTheory.tendsto_eLpNorm_sub_sum_of_ae_hasSum`);
+  conversely, if `∑_k ‖g_k‖_p^ρ < ∞`, an `L_p` limit of the partial sums is the almost
+  everywhere sum of the series (`MeasureTheory.ae_hasSum_of_tendsto_eLpNorm`).
 * **The sup-norm bootstrap.** Every function satisfies `|f| ≤ ‖f‖_∞` almost everywhere
   (`MeasureTheory.ae_enorm_le_eLpNorm_top`). A bound `N ≤ M ‖f‖_{p₀}`, `p₀ < ∞`, of a finite
   almost everywhere bound `N` of `|f|` gives `N ≤ M^(p₀/p) ‖f‖_p` for every `0 < p ≤ p₀`
@@ -274,6 +283,33 @@ theorem eLpNorm_sub_rpow_le_tsum {E : Type*} [SeminormedAddCommGroup E] (hr0 : r
       ∑' i, eLpNorm (u (k + i + 1) - u (k + i)) r μ ^ r.toReal := by
   simpa only [ENNReal.toReal_min_one_of_le_one hr1] using eLpNorm_sub_rpow_min_le_tsum hr0 hu hum k
 
+/-- **Fatou's lemma for telescoping sums along almost everywhere limits, `0 < r ≤ ∞`**: if
+`u_n → g` almost everywhere, with almost everywhere strongly measurable `u_n`, then, with
+`ρ = min(1, r)`, `‖g - u_k‖_r^ρ ≤ ∑_{i ≥ 0} ‖u_{k+i+1} - u_{k+i}‖_r^ρ`, on any measure space.
+The finite telescoping sums bound `‖u_{k+n} - u_k‖_r^ρ`
+(`MeasureTheory.eLpNorm_sub_rpow_min_le_sum`), and Mathlib's Fatou lemma
+`MeasureTheory.Lp.eLpNorm_le_of_ae_tendsto` passes the bound to the limit. -/
+theorem eLpNorm_sub_rpow_min_le_tsum_of_ae_tendsto {E : Type*} [SeminormedAddCommGroup E]
+    (hr0 : r ≠ 0) {u : ℕ → α → E} {g : α → E}
+    (hu : ∀ᵐ x ∂μ, Tendsto (fun n => u n x) atTop (𝓝 (g x)))
+    (hum : ∀ n, AEStronglyMeasurable (u n) μ) (k : ℕ) :
+    eLpNorm (g - u k) r μ ^ (min 1 r).toReal ≤
+      ∑' i, eLpNorm (u (k + i + 1) - u (k + i)) r μ ^ (min 1 r).toReal := by
+  have hρ : 0 < (min 1 r).toReal := ENNReal.toReal_min_one_pos hr0
+  set S := ∑' i, eLpNorm (u (k + i + 1) - u (k + i)) r μ ^ (min 1 r).toReal
+  have hk : Tendsto (fun n => k + n) atTop atTop :=
+    tendsto_atTop_mono (fun n => Nat.le_add_left n k) tendsto_id
+  have hlim : ∀ᵐ x ∂μ, Tendsto (fun n => (u (k + n) - u k) x) atTop (𝓝 ((g - u k) x)) := by
+    filter_upwards [hu] with x hx
+    exact (hx.comp hk).sub_const (u k x)
+  have hbound : ∀ n, eLpNorm (u (k + n) - u k) r μ ≤ S ^ (min 1 r).toReal⁻¹ := fun n =>
+    (ENNReal.le_rpow_inv_iff hρ).2 ((eLpNorm_sub_rpow_min_le_sum hr0 u k n).trans
+      (ENNReal.sum_le_tsum _))
+  have hg : AEStronglyMeasurable (g - u k) μ :=
+    (aestronglyMeasurable_of_tendsto_ae atTop hum hu).sub (hum k)
+  exact (ENNReal.le_rpow_inv_iff hρ).1 (Lp.eLpNorm_le_of_ae_tendsto (Eventually.of_forall hbound)
+    (fun n => (hum _).sub (hum k)) hg hlim)
+
 /-! ### Series in `L_p` -/
 
 /-- **Series in `L_p`, `0 < p ≤ 1`**: `‖∑_i g_i‖_p^p ≤ ∑_i ‖g_i‖_p^p` for countably many
@@ -346,6 +382,17 @@ theorem ae_lt_top_of_eLpNorm_ne_top {F : α → ℝ≥0∞} (hp0 : p ≠ 0) (h :
   filter_upwards [ae_lt_top' (hF.pow_const _) hint] with x hx
   exact lt_top_iff_ne_top.2 ((ENNReal.rpow_eq_top_iff_of_pos hρ).not.1 hx.ne)
 
+/-- **Summable powers of quasi-norms make every term measurable**: if `c > 0` and
+`∑_i ‖g_i‖_p^c < ∞`, then every `g_i` is almost everywhere strongly measurable, for every
+exponent `p` and any family of functions: each `‖g_i‖_p` is finite, and a function that is not
+almost everywhere strongly measurable has `‖g_i‖_p = ∞` (Mathlib's
+`aestronglyMeasurable_of_eLpNorm_ne_top`). -/
+theorem aestronglyMeasurable_of_tsum_eLpNorm_rpow_ne_top {ι ε : Type*} [TopologicalSpace ε]
+    [ENorm ε] {g : ι → α → ε} {c : ℝ} (hc : 0 < c) (h : ∑' i, eLpNorm (g i) p μ ^ c ≠ ∞)
+    (i : ι) : AEStronglyMeasurable (g i) μ :=
+  aestronglyMeasurable_of_eLpNorm_ne_top
+    ((ENNReal.rpow_eq_top_iff_of_pos hc).not.1 (ENNReal.ne_top_of_tsum_ne_top h i))
+
 /-- **Series with summable `ρ`-th powers of quasi-norms converge absolutely almost everywhere**:
 for `0 < p ≤ ∞`, `ρ = min(1, p)` and countably many functions `g_i` with values in a normed group,
 `∑_i ‖g_i‖_p^ρ < ∞` gives `∑_i |g_i(x)| < ∞` for almost every `x`. For `p ≥ 1` this is Mathlib's
@@ -357,10 +404,7 @@ theorem summable_norm_of_tsum_eLpNorm_rpow_min_ne_top {ι : Type*} [Countable ι
     (h : ∑' i, eLpNorm (g i) p μ ^ (min 1 p).toReal ≠ ∞) :
     ∀ᵐ x ∂μ, Summable fun i => ‖g i x‖ := by
   have hρ : 0 < (min 1 p).toReal := ENNReal.toReal_min_one_pos hp0
-  have hg : ∀ i, AEStronglyMeasurable (g i) μ := fun i => by
-    by_contra hgi
-    refine h (ENNReal.tsum_eq_top_of_eq_top ⟨i, ?_⟩)
-    rw [eLpNorm_of_not_aestronglyMeasurable hgi, ENNReal.top_rpow_of_pos hρ]
+  have hg := aestronglyMeasurable_of_tsum_eLpNorm_rpow_ne_top hρ h
   have he : ∀ i, eLpNorm (fun x => ‖g i x‖ₑ) p μ = eLpNorm (g i) p μ := fun i =>
     eLpNorm_enorm _ (hg i)
   have h1 := eLpNorm_tsum_rpow_min_le (μ := μ) (g := fun i x => ‖g i x‖ₑ) hp0
@@ -369,6 +413,78 @@ theorem summable_norm_of_tsum_eLpNorm_rpow_min_ne_top {ι : Type*} [Countable ι
     (ENNReal.rpow_eq_top_iff_of_pos hρ).not.1 (ne_top_of_le_ne_top h h1)
   filter_upwards [ae_lt_top_of_eLpNorm_ne_top hp0 hS] with x hx
   exact tsum_enorm_ne_top_iff_summable_norm.1 hx.ne
+
+/-- **The remainders of a series with an almost everywhere sum, `0 < p ≤ ∞`**: with
+`ρ = min(1, p)`, let `g_k` be functions with values in a normed group and `∑_k g_k(x) = f(x)` for
+almost every `x`. Then for every `n`, `‖f - ∑_{k<n} g_k‖_p^ρ ≤ ∑_{i ≥ 0} ‖g_{n+i}‖_p^ρ`, on any
+measure space. If the right side is finite, the `g_{n+i}` are almost everywhere strongly
+measurable (`MeasureTheory.aestronglyMeasurable_of_tsum_eLpNorm_rpow_ne_top`), the partial sums
+`v_m = ∑_{i<m} g_{n+i}` of the remainder series converge to `f - ∑_{k<n} g_k` almost everywhere
+(Mathlib's `hasSum_nat_add_iff'`), and Fatou's lemma for telescoping sums
+(`MeasureTheory.eLpNorm_sub_rpow_min_le_tsum_of_ae_tendsto`) with `v_{i+1} - v_i = g_{n+i}`
+gives the bound. -/
+theorem eLpNorm_sub_sum_rpow_min_le_tsum_of_ae_hasSum {E : Type*} [NormedAddCommGroup E]
+    (hp0 : p ≠ 0) {g : ℕ → α → E} {f : α → E}
+    (hfg : ∀ᵐ x ∂μ, HasSum (fun k => g k x) (f x)) (n : ℕ) :
+    eLpNorm (f - ∑ k ∈ Finset.range n, g k) p μ ^ (min 1 p).toReal ≤
+      ∑' i, eLpNorm (g (n + i)) p μ ^ (min 1 p).toReal := by
+  have hρ : 0 < (min 1 p).toReal := ENNReal.toReal_min_one_pos hp0
+  rcases eq_or_ne (∑' i, eLpNorm (g (n + i)) p μ ^ (min 1 p).toReal) ∞ with h | h
+  · rw [h]
+    exact le_top
+  have hg := aestronglyMeasurable_of_tsum_eLpNorm_rpow_ne_top hρ h
+  set v : ℕ → α → E := fun m => ∑ i ∈ Finset.range m, g (n + i) with hv
+  have hvm : ∀ m, AEStronglyMeasurable (v m) μ := fun m =>
+    Finset.aestronglyMeasurable_sum _ fun i _ => hg i
+  have hconv : ∀ᵐ x ∂μ,
+      Tendsto (fun m => v m x) atTop (𝓝 ((f - ∑ k ∈ Finset.range n, g k) x)) := by
+    filter_upwards [hfg] with x hx
+    have h' := ((hasSum_nat_add_iff' n).2 hx).tendsto_sum_nat
+    simpa only [hv, Finset.sum_apply, Pi.sub_apply, Nat.add_comm _ n] using h'
+  have h1 := eLpNorm_sub_rpow_min_le_tsum_of_ae_tendsto hp0 hconv hvm 0
+  simpa only [hv, zero_add, Finset.sum_range_zero, sub_zero, Finset.sum_range_succ,
+    add_sub_cancel_left] using h1
+
+/-- **The partial sums of a series with an almost everywhere sum converge in `L_p`,
+`0 < p ≤ ∞`**: with `ρ = min(1, p)`, let `g_k` be functions with values in a normed group,
+`∑_k g_k(x) = f(x)` for almost every `x`, and `∑_k ‖g_k‖_p^ρ < ∞`. Then
+`‖f - ∑_{k<n} g_k‖_p → 0`: the `ρ`-th powers are at most the tails `∑_{i ≥ 0} ‖g_{n+i}‖_p^ρ` of a
+convergent series (`MeasureTheory.eLpNorm_sub_sum_rpow_min_le_tsum_of_ae_hasSum`). -/
+theorem tendsto_eLpNorm_sub_sum_of_ae_hasSum {E : Type*} [NormedAddCommGroup E] (hp0 : p ≠ 0)
+    {g : ℕ → α → E} {f : α → E} (hfg : ∀ᵐ x ∂μ, HasSum (fun k => g k x) (f x))
+    (hρ : ∑' k, eLpNorm (g k) p μ ^ (min 1 p).toReal ≠ ∞) :
+    Tendsto (fun n => eLpNorm (f - ∑ k ∈ Finset.range n, g k) p μ) atTop (𝓝 0) := by
+  have hρ0 : 0 < (min 1 p).toReal := ENNReal.toReal_min_one_pos hp0
+  have htail : Tendsto (fun n => ∑' i, eLpNorm (g (n + i)) p μ ^ (min 1 p).toReal) atTop
+      (𝓝 0) :=
+    (ENNReal.tendsto_sum_nat_add _ hρ).congr fun n => tsum_congr fun i => by rw [Nat.add_comm i n]
+  have hpow : Tendsto (fun n => eLpNorm (f - ∑ k ∈ Finset.range n, g k) p μ ^ (min 1 p).toReal)
+      atTop (𝓝 0) :=
+    tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds htail (fun _ => zero_le)
+      (eLpNorm_sub_sum_rpow_min_le_tsum_of_ae_hasSum hp0 hfg)
+  have h := ((ENNReal.continuous_rpow_const (y := (min 1 p).toReal⁻¹)).tendsto 0).comp hpow
+  simpa only [Function.comp_def, ENNReal.rpow_rpow_inv hρ0.ne',
+    ENNReal.zero_rpow_of_pos (inv_pos.2 hρ0)] using h
+
+/-- **An `L_p` limit of the partial sums is the almost everywhere sum, `0 < p ≤ ∞`**: with
+`ρ = min(1, p)`, let `g_k` be functions with values in a normed group with
+`∑_k ‖g_k‖_p^ρ < ∞`, and let `‖f - ∑_{k<n} g_k‖_p → 0`. Then `∑_k g_k(x) = f(x)` for almost every
+`x`. The series converges absolutely almost everywhere
+(`MeasureTheory.summable_norm_of_tsum_eLpNorm_rpow_min_ne_top`), the partial sums converge to `f`
+in measure (Mathlib's `tendstoInMeasure_of_tendsto_eLpNorm`) and along a subsequence almost
+everywhere (Mathlib's `TendstoInMeasure.exists_seq_tendsto_ae`), and an absolutely convergent
+series converges to the limit of any subsequence of its partial sums (Mathlib's
+`hasSum_of_subseq_of_summable`). -/
+theorem ae_hasSum_of_tendsto_eLpNorm {E : Type*} [NormedAddCommGroup E] (hp0 : p ≠ 0)
+    {g : ℕ → α → E} {f : α → E} (hρ : ∑' k, eLpNorm (g k) p μ ^ (min 1 p).toReal ≠ ∞)
+    (hlim : Tendsto (fun n => eLpNorm (f - ∑ k ∈ Finset.range n, g k) p μ) atTop (𝓝 0)) :
+    ∀ᵐ x ∂μ, HasSum (fun k => g k x) (f x) := by
+  have hmeas : TendstoInMeasure μ (fun n => ∑ k ∈ Finset.range n, g k) atTop f :=
+    tendstoInMeasure_of_tendsto_eLpNorm hp0 (hlim.congr fun n => eLpNorm_sub_comm _ _ _ _)
+  obtain ⟨ns, hns, hae⟩ := hmeas.exists_seq_tendsto_ae
+  filter_upwards [summable_norm_of_tsum_eLpNorm_rpow_min_ne_top hp0 hρ, hae] with x hx hxs
+  exact hasSum_of_subseq_of_summable hx (tendsto_finset_range.comp hns.tendsto_atTop)
+    (by simpa only [Finset.sum_apply, Function.comp_def] using hxs)
 
 /-! ### The sup-norm bootstrap -/
 

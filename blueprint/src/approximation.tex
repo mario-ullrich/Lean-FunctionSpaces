@@ -5074,16 +5074,16 @@ For $0 < p < 1$ the quasi-norm $\|f\|_p = (\int |f|^p \, d\mu)^{1/p}$ satisfies 
 $\|f + g\|_p^p \leq \|f\|_p^p + \|g\|_p^p$. With $\rho = \min(1, p)$, one inequality covers
 every exponent (\Cref{lem:lp-quasi-triangle}). Mathlib provides the metric and the completeness
 of $L_p$ only for $p \geq 1$; here limits are identified through convergence in measure and
-Fatou's lemma (\Cref{lem:limit-telescoping,lem:lp-series-every-exponent}), and $L_p$ enters as
-an abelian group with its quasi-norm, which is all that the couples of \Cref{sec:e-functional}
-need. On $[0, 1]$ with Lebesgue measure, the only continuous linear functional on $L_p$,
-$p < 1$, is $0$~\cite{Day1940}, so $L_p$ has no bounded linear projections onto nonzero
-finite-dimensional subspaces; near-best approximants take their place
-(\Cref{lem:near-best-transfer}). The inclusions between
-the $L_p$ hold for every exponent (\Cref{lem:inclusion-linear}), and for an essentially bounded
-function a bound of the supremum by one $L_{p_0}$ quasi-norm, $p_0 < \infty$, gives one by every
-$L_p$ quasi-norm with $0 < p \leq p_0$, and with it bounds of every $\|f\|_r$,
-$p \leq r \leq \infty$ (\Cref{lem:sup-bound-exponents}).
+Fatou's lemma (\Cref{lem:limit-telescoping,lem:lp-series-every-exponent,lem:lp-block-series}),
+and $L_p$ enters as an abelian group with its quasi-norm, which is all that the couples of
+\Cref{sec:e-functional} need. On $[0, 1]$ with Lebesgue measure, the only continuous linear
+functional on $L_p$, $p < 1$, is $0$~\cite{Day1940}, so $L_p$ has no bounded linear projections
+onto nonzero finite-dimensional subspaces; near-best approximants take their place
+(\Cref{lem:near-best-transfer}). The inclusions between the $L_p$ hold for every exponent
+(\Cref{lem:inclusion-linear}), and for an essentially bounded function a bound of the supremum by
+one $L_{p_0}$ quasi-norm, $p_0 < \infty$, gives one by every $L_p$ quasi-norm with
+$0 < p \leq p_0$, and with it bounds of every $\|f\|_r$, $p \leq r \leq \infty$
+(\Cref{lem:sup-bound-exponents}).
 
 \begin{lemma}[The $\rho$-triangle inequality]
 \label{lem:lp-quasi-triangle}
@@ -5107,14 +5107,15 @@ $L_p(\mu)$. Both are the triangle inequality of Mathlib's inhomogeneous quasi-no
 \texttt{inhmgELpNorm}, which equals $\|f\|_p^\rho$.
 \end{proof}
 
-\begin{lemma}[Limits in measure of telescoping sums]
+\begin{lemma}[Limits of telescoping sums]
 \label{lem:limit-telescoping}
 \lean{MeasureTheory.eLpNorm_sub_rpow_min_le_sum, MeasureTheory.eLpNorm_sub_rpow_min_le_tsum,
-  MeasureTheory.eLpNorm_sub_le_tsum, MeasureTheory.TendstoInMeasure.sub_right}
+  MeasureTheory.eLpNorm_sub_le_tsum, MeasureTheory.TendstoInMeasure.sub_right,
+  MeasureTheory.eLpNorm_sub_rpow_min_le_tsum_of_ae_tendsto}
 \leanok
 Let $\mu$ be a measure, $0 < r \leq \infty$ and $\rho = \min(1, r)$, and let $u_0, u_1, \dots$
 be almost everywhere strongly measurable functions with values in a normed group that converge
-in measure to a function $g$. Then for every $k \in \N$
+in measure or almost everywhere to a function $g$. Then for every $k \in \N$
 \[
   \|g - u_k\|_{L_r(\mu)}^\rho \leq \sum_{i=0}^\infty \|u_{k+i+1} - u_{k+i}\|_{L_r(\mu)}^\rho .
 \]
@@ -5128,14 +5129,18 @@ $\|u_{k+n} - u_k\|_r^\rho \leq \sum_{i<n} \|u_{k+i+1} - u_{k+i}\|_r^\rho$ for ev
 functions $u_{k+n} - u_k$ converge in measure to $g - u_k$, since subtracting one function from
 every term and from the limit preserves convergence in measure, and a bound of their $L_r$
 quasi-norms passes to the limit in measure (Mathlib's \texttt{eLpNorm\_\allowbreak
-le\_\allowbreak of\_\allowbreak tendstoInMeasure}), also for $r = \infty$.
+le\_\allowbreak of\_\allowbreak tendstoInMeasure}), also for $r = \infty$. If the $u_n$ converge
+to $g$ almost everywhere, so do the $u_{k+n} - u_k$ to $g - u_k$, and Fatou's lemma (Mathlib's
+\texttt{Lp.\allowbreak eLpNorm\_\allowbreak le\_\allowbreak of\_\allowbreak ae\_\allowbreak
+tendsto}) passes the bound to the limit.
 \end{proof}
 
 \begin{lemma}[Series in $L_p$]
 \label{lem:lp-series-every-exponent}
 \lean{MeasureTheory.eLpNorm_tsum_rpow_le_of_le_one, MeasureTheory.eLpNorm_tsum_rpow_min_le,
   MeasureTheory.ae_lt_top_of_eLpNorm_ne_top,
-  MeasureTheory.summable_norm_of_tsum_eLpNorm_rpow_min_ne_top}
+  MeasureTheory.summable_norm_of_tsum_eLpNorm_rpow_min_ne_top,
+  MeasureTheory.aestronglyMeasurable_of_tsum_eLpNorm_rpow_ne_top}
 \leanok
 Let $\mu$ be a measure on $\Omega$, let $0 < p \leq \infty$ and $\rho = \min(1, p)$, and let $I$
 be a countable set.
@@ -5147,6 +5152,9 @@ be a countable set.
   \item For every family of functions $g_i$, $i \in I$, with values in a normed group and
     $\sum_{i \in I} \|g_i\|_p^\rho < \infty$, the series $\sum_{i \in I} |g_i(x)|$ converges for
     almost every $x \in \Omega$.
+  \item For every family of functions $g_i$, $i \in I$, with values in a normed group or in
+    $[0, \infty]$ and $\sum_{i \in I} \|g_i\|_p^c < \infty$ for some $c > 0$, every $g_i$ is
+    almost everywhere strongly measurable.
 \end{enumerate}
 \end{lemma}
 
@@ -5157,11 +5165,51 @@ be a countable set.
 for $p \leq 1$, $(\sum_i g_i)^p \leq \sum_i g_i^p$ pointwise, and integrating term by term gives
 the claim; for $p \geq 1$ it is \Cref{lem:lp-series-minkowski}. (2) For $p < \infty$,
 $\int F^p \, d\mu < \infty$; for $p = \infty$, $F \leq \|F\|_\infty$ almost everywhere.
-(3) A function with $\|g_i\|_p < \infty$ is almost everywhere measurable, so (1) for the
-functions $|g_i|$ and (2) apply to $\sum_i |g_i|$. For $p \geq 1$ this is Mathlib's
+(3) By (4) the $g_i$ are almost everywhere strongly measurable, so (1) for the functions $|g_i|$
+and (2) apply to $\sum_i |g_i|$. For $p \geq 1$ this is Mathlib's
 \texttt{summable\_\allowbreak norm\_\allowbreak of\_\allowbreak tsum\_\allowbreak
-eLpNorm\_\allowbreak ne\_\allowbreak top}.
+eLpNorm\_\allowbreak ne\_\allowbreak top}. (4) Every $\|g_i\|_p$ is finite, and a function that
+is not almost everywhere strongly measurable has $L_p$ quasi-norm $\infty$.
 \end{proof}
+
+\begin{lemma}[Series with an almost everywhere sum]
+\label{lem:lp-block-series}
+\lean{MeasureTheory.eLpNorm_sub_sum_rpow_min_le_tsum_of_ae_hasSum,
+  MeasureTheory.tendsto_eLpNorm_sub_sum_of_ae_hasSum, MeasureTheory.ae_hasSum_of_tendsto_eLpNorm}
+\leanok
+Let $\mu$ be a measure on $\Omega$, let $0 < p \leq \infty$ and $\rho = \min(1, p)$, and let
+$f, g_0, g_1, \dots$ be functions on $\Omega$ with values in a normed group $E$.
+\begin{enumerate}
+  \item Let $\sum_k g_k(x) = f(x)$ for almost every $x \in \Omega$. Then for every $n \in \N$
+    \[
+      \Bigl\| f - \sum_{k<n} g_k \Bigr\|_p^\rho \leq \sum_{i=0}^\infty \|g_{n+i}\|_p^\rho ,
+    \]
+    and if $\sum_k \|g_k\|_p^\rho < \infty$, then $\bigl\| f - \sum_{k<n} g_k \bigr\|_p \to 0$ as
+    $n \to \infty$.
+  \item Let $\sum_k \|g_k\|_p^\rho < \infty$ and $\bigl\| f - \sum_{k<n} g_k \bigr\|_p \to 0$ as
+    $n \to \infty$. Then $\sum_k g_k(x) = f(x)$ for almost every $x \in \Omega$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:limit-telescoping, lem:lp-series-every-exponent}
+(1) If the right side is infinite, there is nothing to prove. Otherwise the $g_{n+i}$ are almost
+everywhere strongly measurable by \Cref{lem:lp-series-every-exponent}(4). The partial sums
+$v_m = \sum_{i<m} g_{n+i}$ of the remainder series converge to $f - \sum_{k<n} g_k$ almost
+everywhere as $m \to \infty$, and $v_{i+1} - v_i = g_{n+i}$, so \Cref{lem:limit-telescoping}
+with $k = 0$ and $v_0 = 0$ gives the bound. If $\sum_k \|g_k\|_p^\rho < \infty$, the tails
+$\sum_{i \geq 0} \|g_{n+i}\|_p^\rho$ tend to $0$. (2) By \Cref{lem:lp-series-every-exponent}(3)
+the series $\sum_k |g_k(x)|$ converges for almost every $x$. Convergence in $L_p$ implies
+convergence in measure, so a subsequence of the partial sums converges to $f$ almost everywhere.
+An absolutely convergent series converges to the limit of any subsequence of its partial sums,
+since its partial sums form a Cauchy sequence (Mathlib's \texttt{hasSum\_\allowbreak
+of\_\allowbreak subseq\_\allowbreak of\_\allowbreak summable}).
+\end{proof}
+
+Both parts hold for every measure $\mu$. Part (1) gives the convergence in $L_p$ of a series whose
+almost everywhere sum is known, without completeness of $L_p$; part (2) identifies the almost
+everywhere sum of a series that converges in $L_p$, for values in every normed group $E$.
 
 \begin{lemma}[Supremum bounds at different exponents]
 \label{lem:sup-bound-exponents}
@@ -5787,6 +5835,121 @@ The proof of (1) needs $s > \alpha$, where Hardy's constant $H_{(s-\alpha)\rho_r
 finite. \cite[Theorem~7.1]{DeVorePopovTAMS} proves the second bound of (1) at $s = \alpha$ for
 the Besov spaces of the unit cube in $\R^d$, with the third index equal to the integrability
 exponent: $\Besov{\alpha}{p}{p} \subseteq L_r$ for $0 < r < \infty$ and $\alpha = d(1/p - 1/r) > 0$.
+
+\section{Block decompositions of Besov spaces}
+\label{sec:besov-blocks}
+
+For the couple of a scheme of functions in $L_p$, the block decompositions of
+\Cref{sec:e-block-decompositions} consist of classes of essentially bounded approximants, and
+for a series of finite size, $\|(2^{ks} \|g_k\|_p)_k\|_{\ell_q} < \infty$ with $s > 0$, the
+convergence of its partial sums in $L_p$ follows from convergence almost everywhere
+(\Cref{lem:weighted-tails}(5), \Cref{lem:lp-block-series}). The blocks of a sequence
+$(b_k)_k$ are $g_0 = 0$, $g_1 = b_0$ and $g_{k+2} = b_{k+1} - b_k$
+(\Cref{def:e-block-decomposition}).
+
+\begin{lemma}[Blocks of approximants]
+\label{lem:besov-blocks-approximants}
+\lean{ApproximationScheme.nearBestBlocks_mem, FunctionScheme.lpCouple_norm0_topInclusion,
+  FunctionScheme.lpCouple_norm0_sub_sum_topInclusion}
+\leanok
+\uses{def:scheme, def:e-block-decomposition, def:scheme-lp-couple}
+\begin{enumerate}
+  \item Let $A$ be an approximation scheme in a normed space and $b_k \in A_{2^k}$ for every
+    $k \in \N$. Then the blocks $g_k$ of $(b_k)_k$ satisfy $g_k \in A_{2^k}$ for every $k$.
+  \item Let $S$ be a scheme of functions, $0 < p \leq \infty$, let $N_0$ be the quasi-norm of the
+    couple of $S$ in $L_p$, and let $f \in L_p$ and $g_0, g_1, \dots \in L_\infty$. Then
+    $N_0(\iota_{\infty,p} g_k) = \|g_k\|_p$ for every $k \in \N$ and
+    $N_0\bigl(f - \sum_{k<n} \iota_{\infty,p} g_k\bigr) = \bigl\|f - \sum_{k<n} g_k\bigr\|_p$
+    for every $n \in \N$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:scheme-basic, lem:inclusion-linear}
+(1) $g_0 = 0 \in A_1$, $g_1 = b_0 \in A_1 \subseteq A_2$, and $b_{k+1} - b_k \in A_{2^{k+2}}$ by
+(5) of \Cref{lem:scheme-basic}. (2) The inclusion $\iota_{\infty,p}$ keeps every function almost
+everywhere, so $\|\iota_{\infty,p} a\|_p = \|a\|_p$ for every $a \in L_\infty$. It is linear, so
+$\sum_{k<n} \iota_{\infty,p} g_k = \iota_{\infty,p} \sum_{k<n} g_k$, and
+$\|f - \iota_{\infty,p} a\|_p = \|f - a\|_p$ for every $a \in L_\infty$
+(\Cref{lem:inclusion-linear}).
+\end{proof}
+
+For dyadic splines on the unit cube of $\R^d$, the next theorem
+is~\cite[Theorem~5.1 and Corollary~5.3]{DeVorePopovTAMS}, with series that converge in $L_p$.
+
+\begin{theorem}[Block decompositions of Besov spaces]
+\label{thm:besov-blocks}
+\lean{FunctionScheme.tendsto_eLpNorm_sub_sum_of_blocks, FunctionScheme.eNormDyadic_le_of_blocks,
+  FunctionScheme.exists_blocks_of_memBesov, FunctionScheme.memBesov_iff_exists_blocks}
+\leanok
+\uses{def:besov, def:function-scheme, def:scheme-lp-couple, def:e-method, lem:lq-quasi-triangle,
+  lem:lq-reindex, lem:hardy-every-exponent}
+Let $S$ be a scheme of functions, $0 < p \leq \infty$, $\rho = \min(1, p)$, $s > 0$ and
+$q \in (0, \infty]$, with $q/\rho = \infty$ for $q = \infty$. Let $C_q$ be the constant of
+\Cref{lem:lq-quasi-triangle}, $\gamma_{1,q}$ that of \Cref{lem:lq-reindex} and $H_{\alpha, r}$
+that of \Cref{lem:hardy-every-exponent}, let
+$K = C_q^3 \, 2^{1/\rho} \, 2^s (1 + 2^s) (1 + \gamma_{1,q})$, and for $f \in L_p$ let
+$\|f\|^{\mathrm{dy}}_{s,q} = \|f\|_p + \|(2^{ks} E_{2^k}(f)_p)_k\|_{\ell_q}$ be the dyadic norm
+(\Cref{def:e-method}) of the couple of $S$ in $L_p$ (\Cref{def:scheme-lp-couple}).
+\begin{enumerate}
+  \item Let $f \in L_p$ and $g_0, g_1, \dots \in L_\infty$ with
+    $\sum_k g_k(x) = f(x)$ for almost every $x \in \Omega$ and
+    $\|(2^{ks} \|g_k\|_p)_k\|_{\ell_q} < \infty$. Then $\bigl\|f - \sum_{k<n} g_k\bigr\|_p \to 0$
+    as $n \to \infty$, and the partial sums $\sum_{k<n} g_k$ converge to $f$ in measure.
+  \item Let $f \in L_p$ and $g_k \in S_{2^k}$, $k \in \N$, with
+    $\sum_k g_k(x) = f(x)$ for almost every $x \in \Omega$. Then
+    \[
+      \|f\|^{\mathrm{dy}}_{s,q} \leq 2 \, H_{s\rho, q/\rho}^{1/\rho} \,
+      \|(2^{ks} \|g_k\|_p)_k\|_{\ell_q} .
+    \]
+  \item For every $f \in \Besov{s}{p}{q}$ there are $g_k \in S_{2^k}$, $k \in \N$, with
+    $\sum_k g_k(x) = f(x)$ for almost every $x \in \Omega$,
+    $\bigl\|f - \sum_{k<n} g_k\bigr\|_p \to 0$ as $n \to \infty$, $\sum_{k<n} g_k \to f$ in
+    measure, and $\|(2^{ks} \|g_k\|_p)_k\|_{\ell_q} \leq K \, \|f\|^{\mathrm{dy}}_{s,q}$.
+  \item A function $f \in L_p$ lies in $\Besov{s}{p}{q}$ if and only if there are
+    $g_k \in S_{2^k}$, $k \in \N$, with $\sum_k g_k(x) = f(x)$ for almost every
+    $x \in \Omega$ and $\|(2^{ks} \|g_k\|_p)_k\|_{\ell_q} < \infty$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{lem:besov-blocks-approximants, thm:e-block-decomposition, lem:e-block-partial-sums,
+  lem:e-near-best, lem:lp-block-series, lem:scheme-lp-couple, lem:besov-linear,
+  lem:weighted-tails}
+By \Cref{lem:scheme-lp-couple} the couple of $S$ in $L_p$ is quasi-normed, its complexity $N_1$
+is subadditive, $N_0(f + g)^\rho \leq N_0(f)^\rho + N_0(g)^\rho$ for all $f, g \in L_p$, and
+$N_1(b) \leq n$ if and only if $b = \iota_{\infty,p} a$ for some $a \in S_n$. (1) By (5) of
+\Cref{lem:weighted-tails}, $\sum_k \|g_k\|_p^\rho < \infty$, so \Cref{lem:lp-block-series}(1)
+gives the convergence in $L_p$, and convergence in $L_p$ implies convergence in measure. (2) If
+the right side is infinite, there is nothing to prove. Otherwise, by (1) and
+\Cref{lem:besov-blocks-approximants}(2), the classes $\iota_{\infty,p} g_k$ form a block
+decomposition of $f$ in the couple, with $N_0(\iota_{\infty,p} g_k) = \|g_k\|_p$, and
+\Cref{thm:e-block-decomposition}(2) applies. (3) By \Cref{lem:besov-linear}(2),
+$\|f\|^{\mathrm{dy}}_{s,q} < \infty$. By (4) of \Cref{lem:e-near-best} there are $b_k \in L_p$
+with $N_1(b_k) \leq 2^k$, so $b_k = \iota_{\infty,p} a_k$ with $a_k \in S_{2^k}$, and a
+decreasing sequence $(e_k)_k$ with $N_0(f - b_k) \leq e_k$, $N_0(f) \leq e_0$ and
+$\|(2^{ks} e_k)_k\|_{\ell_q} \leq C_q (1 + \gamma_{1,q}) \|f\|^{\mathrm{dy}}_{s,q}$. Let $g_k$ be
+the blocks of $(a_k)_k$. Then $g_k \in S_{2^k}$ by \Cref{lem:besov-blocks-approximants}(1), the
+blocks of $(b_k)_k$ are the $\iota_{\infty,p} g_k$ (\Cref{lem:e-block-partial-sums}(1)), and
+\Cref{thm:e-block-decomposition}(1) gives the bound by $K$. As $s > 0$, $e_k \to 0$
+(\Cref{lem:weighted-tails}(1)), so $N_0(f - b_k) \to 0$; the partial sums of the
+$\iota_{\infty,p} g_j$ converge to $f$ in $N_0$ (\Cref{lem:e-block-partial-sums}(1)), and
+$\bigl\|f - \sum_{j<n} g_j\bigr\|_p \to 0$ by \Cref{lem:besov-blocks-approximants}(2). The bound
+by $K$ and (5) of \Cref{lem:weighted-tails} give $\sum_k \|g_k\|_p^\rho < \infty$, so
+\Cref{lem:lp-block-series}(2) gives the almost everywhere sum, and (1) the convergence in
+measure. (4) By \Cref{lem:besov-linear}(2), $f \in \Besov{s}{p}{q}$ if and only if
+$\|f\|^{\mathrm{dy}}_{s,q} < \infty$; (3) and (2) give the two directions, since $K$ and
+$H_{s\rho, q/\rho}$ are finite for $s > 0$.
+\end{proof}
+
+By (1), the partial sums of every series of essentially bounded functions with almost
+everywhere sum $f$ and $\|(2^{ks} \|g_k\|_p)_k\|_{\ell_q} < \infty$ converge to $f$ in $L_p$ and
+in measure, whether or not the $g_k$ are approximants. \cite[Corollary~5.3]{DeVorePopovTAMS}
+expands every block of a dyadic spline decomposition in the $B$-splines of its level, which
+gives an atomic decomposition of $\Besov{s}{p}{q}$ also for $p < 1$; Haar and wavelet
+expansions with $p < 1$ expand the blocks in the same way.
 
 \section{Interpolation of Besov spaces}
 \label{sec:besov-interpolation}
