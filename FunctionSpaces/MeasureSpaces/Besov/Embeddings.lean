@@ -19,7 +19,8 @@ Then, for every `0 < q ≤ ∞`:
   `s > α` there is `K < ∞` such that every `f ∈ L_p` whose dyadic norm `‖f‖^dy_{s,q}` in the
   couple of `S` in `L_p` (`FunctionScheme.lpCouple`) is finite is the inclusion of some
   `g ∈ L_r`, with `‖g‖^dy_{s-α,q} ≤ K ‖f‖^dy_{s,q}` for the dyadic norm in the couple of `S` in
-  `L_r`;
+  `L_r`, and so `‖f‖_r ≤ K' ‖f‖^dy_{s,q}` for every `f ∈ L_p`
+  (`exists_eLpNorm_le_eNormDyadic_of_nikolskii`);
 * **the Besov embedding** (`MemBesov.exists_inclusion_eq_of_nikolskii`): for `s > α`, every
   `f ∈ B^s_{p,q}` lies in `L_r` and belongs to `B^{s - α}_{r,q}`;
 * **into `L_∞`** (`MemBesov.exists_inclusion_eq_top`, the case `r = ∞`, `α = D/p`): for
@@ -30,19 +31,21 @@ Then, for every `0 < q ≤ ∞`:
   bounded continuous representative.
 
 **The norm bound for every `0 < p ≤ r ≤ ∞`.** Mathlib makes `Lp` a normed group for `p ≥ 1`
-only; for `p < 1` the function `‖·‖_p` is a quasi-norm, and for a non-atomic `μ` the only
-bounded linear functional on `L_p(μ)` is `0` (Day 1940), so the only bounded linear projection
-with finite-dimensional range is `0`. The proof therefore sums the blocks of near-best
-approximants with the `ρ`-triangle inequality and a Nikolskii inequality, as in the proof of
-DeVore–Popov 1988, Theorem 7.1, and identifies the limit through convergence in measure.
-Near-best approximants `b_k ∈ S_{2^k}` with `‖f - b_k‖_p ≤ e_k = E(2^k, f) + ‖f‖_p 2^(-k(s+1))`
-(`FunctionScheme.exists_nearBest_lpCouple`) have blocks `b_{k+1} - b_k ∈ S_{2^(k+2)}`, on which
-the Nikolskii inequality gives `‖b_{k+1} - b_k‖_r ≤ C 2^(2α) 2^(kα) ‖b_{k+1} - b_k‖_p`
-(`eLpNorm_sub_succ_le_of_nikolskii`). The transfer of near-best sequences and Hardy's inequality
-for tails bound `‖(2^(k(s-α)) ‖f - b_k‖_r)_k‖_{ℓ_q}` by `‖(2^(ks) e_k)_k‖_{ℓ_q}`, for functions
-on any measure space (`MeasureTheory.lqNorm_eLpNorm_sub_le_of_nearBest`). Since `b_k ∈ S_{2^k}`,
-the error of best approximation of `f` in `L_r` at `2^k` is at most `‖f - b_k‖_r`, which gives
-`f ∈ L_r` and the bound (`exists_inclusion_eq_eNormDyadic_le`,
+only; for `p < 1` the function `‖·‖_p` is a quasi-norm, and `L_p[0, 1]` has no nonzero
+continuous linear functional (Day 1940, see `FunctionSpaces.Analysis.Lp.QuasiNorm`), so near-best
+approximants take the role of bounded linear projections onto the approximants. The proof
+therefore sums the blocks of near-best approximants with the `ρ`-triangle inequality and a
+Nikolskii inequality, as in the proof of DeVore–Popov 1988, Theorem 7.1, and identifies the limit
+through convergence in measure. Near-best approximants `b_k ∈ S_{2^k}` with
+`‖f - b_k‖_p ≤ e_k = E(2^k, f) + ‖f‖_p 2^(-k(s+1))` (`FunctionScheme.exists_nearBest_lpCouple`)
+have blocks `b_{k+1} - b_k ∈ S_{2^(k+2)}`, on which the Nikolskii inequality gives
+`‖b_{k+1} - b_k‖_r ≤ C 2^(2α) 2^(kα) ‖b_{k+1} - b_k‖_p`
+(`FunctionScheme.eLpNorm_sub_succ_le_of_nikolskii`). The transfer of near-best sequences and
+Hardy's inequality for tails bound `‖(2^(k(s-α)) ‖f - b_k‖_r)_k‖_{ℓ_q}` by
+`‖(2^(ks) e_k)_k‖_{ℓ_q}`, for functions on any measure space
+(`MeasureTheory.lqNorm_eLpNorm_sub_le_of_nearBest`). Since `b_k ∈ S_{2^k}`, the error of best
+approximation of `f` in `L_r` at `2^k` is at most `‖f - b_k‖_r`, which gives `f ∈ L_r` and the
+bound (`FunctionScheme.exists_inclusion_eq_eNormDyadic_le`,
 `exists_inclusion_eq_eNormDyadic_le_of_nearBest`, with the constant `nikolskiiTransferConst`).
 
 **The Besov spaces.** For smoothness `s ≥ 0` the Besov space `B^s_{p,q}` consists of the `f`
@@ -63,51 +66,6 @@ The limiting case `s = α` is not covered: the proof of the norm bound needs Har
 open MeasureTheory Filter Topology
 open scoped ENNReal BoundedContinuousFunction
 open ENNReal (lqNorm dyadicWeight LpAddConst dyadicGeomConst hardyConst)
-
-/-! ### Near-best sequences in weighted `ℓ_q` -/
-
-namespace MeasureTheory
-
-variable {α E : Type*} [MeasurableSpace α] {μ : Measure α} [NormedAddCommGroup E] {p r : ℝ≥0∞}
-
-/-- **Near-best sequences in weighted `ℓ_q`, `0 < p, r ≤ ∞`**: let `ρ_p = min(1, p)`,
-`ρ_r = min(1, r)`, and let `b_k` be almost everywhere strongly measurable functions with
-`‖f - b_k‖_p ≤ e_k`, where `e` decreases to `0`, and blocks with
-`‖b_{k+1} - b_k‖_r ≤ C 2^(kβ) ‖b_{k+1} - b_k‖_p`. Then for every `s ∈ ℝ` and every `q`,
-`‖(2^(k(s-β)) ‖f - b_k‖_r)_k‖_{ℓ_q} ≤ C 2^(1/ρ_p) H^(1/ρ_r) ‖(2^(ks) e_k)_k‖_{ℓ_q}` with Hardy's
-constant `H = hardyConst ((s - β) ρ_r) (q/ρ_r)`, finite for `s > β`. The transfer of near-best
-sequences (`MeasureTheory.eLpNorm_sub_rpow_min_le_tsum_of_nearBest`) bounds
-`‖f - b_k‖_r^(ρ_r)` by a tail of `(2^(jβ) e_j)^(ρ_r)`, the tail inequality in `ρ_r`-th powers
-(`ENNReal.lqNorm_rpow_le_of_rpow_le_tsum`) turns this into a bound of the `ρ_r`-th power of the
-left side, and `2^(k(s-β)) 2^(kβ) = 2^(ks)`. -/
-theorem lqNorm_eLpNorm_sub_le_of_nearBest (hp0 : p ≠ 0) (hr0 : r ≠ 0) {f : α → E}
-    {b : ℕ → α → E} {e : ℕ → ℝ≥0∞} {β : ℝ} {C : ℝ≥0∞}
-    (hb : ∀ k, AEStronglyMeasurable (b k) μ) (hbe : ∀ k, eLpNorm (f - b k) p μ ≤ e k)
-    (he : Antitone e) (he0 : Tendsto e atTop (𝓝 0))
-    (hN : ∀ k, eLpNorm (b (k + 1) - b k) r μ ≤
-      C * dyadicWeight β k * eLpNorm (b (k + 1) - b k) p μ) (s : ℝ) (q : ℝ≥0∞) :
-    lqNorm q (fun k => dyadicWeight (s - β) k * eLpNorm (f - b k) r μ) ≤
-      C * 2 ^ (1 / (min 1 p).toReal) *
-        hardyConst ((s - β) * (min 1 r).toReal) (q / ENNReal.ofReal (min 1 r).toReal) ^
-          (1 / (min 1 r).toReal) * lqNorm q (fun k => dyadicWeight s k * e k) := by
-  have hρ : 0 < (min 1 r).toReal := ENNReal.toReal_min_one_pos hr0
-  have htail : ∀ k, eLpNorm (f - b k) r μ ^ (min 1 r).toReal ≤
-      (C * 2 ^ (1 / (min 1 p).toReal)) ^ (min 1 r).toReal *
-        ∑' i, dyadicWeight 0 i * (dyadicWeight β (k + i) * e (k + i)) ^ (min 1 r).toReal :=
-    fun k => by
-      simpa only [ENNReal.dyadicWeight_zero_left, one_mul] using
-        eLpNorm_sub_rpow_min_le_tsum_of_nearBest hp0 hr0 hb hbe he he0 hN k
-  have hw : ∀ k, dyadicWeight (s - β) k * (dyadicWeight β k * e k) = dyadicWeight s k * e k :=
-    fun k => by rw [← mul_assoc, ← ENNReal.dyadicWeight_add, sub_add_cancel]
-  have h := ENNReal.lqNorm_rpow_le_of_rpow_le_tsum (y := fun j => dyadicWeight β j * e j) hρ
-    htail (s - β) q
-  simp only [sub_zero, hw] at h
-  rw [← ENNReal.rpow_le_rpow_iff hρ, ENNReal.mul_rpow_of_nonneg _ _ hρ.le,
-    ENNReal.mul_rpow_of_nonneg _ _ hρ.le, ← ENNReal.rpow_mul, one_div_mul_cancel hρ.ne',
-    ENNReal.rpow_one]
-  exact h
-
-end MeasureTheory
 
 namespace FunctionScheme
 
@@ -147,65 +105,6 @@ theorem nikolskiiTransferConst_ne_top {C : ℝ≥0∞} {α s : ℝ} {r : ℝ≥0
 
 variable {Ω : Type*} [MeasurableSpace Ω] {μ : Measure Ω} [IsFiniteMeasure μ]
   {S : FunctionScheme μ} {D : ℝ} {p r : ℝ≥0∞} {s : ℝ} {q : ℝ≥0∞}
-
-omit [IsFiniteMeasure μ] in
-/-- **The Nikolskii inequality on the blocks of a dyadic sequence**: if
-`‖a‖_r ≤ C n^α ‖a‖_p` for all `a ∈ S_n`, `n ≥ 1`, and `b_k ∈ S_{2^k}` for every `k`, then
-`‖b_{k+1} - b_k‖_r ≤ C 2^(2α) 2^(kα) ‖b_{k+1} - b_k‖_p`, since
-`b_{k+1} - b_k ∈ S_{2^(k+2)}` (`ApproximationScheme.sub_mem_pow_add_two`) and
-`(2^(k+2))^α = 2^(2α) 2^(kα)`. -/
-theorem eLpNorm_sub_succ_le_of_nikolskii {C : ℝ≥0∞} {α : ℝ}
-    (hC : ∀ n : ℕ, 1 ≤ n → ∀ a ∈ S n, eLpNorm a r μ ≤ C * (n : ℝ≥0∞) ^ α * eLpNorm a p μ)
-    {b : ℕ → Lp ℂ ∞ μ} (hb : ∀ k, b k ∈ S (2 ^ k)) (k : ℕ) :
-    eLpNorm (⇑(b (k + 1)) - ⇑(b k)) r μ ≤
-      C * 2 ^ (2 * α) * dyadicWeight α k * eLpNorm (⇑(b (k + 1)) - ⇑(b k)) p μ := by
-  have h := hC (2 ^ (k + 2)) Nat.one_le_two_pow _
-    (ApproximationScheme.sub_mem_pow_add_two (hb (k + 1)) (hb k))
-  have hae := Lp.coeFn_sub (b (k + 1)) (b k)
-  rw [eLpNorm_congr_ae hae, eLpNorm_congr_ae hae, ENNReal.natCast_two_pow_rpow,
-    ENNReal.dyadicWeight_add_nat] at h
-  refine h.trans_eq ?_
-  rw [show dyadicWeight α 2 = 2 ^ (2 * α) by simp [dyadicWeight]]
-  ring
-
-/-- **Membership in `L_r` along approximants**: let `p ≤ r`, `q ≠ 0`, `t ∈ ℝ`, let
-`b_k ∈ S_{2^k}`, and let `X = ‖(2^(kt) ‖f - b_k‖_r)_k‖_{ℓ_q}` be finite for some `f ∈ L_p`. Then
-`f` is the inclusion of some `g ∈ L_r`, and the dyadic norm of `g` in the couple of `S` in `L_r`
-satisfies `‖g‖^dy_{t,q} ≤ C_r (X + ‖b_0‖_r) + X` with Mathlib's constant `C_r = LpAddConst r`.
-The error of best approximation of `g` at `2^k` is at most `‖g - b_k‖_r = ‖f - b_k‖_r`
-(`FunctionScheme.eFunctional_lpCouple_natCast`), and
-`‖g‖_r ≤ C_r (‖f - b_0‖_r + ‖b_0‖_r)` with `‖f - b_0‖_r ≤ X`. -/
-theorem exists_inclusion_eq_eNormDyadic_le (hpr : p ≤ r) (hq0 : q ≠ 0) {f : Lp ℂ p μ}
-    {b : ℕ → Lp ℂ ∞ μ} (hb : ∀ k, b k ∈ S (2 ^ k)) (t : ℝ)
-    (hX : lqNorm q (fun k => dyadicWeight t k * eLpNorm (⇑f - ⇑(b k)) r μ) ≠ ∞) :
-    ∃ g : Lp ℂ r μ, Lp.inclusionOfExponentLeLinear (𝕜 := ℝ) μ hpr g = f ∧
-      (lpCouple S r).eNormDyadic t q g ≤
-        LpAddConst r * (lqNorm q (fun k => dyadicWeight t k * eLpNorm (⇑f - ⇑(b k)) r μ) +
-          eLpNorm (b 0) r μ) +
-            lqNorm q (fun k => dyadicWeight t k * eLpNorm (⇑f - ⇑(b k)) r μ) := by
-  have hx0 : eLpNorm (⇑f - ⇑(b 0)) r μ ≤
-      lqNorm q (fun k => dyadicWeight t k * eLpNorm (⇑f - ⇑(b k)) r μ) := by
-    simpa only [ENNReal.dyadicWeight_zero_right, one_mul] using
-      ENNReal.le_lqNorm hq0 (fun k => dyadicWeight t k * eLpNorm (⇑f - ⇑(b k)) r μ) 0
-  have hfr : MemLp f r μ := by
-    have hfb : MemLp (⇑f - ⇑(b 0)) r μ := hx0.trans_lt hX.lt_top
-    simpa only [sub_add_cancel] using hfb.add ((Lp.memLp (b 0)).mono_exponent le_top)
-  have hg : ⇑(hfr.toLp f) =ᵐ[μ] f := hfr.coeFn_toLp
-  refine ⟨hfr.toLp f, ?_, ?_⟩
-  · ext1
-    filter_upwards [Lp.coeFn_inclusionOfExponentLeLinear (𝕜 := ℝ) hpr (hfr.toLp f), hg]
-      with x h1 h2
-    rw [h1, h2]
-  rw [InterpCouple.eNormDyadic, lpCouple_norm0, eLpNorm_congr_ae hg]
-  refine add_le_add ?_ (ENNReal.lqNorm_mono fun k => ?_)
-  · calc eLpNorm f r μ = eLpNorm ((⇑f - ⇑(b 0)) + ⇑(b 0)) r μ := by rw [sub_add_cancel]
-      _ ≤ LpAddConst r * (eLpNorm (⇑f - ⇑(b 0)) r μ + eLpNorm (b 0) r μ) := eLpNorm_add_le' r
-      _ ≤ _ := by gcongr
-  gcongr
-  calc (lpCouple S r).eFunctional ((2 ^ k : ℕ) : ℝ≥0∞) (hfr.toLp f)
-      ≤ eLpNorm (⇑(hfr.toLp f) - ⇑(b k)) r μ :=
-        (eFunctional_lpCouple_natCast (2 ^ k) _).trans_le (iInf₂_le (b k) (hb k))
-    _ = eLpNorm (⇑f - ⇑(b k)) r μ := eLpNorm_congr_ae (hg.sub (EventuallyEq.refl _ _))
 
 /-- **The Besov embedding along a near-best sequence**, for `0 < p ≤ r ≤ ∞` and `q ≠ 0`: let
 `‖a‖_r ≤ C n^α ‖a‖_p` for all `a ∈ S_n`, `n ≥ 1`, with `C < ∞`, `α < s` and `s > 0`. Let
@@ -278,8 +177,11 @@ the couple of `S` in `L_r`. The Nikolskii inequality for `0 < p ≤ r`
 (`InterpCouple.lqNorm_dyadicWeight_mul_eFunctional_add_le`), give the bound along the near-best
 sequence (`FunctionScheme.exists_inclusion_eq_eNormDyadic_le_of_nearBest`), so
 `K = nikolskiiTransferConst C α s p r q · C_q (1 + γ_{1,q})` with `C_q = LpAddConst q` and
-`γ_{1,q} = dyadicGeomConst 1 q`. For the dyadic steps on `[0, 1)` (`D = 1`), `r = 1` and
-`0 < p ≤ 1`, the resulting bound of `‖f‖_1` is `Haar.eLpNorm_one_le_eNormDyadic`. -/
+`γ_{1,q} = dyadicGeomConst 1 q`. For the dyadic steps on `[0, 1)` (`D = 1`) this is
+`Haar.exists_uniform_inclusion_eq_stepCouple`, and the bound of `‖f‖_r` that follows
+(`FunctionScheme.exists_eLpNorm_le_eNormDyadic_of_nikolskii`) is
+`Haar.exists_eLpNorm_le_eNormDyadic_stepCouple`; for `r = 1` and `0 < p ≤ 1` it is
+`Haar.eLpNorm_one_le_eNormDyadic`, proved directly with an explicit constant. -/
 theorem exists_uniform_inclusion_eq_of_nikolskii (h : S.HasNikolskii D) (hD : 0 ≤ D)
     (hp0 : p ≠ 0) (hpr : p ≤ r) (hs : nikolskiiExponent D p r < s) (hq0 : q ≠ 0) :
     ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ f : Lp ℂ p μ, (lpCouple S p).eNormDyadic s q f ≠ ∞ →
@@ -309,6 +211,30 @@ theorem exists_uniform_inclusion_eq_of_nikolskii (h : S.HasNikolskii D) (hD : 0 
   rw [mul_assoc]
   gcongr
   exact hY
+
+/-- **The Besov embedding into `L_r`** in the dyadic norm, for `0 < p ≤ r ≤ ∞` and
+`0 < q ≤ ∞`: let `S` have the Nikolskii property of dimension `D ≥ 0` and
+`α = D(1/p - 1/r) < s`. There is `K < ∞` with `‖f‖_r ≤ K ‖f‖^dy_{s,q}` for every `f ∈ L_p`, with
+the dyadic norm `‖f‖^dy_{s,q} = ‖f‖_p + ‖(2^(ks) E(2^k, f))_k‖_{ℓ_q}` of `f` in the couple of `S`
+in `L_p`. For a finite right side this is the bound `‖g‖_r ≤ ‖g‖^dy_{s-α,q}` of the dyadic norm
+in `L_r` together with `FunctionScheme.exists_uniform_inclusion_eq_of_nikolskii`; `K` is taken at
+least `1`, so that the bound also holds when the right side is infinite. -/
+theorem exists_eLpNorm_le_eNormDyadic_of_nikolskii (h : S.HasNikolskii D) (hD : 0 ≤ D)
+    (hp0 : p ≠ 0) (hpr : p ≤ r) (hs : nikolskiiExponent D p r < s) (hq0 : q ≠ 0) :
+    ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ f : Lp ℂ p μ,
+      eLpNorm f r μ ≤ K * (lpCouple S p).eNormDyadic s q f := by
+  obtain ⟨K, hK, hKf⟩ := exists_uniform_inclusion_eq_of_nikolskii h hD hp0 hpr hs hq0
+  refine ⟨max K 1, max_ne_top hK ENNReal.one_ne_top, fun f => ?_⟩
+  rcases eq_or_ne ((lpCouple S p).eNormDyadic s q f) ∞ with hf | hf
+  · rw [hf, ENNReal.mul_top (zero_lt_one.trans_le (le_max_right K 1)).ne']
+    exact le_top
+  obtain ⟨g, rfl, hg⟩ := hKf f hf
+  calc eLpNorm (Lp.inclusionOfExponentLeLinear (𝕜 := ℝ) μ hpr g) r μ = eLpNorm g r μ :=
+        Lp.eLpNorm_inclusionOfExponentLeLinear hpr g r
+    _ = (lpCouple S r).norm0 g := (lpCouple_norm0 g).symm
+    _ ≤ (lpCouple S r).eNormDyadic (s - nikolskiiExponent D p r) q g := le_self_add
+    _ ≤ K * (lpCouple S p).eNormDyadic s q _ := hg
+    _ ≤ max K 1 * (lpCouple S p).eNormDyadic s q _ := by gcongr; exact le_max_left K 1
 
 /-! ### The embeddings of the Besov spaces, `0 < p ≤ r ≤ ∞` -/
 

@@ -93,18 +93,18 @@ declarations.
   for `‖·‖` and `‖·‖₊`), these in `FunctionSpaces/Analysis/Lp/QuasiNorm.lean`. Mathlib states
   the power form only for `inhmgELpNorm`; for `eLpNorm` it has the bounds with the constant
   `2^(1/p - 1)` (`eLpNorm'_add_le_of_le_one`, `eLpNorm_add_le'`). With it, Fatou's lemma for
-  telescoping sums: if `u_n → g` in measure, with a.e. strongly measurable `u_n` with values in
-  a seminormed group, and `0 < r ≤ 1`, then `‖g - u_k‖_r^r ≤ ∑_{i ≥ 0} ‖u_{k+i+1} - u_{k+i}‖_r^r`
-  (`MeasureTheory.eLpNorm_sub_rpow_le_tsum`, from its finite version
-  `MeasureTheory.eLpNorm_sub_rpow_le_sum` in `ApproximationSpaces/Sequences/Lq.lean` and Mathlib's
-  `eLpNorm_le_of_tendstoInMeasure`), and the invariance of convergence in measure under
-  subtracting a function (`MeasureTheory.TendstoInMeasure.sub_right`), both in
-  `FunctionSpaces/Analysis/Lp/MixedNorms.lean`; for every `0 < r ≤ ∞` with `ρ = min(1, r)`,
-  `‖g - u_k‖_r^ρ ≤ ∑_{i ≥ 0} ‖u_{k+i+1} - u_{k+i}‖_r^ρ`
-  (`MeasureTheory.eLpNorm_sub_rpow_min_le_tsum`), and for `1 ≤ r` the triangle inequality
-  `‖g - u_k‖_r ≤ ∑_{i ≥ 0} ‖u_{k+i+1} - u_{k+i}‖_r` for every limit in measure, of finite or
-  infinite quasi-norm (`MeasureTheory.eLpNorm_sub_le_tsum`), both in
-  `FunctionSpaces/Analysis/Lp/QuasiNorm.lean`.
+  telescoping sums, in `FunctionSpaces/Analysis/Lp/QuasiNorm.lean`: if `u_n → g` in measure,
+  with a.e. strongly measurable `u_n` with values in a seminormed group, then for every
+  `0 < r ≤ ∞` with `ρ = min(1, r)`, `‖g - u_k‖_r^ρ ≤ ∑_{i ≥ 0} ‖u_{k+i+1} - u_{k+i}‖_r^ρ`
+  (`MeasureTheory.eLpNorm_sub_rpow_min_le_tsum`, from its finite version
+  `MeasureTheory.eLpNorm_sub_rpow_min_le_sum`, Mathlib's `eLpNorm_le_of_tendstoInMeasure` and the
+  invariance of convergence in measure under subtracting a function,
+  `MeasureTheory.TendstoInMeasure.sub_right`). Its case `ρ = r` is
+  `‖g - u_k‖_r^r ≤ ∑_{i ≥ 0} ‖u_{k+i+1} - u_{k+i}‖_r^r` for `0 < r ≤ 1`
+  (`MeasureTheory.eLpNorm_sub_rpow_le_tsum`, finite version
+  `MeasureTheory.eLpNorm_sub_rpow_le_sum`), and its case `ρ = 1` the triangle inequality
+  `‖g - u_k‖_r ≤ ∑_{i ≥ 0} ‖u_{k+i+1} - u_{k+i}‖_r` for `1 ≤ r` and every limit in measure, of
+  finite or infinite quasi-norm (`MeasureTheory.eLpNorm_sub_le_tsum`).
 * **Series in `L_p` for every `0 < p ≤ ∞` and finiteness almost everywhere**
   (`FunctionSpaces/Analysis/Lp/QuasiNorm.lean`): for `0 < p ≤ 1` and countably many
   `g_i : α → [0, ∞]`, `‖∑_i g_i‖_p^p ≤ ∑_i ‖g_i‖_p^p`
@@ -116,9 +116,12 @@ declarations.
   `∑_i ‖g_i‖_p^ρ < ∞` gives `∑_i ‖g_i(x)‖ < ∞` almost everywhere
   (`MeasureTheory.summable_norm_of_tsum_eLpNorm_rpow_min_ne_top`), which extends Mathlib's
   `summable_norm_of_tsum_eLpNorm_ne_top` (`1 ≤ p`) below `1`.
-* **The Ditzian–Prymak bootstrap** (`FunctionSpaces/Analysis/Lp/QuasiNorm.lean`): an almost
-  everywhere bound `N < ∞` of `‖f‖` with `N ≤ M ‖f‖_{p₀}` gives `N ≤ M^(p₀/p) ‖f‖_p` for every
-  `0 < p ≤ p₀ < ∞` (`MeasureTheory.le_rpow_mul_eLpNorm_of_ae_enorm_le`), and
+* **The Ditzian–Prymak bootstrap** (`FunctionSpaces/Analysis/Lp/QuasiNorm.lean`): every
+  function satisfies `‖f x‖ ≤ ‖f‖_∞` for almost every `x`, measurable or not
+  (`MeasureTheory.ae_enorm_le_eLpNorm_top`; Mathlib states this bound for `eLpNormEssSup` only,
+  `ae_le_eLpNormEssSup`); an almost everywhere bound `N < ∞` of `‖f‖` with `N ≤ M ‖f‖_{p₀}`
+  gives `N ≤ M^(p₀/p) ‖f‖_p` for every `0 < p ≤ p₀ < ∞`
+  (`MeasureTheory.le_rpow_mul_eLpNorm_of_ae_enorm_le`), and
   `‖f‖_∞ ≤ M ‖f‖_p` gives `‖f‖_r ≤ M^(1 - p/r) ‖f‖_p` for every `p ≤ r ≤ ∞`
   (`MeasureTheory.eLpNorm_le_of_eLpNorm_top_le`); Ditzian–Prymak 2016, Theorem 2.1.
 * **Mixed norms `L_p(ℓ_q)` and `ℓ_q(L_p)`** (`FunctionSpaces/Analysis/Lp/MixedNorms.lean`):
@@ -215,7 +218,12 @@ declarations.
   function in `L_p` lies in `L_r` for every `r ≥ p`
   (`MeasureTheory.MemLp.mono_exponent_of_enorm_le`).
 * **`L_∞` norm of bounded continuous functions**
-  (`FunctionSpaces/Analysis/Lp/BoundedContinuous.lean`): for a measure charging open sets,
+  (`FunctionSpaces/Analysis/Lp/BoundedContinuous.lean`): `‖a‖_{L_∞(μ)} ≤ ‖a‖` in `[0, ∞]` for
+  every measure (`BoundedContinuousFunction.eLpNorm_top_le_enorm`, with the real form
+  `BoundedContinuousFunction.toReal_eLpNorm_top_le_norm`), and for a finite measure the class of
+  `a` in `L_p`, taken through `L_∞`, has `‖a‖_p ≤ μ(Ω)^(1/p) ‖a‖` for every exponent `p`, also
+  `p < 1` (`BoundedContinuousFunction.eLpNorm_topInclusion_toLp_le`; Mathlib has
+  `BoundedContinuousFunction.Lp_nnnorm_le` for `1 ≤ p`); for a measure charging open sets,
   `‖toLp ∞ μ a‖ = ‖a‖`, and the range is closed (`BoundedContinuousFunction.norm_toLp_top`,
   `.isClosed_range_toLp_top`).
 * **Conditional expectation on `L_p`**

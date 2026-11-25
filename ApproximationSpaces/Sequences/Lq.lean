@@ -47,8 +47,7 @@ inequality `‖a + b‖_q ≤ C_q (‖a‖_q + ‖b‖_q)` with Mathlib's consta
 `ENNReal.two_rpow_one_div_le_two_mul_LpAddConst`, `ENNReal.rpow_add_rpow_le_LpAddConst_mul`).
 On any measure space the `p`-th power of the `L_p` quasi-norm, `0 < p ≤ 1`, is subadditive,
 `‖f + g‖_p^p ≤ ‖f‖_p^p + ‖g‖_p^p` (`MeasureTheory.eLpNorm_add_rpow_le_of_le_one`), so sums of
-many terms are estimated in the `p`-th power with constant `1`, telescoping sums among them
-(`MeasureTheory.eLpNorm_sub_rpow_le_sum`).
+many terms are estimated in the `p`-th power with constant `1`.
 
 The file adds what Mathlib lacks: the explicit formulas, homogeneity for `ℝ≥0∞` scalars,
 **monotonicity in `q`** (`lqNorm r a ≤ lqNorm q a` for `0 < q ≤ r`; Mathlib has only the
@@ -1368,26 +1367,6 @@ theorem eLpNorm_add_rpow_le_of_le_one {ε : Type*} [TopologicalSpace ε] [ESemin
   rw [← inhmgELpNorm_eq_eLpNorm_pow hp1 hp0, ← inhmgELpNorm_eq_eLpNorm_pow hp1 hp0,
     ← inhmgELpNorm_eq_eLpNorm_pow hp1 hp0]
   exact inhmgELpNorm_add_le
-
-/-- **Telescoping in `L_r`, `0 < r ≤ 1`**:
-`‖u_{k+n} - u_k‖_r^r ≤ ∑_{i<n} ‖u_{k+i+1} - u_{k+i}‖_r^r` for functions with values in a
-seminormed group, since the `r`-th power of the quasi-norm is subadditive
-(`MeasureTheory.eLpNorm_add_rpow_le_of_le_one`). -/
-theorem eLpNorm_sub_rpow_le_sum {E : Type*} [SeminormedAddCommGroup E] {r : ℝ≥0∞}
-    (hr0 : r ≠ 0) (hr1 : r ≤ 1) (u : ℕ → α → E) (k n : ℕ) :
-    eLpNorm (u (k + n) - u k) r μ ^ r.toReal ≤
-      ∑ i ∈ Finset.range n, eLpNorm (u (k + i + 1) - u (k + i)) r μ ^ r.toReal := by
-  have hρ : 0 < r.toReal := ENNReal.toReal_pos hr0 (ne_top_of_le_ne_top ENNReal.one_ne_top hr1)
-  induction n with
-  | zero => simp [ENNReal.zero_rpow_of_pos hρ]
-  | succ n ih =>
-    rw [Finset.sum_range_succ]
-    calc eLpNorm (u (k + (n + 1)) - u k) r μ ^ r.toReal
-        = eLpNorm ((u (k + n + 1) - u (k + n)) + (u (k + n) - u k)) r μ ^ r.toReal := by
-          rw [sub_add_sub_cancel]; rfl
-      _ ≤ eLpNorm (u (k + n + 1) - u (k + n)) r μ ^ r.toReal +
-            eLpNorm (u (k + n) - u k) r μ ^ r.toReal := eLpNorm_add_rpow_le_of_le_one hr0 hr1 _ _
-      _ ≤ _ := by rw [add_comm]; gcongr
 
 /-- **Monotone convergence for `L_p` norms**: for a directed countable family of measurable
 functions `F_b : α → [0, ∞]`, `‖sup_b F_b‖_p = sup_b ‖F_b‖_p`. For `p < ∞` this is the monotone

@@ -20,19 +20,14 @@ space for `p ≥ 1` only, and an `ApproximationScheme` lives in a normed space; 
 the image of `S` in `L_p(μ)` for every `p` through the complexity couple of `InterpCouple`, which
 needs only the abelian group `Lp ℂ p μ` and the quasi-norm `‖·‖_p`.
 
-* **The approximants in `L_p`.** The sets `S^(p)_n = ι_{∞,p}(S_n)` with the inclusion
-  `ι_{∞,p} = MeasureTheory.Lp.topInclusion μ p` (`FunctionScheme.lpSets`) increase, start with
-  `{0}` and satisfy `c S^(p)_n ⊆ S^(p)_n`, `-S^(p)_n ⊆ S^(p)_n` and
-  `S^(p)_m + S^(p)_n ⊆ S^(p)_{m+n}` (`FunctionScheme.monotone_lpSets`, `FunctionScheme.lpSets_zero`,
-  `FunctionScheme.smul_mem_lpSets`, `FunctionScheme.neg_mem_lpSets`,
-  `FunctionScheme.lpSets_add_subset`); the inclusion `L_r ↪ L_p` maps `S^(r)_n` into `S^(p)_n`
-  (`FunctionScheme.inclusion_mem_lpSets`).
 * **The couple of `S` in `L_p`** (`FunctionScheme.lpCouple`) is the complexity couple of
-  `N₀(f) = ‖f‖_p` and the sets `S^(p)_n`, with `N₁(f) = inf {n : f ∈ S^(p)_n}`, the least such
-  `n`, and `∞` if `f` lies in no `S^(p)_n`. It is quasi-normed with Mathlib's constant
-  `LpAddConst p` (`FunctionScheme.isQuasiNormed_lpCouple`), satisfies the `ρ`-triangle inequality
+  `N₀(f) = ‖f‖_p` and the approximants `S^(p)_n = ι_{∞,p}(S_n)` of `S` in `L_p`
+  (`FunctionScheme.lpSets`, in `FunctionSpaces.MeasureSpaces.Scheme`), with
+  `N₁(f) = inf {n : f ∈ S^(p)_n}`, the least such `n`, and `∞` if `f` lies in no `S^(p)_n`.
+  It is quasi-normed with Mathlib's constant `LpAddConst p`
+  (`FunctionScheme.isQuasiNormed_lpCouple`), satisfies the `ρ`-triangle inequality
   `N₀(f + g)^ρ ≤ N₀(f)^ρ + N₀(g)^ρ` with `ρ = min(1, p)`
-  (`FunctionScheme.lpCouple_norm0_add_rpow_le`), and is homogeneous: `N₀(c f) = |c| N₀(f)` and
+  (`FunctionScheme.lpCouple_norm0_add_rpow_min_le`), and is homogeneous: `N₀(c f) = |c| N₀(f)` and
   `N₁(c f) ≤ N₁(f)` (`FunctionScheme.lpCouple_norm0_smul`, `FunctionScheme.lpCouple_norm1_smul_le`).
   Only `0` has complexity below `1`, and `N₁(f) ≤ n` iff `f ∈ S^(p)_n`
   (`FunctionScheme.eq_zero_of_lpCouple_norm1_lt_one`, `FunctionScheme.lpCouple_norm1_le_of_mem`,
@@ -43,10 +38,12 @@ needs only the abelian group `Lp ℂ p μ` and the quasi-norm `‖·‖_p`.
   (`MeasureTheory.Lp.eLpNorm_sub_topInclusion`). Near-best approximants `b_k ∈ S_{2^k}` with
   `‖f - b_k‖_p ≤ E_{2^k}(f)_p + ‖f‖_p 2^(-k(s+1))` exist for every `p`
   (`FunctionScheme.exists_nearBest_lpCouple`). They take the role of bounded linear projections
-  onto the approximants: for a non-atomic `μ` and `p < 1` the dual space of `L_p(μ)` is `{0}`, so
-  every bounded linear projection of `L_p(μ)` with finite-dimensional range is `0`.
+  onto the approximants.
 * **Different exponents.** The inclusion `L_r ↪ L_p`, `p ≤ r`, does not increase the complexity
-  (`FunctionScheme.lpCouple_norm1_inclusion_le`).
+  (`FunctionScheme.lpCouple_norm1_inclusion_le`). If `q ≠ 0`, `p ≤ r` and
+  `‖(2^(kt) ‖f - b_k‖_r)_k‖_{ℓ_q} = X < ∞` for some `f ∈ L_p` and `b_k ∈ S_{2^k}`, then `f` lies
+  in `L_r` and its dyadic norm in the couple of `S` in `L_r` is at most `C_r (X + ‖b_0‖_r) + X`,
+  with `C_r = LpAddConst r` (`FunctionScheme.exists_inclusion_eq_eNormDyadic_le`).
 * **The normed case.** For `p ≥ 1` the couple is the complexity couple of the approximation
   scheme `S^(p) = S.toLp p` in the normed space `L_p(μ)`
   (`FunctionScheme.lpCouple_eq_complexityCouple`), so its E-functional and Pietsch's form give
@@ -60,87 +57,12 @@ The Besov spaces of `S` for every `0 < p ≤ ∞` are defined through this coupl
 
 open MeasureTheory
 open scoped ENNReal Pointwise
-open ENNReal (dyadicWeight LpAddConst)
-
-/-! ### Differences with essentially bounded functions -/
-
-namespace MeasureTheory.Lp
-
-variable {α E 𝕜 : Type*} {m : MeasurableSpace α} {μ : Measure α} [IsFiniteMeasure μ]
-  [NormedAddCommGroup E] [NontriviallyNormedField 𝕜] [NormedSpace 𝕜 E] {p : ℝ≥0∞}
-
-/-- **The quasi-norms of a difference with an essentially bounded function**: for `f ∈ L_p` and
-`a ∈ L_∞` on a finite measure space, `‖f - ι_{∞,p} a‖_t = ‖f - a‖_t` for every exponent `t`,
-since `ι_{∞,p} a = a` almost everywhere. -/
-theorem eLpNorm_sub_topInclusion (f : Lp E p μ) (a : Lp E ∞ μ) (t : ℝ≥0∞) :
-    eLpNorm (⇑(f - topInclusion (𝕜 := 𝕜) μ p a)) t μ = eLpNorm (⇑f - ⇑a) t μ := by
-  refine eLpNorm_congr_ae ?_
-  filter_upwards [coeFn_sub f (topInclusion (𝕜 := 𝕜) μ p a),
-    coeFn_topInclusion (𝕜 := 𝕜) (p := p) a] with x h1 h2
-  rw [h1, Pi.sub_apply, Pi.sub_apply, h2]
-
-end MeasureTheory.Lp
+open ENNReal (dyadicWeight LpAddConst lqNorm)
 
 namespace FunctionScheme
 
 variable {Ω : Type*} [MeasurableSpace Ω] {μ : Measure Ω} [IsFiniteMeasure μ]
-  (S : FunctionScheme μ)
-
-/-! ### The approximants in `L_p` -/
-
-/-- The **approximants of a scheme of functions in `L_p`**: for a scheme `S` of essentially
-bounded functions and every exponent `p`, the sets `S^(p)_n = ι_{∞,p}(S_n)` of the classes in
-`L_p(μ)` of the elements of `S_n`. -/
-def lpSets (p : ℝ≥0∞) (n : ℕ) : Set (Lp ℂ p μ) :=
-  Lp.topInclusion (𝕜 := ℝ) μ p '' S n
-
-variable {S} {p r : ℝ≥0∞}
-
-/-- `f ∈ S^(p)_n` iff `f` is the class in `L_p` of some `a ∈ S_n`. -/
-theorem mem_lpSets {n : ℕ} {f : Lp ℂ p μ} :
-    f ∈ lpSets S p n ↔ ∃ a ∈ S n, Lp.topInclusion (𝕜 := ℝ) μ p a = f :=
-  Iff.rfl
-
-/-- The class in `L_p` of `a ∈ S_n` lies in `S^(p)_n`. -/
-theorem topInclusion_mem_lpSets {n : ℕ} {a : Lp ℂ ∞ μ} (ha : a ∈ S n) :
-    Lp.topInclusion (𝕜 := ℝ) μ p a ∈ lpSets S p n :=
-  ⟨a, ha, rfl⟩
-
-variable (S p) in
-/-- The only approximant of complexity `0` in `L_p` is `0`: `S^(p)_0 = {0}`. -/
-theorem lpSets_zero : lpSets S p 0 = {0} := by
-  rw [lpSets, S.coe_zero, Set.image_singleton, map_zero]
-
-variable (S p) in
-/-- The approximants in `L_p` increase with the complexity: `S^(p)_m ⊆ S^(p)_n` for `m ≤ n`. -/
-theorem monotone_lpSets : Monotone (lpSets S p) :=
-  fun _ _ h => Set.image_mono (S.mono h)
-
-/-- The approximants in `L_p` are closed under real multiples: `c S^(p)_n ⊆ S^(p)_n`. -/
-theorem smul_mem_lpSets (c : ℝ) {n : ℕ} {f : Lp ℂ p μ} (hf : f ∈ lpSets S p n) :
-    c • f ∈ lpSets S p n := by
-  obtain ⟨a, ha, rfl⟩ := hf
-  exact ⟨c • a, S.smul_mem c ha, map_smul _ c a⟩
-
-/-- The approximants in `L_p` are symmetric: `-S^(p)_n ⊆ S^(p)_n`. -/
-theorem neg_mem_lpSets {n : ℕ} {f : Lp ℂ p μ} (hf : f ∈ lpSets S p n) : -f ∈ lpSets S p n := by
-  obtain ⟨a, ha, rfl⟩ := hf
-  exact ⟨-a, ApproximationScheme.neg_mem ha, map_neg _ a⟩
-
-variable (S p) in
-/-- The sum of two approximants in `L_p` has at most the sum of their complexities:
-`S^(p)_m + S^(p)_n ⊆ S^(p)_{m+n}`. -/
-theorem lpSets_add_subset (m n : ℕ) : lpSets S p m + lpSets S p n ⊆ lpSets S p (m + n) := by
-  rintro _ ⟨_, ⟨a, ha, rfl⟩, _, ⟨b, hb, rfl⟩, rfl⟩
-  exact ⟨a + b, ApproximationScheme.add_mem ha hb, map_add _ a b⟩
-
-/-- The inclusion `ι_{r,p} : L_r ↪ L_p`, `p ≤ r`, maps the approximants in `L_r` into those in
-`L_p`: `ι_{r,p}(S^(r)_n) ⊆ S^(p)_n`, since `ι_{r,p} ∘ ι_{∞,r} = ι_{∞,p}`. -/
-theorem inclusion_mem_lpSets (hpr : p ≤ r) {n : ℕ} {f : Lp ℂ r μ} (hf : f ∈ lpSets S r n) :
-    Lp.inclusionOfExponentLeLinear (𝕜 := ℝ) μ hpr f ∈ lpSets S p n := by
-  obtain ⟨a, ha, rfl⟩ := hf
-  rw [Lp.inclusionOfExponentLeLinear_topInclusion]
-  exact topInclusion_mem_lpSets ha
+  {S : FunctionScheme μ} {p r : ℝ≥0∞}
 
 /-! ### The couple in `L_p` -/
 
@@ -160,7 +82,7 @@ theorem lpCouple_norm0 (f : Lp ℂ p μ) : (lpCouple S p).norm0 f = eLpNorm f p 
 /-- **The `ρ`-triangle inequality of the couple in `L_p`**: with `ρ = min(1, p)`,
 `N₀(f + g)^ρ ≤ N₀(f)^ρ + N₀(g)^ρ` for every `p ≠ 0`
 (`MeasureTheory.eLpNorm_add_rpow_min_le`). -/
-theorem lpCouple_norm0_add_rpow_le (hp0 : p ≠ 0) (f g : Lp ℂ p μ) :
+theorem lpCouple_norm0_add_rpow_min_le (hp0 : p ≠ 0) (f g : Lp ℂ p μ) :
     (lpCouple S p).norm0 (f + g) ^ (min 1 p).toReal ≤
       (lpCouple S p).norm0 f ^ (min 1 p).toReal + (lpCouple S p).norm0 g ^ (min 1 p).toReal := by
   rw [lpCouple_norm0, lpCouple_norm0, lpCouple_norm0, eLpNorm_congr_ae (Lp.coeFn_add f g)]
@@ -238,8 +160,8 @@ theorem eFunctional_lpCouple_natCast (n : ℕ) (f : Lp ℂ p μ) :
 /-- **Near-best approximants from the scheme**, for every exponent `p`: for every `f ∈ L_p` and
 `s ∈ ℝ` there are `b_k ∈ S_{2^k}` with `‖f - b_k‖_p ≤ E(2^k, f) + ‖f‖_p 2^(-k(s+1))`, from the
 near-best elements of the couple (`InterpCouple.exists_nearBest_eFunctional`) and a choice of
-preimages in `S_{2^k}`. They take the role of bounded linear projections onto the approximants
-(for a non-atomic `μ` and `p < 1`, the dual space of `L_p(μ)` is `{0}`). -/
+preimages in `S_{2^k}`. They take the role of bounded linear projections onto the
+approximants. -/
 theorem exists_nearBest_lpCouple (f : Lp ℂ p μ) (s : ℝ) :
     ∃ b : ℕ → Lp ℂ ∞ μ, (∀ k, b k ∈ S (2 ^ k)) ∧ ∀ k, eLpNorm (⇑f - ⇑(b k)) p μ ≤
       (lpCouple S p).eFunctional ((2 ^ k : ℕ) : ℝ≥0∞) f +
@@ -249,6 +171,45 @@ theorem exists_nearBest_lpCouple (f : Lp ℂ p μ) (s : ℝ) :
   refine ⟨a, ha, fun k => ?_⟩
   rw [← Lp.eLpNorm_sub_topInclusion (𝕜 := ℝ) f (a k) p, hab k]
   exact hb0 k
+
+/-- **Membership in `L_r` along approximants**: let `p ≤ r`, `q ≠ 0`, `t ∈ ℝ`, let
+`b_k ∈ S_{2^k}`, and let `X = ‖(2^(kt) ‖f - b_k‖_r)_k‖_{ℓ_q}` be finite for some `f ∈ L_p`. Then
+`f` is the inclusion of some `g ∈ L_r`, and the dyadic norm of `g` in the couple of `S` in `L_r`
+satisfies `‖g‖^dy_{t,q} ≤ C_r (X + ‖b_0‖_r) + X` with Mathlib's constant `C_r = LpAddConst r`.
+The error of best approximation of `g` at `2^k` is at most `‖g - b_k‖_r = ‖f - b_k‖_r`
+(`FunctionScheme.eFunctional_lpCouple_natCast`), and
+`‖g‖_r ≤ C_r (‖f - b_0‖_r + ‖b_0‖_r)` with `‖f - b_0‖_r ≤ X`. -/
+theorem exists_inclusion_eq_eNormDyadic_le (hpr : p ≤ r) {q : ℝ≥0∞} (hq0 : q ≠ 0)
+    {f : Lp ℂ p μ} {b : ℕ → Lp ℂ ∞ μ} (hb : ∀ k, b k ∈ S (2 ^ k)) (t : ℝ)
+    (hX : lqNorm q (fun k => dyadicWeight t k * eLpNorm (⇑f - ⇑(b k)) r μ) ≠ ∞) :
+    ∃ g : Lp ℂ r μ, Lp.inclusionOfExponentLeLinear (𝕜 := ℝ) μ hpr g = f ∧
+      (lpCouple S r).eNormDyadic t q g ≤
+        LpAddConst r * (lqNorm q (fun k => dyadicWeight t k * eLpNorm (⇑f - ⇑(b k)) r μ) +
+          eLpNorm (b 0) r μ) +
+            lqNorm q (fun k => dyadicWeight t k * eLpNorm (⇑f - ⇑(b k)) r μ) := by
+  have hx0 : eLpNorm (⇑f - ⇑(b 0)) r μ ≤
+      lqNorm q (fun k => dyadicWeight t k * eLpNorm (⇑f - ⇑(b k)) r μ) := by
+    simpa only [ENNReal.dyadicWeight_zero_right, one_mul] using
+      ENNReal.le_lqNorm hq0 (fun k => dyadicWeight t k * eLpNorm (⇑f - ⇑(b k)) r μ) 0
+  have hfr : MemLp f r μ := by
+    have hfb : MemLp (⇑f - ⇑(b 0)) r μ := hx0.trans_lt hX.lt_top
+    simpa only [sub_add_cancel] using hfb.add ((Lp.memLp (b 0)).mono_exponent le_top)
+  have hg : ⇑(hfr.toLp f) =ᵐ[μ] f := hfr.coeFn_toLp
+  refine ⟨hfr.toLp f, ?_, ?_⟩
+  · ext1
+    filter_upwards [Lp.coeFn_inclusionOfExponentLeLinear (𝕜 := ℝ) hpr (hfr.toLp f), hg]
+      with x h1 h2
+    rw [h1, h2]
+  rw [InterpCouple.eNormDyadic, lpCouple_norm0, eLpNorm_congr_ae hg]
+  refine add_le_add ?_ (ENNReal.lqNorm_mono fun k => ?_)
+  · calc eLpNorm f r μ = eLpNorm ((⇑f - ⇑(b 0)) + ⇑(b 0)) r μ := by rw [sub_add_cancel]
+      _ ≤ LpAddConst r * (eLpNorm (⇑f - ⇑(b 0)) r μ + eLpNorm (b 0) r μ) := eLpNorm_add_le' r
+      _ ≤ _ := by gcongr
+  gcongr
+  calc (lpCouple S r).eFunctional ((2 ^ k : ℕ) : ℝ≥0∞) (hfr.toLp f)
+      ≤ eLpNorm (⇑(hfr.toLp f) - ⇑(b k)) r μ :=
+        (eFunctional_lpCouple_natCast (2 ^ k) _).trans_le (iInf₂_le (b k) (hb k))
+    _ = eLpNorm (⇑f - ⇑(b k)) r μ := eLpNorm_congr_ae (hg.sub (Filter.EventuallyEq.refl _ _))
 
 /-! ### Different exponents and the normed case -/
 

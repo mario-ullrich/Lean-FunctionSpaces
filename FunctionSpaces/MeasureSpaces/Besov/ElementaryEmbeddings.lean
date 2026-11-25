@@ -6,7 +6,6 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.MeasureSpaces.Besov.Basic
-public import ApproximationSpaces.Transfer
 
 /-!
 # Elementary embeddings of Besov spaces
@@ -41,37 +40,6 @@ the scheme (`FunctionSpaces.MeasureSpaces.Besov.Embeddings`).
 
 open MeasureTheory
 open scoped ENNReal BoundedContinuousFunction
-
-/-- **The exponent of Hölder's inequality between `L_r` and `L_p` is nonnegative**:
-`0 ≤ 1/p - 1/r` for `0 < p ≤ r ≤ ∞`, with `1/∞ = 0`. So the constant `μ(Ω)^(1/p - 1/r)` of
-Hölder's inequality `‖f‖_p ≤ μ(Ω)^(1/p - 1/r) ‖f‖_r` is finite for a finite measure `μ`. -/
-theorem ENNReal.one_div_toReal_sub_one_div_toReal_nonneg {p r : ℝ≥0∞} (hp0 : p ≠ 0)
-    (hpr : p ≤ r) : 0 ≤ 1 / p.toReal - 1 / r.toReal := by
-  rcases eq_or_ne r ∞ with rfl | hr
-  · simp
-  rw [sub_nonneg]
-  exact one_div_le_one_div_of_le (ENNReal.toReal_pos hp0 (ne_top_of_le_ne_top hr hpr))
-    (ENNReal.toReal_mono hr hpr)
-
-/-- **The `L_p` quasi-norm of a bounded continuous function**: for a finite measure `μ` on `Ω`,
-every exponent `p` and every bounded continuous `b`, the class `ι_{∞,p}(b)` of `b` in `L_p(μ)`,
-taken through `L_∞(μ)`, satisfies `‖ι_{∞,p}(b)‖_p ≤ μ(Ω)^(1/p) ‖b‖_∞`, since `b` is bounded by
-its sup norm everywhere (`MeasureTheory.eLpNorm_le_of_ae_enorm_bound`). For `1 ≤ p` this is
-Mathlib's `BoundedContinuousFunction.Lp_nnnorm_le`. -/
-theorem BoundedContinuousFunction.eLpNorm_topInclusion_toLp_le {α E 𝕜 : Type*}
-    [MeasurableSpace α] {μ : Measure α} [TopologicalSpace α] [BorelSpace α] [NormedAddCommGroup E]
-    [SecondCountableTopologyEither α E] [NontriviallyNormedField 𝕜] [NormedSpace 𝕜 E]
-    [IsFiniteMeasure μ] (p : ℝ≥0∞) (b : α →ᵇ E) :
-    eLpNorm (Lp.topInclusion (𝕜 := 𝕜) μ p
-        (BoundedContinuousFunction.toLp (E := E) ∞ μ 𝕜 b)) p μ ≤
-      μ Set.univ ^ p.toReal⁻¹ * ‖b‖ₑ := by
-  rw [mul_comm, ← smul_eq_mul]
-  refine eLpNorm_le_of_ae_enorm_bound (Lp.aestronglyMeasurable _) ?_
-  filter_upwards [Lp.coeFn_topInclusion (𝕜 := 𝕜) (p := p)
-      (BoundedContinuousFunction.toLp (E := E) ∞ μ 𝕜 b),
-    BoundedContinuousFunction.coeFn_toLp (E := E) (p := ∞) (μ := μ) (𝕜 := 𝕜) b] with x h1 h2
-  rw [h1, h2, enorm_le_iff_norm_le]
-  exact b.norm_coe_le_norm x
 
 namespace FunctionScheme
 

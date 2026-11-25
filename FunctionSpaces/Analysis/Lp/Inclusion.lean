@@ -27,15 +27,33 @@ The underlying linear map `MeasureTheory.Lp.inclusionOfExponentLeLinear` needs n
 so it serves every `0 < p ≤ r ≤ ∞`: it is injective, the inclusions compose, it keeps every
 quasi-norm `eLpNorm · t μ`, and `MeasureTheory.Lp.topInclusion μ p` is the inclusion
 `L_∞ ↪ L_p` of the essentially bounded functions. For `1 ≤ p` the two maps agree
-(`MeasureTheory.Lp.inclusionOfExponentLe_apply`, by definition).
+(`MeasureTheory.Lp.inclusionOfExponentLe_apply`, by definition). A difference with an
+essentially bounded function has the same quasi-norms in `L_p` and as a function,
+`‖f - ι_{∞,p} a‖_t = ‖f - a‖_t` (`MeasureTheory.Lp.eLpNorm_sub_topInclusion`), and the exponent
+`1/p - 1/r` of Hölder's inequality is nonnegative for every `0 < p ≤ r ≤ ∞`
+(`ENNReal.one_div_toReal_sub_one_div_toReal_nonneg`).
 
 Every embedding theorem between different `L_p` spaces is stated through these maps: "`f ∈ L_p`
-lies in `L_r`" becomes "`f = inclusionOfExponentLe μ hpr g` for some `g ∈ L_r`".
+lies in `L_r`" becomes "`f = inclusionOfExponentLe μ hpr g` for some `g ∈ L_r`" in the
+Sobolev embeddings, for `1 ≤ p`, and "`f = inclusionOfExponentLeLinear μ hpr g` for some
+`g ∈ L_r`" in the Besov embeddings, for every `0 < p`, where an essentially bounded approximant
+`a` enters `L_p` as `topInclusion μ p a`.
 -/
 
 @[expose] public section
 
 open scoped ENNReal
+
+/-- **The exponent of Hölder's inequality between `L_r` and `L_p` is nonnegative**:
+`0 ≤ 1/p - 1/r` for `0 < p ≤ r ≤ ∞`, with `1/∞ = 0`. So the constant `μ(Ω)^(1/p - 1/r)` of
+Hölder's inequality `‖f‖_p ≤ μ(Ω)^(1/p - 1/r) ‖f‖_r` is finite for a finite measure `μ`. -/
+theorem ENNReal.one_div_toReal_sub_one_div_toReal_nonneg {p r : ℝ≥0∞} (hp0 : p ≠ 0)
+    (hpr : p ≤ r) : 0 ≤ 1 / p.toReal - 1 / r.toReal := by
+  rcases eq_or_ne r ∞ with rfl | hr
+  · simp
+  rw [sub_nonneg]
+  exact one_div_le_one_div_of_le (ENNReal.toReal_pos hp0 (ne_top_of_le_ne_top hr hpr))
+    (ENNReal.toReal_mono hr hpr)
 
 namespace MeasureTheory.Lp
 
@@ -58,7 +76,7 @@ noncomputable def inclusionOfExponentLeLinear (μ : Measure α) [IsFiniteMeasure
     grw [MemLp.coeFn_toLp, Lp.coeFn_smul, Lp.coeFn_smul, MemLp.coeFn_toLp]
     rfl
 
-/-- The inclusion does not change the function, up to null sets. -/
+/-- The inclusion agrees with the function almost everywhere. -/
 theorem coeFn_inclusionOfExponentLeLinear (hpr : p ≤ r) (f : Lp E r μ) :
     inclusionOfExponentLeLinear (𝕜 := 𝕜) μ hpr f =ᵐ[μ] f :=
   MemLp.coeFn_toLp ((Lp.memLp f).mono_exponent hpr)
@@ -104,9 +122,19 @@ noncomputable abbrev topInclusion (μ : Measure α) [IsFiniteMeasure μ] (p : �
     Lp E ∞ μ →ₗ[𝕜] Lp E p μ :=
   inclusionOfExponentLeLinear μ le_top
 
-/-- The inclusion `L_∞ → L_p` does not change the function, up to null sets. -/
+/-- The inclusion `L_∞ → L_p` agrees with the function almost everywhere. -/
 theorem coeFn_topInclusion (f : Lp E ∞ μ) : topInclusion (𝕜 := 𝕜) μ p f =ᵐ[μ] f :=
   coeFn_inclusionOfExponentLeLinear le_top f
+
+/-- **The quasi-norms of a difference with an essentially bounded function**: for `f ∈ L_p` and
+`a ∈ L_∞` on a finite measure space, `‖f - ι_{∞,p} a‖_t = ‖f - a‖_t` for every exponent `t`,
+since `ι_{∞,p} a = a` almost everywhere. -/
+theorem eLpNorm_sub_topInclusion (f : Lp E p μ) (a : Lp E ∞ μ) (t : ℝ≥0∞) :
+    eLpNorm (⇑(f - topInclusion (𝕜 := 𝕜) μ p a)) t μ = eLpNorm (⇑f - ⇑a) t μ := by
+  refine eLpNorm_congr_ae ?_
+  filter_upwards [coeFn_sub f (topInclusion (𝕜 := 𝕜) μ p a),
+    coeFn_topInclusion (𝕜 := 𝕜) (p := p) a] with x h1 h2
+  rw [h1, Pi.sub_apply, Pi.sub_apply, h2]
 
 /-- The inclusion `L_∞ → L_p` is injective, for every exponent `p`. -/
 theorem topInclusion_injective : Function.Injective (topInclusion (E := E) (𝕜 := 𝕜) μ p) :=
@@ -137,17 +165,12 @@ theorem inclusionConst_of_isProbabilityMeasure [IsProbabilityMeasure μ] (p r : 
 
 variable [Fact (1 ≤ p)] [Fact (1 ≤ r)] [IsFiniteMeasure μ]
 
+omit [Fact (1 ≤ r)] in
 /-- Hölder's inequality: `‖f‖_p ≤ μ(Ω)^(1/p - 1/r) ‖f‖_r`. -/
 theorem norm_inclusionOfExponentLeLinear_apply_le (hpr : p ≤ r) (f : Lp E r μ) :
     ‖inclusionOfExponentLeLinear (𝕜 := 𝕜) μ hpr f‖ ≤ inclusionConst μ p r * ‖f‖ := by
   have hp : 1 ≤ p := Fact.out
-  have hexp : 0 ≤ 1 / p.toReal - 1 / r.toReal := by
-    rcases eq_or_ne r ∞ with rfl | hr
-    · simp
-    have hp' : p ≠ ∞ := ne_top_of_le_ne_top hr hpr
-    have hp0 : 0 < p.toReal := ENNReal.toReal_pos (zero_lt_one.trans_le hp).ne' hp'
-    rw [sub_nonneg]
-    exact one_div_le_one_div_of_le hp0 (ENNReal.toReal_mono hr hpr)
+  have hexp := ENNReal.one_div_toReal_sub_one_div_toReal_nonneg (zero_lt_one.trans_le hp).ne' hpr
   have hM : μ Set.univ ^ (1 / p.toReal - 1 / r.toReal) ≠ ∞ :=
     ENNReal.rpow_ne_top_of_nonneg hexp (measure_ne_top μ _)
   rw [Lp.norm_def, Lp.norm_def, eLpNorm_congr_ae (coeFn_inclusionOfExponentLeLinear hpr f),
@@ -169,7 +192,8 @@ theorem inclusionOfExponentLe_apply (hpr : p ≤ r) (f : Lp E r μ) :
     inclusionOfExponentLe (𝕜 := 𝕜) μ hpr f = inclusionOfExponentLeLinear (𝕜 := 𝕜) μ hpr f :=
   rfl
 
-/-- The inclusion does not change the function: `inclusionOfExponentLe μ hpr f = f` a.e. -/
+/-- The inclusion agrees with the function almost everywhere:
+`inclusionOfExponentLe μ hpr f = f` a.e. -/
 theorem coeFn_inclusionOfExponentLe (hpr : p ≤ r) (f : Lp E r μ) :
     inclusionOfExponentLe (𝕜 := 𝕜) μ hpr f =ᵐ[μ] f :=
   coeFn_inclusionOfExponentLeLinear hpr f

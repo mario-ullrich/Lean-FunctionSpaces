@@ -22,7 +22,8 @@ from `S_n`. The error `E_n(f)_p` is the E-functional at `t = n` of the couple
 `(‖·‖_p, complexity)` of `S` in `L_p` (`FunctionScheme.lpCouple`,
 `FunctionScheme.eFunctional_lpCouple_natCast`), and the quasi-norm is Pietsch's form of that
 couple (`InterpCouple.eNormPietsch`). The couple needs only the abelian group `Lp ℂ p μ`, so the
-definition holds for every exponent, also for `0 < p < 1`, where Mathlib gives `L_p` no norm.
+definition holds for every exponent, also for `0 < p < 1`, where `Lp ℂ p μ` is an abelian group
+with the quasi-norm `‖·‖_p`.
 On the torus with `S_n` the trigonometric polynomials of degree `< n`, for `1 ≤ p < ∞`,
 `s > 0` and `1 ≤ q ≤ ∞` these are the classical periodic Besov spaces
 (`Torus.memBesov_iff_modNorm_lt_top_lp`); for other schemes (splines, wavelets, eigenfunctions)
@@ -32,13 +33,15 @@ moduli of smoothness is a separate theorem for each scheme (Jackson and Bernstei
 * **The dyadic norm and the linear structure.** For `s ≥ 0` and `0 < q ≤ ∞`, `f ∈ B^s_{p,q}`
   iff the dyadic norm `‖f‖_p + ‖(2^(ks) E_{2^k}(f)_p)_k‖_{ℓ_q}` of the couple is finite
   (`FunctionScheme.memBesov_iff_eNormDyadic_lt_top`,
-  `FunctionScheme.MemBesov.of_eNormDyadic_lt_top`). The quasi-norm vanishes at `0` and is
-  homogeneous, `‖c f‖_{B^s_{p,q}} = |c| ‖f‖_{B^s_{p,q}}` (`FunctionScheme.besovNorm_zero`,
-  `FunctionScheme.besovNorm_smul_le`, `FunctionScheme.besovNorm_smul`). The Besov space contains
-  `0`, is closed under sums by the quasi-triangle inequality of the dyadic norm and under real
-  multiples (`FunctionScheme.memBesov_zero`, `FunctionScheme.MemBesov.add`,
-  `FunctionScheme.MemBesov.smul`), so it is a real subspace of `L_p(μ)`
-  (`FunctionScheme.besovSpace`, `FunctionScheme.mem_besovSpace`).
+  `FunctionScheme.MemBesov.of_eNormDyadic_lt_top`); if moreover `s > 0` or `q = ∞`, the Besov
+  space is the space `E_{s,q}` of the couple (`FunctionScheme.memBesov_iff_memEMethod`). The
+  quasi-norm vanishes at `0` and is homogeneous, `‖c f‖_{B^s_{p,q}} = |c| ‖f‖_{B^s_{p,q}}`
+  (`FunctionScheme.besovNorm_zero`, `FunctionScheme.besovNorm_smul_le`,
+  `FunctionScheme.besovNorm_smul`). The Besov space contains `0`, is closed under sums by the
+  quasi-triangle inequality of the dyadic norm and under real multiples
+  (`FunctionScheme.memBesov_zero`, `FunctionScheme.MemBesov.add`, `FunctionScheme.MemBesov.smul`),
+  so it is a real subspace of `L_p(μ)` (`FunctionScheme.besovSpace`,
+  `FunctionScheme.mem_besovSpace`).
 * **The normed case.** For `1 ≤ p ≤ ∞` the couple of `S` in `L_p` is the complexity couple of
   the scheme `S^(p) = S.toLp p` in the normed space `L_p(μ)`, so the Besov space is the
   approximation space `A^s_q(L_p(μ), S^(p))` with its quasi-norm
@@ -68,11 +71,15 @@ variable {Ω : Type*} [MeasurableSpace Ω] {μ : Measure Ω} [IsFiniteMeasure μ
 
 /-- The **Besov quasi-norm** `‖f‖_{B^s_{p,q}} = ‖((n + 1)^(s - 1/q) E_n(f)_p)_n‖_{ℓ_q}` of
 `f ∈ L_p(μ)`, for every exponent `p`: Pietsch's form of the couple of `S` in `L_p`, whose
-E-functional at `t = n` is the error `E_n(f)_p` of best approximation from `S_n` in `L_p`. -/
+E-functional at `t = n` is the error `E_n(f)_p` of best approximation from `S_n` in `L_p`. It is
+meant for `0 < p ≤ ∞` and `0 < q ≤ ∞`: at `q = 0` it vanishes by the convention
+`lqNorm 0 = 0`, and at `p = 0` since `eLpNorm f 0 μ = 0`. -/
 noncomputable abbrev besovNorm (s : ℝ) (q : ℝ≥0∞) (f : Lp ℂ p μ) : ℝ≥0∞ :=
   (S.lpCouple p).eNormPietsch s q f
 
-/-- `f` belongs to the **Besov space** `B^s_{p,q}(Ω, S)`: its Besov quasi-norm is finite. -/
+/-- `f` belongs to the **Besov space** `B^s_{p,q}(Ω, S)`: its Besov quasi-norm is finite. Meant
+for `0 < p ≤ ∞` and `0 < q ≤ ∞`; at `p = 0` or `q = 0` every `f` belongs to it
+(`FunctionScheme.besovNorm`). -/
 abbrev MemBesov (s : ℝ) (q : ℝ≥0∞) (f : Lp ℂ p μ) : Prop := S.besovNorm p s q f < ∞
 
 variable {S p}
@@ -95,6 +102,17 @@ theorem MemBesov.of_eNormDyadic_lt_top {s : ℝ} {q : ℝ≥0∞} (hs : 0 ≤ s)
   (InterpCouple.eNormPietsch_le_eNormDyadic (lpCouple_norm1_zero S p) hs f).trans_lt
     (ENNReal.mul_lt_top (ENNReal.mul_lt_top (ENNReal.LpAddConst_lt_top q)
       (ENNReal.two_rpow_ne_top s).lt_top) h)
+
+/-- **The Besov space is the space `E_{s,q}` of the couple of `S` in `L_p`**: for `s ≥ 0`,
+`0 < q ≤ ∞` and `s > 0` or `q = ∞`, `f ∈ B^s_{p,q}` iff `f ∈ E_{s,q}`; both are described by
+the dyadic norm (`FunctionScheme.memBesov_iff_eNormDyadic_lt_top`,
+`InterpCouple.memEMethod_iff_eNormDyadic_lt_top`). -/
+theorem memBesov_iff_memEMethod {s : ℝ} {q : ℝ≥0∞} (hq0 : q ≠ 0) (hs : 0 ≤ s)
+    (hsq : 0 < s ∨ q = ∞) {f : Lp ℂ p μ} :
+    S.MemBesov p s q f ↔ (S.lpCouple p).MemEMethod s q f :=
+  (memBesov_iff_eNormDyadic_lt_top hq0 hs).trans
+    (InterpCouple.memEMethod_iff_eNormDyadic_lt_top (lpCouple_norm1_zero S p)
+      (fun _ hb => eq_zero_of_lpCouple_norm1_lt_one hb) hs hsq hq0).symm
 
 variable (S p) in
 /-- **The Besov quasi-norm of `0` is `0`**, for every `s` and `q`: every error `E_n(0)_p`

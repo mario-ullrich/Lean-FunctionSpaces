@@ -16,6 +16,11 @@ public import Mathlib.Topology.UniformSpace.CompleteSeparated
 Mathlib's `BoundedContinuousFunction.toLp p μ 𝕜` regards a bounded continuous function on a
 finite measure space as an element of `L_p(μ)`.  This file adds:
 
+* bounds by the sup norm, for every exponent: `‖a‖_{L_∞} ≤ sup |a|` for every measure, in
+  `[0, ∞]` and between real numbers (`BoundedContinuousFunction.eLpNorm_top_le_enorm`,
+  `BoundedContinuousFunction.toReal_eLpNorm_top_le_norm`), and the class `ι_{∞,p}(a)` of `a` in
+  `L_p`, taken through `L_∞`, has `‖ι_{∞,p}(a)‖_p ≤ μ(Ω)^(1/p) sup |a|` for a finite measure and
+  every `p`, also `p < 1` (`BoundedContinuousFunction.eLpNorm_topInclusion_toLp_le`);
 * compatibility with the inclusion `L_r ↪ L_p`: including the `L_r` class of `a` gives its
   `L_p` class (`BoundedContinuousFunction.inclusionOfExponentLe_toLp`, and for the linear map
   `BoundedContinuousFunction.inclusionOfExponentLeLinear_toLp`);
@@ -34,6 +39,47 @@ open MeasureTheory
 open scoped ENNReal
 
 namespace BoundedContinuousFunction
+
+/-! ### Bounds by the sup norm -/
+
+/-- **The `L_∞` norm of a bounded continuous function is at most its sup norm**:
+`‖a‖_{L_∞(μ)} ≤ sup |a|` in `[0, ∞]` for every measure `μ`, since `|a(x)| ≤ ‖a‖` for every
+`x`. -/
+theorem eLpNorm_top_le_enorm {α E : Type*} [MeasurableSpace α] {μ : Measure α}
+    [TopologicalSpace α] [OpensMeasurableSpace α] [NormedAddCommGroup E]
+    [SecondCountableTopologyEither α E] (a : α →ᵇ E) : eLpNorm a ∞ μ ≤ ‖a‖ₑ := by
+  rw [eLpNorm_exponent_top a.continuous.aestronglyMeasurable]
+  exact eLpNormEssSup_le_of_ae_enorm_bound
+    (Filter.Eventually.of_forall fun x => enorm_le_iff_norm_le.2 (a.norm_coe_le_norm x))
+
+/-- **The real form of the sup-norm bound in `L_∞`**: `(‖a‖_{L_∞(μ)}).toReal ≤ sup |a|` for every
+measure `μ` (`BoundedContinuousFunction.eLpNorm_top_le_enorm`, with `‖a‖ₑ < ∞`). -/
+theorem toReal_eLpNorm_top_le_norm {α E : Type*} [MeasurableSpace α] {μ : Measure α}
+    [TopologicalSpace α] [OpensMeasurableSpace α] [NormedAddCommGroup E]
+    [SecondCountableTopologyEither α E] (a : α →ᵇ E) :
+    (eLpNorm a ∞ μ).toReal ≤ ‖a‖ := by
+  rw [← toReal_enorm]
+  exact ENNReal.toReal_mono enorm_ne_top (eLpNorm_top_le_enorm a)
+
+/-- **The `L_p` quasi-norm of a bounded continuous function**: for a finite measure `μ` on `Ω`,
+every exponent `p` and every bounded continuous `b`, the class `ι_{∞,p}(b)` of `b` in `L_p(μ)`,
+taken through `L_∞(μ)`, satisfies `‖ι_{∞,p}(b)‖_p ≤ μ(Ω)^(1/p) ‖b‖_∞`, since `b` is bounded by
+its sup norm everywhere (`MeasureTheory.eLpNorm_le_of_ae_enorm_bound`). For `1 ≤ p` this is
+Mathlib's `BoundedContinuousFunction.Lp_nnnorm_le`. -/
+theorem eLpNorm_topInclusion_toLp_le {α E 𝕜 : Type*}
+    [MeasurableSpace α] {μ : Measure α} [TopologicalSpace α] [BorelSpace α] [NormedAddCommGroup E]
+    [SecondCountableTopologyEither α E] [NontriviallyNormedField 𝕜] [NormedSpace 𝕜 E]
+    [IsFiniteMeasure μ] (p : ℝ≥0∞) (b : α →ᵇ E) :
+    eLpNorm (Lp.topInclusion (𝕜 := 𝕜) μ p
+        (BoundedContinuousFunction.toLp (E := E) ∞ μ 𝕜 b)) p μ ≤
+      μ Set.univ ^ p.toReal⁻¹ * ‖b‖ₑ := by
+  rw [mul_comm, ← smul_eq_mul]
+  refine eLpNorm_le_of_ae_enorm_bound (Lp.aestronglyMeasurable _) ?_
+  filter_upwards [Lp.coeFn_topInclusion (𝕜 := 𝕜) (p := p)
+      (BoundedContinuousFunction.toLp (E := E) ∞ μ 𝕜 b),
+    BoundedContinuousFunction.coeFn_toLp (E := E) (p := ∞) (μ := μ) (𝕜 := 𝕜) b] with x h1 h2
+  rw [h1, h2, enorm_le_iff_norm_le]
+  exact b.norm_coe_le_norm x
 
 variable {α E 𝕜 : Type*} {m0 : MeasurableSpace α} {μ : Measure α}
   [TopologicalSpace α] [BorelSpace α] [NormedAddCommGroup E] [SecondCountableTopologyEither α E]
