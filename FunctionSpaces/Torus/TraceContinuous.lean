@@ -148,9 +148,9 @@ theorem norm_sub_valleePoussinBCF_le {k : ℕ} {a : UnitAddTorus d →ᵇ ℂ}
 every bounded continuous `f`, since `‖f - V_k f‖_∞ ≤ (1 + ‖Θ‖_1) E_{2^k}(f)_∞ → 0`. -/
 theorem tendsto_valleePoussinBCF (f : UnitAddTorus d →ᵇ ℂ) :
     Tendsto (fun k => valleePoussinBCF k f) atTop (𝓝 f) := by
-  have hE : Tendsto (fun k => valleePoussinConst d * (trigScheme d).approxError f (2 ^ k)) atTop
-      (𝓝 0) := by
-    simpa using ENNReal.Tendsto.const_mul ((tendsto_approxError_trigScheme f).comp
+  have hE : Tendsto (fun k => valleePoussinConst d * (uniformTrigScheme d).approxError f (2 ^ k))
+      atTop (𝓝 0) := by
+    simpa using ENNReal.Tendsto.const_mul ((tendsto_approxError_uniformTrigScheme f).comp
       (tendsto_pow_atTop_atTop_of_one_lt (α := ℕ) one_lt_two)) (Or.inr valleePoussinConst_ne_top)
   rw [tendsto_iff_edist_tendsto_0]
   refine tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds hE (fun _ => bot_le)
@@ -167,9 +167,9 @@ trigonometric scheme in `L_p(𝕋^d)`, `β ≥ 0`, `2^(kβ) ‖F - V_k F‖_p �
 approximants `a_k` have this rate, and `‖F - V_k F‖_p ≤ (1 + ‖Θ‖_1) ‖F - a_k‖_p`. -/
 theorem tendsto_dyadicWeight_mul_enorm_sub_valleePoussin (hp : p ≠ ∞) {β : ℝ} (hβ : 0 ≤ β)
     {F : Lp ℂ p (volume : Measure (UnitAddTorus d))}
-    (hF : ((trigScheme d).toLp volume p).MemApprox β 1 F) :
+    (hF : ((trigScheme d).toLp p).MemApprox β 1 F) :
     Tendsto (fun k => dyadicWeight β k * ‖F - valleePoussin hp k F‖ₑ) atTop (𝓝 0) := by
-  set D := ApproximationScheme.canonicalApprox ((trigScheme d).toLp volume p) β F
+  set D := ApproximationScheme.canonicalApprox ((trigScheme d).toLp p) β F
   have hD := D.tendsto_dyadicWeight_mul_enorm_sub (ApproximationScheme.tsum_canonical_ne_top hβ hF)
   have hC := ENNReal.Tendsto.const_mul hD (Or.inr (valleePoussinConst_ne_top (d := d)))
   rw [mul_zero] at hC
@@ -193,10 +193,10 @@ theorem continuous_restrictFace (n : ℕ) : Continuous (restrictFace n) :=
 trigonometric scheme in `L_p`. -/
 theorem toLpR_valleePoussinBCF_mem (k : ℕ) (f : UnitAddTorus (Fin (n + 1)) →ᵇ ℂ) :
     toLpR p (Fin (n + 1)) (valleePoussinBCF k f) ∈
-      (trigScheme (Fin (n + 1))).toLp volume p (2 ^ (k + (n + 3))) := by
+      (trigScheme (Fin (n + 1))).toLp p (2 ^ (k + (n + 3))) := by
   have h := valleePoussinBCF_mem_trigPoly k f
   rw [Fintype.card_fin, show k + (n + 1) + 2 = k + (n + 3) by omega] at h
-  exact FunctionScheme.toLp_mem_toLp h
+  exact FunctionScheme.toLp_mem_toLp_ofContinuous h
 
 /-- **The trace of a continuous function is its restriction**: for `1 ≤ p < ∞` and a bounded
 continuous `f` on `𝕋^(n+1)` whose class lies in `B^{1/p}_{p,1}(𝕋^(n+1))`, the trace of `f` is
@@ -204,7 +204,7 @@ continuous `f` on `𝕋^(n+1)` whose class lies in `B^{1/p}_{p,1}(𝕋^(n+1))`, 
 trace (`ApproximationScheme.TraceBound.tendsto_limitTrace`) and, uniformly, to `f(0, ·)`. -/
 theorem periodicTraceBound_limitTrace_eq_restrictFace (hp : p ≠ ∞)
     (f : UnitAddTorus (Fin (n + 1)) →ᵇ ℂ)
-    (hf : (trigScheme (Fin (n + 1))).MemBesov volume p p.toReal⁻¹ 1 (toLpR p (Fin (n + 1)) f)) :
+    (hf : (trigScheme (Fin (n + 1))).MemBesov p p.toReal⁻¹ 1 (toLpR p (Fin (n + 1)) f)) :
     (periodicTraceBound p n hp).limitTrace (toLpR p (Fin (n + 1)) f) =
       toLpR p (Fin n) (restrictFace n f) := by
   rw [FunctionScheme.memBesov_iff_memApprox] at hf
@@ -231,7 +231,7 @@ theorem periodicTraceBound_limitTrace_eq_restrictFace (hp : p ≠ ∞)
 `B^{s+1/p}_{p,q}(𝕋^(n+1))`, the trace of `f` is `f(0, ·)`. -/
 theorem trace_besov_eq_restrictFace (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞} (hq : 1 ≤ q)
     (f : UnitAddTorus (Fin (n + 1)) →ᵇ ℂ)
-    (hf : (trigScheme (Fin (n + 1))).MemBesov volume p (s + p.toReal⁻¹) q
+    (hf : (trigScheme (Fin (n + 1))).MemBesov p (s + p.toReal⁻¹) q
       (toLpR p (Fin (n + 1)) f)) :
     (periodicTraceBound p n hp).limitTrace (toLpR p (Fin (n + 1)) f) =
       toLpR p (Fin n) (restrictFace n f) :=
@@ -243,7 +243,7 @@ theorem trace_besov_eq_restrictFace (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s) {q :
 `Torus.periodicTraceBound_limitTrace_eq_restrictFace`, the trace of `f` is `x' ↦ f(0, x')` almost
 everywhere on `𝕋^n`. -/
 theorem ae_trace_eq_restrictFace (hp : p ≠ ∞) (f : UnitAddTorus (Fin (n + 1)) →ᵇ ℂ)
-    (hf : (trigScheme (Fin (n + 1))).MemBesov volume p p.toReal⁻¹ 1 (toLpR p (Fin (n + 1)) f)) :
+    (hf : (trigScheme (Fin (n + 1))).MemBesov p p.toReal⁻¹ 1 (toLpR p (Fin (n + 1)) f)) :
     ⇑((periodicTraceBound p n hp).limitTrace (toLpR p (Fin (n + 1)) f)) =ᵐ[volume]
       fun x' => f (Fin.cons 0 x') := by
   rw [periodicTraceBound_limitTrace_eq_restrictFace hp f hf]
@@ -255,15 +255,15 @@ the class of a bounded continuous `f` (the Besov embedding, since `s + 1/p > (n+
 trace of `F` is `f(0, ·)`. -/
 theorem exists_trace_eq_restrictFace (hp : p ≠ ∞) {s : ℝ} (hs : (n : ℝ) * p.toReal⁻¹ < s)
     {q : ℝ≥0∞} (hq : 1 ≤ q) {F : Lp ℂ p (volume : Measure (UnitAddTorus (Fin (n + 1))))}
-    (hF : (trigScheme (Fin (n + 1))).MemBesov volume p (s + p.toReal⁻¹) q F) :
+    (hF : (trigScheme (Fin (n + 1))).MemBesov p (s + p.toReal⁻¹) q F) :
     ∃ f : UnitAddTorus (Fin (n + 1)) →ᵇ ℂ, toLpR p (Fin (n + 1)) f = F ∧
       (periodicTraceBound p n hp).limitTrace F = toLpR p (Fin n) (restrictFace n f) := by
   have hD : (Fintype.card (Fin (n + 1)) : ℝ) * p.toReal⁻¹ < s + p.toReal⁻¹ := by
     rw [Fintype.card_fin]
     push_cast
     linarith
-  obtain ⟨f, hf⟩ :=
-    FunctionScheme.MemBesov.exists_boundedContinuous_of_nikolskii trigScheme_hasNikolskii
+  obtain ⟨f, hf⟩ := FunctionScheme.MemBesov.exists_boundedContinuous_of_nikolskii
+    (FunctionScheme.hasContinuousApproximants_ofContinuous _) trigScheme_hasNikolskii
     (Nat.cast_nonneg _) hD hq hF
   rw [BoundedContinuousFunction.inclusionOfExponentLe_toLp] at hf
   have hs0 : 0 < s := lt_of_le_of_lt (by positivity) hs

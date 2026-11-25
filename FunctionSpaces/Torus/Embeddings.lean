@@ -55,32 +55,33 @@ theorem toLp_toContinuousMap (a : UnitAddTorus d →ᵇ ℂ) :
 `B^{s - d(1/p - 1/r)}_{r,q}(𝕋^d)`. -/
 theorem memBesov_exists_inclusion_eq (hpr : p ≤ r)
     (hs : (Fintype.card d : ℝ) * (p.toReal⁻¹ - r.toReal⁻¹) < s) (hq : 1 ≤ q)
-    {f : Lp ℂ p (volume : Measure (UnitAddTorus d))} (hf : (trigScheme d).MemBesov volume p s q f) :
+    {f : Lp ℂ p (volume : Measure (UnitAddTorus d))} (hf : (trigScheme d).MemBesov p s q f) :
     ∃ g : Lp ℂ r (volume : Measure (UnitAddTorus d)),
       Lp.inclusionOfExponentLe (𝕜 := ℝ) volume hpr g = f ∧
-        (trigScheme d).MemBesov volume r (s - Fintype.card d * (p.toReal⁻¹ - r.toReal⁻¹)) q g :=
+        (trigScheme d).MemBesov r (s - Fintype.card d * (p.toReal⁻¹ - r.toReal⁻¹)) q g :=
   MemBesov.exists_inclusion_eq_of_nikolskii trigScheme_hasNikolskii (Nat.cast_nonneg _) hpr hs hq
     hf
 
 /-- **Besov functions are continuous** for `s > d/p`: every `f ∈ B^s_{p,q}(𝕋^d)` has a
 continuous representative. -/
 theorem memBesov_exists_continuous (hs : (Fintype.card d : ℝ) * p.toReal⁻¹ < s) (hq : 1 ≤ q)
-    {f : Lp ℂ p (volume : Measure (UnitAddTorus d))} (hf : (trigScheme d).MemBesov volume p s q f) :
+    {f : Lp ℂ p (volume : Measure (UnitAddTorus d))} (hf : (trigScheme d).MemBesov p s q f) :
     ∃ g : C(UnitAddTorus d, ℂ),
       Lp.inclusionOfExponentLe (𝕜 := ℝ) volume le_top (ContinuousMap.toLp (E := ℂ) ∞ volume ℝ g) =
         f := by
-  obtain ⟨a, ha⟩ := MemBesov.exists_boundedContinuous_of_nikolskii trigScheme_hasNikolskii
-    (Nat.cast_nonneg _) hs hq hf
+  obtain ⟨a, ha⟩ :=
+    MemBesov.exists_boundedContinuous_of_nikolskii (hasContinuousApproximants_ofContinuous _)
+      trigScheme_hasNikolskii (Nat.cast_nonneg _) hs hq hf
   exact ⟨a.toContinuousMap, by rw [toLp_toContinuousMap, ha]⟩
 
 /-- **`H^s(𝕋^d) ⊆ B^s_{2,∞}(𝕋^d)`**, from Jackson's inequality. -/
 theorem periodic_sobolev_memBesov_top (hs : 0 < s) (c : ℓ²(d → ℤ, ℂ)) :
-    (trigScheme d).MemBesov volume 2 s ∞ ((periodicSobolevSpace s hs).incl c) :=
+    (trigScheme d).MemBesov 2 s ∞ ((periodicSobolevSpace s hs).incl c) :=
   FunctionScheme.memBesov_iff_memApprox.2 ((periodicSobolevSpace s hs).memApprox_top c)
 
 /-- **`B^t_{2,q}(𝕋^d) ⊆ H^s(𝕋^d)` for `t > s`**, from Bernstein's inequality. -/
 theorem periodic_exists_sobolev_of_memBesov (hs : 0 < s) {t : ℝ} (hst : s < t) (hq : 1 ≤ q)
-    {f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))} (hf : (trigScheme d).MemBesov volume 2 t q f) :
+    {f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))} (hf : (trigScheme d).MemBesov 2 t q f) :
     ∃ c : ℓ²(d → ℤ, ℂ), (periodicSobolevSpace s hs).incl c = f :=
   (periodicSobolevSpace s hs).exists_eq_of_lt hst hq (FunctionScheme.memBesov_iff_memApprox.1 hf)
 
@@ -91,7 +92,7 @@ theorem sobolev_exists_inclusion_eq (h2r : (2 : ℝ≥0∞) ≤ r) (hs : 0 < s)
     (hsr : (Fintype.card d : ℝ) * ((2 : ℝ≥0∞).toReal⁻¹ - r.toReal⁻¹) < s) (c : ℓ²(d → ℤ, ℂ)) :
     ∃ g : Lp ℂ r (volume : Measure (UnitAddTorus d)),
       Lp.inclusionOfExponentLe (𝕜 := ℝ) volume h2r g = (periodicSobolevSpace s hs).incl c ∧
-        (trigScheme d).MemBesov volume r
+        (trigScheme d).MemBesov r
           (s - Fintype.card d * ((2 : ℝ≥0∞).toReal⁻¹ - r.toReal⁻¹)) ∞ g :=
   memBesov_exists_inclusion_eq h2r hsr le_top (periodic_sobolev_memBesov_top hs c)
 
@@ -109,8 +110,9 @@ theorem sobolev_exists_continuous (hs : (Fintype.card d : ℝ) / 2 < s)
   have hs' : (Fintype.card d : ℝ) * (2 : ℝ≥0∞).toReal⁻¹ <
       (periodicSobolevSpace (d := d) s hs0).order := by
     simpa [div_eq_mul_inv] using hs
-  obtain ⟨a, ha⟩ := SobolevSpace.exists_boundedContinuous trigScheme_hasNikolskii
-    (Nat.cast_nonneg _) (periodicSobolevSpace s hs0) hs' c
+  obtain ⟨a, ha⟩ := SobolevSpace.exists_boundedContinuous
+    (hasContinuousApproximants_ofContinuous _) trigScheme_hasNikolskii (Nat.cast_nonneg _)
+    (periodicSobolevSpace s hs0) hs' c
   exact ⟨a.toContinuousMap, by rw [toLp_toContinuousMap, ha]⟩
 
 end Torus

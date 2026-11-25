@@ -50,14 +50,14 @@ variable {d : Type*} [Fintype d] {s : ℝ} {q : ℝ≥0∞}
 /-- Jackson's theorem in the form `E_n(f) ≤ (d + 1) ω(f, 1/n)`. -/
 theorem approxError_le_periodicModulus {n : ℕ} (hn : 1 ≤ n)
     (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
-    ((trigScheme d).toLp volume 2).approxError f n ≤
+    ((trigScheme d).toLp 2).approxError f n ≤
       ((Fintype.card d : ℝ≥0∞) + 1) * periodicModulus f (1 / n) := by
   have h := approxError_sq_le_card_mul_periodicModulus_sq hn f
   have hd : (Fintype.card d : ℝ≥0∞) ≤ ((Fintype.card d : ℝ≥0∞) + 1) ^ 2 := by
     calc (Fintype.card d : ℝ≥0∞) ≤ (Fintype.card d : ℝ≥0∞) + 1 := le_self_add
       _ ≤ ((Fintype.card d : ℝ≥0∞) + 1) ^ 2 := by
           rw [sq]; exact le_mul_of_one_le_left' le_add_self
-  have h2 : ((trigScheme d).toLp volume 2).approxError f n ^ 2 ≤
+  have h2 : ((trigScheme d).toLp 2).approxError f n ^ 2 ≤
       (((Fintype.card d : ℝ≥0∞) + 1) * periodicModulus f (1 / n)) ^ 2 := by
     rw [mul_pow]; exact h.trans (by gcongr)
   rw [← ENNReal.rpow_two, ← ENNReal.rpow_two] at h2
@@ -68,7 +68,7 @@ theorem approxError_le_periodicModulus {n : ℕ} (hn : 1 ≤ n)
 /-- **Trigonometric polynomials have no high frequencies**: for `a` of degree `< n`,
 `â(k) = 0` whenever `deg k ≥ n` (`SpectralScheme.repr_eq_zero_of_mem_levelSpan`). -/
 theorem mFourierCoeff_eq_zero_of_mem {n : ℕ} {a : Lp ℂ 2 (volume : Measure (UnitAddTorus d))}
-    (ha : a ∈ (trigScheme d).toLp volume 2 n) {k : d → ℤ} (hk : n ≤ trigDeg k) :
+    (ha : a ∈ (trigScheme d).toLp 2 n) {k : d → ℤ} (hk : n ≤ trigDeg k) :
     mFourierCoeff a k = 0 := by
   rw [toLp_trigScheme_eq d] at ha
   rw [← mFourierBasis_repr]
@@ -79,7 +79,7 @@ satisfies `‖τ_h a - a‖_2 ≤ 2πd n ‖h‖ ‖a‖_2`, by Parseval and `|e
 (`Torus.norm_mFourier_sub_one_le`). -/
 theorem enorm_periodicTranslate_sub_le_of_mem {n : ℕ}
     {a : Lp ℂ 2 (volume : Measure (UnitAddTorus d))}
-    (ha : a ∈ (trigScheme d).toLp volume 2 n) (h : UnitAddTorus d) :
+    (ha : a ∈ (trigScheme d).toLp 2 n) (h : UnitAddTorus d) :
     ‖periodicTranslate h a - a‖ₑ ≤ ENNReal.ofReal (2 * π * Fintype.card d * n * ‖h‖) * ‖a‖ₑ := by
   have hpars : ‖a‖ₑ ^ 2 = ∑' k, ‖mFourierCoeff a k‖ₑ ^ 2 := by
     rw [← mFourierBasis.repr.enorm_map, lp.enorm_sq_eq_tsum]
@@ -98,7 +98,7 @@ theorem enorm_periodicTranslate_sub_le_of_mem {n : ℕ}
 satisfies `ω(a, 2^(-k))_2 ≤ max(2, 2πd) 2^(-(k-j)) ‖a‖_2`: for `k < j` the modulus is at most
 `2 ‖a‖_2`, and for `k ≥ j` Bernstein's inequality gives `2πd 2^(j-k) ‖a‖_2`. -/
 theorem periodicModulus_le_of_mem {j : ℕ} {a : Lp ℂ 2 (volume : Measure (UnitAddTorus d))}
-    (ha : a ∈ (trigScheme d).toLp volume 2 (2 ^ j)) (k : ℕ) :
+    (ha : a ∈ (trigScheme d).toLp 2 (2 ^ j)) (k : ℕ) :
     periodicModulus a (1 / 2 ^ k) ≤
       ENNReal.ofReal (max 2 (2 * π * Fintype.card d)) * dyadicWeight (-1) (k - j) * ‖a‖ₑ := by
   rcases lt_or_ge k j with hkj | hjk
@@ -125,7 +125,7 @@ the scales `2^(-k)` it is subadditive and at most `2 ‖f‖_2`, Jackson's inequ
 `k = 0` on with the constant `d + 1`, and the inverse inequality with the constant
 `max(2, 2πd)`. -/
 noncomputable def trigModulusData (d : Type*) [Fintype d] :
-    ModulusData ((trigScheme d).toLp volume 2) 1 where
+    ModulusData ((trigScheme d).toLp 2) 1 where
   modulus f k := periodicModulus f (1 / 2 ^ k)
   add_le f g k := Rd.lpModulus_add_le 1 f g k
   C0 := 2
@@ -143,7 +143,7 @@ noncomputable def trigModulusData (d : Type*) [Fintype d] :
 dyadic quasi-norm, with the constant `1 + C_J` of `ModulusData.approxNormDyadic_le_modNorm`. -/
 theorem approxNormDyadic_le_modulusNorm (hq : 1 ≤ q)
     (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
-    ((trigScheme d).toLp volume 2).approxNormDyadic s q f ≤
+    ((trigScheme d).toLp 2).approxNormDyadic s q f ≤
       (trigModulusData d).directConst s * (trigModulusData d).modNorm s q f :=
   (trigModulusData d).approxNormDyadic_le_modNorm hq f
 
@@ -153,7 +153,7 @@ theorem approxNormDyadic_le_modulusNorm (hq : 1 ≤ q)
 theorem modulusNorm_le_approxNormDyadic (hq : 1 ≤ q) (hs : 0 ≤ s) (hs1 : s < 1)
     (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
     (trigModulusData d).modNorm s q f ≤
-      (trigModulusData d).inverseConst s * ((trigScheme d).toLp volume 2).approxNormDyadic s q f :=
+      (trigModulusData d).inverseConst s * ((trigScheme d).toLp 2).approxNormDyadic s q f :=
   (trigModulusData d).modNorm_le_approxNormDyadic hq hs hs1 f
 
 /-- **The coincidence theorem in `L_2(𝕋^d)`**: for `0 < s < 1` and `1 ≤ q ≤ ∞`, the Besov space
@@ -162,7 +162,7 @@ defined by the modulus of smoothness: `f ∈ B^s_{2,q}` iff
 `‖f‖_2 + ‖(2^(js) ω(f, 2^(-j))_2)_j‖_{ℓ_q} < ∞`. -/
 theorem memBesov_iff_modulusNorm_lt_top (hs : 0 < s) (hs1 : s < 1) (hq : 1 ≤ q)
     (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
-    (trigScheme d).MemBesov volume 2 s q f ↔ (trigModulusData d).modNorm s q f < ∞ :=
+    (trigScheme d).MemBesov 2 s q f ↔ (trigModulusData d).modNorm s q f < ∞ :=
   FunctionScheme.memBesov_iff_memApprox.trans
     ((trigModulusData d).memApprox_iff_modNorm_lt_top hq hs.le hs1 f)
 

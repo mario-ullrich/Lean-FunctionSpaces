@@ -40,7 +40,7 @@ variable {d : Type*} [Fintype d] {s : ℝ} {q : ℝ≥0∞}
 `∑_k (1 + max_i |k_i|)^(2s) |f̂(k)|² < ∞`. -/
 theorem periodic_memBesov_two_two_iff (hs : 0 < s)
     (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
-    (trigScheme d).MemBesov volume 2 s 2 f ↔
+    (trigScheme d).MemBesov 2 s 2 f ↔
       Memℓp (fun k => ((((1 + trigDeg k : ℕ) : ℝ) ^ s : ℝ) : ℂ) * mFourierCoeff f k) 2 := by
   have h := (fourierScheme d).memApprox_two_iff_levelWeight hs f
   simp only [fourierScheme, mFourierBasis_repr] at h
@@ -67,7 +67,7 @@ for `s > 0` and `1 ≤ q ≤ ∞`, `f ∈ B^s_{2,q}` iff
 `‖P_1 f‖ + ‖(2^(ks) ‖Δ_k f‖_2)_k‖_{ℓ_q} < ∞`, where `P_1 f` is the mean of `f`. -/
 theorem periodic_memBesov_two_iff_blockNorm_lt_top (hs : 0 < s) (hq : 1 ≤ q)
     (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
-    (trigScheme d).MemBesov volume 2 s q f ↔
+    (trigScheme d).MemBesov 2 s q f ↔
       (fourierScheme d).spectralProjectionScheme.blockNorm s q f < ∞ := by
   rw [FunctionScheme.memBesov_iff_memApprox, toLp_trigScheme_eq]
   exact (fourierScheme d).memApprox_iff_blockNorm_lt_top hs hq

@@ -227,7 +227,7 @@ theorem mFourier_apply_single [DecidableEq d] (k : d → ℤ) (i : d) (u : UnitA
 /-- The error of best approximation is at most the tail of the Fourier series:
 `E_n(f)_2² ≤ ∑_{deg k ≥ n} |f̂(k)|²`. -/
 theorem approxError_sq_le_tsum (n : ℕ) (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
-    ((trigScheme d).toLp volume 2).approxError f n ^ 2 ≤
+    ((trigScheme d).toLp 2).approxError f n ^ 2 ≤
       ∑' k, if n ≤ trigDeg k then ‖mFourierCoeff f k‖ₑ ^ 2 else 0 := by
   rw [toLp_trigScheme_eq]
   have h1 := (fourierScheme d).spectralProjectionScheme.approxError_le_enorm_sub n f
@@ -248,7 +248,7 @@ theorem approxError_sq_le_tsum (n : ℕ) (f : Lp ℂ 2 (volume : Measure (UnitAd
 /-- **Jackson's theorem in `L_2(𝕋^d)`**: `E_n(f)_2² ≤ d · ω(f, 1/n)_2²` for `n ≥ 1`. -/
 theorem approxError_sq_le_card_mul_periodicModulus_sq {n : ℕ} (hn : 1 ≤ n)
     (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
-    ((trigScheme d).toLp volume 2).approxError f n ^ 2 ≤
+    ((trigScheme d).toLp 2).approxError f n ^ 2 ≤
       (Fintype.card d : ℝ≥0∞) * periodicModulus f (1 / n) ^ 2 := by
   classical
   set t : ℝ := 1 / n

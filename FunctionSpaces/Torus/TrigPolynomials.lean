@@ -25,8 +25,10 @@ function `Torus.trigMonomial k`.  The **degree** of a frequency is `deg k = max_
 
 is the space of trigonometric polynomials of degree `< n` (`Torus.trigPoly`).  It contains the
 constants for `n ≥ 1` and is `{0}` for `n = 0`; this strict-degree convention makes the
-spaces an approximation scheme, `Torus.trigScheme d`.  A linear map that sends the monomials of
-degree `< n` into `trigPoly n` maps `trigPoly n` into `trigPoly n` (`Torus.map_mem_trigPoly`).
+spaces an approximation scheme in the sup norm, `Torus.uniformTrigScheme d`. Their classes in
+`L_∞(𝕋^d)` form the scheme of functions `Torus.trigScheme d` of the uniform trigonometric scheme
+(`FunctionScheme.ofContinuous`).  A linear map that sends the monomials of degree `< n` into
+`trigPoly n` maps `trigPoly n` into `trigPoly n` (`Torus.map_mem_trigPoly`).
 
 The frequencies of degree `< n` form the box `boxLt n ⊆ ℤ^d` with at most `(2n)^d` elements
 (`card_boxLt_le`).  Since `e_k e_l = e_{k+l}` and `deg (k + l) ≤ deg k + deg l`, products of
@@ -36,7 +38,7 @@ trigPoly (m + n)`, and `T ∈ trigPoly n` has `T^m ∈ trigPoly (m n)`
 
 The trigonometric polynomials are dense in the bounded continuous functions for the sup norm
 (`Torus.dense_iUnion_trigPoly`, from Mathlib's `span_mFourier_closure_eq_top`), so the errors of
-best uniform approximation tend to `0` (`Torus.tendsto_approxError_trigScheme`).
+best uniform approximation tend to `0` (`Torus.tendsto_approxError_uniformTrigScheme`).
 -/
 
 @[expose] public section
@@ -182,16 +184,32 @@ theorem pow_mem_trigPoly {n : ℕ} {T : UnitAddTorus d →ᵇ ℂ} (hT : T ∈ t
     exact mul_mem_trigPoly ih hT
 
 variable (d) in
-/-- The **scheme of trigonometric polynomials** on `𝕋^d`: `A n` is the space of trigonometric
-polynomials of degree `< n`. -/
-noncomputable def trigScheme : FunctionScheme (UnitAddTorus d) :=
+/-- The **uniform trigonometric scheme** on `𝕋^d`: the trigonometric polynomials of degree `< n`,
+`n ∈ ℕ`, form an approximation scheme in the bounded continuous functions with the sup norm. -/
+noncomputable def uniformTrigScheme : ApproximationScheme (UnitAddTorus d →ᵇ ℂ) :=
   ApproximationScheme.ofSubmodules (fun n => (trigPoly d n).restrictScalars ℝ)
     (by simp) (fun _ _ h => trigPoly_mono h)
 
-/-- The approximants of the trigonometric scheme are the trigonometric polynomials. -/
+/-- The approximants of complexity `n` of the uniform trigonometric scheme are the trigonometric
+polynomials of degree `< n`. -/
 @[simp]
-theorem mem_trigScheme {n : ℕ} {T : UnitAddTorus d →ᵇ ℂ} :
-    T ∈ trigScheme d n ↔ T ∈ trigPoly d n := Iff.rfl
+theorem mem_uniformTrigScheme {n : ℕ} {T : UnitAddTorus d →ᵇ ℂ} :
+    T ∈ uniformTrigScheme d n ↔ T ∈ trigPoly d n := Iff.rfl
+
+variable (d) in
+/-- The **trigonometric scheme** on `𝕋^d`, the scheme of functions of the uniform trigonometric
+scheme: `trigScheme d n` consists of the classes in `L_∞(𝕋^d)` of the trigonometric polynomials
+of degree `< n`. -/
+noncomputable def trigScheme : FunctionScheme (volume : Measure (UnitAddTorus d)) :=
+  FunctionScheme.ofContinuous (uniformTrigScheme d) volume
+
+/-- The approximants of the trigonometric scheme are the classes of the trigonometric
+polynomials. -/
+@[simp]
+theorem mem_trigScheme {n : ℕ} {a : Lp ℂ ∞ (volume : Measure (UnitAddTorus d))} :
+    a ∈ trigScheme d n ↔
+      ∃ T ∈ trigPoly d n, BoundedContinuousFunction.toLp (E := ℂ) ∞ volume ℝ T = a :=
+  Iff.rfl
 
 section UniformDensity
 
@@ -224,8 +242,8 @@ theorem dense_iUnion_trigPoly : Dense (⋃ n, (trigPoly d n : Set (UnitAddTorus 
 
 /-- The errors of best uniform approximation by trigonometric polynomials of degree `< n` tend
 to `0`. -/
-theorem tendsto_approxError_trigScheme (f : UnitAddTorus d →ᵇ ℂ) :
-    Tendsto ((trigScheme d).approxError f) atTop (𝓝 0) :=
+theorem tendsto_approxError_uniformTrigScheme (f : UnitAddTorus d →ᵇ ℂ) :
+    Tendsto ((uniformTrigScheme d).approxError f) atTop (𝓝 0) :=
   (ApproximationScheme.tendsto_approxError_zero_iff f).2 (dense_iUnion_trigPoly f)
 
 end UniformDensity

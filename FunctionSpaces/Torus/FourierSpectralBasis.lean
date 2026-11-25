@@ -68,8 +68,7 @@ theorem basisSpan_fourierEigenbasis (n : ℕ) :
 /-- The scheme of the basis functions is the trigonometric scheme. -/
 theorem basisScheme_fourierEigenbasis : (fourierEigenbasis d).basisScheme = trigScheme d := by
   ext n a
-  change a ∈ (fourierEigenbasis d).basisSpan n ↔ a ∈ trigPoly d n
-  rw [basisSpan_fourierEigenbasis]
+  rw [ContinuousSpectralBasis.mem_basisScheme, mem_trigScheme, basisSpan_fourierEigenbasis]
 
 /-- The levels `< n` are the frequencies of degree `< n`. -/
 theorem spectralLevelSet_fourierEigenbasis (n : ℕ) :
@@ -93,7 +92,7 @@ theorem localWeylBound_fourierEigenbasis :
 
 /-- **The Nikolskii property of the Fourier eigenbasis**, of dimension `d`. -/
 theorem hasNikolskii_fourierEigenbasis :
-    (fourierEigenbasis d).basisScheme.HasNikolskii volume (Fintype.card d) := by
+    (fourierEigenbasis d).basisScheme.HasNikolskii (Fintype.card d) := by
   rw [basisScheme_fourierEigenbasis]
   exact trigScheme_hasNikolskii
 

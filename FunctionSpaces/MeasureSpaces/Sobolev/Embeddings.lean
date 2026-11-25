@@ -26,7 +26,8 @@ If the scheme has the Nikolskii property of dimension `D` (the hypothesis
   (`SobolevSpace.exists_eq_inclusion`): every element of `W` is, as an `L_p` function, the
   inclusion of an element of `W'`;
 * **the embedding into bounded continuous functions** for `s > D/p`
-  (`SobolevSpace.exists_boundedContinuous`), when `μ` charges every nonempty open set.
+  (`SobolevSpace.exists_boundedContinuous`), when `Ω` is a topological space with its Borel
+  `σ`-algebra, `μ` charges every nonempty open set and the scheme has continuous approximants.
 
 The proof is the chain
 
@@ -48,17 +49,16 @@ open scoped ENNReal BoundedContinuousFunction
 
 namespace FunctionScheme
 
-variable {Ω : Type*} [TopologicalSpace Ω] [MeasurableSpace Ω] [BorelSpace Ω]
-  {S : FunctionScheme Ω} {μ : Measure Ω} [IsFiniteMeasure μ] {D : ℝ} {p r : ℝ≥0∞}
-  [Fact (1 ≤ p)] [Fact (1 ≤ r)]
+variable {Ω : Type*} [MeasurableSpace Ω] {μ : Measure Ω} [IsFiniteMeasure μ]
+  {S : FunctionScheme μ} {D : ℝ} {p r : ℝ≥0∞} [Fact (1 ≤ p)] [Fact (1 ≤ r)]
 
-variable (S μ p) in
+variable (S p) in
 /-- A **Sobolev space** inside `L_p(μ)` for the scheme `S`: a smoothness space for `S` in
 `L_p(μ)`, that is, a normed space `W` with an injective bounded linear map into `L_p(μ)` and
 Jackson's and Bernstein's inequalities of some order. It is a hypothesis structure; the instances
 are `Torus.periodicSobolevSpace` and `ContinuousSpectralBasis.sobolevSpace`, both for `p = 2`. -/
 abbrev SobolevSpace (W : Type*) [NormedAddCommGroup W] [NormedSpace ℝ W] :=
-  SmoothnessSpace (S.toLp μ p) W
+  SmoothnessSpace (S.toLp p) W
 
 variable {W W' : Type*} [NormedAddCommGroup W] [NormedSpace ℝ W] [NormedAddCommGroup W']
   [NormedSpace ℝ W'] [CompleteSpace W']
@@ -67,8 +67,8 @@ variable {W W' : Type*} [NormedAddCommGroup W] [NormedSpace ℝ W] [NormedAddCom
 dimension `D ≥ 0`, Sobolev spaces `V` of order `s` in `L_p` and `V'` of order `t` in `L_r`,
 `p ≤ r`, and `t < s - D(1/p - 1/r)`, every element of `V` is, as an `L_p` function, the
 inclusion of an element of `V'`. -/
-theorem SobolevSpace.exists_eq_inclusion (h : S.HasNikolskii μ D) (hD : 0 ≤ D)
-    (V : S.SobolevSpace μ p W) (V' : S.SobolevSpace μ r W') (hpr : p ≤ r)
+theorem SobolevSpace.exists_eq_inclusion (h : S.HasNikolskii D) (hD : 0 ≤ D)
+    (V : S.SobolevSpace p W) (V' : S.SobolevSpace r W') (hpr : p ≤ r)
     (hst : V'.order < V.order - nikolskiiExponent D p r) (y : W) :
     ∃ y' : W', Lp.inclusionOfExponentLe (𝕜 := ℝ) μ hpr (V'.incl y') = V.incl y := by
   have hα : nikolskiiExponent D p r < V.order := by linarith [V'.order_pos]
@@ -78,20 +78,22 @@ theorem SobolevSpace.exists_eq_inclusion (h : S.HasNikolskii μ D) (hD : 0 ≤ D
   exact ⟨y', by rw [hy', hg]⟩
 
 /-- **The Sobolev embedding** in the classical form of the exponents: `t - D/r < s - D/p`. -/
-theorem SobolevSpace.exists_eq_inclusion' (h : S.HasNikolskii μ D) (hD : 0 ≤ D)
-    (V : S.SobolevSpace μ p W) (V' : S.SobolevSpace μ r W') (hpr : p ≤ r)
+theorem SobolevSpace.exists_eq_inclusion' (h : S.HasNikolskii D) (hD : 0 ≤ D)
+    (V : S.SobolevSpace p W) (V' : S.SobolevSpace r W') (hpr : p ≤ r)
     (hst : V'.order - D * r.toReal⁻¹ < V.order - D * p.toReal⁻¹) (y : W) :
     ∃ y' : W', Lp.inclusionOfExponentLe (𝕜 := ℝ) μ hpr (V'.incl y') = V.incl y :=
   V.exists_eq_inclusion h hD V' hpr (by unfold nikolskiiExponent; linarith) y
 
-/-- **Embedding of a Sobolev space into bounded continuous functions**: for `s > D/p` and a
-measure charging every nonempty open set, every element of a Sobolev space of order `s` in
-`L_p` has a bounded continuous representative. -/
-theorem SobolevSpace.exists_boundedContinuous [μ.IsOpenPosMeasure] (h : S.HasNikolskii μ D)
-    (hD : 0 ≤ D) (V : S.SobolevSpace μ p W) (hs : D * p.toReal⁻¹ < V.order) (y : W) :
+/-- **Embedding of a Sobolev space into bounded continuous functions**: if `Ω` is a topological
+space with its Borel `σ`-algebra, `μ` charges every nonempty open set, the scheme has continuous
+approximants and `s > D/p`, every element of a Sobolev space of order `s` in `L_p` has a bounded
+continuous representative. -/
+theorem SobolevSpace.exists_boundedContinuous [TopologicalSpace Ω] [BorelSpace Ω]
+    [μ.IsOpenPosMeasure] (hS : S.HasContinuousApproximants) (h : S.HasNikolskii D)
+    (hD : 0 ≤ D) (V : S.SobolevSpace p W) (hs : D * p.toReal⁻¹ < V.order) (y : W) :
     ∃ a : Ω →ᵇ ℂ, Lp.inclusionOfExponentLe (𝕜 := ℝ) μ le_top
       (BoundedContinuousFunction.toLp (E := ℂ) ∞ μ ℝ a) = V.incl y :=
-  MemBesov.exists_boundedContinuous_of_nikolskii h hD hs le_top
+  MemBesov.exists_boundedContinuous_of_nikolskii hS h hD hs le_top
     (memBesov_iff_memApprox.2 (V.memApprox_top y))
 
 end FunctionScheme

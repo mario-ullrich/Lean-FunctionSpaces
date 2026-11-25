@@ -25,9 +25,11 @@ and continuity of their elements is elliptic regularity, a later goal. The Fouri
 torus is a continuous spectral basis (`Torus.fourierEigenbasis`).
 
 The functions `ẽ_i` of level `< n` span the space `basisSpan n` of bounded continuous functions
-(`ContinuousSpectralBasis.basisSpan`), and these spaces form a scheme of functions
-(`ContinuousSpectralBasis.basisScheme`). Its classes in `L_2` are the spectral scheme
-(`ContinuousSpectralBasis.toLp_basisScheme_eq`), so the spectral theory applies:
+(`ContinuousSpectralBasis.basisSpan`). These spaces form an approximation scheme of bounded
+continuous functions, and their classes in `L_∞(μ)` the scheme of functions
+`ContinuousSpectralBasis.basisScheme` (`FunctionScheme.ofContinuous`). Its classes in `L_2` are
+the spectral scheme (`ContinuousSpectralBasis.toLp_basisScheme_eq`), so the spectral theory
+applies:
 
 * **`B^s_{2,2} = H^s`** (`ContinuousSpectralBasis.memBesov_two_two_iff`): for `s > 0`,
   `f ∈ L_2(μ)` lies in `B^s_{2,2}` iff `∑_i (1 + λ(i))^(2s) |⟨e_i, f⟩|² < ∞`;
@@ -89,21 +91,26 @@ theorem basisFun_mem_basisSpan {n : ℕ} {i : ι} (hi : B.level i < n) :
     B.basisFun i ∈ B.basisSpan n :=
   Submodule.subset_span ⟨i, hi, rfl⟩
 
-/-- The **scheme of the basis functions**: the approximants of complexity `n` are the
-combinations of the continuous basis functions `ẽ_i` of level `< n`. -/
-noncomputable def basisScheme : FunctionScheme M :=
-  ApproximationScheme.ofSubmodules (fun n => (B.basisSpan n).restrictScalars ℝ)
-    (by simp) (fun _ _ h => B.basisSpan_mono h)
+/-- The **scheme of the basis functions**, a scheme of functions on `(M, μ)`: the approximants
+of complexity `n` are the classes in `L_∞(μ)` of the combinations of the continuous basis
+functions `ẽ_i` of level `< n`. -/
+noncomputable def basisScheme : FunctionScheme μ :=
+  FunctionScheme.ofContinuous (ApproximationScheme.ofSubmodules
+    (fun n => (B.basisSpan n).restrictScalars ℝ) (by simp) (fun _ _ h => B.basisSpan_mono h)) μ
 
-/-- The approximants of the scheme of the basis functions are their spans. -/
+/-- The approximants of the scheme of the basis functions are the classes of the elements of
+their spans. -/
 @[simp]
-theorem mem_basisScheme {n : ℕ} {a : M →ᵇ ℂ} : a ∈ B.basisScheme n ↔ a ∈ B.basisSpan n :=
+theorem mem_basisScheme {n : ℕ} {a : Lp ℂ ∞ μ} :
+    a ∈ B.basisScheme n ↔
+      ∃ g ∈ B.basisSpan n, BoundedContinuousFunction.toLp (E := ℂ) ∞ μ ℝ g = a :=
   Iff.rfl
 
 /-- **The scheme in `L_2` is the spectral scheme**: the `L_2` classes of the combinations of
 the continuous basis functions of level `< n` are the combinations of the basis elements of
 level `< n`. -/
-theorem toLp_basisScheme_eq : B.basisScheme.toLp μ 2 = B.toScheme := by
+theorem toLp_basisScheme_eq : B.basisScheme.toLp 2 = B.toScheme := by
+  rw [basisScheme, FunctionScheme.toLp_ofContinuous]
   ext n f
   change f ∈ (BoundedContinuousFunction.toLp (E := ℂ) 2 μ ℝ) '' (B.basisSpan n : Set _) ↔
     f ∈ (B.levelSpan n : Set _)
@@ -126,7 +133,7 @@ variable {s : ℝ} {q : ℝ≥0∞}
 /-- **`B^s_{2,2} = H^s`** for a continuous spectral basis: for `s > 0`, `f ∈ L_2(μ)` lies in
 `B^s_{2,2}` iff `∑_i (1 + λ(i))^(2s) |⟨e_i, f⟩|² < ∞`. -/
 theorem memBesov_two_two_iff (hs : 0 < s) (f : Lp ℂ 2 μ) :
-    B.basisScheme.MemBesov μ 2 s 2 f ↔
+    B.basisScheme.MemBesov 2 s 2 f ↔
       Memℓp (fun i => ((((1 + B.level i : ℕ) : ℝ) ^ s : ℝ) : ℂ) * B.basis.repr f i) 2 := by
   rw [FunctionScheme.memBesov_iff_memApprox, toLp_basisScheme_eq]
   exact B.memApprox_two_iff_levelWeight hs f
@@ -136,7 +143,7 @@ with sharp cut-offs at the levels `2^k`: for `s > 0` and `1 ≤ q ≤ ∞`, `f �
 `‖P_1 f‖ + ‖(2^(ks) ‖Δ_k f‖_2)_k‖_{ℓ_q} < ∞`, with
 `‖Δ_k f‖_2² = ∑_{2^k ≤ λ(i) < 2^(k+1)} |⟨e_i, f⟩|²`. -/
 theorem memBesov_two_iff_blockNorm_lt_top (hs : 0 < s) (hq : 1 ≤ q) (f : Lp ℂ 2 μ) :
-    B.basisScheme.MemBesov μ 2 s q f ↔ B.spectralProjectionScheme.blockNorm s q f < ∞ := by
+    B.basisScheme.MemBesov 2 s q f ↔ B.spectralProjectionScheme.blockNorm s q f < ∞ := by
   rw [FunctionScheme.memBesov_iff_memApprox, toLp_basisScheme_eq]
   exact B.memApprox_iff_blockNorm_lt_top hs hq
 
@@ -144,7 +151,7 @@ theorem memBesov_two_iff_blockNorm_lt_top (hs : 0 < s) (hq : 1 ≤ q) (f : Lp �
 the scheme of the basis functions in `L_2`: the image of `ℓ²(ι)` under
 `c ↦ ∑_i (1 + λ(i))^(-s) c_i e_i`, with Jackson's and Bernstein's inequalities of order `s` and
 constant `1`. -/
-noncomputable def sobolevSpace (s : ℝ) (hs : 0 < s) : B.basisScheme.SobolevSpace μ 2 ℓ²(ι, ℂ) :=
+noncomputable def sobolevSpace (s : ℝ) (hs : 0 < s) : B.basisScheme.SobolevSpace 2 ℓ²(ι, ℂ) :=
   ApproximationScheme.SmoothnessSpace.congr B.toLp_basisScheme_eq.symm
     (B.toSmoothnessSpace s hs)
 
@@ -165,12 +172,12 @@ theorem mem_range_sobolev_iff (hs : 0 < s) (f : Lp ℂ 2 μ) :
 
 /-- **`H^s ⊆ B^s_{2,∞}`**, from Jackson's inequality. -/
 theorem sobolev_memBesov_top (hs : 0 < s) (c : ℓ²(ι, ℂ)) :
-    B.basisScheme.MemBesov μ 2 s ∞ ((B.sobolevSpace s hs).incl c) :=
+    B.basisScheme.MemBesov 2 s ∞ ((B.sobolevSpace s hs).incl c) :=
   FunctionScheme.memBesov_iff_memApprox.2 ((B.sobolevSpace s hs).memApprox_top c)
 
 /-- **`B^t_{2,q} ⊆ H^s` for `t > s`**, from Bernstein's inequality. -/
 theorem exists_sobolev_of_memBesov (hs : 0 < s) {t : ℝ} (hst : s < t) (hq : 1 ≤ q)
-    {f : Lp ℂ 2 μ} (hf : B.basisScheme.MemBesov μ 2 t q f) :
+    {f : Lp ℂ 2 μ} (hf : B.basisScheme.MemBesov 2 t q f) :
     ∃ c : ℓ²(ι, ℂ), (B.sobolevSpace s hs).incl c = f :=
   (B.sobolevSpace s hs).exists_eq_of_lt hst hq (FunctionScheme.memBesov_iff_memApprox.1 hf)
 

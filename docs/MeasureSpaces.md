@@ -5,10 +5,12 @@ spaces*, chapters *Besov spaces and their embeddings*, *Sobolev spaces and their
 *Spectral schemes*; part *Besov spaces*, the opening of chapter *Filtrations and martingale
 differences*.
 
-For a finite measure space `(Ω, μ)` and a scheme `S` of bounded continuous functions, the
-Besov space is `B^s_{p,q}(Ω, S) = A^s_q(L_p(μ), S)`, and the embedding theorems follow from the
-Nikolskii transfer theorem of [Approximation spaces](ApproximationSpaces.md) together with a
-Nikolskii inequality for the scheme. Spectral schemes in a Hilbert space give the Sobolev spaces
+For a finite measure space `(Ω, μ)` and a scheme of functions `S`, an approximation scheme in
+`L_∞(μ)` (`FunctionScheme μ`), the Besov space is `B^s_{p,q}(Ω, S) = A^s_q(L_p(μ), S^(p))`,
+where `S^(p)` is the image of `S` under the inclusion `L_∞(μ) ↪ L_p(μ)`, and the embedding
+theorems follow from the Nikolskii transfer theorem of
+[Approximation spaces](ApproximationSpaces.md) together with a Nikolskii inequality for the
+scheme. Spectral schemes in a Hilbert space give the Sobolev spaces
 `H^s` with Jackson and Bernstein constants `1`, and their dyadic Fourier blocks characterise
 `A^s_q` (`SpectralScheme.memApprox_iff_blockNorm_lt_top`). A compact dense embedding
 `J : V → H` of Hilbert spaces gives such a scheme, from the eigenvectors of `J J†`
@@ -24,15 +26,18 @@ The `L_p` tools are in [Tools from analysis](Analysis.md).
 
 ## Main results
 
-* **Besov embeddings.** Let `μ` be a finite measure on `Ω` and `S` a scheme of bounded continuous
-  functions with the Nikolskii property of dimension `D ≥ 0`: for every `1 ≤ p ≤ ∞` there is `C`
-  with `‖a‖_∞ ≤ C n^(D/p) ‖a‖_p` for all `a ∈ S_n`, `n ≥ 1` (the hypothesis
+* **Besov embeddings.** Let `μ` be a finite measure on `Ω` and `S` a scheme of functions with the
+  Nikolskii property of dimension `D ≥ 0`: for every `1 ≤ p ≤ ∞` there is `C` with
+  `‖a‖_∞ ≤ C n^(D/p) ‖a‖_p` for all `a ∈ S_n`, `n ≥ 1` (the hypothesis
   `FunctionScheme.HasNikolskii`, proved on the torus, `Torus.trigScheme_hasNikolskii`). Let
   `1 ≤ p ≤ r ≤ ∞`, `1 ≤ q ≤ ∞` and `α = D (1/p - 1/r) < s`. Then every `f ∈ B^s_{p,q}` belongs to
   `L_r` and to `B^{s-α}_{r,q}`, with `‖f‖_{B^{s-α}_{r,q}} ≤ K ‖f‖_{B^s_{p,q}}`
   (`FunctionScheme.MemBesov.exists_inclusion_eq_of_nikolskii`,
-  `FunctionScheme.exists_uniform_inclusion_eq_of_nikolskii`). If `μ` charges every nonempty open set
-  and `s > D/p`, every `f ∈ B^s_{p,q}` has a bounded continuous representative
+  `FunctionScheme.exists_uniform_inclusion_eq_of_nikolskii`). For schemes with continuous
+  approximants (`FunctionScheme.HasContinuousApproximants`), such as the scheme of a scheme of
+  bounded continuous functions (`FunctionScheme.ofContinuous`), on a topological space `Ω` with
+  its Borel σ-algebra, with `μ` charging every nonempty open set and for `s > D/p`, every
+  `f ∈ B^s_{p,q}` has a bounded continuous representative
   (`FunctionScheme.MemBesov.exists_boundedContinuous_of_nikolskii`).
 * **Besov spaces interpolate.** For every scheme of functions `S`, `1 ≤ p ≤ ∞`, `0 < η < 1` and
   `1 ≤ q₀, q₁, q ≤ ∞`, the real interpolation spaces of the continuous K-method of the couples
@@ -50,8 +55,9 @@ The `L_p` tools are in [Tools from analysis](Analysis.md).
   `a ∈ S_n` lies in `V` with `‖a‖_V ≤ C n^s ‖a‖_p`). For `S` with the Nikolskii property of
   dimension `D ≥ 0`, Sobolev spaces `V` of order `s` in `L_p` and `V'` of order `t` in `L_r`,
   `p ≤ r` and `t - D/r < s - D/p`, every element of `V` lies in `V'`
-  (`FunctionScheme.SobolevSpace.exists_eq_inclusion'`); for `s > D/p` every element of `V` has a
-  bounded continuous representative (`FunctionScheme.SobolevSpace.exists_boundedContinuous`). The
+  (`FunctionScheme.SobolevSpace.exists_eq_inclusion'`); for schemes with continuous approximants
+  and `s > D/p` every element of `V` has a bounded continuous representative
+  (`FunctionScheme.SobolevSpace.exists_boundedContinuous`). The
   instances of the structure are the spaces `H^s`, `p = 2`, on the torus and for a continuous
   spectral basis (`Torus.periodicSobolevSpace`, `ContinuousSpectralBasis.sobolevSpace`). The
   limiting cases are not covered.

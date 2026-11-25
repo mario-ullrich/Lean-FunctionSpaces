@@ -12,15 +12,20 @@ public import ApproximationSpaces.Lift
 /-!
 # The Nikolskii inequality of a scheme
 
-A scheme of functions `S` has the **Nikolskii property of dimension `D`** for the measure `μ`
-if for every `1 ≤ p ≤ ∞` there is `C` with
+A scheme of functions `S` on a finite measure space `(Ω, μ)` has the **Nikolskii property of
+dimension `D`** if for every `1 ≤ p ≤ ∞` there is `C` with
 
 `‖a‖_∞ ≤ C n^(D/p) ‖a‖_p`   for all `a ∈ S n`, `n ≥ 1`
 
-(`FunctionScheme.HasNikolskii`), a hypothesis on the scheme.  For trigonometric polynomials of
-degree `< n` on `𝕋^d` it holds with `D = d` (`Torus.trigScheme_hasNikolskii`,
-`Torus.hasNikolskii_fourierEigenbasis`); these torus instances are the ones proved in this
-library.  The property is stated against the sup norm only; the general
+(`FunctionScheme.HasNikolskii`), a hypothesis on the scheme; here `‖a‖_∞` is the norm of the
+class `a` in `L_∞(μ)`. At `p = ∞` the bound holds with `C = 1` for every scheme. For the
+scheme of an approximation scheme `T` of bounded continuous functions the same bound with the
+sup norm of the elements of `T` for every `1 ≤ p < ∞` suffices
+(`FunctionScheme.hasNikolskii_ofContinuous`), since the `L_∞` norm of a bounded continuous
+function is at most its sup norm (`FunctionScheme.toReal_eLpNorm_top_le_norm`). For
+trigonometric polynomials of degree `< n` on `𝕋^d` the property holds with `D = d`
+(`Torus.trigScheme_hasNikolskii`, `Torus.hasNikolskii_fourierEigenbasis`); these torus instances
+are the ones proved in this library.  The property is stated against `L_∞` only; the general
 **Nikolskii inequality**
 
 `‖a‖_r ≤ C' n^(D (1/p - 1/r)) ‖a‖_p`,   `p ≤ r`
@@ -204,20 +209,18 @@ theorem nikolskiiExponent_conjExponent_of_eq {n m : ℕ} (hm : 2 ≤ m) {r : ℝ
 
 namespace FunctionScheme
 
-variable {Ω : Type*} [TopologicalSpace Ω] [MeasurableSpace Ω] [BorelSpace Ω]
+variable {Ω : Type*} [MeasurableSpace Ω] {μ : Measure Ω}
 
 /-- The **Nikolskii property of dimension `D`**: for every `1 ≤ p ≤ ∞`,
-`‖a‖_∞ ≤ C n^(D/p) ‖a‖_p` for all approximants `a ∈ S n`, `n ≥ 1`. A hypothesis on the scheme;
-the torus has it (`Torus.trigScheme_hasNikolskii`). -/
-structure HasNikolskii (S : FunctionScheme Ω) (μ : Measure Ω) (D : ℝ) : Prop where
+`‖a‖_∞ ≤ C n^(D/p) ‖a‖_p` for all approximants `a ∈ S n`, `n ≥ 1`, with the norm `‖a‖_∞` of the
+class `a` in `L_∞(μ)`. A hypothesis on the scheme; the torus has it
+(`Torus.trigScheme_hasNikolskii`). -/
+structure HasNikolskii (S : FunctionScheme μ) (D : ℝ) : Prop where
   exists_const : ∀ p : ℝ≥0∞, 1 ≤ p → ∃ C : ℝ, 0 ≤ C ∧ ∀ n : ℕ, 1 ≤ n → ∀ a ∈ S n,
-    ‖a‖ ≤ C * (n : ℝ) ^ (D * p.toReal⁻¹) * (eLpNorm a p μ).toReal
+    (eLpNorm a ∞ μ).toReal ≤ C * (n : ℝ) ^ (D * p.toReal⁻¹) * (eLpNorm a p μ).toReal
 
-variable {S : FunctionScheme Ω} {μ : Measure Ω} [IsFiniteMeasure μ] {D : ℝ}
-
-omit [IsFiniteMeasure μ] in
 /-- The `L_∞` norm of a bounded continuous function is at most its sup norm. -/
-theorem toReal_eLpNorm_top_le_norm (a : Ω →ᵇ ℂ) :
+theorem toReal_eLpNorm_top_le_norm [TopologicalSpace Ω] [OpensMeasurableSpace Ω] (a : Ω →ᵇ ℂ) :
     (eLpNorm a ∞ μ).toReal ≤ ‖a‖ := by
   have : eLpNorm a ∞ μ ≤ ‖a‖ₑ := by
     rw [eLpNorm_exponent_top a.continuous.aestronglyMeasurable]
@@ -226,17 +229,39 @@ theorem toReal_eLpNorm_top_le_norm (a : Ω →ᵇ ℂ) :
   rw [← toReal_enorm]
   exact ENNReal.toReal_mono enorm_ne_top this
 
-/-- **The Nikolskii inequality**: under the Nikolskii property of dimension `D ≥ 0`, for
+variable [IsFiniteMeasure μ] {S : FunctionScheme μ} {D : ℝ}
+
+/-- **The Nikolskii property of the scheme of a scheme of bounded continuous functions**: if an
+approximation scheme `T` of bounded continuous functions satisfies, for every `1 ≤ p < ∞`,
+`sup |a| ≤ C n^(D/p) ‖a‖_p` for all `a ∈ T n`, `n ≥ 1`, then its scheme of functions has the
+Nikolskii property of dimension `D`, since `‖a‖_∞ ≤ sup |a|`. At `p = ∞` the bound of the
+Nikolskii property reads `‖a‖_∞ ≤ C ‖a‖_∞` and holds with `C = 1` for every scheme. -/
+theorem hasNikolskii_ofContinuous [TopologicalSpace Ω] [BorelSpace Ω]
+    {T : ApproximationScheme (Ω →ᵇ ℂ)}
+    (h : ∀ p : ℝ≥0∞, 1 ≤ p → p ≠ ∞ → ∃ C : ℝ, 0 ≤ C ∧ ∀ n : ℕ, 1 ≤ n → ∀ a ∈ T n,
+      ‖a‖ ≤ C * (n : ℝ) ^ (D * p.toReal⁻¹) * (eLpNorm a p μ).toReal) :
+    (ofContinuous T μ).HasNikolskii D := by
+  refine ⟨fun p hp => ?_⟩
+  rcases eq_or_ne p ∞ with rfl | hp'
+  · exact ⟨1, zero_le_one, fun n _ b _ => by simp⟩
+  obtain ⟨C, hC, hCa⟩ := h p hp hp'
+  refine ⟨C, hC, fun n hn _ hb => ?_⟩
+  obtain ⟨a, ha, rfl⟩ := mem_ofContinuous.1 hb
+  have hae := BoundedContinuousFunction.coeFn_toLp (E := ℂ) ∞ μ ℝ a
+  rw [eLpNorm_congr_ae hae, eLpNorm_congr_ae hae]
+  exact (toReal_eLpNorm_top_le_norm a).trans (hCa n hn a ha)
+
+/-- **The Nikolskii inequality**: under the Nikolskii property of dimension `D`, for
 `1 ≤ p ≤ r ≤ ∞` there is `C` with `‖a‖_r ≤ C n^(D(1/p - 1/r)) ‖a‖_p` for all `a ∈ S n`,
 `n ≥ 1`. -/
-theorem HasNikolskii.eLpNorm_le (h : S.HasNikolskii μ D) {p r : ℝ≥0∞} (hp : 1 ≤ p)
+theorem HasNikolskii.eLpNorm_le (h : S.HasNikolskii D) {p r : ℝ≥0∞} (hp : 1 ≤ p)
     (hpr : p ≤ r) : ∃ C : ℝ, 0 ≤ C ∧ ∀ n : ℕ, 1 ≤ n → ∀ a ∈ S n,
       (eLpNorm a r μ).toReal ≤ C * (n : ℝ) ^ nikolskiiExponent D p r * (eLpNorm a p μ).toReal := by
   obtain ⟨C, hC, hCa⟩ := h.exists_const p hp
   rcases eq_or_ne r ∞ with rfl | hr
   · refine ⟨C, hC, fun n hn a ha => ?_⟩
     rw [nikolskiiExponent_top]
-    exact (toReal_eLpNorm_top_le_norm a).trans (hCa n hn a ha)
+    exact hCa n hn a ha
   have hp0 : p ≠ 0 := (zero_lt_one.trans_le hp).ne'
   have hp' : p ≠ ∞ := ne_top_of_le_ne_top hr hpr
   have hr0 : r ≠ 0 := (zero_lt_one.trans_le (hp.trans hpr)).ne'
@@ -248,9 +273,15 @@ theorem HasNikolskii.eLpNorm_le (h : S.HasNikolskii μ D) {p r : ℝ≥0∞} (hp
   have hn0 : (0 : ℝ) ≤ n := Nat.cast_nonneg n
   set Np := (eLpNorm a p μ).toReal
   have hNp : 0 ≤ Np := ENNReal.toReal_nonneg
-  have hint := toReal_eLpNorm_le_rpow_mul (μ := μ) a.continuous.aestronglyMeasurable
-    (norm_nonneg a) (Filter.Eventually.of_forall a.norm_coe_le_norm) hp0 hpr hr
-  calc (eLpNorm a r μ).toReal ≤ ‖a‖ ^ (1 - θ) * Np ^ θ := hint
+  set Ninf := (eLpNorm a ∞ μ).toReal
+  -- the class `a ∈ L_∞` is bounded almost everywhere by its `L_∞` norm
+  have hbd : ∀ᵐ x ∂μ, ‖a x‖ ≤ Ninf := by
+    filter_upwards [ae_le_eLpNormEssSup (f := (a : Ω → ℂ)) (μ := μ)] with x hx
+    rw [← toReal_enorm]
+    exact ENNReal.toReal_mono (Lp.eLpNorm_ne_top a) (hx.trans eLpNormEssSup_le_eLpNorm_top)
+  have hint := toReal_eLpNorm_le_rpow_mul (μ := μ) (Lp.aestronglyMeasurable a)
+    ENNReal.toReal_nonneg hbd hp0 hpr hr
+  calc (eLpNorm a r μ).toReal ≤ Ninf ^ (1 - θ) * Np ^ θ := hint
     _ ≤ (C * (n : ℝ) ^ (D * p.toReal⁻¹) * Np) ^ (1 - θ) * Np ^ θ := by
         gcongr; exact hCa n hn a ha
     _ = C ^ (1 - θ) * (n : ℝ) ^ nikolskiiExponent D p r * (Np ^ (1 - θ) * Np ^ θ) := by
@@ -265,19 +296,16 @@ theorem HasNikolskii.eLpNorm_le (h : S.HasNikolskii μ D) {p r : ℝ≥0∞} (hp
 /-- **The Nikolskii inequality as a lifting bound** for the inclusion `L_r ↪ L_p`: every
 approximant of the scheme in `L_p` is the inclusion of an approximant in `L_r` whose norm is at
 most `C n^(D(1/p - 1/r))` times its `L_p` norm. -/
-theorem HasNikolskii.liftBound (h : S.HasNikolskii μ D) {p r : ℝ≥0∞} [Fact (1 ≤ p)]
+theorem HasNikolskii.liftBound (h : S.HasNikolskii D) {p r : ℝ≥0∞} [Fact (1 ≤ p)]
     [Fact (1 ≤ r)] (hpr : p ≤ r) : ∃ C : ℝ, 0 ≤ C ∧
       ApproximationScheme.LiftBound (Lp.inclusionOfExponentLe (E := ℂ) (𝕜 := ℝ) μ hpr)
-        (S.toLp μ p) (nikolskiiExponent D p r) C := by
+        (S.toLp p) (nikolskiiExponent D p r) C := by
   obtain ⟨C, hC, hCa⟩ := h.eLpNorm_le (Fact.out : 1 ≤ p) hpr
   refine ⟨C, hC, fun n hn g hg => ?_⟩
   obtain ⟨a, ha, rfl⟩ := hg
-  refine ⟨BoundedContinuousFunction.toLp (E := ℂ) r μ ℝ a,
-    BoundedContinuousFunction.inclusionOfExponentLe_toLp hpr a, ?_⟩
-  change ‖BoundedContinuousFunction.toLp (E := ℂ) r μ ℝ a‖ ≤
-    C * (n : ℝ) ^ nikolskiiExponent D p r * ‖BoundedContinuousFunction.toLp (E := ℂ) p μ ℝ a‖
-  rw [BoundedContinuousFunction.norm_toLp_eq_toReal_eLpNorm,
-    BoundedContinuousFunction.norm_toLp_eq_toReal_eLpNorm]
+  refine ⟨Lp.topInclusion (𝕜 := ℝ) μ r a, Lp.inclusionOfExponentLeLinear_topInclusion hpr a, ?_⟩
+  rw [Lp.norm_def, Lp.norm_def, Lp.eLpNorm_inclusionOfExponentLeLinear,
+    Lp.eLpNorm_inclusionOfExponentLeLinear]
   exact hCa n hn a ha
 
 end FunctionScheme

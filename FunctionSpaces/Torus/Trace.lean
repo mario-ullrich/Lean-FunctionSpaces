@@ -449,22 +449,23 @@ theorem enorm_toLpR {d : Type*} [Fintype d] (a : UnitAddTorus d →ᵇ ℂ) :
 /-- Every approximant of the trigonometric scheme in `L_p` is the class of a bounded continuous
 function. -/
 theorem iUnionSubmodule_le_range (d : Type*) [Fintype d] :
-    ((trigScheme d).toLp volume p).iUnionSubmodule ≤ LinearMap.range (toLpR p d) := by
+    ((trigScheme d).toLp p).iUnionSubmodule ≤ LinearMap.range (toLpR p d) := by
   intro g hg
   rw [← SetLike.mem_coe, ApproximationScheme.coe_iUnionSubmodule, Set.mem_iUnion] at hg
-  obtain ⟨k, a, -, rfl⟩ := hg
+  obtain ⟨k, hk⟩ := hg
+  obtain ⟨a, -, rfl⟩ := FunctionScheme.mem_toLp_ofContinuous.1 hk
   exact ⟨a, rfl⟩
 
 /-- The restriction to the face on the `L_p` classes of trigonometric polynomials. -/
 noncomputable def periodicTraceOnApprox (n : ℕ) :
-    ((trigScheme (Fin (n + 1))).toLp volume p).iUnionSubmodule →ₗ[ℝ]
+    ((trigScheme (Fin (n + 1))).toLp p).iUnionSubmodule →ₗ[ℝ]
       Lp ℂ p (volume : Measure (UnitAddTorus (Fin n))) :=
   toLpR p (Fin n) ∘ₗ (restrictFace n).restrictScalars ℝ ∘ₗ
     (LinearEquiv.ofInjective (toLpR p (Fin (n + 1))) (toLpR_injective p _)).symm.toLinearMap ∘ₗ
       Submodule.inclusion (iUnionSubmodule_le_range p (Fin (n + 1)))
 
 theorem periodicTraceOnApprox_apply (a : UnitAddTorus (Fin (n + 1)) →ᵇ ℂ)
-    (h : toLpR p (Fin (n + 1)) a ∈ ((trigScheme (Fin (n + 1))).toLp volume p).iUnionSubmodule) :
+    (h : toLpR p (Fin (n + 1)) a ∈ ((trigScheme (Fin (n + 1))).toLp p).iUnionSubmodule) :
     periodicTraceOnApprox p n ⟨toLpR p (Fin (n + 1)) a, h⟩ =
       toLpR p (Fin n) (restrictFace n a) := by
   have he : Submodule.inclusion (iUnionSubmodule_le_range p (Fin (n + 1)))
@@ -480,18 +481,18 @@ noncomputable def periodicTraceConst : ℝ≥0∞ := ((2 * ⌈p.toReal / 2⌉₊
 /-- **The restriction to the face is a trace bound** of exponent `1/p` from the trigonometric
 scheme of `𝕋^(n+1)` to that of `𝕋^n` in `L_p`, `1 ≤ p < ∞`. -/
 noncomputable def periodicTraceBound (n : ℕ) (hp : p ≠ ∞) :
-    ApproximationScheme.TraceBound ((trigScheme (Fin (n + 1))).toLp volume p)
-      ((trigScheme (Fin n)).toLp volume p) p.toReal⁻¹ :=
+    ApproximationScheme.TraceBound ((trigScheme (Fin (n + 1))).toLp p)
+      ((trigScheme (Fin n)).toLp p) p.toReal⁻¹ :=
   ApproximationScheme.TraceBound.ofSubmodule (periodicTraceOnApprox p n)
     (fun m g hg => by
-      obtain ⟨a, ha, hag⟩ := hg
+      obtain ⟨a, ha, hag⟩ := FunctionScheme.mem_toLp_ofContinuous.1 hg
       have hg' : g = ⟨toLpR p (Fin (n + 1)) a, hag ▸ g.2⟩ := Subtype.ext hag.symm
       rw [hg', periodicTraceOnApprox_apply]
-      exact FunctionScheme.toLp_mem_toLp (restrictFace_mem_trigPoly ha))
+      exact FunctionScheme.toLp_mem_toLp_ofContinuous (restrictFace_mem_trigPoly ha))
     (periodicTraceConst p)
       (ENNReal.rpow_ne_top_of_nonneg (by positivity) (ENNReal.natCast_ne_top _))
     (fun m hm g hg => by
-      obtain ⟨a, ha, hag⟩ := hg
+      obtain ⟨a, ha, hag⟩ := FunctionScheme.mem_toLp_ofContinuous.1 hg
       have hg' : g = ⟨toLpR p (Fin (n + 1)) a, hag ▸ g.2⟩ := Subtype.ext hag.symm
       rw [hg', periodicTraceOnApprox_apply, enorm_toLpR, enorm_toLpR]
       refine (eLpNorm_restrictFace_le ha (Fact.out) hp).trans_eq ?_
@@ -504,8 +505,9 @@ theorem periodicTraceBound_T_toLp (hp : p ≠ ∞) {m : ℕ} {a : UnitAddTorus (
     (periodicTraceBound p n hp).T (toLpR p (Fin (n + 1)) a) =
       toLpR p (Fin n) (restrictFace n a) := by
   have hmem : toLpR p (Fin (n + 1)) a ∈
-      ((trigScheme (Fin (n + 1))).toLp volume p).iUnionSubmodule :=
-    ApproximationScheme.mem_iUnionSubmodule (FunctionScheme.toLp_mem_toLp (n := m) ha)
+      ((trigScheme (Fin (n + 1))).toLp p).iUnionSubmodule :=
+    ApproximationScheme.mem_iUnionSubmodule
+      (FunctionScheme.toLp_mem_toLp_ofContinuous (n := m) ha)
   unfold periodicTraceBound
   exact (ApproximationScheme.TraceBound.ofSubmodule_T _ _ _ _ _ ⟨_, hmem⟩).trans
     (periodicTraceOnApprox_apply p a hmem)
@@ -516,7 +518,8 @@ theorem periodicTraceBound_limitTrace_toLp (hp : p ≠ ∞) {m : ℕ}
     (periodicTraceBound p n hp).limitTrace (toLpR p (Fin (n + 1)) a) =
       toLpR p (Fin n) (restrictFace n a) := by
   exact ((periodicTraceBound p n hp).limitTrace_eq_of_mem (by positivity)
-    (FunctionScheme.toLp_mem_toLp (n := m) ha)).trans (periodicTraceBound_T_toLp p hp ha)
+    (FunctionScheme.toLp_mem_toLp_ofContinuous (n := m) ha)).trans
+      (periodicTraceBound_T_toLp p hp ha)
 
 /-- **The extension is a right inverse on approximants**: every polynomial of degree `< 2^k` on
 `𝕋^n` is the trace of a polynomial of degree `< 2^(k+2)` on `𝕋^(n+1)` of norm
@@ -524,11 +527,13 @@ theorem periodicTraceBound_limitTrace_toLp (hp : p ≠ ∞) {m : ℕ}
 theorem periodicTraceBound_rightInverse (hp : p ≠ ∞) :
     (periodicTraceBound p n hp).RightInverseBound 2 1 := by
   intro k b' hb'
-  obtain ⟨b, hb, rfl⟩ := hb'
+  obtain ⟨b, hb, hbb⟩ := FunctionScheme.mem_toLp_ofContinuous.1 hb'
+  obtain rfl : toLpR p (Fin n) b = b' := hbb
   have hm : 1 ≤ 2 ^ k := Nat.one_le_two_pow
   have hmem : extendFace n (2 ^ k) b ∈ trigPoly (Fin (n + 1)) (2 ^ (k + 2)) :=
     trigPoly_mono (by rw [pow_add]; omega) (extendFace_mem_trigPoly hb)
-  refine ⟨toLpR p (Fin (n + 1)) (extendFace n (2 ^ k) b), FunctionScheme.toLp_mem_toLp hmem, ?_, ?_⟩
+  refine ⟨toLpR p (Fin (n + 1)) (extendFace n (2 ^ k) b),
+    FunctionScheme.toLp_mem_toLp_ofContinuous hmem, ?_, ?_⟩
   · rw [periodicTraceBound_T_toLp p hp hmem, restrictFace_extendFace hm]
   · rw [enorm_toLpR, one_mul, ← ENNReal.natCast_two_pow_rpow]
     exact (eLpNorm_extendFace_le hm b Fact.out hp).trans_eq (by rw [enorm_toLpR])
@@ -538,10 +543,10 @@ restriction to the face `{x_0 = 0}` extends from trigonometric polynomials to a 
 `B^{s+1/p}_{p,q}(𝕋^(n+1))` into `B^s_{p,q}(𝕋^n)`, and every `g ∈ B^s_{p,q}(𝕋^n)` is the trace
 of some `f ∈ B^{s+1/p}_{p,q}(𝕋^(n+1))`. -/
 theorem trace_besov (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞} (hq : 1 ≤ q) :
-    (∀ f, (trigScheme (Fin (n + 1))).MemBesov volume p (s + p.toReal⁻¹) q f →
-      (trigScheme (Fin n)).MemBesov volume p s q ((periodicTraceBound p n hp).limitTrace f)) ∧
-    (∀ g, (trigScheme (Fin n)).MemBesov volume p s q g →
-      ∃ f, (trigScheme (Fin (n + 1))).MemBesov volume p (s + p.toReal⁻¹) q f ∧
+    (∀ f, (trigScheme (Fin (n + 1))).MemBesov p (s + p.toReal⁻¹) q f →
+      (trigScheme (Fin n)).MemBesov p s q ((periodicTraceBound p n hp).limitTrace f)) ∧
+    (∀ g, (trigScheme (Fin n)).MemBesov p s q g →
+      ∃ f, (trigScheme (Fin (n + 1))).MemBesov p (s + p.toReal⁻¹) q f ∧
         (periodicTraceBound p n hp).limitTrace f = g) := by
   have hβ : 0 ≤ p.toReal⁻¹ := by positivity
   refine ⟨fun f hf => ?_, fun g hg => ?_⟩

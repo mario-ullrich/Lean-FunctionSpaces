@@ -122,7 +122,7 @@ theorem periodicLpBlock_eq_zero_of_mem (hp : p ≠ ∞) {i j : ℕ} (hij : i + F
 theorem enorm_periodicLpBlock_le_approxError (hp : p ≠ ∞) {i j : ℕ}
     (hij : i + Fintype.card d + 1 ≤ j) (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     ‖periodicLpBlock hp j f‖ₑ ≤ 2 * eLpNorm (Rd.lpKernel (V := EuclideanSpace ℝ d)) 1 volume *
-      ((trigScheme d).toLp volume p).approxError f (2 ^ i) := by
+      ((trigScheme d).toLp p).approxError f (2 ^ i) := by
   refine ApproximationScheme.le_mul_approxError_of_forall_mem
     (ENNReal.mul_ne_top (by norm_num) Rd.eLpNorm_lpKernel_ne_top) fun a ha => ?_
   have h0 : periodicLpBlock hp j a = 0 :=
@@ -154,7 +154,7 @@ the scheme of trigonometric polynomials. The blocks moved up by one level,
 decomposition (`ApproximationScheme.approxNormDyadic_le_of_hasSum`). -/
 theorem approxNormDyadic_trigScheme_le (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞}
     (hq : 1 ≤ q) (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
-    ((trigScheme d).toLp volume p).approxNormDyadic s q f ≤
+    ((trigScheme d).toLp p).approxNormDyadic s q f ≤
       2 * dyadicWeight s 1 * (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * periodicLittlewoodPaleyNorm hp s q f := by
   rcases eq_or_ne (periodicLittlewoodPaleyNorm hp s q f) ∞ with h | h
   · rw [h, ENNReal.mul_top (mul_ne_zero (mul_ne_zero two_ne_zero
@@ -162,7 +162,7 @@ theorem approxNormDyadic_trigScheme_le (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s) {
       (zero_lt_one.trans_le (ENNReal.one_le_one_sub_two_rpow_neg_inv s)).ne')]
     exact le_top
   set g := ApproximationScheme.shiftSeq 1 fun j => periodicLpBlock hp j f
-  calc ((trigScheme d).toLp volume p).approxNormDyadic s q f
+  calc ((trigScheme d).toLp p).approxNormDyadic s q f
       ≤ 2 * (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * lqNorm q (fun k => dyadicWeight s k * ‖g k‖ₑ) :=
         ApproximationScheme.approxNormDyadic_le_of_hasSum hq
           (ApproximationScheme.shiftSeq_mem fun j =>
@@ -187,7 +187,7 @@ theorem periodicLittlewoodPaleyNorm_le_approxNormDyadic_trigScheme (hp : p ≠ �
     periodicLittlewoodPaleyNorm hp s q f ≤
       2 * ((Fintype.card d : ℝ≥0∞) + 1) * dyadicWeight s (Fintype.card d + 1) *
         eLpNorm (Rd.lpKernel (V := EuclideanSpace ℝ d)) 1 volume *
-          ((trigScheme d).toLp volume p).approxNormDyadic s q f := by
+          ((trigScheme d).toLp p).approxNormDyadic s q f := by
   refine (ApproximationScheme.lqNorm_dyadicWeight_mul_enorm_le_approxNormDyadic
     (M := Fintype.card d + 1) hs hq (by omega) (fun j _ => enorm_periodicLpBlock_le hp j f)
     fun n => enorm_periodicLpBlock_le_approxError hp le_rfl f).trans_eq ?_
@@ -199,7 +199,7 @@ theorem periodicLittlewoodPaleyNorm_le_approxNormDyadic_trigScheme (hp : p ≠ �
 `L_p`) iff `(2^(js) ‖ψ_j ⋆ f‖_p)_j ∈ ℓ_q`. -/
 theorem memBesov_iff_periodicLittlewoodPaleyNorm_lt_top (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞}
     (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure (UnitAddTorus d))} :
-    (trigScheme d).MemBesov volume p s q f ↔ periodicLittlewoodPaleyNorm hp s q f < ∞ := by
+    (trigScheme d).MemBesov p s q f ↔ periodicLittlewoodPaleyNorm hp s q f < ∞ := by
   rw [FunctionScheme.memBesov_iff_memApprox,
     ApproximationScheme.memApprox_iff_approxNormDyadic_lt_top hq hs.le]
   have hK : eLpNorm (Rd.lpKernel (V := EuclideanSpace ℝ d)) 1 volume < ∞ :=
