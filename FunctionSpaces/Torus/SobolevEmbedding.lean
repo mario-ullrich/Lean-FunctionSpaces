@@ -48,7 +48,7 @@ theorem memPeriodicSobolev_exists_inclusion_eq [Nonempty d] (hp1 : 1 < p) (hp : 
           ((m : ℝ) - Fintype.card d * (p.toReal⁻¹ - r.toReal⁻¹)) (max p 2) g :=
   memBesov_exists_inclusion_eq hpr hm (le_max_of_le_right one_le_two)
     (memBesov_of_memPeriodicSobolev hp1 hp
-      (one_le_of_nikolskiiExponent_lt (Nat.cast_nonneg _) Fact.out hpr hm) hf)
+      (one_le_of_nikolskiiExponent_lt (Nat.cast_nonneg _) (zero_lt_one.trans hp1).ne' hpr hm) hf)
 
 /-- **The Sobolev embedding into continuous functions on the torus**: for `d ≥ 1`, `1 < p < ∞`
 and `m > d/p`, every `f ∈ W^m_p(𝕋^d)` has a continuous representative

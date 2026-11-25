@@ -196,7 +196,8 @@ theorem exists_memLp_ae_eq_of_triebelLizorkinNorm_lt_top [Nontrivial V] (hp₀�
       ‖g‖ₑ ≤ criticalEmbeddingConst V p₀ p₁ * triebelLizorkinNorm s ∞ f := by
   have hp₀ : p₀ ≠ ∞ := hp₀₁.ne_top
   have : Fact (1 ≤ p₁) := ⟨(Fact.out : 1 ≤ p₀).trans hp₀₁.le⟩
-  have hs0 : 0 < s := hs ▸ nikolskiiExponent_pos (Nat.cast_pos.2 finrank_pos) Fact.out hp₀₁
+  have hs0 : 0 < s := hs ▸ nikolskiiExponent_pos (Nat.cast_pos.2 finrank_pos)
+    (zero_lt_one.trans_le (Fact.out : 1 ≤ p₀)).ne' hp₀₁
   have hLP : littlewoodPaleyNorm hp₀ s ∞ f < ∞ := by
     refine lt_of_le_of_lt ?_ hf
     simpa using littlewoodPaleyNorm_max_le_triebelLizorkinNorm hp₀ (s := s) le_top f

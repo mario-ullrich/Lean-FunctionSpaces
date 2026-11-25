@@ -25,7 +25,7 @@ frequencies of degree `< n` (`Torus.localWeylBound_fourierEigenbasis`).
   (`ContinuousSpectralBasis.norm_sq_le_of_localWeyl`): for `a` in the span of the basis
   functions of level `< n`, `‖a‖_∞² ≤ C n^D ‖a‖_2²`, by the Cauchy–Schwarz inequality in
   `a(x) = ∑_i c_i ẽ_i(x)` and Parseval's identity `‖a‖_2² = ∑_i |c_i|²`.
-* **The Nikolskii inequality for `1 ≤ p ≤ 2`**
+* **The Nikolskii inequality for `0 < p ≤ 2`**
   (`ContinuousSpectralBasis.norm_rpow_le_of_localWeyl`): `‖a‖_∞^p ≤ C n^D ‖a‖_p^p`, since
   `‖a‖_2² ≤ ‖a‖_∞^(2-p) ‖a‖_p^p`. For `p > 2` the inequality with `n^(D/p)` does not follow this
   way: the proof on the torus raises trigonometric polynomials of degree `< n` to the power `m`,
@@ -136,19 +136,16 @@ theorem norm_le_sqrt_mul_of_localWeyl {D C : ℝ} (hW : B.LocalWeylBound D C) {n
     ← Real.sqrt_mul (mul_nonneg hW.nonneg (by positivity))]
   exact Real.le_sqrt_of_sq_le (norm_sq_le_of_localWeyl hW hn ha)
 
-/-- **The Nikolskii inequality for `1 ≤ p ≤ 2`** under the local Weyl bound: for `a` in the span
+/-- **The Nikolskii inequality for `0 < p ≤ 2`** under the local Weyl bound: for `a` in the span
 of level `< n`, `n ≥ 1`, `‖a‖_∞^p ≤ C n^D ‖a‖_p^p`. The case `p = 2` gives
-`‖a‖_∞² ≤ C n^D ‖a‖_2²`, and `‖a‖_2² ≤ ‖a‖_∞^(2-p) ‖a‖_p^p`
+`‖a‖_∞² ≤ C n^D ‖a‖_2²`, and `‖a‖_2² ≤ ‖a‖_∞^(2-p) ‖a‖_p^p` for every `0 < p ≤ 2`
 (`MeasureTheory.toReal_eLpNorm_le_rpow_mul`). -/
 theorem norm_rpow_le_of_localWeyl {D C : ℝ} (hW : B.LocalWeylBound D C) {n : ℕ} (hn : 1 ≤ n)
-    {a : M →ᵇ ℂ} (ha : a ∈ B.basisSpan n) {p : ℝ≥0∞} (hp : 1 ≤ p) (hp2 : p ≤ 2) :
+    {a : M →ᵇ ℂ} (ha : a ∈ B.basisSpan n) {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp2 : p ≤ 2) :
     ‖a‖ ^ p.toReal ≤ C * (n : ℝ) ^ D * (eLpNorm a p μ).toReal ^ p.toReal := by
   have hp' : p ≠ ∞ := ne_top_of_le_ne_top (by norm_num) hp2
   set P := p.toReal
-  have hP1 : 1 ≤ P := ENNReal.one_le_toReal_of_one_le hp hp'
-  have hP2 : P ≤ 2 := by
-    have h := ENNReal.toReal_mono (by norm_num) hp2
-    simpa using h
+  have hP0 : 0 < P := ENNReal.toReal_pos hp0 hp'
   set K := C * (n : ℝ) ^ D
   have hK : 0 ≤ K := mul_nonneg hW.nonneg (by positivity)
   set N := (eLpNorm a p μ).toReal
@@ -156,8 +153,7 @@ theorem norm_rpow_le_of_localWeyl {D C : ℝ} (hW : B.LocalWeylBound D C) {n : �
   set X := (eLpNorm a 2 μ).toReal
   -- interpolation between `L_p` and `L_∞` at the exponent `2`
   have hint := toReal_eLpNorm_le_rpow_mul (μ := μ) a.continuous.aestronglyMeasurable
-    (norm_nonneg a) (Eventually.of_forall a.norm_coe_le_norm)
-    (zero_lt_one.trans_le hp).ne' hp2 (by norm_num)
+    (norm_nonneg a) (Eventually.of_forall a.norm_coe_le_norm) hp0 hp2 (by norm_num)
   simp only [ENNReal.toReal_ofNat] at hint
   have hX : X ^ (2 : ℝ) ≤ ‖a‖ ^ (2 - P) * N ^ P := by
     calc X ^ (2 : ℝ) ≤ (‖a‖ ^ (1 - P / 2) * N ^ (P / 2)) ^ (2 : ℝ) :=
@@ -174,25 +170,26 @@ theorem norm_rpow_le_of_localWeyl {D C : ℝ} (hW : B.LocalWeylBound D C) {n : �
       _ = K * X ^ (2 : ℝ) := by rw [Real.rpow_two]
       _ ≤ K * (‖a‖ ^ (2 - P) * N ^ P) := by gcongr
   rcases (norm_nonneg a).eq_or_lt with h0 | hpos
-  · rw [← h0, Real.zero_rpow (by linarith)]
+  · rw [← h0, Real.zero_rpow hP0.ne']
     exact mul_nonneg hK (Real.rpow_nonneg hN _)
   have hsplit : ‖a‖ ^ (2 : ℝ) = ‖a‖ ^ (2 - P) * ‖a‖ ^ P := by
     rw [← Real.rpow_add hpos, sub_add_cancel]
   rw [hsplit, mul_left_comm] at hchain
   exact le_of_mul_le_mul_left hchain (Real.rpow_pos_of_pos hpos _)
 
-/-- **The Nikolskii inequality for `1 ≤ p ≤ 2`**, unpowered:
-`‖a‖_∞ ≤ C^(1/p) n^(D/p) ‖a‖_p`. -/
+/-- **The Nikolskii inequality for `0 < p ≤ 2`**, unpowered:
+`‖a‖_∞ ≤ C^(1/p) n^(D/p) ‖a‖_p`. At `p = 2` the factor `C^(1/2) n^(D/2)` is the `√(C n^D)` of
+`ContinuousSpectralBasis.norm_le_sqrt_mul_of_localWeyl`. -/
 theorem norm_le_of_localWeyl {D C : ℝ} (hW : B.LocalWeylBound D C) {n : ℕ} (hn : 1 ≤ n)
-    {a : M →ᵇ ℂ} (ha : a ∈ B.basisSpan n) {p : ℝ≥0∞} (hp : 1 ≤ p) (hp2 : p ≤ 2) :
+    {a : M →ᵇ ℂ} (ha : a ∈ B.basisSpan n) {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp2 : p ≤ 2) :
     ‖a‖ ≤ C ^ p.toReal⁻¹ * (n : ℝ) ^ (D * p.toReal⁻¹) * (eLpNorm a p μ).toReal := by
   have hp' : p ≠ ∞ := ne_top_of_le_ne_top (by norm_num) hp2
   set P := p.toReal
-  have hP0 : 0 < P := zero_lt_one.trans_le (ENNReal.one_le_toReal_of_one_le hp hp')
+  have hP0 : 0 < P := ENNReal.toReal_pos hp0 hp'
   set N := (eLpNorm a p μ).toReal
   have hN : 0 ≤ N := ENNReal.toReal_nonneg
   have hC := hW.nonneg
-  have h := norm_rpow_le_of_localWeyl hW hn ha hp hp2
+  have h := norm_rpow_le_of_localWeyl hW hn ha hp0 hp2
   calc ‖a‖ = (‖a‖ ^ P) ^ P⁻¹ := (Real.rpow_rpow_inv (norm_nonneg a) hP0.ne').symm
     _ ≤ (C * (n : ℝ) ^ D * N ^ P) ^ P⁻¹ := Real.rpow_le_rpow (by positivity) h (by positivity)
     _ = C ^ P⁻¹ * (n : ℝ) ^ (D * P⁻¹) * N := by

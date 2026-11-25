@@ -42,7 +42,8 @@ theorem exists_memLp_eq_of_memSobolev_bessel [Nontrivial V] (hp1 : 1 < p) (hp : 
     (hpr : p ≤ r) (hr : r ≠ ∞) {s : ℝ} (hs : nikolskiiExponent (finrank ℝ V) p r ≤ s)
     {f : 𝓢'(V, ℂ)} (hf : TemperedDistribution.MemSobolev s p f) :
     ∃ g : Lp ℂ r (volume : Measure V), (g : 𝓢'(V, ℂ)) = f := by
-  have hs0 : 0 ≤ s := (nikolskiiExponent_nonneg (Nat.cast_nonneg _) Fact.out hpr).trans hs
+  have hs0 : 0 ≤ s := (nikolskiiExponent_nonneg (Nat.cast_nonneg _)
+    (zero_lt_one.trans_le Fact.out).ne' hpr).trans hs
   obtain ⟨h, hh⟩ := hf
   obtain ⟨C, -, hC⟩ := exists_memTriebelLizorkin_of_besselPotential_eq (V := V) hp1 hp hs0
   obtain ⟨g₀, hg₀, hmem, -⟩ := hC f h hh
@@ -60,7 +61,8 @@ theorem exists_enorm_le_of_besselPotentialSpace [Nontrivial V] (hp1 : 1 < p) (hp
     (hpr : p ≤ r) (hr : r ≠ ∞) {s : ℝ} (hs : nikolskiiExponent (finrank ℝ V) p r ≤ s) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ F : H^{s, p}(V, ℂ), ∃ g : Lp ℂ r (volume : Measure V),
       (g : 𝓢'(V, ℂ)) = F.toDistr ∧ ‖g‖ₑ ≤ C * ‖F‖ₑ := by
-  have hs0 : 0 ≤ s := (nikolskiiExponent_nonneg (Nat.cast_nonneg _) Fact.out hpr).trans hs
+  have hs0 : 0 ≤ s := (nikolskiiExponent_nonneg (Nat.cast_nonneg _)
+    (zero_lt_one.trans_le Fact.out).ne' hpr).trans hs
   obtain ⟨C₀, hC₀, hC⟩ := exists_memTriebelLizorkin_toDistr (V := V) hp1 hp hs0
   rcases hpr.eq_or_lt with rfl | hlt
   · refine ⟨squareSynthesisConst V p * C₀,
