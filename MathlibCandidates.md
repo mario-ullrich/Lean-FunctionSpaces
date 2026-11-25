@@ -104,7 +104,9 @@ declarations.
   (`MeasureTheory.eLpNorm_sub_rpow_le_tsum`, finite version
   `MeasureTheory.eLpNorm_sub_rpow_le_sum`), and its case `ρ = 1` the triangle inequality
   `‖g - u_k‖_r ≤ ∑_{i ≥ 0} ‖u_{k+i+1} - u_{k+i}‖_r` for `1 ≤ r` and every limit in measure, of
-  finite or infinite quasi-norm (`MeasureTheory.eLpNorm_sub_le_tsum`).
+  finite or infinite quasi-norm (`MeasureTheory.eLpNorm_sub_le_tsum`). The same bound holds if
+  `u_n → g` almost everywhere (`MeasureTheory.eLpNorm_sub_rpow_min_le_tsum_of_ae_tendsto`, with
+  Mathlib's `Lp.eLpNorm_le_of_ae_tendsto`).
 * **Series in `L_p` for every `0 < p ≤ ∞` and finiteness almost everywhere**
   (`FunctionSpaces/Analysis/Lp/QuasiNorm.lean`): for `0 < p ≤ 1` and countably many
   `g_i : α → [0, ∞]`, `‖∑_i g_i‖_p^p ≤ ∑_i ‖g_i‖_p^p`
@@ -112,10 +114,18 @@ declarations.
   `MeasureTheory.eLpNorm_add_rpow_le_of_le_one`, and `‖∑_i g_i‖_p^ρ ≤ ∑_i ‖g_i‖_p^ρ` with
   `ρ = min(1, p)` for every `p ≠ 0` (`MeasureTheory.eLpNorm_tsum_rpow_min_le`); a function
   `F : α → [0, ∞]` with finite `eLpNorm F p μ`, `p ≠ 0`, is finite almost everywhere
-  (`MeasureTheory.ae_lt_top_of_eLpNorm_ne_top`); and for every `p ≠ 0` and `ρ = min(1, p)`,
-  `∑_i ‖g_i‖_p^ρ < ∞` gives `∑_i ‖g_i(x)‖ < ∞` almost everywhere
+  (`MeasureTheory.ae_lt_top_of_eLpNorm_ne_top`); `∑_i ‖g_i‖_p^c < ∞` for some `c > 0` makes
+  every `g_i` almost everywhere strongly measurable
+  (`MeasureTheory.aestronglyMeasurable_of_tsum_eLpNorm_rpow_ne_top`); and for every `p ≠ 0` and
+  `ρ = min(1, p)`, `∑_i ‖g_i‖_p^ρ < ∞` gives `∑_i ‖g_i(x)‖ < ∞` almost everywhere
   (`MeasureTheory.summable_norm_of_tsum_eLpNorm_rpow_min_ne_top`), which extends Mathlib's
-  `summable_norm_of_tsum_eLpNorm_ne_top` (`1 ≤ p`) below `1`.
+  `summable_norm_of_tsum_eLpNorm_ne_top` (`1 ≤ p`) below `1`. For `g_k` with values in a normed
+  group and `∑_k g_k(x) = f(x)` almost everywhere,
+  `‖f - ∑_{k<n} g_k‖_p^ρ ≤ ∑_{i ≥ 0} ‖g_{n+i}‖_p^ρ` on any measure space
+  (`MeasureTheory.eLpNorm_sub_sum_rpow_min_le_tsum_of_ae_hasSum`), so `‖f - ∑_{k<n} g_k‖_p → 0`
+  if `∑_k ‖g_k‖_p^ρ < ∞` (`MeasureTheory.tendsto_eLpNorm_sub_sum_of_ae_hasSum`); conversely, if
+  `∑_k ‖g_k‖_p^ρ < ∞`, an `L_p` limit of the partial sums is the almost everywhere sum
+  (`MeasureTheory.ae_hasSum_of_tendsto_eLpNorm`).
 * **The Ditzian–Prymak bootstrap** (`FunctionSpaces/Analysis/Lp/QuasiNorm.lean`): every
   function satisfies `‖f x‖ ≤ ‖f‖_∞` for almost every `x`, measurable or not
   (`MeasureTheory.ae_enorm_le_eLpNorm_top`; Mathlib states this bound for `eLpNormEssSup` only,

@@ -43,6 +43,7 @@ public import FunctionSpaces.MeasureSpaces.Besov.ElementaryEmbeddings
 public import FunctionSpaces.MeasureSpaces.Besov.Nikolskii
 public import FunctionSpaces.MeasureSpaces.Besov.Embeddings
 public import FunctionSpaces.MeasureSpaces.Besov.Interpolation
+public import FunctionSpaces.MeasureSpaces.Besov.BlockDecomposition
 public import FunctionSpaces.MeasureSpaces.Sobolev.Embeddings
 public import FunctionSpaces.MeasureSpaces.Spectral.Basic
 public import FunctionSpaces.MeasureSpaces.Spectral.Blocks

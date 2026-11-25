@@ -60,16 +60,33 @@ The `L_p` tools are in [Tools from analysis](Analysis.md).
   σ-algebra, with `μ` charging every nonempty open set and for `s > D/p`, every `f ∈ B^s_{p,q}`
   has a bounded continuous representative
   (`FunctionScheme.MemBesov.exists_boundedContinuous_of_nikolskii`).
-* **Besov spaces interpolate.** For every scheme of functions `S`, `1 ≤ p ≤ ∞`, `0 < η < 1` and
-  `1 ≤ q₀, q₁, q ≤ ∞`, the real interpolation spaces of the continuous K-method of the couples
-  of dyadic quasi-norms are `(B^{s₀}_{p,q₀}, B^{s₁}_{p,q₁})_{η,q} = B^{(1-η)s₀+ηs₁}_{p,q}` for
-  `0 < s₀ < s₁` and `(L_p, B^{s₁}_{p,q₁})_{η,q} = B^{ηs₁}_{p,q}` for `s₁ > 0`
-  (`FunctionScheme.memKMethod_besovCouple_iff`, `FunctionScheme.memKMethod_lpBesovCouple_iff`),
-  by the reiteration theorem for approximation spaces of
-  [Approximation spaces](ApproximationSpaces.md). The couples of Pietsch's quasi-norms
+* **Besov spaces interpolate.** For every scheme of functions `S`, `0 < p ≤ ∞` and `0 < η < 1`,
+  the real interpolation spaces of the continuous K-method of the couples of dyadic quasi-norms
+  are `(L_p, B^{s₁}_{p,q₁})_{η,q} = B^{ηs₁}_{p,q}` for `s₁ > 0` and `0 < q₁, q ≤ ∞`, and
+  `(B^{s₀}_{p,q₀}, B^{s₁}_{p,q₁})_{η,q} = B^{(1-η)s₀+ηs₁}_{p,q}` for `0 < s₀ < s₁` and
+  `1 ≤ q₀, q₁, q ≤ ∞` (`FunctionScheme.memKMethod_lpBesovCouple_iff`,
+  `FunctionScheme.memKMethod_besovCouple_iff`). In particular
+  `B^s_{p,q} = (L_p, B^r_{p,q₁})_{s/r,q}` for `0 < s < r` and `0 < q, q₁ ≤ ∞` (DeVore, Acta
+  Numer. 7 (1998), (4.32), for the classical spaces;
+  `FunctionScheme.memBesov_iff_memKMethod_lpBesovCouple`). The couples are
+  couples of E-spaces of the couple of `S` in `L_p`, so these are the representation and the
+  reiteration theorem for E-spaces of [Approximation spaces](ApproximationSpaces.md); for
+  `p ≥ 1` they are couples of approximation spaces
+  (`FunctionScheme.besovCouple_eq_approxCouple`,
+  `FunctionScheme.lpBesovCouple_eq_leftApproxCouple`). The couples of Pietsch's quasi-norms
   `FunctionScheme.besovNorm` have the same interpolation spaces
   (`FunctionScheme.memKMethod_besovNormCouple_iff`,
   `FunctionScheme.memKMethod_lpBesovNormCouple_iff`).
+* **Block decompositions.** For every scheme of functions `S`, `0 < p ≤ ∞`, `s > 0` and
+  `0 < q ≤ ∞`, `f ∈ B^s_{p,q}` iff `f = ∑_k g_k` almost everywhere with approximants
+  `g_k ∈ S_{2^k}` and `(2^(ks) ‖g_k‖_p)_k ∈ ℓ_q`, with equivalent quasi-norms (DeVore–Popov for
+  dyadic splines; `FunctionScheme.memBesov_iff_exists_blocks`,
+  `FunctionScheme.eNormDyadic_le_of_blocks`, `FunctionScheme.exists_blocks_of_memBesov`). The
+  partial sums of every series of essentially bounded functions with almost everywhere sum `f`
+  and `(2^(ks) ‖g_k‖_p)_k ∈ ℓ_q`, `s > 0`, converge to `f` in `L_p` and in measure
+  (`FunctionScheme.tendsto_eLpNorm_sub_sum_of_blocks`). This is the block decomposition of the
+  spaces `E_{s,q}` of a `ρ`-normed couple of [Approximation spaces](ApproximationSpaces.md) for
+  the couple of `S` in `L_p`, with `ρ = min(1, p)`.
 * **Sobolev embeddings.** Call a Banach space `V` with an injective bounded map into `L_p(μ)` a
   Sobolev space of order `s` for `S` (the hypothesis structure `FunctionScheme.SobolevSpace`) if it
   satisfies Jackson's inequality `E_n(f)_p ≤ C n^(-s) ‖f‖_V` and Bernstein's inequality (every
@@ -135,7 +152,8 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Schemes of functions and their approximants in every `L_p`, Besov spaces and their elementary embeddings for `0 < p ≤ ∞`, the identity with the spaces `E_{s,q}` of the couples for `s > 0` or `q = ∞` and, for `p ≥ 1`, with the approximation spaces | ✅ | ✗ | `MeasureSpaces/Scheme`, `MeasureSpaces/Besov/Basic`, `MeasureSpaces/Besov/ElementaryEmbeddings` |
 | The couple of a scheme of essentially bounded functions in `L_p`, `0 < p ≤ ∞`: quasi-triangle and `ρ`-triangle inequality, homogeneity, errors of best approximation, near-best approximants, the inclusions `L_r ↪ L_p` and membership in `L_r` along approximants, the complexity couple of the image scheme for `p ≥ 1` | ✅ | ✗ | `MeasureSpaces/SchemeLpCouple` |
 | Nikolskii property, from bounds in `[0, ∞]` and from the sup norm, the Nikolskii bound at one exponent, the Nikolskii inequality for `0 < p ≤ r ≤ ∞` and on dyadic blocks, the sign of the Nikolskii exponent, Besov embeddings, for `0 < p ≤ r ≤ ∞` in the dyadic norms of the couples through near-best sequences, and into `L_r` | ✅ | ✗ | `MeasureSpaces/Besov/Nikolskii`, `MeasureSpaces/Besov/Embeddings` |
-| Besov spaces as interpolation spaces | ✅ | ✗ | `MeasureSpaces/Besov/Interpolation` |
+| Besov spaces as interpolation spaces, `0 < p ≤ ∞` | ✅ | ✗ | `MeasureSpaces/Besov/Interpolation` |
+| Block decompositions of Besov spaces for `0 < p ≤ ∞`, with series converging almost everywhere, in `L_p` and in measure | ✅ | ✗ | `MeasureSpaces/Besov/BlockDecomposition` |
 | Sobolev spaces as a hypothesis structure, Sobolev embeddings | ✅ | ✗ | `MeasureSpaces/Sobolev/Embeddings` |
 | Spectral schemes and `L_2` Sobolev spaces, Jackson and Bernstein | ✅ | ✗ | `MeasureSpaces/Spectral/Basic` |
 | Coefficient characterisations of spectral schemes, `H^s = B^s_{2,2}` | ✅ | ✗ | `MeasureSpaces/Spectral/Blocks` |

@@ -190,7 +190,7 @@ For a general scheme the project describes `A^s_q`
 * by real interpolation: [two approximation spaces](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-approximation-spaces-interpolate.html#thm:approximation-spaces-reiteration)
   interpolate to a third (reiteration, `0 < s₀ < s₁`), and so do
   [two Besov spaces of a scheme](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-besov-interpolation.html#thm:besov-interpolate) on a finite measure space,
-  `1 ≤ p ≤ ∞`.
+  `0 < p ≤ ∞`.
 
 ## Main results
 
@@ -372,12 +372,19 @@ For a general scheme the project describes `A^s_q`
   (`FunctionScheme.MemBesov`). For `s ≥ 0` this holds iff
   `‖f‖_p + ‖(2^(ks) E_{2^k}(f)_p)_k‖_{ℓ_q} < ∞` (`FunctionScheme.memBesov_iff_eNormDyadic_lt_top`),
   and for `p ≥ 1`, `B^s_{p,q}(S)` is the approximation space `A^s_q` of `S` in `L_p(μ)`
-  (`FunctionScheme.memBesov_iff_memApprox`). Let `D ≥ 0`, and let `S` have the Nikolskii
-  property of dimension `D`: for every `1 ≤ p ≤ ∞` there is `C` with `‖a‖_∞ ≤ C n^(D/p) ‖a‖_p`
-  for all `n ≥ 1` and `a ∈ S_n` (`FunctionScheme.HasNikolskii`). Then for `0 < p ≤ r ≤ ∞` there
-  is `C'` with `‖a‖_r ≤ C' n^(D(1/p - 1/r)) ‖a‖_p` for all such `a` (Ditzian–Prymak;
-  `FunctionScheme.HasNikolskii.exists_eLpNorm_le_of_le`); the embeddings below need only the
-  bound `‖a‖_∞ ≤ C n^(D/p) ‖a‖_p` at the source exponent `p` (`FunctionScheme.HasNikolskiiAt`).
+  (`FunctionScheme.memBesov_iff_memApprox`). For `s > 0` and `0 < q ≤ ∞`, `f ∈ B^s_{p,q}(S)` iff
+  `f = ∑_k g_k` almost everywhere with `g_k ∈ S_{2^k}` and `(2^(ks) ‖g_k‖_p)_k ∈ ℓ_q`, and the
+  partial sums of every such series converge to `f` in `L_p` and in measure (DeVore–Popov 1988,
+  Trans. AMS; `FunctionScheme.memBesov_iff_exists_blocks`,
+  `FunctionScheme.tendsto_eLpNorm_sub_sum_of_blocks`). For `0 < s < r` and `0 < q, q₁ ≤ ∞`, the
+  Besov space is a real interpolation space, `B^s_{p,q} = (L_p, B^r_{p,q₁})_{s/r,q}`
+  (`FunctionScheme.memBesov_iff_memKMethod_lpBesovCouple`). Let `D ≥ 0`, and let `S` have the
+  Nikolskii property of dimension `D`: for every `1 ≤ p ≤ ∞` there is `C` with
+  `‖a‖_∞ ≤ C n^(D/p) ‖a‖_p` for all `n ≥ 1` and `a ∈ S_n` (`FunctionScheme.HasNikolskii`). Then
+  for `0 < p ≤ r ≤ ∞` there is `C'` with `‖a‖_r ≤ C' n^(D(1/p - 1/r)) ‖a‖_p` for all such `a`
+  (Ditzian–Prymak; `FunctionScheme.HasNikolskii.exists_eLpNorm_le_of_le`); the embeddings below
+  need only the bound `‖a‖_∞ ≤ C n^(D/p) ‖a‖_p` at the source exponent `p`
+  (`FunctionScheme.HasNikolskiiAt`).
   Let `0 < p ≤ r ≤ ∞`, `0 < q ≤ ∞` and `α = D(1/p - 1/r) < s`. There is `K < ∞` such that
   every `f ∈ B^s_{p,q}(S)` is the class in `L_p(μ)` of some `g ∈ L_r(μ)` with
   `‖g‖_r + ‖(2^(k(s-α)) E_{2^k}(g)_r)_k‖_{ℓ_q} ≤ K (‖f‖_p + ‖(2^(ks) E_{2^k}(f)_p)_k‖_{ℓ_q})`,
@@ -466,8 +473,8 @@ block documents state every result with its Lean name and list the files:
 * Interpolation: Lorentz spaces, real Riesz–Thorin, off-diagonal Marcinkiewicz, J- and complex
   method.
 * The quasi-Banach range: moduli of smoothness on the torus, the cube and `ℝ^d` for `p < 1`,
-  splines of order `r ≥ 2` for `p < 1`, interpolation and block decompositions of Besov spaces
-  with `p < 1`, and Triebel–Lizorkin spaces with `p < 1`.
+  splines of order `r ≥ 2` for `p < 1`, the reiteration of Besov spaces with fine indices below
+  `1`, and Triebel–Lizorkin spaces with `p < 1`.
 * Triebel–Lizorkin spaces with `p = 1` or `q = 1`, and ball means and atoms on the torus.
 * Triebel–Lizorkin spaces on Lipschitz domains and their traces onto `B^{s-1/p}_{p,p}(Γ)`.
 * Sobolev spaces: Jawerth–Franke with Besov targets, Hardy–Littlewood–Sobolev, Trudinger, Mihlin
