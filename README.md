@@ -46,9 +46,12 @@ An approximation scheme in a normed space `X` is a sequence of sets `{0} = A_0 �
 `c A_n ⊆ A_n` and `A_m + A_n ⊆ A_{m+n}`. With the error of best approximation
 `E_n(f) = inf { ‖f - a‖ : a ∈ A_n }`, the approximation space `A^s_q` consists of the `f` with
 `(n^(s - 1/q) E_{n-1}(f))_{n ≥ 1} ∈ ℓ_q` (Pietsch 1981). For trigonometric polynomials, splines,
-band-limited functions, wavelets and eigenfunctions these are Besov spaces. The theory of spaces
-of a scheme on a finite measure space has the torus as its concrete instance; the other settings
-prove their characterisations directly.
+band-limited functions, wavelets and eigenfunctions these are Besov spaces. On a finite measure
+space, a scheme of essentially bounded functions has Besov spaces `B^s_{p,q}` for every
+`0 < p ≤ ∞` and `0 < q ≤ ∞`, with the error of best approximation in the quasi-norm `‖·‖_p`; for
+`p ≥ 1` they are its approximation spaces in `L_p`. The torus and the dyadic step functions on
+`[0, 1)` are concrete instances of this theory, each with a Nikolskii inequality; the other
+settings prove their characterisations directly.
 
 ## Why several descriptions
 
@@ -356,6 +359,33 @@ For a general scheme the project describes `A^s_q`
   `|∫_0^1 f|^τ + ∑_k ∑_{i<2^k} |⟨f, h_{k,i}⟩|^τ < ∞` (`Haar.memApprox_nTerm_iff_haarCoeff`); for
   `1 ≤ τ < 2`, `f ∈ A^θ_τ` iff `‖f‖_τ + ‖(2^(kθ) ω_1(f, 2^(-k), [0, 1])_τ)_k‖_{ℓ_τ} < ∞`, that is,
   iff `f ∈ B^θ_{τ,τ}[0, 1]` (DeVore–Jawerth–Popov; `Haar.memApprox_nTerm_iff_modulus`).
+* **Besov spaces of a scheme for `0 < p ≤ ∞`.** Let `μ` be a finite measure on `Ω` and `S` a
+  scheme of essentially bounded functions: sets `{0} = S_0 ⊆ S_1 ⊆ ⋯` in `L_∞(μ)` with
+  `c S_n ⊆ S_n` and `S_m + S_n ⊆ S_{m+n}` (`FunctionScheme`). For `0 < p ≤ ∞`, `0 < q ≤ ∞` and
+  real `s`, the Besov space `B^s_{p,q}(S)` consists of the `f ∈ L_p(μ)` with
+  `((n + 1)^(s - 1/q) E_n(f)_p)_{n ≥ 0} ∈ ℓ_q`, where `E_n(f)_p = inf {‖f - a‖_p : a ∈ S_n}`
+  (`FunctionScheme.MemBesov`). For `s ≥ 0` this holds iff
+  `‖f‖_p + ‖(2^(ks) E_{2^k}(f)_p)_k‖_{ℓ_q} < ∞` (`FunctionScheme.memBesov_iff_eNormDyadic_lt_top`),
+  and for `p ≥ 1`, `B^s_{p,q}(S)` is the approximation space `A^s_q` of `S` in `L_p(μ)`
+  (`FunctionScheme.memBesov_iff_memApprox`). Let `D ≥ 0`, and let `S` have the Nikolskii
+  property of dimension `D`: for every `1 ≤ p ≤ ∞` there is `C` with `‖a‖_∞ ≤ C n^(D/p) ‖a‖_p`
+  for all `n ≥ 1` and `a ∈ S_n` (`FunctionScheme.HasNikolskii`). Then for `0 < p ≤ r ≤ ∞` there
+  is `C'` with `‖a‖_r ≤ C' n^(D(1/p - 1/r)) ‖a‖_p` for all such `a` (Ditzian–Prymak;
+  `FunctionScheme.HasNikolskii.exists_eLpNorm_le_of_le`). Let `0 < p ≤ r ≤ ∞`, `0 < q ≤ ∞` and
+  `α = D(1/p - 1/r) < s`. There is `K < ∞` such that every `f ∈ B^s_{p,q}(S)` is the class in
+  `L_p(μ)` of some `g ∈ L_r(μ)` with
+  `‖g‖_r + ‖(2^(k(s-α)) E_{2^k}(g)_r)_k‖_{ℓ_q} ≤ K (‖f‖_p + ‖(2^(ks) E_{2^k}(f)_p)_k‖_{ℓ_q})`,
+  so `g ∈ B^{s-α}_{r,q}(S)` (the method of DeVore–Popov, and Kerkyacharian–Petrushev for
+  Dirichlet spaces; `FunctionScheme.exists_uniform_inclusion_eq_of_nikolskii`,
+  `FunctionScheme.MemBesov.exists_inclusion_eq_of_nikolskii`). For `s > D/p`, if `Ω` is a
+  topological space with its Borel σ-algebra, `μ` charges every nonempty open set and the
+  approximants are classes of bounded continuous functions, `f` has a bounded continuous
+  representative (`FunctionScheme.MemBesov.exists_boundedContinuous_of_nikolskii`). The
+  trigonometric polynomials on `𝕋^d` have the Nikolskii property with `D = d` and continuous
+  approximants, so both embeddings hold on the torus (`Torus.memBesov_exists_inclusion_eq`,
+  `Torus.memBesov_exists_continuous`). The dyadic step functions on `[0, 1)` have the Nikolskii
+  property with `D = 1` (`Haar.hasNikolskii_haarScheme`), so the embedding into `L_r` and
+  `B^{s-α}_{r,q}` holds for them (`Haar.exists_uniform_inclusion_eq_stepCouple`).
 * **Besov spaces for `0 < p < 1` on `[0, 1]`.** Let `0 < p ≤ 1` and `0 < q ≤ ∞`, and let
   `E_k(f)` be the error of best approximation of `f ∈ L_p[0, 1]` by step functions on the dyadic
   intervals of length `2^(-k)`. For `0 ≤ s < 1/p`, `‖f‖_p + ‖(2^(ks) E_k(f))_k‖_{ℓ_q} < ∞` iff
@@ -419,8 +449,9 @@ block documents state every result with its Lean name and list the files:
 
 * Interpolation: Lorentz spaces, real Riesz–Thorin, off-diagonal Marcinkiewicz, J- and complex
   method.
-* The quasi-Banach range on the torus and on `ℝ^d`, splines of order `r ≥ 2` for `p < 1`, and
-  Triebel–Lizorkin spaces with `p < 1`.
+* The quasi-Banach range: moduli of smoothness on the torus, the cube and `ℝ^d` for `p < 1`,
+  splines of order `r ≥ 2` for `p < 1`, interpolation and block decompositions of Besov spaces
+  with `p < 1`, and Triebel–Lizorkin spaces with `p < 1`.
 * Triebel–Lizorkin spaces with `p = 1` or `q = 1`, and ball means and atoms on the torus.
 * Triebel–Lizorkin spaces on Lipschitz domains and their traces onto `B^{s-1/p}_{p,p}(Γ)`.
 * Sobolev spaces: Jawerth–Franke with Besov targets, Hardy–Littlewood–Sobolev, Trudinger, Mihlin
@@ -476,12 +507,16 @@ sources. The essential ones:
 * R. A. DeVore, G. G. Lorentz, *Constructive Approximation*, Springer-Verlag, 1993.
 * R. A. DeVore, V. A. Popov, *Interpolation of Besov spaces*, Trans. Amer. Math. Soc. **305**
   (1988), 397–414.
+* Z. Ditzian, A. Prymak, *On Nikol'skii inequalities for domains in `ℝ^d`*, Constr. Approx.
+  **44** (2016), 23–51.
 * C. Fefferman, E. M. Stein, *Some maximal inequalities*, Amer. J. Math. **93** (1971), 107–115.
 * L. Grafakos, *Classical Fourier Analysis*, 3rd ed., Springer, 2014.
 * D. P. Hewett, A. Moiola, *A note on properties of the restriction operator on Sobolev spaces*,
   J. Appl. Anal. **23** (2017), 1–8.
 * J. Johnsen, W. Sickel, *A direct proof of Sobolev embeddings for quasi-homogeneous
   Lizorkin–Triebel spaces with mixed norms*, J. Funct. Spaces Appl. **5** (2007), 183–198.
+* G. Kerkyacharian, P. Petrushev, *Heat kernel based decomposition of spaces of distributions in
+  the framework of Dirichlet spaces*, Trans. Amer. Math. Soc. **367** (2015), 121–189.
 * S. Mayboroda, *The Poisson Problem on Lipschitz Domains*, PhD thesis, University of
   Missouri-Columbia, 2005.
 * W. McLean, *Strongly Elliptic Systems and Boundary Integral Equations*, Cambridge University

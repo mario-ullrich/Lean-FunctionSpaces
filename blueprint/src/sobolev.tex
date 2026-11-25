@@ -5250,8 +5250,7 @@ inclusion $L_r(\T^d) \hookrightarrow L_p(\T^d)$ for $p \leq r$.
 \lean{Torus.memPeriodicSobolev_exists_inclusion_eq, Torus.memPeriodicSobolev_exists_continuous,
   Torus.memPeriodicSobolev_of_memPeriodicSobolev_of_lt}
 \leanok
-\uses{cor:torus-sobolev-besov-sandwich, thm:torus-embeddings, def:nikolskii-property,
-  thm:approx-embedding}
+\uses{def:weak-derivative, def:trig-poly, def:besov, lem:inclusion}
 Let $\#d \geq 1$, $1 < p < \infty$ and $m \in \N$.
 \begin{enumerate}
   \item For every $r$ with $p \leq r \leq \infty$ and $m > \#d (1/p - 1/r)$, every
@@ -5266,12 +5265,14 @@ Let $\#d \geq 1$, $1 < p < \infty$ and $m \in \N$.
 
 \begin{proof}
 \leanok
+\uses{cor:torus-sobolev-besov-sandwich, thm:torus-embeddings, def:nikolskii-property,
+  prop:besov-elementary}
 In (1), $m \geq 1$ since $\#d (1/p - 1/r) \geq 0$ (\Cref{def:nikolskii-property}); in (2),
 $m \geq 1$ since $\#d/p \geq 0$. So $f \in \Besov{m}{p}{\max(p,2)}(\T^d)$
 (\Cref{cor:torus-sobolev-besov-sandwich}), and the first two items of \Cref{thm:torus-embeddings}
 apply. In (3), $m > \#d (1/p - 1/r)$, so (1) gives $g$, and $g \in \Besov{k}{r}{\min(r,2)}(\T^d)$
-since $0 \leq k < m - \#d(1/p - 1/r)$ (\Cref{thm:approx-embedding}); hence $g \in \Sob{k}{r}(\T^d)$
-(\Cref{cor:torus-sobolev-besov-sandwich}, with $1 < p \leq r$).
+since $0 \leq k < m - \#d(1/p - 1/r)$ (\Cref{prop:besov-elementary}(1)); hence
+$g \in \Sob{k}{r}(\T^d)$ (\Cref{cor:torus-sobolev-besov-sandwich}, with $1 < p \leq r$).
 \end{proof}
 
 \chapter{Bessel potential spaces}

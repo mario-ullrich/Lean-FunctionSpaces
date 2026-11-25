@@ -7,29 +7,27 @@ module
 
 public import FunctionSpaces.MeasureSpaces.Besov.Nikolskii
 public import FunctionSpaces.MeasureSpaces.SchemeLpCouple
-public import ApproximationSpaces.Nikolskii
 
 /-!
 # Embedding theorems for Besov spaces
 
 Let `μ` be a finite measure on `Ω`, let `S` be a scheme of functions on `(Ω, μ)` with the
 Nikolskii property of dimension `D ≥ 0`, and write `α = D (1/p - 1/r)` for `0 < p ≤ r ≤ ∞`.
-Then:
+Then, for every `0 < q ≤ ∞`:
 
 * **the Besov embedding with a norm bound** (`exists_uniform_inclusion_eq_of_nikolskii`): for
-  `0 < p ≤ r ≤ ∞`, `0 < q ≤ ∞` and `s > α` there is `K < ∞` such that every `f ∈ L_p` whose dyadic
-  norm `‖f‖^dy_{s,q}` in the couple of `S` in `L_p` (`FunctionScheme.lpCouple`) is finite lies
-  in `L_r`, with `‖f‖^dy_{s-α,q} ≤ K ‖f‖^dy_{s,q}` for the dyadic norm in the couple of `S` in
+  `s > α` there is `K < ∞` such that every `f ∈ L_p` whose dyadic norm `‖f‖^dy_{s,q}` in the
+  couple of `S` in `L_p` (`FunctionScheme.lpCouple`) is finite is the inclusion of some
+  `g ∈ L_r`, with `‖g‖^dy_{s-α,q} ≤ K ‖f‖^dy_{s,q}` for the dyadic norm in the couple of `S` in
   `L_r`;
-* **the Besov embedding** (`MemBesov.exists_inclusion_eq_of_nikolskii`): for `1 ≤ p ≤ r ≤ ∞`,
-  `1 ≤ q ≤ ∞` and `s > α`, every `f ∈ B^s_{p,q}` lies in `L_r` and belongs to `B^{s - α}_{r,q}`;
+* **the Besov embedding** (`MemBesov.exists_inclusion_eq_of_nikolskii`): for `s > α`, every
+  `f ∈ B^s_{p,q}` lies in `L_r` and belongs to `B^{s - α}_{r,q}`;
 * **into `L_∞`** (`MemBesov.exists_inclusion_eq_top`, the case `r = ∞`, `α = D/p`): for
-  `1 ≤ p ≤ ∞`, `1 ≤ q ≤ ∞` and `s > D/p`, every `f ∈ B^s_{p,q}` lies in `L_∞` and belongs to
-  `B^{s - D/p}_{∞,q}`;
-* **into bounded continuous functions** (`MemBesov.exists_boundedContinuous_of_nikolskii`): for
-  `1 ≤ p ≤ ∞` and `1 ≤ q ≤ ∞`, if moreover `Ω` is a topological space with its Borel
-  `σ`-algebra, `μ` charges every nonempty open set and the scheme has continuous approximants,
-  every `f ∈ B^s_{p,q}` with `s > D/p` has a bounded continuous representative.
+  `s > D/p`, every `f ∈ B^s_{p,q}` lies in `L_∞` and belongs to `B^{s - D/p}_{∞,q}`;
+* **into bounded continuous functions** (`MemBesov.exists_boundedContinuous_of_nikolskii`): if
+  moreover `Ω` is a topological space with its Borel `σ`-algebra, `μ` charges every nonempty
+  open set and the scheme has continuous approximants, every `f ∈ B^s_{p,q}` with `s > D/p` has a
+  bounded continuous representative.
 
 **The norm bound for every `0 < p ≤ r ≤ ∞`.** Mathlib makes `Lp` a normed group for `p ≥ 1`
 only; for `p < 1` the function `‖·‖_p` is a quasi-norm, and for a non-atomic `μ` the only
@@ -47,17 +45,17 @@ the error of best approximation of `f` in `L_r` at `2^k` is at most `‖f - b_k�
 `f ∈ L_r` and the bound (`exists_inclusion_eq_eNormDyadic_le`,
 `exists_inclusion_eq_eNormDyadic_le_of_nearBest`, with the constant `nikolskiiTransferConst`).
 
-**For `p ≥ 1`.** The other three theorems are the abstract Nikolskii transfer theorem
-(`ApproximationScheme.MemApprox.exists_preimage_of_nikolskii`, the membership form of
-`ApproximationScheme.exists_preimage_approxNormDyadic_le_of_nikolskii`) for `X = L_p`,
-`Y = L_r` and the inclusion `L_r ↪ L_p`; the pulled-back scheme is again `S` in `L_r`
-(`FunctionScheme.comap_toLp_of_le`).  For the last one, `f` in `L_∞` with positive smoothness
-is a limit of approximants, which are classes of bounded continuous functions, and these classes
-form a closed subspace of `L_∞`.
+**The Besov spaces.** For smoothness `s ≥ 0` the Besov space `B^s_{p,q}` consists of the `f`
+with finite dyadic norm (`FunctionScheme.memBesov_iff_eNormDyadic_lt_top`), and `s > α ≥ 0`, so
+the norm bound gives the second theorem, and the case `r = ∞` the third. For the last one, the
+class `g ∈ L_∞` of the third theorem lies in `B^{s - D/p}_{∞,∞}`
+(`FunctionScheme.MemBesov.mono`), which is the approximation space of `S` in the normed space
+`L_∞` (`FunctionScheme.memBesov_iff_memApprox`). With positive smoothness `g` is a limit of
+approximants, which are classes of bounded continuous functions, and these classes form a closed
+subspace of `L_∞`.
 
 The limiting case `s = α` is not covered: the proof of the norm bound needs Hardy's constant
-`hardyConst ((s - α) ρ_r) (q/ρ_r)` with `ρ_r = min(1, r)`, which is finite for `s > α`, and the
-Nikolskii transfer theorem needs `α < s`.
+`hardyConst ((s - α) ρ_r) (q/ρ_r)` with `ρ_r = min(1, r)`, which is finite for `s > α`.
 -/
 
 @[expose] public section
@@ -312,49 +310,61 @@ theorem exists_uniform_inclusion_eq_of_nikolskii (h : S.HasNikolskii D) (hD : 0 
   gcongr
   exact hY
 
-/-! ### The Besov embeddings for `1 ≤ p ≤ r ≤ ∞` -/
+/-! ### The embeddings of the Besov spaces, `0 < p ≤ r ≤ ∞` -/
 
-variable [Fact (1 ≤ p)] [Fact (1 ≤ r)]
-
-/-- **The Besov embedding** `B^s_{p,q} ↪ B^{s - D(1/p - 1/r)}_{r,q}` for `p ≤ r` and
-`s > D(1/p - 1/r)`: every `f ∈ B^s_{p,q}` is the inclusion of some `g ∈ L_r` lying in
-`B^{s - D(1/p-1/r)}_{r,q}`. -/
+/-- **The Besov embedding** `B^s_{p,q} ↪ B^{s - α}_{r,q}`, `α = D(1/p - 1/r)`, for
+`0 < p ≤ r ≤ ∞`, `0 < q ≤ ∞` and `s > α`, for a scheme with the Nikolskii property of
+dimension `D ≥ 0`: every `f ∈ B^s_{p,q}` is the inclusion of some `g ∈ L_r` lying in
+`B^{s - α}_{r,q}`. Since `s > α ≥ 0`, membership in both Besov spaces is the finiteness of the
+dyadic norms of the couples (`FunctionScheme.memBesov_iff_eNormDyadic_lt_top`), which the norm
+bound `FunctionScheme.exists_uniform_inclusion_eq_of_nikolskii` compares. -/
 theorem MemBesov.exists_inclusion_eq_of_nikolskii (h : S.HasNikolskii D) (hD : 0 ≤ D)
-    (hpr : p ≤ r) (hs : nikolskiiExponent D p r < s) (hq : 1 ≤ q) {f : Lp ℂ p μ}
-    (hf : S.MemBesov p s q f) :
-    ∃ g : Lp ℂ r μ, Lp.inclusionOfExponentLe (𝕜 := ℝ) μ hpr g = f ∧
+    (hp0 : p ≠ 0) (hpr : p ≤ r) (hs : nikolskiiExponent D p r < s) (hq0 : q ≠ 0)
+    {f : Lp ℂ p μ} (hf : S.MemBesov p s q f) :
+    ∃ g : Lp ℂ r μ, Lp.inclusionOfExponentLeLinear (𝕜 := ℝ) μ hpr g = f ∧
       S.MemBesov r (s - nikolskiiExponent D p r) q g := by
-  obtain ⟨C, hC, hN⟩ := h.liftBound hpr
-  have hα := nikolskiiExponent_nonneg hD (zero_lt_one.trans_le (Fact.out : 1 ≤ p)).ne' hpr
-  obtain ⟨g, hg, hmem⟩ := ApproximationScheme.MemApprox.exists_preimage_of_nikolskii
-    (Lp.inclusionOfExponentLe_injective hpr) hN hC hα hs hq (memBesov_iff_memApprox.1 hf)
-  refine ⟨g, hg, ?_⟩
-  rw [memBesov_iff_memApprox]
-  rwa [comap_toLp_of_le hpr] at hmem
+  have hα := nikolskiiExponent_nonneg hD hp0 hpr
+  rw [memBesov_iff_eNormDyadic_lt_top hq0 (hα.trans hs.le)] at hf
+  obtain ⟨K, hK, hKf⟩ := exists_uniform_inclusion_eq_of_nikolskii h hD hp0 hpr hs hq0
+  obtain ⟨g, hg, hgN⟩ := hKf f hf.ne
+  exact ⟨g, hg, MemBesov.of_eNormDyadic_lt_top (sub_nonneg.2 hs.le)
+    (hgN.trans_lt (ENNReal.mul_lt_top hK.lt_top hf))⟩
 
-/-- **Embedding into `L_∞`**: for `s > D/p`, every `f ∈ B^s_{p,q}` is the inclusion of some
-`g ∈ L_∞` lying in `B^{s - D/p}_{∞,q}`. -/
-theorem MemBesov.exists_inclusion_eq_top (h : S.HasNikolskii D) (hD : 0 ≤ D)
-    (hs : D * p.toReal⁻¹ < s) (hq : 1 ≤ q) {f : Lp ℂ p μ} (hf : S.MemBesov p s q f) :
-    ∃ g : Lp ℂ ∞ μ, Lp.inclusionOfExponentLe (𝕜 := ℝ) μ le_top g = f ∧
+/-- **Embedding into `L_∞`**, for `0 < p ≤ ∞` and `0 < q ≤ ∞`: for a scheme with the Nikolskii
+property of dimension `D ≥ 0` and `s > D/p`, every `f ∈ B^s_{p,q}` is the inclusion of some
+`g ∈ L_∞` lying in `B^{s - D/p}_{∞,q}`. This is the case `r = ∞` of
+`FunctionScheme.MemBesov.exists_inclusion_eq_of_nikolskii`, where `D(1/p - 1/∞) = D/p`
+(`nikolskiiExponent_top`). -/
+theorem MemBesov.exists_inclusion_eq_top (h : S.HasNikolskii D) (hD : 0 ≤ D) (hp0 : p ≠ 0)
+    (hs : D * p.toReal⁻¹ < s) (hq0 : q ≠ 0) {f : Lp ℂ p μ} (hf : S.MemBesov p s q f) :
+    ∃ g : Lp ℂ ∞ μ, Lp.topInclusion (𝕜 := ℝ) μ p g = f ∧
       S.MemBesov ∞ (s - D * p.toReal⁻¹) q g := by
-  have := hf.exists_inclusion_eq_of_nikolskii h hD (le_top : p ≤ ∞)
-    (by rwa [nikolskiiExponent_top]) hq
+  have := hf.exists_inclusion_eq_of_nikolskii h hD hp0 (le_top : p ≤ ∞)
+    (by rwa [nikolskiiExponent_top]) hq0
   rwa [nikolskiiExponent_top] at this
 
-/-- **Embedding into bounded continuous functions**: if `Ω` is a topological space with its Borel
-`σ`-algebra, `μ` charges every nonempty open set, the scheme has continuous approximants and
-`s > D/p`, every `f ∈ B^s_{p,q}` has a bounded continuous representative. -/
+/-- **Embedding into bounded continuous functions**, for `0 < p ≤ ∞` and `0 < q ≤ ∞`: if `Ω` is
+a topological space with its Borel `σ`-algebra, `μ` charges every nonempty open set, the scheme
+has continuous approximants and the Nikolskii property of dimension `D ≥ 0`, and `s > D/p`, every
+`f ∈ B^s_{p,q}` has a bounded continuous representative. The class `g ∈ L_∞` of
+`FunctionScheme.MemBesov.exists_inclusion_eq_top` lies in `B^{s - D/p}_{∞,∞}`
+(`FunctionScheme.MemBesov.mono`), the approximation space of `S` in `L_∞`
+(`FunctionScheme.memBesov_iff_memApprox`), so it is a limit of approximants
+(`ApproximationScheme.mem_closure_iUnion_of_memApprox`); these are classes of bounded continuous
+functions, which form a closed subset of `L_∞`
+(`BoundedContinuousFunction.isClosed_range_toLp_top`). -/
 theorem MemBesov.exists_boundedContinuous_of_nikolskii [TopologicalSpace Ω] [BorelSpace Ω]
     [μ.IsOpenPosMeasure] (hS : S.HasContinuousApproximants) (h : S.HasNikolskii D)
-    (hD : 0 ≤ D) (hs : D * p.toReal⁻¹ < s) (hq : 1 ≤ q) {f : Lp ℂ p μ}
+    (hD : 0 ≤ D) (hp0 : p ≠ 0) (hs : D * p.toReal⁻¹ < s) (hq0 : q ≠ 0) {f : Lp ℂ p μ}
     (hf : S.MemBesov p s q f) :
-    ∃ a : Ω →ᵇ ℂ, Lp.inclusionOfExponentLe (𝕜 := ℝ) μ le_top
+    ∃ a : Ω →ᵇ ℂ, Lp.topInclusion (𝕜 := ℝ) μ p
       (BoundedContinuousFunction.toLp (E := ℂ) ∞ μ ℝ a) = f := by
-  obtain ⟨g, hg, hmem⟩ := hf.exists_inclusion_eq_top h hD hs hq
+  obtain ⟨g, hg, hmem⟩ := hf.exists_inclusion_eq_top h hD hp0 hs hq0
+  have htop : S.MemBesov ∞ (s - D * p.toReal⁻¹) ∞ g :=
+    hmem.mono hq0 (sub_pos.2 hs).le (Or.inr ⟨rfl, le_top⟩)
   have hcl : g ∈ closure (⋃ n, S.toLp ∞ n) :=
-    ApproximationScheme.mem_closure_iUnion_of_memApprox hq (sub_pos.2 hs)
-      (memBesov_iff_memApprox.1 hmem)
+    ApproximationScheme.mem_closure_iUnion_of_memApprox le_top (sub_pos.2 hs)
+      (memBesov_iff_memApprox.1 htop)
   have hsub : (⋃ n, S.toLp ∞ n) ⊆
       Set.range (BoundedContinuousFunction.toLp (E := ℂ) ∞ μ ℝ : (Ω →ᵇ ℂ) → Lp ℂ ∞ μ) := by
     rintro _ ⟨_, ⟨n, rfl⟩, a, ha, rfl⟩

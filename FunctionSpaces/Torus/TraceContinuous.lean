@@ -235,9 +235,8 @@ theorem trace_besov_eq_restrictFace (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s) {q :
       (toLpR p (Fin (n + 1)) f)) :
     (periodicTraceBound p n hp).limitTrace (toLpR p (Fin (n + 1)) f) =
       toLpR p (Fin n) (restrictFace n f) :=
-  periodicTraceBound_limitTrace_eq_restrictFace hp f (FunctionScheme.memBesov_iff_memApprox.2
-    (ApproximationScheme.MemApprox.mono hq le_rfl (by positivity) (Or.inl (by linarith))
-      (FunctionScheme.memBesov_iff_memApprox.1 hf)))
+  periodicTraceBound_limitTrace_eq_restrictFace hp f
+    (hf.mono (zero_lt_one.trans_le hq).ne' (by positivity) (Or.inl (by linarith)))
 
 /-- **The trace of a continuous function, almost everywhere**: under the hypotheses of
 `Torus.periodicTraceBound_limitTrace_eq_restrictFace`, the trace of `f` is `x' ↦ f(0, x')` almost
@@ -264,8 +263,8 @@ theorem exists_trace_eq_restrictFace (hp : p ≠ ∞) {s : ℝ} (hs : (n : ℝ) 
     linarith
   obtain ⟨f, hf⟩ := FunctionScheme.MemBesov.exists_boundedContinuous_of_nikolskii
     (FunctionScheme.hasContinuousApproximants_ofContinuous _) trigScheme_hasNikolskii
-    (Nat.cast_nonneg _) hD hq hF
-  rw [BoundedContinuousFunction.inclusionOfExponentLe_toLp] at hf
+    (Nat.cast_nonneg _) (zero_lt_one.trans_le Fact.out).ne' hD (zero_lt_one.trans_le hq).ne' hF
+  rw [BoundedContinuousFunction.inclusionOfExponentLeLinear_toLp] at hf
   have hs0 : 0 < s := lt_of_le_of_lt (by positivity) hs
   subst hf
   exact ⟨f, rfl, trace_besov_eq_restrictFace hp hs0 hq f hF⟩
