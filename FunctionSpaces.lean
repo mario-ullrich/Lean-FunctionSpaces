@@ -302,11 +302,11 @@ Besov, Triebel–Lizorkin, Sobolev and Bessel potential spaces on finite measure
 the torus, intervals, the cube, Lipschitz domains and compact manifolds, their embedding theorems,
 and the theorems that their characterisations agree. The library builds on
 `ApproximationSpaces`. The top folders follow the settings:
-`MeasureSpaces` (finite measure spaces, with spectral schemes, filtrations and martingale
-differences), `Rd` (`ℝ^d`, in subfolders by characterisation and by space), `Domains` (Lipschitz
-domains, extensions, traces, scalar and vector-valued Sobolev spaces on domains, eigenbases of
-the Laplacian, compact manifolds, intervals and the cube), `Torus`, and `Wavelets` (the wavelet
-examples);
+`MeasureSpaces` (finite measure spaces: schemes of essentially bounded functions and their Besov
+and Sobolev spaces, with spectral schemes, filtrations and martingale differences), `Rd` (`ℝ^d`,
+in subfolders by characterisation and by space), `Domains` (Lipschitz domains, extensions,
+traces, scalar and vector-valued Sobolev spaces on domains, eigenbases of the Laplacian, compact
+manifolds, intervals and the cube), `Torus`, and `Wavelets` (the wavelet examples);
 `Analysis` holds the tools without function-space content.
 
 ## Layout

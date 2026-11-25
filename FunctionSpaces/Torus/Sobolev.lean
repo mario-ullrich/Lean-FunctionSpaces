@@ -53,7 +53,8 @@ noncomputable def fourierScheme : SpectralScheme (d → ℤ) (Lp ℂ 2 (volume :
 /-- The `L_2` classes of the trigonometric polynomials of degree `< n` are the span of the
 Fourier basis elements of degree `< n`. -/
 theorem toLp_trigScheme_eq :
-    (trigScheme d).toLp volume 2 = (fourierScheme d).toScheme := by
+    (trigScheme d).toLp 2 = (fourierScheme d).toScheme := by
+  rw [trigScheme, FunctionScheme.toLp_ofContinuous]
   ext n f
   change f ∈ (BoundedContinuousFunction.toLp (E := ℂ) 2 volume ℝ) '' (trigPoly d n : Set _) ↔
     f ∈ ((fourierScheme d).levelSpan n : Set _)
@@ -77,7 +78,7 @@ trigonometric polynomials in `L_2`: the image of `ℓ²(ℤ^d)` under
 `c ↦ ∑_k (1 + deg k)^(-s) c_k e_k`, with Jackson's and Bernstein's inequalities of order `s`
 and constant `1`. -/
 noncomputable def periodicSobolevSpace (s : ℝ) (hs : 0 < s) :
-    (trigScheme d).SobolevSpace volume 2 ℓ²(d → ℤ, ℂ) :=
+    (trigScheme d).SobolevSpace 2 ℓ²(d → ℤ, ℂ) :=
   ApproximationScheme.SmoothnessSpace.congr (toLp_trigScheme_eq d).symm
     ((fourierScheme d).toSmoothnessSpace s hs)
 

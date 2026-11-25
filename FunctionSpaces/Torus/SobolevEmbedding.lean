@@ -44,7 +44,7 @@ theorem memPeriodicSobolev_exists_inclusion_eq [Nonempty d] (hp1 : 1 < p) (hp : 
     {f : Lp ℂ p (volume : Measure (UnitAddTorus d))} (hf : MemPeriodicSobolev m f) :
     ∃ g : Lp ℂ r (volume : Measure (UnitAddTorus d)),
       Lp.inclusionOfExponentLe (𝕜 := ℝ) volume hpr g = f ∧
-        (trigScheme d).MemBesov volume r
+        (trigScheme d).MemBesov r
           ((m : ℝ) - Fintype.card d * (p.toReal⁻¹ - r.toReal⁻¹)) (max p 2) g :=
   memBesov_exists_inclusion_eq hpr hm (le_max_of_le_right one_le_two)
     (memBesov_of_memPeriodicSobolev hp1 hp

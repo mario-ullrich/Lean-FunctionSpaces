@@ -172,7 +172,7 @@ theorem periodicTriebelLizorkinSpace_zero_two_eq_top [Nonempty d] (hp1 : 1 < p) 
 `F^0_{p,2}(𝕋^d) = L_p(𝕋^d)`. This is the torus form of `Rd.memTriebelLizorkin_two_of_memApprox`. -/
 theorem memPeriodicTriebelLizorkin_two_of_memBesov [Nonempty d] (hp1 : 1 < p) (hp : p ≠ ∞) {s : ℝ}
     (hs : 0 ≤ s) {f : Lp ℂ p (volume : Measure (UnitAddTorus d))}
-    (hf : (trigScheme d).MemBesov volume p s (min p 2) f) : MemPeriodicTriebelLizorkin s 2 f := by
+    (hf : (trigScheme d).MemBesov p s (min p 2) f) : MemPeriodicTriebelLizorkin s 2 f := by
   rcases hs.lt_or_eq with hs | rfl
   · exact memPeriodicTriebelLizorkin_of_memBesov hp hs one_le_two hf
   · exact memPeriodicTriebelLizorkin_zero_two hp1 hp f

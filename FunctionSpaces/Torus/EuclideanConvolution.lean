@@ -385,11 +385,11 @@ theorem isClosed_trigPolyLp (n : ℕ) :
   exact Submodule.closed_of_finiteDimensional _
 
 /-- **The trigonometric polynomials of the scheme in `L_p`**: the approximants of degree `< n`
-of `(trigScheme d).toLp volume p` are the trigonometric polynomials of degree `< n` in `L_p`. -/
+of `(trigScheme d).toLp p` are the trigonometric polynomials of degree `< n` in `L_p`. -/
 theorem mem_toLp_trigScheme_iff {n : ℕ} {g : Lp ℂ p (volume : Measure (UnitAddTorus d))} :
-    g ∈ (trigScheme d).toLp volume p n ↔ g ∈ trigPolyLp p n := by
-  rw [FunctionScheme.toLp, ApproximationScheme.mem_map, trigPolyLp, Submodule.mem_map]
-  simp only [trigScheme, mem_uniformTrigScheme]
+    g ∈ (trigScheme d).toLp p n ↔ g ∈ trigPolyLp p n := by
+  rw [trigScheme, FunctionScheme.mem_toLp_ofContinuous, trigPolyLp, Submodule.mem_map]
+  simp only [mem_uniformTrigScheme]
   rfl
 
 /-- **Band-limited kernels map `L_p(𝕋)` into trigonometric polynomials**: if `𝓕Φ(m) = 0` for

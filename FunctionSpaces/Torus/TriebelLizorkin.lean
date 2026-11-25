@@ -300,7 +300,7 @@ lies in the Besov space `B^s_{p,p}(𝕋^d)`, the approximation space of the trig
 polynomials. -/
 theorem memPeriodicTriebelLizorkin_iff_memBesov (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s)
     {f : Lp ℂ p (volume : Measure (UnitAddTorus d))} :
-    MemPeriodicTriebelLizorkin s p f ↔ (trigScheme d).MemBesov volume p s p f := by
+    MemPeriodicTriebelLizorkin s p f ↔ (trigScheme d).MemBesov p s p f := by
   rw [memBesov_iff_periodicLittlewoodPaleyNorm_lt_top hp hs Fact.out, MemPeriodicTriebelLizorkin,
     periodicTriebelLizorkinNorm_eq_periodicLittlewoodPaleyNorm hp]
 
@@ -326,7 +326,7 @@ theorem periodicTriebelLizorkinNorm_le_periodicLittlewoodPaleyNorm_min (hp : p �
 is at most `2 · 2^s (1 - 2^(-s))⁻¹ ‖f‖_{F^s_{p,q}}`. -/
 theorem approxNormDyadic_le_periodicTriebelLizorkinNorm (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞}
     (hq : 1 ≤ q) (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
-    ((trigScheme d).toLp volume p).approxNormDyadic s (max p q) f ≤
+    ((trigScheme d).toLp p).approxNormDyadic s (max p q) f ≤
       2 * dyadicWeight s 1 * (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * periodicTriebelLizorkinNorm s q f :=
   (approxNormDyadic_trigScheme_le hp hs (le_max_of_le_right hq) f).trans
     (by gcongr; exact periodicLittlewoodPaleyNorm_max_le_periodicTriebelLizorkinNorm hp hq f)
@@ -339,7 +339,7 @@ theorem periodicTriebelLizorkinNorm_le_approxNormDyadic (hp : p ≠ ∞) {s : �
     periodicTriebelLizorkinNorm s q f ≤
       2 * ((Fintype.card d : ℝ≥0∞) + 1) * dyadicWeight s (Fintype.card d + 1) *
         eLpNorm (Rd.lpKernel (V := EuclideanSpace ℝ d)) 1 volume *
-          ((trigScheme d).toLp volume p).approxNormDyadic s (min p q) f :=
+          ((trigScheme d).toLp p).approxNormDyadic s (min p q) f :=
   (periodicTriebelLizorkinNorm_le_periodicLittlewoodPaleyNorm_min hp hq f).trans
     (periodicLittlewoodPaleyNorm_le_approxNormDyadic_trigScheme hp hs (le_min Fact.out hq) f)
 
@@ -347,7 +347,7 @@ theorem periodicTriebelLizorkinNorm_le_approxNormDyadic (hp : p ≠ ∞) {s : �
 For `q = 2`: `F^s_{p,2}(𝕋^d) ⊆ B^s_{p,max(p,2)}(𝕋^d)`. -/
 theorem memBesov_of_memPeriodicTriebelLizorkin (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞}
     (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure (UnitAddTorus d))}
-    (hf : MemPeriodicTriebelLizorkin s q f) : (trigScheme d).MemBesov volume p s (max p q) f :=
+    (hf : MemPeriodicTriebelLizorkin s q f) : (trigScheme d).MemBesov p s (max p q) f :=
   (memBesov_iff_periodicLittlewoodPaleyNorm_lt_top hp hs (le_max_of_le_right hq)).2
     ((periodicLittlewoodPaleyNorm_max_le_periodicTriebelLizorkinNorm hp hq f).trans_lt hf)
 
@@ -355,7 +355,7 @@ theorem memBesov_of_memPeriodicTriebelLizorkin (hp : p ≠ ∞) {s : ℝ} (hs : 
 For `q = 2`: `B^s_{p,min(p,2)}(𝕋^d) ⊆ F^s_{p,2}(𝕋^d)`. -/
 theorem memPeriodicTriebelLizorkin_of_memBesov (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞}
     (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure (UnitAddTorus d))}
-    (hf : (trigScheme d).MemBesov volume p s (min p q) f) : MemPeriodicTriebelLizorkin s q f :=
+    (hf : (trigScheme d).MemBesov p s (min p q) f) : MemPeriodicTriebelLizorkin s q f :=
   (periodicTriebelLizorkinNorm_le_periodicLittlewoodPaleyNorm_min hp hq f).trans_lt
     ((memBesov_iff_periodicLittlewoodPaleyNorm_lt_top hp hs (le_min Fact.out hq)).1 hf)
 

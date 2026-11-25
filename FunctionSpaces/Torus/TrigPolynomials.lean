@@ -25,8 +25,9 @@ function `Torus.trigMonomial k`.  The **degree** of a frequency is `deg k = max_
 
 is the space of trigonometric polynomials of degree `< n` (`Torus.trigPoly`).  It contains the
 constants for `n ≥ 1` and is `{0}` for `n = 0`; this strict-degree convention makes the
-spaces an approximation scheme in the sup norm, `Torus.uniformTrigScheme d`, and the scheme of
-functions `Torus.trigScheme d`.  A linear map that sends the monomials of degree `< n` into
+spaces an approximation scheme in the sup norm, `Torus.uniformTrigScheme d`. Their classes in
+`L_∞(𝕋^d)` form the scheme of functions `Torus.trigScheme d` of the uniform trigonometric scheme
+(`FunctionScheme.ofContinuous`).  A linear map that sends the monomials of degree `< n` into
 `trigPoly n` maps `trigPoly n` into `trigPoly n` (`Torus.map_mem_trigPoly`).
 
 The frequencies of degree `< n` form the box `boxLt n ⊆ ℤ^d` with at most `(2n)^d` elements
@@ -196,16 +197,19 @@ theorem mem_uniformTrigScheme {n : ℕ} {T : UnitAddTorus d →ᵇ ℂ} :
     T ∈ uniformTrigScheme d n ↔ T ∈ trigPoly d n := Iff.rfl
 
 variable (d) in
-/-- The **trigonometric scheme** on `𝕋^d`, the scheme of functions given by the uniform
-trigonometric scheme: `trigScheme d n` is the space of trigonometric polynomials of degree
-`< n`. -/
-noncomputable def trigScheme : FunctionScheme (UnitAddTorus d) :=
-  uniformTrigScheme d
+/-- The **trigonometric scheme** on `𝕋^d`, the scheme of functions of the uniform trigonometric
+scheme: `trigScheme d n` consists of the classes in `L_∞(𝕋^d)` of the trigonometric polynomials
+of degree `< n`. -/
+noncomputable def trigScheme : FunctionScheme (volume : Measure (UnitAddTorus d)) :=
+  FunctionScheme.ofContinuous (uniformTrigScheme d) volume
 
-/-- The approximants of the trigonometric scheme are the trigonometric polynomials. -/
+/-- The approximants of the trigonometric scheme are the classes of the trigonometric
+polynomials. -/
 @[simp]
-theorem mem_trigScheme {n : ℕ} {T : UnitAddTorus d →ᵇ ℂ} :
-    T ∈ trigScheme d n ↔ T ∈ trigPoly d n := Iff.rfl
+theorem mem_trigScheme {n : ℕ} {a : Lp ℂ ∞ (volume : Measure (UnitAddTorus d))} :
+    a ∈ trigScheme d n ↔
+      ∃ T ∈ trigPoly d n, BoundedContinuousFunction.toLp (E := ℂ) ∞ volume ℝ T = a :=
+  Iff.rfl
 
 section UniformDensity
 

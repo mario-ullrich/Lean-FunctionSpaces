@@ -534,8 +534,8 @@ The degree of $k \in \Z^d$ is $\deg k = \max_j |k_j|$, with $\deg k = 0$ for $d 
 The space $\mathcal{T}_n$ of trigonometric polynomials of degree $< n$ is the span of
 $\{e_k : \deg k < n\}$ in $C(\T^d)$, a space of dimension at most $(2n)^d$. The spaces
 $\mathcal{T}_n$ form an approximation scheme in $C_b(\T^d) = C(\T^d)$ with the supremum norm,
-the \emph{uniform trigonometric scheme}, and as a scheme of functions on $\T^d$ the
-\emph{trigonometric scheme}. For all finite index sets $\iota, \kappa$, every $m \in \N$ and
+the \emph{uniform trigonometric scheme}, whose scheme of functions is the \emph{trigonometric
+scheme}. For all finite index sets $\iota, \kappa$, every $m \in \N$ and
 every linear map $L$ from the bounded continuous functions on $\T^\iota$ to those on
 $\T^\kappa$ with $L e_k \in \mathcal{T}_m$ for all $k$ with $\deg k < m$, $L$ maps
 $\mathcal{T}_m$ on $\T^\iota$ into $\mathcal{T}_m$ on $\T^\kappa$, since $\mathcal{T}_m$ is the
@@ -582,7 +582,7 @@ kernels: it passes to a power of the polynomial and uses \Cref{lem:trig-sup-l2} 
 \lean{Torus.norm_le_rpow_mul_eLpNorm, Torus.norm_rpow_le_card_mul_eLpNorm_rpow,
   Torus.norm_pow_le_norm_pow, Torus.norm_toLp_two_pow, Torus.trigScheme_hasNikolskii}
 \leanok
-\uses{lem:trig-products, lem:trig-sup-l2, def:nikolskii-property, lem:bc-linfty}
+\uses{lem:trig-products, lem:trig-sup-l2, def:nikolskii-property}
 For all $n \geq 1$, $T \in \mathcal{T}_n$ and $1 \leq p < \infty$,
 \[
   \sup |T| \leq \bigl(2 \lceil p/2 \rceil\bigr)^{d/p} \, n^{d/p} \, \|T\|_{L_p} .
@@ -598,8 +598,9 @@ $T^m \in \mathcal{T}_{mn}$, and \Cref{lem:trig-sup-l2} gives
   (\sup|T|)^{2m} \leq (\sup|T^m|)^2 \leq (2mn)^d \int |T|^{2m} ,
 \]
 and $\int |T|^{2m} \leq (\sup|T|)^{2m-p} \int |T|^p$.
-Divide by $(\sup|T|)^{2m-p}$ and take $p$-th roots. For $p = \infty$ the constant is $1$ by
-\Cref{lem:bc-linfty}.
+Divide by $(\sup|T|)^{2m-p}$ and take $p$-th roots. The trigonometric scheme is the scheme of
+the uniform trigonometric scheme, so by \Cref{def:nikolskii-property} this bound for every
+$1 \leq p < \infty$ gives its Nikolskii property.
 \end{proof}
 
 \begin{definition}[Sobolev space $H^s(\T^d)$]
@@ -671,7 +672,9 @@ Let $1 \leq p \leq r \leq \infty$ and $1 \leq q \leq \infty$.
 \begin{proof}
 \leanok
 The first two items are \Cref{thm:besov-embedding} with \Cref{thm:torus-nikolskii}, the
-third is \Cref{prop:smoothness} for $H^s(\T^d)$, and the last two combine both.
+third is \Cref{prop:smoothness} for $H^s(\T^d)$, and the last two combine both. For the second
+and the last item, the trigonometric scheme, the scheme of a scheme in $C_b(\T^d)$, has
+continuous approximants (\Cref{def:function-scheme}).
 \end{proof}
 
 The next theorem is the Littlewood--Paley characterisation of $\Besov{s}{2}{q}(\T^d)$ with

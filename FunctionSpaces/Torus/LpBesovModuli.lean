@@ -45,7 +45,7 @@ variable (d) in
 /-- **The modulus of order `r` is compatible with the trigonometric polynomials in `L_p(𝕋^d)`**,
 with inverse order `r`: Jackson's inequality from level `1` on, and the inverse inequality. -/
 noncomputable def trigLpModulusData (hp : p ≠ ∞) (r : ℕ) :
-    ApproximationScheme.ModulusData ((trigScheme d).toLp volume p) r where
+    ApproximationScheme.ModulusData ((trigScheme d).toLp p) r where
   modulus f k := Rd.lpModulus p r f k
   add_le f g k := Rd.lpModulus_add_le r f g k
   C0 := 2 ^ r
@@ -67,7 +67,7 @@ noncomputable def trigLpModulusData (hp : p ≠ ∞) (r : ℕ) :
 `‖f‖_{A^s_q} ≤ C (‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k))_p)_k‖_{ℓ_q})`. -/
 theorem approxNormDyadic_le_modNorm_lp (hp : p ≠ ∞) (r : ℕ) {s : ℝ} {q : ℝ≥0∞} (hq : 1 ≤ q)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
-    ((trigScheme d).toLp volume p).approxNormDyadic s q f ≤
+    ((trigScheme d).toLp p).approxNormDyadic s q f ≤
       (trigLpModulusData d hp r).directConst s * (trigLpModulusData d hp r).modNorm s q f :=
   (trigLpModulusData d hp r).approxNormDyadic_le_modNorm hq f
 
@@ -77,7 +77,7 @@ theorem modNorm_le_approxNormDyadic_lp (hp : p ≠ ∞) {r : ℕ} {s : ℝ} (hs 
     {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     (trigLpModulusData d hp r).modNorm s q f ≤
       (trigLpModulusData d hp r).inverseConst s *
-        ((trigScheme d).toLp volume p).approxNormDyadic s q f :=
+        ((trigScheme d).toLp p).approxNormDyadic s q f :=
   (trigLpModulusData d hp r).modNorm_le_approxNormDyadic hq hs hsr f
 
 /-- **Besov spaces on the torus by moduli of smoothness, for all `1 ≤ p < ∞`**: for `0 < s < r`
@@ -85,7 +85,7 @@ and `1 ≤ q ≤ ∞`, `f ∈ B^s_{p,q}(𝕋^d)` (the approximation space of the
 polynomials in `L_p`) iff `‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞`. -/
 theorem memBesov_iff_modNorm_lt_top_lp (hp : p ≠ ∞) {r : ℕ} {s : ℝ} (hs : 0 < s) (hsr : s < r)
     {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
-    (trigScheme d).MemBesov volume p s q f ↔
+    (trigScheme d).MemBesov p s q f ↔
       ‖f‖ₑ + lqNorm q (fun k => dyadicWeight s k * Rd.lpModulus p r f k) < ∞ :=
   FunctionScheme.memBesov_iff_memApprox.trans
     ((trigLpModulusData d hp r).memApprox_iff_modNorm_lt_top hq hs.le hsr f)

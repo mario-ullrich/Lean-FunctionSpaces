@@ -4575,8 +4575,9 @@ Jackson and inverse inequalities directly, as in the proof of~\cite[Theorem~4.8]
 \chapter{Besov spaces and their embeddings}
 \label{ch:besov}
 
-Throughout, $\Omega$ is a topological space with its Borel $\sigma$-algebra and $\mu$ is a
-finite measure on it. For $0 < p \leq \infty$, $L_p = L_p(\mu)$ is the space of classes of
+Throughout, $\Omega$ is a measurable space and $\mu$ is a finite measure on it; where
+continuity is involved, $\Omega$ is a topological space with its Borel $\sigma$-algebra. For
+$0 < p \leq \infty$, $L_p = L_p(\mu)$ is the space of classes of
 complex-valued measurable functions $f$ with $\|f\|_p < \infty$, normed for $p \geq 1$ and
 quasi-normed for $p < 1$ (\Cref{sec:lp-quasi}), and $C_b(\Omega)$ is the space of bounded
 continuous complex-valued functions with the supremum norm.
@@ -4592,20 +4593,24 @@ continuous complex-valued functions with the supremum norm.
   MeasureTheory.Lp.inclusionConst_nonneg, MeasureTheory.Lp.inclusionConst_of_isProbabilityMeasure,
   MeasureTheory.Lp.norm_inclusionOfExponentLeLinear_apply_le,
   MeasureTheory.Lp.norm_inclusionOfExponentLe_apply_le,
-  MeasureTheory.Lp.inclusionOfExponentLe_self, MeasureTheory.Lp.inclusionOfExponentLe_apply}
+  MeasureTheory.Lp.inclusionOfExponentLe_self, MeasureTheory.Lp.inclusionOfExponentLe_apply,
+  BoundedContinuousFunction.inclusionOfExponentLe_toLp,
+  BoundedContinuousFunction.norm_toLp_eq_toReal_eLpNorm}
 \leanok
 \uses{lem:inclusion-linear}
 Let $1 \leq p \leq r \leq \infty$. The identity of functions defines an injective bounded
 linear map $\iota_{r,p} : L_r \to L_p$ with $\|\iota_{r,p}\| \leq
 \mu(\Omega)^{1/p - 1/r}$, and $\iota_{t,p} \circ \iota_{r,t} = \iota_{r,p}$ for every
 $p \leq t \leq r$. As a linear map, $\iota_{r,p}$ is the inclusion of
-\Cref{lem:inclusion-linear}.
+\Cref{lem:inclusion-linear}. For every $a \in C_b(\Omega)$, $\iota_{r,p}$ maps the class of $a$
+in $L_r$ to its class in $L_p$, whose norm is $\|a\|_p$.
 \end{lemma}
 
 \begin{proof}
 \leanok
 The inclusion of \Cref{lem:inclusion-linear} is injective, and the inclusions compose.
-H\"older's inequality $\|f\|_p \leq \mu(\Omega)^{1/p - 1/r} \|f\|_r$ makes it bounded.
+H\"older's inequality $\|f\|_p \leq \mu(\Omega)^{1/p - 1/r} \|f\|_r$ makes it bounded. The
+classes of $a$ in $L_r$ and in $L_p$ agree with $a$ almost everywhere.
 \end{proof}
 
 \begin{lemma}[Interpolation between $L_p$ and $L_\infty$]
@@ -4803,23 +4808,35 @@ in $L_p$.
 \begin{definition}[Scheme of functions]
 \label{def:function-scheme}
 \lean{FunctionScheme, FunctionScheme.toLp, FunctionScheme.mem_toLp, FunctionScheme.toLp_mem_toLp,
-  FunctionScheme.inclusion_mem_toLp}
+  FunctionScheme.inclusion_mem_toLp, FunctionScheme.ofContinuous, FunctionScheme.mem_ofContinuous,
+  FunctionScheme.toLp_ofContinuous, FunctionScheme.mem_toLp_ofContinuous,
+  FunctionScheme.toLp_mem_toLp_ofContinuous, FunctionScheme.HasContinuousApproximants,
+  FunctionScheme.hasContinuousApproximants_ofContinuous}
 \leanok
-\uses{def:scheme, def:comap}
-A \emph{scheme of functions} on $\Omega$ is an approximation scheme $S$ in $C_b(\Omega)$. For
-$1 \leq p \leq \infty$, the classes in $L_p$ of the functions in $S_n$ form an approximation
-scheme $S^{(p)}$ in $L_p$.
+\uses{def:scheme, def:comap, lem:inclusion, lem:inclusion-linear}
+A \emph{scheme of functions} on $(\Omega, \mu)$ is an approximation scheme $S$ in $L_\infty$.
+For $1 \leq p \leq \infty$, the sets $S^{(p)}_n = \iota_{\infty,p}(S_n)$, $n \in \N$, form an
+approximation scheme $S^{(p)}$ in $L_p$. Let $\Omega$ moreover be a topological space with its
+Borel $\sigma$-algebra. For an approximation scheme $T$ in $C_b(\Omega)$, the classes in
+$L_\infty$ of the elements of $T_n$, $n \in \N$, form a scheme of functions, the \emph{scheme
+of $T$}; for $1 \leq p \leq \infty$, its sets $S^{(p)}_n$ consist of the classes in $L_p$ of
+the elements of $T_n$. A scheme of functions has \emph{continuous approximants} if every element
+of every $S_n$ is the class of a bounded continuous function.
 \end{definition}
 
-Taking the approximants continuous and bounded makes them elements of every $L_p$ at once,
-so that one scheme serves all exponents.
+The approximants are essentially bounded, so that they lie in every $L_p$ at once and one scheme
+serves all exponents. The $\mathcal{F}_k$-measurable functions of a filtration
+$(\mathcal{F}_k)$ (step functions for the dyadic filtration) and Haar functions give schemes of
+functions as they stand; trigonometric polynomials and the functions of a continuous spectral
+basis enter through their bounded continuous representatives, as the scheme of a scheme in
+$C_b(\Omega)$, which has continuous approximants. Boundedness costs nothing, since a Nikolskii
+inequality makes approximants bounded anyway; continuity matters only where a theorem concludes
+that a function has a continuous representative.
 
 \begin{lemma}[Compatibility with the inclusions]
 \label{lem:function-scheme-inclusion}
 \lean{FunctionScheme.image_toLp_of_le, FunctionScheme.comap_toLp_of_le,
-  BoundedContinuousFunction.inclusionOfExponentLe_toLp,
-  BoundedContinuousFunction.norm_toLp_eq_toReal_eLpNorm, FunctionScheme.mem_toLp_of_inclusion_mem,
-  FunctionScheme.exists_toLp_of_mem}
+  FunctionScheme.mem_toLp_of_inclusion_mem, FunctionScheme.exists_toLp_of_mem}
 \leanok
 \uses{def:function-scheme, lem:inclusion}
 Let $S$ be a scheme of functions and $1 \leq p \leq r \leq \infty$. For every $n \in \N$,
@@ -4828,8 +4845,9 @@ $\iota_{r,p}(S^{(r)}_n) = S^{(p)}_n$ and $\iota_{r,p}^{-1}(S^{(p)}_n) = S^{(r)}_
 
 \begin{proof}
 \leanok
-The map $\iota_{r,p}$ sends the class of $a$ in $L_r$ to its class in $L_p$, and it is
-injective.
+\uses{lem:inclusion-linear}
+By \Cref{lem:inclusion-linear}, $\iota_{r,p} \circ \iota_{\infty,r} = \iota_{\infty,p}$, and
+$\iota_{r,p}$ is injective.
 \end{proof}
 
 A scheme of essentially bounded functions defines a couple on $L_p$ for every exponent
@@ -4944,7 +4962,9 @@ Let $S$ be a scheme of functions, $s \geq 0$ and $1 \leq p, q \leq \infty$. The
 \emph{Besov space} is $\Besov{s}{p}{q}(\Omega, S) = A^s_q(L_p, S^{(p)})$, the approximation
 space of $L_p$ for the scheme $S^{(p)}$, with the quasi-norm
 $\|f\|_{\Besov{s}{p}{q}} = \|f\|_{A^s_q}$ of \Cref{def:approx-space}. Its errors $E_n(f)_p$ are
-the errors of best approximation of \Cref{def:error} for the scheme $S^{(p)}$.
+the errors of best approximation of \Cref{def:error} for the scheme $S^{(p)}$. For a topological
+space $\Omega$ and an approximation scheme $T$ in $C_b(\Omega)$, the \emph{uniform Besov space}
+of $T$ is $A^s_q(C_b(\Omega), T)$.
 \end{definition}
 
 On the torus $\T^d$ with $S_n$ the trigonometric polynomials of degree $< n$, these are the
@@ -4964,8 +4984,9 @@ Let $S$ be a scheme of functions and $1 \leq p, q, q' \leq \infty$.
   \item If $p \leq r$, then $\iota_{r,p} f \in \Besov{s}{p}{q}$ and
     $\|\iota_{r,p} f\|_{\Besov{s}{p}{q}} \leq \|\iota_{r,p}\| \, \|f\|_{\Besov{s}{r}{q}}$ for
     every $f \in \Besov{s}{r}{q}$.
-  \item The class in $L_p$ of every $a \in A^s_q(C_b(\Omega), S)$ lies in
-    $\Besov{s}{p}{q}$.
+  \item Let $\Omega$ be a topological space with its Borel $\sigma$-algebra and $T$ an
+    approximation scheme in $C_b(\Omega)$. The class in $L_p$ of every
+    $a \in A^s_q(C_b(\Omega), T)$ lies in $\Besov{s}{p}{q}$ of the scheme of $T$.
 \end{enumerate}
 \end{proposition}
 
@@ -4973,7 +4994,8 @@ Let $S$ be a scheme of functions and $1 \leq p, q, q' \leq \infty$.
 \leanok
 The first item is \Cref{thm:approx-embedding}. The others are \Cref{lem:approx-functorial}
 for $T = \iota_{r,p}$, using \Cref{lem:function-scheme-inclusion}, and for the map
-$C_b(\Omega) \to L_p$, of norm at most $\mu(\Omega)^{1/p}$.
+$C_b(\Omega) \to L_p$, of norm at most $\mu(\Omega)^{1/p}$, which maps $T_n$ onto the sets
+$S^{(p)}_n$ of the scheme of $T$ (\Cref{def:function-scheme}).
 \end{proof}
 
 \section{The Nikolskii inequality and the Besov embeddings}
@@ -4983,22 +5005,30 @@ $C_b(\Omega) \to L_p$, of norm at most $\mu(\Omega)^{1/p}$.
 \lean{FunctionScheme.HasNikolskii, nikolskiiExponent, nikolskiiExponent_nonneg,
   one_le_of_nikolskiiExponent_lt, nikolskiiExponent_pos, lt_of_nikolskiiExponent_pos,
   le_of_nikolskiiExponent_nonneg, nikolskiiExponent_top, nikolskiiExponent_self,
-  FunctionScheme.toReal_eLpNorm_top_le_norm}
+  FunctionScheme.toReal_eLpNorm_top_le_norm, FunctionScheme.hasNikolskii_ofContinuous}
 \leanok
 \uses{def:function-scheme}
 Let $S$ be a scheme of functions and $D \in \R$. The scheme has the \emph{Nikolskii property}
 of dimension $D$ if for every $1 \leq p \leq \infty$ there is $C \geq 0$ with
 \[
-  \sup_{x \in \Omega} |a(x)| \leq C \, n^{D/p} \, \|a\|_{L_p}
+  \|a\|_{L_\infty} \leq C \, n^{D/p} \, \|a\|_{L_p}
   \qquad \text{for all } n \geq 1 \text{ and } a \in S_n .
 \]
-For $1 \leq p \leq r \leq \infty$ put $\alpha(D, p, r) = D(1/p - 1/r)$.
+Let $\Omega$ be a topological space with its Borel $\sigma$-algebra and $T$ an approximation
+scheme in $C_b(\Omega)$ such that for every $1 \leq p < \infty$ there is $C \geq 0$ with
+$\sup_{x \in \Omega} |a(x)| \leq C \, n^{D/p} \, \|a\|_{L_p}$ for all $n \geq 1$ and
+$a \in T_n$. Then the scheme of $T$ has the Nikolskii property of dimension $D$. For
+$1 \leq p \leq r \leq \infty$ put $\alpha(D, p, r) = D(1/p - 1/r)$.
 \end{definition}
 
 With $1/\infty = 0$ the exponent $\alpha(D, p, r)$ is defined for all $p, r \in (0, \infty]$. For
 $D > 0$, $1 \leq p < \infty$ and $0 < r \leq \infty$, $\alpha(D, p, r) > 0$ if and only if $p < r$,
 and $\alpha(D, p, r) \geq 0$ if and only if $p \leq r$, since $1/r < 1/p$ if and only if
 $p < r$.
+
+For $p = \infty$ the bound reads $\|a\|_{L_\infty} \leq C \|a\|_{L_\infty}$ and holds with
+$C = 1$ for every scheme. For the scheme of $T$ the bound with the supremum norm suffices,
+since $\|a\|_{L_\infty} \leq \sup_{x \in \Omega} |a(x)|$ for every $a \in C_b(\Omega)$.
 
 The Nikolskii property enters the theorems below as a hypothesis on the scheme; the
 trigonometric polynomials on the torus have it (\Cref{thm:torus-nikolskii}).
@@ -5017,10 +5047,12 @@ exponent $\alpha(D, p, r)$ for $S^{(p)}$.
 
 \begin{proof}
 \leanok
-For $r = \infty$, $\|a\|_{L_\infty} \leq \sup |a|$. For $r < \infty$, \Cref{lem:lp-interpolation}
-with $M = \sup|a| \leq C n^{D/p} \|a\|_p$ gives $\|a\|_r \leq C^{1-p/r} n^{(D/p)(1-p/r)}
-\|a\|_p$, and $(D/p)(1 - p/r) = \alpha(D, p, r)$. The class of $a$ in $L_r$ lifts the class
-in $L_p$.
+\uses{lem:inclusion-linear}
+For $r = \infty$ this is the Nikolskii property. For $r < \infty$, \Cref{lem:lp-interpolation}
+with $M = \|a\|_{L_\infty} \leq C n^{D/p} \|a\|_p$ gives $\|a\|_r \leq C^{1-p/r}
+n^{(D/p)(1-p/r)} \|a\|_p$, and $(D/p)(1 - p/r) = \alpha(D, p, r)$. The element
+$\iota_{\infty,r} a$ of $S^{(r)}_n$ lifts $\iota_{\infty,p} a$, since
+$\iota_{r,p} \circ \iota_{\infty,r} = \iota_{\infty,p}$.
 \end{proof}
 
 \begin{theorem}[Besov embeddings]
@@ -5038,8 +5070,10 @@ Let $S$ have the Nikolskii property of dimension $D \geq 0$, let $1 \leq p \leq 
   \item There is $K < \infty$ such that for every $f \in \Besov{s}{p}{q}$ there is $g \in L_r$
     with $\iota_{r,p} g = f$ and $\|g\|^{\mathrm{dy}}_{\Besov{s-\alpha}{r}{q}} \leq K
     \|f\|^{\mathrm{dy}}_{\Besov{s}{p}{q}}$.
-  \item If $\mu(U) > 0$ for every nonempty open $U \subseteq \Omega$ and $s > D/p$, then every
-    $f \in \Besov{s}{p}{q}$ is the class of a bounded continuous function.
+  \item Let $\Omega$ be a topological space with its Borel $\sigma$-algebra, let $S$ have
+    continuous approximants, and let $\mu(U) > 0$ for every nonempty open $U \subseteq \Omega$.
+    If $s > D/p$, then every $f \in \Besov{s}{p}{q}$ is the class of a bounded continuous
+    function.
 \end{enumerate}
 \end{theorem}
 
@@ -5050,8 +5084,8 @@ injective and satisfies the lifting bound of exponent $\alpha$ by
 \Cref{lem:nikolskii-inequality}; the preimage scheme is $S^{(r)}$ by
 \Cref{lem:function-scheme-inclusion}, and $L_r$ is complete. For the second take
 $r = \infty$: then $g \in \Besov{s - D/p}{\infty}{q}$ with $s - D/p > 0$, so $g$ lies in the
-closure of $\bigcup_n S^{(\infty)}_n$ (\Cref{lem:approx-closure}), which is contained in the
-closed set of classes of bounded continuous functions (\Cref{lem:bc-linfty}).
+closure of $\bigcup_n S^{(\infty)}_n$ (\Cref{lem:approx-closure}). The approximants are classes
+of bounded continuous functions, and these classes form a closed set (\Cref{lem:bc-linfty}).
 \end{proof}
 
 The limiting case $s = \alpha$ is out of reach of this method, since the Nikolskii transfer
@@ -5145,8 +5179,10 @@ Let $S$ have the Nikolskii property of dimension $D \geq 0$, and let $1 \leq p \
   \item Let $(V', \iota')$ be a Sobolev space of order $t$ for $S$ in $L_r$ with $V'$ a Banach
     space, and let $t - D/r < s - D/p$. For every $v \in V$ there is $v' \in V'$ with
     $\iota_{r,p}(\iota' v') = \iota v$.
-  \item If $\mu(U) > 0$ for every nonempty open $U \subseteq \Omega$ and $s > D/p$, then
-    $\iota v$ is the class of a bounded continuous function for every $v \in V$.
+  \item Let $\Omega$ be a topological space with its Borel $\sigma$-algebra, let $S$ have
+    continuous approximants, and let $\mu(U) > 0$ for every nonempty open $U \subseteq \Omega$.
+    If $s > D/p$, then $\iota v$ is the class of a bounded continuous function for every
+    $v \in V$.
 \end{enumerate}
 \end{theorem}
 
@@ -5846,8 +5882,9 @@ consists of the basis, its levels and its continuous representatives alone.
 A \emph{continuous spectral basis} of $L_2(\mu)$ is a spectral scheme $(e_i, \lambda)$ in
 $L_2(\mu)$ together with bounded continuous functions $\tilde e_i$ whose classes are the $e_i$.
 The spaces $\mathcal{E}_n = \spn\{\tilde e_i : \lambda(i) < n\}$ of bounded continuous functions
-form a scheme of functions on $M$, and its classes in $L_2(\mu)$ form the spectral scheme of
-$(e_i, \lambda)$.
+form an approximation scheme in $C_b(M)$, whose scheme of functions (\Cref{def:function-scheme})
+is the \emph{scheme of the basis}. The sets $S^{(2)}_n$ of the scheme of the basis, the classes
+in $L_2(\mu)$ of the elements of $\mathcal{E}_n$, form the spectral scheme of $(e_i, \lambda)$.
 \end{definition}
 
 The structure enters the theorems below as a hypothesis; the Fourier basis of the torus is an
@@ -5858,8 +5895,8 @@ $\lfloor \sqrt{1 + \lambda_i} \rfloor$ (Neumann Laplacian, chart forms) and
 $\lfloor \sqrt{1 + \lambda_i/(4\pi^2)} \rfloor$ (Dirichlet Laplacian); they differ from
 $\lfloor \sqrt{\lambda_i} \rfloor$ at most by a constant factor and an additive constant, which
 changes no approximation space. The Besov spaces
-$\Besov{s}{p}{q}(M)$ of the scheme $(\mathcal{E}_n)$ are defined for every $1 \leq p \leq \infty$
-by \Cref{def:besov}.
+$\Besov{s}{p}{q}(M)$ of the scheme of the basis are defined for every $1 \leq p \leq \infty$ by
+\Cref{def:besov}.
 
 \begin{theorem}[Besov and Sobolev spaces of a continuous spectral basis]
 \label{thm:continuous-spectral-basis-besov}
@@ -5939,8 +5976,9 @@ For $p > 2$ the inequality $\|a\|_\infty \leq C' n^{D/p} \|a\|_p$ does not follo
 the proof on the torus raises polynomials to powers (\Cref{thm:torus-nikolskii}), which lie in
 $\mathcal{E}_{mn}$ (\Cref{lem:trig-products}); for a general basis, products of functions of
 $\mathcal{E}_n$ need not lie in any $\mathcal{E}_m$. The embeddings of \Cref{thm:besov-embedding}
-hold for the scheme $(\mathcal{E}_n)$ whenever it has the Nikolskii property of
-\Cref{def:nikolskii-property}.
+hold for the scheme of the basis whenever it has the Nikolskii property of
+\Cref{def:nikolskii-property}, in particular whenever the spaces $\mathcal{E}_n$ satisfy its
+bound with the supremum norm for every $1 \leq p < \infty$.
 The embedding into continuous functions needs only the local Weyl bound.
 
 \begin{theorem}[Continuity of $H^s(M)$]

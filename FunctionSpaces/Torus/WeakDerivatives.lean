@@ -190,7 +190,7 @@ theorem memPeriodicSobolev_iff (m : ℕ) (f : Lp ℂ 2 (volume : Measure (UnitAd
 derivatives is the Besov space of the trigonometric polynomials. -/
 theorem memPeriodicSobolev_iff_memBesov {m : ℕ} (hm : 1 ≤ m)
     (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
-    MemPeriodicSobolev m f ↔ (trigScheme d).MemBesov volume 2 m 2 f := by
+    MemPeriodicSobolev m f ↔ (trigScheme d).MemBesov 2 m 2 f := by
   rw [memPeriodicSobolev_iff, periodic_memBesov_two_two_iff (by exact_mod_cast hm)]
 
 /-- **`W^m_2(𝕋^d)` is the range of the Sobolev embedding** for `m ≥ 1`, the Sobolev space

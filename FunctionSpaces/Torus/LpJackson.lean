@@ -239,7 +239,7 @@ theorem enorm_sub_periodicJacksonApprox_le (hp : p ≠ ∞) (r k : ℕ)
 `E_{2^(k+1)}(f)_p ≤ C ω_r(f, 2^(-k))_p` in `L_p(𝕋^d)`. -/
 theorem approxError_trigScheme_le (hp : p ≠ ∞) (r k : ℕ)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
-    ((trigScheme d).toLp volume p).approxError f (2 ^ (k + 1)) ≤
+    ((trigScheme d).toLp p).approxError f (2 ^ (k + 1)) ≤
       Rd.bandJacksonConst (EuclideanSpace ℝ d) r p * Rd.lpModulus p r f k :=
   (ApproximationScheme.approxError_le_of_mem
     (mem_toLp_trigScheme_iff.2 (periodicJacksonApprox_mem_trigPolyLp hp r k f)) f).trans

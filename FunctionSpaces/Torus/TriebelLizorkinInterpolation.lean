@@ -108,7 +108,7 @@ theorem memKMethod_periodicTriebelLizorkinCouple_iff (hp : p ≠ ∞) (hs₀ : 0
     (hη : 0 < η) (hη' : η < 1) (hq₀ : 1 ≤ q₀) (hq₁ : 1 ≤ q₁) (hq : 1 ≤ q)
     {f : Lp ℂ p (volume : Measure (UnitAddTorus d))} :
     (periodicTriebelLizorkinCouple s₀ q₀ s₁ q₁).MemKMethod η q f ↔
-      (trigScheme d).MemBesov volume p ((1 - η) * s₀ + η * s₁) q f := by
+      (trigScheme d).MemBesov p ((1 - η) * s₀ + η * s₁) q f := by
   rw [FunctionScheme.memBesov_iff_memApprox]
   exact ApproximationScheme.memKMethod_iff_memApprox_of_two_sandwiches
     (N₀ := periodicTriebelLizorkinNorm s₀ q₀) (N₁ := periodicTriebelLizorkinNorm s₁ q₁)
@@ -129,7 +129,7 @@ interpolation space `(L_p(𝕋^d), F^{s₁}_{p,q₁}(𝕋^d))_{η,q}` iff `f ∈
 theorem memKMethod_periodicLpTriebelLizorkinCouple_iff (hp : p ≠ ∞) (hs₁ : 0 < s₁) (hη : 0 < η)
     (hη' : η < 1) (hq₁ : 1 ≤ q₁) (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure (UnitAddTorus d))} :
     (periodicLpTriebelLizorkinCouple s₁ q₁).MemKMethod η q f ↔
-      (trigScheme d).MemBesov volume p (η * s₁) q f := by
+      (trigScheme d).MemBesov p (η * s₁) q f := by
   rw [FunctionScheme.memBesov_iff_memApprox]
   exact ApproximationScheme.memKMethod_iff_memApprox_of_sandwich
     (N₁ := periodicTriebelLizorkinNorm s₁ q₁)

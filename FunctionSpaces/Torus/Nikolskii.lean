@@ -213,18 +213,13 @@ theorem norm_le_rpow_mul_eLpNorm {n : ℕ} {T : UnitAddTorus d →ᵇ ℂ} (hT :
         rw [Real.mul_rpow (by positivity) (by positivity), Real.rpow_rpow_inv hN hP0.ne']
     _ = _ := by rw [hK]
 
-/-- **The trigonometric polynomials have the Nikolskii property of dimension `d`**. -/
+/-- **The trigonometric polynomials have the Nikolskii property of dimension `d`**: the sup-norm
+bound of `Torus.norm_le_rpow_mul_eLpNorm` for the uniform trigonometric scheme, passed to its
+scheme of functions by `FunctionScheme.hasNikolskii_ofContinuous`. -/
 theorem trigScheme_hasNikolskii :
-    (trigScheme d).HasNikolskii volume (Fintype.card d) := by
-  refine ⟨fun p hp => ?_⟩
-  rcases eq_or_ne p ∞ with rfl | hp'
-  · refine ⟨1, zero_le_one, fun n _ a _ => ?_⟩
-    have := BoundedContinuousFunction.norm_toLp_top (μ := (volume : Measure (UnitAddTorus d)))
-      (𝕜 := ℂ) a
-    rw [BoundedContinuousFunction.norm_toLp_eq_toReal_eLpNorm] at this
-    simp [this]
-  · refine ⟨(2 * ⌈p.toReal / 2⌉₊ : ℝ) ^ ((Fintype.card d : ℝ) * p.toReal⁻¹), by positivity,
-      fun n _ a ha => ?_⟩
-    exact norm_le_rpow_mul_eLpNorm ha hp hp'
+    (trigScheme d).HasNikolskii (Fintype.card d) := by
+  refine FunctionScheme.hasNikolskii_ofContinuous fun p hp hp' =>
+    ⟨(2 * ⌈p.toReal / 2⌉₊ : ℝ) ^ ((Fintype.card d : ℝ) * p.toReal⁻¹), by positivity,
+      fun n _ a ha => norm_le_rpow_mul_eLpNorm ha hp hp'⟩
 
 end Torus

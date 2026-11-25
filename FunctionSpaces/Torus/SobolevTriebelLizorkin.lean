@@ -436,7 +436,7 @@ theorem memPeriodicSobolev_iff_memPeriodicTriebelLizorkin [Nonempty d] (hp1 : 1 
 polynomials (`Torus.trigScheme`), by `Torus.memBesov_of_memPeriodicTriebelLizorkin`. -/
 theorem memBesov_of_memPeriodicSobolev [Nonempty d] (hp1 : 1 < p) (hp : p ≠ ∞) {m : ℕ} (hm : 1 ≤ m)
     {f : Lp ℂ p (volume : Measure (UnitAddTorus d))} (hf : MemPeriodicSobolev m f) :
-    (trigScheme d).MemBesov volume p (m : ℝ) (max p 2) f :=
+    (trigScheme d).MemBesov p (m : ℝ) (max p 2) f :=
   memBesov_of_memPeriodicTriebelLizorkin hp (Nat.cast_pos.2 hm) one_le_two
     (memPeriodicTriebelLizorkin_of_memPeriodicSobolev hp1 hp hf)
 
@@ -445,7 +445,7 @@ the Besov space `B^m_{p,min(p,2)}(𝕋^d)` lies in `W^m_p(𝕋^d)`
 (`Torus.memPeriodicTriebelLizorkin_two_of_memBesov`). -/
 theorem memPeriodicSobolev_of_memBesov [Nonempty d] (hp1 : 1 < p) (hp : p ≠ ∞) {m : ℕ}
     {f : Lp ℂ p (volume : Measure (UnitAddTorus d))}
-    (hf : (trigScheme d).MemBesov volume p (m : ℝ) (min p 2) f) : MemPeriodicSobolev m f :=
+    (hf : (trigScheme d).MemBesov p (m : ℝ) (min p 2) f) : MemPeriodicSobolev m f :=
   memPeriodicSobolev_of_memPeriodicTriebelLizorkin hp1 hp
     (memPeriodicTriebelLizorkin_two_of_memBesov hp1 hp (Nat.cast_nonneg m) hf)
 
@@ -460,7 +460,7 @@ theorem approxNormDyadic_le_of_hasPeriodicWeakLineDeriv [Nonempty d] (hp1 : 1 < 
       Lp ℂ p (volume : Measure (UnitAddTorus d))}
     (hg : ∀ i,
       HasPeriodicWeakLineDeriv (fun k => Rd.gridBasis (EuclideanSpace ℝ d) (i k)) f (g i)) :
-    ((trigScheme d).toLp volume p).approxNormDyadic (m : ℝ) (max p 2) f ≤
+    ((trigScheme d).toLp p).approxNormDyadic (m : ℝ) (max p 2) f ≤
       2 * dyadicWeight (m : ℝ) 1 * (1 - (2 : ℝ≥0∞) ^ (-(m : ℝ)))⁻¹ *
         (eLpNorm (Rd.lpKernel (V := EuclideanSpace ℝ d)) 1 volume * ‖f‖ₑ +
           2 ^ m * ∑ i, periodicSobolevToTLConst d p i * ‖g i‖ₑ) :=
@@ -476,12 +476,12 @@ a class `g ∈ L_p(𝕋^d)` with
 theorem exists_hasPeriodicWeakLineDeriv_of_memBesov [Nonempty d] (hp1 : 1 < p) (hp : p ≠ ∞)
     {k m : ℕ} (hkm : k ≤ m) (w : Fin k → EuclideanSpace ℝ d)
     {f : Lp ℂ p (volume : Measure (UnitAddTorus d))}
-    (hf : (trigScheme d).MemBesov volume p (m : ℝ) (min p 2) f) :
+    (hf : (trigScheme d).MemBesov p (m : ℝ) (min p 2) f) :
     ∃ g : Lp ℂ p (volume : Measure (UnitAddTorus d)), HasPeriodicWeakLineDeriv w f g ∧
       ‖g‖ₑ ≤ periodicTLToSobolevConst d p w * (2 * ((Fintype.card d : ℝ≥0∞) + 1) *
         dyadicWeight (m : ℝ) (Fintype.card d + 1) *
           eLpNorm (Rd.lpKernel (V := EuclideanSpace ℝ d)) 1 volume *
-            ((trigScheme d).toLp volume p).approxNormDyadic (m : ℝ) (min p 2) f) := by
+            ((trigScheme d).toLp p).approxNormDyadic (m : ℝ) (min p 2) f) := by
   obtain ⟨g, hg, hgn⟩ :=
     exists_hasPeriodicWeakLineDeriv_of_memPeriodicTriebelLizorkin_of_le hp1 hp hkm w
     (memPeriodicTriebelLizorkin_two_of_memBesov hp1 hp (Nat.cast_nonneg m) hf)
