@@ -34,6 +34,7 @@ public import ApproximationSpaces.Interpolation.EFunctionalModuli
 public import ApproximationSpaces.Interpolation.EFunctionalSpaces
 public import ApproximationSpaces.Decompositions.Projection
 public import ApproximationSpaces.Decompositions.Blocks
+public import ApproximationSpaces.Decompositions.EFunctionalBlocks
 public import ApproximationSpaces.Decompositions.Synthesis
 public import ApproximationSpaces.Decompositions.Atomic
 public import ApproximationSpaces.Trace
@@ -222,6 +223,11 @@ in the root namespace.
   `ProjectionScheme` and the characterisation of `A^s_q` by dyadic blocks.
 * `ApproximationSpaces.Decompositions.Blocks`: the characterisation of `A^s_q` by block
   decompositions `f = ∑ g_k` with `g_k ∈ A (2^k)` (`memApprox_iff_blockDecompNorm_lt_top`).
+* `ApproximationSpaces.Decompositions.EFunctionalBlocks`: block decompositions for a
+  quasi-normed couple whose first norm has a subadditive `ρ`-th power, as `L_p` for `p < 1`:
+  for `s > 0` and `0 < q ≤ ∞`, the dyadic norm of `u` in `E_{s,q}` is finite iff `u` is the
+  limit of the partial sums of blocks `N₁(g_k) ≤ 2^k` with `(2^(ks) N₀(g_k))_k ∈ ℓ_q`
+  (`InterpCouple.eNormDyadic_lt_top_iff_eBlockDecompNorm_lt_top`).
 * `ApproximationSpaces.Decompositions.Synthesis`: linear schemes `IsLinearScheme` and synthesis from
   blocks that are approximable at rate `σ` (`approxNormDyadic_le_of_hasSum_decay`).
 * `ApproximationSpaces.Decompositions.Atomic`: atomic systems `AtomicSystem`, the sequence

@@ -193,7 +193,12 @@ theory.
 * **Block decompositions.** In a Banach space, for `s > 0` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q` iff
   `f = ∑_k g_k` with blocks `g_k ∈ A_{2^k}` and `(2^(ks) ‖g_k‖)_k ∈ ℓ_q`; the infimum over
   such decompositions is an equivalent quasi-norm
-  (`ApproximationScheme.memApprox_iff_blockDecompNorm_lt_top`).
+  (`ApproximationScheme.memApprox_iff_blockDecompNorm_lt_top`). For a quasi-normed couple with
+  `N₀^ρ` subadditive for some `ρ > 0` and subadditive complexity, `s > 0` and `0 < q ≤ ∞`, the
+  dyadic norm of `u` in `E_{s,q}` is finite iff `u` is the `N₀`-limit of the partial sums of blocks
+  `N₁(g_k) ≤ 2^k` with `(2^(ks) N₀(g_k))_k ∈ ℓ_q`, with equivalent quasi-norms (DeVore–Popov,
+  Trans. Amer. Math. Soc. 305 (1988), Theorem 5.1;
+  `InterpCouple.eNormDyadic_lt_top_iff_eBlockDecompNorm_lt_top`).
 * **Atomic decompositions.** Let `A` be a linear scheme with atoms `a_{j,m}` at finitely many
   positions `m` of level `j`, such that `‖∑_m c_m a_m‖ ≤ C 2^(-jδ) ‖c‖_{ℓ_p}` and
   `E_{2^k}(∑_m c_m a_m) ≤ C 2^(-(k-j)σ) 2^(-jδ) ‖c‖_{ℓ_p}` for `k ≥ j`. For `0 < s < σ`,
@@ -292,6 +297,7 @@ Paths are relative to `ApproximationSpaces/`, without `.lean`.
 | Homogeneity of the E-functional, embeddings of the dyadic norms in the smoothness and the fine index, additive maps, Pietsch's form of a couple and its equivalence with the dyadic norm | ✅ | ✗ | `Interpolation/EFunctionalSpaces` |
 | Moduli compatible with a scheme, coincidence with the classical space, interpolation of the classical spaces | ✅ | ✗ | `Moduli` |
 | Block decompositions, series moved up by a number of levels, projection schemes and dyadic blocks | ✅ | ✗ | `Decompositions/Blocks`, `Decompositions/Projection` |
+| Block decompositions of the spaces `E_{s,q}` of a quasi-normed couple with subadditive `N₀^ρ`, the blocks of near-best sequences, partial sums and tails without completeness | ✅ | ✗ | `Decompositions/EFunctionalBlocks` |
 | Synthesis with decay, atomic systems, `b^s_{p,q}`, atomic characterisation | ✅ | ✗ | `Decompositions/Synthesis`, `Decompositions/Atomic` |
 | Trace theorem: extension, transfer, surjectivity | ✅ | ✗ | `Trace` |
 | Intrinsic and restriction quasi-norms (retract theorem) | ✅ | ✗ | `Retract` |
