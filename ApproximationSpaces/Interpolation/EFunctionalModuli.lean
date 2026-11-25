@@ -37,11 +37,13 @@ With the classical quasi-norm `‖f‖^ω_{s,q} = N₀(f) + ‖(2^(ks) ω(f, k))
   (`InterpCouple.CoupleModulusData.eNormDyadic_le_coupleModNorm`);
 * `‖f‖^ω_{s,q} ≤ K ‖f‖_E` for `0 ≤ s < θ` and every `q`
   (`InterpCouple.CoupleModulusData.coupleModNorm_le_eNormDyadic`). The proof follows
-  DeVore–Popov, proof of Theorem 4.8: near-best `b_k` with `N₁(b_k) ≤ 2^k`
-  (`InterpCouple.exists_nearBest_eFunctional`), the telescoping
+  DeVore–Popov, proof of Theorem 4.8: near-best `b_k` with `N₁(b_k) ≤ 2^k` and decreasing
+  tolerances `e_k` with `‖(2^(ks) e_k)_k‖_{ℓ_q} ≤ C_q (1 + γ_{1,q}) ‖f‖_E`
+  (`InterpCouple.exists_nearBest_tolerances`), the telescoping
   `f = (f - b_k) + b_0 + ∑_{j<k} (b_{j+1} - b_j)`, the inverse inequality for each block in
-  `ρ`-th powers, where `N₀(b_{j+1} - b_j)^ρ ≤ 2 e_j^ρ` for decreasing tolerances `e_j`
-  (`InterpCouple.CoupleModulusData.modulus_sub_rpow_le`; the same bound for a whole sequence is
+  `ρ`-th powers, where `N₁(b_{j+1} - b_j) ≤ 2^(j+2)` and `N₀(b_{j+1} - b_j)^ρ ≤ 2 e_j^ρ`
+  (`InterpCouple.norm1_sub_le_pow_add_two`,
+  `InterpCouple.CoupleModulusData.modulus_sub_rpow_le`; the same bound for a whole sequence is
   `InterpCouple.norm0_sub_succ_rpow_le_of_nearBest`), and Hardy's inequality in `ℓ_{q/ρ}`
   with the exponent `(θ - s)ρ` (`ENNReal.hardy_sum_le'`), since
   `‖(a_k^ρ)_k‖_{ℓ_{q/ρ}} = ‖a‖_{ℓ_q}^ρ` (`ENNReal.lqNorm_div_fun_rpow`).
@@ -95,6 +97,19 @@ theorem norm1_sub_le {A : InterpCouple U} (hneg : ∀ a, A.norm1 (-a) = A.norm1 
   rw [sub_eq_add_neg, ← hneg b]
   exact hadd a (-b)
 
+/-- **The complexity of a difference of consecutive approximants**: if `N₁` is even and
+subadditive, `N₁(b) ≤ 2^j` and `N₁(b') ≤ 2^(j+1)`, then `N₁(b' - b) ≤ 2^(j+2)`, since
+`2^(j+1) + 2^j ≤ 2^(j+2)`. This is the couple form of `ApproximationScheme.sub_mem_pow_add_two`. -/
+theorem norm1_sub_le_pow_add_two {A : InterpCouple U} (hneg : ∀ a, A.norm1 (-a) = A.norm1 a)
+    (hadd : ∀ a b, A.norm1 (a + b) ≤ A.norm1 a + A.norm1 b) {b b' : U} {j : ℕ}
+    (hb : A.norm1 b ≤ ((2 ^ j : ℕ) : ℝ≥0∞)) (hb' : A.norm1 b' ≤ ((2 ^ (j + 1) : ℕ) : ℝ≥0∞)) :
+    A.norm1 (b' - b) ≤ ((2 ^ (j + 2) : ℕ) : ℝ≥0∞) := by
+  have h2 : 2 ^ (j + 1) + 2 ^ j ≤ 2 ^ (j + 2) := by
+    rw [show j + 2 = j + 1 + 1 from rfl, pow_succ 2 (j + 1), pow_succ 2 j]
+    omega
+  refine (norm1_sub_le hneg hadd _ _).trans ((add_le_add hb' hb).trans ?_)
+  exact_mod_cast h2
+
 /-- **The dyadic errors with tolerances**: for every couple, `s` and `q`, the sequence
 `2^(ks) (E(2^k, f) + N₀(f) 2^(-k(s+1)))` has `ℓ_q` norm at most
 `C_q (1 + γ_{1,q}) (N₀(f) + ‖(2^(ks) E(2^k, f))_k‖_{ℓ_q})`, with Mathlib's constant
@@ -127,6 +142,28 @@ theorem lqNorm_dyadicWeight_mul_eFunctional_add_le (A : InterpCouple U) (s : ℝ
         · exact (ENNReal.lqNorm_dyadicWeight_neg_le_dyadicGeomConst zero_le_one).trans le_add_self
     _ = LpAddConst q * (1 + γ) * (A.norm0 f + L) := by ring
     _ = LpAddConst q * (1 + γ) * A.eNormDyadic s q f := rfl
+
+/-- **Near-best sequences with their tolerances**: if `N₁(0) = 0` and `s ≥ -1`, every `u` has
+`b_k` with `N₁(b_k) ≤ 2^k` and a decreasing sequence `e` with `N₀(u - b_k) ≤ e_k`,
+`N₀(u) ≤ e_0` and `‖(2^(ks) e_k)_k‖_{ℓ_q} ≤ C_q (1 + γ_{1,q}) ‖u‖^dy_{s,q}` for every `q`, with
+Mathlib's constant `C_q = LpAddConst q` and `γ_{1,q} = dyadicGeomConst 1 q`: the near-best
+sequence of `InterpCouple.exists_nearBest_eFunctional` with the tolerances
+`e_k = E(2^k, u) + N₀(u) 2^(-k(s+1))` (`InterpCouple.antitone_eFunctional_add_dyadicWeight`,
+`InterpCouple.lqNorm_dyadicWeight_mul_eFunctional_add_le`). -/
+theorem exists_nearBest_tolerances {A : InterpCouple U} (h10 : A.norm1 0 = 0) (u : U) (s : ℝ)
+    (hs : -1 ≤ s) :
+    ∃ (b : ℕ → U) (e : ℕ → ℝ≥0∞), (∀ k, A.norm1 (b k) ≤ ((2 ^ k : ℕ) : ℝ≥0∞)) ∧
+      (∀ k, A.norm0 (u - b k) ≤ e k) ∧ Antitone e ∧ A.norm0 u ≤ e 0 ∧
+      ∀ q : ℝ≥0∞, lqNorm q (fun k => dyadicWeight s k * e k) ≤
+        LpAddConst q * (1 + dyadicGeomConst 1 q) * A.eNormDyadic s q u := by
+  obtain ⟨b, hb1, hb0⟩ := exists_nearBest_eFunctional h10 u s
+  refine ⟨b,
+    fun k => A.eFunctional ((2 ^ k : ℕ) : ℝ≥0∞) u + A.norm0 u * dyadicWeight (-(s + 1)) k,
+    hb1, hb0, antitone_eFunctional_add_dyadicWeight hs u, ?_,
+    fun q => lqNorm_dyadicWeight_mul_eFunctional_add_le A s q u⟩
+  show A.norm0 u ≤ A.eFunctional ((2 ^ 0 : ℕ) : ℝ≥0∞) u + A.norm0 u * dyadicWeight (-(s + 1)) 0
+  rw [ENNReal.dyadicWeight_zero_right, mul_one]
+  exact le_add_self
 
 /-- A **modulus of smoothness compatible with a `ρ`-normed couple** `A = (N₀, N₁)`, with inverse
 order `θ`: the couple axioms with `ρ`-subadditivity of `N₀` and subadditivity of the complexity
@@ -255,12 +292,8 @@ theorem modulus_sub_rpow_le (hθ : 0 ≤ θ) {f b b' : U} {j k : ℕ} {e e' : �
     M.modulus (b' - b) k ^ ρ ≤
       2 * M.CB ^ ρ * dyadicWeight (θ * ρ) 2 * (dyadicWeight (-(θ * ρ)) (k - j) * e ^ ρ) := by
   have hρ := M.rho_pos.le
-  have h2 : 2 ^ (j + 1) + 2 ^ j ≤ 2 ^ (j + 2) := by
-    rw [show j + 2 = j + 1 + 1 from rfl, pow_succ 2 (j + 1), pow_succ 2 j]
-    omega
-  have hN1 : A.norm1 (b' - b) ≤ ((2 ^ (j + 2) : ℕ) : ℝ≥0∞) := by
-    refine (norm1_sub_le M.norm1_neg M.norm1_add_le _ _).trans ((add_le_add hb' hb).trans ?_)
-    exact_mod_cast h2
+  have hN1 : A.norm1 (b' - b) ≤ ((2 ^ (j + 2) : ℕ) : ℝ≥0∞) :=
+    norm1_sub_le_pow_add_two M.norm1_neg M.norm1_add_le hb hb'
   have hN0 : A.norm0 (b' - b) ^ ρ ≤ 2 * e ^ ρ := by
     calc A.norm0 (b' - b) ^ ρ = A.norm0 ((f - b) - (f - b')) ^ ρ := by
           rw [sub_sub_sub_cancel_left]
@@ -444,27 +477,16 @@ theorem eNormDyadic_le_coupleModNorm (f : U) :
 
 /-- **The inverse direction**: for `0 ≤ s < θ` and every `q`,
 `‖f‖^ω_{s,q} ≤ K (N₀(f) + ‖(2^(ks) E(2^k, f))_k‖_{ℓ_q})` with `K = M.coupleInverseConst s q`. The
-near-best elements `b_k` have the tolerances `N₀(f) 2^(-k(s+1))`
-(`InterpCouple.exists_nearBest_eFunctional`). -/
+near-best elements `b_k` have the tolerances `E(2^k, f) + N₀(f) 2^(-k(s+1))`
+(`InterpCouple.exists_nearBest_tolerances`). -/
 theorem coupleModNorm_le_eNormDyadic (hs : 0 ≤ s) (hsθ : s < θ) (f : U) :
     M.coupleModNorm s q f ≤ M.coupleInverseConst s q * A.eNormDyadic s q f := by
   have hθ : 0 ≤ θ := hs.trans hsθ.le
   have hρ := M.rho_pos
   have hfN : A.norm0 f ≤ A.eNormDyadic s q f := le_self_add
-  obtain ⟨b, hb1, hb0⟩ := exists_nearBest_eFunctional M.norm1_zero f s
-  obtain ⟨e, he_eq⟩ : ∃ e : ℕ → ℝ≥0∞, e = fun k =>
-      A.eFunctional ((2 ^ k : ℕ) : ℝ≥0∞) f + A.norm0 f * dyadicWeight (-(s + 1)) k := ⟨_, rfl⟩
-  have hbe : ∀ j, A.norm0 (f - b j) ≤ e j := fun j => by rw [he_eq]; exact hb0 j
-  have he : Antitone e := by
-    rw [he_eq]
-    exact antitone_eFunctional_add_dyadicWeight (by linarith) f
-  have hfe : A.norm0 f ≤ e 0 := by
-    rw [he_eq]
-    exact le_add_left (le_of_eq (by rw [ENNReal.dyadicWeight_zero_right, mul_one]))
-  have hX : lqNorm q (fun k => dyadicWeight s k * e k) ≤
-      LpAddConst q * (1 + dyadicGeomConst 1 q) * A.eNormDyadic s q f := by
-    rw [he_eq]
-    exact lqNorm_dyadicWeight_mul_eFunctional_add_le A s q f
+  obtain ⟨b, e, hb1, hbe, he, hfe, hXq⟩ := exists_nearBest_tolerances M.norm1_zero f s
+    (by linarith)
+  have hX := hXq q
   have hmain := M.lqNorm_rpow_le (s := s) hθ hb1 hbe he hfe (q / ENNReal.ofReal ρ)
   rw [ENNReal.lqNorm_div_fun_rpow hρ, ENNReal.lqNorm_div_fun_rpow hρ] at hmain
   set K := LpAddConst (q / ENNReal.ofReal ρ) * (M.C0 ^ ρ + 4 * M.CB ^ ρ *
@@ -472,14 +494,8 @@ theorem coupleModNorm_le_eNormDyadic (hs : 0 ≤ s) (hsθ : s < θ) (f : U) :
   set P := LpAddConst q * (1 + dyadicGeomConst 1 q)
   set N := A.eNormDyadic s q f
   have h2 : lqNorm q (fun k => dyadicWeight s k * M.modulus f k) ≤ K ^ ρ⁻¹ * (P * N) := by
-    calc lqNorm q (fun k => dyadicWeight s k * M.modulus f k)
-        = (lqNorm q (fun k => dyadicWeight s k * M.modulus f k) ^ ρ) ^ ρ⁻¹ :=
-          (ENNReal.rpow_rpow_inv hρ.ne' _).symm
-      _ ≤ (K * (P * N) ^ ρ) ^ ρ⁻¹ := by
-          refine ENNReal.rpow_le_rpow (hmain.trans ?_) (inv_nonneg.2 hρ.le)
-          gcongr
-      _ = K ^ ρ⁻¹ * (P * N) := by
-          rw [ENNReal.mul_rpow_of_nonneg _ _ (inv_nonneg.2 hρ.le), ENNReal.rpow_rpow_inv hρ.ne']
+    rw [← one_div]
+    exact ENNReal.le_rpow_one_div_mul_of_rpow_le hρ (hmain.trans (by gcongr))
   calc M.coupleModNorm s q f
       = A.norm0 f + lqNorm q (fun k => dyadicWeight s k * M.modulus f k) := rfl
     _ ≤ N + K ^ ρ⁻¹ * (P * N) := add_le_add hfN h2

@@ -32,6 +32,7 @@ public import ApproximationSpaces.Interpolation.ApproxSpaces
 public import ApproximationSpaces.Interpolation.EFunctional
 public import ApproximationSpaces.Interpolation.EFunctionalModuli
 public import ApproximationSpaces.Interpolation.EFunctionalSpaces
+public import ApproximationSpaces.Interpolation.EFunctionalRepresentation
 public import ApproximationSpaces.Decompositions.Projection
 public import ApproximationSpaces.Decompositions.Blocks
 public import ApproximationSpaces.Decompositions.EFunctionalBlocks
@@ -216,6 +217,11 @@ in the root namespace.
   (`InterpCouple.eFunctional_map_le`), and Pietsch's form `InterpCouple.eNormPietsch`,
   equivalent to the dyadic norm for `s ≥ 0` and `q ∈ (0, ∞]` and equal to `‖f‖_{A^s_q}` for the
   complexity couple of a scheme (`ApproximationScheme.eNormPietsch_complexityCouple`).
+* `ApproximationSpaces.Interpolation.EFunctionalRepresentation`: the couples of E-spaces
+  `(N₀, E_{r,q₁})` and `(E_{s₀,q₀}, E_{s₁,q₁})` (`InterpCouple.leftECouple`,
+  `InterpCouple.eCouple`), quasi-normed for every smoothness and every fine index, and Jackson's
+  half of `E_{s,q} = (N₀, E_{r,q₁})_{s/r,q}` for every Jackson inequality
+  (`InterpCouple.eNormDyadic_le_interpNorm_of_jackson`).
 
 ### Decompositions (`Decompositions/`)
 

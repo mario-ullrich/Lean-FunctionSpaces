@@ -39,7 +39,8 @@ dyadic form is `N₀(u) + ‖(2^(kα) E(2^k, u))_k‖_{ℓ_q}` (`InterpCouple.eN
 function in place of `E(·, u)` (`ApproximationScheme.phiFunctional_neg_le_of_antitone`,
 `ApproximationScheme.lqNorm_le_phiFunctional_neg_of_antitone`). The dyadic norm satisfies a
 quasi-triangle inequality (Bergh–Löfström, Lemma 7.1.6, in dyadic form;
-`InterpCouple.eNormDyadic_add_le`).
+`InterpCouple.eNormDyadic_add_le`), and it is even for a couple of even functions
+(`InterpCouple.eNormDyadic_neg`).
 
 The **complexity couple** of a sequence of sets `S n` is `(N, min {n : b ∈ S n})`
 (`InterpCouple.complexity`); for increasing sets its E-functional at `t = n` is the error of best
@@ -482,6 +483,16 @@ theorem eAddConst_ne_top (hC : C ≠ ∞) (s : ℝ) (q : ℝ≥0∞) : eAddConst
     (ENNReal.add_ne_top.2 ⟨ENNReal.ofNat_ne_top,
       ENNReal.mul_ne_top (ENNReal.two_rpow_ne_top s) (ENNReal.LpAddConst_lt_top q).ne⟩)
 
+/-- The constant `eAddConst C s q = C C_q (2 + 2^s C_q)` is at least `C`, for every `C`, `s` and
+`q`, since `C_q ≥ 1` (`ENNReal.one_le_LpAddConst`) and `2 + 2^s C_q ≥ 1`. -/
+theorem le_eAddConst (C : ℝ≥0∞) (s : ℝ) (q : ℝ≥0∞) : C ≤ eAddConst C s q := by
+  unfold eAddConst
+  calc C = C * 1 * 1 := by rw [mul_one, mul_one]
+    _ ≤ C * LpAddConst q * (2 + 2 ^ s * LpAddConst q) := by
+        gcongr
+        · exact ENNReal.one_le_LpAddConst q
+        · exact one_le_two.trans le_self_add
+
 /-- One level up: `2^((k+1)s) E(2^(k+1), u + v) ≤ 2^s C (2^(ks) E(2^k, u) + 2^(ks) E(2^k, v))`
 for a couple quasi-normed with constant `C` with subadditive complexity, since
 `2^(k+1) = 2^k + 2^k` (`eFunctional_add_le`). -/
@@ -545,6 +556,12 @@ theorem eNormDyadic_add_le (hA : A.IsQuasiNormed C)
 theorem eNormDyadic_zero (h00 : A.norm0 0 = 0) (h10 : A.norm1 0 = 0) (s : ℝ) (q : ℝ≥0∞) :
     A.eNormDyadic s q 0 = 0 := by
   simp [eNormDyadic, h00, eFunctional_zero_right h00 h10, ENNReal.lqNorm_zero_right]
+
+/-- **The dyadic norm of a couple of even functions is even**: if `N₀` and `N₁` are even, then
+`‖-u‖^dy_{s,q} = ‖u‖^dy_{s,q}` for all `s` and `q`, termwise by `InterpCouple.eFunctional_neg`. -/
+theorem eNormDyadic_neg (h0 : ∀ a, A.norm0 (-a) = A.norm0 a) (h1 : ∀ a, A.norm1 (-a) = A.norm1 a)
+    (s : ℝ) (q : ℝ≥0∞) (u : U) : A.eNormDyadic s q (-u) = A.eNormDyadic s q u := by
+  simp only [eNormDyadic, h0, eFunctional_neg h0 h1]
 
 /-! ### The complexity couple -/
 

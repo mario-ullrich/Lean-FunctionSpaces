@@ -5,7 +5,7 @@ Authors: Mario Ullrich
 -/
 module
 
-public import ApproximationSpaces.Interpolation.EFunctionalSpaces
+public import ApproximationSpaces.Interpolation.EFunctionalModuli
 public import ApproximationSpaces.Sequences.Hardy
 
 /-!
@@ -19,14 +19,14 @@ A **block decomposition** of `u` is a sequence `g_k` with `N₁(g_k) ≤ 2^k` wh
 `∑_{k<n} g_k` converge to `u` in `N₀`; its size is `‖(2^(ks) N₀(g_k))_k‖_{ℓ_q}`, and the
 infimum of the sizes is `InterpCouple.eBlockDecompNorm`. The norm `N₃` of DeVore–Popov is the
 size of one block decomposition, the blocks `T_k - T_{k-1}` of their spline approximants `T_k`.
-Here the dyadic norm, which is their `N₁` for dyadic splines, is bounded by the size of every
-block decomposition (`InterpCouple.eNormDyadic_le_of_tendsto_sum`) and bounds the size of the
-blocks of near-best approximants (`InterpCouple.exists_blocks_eNormDyadic`).
+Here the dyadic norm, the norm `N₁` of DeVore–Popov for dyadic splines, is bounded by the size
+of every block decomposition (`InterpCouple.eNormDyadic_le_of_tendsto_sum`) and bounds the size
+of the blocks of near-best approximants (`InterpCouple.exists_blocks_eNormDyadic`).
 
 * **Partial sums**: `N₁(∑_{k<n} g_k) ≤ 2^n` if `N₁(0) = 0` and `N₁` is subadditive
   (`InterpCouple.norm1_sum_range_le`), and `N₀(u - ∑_{k<n} g_k)^ρ ≤ ∑_{i ≥ 0} N₀(g_{n+i})^ρ`
   (`InterpCouple.norm0_sub_sum_rpow_le_tsum`): the `ρ`-triangle inequality bounds the finite
-  pieces of the tail, and the partial sums converge, so no completeness is used.
+  pieces of the tail, and the partial sums converge, so the bound holds in every abelian group.
 * **Blocks of a sequence**: `g_0 = 0`, `g_1 = b_0`, `g_{k+2} = b_{k+1} - b_k`
   (`InterpCouple.nearBestBlocks`), with the partial sums `∑_{j<k+2} g_j = b_k`
   (`InterpCouple.sum_range_nearBestBlocks`); additive maps commute with the blocks
@@ -41,9 +41,12 @@ blocks of near-best approximants (`InterpCouple.exists_blocks_eNormDyadic`).
   `‖u‖^dy_{s,q} < ∞` if and only if `u` has a block decomposition of finite size
   (`InterpCouple.eNormDyadic_lt_top_iff_eBlockDecompNorm_lt_top`).
 
-For a scheme in a Banach space and `q ≥ 1` this is
-`ApproximationScheme.memApprox_iff_blockDecompNorm_lt_top`, where the series of blocks converges
-by completeness; here the convergence of the partial sums is part of the definition.
+The normed counterpart, for a scheme in a Banach space and `q ≥ 1`, is
+`ApproximationScheme.memApprox_iff_blockDecompNorm_lt_top`. Its first bound
+`ApproximationScheme.approxNormDyadic_le_of_hasSum` is the case `ρ = 1` of
+`InterpCouple.eNormDyadic_le_of_tendsto_sum` for the complexity couple of the scheme, with the same
+constant for `q ≥ 1`; there the series of blocks converges by completeness, here the convergence
+of the partial sums is part of the definition.
 -/
 
 @[expose] public section
@@ -90,7 +93,7 @@ theorem nearBestBlocks_map {V : Type*} [AddCommGroup V] (T : U →+ V) (b : ℕ 
 /-- **The blocks have the complexity of their level**: if the couple is quasi-normed, `N₁` is
 subadditive and `N₁(b_k) ≤ 2^k` for every `k`, then the blocks `g_k` of `b`
 (`InterpCouple.nearBestBlocks`) satisfy `N₁(g_k) ≤ 2^k`, since
-`N₁(b_{k+1} - b_k) ≤ 2^(k+1) + 2^k ≤ 2^(k+2)`. -/
+`N₁(b_{k+1} - b_k) ≤ 2^(k+2)` (`InterpCouple.norm1_sub_le_pow_add_two`). -/
 theorem norm1_nearBestBlocks_le (hA : A.IsQuasiNormed C)
     (h1 : ∀ a b, A.norm1 (a + b) ≤ A.norm1 a + A.norm1 b) {b : ℕ → U}
     (hb : ∀ k, A.norm1 (b k) ≤ ((2 ^ k : ℕ) : ℝ≥0∞)) (k : ℕ) :
@@ -98,13 +101,7 @@ theorem norm1_nearBestBlocks_le (hA : A.IsQuasiNormed C)
   rcases k with _ | _ | k
   · exact hA.norm1_zero.trans_le zero_le
   · exact (hb 0).trans (Nat.cast_le.2 (by norm_num))
-  · calc A.norm1 (b (k + 1) - b k) ≤ A.norm1 (b (k + 1)) + A.norm1 (b k) :=
-          norm1_sub_le hA.norm1_neg h1 _ _
-      _ ≤ ((2 ^ (k + 1) : ℕ) : ℝ≥0∞) + ((2 ^ k : ℕ) : ℝ≥0∞) := add_le_add (hb _) (hb _)
-      _ ≤ ((2 ^ (k + 2) : ℕ) : ℝ≥0∞) := by
-          rw [← Nat.cast_add, Nat.cast_le]
-          rw [pow_succ, pow_succ, pow_succ]
-          omega
+  · exact norm1_sub_le_pow_add_two hA.norm1_neg h1 (hb k) (hb (k + 1))
 
 /-- **The partial sums of the blocks converge with the sequence**: if `N₀(u - b_k) → 0`, then
 the blocks `g_j` of `b` satisfy `N₀(u - ∑_{j<n} g_j) → 0`, since the partial sum of index `k + 2`
@@ -132,13 +129,8 @@ theorem lqNorm_nearBestBlocks_le (hA : A.IsQuasiNormed C) (hρ : 0 < ρ)
   · simp [ENNReal.lqNorm_zero_left]
   set L := lqNorm q (fun k => dyadicWeight s k * e k)
   set a : ℕ → ℝ≥0∞ := fun k => dyadicWeight s k * A.norm0 (nearBestBlocks b k) with ha
-  have hroot : ∀ x y : ℝ≥0∞, x ^ ρ ≤ 2 * y ^ ρ → x ≤ 2 ^ (1 / ρ) * y := fun x y h => by
-    have h' := ENNReal.le_two_rpow_mul_of_rpow_le (p := ENNReal.ofReal ρ)
-      (ENNReal.ofReal_pos.2 hρ).ne' ENNReal.ofReal_ne_top
-      (by rwa [ENNReal.toReal_ofReal hρ.le])
-    rwa [ENNReal.toReal_ofReal hρ.le] at h'
   have hb0 : A.norm0 (b 0) ≤ 2 ^ (1 / ρ) * e 0 := by
-    refine hroot _ _ ?_
+    refine ENNReal.le_rpow_one_div_mul_of_rpow_le hρ ?_
     calc A.norm0 (b 0) ^ ρ = A.norm0 (u - (u - b 0)) ^ ρ := by rw [sub_sub_cancel]
       _ ≤ A.norm0 u ^ ρ + A.norm0 (u - b 0) ^ ρ := norm0_sub_rpow_le hA.norm0_neg h0 _ _
       _ ≤ e 0 ^ ρ + e 0 ^ ρ :=
@@ -158,7 +150,8 @@ theorem lqNorm_nearBestBlocks_le (hA : A.IsQuasiNormed C) (hρ : 0 < ρ)
           rw [ha]; dsimp only; rw [ENNReal.dyadicWeight_succ, ENNReal.dyadicWeight_succ]; rfl
       _ ≤ 2 ^ s * (2 ^ s * dyadicWeight s k) * (2 ^ (1 / ρ) * e k) := by
           gcongr
-          exact hroot _ _ (norm0_sub_succ_rpow_le_of_nearBest hρ.le hA.norm0_neg h0 hbe he k)
+          exact ENNReal.le_rpow_one_div_mul_of_rpow_le hρ
+            (norm0_sub_succ_rpow_le_of_nearBest hρ.le hA.norm0_neg h0 hbe he k)
       _ = 2 ^ s * 2 ^ s * 2 ^ (1 / ρ) * (dyadicWeight s k * e k) := by ring
   calc lqNorm q a ≤ LpAddConst q * (a 0 + lqNorm q (fun k => a (k + 1))) :=
         ENNReal.lqNorm_le_head_add_shift' q a
@@ -191,7 +184,7 @@ theorem norm1_sum_range_le (h10 : A.norm1 0 = 0)
 `N₀(a + b)^ρ ≤ N₀(a)^ρ + N₀(b)^ρ` for some `ρ > 0`. If the partial sums `S_n = ∑_{k<n} g_k`
 satisfy `N₀(u - S_n) → 0`, then `N₀(u - S_n)^ρ ≤ ∑_{i ≥ 0} N₀(g_{n+i})^ρ` for every `n`. For
 `m ≥ 0`, `u - S_n = (u - S_{n+m}) + ∑_{i<m} g_{n+i}`, the `ρ`-triangle inequality bounds the
-finite sum, and `N₀(u - S_{n+m})^ρ → 0`; no completeness is used. -/
+finite sum, and `N₀(u - S_{n+m})^ρ → 0`; the bound holds in every abelian group `U`. -/
 theorem norm0_sub_sum_rpow_le_tsum (hρ : 0 < ρ) (h00 : A.norm0 0 = 0)
     (h0 : ∀ a b, A.norm0 (a + b) ^ ρ ≤ A.norm0 a ^ ρ + A.norm0 b ^ ρ) {u : U} {g : ℕ → U}
     (hlim : Tendsto (fun n => A.norm0 (u - ∑ k ∈ range n, g k)) atTop (𝓝 0)) (n : ℕ) :
@@ -229,15 +222,16 @@ variable (A) in
 `‖(2^(ks) N₀(g_k))_k‖_{ℓ_q}` over all sequences `g_k` with `N₁(g_k) ≤ 2^k` whose partial sums
 `∑_{k<n} g_k` converge to `u` in `N₀`, written `‖u‖^dec_{s,q}`. The norm `N₃` of DeVore–Popov
 (Trans. Amer. Math. Soc. 305 (1988), Theorem 5.1) is the size of the blocks of near-best spline
-approximants; the infimum over all block decompositions is equivalent to it
-(`InterpCouple.eNormDyadic_le_of_tendsto_sum`, `InterpCouple.exists_blocks_eNormDyadic`). -/
+approximants. For `s > 0` the infimum over all block decompositions is equivalent to the dyadic
+norm, the norm `N₁` of DeVore–Popov for splines (`InterpCouple.eNormDyadic_le_eBlockDecompNorm`,
+`InterpCouple.eBlockDecompNorm_le_eNormDyadic`). -/
 noncomputable def eBlockDecompNorm (s : ℝ) (q : ℝ≥0∞) (u : U) : ℝ≥0∞ :=
   ⨅ (g : ℕ → U) (_ : ∀ k, A.norm1 (g k) ≤ ((2 ^ k : ℕ) : ℝ≥0∞))
     (_ : Tendsto (fun n => A.norm0 (u - ∑ k ∈ range n, g k)) atTop (𝓝 0)),
     lqNorm q (fun k => dyadicWeight s k * A.norm0 (g k))
 
 /-- Every block decomposition bounds the block decomposition quasi-norm. -/
-theorem eBlockDecompNorm_le_of_tendsto {u : U} {g : ℕ → U}
+theorem eBlockDecompNorm_le_of_tendsto_sum {u : U} {g : ℕ → U}
     (hg : ∀ k, A.norm1 (g k) ≤ ((2 ^ k : ℕ) : ℝ≥0∞))
     (hlim : Tendsto (fun n => A.norm0 (u - ∑ k ∈ range n, g k)) atTop (𝓝 0)) :
     A.eBlockDecompNorm s q u ≤ lqNorm q (fun k => dyadicWeight s k * A.norm0 (g k)) :=
@@ -264,11 +258,8 @@ theorem eNormDyadic_le_of_tendsto_sum (hA : A.IsQuasiNormed C)
       simpa only [one_mul, ENNReal.dyadicWeight_zero_left] using
         norm0_sub_sum_rpow_le_tsum hρ hA.norm0_zero h0 hlim n
   have hX : lqNorm q (fun n => dyadicWeight s n * x n) ≤ H ^ (1 / ρ) * M := by
-    have h := ENNReal.lqNorm_rpow_le_of_rpow_le_tsum (y := fun j => A.norm0 (g j)) hρ htail s q
-    rw [one_mul, sub_zero] at h
-    have h' := ENNReal.rpow_le_rpow h (one_div_nonneg.2 hρ.le)
-    rwa [ENNReal.mul_rpow_of_nonneg _ _ (one_div_nonneg.2 hρ.le), one_div,
-      ENNReal.rpow_rpow_inv hρ.ne', ENNReal.rpow_rpow_inv hρ.ne', ← one_div] at h'
+    have h := ENNReal.lqNorm_le_of_rpow_le_tsum (y := fun j => A.norm0 (g j)) hρ htail s q
+    rwa [one_mul, sub_zero] at h
   have hE : ∀ n, A.eFunctional ((2 ^ n : ℕ) : ℝ≥0∞) u ≤ x n := fun n =>
     eFunctional_le (norm1_sum_range_le hA.norm1_zero h1 hg n)
   have hx0 : A.norm0 u ≤ lqNorm q (fun n => dyadicWeight s n * x n) := by
@@ -295,13 +286,10 @@ theorem eNormDyadic_le_eBlockDecompNorm (hA : A.IsQuasiNormed C)
     A.eNormDyadic s q u ≤
       2 * hardyConst (s * ρ) (q / ENNReal.ofReal ρ) ^ (1 / ρ) * A.eBlockDecompNorm s q u := by
   set K := 2 * hardyConst (s * ρ) (q / ENNReal.ofReal ρ) ^ (1 / ρ)
-  have hK : K ≠ ∞ := ENNReal.mul_ne_top (by norm_num) (ENNReal.rpow_ne_top_of_nonneg
-    (one_div_nonneg.2 hρ.le) (ENNReal.hardyConst_ne_top (mul_pos hs hρ) _))
-  have hH : 1 ≤ hardyConst (s * ρ) (q / ENNReal.ofReal ρ) := by
-    unfold hardyConst
-    split_ifs
-    exacts [ENNReal.one_le_one_sub_two_rpow_neg_inv _, ENNReal.one_le_dyadicGeomConst _ _]
-  have hK0 : K ≠ 0 := mul_ne_zero two_ne_zero (ENNReal.rpow_pos (zero_lt_one.trans_le hH)
+  have hK : K ≠ ∞ := ENNReal.mul_ne_top (by norm_num)
+    (ENNReal.hardyConst_rpow_ne_top (mul_pos hs hρ) _ (one_div_nonneg.2 hρ.le))
+  have hK0 : K ≠ 0 := mul_ne_zero two_ne_zero (ENNReal.rpow_pos
+    (zero_lt_one.trans_le (ENNReal.one_le_hardyConst _ _))
     (ENNReal.hardyConst_ne_top (mul_pos hs hρ) _)).ne'
   rw [eBlockDecompNorm, ENNReal.mul_iInf_of_ne hK0 hK]
   refine le_iInf fun g => ?_
@@ -343,7 +331,8 @@ theorem eBlockConst_ne_zero (ρ s : ℝ) (q : ℝ≥0∞) : eBlockConst ρ s q �
 `N₀(a + b)^ρ ≤ N₀(a)^ρ + N₀(b)^ρ` for some `ρ > 0`, let `s > 0` and `q ≠ 0`. If
 `‖u‖^dy_{s,q} < ∞`, there are `b_k` with `N₁(b_k) ≤ 2^k` and `N₀(u - b_k) → 0` whose blocks
 satisfy `‖(2^(ks) N₀(g_k))_k‖_{ℓ_q} ≤ eBlockConst ρ s q ‖u‖^dy_{s,q}`: near-best approximants
-with the tolerances `e_k = E(2^k, u) + N₀(u) 2^(-k(s+1))`, which tend to `0` for `s > 0`. -/
+with the tolerances `e_k = E(2^k, u) + N₀(u) 2^(-k(s+1))`
+(`InterpCouple.exists_nearBest_tolerances`), which tend to `0` for `s > 0`. -/
 theorem exists_blocks_eNormDyadic (hA : A.IsQuasiNormed C) (hρ : 0 < ρ)
     (h0 : ∀ a b, A.norm0 (a + b) ^ ρ ≤ A.norm0 a ^ ρ + A.norm0 b ^ ρ) (hs : 0 < s) (hq : q ≠ 0)
     {u : U} (hu : A.eNormDyadic s q u ≠ ∞) :
@@ -351,14 +340,9 @@ theorem exists_blocks_eNormDyadic (hA : A.IsQuasiNormed C) (hρ : 0 < ρ)
       Tendsto (fun k => A.norm0 (u - b k)) atTop (𝓝 0) ∧
       lqNorm q (fun k => dyadicWeight s k * A.norm0 (nearBestBlocks b k)) ≤
         eBlockConst ρ s q * A.eNormDyadic s q u := by
-  obtain ⟨b, hb1, hb0⟩ := exists_nearBest_eFunctional hA.norm1_zero u s
-  set e : ℕ → ℝ≥0∞ := fun k =>
-    A.eFunctional ((2 ^ k : ℕ) : ℝ≥0∞) u + A.norm0 u * dyadicWeight (-(s + 1)) k
-  have he : Antitone e := antitone_eFunctional_add_dyadicWeight (by linarith) u
-  have he0 : A.norm0 u ≤ e 0 := by simp [e]
-  have hL : lqNorm q (fun k => dyadicWeight s k * e k) ≤
-      LpAddConst q * (1 + dyadicGeomConst 1 q) * A.eNormDyadic s q u :=
-    lqNorm_dyadicWeight_mul_eFunctional_add_le A s q u
+  obtain ⟨b, e, hb1, hb0, he, he0, hLq⟩ :=
+    exists_nearBest_tolerances hA.norm1_zero u s (by linarith)
+  have hL := hLq q
   have hLfin : lqNorm q (fun k => dyadicWeight s k * e k) ≠ ∞ :=
     ne_top_of_le_ne_top (ENNReal.mul_ne_top (ENNReal.mul_ne_top
       (ENNReal.LpAddConst_lt_top q).ne (ENNReal.add_ne_top.2
@@ -387,7 +371,7 @@ theorem eBlockDecompNorm_le_eNormDyadic (hA : A.IsQuasiNormed C)
   · rw [hu, ENNReal.mul_top (eBlockConst_ne_zero ρ s q)]
     exact le_top
   obtain ⟨b, hb1, hblim, hbound⟩ := exists_blocks_eNormDyadic hA hρ h0 hs hq hu
-  exact (eBlockDecompNorm_le_of_tendsto (norm1_nearBestBlocks_le hA h1 hb1)
+  exact (eBlockDecompNorm_le_of_tendsto_sum (norm1_nearBestBlocks_le hA h1 hb1)
     (tendsto_norm0_sub_sum_nearBestBlocks hblim)).trans hbound
 
 /-- **Block decompositions characterise `E_{s,q}`** (DeVore–Popov, Trans. Amer. Math. Soc. 305
@@ -404,7 +388,6 @@ theorem eNormDyadic_lt_top_iff_eBlockDecompNorm_lt_top (hA : A.IsQuasiNormed C)
       (ENNReal.mul_lt_top (eBlockConst_ne_top ρ s q).lt_top hu)
   · refine fun hu => (eNormDyadic_le_eBlockDecompNorm hA h1 hρ h0 hs hq u).trans_lt
       (ENNReal.mul_lt_top (ENNReal.mul_lt_top (by norm_num) ?_) hu)
-    exact (ENNReal.rpow_ne_top_of_nonneg (one_div_nonneg.2 hρ.le)
-      (ENNReal.hardyConst_ne_top (mul_pos hs hρ) _)).lt_top
+    exact (ENNReal.hardyConst_rpow_ne_top (mul_pos hs hρ) _ (one_div_nonneg.2 hρ.le)).lt_top
 
 end InterpCouple
