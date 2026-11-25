@@ -4217,6 +4217,173 @@ $\ell_q$ sums. The reiteration theorem for quasi-normed couples
 is~\cite[Theorem~3.11.5]{BerghLofstrom}, and the reiteration of Besov spaces for all fine
 indices is~\cite[Corollary~6.2]{DeVorePopovTAMS}.
 
+The space $E_{r, q_1}$ in \Cref{thm:e-spaces-interpolate} can be replaced by any smoothness
+space for which Jackson's and Bernstein's inequalities hold. Bernstein's half then telescopes
+near-best approximants in the $\rho$-th power of the smoothness quasi-seminorm; the sums are
+finite, so the argument holds in every abelian group, and it uses only the quasi-triangle
+inequality of $N_0$.
+
+\begin{definition}[Jackson's and Bernstein's inequalities for a couple]
+\label{def:jackson-bernstein-data}
+\lean{InterpCouple.JacksonBernsteinData, InterpCouple.JacksonBernsteinData.smoothnessCouple,
+  InterpCouple.JacksonBernsteinData.smoothnessCouple_norm0,
+  InterpCouple.JacksonBernsteinData.smoothnessCouple_norm1}
+\leanok
+\uses{def:couple, def:e-functional}
+Let $A = (N_0, N_1)$ be a couple on $U$ with $E$-functional $E$, let $\rho > 0$ and
+$r \in \R$. A function $Y : U \to [0, \infty]$ satisfies \emph{Jackson's and
+Bernstein's inequalities of order $r$ with exponent $\rho$} if $Y(-a) = Y(a)$ and
+$Y(a + b)^\rho \leq Y(a)^\rho + Y(b)^\rho$ for all $a, b \in U$, and if there are
+$C_J, C_B \in [0, \infty)$ with
+\[
+  E(2^k, u) \leq C_J \, 2^{-kr} \, Y(u)
+  \qquad \text{and} \qquad
+  Y(a) \leq C_B \, 2^{kr} N_0(a) \quad \text{if } N_1(a) \leq 2^k
+\]
+for all $k \in \N$ and $u, a \in U$. The couple $(N_0, N_0 + Y)$ on $U$ has the norms $N_0$ and
+$N_0 + Y$.
+\end{definition}
+
+\begin{lemma}[The couple of Jackson's and Bernstein's inequalities]
+\label{lem:jackson-bernstein-couple}
+\lean{InterpCouple.norm0_le_of_sub_le, InterpCouple.norm0_sub_le_two_mul,
+  InterpCouple.JacksonBernsteinData.smoothNorm_zero,
+  InterpCouple.JacksonBernsteinData.smoothNorm_sum_rpow_le,
+  InterpCouple.JacksonBernsteinData.smoothNorm_add_le,
+  InterpCouple.JacksonBernsteinData.isQuasiNormed_smoothnessCouple,
+  InterpCouple.JacksonBernsteinData.norm0_le_smoothnessCouple_norm1,
+  InterpCouple.JacksonBernsteinData.smoothNorm_rpow_le_of_norm1_le,
+  InterpCouple.JacksonBernsteinData.dyadicWeight_mul_smoothNorm_rpow_le_of_nearBest}
+\leanok
+\uses{def:jackson-bernstein-data, def:couple, lem:lq-quasi-triangle}
+Let $Y$ satisfy Jackson's and Bernstein's inequalities of order $r$ with exponent $\rho$ and
+constants $C_J$, $C_B$, and let $C_\rho$ be the constant of \Cref{lem:lq-quasi-triangle}.
+\begin{enumerate}
+  \item Let $A$ be quasi-normed with constant $C$, let $u, a, a' \in U$ and
+    $x \in [0, \infty]$. If $N_0(u - a) \leq x$, then $N_0(a) \leq C (x + N_0(u))$; if
+    moreover $N_0(u - a') \leq x$, then $N_0(a - a') \leq 2 C x$.
+  \item If $N_0(0) = 0$ and $N_1(0) = 0$, then $Y(0) = 0$ and
+    $Y\bigl(\sum_{i \in t} g_i\bigr)^\rho \leq \sum_{i \in t} Y(g_i)^\rho$ for every finite
+    family $(g_i)_{i \in t}$ in $U$.
+  \item $Y(a + b) \leq C_\rho \bigl(Y(a) + Y(b)\bigr)$ for all $a, b \in U$.
+  \item If $A$ is quasi-normed with constant $C$, then $(N_0, N_0 + Y)$ is quasi-normed with
+    constant $\max(C, C_\rho)$, and $N_0 \leq 1 \cdot (N_0 + Y)$.
+  \item For $a \in U$, $j \in \N$ and $c, x \in [0, \infty]$ with $N_1(a) \leq 2^j$ and
+    $N_0(a) \leq c x$, $Y(a)^\rho \leq (c C_B)^\rho \, 2^{jr\rho} x^\rho$.
+  \item Let $A$ be quasi-normed with constant $C$, let $N_1$ be subadditive and $r \geq 0$. Let
+    $u \in U$, let $b_k \in U$ with $N_1(b_k) \leq 2^k$, and let $(e_k)_k$ be a decreasing
+    sequence in $[0, \infty]$ with $N_0(u - b_k) \leq e_k$ for every $k \in \N$ and
+    $N_0(u) \leq e_0$. Then for every $k \in \N$,
+    \[
+      \bigl(2^{-kr} Y(b_k)\bigr)^\rho
+      \leq 2 (2 C C_B)^\rho \, 4^{r\rho} \sum_{j \leq k} 2^{-(k-j) r \rho} e_j^\rho .
+    \]
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:e-near-best, lem:sum-of-products-le-product-of-sums}
+(1) Write $a = -(u - a) + u$ and $a - a' = (u - a') - (u - a)$, and use the quasi-triangle
+inequality and the evenness of $N_0$. (2) Bernstein's inequality with $k = 0$ and $a = 0$ gives
+$Y(0) \leq C_B N_0(0) = 0$; so $Y^\rho$ vanishes at $0$ and is subadditive, hence subadditive on
+finite sums. (3) follows from $Y(a + b)^\rho \leq Y(a)^\rho + Y(b)^\rho$ by
+\Cref{lem:lq-quasi-triangle}, applied to $x = Y(a + b)$. (4) $Y$ vanishes at $0$ by (2), it is
+even, and by (3)
+$N_0(a + b) + Y(a + b) \leq C (N_0(a) + N_0(b)) + C_\rho (Y(a) + Y(b))$, which is at most
+$\max(C, C_\rho)$ times $(N_0(a) + Y(a)) + (N_0(b) + Y(b))$. (5) By Bernstein's inequality,
+$Y(a) \leq C_B 2^{jr} c x$; take the $\rho$-th power. (6) Write
+$b_k = b_0 + \sum_{j < k} (b_{j+1} - b_j)$, a finite sum, so that
+$Y(b_k)^\rho \leq Y(b_0)^\rho + \sum_{j < k} Y(b_{j+1} - b_j)^\rho$ by (2). By (1) with
+$a' = 0$, $N_0(b_0) \leq 2 C e_0$, and since $e_{j+1} \leq e_j$,
+$N_0(b_{j+1} - b_j) \leq 2 C e_j$. By (3) of \Cref{lem:e-near-best},
+$N_1(b_{j+1} - b_j) \leq 2^{j+2}$, so (5) at the levels $0$ and $j + 2$ gives
+$Y(b_0)^\rho \leq (2 C C_B)^\rho e_0^\rho$ and
+$Y(b_{j+1} - b_j)^\rho \leq (2 C C_B)^\rho \, 2^{(j+2) r \rho} e_j^\rho$. Multiply by
+$2^{-kr\rho}$: $2^{-kr\rho} \, 2^{(j+2) r\rho} = 4^{r\rho} \, 2^{-(k-j) r\rho}$ for $j \leq k$,
+and $2^{-kr\rho} \leq 4^{r\rho} \, 2^{-kr\rho}$ since $r \geq 0$. The term of $b_0$ and the
+first block both sit at $j = 0$, and $x_0 + \sum_{j < k} x_j \leq 2 \sum_{j \leq k} x_j$
+(\Cref{lem:sum-of-products-le-product-of-sums}).
+\end{proof}
+
+The next theorem is~\cite[\S 4.3, Theorem~1]{DeVore1998} for quasi-normed couples; DeVore
+states it for a normed space $X$, a quasi-semi-normed space $Y$ continuously embedded in $X$ and
+approximation from sets $X_n$.
+
+\begin{theorem}[The Jackson--Bernstein theorem for quasi-normed couples]
+\label{thm:jackson-bernstein-couple}
+\lean{InterpCouple.JacksonBernsteinData.kFunctional_smoothnessCouple_le_of_nearBest,
+  InterpCouple.jacksonBernsteinConst, InterpCouple.jacksonBernsteinConst_ne_top,
+  InterpCouple.JacksonBernsteinData.interpNorm_smoothnessCouple_le_eNormDyadic,
+  InterpCouple.JacksonBernsteinData.eNormDyadic_le_interpNorm_smoothnessCouple,
+  InterpCouple.JacksonBernsteinData.memKMethod_smoothnessCouple_iff}
+\leanok
+\uses{def:jackson-bernstein-data, def:e-method, def:couple-k-functional, def:couple-k-method,
+  prop:couple-natural-grid, lem:lq-quasi-triangle, lem:lq-reindex, lem:hardy-every-exponent}
+Let $A$ be quasi-normed with constant $C$, let $N_1$ be subadditive, and let $Y$ satisfy
+Jackson's and Bernstein's inequalities of order $r$ with exponent $\rho$ and constants $C_J$,
+$C_B$. Let $C_q$, $\gamma_{\alpha, q}$ and $H_{\alpha, q}$ be the constants of
+\Cref{lem:lq-quasi-triangle}, \Cref{lem:lq-reindex} and \Cref{lem:hardy-every-exponent}, let $K$
+be the $K$-functional of the couple $(N_0, N_0 + Y)$, and write $\|\cdot\|_{s/r, r, q}$ for its
+norm of \Cref{prop:couple-natural-grid}.
+\begin{enumerate}
+  \item Let $r \geq 0$ and $u \in U$, and let $b_k \in U$ and $e_k \in [0, \infty]$ satisfy
+    $N_0(u - b_k) \leq e_k$ for every $k \in \N$. Then for every $k \in \N$,
+    \[
+      K(2^{-kr}, u) \leq (1 + C) e_k + C N_0(u) \, 2^{-kr} + 2^{-kr} Y(b_k) .
+    \]
+  \item Let $0 \leq s < r$ and $q \in (0, \infty]$. Then for every $u \in U$,
+    $\|u\|_{s/r, r, q} \leq c \, \|u\|^{\mathrm{dy}}_{E, s, q}$, where
+    $M = C_q (1 + \gamma_{1, q})$ and
+    \[
+      c = 1 + C_q \Bigl( C_q \bigl((1 + C) M + C \gamma_{r-s, q}\bigr)
+        + \bigl(2 (2 C C_B)^\rho \, 4^{r\rho} H_{(r-s)\rho, q/\rho}\bigr)^{1/\rho} M \Bigr)
+    \]
+    is finite.
+  \item Let $r \neq 0$, $s \in \R$ and $q \in (0, \infty]$. Then for every $u \in U$,
+    $\|u\|^{\mathrm{dy}}_{E, s, q} \leq \bigl(1 + C_q (1 + 2^s C \max(1, C_J))\bigr)
+    \|u\|_{s/r, r, q}$.
+  \item Let $0 < s < r$ and $q \in (0, \infty]$. For every $u \in U$,
+    $u \in (N_0, N_0 + Y)_{s/r, q}$, the space of the continuous $K$-method of the couple
+    $(N_0, N_0 + Y)$, if and only if $\|u\|^{\mathrm{dy}}_{E, s, q} < \infty$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{lem:e-couple-jackson, thm:e-couple-bernstein, lem:e-near-best, lem:weighted-tails,
+  lem:jackson-bernstein-couple}
+(1) $K(2^{-kr}, u) \leq N_0(u - b_k) + 2^{-kr} \bigl(N_0(b_k) + Y(b_k)\bigr)$, with
+$N_0(b_k) \leq C (e_k + N_0(u))$ by (1) of \Cref{lem:jackson-bernstein-couple} and
+$2^{-kr} \leq 1$.
+
+(2) Since $r > 0$, $2^{kr \cdot s/r} = 2^{ks}$. Choose $b_k$ and $e_k$ by (4) of
+\Cref{lem:e-near-best} with $s \geq 0 \geq -1$, so that $N_0(u) \leq e_0$ and
+$L = \|(2^{ks} e_k)_k\|_{\ell_q} \leq M \|u\|^{\mathrm{dy}}_{E, s, q}$. By (6) of
+\Cref{lem:jackson-bernstein-couple}, $x_k = 2^{-kr} Y(b_k)$ satisfies the hypothesis of (4) of
+\Cref{lem:weighted-tails} with $\beta = r\rho$ and the constant $2 (2 C C_B)^\rho 4^{r\rho}$, so
+$\|(2^{ks} x_k)_k\|_{\ell_q} \leq (2 (2 C C_B)^\rho 4^{r\rho} H_{(r-s)\rho, q/\rho})^{1/\rho} L$.
+By (1), (1) of \Cref{thm:e-couple-bernstein} with $a = 1 + C$ and $b = C N_0(u)$ bounds
+$\|(2^{ks} K(2^{-kr}, u))_k\|_{\ell_q}$; add $N_0(u) \leq \|u\|^{\mathrm{dy}}_{E, s, q}$. The
+constant is finite by \Cref{lem:lq-reindex} and \Cref{lem:hardy-every-exponent}, since
+$r - s > 0$ and $(r - s)\rho > 0$.
+
+(3) Jackson's inequality and $Y \leq N_0 + Y$ give
+$E(2^k, g) \leq C_J \, 2^{-kr} (N_0(g) + Y(g))$, so (2) of \Cref{lem:e-couple-jackson} applies
+to $N = N_0 + Y$.
+
+(4) By (4) of \Cref{lem:jackson-bernstein-couple} the couple $(N_0, N_0 + Y)$ is quasi-normed
+and $N_0 \leq 1 \cdot (N_0 + Y)$, so by (3) of \Cref{prop:couple-natural-grid} with
+$\theta = s/r > 0$ on the grid $t = 2^{-kr}$, $u \in (N_0, N_0 + Y)_{s/r, q}$ if and only if
+$\|u\|_{s/r, r, q} < \infty$. By (2) and (3), each of $\|u\|_{s/r, r, q}$ and
+$\|u\|^{\mathrm{dy}}_{E, s, q}$ is at most a finite multiple of the other.
+\end{proof}
+
+For a scheme in a normed space with a smoothness space $Y \hookrightarrow X$ and $q \geq 1$ the
+normed counterpart is \Cref{thm:representation}. For $L_p$ with $0 < p < 1$ the space $Y$ is a
+classical or an approximation space: the $K$-functional of $L_p$ and the Sobolev space $W^r_p$
+on the circle vanishes identically~\cite{DitzianHristovIvanov1995}.
+
 \chapter{Block decompositions and projections}
 \label{ch:decompositions}
 
@@ -5146,7 +5313,7 @@ $\|(2^{ks} \omega(f, k))_k\|_{\ell_q}$ by $(C_r (\dots))^{1/\rho} \, \|(2^{ks} e
 The last claim follows with (3) of \Cref{lem:e-method-dyadic}.
 \end{proof}
 
-For $0 < p < 1$ the $K$-functional of $L_p$ and the Sobolev space $W^r_p$ on an interval
+For $0 < p < 1$ the $K$-functional of $L_p$ and the Sobolev space $W^r_p$ on the circle
 vanishes identically~\cite{DitzianHristovIvanov1995}, so it carries no information on
 smoothness, and the representation of the classical spaces as interpolation spaces in
 \Cref{cor:modulus-spaces-interpolate} has no analogue there. The theorem above goes through the

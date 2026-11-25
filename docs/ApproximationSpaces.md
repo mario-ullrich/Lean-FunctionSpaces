@@ -198,6 +198,15 @@ theory.
   take the place of the lifts, and only the quasi-triangle inequality of `N₀` is used. For
   `1 ≤ q₀, q₁, q ≤ ∞` and `0 < s₀ < s₁`, `(E_{s₀,q₀}, E_{s₁,q₁})_{η,q} = E_{(1-η)s₀+ηs₁,q}`
   (`InterpCouple.memKMethod_eCouple_iff`).
+* **The Jackson–Bernstein theorem for quasi-normed couples.** For a couple quasi-normed with
+  constant `C` whose complexity is subadditive, let `Y` be an even function with `Y^ρ`
+  subadditive for some `ρ > 0`, `E(2^k, u) ≤ C_J 2^(-kr) Y(u)` and `Y(a) ≤ C_B 2^(kr) N₀(a)` for
+  `N₁(a) ≤ 2^k`, with finite constants `C_J`, `C_B`. For `0 < s < r` and `0 < q ≤ ∞`,
+  `u ∈ (N₀, N₀ + Y)_{s/r,q}` iff `N₀(u) + ‖(2^(ks) E(2^k, u))_k‖_{ℓ_q} < ∞` (for a normed space
+  in place of `N₀`: DeVore, Acta Numer. 7 (1998), §4.3, Theorem 1;
+  `InterpCouple.JacksonBernsteinData.memKMethod_smoothnessCouple_iff`). Bernstein's half
+  telescopes near-best approximants in the `ρ`-th power of `Y`, a finite sum, so the theorem
+  holds in every abelian group.
 * **Block decompositions.** In a Banach space, for `s > 0` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q` iff
   `f = ∑_k g_k` with blocks `g_k ∈ A_{2^k}` and `(2^(ks) ‖g_k‖)_k ∈ ℓ_q`; the infimum over
   such decompositions is an equivalent quasi-norm
@@ -304,6 +313,7 @@ Paths are relative to `ApproximationSpaces/`, without `.lean`.
 | The blocks of near-best sequences, near-best sequences with their tolerances, moduli compatible with a `ρ`-normed couple, coincidence of `E_{s,q}` with the classical space | ✅ | ✗ | `Interpolation/EFunctionalModuli` |
 | Homogeneity of the E-functional, embeddings of the dyadic norms in the smoothness and the fine index, additive maps, Pietsch's form of a couple and its equivalence with the dyadic norm | ✅ | ✗ | `Interpolation/EFunctionalSpaces` |
 | Couples of E-spaces, Jackson's and Bernstein's half, `E_{s,q} = (N₀, E_{r,q₁})_{s/r,q}` for every fine index, reiteration of E-spaces for fine indices ≥ 1 | ✅ | ✗ | `Interpolation/EFunctionalRepresentation` |
+| Jackson's and Bernstein's inequalities for a quasi-normed couple, the couple `(N₀, N₀ + Y)`, the Jackson–Bernstein theorem `E_{s,q} = (N₀, N₀ + Y)_{s/r,q}` for every fine index | ✅ | ✗ | `Interpolation/EFunctionalJacksonBernstein` |
 | Moduli compatible with a scheme, coincidence with the classical space, interpolation of the classical spaces | ✅ | ✗ | `Moduli` |
 | Block decompositions, series moved up by a number of levels, projection schemes and dyadic blocks | ✅ | ✗ | `Decompositions/Blocks`, `Decompositions/Projection` |
 | Block decompositions of the spaces `E_{s,q}` of a quasi-normed couple with subadditive `N₀^ρ`, the blocks of near-best sequences, partial sums and tails in every abelian group | ✅ | ✗ | `Decompositions/EFunctionalBlocks` |
