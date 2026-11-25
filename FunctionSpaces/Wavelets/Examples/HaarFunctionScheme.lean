@@ -49,11 +49,12 @@ on the dyadic intervals of level `⌊log₂ n⌋`, the `ℱ_⌊log₂ n⌋`-meas
   `‖f‖_r ≤ K ‖f‖^dy_{s,q}` for every `f ∈ L_p[0, 1]`
   (`Haar.exists_eLpNorm_le_eNormDyadic_stepCouple`). Both are the Besov embedding of a scheme of
   functions with the Nikolskii property
-  (`FunctionScheme.exists_uniform_inclusion_eq_of_nikolskii`). For `r = 1` and `0 < p ≤ 1` the
-  second is `Haar.eLpNorm_one_le_eNormDyadic`, proved directly with an explicit constant; the
-  agreement checks the Besov embedding of a scheme of functions for `p < 1`. With the first modulus
-  (`Haar.eNormDyadic_stepCouple_lt_top_iff_modulus`), for `0 < p ≤ 1` and
-  `1/p - 1/r < s < 1/p` this is the embedding `B^s_{p,q,1}[0, 1] ⊆ L_r[0, 1]`.
+  (`FunctionScheme.exists_uniform_inclusion_eq_of_nikolskii`). The case `r = 1`, `0 < p ≤ 1` of
+  the second holds with an explicit constant (`Haar.eLpNorm_one_le_eNormDyadic`, proved
+  directly); the agreement of the two proofs checks the Besov embedding of a scheme of functions
+  for `p < 1`. With the first modulus (`Haar.eNormDyadic_stepCouple_lt_top_iff_modulus`), for
+  `0 < p ≤ 1` and `1/p - 1/r < s < 1/p` the second bound is the embedding
+  `B^s_{p,q,1}[0, 1] ⊆ L_r[0, 1]`.
 
 The declared type of `Haar.haarScheme ∞` is `ApproximationScheme (Lp ℂ ∞ vol)`, so the
 declarations of the namespace `FunctionScheme` are applied to it with their full names, as in
@@ -208,8 +209,8 @@ theorem exists_uniform_inclusion_eq_stepCouple (hp0 : p ≠ 0) (hpr : p ≤ r)
 `E`-functional `E` of the step couple of `L_p[0, 1]`. For a finite right side this is the bound
 `‖g‖_r ≤ ‖g‖^dy_{s - (1/p - 1/r), q}` of the dyadic norm in `L_r` together with
 `Haar.exists_uniform_inclusion_eq_stepCouple`; `K` is taken at least `1`, so that the bound
-also holds when the right side is infinite. For `r = 1` and `0 < p ≤ 1` it is
-`Haar.eLpNorm_one_le_eNormDyadic`, which gives the constant explicitly. -/
+also holds when the right side is infinite. Its case `r = 1`, `0 < p ≤ 1` holds with an explicit
+constant (`Haar.eLpNorm_one_le_eNormDyadic`). -/
 theorem exists_eLpNorm_le_eNormDyadic_stepCouple (hp0 : p ≠ 0) (hpr : p ≤ r)
     (hs : p.toReal⁻¹ - r.toReal⁻¹ < s) (hq0 : q ≠ 0) :
     ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ f : Lp ℂ p vol,

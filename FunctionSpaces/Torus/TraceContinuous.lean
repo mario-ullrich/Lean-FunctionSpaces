@@ -15,9 +15,9 @@ The trace `Tr = (Torus.periodicTraceBound p n hp).limitTrace` of `Torus.trace_be
 is a limit of traces of near-best approximants. For every bounded continuous `f` on `𝕋^(n+1)`
 whose class lies in `B^{1/p}_{p,1}(𝕋^(n+1))`, it is the restriction `f(0, ·)` to the face
 (`Torus.periodicTraceBound_limitTrace_eq_restrictFace`), in particular for `f ∈ B^{s+1/p}_{p,q}`,
-`s > 0` (`Torus.trace_besov_eq_restrictFace`). For `s > n/p` every element of
-`B^{s+1/p}_{p,q}(𝕋^(n+1))` has a continuous representative, and its trace is the restriction of that
-representative (`Torus.exists_trace_eq_restrictFace`).
+`s > 0`, `0 < q ≤ ∞` (`Torus.trace_besov_eq_restrictFace`). For `s > n/p` and `0 < q ≤ ∞` every
+element of `B^{s+1/p}_{p,q}(𝕋^(n+1))` has a continuous representative, and its trace is the
+restriction of that representative (`Torus.exists_trace_eq_restrictFace`).
 
 The proof uses the uniform density of the trigonometric polynomials
 (`Torus.dense_iUnion_trigPoly`) and the convolution of bounded continuous functions with
@@ -227,16 +227,17 @@ theorem periodicTraceBound_limitTrace_eq_restrictFace (hp : p ≠ ∞)
   exact tendsto_nhds_unique h1 h2
 
 /-- **The trace of a continuous Besov function is its restriction**: for `1 ≤ p < ∞`, `s > 0`,
-`1 ≤ q ≤ ∞` and a bounded continuous `f` on `𝕋^(n+1)` whose class lies in
-`B^{s+1/p}_{p,q}(𝕋^(n+1))`, the trace of `f` is `f(0, ·)`. -/
-theorem trace_besov_eq_restrictFace (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞} (hq : 1 ≤ q)
+`0 < q ≤ ∞` and a bounded continuous `f` on `𝕋^(n+1)` whose class lies in
+`B^{s+1/p}_{p,q}(𝕋^(n+1))`, the trace of `f` is `f(0, ·)`, since
+`B^{s+1/p}_{p,q} ⊆ B^{1/p}_{p,1}` (`FunctionScheme.MemBesov.mono`). -/
+theorem trace_besov_eq_restrictFace (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞} (hq0 : q ≠ 0)
     (f : UnitAddTorus (Fin (n + 1)) →ᵇ ℂ)
     (hf : (trigScheme (Fin (n + 1))).MemBesov p (s + p.toReal⁻¹) q
       (toLpR p (Fin (n + 1)) f)) :
     (periodicTraceBound p n hp).limitTrace (toLpR p (Fin (n + 1)) f) =
       toLpR p (Fin n) (restrictFace n f) :=
   periodicTraceBound_limitTrace_eq_restrictFace hp f
-    (hf.mono (zero_lt_one.trans_le hq).ne' (by positivity) (Or.inl (by linarith)))
+    (hf.mono hq0 (by positivity) (Or.inl (by linarith)))
 
 /-- **The trace of a continuous function, almost everywhere**: under the hypotheses of
 `Torus.periodicTraceBound_limitTrace_eq_restrictFace`, the trace of `f` is `x' ↦ f(0, x')` almost
@@ -249,11 +250,11 @@ theorem ae_trace_eq_restrictFace (hp : p ≠ ∞) (f : UnitAddTorus (Fin (n + 1)
   exact BoundedContinuousFunction.coeFn_toLp (E := ℂ) p volume ℝ (restrictFace n f)
 
 /-- **Every smooth enough Besov function has a continuous representative whose restriction is its
-trace**: for `1 ≤ p < ∞`, `s > n/p` and `1 ≤ q ≤ ∞`, every `F ∈ B^{s+1/p}_{p,q}(𝕋^(n+1))` is
+trace**: for `1 ≤ p < ∞`, `s > n/p` and `0 < q ≤ ∞`, every `F ∈ B^{s+1/p}_{p,q}(𝕋^(n+1))` is
 the class of a bounded continuous `f` (the Besov embedding, since `s + 1/p > (n+1)/p`), and the
 trace of `F` is `f(0, ·)`. -/
 theorem exists_trace_eq_restrictFace (hp : p ≠ ∞) {s : ℝ} (hs : (n : ℝ) * p.toReal⁻¹ < s)
-    {q : ℝ≥0∞} (hq : 1 ≤ q) {F : Lp ℂ p (volume : Measure (UnitAddTorus (Fin (n + 1))))}
+    {q : ℝ≥0∞} (hq0 : q ≠ 0) {F : Lp ℂ p (volume : Measure (UnitAddTorus (Fin (n + 1))))}
     (hF : (trigScheme (Fin (n + 1))).MemBesov p (s + p.toReal⁻¹) q F) :
     ∃ f : UnitAddTorus (Fin (n + 1)) →ᵇ ℂ, toLpR p (Fin (n + 1)) f = F ∧
       (periodicTraceBound p n hp).limitTrace F = toLpR p (Fin n) (restrictFace n f) := by
@@ -263,10 +264,10 @@ theorem exists_trace_eq_restrictFace (hp : p ≠ ∞) {s : ℝ} (hs : (n : ℝ) 
     linarith
   obtain ⟨f, hf⟩ := FunctionScheme.MemBesov.exists_boundedContinuous_of_nikolskii
     (FunctionScheme.hasContinuousApproximants_ofContinuous _) trigScheme_hasNikolskii
-    (Nat.cast_nonneg _) (zero_lt_one.trans_le Fact.out).ne' hD (zero_lt_one.trans_le hq).ne' hF
+    (Nat.cast_nonneg _) (zero_lt_one.trans_le Fact.out).ne' hD hq0 hF
   rw [BoundedContinuousFunction.inclusionOfExponentLeLinear_toLp] at hf
   have hs0 : 0 < s := lt_of_le_of_lt (by positivity) hs
   subst hf
-  exact ⟨f, rfl, trace_besov_eq_restrictFace hp hs0 hq f hF⟩
+  exact ⟨f, rfl, trace_besov_eq_restrictFace hp hs0 hq0 f hF⟩
 
 end Torus

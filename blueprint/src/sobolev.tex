@@ -3490,9 +3490,7 @@ almost everywhere agree everywhere.
 \lean{Rd.enorm_blockFun_le_nikolskii, Rd.eLpNorm_blockFun_le_nikolskii,
   Rd.memLp_blockFun_of_le}
 \leanok
-\uses{def:nikolskii-block-const, lem:blocks-band-limited-pointwise, lem:conv-pointwise-bound,
-  lem:lp-kernels-basic, lem:lp-interpolation, def:nikolskii-property, def:lq-norm,
-  lem:tl-pointwise-blocks}
+\uses{def:nikolskii-block-const, def:nikolskii-property, def:lq-norm, def:triebel-lizorkin}
 Let $1 \leq p < \infty$ and $f \in L_p(V)$. For every $j \in \N$ and every $x \in V$,
 \[
   |(\psi_j * f)(x)| \leq N_p \, 2^{jn/p} \, \|\psi_j * f\|_p ,
@@ -3506,13 +3504,18 @@ in particular $\psi_j * f \in L_r(V)$.
 
 \begin{proof}
 \leanok
+\uses{lem:blocks-band-limited-pointwise, lem:conv-pointwise-bound, lem:lp-kernels-basic,
+  lem:sup-bound-exponents, lem:tl-pointwise-blocks}
 By \Cref{lem:blocks-band-limited-pointwise}, $\psi_j * f = \Theta_j * (\psi_j * f)$ at every
 point, and \Cref{lem:conv-pointwise-bound} with $\|\Theta_j\|_1 = \|\Theta\|_1$
 (\Cref{lem:lp-kernels-basic}) and $B = 2^{jn} \sup |\Theta|$ gives the first bound, since
 $(2^{jn})^{1/p} = 2^{jn/p}$. For $r = \infty$ the first bound is the second. For $r < \infty$,
-interpolation (\Cref{lem:lp-interpolation}) with $M = N_p 2^{jn/p} \|\psi_j * f\|_p$ gives
-$\|\psi_j * f\|_r \leq M^{1 - p/r} \|\psi_j * f\|_p^{p/r}$, and
-$(n/p)(1 - p/r) = \alpha(n, p, r)$.
+the first bound gives $\|\psi_j * f\|_\infty \leq M \|\psi_j * f\|_p$ with $M = N_p 2^{jn/p}$,
+and \Cref{lem:sup-bound-exponents}(2) gives
+$\|\psi_j * f\|_r \leq M^{1 - p/r} \|\psi_j * f\|_p$, with
+$M^{1 - p/r} = N_p^{1 - p/r} \, 2^{j \alpha(n, p, r)}$ since $(n/p)(1 - p/r) = \alpha(n, p, r)$.
+Since $\psi_j * f \in L_p(V)$
+(\Cref{lem:tl-pointwise-blocks}), the second bound gives $\psi_j * f \in L_r(V)$.
 \end{proof}
 
 \paragraph{Besov embeddings.}

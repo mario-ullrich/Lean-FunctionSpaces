@@ -654,7 +654,7 @@ $\sum_{\deg k < n} |e_k(x)|^2 \leq 2^d n^d$. The Nikolskii property is \Cref{thm
   Torus.periodic_sobolev_memBesov_top, Torus.periodic_exists_sobolev_of_memBesov,
   Torus.sobolev_exists_inclusion_eq, Torus.sobolev_exists_continuous, Torus.toLp_toContinuousMap}
 \leanok
-\uses{thm:torus-nikolskii, thm:besov-embedding, def:torus-sobolev, prop:smoothness}
+\uses{def:besov, def:trig-poly, def:torus-sobolev, lem:inclusion-linear}
 Let $0 < p \leq r \leq \infty$ and $0 < q \leq \infty$.
 \begin{enumerate}
   \item If $s > d(1/p - 1/r)$, then every $f \in \Besov{s}{p}{q}(\T^d)$ is $\iota_{r,p} g$ for
@@ -671,7 +671,8 @@ Let $0 < p \leq r \leq \infty$ and $0 < q \leq \infty$.
 
 \begin{proof}
 \leanok
-\uses{lem:besov-bridge, prop:besov-elementary}
+\uses{thm:torus-nikolskii, thm:besov-embedding, prop:smoothness, lem:besov-bridge,
+  prop:besov-elementary, def:function-scheme}
 The first two items are \Cref{thm:besov-embedding} with \Cref{thm:torus-nikolskii}, the
 third is \Cref{prop:smoothness} for $H^s(\T^d)$ with \Cref{lem:besov-bridge}, after
 $\Besov{t}{2}{q}(\T^d) \subseteq \Besov{t}{2}{\infty}(\T^d)$
@@ -916,16 +917,15 @@ $\|f - V_k f\|_p \leq C_V \|f - a_k\|_p$.
   Torus.periodicTraceBound_limitTrace_eq_restrictFace, Torus.trace_besov_eq_restrictFace,
   Torus.ae_trace_eq_restrictFace, Torus.exists_trace_eq_restrictFace}
 \leanok
-\uses{thm:trace-torus, lem:trace-ext, lem:torus-vallee-poussin, thm:torus-embeddings,
-  thm:approx-embedding}
+\uses{thm:trace-torus, lem:trace-ext}
 Let $1 \leq p < \infty$ and let $\operatorname{Tr}$ be the trace of \Cref{lem:trace-ext} for the
 restriction to the face, as in \Cref{thm:trace-torus}.
 \begin{enumerate}
   \item For every bounded continuous $f$ on $\T^{n+1}$ with
     $f \in \Besov{1/p}{p}{1}(\T^{n+1})$, $\operatorname{Tr} f = f(0, \cdot)$. In particular,
-    $\operatorname{Tr} f = f(0, \cdot)$ for all $s > 0$, $1 \leq q \leq \infty$ and bounded
+    $\operatorname{Tr} f = f(0, \cdot)$ for all $s > 0$, $0 < q \leq \infty$ and bounded
     continuous $f \in \Besov{s+1/p}{p}{q}(\T^{n+1})$.
-  \item For all $s > n/p$, $1 \leq q \leq \infty$ and $f \in \Besov{s+1/p}{p}{q}(\T^{n+1})$
+  \item For all $s > n/p$, $0 < q \leq \infty$ and $f \in \Besov{s+1/p}{p}{q}(\T^{n+1})$
     there is a bounded continuous $g$ on $\T^{n+1}$ with $f = g$ almost everywhere and
     $\operatorname{Tr} f = g(0, \cdot)$.
 \end{enumerate}
@@ -933,13 +933,14 @@ restriction to the face, as in \Cref{thm:trace-torus}.
 
 \begin{proof}
 \leanok
-\uses{lem:besov-bridge}
-By \Cref{lem:torus-vallee-poussin}, $V_k f$ lies in $\mathcal{T}_{2^{k+n+3}}$ and
+\uses{lem:besov-bridge, lem:torus-vallee-poussin, thm:torus-embeddings, prop:besov-elementary}
+By \Cref{lem:besov-bridge}, $f$ lies in $A^{1/p}_1$ of the trigonometric scheme in
+$L_p(\T^{n+1})$. By \Cref{lem:torus-vallee-poussin}, $V_k f$ lies in $\mathcal{T}_{2^{k+n+3}}$ and
 $2^{k/p} \|f - V_k f\|_p \to 0$, so \Cref{lem:trace-ext} gives
 $(V_k f)(0, \cdot) \to \operatorname{Tr} f$ in $L_p(\T^n)$. Since $V_k f \to f$ uniformly,
 also $(V_k f)(0, \cdot) \to f(0, \cdot)$ uniformly, hence in $L_p(\T^n)$. For $s > 0$,
-$\Besov{s+1/p}{p}{q}(\T^{n+1}) \subseteq \Besov{1/p}{p}{1}(\T^{n+1})$ by
-\Cref{thm:approx-embedding} and \Cref{lem:besov-bridge}. For the second item,
+$\Besov{s+1/p}{p}{q}(\T^{n+1}) \subseteq \Besov{1/p}{p}{1}(\T^{n+1})$ by (1) of
+\Cref{prop:besov-elementary}. For the second item,
 $s + 1/p > (n+1)/p$, and \Cref{thm:torus-embeddings} gives the continuous representative $g$.
 \end{proof}
 
@@ -3290,8 +3291,8 @@ $e_0 \leq L$, \Cref{lem:near-best-steps} gives the bound.
 \end{proof}
 
 Through the Nikolskii property of the steps, the Besov embedding of a scheme of functions
-(\Cref{thm:besov-embedding}) reproduces this embedding up to the constant and gives embeddings
-into every $L_r[0, 1]$, for every $0 < p \leq r \leq \infty$.
+(\Cref{thm:besov-embedding}) gives embeddings into every $L_r[0, 1]$, for every
+$0 < p \leq r \leq \infty$.
 
 \begin{corollary}[Besov embeddings of steps]
 \label{cor:steps-embedding}
@@ -3331,10 +3332,11 @@ For the second take $K \geq 1$, so that the bound holds when $\|f\|^{(p)}_{s, q}
 otherwise $\|f\|_r = \|g\|_r$, the first term of $\|g\|^{(r)}_{s - (1/p - 1/r), q}$.
 \end{proof}
 
-For $r = 1$ and $p \leq 1$ the second bound is \Cref{thm:besov-into-l1}, which gives $K$
-explicitly; their agreement is a check of \Cref{thm:besov-embedding}(1) for $p < 1$. With
-\Cref{thm:steps-besov-below-one} and \Cref{cor:steps-besov-space}, for $0 < p \leq 1$,
-$p \leq r < \infty$ and $1/p - 1/r < s < 1/p$ it is the embedding
+For $r = 1$ and $p \leq 1$ the second bound holds with an explicit $K$, proved directly
+(\Cref{thm:besov-into-l1}); the agreement of the two proofs is a check of
+\Cref{thm:besov-embedding}(1) for $p < 1$. With \Cref{thm:steps-besov-below-one} and
+\Cref{cor:steps-besov-space}, for $0 < p \leq 1$, $p \leq r < \infty$ and $1/p - 1/r < s < 1/p$
+the second bound of \Cref{cor:steps-embedding} is the embedding
 $B^s_{p,q,1}[0, 1] \subseteq L_r[0, 1]$.
 
 \begin{lemma}[Martingale convergence in $L_1$]
