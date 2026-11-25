@@ -671,10 +671,11 @@ Let $1 \leq p \leq r \leq \infty$ and $1 \leq q \leq \infty$.
 
 \begin{proof}
 \leanok
+\uses{lem:besov-bridge}
 The first two items are \Cref{thm:besov-embedding} with \Cref{thm:torus-nikolskii}, the
-third is \Cref{prop:smoothness} for $H^s(\T^d)$, and the last two combine both. For the second
-and the last item, the trigonometric scheme, the scheme of a scheme in $C_b(\T^d)$, has
-continuous approximants (\Cref{def:function-scheme}).
+third is \Cref{prop:smoothness} for $H^s(\T^d)$ with \Cref{lem:besov-bridge}, and the last two
+combine both. For the second and the last item, the trigonometric scheme, the scheme of a
+scheme in $C_b(\T^d)$, has continuous approximants (\Cref{def:function-scheme}).
 \end{proof}
 
 The next theorem is the Littlewood--Paley characterisation of $\Besov{s}{2}{q}(\T^d)$ with
@@ -698,8 +699,10 @@ and $\Besov{s}{2}{2}(\T^d) = H^s(\T^d)$.
 
 \begin{proof}
 \leanok
-\Cref{thm:spectral-coefficients} for the Fourier basis; the only index of level $0$ is
-$k = 0$.
+\uses{lem:besov-bridge}
+\Cref{thm:spectral-coefficients} for the Fourier basis, whose approximation spaces in $L_2$ are
+the Besov spaces $\Besov{s}{2}{q}(\T^d)$ (\Cref{lem:besov-bridge}); the only index of level $0$
+is $k = 0$.
 \end{proof}
 
 \section{\texorpdfstring{$n$}{n}-term trigonometric approximation}
@@ -845,11 +848,13 @@ $f \in \Besov{s+1/p}{p}{q}(\T^{n+1})$.
 
 \begin{proof}
 \leanok
+\uses{lem:besov-bridge}
 By \Cref{thm:trace-inequality-torus} the restriction is a trace bound of exponent $1/p$ from
 the trigonometric scheme of $\T^{n+1}$ to that of $\T^n$ in $L_p$, and by
 \Cref{lem:fejer-extension} with $m = 2^k$ it has a right inverse bound with $\gamma = 2$ and
 $C' = 1$. Apply \Cref{thm:trace-transfer} with $s + 1/p$ in place of $s$, and
-\Cref{thm:trace-surjective}.
+\Cref{thm:trace-surjective}, to the approximation spaces of the two schemes, which are the
+Besov spaces (\Cref{lem:besov-bridge}).
 \end{proof}
 
 The map $\operatorname{Tr}$ is $f \mapsto f(0, \cdot)$ on trigonometric polynomials, and on
@@ -926,13 +931,14 @@ restriction to the face, as in \Cref{thm:trace-torus}.
 
 \begin{proof}
 \leanok
+\uses{lem:besov-bridge}
 By \Cref{lem:torus-vallee-poussin}, $V_k f$ lies in $\mathcal{T}_{2^{k+n+3}}$ and
 $2^{k/p} \|f - V_k f\|_p \to 0$, so \Cref{lem:trace-ext} gives
 $(V_k f)(0, \cdot) \to \operatorname{Tr} f$ in $L_p(\T^n)$. Since $V_k f \to f$ uniformly,
 also $(V_k f)(0, \cdot) \to f(0, \cdot)$ uniformly, hence in $L_p(\T^n)$. For $s > 0$,
 $\Besov{s+1/p}{p}{q}(\T^{n+1}) \subseteq \Besov{1/p}{p}{1}(\T^{n+1})$ by
-\Cref{thm:approx-embedding}. For the second item, $s + 1/p > (n+1)/p$, and
-\Cref{thm:torus-embeddings} gives the continuous representative $g$.
+\Cref{thm:approx-embedding} and \Cref{lem:besov-bridge}. For the second item,
+$s + 1/p > (n+1)/p$, and \Cref{thm:torus-embeddings} gives the continuous representative $g$.
 \end{proof}
 
 \chapter{Classical definitions on the torus}
@@ -1115,8 +1121,11 @@ $\|f\|^{\omega}_{s,q} < \infty$.
 
 \begin{proof}
 \leanok
+\uses{lem:besov-bridge}
 \Cref{thm:modulus-coincidence} with the constants of \Cref{def:modulus-norm}: the first
-constant is $1 + C_J$, the second $1 + 3 C_0 + C_B (3 + 6 \cdot 4)(1 - 2^{-(1-s)})^{-1}$.
+constant is $1 + C_J$, the second $1 + 3 C_0 + C_B (3 + 6 \cdot 4)(1 - 2^{-(1-s)})^{-1}$. The
+Besov space $\Besov{s}{2}{q}(\T^d)$ is the approximation space of the trigonometric scheme in
+$L_2$ (\Cref{lem:besov-bridge}).
 \end{proof}
 
 The modulus is also controlled by the dyadic Fourier blocks
@@ -1395,10 +1404,13 @@ with equivalent quasi-norms.
 
 \begin{proof}
 \leanok
+\uses{lem:besov-bridge}
 The modulus $\omega_r(f, 2^{-k})_p$ is compatible with the trigonometric polynomials in
 $L_p(\T^d)$ with inverse order $\theta = r$ (\Cref{def:modulus-data}): $C_0 = 2^r$, Jackson's
 inequality from $k_0 = 1$ on with the constant $2^r C_J$ (\Cref{thm:torus-lp-jackson}), and
-$C_B$ of \Cref{thm:torus-lp-bernstein}. \Cref{thm:modulus-coincidence} gives the equivalence.
+$C_B$ of \Cref{thm:torus-lp-bernstein}. \Cref{thm:modulus-coincidence} gives the equivalence
+for the approximation space of the trigonometric polynomials in $L_p(\T^d)$, which is
+$\Besov{s}{p}{q}(\T^d)$ (\Cref{lem:besov-bridge}).
 \end{proof}
 
 \section{Besov spaces on the torus as interpolation spaces}
@@ -1597,7 +1609,9 @@ quasi-norm makes $f = \sum_k g_k$ a block decomposition (\Cref{lem:torus-lp-bloc
 $\|(2^{ks} \|g_k\|_p)_k\|_{\ell_q} \leq 2^s \|f\|^{\mathrm{LP}}_{s,q}$ by
 \Cref{lem:shifted-blocks}; \Cref{thm:block-decomposition} gives the first inequality. For the
 second, apply \Cref{lem:weighted-blocks}(2) with $M = \#d + 1$ and $C = 2\|\Phi\|_1$
-(\Cref{lem:torus-lp-blocks}, \Cref{lem:torus-lp-blocks-trig}).
+(\Cref{lem:torus-lp-blocks}, \Cref{lem:torus-lp-blocks-trig}). The last claim follows, since
+$\Besov{s}{p}{q}(\T^d) = A^s_q$ (\Cref{lem:besov-bridge}) and the dyadic quasi-norm is
+equivalent to that of $A^s_q$ (\Cref{thm:dyadic-norm}).
 \end{proof}
 
 For $p = 2$ the sharp dyadic blocks of the Fourier coefficients describe the same spaces

@@ -6,9 +6,12 @@ spaces*, chapters *Besov spaces and their embeddings*, *Sobolev spaces and their
 differences*.
 
 For a finite measure space `(Ω, μ)` and a scheme of functions `S`, an approximation scheme in
-`L_∞(μ)` (`FunctionScheme μ`), the Besov space is `B^s_{p,q}(Ω, S) = A^s_q(L_p(μ), S^(p))`,
-where `S^(p)` is the image of `S` under the inclusion `L_∞(μ) ↪ L_p(μ)`, and the embedding
-theorems follow from the Nikolskii transfer theorem of
+`L_∞(μ)` (`FunctionScheme μ`), the Besov space `B^s_{p,q}(Ω, S)` is defined for every
+`0 < p ≤ ∞` and `0 < q ≤ ∞` through the couple `(‖·‖_p, complexity)` of `S` in `L_p(μ)`, with
+Pietsch's quasi-norm `‖((n + 1)^(s - 1/q) E_n(f)_p)_n‖_{ℓ_q}` (`FunctionScheme.besovNorm`). For
+`1 ≤ p ≤ ∞` it is the approximation space `A^s_q(L_p(μ), S^(p))`, where `S^(p)` is the image of
+`S` under the inclusion `L_∞(μ) ↪ L_p(μ)`, and the embedding theorems follow from the Nikolskii
+transfer theorem of
 [Approximation spaces](ApproximationSpaces.md) together with a Nikolskii inequality for the
 scheme. Spectral schemes in a Hilbert space give the Sobolev spaces
 `H^s` with Jackson and Bernstein constants `1`, and their dyadic Fourier blocks characterise
@@ -103,7 +106,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 
 | Result | Lean | Human-checked | Files |
 |---|---|---|---|
-| Schemes of functions, Besov spaces, elementary embeddings | ✅ | ✗ | `MeasureSpaces/Scheme`, `MeasureSpaces/Besov/Basic`, `MeasureSpaces/Besov/ElementaryEmbeddings` |
+| Schemes of functions, Besov spaces and their elementary embeddings for `0 < p ≤ ∞`, the identity with the approximation spaces for `p ≥ 1` | ✅ | ✗ | `MeasureSpaces/Scheme`, `MeasureSpaces/Besov/Basic`, `MeasureSpaces/Besov/ElementaryEmbeddings` |
 | The couple of a scheme of essentially bounded functions in `L_p`, `0 < p ≤ ∞`: approximants, quasi-triangle and `ρ`-triangle inequality, homogeneity, errors of best approximation, near-best approximants, the inclusions `L_r ↪ L_p`, the complexity couple of the image scheme for `p ≥ 1` | ✅ | ✗ | `MeasureSpaces/SchemeLpCouple` |
 | Nikolskii property, the sign of the Nikolskii exponent, Besov embeddings | ✅ | ✗ | `MeasureSpaces/Besov/Nikolskii`, `MeasureSpaces/Besov/Embeddings` |
 | Besov spaces as interpolation spaces | ✅ | ✗ | `MeasureSpaces/Besov/Interpolation` |
