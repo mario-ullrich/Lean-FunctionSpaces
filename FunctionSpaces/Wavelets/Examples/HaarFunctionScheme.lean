@@ -45,11 +45,11 @@ on the dyadic intervals of level `⌊log₂ n⌋`, the `ℱ_⌊log₂ n⌋`-meas
   `s > 1/p - 1/r` there is `K < ∞` such that every `f ∈ L_p[0, 1]` with finite dyadic norm
   `‖f‖^dy_{s,q}` in the step couple of `L_p[0, 1]` is the inclusion of some `g ∈ L_r[0, 1]` with
   `‖g‖^dy_{s - (1/p - 1/r), q} ≤ K ‖f‖^dy_{s,q}` in the step couple of `L_r[0, 1]`
-  (`Haar.exists_uniform_inclusion_eq_stepCouple`), and, with a possibly larger `K`,
-  `‖f‖_r ≤ K ‖f‖^dy_{s,q}` for every `f ∈ L_p[0, 1]`
+  (`Haar.exists_uniform_inclusion_eq_stepCouple`), and there is `K' < ∞` with
+  `‖f‖_r ≤ K' ‖f‖^dy_{s,q}` for every `f ∈ L_p[0, 1]`
   (`Haar.exists_eLpNorm_le_eNormDyadic_stepCouple`). Both are the Besov embedding of a scheme of
-  functions with the Nikolskii property
-  (`FunctionScheme.exists_uniform_inclusion_eq_of_nikolskii`). The case `r = 1`, `0 < p ≤ 1` of
+  functions with the Nikolskii property (`FunctionScheme.exists_uniform_inclusion_eq_of_nikolskii`,
+  `FunctionScheme.exists_eLpNorm_le_eNormDyadic_of_nikolskii`). The case `r = 1`, `0 < p ≤ 1` of
   the second holds with an explicit constant (`Haar.eLpNorm_one_le_eNormDyadic`, proved
   directly); the agreement of the two proofs checks the Besov embedding of a scheme of functions
   for `p < 1`. With the first modulus (`Haar.eNormDyadic_stepCouple_lt_top_iff_modulus`), for
@@ -168,19 +168,14 @@ theorem eLpNorm_top_le_of_mem_haarScheme (hp0 : p ≠ 0) {n : ℕ} {a : Lp ℂ �
 /-- **The Haar scheme has the Nikolskii property of dimension `1`**: the Haar scheme in
 `L_∞[0, 1]`, as a scheme of essentially bounded functions on `[0, 1]`, satisfies
 `‖a‖_∞ ≤ n^(1/p) ‖a‖_p` for every `1 ≤ p ≤ ∞`, `n ≥ 1` and `a` of complexity `n`, with the
-constant `1` (`Haar.eLpNorm_top_le_of_mem_haarScheme`). The norms are finite, since `a ∈ L_∞`
-lies in every `L_p[0, 1]`. -/
-theorem hasNikolskii_haarScheme : FunctionScheme.HasNikolskii (haarScheme ∞) 1 := by
-  refine ⟨fun p hp => ⟨1, zero_le_one, fun n _ a ha => ?_⟩⟩
-  have h := eLpNorm_top_le_of_mem_haarScheme (zero_lt_one.trans_le hp).ne' ha
-  have hap : eLpNorm a p vol ≠ ∞ := ((Lp.memLp a).mono_exponent le_top).eLpNorm_ne_top
-  have hN : (n : ℝ≥0∞) ^ p.toReal⁻¹ ≠ ∞ :=
-    ENNReal.rpow_ne_top_of_nonneg (inv_nonneg.2 ENNReal.toReal_nonneg) (ENNReal.natCast_ne_top n)
-  simp only [one_mul]
-  calc (eLpNorm a ∞ vol).toReal ≤ ((n : ℝ≥0∞) ^ p.toReal⁻¹ * eLpNorm a p vol).toReal :=
-        ENNReal.toReal_mono (ENNReal.mul_ne_top hN hap) h
-    _ = (n : ℝ) ^ p.toReal⁻¹ * (eLpNorm a p vol).toReal := by
-        rw [ENNReal.toReal_mul, ← ENNReal.toReal_rpow, ENNReal.toReal_natCast]
+constant `1` (`Haar.eLpNorm_top_le_of_mem_haarScheme`). On the probability space `[0, 1]` this
+bound in `[0, ∞]` gives the Nikolskii property
+(`FunctionScheme.HasNikolskii.of_eLpNorm_top_le`). -/
+theorem hasNikolskii_haarScheme : FunctionScheme.HasNikolskii (haarScheme ∞) 1 :=
+  FunctionScheme.HasNikolskii.of_eLpNorm_top_le fun p hp _ => ⟨1, ENNReal.one_ne_top,
+    fun _ _ _ ha => by
+      simpa only [one_mul] using
+        eLpNorm_top_le_of_mem_haarScheme (zero_lt_one.trans_le hp).ne' ha⟩
 
 variable {r : ℝ≥0∞} {s : ℝ} {q : ℝ≥0∞}
 
@@ -206,26 +201,19 @@ theorem exists_uniform_inclusion_eq_stepCouple (hp0 : p ≠ 0) (hpr : p ≤ r)
 /-- **The dyadic steps embed into `L_r`**: for `0 < p ≤ r ≤ ∞`, `0 < q ≤ ∞` and
 `s > 1/p - 1/r` there is `K < ∞` with
 `‖f‖_r ≤ K (‖f‖_p + ‖(2^(ks) E(2^k, f))_k‖_{ℓ_q})` for every `f ∈ L_p[0, 1]`, with the
-`E`-functional `E` of the step couple of `L_p[0, 1]`. For a finite right side this is the bound
-`‖g‖_r ≤ ‖g‖^dy_{s - (1/p - 1/r), q}` of the dyadic norm in `L_r` together with
-`Haar.exists_uniform_inclusion_eq_stepCouple`; `K` is taken at least `1`, so that the bound
-also holds when the right side is infinite. Its case `r = 1`, `0 < p ≤ 1` holds with an explicit
+`E`-functional `E` of the step couple of `L_p[0, 1]`. This is the bound of `‖f‖_r` of the
+Besov embedding of a scheme of functions with the Nikolskii property
+(`FunctionScheme.exists_eLpNorm_le_eNormDyadic_of_nikolskii`) for the Haar scheme in
+`L_∞[0, 1]` and `D = 1` (`Haar.hasNikolskii_haarScheme`), whose couple in `L_p` is the step
+couple (`Haar.stepCouple_eq_lpCouple`). Its case `r = 1`, `0 < p ≤ 1` holds with an explicit
 constant (`Haar.eLpNorm_one_le_eNormDyadic`). -/
 theorem exists_eLpNorm_le_eNormDyadic_stepCouple (hp0 : p ≠ 0) (hpr : p ≤ r)
     (hs : p.toReal⁻¹ - r.toReal⁻¹ < s) (hq0 : q ≠ 0) :
     ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ f : Lp ℂ p vol,
       eLpNorm f r vol ≤ K * (stepCouple p).eNormDyadic s q f := by
-  obtain ⟨K, hK, hKf⟩ := exists_uniform_inclusion_eq_stepCouple hp0 hpr hs hq0
-  refine ⟨max K 1, max_ne_top hK ENNReal.one_ne_top, fun f => ?_⟩
-  rcases eq_or_ne ((stepCouple p).eNormDyadic s q f) ∞ with hf | hf
-  · rw [hf, ENNReal.mul_top (zero_lt_one.trans_le (le_max_right K 1)).ne']
-    exact le_top
-  obtain ⟨g, rfl, hg⟩ := hKf f hf
-  calc eLpNorm (Lp.inclusionOfExponentLeLinear (𝕜 := ℝ) vol hpr g) r vol = eLpNorm g r vol :=
-        Lp.eLpNorm_inclusionOfExponentLeLinear hpr g r
-    _ = (stepCouple r).norm0 g := (Lp.enorm_def g).symm
-    _ ≤ (stepCouple r).eNormDyadic (s - (p.toReal⁻¹ - r.toReal⁻¹)) q g := le_self_add
-    _ ≤ K * (stepCouple p).eNormDyadic s q _ := hg
-    _ ≤ max K 1 * (stepCouple p).eNormDyadic s q _ := by gcongr; exact le_max_left K 1
+  have hα : nikolskiiExponent 1 p r = p.toReal⁻¹ - r.toReal⁻¹ := one_mul _
+  rw [stepCouple_eq_lpCouple p]
+  exact FunctionScheme.exists_eLpNorm_le_eNormDyadic_of_nikolskii hasNikolskii_haarScheme
+    zero_le_one hp0 hpr (hα ▸ hs) hq0
 
 end Haar

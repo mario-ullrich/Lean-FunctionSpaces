@@ -331,7 +331,7 @@ theorem HasNikolskii.exists_eLpNorm_top_le (h : S.HasNikolskii D) {p : ℝ≥0�
     fun n hn a ha => ?_⟩
   have h1 := hCa n hn a ha
   rw [ENNReal.toReal_one, inv_one, mul_one] at h1
-  have hN := ae_enorm_le_eLpNorm_top (μ := μ) (a : Ω → ℂ)
+  have hN := ae_enorm_le_eLpNorm_top (a : Ω → ℂ) μ
   calc eLpNorm a ∞ μ
       ≤ (C * (n : ℝ≥0∞) ^ D) ^ ((1 : ℝ≥0∞).toReal / p.toReal) * eLpNorm a p μ :=
         le_rpow_mul_eLpNorm_of_ae_enorm_le hN (Lp.eLpNorm_ne_top a) hp0 hp1.le

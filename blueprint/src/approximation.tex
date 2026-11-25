@@ -3720,8 +3720,6 @@ $1/\infty = 0$. \emph{Pietsch's form} of the norm of $E_{s, q}$ is
 Let $q \in (0, \infty]$, let $C_q$ be the constant of \Cref{lem:lq-quasi-triangle}, and
 $1/\infty = 0$. Let $A = (N_0, N_1)$ be a couple on $U$, let $s \in \R$ and $u \in U$.
 \begin{enumerate}
-  \item The sequence $(E(n, u))_{n \in \N}$ decreases. If $N_1(0) = 0$, then
-    $E(0, u) \leq N_0(u)$; if every $b$ with $N_1(b) < 1$ is $0$, then $N_0(u) \leq E(0, u)$.
   \item If $N_0(0) = N_1(0) = 0$, then $\|0\|^{\mathrm{P}}_{E, s, q} = 0$.
   \item Let $s \geq 0$. If $N_1(0) = 0$, then
     $\|u\|^{\mathrm{P}}_{E, s, q} \leq C_q \, 2^s \, \|u\|^{\mathrm{dy}}_{E, s, q}$. If every $b$
@@ -3738,13 +3736,12 @@ $1/\infty = 0$. Let $A = (N_0, N_1)$ be a couple on $U$, let $s \in \R$ and $u \
 \begin{proof}
 \leanok
 \uses{lem:dyadic-form-decreasing, lem:e-functional}
-(1) This is (1) of \Cref{lem:e-functional} at $t = n$ and $t = 0$. (2) $E(n, 0) = 0$ by
-\Cref{lem:e-functional}. (3) Apply \Cref{lem:dyadic-form-decreasing} to the decreasing sequence
-$e_n = E(n, u)$, whose norm $P$ is $\|u\|^{\mathrm{P}}_{E, s, q}$, and use
-$E(0, u) \leq N_0(u)$ if $N_1(0) = 0$, and $N_0(u) \leq E(0, u)$ if every $b$ with
-$N_1(b) < 1$ is $0$ ((1) of \Cref{lem:e-functional} with $t = 0$), in place of $e_0$. The
-constants are finite, so the two forms are finite together. (4) Termwise by (5) of
-\Cref{lem:e-method-calculus}.
+(1) $E(n, 0) = 0$ by (1) of \Cref{lem:e-functional}. (2) The sequence $e_n = E(n, u)$
+decreases by (1) of \Cref{lem:e-functional}. Apply \Cref{lem:dyadic-form-decreasing} to this
+sequence, whose norm $P$ is $\|u\|^{\mathrm{P}}_{E, s, q}$, and use $E(0, u) \leq N_0(u)$ if
+$N_1(0) = 0$, and $N_0(u) \leq E(0, u)$ if every $b$ with $N_1(b) < 1$ is $0$ ((1) of
+\Cref{lem:e-functional} with $t = 0$), in place of $e_0$. The constants are finite, so the two
+forms are finite together. (3) Termwise by (5) of \Cref{lem:e-method-calculus}.
 \end{proof}
 
 \paragraph{The complexity couple.}
@@ -4943,7 +4940,7 @@ $L_p(\mu)$. Both are the triangle inequality of Mathlib's inhomogeneous quasi-no
 \begin{lemma}[Limits in measure of telescoping sums]
 \label{lem:limit-telescoping}
 \lean{MeasureTheory.eLpNorm_sub_rpow_min_le_sum, MeasureTheory.eLpNorm_sub_rpow_min_le_tsum,
-  MeasureTheory.eLpNorm_sub_le_tsum}
+  MeasureTheory.eLpNorm_sub_le_tsum, MeasureTheory.TendstoInMeasure.sub_right}
 \leanok
 Let $\mu$ be a measure, $0 < r \leq \infty$ and $\rho = \min(1, r)$, and let $u_0, u_1, \dots$
 be almost everywhere strongly measurable functions with values in a normed group that converge
@@ -4958,7 +4955,8 @@ in measure to a function $g$. Then for every $k \in \N$
 \uses{lem:lp-quasi-triangle}
 By \Cref{lem:lp-quasi-triangle},
 $\|u_{k+n} - u_k\|_r^\rho \leq \sum_{i<n} \|u_{k+i+1} - u_{k+i}\|_r^\rho$ for every $n$. The
-functions $u_{k+n} - u_k$ converge in measure to $g - u_k$, and a bound of their $L_r$
+functions $u_{k+n} - u_k$ converge in measure to $g - u_k$, since subtracting one function from
+every term and from the limit preserves convergence in measure, and a bound of their $L_r$
 quasi-norms passes to the limit in measure (Mathlib's \texttt{eLpNorm\_\allowbreak
 le\_\allowbreak of\_\allowbreak tendstoInMeasure}), also for $r = \infty$.
 \end{proof}
@@ -5329,11 +5327,11 @@ Let $S$ be a scheme of functions and $0 < p \leq \infty$.
 \uses{lem:scheme-lp-couple, lem:e-pietsch-norm, lem:e-method-dyadic}
 By \Cref{lem:scheme-lp-couple} the couple is quasi-normed, $N_1$ is subadditive,
 $N_0(ca) = |c| \, N_0(a)$, $N_1(ca) \leq N_1(a)$ and $N_1(0) = 0$, and only $0$ has complexity
-below $1$. (1) Part (4) of \Cref{lem:e-pietsch-norm} for $T f = cf$ and $M = |c|$ gives
+below $1$. (1) Part (3) of \Cref{lem:e-pietsch-norm} for $T f = cf$ and $M = |c|$ gives
 $\|cf\|_{\Besov{s}{p}{q}} \leq |c| \, \|f\|_{\Besov{s}{p}{q}}$. For $c \neq 0$ the same bound
-for $c^{-1}$ and $cf$ gives the reverse inequality. Part (2) of \Cref{lem:e-pietsch-norm} gives
+for $c^{-1}$ and $cf$ gives the reverse inequality. Part (1) of \Cref{lem:e-pietsch-norm} gives
 $\|0\|_{\Besov{s}{p}{q}} = 0$, which is the case $c = 0$. (2) Pietsch's form and the dyadic
-norm are finite together by part (3) of \Cref{lem:e-pietsch-norm}. The dyadic norm satisfies a
+norm are finite together by part (2) of \Cref{lem:e-pietsch-norm}. The dyadic norm satisfies a
 quasi-triangle inequality with a finite constant (\Cref{lem:e-method-dyadic}(4)), so sums stay
 in $\Besov{s}{p}{q}$; multiples stay by (1). For $s > 0$ or $q = \infty$ the space $E_{s,q}$ is
 described by the same dyadic norm (\Cref{lem:e-method-dyadic}(3)).
@@ -5393,12 +5391,12 @@ the dyadic norms of the couple of $S$ in $L_p$, which compare by (3) and (4) of
 (\Cref{lem:inclusion-linear}). H\"older's inequality
 $\|g\|_p \leq \mu(\Omega)^{1/p - 1/r} \|g\|_r$ holds for every $g \in L_r$, the constant is
 finite, and $\iota_{r,p}$ does not increase the complexity (\Cref{lem:scheme-lp-couple}(5)); so
-part (4) of \Cref{lem:e-pietsch-norm} applies with $T = \iota_{r,p}$ and
+part (3) of \Cref{lem:e-pietsch-norm} applies with $T = \iota_{r,p}$ and
 $M = \mu(\Omega)^{1/p - 1/r}$. (3) The map $a \mapsto \iota_{\infty,p}(a)$ from $C_b(\Omega)$ to
 $L_p$ satisfies $\|\iota_{\infty,p}(a)\|_p \leq \mu(\Omega)^{1/p} \|a\|$ for every exponent
 $p$ (\Cref{lem:bc-linfty}), and it maps $T_n$ into
 $S^{(p)}_n$ for the scheme $S$ of $T$, so it does not increase the complexity
-(\Cref{lem:complexity-couple}(4)). Part (4) of \Cref{lem:e-pietsch-norm} for the complexity
+(\Cref{lem:complexity-couple}(4)). Part (3) of \Cref{lem:e-pietsch-norm} for the complexity
 couple of $T$ and the couple of $S$ in $L_p$, with $M = \mu(\Omega)^{1/p}$, and
 \Cref{thm:complexity-couple-approx} for $T$ give the claim.
 \end{proof}
@@ -5478,7 +5476,8 @@ $a \in S_n$ has the Nikolskii property of dimension $D$.
 
 \begin{proof}
 \leanok
-\uses{lem:sup-bound-exponents, lem:function-scheme-inclusion, lem:inclusion-linear}
+\uses{lem:sup-bound-exponents, lem:function-scheme-inclusion, lem:inclusion-linear,
+  lem:scheme-basic}
 First let $r = \infty$. For $p \geq 1$ this is the Nikolskii property, read in $[0, \infty]$,
 since $\|a\|_{L_\infty} < \infty$; conversely, since $\|a\|_{L_p} < \infty$ for the finite
 measure $\mu$, a bound in $[0, \infty]$ is one between real numbers, and for $p = \infty$ the
@@ -5491,10 +5490,10 @@ in~\cite[Theorem~2.1]{DitzianPrymak2016}. In both cases there is $C_0 < \infty$ 
 $\|a\|_{L_\infty} \leq C_0 n^{D/p} \|a\|_{L_p}$ for all $n \geq 1$ and $a \in S_n$. For
 $r < \infty$, \Cref{lem:sup-bound-exponents}(2) with $M = C_0 n^{D/p}$ gives
 $\|a\|_{L_r} \leq C_0^{1-p/r} n^{(D/p)(1-p/r)} \|a\|_{L_p}$, and
-$(D/p)(1 - p/r) = \alpha(D, p, r)$. The block $b_{k+1} - b_k$ lies in $S_{2^{k+2}}$, and
-$(2^{k+2})^\alpha = 2^{2\alpha} 2^{k\alpha}$. The element $\iota_{\infty,r} a$ of
-$S^{(r)}_n$ lifts $\iota_{\infty,p} a$, since $\iota_{r,p} \circ \iota_{\infty,r} =
-\iota_{\infty,p}$.
+$(D/p)(1 - p/r) = \alpha(D, p, r)$. The block $b_{k+1} - b_k$ lies in $S_{2^{k+2}}$ by (5) of
+\Cref{lem:scheme-basic}, and $(2^{k+2})^\alpha = 2^{2\alpha} 2^{k\alpha}$. The element
+$\iota_{\infty,r} a$ of $S^{(r)}_n$ lifts $\iota_{\infty,p} a$, since
+$\iota_{r,p} \circ \iota_{\infty,r} = \iota_{\infty,p}$.
 \end{proof}
 
 For $r = \infty$ the bound reads $\|a\|_{L_\infty} \leq C \, n^{D/p} \|a\|_{L_p}$. The bound is
@@ -5509,8 +5508,8 @@ tail bound of \Cref{lem:near-best-lq} for functions on any measure space.
 
 \begin{theorem}[Besov embeddings]
 \label{thm:besov-embedding}
-\lean{FunctionScheme.nikolskiiTransferConst,
-  FunctionScheme.nikolskiiTransferConst_hardy_ne_top, FunctionScheme.nikolskiiTransferConst_ne_top,
+\lean{FunctionScheme.nearBestEmbeddingConst,
+  FunctionScheme.nearBestEmbeddingConst_hardy_ne_top, FunctionScheme.nearBestEmbeddingConst_ne_top,
   FunctionScheme.exists_inclusion_eq_eNormDyadic_le_of_nearBest,
   FunctionScheme.exists_uniform_inclusion_eq_of_nikolskii,
   FunctionScheme.exists_eLpNorm_le_eNormDyadic_of_nikolskii,
@@ -5600,11 +5599,10 @@ of~\cite[Proposition~6.14]{KerkyacharianPetrushev2015}, under the non-collapsing
 $p, q \geq 1$ the dyadic norms of (1) are the dyadic quasi-norms of the Besov spaces
 (\Cref{lem:scheme-lp-couple-bridge}, \Cref{thm:complexity-couple-approx}).
 
-The limiting case $s = \alpha$ is not covered: the proof of (1) needs Hardy's constant
-$H_{(s-\alpha)\rho_r, q/\rho_r}$, finite only for $s > \alpha$.
-\cite[Theorem~7.1]{DeVorePopovTAMS} is a limiting case for the Besov spaces of the unit cube in
-$\R^d$, into $L_r$ alone and with the third index equal to the integrability exponent:
-$\Besov{\alpha}{p}{p} \subseteq L_r$ for $0 < r < \infty$ and $\alpha = d(1/p - 1/r) > 0$.
+The proof of (1) needs $s > \alpha$, where Hardy's constant $H_{(s-\alpha)\rho_r, q/\rho_r}$ is
+finite. \cite[Theorem~7.1]{DeVorePopovTAMS} proves the second bound of (1) at $s = \alpha$ for
+the Besov spaces of the unit cube in $\R^d$, with the third index equal to the integrability
+exponent: $\Besov{\alpha}{p}{p} \subseteq L_r$ for $0 < r < \infty$ and $\alpha = d(1/p - 1/r) > 0$.
 
 \section{Interpolation of Besov spaces}
 \label{sec:besov-interpolation}
@@ -5715,8 +5713,8 @@ $g \in \Besov{s-\alpha}{r}{\infty}$, and $g \in \iota'(V')$ by \Cref{prop:smooth
 $s - \alpha > t$. The second item is \Cref{thm:besov-embedding}(3) with $q = \infty$.
 \end{proof}
 
-The limiting cases $t - D/r = s - D/p$ and $s = D/p$ are not reached: the passage from $V$
-to $\Besov{s}{p}{\infty}$ and back from $\Besov{t}{r}{1}$ to $V'$ loses the fine index at
+The proof needs the strict inequalities $t - D/r < s - D/p$ and $s > D/p$: the passage from
+$V$ to $\Besov{s}{p}{\infty}$ and back from $\Besov{t}{r}{1}$ to $V'$ loses the fine index at
 both ends.
 
 \chapter{Spectral schemes}

@@ -673,13 +673,13 @@ Let $0 < p \leq r \leq \infty$ and $0 < q \leq \infty$.
 \begin{proof}
 \leanok
 \uses{thm:torus-nikolskii, thm:besov-embedding, prop:smoothness, lem:besov-bridge,
-  prop:besov-elementary, def:function-scheme}
+  prop:besov-elementary, lem:function-scheme-inclusion}
 The first two items are \Cref{thm:besov-embedding} with \Cref{thm:torus-nikolskii}, the
 third is \Cref{prop:smoothness} for $H^s(\T^d)$ with \Cref{lem:besov-bridge}, after
 $\Besov{t}{2}{q}(\T^d) \subseteq \Besov{t}{2}{\infty}(\T^d)$
 (\Cref{prop:besov-elementary}(1)), and the last two combine both. For the second and the last
 item, the trigonometric scheme, the scheme of a scheme in $C_b(\T^d)$, has continuous
-approximants (\Cref{def:function-scheme}).
+approximants (\Cref{lem:function-scheme-inclusion}).
 \end{proof}
 
 The next theorem is the Littlewood--Paley characterisation of $\Besov{s}{2}{q}(\T^d)$ with
@@ -3016,8 +3016,7 @@ $E$-functional of the step couple (\Cref{def:step-couple}).
 
 \begin{lemma}[Fatou's lemma for telescoping sums]
 \label{lem:telescoping-fatou}
-\lean{MeasureTheory.TendstoInMeasure.sub_right, MeasureTheory.eLpNorm_sub_rpow_le_sum,
-  MeasureTheory.eLpNorm_sub_rpow_le_tsum}
+\lean{MeasureTheory.eLpNorm_sub_rpow_le_sum, MeasureTheory.eLpNorm_sub_rpow_le_tsum}
 \leanok
 Let $\mu$ be a measure, $0 < r \leq 1$, and let $u_0, u_1, \dots$ be almost everywhere strongly
 measurable functions with values in a normed group that converge in measure to a function $g$.
@@ -3313,27 +3312,27 @@ $s > 1/p - 1/r$, and for $u \in \{p, r\}$ and $\sigma \in \R$ let $\|\cdot\|^{(u
 the dyadic norm $\|\cdot\|^{\mathrm{dy}}_{E, \sigma, q}$ (\Cref{def:e-method}) of the step couple
 in $L_u[0, 1]$. There is $K < \infty$ such that every $f \in L_p[0, 1]$ with
 $\|f\|^{(p)}_{s, q} < \infty$ is $f = \iota_{r,p} g$ (\Cref{lem:inclusion-linear}) for some
-$g \in L_r[0, 1]$ with $\|g\|^{(r)}_{s - (1/p - 1/r), q} \leq K \|f\|^{(p)}_{s, q}$, and
+$g \in L_r[0, 1]$ with $\|g\|^{(r)}_{s - (1/p - 1/r), q} \leq K \|f\|^{(p)}_{s, q}$, and there
+is $K' < \infty$ with
 \[
-  \|f\|_r \leq K \|f\|^{(p)}_{s, q} \qquad \text{for every } f \in L_p[0, 1] .
+  \|f\|_r \leq K' \|f\|^{(p)}_{s, q} \qquad \text{for every } f \in L_p[0, 1] .
 \]
 \end{corollary}
 
 \begin{proof}
 \leanok
 \uses{def:filtration-scheme, lem:steps-sup-bound, lem:steps-function-scheme,
-  thm:besov-embedding}
+  lem:nikolskii-inequality, thm:besov-embedding}
 For $n \geq 1$ and $j = \lfloor \log_2 n \rfloor$, the elements of $S_n$ are
 $\mathcal{F}_j$-measurable (\Cref{def:filtration-scheme}), so \Cref{lem:steps-sup-bound} gives
-$\|a\|_\infty \leq 2^{j/t} \|a\|_t \leq n^{1/t} \|a\|_t$; for $1 \leq t \leq \infty$ both norms
-are finite, and the bound is the Nikolskii property with $C = 1$. By
+$\|a\|_\infty \leq 2^{j/t} \|a\|_t \leq n^{1/t} \|a\|_t$. For $1 \leq t < \infty$ this bound in
+$[0, \infty]$ gives the Nikolskii property with $C = 1$ (\Cref{lem:nikolskii-inequality}). By
 \Cref{lem:steps-function-scheme}(3) the couples of $S$ in $L_p$ and in $L_r$ are the step
-couples, and $\alpha(1, p, r) = 1/p - 1/r$, so the first claim is \Cref{thm:besov-embedding}(1).
-For the second take $K \geq 1$, so that the bound holds when $\|f\|^{(p)}_{s, q} = \infty$;
-otherwise $\|f\|_r = \|g\|_r$, the first term of $\|g\|^{(r)}_{s - (1/p - 1/r), q}$.
+couples, and $\alpha(1, p, r) = 1/p - 1/r$, so the two bounds are
+\Cref{thm:besov-embedding}(1).
 \end{proof}
 
-For $r = 1$ and $p \leq 1$ the second bound holds with an explicit $K$, proved directly
+For $r = 1$ and $p \leq 1$ the second bound holds with an explicit $K'$, proved directly
 (\Cref{thm:besov-into-l1}); the agreement of the two proofs is a check of
 \Cref{thm:besov-embedding}(1) for $p < 1$. With \Cref{thm:steps-besov-below-one} and
 \Cref{cor:steps-besov-space}, for $0 < p \leq 1$, $p \leq r < \infty$ and $1/p - 1/r < s < 1/p$

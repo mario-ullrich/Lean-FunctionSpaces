@@ -119,8 +119,8 @@ declarations.
 * **The Ditzian–Prymak bootstrap** (`FunctionSpaces/Analysis/Lp/QuasiNorm.lean`): every
   function satisfies `‖f x‖ ≤ ‖f‖_∞` for almost every `x`, measurable or not
   (`MeasureTheory.ae_enorm_le_eLpNorm_top`; Mathlib states this bound for `eLpNormEssSup` only,
-  `ae_le_eLpNormEssSup`); an almost everywhere bound `N < ∞` of `‖f‖` with `N ≤ M ‖f‖_{p₀}`
-  gives `N ≤ M^(p₀/p) ‖f‖_p` for every `0 < p ≤ p₀ < ∞`
+  `enorm_ae_le_eLpNormEssSup` and `ae_le_eLpNormEssSup`); an almost everywhere bound `N < ∞`
+  of `‖f‖` with `N ≤ M ‖f‖_{p₀}` gives `N ≤ M^(p₀/p) ‖f‖_p` for every `0 < p ≤ p₀ < ∞`
   (`MeasureTheory.le_rpow_mul_eLpNorm_of_ae_enorm_le`), and
   `‖f‖_∞ ≤ M ‖f‖_p` gives `‖f‖_r ≤ M^(1 - p/r) ‖f‖_p` for every `p ≤ r ≤ ∞`
   (`MeasureTheory.eLpNorm_le_of_eLpNorm_top_le`); Ditzian–Prymak 2016, Theorem 2.1.
