@@ -190,7 +190,15 @@ theory.
   `N₀(f) + ‖(2^(ks) ω(f, 2^(-k)))_k‖_{ℓ_q} < ∞`, with equivalent quasi-norms (DeVore–Popov,
   Trans. Amer. Math. Soc. 305 (1988), proof of Theorem 4.8;
   `InterpCouple.CoupleModulusData.memEMethod_iff_coupleModNorm_lt_top`). The telescoping sums
-  are estimated in the `ρ`-th power, with Hardy's inequality in `ℓ_{q/ρ}`.
+  are estimated in the `ρ`-th power, with Hardy's inequality in `ℓ_{q/ρ}`. The next two results
+  use only the listed properties of `N₀`, `N₁` and `ω`. If `ω` is even, then for
+  `0 < s < r ≤ θ` and `0 < q ≤ ∞` the `(s/r, q)` interpolation space of
+  `(N₀, N₀(f) + sup_k 2^(kr) ω(f, 2^(-k)))` is the classical space of smoothness `s` and fine
+  index `q` (`InterpCouple.CoupleModulusData.memKMethod_leftCoupleModCouple_top_iff`). For every
+  `ω` as above, `0 < s₁ < θ`, `0 < η < 1` and `0 < q₁, q ≤ ∞`, the `(η, q)` interpolation space of
+  `N₀` and the classical space of smoothness `s₁` and fine index `q₁` is the classical space of
+  smoothness `ηs₁` and fine index `q`
+  (`InterpCouple.CoupleModulusData.memKMethod_leftCoupleModCouple_iff`).
 * **E-spaces as interpolation spaces.** For a couple quasi-normed with constant `C` whose
   complexity is subadditive, `r > 0`, `0 < η < 1` and `0 < q, q₁ ≤ ∞`,
   `u ∈ (N₀, E_{r,q₁})_{η,q}` iff `N₀(u) + ‖(2^(kηr) E(2^k, u))_k‖_{ℓ_q} < ∞` (DeVore, Acta Numer.
@@ -310,10 +318,10 @@ Paths are relative to `ApproximationSpaces/`, without `.lean`.
 | Couples of K-spaces, Holmstedt's formula, the reiteration theorem and its endpoint cases | ✅ | ✗ | `Interpolation/Reiteration` |
 | Approximation spaces as interpolation spaces `A^s_q = (X, A^r_∞)_{s/r,q}`, reiteration of approximation spaces, the sandwich principle | ✅ | ✗ | `Interpolation/ApproxSpaces` |
 | The E-functional of a couple, near-best sequences, the spaces `E_{α,q}` and their dyadic norm, complexity couples, `E_{s,q} = A^s_q` for schemes | ✅ | ✗ | `Interpolation/EFunctional` |
-| The blocks of near-best sequences, near-best sequences with their tolerances, moduli compatible with a `ρ`-normed couple, coincidence of `E_{s,q}` with the classical space | ✅ | ✗ | `Interpolation/EFunctionalModuli` |
+| The blocks of near-best sequences, near-best sequences with their tolerances, the quasi-triangle inequality of `ρ`-normed couples, moduli compatible with a `ρ`-normed couple, coincidence of `E_{s,q}` with the classical space | ✅ | ✗ | `Interpolation/EFunctionalModuli` |
 | Homogeneity of the E-functional, embeddings of the dyadic norms in the smoothness and the fine index, additive maps, Pietsch's form of a couple and its equivalence with the dyadic norm | ✅ | ✗ | `Interpolation/EFunctionalSpaces` |
 | Couples of E-spaces, Jackson's and Bernstein's half, `E_{s,q} = (N₀, E_{r,q₁})_{s/r,q}` for every fine index, reiteration of E-spaces for fine indices ≥ 1 | ✅ | ✗ | `Interpolation/EFunctionalRepresentation` |
-| Jackson's and Bernstein's inequalities for a quasi-normed couple, the couple `(N₀, N₀ + Y)`, the Jackson–Bernstein theorem `E_{s,q} = (N₀, N₀ + Y)_{s/r,q}` for every fine index | ✅ | ✗ | `Interpolation/EFunctionalJacksonBernstein` |
+| Jackson's and Bernstein's inequalities for a quasi-normed couple, the couple `(N₀, N₀ + Y)`, the Jackson–Bernstein theorem `E_{s,q} = (N₀, N₀ + Y)_{s/r,q}` for every fine index, classical spaces of a modulus compatible with a `ρ`-normed couple as interpolation spaces | ✅ | ✗ | `Interpolation/EFunctionalJacksonBernstein` |
 | Moduli compatible with a scheme, coincidence with the classical space, interpolation of the classical spaces | ✅ | ✗ | `Moduli` |
 | Block decompositions, series moved up by a number of levels, projection schemes and dyadic blocks | ✅ | ✗ | `Decompositions/Blocks`, `Decompositions/Projection` |
 | Block decompositions of the spaces `E_{s,q}` of a quasi-normed couple with subadditive `N₀^ρ`, the blocks of near-best sequences, partial sums and tails in every abelian group | ✅ | ✗ | `Decompositions/EFunctionalBlocks` |

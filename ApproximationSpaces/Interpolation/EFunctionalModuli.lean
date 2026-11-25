@@ -51,10 +51,14 @@ With the classical quasi-norm `‖f‖^ω_{s,q} = N₀(f) + ‖(2^(ks) ω(f, k))
 So, if only `0` has complexity below `1`, then for `0 < s < θ` and `q ≠ 0` the approximation
 space `E_{s,q}` of the couple is the classical space
 (`InterpCouple.CoupleModulusData.memEMethod_iff_coupleModNorm_lt_top`). For `p < 1` the
-K-functional of `(L_p, W^r_p)` on an interval vanishes identically (Ditzian–Hristov–Ivanov,
-Constr. Approx. 11 (1995)), so the representation of the classical spaces as interpolation
-spaces has no analogue there, and the theorem goes through the Jackson and inverse inequalities
-directly.
+K-functional of `(L_p, W^r_p)` on the circle vanishes identically (Ditzian–Hristov–Ivanov,
+Constr. Approx. 11 (1995)), so the theorem goes through the Jackson and inverse inequalities
+directly, and the interpolation couples of the classical spaces pair `N₀` with a classical space
+of the modulus (`InterpCouple.CoupleModulusData.memKMethod_leftCoupleModCouple_top_iff`).
+
+A couple with a compatible modulus is quasi-normed with Mathlib's constant `C_ρ = LpAddConst ρ`
+(`InterpCouple.isQuasiNormed_of_rpow_le`, `InterpCouple.CoupleModulusData.isQuasiNormed`), since
+the `ρ`-triangle inequality gives `N₀(a + b) ≤ C_ρ (N₀(a) + N₀(b))` for every `ρ > 0`.
 -/
 
 @[expose] public section
@@ -73,6 +77,25 @@ theorem norm0_sub_rpow_le {A : InterpCouple U} {ρ : ℝ} (hneg : ∀ a, A.norm0
     A.norm0 (a - b) ^ ρ ≤ A.norm0 a ^ ρ + A.norm0 b ^ ρ := by
   rw [sub_eq_add_neg, ← hneg b]
   exact hadd a (-b)
+
+/-- **A `ρ`-normed couple is quasi-normed**: if `N₀` and `N₁` vanish at `0` and are even,
+`N₀(a + b)^ρ ≤ N₀(a)^ρ + N₀(b)^ρ` for some `ρ > 0` and `N₁` is subadditive, then the couple is
+quasi-normed with Mathlib's constant `C_ρ = LpAddConst ρ`: the `ρ`-triangle inequality gives
+`N₀(a + b) ≤ C_ρ (N₀(a) + N₀(b))` (`ENNReal.le_mul_add_of_rpow_le_add_rpow`), and `C_ρ ≥ 1`
+(`ENNReal.one_le_LpAddConst`). -/
+theorem isQuasiNormed_of_rpow_le {A : InterpCouple U} {ρ : ℝ} (hρ : 0 < ρ)
+    (h00 : A.norm0 0 = 0) (h10 : A.norm1 0 = 0) (h0neg : ∀ a, A.norm0 (-a) = A.norm0 a)
+    (h1neg : ∀ a, A.norm1 (-a) = A.norm1 a)
+    (h0 : ∀ a b, A.norm0 (a + b) ^ ρ ≤ A.norm0 a ^ ρ + A.norm0 b ^ ρ)
+    (h1 : ∀ a b, A.norm1 (a + b) ≤ A.norm1 a + A.norm1 b) :
+    A.IsQuasiNormed (LpAddConst (ENNReal.ofReal ρ)) where
+  ne_top := (ENNReal.LpAddConst_lt_top _).ne
+  norm0_zero := h00
+  norm1_zero := h10
+  norm0_neg := h0neg
+  norm1_neg := h1neg
+  norm0_add_le a b := ENNReal.le_mul_add_of_rpow_le_add_rpow hρ (h0 a b)
+  norm1_add_le a b := (h1 a b).trans (le_mul_of_one_le_left' (ENNReal.one_le_LpAddConst _))
 
 /-- **Two near-best elements are close**: if `N₀` is even, `N₀^ρ` is subadditive for some
 `ρ ≥ 0`, `N₀(u - b_k) ≤ e_k` for every `k` and `e` decreases, then
@@ -251,6 +274,14 @@ noncomputable def ofExists (rho_pos : 0 < ρ) (norm0_zero : A.norm0 0 = 0)
   inverse := hB.choose_spec.2
 
 variable (M : A.CoupleModulusData ρ θ)
+
+include M in
+/-- **A couple with a compatible modulus is quasi-normed** with Mathlib's constant
+`C_ρ = LpAddConst ρ`, from the couple axioms of the modulus data
+(`InterpCouple.isQuasiNormed_of_rpow_le`). -/
+theorem isQuasiNormed : A.IsQuasiNormed (LpAddConst (ENNReal.ofReal ρ)) :=
+  isQuasiNormed_of_rpow_le M.rho_pos M.norm0_zero M.norm1_zero M.norm0_neg M.norm1_neg
+    M.norm0_add_rpow_le M.norm1_add_le
 
 /-- The **classical quasi-norm** `‖f‖^ω_{s,q} = N₀(f) + ‖(2^(ks) ω(f, k))_k‖_{ℓ_q}`. -/
 noncomputable def coupleModNorm (s : ℝ) (q : ℝ≥0∞) (f : U) : ℝ≥0∞ :=

@@ -5315,9 +5315,90 @@ The last claim follows with (3) of \Cref{lem:e-method-dyadic}.
 
 For $0 < p < 1$ the $K$-functional of $L_p$ and the Sobolev space $W^r_p$ on the circle
 vanishes identically~\cite{DitzianHristovIvanov1995}, so it carries no information on
-smoothness, and the representation of the classical spaces as interpolation spaces in
-\Cref{cor:modulus-spaces-interpolate} has no analogue there. The theorem above goes through the
-Jackson and inverse inequalities directly, as in the proof of~\cite[Theorem~4.8]{DeVorePopovTAMS}.
+smoothness. The theorem above goes through the Jackson and inverse inequalities directly, as in
+the proof of~\cite[Theorem~4.8]{DeVorePopovTAMS}, and the interpolation couples of the next
+corollary pair $N_0$ with a classical space of the modulus.
+
+\begin{corollary}[Classical spaces of a modulus interpolate]
+\label{cor:couple-modulus-interpolate}
+\lean{InterpCouple.isQuasiNormed_of_rpow_le, InterpCouple.CoupleModulusData.isQuasiNormed,
+  InterpCouple.CoupleModulusData.leftCoupleModCouple,
+  InterpCouple.CoupleModulusData.leftCoupleModCouple_norm0,
+  InterpCouple.CoupleModulusData.leftCoupleModCouple_norm1,
+  InterpCouple.CoupleModulusData.dyadicWeight_mul_modulus_le_of_norm1_le,
+  InterpCouple.CoupleModulusData.lqNorm_top_add_rpow_le,
+  InterpCouple.CoupleModulusData.jacksonBernsteinData,
+  InterpCouple.CoupleModulusData.smoothnessCouple_jacksonBernsteinData,
+  InterpCouple.CoupleModulusData.memKMethod_leftCoupleModCouple_top_iff,
+  InterpCouple.CoupleModulusData.memKMethod_leftCoupleModCouple_iff}
+\leanok
+\uses{def:couple-modulus-data, def:couple-k-method, def:jackson-bernstein-data,
+  lem:lq-quasi-triangle}
+Let $\omega$ be a modulus compatible with $A$ of exponent $\rho$ and inverse order $\theta$, let
+$C_\rho$ be the constant of \Cref{lem:lq-quasi-triangle}, and for $s_1 \in \R$ and
+$q_1 \in (0, \infty]$ let $(N_0, \|\cdot\|^{\omega}_{s_1, q_1})$ be the couple on $U$ with the
+norms $N_0$ and $\|\cdot\|^{\omega}_{s_1, q_1}$.
+\begin{enumerate}
+  \item $A$ is quasi-normed with constant $C_\rho$.
+  \item For every $r \in \R$ and all $f, g \in U$,
+    \[
+      \Bigl(\sup_k 2^{kr} \omega(f + g, k)\Bigr)^\rho \leq
+      \Bigl(\sup_k 2^{kr} \omega(f, k)\Bigr)^\rho + \Bigl(\sup_k 2^{kr} \omega(g, k)\Bigr)^\rho .
+    \]
+    Let $0 \leq r \leq \theta$. For all $a \in U$ and $j \in \N$ with $N_1(a) \leq 2^j$ and
+    every $k \in \N$, $2^{kr} \omega(a, k) \leq C_B \, 2^{jr} N_0(a)$.
+    If moreover $\omega(-f, k) = \omega(f, k)$ for all $f \in U$ and $k \in \N$, then
+    $Y(f) = \sup_k 2^{kr} \omega(f, k)$ satisfies Jackson's and Bernstein's inequalities of
+    order $r$ with exponent $\rho$ and constants $C_J$, $C_B$, and $(N_0, N_0 + Y)$ is the couple
+    $(N_0, \|\cdot\|^{\omega}_{r, \infty})$.
+  \item Let $\omega(-f, k) = \omega(f, k)$ for all $f \in U$ and $k \in \N$, let
+    $0 < s < r \leq \theta$ and $q \in (0, \infty]$. For every $f \in U$,
+    $f \in (N_0, \|\cdot\|^{\omega}_{r, \infty})_{s/r, q}$, the space of the continuous
+    $K$-method of this couple, if and only if $\|f\|^{\omega}_{s, q} < \infty$.
+  \item Let $0 < s_1 < \theta$, $0 < \eta < 1$ and $q_1, q \in (0, \infty]$. For every $f \in U$,
+    $f \in (N_0, \|\cdot\|^{\omega}_{s_1, q_1})_{\eta, q}$ if and only if
+    $\|f\|^{\omega}_{\eta s_1, q} < \infty$.
+\end{enumerate}
+\end{corollary}
+
+\begin{proof}
+\leanok
+\uses{thm:jackson-bernstein-couple, thm:e-spaces-interpolate, thm:couple-modulus-coincidence,
+  lem:weighted-tails, cor:comparable-couples, def:lq-norm}
+(1) By \Cref{lem:lq-quasi-triangle}, $N_0(a + b)^\rho \leq N_0(a)^\rho + N_0(b)^\rho$ gives
+$N_0(a + b) \leq C_\rho (N_0(a) + N_0(b))$, and
+$N_1(a + b) \leq N_1(a) + N_1(b) \leq C_\rho (N_1(a) + N_1(b))$ since $C_\rho \geq 1$.
+
+(2) For each $k$,
+$(2^{kr} \omega(f + g, k))^\rho \leq (2^{kr} \omega(f, k))^\rho + (2^{kr} \omega(g, k))^\rho$,
+which is at most the sum of the $\rho$-th powers of the two suprema; the $\rho$-th power of a
+supremum is the supremum of the $\rho$-th powers. By the inverse inequality,
+$2^{kr} \omega(a, k) \leq C_B \, 2^{kr} 2^{-(k - j)_+ \theta} N_0(a)$. For $k \leq j$,
+$2^{kr} \leq 2^{jr}$ since $r \geq 0$; for $k > j$,
+$2^{kr} 2^{-(k-j)\theta} = 2^{jr} 2^{(k - j)(r - \theta)} \leq 2^{jr}$ since $r \leq \theta$.
+Taking the supremum over $k$ gives Bernstein's inequality. Jackson's inequality follows from
+$E(2^k, f) \leq C_J \, \omega(f, k)$ and $\omega(f, k) \leq 2^{-kr} Y(f)$, item (1) of
+\Cref{lem:weighted-tails} with $q = \infty$. The evenness of $Y$ follows from that of $\omega$,
+and $N_0 + Y = \|\cdot\|^{\omega}_{r, \infty}$ by \Cref{def:lq-norm}.
+
+(3) By (1) and (2), \Cref{thm:jackson-bernstein-couple} (4) applies:
+$f \in (N_0, \|\cdot\|^{\omega}_{r, \infty})_{s/r, q}$ if and only if
+$\|f\|^{\mathrm{dy}}_{E, s, q} < \infty$. Since $0 \leq s < \theta$,
+\Cref{thm:couple-modulus-coincidence} turns this into $\|f\|^{\omega}_{s, q} < \infty$.
+
+(4) By \Cref{thm:couple-modulus-coincidence} with $0 \leq s_1 < \theta$, the norms
+$\|\cdot\|^{\omega}_{s_1, q_1}$ and $\|\cdot\|^{\mathrm{dy}}_{E, s_1, q_1}$ are bounded by
+finite multiples of each other, so the couples $(N_0, \|\cdot\|^{\omega}_{s_1, q_1})$ and
+$(N_0, E_{s_1, q_1})$ have the same interpolation spaces (\Cref{cor:comparable-couples}). By
+(1) and \Cref{thm:e-spaces-interpolate}, $f \in (N_0, E_{s_1, q_1})_{\eta, q}$ if and only if
+$\|f\|^{\mathrm{dy}}_{E, \eta s_1, q} < \infty$, and since $0 < \eta s_1 < \theta$,
+\Cref{thm:couple-modulus-coincidence} turns this into $\|f\|^{\omega}_{\eta s_1, q} < \infty$.
+\end{proof}
+
+For a scheme in a normed space and $q_1, q \geq 1$, part (4) is (2) of
+\Cref{cor:modulus-spaces-interpolate}. Part (4) holds for every compatible modulus. For
+$r < \theta$ it contains part (3), with $s_1 = r$, $q_1 = \infty$ and $\eta = s/r$; the evenness
+of $\omega$ serves the endpoint $r = \theta$ of part (3).
 
 \chapter{Besov spaces and their embeddings}
 \label{ch:besov}

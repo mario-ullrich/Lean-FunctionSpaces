@@ -407,7 +407,10 @@ For a general scheme the project describes `A^s_q`
   `1/p - 1/r < s < 1/p`, `B^s_{p,q,1}[0, 1] ⊆ L_r[0, 1]`: there is `K < ∞` with
   `‖f‖_r ≤ K (‖f‖_p + ‖(2^(ks) E_k(f))_k‖_{ℓ_q})` for every `f ∈ L_p[0, 1]`, by the Besov
   embedding of a scheme of functions with the Nikolskii property of dimension `1`
-  (`Haar.exists_eLpNorm_le_eNormDyadic_stepCouple`). For `1/p - 1 < s < 1/p`,
+  (`Haar.exists_eLpNorm_le_eNormDyadic_stepCouple`). For `0 < s < t ≤ 1/p`, `B^s_{p,q,1}[0, 1]`
+  is the real interpolation space `(L_p, B^t_{p,∞,1}[0, 1])_{s/t,q}`, where `B^t_{p,∞,1}[0, 1]`
+  carries the quasi-norm `‖f‖_p + sup_k 2^(kt) ω_1(f, 2^(-k), [0, 1])_p`
+  (`Haar.memKMethod_intervalLpModulus_iff`). For `1/p - 1 < s < 1/p`,
   `f ∈ B^s_{p,q,1}[0, 1]` iff `f ∈ L_1[0, 1]` and
   `|∫_0^1 f| + ‖(2^(k(s+1/2-1/p)) ‖(⟨f, h_{k,m}⟩)_{m<2^k}‖_{ℓ_p})_k‖_{ℓ_q} < ∞`
   (`Haar.lqNorm_modulus_lt_top_iff_haarCoeff_of_le_one`), and for `q < ∞` the partial sums of the

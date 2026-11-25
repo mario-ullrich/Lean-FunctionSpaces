@@ -6,6 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import ApproximationSpaces.Interpolation.EFunctionalRepresentation
+public import Mathlib.Order.CompleteLattice.Group
 
 /-!
 # The Jackson–Bernstein theorem for quasi-normed couples
@@ -50,6 +51,20 @@ The normed counterpart for approximation schemes is `ApproximationScheme.Smoothn
 `ApproximationScheme.SmoothnessSpace.memApprox_iff_memInterp`. For `L_p`, `0 < p < 1`, the space
 `Y` is a classical or an approximation space: the K-functional of `L_p` and the Sobolev space
 `W^r_p` on the circle vanishes identically (Ditzian–Hristov–Ivanov, Constr. Approx. 11 (1995)).
+
+**Classical spaces of a modulus.** Let `ω` be a modulus compatible with a `ρ`-normed couple of
+inverse order `θ` (`InterpCouple.CoupleModulusData`), with the classical quasi-norm
+`‖f‖^ω_{s,q} = N₀(f) + ‖(2^(ks) ω(f, k))_k‖_{ℓ_q}`. If `ω` is even and `0 ≤ r ≤ θ`, then
+`Y(f) = sup_k 2^(kr) ω(f, k)` satisfies Jackson's and Bernstein's inequalities of order `r`
+(`InterpCouple.CoupleModulusData.jacksonBernsteinData`), and `(N₀, N₀ + Y)` is the couple
+`(N₀, ‖·‖^ω_{r,∞})` (`InterpCouple.CoupleModulusData.leftCoupleModCouple`). With the
+coincidence theorem this gives, for `0 < s < r ≤ θ` and `0 < q ≤ ∞`,
+`(N₀, ‖·‖^ω_{r,∞})_{s/r,q} = {f : ‖f‖^ω_{s,q} < ∞}`
+(`InterpCouple.CoupleModulusData.memKMethod_leftCoupleModCouple_top_iff`).
+
+For every compatible modulus, the representation theorem and the coincidence theorem give
+`(N₀, ‖·‖^ω_{s₁,q₁})_{η,q} = {f : ‖f‖^ω_{ηs₁,q} < ∞}` for `0 < s₁ < θ`, `0 < η < 1` and
+`0 < q₁, q ≤ ∞` (`InterpCouple.CoupleModulusData.memKMethod_leftCoupleModCouple_iff`).
 -/
 
 @[expose] public section
@@ -445,5 +460,161 @@ theorem memKMethod_smoothnessCouple_iff (hA : A.IsQuasiNormed C)
         (jacksonBernsteinConst_ne_top hA.ne_top J.CB_ne_top J.rho_pos hsr q).lt_top h)⟩
 
 end JacksonBernsteinData
+
+/-! ### Classical spaces of a modulus as interpolation spaces -/
+
+namespace CoupleModulusData
+
+variable {A : InterpCouple U} {ρ θ : ℝ} (M : A.CoupleModulusData ρ θ)
+
+/-- The **couple `(N₀, ‖·‖^ω_{s₁,q₁})`** of a modulus `ω` compatible with a `ρ`-normed couple
+`A`: the first norm `N₀` of `A` and the classical quasi-norm
+`‖f‖^ω_{s₁,q₁} = N₀(f) + ‖(2^(ks₁) ω(f, k))_k‖_{ℓ_{q₁}}`, the analogue of
+`ApproximationScheme.ModulusData.leftModCouple`. -/
+noncomputable def leftCoupleModCouple (s₁ : ℝ) (q₁ : ℝ≥0∞) : InterpCouple U :=
+  ⟨A.norm0, M.coupleModNorm s₁ q₁⟩
+
+/-- The first norm of `(N₀, ‖·‖^ω_{s₁,q₁})` is `N₀`. -/
+@[simp]
+theorem leftCoupleModCouple_norm0 (s₁ : ℝ) (q₁ : ℝ≥0∞) (f : U) :
+    (M.leftCoupleModCouple s₁ q₁).norm0 f = A.norm0 f := rfl
+
+/-- The second norm of `(N₀, ‖·‖^ω_{s₁,q₁})` is the classical quasi-norm. -/
+@[simp]
+theorem leftCoupleModCouple_norm1 (s₁ : ℝ) (q₁ : ℝ≥0∞) (f : U) :
+    (M.leftCoupleModCouple s₁ q₁).norm1 f = M.coupleModNorm s₁ q₁ f := rfl
+
+/-- **The inverse inequality gives Bernstein's inequality at each scale**: for `0 ≤ r ≤ θ`, an
+element `a` with `N₁(a) ≤ 2^j` satisfies `2^(kr) ω(a, k) ≤ C_B 2^(jr) N₀(a)` for every `k`. For
+`k ≤ j` this is `2^(kr) ≤ 2^(jr)`; for `k > j`, `2^(kr) 2^(-(k-j)θ) = 2^(jr) 2^((k-j)(r-θ))` and
+`r - θ ≤ 0`. -/
+theorem dyadicWeight_mul_modulus_le_of_norm1_le {r : ℝ} (hr : 0 ≤ r) (hrθ : r ≤ θ) {a : U}
+    {j : ℕ} (ha : A.norm1 a ≤ ((2 ^ j : ℕ) : ℝ≥0∞)) (k : ℕ) :
+    dyadicWeight r k * M.modulus a k ≤ M.CB * dyadicWeight r j * A.norm0 a := by
+  have hw : dyadicWeight r k * dyadicWeight (-θ) (k - j) ≤ dyadicWeight r j := by
+    rcases le_total k j with hkj | hjk
+    · rw [Nat.sub_eq_zero_of_le hkj, ENNReal.dyadicWeight_zero_right, mul_one]
+      exact ENNReal.dyadicWeight_mono hr hkj
+    · obtain ⟨m, rfl⟩ := Nat.exists_eq_add_of_le hjk
+      rw [Nat.add_sub_cancel_left, ENNReal.dyadicWeight_add_nat, mul_assoc,
+        ← ENNReal.dyadicWeight_add]
+      calc dyadicWeight r j * dyadicWeight (r + -θ) m ≤ dyadicWeight r j * 1 := by
+            gcongr
+            exact (ENNReal.dyadicWeight_anti (by linarith) (Nat.zero_le m)).trans_eq
+              (ENNReal.dyadicWeight_zero_right _)
+        _ = dyadicWeight r j := mul_one _
+  calc dyadicWeight r k * M.modulus a k
+      ≤ dyadicWeight r k * (M.CB * dyadicWeight (-θ) (k - j) * A.norm0 a) := by
+        gcongr
+        exact M.inverse j k a ha
+    _ = M.CB * (dyadicWeight r k * dyadicWeight (-θ) (k - j)) * A.norm0 a := by ring
+    _ ≤ M.CB * dyadicWeight r j * A.norm0 a := by gcongr
+
+/-- **The `ρ`-triangle inequality of the weighted supremum of the modulus**: for every `r`,
+`(sup_k 2^(kr) ω(f + g, k))^ρ ≤ (sup_k 2^(kr) ω(f, k))^ρ + (sup_k 2^(kr) ω(g, k))^ρ`, from the
+`ρ`-triangle inequality of `ω(·, k)` at each scale; the `ρ`-th power of a supremum is the
+supremum of the `ρ`-th powers (Mathlib's `ENNReal.orderIsoRpow`), and the supremum of a sum is at
+most the sum of the suprema (Mathlib's `iSup_add_le`). -/
+theorem lqNorm_top_add_rpow_le (r : ℝ) (f g : U) :
+    lqNorm ∞ (fun k => dyadicWeight r k * M.modulus (f + g) k) ^ ρ ≤
+      lqNorm ∞ (fun k => dyadicWeight r k * M.modulus f k) ^ ρ +
+        lqNorm ∞ (fun k => dyadicWeight r k * M.modulus g k) ^ ρ := by
+  have hρ := M.rho_pos
+  have hsup : ∀ h : U, lqNorm ∞ (fun k => dyadicWeight r k * M.modulus h k) ^ ρ =
+      ⨆ k, (dyadicWeight r k * M.modulus h k) ^ ρ := fun h => by
+    rw [ENNReal.lqNorm_top]
+    exact (ENNReal.orderIsoRpow ρ hρ).map_iSup _
+  have hpow : ∀ (h : U) (k : ℕ),
+      (dyadicWeight r k * M.modulus h k) ^ ρ = dyadicWeight (r * ρ) k * M.modulus h k ^ ρ :=
+    fun h k => by rw [ENNReal.mul_rpow_of_nonneg _ _ hρ.le, ENNReal.dyadicWeight_rpow]
+  rw [hsup, hsup, hsup]
+  calc ⨆ k, (dyadicWeight r k * M.modulus (f + g) k) ^ ρ
+      ≤ ⨆ k, ((dyadicWeight r k * M.modulus f k) ^ ρ +
+          (dyadicWeight r k * M.modulus g k) ^ ρ) := iSup_mono fun k => by
+        rw [hpow, hpow, hpow, ← mul_add]
+        gcongr
+        exact M.add_rpow_le f g k
+    _ ≤ _ := iSup_add_le _ _
+
+/-- **Jackson's and Bernstein's inequalities for the classical space of a modulus**: for an even
+modulus `ω` compatible with `A` of exponent `ρ` and inverse order `θ`, and `0 ≤ r ≤ θ`, the
+smoothness quasi-seminorm `Y(f) = sup_k 2^(kr) ω(f, k)` satisfies Jackson's inequality
+`E(2^k, f) ≤ C_J 2^(-kr) Y(f)`, from `E(2^k, f) ≤ C_J ω(f, k)` and `ω(f, k) ≤ 2^(-kr) Y(f)`, and
+Bernstein's inequality `Y(a) ≤ C_B 2^(kr) N₀(a)` for `N₁(a) ≤ 2^k`
+(`InterpCouple.CoupleModulusData.dyadicWeight_mul_modulus_le_of_norm1_le`); `Y^ρ` is subadditive
+(`InterpCouple.CoupleModulusData.lqNorm_top_add_rpow_le`). The evenness of `ω` gives the evenness
+of `Y`. -/
+noncomputable def jacksonBernsteinData (hωneg : ∀ f k, M.modulus (-f) k = M.modulus f k)
+    {r : ℝ} (hr : 0 ≤ r) (hrθ : r ≤ θ) : A.JacksonBernsteinData ρ r where
+  rho_pos := M.rho_pos
+  smoothNorm f := lqNorm ∞ (fun k => dyadicWeight r k * M.modulus f k)
+  smoothNorm_neg f := by simp only [hωneg]
+  smoothNorm_add_rpow_le := M.lqNorm_top_add_rpow_le r
+  CJ := M.CJ
+  CJ_ne_top := M.CJ_ne_top
+  jackson k u := (M.jackson u k).trans (by
+    rw [mul_assoc]
+    gcongr
+    exact ENNReal.le_dyadicWeight_neg_mul_lqNorm ENNReal.top_ne_zero r (M.modulus u) k)
+  CB := M.CB
+  CB_ne_top := M.CB_ne_top
+  bernstein k a ha := by
+    rw [ENNReal.lqNorm_top]
+    exact iSup_le fun i => M.dyadicWeight_mul_modulus_le_of_norm1_le hr hrθ ha i
+
+/-- **The couple of Jackson's and Bernstein's inequalities of a modulus** is the couple
+`(N₀, ‖·‖^ω_{r,∞})`: `N₀ + Y` with `Y(f) = sup_k 2^(kr) ω(f, k)` is the classical quasi-norm
+`‖·‖^ω_{r,∞}`. -/
+theorem smoothnessCouple_jacksonBernsteinData
+    (hωneg : ∀ f k, M.modulus (-f) k = M.modulus f k) {r : ℝ} (hr : 0 ≤ r) (hrθ : r ≤ θ) :
+    (M.jacksonBernsteinData hωneg hr hrθ).smoothnessCouple = M.leftCoupleModCouple r ∞ := rfl
+
+/-- **Classical spaces of a modulus as interpolation spaces of `(N₀, ‖·‖^ω_{r,∞})`**: for an even
+modulus `ω` compatible with `A` of exponent `ρ` and inverse order `θ`, `0 < s < r ≤ θ` and
+`0 < q ≤ ∞`, `f` lies in the real interpolation space `(N₀, ‖·‖^ω_{r,∞})_{s/r,q}` iff
+`‖f‖^ω_{s,q} = N₀(f) + ‖(2^(ks) ω(f, k))_k‖_{ℓ_q} < ∞`. The Jackson–Bernstein theorem
+(`InterpCouple.JacksonBernsteinData.memKMethod_smoothnessCouple_iff`) applies to
+`InterpCouple.CoupleModulusData.jacksonBernsteinData`, and the coincidence theorem
+(`InterpCouple.CoupleModulusData.eNormDyadic_lt_top_iff`) shows that the dyadic norm
+`‖f‖^dy_{s,q}` is finite iff the classical quasi-norm `‖f‖^ω_{s,q}` is, for `0 ≤ s < θ`. For
+`r < θ`, `InterpCouple.CoupleModulusData.memKMethod_leftCoupleModCouple_iff` with `s₁ = r`,
+`q₁ = ∞` and `η = s/r` gives the same equivalence for every compatible modulus; the evenness of
+`ω` serves the endpoint `r = θ`. -/
+theorem memKMethod_leftCoupleModCouple_top_iff
+    (hωneg : ∀ f k, M.modulus (-f) k = M.modulus f k) {r s : ℝ} (hs : 0 < s) (hsr : s < r)
+    (hrθ : r ≤ θ) {q : ℝ≥0∞} (hq : q ≠ 0) {f : U} :
+    (M.leftCoupleModCouple r ∞).MemKMethod (s / r) q f ↔ M.coupleModNorm s q f < ∞ := by
+  have h := (M.jacksonBernsteinData hωneg (hs.le.trans hsr.le) hrθ).memKMethod_smoothnessCouple_iff
+    M.isQuasiNormed M.norm1_add_le hs hsr hq (u := f)
+  rw [M.smoothnessCouple_jacksonBernsteinData] at h
+  rw [h]
+  exact M.eNormDyadic_lt_top_iff hs.le (hsr.trans_le hrθ) f
+
+/-- **Interpolation of `N₀` and a classical space of a modulus**: for a modulus `ω` compatible with
+`A` of exponent `ρ` and inverse order `θ`, `0 < s₁ < θ`, `0 < η < 1` and `0 < q₁, q ≤ ∞`, `f`
+lies in the real interpolation space `(N₀, ‖·‖^ω_{s₁,q₁})_{η,q}` iff `‖f‖^ω_{ηs₁,q} < ∞`. The
+classical quasi-norm `‖·‖^ω_{s₁,q₁}` and the dyadic norm of `E_{s₁,q₁}` bound each other
+(`InterpCouple.CoupleModulusData.eNormDyadic_le_coupleModNorm`,
+`InterpCouple.CoupleModulusData.coupleModNorm_le_eNormDyadic`), so the couple has the
+interpolation spaces of `(N₀, E_{s₁,q₁})` (`InterpCouple.memKMethod_congr`), and
+`(N₀, E_{s₁,q₁})_{η,q}` is the space of finite dyadic norm `‖·‖^dy_{ηs₁,q}`
+(`InterpCouple.memKMethod_leftECouple_iff`); the
+coincidence theorem (`InterpCouple.CoupleModulusData.eNormDyadic_lt_top_iff`) turns this into
+`‖f‖^ω_{ηs₁,q} < ∞`. The theorem holds for every compatible modulus. -/
+theorem memKMethod_leftCoupleModCouple_iff {s₁ η : ℝ} (hs₁ : 0 < s₁) (hs₁θ : s₁ < θ)
+    (hη : 0 < η) (hη' : η < 1) {q₁ q : ℝ≥0∞} (hq₁ : q₁ ≠ 0) (hq : q ≠ 0) {f : U} :
+    (M.leftCoupleModCouple s₁ q₁).MemKMethod η q f ↔ M.coupleModNorm (η * s₁) q f < ∞ := by
+  have hlt : η * s₁ < θ := (mul_lt_of_lt_one_left hs₁ hη').trans hs₁θ
+  have hcongr : (M.leftCoupleModCouple s₁ q₁).MemKMethod η q f ↔
+      (A.leftECouple s₁ q₁).MemKMethod η q f :=
+    memKMethod_congr (A := M.leftCoupleModCouple s₁ q₁) (B := A.leftECouple s₁ q₁)
+      ENNReal.one_ne_top (max_lt ENNReal.one_lt_top M.CJ_ne_top.lt_top).ne
+      ENNReal.one_ne_top (M.coupleInverseConst_ne_top hs₁θ q₁) (fun a => (one_mul _).ge)
+      (fun a => M.eNormDyadic_le_coupleModNorm a) (fun a => (one_mul _).ge)
+      (fun a => M.coupleModNorm_le_eNormDyadic hs₁.le hs₁θ a)
+  rw [hcongr, memKMethod_leftECouple_iff M.isQuasiNormed M.norm1_add_le hs₁ hη hη' hq₁ hq]
+  exact M.eNormDyadic_lt_top_iff (mul_pos hη hs₁).le hlt f
+
+end CoupleModulusData
 
 end InterpCouple

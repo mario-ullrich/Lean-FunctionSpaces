@@ -155,9 +155,13 @@ the quasi-Banach space `L_τ`.
   `L_r[0, 1]` (`Haar.exists_uniform_inclusion_eq_stepCouple`,
   `Haar.exists_eLpNorm_le_eNormDyadic_stepCouple`). For `0 < p ≤ 1`, `0 < q ≤ ∞` and
   `0 ≤ s < 1/p` the Besov space of the Haar scheme in `L_∞[0, 1]` is `B^s_{p,q,1}[0, 1]`
-  (`Haar.memBesov_haarScheme_iff_modulus`). For `0 < p ≤ 1`, `s > 1/p - 1` and `0 < q ≤ ∞` the
-  space `E_{s,q}` embeds into `L_1[0, 1]` (`Haar.eLpNorm_one_le_eNormDyadic`), and `f ∈ E_{s,q}` iff
-  `f ∈ L_1[0, 1]` and `|∫_0^1 f| + ‖(2^(k(s+1/2-1/p)) ‖(⟨f, h_{k,m}⟩)_{m<2^k}‖_{ℓ_p})_k‖_{ℓ_q} < ∞`
+  (`Haar.memBesov_haarScheme_iff_modulus`), and for `0 < s < t ≤ 1/p` it is the real
+  interpolation space `(L_p, B^t_{p,∞,1}[0, 1])_{s/t,q}`, where `B^t_{p,∞,1}[0, 1]` carries the
+  quasi-norm `‖f‖_p + sup_k 2^(kt) ω_1(f, 2^(-k), [0, 1])_p`
+  (`Haar.memKMethod_intervalLpModulus_iff`, with the evenness `Interval.intervalLpModulus_neg`).
+  For `0 < p ≤ 1`, `s > 1/p - 1` and `0 < q ≤ ∞` the space `E_{s,q}` embeds into `L_1[0, 1]`
+  (`Haar.eLpNorm_one_le_eNormDyadic`), and `f ∈ E_{s,q}` iff `f ∈ L_1[0, 1]` and
+  `|∫_0^1 f| + ‖(2^(k(s+1/2-1/p)) ‖(⟨f, h_{k,m}⟩)_{m<2^k}‖_{ℓ_p})_k‖_{ℓ_q} < ∞`
   (`Haar.memEMethod_stepCouple_iff_haarCoeff`); for `1/p - 1 < s < 1/p` this describes
   `B^s_{p,q,1}[0, 1]` by Haar coefficients (`Haar.lqNorm_modulus_lt_top_iff_haarCoeff_of_le_one`).
   For `q < ∞` the Haar system is a Schauder basis of `E_{s,q}`: the partial sums converge
@@ -215,7 +219,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Haar system on `[0, 1]`: dyadic conditional expectations, density, Haar coefficient characterisation | ✅ | ✗ | `Wavelets/Examples/Haar` |
 | Haar coefficients and Besov spaces on the interval and the circle for `0 < s < 1/p` | ✅ | ✗ | `Wavelets/Examples/HaarBesov` |
 | The Haar basis of `L_2[0, 1]`, `n`-term approximation | ✅ | ✗ | `Wavelets/Examples/HaarBasis` |
-| Dyadic step functions in `L_p[0, 1]`, `0 < p ≤ 1`: the step couple, Jackson's inequality by averaging, inverse inequality of order `1/p`, `A^s_q = B^s_{p,q,1}[0, 1]` for `0 < s < 1/p` | ✅ | ✗ | `Wavelets/Examples/DyadicStepsQuasiBanach` |
+| Dyadic step functions in `L_p[0, 1]`, `0 < p ≤ 1`: the step couple, Jackson's inequality by averaging, inverse inequality of order `1/p`, `A^s_q = B^s_{p,q,1}[0, 1]` for `0 < s < 1/p`, `(L_p, B^t_{p,∞,1})_{s/t,q} = B^s_{p,q,1}[0, 1]` for `0 < s < t ≤ 1/p` | ✅ | ✗ | `Wavelets/Examples/DyadicStepsQuasiBanach` |
 | The Haar system for `0 < p ≤ 1`: steps in `L_1`, sup bound and Nikolskii inequality of steps for `0 < p ≤ r ≤ ∞`, level norms, embedding of `A^s_q(L_p, steps)` into `L_1` for `s > 1/p - 1`, martingale convergence in `L_1`, Haar coefficient characterisation, `B^s_{p,q,1}[0, 1]` by Haar coefficients for `1/p - 1 < s < 1/p` | ✅ | ✗ | `Wavelets/Examples/HaarQuasiBanach` |
 | Dyadic steps as a scheme of essentially bounded functions: steps are bounded, the approximants in `L_p`, the step couple as the couple of the Haar scheme in `L_p` for `0 < p ≤ ∞`, the Haar scheme in `L_p` as the image scheme for `p ≥ 1`, Nikolskii property of dimension `1`, Besov embeddings of steps for `0 < p ≤ r ≤ ∞` and `s > 1/p - 1/r` (from the dyadic norm of the step couple in `L_p` to that in `L_r` with smoothness `s - (1/p - 1/r)`, and into `L_r`), the Besov space of the steps is `B^s_{p,q,1}[0, 1]` for `0 < p ≤ 1` and `0 ≤ s < 1/p` | ✅ | ✗ | `Wavelets/Examples/HaarFunctionScheme` |
 | Haar partial sums for `0 < p ≤ 1`: convergence in `A^s_q(L_p, steps)` for `s > 1/p - 1` and `q < ∞`, uniqueness of the coefficients (Schauder basis) | ✅ | ✗ | `Wavelets/Examples/HaarSchauderBasis` |

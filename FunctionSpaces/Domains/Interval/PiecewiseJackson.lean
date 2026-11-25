@@ -33,8 +33,8 @@ of bounded continuous functions (`Interval.interval_approxError_le_of_continuous
 every scheme in `L_p[0, 1]`).
 
 The modulus of elements of `L_p[0, 1]` at the dyadic scales (`Interval.intervalLpModulus`) is
-defined for every `p`; for `0 < p ≤ 1` its `p`-th power is subadditive and it is at most
-`2^(r/p) ‖f‖_p` (`Interval.intervalLpModulus_add_rpow_le`,
+defined and even for every `p` (`Interval.intervalLpModulus_neg`); for `0 < p ≤ 1` its `p`-th
+power is subadditive and it is at most `2^(r/p) ‖f‖_p` (`Interval.intervalLpModulus_add_rpow_le`,
 `Interval.intervalLpModulus_le_of_le_one`).
 -/
 
@@ -246,6 +246,17 @@ theorem intervalLpModulus_anti (r : ℕ) (f : Lp ℂ p unitVol) :
     Antitone (intervalLpModulus p r f) := fun _ _ hjk =>
   intervalModulus_mono r p 0 1 _ (one_div_le_one_div_of_le (by positivity)
     (pow_le_pow_right₀ (by norm_num) hjk))
+
+omit [Fact (1 ≤ p)] in
+/-- **The modulus is even**: `ω_r(-f, 2^(-k), [0, 1])_p = ω_r(f, 2^(-k), [0, 1])_p` for every
+`f ∈ L_p[0, 1]`, every `r` and every `p`, since `-f = (-1) f` and `‖-1‖ = 1`
+(`Interval.intervalModulus_const_mul`). -/
+theorem intervalLpModulus_neg (r : ℕ) (f : Lp ℂ p unitVol) (k : ℕ) :
+    intervalLpModulus p r (-f) k = intervalLpModulus p r f k := by
+  have h : (-(f : ℝ → ℂ)) = fun x => (-1 : ℂ) * f x := funext fun x => by simp
+  rw [intervalLpModulus, intervalModulus_congr_ae (Lp.coeFn_neg f), h, intervalModulus_const_mul,
+    enorm_neg, enorm_one, one_mul]
+  rfl
 
 /-- **From continuous functions to `L_p` by density**: a bound `E_n(g) ≤ C ω_r(g, 2^(-k))_p`
 for every bounded continuous `g`, given by an approximant `u ∈ A_n` of `g`, holds for every

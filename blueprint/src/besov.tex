@@ -2835,7 +2835,8 @@ $L_\infty[0, 1]$ (\Cref{lem:steps-function-scheme}).
 \label{lem:modulus-below-one}
 \lean{Interval.intervalModulus_add_rpow_le, Interval.eLpNorm_higherDiff_le_of_forall_of_le_one,
   Interval.eLpNorm_higherDiff_le_of_le_one, Interval.intervalModulus_le_of_le_one,
-  Interval.intervalLpModulus_add_rpow_le, Interval.intervalLpModulus_le_of_le_one}
+  Interval.intervalLpModulus_add_rpow_le, Interval.intervalLpModulus_le_of_le_one,
+  Interval.intervalLpModulus_neg}
 \leanok
 \uses{def:iter-diff, def:interval-modulus, lem:interval-modulus, lem:lp-rho-triangle,
   thm:pp-jackson}
@@ -2848,7 +2849,9 @@ $\|f(\cdot + kh)\|_{L_p(\mu)} \leq B$ for $k = 0, \dots, r$, then
 $\|\Delta_h^r f\|_{L_p(\mu)} \leq 2^{r/p} B$. Hence for measurable $f$ and $h \geq 0$,
 $\|\Delta_h^r f\|_{L_p[a, b - rh]} \leq 2^{r/p} \|f\|_{L_p[a, b]}$, and
 $\omega_r(f, t, [a, b])_p \leq 2^{r/p} \|f\|_{L_p[a, b]}$. Both bounds on $\omega_r$ hold for
-$f, g \in L_p[0, 1]$, $[a, b] = [0, 1]$ and $t = 2^{-k}$.
+$f, g \in L_p[0, 1]$, $[a, b] = [0, 1]$ and $t = 2^{-k}$. For every $0 < p \leq \infty$, every
+$r \in \N$, $f \in L_p[0, 1]$ and $k \in \N$,
+$\omega_r(-f, 2^{-k}, [0, 1])_p = \omega_r(f, 2^{-k}, [0, 1])_p$.
 \end{lemma}
 
 \begin{proof}
@@ -2858,7 +2861,8 @@ $\|\Delta_h^r (f + g)\|_p^p \leq \|\Delta_h^r f\|_p^p + \|\Delta_h^r g\|_p^p$; t
 For the second claim expand $\Delta_h^r f = \sum_{k \leq r} (-1)^{r-k} \binom{r}{k} f(\cdot + kh)$
 (\Cref{def:iter-diff}): the $p$-th power of the quasi-norm is subadditive,
 $\binom{r}{k}^p \leq \binom{r}{k}$, and $\sum_k \binom{r}{k} = 2^r$. On $[a, b - rh]$ each
-translate has norm at most $\|f\|_{L_p[a, b]}$.
+translate has norm at most $\|f\|_{L_p[a, b]}$. The last claim is the homogeneity of the modulus
+(\Cref{lem:interval-modulus}) with the factor $-1$, applied to a representative of $f$.
 \end{proof}
 
 \begin{lemma}[Jackson's inequality for steps by averaging]
@@ -2999,6 +3003,39 @@ $2^{ks} E(2^k, \ell) \geq 2^{-1/p} \, 2^{k(s - 1)}/4$ by the finite dyadic norm.
 terms are unbounded (\Cref{lem:dyadic-interpolation}); for $s = 1$ and $q < \infty$ they are
 bounded below by a positive constant, so their $\ell_q$ norm is infinite.
 \end{proof}
+
+The first modulus is even, so the classical spaces of the modulus compatible with the step
+couple interpolate (\Cref{cor:couple-modulus-interpolate}).
+
+\begin{corollary}[$B^s_{p,q,1}{[0, 1]}$ as an interpolation space, $0 < p \leq 1$]
+\label{cor:steps-interpolate-below-one}
+\lean{Haar.memKMethod_intervalLpModulus_iff}
+\leanok
+\uses{def:interval-modulus, def:couple, def:couple-k-method}
+Let $0 < p \leq 1$, $0 < s < r \leq 1/p$ and $q \in (0, \infty]$, and consider the couple on
+$L_p[0, 1]$ with the norms $\|\cdot\|_p$ and
+$g \mapsto \|g\|_p + \sup_k 2^{kr} \omega_1(g, 2^{-k}, [0, 1])_p$. For every $f \in L_p[0, 1]$,
+$f$ lies in the space of the continuous $K$-method with $(s/r, q)$ of this couple if and only if
+\[
+  \|f\|_p + \bigl\| \bigl( 2^{ks} \omega_1(f, 2^{-k}, [0, 1])_p \bigr)_k \bigr\|_{\ell_q}
+  < \infty .
+\]
+That is, $(L_p, B^r_{p,\infty,1}[0, 1])_{s/r, q} = B^s_{p,q,1}[0, 1]$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+\uses{thm:steps-besov-below-one, cor:couple-modulus-interpolate, lem:modulus-below-one}
+By the proof of \Cref{thm:steps-besov-below-one}, $\omega_1(\cdot, 2^{-k}, [0, 1])_p$ is a
+modulus compatible with the step couple of exponent $\rho = p$ and inverse order
+$\theta = 1/p$, and it is even (\Cref{lem:modulus-below-one}). The first norm of the step
+couple is $\|\cdot\|_p$, so the couple of the statement is $(N_0, \|\cdot\|^{\omega}_{r, \infty})$.
+Apply (3) of \Cref{cor:couple-modulus-interpolate} with $r \leq \theta$.
+\end{proof}
+
+The smoothness $r$ of the second space may equal the inverse order $1/p$. By
+\Cref{cor:steps-besov-space} the space $B^s_{p,q,1}[0, 1]$ is also the Besov space of the scheme
+of dyadic steps.
 
 On $\R^d$, identifying the approximation spaces of entire functions of exponential type with Besov
 spaces for $0 < p < 1$ rests on Jackson's inequality in $L_p$, $p < 1$

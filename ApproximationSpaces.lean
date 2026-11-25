@@ -234,7 +234,11 @@ in the root namespace.
   Bernstein's inequality `Y(a) ≤ C_B 2^(kr) N₀(a)` for `N₁(a) ≤ 2^k`, with `C_J, C_B < ∞`
   (`InterpCouple.JacksonBernsteinData`), give `E_{s,q} = (N₀, N₀ + Y)_{s/r,q}` for
   `0 < s < r` and `0 < q ≤ ∞`
-  (`InterpCouple.JacksonBernsteinData.memKMethod_smoothnessCouple_iff`).
+  (`InterpCouple.JacksonBernsteinData.memKMethod_smoothnessCouple_iff`); for an even modulus
+  compatible with a `ρ`-normed couple of inverse order `θ` and `0 < s < r ≤ θ`, the classical
+  space of smoothness `s` and fine index `q` is the interpolation space
+  `(N₀, ‖·‖^ω_{r,∞})_{s/r,q}`
+  (`InterpCouple.CoupleModulusData.memKMethod_leftCoupleModCouple_top_iff`).
 
 ### Decompositions (`Decompositions/`)
 

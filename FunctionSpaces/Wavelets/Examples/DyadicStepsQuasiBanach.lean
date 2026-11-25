@@ -7,7 +7,7 @@ module
 
 public import FunctionSpaces.Wavelets.Examples.HaarBesov
 public import FunctionSpaces.Domains.Interval.PiecewiseInverse
-public import ApproximationSpaces.Interpolation.EFunctionalModuli
+public import ApproximationSpaces.Interpolation.EFunctionalJacksonBernstein
 public import FunctionSpaces.Analysis.Lp.QuasiNorm
 
 /-!
@@ -62,6 +62,18 @@ Fourier-analytic `B^s_{p,q}[0, 1]` (Oswald 2018, (2)). For `s > 1`, and for `s =
 (`Haar.intervalLpModulus_two_idLp`) but `E(2^j, x)_p ≥ 2^(-1/p) 2^(-j)/4`
 (`Haar.le_eFunctional_stepCouple_idLp`), so it lies outside `A^s_q(L_p, steps)`
 (`Haar.not_memEMethod_stepCouple_idLp`).
+
+For `0 ≤ r ≤ 1/p` the function `Y(f) = sup_k 2^(kr) ω_1(f, 2^(-k), [0, 1])_p` satisfies Jackson's
+and Bernstein's inequalities of order `r`, by Jackson's inequality and the inverse inequality of
+the first modulus, and it is even since the first modulus is (`Interval.intervalLpModulus_neg`).
+The Jackson–Bernstein theorem for quasi-normed couples gives, for `0 < s < r ≤ 1/p` and `q ≠ 0`
+(`Haar.memKMethod_intervalLpModulus_iff`),
+
+`(L_p, B^r_{p,∞,1}[0, 1])_{s/r,q} = B^s_{p,q,1}[0, 1]`,
+
+where `B^r_{p,∞,1}[0, 1]` carries the quasi-norm `‖f‖_p + Y(f)`. By
+`Haar.memBesov_haarScheme_iff_modulus` the space `B^s_{p,q,1}[0, 1]` is also the Besov space of the
+Haar scheme in `L_∞[0, 1]`.
 -/
 
 @[expose] public section
@@ -545,6 +557,26 @@ theorem memEMethod_stepCouple_iff_modulus (hp0 : p ≠ 0) (hp1 : p ≤ 1) (hq0 :
       ‖f‖ₑ + lqNorm q (fun k => dyadicWeight s k * intervalLpModulus p 1 f k) < ∞ :=
   (stepModulusData hp0 hp1).memEMethod_iff_coupleModNorm_lt_top
     (fun _ hb => InterpCouple.eq_zero_of_ofMonotoneSubgroups_norm1_lt_one hb) hq0 hs hsp f
+
+/-- **`B^s_{p,q,1}[0, 1]` as an interpolation space, `0 < p ≤ 1`.** For `0 < s < r ≤ 1/p` and
+`q ≠ 0`, `f ∈ L_p[0, 1]` lies in the real interpolation space `(L_p, B^r_{p,∞,1}[0, 1])_{s/r,q}`
+of the couple of the quasi-norm `‖·‖_p` and the classical quasi-norm
+`‖g‖_p + sup_k 2^(kr) ω_1(g, 2^(-k), [0, 1])_p` iff
+`‖f‖_p + ‖(2^(ks) ω_1(f, 2^(-k), [0, 1])_p)_k‖_{ℓ_q} < ∞`, that is,
+`(L_p, B^r_{p,∞,1}[0, 1])_{s/r,q} = B^s_{p,q,1}[0, 1]`, including the endpoint `r = 1/p`. The
+first modulus is compatible with the step couple (`Haar.stepModulusData`) and even
+(`Interval.intervalLpModulus_neg`), so the classical spaces of this modulus interpolate
+(`InterpCouple.CoupleModulusData.memKMethod_leftCoupleModCouple_top_iff`). By
+`Haar.memBesov_haarScheme_iff_modulus` the right side is also the Besov space of the Haar scheme
+in `L_∞[0, 1]`. -/
+theorem memKMethod_intervalLpModulus_iff (hp0 : p ≠ 0) (hp1 : p ≤ 1) {r : ℝ} (hs : 0 < s)
+    (hsr : s < r) (hrp : r ≤ 1 / p.toReal) (hq : q ≠ 0) (f : Lp ℂ p vol) :
+    (⟨fun g => ‖g‖ₑ, fun g => ‖g‖ₑ +
+        lqNorm ∞ (fun k => dyadicWeight r k * intervalLpModulus p 1 g k)⟩ :
+        InterpCouple (Lp ℂ p vol)).MemKMethod (s / r) q f ↔
+      ‖f‖ₑ + lqNorm q (fun k => dyadicWeight s k * intervalLpModulus p 1 f k) < ∞ :=
+  (stepModulusData hp0 hp1).memKMethod_leftCoupleModCouple_top_iff
+    (fun g k => intervalLpModulus_neg 1 g k) hs hsr hrp hq
 
 /-! ### The line `x ↦ x` -/
 
