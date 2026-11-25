@@ -6325,25 +6325,39 @@ expansions with $p < 1$ expand the blocks in the same way.
 \section{Interpolation of Besov spaces}
 \label{sec:besov-interpolation}
 
-For $1 \leq p \leq \infty$ the Besov spaces of a scheme are approximation spaces
-(\Cref{lem:besov-bridge}), so the reiteration theorem for approximation spaces
-(\Cref{thm:approximation-spaces-reiteration}) gives their real interpolation spaces, for every
-scheme of functions. For the classical Besov
-spaces this is the theorem of DeVore and Popov~\cite{DeVorePopovTAMS}
-and~\cite[Theorem~6.4.5]{BerghLofstrom}.
+For $0 < p \leq \infty$ and $s \geq 0$ the Besov spaces of a scheme are described by the dyadic
+norm of the couple of $S$ in $L_p$ (\Cref{lem:besov-linear}), so their couples are couples of
+$E$-spaces, and \Cref{sec:e-spaces-interpolate} gives their real interpolation spaces, for every
+scheme of functions: the representation (\Cref{thm:e-spaces-interpolate}) for the couple of
+$L_p$ and a Besov space, and the reiteration (\Cref{thm:e-spaces-reiteration}) for the couple
+of two Besov spaces. For $1 \leq p \leq \infty$ the couples are couples of approximation spaces
+of the scheme $S^{(p)}$ (\Cref{def:besov-couples}, \Cref{lem:besov-bridge}), whose
+interpolation spaces \Cref{thm:approximation-spaces-reiteration} describes in the same way for
+fine indices in $[1, \infty]$. For the classical Besov spaces see~\cite{DeVorePopovTAMS},
+\cite[\S 4.6]{DeVore1998} and, for $1 \leq p, q \leq \infty$,
+\cite[Theorem~6.4.5]{BerghLofstrom}.
 
 \begin{definition}[Couples of Besov spaces]
 \label{def:besov-couples}
-\lean{FunctionScheme.besovCouple, FunctionScheme.lpBesovCouple}
+\lean{FunctionScheme.besovCouple, FunctionScheme.lpBesovCouple,
+  FunctionScheme.besovCouple_eq_approxCouple, FunctionScheme.lpBesovCouple_eq_leftApproxCouple}
 \leanok
-\uses{def:besov, lem:besov-bridge, def:approximation-space-couples}
-Let $S$ be a scheme of functions, $1 \leq p \leq \infty$, $s_0, s_1 \in \R$ and
-$q_0, q_1 \in [1, \infty]$. Since $\Besov{s_i}{p}{q_i} = A^{s_i}_{q_i}(L_p, S^{(p)})$
-(\Cref{lem:besov-bridge}), the couple $(\Besov{s_0}{p}{q_0}, \Besov{s_1}{p}{q_1})$ on $L_p$ is
-the couple $(A^{s_0}_{q_0}, A^{s_1}_{q_1})$ of the scheme $S^{(p)}$, and the couple
-$(L_p, \Besov{s_1}{p}{q_1})$ is the couple $(X, A^{s_1}_{q_1})$ of $S^{(p)}$
-(\Cref{def:approximation-space-couples}), both with the dyadic quasi-norms.
+\uses{def:besov, def:scheme-lp-couple, def:e-couples, def:approximation-space-couples,
+  lem:scheme-lp-couple-bridge, thm:complexity-couple-approx}
+Let $S$ be a scheme of functions, $0 < p \leq \infty$, $s_0, s_1 \in \R$ and
+$q_0, q_1 \in (0, \infty]$, and let $(N_0, N_1)$ be the couple of $S$ in $L_p$
+(\Cref{def:scheme-lp-couple}). The couple $(\Besov{s_0}{p}{q_0}, \Besov{s_1}{p}{q_1})$ on $L_p$
+is the couple $(E_{s_0, q_0}, E_{s_1, q_1})$ of $(N_0, N_1)$, and the couple
+$(L_p, \Besov{s_1}{p}{q_1})$ is the couple $(N_0, E_{s_1, q_1})$ of $(N_0, N_1)$
+(\Cref{def:e-couples}), both with the dyadic quasi-norms. For $1 \leq p \leq \infty$ and
+$q_0, q_1 \in [1, \infty]$ they are the couples $(A^{s_0}_{q_0}, A^{s_1}_{q_1})$ and
+$(X, A^{s_1}_{q_1})$ of the scheme $S^{(p)}$ in $X = L_p$
+(\Cref{def:approximation-space-couples}).
 \end{definition}
+
+For $p \geq 1$ the two descriptions agree since the couple of $S$ in $L_p$ is the complexity
+couple of $S^{(p)}$ (\Cref{lem:scheme-lp-couple-bridge}), whose dyadic norms are those of the
+approximation spaces (\Cref{thm:complexity-couple-approx}).
 
 \begin{theorem}[Besov spaces interpolate]
 \label{thm:besov-interpolate}
@@ -6351,16 +6365,14 @@ $(L_p, \Besov{s_1}{p}{q_1})$ is the couple $(X, A^{s_1}_{q_1})$ of $S^{(p)}$
   FunctionScheme.kMethodSpace_besovCouple, FunctionScheme.kMethodSpace_lpBesovCouple,
   FunctionScheme.memKMethod_besovNormCouple_iff, FunctionScheme.memKMethod_lpBesovNormCouple_iff}
 \leanok
-\uses{def:besov-couples, thm:approximation-spaces-reiteration, thm:dyadic-norm,
-  cor:approximation-space-sandwich}
-Let $S$ be a scheme of functions, $1 \leq p \leq \infty$, $0 < \eta < 1$ and
-$q_0, q_1, q \in [1, \infty]$.
+\uses{def:besov-couples, def:couple-k-method}
+Let $S$ be a scheme of functions, $0 < p \leq \infty$ and $0 < \eta < 1$.
 \begin{enumerate}
-  \item For every $0 < s_0 < s_1$,
+  \item For $0 < s_0 < s_1$ and $q_0, q_1, q \in [1, \infty]$,
     $(\Besov{s_0}{p}{q_0}, \Besov{s_1}{p}{q_1})_{\eta, q}
     = \Besov{(1-\eta)s_0 + \eta s_1}{p}{q}$ as subspaces of $L_p$.
-  \item For every $s_1 > 0$, $(L_p, \Besov{s_1}{p}{q_1})_{\eta, q} = \Besov{\eta s_1}{p}{q}$ as
-    subspaces of $L_p$.
+  \item For $s_1 > 0$ and $q_1, q \in (0, \infty]$,
+    $(L_p, \Besov{s_1}{p}{q_1})_{\eta, q} = \Besov{\eta s_1}{p}{q}$ as subspaces of $L_p$.
   \item Both statements hold for the couples of Pietsch's quasi-norms
     $(\|\cdot\|_{\Besov{s_0}{p}{q_0}}, \|\cdot\|_{\Besov{s_1}{p}{q_1}})$ and
     $(\|\cdot\|_p, \|\cdot\|_{\Besov{s_1}{p}{q_1}})$ in place of the dyadic ones.
@@ -6369,13 +6381,57 @@ $q_0, q_1, q \in [1, \infty]$.
 
 \begin{proof}
 \leanok
-\uses{lem:besov-bridge}
-Parts (1) and (2) are \Cref{thm:approximation-spaces-reiteration} for the scheme $S^{(p)}$ in
-$L_p$, whose approximation spaces are the Besov spaces by \Cref{lem:besov-bridge}. For part
-(3), Pietsch's quasi-norm of smoothness $s$ is at most $2^s$ times the dyadic one, and the
-dyadic one at most $4 \cdot 2^s$ times Pietsch's (\Cref{thm:dyadic-norm}); the sandwich
-principle (\Cref{cor:approximation-space-sandwich}) applies.
+\uses{thm:e-spaces-interpolate, thm:e-spaces-reiteration, lem:e-couples, lem:e-pietsch-norm,
+  lem:besov-linear, lem:scheme-lp-couple, cor:comparable-couples}
+By \Cref{lem:scheme-lp-couple} the couple $A = (N_0, N_1)$ of $S$ in $L_p$ is quasi-normed,
+its complexity $N_1$ is subadditive, $N_1(0) = 0$, only $0$ has complexity below $1$,
+$\|cf\|_p = |c| \, \|f\|_p$ and $N_1(cf) \leq N_1(f)$ for $c \in \R$. By \Cref{lem:besov-linear},
+for $s \geq 0$ and $q \in (0, \infty]$, $f \in \Besov{s}{p}{q}$ if and only if
+$\|f\|^{\mathrm{dy}}_{E, s, q} < \infty$. Part (1) is then \Cref{thm:e-spaces-reiteration} for
+$A$, since $(1 - \eta) s_0 + \eta s_1 > 0$, and part (2) is \Cref{thm:e-spaces-interpolate} for
+$A$ with $r = s_1$. By \Cref{lem:e-couples} both couples are quasi-normed and homogeneous, so
+their interpolation spaces are subspaces of $L_p$. For part (3), Pietsch's form of smoothness
+$s \geq 0$ is at most $C_q 2^s$ times the dyadic norm, and the dyadic norm at most
+$4 C_q^2 2^s$ times Pietsch's form (\Cref{lem:e-pietsch-norm}), so by
+\Cref{cor:comparable-couples} the couples of Pietsch's quasi-norms have the interpolation spaces
+of the couples of dyadic quasi-norms.
 \end{proof}
+
+The fine indices $q_0, q_1, q \geq 1$ in (1) are those of \Cref{thm:e-spaces-reiteration}; for
+the classical Besov spaces \cite[Corollary~6.2]{DeVorePopovTAMS} interpolates two Besov spaces
+of positive smoothness for all fine indices. In (2) every fine index is allowed, which gives
+the following representation. For the classical Besov spaces it is~\cite[(4.32)]{DeVore1998};
+for approximation spaces it is~\cite[\S 4.3, Theorem~2]{DeVore1998}, due
+to~\cite{DeVorePopovLNM}.
+
+\begin{corollary}[Besov spaces by the representation]
+\label{cor:besov-representation}
+\lean{FunctionScheme.memBesov_iff_memKMethod_lpBesovCouple}
+\leanok
+\uses{def:besov-couples}
+Let $S$ be a scheme of functions, $0 < p \leq \infty$, $0 < s < r$ and $q, q_1 \in (0, \infty]$.
+Then $\Besov{s}{p}{q} = (L_p, \Besov{r}{p}{q_1})_{s/r, q}$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+\uses{thm:besov-interpolate}
+Part (2) of \Cref{thm:besov-interpolate} with $s_1 = r$ and $\eta = s/r \in (0, 1)$, since
+$\eta r = s$.
+\end{proof}
+
+For the scheme $S$ of dyadic step functions on $[0, 1)$ and $0 < p \leq 1$,
+$\Besov{s}{p}{q}([0, 1], S) = B^s_{p,q,1}[0, 1]$ for $0 \leq s < 1/p$
+(\Cref{cor:steps-besov-space}). The couple of $S$ in $L_p$ is the step couple
+(\Cref{lem:steps-function-scheme}), and for $0 \leq r < 1/p$ and $q_1 \in (0, \infty]$ its
+dyadic norm of smoothness $r$ and the quasi-norm
+$\|f\|_p + \|(2^{kr} \omega_1(f, 2^{-k}, [0, 1])_p)_k\|_{\ell_{q_1}}$ of $B^r_{p,q_1,1}[0, 1]$
+bound each other up to finite constants (\Cref{thm:couple-modulus-coincidence}, applied to the
+step couple as in the proof of \Cref{thm:steps-besov-below-one}). By
+\Cref{cor:comparable-couples} the couple $(L_p, \Besov{r}{p}{q_1}([0, 1], S))$ of
+\Cref{def:besov-couples} and the couple $(L_p, B^r_{p,q_1,1}[0, 1])$ with this quasi-norm have
+the same interpolation spaces, so for $0 < s < r < 1/p$ and $q, q_1 \in (0, \infty]$ the
+corollary gives $B^s_{p,q,1}[0, 1] = (L_p, B^r_{p,q_1,1}[0, 1])_{s/r, q}$.
 
 On the torus with the trigonometric polynomials these are the periodic Besov spaces;
 \Cref{thm:torus-besov-interpolate} describes their interpolation spaces by differences.
