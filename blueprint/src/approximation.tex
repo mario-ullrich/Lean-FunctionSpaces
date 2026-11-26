@@ -352,7 +352,7 @@ smoothness, and a finite set for the coefficients of one level of atoms and wave
   ENNReal.lqNorm_le_sum_range_add_shift, ENNReal.lqNorm_le_lqNorm_one, ENNReal.lqNorm_geometric_le,
   ENNReal.lqNorm_shift_le, ENNReal.lqNorm_eq_sum, ENNReal.lqNorm_le_card_rpow_mul,
   ENNReal.lqNorm_prod_rpow, ENNReal.lqNorm_lqNorm_rpow, ENNReal.lqNorm_le_sum_of_eq_zero,
-  ENNReal.lqNorm_ite_eq, ENNReal.lqNorm_ite_le_eq,
+  ENNReal.lqNorm_lt_top_of_eq_zero, ENNReal.lqNorm_ite_eq, ENNReal.lqNorm_ite_le_eq,
   ENNReal.lqNorm_dyadicWeight_le_of_head_of_succ_le, ENNReal.lqNorm_dyadicWeight_le_of_shift,
   ENNReal.one_add_dyadicWeight_mul_ne_top}
 \leanok
@@ -393,7 +393,9 @@ $(b_{k,n})_{k \in K, n \in N_k}$ in $[0, \infty]$ has
 $\bigl\|\bigl(\|(b_{k,n})_{n \in N_k}\|_{\ell_p}\bigr)_{k \in K}\bigr\|_{\ell_p}^p
 = \sum_{k \in K} \sum_{n \in N_k} b_{k,n}^p$.
 The first two items, the bound $\|a\|_{\ell_r} \leq \|a\|_{\ell_q}$ of the fourth item and the
-sequence with one nonzero term of the seventh hold for all $0 < q \leq r \leq \infty$.
+sequence with one nonzero term of the seventh hold for all $0 < q \leq r \leq \infty$. For every
+$q \in (0, \infty]$, a sequence in $[0, \infty)$ that vanishes outside a finite set has finite
+$\ell_q$ norm.
 \end{lemma}
 
 \begin{proof}
@@ -417,7 +419,9 @@ $p$-th powers written as finite sums, and the iterated norm is
 $\|a\|_{\ell_p}^p = \sum_i a_i^p$ applied to the outer norm and to each inner norm. The proof
 of $\|a\|_{\ell_r} \leq \|a\|_{\ell_q}$ uses only $q > 0$, and the sequence equal to $c$ at $n$
 and to $0$ elsewhere has the $\ell_q$ norm $(c^q)^{1/q} = c$ for every $q \in (0, \infty)$ and
-the supremum $c$ for $q = \infty$.
+the supremum $c$ for $q = \infty$. A sequence in $[0, \infty)$ that vanishes outside a finite set
+$s$ has $\|a\|_{\ell_\infty} \leq \sum_{k \in s} a_k$ by the seventh item, and for
+$0 < q < \infty$ the $q$-th power of its norm is the finite sum $\sum_{k \in s} a_k^q$.
 \end{proof}
 
 The next lemma holds for every $q \in (0, \infty]$, also below $1$, and for families on any
@@ -1268,7 +1272,8 @@ This is the case $C_q = 1$ of \Cref{lem:dyadic-norm-below-one}, since $C_q = 1$ 
 \begin{proposition}[Linear structure]
 \label{prop:approx-linear}
 \lean{ApproximationScheme.approxNorm_smul, ApproximationScheme.enorm_le_approxNorm,
-  ApproximationScheme.approxNorm_eq_zero_iff, ApproximationScheme.approxNormDyadic_add_le,
+  ApproximationScheme.approxNorm_eq_zero_iff, ApproximationScheme.approxNormDyadic_add_le',
+  ApproximationScheme.approxNormDyadic_add_le,
   ApproximationScheme.approxNorm_add_le, ApproximationScheme.memApprox_of_mem,
   ApproximationScheme.approxSpace, ApproximationScheme.mem_approxSpace,
   ApproximationScheme.approxNorm_zero, ApproximationScheme.memApprox_zero,
@@ -1278,29 +1283,41 @@ This is the case $C_q = 1$ of \Cref{lem:dyadic-norm-below-one}, since $C_q = 1$ 
   ApproximationScheme.MemApprox.sub, ApproximationScheme.MemApprox.sum,
   ApproximationScheme.iUnion_subset_approxSpace}
 \leanok
-\uses{thm:dyadic-norm, lem:error-basic}
-Let $s \geq 0$ and $1 \leq q \leq \infty$. For all $f, g \in X$, $c \in \R$ and $m \in \N$:
+\uses{def:approx-space, def:dyadic-norm, lem:lq-quasi-triangle}
+Let $s \geq 0$, $0 < q \leq \infty$ and let $C_q$ be the constant of
+\Cref{lem:lq-quasi-triangle}. For all $f, g \in X$, $c \in \R$ and $m \in \N$:
 \begin{enumerate}
   \item $\|c f\|_{A^s_q} = |c| \, \|f\|_{A^s_q}$;
   \item $\|f\| \leq \|f\|_{A^s_q}$, and $\|f\|_{A^s_q} = 0$ only for $f = 0$;
-  \item $\|f + g\|^{\mathrm{dy}}_{A^s_q} \leq 2 \cdot 2^s \bigl(\|f\|^{\mathrm{dy}}_{A^s_q} +
+  \item $\|f + g\|^{\mathrm{dy}}_{A^s_q} \leq C_q (2 + 2^s C_q)
+    \bigl(\|f\|^{\mathrm{dy}}_{A^s_q} + \|g\|^{\mathrm{dy}}_{A^s_q}\bigr)$; if $q \geq 1$, then
+    $\|f + g\|^{\mathrm{dy}}_{A^s_q} \leq 2 \cdot 2^s \bigl(\|f\|^{\mathrm{dy}}_{A^s_q} +
     \|g\|^{\mathrm{dy}}_{A^s_q}\bigr)$ and
     $\|f + g\|_{A^s_q} \leq 8 \cdot 8^s \bigl(\|f\|_{A^s_q} + \|g\|_{A^s_q}\bigr)$;
   \item $A_m \subseteq A^s_q$;
   \item a scheme with larger sets has smaller quasi-norms and larger approximation spaces.
 \end{enumerate}
-In particular $A^s_q$ is a linear subspace of $X$. The second item holds for every
-$q \in (0, \infty]$.
+In particular $A^s_q$ is a linear subspace of $X$. The first bound of the third item holds for
+every $s \in \R$.
 \end{proposition}
 
 \begin{proof}
 \leanok
+\uses{lem:error-basic, thm:dyadic-norm, lem:dyadic-norm-below-one, lem:lq-basic}
 The first item follows from $E_n(cf) = |c| E_n(f)$, the second from the term $n = 0$, which
 is $E_0(f) = \|f\|$. For the third, $E_{2^{k+1}}(f + g) \leq E_{2^k}(f) + E_{2^k}(g)$ by
 \Cref{lem:error-basic}, so $2^{(k+1)s} E_{2^{k+1}}(f+g) \leq 2^s (2^{ks} E_{2^k}(f) +
-2^{ks} E_{2^k}(g))$; the term $k = 0$ is at most $\|f + g\|$, and Minkowski's inequality
-gives the dyadic bound. Pietsch's form follows by \Cref{thm:dyadic-norm}. For the fourth,
-$E_n(a) = 0$ for $a \in A_m$ and $n \geq m$, so only finitely many terms are nonzero.
+2^{ks} E_{2^k}(g))$, and the term $k = 0$ is at most $\|f + g\| \leq \|f\| + \|g\|$.
+Splitting off the term $k = 0$ and adding the two shifted sequences cost a factor $C_q$ each
+(\Cref{lem:lq-quasi-triangle}), so the dyadic quasi-norm of $f + g$ is at most
+$(1 + C_q)(\|f\| + \|g\|) + 2^s C_q^2 \bigl(\|(2^{ks} E_{2^k}(f))_k\|_{\ell_q} +
+\|(2^{ks} E_{2^k}(g))_k\|_{\ell_q}\bigr)$, and $1 + C_q \leq 2 C_q$. For $q \geq 1$, $C_q = 1$,
+and since $2^s \geq 1$ this bound is at most $2 \cdot 2^s$ times the sum of the two dyadic
+quasi-norms; Pietsch's form follows by \Cref{thm:dyadic-norm}. For the fourth,
+$E_n(a) = 0$ for $a \in A_m$ and $n \geq m$, so only finitely many terms of the dyadic sequence
+of $a$ are nonzero, and it lies in $\ell_q$ (\Cref{lem:lq-basic}). By
+\Cref{lem:dyadic-norm-below-one}, membership in $A^s_q$ is the finiteness of the dyadic
+quasi-norm, which gives the fourth item and, with the third, the linear structure.
 \end{proof}
 
 The constants are not optimised. The quasi-triangle inequality is all that is needed: Mathlib
@@ -1315,16 +1332,17 @@ function into $[0, \infty]$, in the way Mathlib treats $L_p$ through \texttt{eLp
   ApproximationScheme.approxSpace_subset_closure}
 \leanok
 \uses{def:dyadic-norm, lem:error-tendsto}
-Let $s > 0$ and $1 \leq q \leq \infty$. For every $f \in A^s_q$ and $k \in \N$,
+Let $s > 0$ and $0 < q \leq \infty$. For every $f \in A^s_q$ and $k \in \N$,
 $E_{2^k}(f) \leq 2^{-ks} \|f\|^{\mathrm{dy}}_{A^s_q}$, and $f$ lies in the closure of
-$\bigcup_n A_n$. The bound for $E_{2^k}(f)$ holds for every $q \in (0, \infty]$.
+$\bigcup_n A_n$.
 \end{lemma}
 
 \begin{proof}
 \leanok
-\uses{thm:dyadic-norm}
-The bound is $2^{ks} E_{2^k}(f) \leq \|(2^{js} E_{2^j}(f))_j\|_{\ell_q}$. It tends to zero,
-and \Cref{lem:error-tendsto} applies.
+\uses{lem:dyadic-norm-below-one}
+The bound is $2^{ks} E_{2^k}(f) \leq \|(2^{js} E_{2^j}(f))_j\|_{\ell_q}$. The right-hand side is
+finite by \Cref{lem:dyadic-norm-below-one}, so $E_{2^k}(f)$ tends to zero, and
+\Cref{lem:error-tendsto} applies.
 \end{proof}
 
 \begin{theorem}[Embeddings between approximation spaces]
@@ -1369,12 +1387,13 @@ two and the two comparisons of \Cref{thm:dyadic-norm}.
 \uses{lem:error-map, def:approx-space, def:dyadic-norm}
 Let $A$ and $B$ be approximation schemes in $X$ and $Y$, and let $T : X \to Y$ be a bounded
 linear map with $T(A_n) \subseteq B_n$ for all $n$. Then for all $s \in \R$,
-$1 \leq q \leq \infty$ and $f \in X$,
+$0 < q \leq \infty$ and $f \in X$,
 \[
   \|Tf\|_{B^s_q} \leq \|T\| \, \|f\|_{A^s_q}
   \qquad \text{and} \qquad
   \|Tf\|^{\mathrm{dy}}_{B^s_q} \leq \|T\| \, \|f\|^{\mathrm{dy}}_{A^s_q} .
 \]
+In particular $T$ maps $A^s_q$ into $B^s_q$.
 \end{lemma}
 
 \begin{proof}
@@ -5958,7 +5977,7 @@ couple,
 \]
 with $1/\infty = 0$, and the \emph{Besov space} $\Besov{s}{p}{q}(\Omega, S)$ consists of the
 $f \in L_p$ with $\|f\|_{\Besov{s}{p}{q}} < \infty$. For a topological space $\Omega$, an
-approximation scheme $T$ in $C_b(\Omega)$, $s \geq 0$ and $1 \leq q \leq \infty$, the
+approximation scheme $T$ in $C_b(\Omega)$, $s \geq 0$ and $0 < q \leq \infty$, the
 \emph{uniform Besov space} of $T$ is $A^s_q(C_b(\Omega), T)$.
 \end{definition}
 

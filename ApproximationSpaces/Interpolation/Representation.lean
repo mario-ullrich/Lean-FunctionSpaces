@@ -219,7 +219,7 @@ theorem memApprox_iff_memInterp_of_jacksonBound_of_liftBound {C₁ C₂ : ℝ}
 /-- **The representation theorem** as an equality of subspaces: `A^s_q = (X, Y)_{s/r,q}`. -/
 theorem approxSpace_eq_interpSpace {C₁ C₂ : ℝ} (hJ : JacksonBound ι A r C₁) (hC₁ : 0 ≤ C₁)
     (hB : LiftBound ι A r C₂) (hC₂ : 0 ≤ C₂) (hs : 0 < s) (hsr : s < r) (hq : 1 ≤ q) :
-    A.approxSpace s q hs.le hq = interpSpace ι (s / r) r q hq :=
+    A.approxSpace s q hs.le (zero_lt_one.trans_le hq).ne' = interpSpace ι (s / r) r q hq :=
   Submodule.ext fun _ =>
     memApprox_iff_memInterp_of_jacksonBound_of_liftBound hJ hC₁ hB hC₂ hs hsr hq
 
@@ -230,7 +230,8 @@ theorem approxSpace_eq_of_jackson_bernstein {B : ApproximationScheme X} {C₁ C�
     (hJA : JacksonBound ι A r C₁) (hC₁ : 0 ≤ C₁) (hBA : LiftBound ι A r C₂) (hC₂ : 0 ≤ C₂)
     (hJB : JacksonBound ι B r C₃) (hC₃ : 0 ≤ C₃) (hBB : LiftBound ι B r C₄) (hC₄ : 0 ≤ C₄)
     (hs : 0 < s) (hsr : s < r) (hq : 1 ≤ q) :
-    A.approxSpace s q hs.le hq = B.approxSpace s q hs.le hq := by
+    A.approxSpace s q hs.le (zero_lt_one.trans_le hq).ne' =
+      B.approxSpace s q hs.le (zero_lt_one.trans_le hq).ne' := by
   rw [approxSpace_eq_interpSpace hJA hC₁ hBA hC₂ hs hsr hq,
     approxSpace_eq_interpSpace hJB hC₃ hBB hC₄ hs hsr hq]
 

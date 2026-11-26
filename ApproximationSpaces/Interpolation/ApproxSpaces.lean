@@ -268,7 +268,8 @@ theorem memApprox_iff_memKMethod_reprCouple (hs : 0 < s) (hsr : s < r) (hq : 1 �
 `0 < s < r` and `1 ≤ q ≤ ∞`, the real interpolation space `(X, A^r_∞)_{s/r,q}` is `A^s_q`. -/
 theorem kMethodSpace_reprCouple (hs : 0 < s) (hsr : s < r) (hq : 1 ≤ q) :
     InterpCouple.kMethodSpace (isQuasiNormed_reprCouple (A := A) (hs.trans hsr).le)
-      isHomogeneousCouple_reprCouple (s / r) q = A.approxSpace s q hs.le hq :=
+      isHomogeneousCouple_reprCouple (s / r) q =
+        A.approxSpace s q hs.le (zero_lt_one.trans_le hq).ne' :=
   Submodule.ext fun _ => (memApprox_iff_memKMethod_reprCouple hs hsr hq).symm
 
 /-- The constant `2 · 2^s (1 + 2 · 2^r) 2^s (r log 2)^(-1/q)` of the bound of the dyadic
@@ -459,7 +460,8 @@ theorem kMethodSpace_approxCouple (hs₀ : 0 < s₀) (hs : s₀ < s₁) (hη : 0
     (hq₀ : 1 ≤ q₀) (hq₁ : 1 ≤ q₁) (hq : 1 ≤ q) :
     InterpCouple.kMethodSpace (isQuasiNormed_approxCouple (A := A) hs₀.le (hs₀.trans hs).le hq₀ hq₁)
       isHomogeneousCouple_approxCouple η q =
-      A.approxSpace ((1 - η) * s₀ + η * s₁) q (reiterationExponent_pos hs₀ hs hη hη').le hq :=
+      A.approxSpace ((1 - η) * s₀ + η * s₁) q (reiterationExponent_pos hs₀ hs hη hη').le
+        (zero_lt_one.trans_le hq).ne' :=
   Submodule.ext fun _ => memKMethod_approxCouple_iff hs₀ hs hη hη' hq₀ hq₁ hq
 
 /-- **The reiteration theorem for approximation spaces at the left endpoint**, as an equality of
@@ -468,7 +470,8 @@ subspaces: for `s₁ > 0`, `0 < η < 1` and `1 ≤ q₁, q ≤ ∞`, the real in
 theorem kMethodSpace_approxCouple_zero (hs₁ : 0 < s₁) (hη : 0 < η) (hη' : η < 1)
     (hq₁ : 1 ≤ q₁) (hq : 1 ≤ q) :
     InterpCouple.kMethodSpace (isQuasiNormed_leftApproxCouple (A := A) hs₁.le hq₁)
-      isHomogeneousCouple_leftApproxCouple η q = A.approxSpace (η * s₁) q (mul_pos hη hs₁).le hq :=
+      isHomogeneousCouple_leftApproxCouple η q =
+        A.approxSpace (η * s₁) q (mul_pos hη hs₁).le (zero_lt_one.trans_le hq).ne' :=
   Submodule.ext fun _ => memKMethod_approxCouple_zero_iff hs₁ hη hη' hq₁ hq
 
 /-! ### Sandwiches -/

@@ -117,7 +117,9 @@ theorem MemApprox.mono (hq : 1 ≤ q) (hr : 1 ≤ r) (ht : 0 ≤ t)
 
 /-- The approximation spaces decrease in `s` and increase in `q`, as submodules. -/
 theorem approxSpace_mono (hq : 1 ≤ q) (hr : 1 ≤ r) (ht : 0 ≤ t) (hs : 0 ≤ s)
-    (h : t < s ∨ (t = s ∧ q ≤ r)) : A.approxSpace s q hs hq ≤ A.approxSpace t r ht hr :=
+    (h : t < s ∨ (t = s ∧ q ≤ r)) :
+    A.approxSpace s q hs (zero_lt_one.trans_le hq).ne' ≤
+      A.approxSpace t r ht (zero_lt_one.trans_le hr).ne' :=
   fun _ hf => MemApprox.mono hq hr ht h hf
 
 /-- For `0 ≤ t < s`, the dyadic series `∑ₖ 2^(kt) E_{2^k}(f)` converges for `f ∈ A^s_q`.  This

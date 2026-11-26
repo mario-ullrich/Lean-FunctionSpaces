@@ -46,11 +46,15 @@ theory.
   factors `C_q` and `C_q²`, where `C_q = 2^(1/q - 1)` is the constant of the quasi-triangle
   inequality in `ℓ_q` (`ApproximationScheme.approxNorm_le_approxNormDyadic'`,
   `.approxNormDyadic_le_approxNorm'`, `.memApprox_iff_lqNorm_dyadic_lt_top'`).
-* **Linear structure.** For `s ≥ 0` and `1 ≤ q ≤ ∞`, `A^s_q` is a linear subspace of `X`
-  containing every `A_n`, `‖f‖ ≤ ‖f‖_{A^s_q}`, and
-  `‖f + g‖_{A^s_q} ≤ 8 · 8^s (‖f‖_{A^s_q} + ‖g‖_{A^s_q})`
+* **Linear structure.** For `s ≥ 0` and `0 < q ≤ ∞`, `A^s_q` is a linear subspace of `X`
+  containing every `A_n`, `‖f‖ ≤ ‖f‖_{A^s_q}`, and the dyadic quasi-norm
+  `‖f‖^dy = ‖f‖ + ‖(2^(ks) E_{2^k}(f))_k‖_{ℓ_q}` satisfies
+  `‖f + g‖^dy ≤ C_q (2 + 2^s C_q) (‖f‖^dy + ‖g‖^dy)`, with the constant `C_q` of the
+  quasi-triangle inequality in `ℓ_q`, `2^(1/q - 1)` for `q < 1` and `1` for `q ≥ 1`
   (`ApproximationScheme.approxSpace`, `.memApprox_of_mem`, `.enorm_le_approxNorm`,
-  `.approxNorm_add_le`). For `s > 0` it lies in the closure of `⋃ A_n`
+  `.approxNormDyadic_add_le'`). For `1 ≤ q ≤ ∞`,
+  `‖f + g‖_{A^s_q} ≤ 8 · 8^s (‖f‖_{A^s_q} + ‖g‖_{A^s_q})` (`.approxNorm_add_le`). For `s > 0`
+  the space lies in the closure of `⋃ A_n`
   (`ApproximationScheme.mem_closure_iUnion_of_memApprox`).
 * **Embeddings.** For `0 ≤ t` and `1 ≤ q, r ≤ ∞`, `A^s_q ⊆ A^t_r` whenever `t < s`, or
   `t = s` and `q ≤ r` (`ApproximationScheme.MemApprox.mono`); for `t < s` the norm bound is
@@ -323,7 +327,7 @@ Paths are relative to `ApproximationSpaces/`, without `.lean`.
 | Cauchy condensation with power weights, `n ≥ 1` written as `2^k + i` with `0 ≤ i < 2^k` and series split into dyadic blocks, the dyadic sum `∑_j min(2^j a, (2^j a)⁻¹) ≤ 4`, Pietsch's weights against the dyadic ones for a decreasing sequence, finitely many changed terms, sums over the dyadic scales of an annulus, the interpolation inequality for dyadic suprema (Brezis–Mironescu) | ✅ | ✗ | `Sequences/Dyadic` |
 | Decreasing rearrangement, layer cake formula for sums | ✅ | ✗ | `Sequences/Rearrangement` |
 | Countable Minkowski inequality, monotone convergence and truncations in `ℓ_q`, window sums in `ℓ_q`, discrete Hardy inequalities, almost diagonal sums and their constant, the Hardy and almost diagonal bounds for `0 < q ≤ 1`, Hardy's inequalities for every exponent, Hardy's inequalities for tails and for partial sums in `ρ`-th powers, powers inside `ℓ_q` norms, shift invariance and geometric convolutions on `ℤ` | ✅ | ✗ | `Sequences/Hardy` |
-| `A^s_q` and its dyadic quasi-norm for `q > 0`, linear structure for `q ≥ 1` | ✅ | ✗ | `Norm`, `Dyadic`, `Space` |
+| `A^s_q`, its dyadic quasi-norm and its linear structure for `q > 0` | ✅ | ✗ | `Norm`, `Dyadic`, `Space` |
 | Embeddings `A^s_q ↪ A^t_r` and functoriality | ✅ | ✗ | `Embedding`, `Transfer` |
 | Telescoping lift, Bernstein gives `A^β_1 ↪ Y`, Nikolskii transfer theorem | ✅ | ✗ | `Lift`, `Nikolskii` |
 | K-functional, real interpolation, representation theorem | ✅ | ✗ | `Interpolation/KFunctional`, `Interpolation/Representation` |

@@ -59,12 +59,13 @@ open scoped ENNReal BoundedContinuousFunction
 
 namespace FunctionScheme
 
-/-- The **uniform Besov space** of an approximation scheme `T` of bounded continuous functions:
-the approximation space of `T` in the sup norm, a space of bounded continuous functions. -/
+/-- The **uniform Besov space** of an approximation scheme `T` of bounded continuous functions,
+for `s ≥ 0` and `0 < q ≤ ∞`: the approximation space of `T` in the sup norm, a space of bounded
+continuous functions. -/
 noncomputable abbrev besovSpaceSup {Ω : Type*} [TopologicalSpace Ω]
-    (T : ApproximationScheme (Ω →ᵇ ℂ)) (s : ℝ) (q : ℝ≥0∞) (hs : 0 ≤ s) (hq : 1 ≤ q) :
+    (T : ApproximationScheme (Ω →ᵇ ℂ)) (s : ℝ) (q : ℝ≥0∞) (hs : 0 ≤ s) (hq0 : q ≠ 0) :
     Submodule ℝ (Ω →ᵇ ℂ) :=
-  T.approxSpace s q hs hq
+  T.approxSpace s q hs hq0
 
 variable {Ω : Type*} [MeasurableSpace Ω] {μ : Measure Ω} [IsFiniteMeasure μ]
   (S : FunctionScheme μ) (p : ℝ≥0∞)

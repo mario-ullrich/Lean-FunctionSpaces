@@ -57,7 +57,7 @@ of at most `n` elements of a dictionary. The error of best approximation of `f �
 
 `E_n(f) = inf { ‖f - a‖ : a ∈ A n }`.
 
-**Approximation spaces.** For a smoothness `s > 0` and a fine index `1 ≤ q ≤ ∞`, the space
+**Approximation spaces.** For a smoothness `s > 0` and a fine index `0 < q ≤ ∞`, the space
 `A^s_q` consists of the `f` whose errors decay at the rate `n^(-s)`, measured in `ℓ_q`:
 
 `‖f‖_{A^s_q} = ‖(n^(s - 1/q) E_{n-1}(f))_{n ≥ 1}‖_{ℓ_q} < ∞`.
@@ -71,7 +71,7 @@ approximated. Bernstein's inequality says that approximants are smooth, with con
 of controlled size. The K-method builds from it the interpolation spaces `(X, Y)_{θ,q}`. Under
 Jackson's and Bernstein's inequalities of order `r`, the representation theorem gives
 
-`A^s_q = (X, Y)_{s/r,q}`   for `0 < s < r`.
+`A^s_q = (X, Y)_{s/r,q}`   for `0 < s < r` and `1 ≤ q ≤ ∞`.
 
 Hence theorems about interpolation spaces, such as the reiteration theorem, apply to
 approximation spaces.
@@ -127,7 +127,8 @@ in the root namespace.
 * `ApproximationSpaces.Dyadic`: the equivalent dyadic quasi-norm
   `‖f‖ + ‖(2^(ks) E_{2^k}(f))_k‖_{ℓ_q}`, `approxNormDyadic`, the working norm of all later files;
   the equivalence holds for every `q ∈ (0, ∞]` (`memApprox_iff_approxNormDyadic_lt_top'`).
-* `ApproximationSpaces.Space`: the quasi-triangle inequality and `A^s_q` as a submodule of `X`,
+* `ApproximationSpaces.Space`: the quasi-triangle inequality for every `q`
+  (`approxNormDyadic_add_le'`) and `A^s_q` as a submodule of `X` for `s ≥ 0` and `0 < q ≤ ∞`,
   `approxSpace`.
 
 ### Sequence spaces (`Sequences/`)

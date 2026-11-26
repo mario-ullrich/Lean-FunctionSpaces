@@ -215,10 +215,10 @@ theorem approxNormDyadic_top_le_of_mem {k : ℕ} {a : X} (ha : a ∈ A (2 ^ k)) 
       approxError_eq_zero_of_mem (mem_of_le (Nat.pow_le_pow_right two_pos hj) ha), mul_zero]
     exact zero_le
 
-/-- For `f ∈ A^s_q` with `s > 0`, the dyadic errors `E_{2^k}(f)` tend to zero. -/
-theorem tendsto_approxError_pow_zero_of_memApprox (hq : 1 ≤ q) (hs : 0 < s) {f : X}
+/-- For `f ∈ A^s_q` with `s > 0` and `0 < q ≤ ∞`, the dyadic errors `E_{2^k}(f)` tend to zero. -/
+theorem tendsto_approxError_pow_zero_of_memApprox (hq0 : q ≠ 0) (hs : 0 < s) {f : X}
     (hf : A.MemApprox s q f) : Tendsto (fun k => A.approxError f (2 ^ k)) atTop (𝓝 0) := by
-  have hD := (memApprox_iff_lqNorm_dyadic_lt_top hq hs.le).1 hf
+  have hD := (memApprox_iff_lqNorm_dyadic_lt_top' hq0 hs.le).1 hf
   set D := lqNorm q (A.approxSeqDyadic s f)
   have hgeom : Tendsto (fun k => D * ((2 : ℝ≥0∞) ^ (-s)) ^ k) atTop (𝓝 0) := by
     simpa using ENNReal.Tendsto.const_mul
@@ -227,12 +227,12 @@ theorem tendsto_approxError_pow_zero_of_memApprox (hq : 1 ≤ q) (hs : 0 < s) {f
   exact tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds hgeom (fun _ => bot_le)
     fun k => by
       rw [mul_comm, ← ENNReal.dyadicWeight_eq_pow]
-      exact approxError_pow_le (zero_lt_one.trans_le hq).ne' f k
+      exact approxError_pow_le hq0 f k
 
-/-- **`A^s_q` lies in the closure of `⋃ A n`** for `s > 0`. -/
-theorem mem_closure_iUnion_of_memApprox (hq : 1 ≤ q) (hs : 0 < s) {f : X}
+/-- **`A^s_q` lies in the closure of `⋃ A n`** for `s > 0` and `0 < q ≤ ∞`. -/
+theorem mem_closure_iUnion_of_memApprox (hq0 : q ≠ 0) (hs : 0 < s) {f : X}
     (hf : A.MemApprox s q f) : f ∈ closure (⋃ n, A n) :=
   (tendsto_approxError_zero_iff f).1
-    (tendsto_approxError_zero_of_pow (tendsto_approxError_pow_zero_of_memApprox hq hs hf))
+    (tendsto_approxError_zero_of_pow (tendsto_approxError_pow_zero_of_memApprox hq0 hs hf))
 
 end ApproximationScheme

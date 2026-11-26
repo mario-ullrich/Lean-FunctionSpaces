@@ -298,7 +298,7 @@ theorem MemBesov.exists_boundedContinuous_of_nikolskii [TopologicalSpace Ω] [Bo
   have htop : S.MemBesov ∞ (s - D * p.toReal⁻¹) ∞ g :=
     hmem.mono hq0 (sub_pos.2 hs).le (Or.inr ⟨rfl, le_top⟩)
   have hcl : g ∈ closure (⋃ n, S.toLp ∞ n) :=
-    ApproximationScheme.mem_closure_iUnion_of_memApprox le_top (sub_pos.2 hs)
+    ApproximationScheme.mem_closure_iUnion_of_memApprox ENNReal.top_ne_zero (sub_pos.2 hs)
       (memBesov_iff_memApprox.1 htop)
   have hsub : (⋃ n, S.toLp ∞ n) ⊆
       Set.range (BoundedContinuousFunction.toLp (E := ℂ) ∞ μ ℝ : (Ω →ᵇ ℂ) → Lp ℂ ∞ μ) := by

@@ -175,7 +175,7 @@ theorem DyadicApprox.hasSum_blockSeq [CompleteSpace X] (hs : 0 < s) (hq : 1 ≤ 
     HasSum D.blockSeq f := by
   have hsum : Summable D.blockSeq :=
     Summable.of_enorm (D.tsum_enorm_blockSeq_ne_top hs hq hf ht htsum)
-  have he := tendsto_approxError_pow_zero_of_memApprox hq hs hf
+  have he := tendsto_approxError_pow_zero_of_memApprox (zero_lt_one.trans_le hq).ne' hs hf
   have h2 : Tendsto (fun K => ∑ j ∈ range (K + 2), D.blockSeq j) atTop (𝓝 (∑' k, D.blockSeq k)) :=
     hsum.hasSum.tendsto_sum_nat.comp (tendsto_add_atTop_nat 2)
   simp_rw [D.sum_range_blockSeq] at h2

@@ -275,7 +275,7 @@ theorem limitTrace_eq_of_mem [CompleteSpace Y] (hβ : 0 ≤ β) {m : ℕ} {a : X
   have hc : ∀ k, a ∈ A (2 ^ (k + m)) := fun k =>
     A.mem_of_le ((Nat.lt_two_pow_self).le.trans
       (Nat.pow_le_pow_right two_pos (Nat.le_add_left m k))) ha
-  have h := TB.tendsto_limitTrace hβ (memApprox_of_mem le_rfl hβ ha) hc (by simp)
+  have h := TB.tendsto_limitTrace hβ (memApprox_of_mem one_ne_zero hβ ha) hc (by simp)
   exact tendsto_nhds_unique h tendsto_const_nhds
 
 /-- The trace of `0` is `0`. -/
@@ -302,7 +302,7 @@ theorem limitTrace_add [CompleteSpace Y] (hβ : 0 ≤ β) {f g : X} (hf : A.MemA
       _ ≤ dyadicWeight β k * (‖f - Df.a k‖ₑ + ‖g - Dg.a k‖ₑ) := by
           gcongr; exact enorm_add_le _ _
       _ = _ := mul_add _ _ _
-  have h1 := TB.tendsto_limitTrace hβ (MemApprox.add le_rfl hβ hf hg) hc hlim
+  have h1 := TB.tendsto_limitTrace hβ (MemApprox.add one_ne_zero hβ hf hg) hc hlim
   have h2 : Tendsto (fun k => TB.T (Df.a k + Dg.a k)) atTop
       (𝓝 (TB.limitTrace f + TB.limitTrace g)) := by
     simp_rw [map_add]
@@ -328,7 +328,7 @@ theorem limitTrace_smul [CompleteSpace Y] (hβ : 0 ≤ β) {f : X} (hf : A.MemAp
 
 /-- The trace as a linear map on `A^β_1`. -/
 noncomputable def limitTraceLinear [CompleteSpace Y] (hβ : 0 ≤ β) :
-    A.approxSpace β 1 hβ le_rfl →ₗ[ℝ] Y where
+    A.approxSpace β 1 hβ one_ne_zero →ₗ[ℝ] Y where
   toFun f := TB.limitTrace f
   map_add' f g := TB.limitTrace_add hβ (mem_approxSpace.1 f.2) (mem_approxSpace.1 g.2)
   map_smul' r f := TB.limitTrace_smul hβ (mem_approxSpace.1 f.2) r

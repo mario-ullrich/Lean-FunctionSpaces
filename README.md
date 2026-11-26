@@ -45,13 +45,14 @@ continuous positive density in every chart.
 An approximation scheme in a normed space `X` is a sequence of sets `{0} = A_0 ⊆ A_1 ⊆ ⋯` with
 `c A_n ⊆ A_n` and `A_m + A_n ⊆ A_{m+n}`. With the error of best approximation
 `E_n(f) = inf { ‖f - a‖ : a ∈ A_n }`, the approximation space `A^s_q` consists of the `f` with
-`(n^(s - 1/q) E_{n-1}(f))_{n ≥ 1} ∈ ℓ_q` (Pietsch 1981). For trigonometric polynomials, splines,
-band-limited functions, wavelets and eigenfunctions these are Besov spaces. On a finite measure
-space, a scheme of essentially bounded functions has Besov spaces `B^s_{p,q}` for every
-`0 < p ≤ ∞` and `0 < q ≤ ∞`, with the error of best approximation in the quasi-norm `‖·‖_p`; for
-`p ≥ 1` they are its approximation spaces in `L_p`. The torus and the dyadic step functions on
-`[0, 1)` are the concrete instances of its Nikolskii theory; filtrations and eigenbases use its
-martingale and spectral parts, and the other characterisations are proved in their settings.
+`(n^(s - 1/q) E_{n-1}(f))_{n ≥ 1} ∈ ℓ_q` (Pietsch 1981); for `s ≥ 0` and `0 < q ≤ ∞` it is a linear
+subspace of `X`. For trigonometric polynomials, splines, band-limited functions, wavelets and
+eigenfunctions these are Besov spaces. On a finite measure space, a scheme of essentially bounded
+functions has Besov spaces `B^s_{p,q}` for every `0 < p ≤ ∞` and `0 < q ≤ ∞`, with the error of best
+approximation in the quasi-norm `‖·‖_p`; for `p ≥ 1` they are its approximation spaces in `L_p`. The
+torus and the dyadic step functions on `[0, 1)` are the concrete instances of its Nikolskii theory;
+filtrations and eigenbases use its martingale and spectral parts, and the other characterisations
+are proved in their settings.
 
 ## Why several descriptions
 

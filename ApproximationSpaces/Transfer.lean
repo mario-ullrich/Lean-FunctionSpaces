@@ -58,10 +58,10 @@ theorem MemApprox.map (T : X →L[ℝ] Y) (hT : ∀ n, ∀ a ∈ A n, T a ∈ B 
     (hf : A.MemApprox s q f) : B.MemApprox s q (T f) :=
   (approxNorm_map_le T hT f).trans_lt (ENNReal.mul_lt_top enorm_lt_top hf)
 
-/-- The image of `A^s_q(X)` under `T` lies in `B^s_q(Y)`. -/
-theorem approxSpace_map_le (hs : 0 ≤ s) (hq : 1 ≤ q) (T : X →L[ℝ] Y)
+/-- The image of `A^s_q(X)` under `T` lies in `B^s_q(Y)`, for `s ≥ 0` and `0 < q ≤ ∞`. -/
+theorem approxSpace_map_le (hs : 0 ≤ s) (hq0 : q ≠ 0) (T : X →L[ℝ] Y)
     (hT : ∀ n, ∀ a ∈ A n, T a ∈ B n) :
-    (A.approxSpace s q hs hq).map T.toLinearMap ≤ B.approxSpace s q hs hq := by
+    (A.approxSpace s q hs hq0).map T.toLinearMap ≤ B.approxSpace s q hs hq0 := by
   rintro _ ⟨f, hf, rfl⟩
   exact MemApprox.map T hT hf
 

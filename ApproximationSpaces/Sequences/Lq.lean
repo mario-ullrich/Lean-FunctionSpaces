@@ -390,6 +390,23 @@ theorem lqNorm_le_sum_of_eq_zero (hq : 1 ≤ q) (s : Finset ι) (ha : ∀ i ∉ 
     lqNorm q a ≤ ∑ i ∈ s, a i :=
   (lqNorm_le_lqNorm_one hq a).trans_eq (tsum_eq_sum ha)
 
+/-- A family that vanishes outside a finite set `s` and is finite on `s` has finite `ℓ_q` norm,
+for every `q`, also for `0 < q < 1`: for `q = ∞` the norm is at most `∑_{i ∈ s} a_i`
+(`ENNReal.lqNorm_le_sum_of_eq_zero`), and for `0 < q < ∞` its `q`-th power is the finite sum
+`∑_{i ∈ s} a_i^q` (`ENNReal.lqNorm_rpow`). -/
+theorem lqNorm_lt_top_of_eq_zero (s : Finset ι) (ha : ∀ i ∉ s, a i = 0)
+    (hfin : ∀ i ∈ s, a i ≠ ∞) : lqNorm q a < ∞ := by
+  rcases eq_or_ne q 0 with rfl | hq0
+  · rw [lqNorm_zero_left]
+    exact ENNReal.zero_lt_top
+  rcases eq_or_ne q ∞ with rfl | hq
+  · exact (lqNorm_le_sum_of_eq_zero le_top s ha).trans_lt
+      (ENNReal.sum_lt_top.2 fun i hi => (hfin i hi).lt_top)
+  have hq' : 0 < q.toReal := ENNReal.toReal_pos hq0 hq
+  rw [← ENNReal.rpow_lt_top_iff_of_pos hq', lqNorm_rpow hq0 hq,
+    tsum_eq_sum (s := s) fun i hi => by rw [ha i hi, ENNReal.zero_rpow_of_pos hq']]
+  exact ENNReal.sum_lt_top.2 fun i hi => ENNReal.rpow_lt_top_of_nonneg hq'.le (hfin i hi)
+
 /-- For a finite index set, `‖a‖_{ℓ_q} = (∑_i a_i^q)^(1/q)` for `0 < q < ∞`. -/
 theorem lqNorm_eq_sum [Fintype ι] (hq0 : q ≠ 0) (hq : q ≠ ∞) (a : ι → ℝ≥0∞) :
     lqNorm q a = (∑ i, a i ^ q.toReal) ^ (1 / q.toReal) := by
