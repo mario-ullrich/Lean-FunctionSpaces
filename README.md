@@ -21,13 +21,20 @@ files and contains no `sorry`.
 
 ## The setting
 
-Let `1 ≤ p < ∞`, `1 ≤ q ≤ ∞`, `s > 0` and `r > s` an integer. The Besov space `B^s_{p,q}(ℝ^d)`
-consists of the `f ∈ L_p(ℝ^d)` with `‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k))_p)_{k ≥ 0}‖_{ℓ_q} < ∞`,
-where `ω_r(f, t)_p = sup_{|h| ≤ t} ‖Δ_h^r f‖_p`. The Triebel–Lizorkin space `F^s_{p,q}(ℝ^d)`
-takes the `ℓ_q` norm of the Littlewood–Paley blocks `ψ_j ⋆ f` at each point before the `L_p`
-norm. The Sobolev space `W^m_p` consists of the functions whose weak derivatives up to order `m`
-lie in `L_p`, and the Bessel potential space `H^{s,p}` is Mathlib's space of the tempered
-distributions `u` with `(1 - Δ)^{s/2} u ∈ L_p`. Throughout, `ℕ = {0, 1, 2, …}`.
+The project treats the classical spaces of smooth functions: the Besov spaces `B^s_{p,q}`, the
+Triebel–Lizorkin spaces `F^s_{p,q}`, the Sobolev spaces `W^m_p` and the Bessel potential spaces
+`H^{s,p}`. These spaces can be characterized by
+
+* finite differences (moduli of smoothness), on `ℝ^d` or inside a domain,
+* Littlewood–Paley blocks, local means and ball means,
+* atomic decompositions,
+* wavelet coefficients, Fourier coefficients and eigenfunction expansions,
+* weak derivatives and Bessel potentials,
+* best approximation by a fixed scheme,
+* real interpolation,
+* restrictions of spaces on `ℝ^d` and pieces in charts,
+
+depending on the choice of parameters and the domain.
 
 The spaces are studied in these settings:
 
@@ -68,7 +75,8 @@ Each table collects descriptions of one kind of space. A row names a description
 setting in it links to the blueprint statement that proves the description equivalent to another
 one of the same space; the blueprint names the Lean declarations. Throughout `1 ≤ q ≤ ∞`, and
 `1 ≤ p < ∞` unless an entry says otherwise. Ranges `0 < s < r` or `0 < s < L` refer to
-differences, local means or atoms of order `r` or `L`. The blueprint chapter
+differences, local means or atoms of order `r` or `L`. The modulus of smoothness of order `r` is
+`ω_r(f, t)_p = sup_{|h| ≤ t} ‖Δ_h^r f‖_p`, and `ℕ = {0, 1, 2, …}`. The blueprint chapter
 [The representations of Besov spaces][representations] explains what each description measures
 and how they differ.
 
@@ -208,9 +216,9 @@ gives the central statements of one area. The block documents listed under
 [Organisation](#organisation) state every result with its Lean name.
 
 * **Besov spaces on `ℝ^d`.** Let `1 ≤ p < ∞`, `1 ≤ q ≤ ∞` and `0 < s < r`. For `f ∈ L_p(V)` these
-  are equivalent: `f ∈ A^s_q` of the band-limited functions; `‖(2^(js) ‖ψ_j ⋆ f‖_p)_j‖_{ℓ_q} < ∞`;
-  `‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞` (`Rd.memApprox_bandScheme_iff_modulus`,
-  `Rd.littlewoodPaleyNorm_lt_top_iff_modulus`).
+  are equivalent: `f ∈ A^s_q` of the band-limited functions; `‖(2^(js) ‖ψ_j ⋆ f‖_p)_j‖_{ℓ_q} < ∞`
+  for the Littlewood–Paley blocks `ψ_j ⋆ f`; `‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞`
+  (`Rd.memApprox_bandScheme_iff_modulus`, `Rd.littlewoodPaleyNorm_lt_top_iff_modulus`).
 * **Daubechies wavelets.** Let `1 ≤ p < ∞` and `1 ≤ q ≤ ∞`, let `φ`, `ψ` be the scaling
   function and wavelet of a mask of order `N ≥ 2` with `ω_N(φ, t)_p ≤ K t^θ` for `0 < t ≤ 1`,
   `Φ = φ ⊗ ⋯ ⊗ φ` and, for nonempty `e ⊆ {1, …, d}`, `Ψ^e` the tensor product with `ψ` in the
