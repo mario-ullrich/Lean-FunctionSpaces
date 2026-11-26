@@ -26,6 +26,33 @@ powers (`MeasureTheory.eLpNorm_rpow_eq`).
 
 ## Main results
 
+* **`L_p` for every `0 < p ≤ ∞`.** Let `(X, μ)` be a measure space, `0 < p ≤ ∞` and
+  `ρ = min(1, p)`. Then `‖f + g‖_p^ρ ≤ ‖f‖_p^ρ + ‖g‖_p^ρ` (`MeasureTheory.eLpNorm_add_rpow_min_le`),
+  Mathlib's triangle inequality for `inhmgELpNorm f p μ = ‖f‖_p^ρ`
+  (`MeasureTheory.inhmgELpNorm_eq_eLpNorm_rpow_min`). If almost everywhere strongly measurable
+  `u_n` tend to `g` in measure, then
+  `‖g - u_k‖_r^(ρ_r) ≤ ∑_{i ≥ 0} ‖u_{k+i+1} - u_{k+i}‖_r^(ρ_r)` for every `0 < r ≤ ∞` and
+  `ρ_r = min(1, r)`, by Fatou's lemma along an almost everywhere convergent subsequence
+  (`MeasureTheory.eLpNorm_sub_rpow_min_le_tsum`). A series with `∑_i ‖g_i‖_p^ρ < ∞` converges
+  absolutely almost everywhere (`MeasureTheory.summable_norm_of_tsum_eLpNorm_rpow_min_ne_top`),
+  and if `∑_k g_k = f` almost everywhere, then
+  `‖f - ∑_{k<n} g_k‖_p^ρ ≤ ∑_{i ≥ 0} ‖g_{n+i}‖_p^ρ`, so the partial sums converge to `f` in `L_p`
+  (`MeasureTheory.eLpNorm_sub_sum_rpow_min_le_tsum_of_ae_hasSum`,
+  `MeasureTheory.tendsto_eLpNorm_sub_sum_of_ae_hasSum`). Every function satisfies `|f| ≤ ‖f‖_∞`
+  almost everywhere (`MeasureTheory.ae_enorm_le_eLpNorm_top`), and `‖f‖_∞ ≤ M ‖f‖_p` gives
+  `‖f‖_r ≤ M^(1 - p/r) ‖f‖_p` for `p ≤ r ≤ ∞`; an almost everywhere bound `N < ∞` of `|f|` with
+  `N ≤ M ‖f‖_{p₀}`, `p₀ < ∞`, gives `N ≤ M^(p₀/p) ‖f‖_p` for `0 < p ≤ p₀` (Ditzian–Prymak;
+  `MeasureTheory.eLpNorm_le_of_eLpNorm_top_le`,
+  `MeasureTheory.le_rpow_mul_eLpNorm_of_ae_enorm_le`). Near-best sequences transfer from `L_p`
+  to `L_r`: if almost everywhere strongly measurable `b_k` satisfy `‖f - b_k‖_p ≤ e_k` with `e`
+  decreasing to `0` and `‖b_{k+1} - b_k‖_r ≤ C 2^(kβ) ‖b_{k+1} - b_k‖_p`, then
+  `‖f - b_k‖_r^(ρ_r) ≤ (C 2^(1/ρ))^(ρ_r) ∑_{i ≥ 0} (2^((k+i)β) e_{k+i})^(ρ_r)` for every
+  `0 < p, r ≤ ∞` (`MeasureTheory.eLpNorm_sub_rpow_min_le_tsum_of_nearBest`), and Hardy's
+  inequality for tails gives
+  `‖(2^(k(s-β)) ‖f - b_k‖_r)_k‖_{ℓ_q} ≤ C 2^(1/ρ) H^(1/ρ_r) ‖(2^(ks) e_k)_k‖_{ℓ_q}` with a
+  constant `H` finite for `s > β` (`MeasureTheory.lqNorm_eLpNorm_sub_le_of_nearBest`). These are
+  the tools of the Besov spaces of a scheme for `0 < p ≤ ∞` in
+  [Besov and Sobolev spaces on measure spaces](MeasureSpaces.md).
 * **Mixed norms.** Let `(X, μ)` be a measure space and `g_i : X → [0, ∞]` measurable functions
   indexed by a countable set, with the mixed norms
   `‖g‖_{L_p(ℓ_q)} = ‖ x ↦ ‖(g_i(x))_i‖_{ℓ_q} ‖_p` and `‖g‖_{ℓ_q(L_p)} = ‖(‖g_i‖_p)_i‖_{ℓ_q}`.

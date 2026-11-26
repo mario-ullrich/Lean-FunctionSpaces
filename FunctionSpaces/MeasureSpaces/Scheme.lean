@@ -33,9 +33,9 @@ satisfy `c S^(p)_n ⊆ S^(p)_n`, `-S^(p)_n ⊆ S^(p)_n` and `S^(p)_m + S^(p)_n �
 **The scheme in the normed `L_p`.** For `1 ≤ p ≤ ∞` the sets `S^(p)_n` form an approximation
 scheme `S^(p)` in the normed space `L_p(μ)` (`FunctionScheme.toLp`, `FunctionScheme.toLp_sets`).
 The inclusion `L_r ↪ L_p` maps `S^(r)` onto `S^(p)` (`FunctionScheme.image_toLp_of_le`), and the
-preimage of `S^(p)` is `S^(r)` (`FunctionScheme.comap_toLp_of_le`): the scheme pulled back along
-`L_r ↪ L_p` in the abstract Nikolskii transfer theorem
-(`ApproximationScheme.exists_preimage_approxNormDyadic_le_of_nikolskii`) is `S^(r)`.
+preimage of `S^(p)` is `S^(r)` (`FunctionScheme.comap_toLp_of_le`), the pulled-back scheme of the
+abstract Nikolskii transfer theorem of `ApproximationSpaces.Nikolskii`
+(`ApproximationScheme.exists_preimage_approxNormDyadic_le_of_nikolskii`).
 
 **Schemes of bounded continuous functions.** On a topological space `Ω` with its Borel
 `σ`-algebra, an approximation scheme `T` of bounded continuous functions gives a scheme of

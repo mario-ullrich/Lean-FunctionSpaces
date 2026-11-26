@@ -64,8 +64,9 @@ theorem toReal_eLpNorm_top_le_norm {α E : Type*} [MeasurableSpace α] {μ : Mea
 /-- **The `L_p` quasi-norm of a bounded continuous function**: for a finite measure `μ` on `Ω`,
 every exponent `p` and every bounded continuous `b`, the class `ι_{∞,p}(b)` of `b` in `L_p(μ)`,
 taken through `L_∞(μ)`, satisfies `‖ι_{∞,p}(b)‖_p ≤ μ(Ω)^(1/p) ‖b‖_∞`, since `b` is bounded by
-its sup norm everywhere (`MeasureTheory.eLpNorm_le_of_ae_enorm_bound`). For `1 ≤ p` this is
-Mathlib's `BoundedContinuousFunction.Lp_nnnorm_le`. -/
+its sup norm everywhere (`MeasureTheory.eLpNorm_le_of_ae_enorm_bound`). This is the `[0, ∞]`
+form, along `L_∞ ↪ L_p`, of Mathlib's `BoundedContinuousFunction.Lp_nnnorm_le`, which holds for
+every exponent. -/
 theorem eLpNorm_topInclusion_toLp_le {α E 𝕜 : Type*}
     [MeasurableSpace α] {μ : Measure α} [TopologicalSpace α] [BorelSpace α] [NormedAddCommGroup E]
     [SecondCountableTopologyEither α E] [NontriviallyNormedField 𝕜] [NormedSpace 𝕜 E]

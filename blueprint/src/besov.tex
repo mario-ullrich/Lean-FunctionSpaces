@@ -104,7 +104,9 @@ Each table lists the descriptions that are shown to agree in one setting, the sm
 the statement, and the result. A range $0 \leq s < \theta$ or $0 < s < \theta$ is the range of
 the cited statement; outside it the descriptions may differ (\Cref{sec:differences}).
 
-\paragraph{Abstract schemes.} Here $A$ is an approximation scheme in a normed space $X$.
+\paragraph{Abstract schemes.} Here $A$ is an approximation scheme in a normed space $X$; the rows
+on Besov spaces of a scheme of functions concern a scheme of essentially bounded functions on a
+finite measure space, with $L_p$ quasi-normed for $p < 1$ (\Cref{def:besov}).
 
 \begin{center}
 \small
@@ -121,6 +123,9 @@ Descriptions & Range & Result \\
   Besov spaces of a scheme of functions
   & $0 < s_0 < s_1$ & \Cref{thm:approximation-spaces-reiteration}\newline
   \Cref{thm:besov-interpolate} \\
+\raggedright Besov spaces of a scheme of functions, $0 < p \leq \infty$, and real interpolation
+  of $L_p$ and a Besov space of smoothness $t$, every fine index
+  & $0 < s < t$ & \Cref{cor:besov-representation} \\
 \raggedright Moduli and real interpolation of two classical spaces, under Jackson's and the
   inverse inequality of order $\theta$
   & $0 < s_0 < s_1 < \theta$ & \Cref{cor:modulus-spaces-interpolate} \\
@@ -178,6 +183,11 @@ Descriptions & Range & Result \\
   & \Cref{thm:continuous-spectral-basis-besov} \\
 \raggedright $H^s$ and continuous functions, under the local Weyl bound of dimension $D$
   & $s > D/2$ & \Cref{thm:local-weyl-continuity} \\
+\raggedright Embeddings $\Besov{s}{p}{q} \subseteq \Besov{s-\alpha}{r}{q}$, $0 < p \leq 2$,
+  $p \leq r \leq \infty$, and into continuous functions, under the local Weyl bound of
+  dimension $D$
+  & $s > \alpha = D(1/p - 1/r)$\newline (continuity: $s > D/p$)
+  & \Cref{thm:local-weyl-embedding} \\
 \hline
 \end{tabular}
 \end{center}
@@ -205,6 +215,9 @@ Descriptions & Range & Result \\
 \raggedright Step functions in $L_p$, $0 < p \leq 1$, Haar coefficients and differences of order $1$
   & $s > 1/p - 1$\newline (differences: $s < 1/p$) & \Cref{thm:haar-below-one}\newline
   \Cref{cor:haar-besov-below-one} \\
+\raggedright Differences of order $1$ in $L_p$, $0 < p \leq 1$, and real interpolation of $L_p$
+  and $B^t_{p,\infty,1}[0, 1]$
+  & $0 < s < t \leq 1/p$ & \Cref{cor:steps-interpolate-below-one} \\
 \raggedright $n$-term Haar approximation in $L_2$ and differences of order $1$ in $L_\tau$,
   $p = q = \tau$
   & $s = 1/\tau - 1/2$,\newline $0 < \tau < 2$ & \Cref{cor:haar-nterm-besov}\newline

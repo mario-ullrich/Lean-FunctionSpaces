@@ -65,8 +65,8 @@ inclusion `L_r ↪ L_p` and the scheme in `L_p` (`HasNikolskii.liftBound`): the 
 `L_p` is the inclusion of the same function in `L_r`, of norm at most
 `C' n^(D(1/p - 1/r)) ‖a‖_p`.
 
-The norms are written with `eLpNorm`, so that the hypothesis does not need an `L_p` space, and
-hence no instance `Fact (1 ≤ p)`, for every `p` at once.
+The norms are written with `eLpNorm`, a function of representatives, so one statement
+quantifies over all exponents `1 ≤ p ≤ ∞`, without an instance `Fact (1 ≤ p)` for each.
 -/
 
 @[expose] public section

@@ -3145,10 +3145,10 @@ approximation spaces~\cite[Chapter~7]{DeVoreLorentz}.
   ApproximationScheme.approxCouple}
 \leanok
 \uses{def:couple, def:dyadic-norm}
-Let $s \in \R$ and $q \in [1, \infty]$. The couple $(X, A^s_q)$ on $X$ is $N_0(f) = \|f\|$ and
+Let $s \in \R$ and $q \in (0, \infty]$. The couple $(X, A^s_q)$ on $X$ is $N_0(f) = \|f\|$ and
 $N_1(f) = \|f\|^{\mathrm{dy}}_{A^s_q}$; for $r \in \R$, the couple $(X, A^r_\infty)$ is the case
 $s = r$, $q = \infty$. For $s_0, s_1 \in \R$ and
-$q_0, q_1 \in [1, \infty]$, the couple $(A^{s_0}_{q_0}, A^{s_1}_{q_1})$ on $X$ is
+$q_0, q_1 \in (0, \infty]$, the couple $(A^{s_0}_{q_0}, A^{s_1}_{q_1})$ on $X$ is
 $(\|\cdot\|^{\mathrm{dy}}_{A^{s_0}_{q_0}}, \|\cdot\|^{\mathrm{dy}}_{A^{s_1}_{q_1}})$.
 \end{definition}
 
@@ -6430,10 +6430,9 @@ $q_0, q_1 \in (0, \infty]$, and let $(N_0, N_1)$ be the couple of $S$ in $L_p$
 (\Cref{def:scheme-lp-couple}). The couple $(\Besov{s_0}{p}{q_0}, \Besov{s_1}{p}{q_1})$ on $L_p$
 is the couple $(E_{s_0, q_0}, E_{s_1, q_1})$ of $(N_0, N_1)$, and the couple
 $(L_p, \Besov{s_1}{p}{q_1})$ is the couple $(N_0, E_{s_1, q_1})$ of $(N_0, N_1)$
-(\Cref{def:e-couples}), both with the dyadic quasi-norms. For $1 \leq p \leq \infty$ and
-$q_0, q_1 \in [1, \infty]$ they are the couples $(A^{s_0}_{q_0}, A^{s_1}_{q_1})$ and
-$(X, A^{s_1}_{q_1})$ of the scheme $S^{(p)}$ in $X = L_p$
-(\Cref{def:approximation-space-couples}).
+(\Cref{def:e-couples}), both with the dyadic quasi-norms. For $1 \leq p \leq \infty$ they are
+the couples $(A^{s_0}_{q_0}, A^{s_1}_{q_1})$ and $(X, A^{s_1}_{q_1})$ of the scheme $S^{(p)}$
+in $X = L_p$ (\Cref{def:approximation-space-couples}).
 \end{definition}
 
 For $p \geq 1$ the two descriptions agree since the couple of $S$ in $L_p$ is the complexity
@@ -6512,7 +6511,9 @@ step couple as in the proof of \Cref{thm:steps-besov-below-one}). By
 \Cref{cor:comparable-couples} the couple $(L_p, \Besov{r}{p}{q_1}([0, 1], S))$ of
 \Cref{def:besov-couples} and the couple $(L_p, B^r_{p,q_1,1}[0, 1])$ with this quasi-norm have
 the same interpolation spaces, so for $0 < s < r < 1/p$ and $q, q_1 \in (0, \infty]$ the
-corollary gives $B^s_{p,q,1}[0, 1] = (L_p, B^r_{p,q_1,1}[0, 1])_{s/r, q}$.
+corollary gives $B^s_{p,q,1}[0, 1] = (L_p, B^r_{p,q_1,1}[0, 1])_{s/r, q}$. For $q_1 = \infty$,
+\Cref{cor:steps-interpolate-below-one} proves this identity also for $r = 1/p$, through the
+Jackson--Bernstein theorem for quasi-normed couples (\Cref{thm:jackson-bernstein-couple}).
 
 On the torus with the trigonometric polynomials these are the periodic Besov spaces;
 \Cref{thm:torus-besov-interpolate} describes their interpolation spaces by differences.

@@ -6,18 +6,19 @@ potential spaces*, chapter *Sobolev spaces on the torus*.
 
 On `𝕋^d` with its normalised Haar measure, the scheme consists of the trigonometric polynomials of
 degree `< n`. They satisfy the Nikolskii inequality, so all the embeddings of [Besov and Sobolev
-spaces on measure spaces](MeasureSpaces.md) hold on `𝕋^d`. For `p = 2` the Fourier coefficients
-describe `B^s_{2,q}`, `H^s` and the Sobolev spaces `W^m_2` of weak derivatives, defined by Fourier
-multipliers; for `0 < τ < 2` the `ℓ_τ` norm of the Fourier coefficients describes best `n`-term
-approximation in `L_2`. For every `1 ≤ p < ∞` the Besov spaces are described by moduli of
-smoothness of every order: the kernels of `ℝ^d` act on `𝕋^d` by convolution with their
-periodisations, using Young's inequality on measurable groups of [Tools from
-analysis](Analysis.md) and the band-limited approximation of [Besov spaces on `ℝ^d`](Rd.md); the
-same kernels give smooth Littlewood–Paley blocks, which describe the Besov spaces for every
-`1 ≤ p < ∞`. Weak derivatives in `L_p`, `1 ≤ p ≤ ∞`, defined by Fourier coefficients, are the
-distributional derivatives of the periodic lifts on `ℝ^d`; for `1 < p < ∞` they give
-`W^m_p(𝕋^d) = F^m_{p,2}(𝕋^d)`, with the Besov sandwich and the Sobolev embeddings. The
-restriction to a face of `𝕋^(n+1)` is the model case of the trace theorem.
+spaces on measure spaces](MeasureSpaces.md) hold on `𝕋^d`, the Besov embeddings for every
+`0 < p ≤ r ≤ ∞`. For `p = 2` the Fourier coefficients describe `B^s_{2,q}`, `H^s` and the
+Sobolev spaces `W^m_2` of weak derivatives, defined by Fourier multipliers; for `0 < τ < 2` the
+`ℓ_τ` norm of the Fourier coefficients describes best `n`-term approximation in `L_2`. For every
+`1 ≤ p < ∞` the Besov spaces are described by moduli of smoothness of every order: the kernels
+of `ℝ^d` act on `𝕋^d` by convolution with their periodisations, using Young's inequality on
+measurable groups of [Tools from analysis](Analysis.md) and the band-limited approximation of
+[Besov spaces on `ℝ^d`](Rd.md); the same kernels give smooth Littlewood–Paley blocks, which
+describe the Besov spaces for every `1 ≤ p < ∞`. Weak derivatives in `L_p`, `1 ≤ p ≤ ∞`,
+defined by Fourier coefficients, are the distributional derivatives of the periodic lifts on
+`ℝ^d`; for `1 < p < ∞` they give `W^m_p(𝕋^d) = F^m_{p,2}(𝕋^d)`, with the Besov sandwich and the
+Sobolev embeddings. The restriction to a face of `𝕋^(n+1)` is the model case of the trace
+theorem.
 
 ## Main results
 

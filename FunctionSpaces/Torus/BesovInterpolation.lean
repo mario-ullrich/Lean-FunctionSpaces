@@ -18,8 +18,11 @@ For `1 ≤ p < ∞` and Besov spaces by differences of order `r` on `𝕋^d`, wi
 `f ∈ (B^{s₀}_{p,q₀}, B^{s₁}_{p,q₁})_{η,q} ⟺ ‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞`
 
 (`Torus.periodic_memKMethod_modCouple_iff`), and `(L_p, B^{s₁}_{p,q₁})_{η,q} = B^{ηs₁}_{p,q}` by
-differences (`Torus.periodic_memKMethod_leftModCouple_iff`).  The approximation spaces of the
-trigonometric scheme interpolate by `FunctionScheme.memKMethod_besovCouple_iff`.
+differences (`Torus.periodic_memKMethod_leftModCouple_iff`). The Besov spaces of the
+trigonometric scheme, defined by best approximation, interpolate in the same way for every
+`0 < p ≤ ∞` (`FunctionScheme.memKMethod_besovCouple_iff`,
+`FunctionScheme.memKMethod_lpBesovCouple_iff`), and for `0 < s < t` and every fine index
+`B^s_{p,q} = (L_p, B^t_{p,q₁})_{s/t,q}` (`FunctionScheme.memBesov_iff_memKMethod_lpBesovCouple`).
 -/
 
 @[expose] public section

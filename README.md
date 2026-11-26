@@ -8,7 +8,7 @@ space is also identified with an approximation space: the functions whose error 
 approximation by a fixed scheme (band-limited functions, trigonometric polynomials, splines,
 wavelets, eigenfunctions) decays at a given rate. This form makes the general methods of
 approximation theory available, such as interpolation, embeddings, decompositions and traces,
-and it is the form numerical analysis needs. The project has about 129 000 lines of Lean in 318
+and it is the form numerical analysis needs. The project has about 135 000 lines of Lean in 327
 files and contains no `sorry`.
 
 * **Blueprint** (a webpage explaining the mathematics):
@@ -50,8 +50,8 @@ band-limited functions, wavelets and eigenfunctions these are Besov spaces. On a
 space, a scheme of essentially bounded functions has Besov spaces `B^s_{p,q}` for every
 `0 < p ≤ ∞` and `0 < q ≤ ∞`, with the error of best approximation in the quasi-norm `‖·‖_p`; for
 `p ≥ 1` they are its approximation spaces in `L_p`. The torus and the dyadic step functions on
-`[0, 1)` are concrete instances of this theory, each with a Nikolskii inequality; the other
-settings prove their characterisations directly.
+`[0, 1)` are the concrete instances of its Nikolskii theory; filtrations and eigenbases use its
+martingale and spectral parts, and the other characterisations are proved in their settings.
 
 ## Why several descriptions
 
@@ -88,6 +88,7 @@ and how they differ.
 | wavelet coefficients | [`ℝ`, Daubechies D4](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-daubechies-besov-coefficients.html#thm:daub-besov-d4) (`0 < s < 2 - log₂(1 + √3)`), [`ℝ^d`, tensor Daubechies](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-daub-rd-besov.html#thm:daub-rd-besov) (`0 < s < min(θ, N)`), [`[0, 1]`, multiwavelets](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-multiwavelets.html#thm:multiwavelet-besov) (`0 < s < 1/p`) |
 | the Gagliardo form, `W^{s,p} = B^s_{p,p}` | [`ℝ^d`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-sobolev-slobodeckij.html#thm:sobolev-slobodeckij-besov) (`0 < s < 1`) |
 | real interpolation of two difference spaces | [`ℝ^d`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-rd-besov-interpolation.html#thm:rd-besov-interpolate) (`0 < s₀ < s₁ < r`) |
+| real interpolation of `L_p` and a difference space, `(L_p, B^t_{p,∞,1})_{s/t,q} = B^s_{p,q,1}` | [`[0, 1]`, `0 < p ≤ 1`, first differences](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-steps-below-one.html#cor:steps-interpolate-below-one) (`0 < s < t ≤ 1/p`, `0 < q ≤ ∞`) |
 | chart pieces | [bounded smooth domains](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-smooth-domain-charts.html#thm:smooth-domain-besov), [compact manifolds, any two Besov atlases](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-manifold-besov.html#def:manifold-besov) |
 | eigenfunction expansions | [bounded Lipschitz domains, Neumann](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-spectral-besov-domains.html#thm:spectral-besov-neumann), [compact manifolds, a chart form](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-spectral-besov-manifold.html#thm:spectral-besov-manifold) (`d ≥ 1`, `p = 2`, `0 < s < 1`) |
 | best approximation | the table of approximation spaces below |
@@ -154,7 +155,7 @@ spaces it is.
 | `B^s_{p,q}(ℝ^d)` | [band-limited functions](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-rd-besov-differences.html#thm:rd-besov) (`s > 0`), [tensor Daubechies scaling spaces](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-daub-rd-besov.html#thm:daub-rd-approx-modulus) (`0 < s < min(θ, N)`) |
 | `B^s_{p,q}(𝕋^d)` | [trigonometric polynomials](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-torus-lp-moduli.html#thm:torus-lp-moduli) (`s > 0`) |
 | `B^s_{p,q}[0, 1]` | [dyadic splines of order `r`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-spline-jackson-coincidence.html#thm:spline-besov) (`0 < s < r - 1 + 1/p`), [dyadic piecewise polynomials](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-multiwavelets.html#thm:multiwavelet-besov) (`0 < s < 1/p`) |
-| `B^s_{p,q,1}[0, 1]`, `0 < p < 1`, by the first modulus | [dyadic step functions](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-steps-below-one.html#thm:steps-besov-below-one) (`0 < s < 1/p`) |
+| `B^s_{p,q,1}[0, 1]`, `0 < p ≤ 1`, by the first modulus | [dyadic step functions](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-steps-below-one.html#thm:steps-besov-below-one) (`0 < s < 1/p`) |
 | `B^θ_{τ,τ}[0, 1]`, `θ = 1/τ - 1/2` | [`n`-term combinations of Haar functions](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-haar-below-one.html#thm:haar-nterm-besov-all), a nonlinear scheme in `L_2[0, 1]` (`2/3 < τ < 2`; for `0 < τ ≤ 2/3` the space of the first modulus) |
 | `B^{d(1/τ - 1/2)}_{τ,τ}(ℝ^d) ∩ L_2(ℝ^d)` | [`n`-term combinations of tensor Daubechies wavelets](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-daub-rd-basis.html#cor:daub-rd-nterm), a nonlinear scheme in `L_2(ℝ^d)` (`1 ≤ τ < 2`, `d(1/τ - 1/2) < min(θ, N)`) |
 | `B^s_{p,q}([0, 1]^d)` | [tensor splines of order `r`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-iso-modulus.html#thm:iso-besov) (`0 < s < r - 1 + 1/p`) |
@@ -167,6 +168,7 @@ spaces it is.
 | `(L_2(Ω), H^1_0(Ω))_{θ,q}` of a bounded open set | [Dirichlet eigenfunctions](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-dirichlet-eigenbasis.html#cor:dirichlet-interpolation) (`0 < θ < 1`) |
 | `B^θ_{2,q}(M)` of a compact manifold | [eigenfunctions of a chart form](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-spectral-besov-manifold.html#thm:spectral-besov-manifold) (`d ≥ 1`, `0 < θ < 1`) |
 | `(X, Y)_{s/r,q}` for a bounded linear map `Y → X` | [every scheme in `X` with Jackson and Bernstein inequalities of order `r`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-continuous-k-method.html#cor:representation-continuous-k-method) (`0 < s < r`) |
+| `(N₀, N₀ + Y)_{s/r,q}` in a quasi-normed group | [every couple whose `Y` has Jackson's and Bernstein's inequality of order `r`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-e-spaces-interpolate.html#thm:jackson-bernstein-couple), through the E-functional (`0 < s < r`, `0 < q ≤ ∞`) |
 
 For a general scheme the project describes `A^s_q`
 
@@ -190,7 +192,13 @@ For a general scheme the project describes `A^s_q`
 * by real interpolation: [two approximation spaces](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-approximation-spaces-interpolate.html#thm:approximation-spaces-reiteration)
   interpolate to a third (reiteration, `0 < s₀ < s₁`), and so do
   [two Besov spaces of a scheme](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-besov-interpolation.html#thm:besov-interpolate) on a finite measure space,
-  `0 < p ≤ ∞`.
+  `0 < p ≤ ∞`; in a quasi-normed group the spaces `E_{s,q}` of the E-functional are the
+  [interpolation spaces of `(N₀, E_{r,q₁})`](
+  https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-e-spaces-interpolate.html#thm:e-spaces-interpolate)
+  for every `0 < q, q₁ ≤ ∞`, and those of `(N₀, N₀ + Y)` for a `Y` with
+  [Jackson's and Bernstein's inequality](
+  https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-e-spaces-interpolate.html#thm:jackson-bernstein-couple)
+  of order `r` (`0 < s < r`).
 
 ## Main results
 
@@ -354,6 +362,24 @@ For a general scheme the project describes `A^s_q`
   `‖y‖ ≤ C n^r ‖a‖`), `n ≥ 1`. For `0 < s < r` and `1 ≤ q ≤ ∞`, `A^s_q = (X, Y)_{s/r,q}` for the
   continuous K-method with `K(t, f) = inf_y (‖f - ι y‖ + t ‖y‖)`
   (`ApproximationScheme.memApprox_iff_memInclKMethod_of_jacksonBound_of_liftBound`).
+* **Approximation in quasi-normed groups.** Let `(N₀, N₁)` be a couple of an error quasi-norm
+  `N₀` and a complexity `N₁` on an abelian group `U`, both even, vanishing at `0` and satisfying
+  a quasi-triangle inequality, with `N₁` subadditive; the model is the couple of a scheme of
+  functions in `L_p`, `0 < p < 1`, with `N₀ = ‖·‖_p` and `N₁` the level of the approximants
+  (`FunctionScheme.lpCouple`). The E-functional `E(t, u) = inf {N₀(u - b) : N₁(b) ≤ t}`
+  (Bergh–Löfström, Section 7.1, with the two spaces swapped; `InterpCouple.eFunctional`) gives
+  the space `E_{s,q}`, in dyadic form, of the `u` with `N₀(u) + ‖(2^(ks) E(2^k, u))_k‖_{ℓ_q} < ∞`
+  (`InterpCouple.eNormDyadic`). For `r > 0`, `0 < η < 1` and `0 < q, q₁ ≤ ∞`,
+  `(N₀, E_{r,q₁})_{η,q} = E_{ηr,q}`, with the dyadic quasi-norm on `E_{r,q₁}` (DeVore;
+  `InterpCouple.memKMethod_leftECouple_iff`). Let `Y : U → [0, ∞]` be even with `Y^ρ` subadditive
+  for some `ρ > 0`, and let Jackson's inequality `E(2^k, u) ≤ C_J 2^(-kr) Y(u)` and Bernstein's
+  inequality `Y(a) ≤ C_B 2^(kr) N₀(a)` for `N₁(a) ≤ 2^k` hold with finite constants
+  (`InterpCouple.JacksonBernsteinData`). Then `(N₀, N₀ + Y)_{s/r,q} = E_{s,q}` for `0 < s < r` and
+  `0 < q ≤ ∞` (DeVore; `InterpCouple.JacksonBernsteinData.memKMethod_smoothnessCouple_iff`). If
+  `N₀^ρ` is subadditive for some `ρ > 0`, then for `s > 0` and `0 < q ≤ ∞`, `u ∈ E_{s,q}` iff `u` is
+  the `N₀`-limit of the partial sums of blocks `g_k` with `N₁(g_k) ≤ 2^k` and
+  `(2^(ks) N₀(g_k))_k ∈ ℓ_q` (DeVore–Popov;
+  `InterpCouple.eNormDyadic_lt_top_iff_eBlockDecompNorm_lt_top`).
 * **Nonlinear approximation from an orthonormal basis.** Let `(e_i)_{i ∈ I}` be a Hilbert basis
   of a complex Hilbert space `H`, and let `A_n` be the set of linear combinations of at most `n`
   of the vectors `e_i`. For `0 < τ < 2` and `θ = 1/τ - 1/2`, `f ∈ H` lies in the approximation
@@ -376,8 +402,9 @@ For a general scheme the project describes `A^s_q`
   `f = ∑_k g_k` almost everywhere with `g_k ∈ S_{2^k}` and `(2^(ks) ‖g_k‖_p)_k ∈ ℓ_q`, and the
   partial sums of every such series converge to `f` in `L_p` and in measure (DeVore–Popov 1988,
   Trans. AMS; `FunctionScheme.memBesov_iff_exists_blocks`,
-  `FunctionScheme.tendsto_eLpNorm_sub_sum_of_blocks`). For `0 < s < r` and `0 < q, q₁ ≤ ∞`, the
-  Besov space is a real interpolation space, `B^s_{p,q} = (L_p, B^r_{p,q₁})_{s/r,q}`
+  `FunctionScheme.tendsto_eLpNorm_sub_sum_of_blocks`). For `0 < s < t` and `0 < q, q₁ ≤ ∞`, the
+  Besov space is a real interpolation space, `B^s_{p,q} = (L_p, B^t_{p,q₁})_{s/t,q}` with the
+  dyadic quasi-norm on `B^t_{p,q₁}`, by the representation theorem in quasi-normed groups above
   (`FunctionScheme.memBesov_iff_memKMethod_lpBesovCouple`). Let `D ≥ 0`, and let `S` have the
   Nikolskii property of dimension `D`: for every `1 ≤ p ≤ ∞` there is `C` with
   `‖a‖_∞ ≤ C n^(D/p) ‖a‖_p` for all `n ≥ 1` and `a ∈ S_n` (`FunctionScheme.HasNikolskii`). Then
@@ -405,7 +432,7 @@ For a general scheme the project describes `A^s_q`
   `∑_{λ(i) < n} |e_i(x)|² ≤ C n^D` of dimension `D ≥ 0` and `0 < p ≤ 2`
   (`ContinuousSpectralBasis.memBesov_exists_inclusion_eq_of_localWeyl`,
   `ContinuousSpectralBasis.memBesov_exists_boundedContinuous_of_localWeyl`).
-* **Besov spaces for `0 < p < 1` on `[0, 1]`.** Let `0 < p ≤ 1` and `0 < q ≤ ∞`, and let
+* **Besov spaces for `0 < p ≤ 1` on `[0, 1]`.** Let `0 < p ≤ 1` and `0 < q ≤ ∞`, and let
   `E_k(f)` be the error of best approximation of `f ∈ L_p[0, 1]` by step functions on the dyadic
   intervals of length `2^(-k)`. For `0 ≤ s < 1/p`, `‖f‖_p + ‖(2^(ks) E_k(f))_k‖_{ℓ_q} < ∞` iff
   `‖f‖_p + ‖(2^(ks) ω_1(f, 2^(-k), [0, 1])_p)_k‖_{ℓ_q} < ∞`, that is, iff `f ∈ B^s_{p,q,1}[0, 1]`
@@ -434,11 +461,12 @@ For a general scheme the project describes `A^s_q`
 ## Organisation
 
 The library `ApproximationSpaces` holds the abstract theory: schemes, the spaces `A^s_q`, real
-interpolation of couples (`Interpolation/`) and decompositions (`Decompositions/`). The library
-`FunctionSpaces` holds the function spaces in folders by setting: `Analysis/`, `MeasureSpaces/`,
-`Rd/` (one folder per characterisation), `Torus/`, `Domains/` (intervals, the cube, Lipschitz
-domains, traces, eigenbases, manifolds) and `Wavelets/`. The blueprint gives the proofs. The
-block documents state every result with its Lean name and list the files:
+interpolation of couples and the E-functional of quasi-normed couples (`Interpolation/`) and
+decompositions (`Decompositions/`). The library `FunctionSpaces` holds the function spaces in
+folders by setting: `Analysis/`, `MeasureSpaces/`, `Rd/` (one folder per characterisation),
+`Torus/`, `Domains/` (intervals, the cube, Lipschitz domains, traces, eigenbases, manifolds) and
+`Wavelets/`. The blueprint gives the proofs. The block documents state every result with its
+Lean name and list the files:
 
 * [Besov spaces on `ℝ^d`](docs/Rd.md): Littlewood–Paley blocks, differences, local means, atoms.
 * [Daubechies wavelets](docs/Daubechies.md): wavelet coefficients on `ℝ` and `ℝ^d`, `H^s` by
@@ -459,12 +487,12 @@ block documents state every result with its Lean name and list the files:
   kernel of the trace, vector-valued spaces.
 * [Manifolds and eigenbases](docs/Manifolds.md): compact manifolds, Dirichlet and Neumann
   eigenfunctions.
-* [Besov and Sobolev spaces on measure spaces](docs/MeasureSpaces.md): spaces of a scheme,
-  embeddings.
-* [Approximation spaces](docs/ApproximationSpaces.md): schemes, `A^s_q`, interpolation,
-  decompositions.
-* [Tools from analysis](docs/Analysis.md): `L_p` tools, convolution, maximal functions,
-  Gelfand triples, finite `L_2` sums.
+* [Besov and Sobolev spaces on measure spaces](docs/MeasureSpaces.md): spaces of a scheme for
+  `0 < p ≤ ∞`, embeddings, block decompositions, interpolation.
+* [Approximation spaces](docs/ApproximationSpaces.md): schemes, `A^s_q`, the E-functional of
+  quasi-normed couples, interpolation, decompositions.
+* [Tools from analysis](docs/Analysis.md): `L_p` tools for every `0 < p ≤ ∞`, convolution,
+  maximal functions, Gelfand triples, finite `L_2` sums.
 
 [MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed.
 
@@ -473,8 +501,8 @@ block documents state every result with its Lean name and list the files:
 * Interpolation: Lorentz spaces, real Riesz–Thorin, off-diagonal Marcinkiewicz, J- and complex
   method.
 * The quasi-Banach range: moduli of smoothness on the torus, the cube and `ℝ^d` for `p < 1`,
-  splines of order `r ≥ 2` for `p < 1`, the reiteration of Besov spaces with fine indices below
-  `1`, and Triebel–Lizorkin spaces with `p < 1`.
+  splines of order `r ≥ 2` for `p < 1`, Triebel–Lizorkin spaces with `p < 1`, and the
+  interpolation of two Besov spaces with fine indices below `1`.
 * Triebel–Lizorkin spaces with `p = 1` or `q = 1`, and ball means and atoms on the torus.
 * Triebel–Lizorkin spaces on Lipschitz domains and their traces onto `B^{s-1/p}_{p,p}(Γ)`.
 * Sobolev spaces: Jawerth–Franke with Besov targets, Hardy–Littlewood–Sobolev, Trudinger, Mihlin
@@ -546,6 +574,8 @@ sources. The essential ones:
   Press, 2000.
 * S. M. Nikol'skii, *Approximation of Functions of Several Variables and Imbedding Theorems*,
   Springer-Verlag, 1975.
+* P. Oswald, *Haar system as Schauder basis in Besov spaces: The limiting cases for
+  `0 < p ≤ 1`*, preprint, 2018, [arXiv:1808.08156](https://arxiv.org/abs/1808.08156).
 * A. Pietsch, *Approximation spaces*, J. Approx. Theory **32** (1981), 115–134.
 * V. S. Rychkov, *On restrictions and extensions of the Besov and Triebel–Lizorkin spaces with
   respect to Lipschitz domains*, J. London Math. Soc. (2) **60** (1999), 237–257.

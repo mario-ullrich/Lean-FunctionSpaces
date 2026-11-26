@@ -18,13 +18,14 @@ block, projection and atomic decompositions, abstract trace and retract theorems
 comparison with spaces defined by moduli of smoothness (`ModulusData`), and best `n`-term
 approximation from a Hilbert basis with the theorem of Stechkin and DeVore. The E-functional of a
 couple, the error of best approximation under a bound on the complexity, gives approximation
-spaces on abelian groups with a quasi-norm, such as `L_p` for `0 < p < 1`. Their comparison with
-moduli of smoothness and their description by block decompositions rest on the subadditivity of
-a power of the quasi-norm. A smoothness space of order `r` is a Banach space with an injective
-bounded map into `X` satisfying Jackson's and Bernstein's inequalities of order `r`
-(`ApproximationScheme.JacksonBound`, `ApproximationScheme.SmoothnessSpace`, a hypothesis
-structure whose fields are the embedding, the order and Jackson's and Bernstein's inequalities);
-Sobolev spaces are the motivating examples.
+spaces on abelian groups with a quasi-norm, such as `L_p` for `0 < p < 1`, and their real
+interpolation spaces. Their comparison with moduli of smoothness and their description by block
+decompositions rest on the subadditivity of a power of the quasi-norm. A smoothness space of
+order `r` is a normed space with an injective bounded map into `X` satisfying Jackson's and
+Bernstein's inequalities of order `r` (`ApproximationScheme.JacksonBound`,
+`ApproximationScheme.SmoothnessSpace`, a hypothesis structure whose fields are the embedding,
+the order and Jackson's and Bernstein's inequalities); Sobolev spaces are the motivating
+examples.
 The schemes live in real normed spaces and the couples on abelian groups; the measures are the
 counting measure behind the `ℓ_q` norms, Lebesgue measure on `(0, ∞)` in the layer cake formula
 for sums, and `dt/t` on `(0, ∞)` of the continuous K-method. The other blocks instantiate the
@@ -179,7 +180,16 @@ theory.
   approximation scheme, `N₁(b) = min {n : b ∈ A_n}`, `E(n, f) = E_n(f)` and `E_{s,q} = A^s_q`
   for `s > 0`, `0 < q ≤ ∞`, and for `s = 0`, `q = ∞`
   (`ApproximationScheme.eFunctional_complexityCouple`,
-  `ApproximationScheme.memEMethod_complexityCouple_iff`).
+  `ApproximationScheme.memEMethod_complexityCouple_iff`). If `N₁(0) = 0`, then for every `u`
+  and `s` there are near-best elements `b_k` with `N₁(b_k) ≤ 2^k` and
+  `N₀(u - b_k) ≤ E(2^k, u) + N₀(u) 2^(-k(s+1))` (`InterpCouple.exists_nearBest_eFunctional`);
+  they take the role of bounded linear projections onto the approximants. If `N₁(0) = 0`,
+  Pietsch's form `‖((n + 1)^(s - 1/q) E(n, u))_n‖_{ℓ_q}` (`InterpCouple.eNormPietsch`) is at most
+  `C_q 2^s` times the dyadic norm for `s ≥ 0`, and if only `0` has complexity below `1`, the
+  dyadic norm is at most `4 C_q² 2^s` times Pietsch's form for `s ≥ 0` and `0 < q ≤ ∞`, with
+  `C_q = LpAddConst q` (`InterpCouple.eNormPietsch_le_eNormDyadic`,
+  `InterpCouple.eNormDyadic_le_eNormPietsch`); for the complexity couple of a scheme it is
+  Pietsch's quasi-norm of `A^s_q` (`ApproximationScheme.eNormPietsch_complexityCouple`).
 * **Moduli of smoothness for `ρ`-normed couples.** Let `N₀(a + b)^ρ ≤ N₀(a)^ρ + N₀(b)^ρ` for
   some `ρ > 0`, as for `‖·‖_p` with `ρ = p ≤ 1`, let `N₁` be subadditive, let `N₀` and `N₁` be
   even and vanish at `0`, and let `ω(f, 2^(-k))`
@@ -263,6 +273,11 @@ theory.
   `‖(2^(-kα) ∑_{j ≤ k} b_j)_k‖_{ℓ_q} ≤ (1 - 2^(-α))⁻¹ ‖(2^(-kα) b_k)_k‖_{ℓ_q}`
   (`ENNReal.hardy_tail_le`, `ENNReal.hardy_sum_le`). For `0 < q ≤ 1` both hold with the constant
   `(1 - 2^(-αq))^(-1/q)` (`ENNReal.hardy_tail_le_of_le_one`, `ENNReal.hardy_sum_le_of_le_one`).
+  In `ρ`-th powers, for `ρ > 0` and every `0 < q ≤ ∞`:
+  `x_k^ρ ≤ c ∑_{i ≥ 0} 2^(iβ) y_{k+i}^ρ` for every `k` gives
+  `‖(2^(ks) x_k)_k‖_{ℓ_q}^ρ ≤ c H ‖(2^(ks) y_k)_k‖_{ℓ_q}^ρ` with `H` finite for `sρ > β`, and
+  `x_k^ρ ≤ c ∑_{j ≤ k} 2^(-(k-j)β) y_j^ρ` gives the same with `H` finite for `β > sρ`
+  (`ENNReal.lqNorm_rpow_le_of_rpow_le_tsum`, `ENNReal.lqNorm_rpow_le_of_rpow_le_sum`).
 * **Interpolation of dyadic suprema** (Brezis–Mironescu). For `σ₁ < σ₀`, `0 < θ < 1` and every
   sequence `a` in `[0, ∞]`,
   `∑_j 2^(j(θσ₀ + (1-θ)σ₁)) a_j ≤ c (sup_j 2^(jσ₀) a_j)^θ (sup_j 2^(jσ₁) a_j)^(1-θ)` with

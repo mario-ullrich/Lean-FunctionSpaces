@@ -15,23 +15,48 @@ Pietsch's quasi-norm `‖((n + 1)^(s - 1/q) E_n(f)_p)_n‖_{ℓ_q}` (`FunctionSc
 blocks of near-best approximants of `f` in `L_r`, the approximants converge to `f` in measure,
 and Fatou's lemma bounds the error in `L_r` (the transfer of near-best sequences of [Tools from
 analysis](Analysis.md)); Hardy's inequality for tails of [Approximation
-spaces](ApproximationSpaces.md) sums the bounds. Spectral schemes in a Hilbert space give the
-Sobolev spaces `H^s` with Jackson and Bernstein constants `1`, and their dyadic Fourier blocks
-characterise `A^s_q` (`SpectralScheme.memApprox_iff_blockNorm_lt_top`). A compact dense
-embedding `J : V → H` of Hilbert spaces gives such a scheme, from the eigenvectors of `J J†`
-(`CompactDenseEmbedding.spectralScheme`). Orthonormal bases of continuous functions with
-levels (continuous spectral bases), modelled on the eigenfunctions of the
-Laplacian on a compact manifold, enter as a hypothesis. The trigonometric polynomials on the
-torus and the dyadic step functions on `[0, 1)` are the concrete instances of the Nikolskii
-theory ([The torus](Torus.md), [Intervals, the cube, splines and wavelets](IntervalCube.md)),
-and the Fourier basis of the torus is the concrete continuous spectral basis. The compact dense
-embeddings have the Dirichlet, Neumann and chart-form eigenbases as instances
-([Manifolds and eigenbases](Manifolds.md)). A filtration gives a projection scheme, whose
-approximation spaces are described by martingale differences.
+spaces](ApproximationSpaces.md) sums the bounds. The blocks of near-best approximants decompose
+every element of `B^s_{p,q}`, and the E-spaces of the couple of `S` in `L_p` give the real
+interpolation spaces of the Besov spaces, for every `0 < p ≤ ∞`. Spectral schemes in a Hilbert
+space give the Sobolev spaces `H^s` with Jackson and Bernstein constants `1`, and their dyadic
+Fourier blocks characterise `A^s_q` (`SpectralScheme.memApprox_iff_blockNorm_lt_top`). A compact
+dense embedding `J : V → H` of Hilbert spaces gives such a scheme, from the eigenvectors of
+`J J†` (`CompactDenseEmbedding.spectralScheme`). Orthonormal bases of continuous functions with
+levels (continuous spectral bases), modelled on the eigenfunctions of the Laplacian on a compact
+manifold, enter as a hypothesis. The trigonometric polynomials on the torus and the dyadic step
+functions on `[0, 1)` are the concrete instances of the Nikolskii theory ([The torus](Torus.md),
+[Intervals, the cube, splines and wavelets](IntervalCube.md)), and the Fourier basis of the torus is
+the concrete continuous spectral basis. The compact dense embeddings have the Dirichlet, Neumann and
+chart-form eigenbases as instances ([Manifolds and eigenbases](Manifolds.md)). A filtration gives a
+projection scheme, whose approximation spaces are described by martingale differences.
 The `L_p` tools are in [Tools from analysis](Analysis.md).
 
 ## Main results
 
+* **Besov spaces of a scheme for `0 < p ≤ ∞`.** Let `μ` be a finite measure on `Ω`, `S` a scheme
+  of functions and `0 < p ≤ ∞`. The couple of `S` in `L_p` consists of the quasi-norm
+  `N₀(f) = ‖f‖_p` and the complexity `N₁(f) = inf {n : f ∈ ι_{∞,p}(S_n)}`, and `∞` if there is
+  none, with the inclusion `ι_{∞,p} : L_∞ ↪ L_p` (`FunctionScheme.lpCouple`); it is quasi-normed
+  with Mathlib's constant `LpAddConst p` (`FunctionScheme.isQuasiNormed_lpCouple`), satisfies
+  `N₀(f + g)^ρ ≤ N₀(f)^ρ + N₀(g)^ρ` with `ρ = min(1, p)`
+  (`FunctionScheme.lpCouple_norm0_add_rpow_min_le`), and for every `f ∈ L_p` and real `s` there are
+  near-best approximants `b_k ∈ S_{2^k}` with `‖f - b_k‖_p ≤ E_{2^k}(f)_p + ‖f‖_p 2^(-k(s+1))`
+  (`FunctionScheme.exists_nearBest_lpCouple`). For `0 < q ≤ ∞` and real `s`, `f ∈ B^s_{p,q}` iff
+  Pietsch's quasi-norm `‖((n + 1)^(s - 1/q) E_n(f)_p)_n‖_{ℓ_q}` is finite
+  (`FunctionScheme.MemBesov`, `FunctionScheme.besovNorm`). For `s ≥ 0` this holds iff the dyadic
+  norm `‖f‖_p + ‖(2^(ks) E_{2^k}(f)_p)_k‖_{ℓ_q}` is finite
+  (`FunctionScheme.memBesov_iff_eNormDyadic_lt_top`), so for `s > 0`, and for `s = 0` with `q = ∞`,
+  `B^s_{p,q}` is the space `E_{s,q}` of the couple (`FunctionScheme.memBesov_iff_memEMethod`), and
+  for `s ≥ 0` it is a real subspace of `L_p` (`FunctionScheme.besovSpace`). For `1 ≤ p ≤ ∞` it is
+  the approximation space `A^s_q(L_p(μ), S^(p))` (`FunctionScheme.memBesov_iff_memApprox`). The
+  spaces decrease in the smoothness and the fine index: `B^s_{p,q} ⊆ B^t_{p,q'}` for `0 ≤ t < s`,
+  and for `t = s ≥ 0` with `q ≤ q'` (`FunctionScheme.MemBesov.mono`). For `0 < p ≤ r ≤ ∞` the
+  inclusion `ι_{r,p} : L_r ↪ L_p` maps `B^s_{r,q}` into `B^s_{p,q}` with
+  `‖ι_{r,p} f‖_{B^s_{p,q}} ≤ μ(Ω)^(1/p - 1/r) ‖f‖_{B^s_{r,q}}`
+  (`FunctionScheme.besovNorm_inclusion_le`, `FunctionScheme.MemBesov.inclusion`). For a scheme `T`
+  of bounded continuous functions on a topological space `Ω` with its Borel σ-algebra, the classes
+  of the elements of its approximation space `A^s_q` in the sup norm lie in `B^s_{p,q}` of the
+  scheme of `T` (`FunctionScheme.MemBesov.of_sup`).
 * **Besov embeddings.** Let `μ` be a finite measure on `Ω` and `S` a scheme of functions with the
   Nikolskii property of dimension `D ≥ 0`: for every `1 ≤ p ≤ ∞` there is `C` with
   `‖a‖_∞ ≤ C n^(D/p) ‖a‖_p` for all `a ∈ S_n`, `n ≥ 1` (the hypothesis
@@ -87,12 +112,12 @@ The `L_p` tools are in [Tools from analysis](Analysis.md).
   (`FunctionScheme.tendsto_eLpNorm_sub_sum_of_blocks`). This is the block decomposition of the
   spaces `E_{s,q}` of a `ρ`-normed couple of [Approximation spaces](ApproximationSpaces.md) for
   the couple of `S` in `L_p`, with `ρ = min(1, p)`.
-* **Sobolev embeddings.** Call a Banach space `V` with an injective bounded map into `L_p(μ)` a
+* **Sobolev embeddings.** Call a normed space `V` with an injective bounded map into `L_p(μ)` a
   Sobolev space of order `s` for `S` (the hypothesis structure `FunctionScheme.SobolevSpace`) if it
   satisfies Jackson's inequality `E_n(f)_p ≤ C n^(-s) ‖f‖_V` and Bernstein's inequality (every
   `a ∈ S_n` lies in `V` with `‖a‖_V ≤ C n^s ‖a‖_p`). For `S` with the Nikolskii property of
-  dimension `D ≥ 0`, Sobolev spaces `V` of order `s` in `L_p` and `V'` of order `t` in `L_r`,
-  `p ≤ r` and `t - D/r < s - D/p`, every element of `V` lies in `V'`
+  dimension `D ≥ 0`, `1 ≤ p ≤ r ≤ ∞`, Sobolev spaces `V` of order `s` in `L_p` and `V'` of order
+  `t` in `L_r`, with `V'` complete, and `t - D/r < s - D/p`, every element of `V` lies in `V'`
   (`FunctionScheme.SobolevSpace.exists_eq_inclusion'`); for schemes with continuous approximants
   and `s > D/p` every element of `V` has a bounded continuous representative
   (`FunctionScheme.SobolevSpace.exists_boundedContinuous`). The

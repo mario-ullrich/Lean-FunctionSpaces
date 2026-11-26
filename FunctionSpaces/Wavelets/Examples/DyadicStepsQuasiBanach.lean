@@ -13,17 +13,17 @@ public import FunctionSpaces.Analysis.Lp.QuasiNorm
 /-!
 # Dyadic step functions in `L_p[0, 1]`, `0 < p ≤ 1`
 
-For `0 < p < 1` the space `L_p[0, 1]` is a quasi-Banach space: Mathlib's `Lp ℂ p vol` is an
-abelian group with the quasi-norm `‖·‖ₑ`, and the `p`-th power of the quasi-norm is subadditive,
-`‖f + g‖_p^p ≤ ‖f‖_p^p + ‖g‖_p^p` (`MeasureTheory.Lp.enorm_add_rpow_le_of_le_one`). Approximation
-by dyadic step functions is described by the **step couple** `Haar.stepCouple p`, the couple of
-the quasi-norm and of the increasing subgroups `V_j` of `ℱ_j`-measurable elements, the step
-functions of level `j` (`InterpCouple.ofMonotoneSubgroups`): its E-functional at `t = 2^j` is the
-error of best approximation from `V_j` (`Haar.eFunctional_stepCouple_two_pow`), and its spaces
-`E_{s,q}` are the approximation spaces `A^s_q(L_p, steps)`. For `1 ≤ p` the sets of the Haar
-scheme are the dyadic levels of the `V_j` (`Haar.sets_haarScheme`), so the step couple is the
-complexity couple of the Haar scheme (`Haar.stepCouple_eq_complexityCouple`,
-`Haar.memEMethod_stepCouple_iff_memApprox`).
+For `0 < p < 1` the space `L_p[0, 1]` is a quasi-Banach space: Mathlib's `Lp ℂ p vol` is an abelian
+group with the quasi-norm `‖·‖ₑ`, and the `p`-th power of the quasi-norm is subadditive,
+`‖f + g‖_p^p ≤ ‖f‖_p^p + ‖g‖_p^p` (`MeasureTheory.Lp.enorm_add_rpow_le_of_le_one`, from
+`FunctionSpaces.Analysis.Lp.QuasiNorm`). Approximation by dyadic step functions is described by the
+**step couple** `Haar.stepCouple p`, the couple of the quasi-norm and of the increasing subgroups
+`V_j` of `ℱ_j`-measurable elements, the step functions of level `j`
+(`InterpCouple.ofMonotoneSubgroups`): its E-functional at `t = 2^j` is the error of best
+approximation from `V_j` (`Haar.eFunctional_stepCouple_two_pow`), and its spaces `E_{s,q}` are the
+approximation spaces `A^s_q(L_p, steps)`. For `1 ≤ p` the sets of the Haar scheme are the dyadic
+levels of the `V_j` (`Haar.sets_haarScheme`), so the step couple is the complexity couple of the
+Haar scheme (`Haar.stepCouple_eq_complexityCouple`, `Haar.memEMethod_stepCouple_iff_memApprox`).
 
 The modulus of smoothness `ω_r(f, t, [0, 1])_p` satisfies, for `0 < p ≤ 1`,
 `ω_r(f + g, t)_p^p ≤ ω_r(f, t)_p^p + ω_r(g, t)_p^p` and `ω_r(f, t)_p ≤ 2^(r/p) ‖f‖_p`
@@ -31,13 +31,14 @@ The modulus of smoothness `ω_r(f, t, [0, 1])_p` satisfies, for `0 < p ≤ 1`,
 `L_p`, `Interval.intervalLpModulus_add_rpow_le`, `Interval.intervalLpModulus_le_of_le_one`). Two
 inequalities connect it with the steps:
 
-* **Jackson's inequality by averaging**, `E(2^j, f)_p ≤ 2^(1/p) ω_1(f, 2^(-j), [0, 1])_p` for
-  every `0 < p < ∞` (`Haar.eFunctional_stepCouple_le`). On each dyadic interval `I` some value
-  `f(y)` approximates `f` at least as well as the mean over `y` of `∫_I |f - f(y)|^p`
-  (`MeasureTheory.exists_setLIntegral_enorm_sub_rpow_le`, the first moment method), and the double
-  integrals over the dyadic squares add up to at most `2 ω_1(f, 2^(-j))_p^p`
-  (`Interval.two_pow_mul_sum_lintegral_le_intervalModulus`). The proof averages pointwise and uses
-  Tonelli's theorem, so it holds for every `0 < p < ∞` with the constant `2^(1/p)`.
+* **Jackson's inequality by averaging**, `E(2^j, f)_p ≤ 2^(1/p) ω_1(f, 2^(-j), [0, 1])_p` for every
+  `0 < p < ∞` (`Haar.eFunctional_stepCouple_le`). On each dyadic interval `I` some value `f(y)`
+  approximates `f` at least as well as the mean over `y` of `∫_I |f - f(y)|^p`
+  (`MeasureTheory.exists_setLIntegral_enorm_sub_rpow_le`, the first moment method, from
+  `FunctionSpaces.Analysis.Lp.QuasiNorm`), and the double integrals over the dyadic squares add up
+  to at most `2 ω_1(f, 2^(-j))_p^p` (`Interval.two_pow_mul_sum_lintegral_le_intervalModulus`). The
+  proof averages pointwise and uses Tonelli's theorem, so it holds for every `0 < p < ∞` with the
+  constant `2^(1/p)`.
 * **The inverse inequality of order `1/p`**: for a step function `a` of level `j`,
   `ω_1(a, 2^(-k), [0, 1])_p ≤ 2^(1/p) 2^(-(k-j)/p) ‖a‖_p`
   (`Haar.intervalLpModulus_le_of_mem_lpMeas`). A difference `Δ_h a` lives on strips of width `h`

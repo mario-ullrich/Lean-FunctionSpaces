@@ -72,6 +72,22 @@ declarations.
   `ENNReal.lqNorm_tsum_geom_add_le`); this complements *MultilinearInterpolation*, which has
   the K-method, parts of the J-method and Janson's lemma, and no reiteration theorem; coordinate
   with lua-vr/MultilinearInterpolation.
+* **The E-functional of a couple** (`ApproximationSpaces/Interpolation/EFunctional.lean`,
+  `EFunctionalSpaces.lean`, `EFunctionalModuli.lean`, `EFunctionalRepresentation.lean`,
+  `EFunctionalJacksonBernstein.lean`, `ApproximationSpaces/Decompositions/EFunctionalBlocks.lean`):
+  for a couple `(N₀, N₁)` of a quasi-norm and a complexity on an abelian group, the error of best
+  approximation `E(t, u) = inf {N₀(u - b) : N₁(b) ≤ t}` (Bergh–Löfström, Section 7.1;
+  `InterpCouple.eFunctional`), its `ρ`-subadditivity (`InterpCouple.eFunctional_add_rpow_le`),
+  the dyadic description of `E_{α,q}` (`InterpCouple.memEMethod_iff_eNormDyadic_lt_top`),
+  near-best sequences (`InterpCouple.exists_nearBest_eFunctional`), Pietsch's form
+  (`InterpCouple.eNormPietsch_lt_top_iff`), the representation
+  `(N₀, E_{r,q₁})_{η,q} = E_{ηr,q}` for every fine index and the reiteration of E-spaces
+  (`InterpCouple.memKMethod_leftECouple_iff`, `InterpCouple.memKMethod_eCouple_iff`), the
+  Jackson–Bernstein theorem for quasi-normed couples
+  (`InterpCouple.JacksonBernsteinData.memKMethod_smoothnessCouple_iff`) and block
+  decompositions (`InterpCouple.eNormDyadic_lt_top_iff_eBlockDecompNorm_lt_top`). Mathlib has
+  neither the K- nor the E-functional; a candidate only together with `InterpCouple`, so
+  coordinate with lua-vr/MultilinearInterpolation as for the K-method.
 * **Monotone convergence and countable Minkowski for `eLpNorm`**: on any measure space,
   `‖sup_b F_b‖_p = sup_b ‖F_b‖_p` for directed countable families of a.e. measurable `F_b`
   (`MeasureTheory.eLpNorm_iSup_of_directed`) and `‖∑_i g_i‖_p ≤ ∑_i ‖g_i‖_p` for `1 ≤ p ≤ ∞` and
@@ -134,6 +150,19 @@ declarations.
   (`MeasureTheory.le_rpow_mul_eLpNorm_of_ae_enorm_le`), and
   `‖f‖_∞ ≤ M ‖f‖_p` gives `‖f‖_r ≤ M^(1 - p/r) ‖f‖_p` for every `p ≤ r ≤ ∞`
   (`MeasureTheory.eLpNorm_le_of_eLpNorm_top_le`); Ditzian–Prymak 2016, Theorem 2.1.
+* **Near-best sequences in `L_p`, every `0 < p ≤ ∞`**
+  (`FunctionSpaces/Analysis/Lp/QuasiNorm.lean`): with `ρ = min(1, p)`, two functions within `e`
+  of `f` in `L_p` satisfy `‖g - h‖_p^ρ ≤ 2 e^ρ` and `‖g - h‖_p ≤ 2^(1/ρ) e`
+  (`MeasureTheory.eLpNorm_sub_rpow_min_le_two_mul`, `MeasureTheory.eLpNorm_sub_le_two_rpow_mul`);
+  and if almost everywhere strongly measurable `b_k` satisfy `‖f - b_k‖_p ≤ e_k`, `e` decreases
+  to `0` and `‖b_{k+1} - b_k‖_r ≤ C 2^(kβ) ‖b_{k+1} - b_k‖_p`, then, with `ρ_r = min(1, r)`,
+  `‖f - b_k‖_r^(ρ_r) ≤ (C 2^(1/ρ))^(ρ_r) ∑_{i ≥ 0} (2^((k+i)β) e_{k+i})^(ρ_r)` for every
+  `0 < r ≤ ∞`, on any measure space (`MeasureTheory.eLpNorm_sub_rpow_min_le_tsum_of_nearBest`),
+  with its `ℓ_q` form by Hardy's inequality (`MeasureTheory.lqNorm_eLpNorm_sub_le_of_nearBest`).
+  The last two are candidates only together with `ENNReal.dyadicWeight` and `ENNReal.lqNorm`.
+  Their companion `MeasureTheory.tendstoInMeasure_of_eLpNorm_sub_le` (`‖f - u_n‖_p ≤ e_n → 0`
+  eventually gives `u_n → f` in measure, along any filter), a short corollary of Mathlib's
+  `tendstoInMeasure_of_tendsto_eLpNorm`, goes with them.
 * **Mixed norms `L_p(ℓ_q)` and `ℓ_q(L_p)`** (`FunctionSpaces/Analysis/Lp/MixedNorms.lean`):
   Minkowski's integral inequality for `ℓ_u`-valued functions,
   `‖(∫ g_i)_i‖_{ℓ_u} ≤ ∫ ‖(g_i(x))_i‖_{ℓ_u}` for `1 ≤ u ≤ ∞` (`MeasureTheory.lqNorm_lintegral_le`);
@@ -149,7 +178,12 @@ declarations.
   sequence capped at `b_{2^m}` (`ENNReal.tsum_min_le_dyadic`); the bound
   `∑_k 2^k b_{2^k} ≤ 2 ∑_n b_n` (`ENNReal.tsum_two_pow_mul_le_two_mul`), where Mathlib's
   `ENNReal.tsum_condensed_le` has `b_1 + 2 ∑_n b_n`; and
-  `ENNReal.rpow_le_rpow_of_nonpos`, which exists for `ℝ` and `ℝ≥0` but not for `ℝ≥0∞`.
+  `ENNReal.rpow_le_rpow_of_nonpos`, which exists for `ℝ` and `ℝ≥0` but not for `ℝ≥0∞`. In `ℓ_q`
+  form for every `0 < q ≤ ∞`: for a decreasing sequence `e` and `s ≥ 0`,
+  `‖((n + 1)^(s - 1/q) e_n)_n‖_{ℓ_q} ≤ C_q 2^s (e_0 + ‖(2^(ks) e_{2^k})_k‖_{ℓ_q})` and
+  `e_0 + ‖(2^(ks) e_{2^k})_k‖_{ℓ_q} ≤ 4 C_q² 2^s ‖((n + 1)^(s - 1/q) e_n)_n‖_{ℓ_q}`, with
+  `C_q = LpAddConst q` (`ENNReal.lqNorm_pow_mul_le_dyadic`, `ENNReal.dyadic_le_lqNorm_pow_mul`),
+  Pietsch's weighted norm against the dyadic one; a candidate together with `ENNReal.lqNorm`.
 * **`x^z ≤ x` in `[0, ∞]`** (`FunctionSpaces/Domains/Lipschitz/IndicatorMultiplier.lean`):
   `x^z ≤ x` for `x ≥ 1` and `z ≤ 1` (`ENNReal.rpow_le_self_of_one_le`), the companion of
   Mathlib's `ENNReal.rpow_le_self_of_le_one`; Mathlib has it for `ℝ`
@@ -178,7 +212,9 @@ declarations.
   `ENNReal.hardy_tail_le`, `ENNReal.hardy_sum_le`, and the almost diagonal estimate that combines
   both (`ENNReal.lqNorm_almostDiagonal_le`), with its constant `ENNReal.almostDiagonalConst`, and
   their forms for `0 < q ≤ 1` (`ENNReal.hardy_tail_le_of_le_one`,
-  `ENNReal.hardy_sum_le_of_le_one`, `ENNReal.lqNorm_almostDiagonal_le_of_le_one`).
+  `ENNReal.hardy_sum_le_of_le_one`, `ENNReal.lqNorm_almostDiagonal_le_of_le_one`), and their
+  forms in `ρ`-th powers for every `ρ > 0` and every `0 < q ≤ ∞`, for tails and for partial sums
+  (`ENNReal.lqNorm_rpow_le_of_rpow_le_tsum`, `ENNReal.lqNorm_rpow_le_of_rpow_le_sum`).
 * **A fractional Hardy inequality on `(0, 1]`**
   (`FunctionSpaces/Analysis/Lp/HalfLineHardy.lean`): for `s > 1/2` and a measurable `u : ℝ → ℂ`
   that vanishes almost everywhere on some `(0, ε)`,
@@ -220,8 +256,14 @@ declarations.
   and `p ≤ r`, the bounded linear injection `MeasureTheory.Lp.inclusionOfExponentLe`, with
   its norm bound and compatibility with `BoundedContinuousFunction.toLp`; the linear map
   underneath, `MeasureTheory.Lp.inclusionOfExponentLeLinear`, needs no `Fact (1 ≤ p)` and is
-  injective for all exponents (`MeasureTheory.Lp.inclusionOfExponentLeLinear_injective`). Mathlib
-  has the subgroup inclusion `MeasureTheory.Lp.antitone` but no bundled map.
+  injective for all exponents (`MeasureTheory.Lp.inclusionOfExponentLeLinear_injective`); the
+  inclusion `L_∞ ↪ L_p` of essentially bounded functions (`MeasureTheory.Lp.topInclusion`), with
+  `‖f - ι a‖_t = ‖f - a‖_t` for every exponent `t` (`MeasureTheory.Lp.eLpNorm_sub_topInclusion`).
+  Mathlib has the subgroup inclusion `MeasureTheory.Lp.antitone` but no bundled map. Short
+  companions go with the bundled map: the inclusions compose
+  (`MeasureTheory.Lp.inclusionOfExponentLeLinear_comp`) and keep every quasi-norm
+  (`MeasureTheory.Lp.eLpNorm_inclusionOfExponentLeLinear`), and the Hölder exponent
+  `1/p - 1/r` is nonnegative (`ENNReal.one_div_toReal_sub_one_div_toReal_nonneg`).
 * **Interpolation between `L_p` and `L_∞`** (`FunctionSpaces/Analysis/Lp/Interpolation.lean`):
   `eLpNorm f r μ ≤ M^(1-p/r) eLpNorm f p μ^(p/r)` for `‖f‖ ≤ M` a.e.
   (`MeasureTheory.eLpNorm_le_rpow_mul_eLpNorm_rpow`), and its consequence that a bounded
@@ -230,12 +272,13 @@ declarations.
 * **`L_∞` norm of bounded continuous functions**
   (`FunctionSpaces/Analysis/Lp/BoundedContinuous.lean`): `‖a‖_{L_∞(μ)} ≤ ‖a‖` in `[0, ∞]` for
   every measure (`BoundedContinuousFunction.eLpNorm_top_le_enorm`, with the real form
-  `BoundedContinuousFunction.toReal_eLpNorm_top_le_norm`), and for a finite measure the class of
-  `a` in `L_p`, taken through `L_∞`, has `‖a‖_p ≤ μ(Ω)^(1/p) ‖a‖` for every exponent `p`, also
-  `p < 1` (`BoundedContinuousFunction.eLpNorm_topInclusion_toLp_le`; Mathlib has
-  `BoundedContinuousFunction.Lp_nnnorm_le` for `1 ≤ p`); for a measure charging open sets,
+  `BoundedContinuousFunction.toReal_eLpNorm_top_le_norm`); for a measure charging open sets,
   `‖toLp ∞ μ a‖ = ‖a‖`, and the range is closed (`BoundedContinuousFunction.norm_toLp_top`,
-  `.isClosed_range_toLp_top`).
+  `.isClosed_range_toLp_top`). A companion of `MeasureTheory.Lp.topInclusion`: for a finite
+  measure the class of `a` in `L_p`, taken through `L_∞ ↪ L_p`, satisfies
+  `‖a‖_p ≤ μ(Ω)^(1/p) ‖a‖` in `[0, ∞]` for every exponent `p`
+  (`BoundedContinuousFunction.eLpNorm_topInclusion_toLp_le`), the bound of Mathlib's
+  `BoundedContinuousFunction.Lp_nnnorm_le` for this class.
 * **Conditional expectation on `L_p`**
   (`FunctionSpaces/MeasureSpaces/Martingales/Filtration.lean`): for a finite measure and
   `1 ≤ p ≤ ∞`, `E[· | m]` as a contraction `Lp E p μ →L Lp E p μ`

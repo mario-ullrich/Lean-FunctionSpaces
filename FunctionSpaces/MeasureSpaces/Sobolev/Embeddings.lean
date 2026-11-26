@@ -11,22 +11,22 @@ public import FunctionSpaces.MeasureSpaces.Besov.Embeddings
 /-!
 # Embedding theorems for Sobolev spaces
 
-A **Sobolev space** of order `s` inside `L_p(μ)` is, for this library, a smoothness space for
-the scheme `S` in `L_p`: a Banach space `W` with an injective bounded map `ι : W → L_p(μ)` and
-Jackson's and Bernstein's inequalities of order `s` (`FunctionScheme.SobolevSpace`). It is a
-hypothesis structure whose fields are the embedding, the order and Jackson's and Bernstein's
-inequalities with their constants; its instances in this library are the spaces `H^s` with
-`p = 2` on the torus (`Torus.periodicSobolevSpace`) and for a continuous spectral basis
-(`ContinuousSpectralBasis.sobolevSpace`).
+A **Sobolev space** of order `s` inside `L_p(μ)`, `1 ≤ p ≤ ∞`, is, for this library, a
+smoothness space for the scheme `S` in `L_p`: a normed space `W` with an injective bounded map
+`ι : W → L_p(μ)` and Jackson's and Bernstein's inequalities of order `s`
+(`FunctionScheme.SobolevSpace`). It is a hypothesis structure whose fields are the embedding,
+the order and Jackson's and Bernstein's inequalities with their constants; its instances in
+this library are the spaces `H^s` with `p = 2` on the torus (`Torus.periodicSobolevSpace`) and
+for a continuous spectral basis (`ContinuousSpectralBasis.sobolevSpace`).
 
 If the scheme has the Nikolskii property of dimension `D` (the hypothesis
 `FunctionScheme.HasNikolskii`, proved for the trigonometric polynomials on the torus,
 `Torus.trigScheme_hasNikolskii`, and for the dyadic steps on `[0, 1)`,
 `Haar.hasNikolskii_haarScheme`), then:
 
-* **the Sobolev embedding** `W^s_p ↪ W^t_r` for `p ≤ r` and `t < s - D(1/p - 1/r)`
-  (`SobolevSpace.exists_eq_inclusion`): every element of `W` is, as an `L_p` function, the
-  inclusion of an element of `W'`;
+* **the Sobolev embedding** `W^s_p ↪ W^t_r` for `1 ≤ p ≤ r ≤ ∞` and `t < s - D(1/p - 1/r)`
+  (`SobolevSpace.exists_eq_inclusion`): for a complete Sobolev space `W'` of order `t` in
+  `L_r`, every element of `W` is, as an `L_p` function, the inclusion of an element of `W'`;
 * **the embedding into bounded continuous functions** for `s > D/p`
   (`SobolevSpace.exists_boundedContinuous`), when `Ω` is a topological space with its Borel
   `σ`-algebra, `μ` charges every nonempty open set and the scheme has continuous approximants.
@@ -39,9 +39,12 @@ by Jackson, the Besov embedding, the embedding `A^{s-α}_∞ ⊆ A^t_1` for `t <
 Bernstein.
 
 **Limiting cases.** The chain loses the fine index at both ends (`W ⊆ B_{·,∞}` and
-`B_{·,1} ⊆ W`), and the Besov embedding needs a strict inequality.  The sharp cases
-`t = s - D(1/p - 1/r)` (for instance `W^1_1(𝕋^d) ↪ L_{d/(d-1)}`) and `s = D/p` for continuity
-are therefore not provable by this method; they need tools of harmonic analysis.
+`B_{·,1} ⊆ W`), and the Besov embedding needs a strict inequality, so the chain gives the strict
+inequalities `t < s - D(1/p - 1/r)` and `s > D/p`. The sharp case `t = s - D(1/p - 1/r)` holds
+in some settings by other arguments, such as `W^1_1 ↪ L_{d/(d-1)}` on `ℝ^d`, `d ≥ 2`, by the
+Gagliardo–Nirenberg–Sobolev inequality (`Rd.exists_memLp_ae_eq_of_hasWeakLineDeriv_one`).
+For the classical spaces, continuity at `s = D/p` holds for `p = 1` only: `W^d_1(𝕋^d)` consists
+of continuous functions, and `H^{d/2}(𝕋^d)` contains unbounded ones.
 -/
 
 @[expose] public section
