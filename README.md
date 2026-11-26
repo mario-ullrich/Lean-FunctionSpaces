@@ -8,7 +8,7 @@ space is also identified with an approximation space: the functions whose error 
 approximation by a fixed scheme (band-limited functions, trigonometric polynomials, splines,
 wavelets, eigenfunctions) decays at a given rate. This form makes the general methods of
 approximation theory available, such as interpolation, embeddings, decompositions and traces,
-and it is the form numerical analysis needs. The project has about 135 000 lines of Lean in 327
+and it is the form numerical analysis needs. The project has about 136 000 lines of Lean in 327
 files and contains no `sorry`.
 
 * **Blueprint** (a webpage explaining the mathematics):
@@ -203,160 +203,116 @@ For a general scheme the project describes `A^s_q`
 
 ## Main results
 
-`V` is a finite-dimensional real inner product space of dimension `d`, such as `ℝ^d`.
+`V` is a finite-dimensional real inner product space of dimension `d`, such as `ℝ^d`. Each item
+gives the central statements of one area. The block documents listed under
+[Organisation](#organisation) state every result with its Lean name.
 
 * **Besov spaces on `ℝ^d`.** Let `1 ≤ p < ∞`, `1 ≤ q ≤ ∞` and `0 < s < r`. For `f ∈ L_p(V)` these
   are equivalent: `f ∈ A^s_q` of the band-limited functions; `‖(2^(js) ‖ψ_j ⋆ f‖_p)_j‖_{ℓ_q} < ∞`;
   `‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞` (`Rd.memApprox_bandScheme_iff_modulus`,
   `Rd.littlewoodPaleyNorm_lt_top_iff_modulus`).
-* **Daubechies wavelets.** Let `φ`, `ψ` be the D4 scaling function and wavelet, `1 ≤ p < ∞`,
-  `1 ≤ q ≤ ∞` and `0 < s < 2 - log₂(1 + √3) ≈ 0.55`. Then `f ∈ L_p(ℝ)` has
-  `‖f‖_p + ‖(2^(ks) ω_2(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff
-  `‖(⟨f, φ(· - k)⟩)_k‖_{ℓ_p} + ‖(2^(j(s+1/2-1/p)) ‖(⟨f, ψ_{j,k}⟩)_k‖_{ℓ_p})_j‖_{ℓ_q} < ∞`
-  (`Daubechies.besov_iff_coeff_d4`).
-* **Tensor Daubechies wavelets on `ℝ^d`.** Let `φ`, `ψ` be the scaling function and wavelet of a
-  mask of order `N ≥ 2` with `ω_N(φ, t)_p ≤ K t^θ` for `0 < t ≤ 1`, `Φ = φ ⊗ ⋯ ⊗ φ` and, for
-  nonempty `e ⊆ {1, …, d}`, `Ψ^e` the tensor product with `ψ` in the coordinates of `e` and `φ`
-  in the others; let `1 ≤ p < ∞`, `1 ≤ q ≤ ∞` and `0 < s < min(θ, N)` (every such `θ` is at most
-  `N`). Then `f ∈ L_p(ℝ^d)`, with the maximum norm on `ℝ^d`, has
-  `‖f‖_p + ‖(2^(ks) ω_N(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff
-  `‖(⟨f, Φ(· - k)⟩)_k‖_{ℓ_p} + ‖(2^(j(s+d/2-d/p)) ‖(⟨f, Ψ^e_{j,k}⟩)_{e,k}‖_{ℓ_p})_j‖_{ℓ_q} < ∞`
-  (`Daubechies.tensor_besov_iff_coeff`). For masks of order three and `0 < s < 3 - log₂ 3`,
-  `u ∈ H^s(V)` iff `u` is an `L_2` function with
-  `∑_k |⟨u, Φ(· - k)⟩|² + ∑_j 2^(2js) ∑_{e,k} |⟨u, Ψ^e_{j,k}⟩|² < ∞` in the coordinates of a
-  fixed orthonormal basis (`Daubechies.memSobolev_two_iff_tensorCoeff_order_three`). The
-  functions `Φ(· - k)` and `Ψ^e_{j,k}` form a Hilbert basis of `L_2(ℝ^d)`
-  (`Daubechies.tensorWaveletBasis`). Let `1 ≤ τ < 2` and `0 < α = d(1/τ - 1/2) < min(θ, N)`,
-  with `θ` as above for `p = τ`. Then `f ∈ L_2(ℝ^d)` lies in the approximation space
-  `A^{1/τ - 1/2}_τ` of `n`-term approximation from this basis iff `f ∈ L_τ(ℝ^d)` and
-  `‖f‖_τ + ‖(2^(kα) ω_N(f, 2^(-k))_τ)_k‖_{ℓ_τ} < ∞`, that is, iff `f ∈ B^α_{τ,τ}(ℝ^d)`
-  (`Daubechies.memApprox_nTerm_tensorWaveletBasis_iff`).
-* **Sobolev, Bessel potential and Triebel–Lizorkin spaces.** Let `d ≥ 1` and `1 < p < ∞`. Every
-  `f ∈ L_p(V)` has `‖f‖_{F^0_{p,2}} ≤ C ‖f‖_p` and `‖f‖_p ≤ C' ‖f‖_{F^0_{p,2}}`, with finite
-  constants depending on `V` and `p` (`Rd.triebelLizorkinNorm_zero_two_le`,
-  `Rd.enorm_le_triebelLizorkinNorm_zero_two`). For `m ∈ ℕ`, `f ∈ L_p(V)` lies in `W^m_p(V)` iff
-  in `F^m_{p,2}(V)` iff in `H^{m,p}(V)`, the last being Calderón's theorem
-  (`Rd.memSobolevW_iff_memTriebelLizorkin`, `Rd.memSobolevW_iff_memSobolev_bessel`). For real `s`,
-  a tempered distribution lies in `H^{s,p}(V)` iff it lies in `F^s_{p,2}(V)`
-  (`Rd.memSobolev_bessel_iff_memTriebelLizorkinDistr`). For real `t ≤ s` the inclusion
-  `H^s(V) ⊆ H^t(V)` has norm at most `1`, every derivative `∂_v : H^{s+1}(V) → H^s(V)` is
-  bounded, and for an orthonormal basis `(e_i)` of `V`,
-  `(2π)² ‖U‖²_{H^{s+1}} = (2π)² ‖U‖²_{H^s} + ∑_i ‖∂_{e_i} U‖²_{H^s}` (`Rd.sobolevInclusion`,
-  `Rd.sobolevLineDeriv`, `Rd.sq_norm_eq_add_sum_sobolevLineDeriv`). For `0 < s < r`,
-  `‖U‖_{H^s}` is equivalent to `‖U‖_2 + ‖(2^(ks) ω_r(U, 2^(-k))_2)_k‖_{ℓ_2}`, with explicit
-  constants (`Rd.modNorm_sobolevToL2_le`, `Rd.enorm_le_modNorm_sobolevToL2`).
-* **Sobolev embeddings.** Let `d ≥ 1`, `1 < p < ∞`, `m ∈ ℕ` and `f ∈ W^m_p(V)`. If `r < ∞` and
-  `1/r = 1/p - m/d`, then `f` agrees almost everywhere with a function in `L_r(V)`
-  (`Rd.exists_memLp_ae_eq_of_memSobolevW_of_eq`); if `m > d/p`, with a bounded continuous function
-  (`Rd.exists_boundedContinuous_ae_eq_of_memSobolevW`). For `1 ≤ p < ∞`, `r < ∞`,
-  `1/r = 1/p - 1/d` and `f ∈ W^1_p(V)`, some `u ∈ L_r(V)` equals `f` almost everywhere with
-  `‖u‖_r ≤ C ∑_k ‖∂_k f‖_p`, `C` Mathlib's Gagliardo–Nirenberg–Sobolev constant
-  (`Rd.exists_memLp_ae_eq_of_memSobolevW_one`).
+* **Daubechies wavelets.** Let `1 ≤ p < ∞` and `1 ≤ q ≤ ∞`, let `φ`, `ψ` be the scaling
+  function and wavelet of a mask of order `N ≥ 2` with `ω_N(φ, t)_p ≤ K t^θ` for `0 < t ≤ 1`,
+  `Φ = φ ⊗ ⋯ ⊗ φ` and, for nonempty `e ⊆ {1, …, d}`, `Ψ^e` the tensor product with `ψ` in the
+  coordinates of `e` and `φ` in the others.
+  - For `0 < s < min(θ, N)`, `f ∈ L_p(ℝ^d)`, with the maximum norm on `ℝ^d`, has
+    `‖f‖_p + ‖(2^(ks) ω_N(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff
+    `‖(⟨f, Φ(· - k)⟩)_k‖_{ℓ_p} + ‖(2^(j(s+d/2-d/p)) ‖(⟨f, Ψ^e_{j,k}⟩)_{e,k}‖_{ℓ_p})_j‖_{ℓ_q} < ∞`
+    (`Daubechies.tensor_besov_iff_coeff`).
+  - On `ℝ`, for the D4 scaling function and wavelet, `f ∈ L_p(ℝ)` has
+    `‖f‖_p + ‖(2^(ks) ω_2(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff
+    `‖(⟨f, φ(· - k)⟩)_k‖_{ℓ_p} + ‖(2^(j(s+1/2-1/p)) ‖(⟨f, ψ_{j,k}⟩)_k‖_{ℓ_p})_j‖_{ℓ_q} < ∞`, for
+    `0 < s < 2 - log₂(1 + √3) ≈ 0.55` (`Daubechies.besov_iff_coeff_d4`).
+  - The functions `Φ(· - k)` and `Ψ^e_{j,k}` form a Hilbert basis of `L_2(ℝ^d)`
+    (`Daubechies.tensorWaveletBasis`). Let `1 ≤ τ < 2` and `0 < α = d(1/τ - 1/2) < min(θ, N)`,
+    with `θ` as above for `p = τ`. Then `f ∈ L_2(ℝ^d)` lies in the approximation space
+    `A^{1/τ - 1/2}_τ` of `n`-term approximation from this basis iff `f ∈ L_τ(ℝ^d)` and
+    `‖f‖_τ + ‖(2^(kα) ω_N(f, 2^(-k))_τ)_k‖_{ℓ_τ} < ∞`, that is, iff `f ∈ B^α_{τ,τ}(ℝ^d)`
+    (`Daubechies.memApprox_nTerm_tensorWaveletBasis_iff`).
+* **Sobolev, Bessel potential and Triebel–Lizorkin spaces on `ℝ^d`.** Let `d ≥ 1` and
+  `1 < p < ∞`.
+  - The square function theorem, `L_p = F^0_{p,2}`: every `f ∈ L_p(V)` has
+    `‖f‖_{F^0_{p,2}} ≤ C ‖f‖_p` and `‖f‖_p ≤ C' ‖f‖_{F^0_{p,2}}`, with finite constants depending
+    on `V` and `p` (`Rd.triebelLizorkinNorm_zero_two_le`,
+    `Rd.enorm_le_triebelLizorkinNorm_zero_two`).
+  - For `m ∈ ℕ`, `f ∈ L_p(V)` lies in `W^m_p(V)` iff in `F^m_{p,2}(V)` iff in `H^{m,p}(V)`, the
+    last being Calderón's theorem (`Rd.memSobolevW_iff_memTriebelLizorkin`,
+    `Rd.memSobolevW_iff_memSobolev_bessel`).
+  - For real `s`, a tempered distribution lies in `H^{s,p}(V)` iff it lies in `F^s_{p,2}(V)`
+    (`Rd.memSobolev_bessel_iff_memTriebelLizorkinDistr`).
+  - Sobolev embeddings: let `m ∈ ℕ` and `f ∈ W^m_p(V)`. If `r < ∞` and `1/r = 1/p - m/d`, then
+    `f` agrees almost everywhere with a function in `L_r(V)`
+    (`Rd.exists_memLp_ae_eq_of_memSobolevW_of_eq`); if `m > d/p`, with a bounded continuous
+    function (`Rd.exists_boundedContinuous_ae_eq_of_memSobolevW`).
 * **Bounded Lipschitz domains.** Let `Ω ⊆ V` be a bounded open set that agrees near each
-  boundary point with the region above a Lipschitz graph (`Rd.isBoundedLipschitzDomain_iff_exists`),
-  `1 ≤ p < ∞`, `1 ≤ q ≤ ∞` and `0 < s < r`. Then `f ∈ L_p(V)` agrees on `Ω` with some `F` with
-  `‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff
-  `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`, with differences inside `Ω`; some
-  such `F` has quasi-norm at most `C` times the intrinsic one, one `C < ∞` for all `f`
-  (`Rd.BoundedLipschitzDomain.exists_besov_extension_iff_modulusOn_indicator`,
-  `Rd.BoundedLipschitzDomain.exists_besov_extension_le`). For `1 < p < ∞` and every `m`, every
-  `f ∈ L_p(Ω)` with weak derivatives of order at most `m` in `L_p(Ω)` agrees on `Ω` with some
-  `F ∈ W^m_p(V)` (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolevW_order`); for
-  `m = 1`, `d ≥ 1` and `1 ≤ p ≤ ∞` a bounded linear operator does this
-  (`Rd.BoundedLipschitzDomain.sobolevExtensionL`).
-* **Splines on bounded Lipschitz domains.** Let `Ω` be a bounded Lipschitz domain in a cube
-  `Q = a + L [0, 1]^d`, `1 ≤ p < ∞`, `1 ≤ q ≤ ∞`, `r ≥ 1` and `0 < s < r - 1 + 1/p`, and let the
-  tensor splines of order `r` on `Q` be those of `[0, 1]^d` moved by `x ↦ a + L x`. Then
-  `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞` iff `f` agrees on `Ω` with a
-  function in the approximation space `A^s_q` of these splines
-  (`Rd.BoundedLipschitzDomain.exists_memApprox_cubeSplineSchemeAt_iff`), iff `f = ∑_k b_k` on `Ω`,
-  the series converging in `L_p(Q)`, with tensor splines `b_k` of level `k` on `Q` and
-  `‖(2^(ks) ‖b_k‖_{L_p(Q)})_k‖_{ℓ_q} < ∞` (`Rd.HasBesovExtension.exists_cubeSplineBlocksAt_iff`).
-  The errors `E_k(f)` of best approximation of `f` in `L_p(Ω)` by the restrictions of the
-  splines of level `k` then satisfy
-  `‖(2^(ks) E_k(f))_k‖_{ℓ_q} ≤ C (‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q})`
-  (`Rd.HasBesovExtension.exists_approxNormDyadic_domainSplineScheme_le`). On `[0, 1]^d` itself the
-  tensor splines describe the restrictions of `B^s_{p,q}(ℝ^d)`
-  (`Cube.memApprox_cubeSplineScheme_iff_exists_besov`).
-* **Compact manifolds.** Let `M` be a compact Hausdorff smooth manifold of dimension `d ≥ 1`,
-  without boundary, with boundary or with corners, with a smooth measure `μ`. For `1 ≤ p < ∞`,
-  `s > 0` and `1 ≤ q ≤ ∞`, `B^s_{p,q}(M)`, defined by the chart pieces of a Besov atlas, is the
-  same for every atlas (`Manifold.memManifoldBesov_iff`).
-* **Traces.** Let `Ω` be as above, with boundary `Γ` and surface measure `σ`, the
-  `(d-1)`-dimensional Hausdorff measure on `Γ`. For `1 ≤ p < ∞`, `1 ≤ q ≤ ∞` and
-  `1/p < s < 1 + 1/p`, let `B^s_{p,q}(Ω)` carry the intrinsic quasi-norm with differences of
-  order `2` and `B^{s-1/p}_{p,q}(Γ)` the quasi-norm by the chart pieces of a resolution of unity.
-  Both are Banach spaces, and the trace is a bounded linear operator from `B^s_{p,q}(Ω)` onto
-  `B^{s-1/p}_{p,q}(Γ)` with a bounded linear right inverse
-  (`Rd.BoundedLipschitzDomain.besovTrace`, `Rd.BoundedLipschitzDomain.besovTrace_surjective`,
-  `Rd.BoundedLipschitzDomain.besovExtend`,
-  `Rd.BoundedLipschitzDomain.toLp_besovTrace_besovExtend`; Schneider–Vybíral, Mayboroda). For
-  `0 < t < 1` let `H^t(Γ)` be `B^t_{2,2}(Γ)` with the Hilbert norm
-  `(‖g‖²_{L_2(Γ)} + ∑_j E_j(g))^(1/2)`, where `E_j(g)` is the Gagliardo form of the `j`-th chart
-  piece of `g` (`Rd.BoundedLipschitzDomain.BoundarySobolev`). This norm is equivalent to the
-  norm by chart pieces and to the square root of
-  `‖g‖²_{L_2(Γ)} + ∫_Γ ∫_Γ |g(x) - g(y)|² / |x - y|^(d-1+2t) dσ dσ`
-  (`Rd.BoundedLipschitzDomain.boundarySobolevEquivBoundaryBesov`,
-  `Rd.BoundedLipschitzDomain.exists_boundarySobolev_norm_equiv_slobodeckij`), and Riesz
-  identifies the dual `H^{-t}(Γ)` with `H^t(Γ)`
-  (`Rd.BoundedLipschitzDomain.dualBoundarySobolevEquiv`). Let `1/2 < s < 3/2`, `H^s(Ω)` the
-  restrictions of `H^s(V)`, `H^s_0(Ω)` the closure of the restricted test functions, and the
-  trace space the orthogonal complement of the kernel of the trace in `H^s(Ω)`. The trace maps
-  `H^s(Ω)` onto `H^{s-1/2}(Γ)` with a bounded linear right inverse
-  (`Rd.BoundedLipschitzDomain.sobolevTrace`,
-  `Rd.BoundedLipschitzDomain.sobolevTrace_sobolevExtend`; McLean, Theorem 3.38), its kernel is
-  `H^s_0(Ω)` (`Rd.BoundedLipschitzDomain.traceKer_eq_zeroBoundarySpace`; McLean, Theorem 3.40),
-  and the trace space and `H^s(Ω) ⧸ H^s_0(Ω)` are isomorphic to `H^{s-1/2}(Γ)`
-  (`Rd.BoundedLipschitzDomain.traceSpaceEquivBoundarySobolev`,
-  `Rd.BoundedLipschitzDomain.quotientZeroBoundaryEquivBoundarySobolev`). Let `τ` be the trace of
-  the trace space into `L_2(Γ)`. Then `g ∈ L_2(Γ)` is `τ u` for some `u` iff
-  `∫_Γ ∫_Γ |g(x) - g(y)|² / |x - y|^(d+2s-2) dσ(x) dσ(y) < ∞`, and `‖u‖²` is equivalent to
-  `‖τ u‖²_{L_2(Γ)}` plus this form (`Rd.BoundedLipschitzDomain.mem_range_traceL2_iff_slobodeckij`,
-  `Rd.BoundedLipschitzDomain.exists_traceL2_norm_equiv_slobodeckij`).
-* **`H̃^s(Ω)` and `H^s_0(Ω)`.** Let `Ω ⊆ V` be open, `H̃^s(Ω)` the closure of the test
-  functions of `Ω` in `H^s(V)` and `H^s_0(Ω)` the closure of their restrictions in `H^s(Ω)`.
-  For every `l ∈ ℕ`, restriction is an isometric isomorphism of `H̃^l(Ω)` onto `H^l_0(Ω)`
-  (`Rd.tildeEquivZeroBoundaryNat`; Hewett–Moiola, Lemma 2.2(iii)). Let `Ω` be a bounded
-  Lipschitz domain and `s ≥ 0`. Then `H̃^s(Ω)` consists of the `U ∈ H^s(V)` that vanish almost
-  everywhere outside `Ω` (`Rd.BoundedLipschitzDomain.mem_tildeSpace_iff_of_nonneg`); if
-  `s - 1/2 ∉ ℕ`, restriction is an isomorphism of `H̃^s(Ω)` onto `H^s_0(Ω)`
-  (`Rd.BoundedLipschitzDomain.tildeEquivZeroBoundaryOfNeHalf`; McLean, Theorem 3.33); and
-  `H^s_0(Ω) = H^s(Ω)` for `s < 1/2`
-  (`Rd.BoundedLipschitzDomain.zeroBoundarySpace_eq_top_of_lt_half`). Two inequalities carry the
-  proofs. For `1 ≤ p < ∞`, `1 ≤ q ≤ ∞` and `0 < s < 1/p`, multiplication by the indicator of
-  `Ω` is bounded on `B^s_{p,q}(V)` (`Rd.BoundedLipschitzDomain.exists_modNorm_indicatorLp_le`).
-  On a Lipschitz graph domain `Ω'` with height `h(x)` above the graph and `1/2 < s < 1`, every
-  `G ∈ L_2(V)` that vanishes near the graph has
-  `∫_{Ω'} |G|² / min(h, 1)^(2s) ≤ C (‖G‖_{L_2(Ω')} + ‖(2^(ks) ω_1(G, 2^(-k), Ω')_2)_k‖_{ℓ_2})²`
-  (`Rd.LipschitzGraph.exists_lintegral_div_graphHeight_le`), a fractional Hardy inequality. On a
-  bounded Lipschitz domain the traces, the isomorphisms and the duals hold componentwise for
-  `ℂ^m`-valued functions, in the Hilbert direct sums `X^m`: the trace maps `H^s(Ω)^m` onto
-  `H^{s-1/2}(Γ)^m` with kernel `H^s_0(Ω)^m` for `1/2 < s < 3/2`, restriction maps `H̃^s(Ω)^m`
-  isomorphically onto `H^s_0(Ω)^m` for `s ≥ 0` with `s - 1/2 ∉ ℕ`, and the dual of
-  `H̃^s(Ω)^m` is `H^{-s}(Ω)^m` for every real `s`
-  (`Rd.BoundedLipschitzDomain.vecSobolevTrace`, `Rd.BoundedLipschitzDomain.ker_vecSobolevTrace`,
-  `Rd.BoundedLipschitzDomain.vecTildeEquivZeroBoundaryOfNeHalf`, `Rd.vecDualEquiv`).
-* **Gelfand triples.** `L_2` is the pivot space between `H^s` and `H^{-s}` on `ℝ^d`, on open
-  sets `Ω` and on `Γ`. For `s ≥ 0` the embeddings `H^s(V) → L_2(V)` and `H̃^s(Ω) → L_2(Ω)`, and
-  for `0 < t < 1` the embedding `H^t(Γ) → L_2(Γ)`, are injective with dense range
-  (`Rd.sobolevToL2_injective`, `Rd.denseRange_sobolevToL2`, `Rd.tildeToL2_injective`,
-  `Rd.denseRange_tildeToL2`, `Rd.BoundedLipschitzDomain.boundarySobolevToL2_injective`,
-  `Rd.BoundedLipschitzDomain.denseRange_boundarySobolevToL2`), so their pivot duals
-  `g ↦ ⟪g, ι ·⟫_{L_2}` map `L_2` injectively into the dual spaces
-  (`ContinuousLinearMap.pivotDual_injective_iff`). On `ℝ^d`, `g` goes to the pairing with the
-  element of `H^{-s}(V)` whose distribution is `g` (`Rd.pivotDual_sobolevToL2_apply_apply`); on
-  `Ω` and on `Γ` the pairing of the dual space with the smaller space extends the inner product
-  of `L_2`, as `U ↦ ∫_Ω conj (g) ι_s U`, with `ι_s U` the `L_2` function of `U`, and
-  `h ↦ ∫_Γ conj (g) h dσ` (`Rd.sobolevPairing_tildeDualEquiv_pivotDual_tildeToL2`,
-  `Rd.BoundedLipschitzDomain.pivotDual_boundarySobolevToL2_apply_apply`).
-* **Eigenfunction expansions.** For an orthonormal basis of weak eigenfunctions `e_i` with
-  eigenvalues `λ_i`, let `A_k` be the span of the `e_i` with `⌊√(1 + λ_i)⌋ < k`, and let
-  `0 < θ < 1`, `1 ≤ q ≤ ∞`. On a bounded Lipschitz domain `Ω`, `d ≥ 1`, with the Neumann
-  eigenbasis, `f ∈ L_2(V)` has `f|_Ω ∈ A^θ_q` iff
-  `‖f‖_{L_2(Ω)} + ‖(2^(kθ) ω_r(f, 2^(-k), Ω)_2)_k‖_{ℓ_q} < ∞`, for every `r ≥ 1`
-  (`Rd.BoundedLipschitzDomain.memApprox_neumannScheme_iff`). On `M` as above, with the eigenbasis
-  of the chart form `a_A(u, w) = ∑_{k,j} ⟨∂_j P_k u, ∂_j P_k w⟩` of an atlas `A`, `f ∈ L_2(μ)`
-  lies in `A^θ_q` iff `f ∈ B^θ_{2,q}(M)` (`Manifold.BesovAtlas.memApprox_chartScheme_iff`).
+  boundary point with the region above a Lipschitz graph
+  (`Rd.isBoundedLipschitzDomain_iff_exists`).
+  - Besov spaces: let `1 ≤ p < ∞`, `1 ≤ q ≤ ∞` and `0 < s < r`. Then `f ∈ L_p(V)` agrees on `Ω`
+    with some `F` with `‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff
+    `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`, with differences inside `Ω`; some
+    such `F` has quasi-norm at most `C` times the intrinsic one, one `C < ∞` for all `f`
+    (`Rd.BoundedLipschitzDomain.exists_besov_extension_iff_modulusOn_indicator`,
+    `Rd.BoundedLipschitzDomain.exists_besov_extension_le`).
+  - Sobolev spaces: for `1 < p < ∞` and every `m`, every `f ∈ L_p(Ω)` with weak derivatives of
+    order at most `m` in `L_p(Ω)` agrees on `Ω` with some `F ∈ W^m_p(V)`
+    (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolevW_order`); for `m = 1`,
+    `d ≥ 1` and `1 ≤ p ≤ ∞` a bounded linear operator does this
+    (`Rd.BoundedLipschitzDomain.sobolevExtensionL`).
+  - Splines: let `Ω` lie in a cube `Q = a + L [0, 1]^d`, `1 ≤ p < ∞`, `1 ≤ q ≤ ∞`, `r ≥ 1` and
+    `0 < s < r - 1 + 1/p`, and let the tensor splines of order `r` on `Q` be those of
+    `[0, 1]^d` moved by `x ↦ a + L x`. Then
+    `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞` iff `f` agrees on `Ω` with a
+    function in the approximation space `A^s_q` of these splines
+    (`Rd.BoundedLipschitzDomain.exists_memApprox_cubeSplineSchemeAt_iff`).
+* **Traces.** Let `Ω` be a bounded Lipschitz domain, with boundary `Γ` and surface measure `σ`,
+  the `(d-1)`-dimensional Hausdorff measure on `Γ`.
+  - Besov spaces: for `1 ≤ p < ∞`, `1 ≤ q ≤ ∞` and `1/p < s < 1 + 1/p`, let `B^s_{p,q}(Ω)` carry
+    the intrinsic quasi-norm with differences of order `2` and `B^{s-1/p}_{p,q}(Γ)` the
+    quasi-norm by the chart pieces of a resolution of unity. Both are Banach spaces, and the
+    trace is a bounded linear operator from `B^s_{p,q}(Ω)` onto `B^{s-1/p}_{p,q}(Γ)` with a
+    bounded linear right inverse (`Rd.BoundedLipschitzDomain.besovTrace`,
+    `Rd.BoundedLipschitzDomain.besovTrace_surjective`, `Rd.BoundedLipschitzDomain.besovExtend`,
+    `Rd.BoundedLipschitzDomain.toLp_besovTrace_besovExtend`; Schneider–Vybíral, Mayboroda).
+  - Sobolev spaces: for `0 < t < 1` let `H^t(Γ)` be `B^t_{2,2}(Γ)` with a Hilbert norm built
+    from the Gagliardo forms of the chart pieces (`Rd.BoundedLipschitzDomain.BoundarySobolev`).
+    Let `1/2 < s < 3/2`, `H^s(Ω)` the restrictions of `H^s(V)` and `H^s_0(Ω)` the closure of the
+    restricted test functions. The trace maps `H^s(Ω)` onto `H^{s-1/2}(Γ)` with a bounded linear
+    right inverse (`Rd.BoundedLipschitzDomain.sobolevTrace`,
+    `Rd.BoundedLipschitzDomain.sobolevTrace_sobolevExtend`; McLean, Theorem 3.38), its kernel is
+    `H^s_0(Ω)` (`Rd.BoundedLipschitzDomain.traceKer_eq_zeroBoundarySpace`; McLean, Theorem 3.40),
+    and `H^s(Ω) ⧸ H^s_0(Ω)` is isomorphic to `H^{s-1/2}(Γ)`
+    (`Rd.BoundedLipschitzDomain.quotientZeroBoundaryEquivBoundarySobolev`).
+* **`H̃^s(Ω)`, `H^s_0(Ω)` and Gelfand triples.** Let `Ω ⊆ V` be open, `H̃^s(Ω)` the closure of
+  the test functions of `Ω` in `H^s(V)` and `H^s_0(Ω)` the closure of their restrictions in
+  `H^s(Ω)`.
+  - For every `l ∈ ℕ`, restriction is an isometric isomorphism of `H̃^l(Ω)` onto `H^l_0(Ω)`
+    (`Rd.tildeEquivZeroBoundaryNat`; Hewett–Moiola, Lemma 2.2(iii)).
+  - Let `Ω` be a bounded Lipschitz domain and `s ≥ 0`. Then `H̃^s(Ω)` consists of the
+    `U ∈ H^s(V)` that vanish almost everywhere outside `Ω`
+    (`Rd.BoundedLipschitzDomain.mem_tildeSpace_iff_of_nonneg`); if `s - 1/2 ∉ ℕ`, restriction is
+    an isomorphism of `H̃^s(Ω)` onto `H^s_0(Ω)`
+    (`Rd.BoundedLipschitzDomain.tildeEquivZeroBoundaryOfNeHalf`; McLean, Theorem 3.33); and
+    `H^s_0(Ω) = H^s(Ω)` for `s < 1/2`
+    (`Rd.BoundedLipschitzDomain.zeroBoundarySpace_eq_top_of_lt_half`).
+  - `L_2` is the pivot space between `H^s` and `H^{-s}` on `ℝ^d`, on open sets `Ω` and on the
+    boundary `Γ` of a bounded Lipschitz domain. For `s ≥ 0` the embeddings `H^s(V) → L_2(V)` and
+    `H̃^s(Ω) → L_2(Ω)`, and for `0 < t < 1` the embedding `H^t(Γ) → L_2(Γ)`, are injective with
+    dense range, so their pivot duals `g ↦ ⟪g, ι ·⟫_{L_2}` map `L_2` injectively into the dual
+    spaces (`ContinuousLinearMap.pivotDual_injective_iff`, `Rd.denseRange_sobolevToL2`,
+    `Rd.denseRange_tildeToL2`, `Rd.BoundedLipschitzDomain.denseRange_boundarySobolevToL2`).
+* **Compact manifolds and eigenfunction expansions.**
+  - Let `M` be a compact Hausdorff smooth manifold of dimension `d ≥ 1`, without boundary, with
+    boundary or with corners, with a smooth measure `μ`. For `1 ≤ p < ∞`, `s > 0` and
+    `1 ≤ q ≤ ∞`, `B^s_{p,q}(M)`, defined by the chart pieces of a Besov atlas, is the same for
+    every atlas (`Manifold.memManifoldBesov_iff`).
+  - For an orthonormal basis of weak eigenfunctions `e_i` with eigenvalues `λ_i`, let `A_k` be
+    the span of the `e_i` with `⌊√(1 + λ_i)⌋ < k`, and let `0 < θ < 1`, `1 ≤ q ≤ ∞`. On a
+    bounded Lipschitz domain `Ω`, `d ≥ 1`, with the Neumann eigenbasis, `f ∈ L_2(V)` has
+    `f|_Ω ∈ A^θ_q` iff `‖f‖_{L_2(Ω)} + ‖(2^(kθ) ω_r(f, 2^(-k), Ω)_2)_k‖_{ℓ_q} < ∞`, for every
+    `r ≥ 1` (`Rd.BoundedLipschitzDomain.memApprox_neumannScheme_iff`). On `M`, with the
+    eigenbasis of the chart form `a_A(u, w) = ∑_{k,j} ⟨∂_j P_k u, ∂_j P_k w⟩` of an atlas `A`,
+    `f ∈ L_2(μ)` lies in `A^θ_q` iff `f ∈ B^θ_{2,q}(M)`
+    (`Manifold.BesovAtlas.memApprox_chartScheme_iff`).
 * **Approximation spaces are interpolation spaces.** Let `ι : Y → X` be a bounded linear map
   of real normed spaces and `(A_n)` a scheme in `X` with Jackson's inequality
   `E_n(ι y) ≤ C n^(-r) ‖y‖` and Bernstein's inequality (every `a ∈ A_n` is `ι y` with
@@ -370,94 +326,72 @@ For a general scheme the project describes `A^s_q`
   (`FunctionScheme.lpCouple`). The E-functional `E(t, u) = inf {N₀(u - b) : N₁(b) ≤ t}`
   (Bergh–Löfström, Section 7.1, with the two spaces swapped; `InterpCouple.eFunctional`) gives
   the space `E_{s,q}`, in dyadic form, of the `u` with `N₀(u) + ‖(2^(ks) E(2^k, u))_k‖_{ℓ_q} < ∞`
-  (`InterpCouple.eNormDyadic`). For `r > 0`, `0 < η < 1` and `0 < q, q₁ ≤ ∞`,
-  `(N₀, E_{r,q₁})_{η,q} = E_{ηr,q}`, with the dyadic quasi-norm on `E_{r,q₁}` (DeVore;
-  `InterpCouple.memKMethod_leftECouple_iff`). Let `Y : U → [0, ∞]` be even with `Y^ρ` subadditive
-  for some `ρ > 0`, and let Jackson's inequality `E(2^k, u) ≤ C_J 2^(-kr) Y(u)` and Bernstein's
-  inequality `Y(a) ≤ C_B 2^(kr) N₀(a)` for `N₁(a) ≤ 2^k` hold with finite constants
-  (`InterpCouple.JacksonBernsteinData`). Then `(N₀, N₀ + Y)_{s/r,q} = E_{s,q}` for `0 < s < r` and
-  `0 < q ≤ ∞` (DeVore; `InterpCouple.JacksonBernsteinData.memKMethod_smoothnessCouple_iff`). If
-  `N₀^ρ` is subadditive for some `ρ > 0`, then for `s > 0` and `0 < q ≤ ∞`, `u ∈ E_{s,q}` iff `u` is
-  the `N₀`-limit of the partial sums of blocks `g_k` with `N₁(g_k) ≤ 2^k` and
-  `(2^(ks) N₀(g_k))_k ∈ ℓ_q` (DeVore–Popov;
-  `InterpCouple.eNormDyadic_lt_top_iff_eBlockDecompNorm_lt_top`).
+  (`InterpCouple.eNormDyadic`).
+  - For `r > 0`, `0 < η < 1` and `0 < q, q₁ ≤ ∞`, `(N₀, E_{r,q₁})_{η,q} = E_{ηr,q}`, with the
+    dyadic quasi-norm on `E_{r,q₁}` (DeVore; `InterpCouple.memKMethod_leftECouple_iff`).
+  - Let `Y : U → [0, ∞]` be even with `Y^ρ` subadditive for some `ρ > 0`, and let Jackson's
+    inequality `E(2^k, u) ≤ C_J 2^(-kr) Y(u)` and Bernstein's inequality
+    `Y(a) ≤ C_B 2^(kr) N₀(a)` for `N₁(a) ≤ 2^k` hold with finite constants
+    (`InterpCouple.JacksonBernsteinData`). Then `(N₀, N₀ + Y)_{s/r,q} = E_{s,q}` for `0 < s < r`
+    and `0 < q ≤ ∞` (DeVore;
+    `InterpCouple.JacksonBernsteinData.memKMethod_smoothnessCouple_iff`).
+  - If `N₀^ρ` is subadditive for some `ρ > 0`, then for `s > 0` and `0 < q ≤ ∞`, `u ∈ E_{s,q}`
+    iff `u` is the `N₀`-limit of the partial sums of blocks `g_k` with `N₁(g_k) ≤ 2^k` and
+    `(2^(ks) N₀(g_k))_k ∈ ℓ_q` (DeVore–Popov;
+    `InterpCouple.eNormDyadic_lt_top_iff_eBlockDecompNorm_lt_top`).
 * **Nonlinear approximation from an orthonormal basis.** Let `(e_i)_{i ∈ I}` be a Hilbert basis
   of a complex Hilbert space `H`, and let `A_n` be the set of linear combinations of at most `n`
   of the vectors `e_i`. For `0 < τ < 2` and `θ = 1/τ - 1/2`, `f ∈ H` lies in the approximation
   space `A^θ_τ` of `(A_n)` iff `∑_i |⟨e_i, f⟩|^τ < ∞` (Stechkin for `τ = 1`; Pietsch, DeVore in
-  general; `HilbertBasis.memApprox_nTerm_iff`). For the Fourier basis of `L_2(𝕋^d)` the
-  condition is `∑_{k ∈ ℤ^d} |f̂(k)|^τ < ∞` (`Torus.periodic_memApprox_nTerm_iff`). For the Haar
-  basis `1`, `h_{k,i}` (`0 ≤ i < 2^k`) of `L_2[0, 1]` it is
-  `|∫_0^1 f|^τ + ∑_k ∑_{i<2^k} |⟨f, h_{k,i}⟩|^τ < ∞` (`Haar.memApprox_nTerm_iff_haarCoeff`); for
-  `1 ≤ τ < 2`, `f ∈ A^θ_τ` iff `‖f‖_τ + ‖(2^(kθ) ω_1(f, 2^(-k), [0, 1])_τ)_k‖_{ℓ_τ} < ∞`, that is,
-  iff `f ∈ B^θ_{τ,τ}[0, 1]` (DeVore–Jawerth–Popov; `Haar.memApprox_nTerm_iff_modulus`).
+  general; `HilbertBasis.memApprox_nTerm_iff`).
+  - For the Fourier basis of `L_2(𝕋^d)` the condition is `∑_{k ∈ ℤ^d} |f̂(k)|^τ < ∞`
+    (`Torus.periodic_memApprox_nTerm_iff`).
+  - For the Haar basis of `L_2[0, 1]`, `f ∈ A^θ_τ` iff
+    `‖f‖_τ + ‖(2^(kθ) ω_1(f, 2^(-k), [0, 1])_τ)_k‖_{ℓ_τ} < ∞`
+    (`Haar.memApprox_nTerm_iff_intervalModulus_of_lt_two`); for `1 ≤ τ < 2` this is the theorem
+    of DeVore–Jawerth–Popov, `A^θ_τ = B^θ_{τ,τ}[0, 1]`.
 * **Besov spaces of a scheme for `0 < p ≤ ∞`.** Let `μ` be a finite measure on `Ω` and `S` a
   scheme of essentially bounded functions: sets `{0} = S_0 ⊆ S_1 ⊆ ⋯` in `L_∞(μ)` with
   `c S_n ⊆ S_n` and `S_m + S_n ⊆ S_{m+n}` (`FunctionScheme`). For `0 < p ≤ ∞`, `0 < q ≤ ∞` and
   real `s`, the Besov space `B^s_{p,q}(S)` consists of the `f ∈ L_p(μ)` with
   `((n + 1)^(s - 1/q) E_n(f)_p)_{n ≥ 0} ∈ ℓ_q`, where `E_n(f)_p = inf {‖f - a‖_p : a ∈ S_n}`
-  (`FunctionScheme.MemBesov`). For `s ≥ 0` this holds iff
-  `‖f‖_p + ‖(2^(ks) E_{2^k}(f)_p)_k‖_{ℓ_q} < ∞` (`FunctionScheme.memBesov_iff_eNormDyadic_lt_top`),
-  and for `p ≥ 1`, `B^s_{p,q}(S)` is the approximation space `A^s_q` of `S` in `L_p(μ)`
-  (`FunctionScheme.memBesov_iff_memApprox`). For `s > 0` and `0 < q ≤ ∞`, `f ∈ B^s_{p,q}(S)` iff
-  `f = ∑_k g_k` almost everywhere with `g_k ∈ S_{2^k}` and `(2^(ks) ‖g_k‖_p)_k ∈ ℓ_q`, and the
-  partial sums of every such series converge to `f` in `L_p` and in measure (DeVore–Popov 1988,
-  Trans. AMS; `FunctionScheme.memBesov_iff_exists_blocks`,
-  `FunctionScheme.tendsto_eLpNorm_sub_sum_of_blocks`). For `0 < s < t` and `0 < q, q₁ ≤ ∞`, the
-  Besov space is a real interpolation space, `B^s_{p,q} = (L_p, B^t_{p,q₁})_{s/t,q}` with the
-  dyadic quasi-norm on `B^t_{p,q₁}`, by the representation theorem in quasi-normed groups above
-  (`FunctionScheme.memBesov_iff_memKMethod_lpBesovCouple`). Let `D ≥ 0`, and let `S` have the
-  Nikolskii property of dimension `D`: for every `1 ≤ p ≤ ∞` there is `C` with
-  `‖a‖_∞ ≤ C n^(D/p) ‖a‖_p` for all `n ≥ 1` and `a ∈ S_n` (`FunctionScheme.HasNikolskii`). Then
-  for `0 < p ≤ r ≤ ∞` there is `C'` with `‖a‖_r ≤ C' n^(D(1/p - 1/r)) ‖a‖_p` for all such `a`
-  (Ditzian–Prymak; `FunctionScheme.HasNikolskii.exists_eLpNorm_le_of_le`); the embeddings below
-  need only the bound `‖a‖_∞ ≤ C n^(D/p) ‖a‖_p` at the source exponent `p`
-  (`FunctionScheme.HasNikolskiiAt`).
-  Let `0 < p ≤ r ≤ ∞`, `0 < q ≤ ∞` and `α = D(1/p - 1/r) < s`. There is `K < ∞` such that
-  every `f ∈ B^s_{p,q}(S)` is the class in `L_p(μ)` of some `g ∈ L_r(μ)` with
-  `‖g‖_r + ‖(2^(k(s-α)) E_{2^k}(g)_r)_k‖_{ℓ_q} ≤ K (‖f‖_p + ‖(2^(ks) E_{2^k}(f)_p)_k‖_{ℓ_q})`,
-  so `g ∈ B^{s-α}_{r,q}(S)` (the method of DeVore–Popov, and Kerkyacharian–Petrushev for
-  Dirichlet spaces; `FunctionScheme.exists_uniform_inclusion_eq_of_nikolskii`,
-  `FunctionScheme.MemBesov.exists_inclusion_eq_of_nikolskii`). For `s > D/p`, if `Ω` is a
-  topological space with its Borel σ-algebra, `μ` charges every nonempty open set and the
-  approximants are classes of bounded continuous functions, `f` has a bounded continuous
-  representative (`FunctionScheme.MemBesov.exists_boundedContinuous_of_nikolskii`). The
-  trigonometric polynomials on `𝕋^d` have the Nikolskii property with `D = d` and continuous
-  approximants, so both embeddings hold on the torus (`Torus.memBesov_exists_inclusion_eq`,
-  `Torus.memBesov_exists_continuous`). The dyadic step functions on `[0, 1)` have the Nikolskii
-  property with `D = 1` (`Haar.hasNikolskii_haarScheme`), so the embedding into `L_r` and
-  `B^{s-α}_{r,q}` holds for them, in the dyadic norms of the step couples
-  (`Haar.exists_uniform_inclusion_eq_stepCouple`). The embedding into `L_r` and `B^{s-α}_{r,q}`,
-  and, when `μ` charges every nonempty open set, the embedding into bounded continuous functions
-  hold for the scheme of a continuous spectral basis with the local Weyl bound
-  `∑_{λ(i) < n} |e_i(x)|² ≤ C n^D` of dimension `D ≥ 0` and `0 < p ≤ 2`
-  (`ContinuousSpectralBasis.memBesov_exists_inclusion_eq_of_localWeyl`,
-  `ContinuousSpectralBasis.memBesov_exists_boundedContinuous_of_localWeyl`).
+  (`FunctionScheme.MemBesov`).
+  - For `s ≥ 0` this holds iff `‖f‖_p + ‖(2^(ks) E_{2^k}(f)_p)_k‖_{ℓ_q} < ∞`
+    (`FunctionScheme.memBesov_iff_eNormDyadic_lt_top`), and for `p ≥ 1`, `B^s_{p,q}(S)` is the
+    approximation space `A^s_q` of `S` in `L_p(μ)` (`FunctionScheme.memBesov_iff_memApprox`).
+  - Block decompositions: for `s > 0`, `f ∈ B^s_{p,q}(S)` iff `f = ∑_k g_k` almost everywhere
+    with `g_k ∈ S_{2^k}` and `(2^(ks) ‖g_k‖_p)_k ∈ ℓ_q`, and the partial sums of every such
+    series converge to `f` in `L_p` and in measure (DeVore–Popov;
+    `FunctionScheme.memBesov_iff_exists_blocks`,
+    `FunctionScheme.tendsto_eLpNorm_sub_sum_of_blocks`).
+  - Interpolation: for `0 < s < t` and `0 < q, q₁ ≤ ∞`, `B^s_{p,q} = (L_p, B^t_{p,q₁})_{s/t,q}`
+    with the dyadic quasi-norm on `B^t_{p,q₁}`
+    (`FunctionScheme.memBesov_iff_memKMethod_lpBesovCouple`).
+  - Embeddings: let `D ≥ 0`, and let there be `C < ∞` with `‖a‖_∞ ≤ C n^(D/p) ‖a‖_p` for all
+    `n ≥ 1` and `a ∈ S_n` (`FunctionScheme.HasNikolskiiAt`). Let `p ≤ r ≤ ∞` and
+    `α = D(1/p - 1/r) < s`. There is `K < ∞` such that every `f ∈ B^s_{p,q}(S)` is the class in
+    `L_p(μ)` of some `g ∈ L_r(μ)` with
+    `‖g‖_r + ‖(2^(k(s-α)) E_{2^k}(g)_r)_k‖_{ℓ_q} ≤ K (‖f‖_p + ‖(2^(ks) E_{2^k}(f)_p)_k‖_{ℓ_q})`,
+    so `g ∈ B^{s-α}_{r,q}(S)` (`FunctionScheme.exists_uniform_inclusion_eq_of_nikolskii`). The
+    embedding holds for the trigonometric polynomials on `𝕋^d` with `D = d`
+    (`Torus.memBesov_exists_inclusion_eq`), and for the dyadic step functions on `[0, 1)` with
+    `D = 1`, in the dyadic norms of the step couples
+    (`Haar.exists_uniform_inclusion_eq_stepCouple`).
 * **Besov spaces for `0 < p ≤ 1` on `[0, 1]`.** Let `0 < p ≤ 1` and `0 < q ≤ ∞`, and let
   `E_k(f)` be the error of best approximation of `f ∈ L_p[0, 1]` by step functions on the dyadic
-  intervals of length `2^(-k)`. For `0 ≤ s < 1/p`, `‖f‖_p + ‖(2^(ks) E_k(f))_k‖_{ℓ_q} < ∞` iff
-  `‖f‖_p + ‖(2^(ks) ω_1(f, 2^(-k), [0, 1])_p)_k‖_{ℓ_q} < ∞`, that is, iff `f ∈ B^s_{p,q,1}[0, 1]`
-  (`Haar.eNormDyadic_stepCouple_lt_top_iff_modulus`), and this space is the Besov space of the
-  scheme of dyadic steps (`Haar.memBesov_haarScheme_iff_modulus`). For `p ≤ r < ∞` and
-  `1/p - 1/r < s < 1/p`, `B^s_{p,q,1}[0, 1] ⊆ L_r[0, 1]`: there is `K < ∞` with
-  `‖f‖_r ≤ K (‖f‖_p + ‖(2^(ks) E_k(f))_k‖_{ℓ_q})` for every `f ∈ L_p[0, 1]`, by the Besov
-  embedding of a scheme of functions with the Nikolskii property of dimension `1`
-  (`Haar.exists_eLpNorm_le_eNormDyadic_stepCouple`). For `0 < s < t ≤ 1/p`, `B^s_{p,q,1}[0, 1]`
-  is the real interpolation space `(L_p, B^t_{p,∞,1}[0, 1])_{s/t,q}`, where `B^t_{p,∞,1}[0, 1]`
-  carries the quasi-norm `‖f‖_p + sup_k 2^(kt) ω_1(f, 2^(-k), [0, 1])_p`
-  (`Haar.memKMethod_intervalLpModulus_iff`). For `1/p - 1 < s < 1/p`,
-  `f ∈ B^s_{p,q,1}[0, 1]` iff `f ∈ L_1[0, 1]` and
-  `|∫_0^1 f| + ‖(2^(k(s+1/2-1/p)) ‖(⟨f, h_{k,m}⟩)_{m<2^k}‖_{ℓ_p})_k‖_{ℓ_q} < ∞`
-  (`Haar.lqNorm_modulus_lt_top_iff_haarCoeff_of_le_one`), and for `q < ∞` the partial sums of the
-  Haar expansion of `f` converge to `f` in the quasi-norm `‖g‖_p + ‖(2^(ks) E_k(g))_k‖_{ℓ_q}`, and
-  the coefficients of a convergent Haar expansion are unique
-  (`Haar.tendsto_eNormDyadic_sub_haarPartialSum`, `Haar.eq_haarSystemCoeff_of_tendsto`). For
-  `0 < τ < 2` and `θ = 1/τ - 1/2`, `f ∈ L_2[0, 1]` lies in the approximation space `A^θ_τ` of
-  `n`-term approximation from the Haar basis iff
-  `‖f‖_τ + ‖(2^(kθ) ω_1(f, 2^(-k), [0, 1])_τ)_k‖_{ℓ_τ} < ∞`
-  (`Haar.memApprox_nTerm_iff_intervalModulus_of_lt_two`). For `s < 1`, and for `τ > 2/3`, these are
-  the Besov spaces of DeVore–Popov; for `1/p - 1 < s < 1` and `q < ∞` also the Fourier-analytic
-  `B^s_{p,q}[0, 1]` (Oswald).
+  intervals of length `2^(-k)`.
+  - For `0 ≤ s < 1/p`, `‖f‖_p + ‖(2^(ks) E_k(f))_k‖_{ℓ_q} < ∞` iff
+    `‖f‖_p + ‖(2^(ks) ω_1(f, 2^(-k), [0, 1])_p)_k‖_{ℓ_q} < ∞`, that is, iff
+    `f ∈ B^s_{p,q,1}[0, 1]` (`Haar.eNormDyadic_stepCouple_lt_top_iff_modulus`), and this space is
+    the Besov space of the scheme of dyadic steps (`Haar.memBesov_haarScheme_iff_modulus`).
+  - For `0 < s < t ≤ 1/p`, `B^s_{p,q,1}[0, 1]` is the real interpolation space
+    `(L_p, B^t_{p,∞,1}[0, 1])_{s/t,q}`, where `B^t_{p,∞,1}[0, 1]` carries the quasi-norm
+    `‖f‖_p + sup_k 2^(kt) ω_1(f, 2^(-k), [0, 1])_p` (`Haar.memKMethod_intervalLpModulus_iff`).
+  - For `1/p - 1 < s < 1/p`, `f ∈ B^s_{p,q,1}[0, 1]` iff `f ∈ L_1[0, 1]` and
+    `|∫_0^1 f| + ‖(2^(k(s+1/2-1/p)) ‖(⟨f, h_{k,m}⟩)_{m<2^k}‖_{ℓ_p})_k‖_{ℓ_q} < ∞`
+    (`Haar.lqNorm_modulus_lt_top_iff_haarCoeff_of_le_one`).
+  - For `s < 1` these are the Besov spaces of DeVore–Popov; for `1/p - 1 < s < 1` and `q < ∞`
+    also the Fourier-analytic `B^s_{p,q}[0, 1]` (Oswald).
 
 ## Organisation
 

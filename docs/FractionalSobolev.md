@@ -124,7 +124,8 @@ span of the test functions of `Ω` in `H^s(V)` (`Rd.testSpan`), and `U ↦ U|_Ω
   `N_{s,Ω'}(G) = ‖G‖_{L_2(Ω')} + ‖(2^(ks) ω_1(G, 2^(-k), Ω')_2)_k‖_{ℓ_2}`. Every `G ∈ L_2(V)`
   that vanishes almost everywhere on `{x ∈ Ω' : η(x) < ε}` for some `ε > 0` satisfies
   `∫_{Ω'} |G|² / min(η, 1)^(2s) ≤ (1 + K_s 2^(2s+2)) N_{s,Ω'}(G)²`
-  (`Rd.LipschitzGraph.lintegral_div_min_graphHeight_le_modNormOn`; for `1/2 < s < 1` a weaker
+  (`Rd.LipschitzGraph.lintegral_div_min_graphHeight_le_modNormOn`, with a finite constant by
+  `Rd.LipschitzGraph.exists_lintegral_div_graphHeight_le`; for `1/2 < s < 1` a weaker
   form of Dyda 2004, Theorem 1.1, with moduli of smoothness, the height and an additional `L_2`
   term), and there is `C < ∞`, independent of `ε`, with
   `‖1_{Ω'} G‖_2 + ‖(2^(ks) ω_1(1_{Ω'} G, 2^(-k))_2)_k‖_{ℓ_2} ≤ C N_{s,Ω'}(G)`

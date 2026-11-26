@@ -350,7 +350,8 @@ extension from the boundary, one operator for every smoothness, so that the corr
   on the pivot dual (`ContinuousLinearMap.pivotDual_injective_iff`): the space contributes its
   embedding into `L_2`, the dense range of the embedding and the identification of the pivot
   dual. Let `s ≥ 0`. `ι_s : H^s(V) → L_2(V)` is injective with dense range
-  (`Rd.denseRange_sobolevToL2`), and its pivot dual `L_2(V) → (H^s(V))^*`,
+  (`Rd.sobolevToL2_injective`, `Rd.denseRange_sobolevToL2`), and its pivot dual
+  `L_2(V) → (H^s(V))^*`,
   `g ↦ ⟪g, ι_s ·⟫_{L_2}` (`ContinuousLinearMap.pivotDual`), is the pairing `[W, ·]` with the
   element `W ∈ H^{-s}(V)` whose distribution is `g` (`Rd.toDistr_sobolevInclusion_ofLp`,
   `Rd.pivotDual_sobolevToL2_apply_apply`): `L_2(V)` is the pivot space of
@@ -489,10 +490,11 @@ extension from the boundary, one operator for every smoothness, so that the corr
   `(‖g‖²_{L_2(Γ)} + ∫_Γ ∫_Γ |g(y) - g(x)|² / |y - x|^(n-1+2t) dσ dσ)^(1/2)`
   (`Rd.BoundedLipschitzDomain.exists_boundarySobolev_norm_equiv_slobodeckij`); its dual
   `H^{-t}(Γ)` is conjugate-linearly isometric to it by Riesz
-  (`Rd.BoundedLipschitzDomain.dualBoundarySobolevEquiv`). `H^t(Γ)` is dense in `L_2(Γ)`, since it
+  (`Rd.BoundedLipschitzDomain.dualBoundarySobolevEquiv`). `H^t(Γ)` embeds injectively into
+  `L_2(Γ)` (`Rd.BoundedLipschitzDomain.boundarySobolevToL2`,
+  `Rd.BoundedLipschitzDomain.boundarySobolevToL2_injective`) and is dense there, since it
   contains the restrictions to `Γ` of the smooth functions with compact support
-  (`Rd.BoundedLipschitzDomain.boundarySobolevToL2`,
-  `Rd.BoundedLipschitzDomain.denseRange_boundarySobolevToL2`), so its pivot dual
+  (`Rd.BoundedLipschitzDomain.denseRange_boundarySobolevToL2`), so its pivot dual
   `g ↦ (h ↦ ∫_Γ conj (g) h dσ)` maps `L_2(Γ)` injectively into `H^{-t}(Γ)`
   (`Rd.BoundedLipschitzDomain.pivotDual_boundarySobolevToL2_apply_apply`,
   `ContinuousLinearMap.pivotDual_injective_iff`): `H^t(Γ) ⊂ L_2(Γ) ⊂ H^{-t}(Γ)` is a Gelfand
