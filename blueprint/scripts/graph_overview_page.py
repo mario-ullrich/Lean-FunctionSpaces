@@ -11,9 +11,10 @@ the author's homepage) can lay it out with the Graphviz build of this site.
 
 Nodes look like those of leanblueprint's graph: definitions as boxes in light green, results
 as ellipses in green, all with a green border. As there, an arrow runs from a result to the
-results that use it, and the graph runs from left to right: the base results on the left. With
-few ranks and many results per rank, the picture comes out taller than wide. Run it from the
-project root after ``leanblueprint web``. It fails if a node names a block that does not exist.
+results that use it, and the graph runs from left to right: the base results on the left. The
+drawing is stretched to the height-to-width ratio 4 : 3 of the portrait box that shows it on the
+homepage (``RATIO``), so that it fills the box. Run it from the project root after
+``leanblueprint web``. It fails if a node names a block that does not exist.
 """
 
 from __future__ import annotations
@@ -24,6 +25,8 @@ from pathlib import Path
 
 DATA = Path("blueprint/graph/data.json")
 PAGE = Path("blueprint/web/dep_graph_overview.html")
+# Height over width of the drawing: the 3 : 4 portrait box of the homepage picture.
+RATIO = 1.33
 
 
 def quote(s: str) -> str:
@@ -35,7 +38,7 @@ def dot_source(data: dict) -> str:
     groups = {g["id"]: g["title"] for g in data["groups"]}
     lines = [
         'strict digraph "" {',
-        "  graph [bgcolor=transparent, rankdir=LR];",
+        f"  graph [bgcolor=transparent, rankdir=LR, ratio={RATIO}];",
         '  node [label="\\N", penwidth=1.8];',
         "  edge [arrowhead=vee];",
     ]
