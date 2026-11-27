@@ -3,9 +3,8 @@
 // `dep_graph_document.html` and `dep_graph_grouped.html` hold their graph as DOT source and
 // lay it out in the browser with Graphviz 2.44, the hpcc-js WebAssembly build in `js/`. This
 // script runs that same build under Node and writes the pictures the pages show as
-// `dep_graph.svg` and `dep_graph_grouped.svg`, for viewers that run no JavaScript: GitHub
-// displays SVG files in the browser, also in a private repository, where Pages is not
-// available. The images are static; the statements of the nodes are on the pages.
+// `dep_graph.svg` and `dep_graph_grouped.svg`. `static_dep_graph.py` then lets the pages load
+// these pictures instead of laying the graph out in the browser on every visit.
 //
 // The pages draw the graph on a transparent background; the images get a white one, since
 // black arrows and labels would vanish on the dark background of GitHub's dark mode.
