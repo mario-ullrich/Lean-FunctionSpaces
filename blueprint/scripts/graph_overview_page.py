@@ -10,8 +10,10 @@ leanblueprint's graph pages carry their graphs, so that a picture elsewhere (the
 the author's homepage) can lay it out with the Graphviz build of this site.
 
 Nodes look like those of leanblueprint's graph: definitions as boxes in light green, results
-as ellipses in green, all with a green border. Run it from the project root after
-``leanblueprint web``. It fails if a node names a block that does not exist.
+as ellipses in green, all with a green border. As there, an arrow runs from a result to the
+results that use it, and the graph runs from left to right: the base results on the left. With
+few ranks and many results per rank, the picture comes out taller than wide. Run it from the
+project root after ``leanblueprint web``. It fails if a node names a block that does not exist.
 """
 
 from __future__ import annotations
@@ -33,7 +35,7 @@ def dot_source(data: dict) -> str:
     groups = {g["id"]: g["title"] for g in data["groups"]}
     lines = [
         'strict digraph "" {',
-        "  graph [bgcolor=transparent];",
+        "  graph [bgcolor=transparent, rankdir=LR];",
         '  node [label="\\N", penwidth=1.8];',
         "  edge [arrowhead=vee];",
     ]
@@ -54,9 +56,10 @@ def dot_source(data: dict) -> str:
             'fontname="Helvetica"; fontcolor="#808080"; color="#b0b0b0"; style=rounded; '
             f"penwidth=1; margin=12; {ids} }}"
         )
+    # In data.json an edge runs from a result to a result it uses.
     for e in data["edges"]:
         if not e.get("redundant"):
-            lines.append(f"  {quote(e['source'])} -> {quote(e['target'])};")
+            lines.append(f"  {quote(e['target'])} -> {quote(e['source'])};")
     lines.append("}")
     return "\n".join(lines)
 
