@@ -212,7 +212,7 @@ theorem ballMeanDiff_add_le {f : V → ℂ} (hf : Measurable f) (g : V → ℂ) 
       ≤ ∫⁻ v in ball (0 : V) (1 / 2 ^ j),
           (‖(fwdDiff v)^[L] f x‖ₑ + ‖(fwdDiff v)^[L] g x‖ₑ) := lintegral_mono fun v => by
         rw [fwdDiff_iter_add, Pi.add_apply]
-        exact enorm_add_le _ _
+        exact eNorm_add_le _ _
     _ = _ := lintegral_add_left' (measurable_enorm_higherDiff_step hf L x).aemeasurable _
 
 /-- The ball means of the zero function vanish. -/
@@ -415,7 +415,7 @@ theorem lintegral_enorm_mul_higherDiff_le (L j : ℕ) {k : ℕ} (hk : b.radius <
     by_cases hz : z ∈ closedBall (0 : V) b.radius
     · rw [indicator_of_mem hz]
       exact mul_le_mul' (le_iSup (fun z => ‖b.toFun z‖ₑ) z) le_rfl
-    · rw [indicator_of_notMem hz, b.eq_zero z (by simpa using hz), enorm_zero, zero_mul]
+    · rw [indicator_of_notMem hz, b.eq_zero z (by simpa using hz), eNorm_zero, zero_mul]
   calc ∫⁻ z, ‖b.toFun z‖ₑ * ‖(fwdDiff (-((2 : ℝ) ^ (j + k))⁻¹ • z))^[L] f x‖ₑ
       ≤ ∫⁻ z in closedBall (0 : V) b.radius, (⨆ z, ‖b.toFun z‖ₑ) *
           ‖(fwdDiff (-((2 : ℝ) ^ (j + k))⁻¹ • z))^[L] f x‖ₑ := by
@@ -464,7 +464,7 @@ theorem enorm_localMean_le_ballMeanDiff {p : ℝ≥0∞} [Fact (1 ≤ p)] (L : �
   have hsplit : ∀ a c d : ℂ, c - d = (a - d) - (a - c) := fun a c d => by ring
   rw [hk, hx, Pi.sub_apply, hsplit ((f : V → ℂ) x)]
   calc _ ≤ ‖(f : V → ℂ) x - conv (b.scaledMoment L (j + ⌈b.radius⌉₊)) f volume x‖ₑ +
-        ‖(f : V → ℂ) x - conv (b.scaledMoment L (j + ⌈b.radius⌉₊ + 1)) f volume x‖ₑ := enorm_sub_le
+        ‖(f : V → ℂ) x - conv (b.scaledMoment L (j + ⌈b.radius⌉₊ + 1)) f volume x‖ₑ := eNorm_sub_le
     _ ≤ (⨆ z, ‖b.toFun z‖ₑ) * volume (ball (0 : V) 1) * 2 ^ (⌈b.radius⌉₊ * finrank ℝ V) *
           ballMeanDiff L j f x + (⨆ z, ‖b.toFun z‖ₑ) * volume (ball (0 : V) 1) *
           2 ^ ((⌈b.radius⌉₊ + 1) * finrank ℝ V) * ballMeanDiff L j f x :=
@@ -502,7 +502,7 @@ theorem enorm_higherDiff_dualKernel_le_mul (L i : ℕ) (h y : V) :
     ‖(fwdDiff h)^[L] (b.dualKernel L i) y‖ₑ ≤
       ENNReal.ofReal (b.dualDerivConst L L) * 2 ^ (i * finrank ℝ V) * dyadicWeight (L : ℝ) i *
         ‖h‖ₑ ^ L := by
-  simpa [ENNReal.dyadicWeight_zero_right, enorm_neg] using
+  simpa [ENNReal.dyadicWeight_zero_right, eNorm_neg] using
     b.enorm_higherDiff_dualKernel_le L L i 0 (-h) y
 
 /-- **Differences of the dual kernels for short steps**: for `i ≤ j` and `‖h‖ < 2^(-j)`,
@@ -529,7 +529,7 @@ theorem enorm_higherDiff_dualKernel_le_indicator (L : ℕ) {i j : ℕ} (hij : i 
           exact mul_le_mul' le_rfl hhL
       _ = _ := by rw [dyadicWeight_mul_dyadicWeight_neg_of_le _ hij]
   · rw [indicator_of_notMem hy, mul_zero, nonpos_iff_eq_zero,
-      b.higherDiff_dualKernel_eq_zero L L i ?_, enorm_zero]
+      b.higherDiff_dualKernel_eq_zero L L i ?_, eNorm_zero]
     rw [mem_ball_zero_iff, not_lt] at hy
     rw [mem_ball_zero_iff] at hh
     have hji : (1 : ℝ) / 2 ^ j ≤ 1 / 2 ^ i :=
@@ -601,7 +601,7 @@ theorem enorm_dualKernel_le_indicator (L i : ℕ) (y : V) :
     rw [ENNReal.ofReal_mul (b.dualDerivConst_nonneg L 0), ENNReal.ofReal_pow zero_le_two,
       ENNReal.ofReal_ofNat]
   · rw [indicator_of_notMem hy, mul_zero, nonpos_iff_eq_zero, b.dualKernel_eq_zero_of_lt L i ?_,
-      enorm_zero]
+      eNorm_zero]
     rw [mem_ball_zero_iff, not_lt] at hy
     refine lt_of_lt_of_le ?_ hy
     rw [← mul_one_div]
@@ -680,7 +680,7 @@ theorem laverage_enorm_conv_dualKernel_add_smul_le_of_one_le (L : ℕ) {i j : �
               maximalFunction (fun y => ‖g y‖ₑ) x))) := by
         rw [lintegral_const_mul' _ _ hA]
         refine mul_le_mul' le_rfl (mul_le_mul' le_rfl ((setLIntegral_setLIntegral_ball_le
-          hg.aestronglyMeasurable.enorm hl _ _ x).trans (mul_le_mul' le_rfl ?_)))
+          hg.aestronglyMeasurable.eNorm hl _ _ x).trans (mul_le_mul' le_rfl ?_)))
         exact (lintegral_mono_set (ball_subset_ball hrad)).trans
           (setLIntegral_ball_le_mul_maximalFunction (mul_pos hc2 (one_div_two_pow_pos j)) _ x)
     _ = _ := by
@@ -747,7 +747,7 @@ theorem ballMeanDiff_conv_dualKernel_le_of_lt (L : ℕ) {i j : ℕ} (hji : j < i
   have hmeas : ∀ l ∈ Finset.range (L + 1), AEMeasurable
       (fun h => (L.choose l : ℝ≥0∞) * ‖F (x + (l : ℝ) • h)‖ₑ)
       (volume.restrict (ball (0 : V) (1 / 2 ^ j))) := fun l _ =>
-    ((hF.comp (continuous_const.add (continuous_id.const_smul _))).measurable.enorm.const_mul
+    ((hF.comp (continuous_const.add (continuous_id.const_smul _))).measurable.eNorm.const_mul
       _).aemeasurable
   calc ballMeanDiff L j F x
       ≤ (volume (ball (0 : V) (1 / 2 ^ j)))⁻¹ * ∫⁻ h in ball (0 : V) (1 / 2 ^ j),
@@ -852,7 +852,7 @@ theorem ballMeanDiff_le_tsum_add (L : ℕ) (hp : p ≠ ∞) (f : Lp ℂ p (volum
   rw [h1]
   refine (ballMeanDiff_add_le hFc.measurable _ L j x).trans (add_le_add ?_ le_rfl)
   refine (b.ballMeanDiff_partialSum_le L hp f J j x).trans (mul_le_mul' le_rfl ?_)
-  exact ENNReal.sum_le_tsum _
+  exact sum_le_tsum _
 
 /-- The remainders of the reproducing formula vanish in the ball means: for `L ≥ 1`,
 `1 ≤ p < ∞`, `f ∈ L_p` and every `j`, `‖d_j(f - m_{2^J} ⋆ m_{2^J} ⋆ f)‖_p → 0` as `J → ∞`,
@@ -871,8 +871,8 @@ theorem tendsto_eLpNorm_ballMeanDiff_sub {L : ℕ} (hL : 1 ≤ L) (hp : p ≠ �
     simp_rw [b.sum_dual_localMean hp L] at h
     exact h
   have h0 : Tendsto (fun J => 2 ^ L * ‖H J - f‖ₑ) atTop (𝓝 0) := by
-    have h := (hH.sub_const f).enorm
-    rw [sub_self, enorm_zero] at h
+    have h := (hH.sub_const f).eNorm
+    rw [sub_self, eNorm_zero] at h
     simpa using ENNReal.Tendsto.const_mul h (Or.inr (ENNReal.pow_ne_top ENNReal.ofNat_ne_top))
   refine tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds h0 (fun J => zero_le)
     fun J => ?_
@@ -888,7 +888,7 @@ theorem tendsto_eLpNorm_ballMeanDiff_sub {L : ℕ} (hL : 1 ≤ L) (hp : p ≠ �
       (b.continuous_scaledMoment L J) ((Lp.memLp _).locallyIntegrable hp1)
   refine (eLpNorm_ballMeanDiff_le hp1 hp ((Lp.aestronglyMeasurable f).sub
     hFc.aestronglyMeasurable) L j).trans (le_of_eq ?_)
-  rw [eLpNorm_congr_ae hae, ← Lp.enorm_def, enorm_sub_rev]
+  rw [eLpNorm_congr_ae hae, ← Lp.eNorm_def, eNorm_sub_rev]
 
 /-- **Ball means by local means, pointwise**: for `L ≥ 1`, `1 ≤ p < ∞` and `f ∈ L_p`, almost
 everywhere and for all levels `j`, `d_j f(x) ≤ C ∑_i c_{ji} M(k_i ⋆ f)(x)` with
@@ -930,7 +930,7 @@ theorem enorm_le_tlLocalMeansNorm {L : ℕ} (hL : 1 ≤ L) (hp : p ≠ ∞) {q :
       eLpNorm (fun y => dyadicWeight s j * ‖conv (b.meansKernel L j) f volume y‖ₑ) p volume :=
     fun j => by
     rw [eLpNorm_const_mul_enorm _ (b.continuous_conv_meansKernel L j f).aestronglyMeasurable,
-      Lp.enorm_def, eLpNorm_congr_ae (b.localMean_ae_eq hp L j f)]
+      Lp.eNorm_def, eLpNorm_congr_ae (b.localMean_ae_eq hp L j f)]
   simp_rw [heq]
   calc lqNorm ∞ (fun j =>
         eLpNorm (fun y => dyadicWeight s j * ‖conv (b.meansKernel L j) f volume y‖ₑ) p volume)
@@ -940,8 +940,8 @@ theorem enorm_le_tlLocalMeansNorm {L : ℕ} (hL : 1 ≤ L) (hp : p ≠ ∞) {q :
           fun j => (hmeas j).aemeasurable (μ := volume)
         rwa [max_eq_right le_top] at h
     _ ≤ b.tlLocalMeansNorm L s q f :=
-        eLpNorm_mono_enorm (measurable_lqNorm_comp hmeas ∞).aestronglyMeasurable fun x => by
-          simp only [enorm_eq_self]
+        eLpNorm_mono_eNorm (measurable_lqNorm_comp hmeas ∞).aestronglyMeasurable fun x => by
+          simp only [eNorm_eq_self]
           exact ENNReal.lqNorm_le_lqNorm_of_le (zero_lt_one.trans_le hq).ne' le_top _
 
 /-- The constant `2 ‖m‖_1 (1 - 2^(-s))⁻¹ + C A_{s,L} C_{FS}` of the bound of the ball means
@@ -1006,7 +1006,7 @@ theorem eLpNorm_dyadicWeight_mul_conv_meansKernel_le (L : ℕ) (hp : p ≠ ∞) 
     eLpNorm (fun y => dyadicWeight s j * ‖conv (b.meansKernel L j) f volume y‖ₑ) p volume ≤
       dyadicWeight s j * (2 * eLpNorm (momentKernel b.toFun L) 1 volume * ‖f‖ₑ) := by
   rw [eLpNorm_const_mul_enorm _ (b.continuous_conv_meansKernel L j f).aestronglyMeasurable,
-    ← eLpNorm_congr_ae (b.localMean_ae_eq hp L j f), ← Lp.enorm_def]
+    ← eLpNorm_congr_ae (b.localMean_ae_eq hp L j f), ← Lp.eNorm_def]
   exact mul_le_mul' le_rfl
     ((enorm_convLp_le hp _ f).trans (mul_le_mul' (b.eLpNorm_meansKernel_one_le L j) le_rfl))
 
@@ -1060,21 +1060,21 @@ theorem tlLocalMeansNorm_le_tlDiffNorm (L : ℕ) (hp : p ≠ ∞) {q : ℝ≥0�
         dyadicWeight s (⌈b.radius⌉₊ + 1) * b.ballMeanConst *
           eLpNorm (fun x => lqNorm q (fun j => dyadicWeight s j * ballMeanDiff L j f x)) p
             volume := by
-    refine (eLpNorm_mono_enorm_ae (measurable_lqNorm_comp
+    refine (eLpNorm_mono_eNorm_ae (measurable_lqNorm_comp
       (fun j => hmeas (j + (⌈b.radius⌉₊ + 1))) q).aestronglyMeasurable (μ := volume) (p := p)
       (g := fun x => dyadicWeight s (⌈b.radius⌉₊ + 1) * b.ballMeanConst *
         lqNorm q (fun j => dyadicWeight s j * ballMeanDiff L j f x))
       ((b.lqNorm_localMean_shift_le L hp q s f).mono fun x hx => ?_)).trans_eq ?_
-    · simpa only [enorm_eq_self] using hx
+    · simpa only [eNorm_eq_self] using hx
     · exact eLpNorm_const_mul_ennreal (measurable_lqNorm_ballMeanDiff L s q f).aestronglyMeasurable
   calc b.tlLocalMeansNorm L s q f
       ≤ eLpNorm (fun x => ∑ j ∈ Finset.range (⌈b.radius⌉₊ + 1),
           dyadicWeight s j * ‖conv (b.meansKernel L j) f volume x‖ₑ +
           lqNorm q (fun j => dyadicWeight s (j + (⌈b.radius⌉₊ + 1)) *
             ‖conv (b.meansKernel L (j + (⌈b.radius⌉₊ + 1))) f volume x‖ₑ)) p volume :=
-        eLpNorm_mono_enorm (b.aemeasurable_lqNorm_conv_meansKernel L s q f).aestronglyMeasurable
+        eLpNorm_mono_eNorm (b.aemeasurable_lqNorm_conv_meansKernel L s q f).aestronglyMeasurable
           fun x => by
-            simp only [enorm_eq_self]
+            simp only [eNorm_eq_self]
             exact ENNReal.lqNorm_le_sum_range_add_shift hq _ _
     _ ≤ _ := eLpNorm_add_le hp1
     _ ≤ _ := add_le_add hhead htail

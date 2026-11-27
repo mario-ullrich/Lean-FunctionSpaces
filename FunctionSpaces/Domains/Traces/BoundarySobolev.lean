@@ -85,7 +85,7 @@ theorem memLp_chartPiece_sub (j : Fin Ω.N) {t : ℝ} (ht : 0 < t) (g : Ω.Bound
   have hlt : slobodeckijForm 2 t (G : (Ω.graph j).hyperplane → ℂ) < ∞ := by
     refine hS.trans_lt (ENNReal.mul_lt_top (slobodeckijConstLower_ne_top two_ne_zero
       ENNReal.ofNat_ne_top ht).lt_top (ENNReal.add_lt_top.2 ⟨?_, ?_⟩))
-    · exact ENNReal.rpow_lt_top_of_nonneg (by norm_num) enorm_ne_top
+    · exact ENNReal.rpow_lt_top_of_nonneg (by norm_num) eNorm_ne_top
     · exact ENNReal.rpow_lt_top_of_nonneg (by norm_num) (ENNReal.add_lt_top.1 hfin).2.ne
   rw [← eLpNorm_sub_sq_gagliardoMeasure t hG] at hlt
   exact (ENNReal.pow_lt_top_iff.1 hlt).resolve_right two_ne_zero
@@ -132,7 +132,7 @@ theorem enorm_chartGagliardoDiff_sq (j : Fin Ω.N) {t : ℝ} (ht : 0 < t)
     ‖Ω.chartGagliardoDiff j t g‖ₑ ^ 2 =
       slobodeckijForm 2 t (Ω.chartPieceLp Ω.boundaryPartition j g.toLp :
         (Ω.graph j).hyperplane → ℂ) := by
-  rw [chartGagliardoDiff, dite_eq_left ht, LinearMap.coe_mk, AddHom.coe_mk, Lp.enorm_def,
+  rw [chartGagliardoDiff, dite_eq_left ht, LinearMap.coe_mk, AddHom.coe_mk, Lp.eNorm_def,
     eLpNorm_congr_ae (MemLp.coeFn_toLp _)]
   exact eLpNorm_sub_sq_gagliardoMeasure t (Lp.stronglyMeasurable _).measurable
 
@@ -224,7 +224,7 @@ theorem exists_enorm_gagliardoEmbedding_le {t : ℝ} (ht : 0 < t) :
   rw [← ENNReal.pow_le_pow_left_iff two_ne_zero, mul_pow, hK2, Ω.enorm_sq_gagliardoEmbedding ht,
     BoundaryBesov.enorm_eq, hKdef, add_mul, Finset.sum_mul]
   refine add_le_add ?_ (Finset.sum_le_sum fun j _ => ?_)
-  · rw [← mul_pow, Lp.enorm_def]
+  · rw [← mul_pow, Lp.eNorm_def]
     exact pow_le_pow_left₀ zero_le (h₀ _ (Lp.aestronglyMeasurable _)) 2
   · have hS := slobodeckijForm_le two_ne_top ht (Ω.chartPieceLp Ω.boundaryPartition j g.toLp)
     have hsum := ENNReal.add_rpow_le_rpow_add
@@ -256,10 +256,10 @@ theorem exists_enorm_le_enorm_gagliardoEmbedding {t : ℝ} (ht : 0 < t) :
   refine Finset.sum_le_sum fun j _ => ?_
   rw [add_mul]
   refine add_le_add ?_ ?_
-  · rw [Lp.enorm_def, eLpNorm_congr_ae (Ω.chartPieceLp_ae _ j g.toLp)]
+  · rw [Lp.eNorm_def, eLpNorm_congr_ae (Ω.chartPieceLp_ae _ j g.toLp)]
     refine (Ω.eLpNorm_chartPiece_le _ j (Lp.stronglyMeasurable g.toLp)).trans
       (mul_le_mul' le_rfl ?_)
-    rw [← Lp.enorm_def]
+    rw [← Lp.eNorm_def]
     exact Ω.enorm_toLp_le_enorm_gagliardoEmbedding ht g
   · have hL := lqNorm_modulus_rpow_le_slobodeckijForm two_ne_top ht
       (Ω.chartPieceLp Ω.boundaryPartition j g.toLp)
@@ -459,7 +459,7 @@ theorem exists_boundarySobolev_norm_equiv_slobodeckij {t : ℝ} (ht : 0 < t) (ht
     calc _ ≤ (C₁ * Ω.boundaryBesovNorm 2 Ω.boundaryPartition t 2 g.toLp) ^ 2 :=
           pow_le_pow_left₀ zero_le hB 2
       _ ≤ C₁ ^ 2 * (C₃ * (‖g.toLp‖ₑ ^ 2 + Ω.boundarySlobodeckijForm 2 t g.toLp)) := by
-          rw [mul_pow, Lp.enorm_def]
+          rw [mul_pow, Lp.eNorm_def]
           exact mul_le_mul' le_rfl (h₃ _ (Lp.aestronglyMeasurable _))
       _ ≤ _ := by
           rw [← mul_assoc]
@@ -468,7 +468,7 @@ theorem exists_boundarySobolev_norm_equiv_slobodeckij {t : ℝ} (ht : 0 < t) (ht
     rw [enorm_boundarySobolev]
     calc _ ≤ (C₀ * Ω.boundaryBesovNorm 2 Ω.boundaryPartition t 2 g.toLp) ^ 2 +
           C₂ * Ω.boundaryBesovNorm 2 Ω.boundaryPartition t 2 g.toLp ^ 2 := by
-          rw [Lp.enorm_def]
+          rw [Lp.eNorm_def]
           exact add_le_add (pow_le_pow_left₀ zero_le (h₀ _ (Lp.aestronglyMeasurable _)) 2)
             (h₂ _)
       _ = (C₀ ^ 2 + C₂) * Ω.boundaryBesovNorm 2 Ω.boundaryPartition t 2 g.toLp ^ 2 := by ring
@@ -581,7 +581,7 @@ noncomputable def restrictionToDomainBesov (s : ℝ) (hs : 0 < s) (hs2 : s < 2) 
     { toFun u := ⟨indicatorLp Ω.measurableSet (sobolevToL2 hs.le (u : H^{s}(V))),
         indicatorLp_indicatorLp _ _,
         (Ω.modNormOn_indicatorLp_sobolevToL2_le hs hs2 _).trans_lt (ENNReal.mul_lt_top
-          (sobolevBesovConst_ne_top hs (r := 2) (by exact_mod_cast hs2)).lt_top enorm_lt_top)⟩
+          (sobolevBesovConst_ne_top hs (r := 2) (by exact_mod_cast hs2)).lt_top eNorm_lt_top)⟩
       map_add' u w := DomainBesov.ext (by
         change indicatorLp Ω.measurableSet (sobolevToL2 hs.le ((u : H^{s}(V)) + w)) = _
         rw [map_add, map_add]
@@ -619,7 +619,7 @@ theorem toLp_sobolevTrace_eq_besovTrace (s : ℝ) (u : RestrictionSpace s Ω.toO
   exact (Ω.besovTrace_ae two_ne_top _ _ _ (F := sobolevToL2 hs0.le (u : H^{s}(V))) rfl
     ((modNorm_sobolevToL2_le hs0 (r := 2) (by norm_num; linarith) _).trans_lt
       (ENNReal.mul_lt_top (sobolevBesovConst_ne_top hs0 (r := 2)
-        (by norm_num; linarith)).lt_top enorm_lt_top))).symm
+        (by norm_num; linarith)).lt_top eNorm_lt_top))).symm
 
 /-! ### The Gelfand triple `H^t(Γ) ⊂ L_2(Γ) ⊂ H^{-t}(Γ)` -/
 

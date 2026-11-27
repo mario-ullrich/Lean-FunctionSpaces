@@ -140,9 +140,9 @@ theorem enorm_periodicTranslate_sub_sq (h : UnitAddTorus d)
     (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
     ‖periodicTranslate h f - f‖ₑ ^ 2 =
       ∑' k, ‖mFourier k h - 1‖ₑ ^ 2 * ‖mFourierCoeff f k‖ₑ ^ 2 := by
-  rw [← mFourierBasis.repr.enorm_map, lp.enorm_sq_eq_tsum]
+  rw [← mFourierBasis.repr.eNorm_map, lp.enorm_sq_eq_tsum]
   congr 1; funext k
   rw [map_sub, lp.coeFn_sub, Pi.sub_apply, repr_periodicTranslate,
-    mFourierBasis_repr, ← sub_one_mul, enorm_mul, mul_pow]
+    mFourierBasis_repr, ← sub_one_mul, eNorm_mul, mul_pow]
 
 end Torus

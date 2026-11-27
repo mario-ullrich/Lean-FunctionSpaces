@@ -97,14 +97,14 @@ theorem mixedWeight_eq_dyadicWeight_gridLevel (s : ℝ) (k : Fin d → ℕ) :
 /-- **Regrouping by levels**: `∑_k F_k ≤ ∑_n ∑_{|k|_1 = n} F_k`. -/
 theorem tsum_le_tsum_gridLevelSet (F : (Fin d → ℕ) → ℝ≥0∞) :
     ∑' k, F k ≤ ∑' n, ∑ k ∈ gridLevelSet n, F k := by
-  rw [ENNReal.tsum_eq_iSup_sum]
+  rw [tsum_eq_iSup_sum]
   refine iSup_le fun T => ?_
   calc ∑ k ∈ T, F k = ∑ n ∈ T.image gridLevel, ∑ k ∈ T.filter (fun k => gridLevel k = n), F k :=
         (Finset.sum_fiberwise_of_maps_to (fun k hk => Finset.mem_image_of_mem gridLevel hk) F).symm
     _ ≤ ∑ n ∈ T.image gridLevel, ∑ k ∈ gridLevelSet n, F k :=
         Finset.sum_le_sum fun n _ => Finset.sum_le_sum_of_subset fun k hk =>
           mem_gridLevelSet.2 (Finset.mem_filter.1 hk).2
-    _ ≤ ∑' n, ∑ k ∈ gridLevelSet n, F k := ENNReal.sum_le_tsum _
+    _ ≤ ∑' n, ∑ k ∈ gridLevelSet n, F k := sum_le_tsum _
 
 /-- **Hölder's inequality on a finite set**: `∑_{k ∈ S} x_k ≤ #S^(1-1/q) ‖x‖_{ℓ_q}` for
 `1 ≤ q ≤ ∞`. -/
@@ -123,7 +123,7 @@ theorem sum_le_card_rpow_mul_lqNorm {q : ℝ≥0∞} (hq : 1 ≤ q) (S : Finset 
     refine (ENNReal.rpow_sum_le_const_mul_sum_rpow (s := S) (f := x) hr).trans
       (mul_le_mul' le_rfl ?_)
     rw [ENNReal.lqNorm_rpow hq0 hq']
-    exact ENNReal.sum_le_tsum _
+    exact sum_le_tsum _
   calc ∑ k ∈ S, x k = ((∑ k ∈ S, x k) ^ r) ^ (1 / r) := by
         rw [← ENNReal.rpow_mul, mul_one_div_cancel hr0.ne', ENNReal.rpow_one]
     _ ≤ ((S.card : ℝ≥0∞) ^ (r - 1) * lqNorm q x ^ r) ^ (1 / r) :=
@@ -165,7 +165,7 @@ theorem tsum_dyadicWeight_mul_rpow_ne_top {s : ℝ} (hs : 0 < s) {a : ℝ} (ha :
       exact Real.rpow_le_rpow_of_exponent_le (by exact_mod_cast Nat.succ_pos l) (Nat.le_ceil a)
     rw [h1, ENNReal.ofReal_mul (by positivity)]
     exact mul_le_mul' le_rfl h2
-  refine ne_top_of_le_ne_top ?_ (ENNReal.tsum_le_tsum hterm)
+  refine ne_top_of_le_ne_top ?_ (tsum_le_tsum hterm)
   rw [← ENNReal.ofReal_tsum_of_nonneg (fun l => by positivity) hsum]
   exact ENNReal.ofReal_ne_top
 
@@ -175,7 +175,7 @@ theorem tsum_tail_le (s : ℝ) {a : ℝ} (ha : 0 ≤ a) (N : ℕ) :
     ∑' n : ℕ, (if N < n then dyadicWeight (-s) n * ((n + 1 : ℕ) : ℝ≥0∞) ^ a else 0) ≤
       (∑' l : ℕ, dyadicWeight (-s) l * ((l + 1 : ℕ) : ℝ≥0∞) ^ a) *
         (dyadicWeight (-s) N * ((N + 1 : ℕ) : ℝ≥0∞) ^ a) := by
-  rw [← ENNReal.summable.sum_add_tsum_nat_add' (k := N)]
+  rw [← CompleteLattice.summable.sum_add_tsum_nat_add' (k := N)]
   have hzero : ∑ i ∈ Finset.range N,
       (if N < i then dyadicWeight (-s) i * ((i + 1 : ℕ) : ℝ≥0∞) ^ a else 0) = 0 :=
     Finset.sum_eq_zero fun i hi => by
@@ -184,7 +184,7 @@ theorem tsum_tail_le (s : ℝ) {a : ℝ} (ha : 0 ≤ a) (N : ℕ) :
         omega
       simp [this]
   rw [hzero, zero_add, ← ENNReal.tsum_mul_right]
-  refine ENNReal.tsum_le_tsum fun l => ?_
+  refine tsum_le_tsum fun l => ?_
   split_ifs with h
   · rw [ENNReal.dyadicWeight_add_nat]
     calc dyadicWeight (-s) l * dyadicWeight (-s) N * ((l + N + 1 : ℕ) : ℝ≥0∞) ^ a
@@ -245,7 +245,7 @@ theorem enorm_sub_hyperbolicSum_le (hp : p ≠ ∞) (N : ℕ)
     rw [Finset.sum_ite, Finset.sum_const_zero, zero_add, ← hcross, eq_comm, eq_sub_iff_add_eq,
       add_comm, Finset.sum_filter_add_sum_filter_not]
   refine (ENNReal.le_tsum_of_tendsto_finsetSum (Q := fun x : Lp ℂ p (volume : Measure (Fin d → ℝ)) =>
-    ‖x‖ₑ) (C := 1) ENNReal.one_ne_top (fun x y => enorm_add_le x y) (fun x => (one_mul _).ge)
+    ‖x‖ₑ) (C := 1) ENNReal.one_ne_top (fun x y => eNorm_add_le x y) (fun x => (one_mul _).ge)
     hrep).trans (le_of_eq ?_)
   refine tsum_congr fun k => ?_
   by_cases h : gridLevel k ≤ N <;> simp [u, h]
@@ -299,7 +299,7 @@ theorem enorm_sub_hyperbolicSum_le_mixedLPNorm (hp : p ≠ ∞) (s : ℝ) {q : �
     _ ≤ ∑' n, ∑ k ∈ gridLevelSet n, (if gridLevel k ≤ N then 0 else ‖mixedBlock hp k f‖ₑ) :=
         tsum_le_tsum_gridLevelSet _
     _ ≤ ∑' n : ℕ, (if N < n then dyadicWeight (-s) n * ((n + 1 : ℕ) : ℝ≥0∞) ^ a else 0) * X := by
-        refine ENNReal.tsum_le_tsum fun n => ?_
+        refine tsum_le_tsum fun n => ?_
         have hk : ∀ k ∈ gridLevelSet n, (if gridLevel k ≤ N then 0 else ‖mixedBlock hp k f‖ₑ) =
             if N < n then ‖mixedBlock hp k f‖ₑ else 0 := fun k hk => by
           rw [mem_gridLevelSet.1 hk]

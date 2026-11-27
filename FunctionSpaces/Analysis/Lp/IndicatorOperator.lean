@@ -105,7 +105,7 @@ theorem setIntegral_mul_eq_lpPairing {s : Set α} (hs : MeasurableSet s) (a b : 
 /-- `‖1_s g‖_p ≤ ‖g‖_p`. -/
 theorem enorm_indicatorLp_le {s : Set α} (hs : MeasurableSet s) (g : Lp ℂ p μ) :
     ‖indicatorLp hs g‖ₑ ≤ ‖g‖ₑ := by
-  rw [Lp.enorm_def, Lp.enorm_def, eLpNorm_congr_ae (indicatorLp_apply_ae hs g)]
+  rw [Lp.eNorm_def, Lp.eNorm_def, eLpNorm_congr_ae (indicatorLp_apply_ae hs g)]
   exact eLpNorm_indicator_le _ hs.nullMeasurableSet
 
 /-- **The `L_p(μ|_s)` norm as a cut-off norm**: `‖1_s f‖_{L_p(μ)} = ‖f|_s‖_{L_p(μ|_s)}` for a
@@ -113,7 +113,7 @@ measurable `s` (Mathlib's `MeasureTheory.eLpNorm_indicator_eq_eLpNorm_restrict` 
 `MeasureTheory.LpToLpRestrictCLM_coeFn`). -/
 theorem enorm_indicatorLp_eq {s : Set α} (hs : MeasurableSet s) (f : Lp ℂ p μ) :
     ‖indicatorLp hs f‖ₑ = ‖LpToLpRestrictCLM α ℂ ℂ μ p s f‖ₑ := by
-  rw [Lp.enorm_def, Lp.enorm_def, eLpNorm_congr_ae (indicatorLp_apply_ae hs f),
+  rw [Lp.eNorm_def, Lp.eNorm_def, eLpNorm_congr_ae (indicatorLp_apply_ae hs f),
     eLpNorm_indicator_eq_eLpNorm_restrict hs.nullMeasurableSet,
     eLpNorm_congr_ae (LpToLpRestrictCLM_coeFn ℂ s f)]
 
@@ -196,7 +196,7 @@ theorem indicatorExtendLp_apply_ae {T O : Set α} (hT : MeasurableSet T) (hTO : 
 /-- `‖1_T g‖_{L_p(μ)} ≤ ‖g‖_{L_p(μ|_O)}` for the extension by zero. -/
 theorem enorm_indicatorExtendLp_le {T O : Set α} (hT : MeasurableSet T) (hTO : T ⊆ O)
     (g : Lp ℂ p (μ.restrict O)) : ‖indicatorExtendLp hT hTO g‖ₑ ≤ ‖g‖ₑ := by
-  rw [Lp.enorm_def, Lp.enorm_def g, eLpNorm_congr_ae (indicatorExtendLp_apply_ae hT hTO g)]
+  rw [Lp.eNorm_def, Lp.eNorm_def g, eLpNorm_congr_ae (indicatorExtendLp_apply_ae hT hTO g)]
   exact eLpNorm_indicator_restrict_le hT hTO g
 
 /-- **The zero extension of a restriction agrees with the function on the set**: for a

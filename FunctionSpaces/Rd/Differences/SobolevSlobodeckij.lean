@@ -95,7 +95,7 @@ theorem slobodeckijForm_of_subsingleton [Subsingleton V] {p : ℝ≥0∞} (hp0 :
   have h : ∀ x y : V,
       ‖f y - f x‖ₑ ^ p.toReal / ‖y - x‖ₑ ^ ((finrank ℝ V : ℝ) + s * p.toReal) = 0 :=
     fun x y => by
-      rw [Subsingleton.elim y x, sub_self, enorm_zero, ENNReal.zero_rpow_of_pos hP,
+      rw [Subsingleton.elim y x, sub_self, eNorm_zero, ENNReal.zero_rpow_of_pos hP,
         ENNReal.zero_div]
   simp only [slobodeckijForm, h, lintegral_zero]
 
@@ -105,13 +105,13 @@ theorem fwdDiff_congr_ae {f g : V → ℂ} (hfg : f =ᵐ[volume] g) (h : V) :
   simpa using higherDiff_congr_ae hfg 1 h
 
 /-- `‖Δ_h f‖_p^p = ∫ |f(x + h) - f(x)|^p dx` for `0 < p < ∞` and a.e. strongly measurable `f`
-(Mathlib's `eLpNorm_eq_lintegral_rpow_enorm_toReal`). -/
+(Mathlib's `eLpNorm_eq_lintegral_rpow_eNorm_toReal`). -/
 theorem eLpNorm_fwdDiff_rpow_eq {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞) {f : V → ℂ}
     (hf : AEStronglyMeasurable f volume) (h : V) :
     eLpNorm (fwdDiff h f) p volume ^ p.toReal = ∫⁻ x, ‖f (x + h) - f x‖ₑ ^ p.toReal := by
   have hm : AEStronglyMeasurable (fwdDiff h f) volume := by
     simpa using aestronglyMeasurable_higherDiff hf 1 h
-  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hm, one_div,
+  rw [eLpNorm_eq_lintegral_rpow_eNorm_toReal hp0 hp hm, one_div,
     ENNReal.rpow_inv_rpow (ENNReal.toReal_pos hp0 hp).ne']
   rfl
 
@@ -136,7 +136,7 @@ theorem measurable_eLpNorm_fwdDiff_rpow {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p
   rw [heq]
   exact Measurable.lintegral_prod_left' (f := fun z : V × V =>
     ‖hf.mk f (z.1 + z.2) - hf.mk f z.1‖ₑ ^ p.toReal)
-    (((hg.comp (measurable_fst.add measurable_snd)).sub (hg.comp measurable_fst)).enorm.pow_const _)
+    (((hg.comp (measurable_fst.add measurable_snd)).sub (hg.comp measurable_fst)).eNorm.pow_const _)
 
 /-- **The Gagliardo form by the step**, for measurable `f`: the substitution `y = x + h`
 (Mathlib's `lintegral_add_left_eq_self`) and Tonelli's theorem (`lintegral_lintegral_swap`) give
@@ -153,8 +153,8 @@ theorem slobodeckijForm_eq_lintegral_of_measurable {p : ℝ≥0∞} (hp0 : p ≠
     simp only [add_sub_cancel_left]
   have hmeas : Measurable (Function.uncurry fun (x h : V) =>
       ‖f (x + h) - f x‖ₑ ^ p.toReal / ‖h‖ₑ ^ ((finrank ℝ V : ℝ) + s * p.toReal)) :=
-    (((hf.comp (measurable_fst.add measurable_snd)).sub (hf.comp measurable_fst)).enorm.pow_const
-      _).div (measurable_snd.enorm.pow_const _)
+    (((hf.comp (measurable_fst.add measurable_snd)).sub (hf.comp measurable_fst)).eNorm.pow_const
+      _).div (measurable_snd.eNorm.pow_const _)
   rw [slobodeckijForm]
   simp_rw [hshift]
   rw [lintegral_lintegral_swap hmeas.aemeasurable]
@@ -162,7 +162,7 @@ theorem slobodeckijForm_eq_lintegral_of_measurable {p : ℝ≥0∞} (hp0 : p ≠
   rw [eLpNorm_fwdDiff_rpow_eq hp0 hp hf.aestronglyMeasurable h]
   simp_rw [div_eq_mul_inv]
   exact lintegral_mul_const _
-    (((hf.comp (measurable_add_const h)).sub hf).enorm.pow_const _)
+    (((hf.comp (measurable_add_const h)).sub hf).eNorm.pow_const _)
 
 /-- **The Gagliardo form by the step**: for `0 < p < ∞` and a.e. strongly measurable `f`,
 `∫∫ |f(y) - f(x)|^p / |y - x|^(n + sp) dy dx = ∫ ‖Δ_h f‖_p^p / |h|^(n + sp) dh`. -/
@@ -195,7 +195,7 @@ theorem lintegral_gagliardoMeasure (s : ℝ) {F : V × V → ℝ≥0∞} (hF : M
     ∫⁻ z, F z ∂gagliardoMeasure V s =
       ∫⁻ x, ∫⁻ y, F (x, y) * ‖y - x‖ₑ ^ (-((finrank ℝ V : ℝ) + s * 2)) := by
   have hρ : Measurable fun z : V × V => ‖z.2 - z.1‖ₑ ^ (-((finrank ℝ V : ℝ) + s * 2)) :=
-    (measurable_snd.sub measurable_fst).enorm.pow_const _
+    (measurable_snd.sub measurable_fst).eNorm.pow_const _
   rw [gagliardoMeasure, lintegral_withDensity_eq_lintegral_mul _ hρ hF,
     lintegral_prod _ (hρ.mul hF).aemeasurable]
   simp only [Pi.mul_apply, mul_comm]
@@ -221,7 +221,7 @@ theorem eLpNorm_sub_sq_gagliardoMeasure (s : ℝ) {f : V → ℂ} (hf : Measurab
   have h := eLpNorm_rpow_eq hm.aestronglyMeasurable (μ := gagliardoMeasure V s) two_ne_zero
     ENNReal.ofNat_ne_top
   rw [ENNReal.toReal_ofNat, ENNReal.rpow_two] at h
-  rw [h, lintegral_gagliardoMeasure s (hm.enorm.pow_const _), slobodeckijForm]
+  rw [h, lintegral_gagliardoMeasure s (hm.eNorm.pow_const _), slobodeckijForm]
   simp only [ENNReal.toReal_ofNat, div_eq_mul_inv, ← ENNReal.rpow_neg]
 
 /-! ### Dyadic annuli -/
@@ -304,7 +304,8 @@ radius `ρ 2^(-j)` (`Rd.volume_closedBall_div_two_pow`). -/
 theorem volume_dyadicAnnulus_le {ρ : ℝ} (hρ : 0 < ρ) (j : ℕ) :
     volume (dyadicAnnulus (V := V) ρ j) ≤ ENNReal.ofReal ρ ^ (finrank ℝ V : ℝ) *
       dyadicWeight (-(finrank ℝ V : ℝ)) j * volume (ball (0 : V) 1) :=
-  (measure_mono fun z hz => mem_closedBall_zero_iff.2 hz.2).trans_eq <| by
+  (measure_mono fun z (hz : z ∈ dyadicAnnulus (V := V) ρ j) =>
+    mem_closedBall_zero_iff.2 hz.2).trans_eq <| by
     rw [volume_closedBall_div_two_pow hρ.le, ENNReal.ofReal_pow hρ.le, ← ENNReal.rpow_natCast]
     ring
 
@@ -324,7 +325,7 @@ theorem lintegral_real_le_tsum_dyadicAnnulus {F : ℝ → ℝ≥0∞} (hF0 : F 0
   rw [← setLIntegral_eq_of_support_subset hsupp]
   refine (setLIntegral_closedBall_le_tsum_dyadicAnnulus_of_zero hF0 1 0).trans ?_
   rw [← ENNReal.tsum_mul_left]
-  refine ENNReal.tsum_le_tsum fun k => ?_
+  refine tsum_le_tsum fun k => ?_
   rw [zero_add]
   calc ∫⁻ r in dyadicAnnulus 1 k, F r ≤ ∫⁻ _ in dyadicAnnulus (1 : ℝ) k, c k :=
         setLIntegral_mono' (measurableSet_dyadicAnnulus 1 k) (hc k)
@@ -406,7 +407,7 @@ theorem lintegral_compl_ball_norm_rpow_neg_le {a : ℝ} (ha : (finrank ℝ V : �
         lintegral_iUnion_le _ _
     _ ≤ ∑' i, 2 ^ (finrank ℝ V : ℝ) * volume (ball (0 : V) 1) *
           ENNReal.ofReal R ^ ((finrank ℝ V : ℝ) - a) * dyadicWeight (-(a - finrank ℝ V)) i :=
-        ENNReal.tsum_le_tsum fun i => setLIntegral_compl_ball_inter_dyadicShell_le ha0 hR i
+        tsum_le_tsum fun i => setLIntegral_compl_ball_inter_dyadicShell_le ha0 hR i
     _ = _ := by
         rw [ENNReal.tsum_mul_left, ENNReal.tsum_dyadicWeight_neg, complBallRpowConst]
         ring
@@ -466,7 +467,7 @@ theorem lintegral_ball_norm_rpow_neg_le {a : ℝ} (ha : a < finrank ℝ V) {R : 
       rw [finrank_zero_of_subsingleton, Nat.cast_zero] at ha
       linarith
     have h0 : ∀ z : V, ‖z‖ₑ ^ (-a) = 0 := fun z => by
-      rw [Subsingleton.elim z 0, enorm_zero, ENNReal.zero_rpow_of_pos ha']
+      rw [Subsingleton.elim z 0, eNorm_zero, ENNReal.zero_rpow_of_pos ha']
     simp only [h0, lintegral_zero, zero_le]
   calc ∫⁻ z in ball (0 : V) R, ‖z‖ₑ ^ (-a)
       ≤ ∫⁻ z in closedBall (0 : V) (R / 2 ^ 0), ‖z‖ₑ ^ (-a) := by
@@ -479,7 +480,7 @@ theorem lintegral_ball_norm_rpow_neg_le {a : ℝ} (ha : a < finrank ℝ V) {R : 
           ENNReal.ofReal R ^ ((finrank ℝ V : ℝ) - a) *
             dyadicWeight (-((finrank ℝ V : ℝ) - a)) i := by
         rw [measure_singleton, mul_zero, zero_add]
-        exact ENNReal.tsum_le_tsum fun i => by
+        exact tsum_le_tsum fun i => by
           simpa only [zero_add] using setLIntegral_dyadicAnnulus_norm_rpow_neg_le a hR i
     _ = _ := by
         rw [ENNReal.tsum_mul_left, ENNReal.tsum_dyadicWeight_neg, ballRpowConst]
@@ -497,14 +498,14 @@ theorem lintegral_rpow_div_norm_rpow_le {u : V → ℝ≥0∞} {L S : ℝ≥0∞
       L ^ p * ballRpowConst V (a - p) + S ^ p * complBallRpowConst V a := by
   have hin : ∀ z, u z ^ p / ‖z‖ₑ ^ a ≤ L ^ p * ‖z‖ₑ ^ (-(a - p)) := fun z => by
     rcases eq_or_ne z 0 with rfl | hz
-    · have h0 : u 0 = 0 := le_antisymm ((huL 0).trans (by rw [enorm_zero, mul_zero])) zero_le
+    · have h0 : u 0 = 0 := le_antisymm ((huL 0).trans (by rw [eNorm_zero, mul_zero])) zero_le
       rw [h0, ENNReal.zero_rpow_of_pos hp, ENNReal.zero_div]
       exact zero_le
     · calc u z ^ p / ‖z‖ₑ ^ a ≤ (L * ‖z‖ₑ) ^ p / ‖z‖ₑ ^ a :=
             ENNReal.div_le_div_right (ENNReal.rpow_le_rpow (huL z) hp.le) _
         _ = L ^ p * ‖z‖ₑ ^ (-(a - p)) := by
             rw [ENNReal.mul_rpow_of_nonneg _ _ hp.le, mul_div_assoc, neg_sub,
-              ENNReal.rpow_sub _ _ (enorm_ne_zero.2 hz) enorm_ne_top]
+              ENNReal.rpow_sub _ _ (eNorm_ne_zero.2 hz) eNorm_ne_top]
   have hout : ∀ z, u z ^ p / ‖z‖ₑ ^ a ≤ S ^ p * ‖z‖ₑ ^ (-a) := fun z => by
     rw [ENNReal.rpow_neg, ← div_eq_mul_inv]
     exact ENNReal.div_le_div_right (ENNReal.rpow_le_rpow (huS z) hp.le) _
@@ -518,8 +519,8 @@ theorem lintegral_rpow_div_norm_rpow_le {u : V → ℝ≥0∞} {L S : ℝ≥0∞
         add_le_add (lintegral_mono hin) (lintegral_mono hout)
     _ = L ^ p * (∫⁻ z in ball (0 : V) 1, ‖z‖ₑ ^ (-(a - p))) +
           S ^ p * ∫⁻ z in (ball (0 : V) 1)ᶜ, ‖z‖ₑ ^ (-a) := by
-        rw [lintegral_const_mul _ (measurable_enorm.pow_const _),
-          lintegral_const_mul _ (measurable_enorm.pow_const _)]
+        rw [lintegral_const_mul _ (measurable_eNorm.pow_const _),
+          lintegral_const_mul _ (measurable_eNorm.pow_const _)]
     _ ≤ L ^ p * ballRpowConst V (a - p) + S ^ p * complBallRpowConst V a := by
         gcongr
         · simpa using lintegral_ball_norm_rpow_neg_le hap one_pos
@@ -534,7 +535,7 @@ theorem lintegral_lintegral_mul_indicator_le (u : V → ℝ≥0∞) {η a : ℝ}
     ∫⁻ x, ∫⁻ y, u x * (ball (0 : V) η)ᶜ.indicator (fun z => ‖z‖ₑ ^ (-a)) (y - x) ≤
       complBallRpowConst V a * ENNReal.ofReal η ^ ((finrank ℝ V : ℝ) - a) * ∫⁻ x, u x := by
   have hh : Measurable ((ball (0 : V) η)ᶜ.indicator fun z => ‖z‖ₑ ^ (-a)) :=
-    (measurable_enorm.pow_const _).indicator measurableSet_ball.compl
+    (measurable_eNorm.pow_const _).indicator measurableSet_ball.compl
   have hI : complBallRpowConst V a * ENNReal.ofReal η ^ ((finrank ℝ V : ℝ) - a) ≠ ∞ :=
     ENNReal.mul_ne_top (complBallRpowConst_ne_top ha)
       (ENNReal.rpow_ne_top_of_ne_zero (ENNReal.ofReal_pos.2 hη).ne' ENNReal.ofReal_ne_top)
@@ -554,8 +555,8 @@ theorem lintegral_lintegral_mul_indicator_le (u : V → ℝ≥0∞) {η a : ℝ}
 measurable `f`. -/
 theorem measurable_slobodeckijIntegrand {f : V → ℂ} (hf : Measurable f) (p b : ℝ) :
     Measurable (Function.uncurry fun x y : V => ‖f y - f x‖ₑ ^ p / ‖y - x‖ₑ ^ b) :=
-  (((hf.comp measurable_snd).sub (hf.comp measurable_fst)).enorm.pow_const _).div
-    ((measurable_snd.sub measurable_fst).enorm.pow_const _)
+  (((hf.comp measurable_snd).sub (hf.comp measurable_fst)).eNorm.pow_const _).div
+    ((measurable_snd.sub measurable_fst).eNorm.pow_const _)
 
 /-- **Splitting a double integral**: `∫∫ (F + G) = ∫∫ F + ∫∫ G` for an s-finite measure and `G`
 jointly measurable, whatever `F` (Mathlib's `lintegral_add_right'` for the inner and the outer
@@ -742,8 +743,8 @@ theorem dyadicWeight_mul_setLIntegral_dyadicAnnulus_le (G : V → ℝ≥0∞) {b
   refine setLIntegral_mono' (measurableSet_dyadicAnnulus 2 j) fun z hz => ?_
   have hz0 : 0 < ‖z‖ := lt_of_le_of_lt (by positivity) hz.1
   have hn0 : ‖z‖ₑ ^ b ≠ 0 :=
-    (ENNReal.rpow_pos (enorm_pos.2 (norm_pos_iff.1 hz0)) enorm_ne_top).ne'
-  have hnt : ‖z‖ₑ ^ b ≠ ∞ := ENNReal.rpow_ne_top_of_nonneg hb enorm_ne_top
+    (ENNReal.rpow_pos (eNorm_pos.2 (norm_pos_iff.1 hz0)) eNorm_ne_top).ne'
+  have hnt : ‖z‖ₑ ^ b ≠ ∞ := ENNReal.rpow_ne_top_of_nonneg hb eNorm_ne_top
   have hle : dyadicWeight b j * ‖z‖ₑ ^ b ≤ 2 ^ b := by
     calc dyadicWeight b j * ‖z‖ₑ ^ b ≤ dyadicWeight b j * ENNReal.ofReal (2 / 2 ^ j) ^ b := by
           gcongr
@@ -768,7 +769,7 @@ theorem tsum_dyadicWeight_mul_setLIntegral_closedBall_le {G : V → ℝ≥0∞} 
       (1 - 2 ^ (-b))⁻¹ * 2 ^ b * ∫⁻ z, G z / ‖z‖ₑ ^ b := by
   calc ∑' k, dyadicWeight b k * ∫⁻ z in closedBall (0 : V) (2 / 2 ^ k), G z
       ≤ ∑' k, dyadicWeight b k * ∑' i, ∫⁻ z in dyadicAnnulus 2 (k + i), G z :=
-        ENNReal.tsum_le_tsum fun k =>
+        tsum_le_tsum fun k =>
           mul_le_mul_right (setLIntegral_closedBall_le_tsum_dyadicAnnulus_of_zero hG 2 k) _
     _ = lqNorm 1 (fun k => dyadicWeight b k *
           ∑' i, (fun j => ∫⁻ z in dyadicAnnulus (V := V) 2 j, G z) (k + i)) :=
@@ -779,7 +780,7 @@ theorem tsum_dyadicWeight_mul_setLIntegral_closedBall_le {G : V → ℝ≥0∞} 
     _ = (1 - 2 ^ (-b))⁻¹ * ∑' k, dyadicWeight b k * ∫⁻ z in dyadicAnnulus (V := V) 2 k, G z := by
         rw [ENNReal.lqNorm_one]
     _ ≤ (1 - 2 ^ (-b))⁻¹ * ∑' k, 2 ^ b * ∫⁻ z in dyadicAnnulus (V := V) 2 k, G z / ‖z‖ₑ ^ b := by
-        exact mul_le_mul_right (ENNReal.tsum_le_tsum fun k =>
+        exact mul_le_mul_right (tsum_le_tsum fun k =>
           dyadicWeight_mul_setLIntegral_dyadicAnnulus_le G hb.le k) _
     _ = (1 - 2 ^ (-b))⁻¹ * 2 ^ b *
           ∑' k, ∫⁻ z in dyadicAnnulus (V := V) 2 k, G z / ‖z‖ₑ ^ b := by
@@ -824,7 +825,7 @@ theorem lqNorm_modulus_rpow_le_slobodeckijForm (hp : p ≠ ∞) {s : ℝ} (hs : 
           (dyadicWeight ((finrank ℝ V : ℝ) + s * p.toReal) k *
             ∫⁻ z in closedBall (0 : V) (2 / 2 ^ k),
               eLpNorm (fwdDiff z (f : V → ℂ)) p volume ^ p.toReal) :=
-        ENNReal.tsum_le_tsum fun k => dyadicWeight_mul_lpModulus_rpow_le hp s f k
+        tsum_le_tsum fun k => dyadicWeight_mul_lpModulus_rpow_le hp s f k
     _ = 2 ^ p.toReal * (volume (ball (0 : V) 1))⁻¹ *
           ∑' k, dyadicWeight ((finrank ℝ V : ℝ) + s * p.toReal) k *
             ∫⁻ z in closedBall (0 : V) (2 / 2 ^ k),
@@ -915,7 +916,7 @@ theorem setLIntegral_compl_ball_le_enorm {s : ℝ} (hs : 0 < s) (hp : p ≠ ∞)
     rw [div_eq_mul_inv, ← ENNReal.rpow_neg]
     gcongr
     have h := eLpNorm_higherDiff_le_two_pow_mul (Lp.aestronglyMeasurable f) (Fact.out : 1 ≤ p) 1 z
-    rw [pow_one, ← Lp.enorm_def] at h
+    rw [pow_one, ← Lp.eNorm_def] at h
     exact h
   have hlt : (finrank ℝ V : ℝ) < (finrank ℝ V : ℝ) + s * p.toReal :=
     lt_add_of_pos_right _ (mul_pos hs (ENNReal.toReal_pos hp0 hp))
@@ -926,7 +927,7 @@ theorem setLIntegral_compl_ball_le_enorm {s : ℝ} (hs : 0 < s) (hp : p ≠ ∞)
         lintegral_mono hpt
     _ = (2 * ‖f‖ₑ) ^ p.toReal *
           ∫⁻ z in (ball (0 : V) 1)ᶜ, ‖z‖ₑ ^ (-((finrank ℝ V : ℝ) + s * p.toReal)) :=
-        lintegral_const_mul _ (measurable_enorm.pow_const _)
+        lintegral_const_mul _ (measurable_eNorm.pow_const _)
     _ ≤ (2 * ‖f‖ₑ) ^ p.toReal * (complBallRpowConst V ((finrank ℝ V : ℝ) + s * p.toReal) *
           ENNReal.ofReal 1 ^ ((finrank ℝ V : ℝ) - ((finrank ℝ V : ℝ) + s * p.toReal))) := by
         gcongr
@@ -983,7 +984,7 @@ theorem slobodeckijForm_le (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s) (f : Lp ℂ p
                 ‖z‖ₑ ^ ((finrank ℝ V : ℝ) + s * p.toReal)) hF0 1 0
       _ ≤ ∑' i, 2 ^ ((finrank ℝ V : ℝ) + s * p.toReal) * volume (ball (0 : V) 1) *
             (dyadicWeight s i * lpModulus p 1 f i) ^ p.toReal :=
-          ENNReal.tsum_le_tsum fun i => setLIntegral_dyadicAnnulus_le_lpModulus hs.le f i
+          tsum_le_tsum fun i => setLIntegral_dyadicAnnulus_le_lpModulus hs.le f i
       _ = _ := by rw [ENNReal.tsum_mul_left, ENNReal.lqNorm_rpow hp0 hp]
   rw [slobodeckijForm_eq_lintegral_eLpNorm hp0 hp s (Lp.aestronglyMeasurable f)]
   calc ∫⁻ z, eLpNorm (fwdDiff z (f : V → ℂ)) p volume ^ p.toReal /
@@ -1017,7 +1018,7 @@ theorem slobodeckijForm_lt_top_iff_memApprox (hp : p ≠ ∞) {s : ℝ} (hs : 0 
   rw [memApprox_bandScheme_iff_modulus hp hs.le (r := 1) (by exact_mod_cast hs1) Fact.out f]
   constructor
   · intro h
-    refine ENNReal.add_lt_top.2 ⟨enorm_lt_top, ?_⟩
+    refine ENNReal.add_lt_top.2 ⟨eNorm_lt_top, ?_⟩
     rw [← ENNReal.rpow_lt_top_iff_of_pos hP]
     exact (lqNorm_modulus_rpow_le_slobodeckijForm hp hs f).trans_lt
       (ENNReal.mul_lt_top (slobodeckijConstUpper_ne_top hp0 hp hs).lt_top h)
@@ -1025,7 +1026,7 @@ theorem slobodeckijForm_lt_top_iff_memApprox (hp : p ≠ ∞) {s : ℝ} (hs : 0 
     have hL := (ENNReal.add_lt_top.1 h).2
     refine (slobodeckijForm_le hp hs f).trans_lt (ENNReal.mul_lt_top
       (slobodeckijConstLower_ne_top hp0 hp hs).lt_top (ENNReal.add_lt_top.2 ⟨?_, ?_⟩))
-    · exact ENNReal.rpow_lt_top_of_nonneg hP.le enorm_ne_top
+    · exact ENNReal.rpow_lt_top_of_nonneg hP.le eNorm_ne_top
     · exact ENNReal.rpow_lt_top_of_nonneg hP.le hL.ne
 
 end Rd

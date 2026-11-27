@@ -71,7 +71,7 @@ theorem tsum_localMass_ppFun_le (hp : p ≠ ∞) (k : ℕ) (Q : ℕ → ℂ[X]) 
   by_contra hx'
   refine hx ?_
   dsimp only
-  rw [ppFun_eq_zero Q (fun h => hx' (Ico_subset_Icc_self h)), enorm_zero,
+  rw [ppFun_eq_zero Q (fun h => hx' (Ico_subset_Icc_self h)), eNorm_zero,
     ENNReal.zero_rpow_of_pos hq]
 
 /-- `u` is a **piecewise polynomial of level `k` and degree `< r` on `[0, ∞)`**: on every dyadic
@@ -96,7 +96,7 @@ theorem eLpNorm_piece_eq_localMass (hp : p ≠ ∞) {k m : ℕ} {u : ℝ → ℂ
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one (Fact.out : 1 ≤ p)).ne'
   have hIco : dyadicIco k m = Ico ((m : ℝ) / 2 ^ k) (m / 2 ^ k + 1 / 2 ^ k) := by
     rw [dyadicIco, add_div]
-  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp (measurable_polyFun _).aestronglyMeasurable,
+  rw [eLpNorm_eq_lintegral_rpow_eNorm_toReal hp0 hp (measurable_polyFun _).aestronglyMeasurable,
     localMass, hIco, ← setLIntegral_congr Ico_ae_eq_Icc]
   congr 1
   refine setLIntegral_congr_fun (measurableSet_Ico :
@@ -296,7 +296,7 @@ theorem eLpNorm_higherDiff_le_of_pointwise (hp : p ≠ ∞) {r j : ℕ} {u : ℝ
           rw [ENNReal.mul_rpow_of_nonneg _ _ hq.le, ← ENNReal.rpow_mul, one_div_mul_cancel hq.ne',
             ENNReal.rpow_one]
   · push Not at hbad
-    rw [higherDiff_eq_zero_of_isPiecewisePoly hu hh0 (hS hxS).1 hbad, enorm_zero,
+    rw [higherDiff_eq_zero_of_isPiecewisePoly hu hh0 (hS hxS).1 hbad, eNorm_zero,
       ENNReal.zero_rpow_of_pos hq]
 
 /-- **Bounded overlap**: summing the local masses of `r + 1` consecutive pieces over all starting
@@ -309,8 +309,8 @@ theorem sum_sum_localMass_le (hp : p ≠ ∞) (j r : ℕ) (Q : ℕ → ℂ[X]) :
   calc ∑ l ∈ Finset.range (r + 1), ∑ n ∈ Finset.range (2 ^ j),
         localMass p j (ppFun j Q) (n + l)
       ≤ ∑ l ∈ Finset.range (r + 1), ∑' m, localMass p j (ppFun j Q) m :=
-        Finset.sum_le_sum fun l _ => (ENNReal.sum_le_tsum _).trans
-          (ENNReal.tsum_comp_le_tsum_of_injective (add_left_injective l) _)
+        Finset.sum_le_sum fun l _ => (sum_le_tsum _).trans
+          (tsum_comp_le_tsum_of_injective (add_left_injective l) _)
     _ = (r + 1) * ∑' m, localMass p j (ppFun j Q) m := by
         rw [Finset.sum_const, Finset.card_range, nsmul_eq_mul]
         push_cast
@@ -421,7 +421,7 @@ theorem exists_inverse_ppScheme {r : ℕ} (hp : p ≠ ∞) :
   · rw [Nat.sub_eq_zero_of_le hkj.le, ENNReal.dyadicWeight_zero_right, mul_one]
     exact (intervalLpModulus_le r a k).trans (by gcongr; exact two_pow_le_ppInverseConst r K)
   · have hnorm : ‖a‖ₑ = eLpNorm (ppFun j Q) p unitVol := by
-      rw [Lp.enorm_def]
+      rw [Lp.eNorm_def]
       exact eLpNorm_congr_ae hae
     rw [intervalLpModulus, intervalModulus_congr_ae hae, hnorm, intervalModulus_eq_iSup_nonneg]
     refine iSup₂_le fun h hh => ?_

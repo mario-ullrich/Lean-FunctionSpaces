@@ -143,7 +143,7 @@ theorem contDiffOn_derivSymbol {m : ℕ} (i : Fin m → Fin (finrank ℝ V)) :
   have hN : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun ξ : V => ‖ξ‖ ^ (2 * m)) := by
     simp_rw [pow_mul]
     exact (contDiff_norm_sq ℝ).pow m
-  have hq := hP.contDiffOn.div hN.contDiffOn fun ξ (hξ : ξ ≠ 0) =>
+  have hq := hP.contDiffOn.div hN.contDiffOn fun ξ (hξ : ξ ∈ {ξ : V | ξ ≠ 0}) =>
     pow_ne_zero _ (norm_ne_zero_iff.2 hξ)
   exact contDiffOn_const.mul (Complex.ofRealCLM.contDiff.comp_contDiffOn hq)
 
@@ -271,10 +271,10 @@ theorem two_pow_smul_lpBlockKernel_succ_eq_sum (m j : ℕ) :
   rw [Finset.sum_apply, hx, Pi.smul_apply, coe_schwartzDilate, coe_lpBlockKernelOneS,
     dilate_lpBlockKernel_one]
 
-/-- The complex number `2^n` has absolute value `2^n`, by Mathlib's `enorm_pow` and
+/-- The complex number `2^n` has absolute value `2^n`, by Mathlib's `eNorm_pow` and
 `Complex.norm_two`; this is the size of the factor `2^{jm}` of the dilated identity. -/
 theorem enorm_two_pow_complex (n : ℕ) : ‖(2 : ℂ) ^ n‖ₑ = 2 ^ n := by
-  rw [enorm_pow, ← ofReal_norm, Complex.norm_two, ENNReal.ofReal_ofNat]
+  rw [eNorm_pow, ← ofReal_norm, Complex.norm_two, ENNReal.ofReal_ofNat]
 
 /-! ### The derivative families -/
 
@@ -293,9 +293,9 @@ theorem fourier_derivKernelFamily {m : ℕ} (i : Fin m → Fin (finrank ℝ V)) 
 `|σ_i| ≤ 1` there (`Rd.norm_derivSymbol_le`). -/
 theorem enorm_fourier_derivKernelFamily_le {m : ℕ} (i : Fin m → Fin (finrank ℝ V)) (j : ℕ) (ξ : V) :
     ‖𝓕 (derivKernelFamily i j) ξ‖ₑ ≤ ‖𝓕 (lpBlockKernel (V := V) (j + 1)) ξ‖ₑ := by
-  rw [fourier_derivKernelFamily, enorm_mul]
+  rw [fourier_derivKernelFamily, eNorm_mul]
   by_cases h : 𝓕 (lpBlockKernel (V := V) (j + 1)) ξ = 0
-  · rw [h, enorm_zero, mul_zero]
+  · rw [h, eNorm_zero, mul_zero]
   · rw [fourier_lpBlockKernel_succ_eq_fourier_lpBlockKernel_one j ξ] at h
     have h1 := (one_lt_norm_of_fourier_lpBlockKernel_one_ne_zero h).le
     calc ‖derivSymbol i (((2 : ℝ) ^ j)⁻¹ • ξ)‖ₑ * ‖𝓕 (lpBlockKernel (V := V) (j + 1)) ξ‖ₑ
@@ -311,9 +311,9 @@ theorem tsum_fourier_derivKernelFamily_sq_le {m : ℕ} (i : Fin m → Fin (finra
     ∑' j, ‖𝓕 (derivKernelFamily i j) ξ‖ₑ ^ 2 ≤ 2 :=
   calc ∑' j, ‖𝓕 (derivKernelFamily i j) ξ‖ₑ ^ 2
       ≤ ∑' j, ‖𝓕 (lpBlockKernel (V := V) (j + 1)) ξ‖ₑ ^ 2 :=
-        ENNReal.tsum_le_tsum fun j => by gcongr; exact enorm_fourier_derivKernelFamily_le i j ξ
+        tsum_le_tsum fun j => by gcongr; exact enorm_fourier_derivKernelFamily_le i j ξ
     _ ≤ ∑' j, ‖𝓕 (lpBlockKernel (V := V) j) ξ‖ₑ ^ 2 :=
-        ENNReal.tsum_comp_le_tsum_of_injective (add_left_injective 1)
+        tsum_comp_le_tsum_of_injective (add_left_injective 1)
           fun j => ‖𝓕 (lpBlockKernel (V := V) j) ξ‖ₑ ^ 2
     _ ≤ 2 := tsum_fourier_lpBlockKernel_sq_le ξ
 
@@ -389,7 +389,7 @@ omit [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V] [Bo
 /-- The overlap of a dual derivative family is finite. -/
 theorem derivDualOverlap_ne_top {k : ℕ} (w : Fin k → V) : derivDualOverlap w ≠ ∞ :=
   ENNReal.mul_ne_top ENNReal.ofNat_ne_top (ENNReal.pow_ne_top (ENNReal.mul_ne_top
-    (ENNReal.pow_ne_top ENNReal.ofReal_ne_top) (ENNReal.prod_ne_top fun _ _ => enorm_ne_top)))
+    (ENNReal.pow_ne_top ENNReal.ofReal_ne_top) (ENNReal.prod_ne_top fun _ _ => eNorm_ne_top)))
 
 /-- `𝓕(∂^w G̃_j)_{2^j}(ξ) = (∏_l 2πi ⟪2^{-j} ξ, w_l⟫) 𝓕ψ̃_j(ξ)`. -/
 theorem fourier_derivDualFamily {k : ℕ} (w : Fin k → V) (j : ℕ) (ξ : V) :
@@ -428,9 +428,9 @@ theorem enorm_prod_inner_le {k : ℕ} (w : Fin k → V) {ζ : V} {R : ℝ} (hζ 
 theorem enorm_fourier_derivDualFamily_le {k : ℕ} (w : Fin k → V) (j : ℕ) (ξ : V) :
     ‖𝓕 (derivDualFamily w j) ξ‖ₑ ≤
       ENNReal.ofReal (8 * π) ^ k * (∏ l, ‖w l‖ₑ) * ‖𝓕 (dualLpBlockKernel (V := V) j) ξ‖ₑ := by
-  rw [fourier_derivDualFamily, enorm_mul]
+  rw [fourier_derivDualFamily, eNorm_mul]
   by_cases h : 𝓕 (dualLpBlockKernel (V := V) j) ξ = 0
-  · rw [h, enorm_zero, mul_zero, mul_zero]
+  · rw [h, eNorm_zero, mul_zero, mul_zero]
   · rw [show (8 : ℝ) * π = 2 * π * 4 by ring]
     gcongr
     refine enorm_prod_inner_le w ?_
@@ -449,7 +449,7 @@ theorem tsum_fourier_derivDualFamily_sq_le {k : ℕ} (w : Fin k → V) (ξ : V) 
   calc ∑' j, ‖𝓕 (derivDualFamily w j) ξ‖ₑ ^ 2
       ≤ ∑' j, (ENNReal.ofReal (8 * π) ^ k * ∏ l, ‖w l‖ₑ) ^ 2 *
           ‖𝓕 (dualLpBlockKernel (V := V) j) ξ‖ₑ ^ 2 :=
-        ENNReal.tsum_le_tsum fun j => by
+        tsum_le_tsum fun j => by
           rw [← mul_pow]
           gcongr
           exact enorm_fourier_derivDualFamily_le w j ξ

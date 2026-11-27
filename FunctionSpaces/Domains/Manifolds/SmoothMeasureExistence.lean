@@ -63,7 +63,7 @@ noncomputable def chartMeasure : Measure M :=
 theorem chartMeasure_apply {S : Set M} (hS : MeasurableSet S) :
     A.chartMeasure S = ∑ k, ∫⁻ y in (A.extChart k).target ∩ (A.extChart k).symm ⁻¹' S,
       ENNReal.ofReal (A.psi k ((A.extChart k).symm y)) := by
-  rw [chartMeasure, Measure.coe_finsetSum, Finset.sum_apply]
+  rw [chartMeasure, FunLike.coe_sum, Finset.sum_apply]
   refine Finset.sum_congr rfl fun k _ => ?_
   have hT := measurableSet_extend_target I (A.chart k)
   have hκ : AEMeasurable (A.extChart k).symm ((volume.restrict (A.extChart k).target).withDensity

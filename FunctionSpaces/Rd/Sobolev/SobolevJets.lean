@@ -62,9 +62,9 @@ theorem prod_pi_norm_fst_add_sum_le {E F ι : Type*} [SeminormedAddCommGroup E]
 `‖x‖ + ∑_i ‖y_i‖` in `ℝ≥0∞` and in `ℝ`. -/
 theorem toReal_enorm_add_sum {E ι : Type*} [NormedAddCommGroup E] [Fintype ι] (x : E)
     (y : ι → E) : (‖x‖ₑ + ∑ i, ‖y i‖ₑ).toReal = ‖x‖ + ∑ i, ‖y i‖ := by
-  rw [ENNReal.toReal_add enorm_ne_top (ENNReal.sum_ne_top.2 fun _ _ => enorm_ne_top),
-    ENNReal.toReal_sum fun _ _ => enorm_ne_top]
-  simp only [toReal_enorm]
+  rw [ENNReal.toReal_add eNorm_ne_top (ENNReal.sum_ne_top.2 fun _ _ => eNorm_ne_top),
+    ENNReal.toReal_sum fun _ _ => eNorm_ne_top]
+  simp only [toReal_eNorm]
 
 /-- If `‖x‖ + ∑_i ‖y_i‖ ≤ K` in `ℝ≥0∞` with `K` finite, then `‖x‖² + ∑_i ‖y_i‖² ≤ K²` in `ℝ`. -/
 theorem sq_norm_add_sum_sq_le {E : Type*} [NormedAddCommGroup E] {ι : Type*} [Fintype ι] {x : E}

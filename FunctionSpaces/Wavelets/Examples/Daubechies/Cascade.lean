@@ -98,7 +98,7 @@ theorem cascade_eq_zero (n : ℕ) {x : ℝ} (hx : x ∉ Set.Icc (0 : ℝ) (2 * N
   induction n generalizing x with
   | zero =>
     have h1 : (1 : ℝ) ≤ N := by exact_mod_cast m.one_le
-    exact Set.indicator_of_notMem (fun h => hx ⟨h.1, by linarith [h.2]⟩) _
+    exact Set.indicator_of_notMem (fun h : x ∈ Set.Ico (0 : ℝ) 1 => hx ⟨h.1, by linarith [h.2]⟩) _
   | succ n ih =>
     rw [cascade_succ_apply]
     refine Finset.sum_eq_zero fun k hk => ?_

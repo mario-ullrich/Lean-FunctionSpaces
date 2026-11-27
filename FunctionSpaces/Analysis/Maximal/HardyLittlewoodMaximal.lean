@@ -286,8 +286,9 @@ omit [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] in
 /-- The shells are measurable. -/
 theorem measurableSet_dyadicShell (ρ : ℝ) (i : ℕ) :
     MeasurableSet (dyadicShell (V := V) ρ i) := by
-  refine (measurableSet_lt measurable_norm measurable_const).inter ?_
-  exact (MeasurableSet.const _).union (measurableSet_le measurable_const measurable_norm)
+  rw [dyadicShell, ofPred_and, ofPred_or]
+  exact (measurableSet_lt measurable_norm measurable_const).inter
+    ((MeasurableSet.const _).union (measurableSet_le measurable_const measurable_norm))
 
 omit [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- The shells **cover** `V`: a point with `‖y‖ ≥ ρ` lies in the shell `i` with
@@ -390,7 +391,7 @@ theorem lintegral_mul_le_maximalFunction_of_decay {K : V → ℝ≥0∞} {A : �
         rw [iUnion_dyadicShell hρ, Measure.restrict_univ]
     _ ≤ ∑' i, ∫⁻ y in dyadicShell ρ i, K y * g (x - y) := lintegral_iUnion_le _ _
     _ ≤ ∑' i : ℕ, A * volume (ball (0 : V) ρ) * maximalFunction g x *
-          (2⁻¹ ^ (i * N) * 2 ^ ((i + 1) * finrank ℝ V)) := ENNReal.tsum_le_tsum hshell
+          (2⁻¹ ^ (i * N) * 2 ^ ((i + 1) * finrank ℝ V)) := tsum_le_tsum hshell
     _ = _ := by rw [ENNReal.tsum_mul_left, tsum_two_inv_pow_mul_two_pow hN.le]; ring
 
 variable (V) in
@@ -542,7 +543,7 @@ theorem mul_setLIntegral_bigBallSet_le (g w : V → ℝ≥0∞) (t : ℝ≥0∞)
         mul_le_mul_right (lintegral_iUnion_le _ _) t
     _ = ∑' b : u, t * ∫⁻ x in closedBall (b : V) (4 * r b), w x := ENNReal.tsum_mul_left.symm
     _ ≤ ∑' b : u, 5 ^ finrank ℝ V * ∫⁻ x in ball (b : V) (r b), g x * maximalFunction w x :=
-        ENNReal.tsum_le_tsum fun b =>
+        tsum_le_tsum fun b =>
           mul_setLIntegral_closedBall_le (hr0 b (hus b.2)) w (hrI b (hus b.2)).le
     _ = 5 ^ finrank ℝ V * ∫⁻ x in ⋃ b : u, ball (b : V) (r b), g x * maximalFunction w x := by
         rw [hball, ENNReal.tsum_mul_left]
@@ -771,10 +772,10 @@ theorem eLpNorm_maximalFunction_le (g : V → ℝ≥0∞) {p : ℝ≥0∞} (hp1 
       aemeasurable_const hpr
     rw [maximalFunction_const] at h
     simp only [mul_one] at h
-    rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp
+    rw [eLpNorm_eq_lintegral_rpow_eNorm_toReal hp0 hp
       (measurable_maximalFunction g).aestronglyMeasurable,
-      eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hg]
-    simp only [enorm_eq_self]
+      eLpNorm_eq_lintegral_rpow_eNorm_toReal hp0 hp hg]
+    simp only [eNorm_eq_self]
     rw [← ENNReal.mul_rpow_of_nonneg _ _ (by positivity)]
     exact ENNReal.rpow_le_rpow h (by positivity)
   · have hC : maximalConst (finrank ℝ V) p.toReal ^ (1 / p.toReal) ≠ 0 :=

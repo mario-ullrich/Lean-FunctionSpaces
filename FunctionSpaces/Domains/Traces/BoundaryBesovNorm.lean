@@ -265,7 +265,7 @@ variable {Ω} in
 theorem MemBoundaryBesov.const_smul {ψ : Ω.BoundaryPartition} {s : ℝ} {q : ℝ≥0∞} (c : ℂ)
     {g : V → ℂ} (hg : Ω.MemBoundaryBesov p ψ s q g) : Ω.MemBoundaryBesov p ψ s q (c • g) := by
   rw [memBoundaryBesov_iff_boundaryBesovNorm_lt_top, Ω.boundaryBesovNorm_const_smul_of_mem ψ c hg]
-  exact ENNReal.mul_lt_top enorm_lt_top
+  exact ENNReal.mul_lt_top eNorm_lt_top
     ((Ω.memBoundaryBesov_iff_boundaryBesovNorm_lt_top ψ g).1 hg)
 
 /-- **The quasi-norm is homogeneous**: for `c ∈ ℂ` and every function `g` on `V`,
@@ -277,7 +277,7 @@ theorem boundaryBesovNorm_const_smul (ψ : Ω.BoundaryPartition) {s : ℝ} {q : 
     (g : V → ℂ) :
     Ω.boundaryBesovNorm p ψ s q (c • g) = ‖c‖ₑ * Ω.boundaryBesovNorm p ψ s q g := by
   by_cases hc : c = 0
-  · rw [hc, zero_smul, enorm_zero, zero_mul]
+  · rw [hc, zero_smul, eNorm_zero, zero_mul]
     exact Ω.boundaryBesovNorm_zero ψ s q
   by_cases hg : Ω.MemBoundaryBesov p ψ s q g
   · exact Ω.boundaryBesovNorm_const_smul_of_mem ψ c hg
@@ -285,7 +285,7 @@ theorem boundaryBesovNorm_const_smul (ψ : Ω.BoundaryPartition) {s : ℝ} {q : 
     have h' := h.const_smul c⁻¹
     rwa [smul_smul, inv_mul_cancel₀ hc, one_smul] at h')
   rw [Ω.boundaryBesovNorm_eq_top_of_not_mem ψ hcg, Ω.boundaryBesovNorm_eq_top_of_not_mem ψ hg,
-    ENNReal.mul_top (enorm_ne_zero.2 hc)]
+    ENNReal.mul_top (eNorm_ne_zero.2 hc)]
 
 /-- **Vanishing quasi-norm**: if `‖g‖_{B^s_{p,q}(Γ)} = 0`, then every chart piece
 `(ψ_j g) ∘ γ_j` vanishes almost everywhere on `H_j`. -/
@@ -297,7 +297,7 @@ theorem chart_ae_eq_zero_of_boundaryBesovNorm_eq_zero (ψ : Ω.BoundaryPartition
     (Ω.memBoundaryBesov_iff_boundaryBesovNorm_lt_top ψ g).2 (h0 ▸ ENNReal.zero_lt_top)
   choose G hG _ using hg
   rw [Ω.boundaryBesovNorm_eq_sum ψ G hG, Finset.sum_eq_zero_iff] at h0
-  have hG0 : G j = 0 := enorm_eq_zero.1 (add_eq_zero.1 (h0 j (Finset.mem_univ j))).1
+  have hG0 : G j = 0 := eNorm_eq_zero.1 (add_eq_zero.1 (h0 j (Finset.mem_univ j))).1
   refine (hG j).symm.trans ?_
   rw [hG0]
   exact Lp.coeFn_zero ℂ p _
@@ -441,10 +441,10 @@ theorem lintegral_chartPiece_le (ψ : Ω.BoundaryPartition) (j : Fin Ω.N) {P : 
       ENNReal.ofReal (ψ.derivBound j) ^ P * ∫⁻ y, ‖g y‖ₑ ^ P ∂Ω.surfaceMeasure := by
   refine (Ω.lintegral_chart_le j (fun y => ‖ψ.toComplex j y * g y‖ₑ ^ P) fun y hy =>
     ψ.mem_ball_of_ne_zero fun h => hy ?_).trans ?_
-  · rw [ψ.toComplex_of_eq_zero h, zero_mul, enorm_zero, ENNReal.zero_rpow_of_pos hP]
+  · rw [ψ.toComplex_of_eq_zero h, zero_mul, eNorm_zero, ENNReal.zero_rpow_of_pos hP]
   · rw [← lintegral_const_mul' _ _ (ENNReal.rpow_ne_top_of_nonneg hP.le ENNReal.ofReal_ne_top)]
     refine lintegral_mono fun y => ?_
-    rw [enorm_mul, ENNReal.mul_rpow_of_nonneg _ _ hP.le]
+    rw [eNorm_mul, ENNReal.mul_rpow_of_nonneg _ _ hP.le]
     exact mul_le_mul' (ENNReal.rpow_le_rpow (ψ.enorm_toComplex_le j y) hP.le) le_rfl
 
 omit [FiniteDimensional ℝ V] in
@@ -471,18 +471,18 @@ theorem eLpNorm_chartPiece_le (ψ : Ω.BoundaryPartition) (j : Fin Ω.N) {g : V 
     (μ := (volume : Measure (Ω.graph j).hyperplane))
   rcases eq_or_ne p ∞ with rfl | hp
   · rw [eLpNorm_exponent_top hm, eLpNorm_exponent_top hg.aestronglyMeasurable]
-    refine eLpNormEssSup_le_of_ae_enorm_bound ?_
+    refine eLpNormEssSup_le_of_ae_eNorm_bound ?_
     filter_upwards [Ω.ae_graphMap_of_ae_surfaceMeasure j
       (ae_le_eLpNormEssSup (f := g) (μ := Ω.surfaceMeasure))] with x' hx'
     by_cases hψ : ψ.toFun j ((Ω.graph j).graphMap x') = 0
-    · rw [ψ.toComplex_of_eq_zero hψ, zero_mul, enorm_zero]
+    · rw [ψ.toComplex_of_eq_zero hψ, zero_mul, eNorm_zero]
       exact zero_le
-    · rw [enorm_mul]
+    · rw [eNorm_mul]
       exact mul_le_mul' (ψ.enorm_toComplex_le j _) (hx' (ψ.mem_ball_of_ne_zero hψ))
   · have hp0 : p ≠ 0 := (zero_lt_one.trans_le (Fact.out : 1 ≤ p)).ne'
     have hP : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
-    rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hm,
-      eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hg.aestronglyMeasurable]
+    rw [eLpNorm_eq_lintegral_rpow_eNorm_toReal hp0 hp hm,
+      eLpNorm_eq_lintegral_rpow_eNorm_toReal hp0 hp hg.aestronglyMeasurable]
     calc _ ≤ (ENNReal.ofReal (ψ.derivBound j) ^ p.toReal *
           ∫⁻ y, ‖g y‖ₑ ^ p.toReal ∂Ω.surfaceMeasure) ^ (1 / p.toReal) :=
           ENNReal.rpow_le_rpow (Ω.lintegral_chartPiece_le ψ j hP g) (by positivity)
@@ -525,9 +525,9 @@ noncomputable def chartPieceLp (ψ : Ω.BoundaryPartition) (j : Fin Ω.N) :
     Lp ℂ p Ω.surfaceMeasure →L[ℂ] Lp ℂ p (volume : Measure (Ω.graph j).hyperplane) :=
   (Ω.chartPieceLinear ψ j).mkContinuous (ENNReal.ofReal (ψ.derivBound j)).toReal fun g => by
     change ‖(Ω.memLp_chartPiece ψ j g).toLp _‖ ≤ _
-    rw [Lp.norm_toLp, ← toReal_enorm g, ← ENNReal.toReal_mul]
-    refine ENNReal.toReal_mono (ENNReal.mul_ne_top ENNReal.ofReal_ne_top enorm_ne_top) ?_
-    rw [Lp.enorm_def]
+    rw [Lp.norm_toLp, ← toReal_eNorm g, ← ENNReal.toReal_mul]
+    refine ENNReal.toReal_mono (ENNReal.mul_ne_top ENNReal.ofReal_ne_top eNorm_ne_top) ?_
+    rw [Lp.eNorm_def]
     exact Ω.eLpNorm_chartPiece_le ψ j (Lp.stronglyMeasurable g)
 
 /-- The chart piece in `L_p(H_j)` is `(ψ_j g) ∘ γ_j` almost everywhere on `H_j`. -/
@@ -590,8 +590,8 @@ theorem eLpNorm_mul_le_chart (ψ : Ω.BoundaryPartition) (j : Fin Ω.N) {g : V �
     rw [ψ.toComplex_of_eq_zero h, zero_mul]
   rcases eq_or_ne p ∞ with rfl | hp
   · rw [ENNReal.toReal_top, div_zero, ENNReal.rpow_zero, one_mul, eLpNorm_exponent_top hm,
-      Lp.enorm_def, eLpNorm_exponent_top (Lp.aestronglyMeasurable G)]
-    refine eLpNormEssSup_le_of_ae_enorm_bound ?_
+      Lp.eNorm_def, eLpNorm_exponent_top (Lp.aestronglyMeasurable G)]
+    refine eLpNormEssSup_le_of_ae_eNorm_bound ?_
     have h := (Ω.ae_surfaceMeasure_ball_iff j
       (P := fun y => ‖ψ.toComplex j y * g y‖ₑ ≤ eLpNormEssSup G volume)).2
       (by filter_upwards [hG, ae_le_eLpNormEssSup (f := (G : _ → ℂ)) (μ := volume)] with
@@ -599,7 +599,7 @@ theorem eLpNorm_mul_le_chart (ψ : Ω.BoundaryPartition) (j : Fin Ω.N) {g : V �
           rwa [← h1])
     filter_upwards [h] with y hy
     by_cases hψ : ψ.toFun j y = 0
-    · rw [hout y hψ, enorm_zero]
+    · rw [hout y hψ, eNorm_zero]
       exact zero_le
     · exact hy (ψ.mem_ball_of_ne_zero hψ)
   · have hp0 : p ≠ 0 := (zero_lt_one.trans_le (Fact.out : 1 ≤ p)).ne'
@@ -607,12 +607,12 @@ theorem eLpNorm_mul_le_chart (ψ : Ω.BoundaryPartition) (j : Fin Ω.N) {g : V �
     have hGint : ∫⁻ x', ‖G x'‖ₑ ^ p.toReal = ∫⁻ x', ‖ψ.toComplex j ((Ω.graph j).graphMap x') *
         g ((Ω.graph j).graphMap x')‖ₑ ^ p.toReal :=
       lintegral_congr_ae (hG.mono fun x' hx' => by simp only [hx'])
-    rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hm, Lp.enorm_def,
-      eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp (Lp.aestronglyMeasurable G), hGint,
+    rw [eLpNorm_eq_lintegral_rpow_eNorm_toReal hp0 hp hm, Lp.eNorm_def,
+      eLpNorm_eq_lintegral_rpow_eNorm_toReal hp0 hp (Lp.aestronglyMeasurable G), hGint,
       ← ENNReal.mul_rpow_of_nonneg _ _ (by positivity)]
     refine ENNReal.rpow_le_rpow ((Ω.lintegral_le_chart j _ fun y hy =>
       ψ.mem_ball_of_ne_zero fun h => hy ?_).trans_eq rfl) (by positivity)
-    rw [hout y h, enorm_zero, ENNReal.zero_rpow_of_pos hP]
+    rw [hout y h, eNorm_zero, ENNReal.zero_rpow_of_pos hP]
 
 /-- **The `L_p(Γ)` norm is bounded by the quasi-norm on the boundary**: for `1 ≤ p ≤ ∞`, every
 resolution of unity `ψ`, `s ∈ ℝ` and `q`, there is `C < ∞` with
@@ -746,7 +746,7 @@ protected theorem norm_smul (c : ℂ) (a : Ω.BoundaryBesov p t q) : ‖c • a�
     ((c • a.toLp : Lp ℂ p Ω.surfaceMeasure) : V → ℂ)).toReal = _
   rw [Ω.boundaryBesovNorm_congr _
       (Ω.ae_surfaceMeasure_iff_aeBoundary.1 (Lp.coeFn_smul c a.toLp)),
-    Ω.boundaryBesovNorm_const_smul _ c _, ENNReal.toReal_mul, toReal_enorm]
+    Ω.boundaryBesovNorm_const_smul _ c _, ENNReal.toReal_mul, toReal_eNorm]
 
 /-- The triangle inequality, for `q ≥ 1`
 (`Rd.BoundedLipschitzDomain.boundaryBesovNorm_add_le`). -/
@@ -818,9 +818,9 @@ noncomputable def toLpL [Fact (1 ≤ q)] : Ω.BoundaryBesov p t q →L[ℂ] Lp �
       Ω.exists_eLpNorm_le_boundaryBesovNorm (p := p) Ω.boundaryPartition t q
     refine ⟨C.toReal, fun a => ?_⟩
     change ‖a.toLp‖ ≤ C.toReal * ‖a‖
-    rw [← toReal_enorm a.toLp, ← toReal_enorm a, ← ENNReal.toReal_mul, a.enorm_eq]
+    rw [← toReal_eNorm a.toLp, ← toReal_eNorm a, ← ENNReal.toReal_mul, a.enorm_eq]
     refine ENNReal.toReal_mono (ENNReal.mul_ne_top hC a.boundaryBesovNorm_lt_top.ne) ?_
-    rw [Lp.enorm_def]
+    rw [Lp.eNorm_def]
     exact hle _ (Lp.aestronglyMeasurable _))
 
 /-- The inclusion `B^t_{p,q}(Γ) → L_p(Γ)` sends `g` to its function. -/
@@ -875,7 +875,7 @@ instance completeSpace_boundaryBesov {t : ℝ} {q : ℝ≥0∞} [Fact (1 ≤ q)]
     obtain ⟨N, hN⟩ := EMetric.cauchySeq_iff.1 hu ε hε
     refine ⟨N, fun m hm n hn => ?_⟩
     have h := hN m hm n hn
-    rw [edist_eq_enorm_sub, BoundaryBesov.enorm_eq] at h
+    rw [eDist_eq_eNorm_sub, BoundaryBesov.enorm_eq] at h
     exact h.le
   have hlim := Ω.tendsto_boundaryBesovNorm_sub_of_cauchy Ω.boundaryPartition hg' hC
   obtain ⟨n, hn⟩ := (ENNReal.tendsto_nhds_zero.1 hlim 1 one_pos).exists
@@ -884,7 +884,7 @@ instance completeSpace_boundaryBesov {t : ℝ} {q : ℝ≥0∞} [Fact (1 ≤ q)]
       (hn.trans_lt ENNReal.one_lt_top)).coe_add Fact.out (u n).mem
     rwa [sub_add_cancel] at h
   refine ⟨⟨g, hmem⟩, tendsto_iff_edist_tendsto_0.2 (hlim.congr fun n => ?_)⟩
-  rw [edist_comm, edist_eq_enorm_sub, BoundaryBesov.enorm_eq]
+  rw [edist_comm, eDist_eq_eNorm_sub, BoundaryBesov.enorm_eq]
   rfl
 
 /-! ### The Besov trace operator -/
@@ -1002,7 +1002,7 @@ theorem besovTraceLp_smul (hp : p ≠ ∞) {s : ℝ} {q : ℝ≥0∞} [Fact (1 �
   have hcE : ‖c • Ω.besovTraceExtension hp hs hs' f‖ₑ + lqNorm q (fun k =>
       dyadicWeight s k * lpModulus p 2 (c • Ω.besovTraceExtension hp hs hs' f) k) < ∞ := by
     rw [modNorm_const_smul]
-    exact ENNReal.mul_lt_top enorm_lt_top hE
+    exact ENNReal.mul_lt_top eNorm_lt_top hE
   have hind : indicatorLp Ω.measurableSet (c • Ω.besovTraceExtension hp hs hs' f) =
       (c • f).toLp := by
     rw [map_smul, Ω.indicatorLp_besovTraceExtension]
@@ -1056,8 +1056,8 @@ noncomputable def besovTrace (hp : p ≠ ∞) (s : ℝ) (q : ℝ≥0∞) [Fact (
     refine ⟨C.toReal, fun f => ?_⟩
     show (Ω.boundaryBesovNorm p Ω.boundaryPartition (s - 1 / p.toReal) q
       (Ω.besovTraceLp hp hs hs' f)).toReal ≤ C.toReal * ‖f‖
-    rw [← toReal_enorm f, ← ENNReal.toReal_mul]
-    exact ENNReal.toReal_mono (ENNReal.mul_ne_top hC enorm_ne_top) (hle f))
+    rw [← toReal_eNorm f, ← ENNReal.toReal_mul]
+    exact ENNReal.toReal_mono (ENNReal.mul_ne_top hC eNorm_ne_top) (hle f))
 
 /-- The Besov trace of `f` has the function `Rd.BoundedLipschitzDomain.besovTraceLp`. -/
 theorem toLp_besovTrace (hp : p ≠ ∞) {s : ℝ} {q : ℝ≥0∞} [Fact (1 ≤ q)]
@@ -1244,7 +1244,7 @@ noncomputable def besovExtend (hp : p ≠ ∞) (t : ℝ) (q : ℝ≥0∞) [Fact 
     refine ⟨C.toReal, fun g => ?_⟩
     show (modNormOn Ω.measurableSet 2 (t + 1 / p.toReal) q
       (indicatorLp Ω.measurableSet (Ω.besovExtendLp hp g.toLp))).toReal ≤ C.toReal * ‖g‖
-    rw [← toReal_enorm g, ← ENNReal.toReal_mul, BoundaryBesov.enorm_eq]
+    rw [← toReal_eNorm g, ← ENNReal.toReal_mul, BoundaryBesov.enorm_eq]
     exact ENNReal.toReal_mono (ENNReal.mul_ne_top hC g.boundaryBesovNorm_lt_top.ne)
       ((Ω.modNormOn_indicatorLp_besovExtendLp_le hp _ q _).trans (hle _ g.mem)))
 

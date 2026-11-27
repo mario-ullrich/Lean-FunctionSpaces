@@ -1,12 +1,12 @@
 name = "functionspaces"
 defaultTargets = ["ApproximationSpaces", "FunctionSpaces"]
 
-# Mathlib pinned to the v4.35.0 tag, matching lean-toolchain: a release tag has a
+# Mathlib pinned to the v4.36.0 tag, matching lean-toolchain: a release tag has a
 # fully-published build cache, so `lake exe cache get` finds every olean.
 [[require]]
 name = "mathlib"
 scope = "leanprover-community"
-version = "git#v4.35.0"
+version = "git#v4.36.0"
 
 # The abstract theory of approximation spaces in the sense of Pietsch: approximation
 # schemes in a normed space, the errors of best approximation, the spaces A^s_q, embeddings,

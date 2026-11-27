@@ -56,7 +56,7 @@ theorem approxNormDyadic_map_le (T : X →L[ℝ] Y) (hT : ∀ n, ∀ a ∈ A n, 
 /-- A bounded linear map with `T(A_n) ⊆ B_n` maps `A^s_q` into `B^s_q`. -/
 theorem MemApprox.map (T : X →L[ℝ] Y) (hT : ∀ n, ∀ a ∈ A n, T a ∈ B n) {f : X}
     (hf : A.MemApprox s q f) : B.MemApprox s q (T f) :=
-  (approxNorm_map_le T hT f).trans_lt (ENNReal.mul_lt_top enorm_lt_top hf)
+  (approxNorm_map_le T hT f).trans_lt (ENNReal.mul_lt_top eNorm_lt_top hf)
 
 /-- The image of `A^s_q(X)` under `T` lies in `B^s_q(Y)`, for `s ≥ 0` and `0 < q ≤ ∞`. -/
 theorem approxSpace_map_le (hs : 0 ≤ s) (hq0 : q ≠ 0) (T : X →L[ℝ] Y)

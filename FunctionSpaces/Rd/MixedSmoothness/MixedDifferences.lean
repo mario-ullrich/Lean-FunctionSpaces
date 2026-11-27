@@ -73,7 +73,7 @@ theorem mixedDiff_empty (L : ℕ) (h : Fin d → ℝ) (f : (Fin d → ℝ) → �
 theorem mixedDiff_insert (L : ℕ) {e : Finset (Fin d)} {i : Fin d} (hi : i ∉ e) (h : Fin d → ℝ)
     (f : (Fin d → ℝ) → ℂ) :
     mixedDiff L (insert i e) h f = (fwdDiff (Pi.single i (h i)))^[L] (mixedDiff L e h f) := by
-  rw [mixedDiff, Finset.prod_insert hi, map_mul, Module.End.mul_apply,
+  rw [mixedDiff, Finset.prod_insert hi, map_mul, mul_apply_eq_comp,
     diffAct_coordElem_pow_eq_higherDiff]
   rfl
 
@@ -269,7 +269,7 @@ noncomputable def lpMixedModulus (L : ℕ) (f : Lp ℂ p (volume : Measure (Fin 
 /-- At `k = 0` the mixed modulus is the norm. -/
 theorem lpMixedModulus_zero (L : ℕ) (f : Lp ℂ p (volume : Measure (Fin d → ℝ))) :
     lpMixedModulus p L f 0 = ‖f‖ₑ := by
-  rw [lpMixedModulus, mixedSupp_zero, mixedModulus_empty, Lp.enorm_def]
+  rw [lpMixedModulus, mixedSupp_zero, mixedModulus_empty, Lp.eNorm_def]
 
 /-- The mixed modulus on `L_p` is subadditive. -/
 theorem lpMixedModulus_add_le (L : ℕ) (f g : Lp ℂ p (volume : Measure (Fin d → ℝ)))
@@ -281,7 +281,7 @@ theorem lpMixedModulus_add_le (L : ℕ) (f g : Lp ℂ p (volume : Measure (Fin d
 /-- `Ω^{e(k)}_L(f, 2^(-k))_p ≤ 2^(Ld) ‖f‖_p`. -/
 theorem lpMixedModulus_le (L : ℕ) (f : Lp ℂ p (volume : Measure (Fin d → ℝ))) (k : Fin d → ℕ) :
     lpMixedModulus p L f k ≤ 2 ^ (L * d) * ‖f‖ₑ := by
-  rw [Lp.enorm_def]
+  rw [Lp.eNorm_def]
   refine (mixedModulus_le (Lp.aestronglyMeasurable f) Fact.out L _ _).trans
     (mul_le_mul' (pow_le_pow_right₀ one_le_two (Nat.mul_le_mul_left L ?_)) le_rfl)
   exact (Finset.card_le_univ _).trans (Fintype.card_fin d).le

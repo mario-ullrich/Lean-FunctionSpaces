@@ -80,10 +80,10 @@ theorem measurable_eLpNorm_slices {f : (Fin (n + 1) → ℝ) → ℂ} (hf : Meas
     Measurable fun y : Fin n → ℝ => eLpNorm (fun t : ℝ => f (i.insertNth t y)) p volume := by
   have hj := hf.comp (measurable_insertNth i)
   have h : Measurable fun y : Fin n → ℝ => ∫⁻ t, ‖f (i.insertNth t y)‖ₑ ^ p.toReal :=
-    (hj.enorm.pow_const p.toReal).lintegral_prod_right'
+    (hj.eNorm.pow_const p.toReal).lintegral_prod_right'
   have heq : (fun y : Fin n → ℝ => eLpNorm (fun t : ℝ => f (i.insertNth t y)) p volume) =
       fun y => (∫⁻ t, ‖f (i.insertNth t y)‖ₑ ^ p.toReal) ^ (1 / p.toReal) := funext fun y =>
-    eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp
+    eLpNorm_eq_lintegral_rpow_eNorm_toReal hp0 hp
       (hj.comp (measurable_const.prodMk measurable_id)).aestronglyMeasurable
   rw [heq]
   exact h.pow_const _
@@ -100,8 +100,8 @@ theorem eLpNorm_eq_eLpNorm_slices {f : (Fin (n + 1) → ℝ) → ℂ} (hf : Meas
   refine (ENNReal.rpow_left_injective (ENNReal.toReal_pos hp0 hp).ne').eq_iff.1 ?_
   simp only [eLpNorm_rpow_eq hf.aestronglyMeasurable hp0 hp,
     eLpNorm_rpow_eq (measurable_eLpNorm_slices hf hp0 hp i).aestronglyMeasurable hp0 hp,
-    enorm_eq_self]
-  rw [lintegral_eq_lintegral_slices i (hf.enorm.pow_const _).aemeasurable]
+    eNorm_eq_self]
+  rw [lintegral_eq_lintegral_slices i (hf.eNorm.pow_const _).aemeasurable]
   refine lintegral_congr fun y => ?_
   have hmt : Measurable fun t : ℝ => f (i.insertNth t y) :=
     (hf.comp (measurable_insertNth i)).comp (measurable_const.prodMk measurable_id)
@@ -126,9 +126,9 @@ theorem eLpNorm_le_add_of_slice_le {d : ℕ} {p : ℝ≥0∞} (hp1 : 1 ≤ p) (h
     eLpNorm_eq_eLpNorm_slices hD hp0 hp i,
     ← eLpNorm_const_mul_ennreal (measurable_eLpNorm_slices hB hp0 hp i).aestronglyMeasurable,
     ← eLpNorm_const_mul_ennreal (measurable_eLpNorm_slices hD hp0 hp i).aestronglyMeasurable]
-  refine (eLpNorm_mono_enorm (measurable_eLpNorm_slices hA hp0 hp i).aestronglyMeasurable
+  refine (eLpNorm_mono_eNorm (measurable_eLpNorm_slices hA hp0 hp i).aestronglyMeasurable
     fun y => ?_).trans (eLpNorm_add_le hp1)
-  simpa only [enorm_eq_self, Fin.update_insertNth, Pi.add_apply] using h (i.insertNth 0 y)
+  simpa only [eNorm_eq_self, Fin.update_insertNth, Pi.add_apply] using h (i.insertNth 0 y)
 
 /-- **Bounds through slices, one term**: let `0 < p < ∞`, let `A, B` be measurable on `ℝ^d`, `i` a
 coordinate and `a ∈ [0, ∞]`. If the slices through every point `x` in coordinate `i` satisfy
@@ -143,8 +143,8 @@ theorem eLpNorm_le_of_slice_le {d : ℕ} {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : 
   obtain ⟨n, rfl⟩ : ∃ n, d = n + 1 := ⟨d - 1, by have := i.pos; omega⟩
   rw [eLpNorm_eq_eLpNorm_slices hA hp0 hp i, eLpNorm_eq_eLpNorm_slices hB hp0 hp i,
     ← eLpNorm_const_mul_ennreal (measurable_eLpNorm_slices hB hp0 hp i).aestronglyMeasurable]
-  refine eLpNorm_mono_enorm (measurable_eLpNorm_slices hA hp0 hp i).aestronglyMeasurable
+  refine eLpNorm_mono_eNorm (measurable_eLpNorm_slices hA hp0 hp i).aestronglyMeasurable
     fun y => ?_
-  simpa only [enorm_eq_self, Fin.update_insertNth] using h (i.insertNth 0 y)
+  simpa only [eNorm_eq_self, Fin.update_insertNth] using h (i.insertNth 0 y)
 
 end Rd

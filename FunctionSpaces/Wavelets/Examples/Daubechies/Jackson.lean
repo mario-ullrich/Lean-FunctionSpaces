@@ -92,7 +92,7 @@ theorem eLpNorm_le_of_forall_eLpNorm_restrict_le {α ι : Type*} [MeasurableSpac
         rw [hI, Measure.restrict_univ]
     _ ≤ ∑' i, ∫⁻ x in I i, ‖F x‖ₑ ^ p.toReal ∂μ := lintegral_iUnion_le _ _
     _ ≤ ∑' i, B ^ p.toReal * eLpNorm G p (μ.restrict (W i)) ^ p.toReal :=
-        ENNReal.tsum_le_tsum hk
+        tsum_le_tsum hk
     _ = B ^ p.toReal * ∑' i, eLpNorm G p (μ.restrict (W i)) ^ p.toReal := ENNReal.tsum_mul_left
     _ ≤ B ^ p.toReal * (M * eLpNorm G p μ ^ p.toReal) := by gcongr
     _ = (M ^ (1 / p.toReal) * B * eLpNorm G p μ) ^ p.toReal := by
@@ -171,7 +171,7 @@ theorem tsum_eLpNorm_window_rpow_le (hN : 1 ≤ N) {p : ℝ≥0∞} (hp0 : p ≠
         ‖G x‖ₑ ^ p.toReal := fun k => eLpNorm_rpow_eq hG.restrict hp0 hp
   rw [tsum_congr hk, eLpNorm_rpow_eq hG hp0 hp]
   exact tsum_setLIntegral_le_mul_lintegral (fun k => measurableSet_Icc)
-    (fun x T hT => card_le_of_forall_mem_window hN x T hT) (hG.enorm.pow_const _)
+    (fun x T hT => card_le_of_forall_mem_window hN x T hT) (hG.eNorm.pow_const _)
 
 /-- **The length of a window**: `|W_k|^N = (4N - 3)^N 2^(-jN)` for the window
 `W_k = [(k - (2N - 2))/2^j, (k + 2N - 1)/2^j]` of length `(4N - 3)/2^j`, `N ≥ 1`. -/
@@ -424,7 +424,7 @@ theorem enorm_sub_daubechiesProj_le_of_continuous (hN : 2 ≤ N) (hp : p ≠ ∞
     ‖f - daubechiesProj m p hN hp j f‖ₑ ≤ daubechiesJacksonConst m p * Rd.lpModulus p N f j := by
   have hP : ⇑(daubechiesProj m p hN hp j f) =ᵐ[volume] projFun m j g :=
     (daubechiesProj_apply_ae m hN hp j f).trans (EventuallyEq.of_eq (projFun_congr_ae m hfg j))
-  rw [Lp.enorm_def, eLpNorm_congr_ae ((Lp.coeFn_sub _ _).trans (hfg.sub hP)), Rd.lpModulus,
+  rw [Lp.eNorm_def, eLpNorm_congr_ae ((Lp.coeFn_sub _ _).trans (hfg.sub hP)), Rd.lpModulus,
     Rd.smoothnessModulus_congr_ae hfg]
   exact eLpNorm_sub_projFun_le_smoothnessModulus m hN Fact.out hp hg j
 

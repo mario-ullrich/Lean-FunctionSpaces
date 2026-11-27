@@ -246,7 +246,7 @@ theorem modNorm_toL2_lt_top (U : H^{1}(V)) :
   have hσ : (1 / 2 : ℝ) + 1 / (2 : ℝ≥0∞).toReal = 1 := by norm_num
   rw [hσ]
   exact (modNorm_two_le_norm U).trans_lt
-    (ENNReal.mul_lt_top sobolevOneBesovConst_ne_top.lt_top enorm_lt_top)
+    (ENNReal.mul_lt_top sobolevOneBesovConst_ne_top.lt_top eNorm_lt_top)
 
 /-- **The trace of `H^1(V)` on a Lipschitz graph is bounded**: `‖Tr ι U‖_{L_2(H)} ≤ C ‖U‖` for every
 `U ∈ H^1(V)` with `L_2` function `ι U` (`Rd.toL2`), with `C = K √2 Rd.sobolevOneBesovConst V` for
@@ -294,8 +294,8 @@ noncomputable def traceH1 : H^{1}(V) →L[ℂ] Lp ℂ 2 (volume : Measure Ω.hyp
   (Ω.traceH1Linear).mkContinuousOfExistsBound (by
     obtain ⟨C, hC, hle⟩ := Ω.exists_enorm_graphTrace_toL2_le
     refine ⟨C.toReal, fun U => ?_⟩
-    rw [← toReal_enorm, ← toReal_enorm U, ← ENNReal.toReal_mul]
-    exact ENNReal.toReal_mono (ENNReal.mul_ne_top hC enorm_ne_top) (hle U))
+    rw [← toReal_eNorm, ← toReal_eNorm U, ← ENNReal.toReal_mul]
+    exact ENNReal.toReal_mono (ENNReal.mul_ne_top hC eNorm_ne_top) (hle U))
 
 /-- `traceH1 U = Tr(ι U)`. -/
 theorem traceH1_apply (U : H^{1}(V)) : Ω.traceH1 U = Ω.graphTrace two_ne_top 2 (toL2 U) :=
@@ -525,8 +525,8 @@ noncomputable def chartTrace (j : Fin Ω.N) (s : ℝ) (hs : 1 / 2 < s := by norm
   (Ω.chartTraceLinear j s hs hs').mkContinuousOfExistsBound (by
     obtain ⟨C, hC, hle⟩ := Ω.exists_enorm_graphTrace_localizeL2_le Ω.boundaryPartition j s hs hs'
     refine ⟨C.toReal, fun u => ?_⟩
-    rw [← toReal_enorm, ← toReal_enorm u, ← ENNReal.toReal_mul]
-    exact ENNReal.toReal_mono (ENNReal.mul_ne_top hC enorm_ne_top) (hle (u : H^{s}(V))))
+    rw [← toReal_eNorm, ← toReal_eNorm u, ← ENNReal.toReal_mul]
+    exact ENNReal.toReal_mono (ENNReal.mul_ne_top hC eNorm_ne_top) (hle (u : H^{s}(V))))
 
 /-- `chartTrace Ω j s u = Tr_j(ψ_j ι_s u)`. -/
 theorem chartTrace_apply (j : Fin Ω.N) (s : ℝ) (u : RestrictionSpace s Ω.toOpens)

@@ -349,7 +349,7 @@ every `f : ℝ^d → ℂ`, `Daubechies.tensorCoeffNorm m p s p f < ∞` iff
 `∑_i (w_i |∫ f conj b_i|)^p < ∞` over the tensor wavelet system, with the weights
 `w_i = 2^(j(s + d/2 - d/p))` at the wavelets of level `j` and `1` at the scaling functions
 (`Daubechies.tensorWaveletWeight`). The sum splits into the scaling part and the wavelet part
-(Mathlib's `Summable.tsum_sum`, `ENNReal.tsum_prod'`), and the `p`-th power of the `ℓ_p` norm of
+(Mathlib's `Summable.tsum_sum`, `tsum_prod'`), and the `p`-th power of the `ℓ_p` norm of
 the `ℓ_p` norms of the levels is the double sum (`ENNReal.lqNorm_lqNorm_rpow`). -/
 theorem tensorCoeffNorm_lt_top_iff_tsum {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞) (s : ℝ)
     (f : (Fin d → ℝ) → ℂ) :
@@ -357,8 +357,8 @@ theorem tensorCoeffNorm_lt_top_iff_tsum {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p
       ∑' i, (tensorWaveletWeight (s + d * (1 / 2 - 1 / p.toReal)) i *
         ‖∫ x, f x * conj (tensorWaveletFun m d i x)‖ₑ) ^ p.toReal < ∞ := by
   have hτ : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
-  rw [Summable.tsum_sum ENNReal.summable ENNReal.summable, ENNReal.tsum_prod', tensorCoeffNorm,
-    ENNReal.add_lt_top, ENNReal.add_lt_top, ← ENNReal.rpow_lt_top_iff_of_pos hτ,
+  rw [Summable.tsum_sum CompleteLattice.summable CompleteLattice.summable, tsum_prod',
+    tensorCoeffNorm, ENNReal.add_lt_top, ENNReal.add_lt_top, ← ENNReal.rpow_lt_top_iff_of_pos hτ,
     ENNReal.lqNorm_rpow hp0 hp]
   simp only [tensorWaveletWeight_inl, tensorWaveletWeight_inr, one_mul,
     integral_mul_conj_tensorWaveletFun_inl, integral_mul_conj_tensorWaveletFun_inr]
@@ -524,7 +524,7 @@ theorem eLpNorm_tensorProjFun_le_tensorCoeffNorm (hN : 2 ≤ N) {p : ℝ≥0∞}
           ∑' j, C * tensorCoeffNorm m p s q f * dyadicWeight (-s) j :=
         add_le_add h0 ((Finset.sum_le_sum fun j _ =>
           eLpNorm_tensorDetailFun_le_tensorCoeffNorm m hN hp1 hp hq j f).trans
-          (ENNReal.sum_le_tsum _))
+          (sum_le_tsum _))
     _ = (C₀ + C * (1 - 2 ^ (-s))⁻¹) * tensorCoeffNorm m p s q f := by
         rw [ENNReal.tsum_mul_left, ENNReal.tsum_dyadicWeight_neg]
         ring

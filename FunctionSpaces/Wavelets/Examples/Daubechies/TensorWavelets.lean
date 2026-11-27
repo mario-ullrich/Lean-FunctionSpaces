@@ -350,7 +350,7 @@ theorem ModulusBound.of_order {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞)
       _ = K := by
           rw [mul_left_comm, ENNReal.dyadicWeight_mul_neg_self, mul_one]
   refine modulusBound_of_dyadic hθ'0 (B := C * (‖F‖ₑ + K))
-    (ENNReal.mul_ne_top hC (ENNReal.add_ne_top.2 ⟨enorm_ne_top, hK⟩)) fun k => ?_
+    (ENNReal.mul_ne_top hC (ENNReal.add_ne_top.2 ⟨eNorm_ne_top, hK⟩)) fun k => ?_
   have h1 : dyadicWeight θ' k * Rd.lpModulus p r' F k ≤ C * (‖F‖ₑ + K) :=
     ((ENNReal.le_lqNorm ENNReal.top_ne_zero _ k).trans le_add_self).trans
       ((hle F).trans (by gcongr))
@@ -464,7 +464,7 @@ theorem modulusBound_wavelet (hN : 2 ≤ N) {p : ℝ≥0∞} [Fact (1 ≤ p)] (h
       rw [← ENNReal.ofReal_one]
       exact ENNReal.ofReal_le_ofReal (Real.one_le_rpow h2.le hθ)
     calc Rd.smoothnessModulus volume r p (a : ℝ → ℂ) t ≤ 2 ^ r * ‖a‖ₑ := by
-          rw [Lp.enorm_def]
+          rw [Lp.eNorm_def]
           exact Rd.smoothnessModulus_le (Lp.aestronglyMeasurable a) Fact.out r t
       _ ≤ (daubechiesBernsteinConst m p r * K + 2 ^ r) * ENNReal.ofReal ((2 * t) ^ θ) * ‖a‖ₑ := by
           gcongr

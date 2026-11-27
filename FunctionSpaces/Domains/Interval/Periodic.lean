@@ -158,8 +158,8 @@ theorem eLpNorm_perExt_Icc {f : ℝ → ℂ} (hf : Measurable f) {p : ℝ≥0∞
     eLpNorm (perExt f) p (volume.restrict (Icc c (c + 1))) =
       eLpNorm f p (volume.restrict (Icc 0 1)) := by
   have hm := measurable_perExt hf
-  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hm.aestronglyMeasurable,
-    eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hf.aestronglyMeasurable]
+  rw [eLpNorm_eq_lintegral_rpow_eNorm_toReal hp0 hp hm.aestronglyMeasurable,
+    eLpNorm_eq_lintegral_rpow_eNorm_toReal hp0 hp hf.aestronglyMeasurable]
   congr 1
   rw [lintegral_Icc_periodic (G := fun x => ‖perExt f x‖ₑ ^ p.toReal)
     (fun x => by simp only [perExt_periodic f x]) c]
@@ -212,8 +212,8 @@ theorem intervalModulus_perExt_le {f : ℝ → ℂ} (hf : Measurable f) {p : ℝ
         eLpNorm_Icc_mono _ p le_rfl (by linarith)
     _ ≤ (n : ℝ≥0∞) ^ (1 / p.toReal) *
           eLpNorm (higherDiff r h (perExt f)) p (volume.restrict (Icc 0 1)) := by
-        rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hm.aestronglyMeasurable,
-          eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hm.aestronglyMeasurable,
+        rw [eLpNorm_eq_lintegral_rpow_eNorm_toReal hp0 hp hm.aestronglyMeasurable,
+          eLpNorm_eq_lintegral_rpow_eNorm_toReal hp0 hp hm.aestronglyMeasurable,
           ← ENNReal.mul_rpow_of_nonneg _ _ hθ]
         exact ENNReal.rpow_le_rpow (lintegral_Icc_nat_le hper n) hθ
     _ ≤ (n : ℝ≥0∞) ^ (1 / p.toReal) * perModulus r p f t :=

@@ -205,7 +205,7 @@ theorem norm0_sub_sum_rpow_le_tsum (hρ : 0 < ρ) (h00 : A.norm0 0 = 0)
           A.norm0 (∑ i ∈ range m, g (n + i)) ^ ρ := h0 _ _
       _ ≤ A.norm0 (u - ∑ k ∈ range (m + n), g k) ^ ρ + T := by
           gcongr
-          exact hfin.trans (ENNReal.sum_le_tsum _)
+          exact hfin.trans (sum_le_tsum _)
   have hlim' : Tendsto (fun m => A.norm0 (u - ∑ k ∈ range (m + n), g k) ^ ρ + T) atTop
       (𝓝 (0 + T)) := by
     have h := ((ENNReal.continuous_rpow_const (y := ρ)).tendsto (0 : ℝ≥0∞)).comp

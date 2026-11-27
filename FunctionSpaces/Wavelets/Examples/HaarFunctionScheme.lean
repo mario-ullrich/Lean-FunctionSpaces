@@ -112,11 +112,11 @@ variable (p) in
 /-- **The step couple is the couple of the Haar scheme in `L_p`**: for every exponent `p`, the
 couple of dyadic step functions in `L_p[0, 1]` (`Haar.stepCouple`) is the couple in `L_p` of the
 Haar scheme in `L_∞[0, 1]` (`FunctionScheme.lpCouple`). Both are complexity couples of the
-quasi-norm `‖·‖_p`, which is Mathlib's `‖f‖ₑ` on `Lp` (`MeasureTheory.Lp.enorm_def`), and of the
+quasi-norm `‖·‖_p`, which is Mathlib's `‖f‖ₑ` on `Lp` (`MeasureTheory.Lp.eNorm_def`), and of the
 same sets (`Haar.lpSets_haarScheme`). -/
 theorem stepCouple_eq_lpCouple : stepCouple p = FunctionScheme.lpCouple (haarScheme ∞) p := by
   have hN : (fun f : Lp ℂ p vol => ‖f‖ₑ) = fun f : Lp ℂ p vol => eLpNorm f p vol :=
-    funext fun f => Lp.enorm_def f
+    funext fun f => Lp.eNorm_def f
   have hS : InterpCouple.dyadicLevels (fun j => lpMeasSubgroup ℂ (dyadicFiltration j) p vol) =
       FunctionScheme.lpSets (haarScheme ∞) p :=
     funext fun n => (lpSets_haarScheme p n).symm

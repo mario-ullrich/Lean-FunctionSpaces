@@ -69,10 +69,10 @@ theorem continuous_eLpNorm_comp_sub_sub {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : 
   have hc : Continuous fun w : V => DomAddAct.mk (-w) +ᵥ hf.toLp f :=
     (DomAddAct.continuous_mk.comp continuous_neg).vadd continuous_const
   have hG : Continuous G := hc.congr fun w => DomAddAct.mk_vadd_toLp (-w) hf
-  have hT : Continuous fun w : V => ‖G w - hf.toLp f‖ₑ := (hG.sub continuous_const).enorm
+  have hT : Continuous fun w : V => ‖G w - hf.toLp f‖ₑ := (hG.sub continuous_const).eNorm
   refine hT.congr fun w => ?_
   simp only [G]
-  rw [← MemLp.toLp_sub, Lp.enorm_toLp]
+  rw [← MemLp.toLp_sub, Lp.eNorm_toLp]
   congr 1
   funext x
   simp only [Pi.sub_apply, vadd_eq_add, neg_add_eq_sub]
@@ -201,7 +201,7 @@ theorem lintegral_enorm_dilate (F : V → ℂ) {c : ℝ} (hc : 0 < c) :
     ∫⁻ x, ‖dilate c F x‖ₑ ∂μ = ∫⁻ x, ‖F x‖ₑ ∂μ := by
   have hpow : (0 : ℝ) < c ^ finrank ℝ V := pow_pos hc _
   have h : ∀ x, ‖dilate c F x‖ₑ = ENNReal.ofReal (c ^ finrank ℝ V) * ‖F (c • x)‖ₑ := fun x => by
-    rw [dilate, enorm_mul, ← ofReal_norm (((c ^ finrank ℝ V : ℝ)) : ℂ), Complex.norm_real,
+    rw [dilate, eNorm_mul, ← ofReal_norm (((c ^ finrank ℝ V : ℝ)) : ℂ), Complex.norm_real,
       Real.norm_of_nonneg hpow.le]
   simp_rw [h]
   rw [lintegral_const_mul' _ _ ENNReal.ofReal_ne_top, lintegral_comp_smul (fun u => ‖F u‖ₑ) hc.ne',
@@ -212,8 +212,8 @@ theorem lintegral_enorm_dilate (F : V → ℂ) {c : ℝ} (hc : 0 < c) :
 (`Rd.lintegral_enorm_dilate`). -/
 theorem eLpNorm_dilate_one {Φ : V → ℂ} (hΦ : Integrable Φ μ) {c : ℝ} (hc : 0 < c) :
     eLpNorm (dilate c Φ) 1 μ = eLpNorm Φ 1 μ := by
-  rw [eLpNorm_one_eq_lintegral_enorm (integrable_dilate hΦ hc.ne').aestronglyMeasurable,
-    eLpNorm_one_eq_lintegral_enorm hΦ.aestronglyMeasurable, lintegral_enorm_dilate Φ hc]
+  rw [eLpNorm_one_eq_lintegral_eNorm (integrable_dilate hΦ hc.ne').aestronglyMeasurable,
+    eLpNorm_one_eq_lintegral_eNorm hΦ.aestronglyMeasurable, lintegral_enorm_dilate Φ hc]
 
 /-- **Convolution with a dilation**: `(Φ_c ⋆ f)(x) = ∫ Φ(z) f(x - c^(-1) z) dz` for `c > 0`
 (substitute `y = c^(-1) z`, Mathlib's `Measure.integral_comp_smul`). -/
@@ -257,11 +257,11 @@ theorem ae_enorm_conv_dilate_sub_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠
   calc ‖conv (dilate c Φ) f μ x - f x‖ₑ
       = ‖∫ z, (Φ z * f (x - c⁻¹ • z) - Φ z * f x) ∂μ‖ₑ := by
         rw [integral_sub hint hconst, integral_mul_const, h1, one_mul, conv_dilate_apply Φ f hc x]
-    _ ≤ ∫⁻ z, ‖Φ z * f (x - c⁻¹ • z) - Φ z * f x‖ₑ ∂μ := enorm_integral_le_lintegral_enorm _
+    _ ≤ ∫⁻ z, ‖Φ z * f (x - c⁻¹ • z) - Φ z * f x‖ₑ ∂μ := eNorm_integral_le_lintegral_eNorm _
     _ = ∫⁻ z, ‖Φ z‖ₑ * ‖f (x - c⁻¹ • z) - f x‖ₑ ∂μ := by
         congr 1
         funext z
-        rw [← mul_sub, enorm_mul]
+        rw [← mul_sub, eNorm_mul]
 
 /-- **The `L_p` distance of an approximate identity**: for an integrable `Φ` with `∫ Φ = 1`, a
 strongly measurable `g ∈ L_p` and `c > 0`,
@@ -286,9 +286,9 @@ theorem eLpNorm_conv_dilate_sub_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ 
   rw [← ENNReal.rpow_mul, one_div_mul_cancel hq.ne', ENNReal.rpow_one]
   have hprod : AEMeasurable (Function.uncurry fun x z =>
       ‖Φ z‖ₑ * ‖g (x - c⁻¹ • z) - g x‖ₑ ^ q) (μ.prod μ) :=
-    hΦ.aestronglyMeasurable.enorm.comp_snd.mul
+    hΦ.aestronglyMeasurable.eNorm.comp_snd.mul
       (((hgmeas.comp (measurable_fst.sub (measurable_snd.const_smul c⁻¹))).sub
-        (hgmeas.comp measurable_fst)).enorm.pow_const q).aemeasurable
+        (hgmeas.comp measurable_fst)).eNorm.pow_const q).aemeasurable
   calc ∫⁻ x, ‖(conv (dilate c Φ) g μ - g) x‖ₑ ^ q ∂μ
       ≤ ∫⁻ x, (∫⁻ z, ‖Φ z‖ₑ * ‖g (x - c⁻¹ • z) - g x‖ₑ ∂μ) ^ q ∂μ := by
         refine lintegral_mono_ae ?_
@@ -296,9 +296,9 @@ theorem eLpNorm_conv_dilate_sub_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ 
         exact ENNReal.rpow_le_rpow hx hq.le
     _ ≤ ∫⁻ x, (∫⁻ z, ‖Φ z‖ₑ ∂μ) ^ (q - 1) *
           ∫⁻ z, ‖Φ z‖ₑ * ‖g (x - c⁻¹ • z) - g x‖ₑ ^ q ∂μ ∂μ :=
-        lintegral_mono fun x => lintegral_mul_rpow_le hq1 hΦ.aestronglyMeasurable.enorm
+        lintegral_mono fun x => lintegral_mul_rpow_le hq1 hΦ.aestronglyMeasurable.eNorm
           ((hgmeas.comp (measurable_const.sub (measurable_id.const_smul c⁻¹))).sub
-            measurable_const).enorm.aemeasurable
+            measurable_const).eNorm.aemeasurable
     _ = (∫⁻ z, ‖Φ z‖ₑ ∂μ) ^ (q - 1) *
           ∫⁻ x, ∫⁻ z, ‖Φ z‖ₑ * ‖g (x - c⁻¹ • z) - g x‖ₑ ^ q ∂μ ∂μ :=
         lintegral_const_mul'' _ hprod.lintegral_prod_right'
@@ -309,7 +309,7 @@ theorem eLpNorm_conv_dilate_sub_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ 
         congr 1
         refine lintegral_congr fun z => ?_
         have hm : Measurable fun x => ‖g (x - c⁻¹ • z) - g x‖ₑ ^ q :=
-          ((hgmeas.comp (measurable_id.sub_const _)).sub hgmeas).enorm.pow_const q
+          ((hgmeas.comp (measurable_id.sub_const _)).sub hgmeas).eNorm.pow_const q
         have hsm : AEStronglyMeasurable (fun x => g (x - c⁻¹ • z) - g x) μ :=
           ((hgm.comp_measurable (measurable_id.sub_const _)).sub hgm).aestronglyMeasurable
         rw [lintegral_const_mul _ hm]
@@ -348,7 +348,7 @@ theorem tendsto_eLpNorm_conv_dilate_sub {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : 
     have hlim := tendsto_lintegral_filter_of_dominated_convergence'
       (μ := μ) (l := atTop) (F := fun (c : ℝ) z => ‖Φ z‖ₑ * T (c⁻¹ • z) ^ q)
       (f := fun _ => 0) (fun z => ‖Φ z‖ₑ * (2 * eLpNorm g p μ) ^ q)
-      (Eventually.of_forall fun c => hΦ.aestronglyMeasurable.enorm.mul
+      (Eventually.of_forall fun c => hΦ.aestronglyMeasurable.eNorm.mul
         ((hT.measurable.comp (measurable_const_smul c⁻¹)).pow_const q).aemeasurable)
       (Eventually.of_forall fun c => Eventually.of_forall fun z => by
         gcongr
@@ -357,7 +357,7 @@ theorem tendsto_eLpNorm_conv_dilate_sub {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : 
           _ = 2 * eLpNorm g p μ := by
               rw [eLpNorm_comp_sub_right hgm.aestronglyMeasurable, two_mul])
       (by
-        rw [lintegral_mul_const'' _ hΦ.aestronglyMeasurable.enorm]
+        rw [lintegral_mul_const'' _ hΦ.aestronglyMeasurable.eNorm]
         exact ENNReal.mul_ne_top hΦ1 (ENNReal.rpow_ne_top_of_nonneg hq.le
           (ENNReal.mul_ne_top (by simp) hg.eLpNorm_ne_top)))
       (Eventually.of_forall fun z => by
@@ -370,7 +370,7 @@ theorem tendsto_eLpNorm_conv_dilate_sub {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : 
         have h1' : Tendsto (fun c : ℝ => T (c⁻¹ • z) ^ q) atTop (𝓝 0) := by
           have := ((ENNReal.continuous_rpow_const (y := q)).tendsto 0).comp h2
           rwa [ENNReal.zero_rpow_of_pos hq] at this
-        have := ENNReal.Tendsto.const_mul (a := ‖Φ z‖ₑ) h1' (Or.inr enorm_ne_top)
+        have := ENNReal.Tendsto.const_mul (a := ‖Φ z‖ₑ) h1' (Or.inr eNorm_ne_top)
         rwa [mul_zero] at this)
     rwa [lintegral_zero] at hlim
   -- conclusion
@@ -489,10 +489,10 @@ theorem conv_dilate_near {Φ : V → ℂ} (hΦ : Integrable Φ) (h1 : ∫ x, Φ 
           funext w
           ring
   have hnorm : ∫ w, ‖dilate ((2 : ℝ) ^ J) Φ w‖ = ∫ x, ‖Φ x‖ := by
-    rw [integral_norm_eq_lintegral_enorm hΦ'.aestronglyMeasurable,
-      integral_norm_eq_lintegral_enorm hΦ.aestronglyMeasurable,
-      ← eLpNorm_one_eq_lintegral_enorm hΦ'.aestronglyMeasurable,
-      ← eLpNorm_one_eq_lintegral_enorm hΦ.aestronglyMeasurable,
+    rw [integral_norm_eq_lintegral_eNorm hΦ'.aestronglyMeasurable,
+      integral_norm_eq_lintegral_eNorm hΦ.aestronglyMeasurable,
+      ← eLpNorm_one_eq_lintegral_eNorm hΦ'.aestronglyMeasurable,
+      ← eLpNorm_one_eq_lintegral_eNorm hΦ.aestronglyMeasurable,
       eLpNorm_dilate_one hΦ (by positivity)]
   rw [hkey]
   calc ‖∫ w, dilate ((2 : ℝ) ^ J) Φ w * (F J (z - w) - z₀)‖

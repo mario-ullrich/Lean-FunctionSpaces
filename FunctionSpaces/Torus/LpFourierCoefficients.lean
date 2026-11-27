@@ -57,9 +57,9 @@ theorem enorm_mFourierCoeff_le_eLpNorm_one (f : UnitAddTorus d → ℂ) (m : d �
   swap
   · rw [eLpNorm_of_not_aestronglyMeasurable hf]
     exact le_top
-  rw [eLpNorm_one_eq_lintegral_enorm hf]
-  refine (enorm_integral_le_lintegral_enorm _).trans (lintegral_mono fun t => ?_)
-  rw [enorm_smul]
+  rw [eLpNorm_one_eq_lintegral_eNorm hf]
+  refine (eNorm_integral_le_lintegral_eNorm _).trans (lintegral_mono fun t => ?_)
+  rw [eNorm_smul]
   calc ‖mFourier (-m) t‖ₑ * ‖f t‖ₑ ≤ 1 * ‖f t‖ₑ := by
         gcongr
         rw [← ofReal_norm, ENNReal.ofReal_le_one]
@@ -94,14 +94,14 @@ theorem mFourierCoeff_smul (c : ℂ) (f : Lp ℂ p (volume : Measure (UnitAddTor
 `|f̂(m)| ≤ ‖f‖_1` and `‖f‖_1 ≤ ‖f‖_p` on the probability space `𝕋^d`. -/
 theorem enorm_mFourierCoeff_le (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) (m : d → ℤ) :
     ‖mFourierCoeff f m‖ₑ ≤ ‖f‖ₑ := by
-  rw [Lp.enorm_def]
+  rw [Lp.eNorm_def]
   exact (enorm_mFourierCoeff_le_eLpNorm_one f m).trans
     (eLpNorm_le_eLpNorm_of_exponent_le Fact.out)
 
 /-- **The coefficient is bounded by the norm**, in real norms: `|f̂(m)| ≤ ‖f‖_p`. -/
 theorem norm_mFourierCoeff_le (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) (m : d → ℤ) :
     ‖mFourierCoeff f m‖ ≤ ‖f‖ :=
-  enorm_le_iff_norm_le.1 (enorm_mFourierCoeff_le f m)
+  eNorm_le_iff_norm_le.1 (enorm_mFourierCoeff_le f m)
 
 /-! ### The coefficient functional -/
 

@@ -183,7 +183,7 @@ theorem graphTrace_chartChange_applyLp_of_modNorm {L : ℕ} (hL : 1 ≤ L) {s : 
     rw [tendsto_iff_edist_tendsto_0]
     refine tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds hb (fun _ => zero_le)
       fun J => ?_
-    rw [edist_comm, edist_eq_enorm_sub, ← Ω.graphTrace_sub hp L hs hq (hint hF) (hint (hGfin J)),
+    rw [edist_comm, eDist_eq_eNorm_sub, ← Ω.graphTrace_sub hp L hs hq (hint hF) (hint (hGfin J)),
       ← map_sub TL F (b.reproducingSum hp L J F)]
     refine (hKle _).trans (mul_le_mul' le_rfl ?_)
     rw [← modNormOn_range_eq hΩm]

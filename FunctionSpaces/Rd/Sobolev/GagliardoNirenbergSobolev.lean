@@ -357,10 +357,10 @@ theorem exists_memLp_ae_eq_of_hasWeakLineDeriv_one {p r : ℝ≥0∞} [Fact (1 �
   have hbound := eLpNorm_le_of_hasWeakLineDeriv (p' := r.toNNReal) hp1 (Nat.cast_pos.1 hn) hinv
     (by rw [ENNReal.coe_toNNReal hp]; exact Lp.memLp f) hfg
   rw [ENNReal.coe_toNNReal hp, ENNReal.coe_toNNReal hr, ENNReal.coe_toNNReal_eq_toReal] at hbound
-  simp only [← Lp.enorm_def] at hbound
+  simp only [← Lp.eNorm_def] at hbound
   have hmem : MemLp (f : V → ℂ) r volume := memLp_iff.2 (hbound.trans_lt
-    (ENNReal.mul_lt_top ENNReal.coe_lt_top (ENNReal.sum_lt_top.2 fun k _ => enorm_lt_top)))
-  exact ⟨hmem.toLp f, hmem.coeFn_toLp, by rw [Lp.enorm_toLp]; exact hbound⟩
+    (ENNReal.mul_lt_top ENNReal.coe_lt_top (ENNReal.sum_lt_top.2 fun k _ => eNorm_lt_top)))
+  exact ⟨hmem.toLp f, hmem.coeFn_toLp, by rw [Lp.eNorm_toLp]; exact hbound⟩
 
 /-- **`W^1_p ↪ L_r` for `1/r = 1/p - 1/n`** (Gagliardo 1958 and Nirenberg 1959, independently,
 for `p = 1`; `1 < p < n` follows by applying it to `|u|^γ`): for `1 ≤ p`, `r < ∞` and

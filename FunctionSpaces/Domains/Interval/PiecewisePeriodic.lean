@@ -157,7 +157,7 @@ theorem lpPerModulus_add_le (r : ℕ) (f g : Lp ℂ p unitVol) (k : ℕ) :
 /-- `ω_r^per(f, t)_p ≤ 2^r ‖f‖_p` in `L_p[0, 1]`. -/
 theorem lpPerModulus_le (hp : p ≠ ∞) (r : ℕ) (f : Lp ℂ p unitVol) (k : ℕ) :
     lpPerModulus p r f k ≤ 2 ^ r * ‖f‖ₑ := by
-  rw [Lp.enorm_def]
+  rw [Lp.eNorm_def]
   exact perModulus_le (Lp.stronglyMeasurable f).measurable Fact.out hp r _
 
 omit [Fact (1 ≤ p)] in
@@ -189,7 +189,7 @@ theorem exists_inverse_ppScheme_per {r : ℕ} (hp : p ≠ ∞) :
   · rw [Nat.sub_eq_zero_of_le hkj.le, ENNReal.dyadicWeight_zero_right, mul_one]
     exact (lpPerModulus_le hp r a k).trans (by gcongr; exact two_pow_le_ppInverseConst r K)
   · have hnorm : ‖a‖ₑ = eLpNorm (ppFun j Q) p unitVol := by
-      rw [Lp.enorm_def]
+      rw [Lp.eNorm_def]
       exact eLpNorm_congr_ae hae
     rw [lpPerModulus, perModulus_congr_ae hae, hnorm]
     refine iSup₂_le fun h hh => ?_

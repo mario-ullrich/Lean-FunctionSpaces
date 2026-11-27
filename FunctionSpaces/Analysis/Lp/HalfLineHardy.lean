@@ -104,12 +104,12 @@ theorem rpow_mul_lintegral_rpow_le {α : Type*} [MeasurableSpace α] {μ : Measu
   set c := (∫⁻ τ in B, ‖u τ‖ₑ ^ 2 ∂μ) ^ (2⁻¹ : ℝ)
   set e : α → ℝ≥0∞ := fun t => (∫⁻ τ in B, ‖u t - u τ‖ₑ ^ 2 ∂μ) ^ (2⁻¹ : ℝ)
   have hF : Measurable fun p : α × α => ‖u p.1 - u p.2‖ₑ ^ 2 :=
-    ((hu.comp measurable_fst).sub (hu.comp measurable_snd)).enorm.pow_const 2
+    ((hu.comp measurable_fst).sub (hu.comp measurable_snd)).eNorm.pow_const 2
   have he : Measurable e := (hF.lintegral_prod_right' (ν := μ.restrict B)).pow_const _
   have h2 : (0 : ℝ) ≤ 2⁻¹ := by norm_num
   have hpt : ∀ t, μ B ^ (2⁻¹ : ℝ) * ‖u t‖ₑ ≤ e t + c := fun t => by
     have hmink := ENNReal.lintegral_Lp_add_le (μ := μ.restrict B) (f := fun τ => ‖u t - u τ‖ₑ)
-      (g := fun τ => ‖u τ‖ₑ) (hu.const_sub (u t)).enorm.aemeasurable hu.enorm.aemeasurable
+      (g := fun τ => ‖u τ‖ₑ) (hu.const_sub (u t)).eNorm.aemeasurable hu.eNorm.aemeasurable
       one_le_two
     simp only [Pi.add_apply, ENNReal.rpow_two, one_div] at hmink
     calc μ B ^ (2⁻¹ : ℝ) * ‖u t‖ₑ = (∫⁻ _ in B, ‖u t‖ₑ ^ 2 ∂μ) ^ (2⁻¹ : ℝ) := by
@@ -119,7 +119,7 @@ theorem rpow_mul_lintegral_rpow_le {α : Type*} [MeasurableSpace α] {μ : Measu
           refine ENNReal.rpow_le_rpow (lintegral_mono fun τ => ?_) h2
           refine pow_le_pow_left₀ zero_le ?_ 2
           calc ‖u t‖ₑ = ‖u t - u τ + u τ‖ₑ := by rw [sub_add_cancel]
-            _ ≤ ‖u t - u τ‖ₑ + ‖u τ‖ₑ := enorm_add_le _ _
+            _ ≤ ‖u t - u τ‖ₑ + ‖u τ‖ₑ := eNorm_add_le _ _
       _ ≤ e t + c := hmink
   have hmink := ENNReal.lintegral_Lp_add_le (μ := μ.restrict A) (f := e) (g := fun _ => c)
     he.aemeasurable aemeasurable_const one_le_two
@@ -129,7 +129,7 @@ theorem rpow_mul_lintegral_rpow_le {α : Type*} [MeasurableSpace α] {μ : Measu
         have hB : (μ B ^ (2⁻¹ : ℝ)) ^ 2 = μ B := by
           rw [← ENNReal.rpow_two, ENNReal.rpow_inv_rpow two_ne_zero]
         simp_rw [mul_pow, hB]
-        rw [lintegral_const_mul _ (hu.enorm.pow_const 2), ENNReal.mul_rpow_of_nonneg _ _ h2]
+        rw [lintegral_const_mul _ (hu.eNorm.pow_const 2), ENNReal.mul_rpow_of_nonneg _ _ h2]
     _ ≤ (∫⁻ t in A, (e t + c) ^ 2 ∂μ) ^ (2⁻¹ : ℝ) :=
         ENNReal.rpow_le_rpow (lintegral_mono fun t => pow_le_pow_left₀ zero_le (hpt t) 2) h2
     _ ≤ (∫⁻ t in A, e t ^ 2 ∂μ) ^ (2⁻¹ : ℝ) + (∫⁻ _ in A, c ^ 2 ∂μ) ^ (2⁻¹ : ℝ) := hmink
@@ -179,7 +179,7 @@ theorem tsum_dyadicWeight_mul_setLIntegral_le {α : Type*} [MeasurableSpace α] 
       (1 - (2 : ℝ≥0∞) ^ (-(2 * s)))⁻¹ * ∑' k, dyadicWeight (2 * s) k * b k := by
     have hH := ENNReal.hardy_tail_le (q := 1) le_rfl (2 * s) b
     rw [ENNReal.lqNorm_one, ENNReal.lqNorm_one] at hH
-    exact le_trans (ENNReal.tsum_le_tsum fun k =>
+    exact le_trans (tsum_le_tsum fun k =>
       mul_le_mul' le_rfl (setLIntegral_preimage_Ioc_le_tsum η hc g k)) hH
   have h2 : ∀ j, dyadicWeight (2 * s) j * b j ≤
       ∫⁻ x in A j, ENNReal.ofReal c ^ (2 * s) *
@@ -206,7 +206,7 @@ theorem tsum_dyadicWeight_mul_setLIntegral_le {α : Type*} [MeasurableSpace α] 
   calc _ ≤ _ := h1
     _ ≤ (1 - (2 : ℝ≥0∞) ^ (-(2 * s)))⁻¹ * ∑' j, ∫⁻ x in A j, ENNReal.ofReal c ^ (2 * s) *
           (g x / ENNReal.ofReal (min (η x) 1) ^ (2 * s)) ∂μ :=
-        mul_le_mul' le_rfl (ENNReal.tsum_le_tsum h2)
+        mul_le_mul' le_rfl (tsum_le_tsum h2)
     _ ≤ _ := by
         rw [← lintegral_iUnion hA hdisj, mul_assoc,
           ← lintegral_const_mul' _ _ (ENNReal.rpow_ne_top_of_nonneg (by positivity)
@@ -239,7 +239,7 @@ theorem le_tsum_of_le_add_of_eq_zero {m b : ℕ → ℝ≥0∞} (h : ∀ k, m k 
             ring
   calc m k ≤ m (k + K) + ∑ i ∈ Finset.range K, b (k + i) := hj K
     _ = ∑ i ∈ Finset.range K, b (k + i) := by rw [hK _ (Nat.le_add_left K k), zero_add]
-    _ ≤ ∑' i, b (k + i) := ENNReal.sum_le_tsum _
+    _ ≤ ∑' i, b (k + i) := sum_le_tsum _
 
 /-- **Hardy's inequality for telescoping sequences**: if `m_k ≤ m_{k+1} + b_k` for all `k` and
 `m` vanishes from some index on, then for every real `α`
@@ -264,7 +264,7 @@ namespace Rd
 /-! ### Dyadic blocks of `(0, 1]` -/
 
 /-- The **dyadic block** `I_k = (2^(-k-1), 2^(-k)]` of `(0, 1]`, a dyadic interval. -/
-def halfLineBlock (k : ℕ) : Set ℝ := Ioc (1 / 2 ^ (k + 1)) (1 / 2 ^ k)
+noncomputable def halfLineBlock (k : ℕ) : Set ℝ := Ioc (1 / 2 ^ (k + 1)) (1 / 2 ^ k)
 
 /-- The dyadic blocks are measurable. -/
 theorem measurableSet_halfLineBlock (k : ℕ) : MeasurableSet (halfLineBlock k) :=
@@ -316,7 +316,7 @@ theorem lintegral_Ioc_div_rpow_le_tsum_halfLineBlock {s : ℝ} (hs : 0 ≤ s) (u
     ∫⁻ t in Ioc (0 : ℝ) 1, ‖u t‖ₑ ^ 2 / ENNReal.ofReal t ^ (2 * s) ≤
       ∑' k, dyadicWeight (2 * s) (k + 1) * ∫⁻ t in halfLineBlock k, ‖u t‖ₑ ^ 2 := by
   rw [← iUnion_halfLineBlock]
-  refine (lintegral_iUnion_le _ _).trans (ENNReal.tsum_le_tsum fun k => ?_)
+  refine (lintegral_iUnion_le _ _).trans (tsum_le_tsum fun k => ?_)
   rw [← lintegral_const_mul' _ _ (ENNReal.dyadicWeight_ne_top _ _)]
   refine setLIntegral_mono' (measurableSet_halfLineBlock k) fun t ht => ?_
   rw [div_eq_mul_inv, mul_comm]
@@ -349,7 +349,7 @@ theorem tsum_dyadicWeight_mul_lintegral_le_halfLineForm {s : ℝ} (hs : -(1 / 2)
     have hτt : τ < t := hτ.2.trans_lt ht.1
     have hle : ‖t - τ‖ₑ ^ (1 + 2 * s) ≤ dyadicWeight (-(1 + 2 * s)) k := by
       rw [← ENNReal.ofReal_one_div_two_pow_rpow, ← ENNReal.ofReal_rpow_of_nonneg
-        (by positivity) hb, Real.enorm_eq_ofReal_abs, abs_of_pos (sub_pos.2 hτt)]
+        (by positivity) hb, Real.eNorm_eq_ofReal_abs, abs_of_pos (sub_pos.2 hτt)]
       exact ENNReal.rpow_le_rpow (ENNReal.ofReal_le_ofReal
         (by linarith [ht.2, (lt_trans (by positivity) hτ.1 : (0 : ℝ) < τ)])) hb
     rw [div_eq_mul_inv, mul_comm]
@@ -358,7 +358,7 @@ theorem tsum_dyadicWeight_mul_lintegral_le_halfLineForm {s : ℝ} (hs : -(1 / 2)
     exact hle
   calc _ ≤ ∑' k, ∫⁻ t in halfLineBlock k,
         ∫⁻ τ in Ioc (0 : ℝ) 1, ‖u t - u τ‖ₑ ^ 2 / ‖t - τ‖ₑ ^ (1 + 2 * s) :=
-        ENNReal.tsum_le_tsum hk
+        tsum_le_tsum hk
     _ = halfLineForm s u := by
         rw [← lintegral_iUnion measurableSet_halfLineBlock pairwise_disjoint_halfLineBlock,
           iUnion_halfLineBlock, halfLineForm]
@@ -434,7 +434,7 @@ theorem lintegral_div_rpow_le_halfLineForm {s : ℝ} (hs : 1 / 2 < s) {u : ℝ �
       have hkK : (1 / 2 : ℝ) ^ k ≤ (1 / 2) ^ K := pow_le_pow_of_le_one (by norm_num)
         (by norm_num) hk
       rw [ht ⟨lt_trans (by positivity) htk.1, htk.2.trans_lt (by
-        rw [← one_div_pow]; exact hkK.trans_lt hK)⟩, enorm_zero, zero_pow two_ne_zero]
+        rw [← one_div_pow]; exact hkK.trans_lt hK)⟩, eNorm_zero, zero_pow two_ne_zero]
     simp only [m, hI, ENNReal.zero_rpow_of_pos (by norm_num : (0 : ℝ) < 2⁻¹), mul_zero]
   have hH := ENNReal.tsum_sq_le_of_le_add_of_eq_zero
     (fun k => dyadicWeight_mul_lintegral_halfLineBlock_le_add hu k) hm0 (s - 1 / 2)

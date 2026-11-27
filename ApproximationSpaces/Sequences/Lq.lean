@@ -157,16 +157,16 @@ theorem rpow_sum_le_sum_rpow (s : Finset ι) (f : ι → ℝ≥0∞) {p : ℝ} (
 
 /-- **Subadditivity of `x ↦ x^p` for series**, `0 < p ≤ 1`: `(∑_i f_i)^p ≤ ∑_i f_i^p` for every
 family `f` in `[0, ∞]`. A series is the supremum of its finite partial sums
-(`ENNReal.tsum_eq_iSup_sum`), the power `x ↦ x^p` commutes with suprema
+(`tsum_eq_iSup_sum`), the power `x ↦ x^p` commutes with suprema
 (`ENNReal.orderIsoRpow`), and `ENNReal.rpow_sum_le_sum_rpow` bounds each partial sum. -/
 theorem rpow_tsum_le_tsum_rpow (f : ι → ℝ≥0∞) {p : ℝ} (hp_pos : 0 < p) (hp1 : p ≤ 1) :
     (∑' i, f i) ^ p ≤ ∑' i, f i ^ p := by
-  rw [ENNReal.tsum_eq_iSup_sum]
+  rw [tsum_eq_iSup_sum]
   calc (⨆ s : Finset ι, ∑ i ∈ s, f i) ^ p = ⨆ s : Finset ι, (∑ i ∈ s, f i) ^ p :=
         (orderIsoRpow p hp_pos).map_iSup _
     _ ≤ ⨆ s : Finset ι, ∑ i ∈ s, f i ^ p :=
         iSup_mono fun s => rpow_sum_le_sum_rpow s f hp_pos hp1
-    _ = ∑' i, f i ^ p := ENNReal.tsum_eq_iSup_sum.symm
+    _ = ∑' i, f i ^ p := tsum_eq_iSup_sum.symm
 
 /-- **The `ℓ_p` sums of a series decrease in `p`**: `(∑_i f_i^q)^(1/q) ≤ (∑_i f_i^p)^(1/p)` for
 `0 < p ≤ q` and every family `f` in `[0, ∞]` on any index set, so `‖f‖_{ℓ_q} ≤ ‖f‖_{ℓ_p}`; for a
@@ -215,7 +215,7 @@ theorem lqNorm_top (a : ι → ℝ≥0∞) : lqNorm ∞ a = ⨆ n, a n := by
 /-- `‖a‖_{ℓ_q} = (∑_n a_n^q)^(1/q)` for `0 < q < ∞`. -/
 theorem lqNorm_eq_tsum (hq0 : q ≠ 0) (hq : q ≠ ∞) (a : ι → ℝ≥0∞) :
     lqNorm q a = (∑' n, a n ^ q.toReal) ^ (1 / q.toReal) := by
-  rw [lqNorm, eLpNorm_eq_lintegral_rpow_enorm_toReal hq0 hq (aestronglyMeasurable_count a),
+  rw [lqNorm, eLpNorm_eq_lintegral_rpow_eNorm_toReal hq0 hq (aestronglyMeasurable_count a),
     lintegral_count]
   rfl
 
@@ -269,11 +269,11 @@ theorem lqNorm_one_mul_le (a b : ι → ℝ≥0∞) :
 /-- **The Cauchy–Schwarz inequality for finite sums against `ℓ_2` norms**:
 `∑_{j ∈ s} a_j b_j ≤ ‖a‖_{ℓ_2} ‖b‖_{ℓ_2}` for every finite set `s` and all families `a, b` in
 `[0, ∞]` indexed by a countable set: a finite sum is at most the series
-(`ENNReal.sum_le_tsum`), which is the `ℓ_1` norm of the products (`ENNReal.lqNorm_one`), and
+(`sum_le_tsum`), which is the `ℓ_1` norm of the products (`ENNReal.lqNorm_one`), and
 `ENNReal.lqNorm_one_mul_le` bounds that. -/
 theorem sum_mul_le_lqNorm_two_mul (s : Finset ι) (a b : ι → ℝ≥0∞) :
     ∑ j ∈ s, a j * b j ≤ lqNorm 2 a * lqNorm 2 b :=
-  (ENNReal.sum_le_tsum s).trans ((lqNorm_one _).symm.trans_le (lqNorm_one_mul_le a b))
+  (sum_le_tsum s).trans ((lqNorm_one _).symm.trans_le (lqNorm_one_mul_le a b))
 
 omit [Countable ι] [MeasurableSingletonClass ι] in
 /-- The zero family has norm `0`. -/
@@ -290,17 +290,17 @@ theorem lqNorm_zero_left (a : ι → ℝ≥0∞) : lqNorm 0 a = 0 :=
 omit [Countable ι] in
 /-- Every term is bounded by the norm. -/
 theorem le_lqNorm (hq : q ≠ 0) (a : ι → ℝ≥0∞) (n : ι) : a n ≤ lqNorm q a :=
-  enorm_le_eLpNorm_count a n hq
+  eNorm_le_eLpNorm_count a n hq
 
 /-- The `ℓ_q` norm is monotone in the sequence. -/
 theorem lqNorm_mono (h : ∀ n, a n ≤ b n) : lqNorm q a ≤ lqNorm q b :=
-  eLpNorm_mono_enorm (aestronglyMeasurable_count a) h
+  eLpNorm_mono_eNorm (aestronglyMeasurable_count a) h
 
 /-- **Fatou's lemma for `ℓ_q` norms**, `q ∈ [0, ∞]`: if `a_m → b` termwise and
 `‖a_m‖_{ℓ_q} ≤ d_m` eventually with `d_m → D`, then `‖b‖_{ℓ_q} ≤ D`. For `q = ∞` every term is
 bounded; for `0 < q < ∞` every finite sum `∑_{i ∈ S} b_i^q` is the limit of the finite sums of the
 `a_m`, which are at most `d_m^q`, and `∑_i b_i^q` is their supremum
-(Mathlib's `ENNReal.tsum_eq_iSup_sum`). -/
+(Mathlib's `tsum_eq_iSup_sum`). -/
 theorem lqNorm_le_of_tendsto {a : ℕ → ι → ℝ≥0∞}
     (hab : ∀ i, Tendsto (fun m => a m i) atTop (𝓝 (b i))) {d : ℕ → ℝ≥0∞} {D : ℝ≥0∞}
     (hd : Tendsto d atTop (𝓝 D)) (hle : ∀ᶠ m in atTop, lqNorm q (a m) ≤ d m) :
@@ -314,12 +314,12 @@ theorem lqNorm_le_of_tendsto {a : ℕ → ι → ℝ≥0∞}
     exact (le_lqNorm top_ne_zero (a m) i).trans hm
   have hpos : 0 < q.toReal := ENNReal.toReal_pos hq0 hq
   have hsum : ∑' i, b i ^ q.toReal ≤ D ^ q.toReal := by
-    rw [ENNReal.tsum_eq_iSup_sum]
+    rw [tsum_eq_iSup_sum]
     refine iSup_le fun S => le_of_tendsto_of_tendsto
       (tendsto_finsetSum S fun i _ => (ENNReal.continuous_rpow_const.tendsto _).comp (hab i))
       ((ENNReal.continuous_rpow_const.tendsto D).comp hd) ?_
     filter_upwards [hle] with m hm
-    exact (ENNReal.sum_le_tsum S).trans ((lqNorm_rpow hq0 hq (a m)).symm.le.trans
+    exact (sum_le_tsum S).trans ((lqNorm_rpow hq0 hq (a m)).symm.le.trans
       (ENNReal.rpow_le_rpow hm hpos.le))
   calc lqNorm q b = (∑' i, b i ^ q.toReal) ^ (1 / q.toReal) := lqNorm_eq_tsum hq0 hq b
     _ ≤ (D ^ q.toReal) ^ (1 / q.toReal) := ENNReal.rpow_le_rpow hsum (by positivity)
@@ -413,10 +413,10 @@ theorem lqNorm_eq_sum [Fintype ι] (hq0 : q ≠ 0) (hq : q ≠ ∞) (a : ι → 
   rw [lqNorm_eq_tsum hq0 hq, tsum_fintype]
 
 /-- For a finite index set, a family bounded by `B` has `‖a‖_{ℓ_q} ≤ (#ι)^(1/q) B` (Mathlib's
-`eLpNorm_le_of_ae_enorm_bound`, with `#ι` the counting measure of `ι`). -/
+`eLpNorm_le_of_ae_eNorm_bound`, with `#ι` the counting measure of `ι`). -/
 theorem lqNorm_le_card_rpow_mul [Fintype ι] {B : ℝ≥0∞} (h : ∀ i, a i ≤ B) :
     lqNorm q a ≤ (Fintype.card ι : ℝ≥0∞) ^ (1 / q.toReal) * B := by
-  refine (eLpNorm_le_of_ae_enorm_bound (aestronglyMeasurable_count a)
+  refine (eLpNorm_le_of_ae_eNorm_bound (aestronglyMeasurable_count a)
     (Eventually.of_forall h)).trans_eq ?_
   rw [Measure.count_univ, ENat.card_eq_coe_fintype_card, ENat.toENNReal_coe, smul_eq_mul,
     mul_comm, one_div]
@@ -1058,13 +1058,13 @@ theorem le_tsum_of_tendsto_finsetSum {E ι : Type*} [NormedAddCommGroup E] {Q : 
     calc Q F = Q (∑ k ∈ S J, u k + (F - ∑ k ∈ S J, u k)) := by rw [add_sub_cancel]
       _ ≤ Q (∑ k ∈ S J, u k) + Q (F - ∑ k ∈ S J, u k) := hadd _ _
       _ ≤ ∑' k, Q (u k) + C * ‖F - ∑ k ∈ S J, u k‖ₑ :=
-          add_le_add ((hsum _).trans (ENNReal.sum_le_tsum _)) (hle _)
+          add_le_add ((hsum _).trans (sum_le_tsum _)) (hle _)
   have h1 : Tendsto (fun J => F - ∑ k ∈ S J, u k) atTop (nhds 0) := by
     have := (tendsto_const_nhds (x := F)).sub hu
     rwa [sub_self] at this
   have h2 : Tendsto (fun J => ‖F - ∑ k ∈ S J, u k‖ₑ) atTop (nhds 0) := by
-    have h3 := (continuous_enorm.tendsto (0 : E)).comp h1
-    rw [enorm_zero] at h3
+    have h3 := (continuous_eNorm.tendsto (0 : E)).comp h1
+    rw [eNorm_zero] at h3
     exact h3
   have hlim : Tendsto (fun J => ∑' k, Q (u k) + C * ‖F - ∑ k ∈ S J, u k‖ₑ) atTop
       (nhds (∑' k, Q (u k) + C * 0)) :=
@@ -1114,7 +1114,7 @@ theorem tsum_rpow_le_lqNorm_dyadicWeight {q : ℝ≥0∞} (hq0 : q ≠ 0) (s : �
           ENNReal.rpow_le_rpow (le_dyadicWeight_neg_mul_lqNorm hq0 s a j) hρ
       _ = dyadicWeight (-(s * ρ)) j * X ^ ρ := by
           rw [mul_rpow_of_nonneg _ _ hρ, dyadicWeight_rpow, neg_mul]
-  calc ∑' j, a j ^ ρ ≤ ∑' j, dyadicWeight (-(s * ρ)) j * X ^ ρ := ENNReal.tsum_le_tsum hterm
+  calc ∑' j, a j ^ ρ ≤ ∑' j, dyadicWeight (-(s * ρ)) j * X ^ ρ := tsum_le_tsum hterm
     _ = (1 - (2 : ℝ≥0∞) ^ (-(s * ρ)))⁻¹ * X ^ ρ := by
         rw [ENNReal.tsum_mul_right, tsum_dyadicWeight_neg]
 
@@ -1143,9 +1143,9 @@ theorem enorm_le_of_tendsto_sum {E : Type*} [NormedAddCommGroup E] {u : ℕ → 
     {b : ℕ → ℝ≥0∞} (hb : ∀ j, ‖u j‖ₑ ≤ K * b j) (s : ℝ) {q : ℝ≥0∞} (hq : 1 ≤ q) :
     ‖F‖ₑ ≤ K * (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * lqNorm q (fun j => dyadicWeight s j * b j) := by
   have h1 : ‖F‖ₑ ≤ ∑' j, ‖u j‖ₑ :=
-    le_tsum_of_tendsto_sum (C := 1) ENNReal.one_ne_top (fun x y => enorm_add_le x y)
+    le_tsum_of_tendsto_sum (C := 1) ENNReal.one_ne_top (fun x y => eNorm_add_le x y)
       (fun x => by rw [one_mul]) hu
-  calc ‖F‖ₑ ≤ ∑' j, K * b j := h1.trans (ENNReal.tsum_le_tsum hb)
+  calc ‖F‖ₑ ≤ ∑' j, K * b j := h1.trans (tsum_le_tsum hb)
     _ = K * ∑' j, b j := ENNReal.tsum_mul_left
     _ ≤ K * ((1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * lqNorm q (fun j => dyadicWeight s j * b j)) :=
         mul_le_mul' le_rfl (tsum_le_lqNorm_dyadicWeight hq s b)
@@ -1156,7 +1156,7 @@ theorem enorm_le_of_tendsto_sum {E : Type*} [NormedAddCommGroup E] {u : ℕ → 
 /-- `∑_K [j ≤ K] g K = ∑_i g (j + i)`. -/
 theorem tsum_ite_le_eq (j : ℕ) (g : ℕ → ℝ≥0∞) :
     ∑' K, (if j ≤ K then g K else 0) = ∑' i, g (j + i) := by
-  rw [← ENNReal.summable.sum_add_tsum_nat_add' (k := j)]
+  rw [← CompleteLattice.summable.sum_add_tsum_nat_add' (k := j)]
   have h0 : ∑ K ∈ Finset.range j, (if j ≤ K then g K else 0) = 0 :=
     Finset.sum_eq_zero fun K hK => by simp [not_le.2 (Finset.mem_range.1 hK)]
   rw [h0, zero_add]
@@ -1420,10 +1420,10 @@ variable {α : Type*} [MeasurableSpace α] {μ : Measure α}
 /-! ### `L_p` norms of functions with values in `[0, ∞]` -/
 
 /-- **Powers inside an `L_p` norm**: `‖g^r‖_p = ‖g‖_{p r}^r` for `r > 0` and `g : α → [0, ∞]`
-measurable (Mathlib's `eLpNorm_enorm_rpow`). -/
+measurable (Mathlib's `eLpNorm_eNorm_rpow`). -/
 theorem eLpNorm_fun_rpow {g : α → ℝ≥0∞} (hg : AEMeasurable g μ) {r : ℝ} (hr : 0 < r)
     (p : ℝ≥0∞) : eLpNorm (fun x => g x ^ r) p μ = eLpNorm g (p * ENNReal.ofReal r) μ ^ r := by
-  simpa only [enorm_eq_self] using eLpNorm_enorm_rpow (p := p) (μ := μ) g hg.aestronglyMeasurable hr
+  simpa only [eNorm_eq_self] using eLpNorm_eNorm_rpow (p := p) (μ := μ) g hg.aestronglyMeasurable hr
 
 /-- **The `p`-th power of the `L_p` quasi-norm is subadditive for `0 < p ≤ 1`**:
 `‖f + g‖_p^p ≤ ‖f‖_p^p + ‖g‖_p^p` on any measure space, for all functions `f`, `g` with values in
@@ -1450,7 +1450,7 @@ theorem eLpNorm_iSup_of_directed {β : Type*} [Countable β] {F : β → α → 
       eLpNorm_exponent_zero (hF _).aestronglyMeasurable]
   rcases eq_or_ne p ∞ with rfl | hp
   · simp only [eLpNorm_exponent_top hm.aestronglyMeasurable,
-      eLpNorm_exponent_top (hF _).aestronglyMeasurable, eLpNormEssSup, enorm_eq_self]
+      eLpNorm_exponent_top (hF _).aestronglyMeasurable, eLpNormEssSup, eNorm_eq_self]
     refine le_antisymm (essSup_le_of_ae_le _ ?_) (iSup_le fun b => essSup_mono_ae ?_)
     · have h : ∀ᵐ x ∂μ, ∀ b, F b x ≤ essSup (F b) μ :=
         ae_all_iff.2 fun b => ENNReal.ae_le_essSup (F b)
@@ -1458,9 +1458,9 @@ theorem eLpNorm_iSup_of_directed {β : Type*} [Countable β] {F : β → α → 
       exact iSup_le fun b => (hx b).trans (le_iSup (fun b => essSup (F b) μ) b)
     · exact Eventually.of_forall fun x => le_iSup (fun b => F b x) b
   have hr : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
-  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hm.aestronglyMeasurable]
-  simp_rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp (hF _).aestronglyMeasurable]
-  simp only [enorm_eq_self]
+  rw [eLpNorm_eq_lintegral_rpow_eNorm_toReal hp0 hp hm.aestronglyMeasurable]
+  simp_rw [eLpNorm_eq_lintegral_rpow_eNorm_toReal hp0 hp (hF _).aestronglyMeasurable]
+  simp only [eNorm_eq_self]
   have h1 : ∀ x, (⨆ b, F b x) ^ p.toReal = ⨆ b, F b x ^ p.toReal := fun x =>
     (ENNReal.orderIsoRpow p.toReal hr).map_iSup (fun b => F b x)
   simp_rw [h1]
@@ -1483,11 +1483,11 @@ theorem eLpNorm_tsum_le {ι : Type*} [Countable ι] {g : ι → α → ℝ≥0�
   · obtain ⟨i, hi⟩ := not_forall.1 hg
     have h : eLpNorm (g i) p μ = ∞ :=
       eLpNorm_of_not_aestronglyMeasurable fun h => hi h.aemeasurable
-    rw [ENNReal.tsum_eq_top_of_eq_top ⟨i, h⟩]
+    rw [tsum_eq_top_of_eq_top ⟨i, h⟩]
     exact le_top
   have h : (fun x => ∑' i, g i x) = fun x => ⨆ s : Finset ι, ∑ i ∈ s, g i x := by
     funext x
-    exact ENNReal.tsum_eq_iSup_sum
+    exact tsum_eq_iSup_sum
   have hmono : Monotone fun (s : Finset ι) (x : α) => ∑ i ∈ s, g i x := fun s t hst x =>
     Finset.sum_le_sum_of_subset hst
   rw [h, eLpNorm_iSup_of_directed (fun s => Finset.aemeasurable_fun_sum s fun i _ => hg i)
@@ -1498,7 +1498,7 @@ theorem eLpNorm_tsum_le {ι : Type*} [Countable ι] {g : ι → α → ℝ≥0�
         funext x
         simp [Finset.sum_apply]
     _ ≤ ∑ i ∈ s, eLpNorm (g i) p μ := eLpNorm_sum_le hp1
-    _ ≤ ∑' i, eLpNorm (g i) p μ := ENNReal.sum_le_tsum s
+    _ ≤ ∑' i, eLpNorm (g i) p μ := sum_le_tsum s
 
 /-! ### Powers of bounded functions -/
 
@@ -1543,7 +1543,7 @@ theorem lintegral_le_of_le_on_pieces (hS : ∀ n, MeasurableSet (S n))
   calc ∫⁻ x, G x ∂μ = ∫⁻ x in ⋃ n, S n, G x ∂μ := by
         rw [Measure.restrict_eq_self_of_ae_mem hcov]
     _ = ∑' n, ∫⁻ x in S n, G x ∂μ := lintegral_iUnion hS hd G
-    _ ≤ ∑' n, ∫⁻ _ in S n, a n ∂μ := ENNReal.tsum_le_tsum fun n =>
+    _ ≤ ∑' n, ∫⁻ _ in S n, a n ∂μ := tsum_le_tsum fun n =>
         lintegral_mono_ae ((ae_restrict_iff' (hS n)).2 (Filter.Eventually.of_forall (h n)))
     _ = c * ∑' n, a n := by
         simp_rw [setLIntegral_const, hμ]
@@ -1558,7 +1558,7 @@ theorem le_lintegral_of_le_on_pieces (hS : ∀ n, MeasurableSet (S n))
   calc c * ∑' n, a n = ∑' n, ∫⁻ _ in S n, a n ∂μ := by
         simp_rw [setLIntegral_const, hμ]
         rw [ENNReal.tsum_mul_right, mul_comm]
-    _ ≤ ∑' n, ∫⁻ x in S n, G x ∂μ := ENNReal.tsum_le_tsum fun n =>
+    _ ≤ ∑' n, ∫⁻ x in S n, G x ∂μ := tsum_le_tsum fun n =>
         lintegral_mono_ae ((ae_restrict_iff' (hS n)).2 (Filter.Eventually.of_forall (h n)))
     _ = ∫⁻ x in ⋃ n, S n, G x ∂μ := (lintegral_iUnion hS hd G).symm
     _ ≤ ∫⁻ x, G x ∂μ := setLIntegral_le_lintegral _ _
@@ -1579,13 +1579,13 @@ theorem eLpNorm_le_of_le_on_pieces (hG : AEStronglyMeasurable G μ)
       ENNReal.rpow_zero, one_mul]
     refine essSup_le_of_ae_le _ (hcov.mono fun x hx => ?_)
     obtain ⟨n, hn⟩ := mem_iUnion.1 hx
-    simpa only [enorm_eq_self] using (h n x hn).trans (le_iSup a n)
+    simpa only [eNorm_eq_self] using (h n x hn).trans (le_iSup a n)
   have hp : 0 < q.toReal := ENNReal.toReal_pos hq0 hq
-  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hq0 hq hG, ENNReal.lqNorm_eq_tsum hq0 hq,
+  rw [eLpNorm_eq_lintegral_rpow_eNorm_toReal hq0 hq hG, ENNReal.lqNorm_eq_tsum hq0 hq,
     ← ENNReal.mul_rpow_of_nonneg _ _ (by positivity)]
   gcongr
   refine lintegral_le_of_le_on_pieces hS hd hcov hμ fun n x hx => ?_
-  simp only [enorm_eq_self]
+  simp only [eNorm_eq_self]
   exact ENNReal.rpow_le_rpow (h n x hx) hp.le
 
 /-- **`L_q` norm of a function bounded below on pieces**: if the measurable sets `S n` are
@@ -1609,15 +1609,15 @@ theorem le_eLpNorm_of_le_on_pieces (hS : ∀ n, MeasurableSet (S n))
     push Not at hlt
     have hae : ∀ᵐ x ∂μ, ‖G x‖ₑ < a n := ae_lt_of_essSup_lt hlt
     have hsub : S n ⊆ {x | ¬ ‖G x‖ₑ < a n} := fun x hx => by
-      simp only [mem_ofPred_eq, enorm_eq_self, not_lt]
+      simp only [mem_ofPred_eq, eNorm_eq_self, not_lt]
       exact h n x hx
     exact hc ((hμ n).symm.trans (measure_mono_null hsub (ae_iff.1 hae)))
   have hp : 0 < q.toReal := ENNReal.toReal_pos hq0 hq
-  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hq0 hq hG, ENNReal.lqNorm_eq_tsum hq0 hq,
+  rw [eLpNorm_eq_lintegral_rpow_eNorm_toReal hq0 hq hG, ENNReal.lqNorm_eq_tsum hq0 hq,
     ← ENNReal.mul_rpow_of_nonneg _ _ (by positivity)]
   gcongr
   refine le_lintegral_of_le_on_pieces hS hd hμ fun n x hx => ?_
-  simp only [enorm_eq_self]
+  simp only [eNorm_eq_self]
   exact ENNReal.rpow_le_rpow (h n x hx) hp.le
 
 end Pieces

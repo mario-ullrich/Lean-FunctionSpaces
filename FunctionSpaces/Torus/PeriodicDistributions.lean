@@ -86,23 +86,23 @@ theorem enorm_integral_mul_comp_quotientProj_le (φ : 𝓓((⊤ : Opens (Euclide
     ‖∫ x, (φ x : ℂ) * h (quotientProj x)‖ₑ ≤
       ENNReal.ofReal M * ENNReal.ofReal (2 * R + 2) ^ Fintype.card d * eLpNorm h 1 volume := by
   calc ‖∫ x, (φ x : ℂ) * h (quotientProj x)‖ₑ ≤ ∫⁻ x, ‖(φ x : ℂ) * h (quotientProj x)‖ₑ :=
-        enorm_integral_le_lintegral_enorm _
+        eNorm_integral_le_lintegral_eNorm _
     _ ≤ ∫⁻ x in ball 0 R, ENNReal.ofReal M * ‖h (quotientProj x)‖ₑ := by
         rw [← lintegral_indicator measurableSet_ball]
         refine lintegral_mono fun x => ?_
         by_cases hx : x ∈ ball (0 : EuclideanSpace ℝ d) R
-        · rw [Set.indicator_of_mem hx, enorm_mul, ← ofReal_norm, Complex.norm_real]
+        · rw [Set.indicator_of_mem hx, eNorm_mul, ← ofReal_norm, Complex.norm_real]
           gcongr
           exact hM x
         · rw [Set.indicator_of_notMem hx, image_eq_zero_of_notMem_tsupport fun h' => hx (hR h'),
-            Complex.ofReal_zero, zero_mul, enorm_zero]
+            Complex.ofReal_zero, zero_mul, eNorm_zero]
     _ = ENNReal.ofReal M * ∫⁻ x in ball 0 R, ‖h (quotientProj x)‖ₑ :=
         lintegral_const_mul' _ _ ENNReal.ofReal_ne_top
     _ ≤ ENNReal.ofReal M * (ENNReal.ofReal (2 * R + 2) ^ Fintype.card d * ∫⁻ t, ‖h t‖ₑ) := by
         gcongr
         exact setLIntegral_ball_comp_quotientProj_le (fun t => ‖h t‖ₑ) 0 R
     _ = _ := by
-        rw [mul_assoc, eLpNorm_one_eq_lintegral_enorm (Lp.aestronglyMeasurable h)]
+        rw [mul_assoc, eLpNorm_one_eq_lintegral_eNorm (Lp.aestronglyMeasurable h)]
 
 /-- The pairing `h ↦ ∫ φ(x) h(π x) dx` has a bound `C ‖h‖_p` on `L_p(𝕋^d)`: a test function is
 bounded and supported in a ball (`Torus.enorm_integral_mul_comp_quotientProj_le`), and
@@ -113,11 +113,11 @@ theorem exists_norm_integral_mul_comp_quotientProj_le (φ : 𝓓((⊤ : Opens (E
   obtain ⟨M, hM⟩ := φ.continuous.bounded_above_of_compact_support φ.hasCompactSupport
   obtain ⟨R, hR⟩ := φ.hasCompactSupport.isCompact.isBounded.subset_ball 0
   refine ⟨(ENNReal.ofReal M * ENNReal.ofReal (2 * R + 2) ^ Fintype.card d).toReal, fun h => ?_⟩
-  rw [← toReal_enorm, ← toReal_enorm h, ← ENNReal.toReal_mul]
+  rw [← toReal_eNorm, ← toReal_eNorm h, ← ENNReal.toReal_mul]
   refine ENNReal.toReal_mono (ENNReal.mul_ne_top (ENNReal.mul_ne_top ENNReal.ofReal_ne_top
-    (ENNReal.pow_ne_top ENNReal.ofReal_ne_top)) enorm_ne_top)
+    (ENNReal.pow_ne_top ENNReal.ofReal_ne_top)) eNorm_ne_top)
     ((enorm_integral_mul_comp_quotientProj_le φ hM hR h).trans ?_)
-  rw [Lp.enorm_def]
+  rw [Lp.eNorm_def]
   gcongr
   exact eLpNorm_le_eLpNorm_of_exponent_le Fact.out
 

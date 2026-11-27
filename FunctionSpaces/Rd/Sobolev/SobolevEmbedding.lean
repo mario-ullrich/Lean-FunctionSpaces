@@ -117,7 +117,7 @@ theorem continuous_conv_of_enorm_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠
       B ^ (1 / p.toReal) * (k : ℝ≥0∞)⁻¹) atTop (𝓝 0) := by
     simpa using ENNReal.Tendsto.const_mul ENNReal.tendsto_inv_nat_nhds_zero (Or.inr hC)
   filter_upwards [(tendsto_order.1 hlim).2 ε hε] with k hk x
-  rw [edist_eq_enorm_sub, conv_sub_apply_of_enorm_le hp1 hK hB hBtop hf (hgm k) x]
+  rw [eDist_eq_eNorm_sub, conv_sub_apply_of_enorm_le hp1 hK hB hBtop hf (hgm k) x]
   refine lt_of_le_of_lt ?_ hk
   calc ‖conv K (f - g k) volume x‖ₑ
       ≤ eLpNorm K 1 volume ^ (1 - 1 / p.toReal) * B ^ (1 / p.toReal) *
@@ -234,7 +234,7 @@ theorem eLpNorm_blockFun_le_nikolskii (hp : p ≠ ∞) {r : ℝ≥0∞} (hpr : p
   have htop : eLpNorm (blockFun j f) ∞ volume ≤ nikolskiiBlockConst V p *
       dyadicWeight (nikolskiiExponent (finrank ℝ V) p ∞) j * eLpNorm (blockFun j f) p volume := by
     rw [eLpNorm_exponent_top (aestronglyMeasurable_blockFun j f)]
-    exact eLpNormEssSup_le_of_ae_enorm_bound (ae_of_all _ (enorm_blockFun_le_nikolskii hp j f))
+    exact eLpNormEssSup_le_of_ae_eNorm_bound (ae_of_all _ (enorm_blockFun_le_nikolskii hp j f))
   refine (eLpNorm_le_of_eLpNorm_top_le hp0 hpr htop).trans_eq ?_
   rw [ENNReal.mul_rpow_of_nonneg _ _ h1, ENNReal.dyadicWeight_rpow, nikolskiiExponent_top,
     ← nikolskiiExponent_eq_mul_one_sub_div (finrank ℝ V : ℝ) hp0 hpr]
@@ -317,7 +317,7 @@ theorem tsum_eLpNorm_blockFun_le (hp : p ≠ ∞) {r : ℝ≥0∞} (hpr : p ≤ 
     (hq : 1 ≤ q) (f : Lp ℂ p (volume : Measure V)) :
     ∑' j, eLpNorm (blockFun j f) r volume ≤
       besovEmbeddingConst V p r s * littlewoodPaleyNorm hp s q f :=
-  (ENNReal.tsum_le_tsum fun j => eLpNorm_blockFun_le_nikolskii hp hpr j f).trans
+  (tsum_le_tsum fun j => eLpNorm_blockFun_le_nikolskii hp hpr j f).trans
     (tsum_nikolskii_le hp s hq f)
 
 /-- **The Besov embedding into `L_r`**: for `1 ≤ p ≤ r ≤ ∞`, `p < ∞`,
@@ -338,11 +338,11 @@ theorem exists_memLp_ae_eq_of_memApprox (hp : p ≠ ∞) {r : ℝ≥0∞} (hpr :
   have hLP : littlewoodPaleyNorm hp s q f < ∞ := (memApprox_bandScheme_iff hp hs0 hq).1 hf
   set u : ℕ → Lp ℂ r (volume : Measure V) := fun j => (memLp_blockFun_of_le hp hpr j f).toLp _
   have htsum : ∑' j, ‖u j‖ₑ ≤ besovEmbeddingConst V p r s * littlewoodPaleyNorm hp s q f := by
-    simp only [u, Lp.enorm_toLp]
+    simp only [u, Lp.eNorm_toLp]
     exact tsum_eLpNorm_blockFun_le hp hpr s hq f
   have hfin : ∑' j, ‖u j‖ₑ ≠ ∞ :=
     ne_top_of_le_ne_top (ENNReal.mul_ne_top (besovEmbeddingConst_ne_top hpr hs) hLP.ne) htsum
-  refine ⟨∑' j, u j, ?_, enorm_tsum_le_tsum_enorm.trans htsum⟩
+  refine ⟨∑' j, u j, ?_, eNorm_tsum_le_tsum_eNorm.trans htsum⟩
   have h2 : ∀ᵐ x ∂volume, ∀ j, u j x = blockFun j f x :=
     ae_all_iff.2 fun j => MemLp.coeFn_toLp _
   filter_upwards [Lp.hasSum_coeFn_tsum hfin, h2, ae_hasSum_blockFun hp hs0 hq hLP]
@@ -358,7 +358,7 @@ continuous function `a` with `a = f` almost everywhere and
 (`Rd.enorm_blockFun_le_nikolskii`, `Rd.tsum_nikolskii_le`), so their series converges uniformly
 to a continuous function (Mathlib's `continuous_tsum`), which is `f` almost everywhere
 (`Rd.ae_hasSum_blockFun`); its sup norm is the supremum of `|a(x)|` (Mathlib's
-`BoundedContinuousFunction.enorm_eq_iSup_enorm`). -/
+`BoundedContinuousFunction.eNorm_eq_iSup_eNorm`). -/
 theorem exists_boundedContinuous_ae_eq_of_memApprox (hp : p ≠ ∞) {s : ℝ}
     (hs : (finrank ℝ V : ℝ) / p.toReal < s) {q : ℝ≥0∞} (hq : 1 ≤ q)
     {f : Lp ℂ p (volume : Measure V)} (hf : (bandScheme hp).MemApprox s q f) :
@@ -379,8 +379,8 @@ theorem exists_boundedContinuous_ae_eq_of_memApprox (hp : p ≠ ∞) {s : ℝ}
     (enorm_blockFun_le_nikolskii hp j f x).trans_eq (by
       simp only [b, ENNReal.toReal_top, div_zero, sub_zero, ENNReal.rpow_one])
   have hnorm : ∀ j x, ‖blockFun j f x‖ ≤ (b j).toReal := fun j x => by
-    rw [← toReal_enorm]
-    exact ENNReal.toReal_mono (ne_top_of_le_ne_top hfin (ENNReal.le_tsum j)) (hb j x)
+    rw [← toReal_eNorm]
+    exact ENNReal.toReal_mono (ne_top_of_le_ne_top hfin (le_tsum _ j)) (hb j x)
   have hsum : Summable fun j => (b j).toReal := ENNReal.summable_toReal hfin
   have hac : Continuous fun x => ∑' j, blockFun j f x :=
     continuous_tsum (fun j => continuous_blockFun hp j f) hsum hnorm
@@ -389,9 +389,9 @@ theorem exists_boundedContinuous_ae_eq_of_memApprox (hp : p ≠ ∞) {s : ℝ}
   refine ⟨BoundedContinuousFunction.ofNormedAddCommGroup _ hac _ hab, ?_, ?_⟩
   · filter_upwards [ae_hasSum_blockFun hp hs0 hq hLP] with x hx
     exact hx.tsum_eq
-  · rw [BoundedContinuousFunction.enorm_eq_iSup_enorm]
-    exact iSup_le fun x => enorm_tsum_le_tsum_enorm.trans
-      ((ENNReal.tsum_le_tsum fun j => hb j x).trans htsum)
+  · rw [BoundedContinuousFunction.eNorm_eq_iSup_eNorm]
+    exact iSup_le fun x => eNorm_tsum_le_tsum_eNorm.trans
+      ((tsum_le_tsum fun j => hb j x).trans htsum)
 
 /-! ### Sobolev embeddings -/
 

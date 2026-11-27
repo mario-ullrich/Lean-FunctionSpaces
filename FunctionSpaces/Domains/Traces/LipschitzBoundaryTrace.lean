@@ -408,7 +408,7 @@ theorem boundaryTrace_smul (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞) {L : ℕ
   have hcF : ‖c • F‖ₑ + lqNorm q (fun k =>
       dyadicWeight (s + 1 / p.toReal) k * lpModulus p L (c • F) k) < ∞ := by
     rw [modNorm_const_smul]
-    exact ENNReal.mul_lt_top enorm_lt_top hF
+    exact ENNReal.mul_lt_top eNorm_lt_top hF
   refine Ω.eventually_aeBoundary_iff.2 fun j => ?_
   filter_upwards [Ω.boundaryTrace_graphMap ψ hp hL hs hsL hq hcF j,
     Ω.boundaryTrace_graphMap ψ hp hL hs hsL hq hF j,

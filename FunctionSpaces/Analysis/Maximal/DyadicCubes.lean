@@ -178,7 +178,7 @@ end Measure
 /-! ### Lebesgue differentiation along cubes -/
 
 /-- The dyadic cube of level `k` containing `x`. -/
-def cubeAt (k : ℤ) (x : V) : Set V := zcell k (zcellIndex k x)
+noncomputable def cubeAt (k : ℤ) (x : V) : Set V := zcell k (zcellIndex k x)
 
 /-- Every point lies in its cube. -/
 theorem mem_cubeAt (k : ℤ) (x : V) : x ∈ cubeAt k x := mem_zcell_zcellIndex k x

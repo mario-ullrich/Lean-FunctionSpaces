@@ -290,7 +290,7 @@ theorem lpIsoModulus_add_le (r : ℕ) (f g : Lp ℂ p (cubeVol d)) (k : ℕ) :
 /-- `ω_r(f, t)_p ≤ 2^r ‖f‖_p` in `L_p(Q)`, for the isotropic modulus. -/
 theorem lpIsoModulus_le (r : ℕ) (f : Lp ℂ p (cubeVol d)) (k : ℕ) :
     lpIsoModulus p r f k ≤ 2 ^ r * ‖f‖ₑ := by
-  rw [Lp.enorm_def]
+  rw [Lp.eNorm_def]
   exact isoModulus_le (Lp.stronglyMeasurable f).measurable Fact.out r _
 
 omit [Fact (1 ≤ p)] in
@@ -460,7 +460,7 @@ theorem enorm_restrictEuclidean (F : Lp ℂ p (volume : Measure (EuclideanSpace 
 
 /-- **Extension by zero keeps the norm**: `‖E g‖_{L_p(ℝ^d)} = ‖g‖_{L_p(Q)}`. -/
 theorem enorm_extendEuclidean (g : Lp ℂ p (cubeVol d)) : ‖extendEuclidean p d g‖ₑ = ‖g‖ₑ := by
-  rw [Lp.enorm_def, Lp.enorm_def, eLpNorm_congr_ae (extendEuclidean_ae g),
+  rw [Lp.eNorm_def, Lp.eNorm_def, eLpNorm_congr_ae (extendEuclidean_ae g),
     eLpNorm_indicator_eq_eLpNorm_restrict (measurableSet_euclideanCube d).nullMeasurableSet,
     eLpNorm_comp_measurePreserving (Lp.aestronglyMeasurable g)
       (measurePreserving_ofLp_euclideanCube d)]

@@ -91,7 +91,7 @@ theorem approxNorm_smul (c : ℝ) (f : X) :
 /-- `A^s_q` is closed under real multiples. -/
 theorem MemApprox.smul {f : X} (hf : A.MemApprox s q f) (c : ℝ) : A.MemApprox s q (c • f) := by
   rw [MemApprox, approxNorm_smul]
-  exact ENNReal.mul_lt_top enorm_lt_top hf
+  exact ENNReal.mul_lt_top eNorm_lt_top hf
 
 /-- `A^s_q` is closed under negation. -/
 theorem MemApprox.neg {f : X} (hf : A.MemApprox s q f) : A.MemApprox s q (-f) := by
@@ -109,7 +109,7 @@ theorem enorm_le_approxNorm (hq0 : q ≠ 0) (f : X) : ‖f‖ₑ ≤ A.approxNor
 theorem approxNorm_eq_zero_iff (hq0 : q ≠ 0) {f : X} : A.approxNorm s q f = 0 ↔ f = 0 := by
   refine ⟨fun h => ?_, fun h => h ▸ approxNorm_zero s q⟩
   have := enorm_le_approxNorm (A := A) (s := s) hq0 f
-  rw [h, nonpos_iff_eq_zero, enorm_eq_zero] at this
+  rw [h, nonpos_iff_eq_zero, eNorm_eq_zero] at this
   exact this
 
 /-- A scheme with larger sets has smaller quasi-norms, hence larger approximation spaces. -/

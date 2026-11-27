@@ -51,6 +51,6 @@ theorem ofReal_two_rpow_half_pow_mul_self {d : ℕ} (j : ℕ) :
 (`enorm_two_rpow_half`). -/
 theorem enorm_two_rpow_half_pow {d : ℕ} (j : ℕ) :
     ‖(((2 : ℝ) ^ ((j : ℝ) / 2) : ℝ) : ℂ) ^ d‖ₑ = ENNReal.dyadicWeight (d / 2) j := by
-  rw [enorm_pow, enorm_two_rpow_half, ← ENNReal.rpow_natCast, ENNReal.dyadicWeight_rpow]
+  rw [eNorm_pow, enorm_two_rpow_half, ← ENNReal.rpow_natCast, ENNReal.dyadicWeight_rpow]
   congr 1
   ring

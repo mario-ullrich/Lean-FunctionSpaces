@@ -199,8 +199,8 @@ theorem eLpNorm_periodicEconv_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ �
     eLpNorm (periodicEconv Φ f) p volume ≤ (∫⁻ y, ‖Φ y‖ₑ) * eLpNorm f p volume := by
   by_cases h0 : ∫⁻ y, ‖Φ y‖ₑ = 0
   · have he : periodicEconv Φ f = 0 := funext fun t => integral_eq_zero_of_ae <| by
-      filter_upwards [(lintegral_eq_zero_iff' hΦ.aestronglyMeasurable.enorm).1 h0] with y hy
-      simp [enorm_eq_zero.1 hy]
+      filter_upwards [(lintegral_eq_zero_iff' hΦ.aestronglyMeasurable.eNorm).1 h0] with y hy
+      simp [eNorm_eq_zero.1 hy]
     simp [he]
   · exact eLpNorm_integral_kernel_le_of_bound hp1 hp hΦ.aestronglyMeasurable h0 hΦ.2.ne
       (measurable_comp_sub_quotientProj hf) fun z _ =>
@@ -223,15 +223,15 @@ theorem ae_integrable_econv {Φ : EuclideanSpace ℝ d → ℂ} (hΦ : Integrabl
   have hF : Integrable (Function.uncurry fun (t : UnitAddTorus d) (y : EuclideanSpace ℝ d) =>
       Φ y * f (t - quotientProj y)) (volume.prod volume) := by
     refine ⟨hmeas, ?_⟩
-    rw [HasFiniteIntegral, lintegral_prod_symm _ hmeas.enorm]
+    rw [HasFiniteIntegral, lintegral_prod_symm _ hmeas.eNorm]
     have hin : ∀ y, ∫⁻ t, ‖Function.uncurry (fun (t : UnitAddTorus d)
         (y : EuclideanSpace ℝ d) => Φ y * f (t - quotientProj y)) (t, y)‖ₑ =
           ‖Φ y‖ₑ * ∫⁻ t, ‖f t‖ₑ := fun y => by
-      simp only [Function.uncurry_apply_pair, enorm_mul]
-      rw [lintegral_const_mul' _ _ enorm_ne_top,
+      simp only [Function.uncurry_apply_pair, eNorm_mul]
+      rw [lintegral_const_mul' _ _ eNorm_ne_top,
         lintegral_sub_right_eq_self (fun t => ‖f t‖ₑ) (quotientProj y)]
     simp_rw [hin]
-    rw [lintegral_mul_const'' _ hΦ.aestronglyMeasurable.enorm]
+    rw [lintegral_mul_const'' _ hΦ.aestronglyMeasurable.eNorm]
     exact ENNReal.mul_lt_top hΦ.2 hfi.2
   exact hF.prod_right_ae
 
@@ -334,7 +334,7 @@ theorem coeFn_sum_periodicEconvLp_ae (hp : p ≠ ∞) {ι : Type*} (s : Finset �
 theorem enorm_periodicEconvLp_le (hp : p ≠ ∞) {Φ : EuclideanSpace ℝ d → ℂ} (hΦ : Integrable Φ)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     ‖periodicEconvLp hp hΦ f‖ₑ ≤ (∫⁻ y, ‖Φ y‖ₑ) * ‖f‖ₑ := by
-  rw [Lp.enorm_def, Lp.enorm_def, eLpNorm_congr_ae (periodicEconvLp_apply_ae hp hΦ f)]
+  rw [Lp.eNorm_def, Lp.eNorm_def, eLpNorm_congr_ae (periodicEconvLp_apply_ae hp hΦ f)]
   exact eLpNorm_periodicEconv_le Fact.out hp hΦ (Lp.stronglyMeasurable f).measurable
 
 /-! ### Fourier multipliers -/
@@ -382,7 +382,7 @@ theorem isClosed_trigPolyLp (n : ℕ) :
   have : FiniteDimensional ℂ (trigPolyLp (d := d) p n) := by
     rw [trigPolyLp_eq_span]
     exact FiniteDimensional.span_of_finite ℂ ((boxLt d n).finite_toSet.image _)
-  exact Submodule.closed_of_finiteDimensional _
+  exact Submodule.isClosed_of_finiteDimensional _
 
 /-- **The trigonometric polynomials of the scheme in `L_p`**: the approximants of degree `< n`
 of `(trigScheme d).toLp p` are the trigonometric polynomials of degree `< n` in `L_p`. -/
@@ -513,7 +513,7 @@ noncomputable def periodicEconvBCF {Φ : EuclideanSpace ℝ d → ℂ} (hΦ : In
       map_add' := fun f g => by
         ext t
         show periodicEconv Φ ⇑(f + g) t = periodicEconv Φ f t + periodicEconv Φ g t
-        simp only [periodicEconv, BoundedContinuousFunction.coe_add, Pi.add_apply, mul_add]
+        simp only [periodicEconv, FunLike.coe_add, Pi.add_apply, mul_add]
         exact integral_add (integrable_mul_comp_sub_quotientProj hΦ f t)
           (integrable_mul_comp_sub_quotientProj hΦ g t)
       map_smul' := fun c f => by

@@ -158,14 +158,14 @@ theorem eLpNorm_tsum_dyadicWeight_enorm_blockFun_le [Nontrivial V] (hp₀₁ : p
   set T := triebelLizorkinNorm s₀ ∞ f
   have hmeas : AEStronglyMeasurable (fun x => ∑' j, dyadicWeight s₁ j * ‖blockFun j f x‖ₑ)
       volume := (AEMeasurable.tsum fun j =>
-        (aestronglyMeasurable_blockFun j f).enorm.const_mul _).aestronglyMeasurable
+        (aestronglyMeasurable_blockFun j f).eNorm.const_mul _).aestronglyMeasurable
   have hB : littlewoodPaleyNorm hp₀ s₀ ∞ f ≤ T := by
     simpa using littlewoodPaleyNorm_max_le_triebelLizorkinNorm hp₀ (s := s₀) le_top f
   calc eLpNorm (fun x => ∑' j, dyadicWeight s₁ j * ‖blockFun j f x‖ₑ) p₁ volume
       ≤ eLpNorm (fun x => K * B ^ (1 - θ) *
           (lqNorm ∞ fun j => dyadicWeight s₀ j * ‖blockFun j f x‖ₑ) ^ θ) p₁ volume :=
-        eLpNorm_mono_enorm hmeas fun x => by
-          simp only [enorm_eq_self]
+        eLpNorm_mono_eNorm hmeas fun x => by
+          simp only [eNorm_eq_self]
           refine (tsum_dyadicWeight_enorm_blockFun_le hp₀ hp₀₁ hp₁ hs f x).trans_eq ?_
           ring
     _ = K * B ^ (1 - θ) * T ^ θ := by
@@ -203,15 +203,15 @@ theorem exists_memLp_ae_eq_of_triebelLizorkinNorm_lt_top [Nontrivial V] (hp₀�
     simpa using littlewoodPaleyNorm_max_le_triebelLizorkinNorm hp₀ (s := s) le_top f
   have hae : ∀ᵐ x ∂volume, ‖f x‖ₑ ≤ ‖∑' j, dyadicWeight 0 j * ‖blockFun j f x‖ₑ‖ₑ := by
     filter_upwards [ae_hasSum_blockFun hp₀ hs0 le_top hLP] with x hx
-    simp only [ENNReal.dyadicWeight_zero_left, one_mul, enorm_eq_self]
+    simp only [ENNReal.dyadicWeight_zero_left, one_mul, eNorm_eq_self]
     rw [← hx.tsum_eq]
-    exact enorm_tsum_le_tsum_enorm
+    exact eNorm_tsum_le_tsum_eNorm
   have hbound : eLpNorm f p₁ volume ≤ criticalEmbeddingConst V p₀ p₁ * triebelLizorkinNorm s ∞ f :=
-    (eLpNorm_mono_enorm_ae (Lp.aestronglyMeasurable f) hae).trans
+    (eLpNorm_mono_eNorm_ae (Lp.aestronglyMeasurable f) hae).trans
       (eLpNorm_tsum_dyadicWeight_enorm_blockFun_le hp₀₁ hp₁ (by rw [sub_zero, hs]) f)
   have hmem : MemLp f p₁ volume := memLp_iff.2 (hbound.trans_lt
     (ENNReal.mul_lt_top (criticalEmbeddingConst_ne_top hp₀₁ hp₁).lt_top hf))
-  exact ⟨hmem.toLp f, hmem.coeFn_toLp, by rw [Lp.enorm_toLp]; exact hbound⟩
+  exact ⟨hmem.toLp f, hmem.coeFn_toLp, by rw [Lp.eNorm_toLp]; exact hbound⟩
 
 /-- **`F^α_{p₀,q} ↪ L_{p₁}` for every `q`**: under the hypotheses of
 `Rd.exists_memLp_ae_eq_of_triebelLizorkinNorm_lt_top`, every `f ∈ F^α_{p₀,q}`, `1 ≤ q ≤ ∞`, has a
@@ -262,9 +262,9 @@ theorem exists_triebelLizorkinNorm_le_of_nikolskiiExponent [Nontrivial V] (hp₀
     ((triebelLizorkinNorm_mono_smoothness (by linarith) ∞ f).trans_lt hf)
   refine ⟨g, hg, fun q hq => ?_⟩
   refine le_trans ?_ (eLpNorm_tsum_dyadicWeight_enorm_blockFun_le hp₀₁ hp₁ hs f)
-  refine eLpNorm_mono_enorm (aemeasurable_lqNorm_blockFun s₁ q g).aestronglyMeasurable
+  refine eLpNorm_mono_eNorm (aemeasurable_lqNorm_blockFun s₁ q g).aestronglyMeasurable
     fun x => ?_
-  simp only [enorm_eq_self, blockFun_eq_of_ae_eq hg]
+  simp only [eNorm_eq_self, blockFun_eq_of_ae_eq hg]
   exact ENNReal.lqNorm_le_lqNorm_one hq _
 
 /-! ### The critical Sobolev embedding -/
@@ -280,7 +280,7 @@ theorem exists_lp_zero_ae_eq (f : Lp ℂ p (volume : Measure V)) :
   have hmem : MemLp (f : V → ℂ) 0 volume :=
     memLp_zero_iff_aestronglyMeasurable.2 (Lp.aestronglyMeasurable f)
   exact ⟨hmem.toLp f, hmem.coeFn_toLp,
-    by rw [Lp.enorm_toLp, eLpNorm_exponent_zero (Lp.aestronglyMeasurable f)]⟩
+    by rw [Lp.eNorm_toLp, eLpNorm_exponent_zero (Lp.aestronglyMeasurable f)]⟩
 
 /-- **The critical Sobolev embedding with named constants**: let `n ≥ 1`, `1 < p < ∞`, `r < ∞`,
 `m ≥ 1` and `m = n(1/p - 1/r)`, that is `1/r = 1/p - m/n`, and let `f ∈ L_p(V)` have weak

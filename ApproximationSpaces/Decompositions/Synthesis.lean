@@ -99,10 +99,10 @@ theorem approxNormDyadic_le_of_hasSum_decay (hA : A.IsLinearScheme) (hq : 1 ≤ 
   -- the tail of the series
   have htail : ∀ k, ‖f - ∑ j ∈ range (k + 1), g j‖ₑ ≤ ∑' i, ε (k + i) := fun k => by
     calc _ ≤ ∑' i, ‖g (i + (k + 1))‖ₑ := hf.enorm_sub_sum_range_le (k + 1)
-      _ ≤ ∑' i, ε (i + (k + 1)) := ENNReal.tsum_le_tsum fun i => hsize _
+      _ ≤ ∑' i, ε (i + (k + 1)) := tsum_le_tsum fun i => hsize _
       _ = ∑' i, ε (k + (i + 1)) := by congr 1; funext i; congr 1; omega
       _ ≤ ∑' i, ε (k + i) :=
-          ENNReal.tsum_comp_le_tsum_of_injective Nat.succ_injective (fun i => ε (k + i))
+          tsum_comp_le_tsum_of_injective Nat.succ_injective (fun i => ε (k + i))
   -- the dyadic errors
   have herr : ∀ k, A.approxSeqDyadic s f k ≤
       C * (dyadicWeight (-(σ - s)) k * ∑ j ∈ range (k + 1), dyadicWeight σ j * ε j) +
@@ -133,7 +133,7 @@ theorem approxNormDyadic_le_of_hasSum_decay (hA : A.IsLinearScheme) (hq : 1 ≤ 
   have hf0 : ‖f‖ₑ ≤ Cs * P := by
     calc ‖f‖ₑ ≤ ∑' i, ε i := by
           rw [← hf.tsum_eq]
-          exact enorm_tsum_le_tsum_enorm.trans (ENNReal.tsum_le_tsum hsize)
+          exact eNorm_tsum_le_tsum_eNorm.trans (tsum_le_tsum hsize)
       _ = dyadicWeight s 0 * ∑' i, ε (0 + i) := by simp
       _ ≤ lqNorm q (fun k => dyadicWeight s k * ∑' i, ε (k + i)) :=
           ENNReal.le_lqNorm hq0 (fun k => dyadicWeight s k * ∑' i, ε (k + i)) 0

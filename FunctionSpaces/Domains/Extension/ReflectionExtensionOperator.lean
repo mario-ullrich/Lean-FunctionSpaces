@@ -91,15 +91,15 @@ theorem exists_hasWeakLineDeriv_jet (hE : IsSobolevExtensionMap p O U C E)
         C * (‖u.1.1‖ₑ + ∑ i, ‖u.1.2 i‖ₑ) := by
   obtain ⟨G, hG, hU, hb⟩ := hE.exists_hasWeakLineDeriv u.1.1 (fun i => u.1.2 i) (Lp.memLp _)
     (fun i => Lp.memLp _) u.2
-  exact ⟨G, hG, hU, by simpa only [Lp.enorm_def] using hb⟩
+  exact ⟨G, hG, hU, by simpa only [Lp.eNorm_def] using hb⟩
 
 /-- The linear extension of the value of a jet lies in `L_p(V)` for finite `C`
 (`Rd.memLp_of_eLpNorm_add_sum_le`). -/
 theorem memLp_apply (hE : IsSobolevExtensionMap p O U C E) (hC : C ≠ ∞)
     (u : weakSobolevJet p O) : MemLp (E u.1.1) p volume := by
   obtain ⟨G, -, -, hb⟩ := hE.exists_hasWeakLineDeriv_jet u
-  exact (memLp_of_eLpNorm_add_sum_le hC (ENNReal.add_ne_top.2 ⟨enorm_ne_top,
-    ENNReal.sum_ne_top.2 fun _ _ => enorm_ne_top⟩) hb).1
+  exact (memLp_of_eLpNorm_add_sum_le hC (ENNReal.add_ne_top.2 ⟨eNorm_ne_top,
+    ENNReal.sum_ne_top.2 fun _ _ => eNorm_ne_top⟩) hb).1
 
 /-- **The values of the extension of jets**: `u = (f, (g_i)_i) ↦ E f`, a linear map from the jets
 of `W^1_p(O)` into `L_p(V)`; it is additive and homogeneous since `E` is linear and sees only the
@@ -136,14 +136,14 @@ theorem exists_hasWeakLineDeriv_valueMap (hE : IsSobolevExtensionMap p O U C E) 
       (∀ i, HasWeakLineDeriv ⊤ (fun _ : Fin 1 => gridBasis V i) (hE.valueMap hC u) (G i)) ∧
       ‖hE.valueMap hC u‖ₑ + ∑ i, ‖G i‖ₑ ≤ C * (‖u.1.1‖ₑ + ∑ i, ‖u.1.2 i‖ₑ) := by
   obtain ⟨G, hG, -, hb⟩ := hE.exists_hasWeakLineDeriv_jet u
-  have hm := memLp_of_eLpNorm_add_sum_le hC (ENNReal.add_ne_top.2 ⟨enorm_ne_top,
-    ENNReal.sum_ne_top.2 fun _ _ => enorm_ne_top⟩) hb
+  have hm := memLp_of_eLpNorm_add_sum_le hC (ENNReal.add_ne_top.2 ⟨eNorm_ne_top,
+    ENNReal.sum_ne_top.2 fun _ _ => eNorm_ne_top⟩) hb
   refine ⟨fun i => (hm.2 i).toLp (G i), fun i => (hG i).congr_ae ?_ ?_, ?_⟩
   · rw [volume_restrict_top, valueMap_apply]
     exact (hE.memLp_apply hC u).coeFn_toLp.symm
   · rw [volume_restrict_top]
     exact (hm.2 i).coeFn_toLp.symm
-  · simpa only [valueMap_apply, Lp.enorm_toLp] using hb
+  · simpa only [valueMap_apply, Lp.eNorm_toLp] using hb
 
 /-- The value map of a linear extension agrees with the value of the jet almost everywhere on
 `U`. -/

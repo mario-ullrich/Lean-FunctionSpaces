@@ -182,8 +182,8 @@ theorem eLpNorm_top_le_of_mem_lpMeas (hp0 : p ≠ 0) {t : ℝ≥0∞} {j : ℕ} 
   have hgm : AEStronglyMeasurable g vol := (hg.mono (dyadicFiltration.le j)).aestronglyMeasurable
   have hρ : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
   rw [eLpNorm_congr_ae hag, eLpNorm_congr_ae hag, eLpNorm_exponent_top hgm,
-    eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hgm]
-  refine eLpNormEssSup_le_of_ae_enorm_bound ?_
+    eLpNorm_eq_lintegral_rpow_eNorm_toReal hp0 hp hgm]
+  refine eLpNormEssSup_le_of_ae_eNorm_bound ?_
   filter_upwards [Interval.ae_mem_Ico_unitVol] with x hx
   have h : ‖g x‖ₑ ^ p.toReal ≤ dyadicWeight 1 j * ∫⁻ y, ‖g y‖ₑ ^ p.toReal ∂vol := by
     simpa only [Measure.restrict_univ] using
@@ -222,7 +222,7 @@ values `c_n` of `a`, this is `2^(-j) ∑ |c_n| ≤ 2^(-j) (∑ |c_n|^p)^(1/p)`. 
 theorem eLpNorm_one_le_of_mem_lpMeas (hp0 : p ≠ 0) (hp1 : p ≤ 1) {j : ℕ} {a : Lp ℂ p vol}
     (ha : a ∈ lpMeas ℂ ℝ (dyadicFiltration j) p vol) :
     eLpNorm a 1 vol ≤ dyadicWeight (1 / p.toReal - 1) j * ‖a‖ₑ := by
-  simpa only [ENNReal.toReal_one, div_one, ← Lp.enorm_def] using
+  simpa only [ENNReal.toReal_one, div_one, ← Lp.eNorm_def] using
     eLpNorm_le_of_mem_lpMeas hp0 hp1 ha
 
 /-! ### Haar coefficients -/
@@ -252,12 +252,12 @@ theorem haarCoeff_sub {f g : ℝ → ℂ} (hf : Integrable f vol) (hg : Integrab
 `2^(k/2)` on it. For non-integrable `f` the coefficient is `0`. -/
 theorem enorm_haarCoeff_le (f : ℝ → ℂ) (k : ℕ) (m : ℤ) :
     ‖haarCoeff f k m‖ₑ ≤ dyadicWeight (1 / 2) k * ∫⁻ x in haarDyadicInterval k m, ‖f x‖ₑ ∂vol := by
-  refine (enorm_integral_le_lintegral_enorm _).trans ?_
+  refine (eNorm_integral_le_lintegral_eNorm _).trans ?_
   rw [← lintegral_const_mul' _ _ (ENNReal.dyadicWeight_ne_top _ _),
     ← lintegral_indicator (measurableSet_haarDyadicInterval k m)]
   refine lintegral_mono fun x => ?_
   by_cases hx : dyadicIndex k x = m
-  · rw [indicator_of_mem (mem_haarDyadicInterval.2 hx), enorm_mul, enorm_haarFunction hx]
+  · rw [indicator_of_mem (mem_haarDyadicInterval.2 hx), eNorm_mul, enorm_haarFunction hx]
   · rw [haarFunction_eq_zero hx]
     simp
 
@@ -351,7 +351,7 @@ theorem haarLevelNorm_add_rpow_le (hp0 : p ≠ 0) (hp1 : p ≤ 1) {f g : ℝ →
     ← Finset.sum_add_distrib]
   gcongr with m
   rw [haarCoeff_add hf hg]
-  exact (ENNReal.rpow_le_rpow (enorm_add_le _ _) hρ.le).trans
+  exact (ENNReal.rpow_le_rpow (eNorm_add_le _ _) hρ.le).trans
     (ENNReal.rpow_add_le_add_rpow _ _ hρ.le hρ1)
 
 /-- **The level norm of a step**: for `0 < p ≤ 1`, `k ≤ j` and an `ℱ_j`-measurable
@@ -385,8 +385,8 @@ theorem haarLevelNorm_le_of_mem_lpMeas (hp0 : p ≠ 0) (hp1 : p ≤ 1) {j k : �
             one_div_mul_cancel hρ.ne', ENNReal.rpow_one, show (1 / 2 : ℝ) * ρ = ρ / 2 by ring,
             show (1 / ρ - 1) * ρ = 1 - ρ by field_simp]
   rw [← ENNReal.rpow_le_rpow_iff hρ, haarLevelNorm_congr_ae hag, haarLevelNorm_rpow hp0 hp,
-    ENNReal.mul_rpow_of_nonneg _ _ hρ.le, ENNReal.dyadicWeight_rpow, Lp.enorm_def,
-    eLpNorm_congr_ae hag, eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hgm, ← ENNReal.rpow_mul,
+    ENNReal.mul_rpow_of_nonneg _ _ hρ.le, ENNReal.dyadicWeight_rpow, Lp.eNorm_def,
+    eLpNorm_congr_ae hag, eLpNorm_eq_lintegral_rpow_eNorm_toReal hp0 hp hgm, ← ENNReal.rpow_mul,
     one_div_mul_cancel hρ.ne', ENNReal.rpow_one]
   calc dyadicWeight (ρ / 2 - 1) k * ∑ m : Fin (2 ^ k), ‖haarCoeff g k ((m : ℕ) : ℤ)‖ₑ ^ ρ
       ≤ dyadicWeight (ρ / 2 - 1) k * ∑ m : Fin (2 ^ k), dyadicWeight (ρ / 2) k *
@@ -447,7 +447,7 @@ measure, the case of elements of `L_p` of `MeasureTheory.tendstoInMeasure_of_eLp
 theorem tendstoInMeasure_of_nearBest (hp0 : p ≠ 0) (hbe : ∀ j, ‖f - b j‖ₑ ≤ e j)
     (he0 : Tendsto e atTop (𝓝 0)) : TendstoInMeasure vol (fun n => ⇑(b n)) atTop ⇑f := by
   have hbe' : ∀ᶠ n in atTop, eLpNorm (⇑f - ⇑(b n)) p vol ≤ e n := Eventually.of_forall fun n => by
-    rw [← eLpNorm_congr_ae (Lp.coeFn_sub _ _), ← Lp.enorm_def]
+    rw [← eLpNorm_congr_ae (Lp.coeFn_sub _ _), ← Lp.eNorm_def]
     exact hbe n
   exact tendstoInMeasure_of_eLpNorm_sub_le hp0 hbe' he0
 
@@ -466,7 +466,7 @@ theorem eLpNorm_one_sub_le_tsum_of_nearBest (hp0 : p ≠ 0) (hp1 : p ≤ 1)
   have h := MeasureTheory.eLpNorm_sub_rpow_le_tsum one_ne_zero le_rfl
     (tendstoInMeasure_of_nearBest hp0 hbe he0) (fun n => Lp.aestronglyMeasurable (b n)) k
   simp only [ENNReal.toReal_one, ENNReal.rpow_one] at h
-  exact h.trans (ENNReal.tsum_le_tsum fun i =>
+  exact h.trans (tsum_le_tsum fun i =>
     eLpNorm_one_sub_le_of_nearBest hp0 hp1 hb hbe he (k + i))
 
 /-- **The `L_1` norm by near-best steps**: under the hypotheses of
@@ -542,7 +542,7 @@ theorem haarLevelNorm_rpow_le_tsum_of_nearBest (hp0 : p ≠ 0) (hp1 : p ≤ 1)
       gcongr
       exact ENNReal.le_two_rpow_mul_of_rpow_le hp0 hp (enorm_sub_rpow_le_of_nearBest hp1 hbe he _)
     refine le_trans ?_ ((Finset.sum_le_sum (s := Finset.range n) fun i _ => hstep i).trans
-      (ENNReal.sum_le_tsum _))
+      (sum_le_tsum _))
     induction n with
     | zero => simp [haarLevelNorm_eq_zero_of_mem_lpMeas le_rfl (hb k), ENNReal.zero_rpow_of_pos hρ]
     | succ n ih =>
@@ -565,7 +565,7 @@ theorem haarLevelNorm_rpow_le_tsum_of_nearBest (hp0 : p ≠ 0) (hp1 : p ≤ 1)
     have hfb : haarLevelNorm p (⇑f - ⇑(b (k + n))) k ≤ dyadicWeight 1 k * T (k + n) := by
       refine (haarLevelNorm_le_lintegral _ k).trans ?_
       gcongr
-      rw [← eLpNorm_one_eq_lintegral_enorm
+      rw [← eLpNorm_one_eq_lintegral_eNorm
         ((Lp.aestronglyMeasurable f).sub (Lp.aestronglyMeasurable _))]
       exact eLpNorm_one_sub_le_tsum_of_nearBest hp0 hp1 hb hbe he he0 (k + n)
     calc haarLevelNorm p f k ^ ρ
@@ -793,7 +793,7 @@ theorem eFunctional_stepCouple_le_eLpNorm_sub_condExp (f : Lp ℂ p vol) (k : �
       ⟨_, stronglyMeasurable_condExp, MemLp.coeFn_toLp hm⟩
   rw [eFunctional_stepCouple_two_pow]
   refine (iInf₂_le _ hb).trans_eq ?_
-  rw [Lp.enorm_def]
+  rw [Lp.eNorm_def]
   exact eLpNorm_congr_ae ((Lp.coeFn_sub _ _).trans (EventuallyEq.rfl.sub (MemLp.coeFn_toLp hm)))
 
 /-! ### The coefficient characterisation -/
@@ -874,7 +874,7 @@ theorem eNormDyadic_lt_top_of_lqNorm_haarLevelNorm (hp0 : p ≠ 0) (hp1 : p ≤ 
     (ENNReal.mul_lt_top ENNReal.one_lt_top (ENNReal.hardyConst_ne_top (by
       rw [sub_zero]; positivity) _).lt_top) (ENNReal.rpow_lt_top_of_nonneg hρ.le hH.ne))
   rw [ENNReal.rpow_lt_top_iff_of_pos hρ] at hE
-  exact ENNReal.add_lt_top.2 ⟨(Lp.eLpNorm_lt_top f).trans_eq' (Lp.enorm_def f).symm, hE⟩
+  exact ENNReal.add_lt_top.2 ⟨(Lp.eLpNorm_lt_top f).trans_eq' (Lp.eNorm_def f).symm, hE⟩
 
 variable (p) in
 /-- The weight of the Haar coefficient condition is the level norm:
@@ -901,7 +901,7 @@ theorem memEMethod_stepCouple_iff_haarCoeff (hp0 : p ≠ 0) (hp1 : p ≤ 1)
       lqNorm q (fun k => dyadicWeight (s + (1 / 2 - 1 / p.toReal)) k *
         lqNorm p (fun m : Fin (2 ^ k) => ‖haarCoeff f k ((m : ℕ) : ℤ)‖ₑ)) < ∞ := by
   have hs0 := pos_of_one_div_sub_one_lt hp0 hp1 hs
-  simp only [dyadicWeight_mul_lqNorm_haarCoeff p s, ENNReal.add_lt_top, enorm_lt_top, true_and]
+  simp only [dyadicWeight_mul_lqNorm_haarCoeff p s, ENNReal.add_lt_top, eNorm_lt_top, true_and]
   rw [InterpCouple.memEMethod_iff_eNormDyadic_lt_top (A := stepCouple p)
     InterpCouple.ofMonotoneSubgroups_norm1_zero
     (fun _ hb => InterpCouple.eq_zero_of_ofMonotoneSubgroups_norm1_lt_one hb) hs0.le

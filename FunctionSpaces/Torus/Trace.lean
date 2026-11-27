@@ -98,7 +98,7 @@ theorem compLinear_lineThrough_trigMonomial (x' : UnitAddTorus (Fin n)) (k : Fin
   ext v
   simp only [compLinear_apply, lineThrough_apply, trigMonomial_apply, mFourier,
     ContinuousMap.coe_mk, Fin.prod_univ_succ, Fin.cons_zero, Fin.cons_succ,
-    BoundedContinuousFunction.coe_smul, smul_eq_mul, Fin.tail]
+    FunLike.coe_smul, Pi.smul_apply, smul_eq_mul, Fin.tail]
   ring
 
 /-- The restriction of a trigonometric polynomial of degree `< m` to the face is a trigonometric
@@ -126,7 +126,7 @@ theorem lintegral_eq_lintegral_cons {F : UnitAddTorus (Fin (n + 1)) → ℝ≥0�
   set e := MeasurableEquiv.piFinSuccAbove (fun _ : Fin (n + 1) => UnitAddCircle) 0
   have he : MeasurePreserving e := volume_preserving_piFinSuccAbove (fun _ => UnitAddCircle) 0
   have he' : ∀ y : UnitAddCircle × UnitAddTorus (Fin n), e.symm y = Fin.cons y.1 y.2 := fun y => by
-    simp [e, MeasurableEquiv.piFinSuccAbove_symm_apply]; rfl
+    simp [e, MeasurableEquiv.piFinSuccAbove_symm_apply]
   have h1 : ∫⁻ x, F x = ∫⁻ y : UnitAddCircle × UnitAddTorus (Fin n), F (e.symm y) :=
     (he.symm.lintegral_comp hF).symm
   have hmeas : Measurable fun y : UnitAddCircle × UnitAddTorus (Fin n) => F (e.symm y) :=
@@ -155,7 +155,7 @@ theorem enorm_rpow_le_lintegral {m : ℕ} {F : UnitAddTorus (Fin 1) →ᵇ ℂ}
   have hfin : eLpNorm F p volume ≠ ∞ :=
     ((F.memLp_top (μ := volume)).mono_exponent le_top).eLpNorm_ne_top
   have hI : eLpNorm F p volume ^ P = ∫⁻ w, ‖F w‖ₑ ^ P := by
-    rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp' F.continuous.aestronglyMeasurable,
+    rw [eLpNorm_eq_lintegral_rpow_eNorm_toReal hp0 hp' F.continuous.aestronglyMeasurable,
       one_div, ENNReal.rpow_inv_rpow hP0.ne']
   calc ‖F v‖ₑ ^ P = ENNReal.ofReal (‖F v‖ ^ P) := by
         rw [← ofReal_norm, ENNReal.ofReal_rpow_of_nonneg (norm_nonneg _) hP0.le]
@@ -178,12 +178,12 @@ theorem eLpNorm_restrictFace_le {m : ℕ} {a : UnitAddTorus (Fin (n + 1)) →ᵇ
   set N : ℝ≥0∞ := ((2 * (⌈P / 2⌉₊ * m) : ℕ) : ℝ≥0∞)
   have hP0 : 0 < P := zero_lt_one.trans_le (ENNReal.one_le_toReal_of_one_le hp hp')
   have hp0 : p ≠ 0 := (zero_lt_one.trans_le hp).ne'
-  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp'
+  rw [eLpNorm_eq_lintegral_rpow_eNorm_toReal hp0 hp'
       (restrictFace n a).continuous.aestronglyMeasurable,
-    eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp' a.continuous.aestronglyMeasurable,
+    eLpNorm_eq_lintegral_rpow_eNorm_toReal hp0 hp' a.continuous.aestronglyMeasurable,
     ← ENNReal.mul_rpow_of_nonneg _ _ (by positivity)]
   refine ENNReal.rpow_le_rpow ?_ (by positivity)
-  have hmeas : Measurable fun x => ‖a x‖ₑ ^ P := a.continuous.measurable.enorm.pow_const P
+  have hmeas : Measurable fun x => ‖a x‖ₑ ^ P := a.continuous.measurable.eNorm.pow_const P
   calc ∫⁻ x', ‖restrictFace n a x'‖ₑ ^ P
       ≤ ∫⁻ x', N * ∫⁻ v : UnitAddTorus (Fin 1), ‖a (Fin.cons (v 0) x')‖ₑ ^ P := by
         refine lintegral_mono fun x' => ?_
@@ -265,7 +265,7 @@ noncomputable def dirichletSum (n m : ℕ) : UnitAddTorus (Fin (n + 1)) →ᵇ �
 
 theorem dirichletSum_cons (m : ℕ) (u : UnitAddCircle) (x' : UnitAddTorus (Fin n)) :
     dirichletSum n m (Fin.cons u x') = ∑ j ∈ Finset.range m, fourier (j : ℤ) u := by
-  simp only [dirichletSum, BoundedContinuousFunction.coe_sum, Finset.sum_apply,
+  simp only [dirichletSum, FunLike.coe_sum, Finset.sum_apply,
     trigMonomial_single_cons]
 
 /-- `D_m` has degree `< m`. -/
@@ -276,7 +276,7 @@ theorem dirichletSum_mem_trigPoly (m : ℕ) : dirichletSum n m ∈ trigPoly (Fin
 /-- `|D_m| ≤ m`. -/
 theorem norm_dirichletSum_le (m : ℕ) (x : UnitAddTorus (Fin (n + 1))) :
     ‖dirichletSum n m x‖ ≤ m := by
-  simp only [dirichletSum, BoundedContinuousFunction.coe_sum, Finset.sum_apply]
+  simp only [dirichletSum, FunLike.coe_sum, Finset.sum_apply]
   refine (norm_sum_le _ _).trans ?_
   simp only [norm_trigMonomial_apply, Finset.sum_const, Finset.card_range, nsmul_eq_mul, mul_one,
     le_refl]
@@ -301,7 +301,7 @@ theorem lintegral_enorm_dirichletSum_sq (m : ℕ) :
   rw [BoundedContinuousFunction.norm_toLp_eq_toReal_eLpNorm] at h2
   have he : eLpNorm (dirichletSum n m) 2 volume ^ (2 : ℝ) =
       ∫⁻ x, ‖dirichletSum n m x‖ₑ ^ (2 : ℝ) := by
-    rw [eLpNorm_eq_lintegral_rpow_enorm_toReal (by norm_num) (by norm_num)
+    rw [eLpNorm_eq_lintegral_rpow_eNorm_toReal (by norm_num) (by norm_num)
       (dirichletSum n m).continuous.aestronglyMeasurable]
     simp only [ENNReal.toReal_ofNat, one_div]
     rw [ENNReal.rpow_inv_rpow (by norm_num)]
@@ -315,8 +315,9 @@ noncomputable def fejerFace (n m : ℕ) : UnitAddTorus (Fin (n + 1)) →ᵇ ℂ 
 
 theorem fejerFace_apply (m : ℕ) (x : UnitAddTorus (Fin (n + 1))) :
     fejerFace n m x = (((m : ℝ) ^ 2)⁻¹ * ‖dirichletSum n m x‖ ^ 2 : ℝ) := by
-  simp only [fejerFace, BoundedContinuousFunction.coe_smul, BoundedContinuousFunction.coe_mul,
-    BoundedContinuousFunction.star_apply, Pi.mul_apply, smul_eq_mul]
+  simp only [fejerFace, FunLike.coe_smul, Pi.smul_apply,
+    FunLike.coe_mul, BoundedContinuousFunction.star_apply, Pi.mul_apply,
+    smul_eq_mul]
   rw [show star (dirichletSum n m x) = (starRingEnd ℂ) (dirichletSum n m x) from rfl,
     Complex.mul_conj, Complex.normSq_eq_norm_sq]
   push_cast; ring
@@ -396,7 +397,7 @@ theorem eLpNorm_extendFace_le {m : ℕ} (hm : 1 ≤ m) (b : UnitAddTorus (Fin n)
   -- `∫ φ_m^p ≤ ∫ φ_m = 1/m`, integrated over the first coordinate
   have hψ : ∫⁻ v : UnitAddTorus (Fin 1), ψ (v 0) ^ P ≤ (m : ℝ≥0∞)⁻¹ := by
     have hmeasφ : Measurable fun x => ‖fejerFace n m x‖ₑ :=
-      (fejerFace n m).continuous.measurable.enorm
+      (fejerFace n m).continuous.measurable.eNorm
     have h1 := lintegral_eq_lintegral_cons hmeasφ
     simp_rw [hφ] at h1
     rw [lintegral_const, measure_univ, mul_one, lintegral_enorm_fejerFace hm] at h1
@@ -404,24 +405,24 @@ theorem eLpNorm_extendFace_le {m : ℕ} (hm : 1 ≤ m) (b : UnitAddTorus (Fin n)
           lintegral_mono fun v => ENNReal.rpow_le_self_of_le_one (enorm_fejerFace_le m _) hP1
       _ = (m : ℝ≥0∞)⁻¹ := h1.symm
   have hmeas : Measurable fun x => ‖extendFace n m b x‖ₑ ^ P :=
-    (extendFace n m b).continuous.measurable.enorm.pow_const P
+    (extendFace n m b).continuous.measurable.eNorm.pow_const P
   have hint : ∫⁻ x, ‖extendFace n m b x‖ₑ ^ P ≤ (m : ℝ≥0∞)⁻¹ * ∫⁻ x', ‖b x'‖ₑ ^ P := by
     rw [lintegral_eq_lintegral_cons hmeas]
     calc ∫⁻ x', ∫⁻ v : UnitAddTorus (Fin 1), ‖extendFace n m b (Fin.cons (v 0) x')‖ₑ ^ P
         = ∫⁻ x', (∫⁻ v : UnitAddTorus (Fin 1), ψ (v 0) ^ P) * ‖b x'‖ₑ ^ P := by
           congr 1; funext x'
-          rw [← lintegral_mul_const' _ _ (ENNReal.rpow_ne_top_of_nonneg hP0.le enorm_ne_top)]
+          rw [← lintegral_mul_const' _ _ (ENNReal.rpow_ne_top_of_nonneg hP0.le eNorm_ne_top)]
           congr 1; funext v
-          simp only [extendFace, BoundedContinuousFunction.coe_mul, Pi.mul_apply,
-            compLinear_apply, tailMap_apply, Fin.tail_cons, enorm_mul, ψ, hφ (v 0) x']
+          simp only [extendFace, FunLike.coe_mul, Pi.mul_apply,
+            compLinear_apply, tailMap_apply, Fin.tail_cons, eNorm_mul, ψ, hφ (v 0) x']
           rw [ENNReal.mul_rpow_of_nonneg _ _ hP0.le]
       _ = (∫⁻ v : UnitAddTorus (Fin 1), ψ (v 0) ^ P) * ∫⁻ x', ‖b x'‖ₑ ^ P :=
           lintegral_const_mul' _ _ (ne_top_of_le_ne_top (ENNReal.inv_ne_top.2
             (by exact_mod_cast (Nat.one_le_iff_ne_zero.1 hm))) hψ)
       _ ≤ (m : ℝ≥0∞)⁻¹ * ∫⁻ x', ‖b x'‖ₑ ^ P := by gcongr
-  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp'
+  rw [eLpNorm_eq_lintegral_rpow_eNorm_toReal hp0 hp'
       (extendFace n m b).continuous.aestronglyMeasurable,
-    eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp' b.continuous.aestronglyMeasurable]
+    eLpNorm_eq_lintegral_rpow_eNorm_toReal hp0 hp' b.continuous.aestronglyMeasurable]
   calc (∫⁻ x, ‖extendFace n m b x‖ₑ ^ P) ^ (1 / P)
       ≤ ((m : ℝ≥0∞)⁻¹ * ∫⁻ x', ‖b x'‖ₑ ^ P) ^ (1 / P) :=
         ENNReal.rpow_le_rpow hint (by positivity)
@@ -443,7 +444,7 @@ theorem toLpR_injective (d : Type*) [Fintype d] : Function.Injective (toLpR p d)
 
 theorem enorm_toLpR {d : Type*} [Fintype d] (a : UnitAddTorus d →ᵇ ℂ) :
     ‖toLpR p d a‖ₑ = eLpNorm a p volume := by
-  rw [Lp.enorm_def]
+  rw [Lp.eNorm_def]
   exact eLpNorm_congr_ae (BoundedContinuousFunction.coeFn_toLp p volume ℝ a)
 
 /-- Every approximant of the trigonometric scheme in `L_p` is the class of a bounded continuous

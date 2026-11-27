@@ -65,7 +65,7 @@ theorem inclKFunctional_le_enorm (f : X) : inclKFunctional ι t f ≤ ‖f‖ₑ
 /-- `K(t, 0) = 0`. -/
 @[simp]
 theorem inclKFunctional_zero_right : inclKFunctional ι t 0 = 0 :=
-  le_antisymm ((inclKFunctional_le_enorm 0).trans_eq enorm_zero) bot_le
+  le_antisymm ((inclKFunctional_le_enorm 0).trans_eq eNorm_zero) bot_le
 
 /-- The K-functional increases with `t`. -/
 theorem inclKFunctional_mono (h : t ≤ u) (f : X) : inclKFunctional ι t f ≤ inclKFunctional ι u f :=
@@ -84,8 +84,8 @@ theorem inclKFunctional_add_le (f g : X) :
     _ ≤ (‖f - ι y‖ₑ + ‖g - ι z‖ₑ) + t * (‖y‖ₑ + ‖z‖ₑ) := by
         rw [map_add, add_sub_add_comm]
         gcongr
-        · exact enorm_add_le _ _
-        · exact enorm_add_le _ _
+        · exact eNorm_add_le _ _
+        · exact eNorm_add_le _ _
     _ = (‖f - ι y‖ₑ + t * ‖y‖ₑ) + (‖g - ι z‖ₑ + t * ‖z‖ₑ) := by ring
 
 /-- **Homogeneity**, one inequality: `K(t, c f) ≤ |c| K(t, f)`. -/
@@ -94,11 +94,11 @@ theorem inclKFunctional_smul_le (c : ℝ) (f : X) :
   rcases eq_or_ne c 0 with rfl | hc
   · simp
   rw [show ‖c‖ₑ * inclKFunctional ι t f = ⨅ y, ‖c‖ₑ * (‖f - ι y‖ₑ + t * ‖y‖ₑ) from
-    ENNReal.mul_iInf_of_ne (enorm_ne_zero.2 hc) enorm_ne_top]
+    ENNReal.mul_iInf_of_ne (eNorm_ne_zero.2 hc) eNorm_ne_top]
   refine le_iInf fun y => ?_
   calc inclKFunctional ι t (c • f) ≤ ‖c • f - ι (c • y)‖ₑ + t * ‖c • y‖ₑ := inclKFunctional_le _ _
     _ = ‖c‖ₑ * (‖f - ι y‖ₑ + t * ‖y‖ₑ) := by
-        rw [map_smul, ← smul_sub, enorm_smul, enorm_smul]; ring
+        rw [map_smul, ← smul_sub, eNorm_smul, eNorm_smul]; ring
 
 /-- **Jackson's inequality controls the errors by the K-functional**:
 `E_n(f) ≤ max(1, C) K(n^(-r), f)` for `n ≥ 1`. -/
@@ -155,13 +155,13 @@ theorem inclInterpNorm_add_le (hq : 1 ≤ q) (f g : X) :
       _ ≤ _ := ENNReal.lqNorm_add_le hq _ _
   calc inclInterpNorm ι θ ρ q (f + g) ≤ (‖f‖ₑ + ‖g‖ₑ) +
         (lqNorm q (interpSeq ι θ ρ f) + lqNorm q (interpSeq ι θ ρ g)) :=
-      add_le_add (enorm_add_le f g) hseq
+      add_le_add (eNorm_add_le f g) hseq
     _ = _ := by rw [inclInterpNorm, inclInterpNorm]; ring
 
 /-- The interpolation norm is homogeneous: `‖c f‖_{θ,q} ≤ |c| ‖f‖_{θ,q}`. -/
 theorem inclInterpNorm_smul_le (c : ℝ) (f : X) :
     inclInterpNorm ι θ ρ q (c • f) ≤ ‖c‖ₑ * inclInterpNorm ι θ ρ q f := by
-  rw [inclInterpNorm, inclInterpNorm, mul_add, enorm_smul, ← ENNReal.lqNorm_const_mul]
+  rw [inclInterpNorm, inclInterpNorm, mul_add, eNorm_smul, ← ENNReal.lqNorm_const_mul]
   gcongr
   refine ENNReal.lqNorm_mono fun k => ?_
   rw [interpSeq, interpSeq, mul_left_comm]
@@ -180,7 +180,7 @@ def interpSpace (θ ρ : ℝ) (q : ℝ≥0∞) (hq : 1 ≤ q) : Submodule ℝ X 
     have : interpSeq ι θ ρ (0 : X) = fun _ => 0 := by funext k; simp [interpSeq]
     simp [inclInterpNorm, this]
   add_mem' hf hg := (inclInterpNorm_add_le hq _ _).trans_lt (ENNReal.add_lt_top.2 ⟨hf, hg⟩)
-  smul_mem' c _ hf := (inclInterpNorm_smul_le c _).trans_lt (ENNReal.mul_lt_top enorm_lt_top hf)
+  smul_mem' c _ hf := (inclInterpNorm_smul_le c _).trans_lt (ENNReal.mul_lt_top eNorm_lt_top hf)
 
 /-- Membership in the interpolation space as a submodule. -/
 @[simp]

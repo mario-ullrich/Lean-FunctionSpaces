@@ -238,12 +238,12 @@ theorem exists_eLpNorm_chart_le {e : OpenPartialHomeomorph M H} (he : e ∈ atla
   have hκ : AEMeasurable (e.extend I).symm (volume.restrict (e.extend I).target) :=
     (e.continuousOn_extend_symm (I := I)).aemeasurable hT
   have hFK : ∀ x ∉ K, ‖G x‖ₑ ^ p.toReal = 0 := fun x hx => by
-    rw [hGK x hx, enorm_zero, ENNReal.zero_rpow_of_pos hr]
-  obtain ⟨h1, h2⟩ := hcmp _ (hG.enorm.pow_const _) hFK
+    rw [hGK x hx, eNorm_zero, ENNReal.zero_rpow_of_pos hr]
+  obtain ⟨h1, h2⟩ := hcmp _ (hG.eNorm.pow_const _) hFK
   rw [eLpNorm_indicator_eq_eLpNorm_restrict hT.nullMeasurableSet,
-    eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp (f := fun y => G ((e.extend I).symm y))
+    eLpNorm_eq_lintegral_rpow_eNorm_toReal hp0 hp (f := fun y => G ((e.extend I).symm y))
       (hG.aestronglyMeasurable.comp_aemeasurable hκ),
-    eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hG.aestronglyMeasurable,
+    eLpNorm_eq_lintegral_rpow_eNorm_toReal hp0 hp hG.aestronglyMeasurable,
     ← ENNReal.mul_rpow_of_nonneg _ _ (by positivity : (0 : ℝ) ≤ 1 / p.toReal),
     ← ENNReal.mul_rpow_of_nonneg _ _ (by positivity : (0 : ℝ) ≤ 1 / p.toReal)]
   exact ⟨ENNReal.rpow_le_rpow h1 (by positivity), ENNReal.rpow_le_rpow h2 (by positivity)⟩
@@ -286,12 +286,12 @@ theorem quasiMeasurePreserving_piecewise_extend [CompactSpace M] {e : OpenPartia
     QuasiMeasurePreserving (e.source.piecewise (e.extend I) fun _ => (0 : E))
       (μ.restrict K) volume := by
   have hκ := measurable_piecewise_extend I e
-  refine ⟨hκ, Measure.AbsolutelyContinuous.mk fun N hN hN0 => ?_⟩
+  refine ⟨hκ.aemeasurable, Measure.AbsolutelyContinuous.mk fun N hN hN0 => ?_⟩
   obtain ⟨c, C, -, -, hcmp⟩ := exists_lintegral_chart_le (I := I) μ he hK.isCompact hKs
   have hS : MeasurableSet (K ∩ (e.source.piecewise (e.extend I) fun _ => (0 : E)) ⁻¹' N) :=
     hK.measurableSet.inter (hκ hN)
   have h := (hcmp _ (measurable_one.indicator hS)
-    fun x hx => indicator_of_notMem (fun h => hx h.1) _).2
+    fun x hx => indicator_of_notMem (fun h : x ∈ K ∩ _ => hx h.1) _).2
   rw [lintegral_indicator_one hS] at h
   rw [Measure.map_apply hκ hN, Measure.restrict_apply (hκ hN), inter_comm]
   exact le_antisymm (h.trans ((mul_le_mul' le_rfl (setLIntegral_indicator_preimage_le hKs N)).trans

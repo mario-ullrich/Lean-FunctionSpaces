@@ -50,11 +50,11 @@ right side with the integrals `(∫ F^p)^(1/p) (∫ G^q)^(1/q)` and real exponen
 theorem lintegral_mul_le_eLpNorm_mul_eLpNorm {p q : ℝ≥0∞} [p.HolderConjugate q] (hp : p ≠ ∞)
     (hq : q ≠ ∞) {F G : α → ℝ≥0∞} (hF : AEMeasurable F μ) (hG : AEMeasurable G μ) :
     ∫⁻ x, F x * G x ∂μ ≤ eLpNorm F p μ * eLpNorm G q μ := by
-  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal (ENNReal.HolderConjugate.ne_zero p q) hp
+  rw [eLpNorm_eq_lintegral_rpow_eNorm_toReal (ENNReal.HolderConjugate.ne_zero p q) hp
       hF.aestronglyMeasurable,
-    eLpNorm_eq_lintegral_rpow_enorm_toReal (ENNReal.HolderConjugate.ne_zero q p) hq
+    eLpNorm_eq_lintegral_rpow_eNorm_toReal (ENNReal.HolderConjugate.ne_zero q p) hq
       hG.aestronglyMeasurable]
-  simp only [enorm_eq_self]
+  simp only [eNorm_eq_self]
   exact ENNReal.lintegral_mul_le_Lp_mul_Lq μ (ENNReal.HolderConjugate.toReal_of_ne_top hp hq) hF hG
 
 omit [MeasurableSpace α] in
@@ -62,7 +62,7 @@ omit [MeasurableSpace α] in
 `ℓ_2` norm: `‖(u_j(x))_j‖_{ℓ_2} ≤ ∑_{j ∈ s} |u_j(x)| < ∞` (`ENNReal.lqNorm_le_sum_of_eq_zero`). -/
 theorem lqNorm_enorm_ne_top_of_finite (s : Finset ℕ) {u : ℕ → α → ℂ} (hus : ∀ j ∉ s, u j = 0)
     (x : α) : lqNorm 2 (fun j => ‖u j x‖ₑ) ≠ ∞ :=
-  ne_top_of_le_ne_top (ENNReal.sum_lt_top.2 fun j (_ : j ∈ s) => enorm_lt_top).ne
+  ne_top_of_le_ne_top (ENNReal.sum_lt_top.2 fun j (_ : j ∈ s) => eNorm_lt_top).ne
     (ENNReal.lqNorm_le_sum_of_eq_zero one_le_two s fun j hj => by simp [hus j hj])
 
 /-- **A family in `L_p` that vanishes outside a finite set lies in `L_p(ℓ_2)`**: if
@@ -73,7 +73,7 @@ theorem eLpNorm_lqNorm_ne_top_of_finite {p : ℝ≥0∞} (hp1 : 1 ≤ p) (s : Fi
     {u : ℕ → α → ℂ} (hu : ∀ j, MemLp (u j) p μ) (hus : ∀ j ∉ s, u j = 0) :
     eLpNorm (fun x => lqNorm 2 fun j => ‖u j x‖ₑ) p μ ≠ ∞ := by
   have hm : AEMeasurable (fun x => lqNorm 2 fun j => ‖u j x‖ₑ) μ :=
-    aemeasurable_lqNorm_comp (fun j => (hu j).aestronglyMeasurable.enorm) 2
+    aemeasurable_lqNorm_comp (fun j => (hu j).aestronglyMeasurable.eNorm) 2
   have hsum : eLpNorm (fun x => ∑ j ∈ s, ‖u j x‖ₑ) p μ ≤ ∑ j ∈ s, eLpNorm (u j) p μ := by
     calc eLpNorm (fun x => ∑ j ∈ s, ‖u j x‖ₑ) p μ
         = eLpNorm (∑ j ∈ s, fun x => ‖u j x‖ₑ) p μ := by
@@ -82,11 +82,11 @@ theorem eLpNorm_lqNorm_ne_top_of_finite {p : ℝ≥0∞} (hp1 : 1 ≤ p) (s : Fi
           simp [Finset.sum_apply]
       _ ≤ ∑ j ∈ s, eLpNorm (fun x => ‖u j x‖ₑ) p μ := eLpNorm_sum_le hp1
       _ = ∑ j ∈ s, eLpNorm (u j) p μ :=
-          Finset.sum_congr rfl fun j _ => eLpNorm_enorm _ (hu j).aestronglyMeasurable
-  refine ne_top_of_le_ne_top ?_ ((eLpNorm_mono_enorm hm.aestronglyMeasurable fun x => ?_).trans
+          Finset.sum_congr rfl fun j _ => eLpNorm_eNorm _ (hu j).aestronglyMeasurable
+  refine ne_top_of_le_ne_top ?_ ((eLpNorm_mono_eNorm hm.aestronglyMeasurable fun x => ?_).trans
     hsum)
   · exact (ENNReal.sum_lt_top.2 fun j _ => (hu j).eLpNorm_lt_top).ne
-  · simpa only [enorm_eq_self] using
+  · simpa only [eNorm_eq_self] using
       ENNReal.lqNorm_le_sum_of_eq_zero one_le_two s fun j hj => by simp [hus j hj]
 
 /-- A member of a family lies in `L_p` if the pointwise `ℓ_2` norm of the family has finite
@@ -95,7 +95,7 @@ almost everywhere strongly measurable. -/
 theorem memLp_of_lintegral_lqNorm_rpow_ne_top {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞)
     {g : ℕ → α → ℂ} {j : ℕ} (hg : AEStronglyMeasurable (g j) μ)
     (hG : ∫⁻ x, (lqNorm 2 fun i => ‖g i x‖ₑ) ^ p.toReal ∂μ ≠ ∞) : MemLp (g j) p μ :=
-  memLp_iff.2 ((eLpNorm_lt_top_iff_lintegral_rpow_enorm_lt_top hp0 hp hg).2 (lt_of_le_of_lt
+  memLp_iff.2 ((eLpNorm_lt_top_iff_lintegral_rpow_eNorm_lt_top hp0 hp hg).2 (lt_of_le_of_lt
     (lintegral_mono fun x => ENNReal.rpow_le_rpow
       (ENNReal.le_lqNorm two_ne_zero (fun i => ‖g i x‖ₑ) j) ENNReal.toReal_nonneg) hG.lt_top))
 
@@ -105,7 +105,7 @@ theorem lintegral_lqNorm_rpow_ne_top_of_finite {p : ℝ≥0∞} (hp1 : 1 ≤ p) 
     (s : Finset ℕ) {u : ℕ → α → ℂ} (hu : ∀ j, MemLp (u j) p μ) (hus : ∀ j ∉ s, u j = 0) :
     ∫⁻ x, (lqNorm 2 fun j => ‖u j x‖ₑ) ^ p.toReal ∂μ ≠ ∞ := by
   rw [← eLpNorm_rpow_eq_lintegral (zero_lt_one.trans_le hp1).ne' hp
-    (aemeasurable_lqNorm_comp (fun j => (hu j).aestronglyMeasurable.enorm) 2)]
+    (aemeasurable_lqNorm_comp (fun j => (hu j).aestronglyMeasurable.eNorm) 2)]
   exact ENNReal.rpow_ne_top_of_nonneg ENNReal.toReal_nonneg
     (eLpNorm_lqNorm_ne_top_of_finite hp1 s hu hus)
 
@@ -125,7 +125,7 @@ theorem aestronglyMeasurable_normingFamily {u : ℕ → α → ℂ}
     AEStronglyMeasurable (normingFamily p u j) μ :=
   (hu j).mul (Complex.measurable_ofReal.comp_aemeasurable
     ((ENNReal.measurable_toReal.comp_aemeasurable
-      (aemeasurable_lqNorm_comp (fun i => (hu i).enorm) 2)).pow_const _)).aestronglyMeasurable
+      (aemeasurable_lqNorm_comp (fun i => (hu i).eNorm) 2)).pow_const _)).aestronglyMeasurable
 
 omit [MeasurableSpace α] in
 /-- **The size of the norming family**: for `p > 1` and every point `x` with
@@ -136,7 +136,7 @@ theorem lqNorm_normingFamily {p : ℝ} (hp : 1 < p) (u : ℕ → α → ℂ) {x 
     lqNorm 2 (fun j => ‖normingFamily p u j x‖ₑ) = lqNorm 2 (fun i => ‖u i x‖ₑ) ^ (p - 1) := by
   have h1 : ∀ j, ‖normingFamily p u j x‖ₑ =
       ENNReal.ofReal ((lqNorm 2 fun i => ‖u i x‖ₑ).toReal ^ (p - 2)) * ‖u j x‖ₑ := fun j => by
-    rw [normingFamily, enorm_mul, mul_comm]
+    rw [normingFamily, eNorm_mul, mul_comm]
     congr 1
     rw [← ofReal_norm, Complex.norm_real,
       Real.norm_of_nonneg (Real.rpow_nonneg ENNReal.toReal_nonneg _)]
@@ -163,7 +163,7 @@ theorem sum_mul_conj_normingFamily {p : ℝ} (hp : 0 < p) (s : Finset ℕ) (u : 
     rw [tsum_eq_sum (s := s) fun j hj => by simp [hus j hj]] at h
     have h' := congrArg ENNReal.toReal h
     rw [ENNReal.toReal_pow, ENNReal.toReal_sum fun j _ => by finiteness] at h'
-    simpa only [ENNReal.toReal_pow, toReal_enorm] using h'
+    simpa only [ENNReal.toReal_pow, toReal_eNorm] using h'
   have hr : 0 ≤ (lqNorm 2 fun i => ‖u i x‖ₑ).toReal := ENNReal.toReal_nonneg
   simp only [normingFamily]
   generalize (lqNorm 2 fun i => ‖u i x‖ₑ).toReal = r at hr hsq ⊢
@@ -188,10 +188,10 @@ theorem eLpNorm_lqNorm_normingFamily {p q : ℝ≥0∞} [p.HolderConjugate q] (h
   have hq : q ≠ ∞ := ((ENNReal.HolderConjugate.lt_top_iff_one_lt q p).2 hp1).ne
   have hpq := ENNReal.HolderConjugate.toReal_of_ne_top hp hq
   have hGm : AEMeasurable (fun x => lqNorm 2 fun j => ‖normingFamily p.toReal u j x‖ₑ) μ :=
-    aemeasurable_lqNorm_comp (fun j => (aestronglyMeasurable_normingFamily hu _ j).enorm) 2
-  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal (ENNReal.HolderConjugate.ne_zero q p) hq
+    aemeasurable_lqNorm_comp (fun j => (aestronglyMeasurable_normingFamily hu _ j).eNorm) 2
+  rw [eLpNorm_eq_lintegral_rpow_eNorm_toReal (ENNReal.HolderConjugate.ne_zero q p) hq
     hGm.aestronglyMeasurable]
-  simp only [enorm_eq_self, lqNorm_normingFamily (ENNReal.one_lt_toReal hp1 hp) u (hfin _)]
+  simp only [eNorm_eq_self, lqNorm_normingFamily (ENNReal.one_lt_toReal hp1 hp) u (hfin _)]
   congr 1
   refine lintegral_congr fun x => ?_
   rw [← ENNReal.rpow_mul, hpq.sub_one_mul_conj]
@@ -203,9 +203,9 @@ theorem memLp_normingFamily {p q : ℝ≥0∞} [p.HolderConjugate q] (hp1 : 1 < 
     (s : Finset ℕ) {u : ℕ → α → ℂ} (hu : ∀ j, MemLp (u j) p μ) (hus : ∀ j ∉ s, u j = 0)
     (j : ℕ) : MemLp (normingFamily p.toReal u j) q μ := by
   have hgm := aestronglyMeasurable_normingFamily (fun i => (hu i).aestronglyMeasurable) p.toReal
-  refine memLp_iff.2 (lt_of_le_of_lt (eLpNorm_mono_enorm (hgm j)
+  refine memLp_iff.2 (lt_of_le_of_lt (eLpNorm_mono_eNorm (hgm j)
     (g := fun x => lqNorm 2 fun i => ‖normingFamily p.toReal u i x‖ₑ) fun x => ?_) ?_)
-  · rw [enorm_eq_self]
+  · rw [eNorm_eq_self]
     exact ENNReal.le_lqNorm two_ne_zero (fun i => ‖normingFamily p.toReal u i x‖ₑ) j
   · rw [eLpNorm_lqNorm_normingFamily hp1 hp (fun i => (hu i).aestronglyMeasurable)
       (lqNorm_enorm_ne_top_of_finite s hus)]
@@ -222,7 +222,7 @@ theorem enorm_sum_integral_mul_conj_normingFamily {p q : ℝ≥0∞} [p.HolderCo
     ‖∑ j ∈ s, ∫ x, u j x * conj (normingFamily p.toReal u j x) ∂μ‖ₑ =
       ∫⁻ x, (lqNorm 2 fun j => ‖u j x‖ₑ) ^ p.toReal ∂μ := by
   have hUm : AEMeasurable (fun x => lqNorm 2 fun j => ‖u j x‖ₑ) μ :=
-    aemeasurable_lqNorm_comp (fun j => (hu j).aestronglyMeasurable.enorm) 2
+    aemeasurable_lqNorm_comp (fun j => (hu j).aestronglyMeasurable.eNorm) 2
   rw [← integral_finsetSum (f := fun j x => u j x * conj (normingFamily p.toReal u j x)) s
     fun j _ => (hu j).integrable_mul (memLp_normingFamily (q := q) hp1 hp s hu hus j).star]
   have hpt : ∀ x, ∑ j ∈ s, u j x * conj (normingFamily p.toReal u j x) =
@@ -254,7 +254,7 @@ theorem eLpNorm_lqNorm_le_of_forall_enorm_sum_integral_le {p q : ℝ≥0∞} [p.
   have hpq := ENNReal.HolderConjugate.toReal_of_ne_top hp hq
   have hP : 1 < p.toReal := ENNReal.one_lt_toReal hp1 hp
   have hUm : AEMeasurable (fun x => lqNorm 2 fun j => ‖u j x‖ₑ) μ :=
-    aemeasurable_lqNorm_comp (fun j => (hu j).aestronglyMeasurable.enorm) 2
+    aemeasurable_lqNorm_comp (fun j => (hu j).aestronglyMeasurable.eNorm) 2
   have hle := hA _ (memLp_normingFamily hp1 hp s hu hus)
   rw [enorm_sum_integral_mul_conj_normingFamily (q := q) hp1 hp s hu hus,
     eLpNorm_lqNorm_normingFamily hp1 hp (fun j => (hu j).aestronglyMeasurable)
@@ -263,9 +263,9 @@ theorem eLpNorm_lqNorm_le_of_forall_enorm_sum_integral_le {p q : ℝ≥0∞} [p.
     (lintegral_lqNorm_rpow_ne_top_of_finite hp1.le hp s hu hus)
     (by rwa [ENNReal.one_rpow, mul_one])
   rw [mul_one] at hXle
-  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal (ENNReal.HolderConjugate.ne_zero p q) hp
+  rw [eLpNorm_eq_lintegral_rpow_eNorm_toReal (ENNReal.HolderConjugate.ne_zero p q) hp
     hUm.aestronglyMeasurable]
-  simp only [enorm_eq_self]
+  simp only [eNorm_eq_self]
   calc (∫⁻ x, (lqNorm 2 fun j => ‖u j x‖ₑ) ^ p.toReal ∂μ) ^ (1 / p.toReal)
       ≤ (A ^ p.toReal) ^ (1 / p.toReal) := ENNReal.rpow_le_rpow hXle (by positivity)
     _ = A := by rw [one_div, ENNReal.rpow_rpow_inv (by linarith)]
@@ -289,13 +289,13 @@ theorem eLpNorm_le_of_forall_enorm_integral_mul_conj_le {p q : ℝ≥0∞} [p.Ho
       simp only [Finset.sum_singleton, ↓reduceIte]
       refine (hA (g 0) (hg 0)).trans ?_
       gcongr
-      exact eLpNorm_mono_enorm (hg 0).aestronglyMeasurable fun x => by
-        rw [enorm_eq_self]
+      exact eLpNorm_mono_eNorm (hg 0).aestronglyMeasurable fun x => by
+        rw [eNorm_eq_self]
         exact ENNReal.le_lqNorm two_ne_zero (fun j => ‖g j x‖ₑ) 0
   have hpt : (fun x => lqNorm 2 fun j => ‖(if j = 0 then v x else 0)‖ₑ) = fun x => ‖v x‖ₑ := by
     funext x
-    simp_rw [apply_ite (fun z : ℂ => ‖z‖ₑ), enorm_zero]
+    simp_rw [apply_ite (fun z : ℂ => ‖z‖ₑ), eNorm_zero]
     exact ENNReal.lqNorm_ite_eq two_ne_zero 0 _
-  rwa [hpt, eLpNorm_enorm _ hv.aestronglyMeasurable] at h
+  rwa [hpt, eLpNorm_eNorm _ hv.aestronglyMeasurable] at h
 
 end MeasureTheory

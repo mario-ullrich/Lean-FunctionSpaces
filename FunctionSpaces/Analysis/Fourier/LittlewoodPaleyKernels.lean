@@ -199,11 +199,11 @@ theorem integral_fourier_smul_eq_of_integrable (u : 𝓢(V, ℂ)) {g : V → ℂ
   simpa [SchwartzMap.fourier_coe] using integral_fourier_mul u.integrable hg
 
 /-- The Fourier transform of a function is bounded by its `L_1` norm, in `ℝ≥0∞`:
-`|𝓕K(ξ)| ≤ ∫ |K|` for every `K` and `ξ` (Mathlib's `enorm_integral_le_lintegral_enorm`, with
+`|𝓕K(ξ)| ≤ ∫ |K|` for every `K` and `ξ` (Mathlib's `eNorm_integral_le_lintegral_eNorm`, with
 `|e^(-2πi⟪x, ξ⟫)| = 1`). -/
 theorem enorm_fourier_le_lintegral (K : V → ℂ) (ξ : V) : ‖𝓕 K ξ‖ₑ ≤ ∫⁻ x, ‖K x‖ₑ := by
   rw [Real.fourier_eq]
-  simpa using enorm_integral_le_lintegral_enorm (fun v => 𝐞 (-inner ℝ v ξ) • K v)
+  simpa using eNorm_integral_le_lintegral_eNorm (fun v => 𝐞 (-inner ℝ v ξ) • K v)
 
 /-- The Fourier transform of an integrable function lies in `L_∞`: it is continuous
 (`Rd.continuous_fourier_of_integrable`) and bounded by `‖K‖_1`. -/
@@ -485,17 +485,17 @@ theorem eLpNorm_lpKernel_lt_top : eLpNorm (lpKernel (V := V)) 1 volume < ⊤ :=
   eLpNorm_lpKernel_ne_top.lt_top
 
 /-- **The kernel `Φ` has `L_1` norm at least `1`**: `‖Φ‖_1 ≥ |∫ Φ| = 1`
-(`Rd.integral_lpKernel` and Mathlib's `enorm_integral_le_lintegral_enorm`). -/
+(`Rd.integral_lpKernel` and Mathlib's `eNorm_integral_le_lintegral_eNorm`). -/
 theorem one_le_eLpNorm_lpKernel : 1 ≤ eLpNorm (lpKernel (V := V)) 1 volume :=
-  calc (1 : ℝ≥0∞) = ‖∫ x, lpKernel (V := V) x‖ₑ := by rw [integral_lpKernel, enorm_one]
-    _ ≤ ∫⁻ x, ‖lpKernel (V := V) x‖ₑ := enorm_integral_le_lintegral_enorm _
+  calc (1 : ℝ≥0∞) = ‖∫ x, lpKernel (V := V) x‖ₑ := by rw [integral_lpKernel, eNorm_one]
+    _ ≤ ∫⁻ x, ‖lpKernel (V := V) x‖ₑ := eNorm_integral_le_lintegral_eNorm _
     _ = eLpNorm (lpKernel (V := V)) 1 volume :=
-        (eLpNorm_one_eq_lintegral_enorm integrable_lpKernel.aestronglyMeasurable).symm
+        (eLpNorm_one_eq_lintegral_eNorm integrable_lpKernel.aestronglyMeasurable).symm
 
 /-- `∫ |Θ_k| = ‖Θ‖_1` for every dilation, as a lower Lebesgue integral. -/
 theorem lintegral_enorm_dilatedBandKernel (k : ℕ) :
     ∫⁻ y, ‖dilatedBandKernel (V := V) k y‖ₑ = eLpNorm (bandKernel (V := V)) 1 volume := by
-  rw [← eLpNorm_one_eq_lintegral_enorm (integrable_dilatedBandKernel k).aestronglyMeasurable,
+  rw [← eLpNorm_one_eq_lintegral_eNorm (integrable_dilatedBandKernel k).aestronglyMeasurable,
     eLpNorm_dilatedBandKernel_one]
 
 /-- `‖ψ_j‖_1 ≤ 2 ‖Φ‖_1`. -/

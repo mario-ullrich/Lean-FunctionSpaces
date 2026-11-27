@@ -76,7 +76,7 @@ measurable on `V × V`, since every `θ_j` is continuous. -/
 theorem IsCZFamily.measurable_lqNorm_sub (h : IsCZFamily θ B H) (c : V) :
     Measurable fun p : V × V => lqNorm 2 (fun j => ‖θ j (p.1 - p.2) - θ j (p.1 - c)‖ₑ) :=
   measurable_lqNorm_comp (fun j => (((h.continuous j).comp (continuous_fst.sub continuous_snd)).sub
-    ((h.continuous j).comp (continuous_fst.sub continuous_const))).measurable.enorm) 2
+    ((h.continuous j).comp (continuous_fst.sub continuous_const))).measurable.eNorm) 2
 
 /-- **The bad part off the doubled ball** (scalar mass): for a Calderón–Zygmund family with
 Hörmander constant `H`, a measurable set `Q ⊆ B̄(c, ρ)` and an almost everywhere measurable mass
@@ -129,8 +129,8 @@ theorem enorm_conv_le_setLIntegral_sub {K : V → ℂ} (hK : Continuous K)
     rw [integral_sub hKb (hb.const_mul _), integral_const_mul, hb0, mul_zero, sub_zero,
       conv_apply_eq_integral_sub]
   rw [hconv]
-  refine (enorm_integral_le_lintegral_enorm _).trans (le_of_eq ?_)
-  simp_rw [enorm_mul]
+  refine (eNorm_integral_le_lintegral_eNorm _).trans (le_of_eq ?_)
+  simp_rw [eNorm_mul]
   refine (setLIntegral_eq_of_support_subset fun y hy => ?_).symm
   by_contra hyQ
   exact hy (by simp [hbQ y hyQ])
@@ -147,7 +147,7 @@ theorem IsCZFamily.lqNorm_conv_le_setLIntegral (h : IsCZFamily θ B H) {Q : Set 
   have hm : ∀ j, AEMeasurable (fun y => ‖θ j (x - y) - θ j (x - c)‖ₑ * ‖b y‖ₑ)
       (volume.restrict Q) := fun j =>
     (((h.continuous j).comp (continuous_const.sub continuous_id)).sub
-      continuous_const).measurable.enorm.aemeasurable.mul hb.1.enorm.restrict
+      continuous_const).measurable.eNorm.aemeasurable.mul hb.1.eNorm.restrict
   calc lqNorm 2 (fun j => ‖conv (θ j) b volume x‖ₑ)
       ≤ lqNorm 2 (fun j => ∫⁻ y in Q, ‖θ j (x - y) - θ j (x - c)‖ₑ * ‖b y‖ₑ) :=
         ENNReal.lqNorm_mono fun j =>
@@ -173,9 +173,9 @@ theorem IsCZFamily.enorm_sum_conv_le_setLIntegral (h : IsCZFamily θ B H) (s : F
   have hm : ∀ j ∈ s, AEMeasurable (fun y => ‖θ j (x - y) - θ j (x - c)‖ₑ * ‖b j y‖ₑ)
       (volume.restrict Q) := fun j _ =>
     (((h.continuous j).comp (continuous_const.sub continuous_id)).sub
-      continuous_const).measurable.enorm.aemeasurable.mul (hb j).1.enorm.restrict
+      continuous_const).measurable.eNorm.aemeasurable.mul (hb j).1.eNorm.restrict
   calc ‖∑ j ∈ s, conv (θ j) (b j) volume x‖ₑ ≤ ∑ j ∈ s, ‖conv (θ j) (b j) volume x‖ₑ :=
-        enorm_sum_le _ _
+        eNorm_sum_le _ _
     _ ≤ ∑ j ∈ s, ∫⁻ y in Q, ‖θ j (x - y) - θ j (x - c)‖ₑ * ‖b j y‖ₑ :=
         Finset.sum_le_sum fun j _ => enorm_conv_le_setLIntegral_sub (h.continuous j)
           (h.bddAbove j) (hb j) (hbQ j) (hb0 j) c x
@@ -204,19 +204,19 @@ theorem hasSum_conv_czBadPart {K : V → ℂ} (hK : Continuous K)
       ENNReal.ofReal C * ∫⁻ y, ‖czBadPart f km.1 y‖ₑ := fun km => by
     rw [← lintegral_const_mul' _ _ ENNReal.ofReal_ne_top]
     refine lintegral_mono fun y => ?_
-    rw [enorm_mul, ← ofReal_norm (K (x - y))]
+    rw [eNorm_mul, ← ofReal_norm (K (x - y))]
     gcongr
     exact hC ⟨x - y, rfl⟩
   have hsum : ∑' km : czMaximal G t, ∫⁻ y, ‖K (x - y) * czBadPart f km.1 y‖ₑ ≠ ∞ := by
     refine ne_top_of_le_ne_top (ENNReal.mul_ne_top (ENNReal.ofReal_ne_top (r := C))
       (ENNReal.mul_ne_top (by norm_num : (2 : ℝ≥0∞) ≠ ∞) hf.2.ne))
-      ((ENNReal.tsum_le_tsum hle).trans ?_)
+      ((tsum_le_tsum hle).trans ?_)
     rw [ENNReal.tsum_mul_left]
     gcongr
     exact tsum_lintegral_enorm_czBadPart_le f
   have hnorm : (fun km : czMaximal G t => ∫ y, ‖K (x - y) * czBadPart f km.1 y‖) =
       fun km => (∫⁻ y, ‖K (x - y) * czBadPart f km.1 y‖ₑ).toReal :=
-    funext fun km => integral_norm_eq_lintegral_enorm (hint km).1
+    funext fun km => integral_norm_eq_lintegral_eNorm (hint km).1
   have h1 := hasSum_integral_of_summable_integral_norm hint
     (hnorm ▸ ENNReal.summable_toReal hsum)
   have h2 : (fun km : czMaximal G t => conv K (czBadPart f km.1) volume x) =
@@ -248,7 +248,7 @@ theorem IsCZFamily.setLIntegral_compl_czEnlarged_tsum_le (h : IsCZFamily θ B H)
       (hm km).restrict.comp_snd
     exact ((h.measurable_lqNorm_sub _).aemeasurable.mul h2).lintegral_prod_right'
   rw [lintegral_tsum hmeas, ← ENNReal.tsum_mul_left]
-  refine ENNReal.tsum_le_tsum fun km => ?_
+  refine tsum_le_tsum fun km => ?_
   have hsub : (czEnlarged G t)ᶜ ⊆
       (closedBall (zcellCenter km.1.1 km.1.2) (2 * (finrank ℝ V / 2 ^ km.1.1)))ᶜ :=
     compl_subset_compl.2 (subset_biUnion_of_mem (u := fun km : ℤ × (Fin (finrank ℝ V) → ℤ) =>
@@ -273,10 +273,10 @@ theorem IsCZFamily.setLIntegral_lqNorm_conv_czBadC_le (h : IsCZFamily θ B H) {f
     calc lqNorm 2 (fun j => ‖conv (θ j) (czBadC G t f) volume x‖ₑ)
         ≤ lqNorm 2 (fun j => ∑' km : czMaximal G t, ‖conv (θ j) (czBadPart f km.1) volume x‖ₑ) :=
           ENNReal.lqNorm_mono fun j => (hasSum_conv_czBadPart (h.continuous j) (h.bddAbove j)
-            hf x).enorm_le_of_bounded ENNReal.summable.hasSum fun _ => le_rfl
+            hf x).eNorm_le_of_bounded CompleteLattice.summable.hasSum fun _ => le_rfl
       _ ≤ ∑' km : czMaximal G t, lqNorm 2 (fun j => ‖conv (θ j) (czBadPart f km.1) volume x‖ₑ) :=
           eLpNorm_tsum_le one_le_two
-      _ ≤ _ := ENNReal.tsum_le_tsum fun km => h.lqNorm_conv_le_setLIntegral
+      _ ≤ _ := tsum_le_tsum fun km => h.lqNorm_conv_le_setLIntegral
           (integrable_czBadPart hf.integrableOn) (fun y hy => czBadPart_of_notMem f hy)
           (integral_czBadPart f km.1) _ x
   calc ∫⁻ x in (czEnlarged G t)ᶜ, lqNorm 2 (fun j => ‖conv (θ j) (czBadC G t f) volume x‖ₑ)
@@ -285,10 +285,10 @@ theorem IsCZFamily.setLIntegral_lqNorm_conv_czBadC_le (h : IsCZFamily θ B H) {f
             ‖czBadPart f km.1 y‖ₑ := lintegral_mono fun x => hpt x
     _ ≤ H * ∑' km : czMaximal G t, ∫⁻ y in zcell km.1.1 km.1.2, ‖czBadPart f km.1 y‖ₑ :=
         h.setLIntegral_compl_czEnlarged_tsum_le fun km =>
-          (integrable_czBadPart hf.integrableOn).1.enorm
+          (integrable_czBadPart hf.integrableOn).1.eNorm
     _ ≤ H * (2 * ∫⁻ x, ‖f x‖ₑ) := by
         gcongr
-        exact (ENNReal.tsum_le_tsum fun km => setLIntegral_le_lintegral _ _).trans
+        exact (tsum_le_tsum fun km => setLIntegral_le_lintegral _ _).trans
           (tsum_lintegral_enorm_czBadPart_le f)
     _ = 2 * H * ∫⁻ x, ‖f x‖ₑ := by ring
 
@@ -309,8 +309,8 @@ theorem IsCZFamily.setLIntegral_enorm_sum_conv_czBadC_le (h : IsCZFamily θ B H)
     calc ‖∑ j ∈ s, conv (θ j) (czBadC G t (g j)) volume x‖ₑ
         ≤ ∑' km : czMaximal G t, ‖∑ j ∈ s, conv (θ j) (czBadPart (g j) km.1) volume x‖ₑ :=
           (hasSum_sum fun j _ => hasSum_conv_czBadPart (h.continuous j) (h.bddAbove j) (hg j)
-            x).enorm_le_of_bounded ENNReal.summable.hasSum fun _ => le_rfl
-      _ ≤ _ := ENNReal.tsum_le_tsum fun km => h.enorm_sum_conv_le_setLIntegral s
+            x).eNorm_le_of_bounded CompleteLattice.summable.hasSum fun _ => le_rfl
+      _ ≤ _ := tsum_le_tsum fun km => h.enorm_sum_conv_le_setLIntegral s
           (fun j => integrable_czBadPart (hg j).integrableOn)
           (fun j y hy => czBadPart_of_notMem (g j) hy) (fun j => integral_czBadPart (g j) km.1) _ x
   calc ∫⁻ x in (czEnlarged G t)ᶜ, ‖∑ j ∈ s, conv (θ j) (czBadC G t (g j)) volume x‖ₑ
@@ -320,10 +320,10 @@ theorem IsCZFamily.setLIntegral_enorm_sum_conv_czBadC_le (h : IsCZFamily θ B H)
     _ ≤ H * ∑' km : czMaximal G t, ∫⁻ y in zcell km.1.1 km.1.2,
           lqNorm 2 (fun j => ‖czBadPart (g j) km.1 y‖ₑ) :=
         h.setLIntegral_compl_czEnlarged_tsum_le fun km => aemeasurable_lqNorm_comp
-          (fun j => (integrable_czBadPart (hg j).integrableOn).1.enorm) 2
+          (fun j => (integrable_czBadPart (hg j).integrableOn).1.eNorm) 2
     _ ≤ H * (2 * ∫⁻ x, lqNorm 2 (fun j => ‖g j x‖ₑ)) := by
         gcongr
-        exact (ENNReal.tsum_le_tsum fun km => setLIntegral_le_lintegral _ _).trans
+        exact (tsum_le_tsum fun km => setLIntegral_le_lintegral _ _).trans
           (tsum_lintegral_lqNorm_czBadPart_le one_le_two fun j => (hg j).1)
     _ = 2 * H * ∫⁻ x, lqNorm 2 (fun j => ‖g j x‖ₑ) := by ring
 
@@ -392,7 +392,7 @@ theorem IsCZFamily.ae_lqNorm_conv_le_add (h : IsCZFamily θ B H) {f : V → ℂ}
   simp only [czGoodC_add_czBadC, Pi.add_apply] at hx
   refine (ENNReal.lqNorm_mono fun j => ?_).trans (ENNReal.lqNorm_add_le one_le_two _ _)
   rw [hx j]
-  exact enorm_add_le _ _
+  exact eNorm_add_le _ _
 
 /-- **Splitting the synthesis operator**: for a Calderón–Zygmund family, integrable `g_j`, a
 finite set `s` and the cubes of any `G` at any height `t`, almost every `x` satisfies
@@ -409,7 +409,7 @@ theorem IsCZFamily.ae_enorm_sum_conv_le_add (h : IsCZFamily θ B H) (s : Finset 
   filter_upwards [hae] with x hx
   simp only [czGoodC_add_czBadC, Pi.add_apply] at hx
   rw [Finset.sum_congr rfl fun j _ => hx j, Finset.sum_add_distrib]
-  exact enorm_add_le _ _
+  exact eNorm_add_le _ _
 
 /-! ### The weak type `(1,1)` -/
 
@@ -441,11 +441,11 @@ theorem IsCZFamily.volume_lqNorm_conv_gt_le [Nontrivial V] (h : IsCZFamily θ B 
   have ha : AEMeasurable (fun x => lqNorm 2 (fun j =>
       ‖conv (θ j) (czGoodC (fun y => ‖f y‖ₑ) t f) volume x‖ₑ)) volume :=
     aemeasurable_lqNorm_comp (fun j => (aestronglyMeasurable_conv (h.integrable j).1
-      (aestronglyMeasurable_czGoodC hf.1)).enorm) 2
+      (aestronglyMeasurable_czGoodC hf.1)).eNorm) 2
   have hb : AEMeasurable (fun x => lqNorm 2 (fun j =>
       ‖conv (θ j) (czBadC (fun y => ‖f y‖ₑ) t f) volume x‖ₑ)) volume :=
     aemeasurable_lqNorm_comp (fun j => (aestronglyMeasurable_conv (h.integrable j).1
-      (integrable_czBadC hf).1).enorm) 2
+      (integrable_czBadC hf).1).eNorm) 2
   refine (measure_lt_le_of_ae_le_add ha hb (h.ae_lqNorm_conv_le_add hf) measurableSet_czEnlarged
     ht0 ht (h.lintegral_lqNorm_conv_czGoodC_sq_le hf ht0 ht) volume_czEnlarged_le
     (h.setLIntegral_lqNorm_conv_czBadC_le hf)).trans_eq ?_
@@ -468,11 +468,11 @@ theorem IsCZFamily.volume_enorm_sum_conv_gt_le [Nontrivial V] (h : IsCZFamily θ
   have ha : AEMeasurable (fun x => ‖∑ j ∈ s, conv (θ j)
       (czGoodC (fun y => lqNorm 2 (fun j => ‖g j y‖ₑ)) t (g j)) volume x‖ₑ) volume :=
     (Finset.aestronglyMeasurable_fun_sum s fun j _ => aestronglyMeasurable_conv
-      (h.integrable j).1 (aestronglyMeasurable_czGoodC (hg j))).enorm
+      (h.integrable j).1 (aestronglyMeasurable_czGoodC (hg j))).eNorm
   have hb : AEMeasurable (fun x => ‖∑ j ∈ s, conv (θ j)
       (czBadC (fun y => lqNorm 2 (fun j => ‖g j y‖ₑ)) t (g j)) volume x‖ₑ) volume :=
     (Finset.aestronglyMeasurable_fun_sum s fun j _ => aestronglyMeasurable_conv
-      (h.integrable j).1 (integrable_czBadC (hgi j)).1).enorm
+      (h.integrable j).1 (integrable_czBadC (hgi j)).1).eNorm
   refine (measure_lt_le_of_ae_le_add ha hb (h.ae_enorm_sum_conv_le_add s hgi)
     measurableSet_czEnlarged ht0 ht (h.lintegral_enorm_sum_conv_czGoodC_sq_le s hg hG ht0 ht)
     volume_czEnlarged_le (h.setLIntegral_enorm_sum_conv_czBadC_le s hgi)).trans_eq ?_

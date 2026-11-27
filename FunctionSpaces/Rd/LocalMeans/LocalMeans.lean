@@ -251,7 +251,7 @@ theorem eLpNorm_higherDiff_scaledMoment_le (L j : ℕ) (v : V) :
   have hint : Integrable ((fwdDiff ((2 : ℝ) ^ j • v))^[L] (momentKernel b.toFun L)) :=
     integrable_higherDiff (integrable_momentKernel b.integrable L) L _
   rw [scaledMoment, higherDiff_dilate, eLpNorm_dilate_one hint (by positivity),
-    eLpNorm_one_eq_lintegral_enorm hint.aestronglyMeasurable]
+    eLpNorm_one_eq_lintegral_eNorm hint.aestronglyMeasurable]
   refine (lintegral_enorm_higherDiff_schwartz_le _ L (b.momentSchwartz L)).trans_eq ?_
   rw [← ofReal_norm, norm_smul, Real.norm_of_nonneg (by positivity)]
   rfl
@@ -444,7 +444,7 @@ theorem enorm_localMean_succ_le (hp : p ≠ ∞) (L j : ℕ) (f : Lp ℂ p (volu
       ≤ ‖f - convLp hp (b.integrable_scaledMoment L j) f‖ₑ +
           ‖f - convLp hp (b.integrable_scaledMoment L (j + 1)) f‖ₑ := by
         rw [hk]
-        exact enorm_sub_le
+        exact eNorm_sub_le
     _ ≤ A * smoothnessModulus volume L p (f : V → ℂ) (b.radius / 2 ^ j) +
           A * smoothnessModulus volume L p (f : V → ℂ) (b.radius / 2 ^ j) :=
         add_le_add (hω j) ((hω (j + 1)).trans (by gcongr))
@@ -552,7 +552,7 @@ theorem modNorm_le_of_tendsto (hp : p ≠ ∞) (L : ℕ) (s : ℝ) {q : ℝ≥0�
         (fun x => lpModulus_le L x i) hrep
     refine h1.trans ?_
     rw [← ENNReal.tsum_mul_left]
-    refine ENNReal.tsum_le_tsum fun j => ?_
+    refine tsum_le_tsum fun j => ?_
     rw [← mul_assoc]
     exact b.lpModulus_dual_le hp L i j _
   have hlq : lqNorm q (fun i => dyadicWeight s i * lpModulus p L F i) ≤

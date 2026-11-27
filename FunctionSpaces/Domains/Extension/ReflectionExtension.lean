@@ -354,7 +354,7 @@ theorem memLp_flatDeriv {p : ℝ≥0∞} (hp : 1 ≤ p)
     (hg : ∀ i, MemLp (g i) p (volume.restrict Ω.domain)) (w : V) :
     MemLp (Ω.flatDeriv g w) p (volume.restrict (openHalfSpace Ω.e)) :=
   memLp_iff.2 ((Ω.eLpNorm_flatDeriv_le hp w).trans_lt (ENNReal.mul_lt_top
-    (ENNReal.mul_lt_top ENNReal.ofReal_lt_top enorm_lt_top)
+    (ENNReal.mul_lt_top ENNReal.ofReal_lt_top eNorm_lt_top)
     (ENNReal.sum_lt_top.2 fun i _ => hg i)))
 
 /-- **Functions in flat coordinates on bounded parts**: if `f` is integrable on every bounded part
@@ -377,7 +377,7 @@ theorem integrableOn_flatDeriv_inter_ball
     Ω.measurePreserving_unflatten (Ω.measurableSet_domain.inter measurableSet_ball)
     (Ω.mapsTo_unflatten_inter_ball R) w g
   exact memLp_one_iff_integrable.1 (memLp_iff.2 (h.trans_lt (ENNReal.mul_lt_top
-    (ENNReal.mul_lt_top ENNReal.coe_lt_top enorm_lt_top)
+    (ENNReal.mul_lt_top ENNReal.coe_lt_top eNorm_lt_top)
     (ENNReal.sum_lt_top.2 fun i _ => (memLp_one_iff_integrable.2 (hg i _)).eLpNorm_lt_top))))
 
 /-- **The extension by reflection is weakly differentiable** (Evans–Gariepy, Section 4.4): if
@@ -487,7 +487,7 @@ theorem eLpNorm_reflectionDeriv_le {p : ℝ≥0∞} (hp : 1 ≤ p) {f : V → �
           (openHalfSpace Ω.e).isOpen.measurableSet S S).trans ?_
         gcongr <;> exact Ω.eLpNorm_sum_norm_comp_unflatten_le hp hg
     _ = _ := by
-        rw [Real.enorm_eq_ofReal hc, ENNReal.ofReal_mul (by positivity), ofReal_norm]
+        rw [Real.eNorm_eq_ofReal hc, ENNReal.ofReal_mul (by positivity), ofReal_norm]
         ring
 
 end Derivatives

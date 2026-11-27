@@ -222,7 +222,7 @@ theorem exists_inverse_perSplineScheme {r : ℕ} (hp : p ≠ ∞) :
   · rw [Nat.sub_eq_zero_of_le hkj.le, ENNReal.dyadicWeight_zero_right, mul_one]
     exact (lpPerModulus_le hp r a k).trans (by gcongr; exact two_pow_le_two_pow_mul_one_add r _)
   · have hnorm : ‖a‖ₑ = eLpNorm (ppFun j Q) p unitVol := by
-      rw [Lp.enorm_def]
+      rw [Lp.eNorm_def]
       exact eLpNorm_congr_ae hae
     rw [lpPerModulus, perModulus_congr_ae hae, hnorm]
     refine iSup₂_le fun h hh => ?_

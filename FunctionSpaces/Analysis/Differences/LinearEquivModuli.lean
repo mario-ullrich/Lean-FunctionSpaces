@@ -62,7 +62,7 @@ theorem MeasureTheory.Lp.enorm_compMeasurePreserving {α β E : Type*} [Measurab
     [MeasurableSpace β] [NormedAddCommGroup E] {p : ℝ≥0∞} {μ : Measure α} {μb : Measure β}
     {f : α → β} (g : Lp E p μb) (hf : MeasurePreserving f μ μb) :
     ‖Lp.compMeasurePreserving f hf g‖ₑ = ‖g‖ₑ := by
-  rw [Lp.enorm_def, Lp.enorm_def, eLpNorm_congr_ae (Lp.coeFn_compMeasurePreserving g hf),
+  rw [eNorm_def, eNorm_def, eLpNorm_congr_ae (Lp.coeFn_compMeasurePreserving g hf),
     eLpNorm_comp_measurePreserving (Lp.aestronglyMeasurable g) hf]
 
 /-- **The identification of `PiLp p β` with the product has norm at most `1`**: for
@@ -344,7 +344,7 @@ theorem compAffineLp_ae (a : V) {L : ℝ} (hL : 0 < L) (G : Lp ℂ p μ) :
 `[0, ∞]`, `n = dim V` (`Rd.eLpNorm_comp_affine`). -/
 theorem enorm_compAffineLp (a : V) {L : ℝ} (hL : 0 < L) (G : Lp ℂ p μ) :
     ‖compAffineLp a hL G‖ₑ = ENNReal.ofReal (L ^ finrank ℝ V)⁻¹ ^ (1 / p).toReal * ‖G‖ₑ := by
-  rw [Lp.enorm_def, Lp.enorm_def, eLpNorm_congr_ae (compAffineLp_ae a hL G),
+  rw [Lp.eNorm_def, Lp.eNorm_def, eLpNorm_congr_ae (compAffineLp_ae a hL G),
     eLpNorm_comp_affine a hL (Lp.aestronglyMeasurable G)]
 
 /-- **The inverse affine map undoes the composition**: the inverse of `A x = a + L x` is
@@ -401,7 +401,7 @@ theorem enorm_indicatorLp_compAffineLp (a : V) {L : ℝ} (hL : 0 < L) {U : Set V
         Set.indicator_of_mem h, hx]
     · rw [Set.indicator_of_notMem (show x ∉ (fun x => a + L • x) ⁻¹' U from h),
         Set.indicator_of_notMem h]
-  rw [Lp.enorm_def, Lp.enorm_def, eLpNorm_congr_ae (indicatorLp_apply_ae hAU _),
+  rw [Lp.eNorm_def, Lp.eNorm_def, eLpNorm_congr_ae (indicatorLp_apply_ae hAU _),
     eLpNorm_congr_ae (indicatorLp_apply_ae hU G), eLpNorm_congr_ae h,
     eLpNorm_comp_affine a hL ((Lp.aestronglyMeasurable G).indicator hU)]
 
@@ -427,7 +427,7 @@ theorem exists_modNormOn_compAffineLp_le (a : V) {L : ℝ} (hL : 0 < L) {U : Set
     ENNReal.mul_ne_top hc (ENNReal.one_add_dyadicWeight_mul_ne_top s m r), fun G => ?_⟩
   set N := modNormOn hU r s q G
   have hIe : eLpNorm (U.indicator G) p μ = ‖indicatorLp hU G‖ₑ := by
-    rw [Lp.enorm_def, eLpNorm_congr_ae (indicatorLp_apply_ae hU G)]
+    rw [Lp.eNorm_def, eLpNorm_congr_ae (indicatorLp_apply_ae hU G)]
   have hI : ‖indicatorLp hU G‖ₑ ≤ N := le_self_add
   have hΛ : lqNorm q (fun k => dyadicWeight s k * lpModulusOn p U r G k) ≤ N := le_add_self
   have hlev : ∀ k, L * (1 / 2 ^ (k + m)) ≤ 1 / 2 ^ k := fun k => by

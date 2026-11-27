@@ -57,7 +57,7 @@ noncomputable def dyadicIndex (j : ℕ) (x : ℝ) : ℤ := ⌊(2 : ℝ) ^ j * x�
 
 /-- The dyadic interval `I_{j,n} = [n 2^(-j), (n + 1) 2^(-j))`, the fibre of `dyadicIndex j`
 over `n` (`Haar.haarDyadicInterval_eq_Ico`). -/
-def haarDyadicInterval (j : ℕ) (n : ℤ) : Set ℝ := dyadicIndex j ⁻¹' {n}
+noncomputable def haarDyadicInterval (j : ℕ) (n : ℤ) : Set ℝ := dyadicIndex j ⁻¹' {n}
 
 /-- `x ∈ I_{j,n}` iff `⌊2^j x⌋ = n`. -/
 theorem mem_haarDyadicInterval {j : ℕ} {n : ℤ} {x : ℝ} :
@@ -210,7 +210,7 @@ theorem condExpLp_zero_ae_eq (f : Lp ℂ p vol) :
 theorem enorm_condExpLp_zero (f : Lp ℂ p vol) :
     ‖Lp.condExpLp (dyadicFiltration 0) f‖ₑ = ‖∫ x, f x ∂vol‖ₑ := by
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one (Fact.out : 1 ≤ p)).ne'
-  rw [Lp.enorm_def, eLpNorm_congr_ae (condExpLp_zero_ae_eq f),
+  rw [Lp.eNorm_def, eLpNorm_congr_ae (condExpLp_zero_ae_eq f),
     eLpNorm_const _ hp0 (IsProbabilityMeasure.ne_zero vol), measure_univ, ENNReal.one_rpow,
     mul_one]
 
@@ -379,13 +379,13 @@ theorem eLpNorm_sum_haar (hp0 : p ≠ 0) (hp : p ≠ ∞) (j : ℕ) (c : Fin (2 
       sum_fin_eq_of_ne hx (fun m => (haarDyadicInterval j m).indicator
         (fun _ => ‖C m‖ₑ ^ r * ENNReal.dyadicWeight (1 / 2 * r) j) x)
         fun m hm => indicator_of_notMem (fun h => hm (mem_haarDyadicInterval.1 h).symm) _,
-      indicator_of_mem (mem_haarDyadicInterval.2 rfl), enorm_mul,
+      indicator_of_mem (mem_haarDyadicInterval.2 rfl), eNorm_mul,
       ENNReal.mul_rpow_of_nonneg _ _ hr.le, enorm_haarFunction rfl, ENNReal.dyadicWeight_rpow]
   have hmeas : AEStronglyMeasurable
       (fun x => ∑ m : Fin (2 ^ j), c m * (haarFunction j ((m : ℕ) : ℤ) x : ℂ)) vol :=
     (Finset.measurable_sum _ fun m _ => measurable_const.mul
       (Complex.measurable_ofReal.comp (measurable_haarFunction _ _))).aestronglyMeasurable
-  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hmeas, lintegral_congr_ae hpt,
+  rw [eLpNorm_eq_lintegral_rpow_eNorm_toReal hp0 hp hmeas, lintegral_congr_ae hpt,
     lintegral_finsetSum _ fun m _ =>
       measurable_const.indicator (measurableSet_haarDyadicInterval _ _)]
   simp_rw [lintegral_indicator_const (measurableSet_haarDyadicInterval _ _)]
@@ -489,7 +489,7 @@ theorem memApprox_iff_haarCoeff (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s) {q : ℝ
       Lp.condExpLp (dyadicFiltration k) f‖ₑ = ENNReal.dyadicWeight (1 / 2 - 1 / p.toReal) k *
         ENNReal.lqNorm p (fun m : Fin (2 ^ k) => ‖haarCoeff f k ((m : ℕ) : ℤ)‖ₑ) :=
     fun k => by
-      rw [Lp.enorm_def, eLpNorm_congr_ae (condExpLp_succ_sub_ae_eq k f)]
+      rw [Lp.eNorm_def, eLpNorm_congr_ae (condExpLp_succ_sub_ae_eq k f)]
       exact eLpNorm_sum_haar (lt_of_lt_of_le zero_lt_one (Fact.out : 1 ≤ p)).ne' hp k _
   rw [dyadicFiltration.memApprox_iff_martingale (closure_iUnion_haarScheme hp) hs hq,
     enorm_condExpLp_zero]

@@ -66,7 +66,7 @@ theorem enorm_indicatorLp_sub_convLp_scaledMoment_le (hp : p ≠ ∞) {W T : Set
     (f : Lp ℂ p (volume : Measure V)) :
     ‖indicatorLp hW (f - convLp hp (b.integrable_scaledMoment L j) f)‖ₑ ≤
       (∫⁻ z, ‖b.toFun z‖ₑ) * modulusOn volume T L p (f : V → ℂ) (b.radius / 2 ^ j) := by
-  rw [Lp.enorm_def, eLpNorm_congr_ae (indicatorLp_apply_ae hW _)]
+  rw [Lp.eNorm_def, eLpNorm_congr_ae (indicatorLp_apply_ae hW _)]
   exact eLpNorm_indicator_sub_convLp_momentKernel_le hp b.integrable b.integral_eq_one b.eq_zero L
     (c := 2 ^ j) (by positivity) hW (hstep _ (one_le_pow₀ one_le_two)) f
 
@@ -99,7 +99,7 @@ theorem enorm_indicatorLp_localMean_succ_le (hp : p ≠ ∞) {W T : Set V} (hW :
       ≤ ‖indicatorLp hW (f - convLp hp (b.integrable_scaledMoment L j) f)‖ₑ +
           ‖indicatorLp hW (f - convLp hp (b.integrable_scaledMoment L (j + 1)) f)‖ₑ := by
         rw [hk, map_sub]
-        exact enorm_sub_le
+        exact eNorm_sub_le
     _ ≤ A * lpModulusOn p T L f (j + 1) + A * lpModulusOn p T L f (j + 1) :=
         add_le_add
           ((b.enorm_indicatorLp_sub_convLp_scaledMoment_le hp hW L j hstep f).trans

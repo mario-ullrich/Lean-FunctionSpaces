@@ -145,7 +145,7 @@ real `c`, since `‖c a‖_p = |c| ‖a‖_p` and multiples of approximants are 
 theorem besovNorm_smul_le {s : ℝ} {q : ℝ≥0∞} (c : ℝ) (f : Lp ℂ p μ) :
     S.besovNorm p s q (c • f) ≤ ‖c‖ₑ * S.besovNorm p s q f :=
   InterpCouple.eNormPietsch_map_le (DistribSMul.toAddMonoidHom (Lp ℂ p μ) c)
-    (lpCouple_norm1_zero S p) enorm_ne_top (fun a => (lpCouple_norm0_smul c a).le)
+    (lpCouple_norm1_zero S p) eNorm_ne_top (fun a => (lpCouple_norm0_smul c a).le)
     (fun a => lpCouple_norm1_smul_le c a) s q f
 
 /-- **Homogeneity of the Besov quasi-norm**: `‖c f‖_{B^s_{p,q}} = |c| ‖f‖_{B^s_{p,q}}` for every
@@ -154,19 +154,19 @@ gives the reverse inequality; for `c = 0` both sides are `0` (`FunctionScheme.be
 theorem besovNorm_smul {s : ℝ} {q : ℝ≥0∞} (c : ℝ) (f : Lp ℂ p μ) :
     S.besovNorm p s q (c • f) = ‖c‖ₑ * S.besovNorm p s q f := by
   rcases eq_or_ne c 0 with rfl | hc
-  · rw [zero_smul, besovNorm_zero, enorm_zero, zero_mul]
+  · rw [zero_smul, besovNorm_zero, eNorm_zero, zero_mul]
   refine le_antisymm (besovNorm_smul_le c f) ?_
   have h := besovNorm_smul_le (S := S) (s := s) (q := q) c⁻¹ (c • f)
   rw [smul_smul, inv_mul_cancel₀ hc, one_smul] at h
   calc ‖c‖ₑ * S.besovNorm p s q f ≤ ‖c‖ₑ * (‖c⁻¹‖ₑ * S.besovNorm p s q (c • f)) := by gcongr
     _ = S.besovNorm p s q (c • f) := by
-      rw [← mul_assoc, ← enorm_mul, mul_inv_cancel₀ hc, enorm_one, one_mul]
+      rw [← mul_assoc, ← eNorm_mul, mul_inv_cancel₀ hc, eNorm_one, one_mul]
 
 /-- **The Besov space is closed under real multiples**: `f ∈ B^s_{p,q}` implies
 `c f ∈ B^s_{p,q}` for every real `c`. -/
 theorem MemBesov.smul {s : ℝ} {q : ℝ≥0∞} {f : Lp ℂ p μ} (hf : S.MemBesov p s q f) (c : ℝ) :
     S.MemBesov p s q (c • f) :=
-  (besovNorm_smul_le c f).trans_lt (ENNReal.mul_lt_top enorm_lt_top hf)
+  (besovNorm_smul_le c f).trans_lt (ENNReal.mul_lt_top eNorm_lt_top hf)
 
 variable (S p) in
 /-- The **Besov space** `B^s_{p,q}(Ω, S)` as a real subspace of `L_p(μ)`, for every exponent `p`,

@@ -271,7 +271,7 @@ theorem lpIsoModulus_le_of_exponents {p : ℝ≥0∞} [Fact (1 ≤ p)] (V : Subm
     (hgV : ∀ i x, slice g x i ∈ V) (hae : a =ᵐ[cubeVol d] g) :
     lpIsoModulus p r a k ≤
       ((d : ℝ≥0∞) ^ r * C ^ d + 2 ^ r) * ENNReal.dyadicWeight (-Θ) (k - j) * ‖a‖ₑ := by
-  rw [lpIsoModulus, isoModulus_congr_ae hae, Lp.enorm_def, eLpNorm_congr_ae hae]
+  rw [lpIsoModulus, isoModulus_congr_ae hae, Lp.eNorm_def, eLpNorm_congr_ae hae]
   rcases lt_or_ge k j with hkj | hjk
   · rw [Nat.sub_eq_zero_of_le hkj.le, ENNReal.dyadicWeight_zero_right, mul_one]
     exact (isoModulus_le hg Fact.out r _).trans (by gcongr; exact le_add_self)

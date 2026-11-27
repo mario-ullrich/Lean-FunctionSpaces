@@ -451,7 +451,7 @@ theorem exists_approxError_perSplineScheme_le {r : ℕ} (hr : 1 ≤ r) (hp : p �
     mem_perSplineScheme_two_pow.2 ⟨perQiPieces hr k G, perQiPieces_mem hr k G,
       splineJoins_perQiPieces hr k G, perJoin_perQiPieces hr hGp hrk, MemLp.coeFn_toLp _⟩
   refine (ApproximationScheme.approxError_le_of_mem ha g).trans ?_
-  rw [Lp.enorm_def, eLpNorm_congr_ae ((Lp.coeFn_sub _ _).trans (hgG.sub (MemLp.coeFn_toLp _))),
+  rw [Lp.eNorm_def, eLpNorm_congr_ae ((Lp.coeFn_sub _ _).trans (hgG.sub (MemLp.coeFn_toLp _))),
     lpPerModulus, perModulus_congr_ae hgG]
   exact hCb G hGc hGp k
 

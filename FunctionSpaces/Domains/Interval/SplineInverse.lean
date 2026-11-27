@@ -222,12 +222,12 @@ theorem enorm_jumpCoeff_le {r j N : ℕ} {P : ℕ → ℂ[X]} (hP : ∀ m, P m �
   calc ‖jumpCoeff r N P m‖ₑ * ENNReal.ofReal (1 / 2 ^ j) ^ (r - 1)
       = ‖polyFun (P m) ((m : ℝ) / 2 ^ j + 1 / 2 ^ j) -
           polyFun (P (m - 1)) ((m : ℝ) / 2 ^ j + 1 / 2 ^ j)‖ₑ := by
-        rw [hval, enorm_mul, ← ofReal_norm (((1 / 2 ^ j : ℝ) ^ (r - 1) : ℝ) : ℂ),
+        rw [hval, eNorm_mul, ← ofReal_norm (((1 / 2 ^ j : ℝ) ^ (r - 1) : ℝ) : ℂ),
           Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg (by positivity),
           ENNReal.ofReal_pow hL.le]
     _ ≤ ‖polyFun (P m) ((m : ℝ) / 2 ^ j + 1 / 2 ^ j)‖ₑ +
           ‖polyFun (P (m - 1)) ((m : ℝ) / 2 ^ j + 1 / 2 ^ j)‖ₑ :=
-        enorm_sub_le
+        eNorm_sub_le
     _ ≤ _ := by rw [mul_add]; exact add_le_add h1 h2
 
 /-- **A jump term of a spline, for every order**: for `h ≥ 0` and a knot `l 2^(-j)` with
@@ -265,7 +265,7 @@ theorem enorm_jumpCoeff_mul_higherDiff_truncPow_le_any_order {r j N : ℕ} (m : 
     rw [lt_div_iff₀ hpos]
     have : (n₀ : ℝ) + 1 ≤ l := by exact_mod_cast hl1
     linarith
-  rw [enorm_mul]
+  rw [eNorm_mul]
   refine (mul_le_mul' le_rfl (enorm_higherDiff_truncPow_le_of_lt r m hh0 hxl)).trans ?_
   rcases lt_or_ge l N with hlN | hlN
   · have hc := enorm_jumpCoeff_le hP hJ hu hK hp (by omega) hlN
@@ -285,7 +285,7 @@ theorem enorm_jumpCoeff_mul_higherDiff_truncPow_le_any_order {r j N : ℕ} (m : 
       _ = _ := by ring
   · have h0 : jumpCoeff r N P l = 0 := by
       simp only [jumpCoeff, show ¬ (0 < l ∧ l < N) by omega, ↓reduceIte]
-    rw [h0, enorm_zero, zero_mul]
+    rw [h0, eNorm_zero, zero_mul]
     exact zero_le
 
 /-- The constant of the pointwise bound,
@@ -313,7 +313,7 @@ theorem enorm_higherDiff_spline_le {r j N : ℕ} {P : ℕ → ℂ[X]} (hP : ∀ 
       hm).trans_eq
         (by rw [ENNReal.ofReal_mul (Nat.cast_nonneg r), ENNReal.ofReal_natCast, mul_pow]; ring)
   rw [higherDiff_eq_sum_jumps hP hJ hu hh0 hh hx hxr]
-  refine (enorm_sum_le _ _).trans ((Finset.sum_le_sum hterm).trans ?_)
+  refine (eNorm_sum_le _ _).trans ((Finset.sum_le_sum hterm).trans ?_)
   rw [Finset.sum_const, Nat.card_Ioc, Nat.add_sub_cancel_left, nsmul_eq_mul, splineStripConst]
   exact le_of_eq (by ring)
 
@@ -431,7 +431,7 @@ theorem exists_inverse_splineScheme {r : ℕ} (hp : p ≠ ∞) :
   · rw [Nat.sub_eq_zero_of_le hkj.le, ENNReal.dyadicWeight_zero_right, mul_one]
     exact (intervalLpModulus_le r a k).trans (by gcongr; exact two_pow_le_two_pow_mul_one_add r _)
   · have hnorm : ‖a‖ₑ = eLpNorm (ppFun j Q) p unitVol := by
-      rw [Lp.enorm_def]
+      rw [Lp.eNorm_def]
       exact eLpNorm_congr_ae hae
     rw [intervalLpModulus, intervalModulus_congr_ae hae, hnorm, intervalModulus_eq_iSup_nonneg]
     refine iSup₂_le fun h hh => ?_

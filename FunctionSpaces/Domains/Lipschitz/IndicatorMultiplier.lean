@@ -76,13 +76,13 @@ theorem eLpNorm_le_of_enorm_le_indicator_add {α E : Type*} [MeasurableSpace α]
     (hB : ∀ x, ‖f x‖ₑ ≤ S₁.indicator (fun _ => B₁) x + S₂.indicator (fun _ => B₂) x) :
     eLpNorm f p μ ≤ B₁ * μ S₁ ^ (1 / p.toReal) + B₂ * μ S₂ ^ (1 / p.toReal) := by
   calc eLpNorm f p μ ≤ eLpNorm (S₁.indicator (fun _ => B₁) + S₂.indicator (fun _ => B₂)) p μ :=
-        eLpNorm_mono_enorm hf fun x => (hB x).trans_eq (enorm_eq_self _).symm
+        eLpNorm_mono_eNorm hf fun x => (hB x).trans_eq (eNorm_eq_self _).symm
     _ ≤ eLpNorm (S₁.indicator fun _ => B₁) p μ + eLpNorm (S₂.indicator fun _ => B₂) p μ :=
         eLpNorm_add_le hp1
     _ ≤ _ := by
         refine add_le_add ((eLpNorm_indicator_const_le B₁ p h₁.nullMeasurableSet).trans_eq ?_)
           ((eLpNorm_indicator_const_le B₂ p h₂.nullMeasurableSet).trans_eq ?_) <;>
-        rw [enorm_eq_self]
+        rw [eNorm_eq_self]
 
 /-- **Differences of a cut-off function**: for a set `X` with an addition, `U ⊆ X` and
 `a : X → E` with values in a normed group,
@@ -97,13 +97,13 @@ theorem enorm_indicator_add_sub_le {X E : Type*} [Add X] [NormedAddCommGroup E] 
   · rw [indicator_of_mem hx, indicator_of_mem hxh]
     exact le_self_add
   · have hs : x ∈ switchSet U h := fun hiff => hxh (hiff.1 hx)
-    rw [indicator_of_mem hx, indicator_of_notMem hxh, indicator_of_mem hs, zero_sub, enorm_neg]
+    rw [indicator_of_mem hx, indicator_of_notMem hxh, indicator_of_mem hs, zero_sub, eNorm_neg]
     exact le_add_self
   · have hs : x ∈ switchSet U h := fun hiff => hx (hiff.2 hxh)
     rw [indicator_of_notMem hx, indicator_of_mem hxh, indicator_of_mem hs, sub_zero]
     calc ‖a (x + h)‖ₑ = ‖(a (x + h) - a x) + a x‖ₑ := by rw [sub_add_cancel]
-      _ ≤ _ := enorm_add_le _ _
-  · rw [indicator_of_notMem hx, indicator_of_notMem hxh, sub_self, enorm_zero]
+      _ ≤ _ := eNorm_add_le _ _
+  · rw [indicator_of_notMem hx, indicator_of_notMem hxh, sub_self, eNorm_zero]
     exact zero_le
 
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V]
@@ -130,7 +130,7 @@ theorem IsSmoothAtom.enorm_sub_le_indicator {d A : ℝ} {j : ℕ} {c : V}
   · rw [indicator_of_notMem hx]
     simp only [mem_union, mem_closedBall, dist_eq_norm, not_or, not_le] at hx
     rw [show x - (c - h) = x + h - c by abel] at hx
-    rw [ha.eq_zero x hx.1, ha.eq_zero (x + h) hx.2, sub_zero, enorm_zero]
+    rw [ha.eq_zero x hx.1, ha.eq_zero (x + h) hx.2, sub_zero, eNorm_zero]
 
 /-- **The switch term of a smooth atom**: `1_{S_h(U)}(x) |a(x)| ≤ A 1_{S_h(U) ∩ B̄(c, d 2^(-j))}(x)`
 for a smooth atom `a` on `V` with level `j`, centre `c`, radius factor `d` and constant `A`, since
@@ -144,7 +144,7 @@ theorem IsSmoothAtom.indicator_switchSet_le {K : ℕ} {d A : ℝ} {j : ℕ} {c :
     · rw [indicator_of_mem hs, indicator_of_mem (mem_inter hs hb), ← ofReal_norm]
       exact ENNReal.ofReal_le_ofReal (ha.norm_le (mem_univ x))
     · rw [mem_closedBall, dist_eq_norm, not_le] at hb
-      rw [indicator_of_mem hs, ha.eq_zero x hb, enorm_zero]
+      rw [indicator_of_mem hs, ha.eq_zero x hb, eNorm_zero]
       exact zero_le
   · rw [indicator_of_notMem hs]
     exact zero_le
@@ -168,7 +168,7 @@ theorem IsSmoothAtom.eLpNorm_indicator_le_dyadicWeight {p : ℝ≥0∞} (hp1 : 1
     (S := closedBall c (d / 2 ^ j)) (B := ENNReal.ofReal A) (fun x hx => ?_) (fun x => ?_)).trans ?_
   · rw [mem_closedBall, dist_eq_norm, not_le] at hx
     exact indicator_apply_eq_zero.2 fun _ => ha.eq_zero x hx
-  · refine (enorm_indicator_le_enorm_self a x).trans ?_
+  · refine (eNorm_indicator_le_eNorm_self a x).trans ?_
     rw [← ofReal_norm]
     exact ENNReal.ofReal_le_ofReal (ha.norm_le (mem_univ x))
   · rw [volume_closedBall_div_two_pow hd0 j c, ENNReal.rpow_mul_dyadicWeight_neg,

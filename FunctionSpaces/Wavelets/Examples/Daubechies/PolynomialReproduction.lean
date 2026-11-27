@@ -135,7 +135,7 @@ theorem exists_coeff_poly_of_mem_degreeLT (hN : 2 ≤ N) {n : ℕ} (hn : n ≤ N
       ∀ x : ℝ, Q.eval (x : ℂ) = ∑' k : ℤ, a.eval (k : ℂ) * scalingFun m (x - k) := by
   induction n generalizing Q with
   | zero =>
-    have hQ0 : Q = 0 := Polynomial.ext fun i => by
+    have hQ0 : Q = 0 := AddMonoidAlgebra.ext <| Finsupp.ext fun i => by
       simpa using (Polynomial.degree_lt_iff_coeff_zero Q 0).1 (Polynomial.mem_degreeLT.1 hQ) i
         (Nat.zero_le i)
     exact ⟨0, Submodule.zero_mem _, fun x => by simp [hQ0]⟩

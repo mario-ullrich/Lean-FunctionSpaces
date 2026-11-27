@@ -118,11 +118,11 @@ theorem lqNorm_le_mul_eLpNorm_of_overlap {α κ E : Type*} [MeasurableSpace α]
             eLpNorm_rpow_eq hf.restrict hp0 hp]
   have hsum : ∑' i, w i ^ p.toReal ≤ B ^ p.toReal * ((M : ℝ≥0∞) * eLpNorm f p μ ^ p.toReal) := by
     calc ∑' i, w i ^ p.toReal
-        ≤ ∑' i, B ^ p.toReal * ∫⁻ x in W i, ‖f x‖ₑ ^ p.toReal ∂μ := ENNReal.tsum_le_tsum hk
+        ≤ ∑' i, B ^ p.toReal * ∫⁻ x in W i, ‖f x‖ₑ ^ p.toReal ∂μ := tsum_le_tsum hk
       _ = B ^ p.toReal * ∑' i, ∫⁻ x in W i, ‖f x‖ₑ ^ p.toReal ∂μ := ENNReal.tsum_mul_left
       _ ≤ B ^ p.toReal * ((M : ℝ≥0∞) * ∫⁻ x, ‖f x‖ₑ ^ p.toReal ∂μ) := by
           gcongr
-          exact tsum_setLIntegral_le_mul_lintegral hW hM (hf.enorm.pow_const _)
+          exact tsum_setLIntegral_le_mul_lintegral hW hM (hf.eNorm.pow_const _)
       _ = B ^ p.toReal * ((M : ℝ≥0∞) * eLpNorm f p μ ^ p.toReal) := by
           rw [eLpNorm_rpow_eq hf hp0 hp]
   rw [← ENNReal.rpow_le_rpow_iff hr, ENNReal.lqNorm_rpow hp0 hp]
@@ -612,9 +612,9 @@ theorem enorm_coeffFun_le (hg : AEStronglyMeasurable g volume)
   have hm : AEStronglyMeasurable (fun y => f y * conj (scaledFun g j k y)) volume :=
     hf.mul (Complex.continuous_conj.comp_aestronglyMeasurable
       (aestronglyMeasurable_scaledFun hg j k))
-  refine (enorm_integral_le_lintegral_enorm _).trans
+  refine (eNorm_integral_le_lintegral_eNorm _).trans
     (le_of_eq_of_le ?_ (eLpNorm_mul_conj_scaledFun_le hg hsupp hp1 hf j k))
-  rw [eLpNorm_one_eq_lintegral_enorm hm]
+  rw [eLpNorm_one_eq_lintegral_eNorm hm]
 
 /-- **Summing local bounds over the support windows**: let `0 < p < ∞`, let `f` be a.e. strongly
 measurable, and let `d : ℤ → [0, ∞]` satisfy `d_k ≤ ‖1_{W_k} f‖_p B` for every `k`, where

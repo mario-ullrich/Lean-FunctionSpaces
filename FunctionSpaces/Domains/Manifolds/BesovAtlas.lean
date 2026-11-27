@@ -246,7 +246,7 @@ noncomputable def piece (i : Fin A.n) (g : M → ℂ) : E → ℂ :=
 
 /-- **The carrier of the `i`-th piece**: the set `κ_i(tsupport ψ_i) ⊆ range I`, outside which
 the piece `(ψ_i g) ∘ κ_i⁻¹` vanishes; it is compact on a compact manifold. -/
-def pieceCarrier (i : Fin A.n) : Set E :=
+noncomputable def pieceCarrier (i : Fin A.n) : Set E :=
   A.extChart i '' tsupport (A.psi i)
 
 omit [FiniteDimensional ℝ E] in

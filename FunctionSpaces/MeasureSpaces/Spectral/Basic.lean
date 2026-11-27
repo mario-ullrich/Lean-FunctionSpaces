@@ -247,9 +247,9 @@ truncation as approximant (`SpectralScheme.norm_sub_levelTruncate_le`). -/
 theorem jacksonBound (s : ℝ) (hs : 0 ≤ s) :
     ApproximationScheme.JacksonBound ((S.sobolevEmbed s hs).restrictScalars ℝ) S.toScheme s 1 := by
   intro n hn c
-  refine (ENNReal.toReal_mono enorm_ne_top (ApproximationScheme.approxError_le_of_mem
+  refine (ENNReal.toReal_mono eNorm_ne_top (ApproximationScheme.approxError_le_of_mem
     (S.levelTruncate_mem_levelSpan n (S.sobolevEmbed s hs c)) _)).trans ?_
-  rw [toReal_enorm, one_mul]
+  rw [toReal_eNorm, one_mul]
   exact S.norm_sub_levelTruncate_le s hs hn c
 
 /-- **Bernstein's inequality** for the Sobolev space: every `a ∈ A n` is `J_s c` with

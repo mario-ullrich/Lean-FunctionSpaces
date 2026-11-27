@@ -266,7 +266,7 @@ theorem enorm_localExtension_le_of_tlLocalNormOn (hp : p ≠ ∞) {W : Set V} (h
     ‖b.localExtension hp hW L f‖ₑ ≤ 2 * eLpNorm (momentKernel b.toFun L) 1 volume *
       (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * b.tlLocalNormOn hp hW L s q f := by
   have h1 : ‖b.localExtension hp hW L f‖ₑ ≤ ∑' j, ‖b.localExtTerm hp hW L j f‖ₑ :=
-    ENNReal.le_tsum_of_tendsto_sum (C := 1) ENNReal.one_ne_top (fun x y => enorm_add_le x y)
+    ENNReal.le_tsum_of_tendsto_sum (C := 1) ENNReal.one_ne_top (fun x y => eNorm_add_le x y)
       (fun x => by rw [one_mul])
       (b.tendsto_sum_localExtTerm_of_summable hp hW L
         (b.summable_localExtTerm_of_tlLocalNormOn hp hW L hs hq hf))
@@ -348,16 +348,16 @@ theorem tlLocalNormOn_le_of_pointwise (hp : p ≠ ∞) (L : ℕ) (s : ℝ) {W : 
   have hΛ : ∀ i, AEMeasurable (fun x => lqNorm 2 (fun j =>
       ‖conv (dilate (2 ^ j) (K i : V → ℂ)) (h i) volume x‖ₑ)) volume := fun i =>
     aemeasurable_lqNorm_comp (fun j => (aestronglyMeasurable_conv
-      (continuous_dilate (K i).continuous _).aestronglyMeasurable (hh i)).enorm) 2
+      (continuous_dilate (K i).continuous _).aestronglyMeasurable (hh i)).eNorm) 2
   have h1 : b.tlLocalNormOn hp hW L s 2 F ≤
       eLpNorm (fun x => ‖(indicatorLp hW (b.localMean hp L 0 F) : V → ℂ) x‖ₑ) p volume +
         eLpNorm (fun x => c * ∑ i, lqNorm 2 (fun j =>
           ‖conv (dilate (2 ^ j) (K i : V → ℂ)) (h i) volume x‖ₑ)) p volume := by
-    refine (eLpNorm_mono_enorm_ae
-      (aemeasurable_lqNorm_comp (fun j => ((Lp.aestronglyMeasurable _).enorm.const_mul _))
+    refine (eLpNorm_mono_eNorm_ae
+      (aemeasurable_lqNorm_comp (fun j => ((Lp.aestronglyMeasurable _).eNorm.const_mul _))
         2).aestronglyMeasurable ?_).trans (eLpNorm_add_le Fact.out)
     filter_upwards [b.ae_lqNorm_le_of_pointwise hp L s hW K h c hpt hF] with x hx
-    simpa only [enorm_eq_self, Pi.add_apply] using hx
+    simpa only [eNorm_eq_self, Pi.add_apply] using hx
   have h2 : eLpNorm (fun x => c * ∑ i, lqNorm 2 (fun j =>
       ‖conv (dilate (2 ^ j) (K i : V → ℂ)) (h i) volume x‖ₑ)) p volume ≤
       c * ∑ i, eLpNorm (fun x => lqNorm 2 (fun j =>
@@ -368,7 +368,7 @@ theorem tlLocalNormOn_le_of_pointwise (hp : p ≠ ∞) (L : ℕ) (s : ℝ) {W : 
     simpa only [Finset.sum_fn] using eLpNorm_sum_le (p := p) (μ := volume) Fact.out
   have h3 : eLpNorm (fun x => ‖(indicatorLp hW (b.localMean hp L 0 F) : V → ℂ) x‖ₑ) p volume ≤
       eLpNorm (momentKernel b.toFun L) 1 volume * ‖F‖ₑ := by
-    rw [eLpNorm_enorm _ (Lp.aestronglyMeasurable _), ← Lp.enorm_def]
+    rw [eLpNorm_eNorm _ (Lp.aestronglyMeasurable _), ← Lp.eNorm_def]
     exact b.enorm_indicatorLp_localMean_zero_le hp hW L F
   exact h1.trans (add_le_add h3 h2)
 
@@ -390,9 +390,9 @@ theorem dyadicWeight_mul_enorm_conv_meansKernel_le {T : Opens V} {f : V → ℂ}
       ENNReal.ofReal_inv_of_pos (by positivity), ENNReal.ofReal_pow zero_le_two,
       ENNReal.ofReal_ofNat, mul_assoc, ENNReal.mul_inv_cancel (pow_ne_zero _ two_ne_zero)
         (ENNReal.pow_ne_top ENNReal.ofNat_ne_top), mul_one]
-  rw [b.conv_meansKernel_two_succ_eq hf hfg j hx, enorm_mul, ← mul_assoc, hw]
+  rw [b.conv_meansKernel_two_succ_eq hf hfg j hx, eNorm_mul, ← mul_assoc, hw]
   gcongr
-  exact enorm_sum_le _ _
+  exact eNorm_sum_le _ _
 
 /-- **The local means of order two by the gradient, pointwise**: if `x - y ∈ T` for `x ∈ W`, every
 level `j` and every `y` in the support of `(K_i)_{2^j}`, and `F = 1_T f` in `L_p`, then almost
@@ -445,7 +445,7 @@ theorem tlLocalNormOn_le_of_hasWeakLineDeriv [Nontrivial V] (hp1 : 1 < p) (hp : 
         eLpNorm (g i) p (volume.restrict T) := by
   have hT := T.isOpen.measurableSet
   have hFn : ‖F‖ₑ = eLpNorm f p (volume.restrict T) := by
-    rw [Lp.enorm_def, eLpNorm_congr_ae hF,
+    rw [Lp.eNorm_def, eLpNorm_congr_ae hF,
       eLpNorm_indicator_eq_eLpNorm_restrict hT.nullMeasurableSet]
   refine (b.tlLocalNormOn_le_of_pointwise hp 2 1 hW b.divKernel
     (fun i => (T : Set V).indicator (g i))
@@ -531,7 +531,7 @@ theorem extendsSobolev_of_eLpNorm_le [Fact (1 ≤ p)] {O : Opens V} {U : Set V} 
     ?_⟩
   · filter_upwards [hFm.coeFn_toLp, hFf] with x h1 h2 hx
     rw [h1, h2 hx]
-  · simpa only [Lp.enorm_toLp] using hb
+  · simpa only [Lp.eNorm_toLp] using hb
 
 namespace LocalMeansBump
 
@@ -716,8 +716,8 @@ theorem extendsSobolev_of_cover [Fact (1 ≤ p)] {ι : Type*} [Fintype ι] {O : 
     · exact (Lp.coeFn_finsetSum _ _).symm
     · exact (Lp.coeFn_finsetSum _ _).symm
   · refine pasting_bound (x := fun k => ‖F k‖ₑ) (y := fun k i => ‖G k i‖ₑ)
-      ((enorm_sum_le _ _).trans (Finset.sum_le_sum fun k _ => enorm_mulLp_le _ _ _))
-      (fun i => (enorm_sum_le _ _).trans (Finset.sum_le_sum fun k _ => (enorm_add_le _ _).trans
+      ((eNorm_sum_le _ _).trans (Finset.sum_le_sum fun k _ => enorm_mulLp_le _ _ _))
+      (fun i => (eNorm_sum_le _ _).trans (Finset.sum_le_sum fun k _ => (eNorm_add_le _ _).trans
         (add_le_add (enorm_mulLp_le _ _ _) (enorm_mulLp_le _ _ _)))) hb
 
 /-! ### The supports of the divergence kernels -/

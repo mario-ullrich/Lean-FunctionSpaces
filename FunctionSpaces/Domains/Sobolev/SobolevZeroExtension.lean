@@ -94,8 +94,8 @@ theorem exists_hasZeroExtensionBound_of_lt_half (hs0 : 0 ≤ s) (hs : s < 1 / 2)
           gcongr
           exact modNorm_sobolevToL2_le hpos hs1 (U + W)
       _ = K * ‖U + W‖ₑ := by ring
-  have h' := ENNReal.toReal_mono (ENNReal.mul_ne_top hK enorm_ne_top) h
-  rwa [toReal_enorm, ENNReal.toReal_mul, toReal_enorm] at h'
+  have h' := ENNReal.toReal_mono (ENNReal.mul_ne_top hK eNorm_ne_top) h
+  rwa [toReal_eNorm, ENNReal.toReal_mul, toReal_eNorm] at h'
 
 /-! ### Zero extensions and `H̃^s(Ω) = H^s_0(Ω) = H^s(Ω)` -/
 
@@ -116,7 +116,7 @@ theorem exists_sobolevToL2_eq_indicatorLp (hs0 : 0 ≤ s) (hs : s < 1 / 2) (U : 
     linarith
   have hfin := (hmult one_le_two (sobolevToL2 hpos.le U)).trans_lt (ENNReal.mul_lt_top hCΩ.lt_top
     ((modNorm_sobolevToL2_le hpos hs1 U).trans_lt
-      (ENNReal.mul_lt_top (sobolevBesovConst_ne_top hpos hs1).lt_top enorm_lt_top)))
+      (ENNReal.mul_lt_top (sobolevBesovConst_ne_top hpos hs1).lt_top eNorm_lt_top)))
   exact exists_sobolevToL2_eq_of_modNorm_lt_top hpos hs1 hfin
 
 /-- **Zero extensions lie in `H̃^s(Ω)`**: for `s ≥ 0` and `U, U' ∈ H^s(V)` with

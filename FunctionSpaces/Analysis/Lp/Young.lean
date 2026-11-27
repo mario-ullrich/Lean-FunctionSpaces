@@ -141,7 +141,7 @@ theorem lintegral_rpow_lintegral_mul_le {q : ℝ} (hq1 : 1 ≤ q) {a b : G → �
 theorem aemeasurable_kernel_rpow {K f : G → ℂ} (hK : AEStronglyMeasurable K μ)
     (hf : AEStronglyMeasurable f μ) (q : ℝ) :
     AEMeasurable (Function.uncurry fun x y => ‖K y‖ₑ * ‖f (x - y)‖ₑ ^ q) (μ.prod μ) :=
-  hK.enorm.comp_snd.mul ((hf.enorm.pow_const q).comp_quasiMeasurePreserving
+  hK.eNorm.comp_snd.mul ((hf.eNorm.pow_const q).comp_quasiMeasurePreserving
     (quasiMeasurePreserving_sub_of_right_invariant μ μ))
 
 /-- The function `x ↦ ∫ |K(y)| |f(x - y)| dy` is measurable. -/
@@ -161,8 +161,8 @@ theorem lintegral_rpow_lintegral_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠
   have hq1 : 1 ≤ p.toReal := by
     have h := ENNReal.toReal_mono hp hp1
     rwa [ENNReal.toReal_one] at h
-  refine (lintegral_rpow_lintegral_mul_le hq1 hK.enorm hf.enorm).trans_eq ?_
-  rw [ENNReal.mul_rpow_of_nonneg _ _ (by linarith), eLpNorm_one_eq_lintegral_enorm hK,
+  refine (lintegral_rpow_lintegral_mul_le hq1 hK.eNorm hf.eNorm).trans_eq ?_
+  rw [ENNReal.mul_rpow_of_nonneg _ _ (by linarith), eLpNorm_one_eq_lintegral_eNorm hK,
     eLpNorm_rpow_eq hf hp0 hp]
 
 omit [MeasurableAdd₂ G] [MeasurableNeg G] [SFinite μ] [μ.IsAddRightInvariant] in
@@ -170,8 +170,8 @@ omit [MeasurableAdd₂ G] [MeasurableNeg G] [SFinite μ] [μ.IsAddRightInvariant
 theorem enorm_convolution_le_lintegral (K f : G → ℂ) (x : G) :
     ‖(K ⋆[ContinuousLinearMap.mul ℂ ℂ, μ] f) x‖ₑ ≤ ∫⁻ y, ‖K y‖ₑ * ‖f (x - y)‖ₑ ∂μ := by
   rw [convolution_def]
-  refine (enorm_integral_le_lintegral_enorm _).trans (le_of_eq ?_)
-  exact lintegral_congr fun y => enorm_mul _ _
+  refine (eNorm_integral_le_lintegral_eNorm _).trans (le_of_eq ?_)
+  exact lintegral_congr fun y => eNorm_mul _ _
 
 /-- **Young's inequality** for an integrable kernel on a measurable group:
 `‖K ⋆ f‖_p ≤ ‖K‖_1 ‖f‖_p`, `1 ≤ p < ∞`. -/
@@ -215,7 +215,7 @@ theorem ae_convolutionExistsAt {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞)
     exact lt_irrefl _ hx
   refine ⟨hK.aestronglyMeasurable.convolution_integrand_snd (ContinuousLinearMap.mul ℂ ℂ)
     hf.aestronglyMeasurable x, ?_⟩
-  simpa [HasFiniteIntegral, enorm_mul] using hx'
+  simpa [HasFiniteIntegral, eNorm_mul] using hx'
 
 end Young
 
@@ -241,18 +241,18 @@ theorem eLpNorm_integral_kernel_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ 
     rwa [ENNReal.toReal_one] at h
   have hprod : AEMeasurable (Function.uncurry fun x z => ‖Φ z‖ₑ * ‖G x z‖ₑ ^ p.toReal)
       (μ.prod ν) :=
-    hΦ.enorm.comp_snd.mul (hG.enorm.pow_const _).aemeasurable
+    hΦ.eNorm.comp_snd.mul (hG.eNorm.pow_const _).aemeasurable
   have hint : AEStronglyMeasurable (fun x => ∫ z, Φ z * G x z ∂ν) μ :=
     (hΦ.comp_snd.mul hG.aestronglyMeasurable).integral_prod_right'
   rw [eLpNorm_rpow_eq hint hp0 hp]
   calc ∫⁻ x, ‖∫ z, Φ z * G x z ∂ν‖ₑ ^ p.toReal ∂μ
       ≤ ∫⁻ x, (∫⁻ z, ‖Φ z‖ₑ * ‖G x z‖ₑ ∂ν) ^ p.toReal ∂μ := lintegral_mono fun x => by
-        refine ENNReal.rpow_le_rpow ((enorm_integral_le_lintegral_enorm _).trans_eq ?_) hq.le
-        simp_rw [enorm_mul]
+        refine ENNReal.rpow_le_rpow ((eNorm_integral_le_lintegral_eNorm _).trans_eq ?_) hq.le
+        simp_rw [eNorm_mul]
     _ ≤ ∫⁻ x, (∫⁻ z, ‖Φ z‖ₑ ∂ν) ^ (p.toReal - 1) *
           ∫⁻ z, ‖Φ z‖ₑ * ‖G x z‖ₑ ^ p.toReal ∂ν ∂μ :=
-        lintegral_mono fun x => lintegral_mul_rpow_le hq1 hΦ.enorm
-          (hG.comp measurable_prodMk_left).enorm.aemeasurable
+        lintegral_mono fun x => lintegral_mul_rpow_le hq1 hΦ.eNorm
+          (hG.comp measurable_prodMk_left).eNorm.aemeasurable
     _ = (∫⁻ z, ‖Φ z‖ₑ ∂ν) ^ (p.toReal - 1) *
           ∫⁻ x, ∫⁻ z, ‖Φ z‖ₑ * ‖G x z‖ₑ ^ p.toReal ∂ν ∂μ :=
         lintegral_const_mul'' _ hprod.lintegral_prod_right'
@@ -265,7 +265,7 @@ theorem eLpNorm_integral_kernel_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ 
         refine lintegral_congr fun z => ?_
         have hGz : AEStronglyMeasurable (fun x => G x z) μ :=
           (hG.comp measurable_prodMk_right).aestronglyMeasurable
-        rw [lintegral_const_mul' _ _ enorm_ne_top, eLpNorm_rpow_eq hGz hp0 hp]
+        rw [lintegral_const_mul' _ _ eNorm_ne_top, eLpNorm_rpow_eq hGz hp0 hp]
 
 /-- **Weighted averages of uniformly bounded functions**: if `‖G(·, z)‖_p ≤ M` for every `z` with
 `Φ(z) ≠ 0` and `0 < ‖Φ‖_1 < ∞`, then `‖∫ Φ(z) G(·, z) dν(z)‖_p ≤ ‖Φ‖_1 M`
@@ -287,7 +287,7 @@ theorem eLpNorm_integral_kernel_le_of_bound {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp
           · simp [hz]
           · exact mul_le_mul' le_rfl (ENNReal.rpow_le_rpow (hM z hz) hq.le))
     _ = (∫⁻ z, ‖Φ z‖ₑ ∂ν) ^ (p.toReal - 1) * (∫⁻ z, ‖Φ z‖ₑ ∂ν) ^ (1 : ℝ) * M ^ p.toReal := by
-        rw [lintegral_mul_const'' _ hΦ.enorm, ENNReal.rpow_one, mul_assoc]
+        rw [lintegral_mul_const'' _ hΦ.eNorm, ENNReal.rpow_one, mul_assoc]
     _ = ((∫⁻ z, ‖Φ z‖ₑ ∂ν) * M) ^ p.toReal := by
         rw [← ENNReal.rpow_add _ _ hΦ0 hΦt, sub_add_cancel, ENNReal.mul_rpow_of_nonneg _ _ hq.le]
 

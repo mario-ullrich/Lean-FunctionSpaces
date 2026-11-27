@@ -66,11 +66,11 @@ theorem IsCZFamily.hasStrongType_lqNorm_conv_two (h : IsCZFamily θ B H) :
   intro f hf
   have hm : AEMeasurable (fun x => lqNorm 2 fun j => ‖conv (θ j) f volume x‖ₑ) volume :=
     aemeasurable_lqNorm_comp (fun j =>
-      (aestronglyMeasurable_conv (h.integrable j).1 hf.aestronglyMeasurable).enorm) 2
+      (aestronglyMeasurable_conv (h.integrable j).1 hf.aestronglyMeasurable).eNorm) 2
   refine ⟨hm.aestronglyMeasurable, ?_⟩
   have h2 := eLpNorm_le_rpow_mul_of_lintegral_enorm_le (p := 2) (C := B) two_ne_zero
     ENNReal.ofNat_ne_top hm.aestronglyMeasurable hf.aestronglyMeasurable (by
-      simpa only [enorm_eq_self, ENNReal.toReal_ofNat, ENNReal.rpow_two] using
+      simpa only [eNorm_eq_self, ENNReal.toReal_ofNat, ENNReal.rpow_two] using
         h.lintegral_lqNorm_conv_sq_le hf)
   simpa only [ENNReal.toReal_ofNat] using h2
 
@@ -93,10 +93,10 @@ theorem IsCZFamily.eLpNorm_sum_conv_two_le (h : IsCZFamily θ B H) (s : Finset �
     Finset.aestronglyMeasurable_fun_sum s fun j _ =>
       aestronglyMeasurable_conv (h.integrable j).1 (hg j).aestronglyMeasurable
   have hm2 : AEMeasurable (fun x => lqNorm 2 fun j => ‖g j x‖ₑ) volume :=
-    aemeasurable_lqNorm_comp (fun j => (hg j).aestronglyMeasurable.enorm) 2
+    aemeasurable_lqNorm_comp (fun j => (hg j).aestronglyMeasurable.eNorm) 2
   have h2 := eLpNorm_le_rpow_mul_of_lintegral_enorm_le (p := 2) (C := B) two_ne_zero
     ENNReal.ofNat_ne_top hm1 hm2.aestronglyMeasurable (by
-      simpa only [enorm_eq_self, ENNReal.toReal_ofNat, ENNReal.rpow_two] using
+      simpa only [eNorm_eq_self, ENNReal.toReal_ofNat, ENNReal.rpow_two] using
         h.lintegral_enorm_sum_conv_sq_le s hg)
   simpa only [ENNReal.toReal_ofNat] using h2
 
@@ -117,10 +117,10 @@ theorem IsCZFamily.aeSubadditiveOn_lqNorm_conv (h : IsCZFamily θ B H) :
   obtain ⟨r, hr1, hr, hgr⟩ := hexp hg
   filter_upwards [ae_all_iff.2 fun j =>
     conv_add_ae_of_memLp hp1 hp hr1 hr (h.integrable j) hfp hgr] with x hx
-  simp only [enorm_eq_self, one_mul]
+  simp only [eNorm_eq_self, one_mul]
   refine (ENNReal.lqNorm_mono fun j => ?_).trans (ENNReal.lqNorm_add_le one_le_two _ _)
   rw [hx j, Pi.add_apply]
-  exact enorm_add_le _ _
+  exact eNorm_add_le _ _
 
 /-- **The analysis operator has weak type `(1,1)`** with constant `Rd.vectorWeakConst V B H`, in
 the terms of the Carleson project, in dimension `n ≥ 1`: the level-set bound
@@ -131,10 +131,10 @@ theorem IsCZFamily.hasWeakType_lqNorm_conv [Nontrivial V] (h : IsCZFamily θ B H
   intro f hf
   have hfi : Integrable f := memLp_one_iff_integrable.1 hf
   refine ⟨(aemeasurable_lqNorm_comp (fun j =>
-    (aestronglyMeasurable_conv (h.integrable j).1 hf.aestronglyMeasurable).enorm)
+    (aestronglyMeasurable_conv (h.integrable j).1 hf.aestronglyMeasurable).eNorm)
       2).aestronglyMeasurable, ?_⟩
   rw [wnorm_ne_top ENNReal.one_ne_top, ENNReal.toReal_one, wnorm',
-    eLpNorm_one_eq_lintegral_enorm hf.aestronglyMeasurable]
+    eLpNorm_one_eq_lintegral_eNorm hf.aestronglyMeasurable]
   refine iSup_le fun t => ?_
   rw [inv_one, ENNReal.rpow_one]
   rcases eq_or_ne (t : ℝ≥0∞) 0 with ht | ht
@@ -144,7 +144,7 @@ theorem IsCZFamily.hasWeakType_lqNorm_conv [Nontrivial V] (h : IsCZFamily θ B H
   calc (t : ℝ≥0∞) * distribution (fun x => lqNorm 2 fun j => ‖conv (θ j) f volume x‖ₑ) t volume
       ≤ t * (vectorWeakConst V B H * (t : ℝ≥0∞)⁻¹ * ∫⁻ x, ‖f x‖ₑ) := by
         gcongr
-        simpa only [distribution, enorm_eq_self] using hw
+        simpa only [distribution, eNorm_eq_self] using hw
     _ = vectorWeakConst V B H * ∫⁻ x, ‖f x‖ₑ := by
         rw [mul_comm (vectorWeakConst V B H), mul_assoc, ← mul_assoc (t : ℝ≥0∞),
           ENNReal.mul_inv_cancel ht ENNReal.coe_ne_top, one_mul]
@@ -182,7 +182,7 @@ theorem IsCZFamily.hasStrongType_lqNorm_conv_of_lt [Nontrivial V] (h : IsCZFamil
   rw [← hc]
   exact hasStrongType_of_hasWeakType_one_of_hasStrongType_two hp1 hp2
     (fun f hf => (aemeasurable_lqNorm_comp (fun j =>
-      (aestronglyMeasurable_conv (h.integrable j).1 hf.aestronglyMeasurable).enorm)
+      (aestronglyMeasurable_conv (h.integrable j).1 hf.aestronglyMeasurable).eNorm)
         2).aestronglyMeasurable)
     (by rw [ENNReal.coe_one]; exact h.aeSubadditiveOn_lqNorm_conv) h.hasWeakType_lqNorm_conv
     h.hasStrongType_lqNorm_conv_two
@@ -224,12 +224,12 @@ theorem IsCZFamily.eLpNorm_sum_conv_le_of_lt_of_measurable [Nontrivial V] (h : I
     (C₁ := vectorWeakConst V B H) (C₂ := B) (p := p)
     (fun g : X => fun x => lqNorm 2 fun j => ‖g.1 j x‖ₑ)
     (fun g : X => fun x => ‖∑ j ∈ s, conv (θ j) (g.1 j) volume x‖ₑ) res
-    (fun g => measurable_lqNorm_comp (fun j => (g.2 j).enorm) 2)
+    (fun g => measurable_lqNorm_comp (fun j => (g.2 j).eNorm) 2)
     (fun g => (Finset.aestronglyMeasurable_fun_sum s fun j _ => aestronglyMeasurable_conv
-      (h.integrable j).1 (g.2 j).aestronglyMeasurable).enorm)
+      (h.integrable j).1 (g.2 j).aestronglyMeasurable).eNorm)
     (fun g S hS => by
       funext x
-      simp only [hres g S hS, enorm_indicator_eq_indicator_enorm]
+      simp only [hres g S hS, eNorm_indicator_eq_indicator_eNorm]
       exact ENNReal.lqNorm_indicator 2 S (fun j y => ‖g.1 j y‖ₑ) x)
     (fun g S hS hfin => by
       have hgp : ∀ j, MemLp (g.1 j) p volume := fun j =>
@@ -238,7 +238,7 @@ theorem IsCZFamily.eLpNorm_sum_conv_le_of_lt_of_measurable [Nontrivial V] (h : I
         ((hgp j).indicator hS.nullMeasurableSet)
         ((hgp j).indicator hS.compl.nullMeasurableSet)] with x hx
       simp only [hres g S hS, hres g Sᶜ hS.compl]
-      refine le_of_eq_of_le ?_ (enorm_add_le _ _)
+      refine le_of_eq_of_le ?_ (eNorm_add_le _ _)
       rw [← Finset.sum_add_distrib]
       refine congrArg _ (Finset.sum_congr rfl fun j _ => ?_)
       rw [← Pi.add_apply (conv (θ j) (S.indicator (g.1 j)) volume), ← hx j,
@@ -250,7 +250,7 @@ theorem IsCZFamily.eLpNorm_sum_conv_le_of_lt_of_measurable [Nontrivial V] (h : I
         (g.2 j).aestronglyMeasurable (by
           simpa only [ENNReal.toReal_ofNat, ENNReal.rpow_two] using hfin))
     hp1 hp2 ⟨g, hg⟩ hG
-  rwa [eLpNorm_enorm _ (Finset.aestronglyMeasurable_fun_sum s fun j _ =>
+  rwa [eLpNorm_eNorm _ (Finset.aestronglyMeasurable_fun_sum s fun j _ =>
     aestronglyMeasurable_conv (h.integrable j).1 (hg j).aestronglyMeasurable)] at h1
 
 /-- **The synthesis bound for `1 < p < 2`**: in dimension `n ≥ 1`, for every finite set `s` and
@@ -281,15 +281,15 @@ theorem IsCZFamily.eLpNorm_sum_conv_le_of_lt [Nontrivial V] (h : IsCZFamily θ B
     exact conv_congr_ae (hg j).aestronglyMeasurable.ae_eq_mk.symm
   have hle : eLpNorm (fun x => lqNorm 2 fun j => ‖g' j x‖ₑ) p volume ≤
       eLpNorm (fun x => lqNorm 2 fun j => ‖g j x‖ₑ) p volume := by
-    refine eLpNorm_mono_enorm_ae (aemeasurable_lqNorm_comp (fun j =>
-      (hm j).enorm.aemeasurable) 2).aestronglyMeasurable ?_
+    refine eLpNorm_mono_eNorm_ae (aemeasurable_lqNorm_comp (fun j =>
+      (hm j).eNorm.aemeasurable) 2).aestronglyMeasurable ?_
     filter_upwards [ae_all_iff.2 fun j => (hg j).aestronglyMeasurable.ae_eq_mk] with x hx
-    simp only [enorm_eq_self]
+    simp only [eNorm_eq_self]
     refine ENNReal.lqNorm_mono fun j => ?_
     by_cases hj : j ∈ s
     · simp only [g', hj, ↓reduceIte]
       rw [← hx j]
-    · simp only [g', hj, ↓reduceIte, Pi.zero_apply, enorm_zero]
+    · simp only [g', hj, ↓reduceIte, Pi.zero_apply, eNorm_zero]
       exact zero_le
   have hfin := eLpNorm_lqNorm_ne_top_of_finite hp1.le s hmem fun j hj => by
     simp only [g', hj, ↓reduceIte]
@@ -330,13 +330,13 @@ theorem IsCZFamily.enorm_sum_integral_conv_mul_conj_le [Nontrivial V] (h : IsCZF
             (memLp_conv hq1.le hq (h.adjoint.integrable j) (hg j)).star]
         simp only [map_sum, Finset.mul_sum]
     _ ≤ ∫⁻ y, ‖f y‖ₑ * ‖∑ j ∈ s, conv (fun z => conj (θ j (-z))) (g j) volume y‖ₑ := by
-        refine (enorm_integral_le_lintegral_enorm _).trans (le_of_eq ?_)
-        simp only [enorm_mul, RCLike.enorm_conj]
+        refine (eNorm_integral_le_lintegral_eNorm _).trans (le_of_eq ?_)
+        simp only [eNorm_mul, RCLike.eNorm_conj]
     _ ≤ eLpNorm f p volume *
           eLpNorm (fun y => ∑ j ∈ s, conv (fun z => conj (θ j (-z))) (g j) volume y) q volume := by
-        rw [← eLpNorm_enorm _ hf.aestronglyMeasurable, ← eLpNorm_enorm _ hS.aestronglyMeasurable]
-        exact lintegral_mul_le_eLpNorm_mul_eLpNorm hp hq hf.aestronglyMeasurable.enorm
-          hS.aestronglyMeasurable.enorm
+        rw [← eLpNorm_eNorm _ hf.aestronglyMeasurable, ← eLpNorm_eNorm _ hS.aestronglyMeasurable]
+        exact lintegral_mul_le_eLpNorm_mul_eLpNorm hp hq hf.aestronglyMeasurable.eNorm
+          hS.aestronglyMeasurable.eNorm
     _ ≤ eLpNorm f p volume *
           (czConstBelow V q B H * eLpNorm (fun x => lqNorm 2 fun j => ‖g j x‖ₑ) q volume) := by
         gcongr
@@ -363,10 +363,10 @@ theorem IsCZFamily.enorm_integral_sum_conv_mul_conj_le [Nontrivial V] (h : IsCZF
   have hw : ∀ j, AEStronglyMeasurable (conv (fun z => conj (θ j (-z))) u volume) volume :=
     fun j => aestronglyMeasurable_conv (h.adjoint.integrable j).1 hu.aestronglyMeasurable
   have hGm : AEMeasurable (fun x => lqNorm 2 fun j => ‖g j x‖ₑ) volume :=
-    aemeasurable_lqNorm_comp (fun j => (hg j).aestronglyMeasurable.enorm) 2
+    aemeasurable_lqNorm_comp (fun j => (hg j).aestronglyMeasurable.eNorm) 2
   have hWm : AEMeasurable
       (fun x => lqNorm 2 fun j => ‖conv (fun z => conj (θ j (-z))) u volume x‖ₑ) volume :=
-    aemeasurable_lqNorm_comp (fun j => (hw j).enorm) 2
+    aemeasurable_lqNorm_comp (fun j => (hw j).eNorm) 2
   calc ‖∫ x, (∑ j ∈ s, conv (θ j) (g j) volume x) * conj (u x)‖ₑ
       = ‖∑ j ∈ s, ∫ y, g j y * conj (conv (fun z => conj (θ j (-z))) u volume y)‖ₑ := by
         simp_rw [Finset.sum_mul]
@@ -375,11 +375,11 @@ theorem IsCZFamily.enorm_integral_sum_conv_mul_conj_le [Nontrivial V] (h : IsCZF
           (memLp_conv hp1 hp (h.integrable j) (hg j)).integrable_mul hu.star]
         rw [Finset.sum_congr rfl fun j _ => integral_conv_mul_conj hp (h.integrable j) (hg j) hu]
     _ ≤ ∑ j ∈ s, ∫⁻ y, ‖g j y‖ₑ * ‖conv (fun z => conj (θ j (-z))) u volume y‖ₑ := by
-        refine (enorm_sum_le _ _).trans (Finset.sum_le_sum fun j _ => ?_)
-        refine (enorm_integral_le_lintegral_enorm _).trans (le_of_eq ?_)
-        simp only [enorm_mul, RCLike.enorm_conj]
+        refine (eNorm_sum_le _ _).trans (Finset.sum_le_sum fun j _ => ?_)
+        refine (eNorm_integral_le_lintegral_eNorm _).trans (le_of_eq ?_)
+        simp only [eNorm_mul, RCLike.eNorm_conj]
     _ = ∫⁻ y, ∑ j ∈ s, ‖g j y‖ₑ * ‖conv (fun z => conj (θ j (-z))) u volume y‖ₑ :=
-        (lintegral_finsetSum' s fun j _ => (hg j).aestronglyMeasurable.enorm.mul (hw j).enorm).symm
+        (lintegral_finsetSum' s fun j _ => (hg j).aestronglyMeasurable.eNorm.mul (hw j).eNorm).symm
     _ ≤ ∫⁻ y, (lqNorm 2 fun j => ‖g j y‖ₑ) *
           lqNorm 2 fun j => ‖conv (fun z => conj (θ j (-z))) u volume y‖ₑ :=
         lintegral_mono fun y => ENNReal.sum_mul_le_lqNorm_two_mul s _ _
@@ -435,14 +435,14 @@ theorem IsCZFamily.eLpNorm_lqNorm_conv_le_of_two_lt [Nontrivial V] (h : IsCZFami
   have hm : ∀ J j : ℕ, AEMeasurable
       (fun x => if j < J then ‖conv (θ j) f volume x‖ₑ else 0) volume := fun J j => by
     split_ifs
-    exacts [(aestronglyMeasurable_conv (h.integrable j).1 hf.aestronglyMeasurable).enorm,
+    exacts [(aestronglyMeasurable_conv (h.integrable j).1 hf.aestronglyMeasurable).eNorm,
       aemeasurable_const]
   simp_rw [hpt]
   rw [eLpNorm_iSup_of_directed (fun J => aemeasurable_lqNorm_comp (hm J) 2) hmono.directed_le p]
   refine iSup_le fun J => le_of_eq_of_le ?_ (hJ J)
   congr 1
   funext x
-  simp_rw [apply_ite (fun z : ℂ => ‖z‖ₑ), enorm_zero]
+  simp_rw [apply_ite (fun z : ℂ => ‖z‖ₑ), eNorm_zero]
 
 /-- **The synthesis bound for `2 < p < ∞`**, in dimension `n ≥ 1`: for every finite set `s` and
 all `g_j ∈ L_p(V)`,

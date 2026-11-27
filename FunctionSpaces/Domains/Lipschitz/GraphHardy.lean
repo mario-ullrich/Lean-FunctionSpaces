@@ -111,9 +111,9 @@ theorem measurable_verticalForm (s : ℝ) {G : V → ℂ} (hG : Measurable G) :
     (f := fun p : V × ℝ => ‖G p.1 - G (p.1 + (p.2 - Ω.graphHeight p.1) • Ω.e)‖ₑ ^ 2 /
       ‖Ω.graphHeight p.1 - p.2‖ₑ ^ (1 + 2 * s)) ?_
   refine Measurable.div ?_ ?_
-  · refine ((hG.comp measurable_fst).sub (hG.comp ?_)).enorm.pow_const 2
+  · refine ((hG.comp measurable_fst).sub (hG.comp ?_)).eNorm.pow_const 2
     exact measurable_fst.add (((measurable_snd.sub (hη.comp measurable_fst))).smul_const _)
-  · exact ((hη.comp measurable_fst).sub measurable_snd).enorm.pow_const _
+  · exact ((hη.comp measurable_fst).sub measurable_snd).eNorm.pow_const _
 
 /-- **Vertical forms on a line**: on the vertical line of `x' ∈ H`, the Gagliardo form on `(0, 1]`
 of `t ↦ G(γ(x') + t e)` is the integral of the vertical form over the heights `t ∈ (0, 1]`, since
@@ -147,7 +147,7 @@ theorem lintegral_Ioc_graphHeight_le {s : ℝ} (hs : 1 / 2 < s) {G : V → ℂ} 
     refine lintegral_congr fun t => ?_
     simp only [indicator, mem_preimage, Ω.graphHeight_graphEquiv]
   rw [key (fun x => ‖G x‖ₑ ^ 2 / ENNReal.ofReal (Ω.graphHeight x) ^ (2 * s))
-      ((hG.enorm.pow_const 2).div (hη.ennreal_ofReal.pow_const _)),
+      ((hG.eNorm.pow_const 2).div (hη.ennreal_ofReal.pow_const _)),
     key _ (Ω.measurable_verticalForm s hG),
     ← lintegral_const_mul' _ _ (halfLineHardyConst_ne_top hs)]
   refine lintegral_mono_ae ?_
@@ -176,11 +176,11 @@ noncomputable def verticalQuotient (s : ℝ) (G : V → ℂ) : V × ℝ → ℝ�
 theorem measurable_verticalQuotient (s : ℝ) {G : V → ℂ} (hG : Measurable G) :
     Measurable (Ω.verticalQuotient s G) := by
   have hη := Ω.continuous_graphHeight.measurable
-  refine Measurable.indicator (Measurable.div ?_ (measurable_snd.enorm.pow_const _))
+  refine Measurable.indicator (Measurable.div ?_ (measurable_snd.eNorm.pow_const _))
     ((hη.comp measurable_fst measurableSet_Ioc).inter
       ((hη.comp measurable_fst).add measurable_snd measurableSet_Ioc))
   exact ((hG.comp (measurable_fst.add (measurable_snd.smul_const _))).sub
-    (hG.comp measurable_fst)).enorm.pow_const 2
+    (hG.comp measurable_fst)).eNorm.pow_const 2
 
 /-- **The vertical forms by vertical differences**: the integral of the vertical form over
 `{0 < η ≤ 1}` is `∫_V ∫_ℝ q(x, r) dr dx` with the vertical difference quotient `q`
@@ -199,8 +199,8 @@ theorem lintegral_verticalForm_eq (s : ℝ) (G : V → ℂ) :
     · rw [indicator_of_mem hr]
       simp only [verticalQuotient,
         indicator_of_mem (show (x, r) ∈ Ω.graphHeightPairs from ⟨hx, hr⟩),
-        add_sub_cancel_left, sub_add_cancel_left, enorm_neg]
-      rw [enorm_sub_rev]
+        add_sub_cancel_left, sub_add_cancel_left, eNorm_neg]
+      rw [eNorm_sub_rev]
     · rw [indicator_of_notMem hr]
       exact (indicator_of_notMem (fun h : (x, r) ∈ Ω.graphHeightPairs => hr h.2) _).symm
   · rw [indicator_of_notMem (show x ∉ Ω.graphHeight ⁻¹' Ioc 0 1 from hx)]
@@ -356,7 +356,7 @@ theorem lintegral_div_min_graphHeight_le_modNormOn {s : ℝ} (hs : 1 / 2 < s)
   have hI : ∫⁻ x in Ω.domain, ‖G x‖ₑ ^ 2 ≤ N ^ 2 := by
     rw [lintegral_enorm_sq_eq_eLpNorm_sq (Lp.aestronglyMeasurable G).restrict,
       ← eLpNorm_indicator_eq_eLpNorm_restrict Ω.measurableSet_domain.nullMeasurableSet,
-      ← eLpNorm_congr_ae (indicatorLp_apply_ae Ω.measurableSet_domain G), ← Lp.enorm_def]
+      ← eLpNorm_congr_ae (indicatorLp_apply_ae Ω.measurableSet_domain G), ← Lp.eNorm_def]
     exact pow_le_pow_left₀ zero_le le_self_add 2
   have hM : ∑' k, (dyadicWeight s k * lpModulusOn 2 Ω.domain 1 G k) ^ 2 ≤ N ^ 2 := by
     rw [← ENNReal.lqNorm_two_sq]
@@ -405,7 +405,7 @@ theorem enorm_fwdDiff_indicator_le (G : V → ℂ) (y x : V) :
       ⟨(Ω.mem_domain_iff_graphHeight_pos x).1 hx, (le_abs_self _).trans
         (Ω.abs_graphHeight_le_of_mem_switchSet
           (show ¬(x ∈ Ω.domain ↔ x + y ∈ Ω.domain) from fun h => hxy (h.1 hx)))⟩
-    rw [indicator_of_mem hx, indicator_of_notMem hxy, indicator_of_mem hL, zero_sub, enorm_neg]
+    rw [indicator_of_mem hx, indicator_of_notMem hxy, indicator_of_mem hL, zero_sub, eNorm_neg]
     exact le_add_right le_add_self
   · have hL : x + y ∈ Ω.graphHeight ⁻¹' Ioc 0 ((1 + Ω.M) * ‖y‖) := by
       refine ⟨(Ω.mem_domain_iff_graphHeight_pos _).1 hxy, (le_abs_self _).trans ?_⟩
@@ -416,7 +416,7 @@ theorem enorm_fwdDiff_indicator_le (G : V → ℂ) (y x : V) :
       rwa [norm_neg] at h
     rw [indicator_of_notMem hx, indicator_of_mem hxy, indicator_of_mem hL, sub_zero]
     exact le_add_left le_rfl
-  · rw [indicator_of_notMem hx, indicator_of_notMem hxy, sub_zero, enorm_zero]
+  · rw [indicator_of_notMem hx, indicator_of_notMem hxy, sub_zero, eNorm_zero]
     exact zero_le
 
 /-- **Differences of the extension by zero in `L_2`**: for an almost everywhere strongly
@@ -445,12 +445,12 @@ theorem eLpNorm_fwdDiff_indicator_le {G : V → ℂ} (hG : AEStronglyMeasurable 
         (fun x => ‖(Ω.graphHeight ⁻¹' Ioc 0 ((1 + Ω.M) * ‖y‖)).indicator G x‖ₑ) +
         (fun x => ‖(Ω.graphHeight ⁻¹' Ioc 0 ((1 + Ω.M) * ‖y‖)).indicator G x‖ₑ) ∘ (· + y)) x‖ₑ :=
     fun x => by
-      simp only [Pi.add_apply, Function.comp_apply, enorm_eq_self]
+      simp only [Pi.add_apply, Function.comp_apply, eNorm_eq_self]
       exact Ω.enorm_fwdDiff_indicator_le G y x
-  refine ((eLpNorm_mono_enorm (p := 2) hfd hpt).trans ((eLpNorm_add_le one_le_two).trans
+  refine ((eLpNorm_mono_eNorm (p := 2) hfd hpt).trans ((eLpNorm_add_le one_le_two).trans
     (add_le_add (eLpNorm_add_le one_le_two) le_rfl))).trans_eq ?_
-  rw [eLpNorm_comp_measurePreserving hLG.enorm.aestronglyMeasurable hτ, eLpNorm_enorm _ hst,
-    eLpNorm_enorm _ hLG]
+  rw [eLpNorm_comp_measurePreserving hLG.eNorm.aestronglyMeasurable hτ, eLpNorm_eNorm _ hst,
+    eLpNorm_eNorm _ hLG]
   ring
 
 /-- **The modulus of the extension by zero**: for `G ∈ L_2(V)` and `k ∈ ℕ`,

@@ -140,7 +140,7 @@ noncomputable def coeffToLp (r : ℕ) (α β : ℝ) :
 theorem enorm_coeffToLp (r : ℕ) (α β : ℝ) (c : Fin r → ℂ) :
     ‖coeffToLp p r α β c‖ₑ =
       eLpNorm (polyFun ((degreeLTEquiv ℂ r).symm c : ℂ[X])) p (volume.restrict (Icc α β)) := by
-  rw [Lp.enorm_def]
+  rw [Lp.eNorm_def]
   exact eLpNorm_congr_ae (MemLp.coeFn_toLp (memLp_polyFun _ p α β))
 
 omit [Fact (1 ≤ p)] in
@@ -188,7 +188,7 @@ theorem exists_enorm_linearMap_le_eLpNorm (r : ℕ) (Φ : ℂ[X] →ₗ[ℂ] ℂ
     (Φ.restrict hΦ) ∘ₗ (degreeLTEquiv ℂ r).symm.toLinearMap
   let T' := LinearMap.toContinuousLinearMap T
   refine ⟨r * (‖T'‖ₑ * K), ENNReal.mul_ne_top (ENNReal.natCast_ne_top r)
-    (ENNReal.mul_ne_top enorm_ne_top ENNReal.coe_ne_top), fun P hP x hx => ?_⟩
+    (ENNReal.mul_ne_top eNorm_ne_top ENNReal.coe_ne_top), fun P hP x hx => ?_⟩
   set c := degreeLTEquiv ℂ r ⟨P, hP⟩
   have hPc : ((degreeLTEquiv ℂ r).symm c : ℂ[X]) = P := by simp [c]
   have hΦc : ((degreeLTEquiv ℂ r).symm (T c) : ℂ[X]) = Φ P := by

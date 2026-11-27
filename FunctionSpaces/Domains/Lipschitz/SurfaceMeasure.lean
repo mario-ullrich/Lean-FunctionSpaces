@@ -368,11 +368,11 @@ theorem memLp_boundaryTrace (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞) {L : �
       dyadicWeight (s + 1 / p.toReal) k * lpModulus p L F k) < ∞) :
     MemLp (Ω.boundaryTrace ψ hp L F) p Ω.surfaceMeasure := by
   have hp0 : p ≠ 0 := (zero_lt_one.trans_le (Fact.out : 1 ≤ p)).ne'
-  refine memLp_iff.2 ((eLpNorm_lt_top_iff_lintegral_rpow_enorm_lt_top hp0 hp
+  refine memLp_iff.2 ((eLpNorm_lt_top_iff_lintegral_rpow_eNorm_lt_top hp0 hp
     (Ω.stronglyMeasurable_boundaryTrace ψ hp L F).aestronglyMeasurable).2
     ((Ω.lintegral_enorm_boundaryTrace_le ψ hp hL hs hsL hq hF).trans_lt
       (ENNReal.sum_lt_top.2 fun j _ => ENNReal.mul_lt_top ENNReal.ofReal_lt_top ?_)))
-  exact lintegral_rpow_enorm_lt_top_of_eLpNorm_lt_top hp0 hp (Lp.memLp _).eLpNorm_lt_top
+  exact lintegral_rpow_eNorm_lt_top_of_eLpNorm_lt_top hp0 hp (Lp.memLp _).eLpNorm_lt_top
 
 end BoundaryLp
 
@@ -411,15 +411,15 @@ theorem exists_eLpNorm_boundaryTrace_sobolevToL2_le (s : ℝ) (hs : 1 / 2 < s :=
         (ENNReal.rpow_ne_top_of_nonneg (by norm_num) (hK j))), fun ψ U => ?_⟩
   have hj : ∀ j, ∫⁻ x', ‖(Ω.graph j).graphTrace two_ne_top 2 (sobolevToL2 hs0 U) x'‖ₑ ^
       (2 : ℝ≥0∞).toReal ≤ K j ^ (2 : ℝ) * ‖U‖ₑ ^ (2 : ℝ) := fun j => by
-    rw [ENNReal.toReal_ofNat, lintegral_rpow_enorm_eq_rpow_eLpNorm' two_pos,
+    rw [ENNReal.toReal_ofNat, lintegral_rpow_eNorm_eq_rpow_eLpNorm' two_pos,
       ← ENNReal.mul_rpow_of_nonneg _ _ (by norm_num)]
     refine ENNReal.rpow_le_rpow ((le_of_eq ?_).trans (hle j U)) (by norm_num)
-    rw [Lp.enorm_def, eLpNorm_eq_eLpNorm' two_ne_zero two_ne_top (Lp.aestronglyMeasurable _),
+    rw [Lp.eNorm_def, eLpNorm_eq_eLpNorm' two_ne_zero two_ne_top (Lp.aestronglyMeasurable _),
       ENNReal.toReal_ofNat]
   have hsum := (Ω.lintegral_enorm_boundaryTrace_le ψ two_ne_top one_le_two (sub_pos.2 hs)
     (by norm_num; linarith) one_le_two (modNorm_sobolevToL2_lt_top hs (by linarith) U)).trans
     (Finset.sum_le_sum fun j _ => mul_le_mul' le_rfl (hj j))
-  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal two_ne_zero two_ne_top
+  rw [eLpNorm_eq_lintegral_rpow_eNorm_toReal two_ne_zero two_ne_top
     (Ω.stronglyMeasurable_boundaryTrace ψ two_ne_top 2 _).aestronglyMeasurable]
   calc (∫⁻ y, ‖Ω.boundaryTrace ψ two_ne_top 2 (sobolevToL2 hs0 U) y‖ₑ ^ (2 : ℝ≥0∞).toReal
         ∂Ω.surfaceMeasure) ^ (1 / (2 : ℝ≥0∞).toReal)
@@ -478,8 +478,8 @@ noncomputable def ambientTraceL2 (s : ℝ) (hs : 1 / 2 < s := by norm_num)
     obtain ⟨C, hC, hle⟩ := Ω.exists_eLpNorm_boundaryTrace_sobolevToL2_le s hs hs'
     refine ⟨C.toReal, fun U => ?_⟩
     change ‖(Ω.memLp_boundaryTrace_sobolevToL2 Ω.boundaryPartition s U hs hs').toLp _‖ ≤ _
-    rw [Lp.norm_toLp, ← toReal_enorm U, ← ENNReal.toReal_mul]
-    exact ENNReal.toReal_mono (ENNReal.mul_ne_top hC enorm_ne_top) (hle _ U))
+    rw [Lp.norm_toLp, ← toReal_eNorm U, ← ENNReal.toReal_mul]
+    exact ENNReal.toReal_mono (ENNReal.mul_ne_top hC eNorm_ne_top) (hle _ U))
 
 /-- The trace of `U ∈ H^s(V)` in `L_2(Γ)` is the boundary trace `Tr_Γ ι_s U` almost everywhere on
 `Γ`, for every resolution of unity (`Rd.BoundedLipschitzDomain.boundaryTrace_eventuallyEq`). -/

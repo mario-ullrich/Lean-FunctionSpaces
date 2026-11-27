@@ -68,8 +68,8 @@ omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] [BorelSpace V] [μ.IsAddHaarM
 theorem enorm_conv_le_lintegral (K f : V → ℂ) (x : V) :
     ‖conv K f μ x‖ₑ ≤ ∫⁻ y, ‖K y‖ₑ * ‖f (x - y)‖ₑ ∂μ := by
   rw [conv_apply]
-  refine (enorm_integral_le_lintegral_enorm _).trans (le_of_eq ?_)
-  exact lintegral_congr fun y => enorm_mul _ _
+  refine (eNorm_integral_le_lintegral_eNorm _).trans (le_of_eq ?_)
+  exact lintegral_congr fun y => eNorm_mul _ _
 
 /-- **Young's inequality** for an integrable kernel: `‖K ⋆ f‖_p ≤ ‖K‖_1 ‖f‖_p`, `1 ≤ p < ∞`
 (`MeasureTheory.eLpNorm_convolution_le` on the group `V`). -/
@@ -125,28 +125,28 @@ theorem ae_integrable_conv_conv {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞
   have hF : AEMeasurable F μ := aemeasurable_lintegral_kernel hL.aestronglyMeasurable hfm
   set G : V → ℝ≥0∞ := fun x₀ => ∫⁻ y, ‖K y‖ₑ * F (x₀ - y) ∂μ with hGdef
   have hGm : AEMeasurable G μ :=
-    (hK.aestronglyMeasurable.enorm.comp_snd.mul (hF.comp_quasiMeasurePreserving
+    (hK.aestronglyMeasurable.eNorm.comp_snd.mul (hF.comp_quasiMeasurePreserving
       (quasiMeasurePreserving_sub_of_right_invariant μ μ))).lintegral_prod_right'
   -- the double integral of the norms is `G x₀`
   have hdouble : ∀ x₀, ∫⁻ z, ‖Function.uncurry (fun x y => K y * (L (x - y) * f (x₀ - x))) z‖ₑ
       ∂(μ.prod μ) = G x₀ := fun x₀ => by
     have hmeas : AEMeasurable (Function.uncurry fun x y =>
         ‖K y‖ₑ * (‖L (x - y)‖ₑ * ‖f (x₀ - x)‖ₑ)) (μ.prod μ) :=
-      hK.aestronglyMeasurable.enorm.comp_snd.mul
-        ((hL.aestronglyMeasurable.enorm.comp_quasiMeasurePreserving
+      hK.aestronglyMeasurable.eNorm.comp_snd.mul
+        ((hL.aestronglyMeasurable.eNorm.comp_quasiMeasurePreserving
           (quasiMeasurePreserving_sub_of_right_invariant μ μ)).mul
-          (hfm.enorm.comp_quasiMeasurePreserving
+          (hfm.eNorm.comp_quasiMeasurePreserving
             (quasiMeasurePreserving_sub_left_of_right_invariant μ x₀)).comp_fst)
     have hrw : (fun z : V × V =>
         ‖Function.uncurry (fun x y => K y * (L (x - y) * f (x₀ - x))) z‖ₑ) =
         Function.uncurry fun x y => ‖K y‖ₑ * (‖L (x - y)‖ₑ * ‖f (x₀ - x)‖ₑ) := by
       funext z
       obtain ⟨x, y⟩ := z
-      simp only [Function.uncurry_apply_pair, enorm_mul]
+      simp only [Function.uncurry_apply_pair, eNorm_mul]
     have hinner : ∀ y, AEMeasurable (fun x => ‖L (x - y)‖ₑ * ‖f (x₀ - x)‖ₑ) μ := fun y =>
-      (hL.aestronglyMeasurable.enorm.comp_quasiMeasurePreserving
+      (hL.aestronglyMeasurable.eNorm.comp_quasiMeasurePreserving
         (measurePreserving_sub_right μ y).quasiMeasurePreserving).mul
-        (hfm.enorm.comp_quasiMeasurePreserving
+        (hfm.eNorm.comp_quasiMeasurePreserving
           (quasiMeasurePreserving_sub_left_of_right_invariant μ x₀))
     rw [hrw, lintegral_prod _ hmeas]
     simp only [Function.uncurry_apply_pair]
@@ -166,8 +166,8 @@ theorem ae_integrable_conv_conv {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞
     exact ENNReal.rpow_ne_top_of_nonneg hq.le hf.eLpNorm_ne_top
   have hGfin : ∫⁻ x₀, G x₀ ^ p.toReal ∂μ ≠ ∞ := by
     refine ne_top_of_le_ne_top ?_ ((lintegral_rpow_lintegral_mul_le hq1
-      hK.aestronglyMeasurable.enorm hF).trans (mul_le_mul' le_rfl
-        (lintegral_rpow_lintegral_mul_le hq1 hL.aestronglyMeasurable.enorm hfm.enorm)))
+      hK.aestronglyMeasurable.eNorm hF).trans (mul_le_mul' le_rfl
+        (lintegral_rpow_lintegral_mul_le hq1 hL.aestronglyMeasurable.eNorm hfm.eNorm)))
     exact ENNReal.mul_ne_top (ENNReal.rpow_ne_top_of_nonneg hq.le hK1)
       (ENNReal.mul_ne_top (ENNReal.rpow_ne_top_of_nonneg hq.le hL1) hfq)
   filter_upwards [ae_lt_top' (hGm.pow_const _) hGfin] with x₀ hx₀
@@ -315,7 +315,7 @@ theorem norm_convLp_le (hp : p ≠ ∞) {K : V → ℂ} (hK : Integrable K μ) (
 /-- **Young's inequality on `L_p`** in extended norms: `‖K ⋆ f‖_p ≤ ‖K‖_1 ‖f‖_p`. -/
 theorem enorm_convLp_le (hp : p ≠ ∞) {K : V → ℂ} (hK : Integrable K μ) (f : Lp ℂ p μ) :
     ‖convLp hp hK f‖ₑ ≤ eLpNorm K 1 μ * ‖f‖ₑ := by
-  rw [Lp.enorm_def, Lp.enorm_def, eLpNorm_congr_ae (convLp_apply_ae hp hK f)]
+  rw [Lp.eNorm_def, Lp.eNorm_def, eLpNorm_congr_ae (convLp_apply_ae hp hK f)]
   exact eLpNorm_conv_le Fact.out hp hK.aestronglyMeasurable (Lp.aestronglyMeasurable f)
 
 /-- **Convolution operators compose like their kernels**: `K ⋆ (L ⋆ f) = (K ⋆ L) ⋆ f` in `L_p`
@@ -400,7 +400,7 @@ theorem lintegral_closedBall_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) {g : V → ℂ}
       volume (closedBall x ρ) ^ (1 - 1 / p.toReal) * eLpNorm g p volume := by
   have hgr : AEStronglyMeasurable g (volume.restrict (closedBall x ρ)) := hg.restrict
   have h := eLpNorm_le_eLpNorm_mul_rpow_measure_univ hp1 hgr
-  rw [eLpNorm_one_eq_lintegral_enorm hgr, Measure.restrict_apply_univ, ENNReal.toReal_one,
+  rw [eLpNorm_one_eq_lintegral_eNorm hgr, Measure.restrict_apply_univ, ENNReal.toReal_one,
     div_one] at h
   refine h.trans ?_
   rw [mul_comm]
@@ -421,12 +421,12 @@ theorem lintegral_kernel_mul_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) {K g : V → �
         exact hy
       simp only [G, Set.indicator_of_mem hmem]
       exact mul_le_mul' (hK y) le_rfl
-    · rw [hKρ y (not_le.1 hy), enorm_zero, zero_mul]
+    · rw [hKρ y (not_le.1 hy), eNorm_zero, zero_mul]
       exact zero_le
   calc ∫⁻ y, ‖K y‖ₑ * ‖g (x - y)‖ₑ ≤ ∫⁻ y, A * G (x - y) := lintegral_mono h1
     _ = ∫⁻ z, A * G z := lintegral_sub_left_eq_self (fun z => A * G z) x
     _ = A * ∫⁻ z in closedBall x ρ, ‖g z‖ₑ := by
-        rw [lintegral_const_mul'' A (hg.enorm.indicator measurableSet_closedBall),
+        rw [lintegral_const_mul'' A (hg.eNorm.indicator measurableSet_closedBall),
           lintegral_indicator measurableSet_closedBall]
     _ ≤ A * (volume (closedBall x ρ) ^ (1 - 1 / p.toReal) * eLpNorm g p volume) :=
         mul_le_mul' le_rfl (lintegral_closedBall_le hp1 hg x ρ)

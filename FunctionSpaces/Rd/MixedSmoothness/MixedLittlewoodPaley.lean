@@ -128,7 +128,7 @@ theorem tendsto_sum_mixedBlock (hp : p ≠ ∞) (f : Lp ℂ p (volume : Measure 
 theorem eLpNorm_conv_eq_enorm_convLp {K G : ℝ → ℂ} (hK : Integrable K) (hG : Integrable G) :
     eLpNorm (conv K G volume) 1 volume =
       ‖convLp ENNReal.one_ne_top hK ((memLp_one_iff_integrable.2 hG).toLp G)‖ₑ := by
-  rw [Lp.enorm_def]
+  rw [Lp.eNorm_def]
   refine eLpNorm_congr_ae ?_
   exact ((convLp_apply_ae ENNReal.one_ne_top hK _).trans
     (Filter.EventuallyEq.of_eq (conv_congr_ae (MemLp.coeFn_toLp _)))).symm
@@ -329,11 +329,11 @@ theorem exists_mixedLPNorm_le (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) :
       (b.tendsto_sum_mixedDualKernel_mixedLocalMean hp hL f)
     simp only [Function.comp_def, map_sum] at hrep
     have h1 := ENNReal.le_tsum_of_tendsto_finsetSum (Q := fun x : Lp ℂ p (volume : Measure (Fin d → ℝ)) =>
-      ‖x‖ₑ) (C := 1) ENNReal.one_ne_top (fun x y => enorm_add_le x y) (fun x => (one_mul _).ge)
+      ‖x‖ₑ) (C := 1) ENNReal.one_ne_top (fun x y => eNorm_add_le x y) (fun x => (one_mul _).ge)
       hrep
     refine h1.trans ?_
     rw [← ENNReal.tsum_mul_left]
-    refine ENNReal.tsum_le_tsum fun k => ?_
+    refine tsum_le_tsum fun k => ?_
     rw [← mul_assoc]
     exact b.enorm_mixedBlock_convLp_mixedDualKernel_le hp L hE m k (h k)
   exact lqNorm_le_of_le_almostDiagonal_pi hq hs hblock
@@ -355,11 +355,11 @@ theorem exists_mixedLocalMeansNorm_le (hp : p ≠ ∞) (L : ℕ) :
       (tendsto_sum_mixedBlock hp f)
     simp only [Function.comp_def, map_sum] at hrep
     have h1 := ENNReal.le_tsum_of_tendsto_finsetSum (Q := fun x : Lp ℂ p (volume : Measure (Fin d → ℝ)) =>
-      ‖x‖ₑ) (C := 1) ENNReal.one_ne_top (fun x y => enorm_add_le x y) (fun x => (one_mul _).ge)
+      ‖x‖ₑ) (C := 1) ENNReal.one_ne_top (fun x y => eNorm_add_le x y) (fun x => (one_mul _).ge)
       hrep
     refine h1.trans ?_
     rw [← ENNReal.tsum_mul_left]
-    refine ENNReal.tsum_le_tsum fun k => ?_
+    refine tsum_le_tsum fun k => ?_
     rw [← mul_assoc]
     exact b.enorm_mixedLocalMean_mixedBlock_le hp L hE m k f
   exact lqNorm_le_of_le_almostDiagonal_pi hq hs hmean

@@ -167,12 +167,12 @@ theorem eLpNorm_sub_rpow_min_le_two_mul {E : Type*} [NormedAddCommGroup E] {f g 
 /-- The quasi-norm of `L_p(μ)` vanishes at `0`, for every `p`. -/
 protected theorem Lp.enorm_zero {E : Type*} [NormedAddCommGroup E] :
     ‖(0 : Lp E p μ)‖ₑ = 0 := by
-  rw [Lp.enorm_def, eLpNorm_congr_ae (Lp.coeFn_zero E p μ), eLpNorm_zero]
+  rw [eNorm_def, eLpNorm_congr_ae (Lp.coeFn_zero E p μ), eLpNorm_zero]
 
 /-- The quasi-norm of `L_p(μ)` is even, `‖-f‖_p = ‖f‖_p`, for every `p`. -/
 protected theorem Lp.enorm_neg {E : Type*} [NormedAddCommGroup E] (f : Lp E p μ) :
     ‖-f‖ₑ = ‖f‖ₑ := by
-  rw [Lp.enorm_def, Lp.enorm_def, eLpNorm_congr_ae (Lp.coeFn_neg f), eLpNorm_neg]
+  rw [eNorm_def, eNorm_def, eLpNorm_congr_ae (Lp.coeFn_neg f), eLpNorm_neg]
 
 /-- **The `p`-th power of the quasi-norm of `L_p` is subadditive for `p ≤ 1`**:
 `‖f + g‖_p^p ≤ ‖f‖_p^p + ‖g‖_p^p` for `f, g ∈ L_p(μ)`, from the same inequality for functions
@@ -183,7 +183,7 @@ theorem Lp.enorm_add_rpow_le_of_le_one {E : Type*} [NormedAddCommGroup E] (hp1 :
   rcases eq_or_ne p 0 with rfl | hp0
   · simp only [ENNReal.toReal_zero, ENNReal.rpow_zero]
     exact le_self_add
-  rw [Lp.enorm_def, Lp.enorm_def, Lp.enorm_def, eLpNorm_congr_ae (Lp.coeFn_add f g)]
+  rw [eNorm_def, eNorm_def, eNorm_def, eLpNorm_congr_ae (Lp.coeFn_add f g)]
   exact eLpNorm_add_rpow_le_of_le_one hp0 hp1 _ _
 
 /-- **Two approximants of one element are close**, `p ≤ 1`: if `‖f - g‖_p ≤ e` and
@@ -193,7 +193,7 @@ theorem Lp.enorm_sub_rpow_le_two_mul {E : Type*} [NormedAddCommGroup E] (hp1 : p
     {f g h : Lp E p μ} {e : ℝ≥0∞} (hg : ‖f - g‖ₑ ≤ e) (hh : ‖f - h‖ₑ ≤ e) :
     ‖g - h‖ₑ ^ p.toReal ≤ 2 * e ^ p.toReal := by
   have hsub : ∀ u v : Lp E p μ, ‖u - v‖ₑ = eLpNorm (⇑u - ⇑v) p μ := fun u v => by
-    rw [Lp.enorm_def, eLpNorm_congr_ae (Lp.coeFn_sub u v)]
+    rw [eNorm_def, eLpNorm_congr_ae (Lp.coeFn_sub u v)]
   rw [hsub, ← ENNReal.toReal_min_one_of_le_one hp1]
   exact eLpNorm_sub_rpow_min_le_two_mul ((hsub f g).symm.trans_le hg)
     ((hsub f h).symm.trans_le hh)
@@ -255,7 +255,7 @@ theorem eLpNorm_sub_rpow_min_le_tsum {E : Type*} [SeminormedAddCommGroup E] (hr0
     (hu.comp hk).sub_right (u k)
   have hbound : ∀ n, eLpNorm (u (k + n) - u k) r μ ≤ S ^ (min 1 r).toReal⁻¹ := fun n =>
     (ENNReal.le_rpow_inv_iff hρ).2 ((eLpNorm_sub_rpow_min_le_sum hr0 u k n).trans
-      (ENNReal.sum_le_tsum _))
+      (sum_le_tsum _))
   have h := eLpNorm_le_of_tendstoInMeasure (Eventually.of_forall hbound) hlim
     fun n => (hum _).sub (hum k)
   exact (ENNReal.le_rpow_inv_iff hρ).1 h
@@ -304,7 +304,7 @@ theorem eLpNorm_sub_rpow_min_le_tsum_of_ae_tendsto {E : Type*} [SeminormedAddCom
     exact (hx.comp hk).sub_const (u k x)
   have hbound : ∀ n, eLpNorm (u (k + n) - u k) r μ ≤ S ^ (min 1 r).toReal⁻¹ := fun n =>
     (ENNReal.le_rpow_inv_iff hρ).2 ((eLpNorm_sub_rpow_min_le_sum hr0 u k n).trans
-      (ENNReal.sum_le_tsum _))
+      (sum_le_tsum _))
   have hg : AEStronglyMeasurable (g - u k) μ :=
     (aestronglyMeasurable_of_tendsto_ae atTop hum hu).sub (hum k)
   exact (ENNReal.le_rpow_inv_iff hρ).1 (Lp.eLpNorm_le_of_ae_tendsto (Eventually.of_forall hbound)
@@ -328,7 +328,7 @@ theorem eLpNorm_tsum_rpow_le_of_le_one {ι : Type*} [Countable ι] {g : ι → �
     have h : eLpNorm (g i) p μ ^ p.toReal = ∞ := by
       rw [eLpNorm_of_not_aestronglyMeasurable fun h => hi h.aemeasurable,
         ENNReal.top_rpow_of_pos hρ]
-    rw [ENNReal.tsum_eq_top_of_eq_top ⟨i, h⟩]
+    rw [tsum_eq_top_of_eq_top ⟨i, h⟩]
     exact le_top
   have hρ1 : p.toReal ≤ 1 := by
     simpa only [ENNReal.toReal_min_one_of_le_one hp1] using ENNReal.toReal_min_one_le_one p
@@ -356,10 +356,10 @@ theorem eLpNorm_tsum_rpow_min_le {ι : Type*} [Countable ι] {g : ι → α → 
 
 /-- **A function is bounded almost everywhere by its `L_∞` quasi-norm**: `‖f(x)‖ ≤ ‖f‖_∞` for
 almost every `x`, for every function, measurable or not (Mathlib's
-`enorm_ae_le_eLpNormEssSup` with `eLpNormEssSup_le_eLpNorm_top`). -/
+`eNorm_ae_le_eLpNormEssSup` with `eLpNormEssSup_le_eLpNorm_top`). -/
 theorem ae_enorm_le_eLpNorm_top {ε : Type*} [TopologicalSpace ε] [ENorm ε] (f : α → ε)
     (μ : Measure α) : ∀ᵐ x ∂μ, ‖f x‖ₑ ≤ eLpNorm f ∞ μ :=
-  (enorm_ae_le_eLpNormEssSup f μ).mono fun _ hx => hx.trans eLpNormEssSup_le_eLpNorm_top
+  (eNorm_ae_le_eLpNormEssSup f μ).mono fun _ hx => hx.trans eLpNormEssSup_le_eLpNorm_top
 
 /-- **A function with finite `L_p` quasi-norm is finite almost everywhere**, for every
 `0 < p ≤ ∞` and every `F : α → [0, ∞]`: for `p < ∞` the integral of `F^p` is finite (Mathlib's
@@ -370,7 +370,7 @@ theorem ae_lt_top_of_eLpNorm_ne_top {F : α → ℝ≥0∞} (hp0 : p ≠ 0) (h :
     ∀ᵐ x ∂μ, F x < ∞ := by
   rcases eq_or_ne p ∞ with rfl | hp
   · filter_upwards [ae_enorm_le_eLpNorm_top F μ] with x hx
-    rw [enorm_eq_self] at hx
+    rw [eNorm_eq_self] at hx
     exact hx.trans_lt h.lt_top
   have hF : AEMeasurable F μ := by
     by_contra hF
@@ -391,7 +391,7 @@ theorem aestronglyMeasurable_of_tsum_eLpNorm_rpow_ne_top {ι ε : Type*} [Topolo
     [ENorm ε] {g : ι → α → ε} {c : ℝ} (hc : 0 < c) (h : ∑' i, eLpNorm (g i) p μ ^ c ≠ ∞)
     (i : ι) : AEStronglyMeasurable (g i) μ :=
   aestronglyMeasurable_of_eLpNorm_ne_top
-    ((ENNReal.rpow_eq_top_iff_of_pos hc).not.1 (ENNReal.ne_top_of_tsum_ne_top h i))
+    ((ENNReal.rpow_eq_top_iff_of_pos hc).not.1 (ne_top_of_tsum_ne_top h i))
 
 /-- **Series with summable `ρ`-th powers of quasi-norms converge absolutely almost everywhere**:
 for `0 < p ≤ ∞`, `ρ = min(1, p)` and countably many functions `g_i` with values in a normed group,
@@ -406,13 +406,13 @@ theorem summable_norm_of_tsum_eLpNorm_rpow_min_ne_top {ι : Type*} [Countable ι
   have hρ : 0 < (min 1 p).toReal := ENNReal.toReal_min_one_pos hp0
   have hg := aestronglyMeasurable_of_tsum_eLpNorm_rpow_ne_top hρ h
   have he : ∀ i, eLpNorm (fun x => ‖g i x‖ₑ) p μ = eLpNorm (g i) p μ := fun i =>
-    eLpNorm_enorm _ (hg i)
+    eLpNorm_eNorm _ (hg i)
   have h1 := eLpNorm_tsum_rpow_min_le (μ := μ) (g := fun i x => ‖g i x‖ₑ) hp0
   simp only [he] at h1
   have hS : eLpNorm (fun x => ∑' i, ‖g i x‖ₑ) p μ ≠ ∞ :=
     (ENNReal.rpow_eq_top_iff_of_pos hρ).not.1 (ne_top_of_le_ne_top h h1)
   filter_upwards [ae_lt_top_of_eLpNorm_ne_top hp0 hS] with x hx
-  exact tsum_enorm_ne_top_iff_summable_norm.1 hx.ne
+  exact tsum_eNorm_ne_top_iff_summable_norm.1 hx.ne
 
 /-- **The remainders of a series with an almost everywhere sum, `0 < p ≤ ∞`**: with
 `ρ = min(1, p)`, let `g_k` be functions with values in a normed group and `∑_k g_k(x) = f(x)` for
@@ -575,7 +575,7 @@ theorem exists_setLIntegral_enorm_sub_rpow_le [SFinite μ] {F : α → ℂ} (hF 
       (μ s)⁻¹ * ∫⁻ y in s, ∫⁻ x in s, ‖F x - F y‖ₑ ^ r ∂μ ∂μ := by
   have hG : Measurable fun y => ∫⁻ x in s, ‖F x - F y‖ₑ ^ r ∂μ :=
     Measurable.lintegral_prod_left' (f := fun z : α × α => ‖F z.1 - F z.2‖ₑ ^ r)
-      (((hF.comp measurable_fst).sub (hF.comp measurable_snd)).enorm.pow_const r)
+      (((hF.comp measurable_fst).sub (hF.comp measurable_snd)).eNorm.pow_const r)
   obtain ⟨y, hy, hle⟩ := exists_le_setLAverage hμ0 hμ hG.aemeasurable
   exact ⟨y, hy, hle.trans_eq (by rw [setLAverage_eq, ENNReal.div_eq_inv_mul])⟩
 
@@ -642,7 +642,7 @@ theorem eLpNorm_sub_rpow_min_le_tsum_of_nearBest (hp0 : p ≠ 0) (hr0 : r ≠ 0)
         eLpNorm_sub_rpow_min_le_tsum hr0 hlim hb k
     _ ≤ ∑' i, (C * 2 ^ (1 / (min 1 p).toReal) *
           (ENNReal.dyadicWeight β (k + i) * e (k + i))) ^ (min 1 r).toReal :=
-        ENNReal.tsum_le_tsum fun i => ENNReal.rpow_le_rpow (hblock (k + i)) hρ
+        tsum_le_tsum fun i => ENNReal.rpow_le_rpow (hblock (k + i)) hρ
     _ = ∑' i, (C * 2 ^ (1 / (min 1 p).toReal)) ^ (min 1 r).toReal *
           (ENNReal.dyadicWeight β (k + i) * e (k + i)) ^ (min 1 r).toReal :=
         tsum_congr fun i => ENNReal.mul_rpow_of_nonneg _ _ hρ

@@ -233,7 +233,7 @@ theorem kFunctional_smul_le [Module ℝ U] (hH : A.IsHomogeneousCouple) (c : ℝ
   · rw [zero_smul, kFunctional_zero_right hH.norm0_zero hH.norm1_zero]
     exact zero_le
   have h : ‖c‖ₑ * A.kFunctional t u = ⨅ b, ‖c‖ₑ * (A.norm0 (u - b) + t * A.norm1 b) :=
-    ENNReal.mul_iInf_of_ne (enorm_ne_zero.2 hc) enorm_ne_top
+    ENNReal.mul_iInf_of_ne (eNorm_ne_zero.2 hc) eNorm_ne_top
   rw [h]
   refine le_iInf fun b => ?_
   calc A.kFunctional t (c • u) ≤ A.norm0 (c • u - c • b) + t * A.norm1 (c • b) :=
@@ -446,7 +446,7 @@ theorem kMethodNorm_add_le (hA : A.IsQuasiNormed C) (u v : U) :
         refine eLpNorm_le_mul_eLpNorm_of_ae_le_mul'' q
           (aestronglyMeasurable_phiIntegrand_kFunctional _) (Filter.Eventually.of_forall
             fun t => ?_)
-        simp only [enorm_eq_self, Pi.add_apply, ApproximationScheme.phiIntegrand]
+        simp only [eNorm_eq_self, Pi.add_apply, ApproximationScheme.phiIntegrand]
         calc ENNReal.ofReal t ^ (-θ) * A.kFunctional (ENNReal.ofReal t) (u + v)
             ≤ ENNReal.ofReal t ^ (-θ) * (C * (A.kFunctional (ENNReal.ofReal t) u +
                 A.kFunctional (ENNReal.ofReal t) v)) := by
@@ -469,7 +469,7 @@ theorem kMethodNorm_smul_le [Module ℝ U] (hH : A.IsHomogeneousCouple) (c : ℝ
     ApproximationScheme.phiFunctional_eq]
   refine eLpNorm_le_mul_eLpNorm_of_ae_le_mul'' q
     (aestronglyMeasurable_phiIntegrand_kFunctional _) (Filter.Eventually.of_forall fun t => ?_)
-  simp only [enorm_eq_self, ApproximationScheme.phiIntegrand]
+  simp only [eNorm_eq_self, ApproximationScheme.phiIntegrand]
   calc ENNReal.ofReal t ^ (-θ) * A.kFunctional (ENNReal.ofReal t) (c • u)
       ≤ ENNReal.ofReal t ^ (-θ) * (‖c‖ₑ * A.kFunctional (ENNReal.ofReal t) u) := by
         gcongr
@@ -524,7 +524,7 @@ def kMethodSpace [Module ℝ U] (hA : A.IsQuasiNormed C) (hH : A.IsHomogeneousCo
   add_mem' hu hv := (kMethodNorm_add_le hA _ _).trans_lt (ENNReal.mul_lt_top
     (ENNReal.mul_lt_top (ENNReal.LpAddConst_lt_top q) hA.ne_top.lt_top)
     (ENNReal.add_lt_top.2 ⟨hu, hv⟩))
-  smul_mem' c _ hu := (kMethodNorm_smul_le hH c _).trans_lt (ENNReal.mul_lt_top enorm_lt_top hu)
+  smul_mem' c _ hu := (kMethodNorm_smul_le hH c _).trans_lt (ENNReal.mul_lt_top eNorm_lt_top hu)
 
 /-- Membership in the real interpolation space as a submodule. -/
 @[simp]
@@ -651,34 +651,34 @@ theorem norm1_ofMap_le {y : Y} {f : X} (hy : ι y = f) : (ofMap ι).norm1 f ≤ 
 
 /-- The quotient norm of `-f` is at most that of `f`. -/
 theorem norm1_ofMap_neg_le (f : X) : (ofMap ι).norm1 (-f) ≤ (ofMap ι).norm1 f :=
-  le_iInf fun y => (norm1_ofMap_le (by rw [map_neg, y.2])).trans_eq (enorm_neg _)
+  le_iInf fun y => (norm1_ofMap_le (by rw [map_neg, y.2])).trans_eq (eNorm_neg _)
 
 /-- The couple of a bounded linear map is quasi-normed with constant `1`. -/
 theorem isQuasiNormed_ofMap : (ofMap ι).IsQuasiNormed 1 where
   ne_top := ENNReal.one_ne_top
-  norm0_zero := enorm_zero
-  norm1_zero := nonpos_iff_eq_zero.1 ((norm1_ofMap_le (map_zero ι)).trans_eq enorm_zero)
-  norm0_neg := enorm_neg
+  norm0_zero := eNorm_zero
+  norm1_zero := nonpos_iff_eq_zero.1 ((norm1_ofMap_le (map_zero ι)).trans_eq eNorm_zero)
+  norm0_neg := eNorm_neg
   norm1_neg f :=
     le_antisymm (norm1_ofMap_neg_le f) (by simpa using norm1_ofMap_neg_le (ι := ι) (-f))
   norm0_add_le f g := by
     rw [one_mul]
-    exact enorm_add_le f g
+    exact eNorm_add_le f g
   norm1_add_le f g := by
     rw [one_mul]
     exact ENNReal.le_iInf_add_iInf fun y z =>
-      (norm1_ofMap_le (by rw [map_add, y.2, z.2])).trans (enorm_add_le _ _)
+      (norm1_ofMap_le (by rw [map_add, y.2, z.2])).trans (eNorm_add_le _ _)
 
 /-- The couple of a bounded linear map is homogeneous. -/
 theorem isHomogeneousCouple_ofMap : (ofMap ι).IsHomogeneousCouple where
-  norm0_smul_le c f := (enorm_smul c f).le
+  norm0_smul_le c f := (eNorm_smul c f).le
   norm1_smul_le c f := by
     rcases eq_or_ne c 0 with rfl | hc
     · rw [zero_smul, isQuasiNormed_ofMap.norm1_zero]
       exact zero_le
-    rw [ofMap_norm1 f, ENNReal.mul_iInf_of_ne (enorm_ne_zero.2 hc) enorm_ne_top]
+    rw [ofMap_norm1 f, ENNReal.mul_iInf_of_ne (eNorm_ne_zero.2 hc) eNorm_ne_top]
     exact le_iInf fun y =>
-      (norm1_ofMap_le (by rw [map_smul, y.2])).trans_eq (enorm_smul _ _)
+      (norm1_ofMap_le (by rw [map_smul, y.2])).trans_eq (eNorm_smul _ _)
 
 /-- **The couple of a bounded linear map is ordered**: `‖f‖ ≤ max(1, ‖ι‖) N₁(f)`, since
 `‖ι y‖ ≤ ‖ι‖ ‖y‖`; the factor `max(1, ‖ι‖) ≥ 1` keeps the bound true for `ι = 0`, where
@@ -688,7 +688,7 @@ theorem norm0_ofMap_le (f : X) : (ofMap ι).norm0 f ≤ max 1 ‖ι‖ₑ * (ofM
   · rw [ofMap_norm1, iInf_of_empty, ENNReal.mul_top (one_pos.trans_le (le_max_left _ _)).ne']
     exact le_top
   · rw [ofMap_norm1, ENNReal.mul_iInf fun h =>
-      absurd h (max_ne_top ENNReal.one_ne_top enorm_ne_top)]
+      absurd h (max_ne_top ENNReal.one_ne_top eNorm_ne_top)]
     refine le_iInf fun y => ?_
     calc (ofMap ι).norm0 f = ‖ι y‖ₑ := by rw [ofMap_norm0, y.2]
       _ ≤ ‖ι‖ₑ * ‖(y : Y)‖ₑ := ι.le_opENorm y

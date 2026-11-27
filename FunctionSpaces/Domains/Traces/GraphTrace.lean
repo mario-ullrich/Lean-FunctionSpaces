@@ -107,7 +107,7 @@ theorem enorm_traceCoef_le (p : ℝ≥0∞) (L j : ℕ) (h : V → ℂ) (m : Fin
   rw [traceCoef]
   split_ifs
   · exact le_rfl
-  · rw [enorm_zero]
+  · rw [eNorm_zero]
     exact zero_le
 
 /-- `‖λ'_{j,·}‖_{ℓ_p} ≤ 2^(jn/p) ‖h‖_p`. -/
@@ -312,13 +312,13 @@ theorem summable_traceTerm (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 < s) {q 
       rw [← ENNReal.dyadicWeight_add]
       congr 1
       ring
-    rw [Lp.enorm_def, eLpNorm_congr_ae (Ω.traceTerm_ae b hp L j (h j))]
+    rw [Lp.eNorm_def, eLpNorm_congr_ae (Ω.traceTerm_ae b hp L j (h j))]
     refine (hle j (Lp.memLp (h j))).trans ?_
-    rw [← Lp.enorm_def, hw]
+    rw [← Lp.eNorm_def, hw]
     calc K * (dyadicWeight (s + 1 / p.toReal) j * dyadicWeight (-s) j) * ‖h j‖ₑ
         = K * (dyadicWeight (s + 1 / p.toReal) j * ‖h j‖ₑ) * dyadicWeight (-s) j := by ring
       _ ≤ K * X * dyadicWeight (-s) j := by gcongr
-  refine Summable.of_enorm (ne_top_of_le_ne_top ?_ (ENNReal.tsum_le_tsum hterm))
+  refine Summable.of_eNorm (ne_top_of_le_ne_top ?_ (tsum_le_tsum hterm))
   rw [ENNReal.tsum_mul_left, ENNReal.tsum_dyadicWeight_neg]
   exact ENNReal.mul_ne_top (ENNReal.mul_ne_top hK hX.ne)
     (ENNReal.one_sub_two_rpow_neg_inv_ne_top hs)
@@ -373,7 +373,7 @@ theorem modNorm_traceSeries_le_of_atoms (hp : p ≠ ∞) (L : ℕ) {r : ℕ} {s 
           (dyadicWeight (finrank ℝ V / p.toReal) j * eLpNorm (h j) p volume) :=
         mul_le_mul' le_rfl (Ω.levelNorm_traceCoef_le b hp0 hp L j (Lp.memLp (h j)))
     _ = dyadicWeight (s + 1 / p.toReal) j * ‖h j‖ₑ := by
-        rw [← mul_assoc, ← ENNReal.dyadicWeight_add, Lp.enorm_def, Ω.finrank_hyperplane_eq]
+        rw [← mul_assoc, ← ENNReal.dyadicWeight_add, Lp.eNorm_def, Ω.finrank_hyperplane_eq]
         congr 2
         ring
 
@@ -615,13 +615,13 @@ theorem enorm_graphTrace_le_modNormOn (hp : p ≠ ∞) (L : ℕ) :
   refine ⟨K * Ω.intrinsicConst L, ENNReal.mul_ne_top hK (Ω.intrinsicConst_ne_top L),
     fun f => ?_⟩
   calc ‖Ω.graphTrace hp L f‖ₑ ≤ ∑' j, ‖Ω.traceTerm Ω.coneBump hp L j
-        (Ω.graphCutoff (Ω.coneBump.localMean hp L j f))‖ₑ := enorm_tsum_le_tsum_enorm
+        (Ω.graphCutoff (Ω.coneBump.localMean hp L j f))‖ₑ := eNorm_tsum_le_tsum_eNorm
     _ ≤ ∑' j, K * (dyadicWeight (1 / p.toReal) j *
           ‖Ω.graphCutoff (Ω.coneBump.localMean hp L j f)‖ₑ) :=
-        ENNReal.tsum_le_tsum fun j => by
-          rw [Lp.enorm_def, eLpNorm_congr_ae (Ω.traceTerm_ae Ω.coneBump hp L j _)]
+        tsum_le_tsum fun j => by
+          rw [Lp.eNorm_def, eLpNorm_congr_ae (Ω.traceTerm_ae Ω.coneBump hp L j _)]
           refine (hle j (Lp.memLp _)).trans ?_
-          rw [← Lp.enorm_def, mul_assoc]
+          rw [← Lp.eNorm_def, mul_assoc]
     _ = K * Ω.intrinsicNorm hp L (1 / p.toReal) 1 f := by
         rw [ENNReal.tsum_mul_left, intrinsicNorm_def, ENNReal.lqNorm_one]
     _ ≤ K * (Ω.intrinsicConst L * modNormOn Ω.measurableSet_domain L (1 / p.toReal) 1 f) :=
@@ -660,7 +660,7 @@ theorem tendsto_graphTrace_of_modNorm_sub_le (hp : p ≠ ∞) (L : ℕ) {s : ℝ
     rwa [ENNReal.toReal_zero] at h
   rw [tendsto_iff_norm_sub_tendsto_zero]
   refine squeeze_zero (fun J => norm_nonneg _) (fun J => ?_) hKb
-  rw [norm_sub_rev, ← Ω.graphTrace_sub hp L hs hq hF (hFJ J), ← toReal_enorm]
+  rw [norm_sub_rev, ← Ω.graphTrace_sub hp L hs hq hF (hFJ J), ← toReal_eNorm]
   exact ENNReal.toReal_mono (ENNReal.mul_ne_top hKT (hbtop J))
     ((hTle _).trans (mul_le_mul' le_rfl (hle J)))
 

@@ -125,7 +125,7 @@ theorem norm_sq_le_of_localWeyl {D C : ℝ} (hW : B.LocalWeylBound D C) {n : ℕ
     fun x => by
       rw [Real.le_sqrt (norm_nonneg _) (by positivity)]
       calc ‖(∑ i ∈ t, c i • B.basisFun i) x‖ ^ 2 = ‖∑ i ∈ t, c i * B.basisFun i x‖ ^ 2 := by
-            simp [BoundedContinuousFunction.coe_sum, Finset.sum_apply]
+            simp
         _ ≤ (∑ i ∈ t, ‖c i‖ * ‖B.basisFun i x‖) ^ 2 := by
             gcongr
             exact (norm_sum_le _ _).trans (Finset.sum_le_sum fun i _ => (norm_mul _ _).le)

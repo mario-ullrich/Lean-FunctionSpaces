@@ -94,12 +94,12 @@ theorem slobodeckijIntegrand_le_of_support {c : E} {r R : ℝ} (hr : r ≤ R) {f
   rcases not_and_or.1 (mem_prod.not.1 hxy) with hx | hy
   · rw [hzero hx, sub_zero]
     by_cases hfy : f y = 0
-    · rw [hfy, enorm_zero, ENNReal.zero_rpow_of_pos hP, ENNReal.zero_div]
+    · rw [hfy, eNorm_zero, ENNReal.zero_rpow_of_pos hP, ENNReal.zero_div]
       exact zero_le
     · exact (hfar hfy hx).trans le_add_self
-  · rw [hzero hy, zero_sub, enorm_neg, enorm_sub_rev]
+  · rw [hzero hy, zero_sub, eNorm_neg, eNorm_sub_rev]
     by_cases hfx : f x = 0
-    · rw [hfx, enorm_zero, ENNReal.zero_rpow_of_pos hP, ENNReal.zero_div]
+    · rw [hfx, eNorm_zero, ENNReal.zero_rpow_of_pos hP, ENNReal.zero_div]
       exact zero_le
     · exact (hfar hfx hy).trans le_self_add
 
@@ -109,8 +109,8 @@ end NormedGroup
 numbers, from `a b - c d = a (b - d) + (a - c) d`. -/
 theorem enorm_mul_sub_mul_le (a b c d : ℂ) :
     ‖a * b - c * d‖ₑ ≤ ‖a‖ₑ * ‖b - d‖ₑ + ‖a - c‖ₑ * ‖d‖ₑ := by
-  rw [show a * b - c * d = a * (b - d) + (a - c) * d by ring, ← enorm_mul, ← enorm_mul]
-  exact enorm_add_le _ _
+  rw [show a * b - c * d = a * (b - d) + (a - c) * d by ring, ← eNorm_mul, ← eNorm_mul]
+  exact eNorm_add_le _ _
 
 namespace BoundedLipschitzDomain
 
@@ -225,7 +225,7 @@ theorem boundarySlobodeckijForm_finsetSum_le (hp : p ≠ ∞) (s : ℝ) {ι : Ty
           ‖y - x‖ₑ ^ (((finrank ℝ V - 1 : ℕ) : ℝ) + s * p.toReal)
         ≤ ((t.card : ℝ≥0∞) ^ (p.toReal - 1) * ∑ i ∈ t, ‖f i y - f i x‖ₑ ^ p.toReal) /
           ‖y - x‖ₑ ^ (((finrank ℝ V - 1 : ℕ) : ℝ) + s * p.toReal) :=
-          ENNReal.div_le_div_right ((ENNReal.rpow_le_rpow (enorm_sum_le _ _) (by linarith)).trans
+          ENNReal.div_le_div_right ((ENNReal.rpow_le_rpow (eNorm_sum_le _ _) (by linarith)).trans
             (ENNReal.rpow_sum_le_const_mul_sum_rpow (s := t)
               (f := fun i => ‖f i y - f i x‖ₑ) hP1)) _
       _ = _ := by simp only [div_eq_mul_inv, mul_assoc, Finset.sum_mul]
@@ -306,12 +306,12 @@ theorem boundarySlobodeckijForm_le_of_support (j : Fin Ω.N) {r : ℝ} (hr : r <
   have ha : 0 ≤ ((finrank ℝ V - 1 : ℕ) : ℝ) + s * p.toReal := by positivity
   have hm : Measurable fun x : V => ‖f x‖ₑ ^ p.toReal /
       ENNReal.ofReal (Ω.radius j - r) ^ (((finrank ℝ V - 1 : ℕ) : ℝ) + s * p.toReal) :=
-    (hf.enorm.pow_const _).div_const _
+    (hf.eNorm.pow_const _).div_const _
   refine (lintegral_lintegral_le_add_two_mul hm fun x y =>
     slobodeckijIntegrand_le_of_support hr.le hf0 hP ha x y).trans
     (add_le_add (Ω.lintegral_lintegral_indicator_le_slobodeckijForm j f p hs) (le_of_eq ?_))
   simp_rw [div_eq_mul_inv]
-  rw [lintegral_mul_const _ (hf.enorm.pow_const _)]
+  rw [lintegral_mul_const _ (hf.eNorm.pow_const _)]
   ring
 
 /-- **The Gagliardo form of one localised piece, by its chart piece**: for `1 ≤ p < ∞`, `s > 0`,
@@ -347,13 +347,13 @@ theorem exists_boundarySlobodeckijForm_mul_le (ψ : Ω.BoundaryPartition) (j : F
         (measure_ne_top _ _)) hδ) ENNReal.ofReal_ne_top⟩, fun g hg G hG => ?_⟩
   have hGP : ‖G‖ₑ ^ p.toReal = ∫⁻ x', ‖ψ.toComplex j ((Ω.graph j).graphMap x') *
       g ((Ω.graph j).graphMap x')‖ₑ ^ p.toReal := by
-    rw [Lp.enorm_def, eLpNorm_rpow_eq (Lp.aestronglyMeasurable G) hp0 hp]
+    rw [Lp.eNorm_def, eLpNorm_rpow_eq (Lp.aestronglyMeasurable G) hp0 hp]
     exact lintegral_congr_ae (hG.mono fun x' hx' => by dsimp only; rw [hx'])
   have hL : ∫⁻ y, ‖ψ.toComplex j y * g y‖ₑ ^ p.toReal ∂Ω.surfaceMeasure ≤
       ENNReal.ofReal √(1 + (Ω.graph j).M ^ 2) * ‖G‖ₑ ^ p.toReal := by
     rw [hGP]
     refine Ω.lintegral_le_chart j _ fun y hy => ball_subset_ball hr.le (hf0 g y fun h => hy ?_)
-    rw [h, enorm_zero, ENNReal.zero_rpow_of_pos hP]
+    rw [h, eNorm_zero, ENNReal.zero_rpow_of_pos hP]
   have hS : slobodeckijForm p s (fun x' => ψ.toComplex j ((Ω.graph j).graphMap x') *
       g ((Ω.graph j).graphMap x')) ≤ slobodeckijConstLower (Ω.graph j).hyperplane p s *
         (‖G‖ₑ ^ p.toReal +
@@ -491,7 +491,7 @@ theorem chartPiece_integrand_le_of_notMem (ψ : Ω.BoundaryPartition) (j : Fin �
     ψ.toComplex_of_eq_zero (by_contra fun h => hx (ball_subset_ball hr (hsub _ h)))
   rw [hφx, zero_mul, sub_zero]
   by_cases hφy : ψ.toFun j ((Ω.graph j).graphMap y') = 0
-  · rw [ψ.toComplex_of_eq_zero hφy, zero_mul, enorm_zero, ENNReal.zero_rpow_of_pos hP,
+  · rw [ψ.toComplex_of_eq_zero hφy, zero_mul, eNorm_zero, ENNReal.zero_rpow_of_pos hP,
       ENNReal.zero_div, zero_mul]
   have hfar := sub_le_norm_sub_of_mem_ball (hsub _ hφy) hx
   have hlip := (Ω.graph j).norm_graphMap_sub_le y' x'
@@ -500,7 +500,7 @@ theorem chartPiece_integrand_le_of_notMem (ψ : Ω.BoundaryPartition) (j : Fin �
     rw [div_le_iff₀ hM, norm_sub_rev]
     linarith
   rw [indicator_of_mem (by simpa [mem_ball_zero_iff] using hη), ENNReal.rpow_neg,
-    ← div_eq_mul_inv, enorm_sub_rev x' y']
+    ← div_eq_mul_inv, eNorm_sub_rev x' y']
 
 omit [MeasurableSpace V] [BorelSpace V] in
 /-- **The integrand of a chart piece, bounded by four parts**: if `ψ_j` vanishes outside
@@ -537,7 +537,7 @@ theorem chartPiece_integrand_le_add (ψ : Ω.BoundaryPartition) (j : Fin Ω.N) {
     · rw [indicator_of_mem (mk_mem_prod hx hy), indicator_of_mem hx]
       exact (Ω.chartPiece_integrand_le ψ j hP1 ha g x' y').trans (le_self_add.trans le_self_add)
     · have h := Ω.chartPiece_integrand_le_of_notMem ψ j hr hsub hP a g (x' := y') (y' := x') hy
-      rw [enorm_sub_rev, enorm_sub_rev x' y'] at h
+      rw [eNorm_sub_rev, eNorm_sub_rev x' y'] at h
       exact h.trans (le_add_right le_add_self)
   · exact (Ω.chartPiece_integrand_le_of_notMem ψ j hr hsub hP a g hx).trans le_add_self
 
@@ -611,7 +611,7 @@ theorem lintegral_lintegral_lipschitz_le (ψ : Ω.BoundaryPartition) (j : Fin Ω
         (ψ.derivBound_spec j) 0)), mul_assoc]
       refine mul_le_mul' le_rfl ((Ω.graph j).enorm_graphMap_sub_le (z + x') x' |>.trans ?_)
       rw [add_sub_cancel_right]
-    · refine enorm_sub_le.trans ?_
+    · refine eNorm_sub_le.trans ?_
       rw [ENNReal.ofReal_mul zero_le_two, ENNReal.ofReal_ofNat, two_mul]
       exact add_le_add (ψ.enorm_toComplex_le j _) (ψ.enorm_toComplex_le j _)
     · rw [hm]
@@ -624,8 +624,8 @@ theorem lintegral_lintegral_lipschitz_le (ψ : Ω.BoundaryPartition) (j : Fin Ω
           ψ.toComplex j ((Ω.graph j).graphMap x')‖ₑ ^ p.toReal /
             ‖y' - x'‖ₑ ^ (((finrank ℝ V - 1 : ℕ) : ℝ) + s * p.toReal) :=
         lintegral_congr fun x' => lintegral_const_mul _ (((hφγ.measurable.sub
-          measurable_const).enorm.pow_const _).div
-            ((measurable_id.sub measurable_const).enorm.pow_const _))
+          measurable_const).eNorm.pow_const _).div
+            ((measurable_id.sub measurable_const).eNorm.pow_const _))
     _ ≤ ∫⁻ x', (ball (Ω.center j) (Ω.radius j)).indicator (fun y => ‖g y‖ₑ ^ p.toReal)
         ((Ω.graph j).graphMap x') * Ω.chartLipschitzConst p ψ j s :=
         lintegral_mono fun x' => mul_le_mul' le_rfl (hin x')
@@ -670,28 +670,28 @@ theorem slobodeckijForm_chartPiece_le (ψ : Ω.BoundaryPartition) (j : Fin Ω.N)
   have hk : Measurable ((ball (0 : (Ω.graph j).hyperplane)
       ((Ω.radius j - r) / (1 + (Ω.graph j).M)))ᶜ.indicator
         fun z => ‖z‖ₑ ^ (-(((finrank ℝ V - 1 : ℕ) : ℝ) + s * p.toReal))) :=
-    (measurable_enorm.pow_const _).indicator measurableSet_ball.compl
+    (measurable_eNorm.pow_const _).indicator measurableSet_ball.compl
   have hT : Measurable (Function.uncurry fun x' y' : (Ω.graph j).hyperplane =>
       ‖ψ.toComplex j ((Ω.graph j).graphMap x') * g ((Ω.graph j).graphMap x')‖ₑ ^ p.toReal *
         (ball (0 : (Ω.graph j).hyperplane) ((Ω.radius j - r) / (1 + (Ω.graph j).M)))ᶜ.indicator
           (fun z => ‖z‖ₑ ^ (-(((finrank ℝ V - 1 : ℕ) : ℝ) + s * p.toReal))) (y' - x')) :=
-    ((hG.comp measurable_fst).enorm.pow_const p.toReal).mul
+    ((hG.comp measurable_fst).eNorm.pow_const p.toReal).mul
       (hk.comp (measurable_snd.sub measurable_fst))
   have hT' : Measurable (Function.uncurry fun x' y' : (Ω.graph j).hyperplane =>
       ‖ψ.toComplex j ((Ω.graph j).graphMap y') * g ((Ω.graph j).graphMap y')‖ₑ ^ p.toReal *
         (ball (0 : (Ω.graph j).hyperplane) ((Ω.radius j - r) / (1 + (Ω.graph j).M)))ᶜ.indicator
           (fun z => ‖z‖ₑ ^ (-(((finrank ℝ V - 1 : ℕ) : ℝ) + s * p.toReal))) (x' - y')) :=
-    ((hG.comp measurable_snd).enorm.pow_const p.toReal).mul
+    ((hG.comp measurable_snd).eNorm.pow_const p.toReal).mul
       (hk.comp (measurable_fst.sub measurable_snd))
   have hB : Measurable (Function.uncurry fun x' y' : (Ω.graph j).hyperplane =>
       (ball (Ω.center j) (Ω.radius j)).indicator (fun y => ‖g y‖ₑ ^ p.toReal)
         ((Ω.graph j).graphMap x') *
         (‖ψ.toComplex j ((Ω.graph j).graphMap y') - ψ.toComplex j ((Ω.graph j).graphMap x')‖ₑ ^
           p.toReal / ‖y' - x'‖ₑ ^ (((finrank ℝ V - 1 : ℕ) : ℝ) + s * p.toReal))) :=
-    ((((hg.enorm.pow_const p.toReal).indicator measurableSet_ball).comp hγ).comp
+    ((((hg.eNorm.pow_const p.toReal).indicator measurableSet_ball).comp hγ).comp
       measurable_fst).mul ((((hφγ.comp measurable_snd).sub
-        (hφγ.comp measurable_fst)).enorm.pow_const p.toReal).div
-          ((measurable_snd.sub measurable_fst).enorm.pow_const _))
+        (hφγ.comp measurable_fst)).eNorm.pow_const p.toReal).div
+          ((measurable_snd.sub measurable_fst).eNorm.pow_const _))
   rw [slobodeckijForm, (Ω.graph j).finrank_hyperplane_eq_sub_one]
   refine (lintegral_mono fun x' => lintegral_mono fun y' =>
     Ω.chartPiece_integrand_le_add ψ j hr hsub hP1 ha g x' y').trans (le_of_eq ?_)
@@ -806,7 +806,7 @@ theorem exists_boundaryBesovNorm_rpow_le (ψ : Ω.BoundaryPartition) (hp : p ≠
     exact le_top
   have hmem : ∀ j, MemLp (fun x' => ψ.toComplex j ((Ω.graph j).graphMap x') *
       hg.mk g ((Ω.graph j).graphMap x')) p volume := fun j =>
-    memLp_iff.2 ((eLpNorm_lt_top_iff_lintegral_rpow_enorm_lt_top hp0 hp
+    memLp_iff.2 ((eLpNorm_lt_top_iff_lintegral_rpow_eNorm_lt_top hp0 hp
       ((((ψ.contDiff_toComplex j).continuous.comp (Ω.graph j).continuous_graphMap).measurable.mul
         (hgm.comp (Ω.graph j).continuous_graphMap.measurable)).aestronglyMeasurable)).2
       ((Ω.lintegral_chartPiece_le ψ j hP _).trans_lt (ENNReal.mul_lt_top
@@ -825,7 +825,7 @@ theorem exists_boundaryBesovNorm_rpow_le (ψ : Ω.BoundaryPartition) (hp : p ≠
       have hGP' : ∫⁻ x', ‖G x'‖ₑ ^ p.toReal = ∫⁻ x', ‖ψ.toComplex j ((Ω.graph j).graphMap x') *
           hg.mk g ((Ω.graph j).graphMap x')‖ₑ ^ p.toReal :=
         lintegral_congr_ae (hG.mono fun x' hx' => by dsimp only; rw [hx'])
-      rw [Lp.enorm_def, eLpNorm_rpow_eq (Lp.aestronglyMeasurable G) hp0 hp, hGP']
+      rw [Lp.eNorm_def, eLpNorm_rpow_eq (Lp.aestronglyMeasurable G) hp0 hp, hGP']
       exact Ω.lintegral_chartPiece_le ψ j hP _
     have hL := (lqNorm_modulus_rpow_le_slobodeckijForm hp hs G).trans (mul_le_mul' le_rfl
       ((slobodeckijForm_congr_ae hG p s).trans_le (hle j _ hgm)))
@@ -899,7 +899,7 @@ theorem exists_traceL2_norm_equiv_slobodeckij (s : ℝ) (hs : 1 / 2 < s := by no
   simp only [ENNReal.toReal_ofNat, ENNReal.rpow_two] at h₂ h₃
   refine ⟨C₁ ^ 2 * C₃ + (‖Ω.traceL2 s hs hs'‖ₑ ^ 2 + C₂ * C₁ ^ 2), ENNReal.add_ne_top.2
     ⟨ENNReal.mul_ne_top (ENNReal.pow_ne_top hC₁) hC₃, ENNReal.add_ne_top.2
-      ⟨ENNReal.pow_ne_top enorm_ne_top, ENNReal.mul_ne_top hC₂ (ENNReal.pow_ne_top hC₁)⟩⟩,
+      ⟨ENNReal.pow_ne_top eNorm_ne_top, ENNReal.mul_ne_top hC₂ (ENNReal.pow_ne_top hC₁)⟩⟩,
     fun w => ⟨?_, ?_⟩⟩
   · calc ‖w‖ₑ ^ 2
         ≤ (C₁ * Ω.boundaryBesovNorm 2 Ω.boundaryPartition (s - 1 / 2) 2
@@ -907,7 +907,7 @@ theorem exists_traceL2_norm_equiv_slobodeckij (s : ℝ) (hs : 1 / 2 < s := by no
           pow_le_pow_left₀ zero_le (h₁ w).1 2
       _ ≤ C₁ ^ 2 * (C₃ * (‖Ω.traceL2 s hs hs' w‖ₑ ^ 2 +
             Ω.boundarySlobodeckijForm 2 (s - 1 / 2) (Ω.traceL2 s hs hs' w))) := by
-          rw [mul_pow, Lp.enorm_def]
+          rw [mul_pow, Lp.eNorm_def]
           exact mul_le_mul' le_rfl (h₃ _ (Lp.aestronglyMeasurable _))
       _ ≤ _ := by
           rw [← mul_assoc]

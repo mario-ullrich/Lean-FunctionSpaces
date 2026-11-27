@@ -77,7 +77,7 @@ theorem memApprox_top_of_jackson (hJ : JacksonBound ι A r C) (hC : 0 ≤ C) (hr
     A.MemApprox r ∞ (ι y) := by
   rw [memApprox_iff_approxNormDyadic_lt_top le_top hr]
   exact (approxNormDyadic_top_le_of_jackson hJ hC y).trans_lt
-    (ENNReal.mul_lt_top (ENNReal.add_lt_top.2 ⟨enorm_lt_top, ENNReal.ofReal_lt_top⟩) enorm_lt_top)
+    (ENNReal.mul_lt_top (ENNReal.add_lt_top.2 ⟨eNorm_lt_top, ENNReal.ofReal_lt_top⟩) eNorm_lt_top)
 
 /-- A **smoothness space** of order `r` for the scheme `A`: a normed space `F` with an injective
 bounded linear map `ι : F → E` satisfying Jackson's and Bernstein's inequalities of order `r`.

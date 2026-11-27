@@ -69,7 +69,7 @@ theorem LipschitzOnWith.euclideanHausdorffMeasure_image_le_pow_mul {X Y : Type*}
     [MeasurableSpace X] [BorelSpace X] [EMetricSpace Y] [MeasurableSpace Y] [BorelSpace Y]
     {K : ℝ≥0} {f : X → Y} {s : Set X} (h : LipschitzOnWith K f s) (d : ℕ) :
     μHE[d] (f '' s) ≤ (K : ℝ≥0∞) ^ d * μHE[d] s := by
-  simp only [Measure.euclideanHausdorffMeasure_def, Measure.smul_apply, ENNReal.smul_def,
+  simp only [Measure.euclideanHausdorffMeasure_def, smul_apply, ENNReal.smul_def,
     smul_eq_mul]
   have h1 := h.hausdorffMeasure_image_le (d := d) (Nat.cast_nonneg d)
   rw [ENNReal.rpow_natCast] at h1
@@ -371,14 +371,14 @@ theorem antilipschitzWith_graphMap : AntilipschitzWith 1 Ω.graphMap :=
 (`Rd.LipschitzGraph.antilipschitzWith_graphMap`). -/
 theorem enorm_sub_le_enorm_graphMap_sub (x' y' : Ω.hyperplane) :
     ‖x' - y'‖ₑ ≤ ‖Ω.graphMap x' - Ω.graphMap y'‖ₑ := by
-  simpa [edist_eq_enorm_sub] using Ω.antilipschitzWith_graphMap x' y'
+  simpa [eDist_eq_eNorm_sub] using Ω.antilipschitzWith_graphMap x' y'
 
 /-- The graph map is Lipschitz: `|γ x' - γ y'| ≤ (1 + M) |x' - y'|`
 (`Rd.LipschitzGraph.lipschitzWith_graphMap`). -/
 theorem enorm_graphMap_sub_le (x' y' : Ω.hyperplane) :
     ‖Ω.graphMap x' - Ω.graphMap y'‖ₑ ≤ ENNReal.ofReal (1 + Ω.M) * ‖x' - y'‖ₑ := by
   have h := Ω.lipschitzWith_graphMap.edist_le_mul x' y'
-  rw [edist_eq_enorm_sub, edist_eq_enorm_sub] at h
+  rw [eDist_eq_eNorm_sub, eDist_eq_eNorm_sub] at h
   rw [ENNReal.ofReal_eq_coe_nnreal (by linarith [Ω.M_nonneg])]
   exact h
 
@@ -793,7 +793,7 @@ theorem euclideanHausdorffMeasure_graphMap_image_le_mul {ε : ℝ} (hε : 0 < ε
         rw [hnull, add_zero]
     _ ≤ ∑' n, μHE[finrank ℝ Ω.hyperplane] (Ω.graphMap '' (A ∩ Q n)) := measure_iUnion_le _
     _ ≤ ∑' n, ENNReal.ofReal (areaFactor (finrank ℝ Ω.hyperplane) ε) *
-        ∫⁻ x' in A ∩ Q n, ENNReal.ofReal (Ω.gramDensity x') := ENNReal.tsum_le_tsum fun n =>
+        ∫⁻ x' in A ∩ Q n, ENNReal.ofReal (Ω.gramDensity x') := tsum_le_tsum fun n =>
           ((hQg n).mono Set.inter_subset_right).euclideanHausdorffMeasure_image_le hε.le
     _ = ENNReal.ofReal (areaFactor (finrank ℝ Ω.hyperplane) ε) *
         ∫⁻ x' in ⋃ n, A ∩ Q n, ENNReal.ofReal (Ω.gramDensity x') := by
@@ -825,7 +825,7 @@ theorem lintegral_gramDensity_le_mul {ε : ℝ} (hε : 0 < ε) {A : Set Ω.hyper
       = ∑' n, ∫⁻ x' in A ∩ Q n, ENNReal.ofReal (Ω.gramDensity x') := by
         rw [hA', lintegral_iUnion (fun n => hA.inter (hQm n)) hdisj]
     _ ≤ ∑' n, ENNReal.ofReal (areaFactor (finrank ℝ Ω.hyperplane) ε) *
-        μHE[finrank ℝ Ω.hyperplane] (Ω.graphMap '' (A ∩ Q n)) := ENNReal.tsum_le_tsum fun n =>
+        μHE[finrank ℝ Ω.hyperplane] (Ω.graphMap '' (A ∩ Q n)) := tsum_le_tsum fun n =>
           ((hQg n).mono Set.inter_subset_right).lintegral_gramDensity_le hε.le
     _ = ENNReal.ofReal (areaFactor (finrank ℝ Ω.hyperplane) ε) *
         μHE[finrank ℝ Ω.hyperplane] (⋃ n, Ω.graphMap '' (A ∩ Q n)) := by

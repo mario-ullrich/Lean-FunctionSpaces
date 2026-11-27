@@ -71,8 +71,8 @@ theorem eLpNorm_le_rpow_mul_eLpNorm_rpow (hf : AEStronglyMeasurable f μ) {M : �
   have hpp : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
   have hrr : 0 < r.toReal := ENNReal.toReal_pos hr0 hr
   have hpr' : p.toReal ≤ r.toReal := ENNReal.toReal_mono hr hpr
-  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hr0 hr hf,
-    eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hf]
+  rw [eLpNorm_eq_lintegral_rpow_eNorm_toReal hr0 hr hf,
+    eLpNorm_eq_lintegral_rpow_eNorm_toReal hp0 hp hf]
   have hpt : ∀ᵐ x ∂μ, ‖f x‖ₑ ^ r.toReal ≤ M ^ (r.toReal - p.toReal) * ‖f x‖ₑ ^ p.toReal := by
     filter_upwards [hM] with x hx
     rw [← sub_add_cancel r.toReal p.toReal,
@@ -83,7 +83,7 @@ theorem eLpNorm_le_rpow_mul_eLpNorm_rpow (hf : AEStronglyMeasurable f μ) {M : �
         gcongr ?_ ^ _
         exact lintegral_mono_ae hpt
     _ = (M ^ (r.toReal - p.toReal) * ∫⁻ x, ‖f x‖ₑ ^ p.toReal ∂μ) ^ (1 / r.toReal) := by
-        rw [lintegral_const_mul'' _ (hf.enorm.pow_const _)]
+        rw [lintegral_const_mul'' _ (hf.eNorm.pow_const _)]
     _ = M ^ (1 - p.toReal / r.toReal) *
           ((∫⁻ x, ‖f x‖ₑ ^ p.toReal ∂μ) ^ (1 / p.toReal)) ^ (p.toReal / r.toReal) := by
         rw [ENNReal.mul_rpow_of_nonneg _ _ (by positivity), ← ENNReal.rpow_mul,
@@ -99,7 +99,7 @@ theorem MemLp.mono_exponent_of_enorm_le (hf : MemLp f p μ) {M : ℝ≥0∞}
   refine memLp_iff.2 ?_
   rcases eq_or_ne r ∞ with rfl | hr
   · rw [eLpNorm_exponent_top hf.aestronglyMeasurable]
-    exact (eLpNormEssSup_le_of_ae_enorm_bound hM).trans_lt hMtop.lt_top
+    exact (eLpNormEssSup_le_of_ae_eNorm_bound hM).trans_lt hMtop.lt_top
   · refine (eLpNorm_le_rpow_mul_eLpNorm_rpow hf.aestronglyMeasurable hM hp0 hpr hr).trans_lt
       (ENNReal.mul_lt_top ?_ ?_)
     · exact ENNReal.rpow_lt_top_of_nonneg (ENNReal.one_sub_toReal_div_nonneg hpr) hMtop

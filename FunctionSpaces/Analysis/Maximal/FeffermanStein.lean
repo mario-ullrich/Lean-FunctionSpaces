@@ -82,7 +82,7 @@ theorem maximalFunction_indicator_iUnion_le {ι : Type*} [Countable ι] (Q : ι 
         rw [setLIntegral_indicator (MeasurableSet.iUnion hm), Set.iUnion_inter]
     _ ≤ ∑' i, ∫⁻ y in Q i ∩ ball x r, g y := lintegral_iUnion_le _ _
     _ ≤ ∑' i, (⨍⁻ z in Q i, g z ∂volume) * volume (Q i ∩ ball x (3 * r)) :=
-        ENNReal.tsum_le_tsum fun i =>
+        tsum_le_tsum fun i =>
           setLIntegral_inter_ball_le (hQ i) (h0 i) (htop i) g (hx i)
     _ = ∫⁻ y in ball x (3 * r), ∑' i, (Q i).indicator (fun _ => ⨍⁻ z in Q i, g z ∂volume) y := by
         rw [lintegral_tsum fun i => (measurable_const.indicator (hm i)).aemeasurable]
@@ -124,7 +124,7 @@ theorem czAverage_eq_of_mem {k : ℤ} {m : Fin (finrank ℝ V) → ℤ} (hkm : (
 /-- Outside the exceptional set `Ω` the Calderón–Zygmund averages vanish. -/
 theorem czAverage_eq_zero_of_notMem (h : V → ℝ≥0∞) {x : V} (hx : x ∉ czSet G t) :
     czAverage G t h x = 0 :=
-  ENNReal.tsum_eq_zero.2 fun km =>
+  tsum_eq_zero_iff.2 fun km =>
     Set.indicator_of_notMem (fun hx' => hx (zcell_subset_czSet km.2 hx')) _
 
 /-- The sum over the maximal big cubes of the integrals of `h : V → [0, ∞]` over the cubes is
@@ -142,7 +142,7 @@ theorem tsum_le_mul_lintegral_of_le_setLIntegral {a : czMaximal G t → ℝ≥0�
     (c : ℝ≥0∞) (h : ∀ km, a km ≤ c * ∫⁻ z in zcell km.1.1 km.1.2, H z) :
     ∑' km, a km ≤ c * ∫⁻ z, H z :=
   calc ∑' km, a km ≤ ∑' km : czMaximal G t, c * ∫⁻ z in zcell km.1.1 km.1.2, H z :=
-        ENNReal.tsum_le_tsum h
+        tsum_le_tsum h
     _ = c * ∫⁻ z in czSet G t, H z := by rw [ENNReal.tsum_mul_left, tsum_setLIntegral_czMaximal]
     _ ≤ c * ∫⁻ z, H z := mul_le_mul_right (setLIntegral_le_lintegral _ _) _
 
@@ -334,7 +334,7 @@ theorem lintegral_lqNorm_maximalFunction_rpow_le {q : ℝ≥0∞} (hq1 : 1 < q) 
   simp_rw [ENNReal.lqNorm_rpow hq0 hq]
   rw [lintegral_tsum fun j => (measurable_maximalFunction _).aemeasurable.pow_const _,
     lintegral_tsum fun j => (hg j).pow_const _, ← ENNReal.tsum_mul_left]
-  exact ENNReal.tsum_le_tsum fun j =>
+  exact tsum_le_tsum fun j =>
     lintegral_maximalFunction_rpow_le (hg j) (ENNReal.one_lt_toReal hq1 hq)
 
 variable (V) in
@@ -843,10 +843,10 @@ theorem feffermanStein_top {p : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ ∞) (g : 
       maximalConst (finrank ℝ V) p.toReal ^ (1 / p.toReal) *
         eLpNorm (fun x => lqNorm ∞ (fun j => g j x)) p volume := by
   simp only [ENNReal.lqNorm_top]
-  refine (eLpNorm_mono_enorm
+  refine (eLpNorm_mono_eNorm
     (Measurable.iSup fun j => measurable_maximalFunction (g j)).aestronglyMeasurable
       fun x => ?_).trans (eLpNorm_maximalFunction_le (fun y => ⨆ j, g j y) hp1 hp)
-  simp only [enorm_eq_self]
+  simp only [eNorm_eq_self]
   exact iSup_le fun j => maximalFunction_mono (fun y => le_iSup (fun k => g k y) j) x
 
 /-- **The Fefferman–Stein inequality for `q = p`**: for `1 < p < ∞` and almost everywhere

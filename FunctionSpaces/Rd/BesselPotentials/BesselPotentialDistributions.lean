@@ -60,7 +60,7 @@ theorem exists_tendsto_sum_convLp (hp : p ≠ ∞) {σ : ℝ} {K : ℕ → 𝓢(
       Tendsto (fun J => ∑ j ∈ Finset.range J, convLp hp (K j).integrable (g j)) atTop (𝓝 h) ∧
       ‖h‖ₑ ≤ C * eLpNorm (fun x => lqNorm 2 fun j => dyadicWeight σ j * ‖g j x‖ₑ) p volume := by
   have hmeas : ∀ j, AEMeasurable (fun x => dyadicWeight σ j * ‖g j x‖ₑ) volume := fun j =>
-    (Lp.aestronglyMeasurable (g j)).enorm.const_mul _
+    (Lp.aestronglyMeasurable (g j)).eNorm.const_mul _
   have hS : CauchySeq fun J => ∑ j ∈ Finset.range J, convLp hp (K j).integrable (g j) := by
     refine cauchySeq_of_edist_le_lqNorm_ite (p := p) (q := 2) hC
       (zero_lt_one.trans_le Fact.out).ne' hp two_ne_zero ENNReal.ofNat_ne_top hmeas hG
@@ -68,14 +68,14 @@ theorem exists_tendsto_sum_convLp (hp : p ≠ ∞) {σ : ℝ} {K : ℕ → 𝓢(
     have hd : edist (∑ j ∈ Finset.range N', convLp hp (K j).integrable (g j))
         (∑ j ∈ Finset.range N, convLp hp (K j).integrable (g j)) =
         eLpNorm (fun x => ∑ j ∈ Finset.Ico N N', conv (K j) (g j) volume x) p volume := by
-      rw [edist_eq_enorm_sub, ← Finset.sum_Ico_eq_sub _ hNN', Lp.enorm_def]
+      rw [eDist_eq_eNorm_sub, ← Finset.sum_Ico_eq_sub _ hNN', Lp.eNorm_def]
       exact eLpNorm_congr_ae (coeFn_sum_convLp_ae hp K g _)
     rw [hd]
     exact (hK _).trans (mul_le_mul_of_nonneg_left (eLpNorm_lqNorm_ite_mono hmeas
       fun j hj => (Finset.mem_Ico.1 hj).1) (zero_le (a := C)))
   obtain ⟨h, hh⟩ := cauchySeq_tendsto_of_complete hS
-  refine ⟨h, hh, le_of_tendsto' hh.enorm fun J => ?_⟩
-  rw [Lp.enorm_def, eLpNorm_congr_ae (coeFn_sum_convLp_ae hp K g _)]
+  refine ⟨h, hh, le_of_tendsto' hh.eNorm fun J => ?_⟩
+  rw [Lp.eNorm_def, eLpNorm_congr_ae (coeFn_sum_convLp_ae hp K g _)]
   exact (hK _).trans
     (mul_le_mul_of_nonneg_left (eLpNorm_lqNorm_ite_le hmeas) (zero_le (a := C)))
 
@@ -170,7 +170,7 @@ theorem memSobolev_bessel_iff_memTriebelLizorkinDistr [Nontrivial V] (hp1 : 1 < 
     TemperedDistribution.MemSobolev s p u ↔ MemTriebelLizorkinDistr p s 2 u := by
   refine ⟨fun ⟨h, hh⟩ => ?_, memSobolev_bessel_of_memTriebelLizorkinDistr hp1 hp⟩
   obtain ⟨C, hC, hCu⟩ := exists_triebelLizorkinNormDistr_le_of_besselPotential_eq (V := V) hp1 hp s
-  exact (hCu u h hh).trans_lt (ENNReal.mul_lt_top hC.lt_top enorm_lt_top)
+  exact (hCu u h hh).trans_lt (ENNReal.mul_lt_top hC.lt_top eNorm_lt_top)
 
 /-- **`H^{s,p} ⊆ F^s_{p,2}` in Mathlib's bundled space**: in dimension `n ≥ 1`, for `1 < p < ∞`
 and every real `s` there is a finite constant `C` with `‖F‖_{F^s_{p,2}} ≤ C ‖F‖_{H^{s,p}}` for

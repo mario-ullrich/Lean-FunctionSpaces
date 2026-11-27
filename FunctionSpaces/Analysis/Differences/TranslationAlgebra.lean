@@ -56,7 +56,7 @@ def translHom : Multiplicative G →* Module.End ℂ (G → ℂ) where
     simp
   map_mul' v w := by
     ext f x
-    simp [Module.End.mul_apply, add_assoc]
+    simp [mul_apply_eq_comp, add_assoc]
 
 /-- The **action of the translation algebra** `ℂ[G]` on functions on `G`: `δ_v` acts by the
 translation `τ_v` (Mathlib's `AddMonoidAlgebra.lift`). -/
@@ -80,9 +80,9 @@ theorem higherDiff_eq_diffAct (r : ℕ) (h : G) (f : G → ℂ) :
   have hfwd : ⇑(diffAct (AddMonoidAlgebra.single h (1 : ℂ) - 1)) = fwdDiff h := by
     funext g x
     rw [map_sub, map_one, diffAct_single_one, LinearMap.sub_apply, Pi.sub_apply, transl_apply,
-      Module.End.one_apply]
+      one_apply_eq_self]
     rfl
-  rw [map_pow, Module.End.pow_apply, hfwd, Rd.higherDiff_def]
+  rw [map_pow, pow_apply_eq_iterate, hfwd, Rd.higherDiff_def]
 
 /-- `δ_{∑ v_i} = ∏ δ_{v_i}` (Mathlib's `AddMonoidAlgebra.prod_single`). -/
 theorem single_sum_one {ι : Type*} (s : Finset ι) (v : ι → G) :

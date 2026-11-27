@@ -82,11 +82,11 @@ theorem enorm_periodicTranslate_sub_le_of_mem {n : ℕ}
     (ha : a ∈ (trigScheme d).toLp 2 n) (h : UnitAddTorus d) :
     ‖periodicTranslate h a - a‖ₑ ≤ ENNReal.ofReal (2 * π * Fintype.card d * n * ‖h‖) * ‖a‖ₑ := by
   have hpars : ‖a‖ₑ ^ 2 = ∑' k, ‖mFourierCoeff a k‖ₑ ^ 2 := by
-    rw [← mFourierBasis.repr.enorm_map, lp.enorm_sq_eq_tsum]
+    rw [← mFourierBasis.repr.eNorm_map, lp.enorm_sq_eq_tsum]
     simp only [mFourierBasis_repr]
   refine (ENNReal.pow_le_pow_left_iff two_ne_zero).1 ?_
   rw [enorm_periodicTranslate_sub_sq, mul_pow, hpars, ← ENNReal.tsum_mul_left]
-  refine ENNReal.tsum_le_tsum fun k => ?_
+  refine tsum_le_tsum fun k => ?_
   rcases le_or_gt n (trigDeg k) with hk | hk
   · simp [mFourierCoeff_eq_zero_of_mem ha hk]
   · gcongr
@@ -195,8 +195,8 @@ theorem enorm_periodicTranslate_sub_sq_le {h : UnitAddTorus d} {t : ℝ} (hh : �
     ‖periodicTranslate h f - f‖ₑ ^ 2 ≤ ∑' K, blockMult d K t ^ 2 * ‖fourierBlock K f‖ₑ ^ 2 := by
   rw [enorm_periodicTranslate_sub_sq]
   simp_rw [enorm_fourierBlock_sq, ← ENNReal.tsum_mul_left]
-  rw [ENNReal.tsum_comm]
-  refine ENNReal.tsum_le_tsum fun k => ?_
+  rw [tsum_comm]
+  refine tsum_le_tsum fun k => ?_
   rcases Nat.eq_zero_or_pos (trigDeg k) with h0 | hpos
   · have hk : k = 0 := by
       funext i; have := natAbs_le_trigDeg k i; rw [h0] at this; simpa using this
@@ -212,7 +212,7 @@ theorem enorm_periodicTranslate_sub_sq_le {h : UnitAddTorus d} {t : ℝ} (hh : �
           ‖mFourierCoeff f k‖ₑ ^ 2 else 0) := by simp only [hK0, and_self, ↓reduceIte]
     _ ≤ ∑' K, blockMult d K t ^ 2 * (if 2 ^ K ≤ trigDeg k ∧ trigDeg k < 2 ^ (K + 1) then
           ‖mFourierCoeff f k‖ₑ ^ 2 else 0) :=
-        ENNReal.le_tsum (f := fun K => blockMult d K t ^ 2 * (if 2 ^ K ≤ trigDeg k ∧
+        le_tsum (f := fun K => blockMult d K t ^ 2 * (if 2 ^ K ≤ trigDeg k ∧
           trigDeg k < 2 ^ (K + 1) then ‖mFourierCoeff f k‖ₑ ^ 2 else 0)) K0
 
 /-- **The modulus is controlled by the dyadic blocks**:
@@ -226,8 +226,8 @@ theorem periodicModulus_le_tsum_block (f : Lp ℂ 2 (volume : Measure (UnitAddTo
         simpa only [mul_pow] using enorm_periodicTranslate_sub_sq_le hh f
     _ ≤ (∑' K, blockMult d K t * ‖fourierBlock K f‖ₑ) ^ 2 := by
         simp only [sq, ← ENNReal.tsum_mul_right]
-        exact ENNReal.tsum_le_tsum fun K => by
-          gcongr; exact ENNReal.le_tsum (f := fun K => blockMult d K t * ‖fourierBlock K f‖ₑ) K
+        exact tsum_le_tsum fun K => by
+          gcongr; exact le_tsum (f := fun K => blockMult d K t * ‖fourierBlock K f‖ₑ) K
 
 /-- At `t = 2^(-j)` the block multipliers are `≤ 2` for `K ≥ j` and `≤ 4πd 2^(K-j)` for
 `K ≤ j`. -/

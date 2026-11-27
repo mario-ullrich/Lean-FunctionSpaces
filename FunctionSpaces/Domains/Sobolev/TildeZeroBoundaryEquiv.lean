@@ -244,8 +244,8 @@ theorem exists_hasZeroExtensionBound_of_half_lt (hs : 1 / 2 < s) (hs1 : s < 1) :
           mul_le_mul' le_rfl (hN.trans (mul_le_mul' le_rfl
             (modNorm_sobolevToL2_le (by linarith) hs1' (U + W))))
       _ = K * ‖U + W‖ₑ := by ring
-  have h' := ENNReal.toReal_mono (ENNReal.mul_ne_top hK enorm_ne_top) h
-  rwa [toReal_enorm, ENNReal.toReal_mul, toReal_enorm] at h'
+  have h' := ENNReal.toReal_mono (ENNReal.mul_ne_top hK eNorm_ne_top) h
+  rwa [toReal_eNorm, ENNReal.toReal_mul, toReal_eNorm] at h'
 
 /-! ### `H̃^s(Ω) ≅ H^s_0(Ω)` for `s ≥ 0`, `s ∉ 1/2 + ℕ_0` -/
 

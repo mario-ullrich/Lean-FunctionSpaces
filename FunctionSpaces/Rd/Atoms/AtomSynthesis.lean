@@ -127,7 +127,7 @@ theorem le_of_rpow_le_overlap {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) 
       field_simp, show 1 / p.toReal * p.toReal = 1 by field_simp, ENNReal.rpow_one, mul_assoc]
   refine mul_le_mul' le_rfl ?_
   rw [← ENNReal.tsum_mul_left]
-  refine ENNReal.tsum_le_tsum fun m => ?_
+  refine tsum_le_tsum fun m => ?_
   rw [ENNReal.mul_rpow_of_nonneg _ _ hpos.le, mul_comm]
   exact mul_le_mul' (ENNReal.rpow_le_rpow (hb m) hpos.le) le_rfl
 
@@ -348,7 +348,7 @@ theorem eLpNorm_indicator_le_tsum {p : ℝ≥0∞} [Fact (1 ≤ p)] {Ω : Set V}
             Set.indicator_of_notMem hzΩ, add_zero]
       rw [eLpNorm_congr_ae hxy]
       exact eLpNorm_add_le Fact.out)
-    (fun x => by rw [one_mul, Lp.enorm_def]; exact eLpNorm_indicator_le _ hΩ.nullMeasurableSet) hF
+    (fun x => by rw [one_mul, Lp.eNorm_def]; exact eLpNorm_indicator_le _ hΩ.nullMeasurableSet) hF
 
 /-- **The modulus on `Ω` of a series**: if `∑_{j ≤ J} f_j → F` in `L_p`, then
 `ω_r(F, 2^(-k), Ω)_p ≤ ∑_j ω_r(f_j, 2^(-k), Ω)_p`. -/
@@ -404,7 +404,7 @@ theorem modNormOn_le_coeffNorm {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞
   -- the norm on `Ω`
   have hnorm : eLpNorm (Ω.indicator F) p volume ≤ K0 * (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * X := by
     calc eLpNorm (Ω.indicator F) p volume ≤ ∑' j, K0 * b j :=
-          (eLpNorm_indicator_le_tsum hΩ hF).trans (ENNReal.tsum_le_tsum hlevel)
+          (eLpNorm_indicator_le_tsum hΩ hF).trans (tsum_le_tsum hlevel)
       _ = K0 * ∑' j, b j := ENNReal.tsum_mul_left
       _ ≤ K0 * ((1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * X) :=
           mul_le_mul' le_rfl (ENNReal.tsum_le_lqNorm_dyadicWeight hq s b)
@@ -414,7 +414,7 @@ theorem modNormOn_le_coeffNorm {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞
       ∑' j, (if j ≤ k then dyadicWeight (-σ) (k - j) else 1) * b j := fun k => by
     refine (lpModulusOn_le_tsum hΩ hF r k).trans ?_
     rw [← ENNReal.tsum_mul_left]
-    exact ENNReal.tsum_le_tsum fun j => hlevelMod j k
+    exact tsum_le_tsum fun j => hlevelMod j k
   have hlq : lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω r F k) ≤
       2 ^ r * K0 * ENNReal.almostDiagonalConst s σ * X :=
     ENNReal.lqNorm_le_almostDiagonalConst_mul_of_le hq s σ hmod
@@ -450,7 +450,7 @@ theorem modNorm_le_coeffNorm {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞) 
       atomSynthConst p N C r s σ * coeffNorm p (finrank ℝ V) s q coef := by
   have h := modNormOn_le_coeffNorm hp MeasurableSet.univ c a coef hN ha hf hF hs hsσ hq
   have e : ∀ k, lpModulusOn p Set.univ r F k = lpModulus p r F k := fun k => modulusOn_univ r p _ _
-  simpa only [Set.indicator_univ, e, ← Lp.enorm_def] using h
+  simpa only [Set.indicator_univ, e, ← Lp.eNorm_def] using h
 
 /-- The zero function is a regular atom on every set at every level. -/
 theorem isRegularAtomOn_zero {Ω : Set V} {p : ℝ≥0∞} {σ : ℝ} {r : ℕ} {d : ℝ} {C : ℝ≥0∞} {j : ℕ}
@@ -540,7 +540,7 @@ theorem eLpNorm_le_of_bound_of_support {α : Type*} [MeasurableSpace α] {μ : M
     by_contra h
     exact (Function.mem_support.1 hx) (hS x h)
   rw [← eLpNorm_restrict_eq_of_support_subset hg hsupp]
-  refine (eLpNorm_le_of_ae_enorm_bound hg.restrict (Eventually.of_forall hB)).trans_eq ?_
+  refine (eLpNorm_le_of_ae_eNorm_bound hg.restrict (Eventually.of_forall hB)).trans_eq ?_
   rw [Measure.restrict_apply_univ, one_div, smul_eq_mul]
 
 /-- **Atoms on `Ω` from pointwise bounds**: a function that vanishes outside `B̄(c, d 2^(-j))`
@@ -572,7 +572,7 @@ theorem isRegularAtomOn_of_pointwise {p : ℝ≥0∞} {σ : ℝ} {r : ℕ} {d : 
     · by_cases hx : x ∈ Ω
       · rw [Set.indicator_of_mem hx]
         exact hle x hx
-      · rw [Set.indicator_of_notMem hx, enorm_zero]
+      · rw [Set.indicator_of_notMem hx, eNorm_zero]
         exact zero_le
     · rw [mul_assoc]
       exact mul_le_mul' le_rfl (hball c)
@@ -601,7 +601,7 @@ theorem isRegularAtomOn_of_pointwise {p : ℝ≥0∞} {σ : ℝ} {r : ℕ} {d : 
     · by_cases hx : x ∈ diffStepSet Ω r h
       · rw [Set.indicator_of_mem hx]
         exact hdiff h x hx
-      · rw [Set.indicator_of_notMem hx, enorm_zero]
+      · rw [Set.indicator_of_notMem hx, eNorm_zero]
         exact zero_le
     calc A * min 1 (ENNReal.ofReal (2 ^ j * ‖h‖) ^ σ) * volume T ^ (1 / p.toReal)
         ≤ A * min 1 (ENNReal.ofReal (2 ^ j * ‖h‖) ^ σ) * ((((r + 1 : ℕ) : ℝ≥0∞) * K) ^

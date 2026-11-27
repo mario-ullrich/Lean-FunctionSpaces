@@ -57,7 +57,7 @@ theorem enorm_periodicLpBlock_le (hp : p ≠ ∞) (j : ℕ)
     ‖periodicLpBlock hp j f‖ₑ ≤
       2 * eLpNorm (Rd.lpKernel (V := EuclideanSpace ℝ d)) 1 volume * ‖f‖ₑ := by
   refine (enorm_periodicEconvLp_le hp _ f).trans ?_
-  rw [← eLpNorm_one_eq_lintegral_enorm (Rd.integrable_lpBlockKernel j).1]
+  rw [← eLpNorm_one_eq_lintegral_eNorm (Rd.integrable_lpBlockKernel j).1]
   gcongr
   exact Rd.eLpNorm_lpBlockKernel_one_le j
 

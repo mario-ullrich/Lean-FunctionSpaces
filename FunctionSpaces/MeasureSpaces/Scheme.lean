@@ -71,7 +71,7 @@ section LpSets
 /-- The **approximants of a scheme of functions in `L_p`**: for a scheme `S` of essentially
 bounded functions and every exponent `p`, the sets `S^(p)_n = ι_{∞,p}(S_n)` of the classes in
 `L_p(μ)` of the elements of `S_n`. -/
-def lpSets (p : ℝ≥0∞) (n : ℕ) : Set (Lp ℂ p μ) :=
+noncomputable def lpSets (p : ℝ≥0∞) (n : ℕ) : Set (Lp ℂ p μ) :=
   Lp.topInclusion (𝕜 := ℝ) μ p '' S n
 
 variable {S} {p r : ℝ≥0∞}

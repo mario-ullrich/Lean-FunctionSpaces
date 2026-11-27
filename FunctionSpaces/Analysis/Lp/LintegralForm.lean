@@ -45,7 +45,7 @@ theorem eLpNorm_rpow_eq {α : Type*} [MeasurableSpace α] {μ : Measure α} {ε 
 theorem eLpNorm_rpow_eq_lintegral {α : Type*} [MeasurableSpace α] {μ : Measure α} {p : ℝ≥0∞}
     (hp0 : p ≠ 0) (hp : p ≠ ∞) {g : α → ℝ≥0∞} (hg : AEMeasurable g μ) :
     eLpNorm g p μ ^ p.toReal = ∫⁻ x, g x ^ p.toReal ∂μ := by
-  simpa only [enorm_eq_self] using eLpNorm_rpow_eq hg.aestronglyMeasurable hp0 hp
+  simpa only [eNorm_eq_self] using eLpNorm_rpow_eq hg.aestronglyMeasurable hp0 hp
 
 /-- **The `L_p` norm through the integral of the `p`-th power, as an inequality**: for
 `0 < p < ∞`, every `B ∈ [0, ∞]` and every almost everywhere strongly measurable `g` with values
@@ -91,6 +91,6 @@ theorem eLpNorm_le_rpow_mul_of_lintegral_le {α : Type*} [MeasurableSpace α] {�
     (h : ∫⁻ x, F x ^ p.toReal ∂μ ≤ C * ∫⁻ x, G x ^ p.toReal ∂μ) :
     eLpNorm F p μ ≤ C ^ (1 / p.toReal) * eLpNorm G p μ :=
   eLpNorm_le_rpow_mul_of_lintegral_enorm_le hp0 hp hF.aestronglyMeasurable
-    hG.aestronglyMeasurable (by simpa only [enorm_eq_self] using h)
+    hG.aestronglyMeasurable (by simpa only [eNorm_eq_self] using h)
 
 end MeasureTheory

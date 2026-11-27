@@ -224,11 +224,11 @@ theorem lpCouple_norm1_inclusion_le (hpr : p ≤ r) (f : Lp ℂ r μ) :
 /-- **For `p ≥ 1` the couple in `L_p` is a complexity couple of an approximation scheme**: the
 couple of `S` in `L_p` is the complexity couple of the scheme `S^(p) = S.toLp p`, the image of
 `S` in the normed space `L_p(μ)`. The sets agree by definition, and the first norms since
-`‖f‖ₑ = ‖f‖_p` on `Lp` (`MeasureTheory.Lp.enorm_def`). -/
+`‖f‖ₑ = ‖f‖_p` on `Lp` (`MeasureTheory.Lp.eNorm_def`). -/
 theorem lpCouple_eq_complexityCouple [Fact (1 ≤ p)] :
     lpCouple S p = (S.toLp p).complexityCouple := by
   have hN : (fun f : Lp ℂ p μ => eLpNorm f p μ) = fun f => ‖f‖ₑ :=
-    funext fun f => (Lp.enorm_def f).symm
+    funext fun f => (Lp.eNorm_def f).symm
   rw [lpCouple, ApproximationScheme.complexityCouple, hN]
   rfl
 

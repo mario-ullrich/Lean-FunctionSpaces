@@ -166,7 +166,7 @@ theorem eLpNorm_extendByZero {g : closure Ω.carrier → ℂ} (hg : StronglyMeas
   have hsupp : Function.support (fun x => ‖Ω.extendByZero g x‖ₑ ^ p.toReal) ⊆ closure Ω.carrier :=
     fun x hx => by
       by_contra h
-      exact hx (by simp only [extendByZero_eq_zero g h, enorm_zero, ENNReal.zero_rpow_of_pos he])
+      exact hx (by simp only [extendByZero_eq_zero g h, eNorm_zero, ENNReal.zero_rpow_of_pos he])
   rw [← setLIntegral_eq_of_support_subset hsupp, ← lintegral_subtype_comap hcl]
   simp only [extendByZero_coe]
   rfl

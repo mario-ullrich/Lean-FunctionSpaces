@@ -298,7 +298,7 @@ theorem hardy_tail_le_of_le_one (hq1 : q ≤ 1) (α : ℝ) (b : ℕ → ℝ≥0�
   set p := q.toReal
   calc ∑' k, (dyadicWeight α k * ∑' i, b (k + i)) ^ p
       ≤ ∑' k, dyadicWeight (α * p) k * ∑' i, (fun j => b j ^ p) (k + i) :=
-        ENNReal.tsum_le_tsum fun k => by
+        tsum_le_tsum fun k => by
           rw [mul_rpow_of_nonneg _ _ hp.le, dyadicWeight_rpow]
           gcongr
           exact rpow_tsum_le_tsum_rpow _ hp hp1
@@ -331,7 +331,7 @@ theorem hardy_sum_le_of_le_one (hq1 : q ≤ 1) (α : ℝ) (b : ℕ → ℝ≥0�
     rw [dyadicWeight_rpow, neg_mul]
   calc ∑' k, (dyadicWeight (-α) k * ∑ j ∈ range (k + 1), b j) ^ p
       ≤ ∑' k, dyadicWeight (-(α * p)) k * ∑ j ∈ range (k + 1), b j ^ p :=
-        ENNReal.tsum_le_tsum fun k => by
+        tsum_le_tsum fun k => by
           rw [mul_rpow_of_nonneg _ _ hp.le, hw]
           gcongr
           exact rpow_sum_le_sum_rpow _ _ hp hp1
@@ -527,7 +527,7 @@ theorem lqNorm_almostDiagonal_le (hq : 1 ≤ q) (s L : ℝ) (a : ℕ → ℝ≥0
   have hsplit : ∀ i, ∑' j, (if j ≤ i then dyadicWeight (-L) (i - j) else 1) * a j =
       ∑ j ∈ Finset.range (i + 1), dyadicWeight (-L) (i - j) * a j + ∑' t, a (t + (i + 1)) :=
     fun i => by
-      rw [← Summable.sum_add_tsum_nat_add' (k := i + 1) ENNReal.summable]
+      rw [← Summable.sum_add_tsum_nat_add' (k := i + 1) CompleteLattice.summable]
       congr 1
       · refine Finset.sum_congr rfl fun j hj => ?_
         have hji : j ≤ i := Nat.lt_succ_iff.1 (Finset.mem_range.1 hj)
@@ -569,7 +569,7 @@ theorem lqNorm_almostDiagonal_le (hq : 1 ≤ q) (s L : ℝ) (a : ℕ → ℝ≥0
             funext t
             congr 1
             omega
-        _ ≤ ∑' n, a (i + n) := ENNReal.tsum_comp_le_tsum_of_injective hinj (fun n => a (i + n))
+        _ ≤ ∑' n, a (i + n) := tsum_comp_le_tsum_of_injective hinj (fun n => a (i + n))
     exact mul_le_mul' le_rfl htail
   calc lqNorm q (fun i => dyadicWeight s i *
         ∑' j, (if j ≤ i then dyadicWeight (-L) (i - j) else 1) * a j)
@@ -623,7 +623,7 @@ theorem lqNorm_almostDiagonal_le_of_le_one (hq1 : q ≤ 1) (s L : ℝ) (a : ℕ 
   calc ∑' i, (dyadicWeight s i * ∑' j, (if j ≤ i then dyadicWeight (-L) (i - j) else 1) * a j) ^ p
       ≤ ∑' i, dyadicWeight (s * p) i *
           ∑' j, (if j ≤ i then dyadicWeight (-(L * p)) (i - j) else 1) * a j ^ p :=
-        ENNReal.tsum_le_tsum fun i => by
+        tsum_le_tsum fun i => by
           rw [mul_rpow_of_nonneg _ _ hp.le, dyadicWeight_rpow]
           gcongr
           refine (rpow_tsum_le_tsum_rpow _ hp hp1).trans_eq (tsum_congr fun j => ?_)
@@ -670,7 +670,7 @@ theorem lqNorm_le_almostDiagonalConst_mul_of_le {q : ℝ≥0∞} (hq : 1 ≤ q) 
 `∑_{j ≥ 0} 2^(-(j+1)α) ≤ (1 - 2^(-α))⁻¹` for every real `α`. -/
 theorem tsum_dyadicWeight_neg_succ_le (α : ℝ) :
     ∑' j : ℕ, dyadicWeight (-α) (j + 1) ≤ (1 - (2 : ℝ≥0∞) ^ (-α))⁻¹ :=
-  (ENNReal.tsum_comp_le_tsum_of_injective (add_left_injective 1) (dyadicWeight (-α))).trans_eq
+  (tsum_comp_le_tsum_of_injective (add_left_injective 1) (dyadicWeight (-α))).trans_eq
     (tsum_dyadicWeight_neg α)
 
 /-- **A series over `ℤ` split at `m`**:
@@ -679,7 +679,7 @@ with `n < m` (Mathlib's `tsum_of_nat_of_neg_add_one` after the shift `n ↦ m + 
 theorem tsum_int_eq_tsum_add_tsum_sub (m : ℤ) (f : ℤ → ℝ≥0∞) :
     ∑' n, f n = ∑' j : ℕ, f (m + j) + ∑' j : ℕ, f (m - (j + 1)) := by
   rw [← (Equiv.addLeft m).tsum_eq f,
-    tsum_of_nat_of_neg_add_one ENNReal.summable ENNReal.summable]
+    tsum_of_nat_of_neg_add_one CompleteLattice.summable CompleteLattice.summable]
   simp only [Equiv.coe_addLeft, ← sub_eq_add_neg]
 
 /-- **The `ℓ_q` norm on `ℤ` is shift invariant**: `‖(a(k + i))_k‖_{ℓ_q} = ‖a‖_{ℓ_q}` for every

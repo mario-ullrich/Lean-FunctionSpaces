@@ -112,7 +112,7 @@ theorem tsum_enorm_localExtTerm_le (hp : p ≠ ∞) {W : Set V} (hW : Measurable
     (hX : ∀ j, dyadicWeight s j * ‖indicatorLp hW (b.localMean hp L j f)‖ₑ ≤ X) :
     ∑' j, ‖b.localExtTerm hp hW L j f‖ₑ ≤
       2 * eLpNorm (momentKernel b.toFun L) 1 volume * (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * X := by
-  refine (ENNReal.tsum_le_tsum (b.enorm_localExtTerm_le_of_forall_le hp hW L hX)).trans_eq ?_
+  refine (tsum_le_tsum (b.enorm_localExtTerm_le_of_forall_le hp hW L hX)).trans_eq ?_
   rw [ENNReal.tsum_mul_left, ENNReal.tsum_mul_right, ENNReal.tsum_dyadicWeight_neg]
   ring
 
@@ -127,7 +127,7 @@ theorem summable_localExtTerm_of_forall_le (hp : p ≠ ∞) {W : Set V} (hW : Me
     ne_top_of_le_ne_top (ENNReal.mul_ne_top (ENNReal.mul_ne_top (ENNReal.mul_ne_top (by norm_num)
       (eLpNorm_momentKernel_ne_top b.integrable L))
       (ENNReal.one_sub_two_rpow_neg_inv_ne_top hs)) hXf) (b.tsum_enorm_localExtTerm_le hp hW L hX)
-  exact Summable.of_enorm htsum
+  exact Summable.of_eNorm htsum
 
 /-- **The local extension converges absolutely** for `s > 0` and a finite local means
 quasi-norm on `W`: `‖η_j ⋆ 1_W (k_j ⋆ f)‖_p ≤ 2 ‖m‖_1 2^(-js) ‖f‖_W`

@@ -118,7 +118,7 @@ theorem enorm_block_le (k : ℕ) (f : X) :
     ‖PS.block k f‖ₑ ≤ 2 * (1 + ENNReal.ofReal PS.bound) * A.approxError f (2 ^ k) := by
   calc ‖PS.block k f‖ₑ = ‖(f - PS.P (2 ^ k) f) - (f - PS.P (2 ^ (k + 1)) f)‖ₑ := by
         rw [block]; congr 1; abel
-    _ ≤ ‖f - PS.P (2 ^ k) f‖ₑ + ‖f - PS.P (2 ^ (k + 1)) f‖ₑ := enorm_sub_le
+    _ ≤ ‖f - PS.P (2 ^ k) f‖ₑ + ‖f - PS.P (2 ^ (k + 1)) f‖ₑ := eNorm_sub_le
     _ ≤ (1 + ENNReal.ofReal PS.bound) * A.approxError f (2 ^ k) +
           (1 + ENNReal.ofReal PS.bound) * A.approxError f (2 ^ k) := by
         gcongr
@@ -173,9 +173,9 @@ theorem enorm_sub_le_tsum_block {f : X} (hf : Tendsto (fun n => PS.P n f) atTop 
     refine (hf.comp ?_).sub_const _
     exact (tendsto_pow_atTop_atTop_of_one_lt Nat.one_lt_two).comp
       (tendsto_atTop_atTop_of_monotone (fun _ _ h => by omega) fun b => ⟨b, by omega⟩)
-  refine le_of_tendsto' ((continuous_enorm.tendsto _).comp hlim) fun N => ?_
+  refine le_of_tendsto' ((continuous_eNorm.tendsto _).comp hlim) fun N => ?_
   rw [Function.comp_apply, ← PS.sum_block k N f]
-  exact (enorm_sum_le _ _).trans (ENNReal.sum_le_tsum _)
+  exact (eNorm_sum_le _ _).trans (sum_le_tsum _)
 
 /-- **The approximation norm is controlled by the blocks**: for `s > 0`, `1 ≤ q ≤ ∞` and
 `P n f → f`, `‖f‖^dyadic ≤ (1 + 2 C_s) (‖P 1 f‖ + ‖(2^(ks) ‖Δ_k f‖)_k‖_q)` with
@@ -198,7 +198,7 @@ theorem approxNormDyadic_le_blockNorm (hq : 1 ≤ q) {f : X}
   simp only [pow_zero, zero_add] at h0
   have hf' : ‖f‖ₑ ≤ ‖PS.P 1 f‖ₑ + Cs * L := by
     calc ‖f‖ₑ = ‖PS.P 1 f + (f - PS.P 1 f)‖ₑ := by congr 1; abel
-      _ ≤ ‖PS.P 1 f‖ₑ + ‖f - PS.P 1 f‖ₑ := enorm_add_le _ _
+      _ ≤ ‖PS.P 1 f‖ₑ + ‖f - PS.P 1 f‖ₑ := eNorm_add_le _ _
       _ ≤ ‖PS.P 1 f‖ₑ + Cs * L := by gcongr; exact h0.trans hsum
   have hC1 : 1 ≤ Cs := ENNReal.one_le_one_sub_two_rpow_neg_inv s
   calc A.approxNormDyadic s q f = ‖f‖ₑ + lqNorm q (A.approxSeqDyadic s f) := rfl

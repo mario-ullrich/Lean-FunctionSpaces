@@ -138,7 +138,7 @@ theorem modNormOn_lt_top_of_memApprox_neumannScheme {θ : ℝ} {q : ℝ≥0∞} 
     modNormOn Ω.measurableSet r θ q f < ∞ := by
   have hK := (Ω.memKMethod_neumann_iff hθ hθ' hq).2 hf
   have hI := (InterpCouple.memKMethod_iff_interpNorm_lt_top InterpCouple.isQuasiNormed_ofMap
-    (max_ne_top ENNReal.one_ne_top enorm_ne_top) InterpCouple.norm0_ofMap_le hθ one_pos
+    (max_ne_top ENNReal.one_ne_top eNorm_ne_top) InterpCouple.norm0_ofMap_le hθ one_pos
     (zero_lt_one.trans_le hq).ne').1 hK
   rw [InterpCouple.interpNorm_ofMap] at hI
   obtain ⟨C, hC, h⟩ := Ω.exists_modNormOn_le_inclInterpNorm hr θ q

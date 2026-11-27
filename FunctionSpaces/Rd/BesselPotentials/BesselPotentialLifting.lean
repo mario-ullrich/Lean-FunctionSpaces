@@ -423,7 +423,7 @@ theorem dyadicWeight_mul_enorm_blockFun_eq {q r : ℝ≥0∞} [Fact (1 ≤ q)] [
       ‖conv (dilate (2 ^ j) (besselBase (-s) (lpBlockKernelBase (V := V)) j : V → ℂ)) h
         volume x‖ₑ := by
   rw [blockFun, ← coe_lpBlockKernelS, lpBlockKernelS, conv_eq_conv_besselSchwartz hgh,
-    conv_besselSchwartz_schwartzDilate, conv_smul, Pi.smul_apply, smul_eq_mul, enorm_mul,
+    conv_besselSchwartz_schwartzDilate, conv_smul, Pi.smul_apply, smul_eq_mul, eNorm_mul,
     enorm_two_pow_rpow, ← mul_assoc, ENNReal.dyadicWeight_neg,
     ENNReal.mul_inv_cancel (ENNReal.dyadicWeight_ne_zero s j) (ENNReal.dyadicWeight_ne_top s j),
     one_mul]
@@ -444,7 +444,7 @@ theorem exists_triebelLizorkinNorm_le_of_besselPotential_eq [Nontrivial V] (hp1 
   refine ⟨czConst V p B H, czConst_ne_top hp1 hp hB hH, fun g h hgh => ?_⟩
   have hg : (g : 𝓢'(V, ℂ)) = besselPotential V ℂ (-s) (h : 𝓢'(V, ℂ)) :=
     ((TemperedDistribution.besselPotential_neg_apply_eq_iff s _ _).2 hgh).symm
-  rw [triebelLizorkinNorm, Lp.enorm_def]
+  rw [triebelLizorkinNorm, Lp.eNorm_def]
   simp_rw [dyadicWeight_mul_enorm_blockFun_eq hg]
   exact hθ.eLpNorm_lqNorm_conv_le hp1 hp (Lp.memLp h)
 
@@ -469,7 +469,7 @@ theorem exists_memTriebelLizorkin_of_besselPotential_eq [Nontrivial V] (hp1 : 1 
   have hgf : (g : 𝓢'(V, ℂ)) = f :=
     hg.symm.trans ((TemperedDistribution.besselPotential_neg_apply_eq_iff s _ _).2 hfh)
   have hb := hC₂ g h (by rw [hgf, hfh])
-  exact ⟨g, hgf, hb.trans_lt (ENNReal.mul_lt_top hC.lt_top enorm_lt_top), hb⟩
+  exact ⟨g, hgf, hb.trans_lt (ENNReal.mul_lt_top hC.lt_top eNorm_lt_top), hb⟩
 
 /-! ### The bundled spaces and `W^m_p = H^{m,p}` -/
 
@@ -519,7 +519,7 @@ theorem memTriebelLizorkin_iff_memSobolev_bessel [Nontrivial V] (hp1 : 1 < p) (h
     MemTriebelLizorkin s 2 f ↔ TemperedDistribution.MemSobolev s p (f : 𝓢'(V, ℂ)) := by
   refine ⟨memSobolev_bessel_of_memTriebelLizorkin hp1 hp, fun ⟨h, hh⟩ => ?_⟩
   obtain ⟨C, hC, hC₂⟩ := exists_triebelLizorkinNorm_le_of_besselPotential_eq (V := V) hp1 hp s
-  exact (hC₂ f h hh).trans_lt (ENNReal.mul_lt_top hC.lt_top enorm_lt_top)
+  exact (hC₂ f h hh).trans_lt (ENNReal.mul_lt_top hC.lt_top eNorm_lt_top)
 
 /-- **`W^m_p = H^{m,p}` (Calderón)**: in dimension `n ≥ 1`, for `1 < p < ∞`, `m ∈ ℕ` and
 `f ∈ L_p(V)`, `f` lies in the Sobolev space `W^m_p(V)` of weak derivatives iff it lies in

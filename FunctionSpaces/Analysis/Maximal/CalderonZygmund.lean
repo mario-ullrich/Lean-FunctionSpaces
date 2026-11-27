@@ -47,7 +47,7 @@ every function `f` with values in a real normed space. Both means are integrals 
 normalised measure `μ(α)⁻¹ μ`. -/
 theorem enorm_average_le (f : α → E) : ‖⨍ x, f x ∂μ‖ₑ ≤ ⨍⁻ x, ‖f x‖ₑ ∂μ := by
   rw [average_eq', laverage_eq']
-  exact enorm_integral_le_lintegral_enorm f
+  exact eNorm_integral_le_lintegral_eNorm f
 
 /-- `μ(s) ‖⨍_s f‖ ≤ ∫_s ‖f‖` for every set `s` of finite measure and every function `f` with
 values in a real normed space, by `MeasureTheory.enorm_average_le` and Mathlib's
@@ -62,7 +62,7 @@ measure and every function `f` with values in a real normed space, since
 theorem setLIntegral_enorm_sub_setAverage_le {s : Set α} (hs : μ s ≠ ∞) (f : α → E) :
     ∫⁻ x in s, ‖f x - ⨍ y in s, f y ∂μ‖ₑ ∂μ ≤ 2 * ∫⁻ x in s, ‖f x‖ₑ ∂μ :=
   calc ∫⁻ x in s, ‖f x - ⨍ y in s, f y ∂μ‖ₑ ∂μ
-      ≤ ∫⁻ x in s, (‖f x‖ₑ + ‖⨍ y in s, f y ∂μ‖ₑ) ∂μ := lintegral_mono fun _ => enorm_sub_le
+      ≤ ∫⁻ x in s, (‖f x‖ₑ + ‖⨍ y in s, f y ∂μ‖ₑ) ∂μ := lintegral_mono fun _ => eNorm_sub_le
     _ = (∫⁻ x in s, ‖f x‖ₑ ∂μ) + μ s * ‖⨍ y in s, f y ∂μ‖ₑ := by
         rw [lintegral_add_right _ measurable_const, setLIntegral_const, mul_comm]
     _ ≤ (∫⁻ x in s, ‖f x‖ₑ ∂μ) + ∫⁻ x in s, ‖f x‖ₑ ∂μ :=
@@ -226,7 +226,7 @@ def czSet (G : V → ℝ≥0∞) (t : ℝ≥0∞) : Set V := ⋃ km ∈ czMaxima
 /-- The **enlarged exceptional set** `Ω*`: the union of the closed balls of radius `2n 2^(-k)`
 around the centres of the maximal big cubes `Q_{k,m}`, twice the radius `n 2^(-k)` of a ball
 around the centre containing the cube (`Rd.zcell_subset_closedBall`). -/
-def czEnlarged (G : V → ℝ≥0∞) (t : ℝ≥0∞) : Set V :=
+noncomputable def czEnlarged (G : V → ℝ≥0∞) (t : ℝ≥0∞) : Set V :=
   ⋃ km ∈ czMaximal G t, closedBall (zcellCenter km.1 km.2) (2 * (finrank ℝ V / 2 ^ km.1))
 
 /-- The exceptional set is measurable. -/
@@ -255,7 +255,7 @@ theorem cz_volume_le : volume (czSet G t) ≤ t⁻¹ * ∫⁻ x, G x := by
     fun _ _ => measurableSet_zcell _ _]
   calc ∑' km : czMaximal G t, volume (zcell (V := V) km.1.1 km.1.2)
       ≤ ∑' km : czMaximal G t, t⁻¹ * ∫⁻ y in zcell km.1.1 km.1.2, G y :=
-        ENNReal.tsum_le_tsum fun km => cz_volume_zcell_le km.2
+        tsum_le_tsum fun km => cz_volume_zcell_le km.2
     _ = t⁻¹ * ∫⁻ y in czSet G t, G y := by
         rw [ENNReal.tsum_mul_left, czSet, lintegral_biUnion czMaximal_countable
           (fun _ _ => measurableSet_zcell _ _) czMaximal_pairwiseDisjoint]

@@ -84,7 +84,7 @@ theorem norm_sq_le_card_mul_norm_toLp_sq {n : ℕ} {T : UnitAddTorus d →ᵇ �
     refine (BoundedContinuousFunction.norm_le (Finset.sum_nonneg fun _ _ => norm_nonneg _)).2
       fun x => ?_
     calc ‖(∑ k ∈ t, c k • trigMonomial k) x‖ = ‖∑ k ∈ t, c k * trigMonomial k x‖ := by
-          simp [BoundedContinuousFunction.coe_sum, Finset.sum_apply]
+          simp
       _ ≤ ∑ k ∈ t, ‖c k * trigMonomial k x‖ := norm_sum_le _ _
       _ = ∑ k ∈ t, ‖c k‖ := Finset.sum_congr rfl fun k _ => by
           rw [norm_mul, norm_trigMonomial_apply, mul_one]
@@ -101,7 +101,7 @@ theorem norm_pow_le_norm_pow {α : Type*} [TopologicalSpace α] (T : α →ᵇ �
     (BoundedContinuousFunction.norm_le (Real.rpow_nonneg hA _)).2 fun x => by
       have h1 : ‖T x‖ ^ m ≤ ‖T ^ m‖ := by
         rw [← norm_pow]
-        simpa [BoundedContinuousFunction.coe_pow] using (T ^ m).norm_coe_le_norm x
+        simpa [FunLike.coe_pow] using (T ^ m).norm_coe_le_norm x
       calc ‖T x‖ = (‖T x‖ ^ m) ^ ((m : ℝ)⁻¹) := (Real.pow_rpow_inv_natCast (norm_nonneg _) hm).symm
         _ ≤ ‖T ^ m‖ ^ ((m : ℝ)⁻¹) := Real.rpow_le_rpow (by positivity) h1 (by positivity)
   calc ‖T‖ ^ m ≤ (‖T ^ m‖ ^ ((m : ℝ)⁻¹)) ^ m := pow_le_pow_left₀ (norm_nonneg _) hT m

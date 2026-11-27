@@ -296,7 +296,7 @@ pointwise `ℓ_q` norm `x ↦ ‖(2^{js} |g_j(x)|)_j‖_{ℓ_q}`. -/
 theorem aemeasurable_lqNorm_dyadicWeight_Lp (s : ℝ) (q : ℝ≥0∞)
     (g : ℕ → Lp ℂ p (volume : Measure V)) :
     AEMeasurable (fun x => lqNorm q fun j => dyadicWeight s j * ‖g j x‖ₑ) volume :=
-  aemeasurable_lqNorm_comp (fun j => (Lp.aestronglyMeasurable (g j)).enorm.const_mul _) q
+  aemeasurable_lqNorm_comp (fun j => (Lp.aestronglyMeasurable (g j)).eNorm.const_mul _) q
 
 namespace LPKernel
 
@@ -360,7 +360,7 @@ theorem kernelTriebelLizorkinNormDistr_mono_exponent {s : ℝ} {q r : ℝ≥0∞
     K.kernelTriebelLizorkinNormDistr p s r u ≤ K.kernelTriebelLizorkinNormDistr p s q u :=
   le_iInf₂ fun g hg => (K.kernelTriebelLizorkinNormDistr_le hg).trans
     (eLpNorm_lqNorm_mono_exponent (zero_lt_one.trans_le hq).ne' hqr fun j =>
-      (Lp.aestronglyMeasurable (g j)).enorm.const_mul _)
+      (Lp.aestronglyMeasurable (g j)).eNorm.const_mul _)
 
 /-- **The quasi-norm increases in `s`**: `‖u‖_{F^s_{p,q}, K} ≤ ‖u‖_{F^t_{p,q}, K}` for `s ≤ t`
 (`MeasureTheory.eLpNorm_lqNorm_dyadicWeight_mono_smoothness`). -/
@@ -369,7 +369,7 @@ theorem kernelTriebelLizorkinNormDistr_mono_smoothness {s t : ℝ} (hst : s ≤ 
     K.kernelTriebelLizorkinNormDistr p s q u ≤ K.kernelTriebelLizorkinNormDistr p t q u :=
   le_iInf₂ fun g hg => (K.kernelTriebelLizorkinNormDistr_le hg).trans
     (eLpNorm_lqNorm_dyadicWeight_mono_smoothness hst fun j =>
-      (Lp.aestronglyMeasurable (g j)).enorm)
+      (Lp.aestronglyMeasurable (g j)).eNorm)
 
 end LPKernel
 

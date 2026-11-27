@@ -67,7 +67,7 @@ theorem approxNormDyadic_add_le' (f g : X) :
   set Cq := LpAddConst q
   set D := lqNorm q (A.approxSeqDyadic s f) + lqNorm q (A.approxSeqDyadic s g) with hD
   have hCq : 1 ≤ Cq := ENNReal.one_le_LpAddConst q
-  have hfg : ‖f + g‖ₑ ≤ ‖f‖ₑ + ‖g‖ₑ := enorm_add_le f g
+  have hfg : ‖f + g‖ₑ ≤ ‖f‖ₑ + ‖g‖ₑ := eNorm_add_le f g
   have hx0 : A.approxSeqDyadic s (f + g) 0 ≤ ‖f‖ₑ + ‖g‖ₑ := by
     rw [approxSeqDyadic_zero]
     exact (approxError_le_enorm _ 1).trans hfg
@@ -99,7 +99,7 @@ theorem approxNormDyadic_add_le (hq : 1 ≤ q) (hs : 0 ≤ s) (f g : X) :
     A.approxNormDyadic s q (f + g) ≤
       2 * 2 ^ s * (A.approxNormDyadic s q f + A.approxNormDyadic s q g) := by
   have h2s := ENNReal.one_le_two_rpow hs
-  have hfg : ‖f + g‖ₑ ≤ ‖f‖ₑ + ‖g‖ₑ := enorm_add_le f g
+  have hfg : ‖f + g‖ₑ ≤ ‖f‖ₑ + ‖g‖ₑ := eNorm_add_le f g
   have hD : lqNorm q (A.approxSeqDyadic s (f + g)) ≤ (‖f‖ₑ + ‖g‖ₑ) +
       2 ^ s * (lqNorm q (A.approxSeqDyadic s f) + lqNorm q (A.approxSeqDyadic s g)) := by
     refine (ENNReal.lqNorm_le_head_add_shift hq _).trans (add_le_add ?_ ?_)

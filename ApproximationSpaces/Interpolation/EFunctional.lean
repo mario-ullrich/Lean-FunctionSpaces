@@ -780,7 +780,7 @@ theorem eFunctional_complexityCouple (n : ℕ) (f : X) :
     A.complexityCouple.eFunctional n f = A.approxError f n := by
   rw [complexityCouple, InterpCouple.eFunctional_complexity_natCast A.mono, approxError,
     Metric.infEDist]
-  simp only [edist_eq_enorm_sub]
+  simp only [eDist_eq_eNorm_sub]
 
 /-- The dyadic norm of the complexity couple is the dyadic quasi-norm
 `‖f‖ + ‖(2^(ks) E_{2^k}(f))_k‖_{ℓ_q}` of `A^s_q`. -/

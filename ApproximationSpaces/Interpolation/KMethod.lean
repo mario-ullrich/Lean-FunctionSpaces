@@ -87,7 +87,7 @@ theorem enorm_le_inclKFunctional {t : ℝ≥0∞} (ht : ‖ι‖ₑ ≤ t) (f : 
     ‖f‖ₑ ≤ inclKFunctional ι t f :=
   le_iInf fun y => calc
     ‖f‖ₑ = ‖(f - ι y) + ι y‖ₑ := by rw [sub_add_cancel]
-    _ ≤ ‖f - ι y‖ₑ + ‖ι y‖ₑ := enorm_add_le _ _
+    _ ≤ ‖f - ι y‖ₑ + ‖ι y‖ₑ := eNorm_add_le _ _
     _ ≤ ‖f - ι y‖ₑ + t * ‖y‖ₑ := by
         gcongr
         exact (ι.le_opENorm y).trans (by gcongr)
@@ -95,7 +95,7 @@ theorem enorm_le_inclKFunctional {t : ℝ≥0∞} (ht : ‖ι‖ₑ ≤ t) (f : 
 /-- **The norm by the K-functional at scale one**: `‖f‖ ≤ max(1, ‖ι‖) K(1, f)`. -/
 theorem enorm_le_max_mul_inclKFunctional_one (f : X) :
     ‖f‖ₑ ≤ max 1 ‖ι‖ₑ * inclKFunctional ι 1 f := by
-  have h := inclKFunctional_mul_le_of_ne_top (ι := ι) (enorm_ne_top : ‖ι‖ₑ ≠ ∞) 1 f
+  have h := inclKFunctional_mul_le_of_ne_top (ι := ι) (eNorm_ne_top : ‖ι‖ₑ ≠ ∞) 1 f
   rw [mul_one] at h
   exact (enorm_le_inclKFunctional le_rfl f).trans h
 
@@ -105,7 +105,7 @@ theorem eq_zero_of_inclKFunctional_eq_zero {t : ℝ≥0∞} (ht : t ≠ 0) {f : 
     (h : inclKFunctional ι t f = 0) : f = 0 := by
   have hs0 : min t 1 ≠ 0 := (lt_min (pos_iff_ne_zero.2 ht) zero_lt_one).ne'
   have hsT : min t 1 ≠ ∞ := (min_le_right t 1).trans_lt ENNReal.one_lt_top |>.ne
-  have hc : ‖ι‖ₑ / min t 1 ≠ ∞ := ENNReal.div_ne_top enorm_ne_top hs0
+  have hc : ‖ι‖ₑ / min t 1 ≠ ∞ := ENNReal.div_ne_top eNorm_ne_top hs0
   have hf : ‖f‖ₑ ≤ 0 := calc
     ‖f‖ₑ ≤ inclKFunctional ι (‖ι‖ₑ / min t 1 * min t 1) f :=
         enorm_le_inclKFunctional (ENNReal.div_mul_cancel hs0 hsT).ge f
@@ -115,7 +115,7 @@ theorem eq_zero_of_inclKFunctional_eq_zero {t : ℝ≥0∞} (ht : t ≠ 0) {f : 
         gcongr
         exact inclKFunctional_mono (min_le_left t 1) f
     _ = 0 := by rw [h, mul_zero]
-  exact enorm_eq_zero.1 (nonpos_iff_eq_zero.1 hf)
+  exact eNorm_eq_zero.1 (nonpos_iff_eq_zero.1 hf)
 
 /-- **The K-functional under a change of scale**: `K(c t, f) ≤ max(1, c) K(t, f)` for every
 `c, t ∈ [0, ∞]`.  For `c = ∞` and `t > 0` the right side is `∞` unless `K(t, f) = 0`, and then
@@ -203,7 +203,7 @@ theorem measurable_kMethodIntegrand (f : X) : Measurable (kMethodIntegrand ι θ
 /-! ### The dyadic pieces of `(0, ∞)` -/
 
 /-- The dyadic piece `[2^(nρ), 2^((n+1)ρ))` of `(0, ∞)`. -/
-def dyadicPiece (ρ : ℝ) (n : ℤ) : Set ℝ :=
+noncomputable def dyadicPiece (ρ : ℝ) (n : ℤ) : Set ℝ :=
   Ico ((2 : ℝ) ^ ((n : ℝ) * ρ)) ((2 : ℝ) ^ (((n + 1 : ℤ) : ℝ) * ρ))
 
 /-- The dyadic pieces are measurable. -/
@@ -624,7 +624,7 @@ theorem log_two_rpow_mul_two_rpow_ne_top (θ : ℝ) (q : ℝ≥0∞) :
 /-- The constant `kMethodLowerConst ι θ ρ q` is finite for `ρ > 0`. -/
 theorem kMethodLowerConst_ne_top (hρ : 0 < ρ) (q : ℝ≥0∞) : kMethodLowerConst ι θ ρ q ≠ ∞ :=
   ENNReal.mul_ne_top (ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top,
-    max_ne_top ENNReal.one_ne_top enorm_ne_top⟩)
+    max_ne_top ENNReal.one_ne_top eNorm_ne_top⟩)
     (ENNReal.mul_ne_top (ENNReal.two_rpow_ne_top _)
       (ENNReal.inv_ne_top.2 (ofReal_mul_log_two_rpow_ne_zero hρ q)))
 

@@ -373,7 +373,7 @@ theorem modNormOn_lt_top_of_memApprox_cubeSplineSchemeAt (hp : p ≠ ∞)
   obtain ⟨C, hC, hle⟩ := exists_modNormOn_compAffineLp_le (μ := volume) (p := p) (-(L⁻¹ • a))
     (inv_pos.2 hL) (measurableSet_euclideanCube d) hBQ r hs hq
   have h2 : modNormOn hQ r s q (extendEuclideanAt p a hL g) < ∞ := by
-    rw [← modNormOn_congr_set hBQ hQ hpre.eventuallyEq]
+    rw [← modNormOn_congr_set hBQ hQ hpre.eventuallyEqSet]
     exact (hle _).trans_lt (ENNReal.mul_lt_top hC.lt_top h1)
   have h3 : indicatorLp hΩ (extendEuclideanAt p a hL g) = indicatorLp hΩ f :=
     (indicatorLp_eq_of_subset hΩ hQ hΩQ
@@ -420,7 +420,7 @@ theorem exists_cubeSplineAt_le (h : HasBesovExtension hΩ) (hp : p ≠ ∞)
     (LpToLpRestrictCLM (EuclideanSpace ℝ (Fin d)) ℂ ℂ volume p (euclideanCubeAt a L) ∘L
       extendEuclideanAt p a hL).restrictScalars ℝ
   refine ⟨‖T‖ₑ * (C₂ * (C₃ * C₁)),
-    ENNReal.mul_ne_top enorm_ne_top (ENNReal.mul_ne_top hC₂ (ENNReal.mul_ne_top hC₃ hC₁)),
+    ENNReal.mul_ne_top eNorm_ne_top (ENNReal.mul_ne_top hC₂ (ENNReal.mul_ne_top hC₃ hC₁)),
     fun f hf => ?_⟩
   obtain ⟨F, hFf, hF⟩ := hext f hf
   refine ⟨T (restrictEuclideanAt p a hL F), ?_, ?_⟩
@@ -431,7 +431,7 @@ theorem exists_cubeSplineAt_le (h : HasBesovExtension hΩ) (hp : p ≠ ∞)
     exact (indicatorLp_eq_of_subset hΩ hQ hΩQ hQF).trans hFf
   · have hE : modNormOn (measurableSet_euclideanCube d) r s q (compAffineLp a hL F) ≤
         C₃ * modNormOn hQ r s q F := by
-      rw [modNormOn_congr_set (measurableSet_euclideanCube d) hAQ hpre.symm.eventuallyEq]
+      rw [modNormOn_congr_set (measurableSet_euclideanCube d) hAQ hpre.symm.eventuallyEqSet]
       exact haff F
     calc (cubeSplineSchemeAt p a hL r).approxNormDyadic s q (T (restrictEuclideanAt p a hL F))
         ≤ ‖T‖ₑ * (cubeSplineScheme p d r).approxNormDyadic s q (restrictEuclideanAt p a hL F) :=
@@ -631,7 +631,7 @@ theorem exists_approxNormDyadic_domainSplineScheme_le (h : HasBesovExtension hΩ
           C * modNormOn hΩ r s q f := by
   obtain ⟨C, hC, hle⟩ := h.exists_cubeSplineAt_le hp hL hΩQ hr hq hs hsr
   set T := (restrictSubsetLp (μ := volume) (p := p) hΩ hΩQ).restrictScalars ℝ
-  refine ⟨‖T‖ₑ * C, ENNReal.mul_ne_top enorm_ne_top hC, fun f hf => ?_⟩
+  refine ⟨‖T‖ₑ * C, ENNReal.mul_ne_top eNorm_ne_top hC, fun f hf => ?_⟩
   obtain ⟨G, hGf, hG⟩ := hle f hf
   have hTG : T G = LpToLpRestrictCLM (EuclideanSpace ℝ (Fin d)) ℂ ℂ volume p Ω f :=
     restrictSubsetLp_eq_of_indicatorLp_eq hΩ (measurableSet_euclideanCubeAt a L) hΩQ hGf

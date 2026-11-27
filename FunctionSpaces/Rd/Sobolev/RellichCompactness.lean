@@ -278,7 +278,7 @@ theorem eLpNorm_one_indicator_closedBall_le (h : Lp ℂ 2 (volume : Measure V)) 
     (measurableSet_closedBall : MeasurableSet (closedBall (0 : V) K)).nullMeasurableSet]
   refine (eLpNorm_le_eLpNorm_mul_rpow_measure_univ (q := 2) (by norm_num)
     (Lp.aestronglyMeasurable h).restrict).trans ?_
-  rw [Measure.restrict_apply_univ, mul_comm, Lp.enorm_def]
+  rw [Measure.restrict_apply_univ, mul_comm, Lp.eNorm_def]
   norm_num
   gcongr
   exact Measure.restrict_le_self
@@ -287,7 +287,7 @@ theorem eLpNorm_one_indicator_closedBall_le (h : Lp ℂ 2 (volume : Measure V)) 
 theorem integrable_indicator_closedBall (h : Lp ℂ 2 (volume : Measure V)) (K : ℝ) :
     Integrable ((closedBall (0 : V) K).indicator h) := by
   refine memLp_one_iff_integrable.1 (memLp_iff.2 ?_)
-  refine (eLpNorm_one_indicator_closedBall_le h K).trans_lt (ENNReal.mul_lt_top ?_ enorm_lt_top)
+  refine (eLpNorm_one_indicator_closedBall_le h K).trans_lt (ENNReal.mul_lt_top ?_ eNorm_lt_top)
   exact ENNReal.rpow_lt_top_of_nonneg (by norm_num) measure_closedBall_lt_top.ne
 
 /-- **Cauchy–Schwarz on a ball**, in `ℝ`: `∫ |1_{B_K} h| ≤ |B_K|^{1/2} ‖h‖_2` for `h ∈ L_2(V)`. -/
@@ -295,12 +295,12 @@ theorem integral_norm_indicator_closedBall_le (h : Lp ℂ 2 (volume : Measure V)
     ∫ ξ, ‖(closedBall (0 : V) K).indicator h ξ‖ ≤ ballVolumeSqrt V K * ‖h‖ := by
   have hfin : volume (closedBall (0 : V) K) ^ (1 / 2 : ℝ) * ‖h‖ₑ ≠ ∞ :=
     ENNReal.mul_ne_top (ENNReal.rpow_ne_top_of_nonneg (by norm_num)
-      measure_closedBall_lt_top.ne) enorm_ne_top
+      measure_closedBall_lt_top.ne) eNorm_ne_top
   have hm : AEStronglyMeasurable ((closedBall (0 : V) K).indicator (h : V → ℂ)) volume :=
     (Lp.aestronglyMeasurable h).indicator measurableSet_closedBall
-  rw [integral_norm_eq_lintegral_enorm hm, ← eLpNorm_one_eq_lintegral_enorm hm]
+  rw [integral_norm_eq_lintegral_eNorm hm, ← eLpNorm_one_eq_lintegral_eNorm hm]
   refine (ENNReal.toReal_mono hfin (eLpNorm_one_indicator_closedBall_le h K)).trans_eq ?_
-  rw [ENNReal.toReal_mul, ← ENNReal.toReal_rpow, toReal_enorm, ballVolumeSqrt]
+  rw [ENNReal.toReal_mul, ← ENNReal.toReal_rpow, toReal_eNorm, ballVolumeSqrt]
 
 /-- **Band-limited functions are bounded**: for `h ∈ L_2(V)` and every `x`,
 `|𝓕⁻(1_{B_K} h)(x)| ≤ |B_K|^{1/2} ‖h‖_2`. -/
@@ -338,7 +338,8 @@ equicontinuous and takes values in the compact disc of radius `C`). -/
 theorem totallyBounded_setOf_lipschitzWith {X : Type*} [PseudoMetricSpace X] [CompactSpace X]
     (C : ℝ) (L : ℝ≥0) :
     TotallyBounded {g : X →ᵇ ℂ | (∀ x, ‖g x‖ ≤ C) ∧ LipschitzWith L g} :=
-  (BoundedContinuousFunction.arzela_ascoli (closedBall (0 : ℂ) C) (isCompact_closedBall 0 C) _
+  (BoundedContinuousFunction.arzela_ascoli (closedBall (0 : ℂ) C) (isCompact_closedBall 0 C)
+    {g : X →ᵇ ℂ | (∀ x, ‖g x‖ ≤ C) ∧ LipschitzWith L g}
     (fun _ x hg => mem_closedBall_zero_iff.2 (hg.1 x))
     (LipschitzWith.uniformEquicontinuous _ L fun g => g.2.2).equicontinuous).totallyBounded.subset
     subset_closure

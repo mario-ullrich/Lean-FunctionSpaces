@@ -132,7 +132,7 @@ theorem repr_block (k : ℕ) (f : H) (i : ι) :
 theorem enorm_block_sq (k : ℕ) (f : H) :
     ‖S.spectralProjectionScheme.block k f‖ₑ ^ 2 = ∑' i,
       if 2 ^ k ≤ S.level i ∧ S.level i < 2 ^ (k + 1) then ‖S.basis.repr f i‖ₑ ^ 2 else 0 := by
-  rw [← S.basis.repr.enorm_map, lp.enorm_sq_eq_tsum]
+  rw [← S.basis.repr.eNorm_map, lp.enorm_sq_eq_tsum]
   congr 1; funext i
   rw [repr_block]
   split_ifs <;> simp
@@ -156,7 +156,7 @@ theorem mem_l2_iff (g : ι → ℂ) : Memℓp g 2 ↔ ∑' i, ‖g i‖ₑ ^ 2 �
 /-- The squared Sobolev weight `(1 + lvl i)^(2s)` in `ℝ≥0∞`. -/
 theorem enorm_levelWeight_mul_sq (s : ℝ) (i : ι) (z : ℂ) :
     ‖(S.levelWeight s i : ℂ) * z‖ₑ ^ 2 = ((1 + S.level i : ℕ) : ℝ≥0∞) ^ (2 * s) * ‖z‖ₑ ^ 2 := by
-  rw [enorm_mul, mul_pow, ← ofReal_norm, S.norm_ofReal_levelWeight, levelWeight,
+  rw [eNorm_mul, mul_pow, ← ofReal_norm, S.norm_ofReal_levelWeight, levelWeight,
     ← ENNReal.ofReal_rpow_of_pos (by positivity), ENNReal.ofReal_natCast, ← ENNReal.rpow_natCast,
     ← ENNReal.rpow_mul]
   congr 2
@@ -187,7 +187,7 @@ theorem memApprox_two_iff_levelWeight [CompleteSpace H] {s : ℝ} (hs : 0 < s) (
   have hB : B = ∑' i, (∑' k : ℕ, if blk k i then dyadicWeight (2 * s) k else 0) * e i := by
     simp only [B, enorm_block_sq]
     simp_rw [← ENNReal.tsum_mul_left]
-    rw [ENNReal.tsum_comm]
+    rw [tsum_comm]
     congr 1; funext i
     rw [← ENNReal.tsum_mul_right]
     congr 1; funext k
@@ -217,25 +217,25 @@ theorem memApprox_two_iff_levelWeight [CompleteSpace H] {s : ℝ} (hs : 0 < s) (
         _ = 2 ^ (2 * s) * dyadicWeight (2 * s) (Nat.log 2 (S.level i)) := by
             rw [ENNReal.natCast_two_pow_rpow, ENNReal.dyadicWeight_succ]
   have hBT : B ≤ T := by
-    rw [hB]; exact ENNReal.tsum_le_tsum fun i => by gcongr; exact hle i
+    rw [hB]; exact tsum_le_tsum fun i => by gcongr; exact hle i
   have hTB : T ≤ ‖f‖ₑ ^ 2 + 2 ^ (2 * s) * B := by
     calc T ≤ ∑' i, ((if S.level i = 0 then 1 else 0) * e i +
           2 ^ (2 * s) * ((∑' k : ℕ, if blk k i then dyadicWeight (2 * s) k else 0) * e i)) :=
-          ENNReal.tsum_le_tsum fun i => by
+          tsum_le_tsum fun i => by
             calc Wt i * e i ≤ ((if S.level i = 0 then 1 else 0) +
                 2 ^ (2 * s) * ∑' k : ℕ, if blk k i then dyadicWeight (2 * s) k else 0) * e i := by
                   gcongr; exact hge i
               _ = _ := by ring
       _ = ∑' i, (if S.level i = 0 then 1 else 0) * e i + 2 ^ (2 * s) * B := by
-          rw [ENNReal.tsum_add, ENNReal.tsum_mul_left, hB]
+          rw [tsum_add, ENNReal.tsum_mul_left, hB]
       _ ≤ ‖f‖ₑ ^ 2 + 2 ^ (2 * s) * B := by
           gcongr
           calc ∑' i, (if S.level i = 0 then 1 else 0) * e i ≤ ∑' i, e i :=
-                ENNReal.tsum_le_tsum fun i => by split_ifs <;> simp
-            _ = ‖f‖ₑ ^ 2 := by rw [← S.basis.repr.enorm_map, lp.enorm_sq_eq_tsum]
+                tsum_le_tsum fun i => by split_ifs <;> simp
+            _ = ‖f‖ₑ ^ 2 := by rw [← S.basis.repr.eNorm_map, lp.enorm_sq_eq_tsum]
   -- the block norm is finite iff `B` is
   have hblk : S.spectralProjectionScheme.blockNorm s 2 f < ∞ ↔ B ≠ ∞ := by
-    rw [ProjectionScheme.blockNorm, ENNReal.add_lt_top, and_iff_right enorm_lt_top]
+    rw [ProjectionScheme.blockNorm, ENNReal.add_lt_top, and_iff_right eNorm_lt_top]
     have h2 := lqNorm_rpow (q := 2) (by norm_num) (by norm_num)
       (fun k => dyadicWeight s k * ‖S.spectralProjectionScheme.block k f‖ₑ)
     have hB' : (∑' k, (dyadicWeight s k * ‖S.spectralProjectionScheme.block k f‖ₑ) ^
@@ -251,7 +251,7 @@ theorem memApprox_two_iff_levelWeight [CompleteSpace H] {s : ℝ} (hs : 0 < s) (
   change B ≠ ∞ ↔ T ≠ ∞
   constructor
   · intro h
-    exact ne_top_of_le_ne_top (ENNReal.add_ne_top.2 ⟨ENNReal.pow_ne_top enorm_ne_top,
+    exact ne_top_of_le_ne_top (ENNReal.add_ne_top.2 ⟨ENNReal.pow_ne_top eNorm_ne_top,
       ENNReal.mul_ne_top (ENNReal.two_rpow_ne_top _) h⟩)
       hTB
   · intro h

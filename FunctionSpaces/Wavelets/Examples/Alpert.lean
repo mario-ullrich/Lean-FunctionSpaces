@@ -669,7 +669,7 @@ theorem exists_stable : ∃ K M : ℝ≥0∞, K ≠ ∞ ∧ M ≠ ∞ ∧ ∀ β
     fun β => ⟨?_, ?_⟩⟩
   · have hnorm : ‖sumMultiwavelet r p β‖ₑ =
         eLpNorm (fun t => ∑ i, β i * multiwavelet r i t) p unitVol := by
-      rw [Lp.enorm_def]
+      rw [Lp.eNorm_def]
       exact eLpNorm_congr_ae (coeFn_sumMultiwavelet β)
     have hbe : ‖β‖ₑ ≤ K * ‖sumMultiwavelet r p β‖ₑ := by
       simpa only [edist_zero_right, map_zero] using hK β 0
@@ -764,7 +764,7 @@ theorem exists_eLpNorm_alpertDetailFun_equiv (hp : p ≠ ∞) : ∃ K M : ℝ≥
   -- the coefficients in pieces
   have hβ : ENNReal.lqNorm p (fun mi : Fin (2 ^ k) × Fin r => ‖β mi.1 mi.2‖ₑ) =
       dyadicWeight (1 / 2) k * F := by
-    simp only [β, enorm_mul, enorm_two_rpow_half]
+    simp only [β, eNorm_mul, enorm_two_rpow_half]
     exact ENNReal.lqNorm_const_mul _ _
   have hβm : (dyadicWeight (1 / 2) k * F) ^ p.toReal =
       ∑ m, ENNReal.lqNorm p (fun i => ‖β m i‖ₑ) ^ p.toReal := by
@@ -805,7 +805,7 @@ theorem exists_eLpNorm_alpertDetailFun_equiv (hp : p ≠ ∞) : ∃ K M : ℝ≥
 /-- The detail `P_{k+1} f - P_k f` in `L_p[0, 1]` is the function `Alpert.alpertDetailFun`. -/
 theorem enorm_ppProj_sub (hp : p ≠ ∞) (f : Lp ℂ p unitVol) (k : ℕ) :
     ‖ppProj p hp r (k + 1) f - ppProj p hp r k f‖ₑ = eLpNorm (alpertDetailFun r f k) p unitVol := by
-  rw [Lp.enorm_def]
+  rw [Lp.eNorm_def]
   exact eLpNorm_congr_ae ((Lp.coeFn_sub _ _).trans
     ((coeFn_ppProj hp r (k + 1) f).sub (coeFn_ppProj hp r k f)))
 

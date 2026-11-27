@@ -283,7 +283,7 @@ theorem lintegral_enorm_lineDerivOp_le (v : V) (G : 𝓢(V, ℂ)) :
       ≤ ∫⁻ x, ‖v‖ₑ * schwartzDecayConst G 1 (finrank ℝ V + 1) *
           ((1 + ‖x‖ₑ) ^ (finrank ℝ V + 1))⁻¹ := lintegral_mono hpt
     _ = ‖v‖ₑ * schwartzDecayConst G 1 (finrank ℝ V + 1) * peetreIntegral V (finrank ℝ V + 1) :=
-        lintegral_const_mul' _ _ (ENNReal.mul_ne_top enorm_ne_top (schwartzDecayConst_ne_top _ _ _))
+        lintegral_const_mul' _ _ (ENNReal.mul_ne_top eNorm_ne_top (schwartzDecayConst_ne_top _ _ _))
     _ = ‖v‖ₑ * gradMassConst G := by rw [gradMassConst, mul_assoc]
 
 variable (V) in
@@ -324,7 +324,7 @@ theorem lintegral_enorm_dilate_sub_le_mul (G : 𝓢(V, ℂ)) (j : ℕ) (y : V) :
         lintegral_enorm_dilate _ (by positivity)
     _ ≤ ∫⁻ x, ‖(∂_{((2 : ℝ) ^ j) • -y} G : 𝓢(V, ℂ)) x‖ₑ := lintegral_enorm_fwdDiff_le _ G
     _ ≤ ‖((2 : ℝ) ^ j) • -y‖ₑ * gradMassConst G := lintegral_enorm_lineDerivOp_le _ G
-    _ = _ := by rw [enorm_two_pow_smul, enorm_neg, mul_comm]
+    _ = _ := by rw [enorm_two_pow_smul, eNorm_neg, mul_comm]
 
 omit [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- `(1 + 2^j ‖y‖)^(-1) ≤ (2^j ‖y‖)^(-1)` in `[0, ∞]`. -/
@@ -381,10 +381,10 @@ theorem setLIntegral_enorm_dilate_sub_le_inv (G : 𝓢(V, ℂ)) (j : ℕ) (y : V
   calc ∫⁻ x in {x : V | 2 * ‖y‖ < ‖x‖}, ‖dilate (2 ^ j) G (x - y) - dilate (2 ^ j) G x‖ₑ
       ≤ ∫⁻ x in {x : V | 2 * ‖y‖ < ‖x‖},
           (‖dilate (2 ^ j) (G : V → ℂ) (x - y)‖ₑ + ‖dilate (2 ^ j) (G : V → ℂ) x‖ₑ) :=
-        lintegral_mono fun x => enorm_sub_le
+        lintegral_mono fun x => eNorm_sub_le
     _ = (∫⁻ x in {x : V | 2 * ‖y‖ < ‖x‖}, ‖dilate (2 ^ j) (G : V → ℂ) (x - y)‖ₑ) +
           ∫⁻ x in {x : V | 2 * ‖y‖ < ‖x‖}, ‖dilate (2 ^ j) (G : V → ℂ) x‖ₑ :=
-        lintegral_add_right _ hc.enorm.measurable
+        lintegral_add_right _ hc.eNorm.measurable
     _ ≤ tailConst G 0 1 * (2 ^ j * ‖y‖ₑ)⁻¹ + tailConst G 0 1 * (2 ^ j * ‖y‖ₑ)⁻¹ :=
         add_le_add (h2.trans htail) (h1.trans htail)
     _ = _ := by ring
@@ -454,7 +454,7 @@ theorem lintegral_lqNorm_sub_le {G : ℕ → 𝓢(V, ℂ)} {A : ℕ → ℕ → 
   have hmeas : ∀ j, AEMeasurable (fun x => ‖dilate (2 ^ j) (G j : V → ℂ) (x - y) -
       dilate (2 ^ j) (G j : V → ℂ) x‖ₑ) (volume.restrict {x : V | 2 * ‖y‖ < ‖x‖}) := fun j =>
     (((continuous_dilate (G j).continuous _).comp (continuous_id.sub continuous_const)).sub
-      (continuous_dilate (G j).continuous _)).enorm.measurable.aemeasurable
+      (continuous_dilate (G j).continuous _)).eNorm.measurable.aemeasurable
   calc ∫⁻ x in {x : V | 2 * ‖y‖ < ‖x‖},
         lqNorm 2 (fun j => ‖dilate (2 ^ j) (G j) (x - y) - dilate (2 ^ j) (G j) x‖ₑ)
       ≤ ∫⁻ x in {x : V | 2 * ‖y‖ < ‖x‖},
@@ -464,7 +464,7 @@ theorem lintegral_lqNorm_sub_le {G : ℕ → 𝓢(V, ℂ)} {A : ℕ → ℕ → 
           ‖dilate (2 ^ j) (G j : V → ℂ) (x - y) - dilate (2 ^ j) (G j : V → ℂ) x‖ₑ :=
         lintegral_tsum hmeas
     _ ≤ ∑' j : ℕ, familyHormanderConst V A * min (2 ^ j * ‖y‖ₑ) (2 ^ j * ‖y‖ₑ)⁻¹ :=
-        ENNReal.tsum_le_tsum fun j => (setLIntegral_enorm_dilate_sub_le_min (G j) j y).trans
+        tsum_le_tsum fun j => (setLIntegral_enorm_dilate_sub_le_min (G j) j y).trans
           (by gcongr; exact hormanderConst_le_familyHormanderConst h j)
     _ = familyHormanderConst V A * ∑' j : ℕ, min (2 ^ j * ‖y‖ₑ) (2 ^ j * ‖y‖ₑ)⁻¹ :=
         ENNReal.tsum_mul_left
@@ -527,7 +527,7 @@ theorem IsCZFamily.adjoint {θ : ℕ → V → ℂ} {B H : ℝ≥0∞} (h : IsCZ
       funext (fourier_conj_comp_neg (θ j))]
     exact Complex.conjCLE.toContinuousLinearMap.integrable_comp (h.integrable_fourier j)
   overlap ξ := by
-    simp_rw [fourier_conj_comp_neg, RCLike.enorm_conj]
+    simp_rw [fourier_conj_comp_neg, RCLike.eNorm_conj]
     exact h.overlap ξ
   hormander y := by
     have hS : ∀ z : V, MeasurableSet {x : V | 2 * ‖z‖ < ‖x‖} := fun z =>
@@ -535,7 +535,7 @@ theorem IsCZFamily.adjoint {θ : ℕ → V → ℂ} {B H : ℝ≥0∞} (h : IsCZ
     have hF : ∀ x, (fun j => ‖conj (θ j (-(x - y))) - conj (θ j (-x))‖ₑ) =
         fun j => ‖θ j (-x - -y) - θ j (-x)‖ₑ := fun x => by
       funext j
-      rw [← map_sub, RCLike.enorm_conj, neg_sub, sub_neg_eq_add, neg_add_eq_sub]
+      rw [← map_sub, RCLike.eNorm_conj, neg_sub, sub_neg_eq_add, neg_add_eq_sub]
     simp_rw [hF]
     rw [← lintegral_indicator (hS y)]
     calc ∫⁻ x, {x : V | 2 * ‖y‖ < ‖x‖}.indicator

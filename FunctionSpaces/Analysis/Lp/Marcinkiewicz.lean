@@ -168,10 +168,10 @@ theorem measure_half_lt_le_add_setLIntegral_compl {b : α → ℝ≥0∞} (hb : 
           ENNReal.mul_inv (Or.inr ht) (Or.inl (by norm_num)), inv_inv]
 
 /-- A function with `∫ ‖f‖² < ∞` that is almost everywhere strongly measurable lies in `L_2`
-(Mathlib's `eLpNorm_lt_top_iff_lintegral_rpow_enorm_lt_top`). -/
+(Mathlib's `eLpNorm_lt_top_iff_lintegral_rpow_eNorm_lt_top`). -/
 theorem memLp_two_of_lintegral_enorm_sq_ne_top {E : Type*} [NormedAddCommGroup E] {f : α → E}
     (hf : AEStronglyMeasurable f μ) (h : ∫⁻ x, ‖f x‖ₑ ^ 2 ∂μ ≠ ∞) : MemLp f 2 μ :=
-  memLp_iff.2 ((eLpNorm_lt_top_iff_lintegral_rpow_enorm_lt_top two_ne_zero ENNReal.ofNat_ne_top
+  memLp_iff.2 ((eLpNorm_lt_top_iff_lintegral_rpow_eNorm_lt_top two_ne_zero ENNReal.ofNat_ne_top
     hf).2 (by simpa [ENNReal.rpow_two] using h.lt_top))
 
 /-- **The level sets of a split function**: let `u ≤ a + b` almost everywhere, with almost
@@ -422,8 +422,8 @@ theorem measure_lt_mul_rpow_le_of_le_add {F F₁ F₂ : α' → ℝ≥0∞} (hF�
       ν {x | ENNReal.ofReal τ / 2 < F₁ x} + ν {x | ENNReal.ofReal τ / 2 < F₂ x} := by
     have h := distribution_add_le_of_enorm (μ := ν) (c := 1) (t := ENNReal.ofReal τ / 2)
       (s := ENNReal.ofReal τ / 2) (f := F) (g₁ := F₁) (g₂ := F₂)
-      (hsplit.mono fun x hx => by simpa only [enorm_eq_self, one_mul] using hx)
-    simpa only [distribution, enorm_eq_self, one_mul, ENNReal.add_halves] using h
+      (hsplit.mono fun x hx => by simpa only [eNorm_eq_self, one_mul] using hx)
+    simpa only [distribution, eNorm_eq_self, one_mul, ENNReal.add_halves] using h
   have h4 : (2 : ℝ≥0∞) ^ (2 : ℝ) = 4 := by rw [ENNReal.rpow_two]; norm_num
   calc ν {x | ENNReal.ofReal τ < F x} * ENNReal.ofReal (τ ^ (p - 1))
       ≤ (C₁ * (ENNReal.ofReal τ / 2)⁻¹ * I₁ +
@@ -534,7 +534,7 @@ theorem eLpNorm_le_of_weak_one_strong_two [SFinite μ] {X : Type*} (G : X → α
   have hp0 : p ≠ 0 := (zero_lt_one.trans hp1).ne'
   refine eLpNorm_le_rpow_mul_of_lintegral_enorm_le hp0 hp (hT x).aestronglyMeasurable
     (hG x).aestronglyMeasurable ?_
-  simp only [enorm_eq_self]
+  simp only [eNorm_eq_self]
   refine lintegral_rpow_le_of_weak_one_strong_two G T res hG hT hres hsub hweak hstrong
     (ENNReal.one_lt_toReal hp1 hp) (ENNReal.toReal_lt_of_lt_ofReal (by rwa [ENNReal.ofReal_ofNat]))
     x ?_
@@ -587,7 +587,7 @@ theorem ae_enorm_indicator_eq {ε₁ : Type*} [TopologicalSpace ε₁] [ESeminor
     {f : α → ε₁} {G : α → ℝ≥0∞} (hfG : ∀ᵐ x ∂μ, ‖f x‖ₑ = G x) (S : Set α) :
     ∀ᵐ x ∂μ, ‖S.indicator f x‖ₑ = S.indicator G x :=
   hfG.mono fun x hx => by
-    rw [enorm_indicator_eq_indicator_enorm]
+    rw [eNorm_indicator_eq_indicator_eNorm]
     by_cases h : x ∈ S
     · rw [Set.indicator_of_mem h, Set.indicator_of_mem h, hx]
     · rw [Set.indicator_of_notMem h, Set.indicator_of_notMem h]
@@ -608,7 +608,7 @@ theorem memLp_one_indicator_lt {ε₁ : Type*} [TopologicalSpace ε₁] [ESemino
     (hGp : ∫⁻ x, G x ^ p ∂μ ≠ ∞) {τ : ℝ} (hτ : 0 < τ) :
     MemLp ({y | ENNReal.ofReal τ < G y}.indicator f) 1 μ := by
   have hm := hf.indicator (measurableSet_lt (measurable_const (a := ENNReal.ofReal τ)) hG)
-  rw [MemLp, eLpNorm_one_eq_lintegral_enorm hm, lintegral_congr_ae (ae_enorm_indicator_eq hfG _)]
+  rw [MemLp, eLpNorm_one_eq_lintegral_eNorm hm, lintegral_congr_ae (ae_enorm_indicator_eq hfG _)]
   exact (lintegral_indicator_lt_ne_top hp (ENNReal.ofReal_pos.2 hτ).ne' ENNReal.ofReal_ne_top
     hGp).lt_top
 
@@ -621,7 +621,7 @@ theorem memLp_two_indicator_compl {ε₁ : Type*} [TopologicalSpace ε₁] [ESem
     (hGp : ∫⁻ x, G x ^ p ∂μ ≠ ∞) (τ : ℝ) :
     MemLp ({y | ENNReal.ofReal τ < G y}ᶜ.indicator f) 2 μ := by
   have hm := hf.indicator (measurableSet_lt (measurable_const (a := ENNReal.ofReal τ)) hG).compl
-  refine (eLpNorm_lt_top_iff_lintegral_rpow_enorm_lt_top two_ne_zero ENNReal.ofNat_ne_top hm).2 ?_
+  refine (eLpNorm_lt_top_iff_lintegral_rpow_eNorm_lt_top two_ne_zero ENNReal.ofNat_ne_top hm).2 ?_
   rw [ENNReal.toReal_ofNat,
     lintegral_enorm_indicator_rpow_eq hfG {y | ENNReal.ofReal τ < G y}ᶜ 2]
   exact (lintegral_indicator_compl_rpow_ne_top hp0 hp2 two_pos ENNReal.ofReal_ne_top hGp).lt_top
@@ -657,7 +657,7 @@ theorem lintegral_enorm_rpow_le_of_hasWeakType_of_hasStrongType [SFinite μ]
     (hTf : AEStronglyMeasurable (T f) ν) :
     ∫⁻ x, ‖T f x‖ₑ ^ p ∂ν ≤
       marcinkiewiczConst p (A * C₁) (A ^ 2 * C₂ ^ 2) * ∫⁻ x, ‖f x‖ₑ ^ p ∂μ := by
-  obtain ⟨G, hG, hfG⟩ := hf.enorm
+  obtain ⟨G, hG, hfG⟩ := hf.eNorm
   have hGf : ∫⁻ x, ‖f x‖ₑ ^ p ∂μ = ∫⁻ x, G x ^ p ∂μ :=
     lintegral_congr_ae (hfG.mono fun x (hx : ‖f x‖ₑ = G x) => by simp only [hx])
   rw [hGf] at hfp ⊢
@@ -667,8 +667,8 @@ theorem lintegral_enorm_rpow_le_of_hasWeakType_of_hasStrongType [SFinite μ]
     memLp_two_indicator_compl hf hfG hG (by linarith) hp2.le hfp τ
   refine lintegral_rpow_le_of_forall_le_add
     (fun τ x => A * ‖T ({y | ENNReal.ofReal τ < G y}.indicator f) x‖ₑ)
-    (fun τ x => A * ‖T ({y | ENNReal.ofReal τ < G y}ᶜ.indicator f) x‖ₑ) hTf.enorm hG
-    (fun τ _ => ((h₂ _ (h2 τ)).1.enorm.const_mul _)) (fun τ hτ => ?_) (fun τ hτ => ?_)
+    (fun τ x => A * ‖T ({y | ENNReal.ofReal τ < G y}ᶜ.indicator f) x‖ₑ) hTf.eNorm hG
+    (fun τ _ => ((h₂ _ (h2 τ)).1.eNorm.const_mul _)) (fun τ hτ => ?_) (fun τ hτ => ?_)
     (fun τ _ => ?_) hp1 hp2
   · filter_upwards [hT _ _ (Or.inl (h1 τ hτ)) (Or.inr (h2 τ))] with x hx
     rw [Set.indicator_self_add_compl, mul_add] at hx
@@ -677,7 +677,7 @@ theorem lintegral_enorm_rpow_le_of_hasWeakType_of_hasStrongType [SFinite μ]
     have hm := (h1 τ hτ).aestronglyMeasurable
     refine (measure_lt_mul_enorm_le_wnorm_one _ A ht0
       (ENNReal.div_ne_top ENNReal.ofReal_ne_top two_ne_zero)).trans ?_
-    rw [← lintegral_congr_ae (ae_enorm_indicator_eq hfG _), ← eLpNorm_one_eq_lintegral_enorm hm]
+    rw [← lintegral_congr_ae (ae_enorm_indicator_eq hfG _), ← eLpNorm_one_eq_lintegral_eNorm hm]
     calc (A : ℝ≥0∞) * (ENNReal.ofReal τ / 2)⁻¹ *
           wnorm (T ({y | ENNReal.ofReal τ < G y}.indicator f)) 1 ν
         ≤ A * (ENNReal.ofReal τ / 2)⁻¹ *
@@ -717,6 +717,6 @@ theorem hasStrongType_of_hasWeakType_one_of_hasStrongType_two [SFinite μ] {ε�
   exact lintegral_enorm_rpow_le_of_hasWeakType_of_hasStrongType
     (ENNReal.one_lt_toReal hp1 hp) (ENNReal.toReal_lt_of_lt_ofReal (by rwa [ENNReal.ofReal_ofNat]))
     hT h₁ h₂ hf.aestronglyMeasurable
-    ((eLpNorm_lt_top_iff_lintegral_rpow_enorm_lt_top hp0 hp hf.aestronglyMeasurable).1 hf).ne hTf
+    ((eLpNorm_lt_top_iff_lintegral_rpow_eNorm_lt_top hp0 hp hf.aestronglyMeasurable).1 hf).ne hTf
 
 end MeasureTheory

@@ -159,8 +159,8 @@ theorem enorm_higherDiff_le_sum (r : ℕ) (h : V) (f : V → ℂ) (x : V) :
     ‖(fwdDiff h)^[r] f x‖ₑ ≤
       ∑ l ∈ Finset.range (r + 1), (r.choose l : ℝ≥0∞) * ‖f (x + (l : ℝ) • h)‖ₑ := by
   rw [higherDiff_apply]
-  refine (enorm_sum_le _ _).trans (Finset.sum_le_sum fun l _ => le_of_eq ?_)
-  rw [enorm_mul, enorm_mul, enorm_pow, enorm_neg, enorm_one, one_pow, one_mul,
+  refine (eNorm_sum_le _ _).trans (Finset.sum_le_sum fun l _ => le_of_eq ?_)
+  rw [eNorm_mul, eNorm_mul, eNorm_pow, eNorm_neg, eNorm_one, one_pow, one_mul,
     ← ofReal_norm, Complex.norm_natCast, ENNReal.ofReal_natCast]
 
 omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
@@ -188,7 +188,7 @@ theorem measurable_enorm_higherDiff_uncurry {f : V → ℂ} (hf : Measurable f) 
   have heq : (fun z : V × V => (fwdDiff z.2)^[r] f z.1) = fun z =>
       ∑ l ∈ Finset.range (r + 1), ((-1 : ℂ) ^ (r - l) * (r.choose l : ℂ)) *
         f (z.1 + (l : ℝ) • z.2) := funext fun z => higherDiff_apply r z.2 f z.1
-  refine Measurable.enorm ?_
+  refine Measurable.eNorm ?_
   rw [heq]
   exact Finset.measurable_sum _ fun l _ => measurable_const.mul
     (hf.comp (measurable_fst.add (measurable_snd.const_smul _)))
@@ -427,7 +427,7 @@ theorem lpModulus_add_le (r : ℕ) (f g : Lp ℂ p μ) (k : ℕ) :
 omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] in
 /-- `ω_r(f, 2^(-k))_p ≤ 2^r ‖f‖_p` on `L_p`. -/
 theorem lpModulus_le (r : ℕ) (f : Lp ℂ p μ) (k : ℕ) : lpModulus p r f k ≤ 2 ^ r * ‖f‖ₑ := by
-  rw [Lp.enorm_def]
+  rw [Lp.eNorm_def]
   exact smoothnessModulus_le (Lp.aestronglyMeasurable f) Fact.out r _
 
 omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] in

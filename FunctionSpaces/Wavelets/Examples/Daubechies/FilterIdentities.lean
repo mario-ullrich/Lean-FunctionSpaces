@@ -271,8 +271,8 @@ theorem integral_finsum_mul_conj_finsum {a b : ℤ → ℂ} (ha : (Function.supp
         conj (∑ᶠ k : ℤ, b k * expFreq (k * ξ)) = ∑ᶠ k : ℤ, a k * conj (b k) := by
   obtain ⟨u, hau, hbu⟩ : ∃ u : Finset ℤ,
       Function.support a ⊆ u ∧ Function.support b ⊆ u :=
-    ⟨ha.toFinset ∪ hb.toFinset, by simp [Set.subset_union_left],
-      by simp [Set.subset_union_right]⟩
+    ⟨ha.toFinset ∪ hb.toFinset, by simp,
+      by simp⟩
   have hA : ∀ ξ : ℝ, ∑ᶠ k : ℤ, a k * expFreq (k * ξ) = ∑ k ∈ u, a k * expFreq (k * ξ) :=
     fun ξ => finsum_eq_sum_of_support_subset _
       ((Function.support_mul_subset_left _ _).trans hau)

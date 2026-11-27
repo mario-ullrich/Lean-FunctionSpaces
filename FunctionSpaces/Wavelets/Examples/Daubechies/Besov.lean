@@ -203,8 +203,8 @@ theorem memApprox_daubechiesScheme_iff_coeff (hN : 2 ≤ N) (hp : p ≠ ∞) {s 
     (closure_iUnion_daubechiesScheme m hN hp) hs hq, ApproximationScheme.ProjectionScheme.blockNorm,
     daubechiesProjectionScheme_one, daubechiesCoeffNorm]
   simp only [daubechiesProjectionScheme_block, ENNReal.add_lt_top]
-  refine and_congr ⟨fun _ => (hKM₀ f).1.trans_lt (ENNReal.mul_lt_top hK₀.lt_top enorm_lt_top),
-    fun _ => enorm_lt_top⟩
+  refine and_congr ⟨fun _ => (hKM₀ f).1.trans_lt (ENNReal.mul_lt_top hK₀.lt_top eNorm_lt_top),
+    fun _ => eNorm_lt_top⟩
     (ENNReal.lqNorm_lt_top_iff_of_le_mul hK hM (fun j => ?_) fun j => ?_)
   · rw [ENNReal.dyadicWeight_add, mul_assoc, mul_left_comm M]
     exact mul_le_mul' le_rfl (hKM f j).2

@@ -160,7 +160,7 @@ theorem coe_graphProj_coordChange_symm {y' : bdry n}
 
 /-- The boundary hyperplane is closed. -/
 theorem isClosed_bdry : IsClosed ((bdry n : Set (EuclideanSpace ℝ (Fin n)))) :=
-  Submodule.closed_of_finiteDimensional _
+  Submodule.isClosed_of_finiteDimensional _
 
 /-- The **boundary change of charts with a cut-off**: the restriction of the change of charts with
 a cut-off to the boundary hyperplane `H₀`, a smooth change of variables with a cut-off on all of
@@ -262,7 +262,8 @@ theorem chartChange_apply_coe (G : EuclideanSpace ℝ (Fin n) → ℂ) (x' : bdr
           ((𝓡∂ n).extendCoordChange e e' x') : bdry n) : EuclideanSpace ℝ (Fin n))
     rw [coe_graphProj_coordChange he he' hx]
   · rw [BesovAtlas.chartChange_apply, indicator_of_notMem hx, Rd.CutoffDiffeo.apply,
-      indicator_of_notMem fun h => hx ((mem_coordChange_source_iff_of_bdry x').1 h.2)]
+      indicator_of_notMem fun h : x' ∈ univ ∩ (boundaryChartChange he he' c hc hcs).U =>
+        hx ((mem_coordChange_source_iff_of_bdry x').1 h.2)]
 
 end BoundaryChange
 

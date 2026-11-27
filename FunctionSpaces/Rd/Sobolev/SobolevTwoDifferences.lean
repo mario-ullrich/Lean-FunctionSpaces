@@ -197,7 +197,7 @@ theorem exists_sobolevToL2_eq_mulLp {s : ℝ} (hs : 0 ≤ s) {χ : V → ℝ}
   obtain ⟨D, hD⟩ := exists_iteratedFDeriv_bound hχc (hcs.comp_left Complex.ofReal_zero)
     (⌊s⌋₊ + 1)
   have hF := (modNorm_sobolevToL2_le hpos hsr U).trans_lt
-    (ENNReal.mul_lt_top (sobolevBesovConst_ne_top hpos hsr).lt_top enorm_lt_top)
+    (ENNReal.mul_lt_top (sobolevBesovConst_ne_top hpos hsr).lt_top eNorm_lt_top)
   exact exists_sobolevToL2_eq_of_modNorm_lt_top hpos hsr
     (modNorm_mulLp_lt_top two_ne_top hχc hD hsr one_le_two hF)
 
@@ -243,6 +243,6 @@ theorem modNorm_sobolevToL2_lt_top {s : ℝ} (hs : 1 / 2 < s) (hs2 : s < 2) (U :
   exact (modNorm_sobolevToL2_le (one_half_pos.trans hs) (by exact_mod_cast hs2) U).trans_lt
     (ENNReal.mul_lt_top
       (sobolevBesovConst_ne_top (one_half_pos.trans hs) (by exact_mod_cast hs2)).lt_top
-      enorm_lt_top)
+      eNorm_lt_top)
 
 end Rd

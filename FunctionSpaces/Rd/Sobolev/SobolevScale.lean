@@ -94,7 +94,7 @@ theorem enorm_sq_eq_lintegral_of_fourier_ae_eq {w : V → ℂ} {g h : Lp ℂ 2 (
   rw [← enorm_fourier_Lp_two, enorm_sq_eq_lintegral]
   refine lintegral_congr_ae ?_
   filter_upwards [hgh] with ξ hξ
-  rw [hξ, enorm_mul, mul_pow]
+  rw [hξ, eNorm_mul, mul_pow]
   congr 1
   rw [← ofReal_norm, ENNReal.ofReal_pow (norm_nonneg _)]
 
@@ -504,7 +504,7 @@ theorem enorm_sq_eq_add_sum_sobolevLineDeriv {ι : Type*} [Fintype ι] (b : Orth
       ENNReal.ofReal (2 * π) ^ 2 * ‖sobolevInclusion (lt_add_one s).le U‖ₑ ^ 2 +
         ∑ i, ‖sobolevLineDeriv s (b i) U‖ₑ ^ 2 := by
   set G : V → ℝ≥0∞ := fun ξ => ‖(𝓕 U.toLp : Lp ℂ 2 (volume : Measure V)) ξ‖ₑ ^ 2
-  have hG : AEMeasurable G volume := (Lp.aestronglyMeasurable _).enorm.pow_const 2
+  have hG : AEMeasurable G volume := (Lp.aestronglyMeasurable _).eNorm.pow_const 2
   have hw : ∀ (f : V → ℂ), Continuous f →
       AEMeasurable (fun ξ => ENNReal.ofReal (‖f ξ‖ ^ 2) * G ξ) volume := fun f hf =>
     ((hf.norm.pow 2).measurable.ennreal_ofReal.aemeasurable).mul hG

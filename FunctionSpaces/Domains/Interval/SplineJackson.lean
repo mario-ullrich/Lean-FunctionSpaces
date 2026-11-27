@@ -143,7 +143,8 @@ variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 
 /-- The window `W_i = [(i + 1 - r) 2^(-k), (i + 1) 2^(-k)]` (truncated at `0`) of the
 quasi-interpolant on `I_{k,i}`. -/
-def qiWindow (r k i : ℕ) : Set ℝ := Icc (((i + 1 - r : ℕ) : ℝ) / 2 ^ k) (((i : ℝ) + 1) / 2 ^ k)
+noncomputable def qiWindow (r k i : ℕ) : Set ℝ :=
+  Icc (((i + 1 - r : ℕ) : ℝ) / 2 ^ k) (((i : ℝ) + 1) / 2 ^ k)
 
 /-- The intervals `J(n)`, `i - r < n ≤ i`, lie in the window of `I_{k,i}`. -/
 theorem dyadicIco_subset_qiWindow {r k i : ℕ} {n : ℤ} (hn : (i : ℤ) - r < n ∧ n ≤ i) :
@@ -303,8 +304,8 @@ theorem exists_window_poly {F g D : ℝ → ℂ} (hFm : Measurable F) (hgm : Mea
         ENNReal.rpow_add_le_mul_rpow_add_rpow _ _ hq1
     _ = _ := by
         have hm1 : Measurable fun x => ‖F x - g x‖ₑ ^ p.toReal :=
-          ((hFm.sub hgm).enorm).pow_const _
-        have hm2 : Measurable fun x => ‖D x‖ₑ ^ p.toReal := hDm.enorm.pow_const _
+          ((hFm.sub hgm).eNorm).pow_const _
+        have hm2 : Measurable fun x => ‖D x‖ₑ ^ p.toReal := hDm.eNorm.pow_const _
         rw [ENNReal.mul_rpow_of_nonneg _ _ hq.le,
           eLpNorm_rpow_eq (g := fun x => F x - g x) ((hFm.sub hgm).aestronglyMeasurable) hp0 hp,
           eLpNorm_rpow_eq hDm.aestronglyMeasurable hp0 hp, lintegral_add_left hm1,
@@ -391,7 +392,7 @@ theorem exists_sum_eLpNorm_sub_qiPieces_le_of_taylor {r : ℕ} (hr : 1 ≤ r) (h
           eLpNorm D p (volume.restrict (Icc a b))) ^ p.toReal) := by
     rw [lintegral_const_mul' _ _ h2top, lintegral_indicator measurableSet_Icc,
       lintegral_add_left (f := fun x => ‖u x - g x‖ₑ ^ p.toReal)
-        ((hum.sub hg).enorm.pow_const _), lintegral_const_mul _ (hD.enorm.pow_const _),
+        ((hum.sub hg).eNorm.pow_const _), lintegral_const_mul _ (hD.eNorm.pow_const _),
       ← eLpNorm_rpow_eq (g := fun x => u x - g x) ((hum.sub hg).aestronglyMeasurable) hp0 hp,
       ← eLpNorm_rpow_eq hD.aestronglyMeasurable hp0 hp, ENNReal.mul_rpow_of_nonneg _ _ hq.le]
   calc ∑ i ∈ s, eLpNorm (fun x => u x - polyFun (qiPieces hr k N u i) x) p

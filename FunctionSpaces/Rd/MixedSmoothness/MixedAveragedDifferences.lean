@@ -54,7 +54,7 @@ variable {p : ℝ≥0∞} {a b : AddMonoidAlgebra ℂ (Fin d → ℝ)} {C D : �
 
 /-- The unit acts with norm `1`. -/
 theorem one : ActsBounded p (1 : AddMonoidAlgebra ℂ (Fin d → ℝ)) 1 := fun G hG => by
-  simp only [map_one, Module.End.one_apply, one_mul]
+  simp only [map_one, one_apply_eq_self, one_mul]
   exact ⟨hG, le_rfl⟩
 
 /-- `c δ_v` acts with norm `|c|`: translations preserve `L_p` norms. -/
@@ -84,7 +84,7 @@ theorem mul (ha : ActsBounded p a C) (hb : ActsBounded p b D) :
     ActsBounded p (a * b) (C * D) := fun G hG => by
   obtain ⟨h1, h2⟩ := hb G hG
   obtain ⟨h3, h4⟩ := ha _ h1
-  rw [map_mul, Module.End.mul_apply]
+  rw [map_mul, mul_apply_eq_comp]
   refine ⟨h3, h4.trans ?_⟩
   rw [mul_assoc]
   exact mul_le_mul' le_rfl h2
@@ -98,7 +98,7 @@ theorem smul (ha : ActsBounded p a C) (c : ℂ) : ActsBounded p (c • a) (‖c�
 /-- Negatives act with the same bound. -/
 theorem neg (ha : ActsBounded p a C) : ActsBounded p (-a) C := by
   have h := ha.smul (-1)
-  rwa [neg_one_smul, enorm_neg, enorm_one, one_mul] at h
+  rwa [neg_one_smul, eNorm_neg, eNorm_one, one_mul] at h
 
 /-- Differences act with the sum of the bounds. -/
 theorem sub (hp : 1 ≤ p) (ha : ActsBounded p a C) (hb : ActsBounded p b D) :
@@ -157,7 +157,7 @@ theorem actsBounded_momentPoly {p : ℝ≥0∞} (hp : 1 ≤ p) (L : ℕ) (v : Fi
     ActsBounded p (1 - (-1) ^ L * (AddMonoidAlgebra.single v (1 : ℂ) - 1) ^ L) (1 + 2 ^ L) := by
   have hY : ActsBounded p (AddMonoidAlgebra.single v (1 : ℂ) - 1) 2 := by
     have h := (ActsBounded.single (p := p) v (1 : ℂ)).sub hp ActsBounded.one
-    rwa [enorm_one, one_add_one_eq_two] at h
+    rwa [eNorm_one, one_add_one_eq_two] at h
   have hsign : ActsBounded p ((-1 : AddMonoidAlgebra ℂ (Fin d → ℝ)) ^ L) 1 := by
     have h := (ActsBounded.one (p := p) (d := d)).neg.pow L
     rwa [one_pow] at h
@@ -169,7 +169,7 @@ theorem actsBounded_addPoly {p : ℝ≥0∞} (hp : 1 ≤ p) (L : ℕ) (v : Fin d
     ActsBounded p ((-1) ^ L * ((AddMonoidAlgebra.single v (1 : ℂ) + 1) ^ L - 1)) (2 ^ L + 1) := by
   have hY : ActsBounded p (AddMonoidAlgebra.single v (1 : ℂ) + 1) 2 := by
     have h := (ActsBounded.single (p := p) v (1 : ℂ)).add hp ActsBounded.one
-    rwa [enorm_one, one_add_one_eq_two] at h
+    rwa [eNorm_one, one_add_one_eq_two] at h
   have hsign : ActsBounded p ((-1 : AddMonoidAlgebra ℂ (Fin d → ℝ)) ^ L) 1 := by
     have h := (ActsBounded.one (p := p) (d := d)).neg.pow L
     rwa [one_pow] at h

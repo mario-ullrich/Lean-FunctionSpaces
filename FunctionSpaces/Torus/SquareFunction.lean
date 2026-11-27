@@ -105,7 +105,7 @@ finite Triebel–Lizorkin norm `‖f‖_{F^0_{p,2}(𝕋^d)}`. -/
 theorem memPeriodicTriebelLizorkin_zero_two [Nonempty d] (hp1 : 1 < p) (hp : p ≠ ∞)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) : MemPeriodicTriebelLizorkin 0 2 f :=
   (periodicTriebelLizorkinNorm_zero_two_le hp1 hp f).trans_lt
-    (ENNReal.mul_lt_top (periodicSquareFunctionConst_ne_top hp1 hp).lt_top enorm_lt_top)
+    (ENNReal.mul_lt_top (periodicSquareFunctionConst_ne_top hp1 hp).lt_top eNorm_lt_top)
 
 /-! ### The reproducing formula -/
 
@@ -146,13 +146,13 @@ theorem enorm_le_periodicTriebelLizorkinNorm_zero_two [Nonempty d] (hp1 : 1 < p)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     ‖f‖ₑ ≤ periodicSquareSynthesisConst d p * periodicTriebelLizorkinNorm 0 2 f := by
   have h : Tendsto (fun J => ‖∑ j ∈ Finset.range J, periodicLpBlock hp j f‖ₑ) atTop (𝓝 ‖f‖ₑ) :=
-    (tendsto_sum_periodicLpBlock hp f).enorm
+    (tendsto_sum_periodicLpBlock hp f).eNorm
   have hblock : (fun t => lqNorm 2 fun j => ‖periodicLpBlock hp j f t‖ₑ) =ᵐ[volume]
       fun t => lqNorm 2 fun j => ‖periodicBlockFun j f t‖ₑ := by
     filter_upwards [ae_all_iff.2 fun j => periodicLpBlock_ae_eq_periodicBlockFun hp j f] with t ht
     simp only [ht]
   refine le_of_tendsto' h fun J => ?_
-  rw [Lp.enorm_def,
+  rw [Lp.eNorm_def,
     ← eLpNorm_congr_ae (sum_periodicEconv_dualLpBlockKernel_periodicLpBlock_ae hp _ f),
     periodicTriebelLizorkinNorm_zero_left, ← eLpNorm_congr_ae hblock]
   exact eLpNorm_sum_periodicEconv_le Rd.isCZFamily_dualLpBlockKernel farMass_dualLpBlockKernel_le

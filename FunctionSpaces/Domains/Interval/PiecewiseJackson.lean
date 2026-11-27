@@ -237,7 +237,7 @@ theorem intervalLpModulus_add_le (r : ℕ) (f g : Lp ℂ p unitVol) (k : ℕ) :
 /-- `ω_r(f, t) ≤ 2^r ‖f‖_p` in `L_p[0, 1]`. -/
 theorem intervalLpModulus_le (r : ℕ) (f : Lp ℂ p unitVol) (k : ℕ) :
     intervalLpModulus p r f k ≤ 2 ^ r * ‖f‖ₑ := by
-  rw [Lp.enorm_def]
+  rw [Lp.eNorm_def]
   exact intervalModulus_le (Lp.stronglyMeasurable f).measurable Fact.out r 0 1 _
 
 omit [Fact (1 ≤ p)] in
@@ -255,7 +255,7 @@ theorem intervalLpModulus_neg (r : ℕ) (f : Lp ℂ p unitVol) (k : ℕ) :
     intervalLpModulus p r (-f) k = intervalLpModulus p r f k := by
   have h : (-(f : ℝ → ℂ)) = fun x => (-1 : ℂ) * f x := funext fun x => by simp
   rw [intervalLpModulus, intervalModulus_congr_ae (Lp.coeFn_neg f), h, intervalModulus_const_mul,
-    enorm_neg, enorm_one, one_mul]
+    eNorm_neg, eNorm_one, one_mul]
   rfl
 
 /-- **From continuous functions to `L_p` by density**: a bound `E_n(g) ≤ C ω_r(g, 2^(-k))_p`
@@ -277,7 +277,7 @@ theorem interval_approxError_le_of_continuous {A : ApproximationScheme (Lp ℂ p
   obtain ⟨u, ⟨a, ha, hau⟩, hbound⟩ := h g
   have hg := BoundedContinuousFunction.coeFn_toLp (E := ℂ) p unitVol ℝ g
   refine (A.approxError_le_of_mem ha _).trans ?_
-  rw [Lp.enorm_def, eLpNorm_congr_ae ((Lp.coeFn_sub _ _).trans (hg.sub hau)), intervalLpModulus,
+  rw [Lp.eNorm_def, eLpNorm_congr_ae ((Lp.coeFn_sub _ _).trans (hg.sub hau)), intervalLpModulus,
     intervalModulus_congr_ae hg]
   exact hbound
 
@@ -353,7 +353,7 @@ theorem intervalLpModulus_add_rpow_le (hp1 : p ≤ 1) (r : ℕ) (f g : Lp ℂ p 
 /-- `ω_r(f, 2^(-k), [0, 1])_p ≤ 2^(r/p) ‖f‖_p` in `L_p[0, 1]`, `0 < p ≤ 1`. -/
 theorem intervalLpModulus_le_of_le_one (hp1 : p ≤ 1) (r : ℕ) (f : Lp ℂ p unitVol) (k : ℕ) :
     intervalLpModulus p r f k ≤ 2 ^ ((r : ℝ) / p.toReal) * ‖f‖ₑ := by
-  rw [Lp.enorm_def]
+  rw [Lp.eNorm_def]
   exact intervalModulus_le_of_le_one (Lp.stronglyMeasurable f).measurable hp1 r 0 1 _
 
 end Interval

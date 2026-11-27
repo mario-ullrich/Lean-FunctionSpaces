@@ -333,7 +333,7 @@ theorem enorm_mixedLocalMean_le (hp : p ≠ ∞) (L : ℕ) (hR : b.radius ≤ 1)
         diffAct (lmRemainder L k (h z)) (mixedDiff L e (h z) (f : (Fin d → ℝ) → ℂ)) := by
       funext x
       simp only [G]
-      rw [prod_sum_lmCoeff_eq, map_mul, Module.End.mul_apply]
+      rw [prod_sum_lmCoeff_eq, map_mul, mul_apply_eq_comp]
       rfl
     rw [hGz]
     refine ((actsBounded_lmRemainder L k (h z)) _ (aestronglyMeasurable_mixedDiff
@@ -346,7 +346,7 @@ theorem enorm_mixedLocalMean_le (hp : p ≠ ∞) (L : ℕ) (hR : b.radius ≤ 1)
       Fintype.card_fin]
   have hg0 : (∫⁻ t, ‖b.toFun t‖ₑ) ≠ 0 :=
     lintegral_enorm_ne_zero_of_integral_eq_one b.integrable b.integral_eq_one
-  rw [Lp.enorm_def, eLpNorm_congr_ae (b.mixedLocalMean_ae_eq hp L k f)]
+  rw [Lp.eNorm_def, eLpNorm_congr_ae (b.mixedLocalMean_ae_eq hp L k f)]
   refine (eLpNorm_integral_kernel_le_of_bound hp1 hp
     (integrable_tensorKernel fun _ => b.integrable).aestronglyMeasurable
     (by rw [hA₀]; exact pow_ne_zero _ hg0) (by rw [hA₀]; exact ENNReal.pow_ne_top b.integrable.2.ne)
@@ -465,7 +465,7 @@ theorem lpMixedModulus_convLp_mixedDualKernel_le (hp : p ≠ ∞) (L : ℕ) (m k
   refine (eLpNorm_conv_le hp1 hp
     (integrable_mixedDiff (b.integrable_mixedDualKernel L k) L e v).aestronglyMeasurable
     (Lp.aestronglyMeasurable h)).trans ?_
-  rw [Lp.enorm_def]
+  rw [Lp.eNorm_def]
   refine mul_le_mul' ?_ le_rfl
   rw [mixedDualKernel, mixedDiff_tensorKernel, eLpNorm_tensorKernel_one hfac,
     ← Fin.prod_const d (b.dualConst L), ← Finset.prod_mul_distrib]
@@ -511,7 +511,7 @@ theorem mixedModNorm_le_of_tendsto (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 
         (fun x y => lpMixedModulus_add_le L x y m) (fun x => lpMixedModulus_le L x m) hrep
     refine h1.trans ?_
     rw [← ENNReal.tsum_mul_left]
-    refine ENNReal.tsum_le_tsum fun k => ?_
+    refine tsum_le_tsum fun k => ?_
     rw [← mul_assoc]
     exact b.lpMixedModulus_convLp_mixedDualKernel_le hp L m k (h k)
   exact lqNorm_le_of_le_almostDiagonal_pi hq hs hmod

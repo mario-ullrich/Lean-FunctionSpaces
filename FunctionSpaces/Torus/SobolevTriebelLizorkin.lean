@@ -139,8 +139,8 @@ theorem lqNorm_periodicBlockFun_succ_le_sum_ae (hp : p ≠ ∞) {m : ℕ}
         2 ^ m * ∑ i, lqNorm 2 (fun n => ‖periodicEconv (Rd.derivKernelFamily i n) (g i) t‖ₑ) := by
   filter_upwards [two_pow_mul_periodicBlockFun_succ_ae hp hg] with t ht
   refine ENNReal.lqNorm_dyadicWeight_succ_le_sum one_le_two Finset.univ fun n => ?_
-  rw [← Rd.enorm_two_pow_complex, ← enorm_mul, ht n]
-  exact enorm_sum_le _ _
+  rw [← Rd.enorm_two_pow_complex, ← eNorm_mul, ht n]
+  exact eNorm_sum_le _ _
 
 /-! ### `W^m_p ⊆ F^m_{p,2}` -/
 
@@ -182,10 +182,10 @@ theorem eLpNorm_lqNorm_periodicBlockFun_succ_le [Nonempty d] (hp1 : 1 < p) (hp :
       (fun t => lqNorm 2 (fun n => ‖periodicEconv (Rd.derivKernelFamily i n) (g i) t‖ₑ)) volume :=
     fun i => aemeasurable_lqNorm_comp (fun n => (aestronglyMeasurable_periodicEconv
       ((Rd.isCZFamily_derivKernelFamily i).integrable n).aestronglyMeasurable
-      (Lp.stronglyMeasurable (g i)).measurable).enorm) 2
+      (Lp.stronglyMeasurable (g i)).measurable).eNorm) 2
   refine (eLpNorm_le_const_mul_sum_of_ae_le (p := p) Fact.out Finset.univ
     (aemeasurable_lqNorm_comp (fun n =>
-      (aestronglyMeasurable_periodicBlockFun (n + 1) f).enorm.const_mul _) 2)
+      (aestronglyMeasurable_periodicBlockFun (n + 1) f).eNorm.const_mul _) 2)
     (fun i _ => hF i) _ (lqNorm_periodicBlockFun_succ_le_sum_ae hp hg)).trans ?_
   gcongr with i
   exact eLpNorm_lqNorm_periodicEconv_le (Rd.isCZFamily_derivKernelFamily i)
@@ -209,9 +209,9 @@ theorem periodicTriebelLizorkinNorm_le_of_hasPeriodicWeakLineDeriv [Nonempty d] 
       eLpNorm (Rd.lpKernel (V := EuclideanSpace ℝ d)) 1 volume * ‖f‖ₑ +
         2 ^ m * ∑ i, periodicSobolevToTLConst d p i * ‖g i‖ₑ := by
   refine (eLpNorm_lqNorm_dyadicWeight_le_zero_add_succ (p := p) Fact.out one_le_two _
-    fun j => (aestronglyMeasurable_periodicBlockFun j f).enorm).trans ?_
+    fun j => (aestronglyMeasurable_periodicBlockFun j f).eNorm).trans ?_
   gcongr
-  · rw [eLpNorm_enorm _ (aestronglyMeasurable_periodicBlockFun 0 f)]
+  · rw [eLpNorm_eNorm _ (aestronglyMeasurable_periodicBlockFun 0 f)]
     exact eLpNorm_periodicBlockFun_zero_le hp f
   · exact eLpNorm_lqNorm_periodicBlockFun_succ_le hp1 hp hg
 
@@ -227,9 +227,9 @@ theorem memPeriodicTriebelLizorkin_of_hasPeriodicWeakLineDeriv [Nonempty d] (hp1
     MemPeriodicTriebelLizorkin (m : ℝ) 2 f :=
   (periodicTriebelLizorkinNorm_le_of_hasPeriodicWeakLineDeriv hp1 hp hg).trans_lt
     (ENNReal.add_lt_top.2 ⟨ENNReal.mul_lt_top
-      Rd.eLpNorm_lpKernel_lt_top enorm_lt_top,
+      Rd.eLpNorm_lpKernel_lt_top eNorm_lt_top,
       ENNReal.mul_lt_top (ENNReal.pow_lt_top ENNReal.ofNat_lt_top) (ENNReal.sum_lt_top.2 fun i _ =>
-        ENNReal.mul_lt_top (periodicSobolevToTLConst_ne_top hp1 hp i).lt_top enorm_lt_top)⟩)
+        ENNReal.mul_lt_top (periodicSobolevToTLConst_ne_top hp1 hp i).lt_top eNorm_lt_top)⟩)
 
 /-- **`W^m_p(𝕋^d) ⊆ F^m_{p,2}(𝕋^d)`**: for `d ≥ 1` and `1 < p < ∞`, every `f ∈ W^m_p(𝕋^d)` lies in
 `F^m_{p,2}(𝕋^d)`; the weak derivatives of order `m` along the basis vectors suffice
@@ -299,11 +299,11 @@ theorem enorm_sum_periodicEconvLp_derivDual_le [Nonempty d] (hp1 : 1 < p) (hp : 
     filter_upwards [ae_all_iff.2 fun j => periodicLpBlock_ae_eq_periodicBlockFun hp j f] with t ht
     congr 1
     funext j
-    simp only [a, Pi.smul_apply, smul_eq_mul, enorm_mul, ht j]
+    simp only [a, Pi.smul_apply, smul_eq_mul, eNorm_mul, ht j]
     split_ifs
     · rw [Rd.enorm_two_pow_complex, ENNReal.dyadicWeight_natCast]
-    · rw [enorm_zero, zero_mul]
-  rw [Lp.enorm_def, eLpNorm_congr_ae hsum, ← eLpNorm_congr_ae hnorm]
+    · rw [eNorm_zero, zero_mul]
+  rw [Lp.eNorm_def, eLpNorm_congr_ae hsum, ← eLpNorm_congr_ae hnorm]
   exact eLpNorm_sum_periodicEconv_le (Rd.isCZFamily_derivDualFamily w)
     (farMass_derivDualFamily_le w)
     hp1 hp s (fun j => (Lp.stronglyMeasurable _).measurable.const_smul _)
@@ -349,7 +349,7 @@ theorem enorm_periodicDerivSynthesisSum_sub_le [Nonempty d] (hp1 : 1 < p) (hp : 
   refine (enorm_sum_periodicEconvLp_derivDual_le hp1 hp w _ f).trans ?_
   gcongr
   exact eLpNorm_lqNorm_ite_mono (P := (· ∈ Finset.Ico N N')) (Q := (N ≤ ·))
-    (fun j => (aestronglyMeasurable_periodicBlockFun j f).enorm.const_mul _)
+    (fun j => (aestronglyMeasurable_periodicBlockFun j f).eNorm.const_mul _)
     fun j hj => (Finset.mem_Ico.1 hj).1
 
 /-- **The partial sums of the derivative converge**: for `d ≥ 1`, `1 < p < ∞`, `w ∈ (ℝ^d)^k` and
@@ -364,9 +364,9 @@ theorem cauchySeq_periodicDerivSynthesisSum [Nonempty d] (hp1 : 1 < p) (hp : p �
     (g := fun j t => dyadicWeight (k : ℝ) j * ‖periodicBlockFun j f t‖ₑ)
     (periodicTLToSobolevConst_ne_top hp1 hp w) (zero_lt_one.trans_le Fact.out).ne' hp two_ne_zero
     ENNReal.ofNat_ne_top
-    (fun j => (aestronglyMeasurable_periodicBlockFun j f).enorm.const_mul _) hf.ne
+    (fun j => (aestronglyMeasurable_periodicBlockFun j f).eNorm.const_mul _) hf.ne
     fun N N' hNN' => by
-      rw [edist_eq_enorm_sub]
+      rw [eDist_eq_eNorm_sub]
       exact enorm_periodicDerivSynthesisSum_sub_le hp1 hp w f hNN'
 
 /-- **`F^k_{p,2}(𝕋^d) ⊆ W^k_p(𝕋^d)` with named constants**: for `d ≥ 1`, `1 < p < ∞`,
@@ -384,7 +384,7 @@ theorem exists_hasPeriodicWeakLineDeriv_of_memPeriodicTriebelLizorkin [Nonempty 
   obtain ⟨g, hg⟩ := cauchySeq_tendsto_of_complete (cauchySeq_periodicDerivSynthesisSum hp1 hp w hf)
   refine ⟨g, HasPeriodicWeakLineDeriv.of_tendsto (tendsto_sum_periodicLpBlock hp f) hg
     (Eventually.of_forall fun J => hasPeriodicWeakLineDeriv_sum_periodicLpBlock hp w f J),
-    le_of_tendsto' hg.enorm fun J => ?_⟩
+    le_of_tendsto' hg.eNorm fun J => ?_⟩
   refine (enorm_sum_periodicEconvLp_derivDual_le hp1 hp w _ f).trans ?_
   gcongr
   exact eLpNorm_lqNorm_ite_periodicBlockFun_le _ _ f

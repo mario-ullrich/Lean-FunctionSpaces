@@ -143,9 +143,9 @@ omit [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V] [Bo
 `a < ∞`. -/
 theorem inv_one_add_mul_enorm_sub_pow_le {a : ℝ≥0∞} (ha : a ≠ ∞) (y w : V) (N : ℕ) :
     ((1 + a * ‖y - w‖ₑ) ^ N)⁻¹ ≤ (1 + a * ‖w‖ₑ) ^ N * ((1 + a * ‖y‖ₑ) ^ N)⁻¹ := by
-  refine ENNReal.inv_one_add_mul_pow_le ha enorm_ne_top ?_ N
+  refine ENNReal.inv_one_add_mul_pow_le ha eNorm_ne_top ?_ N
   calc ‖y‖ₑ = ‖(y - w) + w‖ₑ := by rw [sub_add_cancel]
-    _ ≤ ‖y - w‖ₑ + ‖w‖ₑ := enorm_add_le _ _
+    _ ≤ ‖y - w‖ₑ + ‖w‖ₑ := eNorm_add_le _ _
 
 omit [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- The bridge to Mathlib's `finite_integral_one_add_norm`:
@@ -279,7 +279,7 @@ omit [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V] [Bo
 /-- `‖2^j v‖ = 2^j ‖v‖` in `[0, ∞]`. -/
 theorem enorm_two_pow_smul [NormedSpace ℝ V] (j : ℕ) (v : V) :
     ‖((2 : ℝ) ^ j) • v‖ₑ = 2 ^ j * ‖v‖ₑ := by
-  rw [enorm_smul, ← ofReal_norm, Real.norm_of_nonneg (by positivity),
+  rw [eNorm_smul, ← ofReal_norm, Real.norm_of_nonneg (by positivity),
     ENNReal.ofReal_pow zero_le_two, ENNReal.ofReal_ofNat]
 
 omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
@@ -289,7 +289,7 @@ theorem enorm_dilate_two_pow (Φ : V → ℂ) (j : ℕ) (y : V) :
   have hc : ‖(((((2 : ℝ) ^ j) ^ finrank ℝ V : ℝ)) : ℂ)‖ₑ = 2 ^ (j * finrank ℝ V) := by
     rw [← ofReal_norm, Complex.norm_real, Real.norm_of_nonneg (by positivity), ← pow_mul,
       ENNReal.ofReal_pow zero_le_two, ENNReal.ofReal_ofNat]
-  rw [dilate, enorm_mul, hc]
+  rw [dilate, eNorm_mul, hc]
 
 omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- **Decay of dilated Schwartz functions**:
@@ -338,7 +338,7 @@ theorem enorm_mul_enorm_pow_le_of_le (G : 𝓢(V, ℂ)) (r N : ℕ) {ρ : ℝ} {
     ‖G z‖ₑ * ‖z‖ₑ ^ r ≤ schwartzDecayConst G 0 (N + r + finrank ℝ V + 1) *
       ((1 + ENNReal.ofReal ρ) ^ N)⁻¹ * ((1 + ‖z‖ₑ) ^ (finrank ℝ V + 1))⁻¹ := by
   have h1 := enorm_schwartz_le G (N + r + finrank ℝ V + 1) z
-  have h2 := ENNReal.inv_one_add_pow_mul_pow_le (a := ‖z‖ₑ) enorm_ne_top N r (finrank ℝ V + 1)
+  have h2 := ENNReal.inv_one_add_pow_mul_pow_le (a := ‖z‖ₑ) eNorm_ne_top N r (finrank ℝ V + 1)
   have h3 : ((1 + ‖z‖ₑ) ^ N)⁻¹ ≤ ((1 + ENNReal.ofReal ρ) ^ N)⁻¹ := by
     have hρz : ENNReal.ofReal ρ ≤ ‖z‖ₑ := by
       rw [← ofReal_norm]
@@ -404,12 +404,12 @@ theorem peetre_mul_peetre_le {i j : ℕ} (hij : i ≤ j) (N n : ℕ) (y w : V) :
       (1 + 2 ^ j * ‖y - w‖ₑ) ^ N * ((1 + 2 ^ i * ‖y‖ₑ) ^ N)⁻¹ := by
     have hyw : ‖y‖ₑ ≤ ‖w‖ₑ + ‖y - w‖ₑ := by
       calc ‖y‖ₑ = ‖w + (y - w)‖ₑ := by rw [add_sub_cancel]
-        _ ≤ ‖w‖ₑ + ‖y - w‖ₑ := enorm_add_le _ _
+        _ ≤ ‖w‖ₑ + ‖y - w‖ₑ := eNorm_add_le _ _
     refine (ENNReal.inv_one_add_mul_pow_le (a := (2 : ℝ≥0∞) ^ i)
-      (ENNReal.pow_ne_top ENNReal.ofNat_ne_top) enorm_ne_top hyw N).trans ?_
+      (ENNReal.pow_ne_top ENNReal.ofNat_ne_top) eNorm_ne_top hyw N).trans ?_
     gcongr
   have hX := ENNReal.inv_one_add_pow_two_mul_mul_pow (a := (2 : ℝ≥0∞) ^ j * ‖y - w‖ₑ)
-    (ENNReal.mul_ne_top (ENNReal.pow_ne_top ENNReal.ofNat_ne_top) enorm_ne_top) N
+    (ENNReal.mul_ne_top (ENNReal.pow_ne_top ENNReal.ofNat_ne_top) eNorm_ne_top) N
   calc 2 ^ (j * n) * ((1 + 2 ^ j * ‖y - w‖ₑ) ^ (2 * N))⁻¹ *
         (2 ^ (i * n) * ((1 + 2 ^ i * ‖w‖ₑ) ^ N)⁻¹)
       ≤ 2 ^ (j * n) * ((1 + 2 ^ j * ‖y - w‖ₑ) ^ (2 * N))⁻¹ *
@@ -607,7 +607,7 @@ theorem ae_enorm_conv_meansKernel_le_of_scaledMoment (L : ℕ) {f : V → ℂ} (
     rw [h0, Pi.sub_apply]
     ring
   rw [hsplit]
-  refine enorm_sub_le.trans ((add_le_add h1 h2).trans ?_)
+  refine eNorm_sub_le.trans ((add_le_add h1 h2).trans ?_)
   have hw1 := ENNReal.dyadicWeight_neg_sub_le L hji' le_rfl
   have hw2 := ENNReal.dyadicWeight_neg_sub_le L hji' (Nat.le_succ i')
   calc C * dyadicWeight (-(L : ℝ)) (i' - j) * u x +
@@ -629,7 +629,7 @@ theorem enorm_mul_higherDiff_dilatedBandKernel_le (L N : ℕ) {i k : ℕ} (hik :
           ENNReal.ofReal ((1 + L * b.radius) ^ N) *
             (2 ^ (i * finrank ℝ V) * ((1 + 2 ^ i * ‖y‖ₑ) ^ N)⁻¹)) := by
   by_cases hz : b.radius < ‖z‖
-  · rw [b.eq_zero z hz, enorm_zero, zero_mul, zero_mul]
+  · rw [b.eq_zero z hz, eNorm_zero, zero_mul, zero_mul]
   push Not at hz
   refine mul_le_mul_right ?_ _
   have hk : (2 : ℝ) ^ k = 2 ^ (k - i) * 2 ^ i := by rw [← pow_add, Nat.sub_add_cancel hik]
@@ -684,7 +684,7 @@ theorem ae_enorm_dilatedBandKernel_sub_conv_scaledMoment_le (L N : ℕ) {i k : �
     (c := (2 : ℝ) ^ k) (by positivity)] with y hy
   refine hy.trans
     ((lintegral_mono fun z => b.enorm_mul_higherDiff_dilatedBandKernel_le L N hik z y).trans ?_)
-  rw [lintegral_mul_const'' _ b.contDiff.continuous.aestronglyMeasurable.enorm]
+  rw [lintegral_mul_const'' _ b.contDiff.continuous.aestronglyMeasurable.eNorm]
 
 /-- The constant `2 ‖g‖_1 (2R)^L (1 + 2LR)^N C` of the moment case of `k_j ⋆ Θ_i`, with
 `C = Rd.schwartzDecayConst bandKernelS L N`. -/
@@ -766,8 +766,8 @@ theorem lintegral_dilatedBandKernel_mul_meansKernel_le_near (L N i j : ℕ) {y :
     _ = eLpNorm (bandKernel (V := V)) 1 volume *
           (ENNReal.ofReal (b.kernelSupConst L) * 2 ^ (j * finrank ℝ V)) := by
         rw [lintegral_mul_const'' _
-            (continuous_dilatedBandKernel (V := V) i).measurable.enorm.aemeasurable,
-          ← eLpNorm_one_eq_lintegral_enorm
+            (continuous_dilatedBandKernel (V := V) i).measurable.eNorm.aemeasurable,
+          ← eLpNorm_one_eq_lintegral_eNorm
             (continuous_dilatedBandKernel (V := V) i).aestronglyMeasurable,
           eLpNorm_dilatedBandKernel_one]
     _ = eLpNorm (bandKernel (V := V)) 1 volume *
@@ -802,7 +802,7 @@ theorem lintegral_dilatedBandKernel_mul_meansKernel_le_far (L N : ℕ) {i j : �
         have h2 : 2 * L * b.radius / 2 ^ j = (4 * L * b.radius / 2 ^ j) / 2 := by ring
         push Not at hz
         linarith
-      rw [b.meansKernel_eq_zero_of_lt L j hyz, enorm_zero, mul_zero]
+      rw [b.meansKernel_eq_zero_of_lt L j hyz, eNorm_zero, mul_zero]
       exact zero_le
   have htail := setLIntegral_enorm_dilate_schwartz_le (bandKernelS (V := V)) N i (‖y‖ / 2)
   calc ∫⁻ z, ‖dilatedBandKernel i z‖ₑ * ‖b.meansKernel L j (y - z)‖ₑ
@@ -1001,7 +1001,7 @@ theorem enorm_lpBlockKernel_le (j N : ℕ) (y : V) :
       pow_le_pow_right₀ one_le_two (Nat.mul_le_mul_right _ (Nat.le_succ j))
     calc ‖dilatedLpKernel (V := V) (j + 1) y - dilatedLpKernel j y‖ₑ
         ≤ ‖dilatedLpKernel (V := V) (j + 1) y‖ₑ + ‖dilatedLpKernel (V := V) j y‖ₑ :=
-          enorm_sub_le
+          eNorm_sub_le
       _ ≤ schwartzDecayConst (lpKernelS (V := V)) 0 N * 2 ^ ((j + 1) * finrank ℝ V) *
             ((1 + 2 ^ (j + 1) * ‖y‖ₑ) ^ N)⁻¹ +
           schwartzDecayConst (lpKernelS (V := V)) 0 N * 2 ^ ((j + 1) * finrank ℝ V) *
@@ -1023,10 +1023,10 @@ theorem lintegral_mul_peetre_le_of_support {η ψ : V → ℂ} (hη : AEStrongly
     (hψ : ∀ z, ‖ψ z‖ₑ ≤ C * 2 ^ (k * finrank ℝ V) * ((1 + 2 ^ k * ‖z‖ₑ) ^ N)⁻¹) (y : V) :
     ∫⁻ w, ‖η w‖ₑ * ‖ψ (y - w)‖ₑ ≤ (∫⁻ w, ‖η w‖ₑ) * (C * ENNReal.ofReal ((1 + ρ) ^ N) *
       2 ^ (k * finrank ℝ V) * ((1 + 2 ^ k * ‖y‖ₑ) ^ N)⁻¹) := by
-  rw [← lintegral_mul_const'' _ hη.enorm]
+  rw [← lintegral_mul_const'' _ hη.eNorm]
   refine lintegral_mono fun w => ?_
   by_cases hw : ρ / 2 ^ k < ‖w‖
-  · rw [hηs w hw, enorm_zero, zero_mul, zero_mul]
+  · rw [hηs w hw, eNorm_zero, zero_mul, zero_mul]
   push Not at hw
   refine mul_le_mul_right ((hψ (y - w)).trans ?_) _
   have hkw : 2 ^ k * ‖w‖ₑ ≤ ENNReal.ofReal ρ := two_pow_mul_enorm_le_ofReal hw
@@ -1061,7 +1061,7 @@ theorem crossDualSupportConst_ne_top (L N : ℕ) : b.crossDualSupportConst L N �
 /-- `∫ |η_i| ≤ 2 ‖m‖_1`. -/
 theorem lintegral_enorm_dualKernel_le (L i : ℕ) :
     ∫⁻ w, ‖b.dualKernel L i w‖ₑ ≤ 2 * eLpNorm (momentKernel b.toFun L) 1 volume := by
-  rw [← eLpNorm_one_eq_lintegral_enorm (b.continuous_dualKernel L i).aestronglyMeasurable]
+  rw [← eLpNorm_one_eq_lintegral_eNorm (b.continuous_dualKernel L i).aestronglyMeasurable]
   exact b.eLpNorm_dualKernel_one_le L i
 
 /-- **The case `i > j`**: `|(ψ_j ⋆ η_i)(y)| ≤ C 2^(jn) (1 + 2^j ‖y‖)^(-N)` with
@@ -1228,7 +1228,7 @@ theorem lintegral_lpKernel_mul_higherDiff_dualKernel_le (L L' i j' N : ℕ) (w :
           ≤ ‖lpKernel z‖ₑ * (K0 * ‖z‖ₑ ^ L') :=
             mul_le_mul_right (b.enorm_higherDiff_dualKernel_le L L' i j' z w) _
         _ = _ := by ring
-    · rw [hsupp z (not_le.1 hz), enorm_zero, mul_zero]
+    · rw [hsupp z (not_le.1 hz), eNorm_zero, mul_zero]
       exact zero_le
   calc ∫⁻ z, ‖lpKernel z‖ₑ * ‖(fwdDiff (-((2 : ℝ) ^ j')⁻¹ • z))^[L'] (b.dualKernel L i) w‖ₑ
       ≤ ∫⁻ z, {z : V | ρ ≤ ‖z‖}.indicator (fun z => ‖lpKernel z‖ₑ * ‖z‖ₑ ^ L') z * K0 :=

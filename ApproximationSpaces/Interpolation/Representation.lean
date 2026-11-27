@@ -94,7 +94,7 @@ theorem interpSeq_le_of_lift (hr : r ≠ 0) {f : X} {t : ℕ → ℝ≥0∞} (D 
         K * (dyadicWeight (-(r - s)) k * ∑ j ∈ range (k + 1), b j)) := by
   have hz : ‖y0 + ∑ j ∈ range k, d j‖ₑ ≤ B + K * ∑ j ∈ range (k + 1), b j := by
     calc ‖y0 + ∑ j ∈ range k, d j‖ₑ ≤ ‖y0‖ₑ + ∑ j ∈ range k, ‖d j‖ₑ :=
-          (enorm_add_le _ _).trans (by gcongr; exact enorm_sum_le _ _)
+          (eNorm_add_le _ _).trans (by gcongr; exact eNorm_sum_le _ _)
       _ ≤ B + ∑ j ∈ range k, K * b j := by
           gcongr with j; exact hd j
       _ ≤ B + ∑ j ∈ range (k + 1), K * b j := by

@@ -260,9 +260,9 @@ theorem kSumAbove_le {u v : U} {a X : ℝ≥0∞} {m : ℤ}
           exact h _ (by omega)
       _ = _ := by rw [e]; ring
   calc A.kSumAbove θ v m ≤ ∑' j : ℕ, (a * A.discreteKSeq θ 1 u (m + j) +
-        2 ^ (-((m : ℝ) * θ)) * dyadicWeight (-θ) j * X) := ENNReal.tsum_le_tsum hterm
+        2 ^ (-((m : ℝ) * θ)) * dyadicWeight (-θ) j * X) := tsum_le_tsum hterm
     _ = _ := by
-        rw [ENNReal.tsum_add, ENNReal.tsum_mul_left, ENNReal.tsum_mul_right,
+        rw [tsum_add, ENNReal.tsum_mul_left, ENNReal.tsum_mul_right,
           ENNReal.tsum_mul_left, ENNReal.tsum_dyadicWeight_neg]
         rfl
 
@@ -290,10 +290,10 @@ theorem kSumBelow_le {u v : U} {a X : ℝ≥0∞} {m : ℤ}
           exact h _ (by omega)
       _ = _ := by rw [← e]; ring
   calc A.kSumBelow θ v m ≤ ∑' j : ℕ, (a * A.discreteKSeq θ 1 u (m - (j + 1)) +
-        2 ^ (-((m : ℝ) * θ)) * dyadicWeight (-(1 - θ)) (j + 1) * X) := ENNReal.tsum_le_tsum hterm
+        2 ^ (-((m : ℝ) * θ)) * dyadicWeight (-(1 - θ)) (j + 1) * X) := tsum_le_tsum hterm
     _ = a * A.kSumBelow θ u m +
           2 ^ (-((m : ℝ) * θ)) * (∑' j : ℕ, dyadicWeight (-(1 - θ)) (j + 1)) * X := by
-        rw [ENNReal.tsum_add, ENNReal.tsum_mul_left, ENNReal.tsum_mul_right,
+        rw [tsum_add, ENNReal.tsum_mul_left, ENNReal.tsum_mul_right,
           ENNReal.tsum_mul_left]
         rfl
     _ ≤ _ := by
@@ -390,7 +390,7 @@ theorem two_rpow_mul_kFunctional_le_kSumAbove (u : U) (m : ℤ) :
   calc 2 ^ (-((m : ℝ) * θ)) * A.kFunctional (2 ^ (m : ℝ)) u
       = A.discreteKSeq θ 1 u (m + ((0 : ℕ) : ℤ)) := by
         rw [Nat.cast_zero, add_zero, discreteKSeq_one]
-    _ ≤ A.kSumAbove θ u m := ENNReal.le_tsum (f := fun j : ℕ => A.discreteKSeq θ 1 u (m + j)) 0
+    _ ≤ A.kSumAbove θ u m := le_tsum (f := fun j : ℕ => A.discreteKSeq θ 1 u (m + j)) 0
 
 /-- **Holmstedt's formula, the upper bound in `ℓ₁` form** (Holmstedt 1970; Bergh–Löfström,
 Theorem 3.6.1, in discrete form, with `ℓ₁` sums in place of the `ℓ_{q_i}` norms of

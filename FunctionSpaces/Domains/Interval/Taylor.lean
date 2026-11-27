@@ -100,15 +100,15 @@ theorem exists_eLpNorm_sub_polyFun_le {p : ℝ≥0∞} (hp : 1 ≤ p) (r : ℕ) 
           (hcont.intervalIntegrable _ _)
       rw [hu, sub_zero] at hftc
       rw [← hftc, intervalIntegral.integral_of_le hx.1]
-      calc ‖∫ t in Ioc u x, h' t‖ₑ ≤ ∫⁻ t in Ioc u x, ‖h' t‖ₑ := enorm_integral_le_lintegral_enorm _
+      calc ‖∫ t in Ioc u x, h' t‖ₑ ≤ ∫⁻ t in Ioc u x, ‖h' t‖ₑ := eNorm_integral_le_lintegral_eNorm _
         _ ≤ ∫⁻ t in Icc u v, ‖h' t‖ₑ :=
             lintegral_mono_set (Ioc_subset_Icc_self.trans (Icc_subset_Icc le_rfl hx.2))
-        _ = eLpNorm h' 1 μ := (eLpNorm_one_eq_lintegral_enorm hcont.aestronglyMeasurable).symm
+        _ = eLpNorm h' 1 μ := (eLpNorm_one_eq_lintegral_eNorm hcont.aestronglyMeasurable).symm
         _ ≤ M := by
             have := eLpNorm_le_eLpNorm_mul_rpow_measure_univ (μ := μ) (p := 1) (q := p) hp
               hcont.aestronglyMeasurable
             rwa [Measure.restrict_apply_univ] at this
-    have hbound := eLpNorm_le_of_ae_enorm_bound (p := p) (μ := μ)
+    have hbound := eLpNorm_le_of_ae_eNorm_bound (p := p) (μ := μ)
       ((hdiff.continuous.sub (continuous_polyFun Q)).aestronglyMeasurable)
       (by filter_upwards [ae_restrict_mem measurableSet_Icc] with x hx using hpt x hx)
     rw [Measure.restrict_apply_univ, Real.volume_Icc] at hbound

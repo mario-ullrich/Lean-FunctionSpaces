@@ -212,7 +212,7 @@ theorem smoothnessModulus_mem_scalingSpace_le (hN : 2 ≤ N) (hp : p ≠ ∞) (r
     _ ≤ ((2 * N + 2 * r : ℕ) : ℝ≥0∞) ^ (1 - 1 / p.toReal) *
           Rd.smoothnessModulus volume r p (scalingFun m) (2 ^ j * t) *
           (coeffConst (scalingFun m) 0 (2 * N - 1) p * ‖a‖ₑ) := by
-        rw [Lp.enorm_def]
+        rw [Lp.eNorm_def]
         exact mul_le_mul' (mul_le_mul_right (Rd.eLpNorm_higherDiff_le_smoothnessModulus hHt) _)
           hcoef
     _ = daubechiesBernsteinConst m p r *

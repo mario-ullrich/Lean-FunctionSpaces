@@ -121,7 +121,7 @@ theorem tsum_eq_add_tsum_two_pow_add (g : ℕ → ℝ≥0∞) :
     rintro ⟨k, i⟩ ⟨l, j⟩ h
     obtain ⟨rfl, h2⟩ := (Nat.two_pow_add_eq_iff i.isLt j.isLt).1 h
     rw [Fin.ext h2]
-  rw [ENNReal.tsum_eq_add_tsum_ite 0, ← hinj.tsum_eq ?hs, ENNReal.tsum_sigma']
+  rw [tsum_eq_add_tsum_ite 0, ← hinj.tsum_eq ?hs, tsum_sigma']
   · congr 1
     refine tsum_congr fun k => ?_
     rw [tsum_fintype]
@@ -215,7 +215,7 @@ theorem tsum_pow_mul_le_dyadic (hb : Antitone b) (γ : ℝ) :
       ≤ ∑ k ∈ range K, 2 ^ max γ 0 * (dyadicWeight (γ + 1) k * b (2 ^ k)) := by
         gcongr with k
         rw [← mul_assoc]; exact sum_Ico_pow_mul_le hb γ k
-    _ ≤ ∑' k, 2 ^ max γ 0 * (dyadicWeight (γ + 1) k * b (2 ^ k)) := ENNReal.sum_le_tsum _
+    _ ≤ ∑' k, 2 ^ max γ 0 * (dyadicWeight (γ + 1) k * b (2 ^ k)) := sum_le_tsum _
     _ = _ := ENNReal.tsum_mul_left
 
 /-- **Weighted condensation, lower bound**:
@@ -234,7 +234,7 @@ theorem dyadic_le_tsum_pow_mul (hb : Antitone b) (γ : ℝ) :
         rw [Finset.mul_sum]
     _ ≤ 2 ^ max (-γ) 0 * ∑ n ∈ range (2 ^ K), ((n + 1 : ℕ) : ℝ≥0∞) ^ γ * b n := by
         rw [sum_range_two_pow_eq]; gcongr; exact le_add_self
-    _ ≤ _ := by gcongr; exact ENNReal.sum_le_tsum _
+    _ ≤ _ := by gcongr; exact sum_le_tsum _
 
 /-- **Condensation for suprema**, upper bound: for decreasing `b` and `s ≥ 0`,
 `supₙ (n+1)^s b n ≤ b 0 + 2^s supₖ 2^(ks) b (2^k)`. -/
@@ -460,7 +460,7 @@ theorem tsum_min_le_dyadic (hb : Antitone b) (m : ℕ) :
   have hcond := tsum_pow_mul_le_dyadic hd 0
   simp only [ENNReal.rpow_zero, one_mul, max_self, zero_add, dyadicWeight_eq_pow,
     ENNReal.rpow_one] at hcond
-  rw [← ENNReal.summable.sum_add_tsum_nat_add' (k := m)
+  rw [← CompleteLattice.summable.sum_add_tsum_nat_add' (k := m)
     (f := fun k => (2 : ℝ≥0∞) ^ k * min (b (2 ^ k)) (b (2 ^ m))), ← add_assoc] at hcond
   have hhead : min (b 0) (b (2 ^ m)) +
       ∑ k ∈ range m, 2 ^ k * min (b (2 ^ k)) (b (2 ^ m)) ≤ 2 ^ m * b (2 ^ m) := by
@@ -472,9 +472,9 @@ theorem tsum_min_le_dyadic (hb : Antitone b) (m : ℕ) :
       _ = (1 + ∑ k ∈ range m, (2 : ℝ≥0∞) ^ k) * b (2 ^ m) := by rw [add_mul, one_mul, sum_mul]
       _ = 2 ^ m * b (2 ^ m) := by rw [one_add_sum_range_two_pow]
   have hT : 2 ^ m * b (2 ^ m) ≤ T := by
-    simpa using ENNReal.le_tsum (f := fun l => (2 : ℝ≥0∞) ^ (m + l) * b (2 ^ (m + l))) 0
+    simpa using le_tsum (f := fun l => (2 : ℝ≥0∞) ^ (m + l) * b (2 ^ (m + l))) 0
   have htail : ∑' k, 2 ^ (k + m) * min (b (2 ^ (k + m))) (b (2 ^ m)) ≤ T :=
-    ENNReal.tsum_le_tsum fun l => by rw [add_comm l m]; gcongr; exact min_le_left _ _
+    tsum_le_tsum fun l => by rw [add_comm l m]; gcongr; exact min_le_left _ _
   calc ∑' k, min (b k) (b (2 ^ m)) ≤ _ := hcond
     _ ≤ T + T := add_le_add (hhead.trans hT) htail
     _ = 2 * T := (two_mul T).symm
@@ -498,7 +498,7 @@ theorem tsum_two_pow_mul_le_two_mul (hb : Antitone b) :
     _ ≤ 2 * (b 1 + ∑ n ∈ Ico 2 (2 ^ K + 1), b n) := by
         rw [mul_add]; gcongr; exact le_mul_of_one_le_left' one_le_two
     _ = 2 * ∑ n ∈ Ico 1 (2 ^ K + 1), b n := by rw [sum_eq_sum_Ico_succ_bot hK]
-    _ ≤ 2 * ∑' n, b n := by gcongr; exact ENNReal.sum_le_tsum _
+    _ ≤ 2 * ∑' n, b n := by gcongr; exact sum_le_tsum _
 
 /-! ### The dyadic sum -/
 
@@ -557,7 +557,7 @@ theorem tsum_min_two_pow_add_le {a : ℝ≥0∞} {j₀ : ℕ} (h : 1 < 2 ^ j₀ 
           gcongr
           exact ENNReal.inv_le_one.2 h.le
       _ = 2⁻¹ ^ i := mul_one _
-  exact (ENNReal.tsum_le_tsum hterm).trans_eq ENNReal.tsum_geometric_two
+  exact (tsum_le_tsum hterm).trans_eq ENNReal.tsum_geometric_two
 
 /-- **The dyadic sum of `min(t, t⁻¹)`**: for every `a ∈ [0, ∞]`,
 `∑_{j ∈ ℕ} min(2^j a, (2^j a)⁻¹) ≤ 4`. With `j₀` the least `j` such that `2^j a > 1`, the terms
@@ -568,7 +568,7 @@ theorem tsum_min_two_pow_le (a : ℝ≥0∞) : ∑' j : ℕ, min (2 ^ j * a) (2 
   rcases eq_or_ne a 0 with rfl | ha
   · simp
   have hex := exists_one_lt_two_pow_mul ha
-  rw [← ENNReal.summable.sum_add_tsum_nat_add' (k := Nat.find hex)]
+  rw [← CompleteLattice.summable.sum_add_tsum_nat_add' (k := Nat.find hex)]
   calc _ ≤ 2 + 2 := add_le_add (sum_range_min_two_pow_le fun j hj => Nat.find_min hex hj)
         (tsum_min_two_pow_add_le (Nat.find_spec hex))
     _ = 4 := by norm_num
@@ -588,11 +588,11 @@ theorem min_inv_sq_le (x : ℝ≥0∞) : min x x⁻¹ ^ 2 ≤ min x x⁻¹ := by
 theorem tsum_le_tsum_add_sum_of_forall_ge_eq {u v : ℕ → ℝ≥0∞} {N : ℕ}
     (h : ∀ j, N ≤ j → u j = v j) : ∑' j, u j ≤ ∑' j, v j + ∑ i ∈ Finset.range N, u i := by
   calc ∑' j, u j = ∑ i ∈ Finset.range N, u i + ∑' i, u (i + N) :=
-        (ENNReal.summable (f := fun i => u (i + N))).sum_add_tsum_nat_add'.symm
+        (CompleteLattice.summable (f := fun i => u (i + N))).sum_add_tsum_nat_add'.symm
     _ = ∑ i ∈ Finset.range N, u i + ∑' i, v (i + N) := by
         rw [tsum_congr fun i => h _ (Nat.le_add_left N i)]
     _ ≤ ∑ i ∈ Finset.range N, u i + ∑' j, v j :=
-        add_le_add_right (ENNReal.tsum_comp_le_tsum_of_injective (add_left_injective N) v) _
+        add_le_add_right (tsum_comp_le_tsum_of_injective (add_left_injective N) v) _
     _ = ∑' j, v j + ∑ i ∈ Finset.range N, u i := add_comm _ _
 
 /-! ### Sums with few nonzero terms -/
@@ -738,7 +738,7 @@ theorem tsum_add_le_of_le_dyadicWeight_neg (hθ0 : 0 ≤ θ) (hθ1 : θ ≤ 1)
     ∑' i, b (i + J) ≤ (1 - (2 : ℝ≥0∞) ^ (-((1 - θ) * δ)))⁻¹ * (X ^ θ * Y ^ (1 - θ)) := by
   calc ∑' i, b (i + J)
       ≤ ∑' i, dyadicWeight (-((1 - θ) * δ)) i * (dyadicWeight (-((1 - θ) * δ)) J * X) :=
-        ENNReal.tsum_le_tsum fun i => (hhigh (i + J)).trans_eq (by
+        tsum_le_tsum fun i => (hhigh (i + J)).trans_eq (by
           rw [dyadicWeight_add_nat, mul_assoc])
     _ = (1 - (2 : ℝ≥0∞) ^ (-((1 - θ) * δ)))⁻¹ * (dyadicWeight (-((1 - θ) * δ)) J * X) := by
         rw [ENNReal.tsum_mul_right, tsum_dyadicWeight_neg]
@@ -767,7 +767,8 @@ theorem tsum_le_dyadicInterpConst_of_ne (hδ : 0 < δ) (hθ0 : 0 < θ) (hθ1 : �
     ∑' j, b j ≤ dyadicInterpConst δ θ * (X ^ θ * Y ^ (1 - θ)) := by
   classical
   have hex := exists_dyadicWeight_neg_mul_le hδ hX hY
-  rw [← ENNReal.summable.sum_add_tsum_nat_add' (k := Nat.find hex), dyadicInterpConst, add_mul]
+  rw [← CompleteLattice.summable.sum_add_tsum_nat_add' (k := Nat.find hex), dyadicInterpConst,
+    add_mul]
   refine add_le_add ?_
     (tsum_add_le_of_le_dyadicWeight_neg hθ0.le hθ1.le hhigh (Nat.find_spec hex))
   rcases Nat.eq_zero_or_pos (Nat.find hex) with h0 | hpos

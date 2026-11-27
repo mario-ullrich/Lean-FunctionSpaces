@@ -112,7 +112,7 @@ theorem enorm_fwdDiff_schwartz_le_lintegral (v : V) (G : 𝓢(V, ℂ)) (x : V) :
     ‖fwdDiff v (G : V → ℂ) x‖ₑ ≤
       ∫⁻ t in Set.Ioc (0 : ℝ) 1, ‖(∂_{v} G : 𝓢(V, ℂ)) (x + t • v)‖ₑ := by
   rw [fwdDiff_schwartz_eq_integral, intervalIntegral.integral_of_le zero_le_one]
-  exact enorm_integral_le_lintegral_enorm _
+  exact eNorm_integral_le_lintegral_eNorm _
 
 /-- **Averages of translates along a segment**: for a measurable `φ : V → [0, ∞]` and `v ∈ V`,
 `∫_V ∫_0^1 φ(x + t v) dt dx = ∫_V φ`, by Tonelli's theorem (Mathlib's `lintegral_lintegral_swap`)
@@ -151,7 +151,7 @@ theorem enorm_fwdDiff_schwartz_rpow_le {p : ℝ} (hp : 1 ≤ p) (v : V) (G : �
   have hcont : Continuous fun t : ℝ => (∂_{v} G : 𝓢(V, ℂ)) (x + t • v) :=
     (SchwartzMap.continuous _).comp (continuous_const.add (continuous_id.smul continuous_const))
   exact (ENNReal.rpow_le_rpow (enorm_fwdDiff_schwartz_le_lintegral v G x) (by linarith)).trans
-    (rpow_lintegral_Ioc_le hp hcont.enorm.aemeasurable)
+    (rpow_lintegral_Ioc_le hp hcont.eNorm.aemeasurable)
 
 /-- **A difference is bounded by the line derivative in `L_p`**: for a Schwartz function `G` and
 real `p ≥ 1`, `∫ |Δ_v G|^p ≤ ∫ |∂_v G|^p`, that is `‖Δ_v G‖_p ≤ ‖∂_v G‖_p`. Integrate the
@@ -161,7 +161,7 @@ theorem lintegral_enorm_fwdDiff_rpow_le {p : ℝ} (hp : 1 ≤ p) (v : V) (G : �
     ∫⁻ x, ‖fwdDiff v (G : V → ℂ) x‖ₑ ^ p ≤ ∫⁻ x, ‖(∂_{v} G : 𝓢(V, ℂ)) x‖ₑ ^ p :=
   (lintegral_mono fun x => enorm_fwdDiff_schwartz_rpow_le hp v G x).trans_eq
     (lintegral_lintegral_Ioc_add_smul (φ := fun y => ‖(∂_{v} G : 𝓢(V, ℂ)) y‖ₑ ^ p)
-      ((SchwartzMap.continuous _).enorm.measurable.pow_const p) v)
+      ((SchwartzMap.continuous _).eNorm.measurable.pow_const p) v)
 
 /-- **A difference is bounded by the line derivative in `L_1`**: `‖Δ_v G‖_1 ≤ ‖∂_v G‖_1` for a
 Schwartz function `G`, the case `p = 1` of `Rd.lintegral_enorm_fwdDiff_rpow_le`. -/
@@ -209,7 +209,7 @@ theorem fwdDiffL2_ae_eq (v : V) (f : Lp ℂ 2 (volume : Measure V)) :
 (`Rd.fwdDiffL2_ae_eq`). -/
 theorem enorm_fwdDiffL2 (v : V) (f : Lp ℂ 2 (volume : Measure V)) :
     ‖fwdDiffL2 V v f‖ₑ = eLpNorm (fwdDiff v (f : V → ℂ)) 2 volume := by
-  rw [Lp.enorm_def, eLpNorm_congr_ae (fwdDiffL2_ae_eq v f)]
+  rw [Lp.eNorm_def, eLpNorm_congr_ae (fwdDiffL2_ae_eq v f)]
 
 /-- **Differences of Schwartz functions in `L_2(V)`**: `‖Δ_v G‖_2 ≤ ‖∂_v G‖_2`
 (`Rd.eLpNorm_fwdDiff_schwartz_le`). -/
@@ -218,7 +218,7 @@ theorem enorm_fwdDiffL2_toLp_le (v : V) (G : 𝓢(V, ℂ)) :
   have hG : fwdDiff v ((G.toLp 2 : Lp ℂ 2 (volume : Measure V)) : V → ℂ) =ᵐ[volume]
       fwdDiff v (G : V → ℂ) :=
     higherDiff_congr_ae (G.coeFn_toLp 2 volume) 1 v
-  rw [enorm_fwdDiffL2, eLpNorm_congr_ae hG, Lp.enorm_def,
+  rw [enorm_fwdDiffL2, eLpNorm_congr_ae hG, Lp.eNorm_def,
     eLpNorm_congr_ae ((∂_{v} G : 𝓢(V, ℂ)).coeFn_toLp 2 volume)]
   exact eLpNorm_fwdDiff_schwartz_le v G
 
@@ -267,13 +267,13 @@ theorem lintegral_enorm_higherDiff_schwartz_le (v : V) (r : ℕ) (G : 𝓢(V, �
     _ ≤ ∫⁻ x, ‖v‖ₑ ^ r * ‖iteratedFDeriv ℝ r (G : V → ℂ) x‖ₑ :=
         lintegral_mono fun x => enorm_iteratedLineDerivOp_le v r G x
     _ = ‖v‖ₑ ^ r * ∫⁻ x, ‖iteratedFDeriv ℝ r (G : V → ℂ) x‖ₑ :=
-        lintegral_const_mul' _ _ (ENNReal.pow_ne_top enorm_ne_top)
+        lintegral_const_mul' _ _ (ENNReal.pow_ne_top eNorm_ne_top)
 
 /-- The derivatives of a Schwartz function are integrable: `‖D^r G‖_1 < ∞`. -/
 theorem lintegral_enorm_iteratedFDeriv_ne_top (r : ℕ) (G : 𝓢(V, ℂ)) :
     ∫⁻ x, ‖iteratedFDeriv ℝ r (G : V → ℂ) x‖ₑ ≠ ∞ := by
   have h := (SchwartzMap.integrable_pow_mul_iteratedFDeriv volume G 0 r).2
-  simp only [pow_zero, one_mul, HasFiniteIntegral, enorm_norm] at h
+  simp only [pow_zero, one_mul, HasFiniteIntegral, eNorm_norm] at h
   exact h.ne
 
 /-! ### The inverse inequality -/
@@ -296,7 +296,7 @@ theorem eLpNorm_higherDiff_dilatedBandKernel_le (r j : ℕ) (h : V) :
   have hint : Integrable ((fwdDiff ((2 : ℝ) ^ j • h))^[r] (bandKernel (V := V))) :=
     integrable_higherDiff integrable_bandKernel r _
   rw [dilatedBandKernel, higherDiff_dilate, eLpNorm_dilate_one hint (by positivity),
-    eLpNorm_one_eq_lintegral_enorm hint.aestronglyMeasurable]
+    eLpNorm_one_eq_lintegral_eNorm hint.aestronglyMeasurable]
   refine (lintegral_enorm_higherDiff_schwartz_le _ r bandKernelS).trans_eq ?_
   rw [← ofReal_norm, norm_smul, Real.norm_of_nonneg (by positivity)]
 
@@ -324,7 +324,7 @@ theorem lpModulus_le_of_mem_bandSpace (hp : p ≠ ∞) (r : ℕ) {j k : ℕ}
         eLpNorm ((fwdDiff h)^[r] (dilatedBandKernel (V := V) j)) 1 volume * ‖a‖ₑ := by
       rw [eLpNorm_congr_ae
           (higherDiff_conv_ae Fact.out hp (integrable_dilatedBandKernel j) (Lp.memLp a) r h),
-        Lp.enorm_def]
+        Lp.eNorm_def]
       exact eLpNorm_conv_le Fact.out hp
         (integrable_higherDiff (integrable_dilatedBandKernel j) r h).aestronglyMeasurable
         (Lp.aestronglyMeasurable a)

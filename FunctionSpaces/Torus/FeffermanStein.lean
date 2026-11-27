@@ -159,17 +159,17 @@ theorem feffermanStein_periodic {p q : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ ∞
   have h2 : eLpNorm (fun _ : EuclideanSpace ℝ d => c * lqNorm q (fun j => ∫⁻ t, g j t)) p
       (volume.restrict (periodBox 0)) ≤ c * eLpNorm G p volume := by
     rw [eLpNorm_const' _ (zero_lt_one.trans hp1).ne' hp, Measure.restrict_apply_univ,
-      volume_periodBox, ENNReal.one_rpow, mul_one, enorm_eq_self]
+      volume_periodBox, ENNReal.one_rpow, mul_one, eNorm_eq_self]
     gcongr
     exact lqNorm_lintegral_le_eLpNorm hp1.le hq1.le hg
   calc eLpNorm (fun x => lqNorm q (fun j => Rd.maximalFunction (fun y => g j (quotientProj y)) x)) p
         (volume.restrict (periodBox 0))
       ≤ eLpNorm (A + fun _ => c * lqNorm q (fun j => ∫⁻ t, g j t)) p
           (volume.restrict (periodBox 0)) := by
-        refine eLpNorm_mono_enorm_ae (measurable_lqNorm_comp
+        refine eLpNorm_mono_eNorm_ae (measurable_lqNorm_comp
           (fun j => Rd.measurable_maximalFunction _) q).aestronglyMeasurable ?_
         filter_upwards [ae_restrict_mem (measurableSet_periodBox 0)] with x hx
-        simp only [enorm_eq_self, Pi.add_apply]
+        simp only [eNorm_eq_self, Pi.add_apply]
         exact lqNorm_maximalFunction_comp_quotientProj_le hq1.le g hx
     _ ≤ eLpNorm A p (volume.restrict (periodBox 0)) +
           eLpNorm (fun _ : EuclideanSpace ℝ d => c * lqNorm q (fun j => ∫⁻ t, g j t)) p

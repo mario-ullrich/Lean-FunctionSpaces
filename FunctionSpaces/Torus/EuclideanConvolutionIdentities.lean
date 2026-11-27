@@ -155,9 +155,9 @@ theorem norm_periodicEconvLp_le (hp : p ≠ ∞) {Φ : EuclideanSpace ℝ d → 
     ‖periodicEconvLp hp hΦ g‖ ≤ C.toReal * ‖g‖ := by
   have h : ‖periodicEconvLp hp hΦ g‖ₑ ≤ C * ‖g‖ₑ :=
     (enorm_periodicEconvLp_le hp hΦ g).trans (mul_le_mul_left hB _)
-  calc ‖periodicEconvLp hp hΦ g‖ = ‖periodicEconvLp hp hΦ g‖ₑ.toReal := (toReal_enorm _).symm
-    _ ≤ (C * ‖g‖ₑ).toReal := ENNReal.toReal_mono (ENNReal.mul_ne_top hC enorm_ne_top) h
-    _ = C.toReal * ‖g‖ := by rw [ENNReal.toReal_mul, toReal_enorm]
+  calc ‖periodicEconvLp hp hΦ g‖ = ‖periodicEconvLp hp hΦ g‖ₑ.toReal := (toReal_eNorm _).symm
+    _ ≤ (C * ‖g‖ₑ).toReal := ENNReal.toReal_mono (ENNReal.mul_ne_top hC eNorm_ne_top) h
+    _ = C.toReal * ‖g‖ := by rw [ENNReal.toReal_mul, toReal_eNorm]
 
 /-- **Approximate identities on the torus**: let `Φ_i` be integrable kernels on `ℝ^d` with
 `∫ |Φ_i| ≤ C < ∞` and `𝓕Φ_i(m) → 1` for every lattice point `m`. Then `Φ_i ⋆ f → f` in
@@ -189,7 +189,7 @@ theorem tendsto_periodicEconvLp_of_fourier (hp : p ≠ ∞) {ι : Type*} {l : Fi
       ((↑) ∘ fun i => periodicEconvLp hp (hΦ i) :
         ι → Lp ℂ p (volume : Measure (UnitAddTorus d)) →
           Lp ℂ p (volume : Measure (UnitAddTorus d))) :=
-    ((NormedSpace.equicontinuous_TFAE fun i => periodicEconvLp hp (hΦ i)).out 4 2).1 hbd
+    ((NormedSpace.equicontinuous_tfae fun i => periodicEconvLp hp (hΦ i)).out 4 2).1 hbd
   have hS : IsClosed (S : Set (Lp ℂ p (volume : Measure (UnitAddTorus d)))) :=
     hequi.isClosed_setOfPred_tendsto continuous_id
   have hspan : Submodule.span ℂ (Set.range (mFourierLp (d := d) p)) ≤ S := by
@@ -212,8 +212,8 @@ theorem tendsto_periodicEconvLp_dilate (hp : p ≠ ∞) {K : EuclideanSpace ℝ 
     Tendsto (fun i => periodicEconvLp hp (Rd.integrable_dilate hK (hc0 i).ne') f) l (𝓝 f) := by
   refine tendsto_periodicEconvLp_of_fourier hp (fun i => Rd.integrable_dilate hK (hc0 i).ne')
     (hK.2.ne) (fun i => ?_) (fun m => ?_) f
-  · rw [← eLpNorm_one_eq_lintegral_enorm (Rd.integrable_dilate hK (hc0 i).ne').1,
-      Rd.eLpNorm_dilate_one hK (hc0 i), eLpNorm_one_eq_lintegral_enorm hK.1]
+  · rw [← eLpNorm_one_eq_lintegral_eNorm (Rd.integrable_dilate hK (hc0 i).ne').1,
+      Rd.eLpNorm_dilate_one hK (hc0 i), eLpNorm_one_eq_lintegral_eNorm hK.1]
   · have hsmul : Tendsto (fun i => (c i)⁻¹ • latticeVec m) l (𝓝 0) := by
       have h := (tendsto_inv_atTop_zero.comp hc).smul_const (latticeVec m)
       rwa [zero_smul] at h

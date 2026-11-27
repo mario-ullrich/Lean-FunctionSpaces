@@ -461,7 +461,7 @@ theorem enorm_daubechiesScaled_le {C : ℝ≥0∞} (hC : ∀ t, ‖scalingFun m 
     (x : ℝ) : ‖daubechiesScaled m j k x‖ₑ ≤ dyadicWeight (1 / 2) j * C := by
   rw [show daubechiesScaled m j k x =
     (((2 : ℝ) ^ ((j : ℝ) / 2) : ℝ) : ℂ) * scalingFun m (2 ^ j * x - k)
-    from rfl, enorm_mul, enorm_two_rpow_half]
+    from rfl, eNorm_mul, enorm_two_rpow_half]
   gcongr
   exact hC _
 
@@ -585,16 +585,16 @@ theorem enorm_daubechiesScaled_mul_integral_sub_le (hN : 2 ≤ N) {f : ℝ → �
   have hsupp : ∀ t ∉ Set.Icc (0 : ℝ) (2 * N - 1), scalingFun m t = 0 :=
     fun _ ht => scalingFun_eq_zero m hN ht
   by_cases hx : daubechiesScaled m j k x = 0
-  · rw [hx, zero_mul, enorm_zero]
+  · rw [hx, zero_mul, eNorm_zero]
     positivity
   have hxw := mem_supportWindow_of_scaledFun_ne_zero hsupp hx
   have hs := continuous_scaledFun (continuous_scalingFun m hN) j k
   have h1 : ∫⁻ y, ‖(f y - f x) * conj (daubechiesScaled m j k y)‖ₑ ≤
       ∫⁻ y, η * ‖daubechiesScaled m j k y‖ₑ := by
     refine lintegral_mono fun y => ?_
-    rw [enorm_mul, RCLike.enorm_conj]
+    rw [eNorm_mul, RCLike.eNorm_conj]
     by_cases hy : daubechiesScaled m j k y = 0
-    · rw [hy, enorm_zero, mul_zero, mul_zero]
+    · rw [hy, eNorm_zero, mul_zero, mul_zero]
     · gcongr
       exact hη y ((abs_sub_le_of_mem_supportWindow hxw
         (mem_supportWindow_of_scaledFun_ne_zero hsupp hy)).trans_eq (by rw [sub_zero]))
@@ -603,15 +603,15 @@ theorem enorm_daubechiesScaled_mul_integral_sub_le (hN : 2 ≤ N) {f : ℝ → �
     have hw : (1 : ℝ) / 2 - 1 / (1 : ℝ≥0∞).toReal = -(1 / 2) := by norm_num
     calc ‖∫ y, (f y - f x) * conj (daubechiesScaled m j k y)‖ₑ
         ≤ ∫⁻ y, ‖(f y - f x) * conj (daubechiesScaled m j k y)‖ₑ :=
-          enorm_integral_le_lintegral_enorm _
+          eNorm_integral_le_lintegral_eNorm _
       _ ≤ ∫⁻ y, η * ‖daubechiesScaled m j k y‖ₑ := h1
-      _ = η * ∫⁻ y, ‖daubechiesScaled m j k y‖ₑ := lintegral_const_mul η hs.measurable.enorm
+      _ = η * ∫⁻ y, ‖daubechiesScaled m j k y‖ₑ := lintegral_const_mul η hs.measurable.eNorm
       _ = η * (dyadicWeight (-(1 / 2)) j * eLpNorm (scalingFun m) 1 volume) := by
-          rw [← eLpNorm_one_eq_lintegral_enorm hs.aestronglyMeasurable,
+          rw [← eLpNorm_one_eq_lintegral_eNorm hs.aestronglyMeasurable,
             eLpNorm_scaledFun (continuous_scalingFun m hN).aestronglyMeasurable, hw]
   calc ‖daubechiesScaled m j k x * ∫ y, (f y - f x) * conj (daubechiesScaled m j k y)‖ₑ
       = ‖daubechiesScaled m j k x‖ₑ * ‖∫ y, (f y - f x) * conj (daubechiesScaled m j k y)‖ₑ :=
-        enorm_mul _ _
+        eNorm_mul _ _
     _ ≤ (dyadicWeight (1 / 2) j * C) *
           (η * (dyadicWeight (-(1 / 2)) j * eLpNorm (scalingFun m) 1 volume)) :=
         mul_le_mul' (enorm_daubechiesScaled_le m hC j k x) h2
@@ -632,7 +632,7 @@ theorem enorm_projFun_sub_le (hN : 2 ≤ N) {f : ℝ → ℂ} (hf : LocallyInteg
     ‖projFun m j f x - f x‖ₑ ≤ 2 * N * (C * eLpNorm (scalingFun m) 1 volume * η) := by
   rw [projFun_sub_eq_tsum m hN hf j x,
     tsum_eq_sum_of_daubechiesScaled_eq_zero m hN fun k hk => by rw [hk, zero_mul]]
-  refine (enorm_sum_le _ _).trans ((Finset.sum_le_card_nsmul _ _ _ fun k _ =>
+  refine (eNorm_sum_le _ _).trans ((Finset.sum_le_card_nsmul _ _ _ fun k _ =>
     enorm_daubechiesScaled_mul_integral_sub_le m hN hC j k x hη).trans ?_)
   rw [nsmul_eq_mul]
   gcongr
@@ -664,13 +664,13 @@ theorem eLpNorm_sub_projFun_le (hN : 2 ≤ N) {f : ℝ → ℂ} (hf : Continuous
         div_le_self (by linarith) (one_le_pow₀ one_le_two)
       have h3 := abs_sub_abs_le_abs_sub x y
       rw [abs_sub_comm x y] at h3
-      rw [hfx, hR y (by rw [Real.norm_eq_abs]; linarith), sub_zero, enorm_zero]
-    rw [mul_zero, mul_zero, nonpos_iff_eq_zero, enorm_eq_zero, sub_eq_zero, hfx] at h0
+      rw [hfx, hR y (by rw [Real.norm_eq_abs]; linarith), sub_zero, eNorm_zero]
+    rw [mul_zero, mul_zero, nonpos_iff_eq_zero, eNorm_eq_zero, sub_eq_zero, hfx] at h0
     rw [Pi.sub_apply, h0, hfx, sub_self]
   rw [← eLpNorm_restrict_eq_of_support_subset hmeas hsupp]
-  refine (eLpNorm_le_of_ae_enorm_bound (C := 2 * N * (C * eLpNorm (scalingFun m) 1 volume * η))
+  refine (eLpNorm_le_of_ae_eNorm_bound (C := 2 * N * (C * eLpNorm (scalingFun m) 1 volume * η))
     hmeas.restrict (Eventually.of_forall fun x => ?_)).trans ?_
-  · rw [Pi.sub_apply, enorm_sub_rev]
+  · rw [Pi.sub_apply, eNorm_sub_rev]
     exact enorm_projFun_sub_le m hN hf.locallyIntegrable hC j x (hη x)
   · rw [Measure.restrict_apply_univ, smul_eq_mul]
 
@@ -719,7 +719,7 @@ theorem tendsto_eLpNorm_sub_projFun (hN : 2 ≤ N) {f : ℝ → ℂ} (hf : Conti
     have hd : dist y x < δ := by
       rw [Real.dist_eq]
       linarith
-    rw [← edist_eq_enorm_sub, edist_dist]
+    rw [← eDist_eq_eNorm_sub, edist_dist]
     exact (ENNReal.ofReal_le_ofReal (hδ hd).le).trans_eq ENNReal.ofReal_coe_nnreal
   · calc 2 * N * (ENNReal.ofReal C * eLpNorm (scalingFun m) 1 volume * η) *
           volume (Metric.closedBall (0 : ℝ) (R + 2 * N)) ^ p.toReal⁻¹
@@ -783,7 +783,7 @@ every `f ∈ L_p` and every level `j` (`Daubechies.eLpNorm_projFun_le`). -/
 theorem enorm_daubechiesProj_le (hN : 2 ≤ N) (hp : p ≠ ∞) (j : ℕ)
     (f : Lp ℂ p (volume : Measure ℝ)) :
     ‖daubechiesProj m p hN hp j f‖ₑ ≤ ENNReal.ofReal (projConst m p) * ‖f‖ₑ := by
-  rw [Lp.enorm_def, Lp.enorm_def, eLpNorm_congr_ae (daubechiesProj_apply_ae m hN hp j f)]
+  rw [Lp.eNorm_def, Lp.eNorm_def, eLpNorm_congr_ae (daubechiesProj_apply_ae m hN hp j f)]
   exact eLpNorm_projFun_le m hN Fact.out hp (Lp.aestronglyMeasurable f) j
 
 /-! ### The scaling spaces -/

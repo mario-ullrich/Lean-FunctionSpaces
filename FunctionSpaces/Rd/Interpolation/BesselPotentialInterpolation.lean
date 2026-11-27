@@ -87,7 +87,7 @@ potential norm of `f` is finite iff `f` lies in Mathlib's Bessel potential space
 `J_s f ∈ L_p(V)`. -/
 theorem besselPotentialNorm_lt_top_iff {s : ℝ} {f : Lp ℂ p (volume : Measure V)} :
     besselPotentialNorm s f < ∞ ↔ TemperedDistribution.MemSobolev s p (f : 𝓢'(V, ℂ)) := by
-  refine ⟨fun hf => ?_, fun ⟨h, hh⟩ => (besselPotentialNorm_le hh).trans_lt enorm_lt_top⟩
+  refine ⟨fun hf => ?_, fun ⟨h, hh⟩ => (besselPotentialNorm_le hh).trans_lt eNorm_lt_top⟩
   obtain ⟨h, hh⟩ := iInf_lt_iff.1 hf
   exact ⟨h, (iInf_lt_iff.1 hh).choose⟩
 

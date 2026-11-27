@@ -61,7 +61,7 @@ theorem measure_mul_lqNorm_setAverage_le (hq : 1 ≤ q)
     (hg : ∀ i, AEStronglyMeasurable (g i) (μ.restrict s)) (hs : μ s ≠ ∞) :
     μ s * lqNorm q (fun i => ‖⨍ x in s, g i x ∂μ‖ₑ) ≤ ∫⁻ x in s, lqNorm q (fun i => ‖g i x‖ₑ) ∂μ :=
   (mul_le_mul_right ((ENNReal.lqNorm_mono fun i => enorm_average_le (g i)).trans
-    (lqNorm_laverage_le hq fun i => (hg i).enorm)) _).trans_eq (measure_mul_setLAverage _ hs)
+    (lqNorm_laverage_le hq fun i => (hg i).eNorm)) _).trans_eq (measure_mul_setLAverage _ hs)
 
 /-- **The mass of a family minus its means**: for `1 ≤ q ≤ ∞`, every set `s` of finite measure
 and every countable family of functions `g_i` with values in a real normed space that are almost
@@ -75,7 +75,7 @@ theorem setLIntegral_lqNorm_sub_setAverage_le (hq : 1 ≤ q)
   calc ∫⁻ x in s, lqNorm q (fun i => ‖g i x - ⨍ y in s, g i y ∂μ‖ₑ) ∂μ
       ≤ ∫⁻ x in s, (lqNorm q (fun i => ‖g i x‖ₑ) +
           lqNorm q (fun i => ‖⨍ y in s, g i y ∂μ‖ₑ)) ∂μ :=
-        lintegral_mono fun _ => (ENNReal.lqNorm_mono fun _ => enorm_sub_le).trans
+        lintegral_mono fun _ => (ENNReal.lqNorm_mono fun _ => eNorm_sub_le).trans
           (ENNReal.lqNorm_add_le hq _ _)
     _ = (∫⁻ x in s, lqNorm q (fun i => ‖g i x‖ₑ) ∂μ) +
           μ s * lqNorm q (fun i => ‖⨍ y in s, g i y ∂μ‖ₑ) := by
@@ -147,7 +147,7 @@ theorem enorm_czAverageC_le (f : V → E) (x : V) :
   · obtain ⟨km, hkm, hxkm⟩ := Set.mem_iUnion₂.1 hx
     rw [czAverageC_eq_of_mem hkm f hxkm, czAverage_eq_of_mem hkm _ hxkm]
     exact enorm_average_le f
-  · rw [czAverageC_eq_zero_of_notMem f hx, enorm_zero]
+  · rw [czAverageC_eq_zero_of_notMem f hx, eNorm_zero]
     exact zero_le
 
 /-! ### The signed good part -/
@@ -169,8 +169,8 @@ theorem aestronglyMeasurable_czGoodC {f : V → E} (hf : AEStronglyMeasurable f 
 point `x` (outside `Ω` both sides are `‖f(x)‖`). -/
 theorem enorm_czGoodC_le (f : V → E) (x : V) :
     ‖czGoodC G t f x‖ₑ ≤ czGood G t (fun y => ‖f y‖ₑ) x := by
-  refine (enorm_add_le _ _).trans (add_le_add ?_ (enorm_czAverageC_le f x))
-  rw [enorm_indicator_eq_indicator_enorm]
+  refine (eNorm_add_le _ _).trans (add_le_add ?_ (enorm_czAverageC_le f x))
+  rw [eNorm_indicator_eq_indicator_eNorm]
 
 /-- **The integral of the norm of the signed good part is at most that of `f`**:
 `∫ ‖czGoodC f‖ ≤ ∫ ‖f‖` for every `f : V → E`, since the nonnegative good part keeps the integral
@@ -189,7 +189,7 @@ part of `f` in the decomposition of `‖f‖` at height `t` satisfies `‖czGood
 almost every `x`. -/
 theorem ae_enorm_czGoodC_le [Nontrivial V] {f : V → E} (hf : Integrable f volume) (ht0 : 0 < t) :
     ∀ᵐ x, ‖czGoodC (fun y => ‖f y‖ₑ) t f x‖ₑ ≤ 2 ^ finrank ℝ V * t := by
-  filter_upwards [ae_czGood_self_le hf.1.enorm hf.2.ne ht0] with x hx
+  filter_upwards [ae_czGood_self_le hf.1.eNorm hf.2.ne ht0] with x hx
   exact (enorm_czGoodC_le f x).trans hx
 
 /-- **The square of the good part**: in dimension `n ≥ 1`, for integrable `f` and `0 < t`, the
@@ -199,7 +199,7 @@ most `∫ ‖f‖`. -/
 theorem lintegral_enorm_czGoodC_sq_le [Nontrivial V] {f : V → E} (hf : Integrable f volume)
     (ht0 : 0 < t) :
     ∫⁻ x, ‖czGoodC (fun y => ‖f y‖ₑ) t f x‖ₑ ^ 2 ≤ 2 ^ finrank ℝ V * t * ∫⁻ x, ‖f x‖ₑ :=
-  (lintegral_sq_le_mul_lintegral_of_ae_le (aestronglyMeasurable_czGoodC hf.1).enorm
+  (lintegral_sq_le_mul_lintegral_of_ae_le (aestronglyMeasurable_czGoodC hf.1).eNorm
     (ae_enorm_czGoodC_le hf ht0)).trans (mul_le_mul_right (lintegral_enorm_czGoodC_le f) _)
 
 /-! ### The signed bad part and its pieces -/
@@ -291,7 +291,7 @@ theorem integrable_czBadPart {f : V → E} {km : ℤ × (Fin (finrank ℝ V) →
 `f : V → E` (`MeasureTheory.setLIntegral_enorm_sub_setAverage_le`). -/
 theorem lintegral_enorm_czBadPart_le (f : V → E) (km : ℤ × (Fin (finrank ℝ V) → ℤ)) :
     ∫⁻ z, ‖czBadPart f km z‖ₑ ≤ 2 * ∫⁻ z in zcell km.1 km.2, ‖f z‖ₑ := by
-  simp only [czBadPart, enorm_indicator_eq_indicator_enorm]
+  simp only [czBadPart, eNorm_indicator_eq_indicator_eNorm]
   rw [lintegral_indicator (measurableSet_zcell _ _)]
   exact setLIntegral_enorm_sub_setAverage_le (volume_zcell_lt_top _ _).ne f
 
@@ -311,8 +311,8 @@ measurable `f`. -/
 theorem lintegral_enorm_czBadC_le {f : V → E} (hf : AEStronglyMeasurable f volume) :
     ∫⁻ x, ‖czBadC G t f x‖ₑ ≤ 2 * ∫⁻ x, ‖f x‖ₑ :=
   calc ∫⁻ x, ‖czBadC G t f x‖ₑ ≤ ∫⁻ x, (‖f x‖ₑ + ‖czGoodC G t f x‖ₑ) :=
-        lintegral_mono fun _ => enorm_sub_le
-    _ = (∫⁻ x, ‖f x‖ₑ) + ∫⁻ x, ‖czGoodC G t f x‖ₑ := lintegral_add_left' hf.enorm _
+        lintegral_mono fun _ => eNorm_sub_le
+    _ = (∫⁻ x, ‖f x‖ₑ) + ∫⁻ x, ‖czGoodC G t f x‖ₑ := lintegral_add_left' hf.eNorm _
     _ ≤ (∫⁻ x, ‖f x‖ₑ) + ∫⁻ x, ‖f x‖ₑ := add_le_add le_rfl (lintegral_enorm_czGoodC_le f)
     _ = 2 * ∫⁻ x, ‖f x‖ₑ := (two_mul _).symm
 
@@ -329,7 +329,7 @@ theorem ae_lqNorm_czGoodC_le [Nontrivial V] (hq : 1 ≤ q)
     (hG : ∫⁻ x, lqNorm q (fun j => ‖g j x‖ₑ) ≠ ∞) (ht0 : 0 < t) :
     ∀ᵐ x, lqNorm q (fun j => ‖czGoodC (fun y => lqNorm q (fun j => ‖g j y‖ₑ)) t (g j) x‖ₑ) ≤
       2 ^ finrank ℝ V * t := by
-  filter_upwards [ae_lqNorm_czGood_le hq (fun j => (hg j).enorm) hG ht0] with x hx
+  filter_upwards [ae_lqNorm_czGood_le hq (fun j => (hg j).eNorm) hG ht0] with x hx
   exact (ENNReal.lqNorm_mono fun j => enorm_czGoodC_le (g j) x).trans hx
 
 /-- **The integral of the `ℓ_q` norm of the good parts of a family is at most `∫ G`**:
@@ -338,7 +338,7 @@ everywhere strongly measurable `g_j`, and the cubes of any function at any heigh
 theorem lintegral_lqNorm_czGoodC_le (hq : 1 ≤ q) (hg : ∀ j, AEStronglyMeasurable (g j) volume) :
     ∫⁻ x, lqNorm q (fun j => ‖czGoodC G t (g j) x‖ₑ) ≤ ∫⁻ x, lqNorm q (fun j => ‖g j x‖ₑ) :=
   (lintegral_mono fun x => ENNReal.lqNorm_mono fun j => enorm_czGoodC_le (g j) x).trans
-    (lintegral_lqNorm_czGood_le hq fun j => (hg j).enorm)
+    (lintegral_lqNorm_czGood_le hq fun j => (hg j).eNorm)
 
 /-- **The square of the good parts of a family**: in dimension `n ≥ 1`, for `1 ≤ q ≤ ∞`, almost
 everywhere strongly measurable `g_j` with `G = ‖(‖g_j‖)_j‖_{ℓ_q}` integrable, and `0 < t`,
@@ -349,7 +349,7 @@ theorem lintegral_lqNorm_czGoodC_sq_le [Nontrivial V] (hq : 1 ≤ q)
     ∫⁻ x, lqNorm q (fun j => ‖czGoodC (fun y => lqNorm q (fun j => ‖g j y‖ₑ)) t (g j) x‖ₑ) ^ 2 ≤
       2 ^ finrank ℝ V * t * ∫⁻ x, lqNorm q (fun j => ‖g j x‖ₑ) :=
   (lintegral_sq_le_mul_lintegral_of_ae_le
-    (aemeasurable_lqNorm_comp (fun j => (aestronglyMeasurable_czGoodC (hg j)).enorm) q)
+    (aemeasurable_lqNorm_comp (fun j => (aestronglyMeasurable_czGoodC (hg j)).eNorm) q)
     (ae_lqNorm_czGoodC_le hq hg hG ht0)).trans
     (mul_le_mul_right (lintegral_lqNorm_czGoodC_le hq hg) _)
 
@@ -361,7 +361,7 @@ theorem lintegral_lqNorm_czBadPart_le (hq : 1 ≤ q) (hg : ∀ j, AEStronglyMeas
     (km : ℤ × (Fin (finrank ℝ V) → ℤ)) :
     ∫⁻ z, lqNorm q (fun j => ‖czBadPart (g j) km z‖ₑ) ≤
       2 * ∫⁻ z in zcell km.1 km.2, lqNorm q (fun j => ‖g j z‖ₑ) := by
-  simp only [czBadPart, enorm_indicator_eq_indicator_enorm, ENNReal.lqNorm_indicator]
+  simp only [czBadPart, eNorm_indicator_eq_indicator_eNorm, ENNReal.lqNorm_indicator]
   rw [lintegral_indicator (measurableSet_zcell _ _)]
   exact setLIntegral_lqNorm_sub_setAverage_le hq (fun j => (hg j).restrict)
     (volume_zcell_lt_top _ _).ne

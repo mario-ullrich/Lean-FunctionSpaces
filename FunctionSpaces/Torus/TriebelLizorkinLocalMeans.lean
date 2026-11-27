@@ -71,7 +71,7 @@ theorem aemeasurable_dyadicWeight_mul_periodicEconv_meansKernel (L : ℕ) (s : �
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     AEMeasurable (fun t => dyadicWeight s j * ‖periodicEconv (b.meansKernel L j) f t‖ₑ) volume :=
   (aestronglyMeasurable_periodicEconv (b.integrable_meansKernel L j).aestronglyMeasurable
-    (Lp.stronglyMeasurable f).measurable).enorm.const_mul _
+    (Lp.stronglyMeasurable f).measurable).eNorm.const_mul _
 
 omit [Fact (1 ≤ p)] in
 /-- The pointwise `ℓ_q` norm of the weighted local means on the torus is almost everywhere
@@ -134,7 +134,7 @@ theorem tendsto_sum_periodicEconvLp_dualKernel_meansKernel (hp : p ≠ ∞) {L :
   refine Rd.tendsto_apply_apply_of_tendsto
     (T := fun J => periodicEconvLp hp (b.integrable_scaledMoment L J))
     (fun J g => norm_periodicEconvLp_le hp _ hm (by
-      rw [← eLpNorm_one_eq_lintegral_enorm (b.integrable_scaledMoment L J).1,
+      rw [← eLpNorm_one_eq_lintegral_eNorm (b.integrable_scaledMoment L J).1,
         b.eLpNorm_scaledMoment_one]) g) h
 
 /-- A local mean of a block on the torus is the block convolved with the cross kernel:
@@ -239,10 +239,10 @@ theorem ae_enorm_periodicLpBlock_sum_quotientProj_le (hp : p ≠ ∞) (L : ℕ) 
       ← maximalFunction_periodicEconvLp_meansKernel_quotientProj b hp L i f]
     exact b.enorm_conv_conv_lpBlockKernel_dualKernel_le L hL' i j _ x
   rw [hx]
-  refine (enorm_sum_le _ _).trans ((Finset.sum_le_sum fun i _ => hterm i).trans ?_)
+  refine (eNorm_sum_le _ _).trans ((Finset.sum_le_sum fun i _ => hterm i).trans ?_)
   rw [← Finset.mul_sum]
   gcongr
-  exact ENNReal.sum_le_tsum _
+  exact sum_le_tsum _
 
 /-- **The blocks by local means on the torus, pointwise on the lift**: for `L ≥ 1`, `L' ≥ 1`,
 `1 ≤ p < ∞` and `f ∈ L_p(𝕋^d)`, for almost every `x` in the period box `P_0 = (0, 1]^d` and all
@@ -312,10 +312,10 @@ theorem ae_enorm_periodicEconvLp_meansKernel_sum_quotientProj_le (hp : p ≠ ∞
     rw [periodicEconv_quotientProj, ← maximalFunction_periodicLpBlock_quotientProj hp i f]
     exact b.enorm_conv_conv_meansKernel_dilatedBandKernel_le L i j _ x
   rw [hx]
-  refine (enorm_sum_le _ _).trans ((Finset.sum_le_sum fun i _ => hterm i).trans ?_)
+  refine (eNorm_sum_le _ _).trans ((Finset.sum_le_sum fun i _ => hterm i).trans ?_)
   rw [← Finset.mul_sum]
   gcongr
-  exact ENNReal.sum_le_tsum _
+  exact sum_le_tsum _
 
 /-- **The local means by blocks on the torus, pointwise on the lift**: for every order `L`,
 `1 ≤ p < ∞` and `f ∈ L_p(𝕋^d)`, for almost every `x` in the period box `P_0 = (0, 1]^d` and all
@@ -398,9 +398,9 @@ theorem eLpNorm_le_of_le_lqNorm_maximalFunction_quotientProj (hp1 : 1 < p) (hp :
     _ ≤ eLpNorm
         (fun x => C * lqNorm q (fun i => Rd.maximalFunction (fun y => g i (quotientProj y)) x)) p
           (volume.restrict (periodBox 0)) :=
-        eLpNorm_mono_enorm_ae
+        eLpNorm_mono_eNorm_ae
           (hF.comp_quasiMeasurePreserving hmp.quasiMeasurePreserving).aestronglyMeasurable
-          (h.mono fun x hx => by simpa only [enorm_eq_self, Function.comp_apply] using hx)
+          (h.mono fun x hx => by simpa only [eNorm_eq_self, Function.comp_apply] using hx)
     _ = C * eLpNorm
         (fun x => lqNorm q (fun i => Rd.maximalFunction (fun y => g i (quotientProj y)) x)) p
           (volume.restrict (periodBox 0)) :=
@@ -466,7 +466,7 @@ theorem periodicTLLocalMeansNorm_le_periodicTriebelLizorkinNorm (L : ℕ) (hp1 :
       periodicTLLowerConst b L p q s * periodicTriebelLizorkinNorm s q f :=
   eLpNorm_le_of_le_lqNorm_maximalFunction_quotientProj hp1 hp hq1
     (aemeasurable_lqNorm_periodicEconv_meansKernel b L s q f)
-    (fun i => (aestronglyMeasurable_periodicBlockFun i f).enorm.const_mul _)
+    (fun i => (aestronglyMeasurable_periodicBlockFun i f).eNorm.const_mul _)
     (lqNorm_periodicEconv_meansKernel_quotientProj_le_lqNorm_maximalFunction b L hp hq1.le s f)
 
 /-- **The local means characterisation of Triebel–Lizorkin spaces on the torus**: for a bump

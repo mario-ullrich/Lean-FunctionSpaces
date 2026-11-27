@@ -215,7 +215,7 @@ theorem eLpNorm_sub_sum_haarSystem_rpow_le (hp0 : p ≠ 0) (hp1 : p ≤ 1) {f : 
   have hρ : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
   have hT : ∑' j, haarLevelNorm p f (k + j) ^ p.toReal = haarLevelNorm p f k ^ p.toReal +
       ∑' j, haarLevelNorm p f (k + 1 + j) ^ p.toReal := by
-    rw [tsum_eq_zero_add' ENNReal.summable]
+    rw [tsum_eq_zero_add' CompleteLattice.summable]
     congr 1
     exact tsum_congr fun j => by rw [show k + (j + 1) = k + 1 + j by omega]
   rw [eLpNorm_congr_ae (sub_sum_haarSystem_ae_eq hf hi), hT,
@@ -318,7 +318,7 @@ theorem eNormDyadic_sub_haarPartialSum_le_of_le_one (hp0 : p ≠ 0) (hp1 : p ≤
   have hρ : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
   set T := ∑' j, haarLevelNorm p f (k + j) ^ p.toReal
   have hR : ‖f - haarPartialSum p f (2 ^ k + i)‖ₑ ≤ T ^ p.toReal⁻¹ := by
-    rw [ENNReal.le_rpow_inv_iff hρ, Lp.enorm_def, eLpNorm_congr_ae ((Lp.coeFn_sub _ _).trans
+    rw [ENNReal.le_rpow_inv_iff hρ, Lp.eNorm_def, eLpNorm_congr_ae ((Lp.coeFn_sub _ _).trans
       (EventuallyEq.rfl.sub (coeFn_haarPartialSum _ _)))]
     exact eLpNorm_sub_sum_haarSystem_rpow_le hp0 hp1 hf hi
   have hR' : ‖f - haarPartialSum p f (2 ^ k + i)‖ₑ ≤ dyadicWeight s k * T ^ p.toReal⁻¹ :=
@@ -384,10 +384,10 @@ theorem exists_enorm_haarSystemCoeff_le (n : ℕ) :
     ∃ M : ℝ≥0∞, M ≠ ∞ ∧ ∀ g : ℝ → ℂ, ‖haarSystemCoeff g n‖ₑ ≤ M * ∫⁻ x, ‖g x‖ₑ ∂vol := by
   obtain ⟨C, hC⟩ := exists_abs_haarSystem_le n
   refine ⟨ENNReal.ofReal C, ENNReal.ofReal_ne_top, fun g =>
-    (enorm_integral_le_lintegral_enorm _).trans ?_⟩
+    (eNorm_integral_le_lintegral_eNorm _).trans ?_⟩
   rw [← lintegral_const_mul' _ _ ENNReal.ofReal_ne_top]
   refine lintegral_mono fun x => ?_
-  rw [enorm_mul]
+  rw [eNorm_mul]
   gcongr
   rw [← ofReal_norm, Complex.norm_real, Real.norm_eq_abs]
   exact ENNReal.ofReal_le_ofReal (hC x)
@@ -450,7 +450,7 @@ theorem eq_haarSystemCoeff_of_tendsto (hp0 : p ≠ 0) (hp1 : p ≤ 1) (hs : 1 / 
       M * (stepCoupleEmbedConst p s q * (stepCouple p).eNormDyadic s q (g N)) := fun N hiN => by
     rw [← haarSystemCoeff_sub_sum hf a hiN, ← haarSystemCoeff_congr_ae (hg N)]
     refine (hMb _).trans ?_
-    rw [← eLpNorm_one_eq_lintegral_enorm (Lp.aestronglyMeasurable _)]
+    rw [← eLpNorm_one_eq_lintegral_eNorm (Lp.aestronglyMeasurable _)]
     gcongr
     exact eLpNorm_one_le_eNormDyadic hp0 hp1 hs hq0 (g N)
   have hlim : Tendsto (fun N => M * (stepCoupleEmbedConst p s q *
@@ -459,5 +459,5 @@ theorem eq_haarSystemCoeff_of_tendsto (hp0 : p ≠ 0) (hp1 : p ≤ 1) (hs : 1 / 
       (Or.inr (stepCoupleEmbedConst_ne_top hs q))) (Or.inr hM)
   have h0 : ‖haarSystemCoeff f i - a i‖ₑ = 0 := le_antisymm (ge_of_tendsto hlim
     (eventually_atTop.2 ⟨i + 1, fun N hN => hbound N (by omega)⟩)) zero_le
-  rw [enorm_eq_zero, sub_eq_zero] at h0
+  rw [eNorm_eq_zero, sub_eq_zero] at h0
   exact h0.symm

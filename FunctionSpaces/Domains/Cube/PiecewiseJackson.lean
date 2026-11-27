@@ -83,13 +83,13 @@ theorem cube_eLpNorm_le_of_slice_le {F G₁ D₁ G₂ D₂ : (Fin d → ℝ) →
     eLpNorm_regionVol_eq_slice hD₂ hp0 hp' i ha₂ hb₂,
     ← eLpNorm_const_mul_ennreal (c := M) (hm a₁ b₁ hD₁).aestronglyMeasurable,
     ← eLpNorm_const_mul_ennreal (c := M) (hm a₂ b₂ hD₂).aestronglyMeasurable]
-  refine (eLpNorm_mono_enorm (g := fun x =>
+  refine (eLpNorm_mono_eNorm (g := fun x =>
       c * ((eLpNorm (slice G₁ x i) p (volume.restrict (Icc a₁ b₁)) +
           M * eLpNorm (slice D₁ x i) p (volume.restrict (Icc a₁ b₁))) +
         (eLpNorm (slice G₂ x i) p (volume.restrict (Icc a₂ b₂)) +
           M * eLpNorm (slice D₂ x i) p (volume.restrict (Icc a₂ b₂)))))
     (measurable_eLpNorm_slice hF hp0 hp' i _).aestronglyMeasurable
-    fun x => by simpa only [enorm_eq_self] using h x).trans ?_
+    fun x => by simpa only [eNorm_eq_self] using h x).trans ?_
   refine (eLpNorm_const_mul_ennreal (c := c) ?_).trans_le ?_
   · exact (((hm a₁ b₁ hG₁).add ((hm a₁ b₁ hD₁).const_mul M)).add
       ((hm a₂ b₂ hG₂).add ((hm a₂ b₂ hD₂).const_mul M))).aestronglyMeasurable
@@ -235,7 +235,7 @@ theorem approxError_le_of_continuous {A : ApproximationScheme (Lp ℂ p (cubeVol
   obtain ⟨u, ⟨a, ha, hau⟩, hbound⟩ := h g
   have hg := BoundedContinuousFunction.coeFn_toLp (E := ℂ) p (cubeVol d) ℝ g
   refine (A.approxError_le_of_mem ha _).trans ?_
-  rw [Lp.enorm_def, eLpNorm_congr_ae ((Lp.coeFn_sub _ _).trans (hg.sub hau)), lpCubeModulus,
+  rw [Lp.eNorm_def, eLpNorm_congr_ae ((Lp.coeFn_sub _ _).trans (hg.sub hau)), lpCubeModulus,
     cubeModulus_congr_ae (Lp.stronglyMeasurable _).measurable g.continuous.measurable hg hp0 hp]
   exact hbound
 

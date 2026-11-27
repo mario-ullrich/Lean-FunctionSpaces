@@ -524,7 +524,7 @@ theorem ofReal_mul_enorm_mul_enorm_fourier_le (G : 𝓢(V, ℂ)) (ξ : V) :
     simp [mul_assoc]
   have hnorm : ‖𝓕 ((∂_{ξ} G : 𝓢(V, ℂ)) : V → ℂ) ξ‖ₑ =
       ‖ξ‖ₑ * (ENNReal.ofReal (2 * π) * ‖ξ‖ₑ * ‖𝓕 (G : V → ℂ) ξ‖ₑ) := by
-    rw [hF, enorm_mul, real_inner_self_eq_norm_sq]
+    rw [hF, eNorm_mul, real_inner_self_eq_norm_sq]
     have h2 : ‖2 * π * Complex.I * ((‖ξ‖ ^ 2 : ℝ) : ℂ)‖ₑ =
         ENNReal.ofReal (2 * π) * ‖ξ‖ₑ ^ 2 := by
       rw [← ofReal_norm, ← ofReal_norm, ← ENNReal.ofReal_pow (norm_nonneg _),
@@ -536,7 +536,7 @@ theorem ofReal_mul_enorm_mul_enorm_fourier_le (G : 𝓢(V, ℂ)) (ξ : V) :
   have hle : ‖𝓕 ((∂_{ξ} G : 𝓢(V, ℂ)) : V → ℂ) ξ‖ₑ ≤ ‖ξ‖ₑ * gradMassConst G :=
     (enorm_fourier_le_lintegral _ ξ).trans (lintegral_enorm_lineDerivOp_le ξ G)
   rw [hnorm] at hle
-  exact (ENNReal.mul_le_mul_iff_right (enorm_ne_zero.2 hξ) enorm_ne_top).1 hle
+  exact (ENNReal.mul_le_mul_iff_right (eNorm_ne_zero.2 hξ) eNorm_ne_top).1 hle
 
 /-- The constant `4 (2π ∫ ‖x‖ |G(x)| dx + C_G / (2π))²` of the Fourier overlap of the dilates of a
 mean-zero Schwartz function `G`, with the gradient mass `C_G = Rd.gradMassConst G`. -/
@@ -564,12 +564,12 @@ theorem enorm_fourier_le_mul_min (G : 𝓢(V, ℂ)) (h0 : ∫ x, G x = 0) (η : 
     refine ENNReal.ofReal_le_ofReal ((norm_fourier_le_of_integral_eq_zero G h0 η).trans_eq ?_)
     ring
   rcases eq_or_ne η 0 with rfl | hη
-  · rw [enorm_zero, mul_zero] at hA
+  · rw [eNorm_zero, mul_zero] at hA
     exact hA.trans zero_le
   have hc0 : ENNReal.ofReal (2 * π) * ‖η‖ₑ ≠ 0 :=
-    mul_ne_zero (by simp [Real.pi_pos]) (enorm_ne_zero.2 hη)
+    mul_ne_zero (by simp [Real.pi_pos]) (eNorm_ne_zero.2 hη)
   have hct : ENNReal.ofReal (2 * π) * ‖η‖ₑ ≠ ∞ :=
-    ENNReal.mul_ne_top ENNReal.ofReal_ne_top enorm_ne_top
+    ENNReal.mul_ne_top ENNReal.ofReal_ne_top eNorm_ne_top
   have hB : ‖𝓕 (G : V → ℂ) η‖ₑ ≤ (A + B) * ‖η‖ₑ⁻¹ :=
     calc ‖𝓕 (G : V → ℂ) η‖ₑ
         = (ENNReal.ofReal (2 * π) * ‖η‖ₑ)⁻¹ *
@@ -579,7 +579,7 @@ theorem enorm_fourier_le_mul_min (G : 𝓢(V, ℂ)) (h0 : ∫ x, G x = 0) (η : 
           gcongr
           exact ofReal_mul_enorm_mul_enorm_fourier_le G η
       _ = B * ‖η‖ₑ⁻¹ := by
-          rw [ENNReal.mul_inv (Or.inr enorm_ne_top) (Or.inl ENNReal.ofReal_ne_top)]
+          rw [ENNReal.mul_inv (Or.inr eNorm_ne_top) (Or.inl ENNReal.ofReal_ne_top)]
           ring
       _ ≤ (A + B) * ‖η‖ₑ⁻¹ := by gcongr; exact le_add_self
   rw [mul_min]
@@ -598,12 +598,12 @@ theorem tsum_enorm_fourier_dilate_sq_le (G : 𝓢(V, ℂ)) (h0 : ∫ x, G x = 0)
   rcases eq_or_ne ξ 0 with rfl | hξ
   · have h : ∀ j : ℕ, ‖𝓕 (dilate (2 ^ j) (G : V → ℂ)) 0‖ₑ ^ 2 = 0 := fun j => by
       have h1 := enorm_fourier_le_mul_min G h0 0
-      rw [enorm_zero, min_eq_left zero_le, mul_zero, nonpos_iff_eq_zero] at h1
+      rw [eNorm_zero, min_eq_left zero_le, mul_zero, nonpos_iff_eq_zero] at h1
       rw [hdil, smul_zero, h1, zero_pow two_ne_zero]
     simp [h]
   set a := ‖ξ‖ₑ⁻¹
   have hn : ∀ j : ℕ, ‖((2 : ℝ) ^ j)⁻¹ • ξ‖ₑ = (2 ^ j * a)⁻¹ := fun j => by
-    rw [enorm_smul, ENNReal.mul_inv (Or.inl (pow_ne_zero _ two_ne_zero))
+    rw [eNorm_smul, ENNReal.mul_inv (Or.inl (pow_ne_zero _ two_ne_zero))
       (Or.inl (ENNReal.pow_ne_top ENNReal.ofNat_ne_top)), inv_inv]
     congr 1
     rw [← ofReal_norm, Real.norm_of_nonneg (by positivity), ENNReal.ofReal_inv_of_pos
@@ -622,7 +622,7 @@ theorem tsum_enorm_fourier_dilate_sq_le (G : 𝓢(V, ℂ)) (h0 : ∫ x, G x = 0)
           exact ENNReal.min_inv_sq_le _
       _ = C ^ 2 * min (2 ^ j * a) (2 ^ j * a)⁻¹ := by rw [inv_inv, min_comm]
   calc ∑' j : ℕ, ‖𝓕 (dilate (2 ^ j) (G : V → ℂ)) ξ‖ₑ ^ 2
-      ≤ ∑' j : ℕ, C ^ 2 * min (2 ^ j * a) (2 ^ j * a)⁻¹ := ENNReal.tsum_le_tsum hterm
+      ≤ ∑' j : ℕ, C ^ 2 * min (2 ^ j * a) (2 ^ j * a)⁻¹ := tsum_le_tsum hterm
     _ = C ^ 2 * ∑' j : ℕ, min (2 ^ j * a) (2 ^ j * a)⁻¹ := ENNReal.tsum_mul_left
     _ ≤ C ^ 2 * 4 := by gcongr; exact ENNReal.tsum_min_two_pow_le a
     _ = meanZeroOverlap G := by rw [meanZeroOverlap]; ring

@@ -139,7 +139,7 @@ theorem tendsto_modNorm_sub_reproducingSum (hp : p ≠ ∞) {L : ℕ} (hL : 1 �
       _ ≤ dyadicWeight (-(σ - σ')) j * Y := mul_le_mul' le_rfl hYj
       _ = Y * dyadicWeight (-(σ - σ')) j := mul_comm _ _
   have hasum : ∑' j, a j ≠ ∞ := by
-    refine ne_top_of_le_ne_top ?_ (ENNReal.tsum_le_tsum ha)
+    refine ne_top_of_le_ne_top ?_ (tsum_le_tsum ha)
     rw [ENNReal.tsum_mul_left, ENNReal.tsum_dyadicWeight_neg]
     exact ENNReal.mul_ne_top hY.ne (ENNReal.one_sub_two_rpow_neg_inv_ne_top (by linarith))
   have hbound : ∀ J, ‖f - b.reproducingSum hp L J f‖ₑ + lqNorm 1 (fun k =>
@@ -162,7 +162,7 @@ theorem tendsto_modNorm_sub_reproducingSum (hp : p ≠ ∞) {L : ℕ} (hL : 1 �
     refine (b.modNorm_le_of_tendsto hp L σ' le_rfl hrep).trans (mul_le_mul' le_rfl ?_)
     rw [ENNReal.lqNorm_one]
     have hsplit : ∑' j, dyadicWeight σ' j * ‖h' j‖ₑ = ∑' i, a (i + (J + 1)) := by
-      rw [← (ENNReal.summable).sum_add_tsum_nat_add' (k := J + 1)]
+      rw [← (CompleteLattice.summable).sum_add_tsum_nat_add' (k := J + 1)]
       have hzero : ∑ j ∈ Finset.range (J + 1), dyadicWeight σ' j * ‖h' j‖ₑ = 0 :=
         Finset.sum_eq_zero fun j hj => by
           have : ¬ J < j := by
@@ -207,7 +207,7 @@ theorem modNorm_reproducingSum_lt_top (hp : p ≠ ∞) (L J : ℕ) {σ : ℝ} (h
     have : ¬ j ≤ J := fun h => hj (Finset.mem_range.2 (Nat.lt_succ_of_le h))
     simp [h', this]]
   exact ENNReal.sum_lt_top.2 fun j _ => ENNReal.mul_lt_top (ENNReal.dyadicWeight_lt_top _ _)
-    enorm_lt_top
+    eNorm_lt_top
 
 end LocalMeansBump
 
@@ -289,7 +289,7 @@ theorem intrinsicNorm_sub_le (hp : p ≠ ∞) (L : ℕ) (σ : ℝ) {q : ℝ≥0�
   simp only [intrinsicNorm_def]
   refine (ENNReal.lqNorm_mono fun j => ?_).trans (ENNReal.lqNorm_add_le hq _ _)
   rw [map_sub, map_sub, ← mul_add]
-  exact mul_le_mul' le_rfl (enorm_sub_le)
+  exact mul_le_mul' le_rfl (eNorm_sub_le)
 
 /-- **Locality for two functions**: if `f₁ = f₂` almost everywhere on `Ω ∩ U` for an open set `U`,
 then `Tr f₁ = Tr f₂` almost everywhere on `γ⁻¹(U)`. -/
@@ -555,7 +555,7 @@ theorem intrinsicNorm_add_le (hp : p ≠ ∞) (L : ℕ) (σ : ℝ) {q : ℝ≥0�
   simp only [intrinsicNorm_def]
   refine (ENNReal.lqNorm_mono fun j => ?_).trans (ENNReal.lqNorm_add_le hq _ _)
   rw [map_add, map_add, ← mul_add]
-  exact mul_le_mul' le_rfl (enorm_add_le _ _)
+  exact mul_le_mul' le_rfl (eNorm_add_le _ _)
 
 /-- Finite sums of functions with finite intrinsic quasi-norms have finite intrinsic
 quasi-norms. -/
@@ -566,7 +566,7 @@ theorem intrinsicNorm_finsetSum_lt_top (hp : p ≠ ∞) (L : ℕ) (σ : ℝ) {q 
   classical
   induction t using Finset.induction_on with
   | empty =>
-    simp only [Finset.sum_empty, intrinsicNorm_def, map_zero, enorm_zero, mul_zero,
+    simp only [Finset.sum_empty, intrinsicNorm_def, map_zero, eNorm_zero, mul_zero,
       ENNReal.lqNorm_zero_right]
     exact ENNReal.zero_lt_top
   | insert i t hi ih =>

@@ -202,18 +202,18 @@ theorem enorm_locCoeff_le {r : ℕ} {M : ℝ≥0∞}
       M * ENNReal.ofReal (2 ^ j) ^ (1 / p.toReal) * eLpNorm g p (volume.restrict (dyadicIco j m)) := by
   have h1 : ‖∫ y in dyadicIco j m, g y * polyFun (monoBasis r i) (-(m : ℝ) + 2 ^ j * y)‖ₑ ≤
       (∫⁻ y in dyadicIco j m, ‖g y‖ₑ) * M := by
-    refine (enorm_integral_le_lintegral_enorm _).trans ?_
-    rw [← lintegral_mul_const'' M hg.enorm]
+    refine (eNorm_integral_le_lintegral_eNorm _).trans ?_
+    rw [← lintegral_mul_const'' M hg.eNorm]
     refine setLIntegral_mono' (measurableSet_dyadicIco j m) fun y hy => ?_
-    rw [enorm_mul]
+    rw [eNorm_mul]
     gcongr
     refine hM i _ ⟨?_, ?_⟩ <;> rw [mem_dyadicIco] at hy <;> linarith [hy.1, hy.2]
   have h2 : ∫⁻ y in dyadicIco j m, ‖g y‖ₑ ≤
       eLpNorm g p (volume.restrict (dyadicIco j m)) * ENNReal.ofReal (1 / 2 ^ j) ^ (1 - 1 / p.toReal) := by
-    rw [← eLpNorm_one_eq_lintegral_enorm hg]
+    rw [← eLpNorm_one_eq_lintegral_eNorm hg]
     have := eLpNorm_le_eLpNorm_mul_rpow_measure_univ hp hg
     rwa [Measure.restrict_apply_univ, volume_dyadicIco, ENNReal.toReal_one, div_one] at this
-  rw [locCoeff, enorm_mul, ← ofReal_norm, Complex.norm_real, Real.norm_eq_abs,
+  rw [locCoeff, eNorm_mul, ← ofReal_norm, Complex.norm_real, Real.norm_eq_abs,
     abs_of_pos (by positivity)]
   calc ENNReal.ofReal (2 ^ j) * ‖∫ y in dyadicIco j m,
         g y * polyFun (monoBasis r i) (-(m : ℝ) + 2 ^ j * y)‖ₑ
@@ -240,12 +240,12 @@ theorem enorm_polyFun_locProj_le {r : ℕ} {M : ℝ≥0∞}
     rw [mem_dyadicIco] at hx
     constructor <;> linarith [hx.1, hx.2]
   rw [polyFun_locProj]
-  refine (enorm_sum_le _ _).trans ?_
+  refine (eNorm_sum_le _ _).trans ?_
   calc ∑ i, ‖locCoeff r j g m i * polyFun (dualPoly r i) (-(m : ℝ) + 2 ^ j * x)‖ₑ
       ≤ ∑ _i : Fin r, M * ENNReal.ofReal (2 ^ j) ^ (1 / p.toReal) *
           eLpNorm g p (volume.restrict (dyadicIco j m)) * M :=
         Finset.sum_le_sum fun i _ => by
-          rw [enorm_mul]
+          rw [eNorm_mul]
           exact mul_le_mul' (enorm_locCoeff_le hMb hp j m hg i) (hMd i _ hxt)
     _ = _ := by
         rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
@@ -260,7 +260,7 @@ theorem eLpNorm_locProj_le {r : ℕ} {M : ℝ≥0∞}
     eLpNorm (polyFun (locProj r j g m)) p (volume.restrict (dyadicIco j m)) ≤
       r * M * M * eLpNorm g p (volume.restrict (dyadicIco j m)) := by
   have hθ : 0 ≤ 1 / p.toReal := by positivity
-  refine (eLpNorm_le_of_ae_enorm_bound (measurable_polyFun _).aestronglyMeasurable
+  refine (eLpNorm_le_of_ae_eNorm_bound (measurable_polyFun _).aestronglyMeasurable
     ((ae_restrict_iff' (measurableSet_dyadicIco j m)).2 (Filter.Eventually.of_forall
       fun x hx => enorm_polyFun_locProj_le hMb hMd hp j m hg hx))).trans_eq ?_
   rw [Measure.restrict_apply_univ, volume_dyadicIco, smul_eq_mul, ← one_div]

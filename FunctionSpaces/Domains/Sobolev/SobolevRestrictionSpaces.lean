@@ -766,8 +766,8 @@ theorem norm_fwdDiffL2_toL2_le (v : V) (U : H^{1}(V)) :
     (isClosed_le ((fwdDiffL2 V v).continuous.comp toL2.continuous).norm
       (continuous_const.mul continuous_norm)) fun w => ?_
   have h1 : ‖fwdDiffL2 V v (toL2 (ofSchwartz 1 w))‖ ≤ ‖(∂_{v} w : 𝓢(V, ℂ)).toLp 2‖ := by
-    rw [toL2_ofSchwartz, ← toReal_enorm, ← toReal_enorm]
-    exact ENNReal.toReal_mono enorm_ne_top (enorm_fwdDiffL2_toLp_le v w)
+    rw [toL2_ofSchwartz, ← toReal_eNorm, ← toReal_eNorm]
+    exact ENNReal.toReal_mono eNorm_ne_top (enorm_fwdDiffL2_toLp_le v w)
   have h2 : ‖(∂_{v} w : 𝓢(V, ℂ)).toLp 2‖ ≤ 2 * π * ‖v‖ * ‖ofSchwartz 1 w‖ := by
     rw [← weakDerivL2_ofSchwartz]
     exact ((weakDerivL2 v).le_opNorm _).trans

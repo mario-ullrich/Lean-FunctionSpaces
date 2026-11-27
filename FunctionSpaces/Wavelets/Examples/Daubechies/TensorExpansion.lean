@@ -564,9 +564,9 @@ theorem enorm_tensorCoeff_le (hG : ∀ ν, AEStronglyMeasurable (G ν) volume)
   have hm : AEStronglyMeasurable (fun y => f y * conj (tensorScaled (G νk.1) j νk.2 y)) volume :=
     hf.mul (Complex.continuous_conj.comp_aestronglyMeasurable
       (aestronglyMeasurable_tensorScaled (hG νk.1) j νk.2))
-  refine (enorm_integral_le_lintegral_enorm _).trans (le_of_eq_of_le ?_
+  refine (eNorm_integral_le_lintegral_eNorm _).trans (le_of_eq_of_le ?_
     (eLpNorm_mul_conj_tensorScaled_le (hG νk.1) (hsupp νk.1) hp1 hf j νk.2))
-  rw [eLpNorm_one_eq_lintegral_enorm hm]
+  rw [eLpNorm_one_eq_lintegral_eNorm hm]
 
 /-- **Summing local bounds over the windows**: let `0 < p < ∞`, let `f` be a.e. strongly
 measurable, and let `w : ι × ℤ^d → [0, ∞]` satisfy `w_{ν,k} ≤ ‖1_{W_k} f‖_p B` for every `(ν, k)`,
@@ -694,7 +694,7 @@ theorem eLpNorm_tensorExpand_le [MeasurableSpace ι] [MeasurableSingletonClass �
           eLpNorm (fun x => c νk * tensorScaled (G νk.1) j νk.2 x) p volume ^ p.toReal := h
     _ ≤ (tensorOverlap ι a b d : ℝ≥0∞) ^ (p.toReal - 1) * ∑' νk : ι × (Fin d → ℤ),
           (W * B) ^ p.toReal * ‖c νk‖ₑ ^ p.toReal :=
-        mul_le_mul_right (ENNReal.tsum_le_tsum hterm) _
+        mul_le_mul_right (tsum_le_tsum hterm) _
     _ = ((tensorOverlap ι a b d : ℝ≥0∞) ^ (1 - 1 / p.toReal) * B * W *
           lqNorm p (fun νk => ‖c νk‖ₑ)) ^ p.toReal := by
         rw [ENNReal.tsum_mul_left, ← ENNReal.lqNorm_rpow hp0 hp (fun νk => ‖c νk‖ₑ)]

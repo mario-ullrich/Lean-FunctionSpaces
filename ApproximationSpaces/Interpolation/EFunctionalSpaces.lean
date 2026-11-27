@@ -79,7 +79,7 @@ theorem eFunctional_smul_le (h10 : A.norm1 0 = 0)
     rw [zero_smul, eFunctional_zero_right h00 h10]
     exact zero_le
   rw [show ‖c‖ₑ * A.eFunctional t u = ⨅ b : {b : U // A.norm1 b ≤ t}, ‖c‖ₑ * A.norm0 (u - b) from
-    ENNReal.mul_iInf_of_ne (enorm_ne_zero.2 hc) enorm_ne_top]
+    ENNReal.mul_iInf_of_ne (eNorm_ne_zero.2 hc) eNorm_ne_top]
   refine le_iInf fun b => (eFunctional_le ((h1 c hc b).trans b.2)).trans ?_
   rw [← smul_sub]
   exact h0 c (u - b)

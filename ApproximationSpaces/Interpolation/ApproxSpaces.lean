@@ -75,17 +75,17 @@ theorem leftApproxCouple_norm1 (f : X) :
 theorem isQuasiNormed_leftApproxCouple (hs : 0 ≤ s) (hq : 1 ≤ q) :
     (A.leftApproxCouple s q).IsQuasiNormed (2 * 2 ^ s) where
   ne_top := ENNReal.mul_ne_top (by norm_num) (ENNReal.two_rpow_ne_top s)
-  norm0_zero := enorm_zero
+  norm0_zero := eNorm_zero
   norm1_zero := approxNormDyadic_zero s q
-  norm0_neg a := enorm_neg a
+  norm0_neg a := eNorm_neg a
   norm1_neg a := approxNormDyadic_neg a
   norm0_add_le a b :=
-    (enorm_add_le a b).trans (le_mul_of_one_le_left' (ENNReal.one_le_two_mul_two_rpow hs))
+    (eNorm_add_le a b).trans (le_mul_of_one_le_left' (ENNReal.one_le_two_mul_two_rpow hs))
   norm1_add_le := approxNormDyadic_add_le hq hs
 
 /-- The couple `(X, A^s_q)` is homogeneous (`approxNormDyadic_smul`). -/
 theorem isHomogeneousCouple_leftApproxCouple : (A.leftApproxCouple s q).IsHomogeneousCouple where
-  norm0_smul_le c a := (enorm_smul c a).le
+  norm0_smul_le c a := (eNorm_smul c a).le
   norm1_smul_le c a := (approxNormDyadic_smul c a).le
 
 variable (A) in
@@ -236,7 +236,7 @@ theorem interpNorm_reprCouple_le_approxNormDyadic (hs : 0 ≤ s) (hsr : s < r) (
     (A.reprCouple r).interpNorm (s / r) r q f ≤
       devorePopovConst r s * A.approxNormDyadic s q f := by
   rcases eq_or_ne f 0 with rfl | hf0
-  · rw [InterpCouple.interpNorm_zero enorm_zero (approxNormDyadic_zero r ∞)]
+  · rw [InterpCouple.interpNorm_zero eNorm_zero (approxNormDyadic_zero r ∞)]
     exact zero_le
   obtain ⟨D⟩ := exists_dyadicApprox A f (tolerance_ne_zero hf0 s)
   calc (A.reprCouple r).interpNorm (s / r) r q f
@@ -527,7 +527,7 @@ theorem approxNormDyadic_top_le_norm1_ofMap (hJ : JacksonBound ι A r C₁) (hC�
       (1 + (‖ι‖ₑ + ENNReal.ofReal C₁)) * (InterpCouple.ofMap ι).norm1 f := by
   rw [InterpCouple.ofMap_norm1, ENNReal.mul_iInf_of_ne
     (by positivity)
-    (ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top, ENNReal.add_ne_top.2 ⟨enorm_ne_top,
+    (ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top, ENNReal.add_ne_top.2 ⟨eNorm_ne_top,
       ENNReal.ofReal_ne_top⟩⟩)]
   refine le_iInf fun ⟨y, hy⟩ => ?_
   subst hy
@@ -562,7 +562,7 @@ theorem memKMethod_ofMap_iff_memApprox [CompleteSpace Y] (hJ : JacksonBound ι A
     (ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top, ENNReal.add_ne_top.2 ⟨ENNReal.mul_ne_top
       (by norm_num) ENNReal.ofReal_ne_top, ENNReal.mul_ne_top (by norm_num)
         (liftConst_ne_top C₂ r)⟩⟩)
-    (ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top, ENNReal.add_ne_top.2 ⟨enorm_ne_top,
+    (ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top, ENNReal.add_ne_top.2 ⟨eNorm_ne_top,
       ENNReal.ofReal_ne_top⟩⟩)
     le_rfl le_top hr hθ hθ' hq (norm1_ofMap_le_approxNormDyadic_one hB hC₂ hr.le)
     (approxNormDyadic_top_le_norm1_ofMap hJ hC₁)

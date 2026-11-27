@@ -176,18 +176,18 @@ variable {W : Type*} [NormedAddCommGroup W] [InnerProductSpace ℝ W] [FiniteDim
 theorem integral_norm_scaledMoment (L j : ℕ) :
     ∫ z, ‖b.scaledMoment L j z‖ = ∫ z, ‖momentKernel b.toFun L z‖ := by
   have hm := integrable_momentKernel b.integrable L
-  rw [integral_norm_eq_lintegral_enorm (b.integrable_scaledMoment L j).aestronglyMeasurable,
-    integral_norm_eq_lintegral_enorm hm.aestronglyMeasurable,
-    ← eLpNorm_one_eq_lintegral_enorm (b.integrable_scaledMoment L j).aestronglyMeasurable,
-    ← eLpNorm_one_eq_lintegral_enorm hm.aestronglyMeasurable, b.eLpNorm_scaledMoment_one]
+  rw [integral_norm_eq_lintegral_eNorm (b.integrable_scaledMoment L j).aestronglyMeasurable,
+    integral_norm_eq_lintegral_eNorm hm.aestronglyMeasurable,
+    ← eLpNorm_one_eq_lintegral_eNorm (b.integrable_scaledMoment L j).aestronglyMeasurable,
+    ← eLpNorm_one_eq_lintegral_eNorm hm.aestronglyMeasurable, b.eLpNorm_scaledMoment_one]
 
 /-- `∫ |Δ_v^L m_{2^j}| ≤ (2^j ‖v‖)^L ‖D^L m‖_1`, as real numbers. -/
 theorem integral_norm_higherDiff_scaledMoment_le (L j : ℕ) (v : W) :
     ∫ z, ‖(fwdDiff v)^[L] (b.scaledMoment L j) z‖ ≤ (2 ^ j * ‖v‖) ^ L * (b.derivNorm L).toReal := by
   have hint := integrable_higherDiff (b.integrable_scaledMoment L j) L v
   have hD : b.derivNorm L ≠ ∞ := lintegral_enorm_iteratedFDeriv_ne_top L _
-  rw [integral_norm_eq_lintegral_enorm hint.aestronglyMeasurable,
-    ← eLpNorm_one_eq_lintegral_enorm hint.aestronglyMeasurable]
+  rw [integral_norm_eq_lintegral_eNorm hint.aestronglyMeasurable,
+    ← eLpNorm_one_eq_lintegral_eNorm hint.aestronglyMeasurable]
   have h := b.eLpNorm_higherDiff_scaledMoment_le L j v
   calc (eLpNorm ((fwdDiff v)^[L] (b.scaledMoment L j)) 1 volume).toReal
       ≤ (ENNReal.ofReal (2 ^ j * ‖v‖) ^ L * b.derivNorm L).toReal :=

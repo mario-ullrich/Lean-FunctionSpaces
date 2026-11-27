@@ -83,7 +83,7 @@ theorem aestronglyMeasurable_periodicBlockFun (j : ℕ)
 theorem enorm_periodicLpBlock_eq_eLpNorm_periodicBlockFun (hp : p ≠ ∞) (j : ℕ)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     ‖periodicLpBlock hp j f‖ₑ = eLpNorm (periodicBlockFun j f) p volume := by
-  rw [Lp.enorm_def]
+  rw [Lp.eNorm_def]
   exact eLpNorm_congr_ae (periodicLpBlock_ae_eq_periodicBlockFun hp j f)
 
 /-- **The block `j = 0` by Young's inequality**: for `1 ≤ p < ∞` and `f ∈ L_p(𝕋^d)`,
@@ -92,8 +92,8 @@ theorem eLpNorm_periodicBlockFun_zero_le (hp : p ≠ ∞)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     eLpNorm (periodicBlockFun 0 f) p volume ≤
       eLpNorm (Rd.lpKernel (V := EuclideanSpace ℝ d)) 1 volume * ‖f‖ₑ := by
-  rw [Lp.enorm_def, ← Rd.eLpNorm_dilatedLpKernel_one 0,
-    eLpNorm_one_eq_lintegral_enorm (Rd.integrable_dilatedLpKernel 0).1]
+  rw [Lp.eNorm_def, ← Rd.eLpNorm_dilatedLpKernel_one 0,
+    eLpNorm_one_eq_lintegral_eNorm (Rd.integrable_dilatedLpKernel 0).1]
   exact eLpNorm_periodicEconv_le Fact.out hp (Rd.integrable_lpBlockKernel 0)
     (Lp.stronglyMeasurable f).measurable
 
@@ -143,7 +143,7 @@ theorem aemeasurable_lqNorm_periodicBlockFun (s : ℝ) (q : ℝ≥0∞)
     AEMeasurable
       (fun t => lqNorm q (fun j => dyadicWeight s j * ‖periodicBlockFun j f t‖ₑ)) volume :=
   aemeasurable_lqNorm_comp
-    (fun j => (aestronglyMeasurable_periodicBlockFun j f).enorm.const_mul _) q
+    (fun j => (aestronglyMeasurable_periodicBlockFun j f).eNorm.const_mul _) q
 
 /-- **The quasi-norm is subadditive**: for `1 ≤ q ≤ ∞`,
 `‖f + g‖_{F^s_{p,q}} ≤ ‖f‖_{F^s_{p,q}} + ‖g‖_{F^s_{p,q}}`, by the triangle inequalities in
@@ -153,11 +153,11 @@ theorem periodicTriebelLizorkinNorm_add_le {s : ℝ} {q : ℝ≥0∞} (hq : 1 �
     periodicTriebelLizorkinNorm s q (f + g) ≤
       periodicTriebelLizorkinNorm s q f + periodicTriebelLizorkinNorm s q g :=
   eLpNorm_lqNorm_le_add Fact.out hq
-    (fun j => (aestronglyMeasurable_periodicBlockFun j (f + g)).enorm.const_mul _) <| by
+    (fun j => (aestronglyMeasurable_periodicBlockFun j (f + g)).eNorm.const_mul _) <| by
       filter_upwards [periodicBlockFun_add_ae f g] with t ht j
       rw [ht j, ← mul_add]
       gcongr
-      exact enorm_add_le _ _
+      exact eNorm_add_le _ _
 
 omit [Fact (1 ≤ p)] in
 /-- **The quasi-norm is homogeneous**: `‖c f‖_{F^s_{p,q}} = |c| ‖f‖_{F^s_{p,q}}` for `c ∈ ℂ`. -/
@@ -165,9 +165,9 @@ theorem periodicTriebelLizorkinNorm_smul (s : ℝ) (q : ℝ≥0∞) (c : ℂ)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     periodicTriebelLizorkinNorm s q (c • f) = ‖c‖ₑ * periodicTriebelLizorkinNorm s q f :=
   eLpNorm_lqNorm_eq_const_mul _
-    (fun j => (aestronglyMeasurable_periodicBlockFun j f).enorm.const_mul _) <| by
+    (fun j => (aestronglyMeasurable_periodicBlockFun j f).eNorm.const_mul _) <| by
       filter_upwards [periodicBlockFun_smul_ae c f] with t ht j
-      rw [ht j, enorm_mul, mul_left_comm]
+      rw [ht j, eNorm_mul, mul_left_comm]
 
 omit [Fact (1 ≤ p)] in
 /-- The zero function has quasi-norm `0`. -/
@@ -192,7 +192,7 @@ theorem periodicTriebelLizorkinNorm_mono_exponent {s : ℝ} {q r : ℝ≥0∞} (
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     periodicTriebelLizorkinNorm s r f ≤ periodicTriebelLizorkinNorm s q f :=
   eLpNorm_lqNorm_mono_exponent (zero_lt_one.trans_le hq).ne' hqr fun j =>
-    (aestronglyMeasurable_periodicBlockFun j f).enorm.const_mul _
+    (aestronglyMeasurable_periodicBlockFun j f).eNorm.const_mul _
 
 omit [Fact (1 ≤ p)] in
 /-- **The quasi-norm increases in `s`**: `‖f‖_{F^s_{p,q}} ≤ ‖f‖_{F^t_{p,q}}` for `s ≤ t`, since
@@ -201,7 +201,7 @@ theorem periodicTriebelLizorkinNorm_mono_smoothness {s t : ℝ} (hst : s ≤ t) 
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     periodicTriebelLizorkinNorm s q f ≤ periodicTriebelLizorkinNorm t q f :=
   eLpNorm_lqNorm_dyadicWeight_mono_smoothness hst fun j =>
-    (aestronglyMeasurable_periodicBlockFun j f).enorm
+    (aestronglyMeasurable_periodicBlockFun j f).eNorm
 
 omit [Fact (1 ≤ p)] in
 /-- **Weighted blocks with terms set to zero**: for every predicate `P` on `ℕ`,
@@ -212,7 +212,7 @@ theorem eLpNorm_lqNorm_ite_periodicBlockFun_le {P : ℕ → Prop} [DecidablePred
     eLpNorm (fun t => lqNorm q fun j =>
       if P j then dyadicWeight s j * ‖periodicBlockFun j f t‖ₑ else 0) p volume ≤
       periodicTriebelLizorkinNorm s q f :=
-  eLpNorm_lqNorm_ite_le fun j => (aestronglyMeasurable_periodicBlockFun j f).enorm.const_mul _
+  eLpNorm_lqNorm_ite_le fun j => (aestronglyMeasurable_periodicBlockFun j f).eNorm.const_mul _
 
 /-- **The tails of the weighted blocks tend to zero**: for `1 ≤ p < ∞`, `0 < q < ∞`, `s ∈ ℝ` and
 `f ∈ F^s_{p,q}(𝕋^d)`, `‖ t ↦ ‖(2^{js} (ψ_j ⋆ f)(t))_{j ≥ N}‖_{ℓ_q} ‖_p → 0` as `N → ∞`, where
@@ -223,7 +223,7 @@ theorem tendsto_eLpNorm_lqNorm_periodicBlockFun_tail (hp : p ≠ ∞) {s : ℝ} 
     Tendsto (fun N => eLpNorm (fun t => lqNorm q fun j =>
       if N ≤ j then dyadicWeight s j * ‖periodicBlockFun j f t‖ₑ else 0) p volume) atTop (𝓝 0) :=
   tendsto_eLpNorm_lqNorm_ite_le (zero_lt_one.trans_le Fact.out).ne' hp hq0 hq
-    (fun j => (aestronglyMeasurable_periodicBlockFun j f).enorm.const_mul _) hf.ne
+    (fun j => (aestronglyMeasurable_periodicBlockFun j f).eNorm.const_mul _) hf.ne
 
 /-! ### The spaces `F^s_{p,q}(𝕋^d)` -/
 
@@ -253,7 +253,7 @@ theorem MemPeriodicTriebelLizorkin.smul {s : ℝ} {q : ℝ≥0∞} (c : ℂ)
     {f : Lp ℂ p (volume : Measure (UnitAddTorus d))} (hf : MemPeriodicTriebelLizorkin s q f) :
     MemPeriodicTriebelLizorkin s q (c • f) := by
   rw [MemPeriodicTriebelLizorkin, periodicTriebelLizorkinNorm_smul]
-  exact ENNReal.mul_lt_top enorm_lt_top hf
+  exact ENNReal.mul_lt_top eNorm_lt_top hf
 
 /-- The **Triebel–Lizorkin space** `F^s_{p,q}(𝕋^d)` as a subspace of `L_p(𝕋^d)`, for
 `1 ≤ p ≤ ∞`, `s ∈ ℝ` and `1 ≤ q ≤ ∞`, with real scalars as `FunctionScheme.besovSpace`. -/

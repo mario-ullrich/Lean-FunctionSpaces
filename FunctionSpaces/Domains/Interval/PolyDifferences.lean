@@ -110,7 +110,8 @@ bounded by `K ‖P‖_{L_p[0, 1/2]}` (`Interval.exists_enorm_linearMap_le_eLpNor
 `x = u + 2L y` rescales. -/
 theorem exists_diffBound (r m : ℕ) (hp : p ≠ ∞) : ∃ K : ℝ≥0∞, K ≠ ∞ ∧ DiffBound p r m K := by
   obtain ⟨K, hK, hKb⟩ := exists_enorm_linearMap_le_eLpNorm (p := p) r
-    ((derivative : ℂ[X] →ₗ[ℂ] ℂ[X]) ^ m) (fun P hP => by rw [Module.End.pow_apply]; exact iterate_derivative_mem_degreeLT hP m)
+    ((derivative : ℂ[X] →ₗ[ℂ] ℂ[X]) ^ m)
+    (fun P hP => by rw [pow_apply_eq_iterate]; exact iterate_derivative_mem_degreeLT hP m)
     (by norm_num : (0 : ℝ) < 1 / 2)
   refine ⟨K, hK, fun P hPr u L hL t ht x hux hxu => ?_⟩
   have h2L : 0 < 2 * L := by positivity
@@ -143,7 +144,7 @@ theorem exists_diffBound (r m : ℕ) (hp : p ≠ ∞) : ∃ K : ℝ≥0∞, K �
         linarith
       exact ⟨hy0.trans hz.1, hz.2.trans hy1⟩
     have h := hKb Q hQ z hz01
-    rw [Module.End.pow_apply] at h
+    rw [pow_apply_eq_iterate] at h
     rw [← ofReal_norm] at h
     exact (ENNReal.ofReal_le_iff_le_toReal hKQ).1 h
   have hval := norm_higherDiff_polyFun_le m hσ Q y hder

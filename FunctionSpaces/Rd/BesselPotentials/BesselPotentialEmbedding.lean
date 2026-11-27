@@ -78,7 +78,7 @@ theorem exists_enorm_le_of_besselPotentialSpace [Nontrivial V] (hp1 : 1 < p) (hp
     ((triebelLizorkinNorm_mono_exponent one_le_two le_top g₀).trans
       (triebelLizorkinNorm_mono_smoothness hs 2 g₀)).trans hn
   obtain ⟨g, hg, hgn⟩ := exists_memLp_ae_eq_of_triebelLizorkinNorm_lt_top hlt hr rfl
-    (hle.trans_lt (ENNReal.mul_lt_top hC₀.lt_top enorm_lt_top))
+    (hle.trans_lt (ENNReal.mul_lt_top hC₀.lt_top eNorm_lt_top))
   refine ⟨g, (toTemperedDistribution_eq_of_ae_eq hg).trans hg₀, hgn.trans ?_⟩
   rw [mul_assoc]
   exact mul_le_mul' le_rfl hle

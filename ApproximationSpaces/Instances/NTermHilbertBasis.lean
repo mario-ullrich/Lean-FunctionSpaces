@@ -76,7 +76,7 @@ variable {ι H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] (b : Hi
 /-- The **coefficient dictionary** of a Hilbert basis `(e_i)`: the multiples `c e_i`, `c ∈ ℂ`.
 The scheme `nTerm` takes real linear spans, so complex multiples are needed for its approximants
 to be all complex combinations of `n` basis vectors. -/
-def coeffDictionary : Set H := Set.range fun p : ι × ℂ => p.2 • b p.1
+noncomputable def coeffDictionary : Set H := Set.range fun p : ι × ℂ => p.2 • b p.1
 
 /-- Every complex multiple of a basis vector lies in the coefficient dictionary. -/
 theorem smul_mem_coeffDictionary (c : ℂ) (i : ι) : c • b i ∈ b.coeffDictionary :=
@@ -124,7 +124,7 @@ theorem approxError_nTerm_sq_le [DecidableEq ι] {n : ℕ} {Λ : Finset ι} (hΛ
       ≤ ‖f - ∑ j ∈ Λ, b.repr f j • b j‖ₑ ^ 2 := by
         gcongr; exact approxError_le_of_mem ha f
     _ = ∑' i, ‖b.repr (f - ∑ j ∈ Λ, b.repr f j • b j) i‖ₑ ^ 2 := by
-        rw [← b.repr.enorm_map, lp.enorm_sq_eq_tsum]
+        rw [← b.repr.eNorm_map, lp.enorm_sq_eq_tsum]
     _ = _ := by
         congr 1; funext i
         rw [b.repr_apply_apply, inner_sub_right, ← b.repr_apply_apply, ← b.repr_apply_apply,
@@ -155,11 +155,11 @@ theorem exists_tsum_ite_le_enorm_sub_sq [DecidableEq ι] {n : ℕ} {a : H}
     | add x y _ _ hx hy => rw [inner_add_right, hx, hy, add_zero]
     | smul t x _ hx => rw [RCLike.real_smul_eq_coe_smul (K := ℂ), inner_smul_right, hx, mul_zero]
   calc (∑' i, if i ∈ Λ then 0 else ‖b.repr f i‖ₑ ^ 2) ≤ ∑' i, ‖b.repr (f - a) i‖ₑ ^ 2 := by
-        refine ENNReal.tsum_le_tsum fun i => ?_
+        refine tsum_le_tsum fun i => ?_
         split_ifs with hi
         · exact zero_le
         · rw [b.repr_apply_apply, b.repr_apply_apply, inner_sub_right, hzero i hi, sub_zero]
-    _ = ‖f - a‖ₑ ^ 2 := by rw [← lp.enorm_sq_eq_tsum, b.repr.enorm_map]
+    _ = ‖f - a‖ₑ ^ 2 := by rw [← lp.enorm_sq_eq_tsum, b.repr.eNorm_map]
 
 /-- **The error of best `n`-term approximation from a Hilbert basis**:
 `E_n(f)² = inf_{#Λ ≤ n} ∑_{i ∉ Λ} |⟨e_i, f⟩|²`, the smallest tail of the squared coefficients
@@ -231,7 +231,7 @@ theorem two_pow_mul_decreasingRearrangement_sq_le (m : ℕ) (f : H) :
         have hk' := mem_range.1 hk
         rw [pow_succ]
         omega
-    _ ≤ _ := ENNReal.sum_le_tsum _
+    _ ≤ _ := sum_le_tsum _
 
 /-- `E_n(f)² ≤ (γ*_n)^(2-τ) ∑_i γ_i^τ` for `0 < τ ≤ 2`: each term of the upper tail bound is
 `min((γ*_k)², (γ*_n)²) ≤ (γ*_k)^τ (γ*_n)^(2-τ)`, and `∑_k (γ*_k)^τ = ∑_i γ_i^τ`. -/
@@ -246,7 +246,7 @@ private theorem approxError_nTerm_sq_le_mul {τ : ℝ} (hτ0 : 0 < τ) (hτ2 : �
     simp only [ofReal_norm]
   refine (b.approxError_nTerm_sq_le_tsum_min n f).trans ?_
   rw [hS, ← ENNReal.tsum_mul_right]
-  exact ENNReal.tsum_le_tsum fun k => min_sq_le_rpow_mul_rpow _ _ hτ0.le hτ2
+  exact tsum_le_tsum fun k => min_sq_le_rpow_mul_rpow _ _ hτ0.le hτ2
 
 /-- **The tail bound with constant `1`**: for `0 < τ ≤ 2`, `θ = 1/τ - 1/2` and every `n ≥ 0`,
 `E_n(f) ≤ (n + 1)^(-θ) (∑_i |⟨e_i, f⟩|^τ)^(1/τ)`. Since `θ ≥ 0`, it gives
@@ -310,7 +310,7 @@ theorem enorm_le_tsum_repr_rpow {τ : ℝ} (hτ0 : 0 < τ) (hτ2 : τ ≤ 2) (f 
     ‖f‖ₑ ≤ (∑' i, ‖b.repr f i‖ₑ ^ τ) ^ (1 / τ) := by
   refine le_trans (le_of_eq ?_) (ENNReal.rpow_tsum_rpow_le (fun i => ‖b.repr f i‖ₑ) hτ0 hτ2)
   have hP : ‖f‖ₑ ^ 2 = ∑' i, ‖b.repr f i‖ₑ ^ 2 := by
-    rw [← b.repr.enorm_map, lp.enorm_sq_eq_tsum]
+    rw [← b.repr.eNorm_map, lp.enorm_sq_eq_tsum]
   simp_rw [ENNReal.rpow_two]
   rw [← hP, ← ENNReal.rpow_two, ← ENNReal.rpow_mul]
   norm_num
@@ -431,7 +431,7 @@ theorem tsum_repr_rpow_le {τ : ℝ} (hτ0 : 0 < τ) (f : H) :
   have h1 := tsum_rpow_le_decreasingRearrangement (fun i => norm_nonneg (b.repr f i))
     (b.tendsto_norm_repr f) hτ0
   simp only [ofReal_norm] at h1
-  rw [tsum_eq_zero_add' ENNReal.summable] at h1
+  rw [tsum_eq_zero_add' CompleteLattice.summable] at h1
   calc ∑' i, ‖b.repr f i‖ₑ ^ τ
       ≤ ENNReal.ofReal (c 0) ^ τ + (2 ^ 0 * ENNReal.ofReal (c (2 ^ 0)) ^ τ +
           ∑' l, 2 ^ (l + 1) * ENNReal.ofReal (c (2 ^ (l + 1))) ^ τ) := h1
@@ -439,7 +439,7 @@ theorem tsum_repr_rpow_le {τ : ℝ} (hτ0 : 0 < τ) (f : H) :
         gcongr
         · exact hc 0
         · simpa using ENNReal.rpow_le_rpow (hc 1) hτ0.le
-        · rw [hL, ← ENNReal.tsum_mul_left]; exact ENNReal.tsum_le_tsum hblock
+        · rw [hL, ← ENNReal.tsum_mul_left]; exact tsum_le_tsum hblock
     _ ≤ N ^ τ + (N ^ τ + 2 * N ^ τ) := by gcongr
     _ = 4 * N ^ τ := by ring
 

@@ -60,7 +60,7 @@ theorem approxError_ne_top (f : X) (n : ℕ) : A.approxError f n ≠ ∞ :=
 /-- Every approximant gives an upper bound: `E_n(f) ≤ ‖f - a‖` for `a ∈ A_n`. -/
 theorem approxError_le_of_mem {n : ℕ} {a : X} (ha : a ∈ A n) (f : X) :
     A.approxError f n ≤ ‖f - a‖ₑ := by
-  rw [← edist_eq_enorm_sub]; exact Metric.infEDist_le_edist_of_mem ha
+  rw [← eDist_eq_eNorm_sub]; exact Metric.infEDist_le_edist_of_mem ha
 
 /-- The error never exceeds the norm, since `0` is an approximant. -/
 theorem approxError_le_enorm (f : X) (n : ℕ) : A.approxError f n ≤ ‖f‖ₑ := by
@@ -97,7 +97,7 @@ theorem approxError_anti_scheme {A' : ApproximationScheme X} (h : ∀ n, A n ⊆
 /-- `r ≤ E_n(f)` iff `r ≤ ‖f - a‖` for every `a ∈ A_n`. -/
 theorem le_approxError_iff {n : ℕ} {f : X} {r : ℝ≥0∞} :
     r ≤ A.approxError f n ↔ ∀ a ∈ A n, r ≤ ‖f - a‖ₑ := by
-  simp only [approxError, Metric.le_infEDist, edist_eq_enorm_sub]
+  simp only [approxError, Metric.le_infEDist, eDist_eq_eNorm_sub]
 
 /-- `r ≤ E_n(f)²` iff `r ≤ ‖f - a‖²` for every `a ∈ A_n`. Squaring preserves the order of
 `[0, ∞]` (`ENNReal.rpow_inv_le_iff`), so `le_approxError_iff` applies to `r^(1/2)`. -/
@@ -110,7 +110,7 @@ theorem le_approxError_sq_iff {n : ℕ} {f : X} {r : ℝ≥0∞} :
 /-- If the error is below `r`, some approximant is closer than `r`. -/
 theorem exists_mem_enorm_sub_lt {n : ℕ} {f : X} {r : ℝ≥0∞} (h : A.approxError f n < r) :
     ∃ a ∈ A n, ‖f - a‖ₑ < r := by
-  simpa [edist_eq_enorm_sub] using Metric.infEDist_lt_iff.1 h
+  simpa [eDist_eq_eNorm_sub] using Metric.infEDist_lt_iff.1 h
 
 /-- **Near-best approximants.** For every `ε > 0` there is `a ∈ A n` with
 `‖f - a‖ ≤ E_n(f) + ε`.  A best approximant (`ε = 0`) need not exist. -/
@@ -166,7 +166,7 @@ theorem approxError_neg (f : X) (n : ℕ) : A.approxError (-f) n = A.approxError
 /-- `E_n(f) ≤ E_n(g) + ‖f - g‖`: the error is `1`-Lipschitz in `f`. -/
 theorem approxError_le_approxError_add_enorm (n : ℕ) (f g : X) :
     A.approxError f n ≤ A.approxError g n + ‖f - g‖ₑ := by
-  rw [← edist_eq_enorm_sub]; exact Metric.infEDist_le_infEDist_add_edist
+  rw [← eDist_eq_eNorm_sub]; exact Metric.infEDist_le_infEDist_add_edist
 
 /-- `E_n` is continuous in `f`, being `1`-Lipschitz. -/
 theorem continuous_approxError (n : ℕ) : Continuous (A.approxError · n) :=
@@ -194,7 +194,7 @@ approximants satisfies `E^B_n(T f) ≤ ‖T‖ E^A_n(f)`. -/
 theorem approxError_map_le {B : ApproximationScheme Y} (T : X →L[ℝ] Y)
     (hT : ∀ n, ∀ a ∈ A n, T a ∈ B n) (f : X) (n : ℕ) :
     B.approxError (T f) n ≤ ‖T‖ₑ * A.approxError f n := by
-  refine le_mul_approxError_of_forall_mem enorm_ne_top fun a ha => ?_
+  refine le_mul_approxError_of_forall_mem eNorm_ne_top fun a ha => ?_
   calc B.approxError (T f) n ≤ ‖T f - T a‖ₑ := approxError_le_of_mem (hT n a ha) _
     _ = ‖T (f - a)‖ₑ := by rw [map_sub]
     _ ≤ ‖T‖ₑ * ‖f - a‖ₑ := T.le_opENorm _
@@ -213,12 +213,12 @@ theorem approxError_le_of_dense {D : Set X} (hD : Dense D)
   have hK0 : K ≠ 0 := by simp [K]
   obtain ⟨g, hgD, hfg⟩ := EMetric.mem_closure_iff.1 (hD f) (ε / K)
     (ENNReal.div_pos (by exact_mod_cast hε.ne') hK)
-  have hdist : ‖f - g‖ₑ ≤ ε / K := by rw [← edist_eq_enorm_sub]; exact hfg.le
+  have hdist : ‖f - g‖ₑ ≤ ε / K := by rw [← eDist_eq_eNorm_sub]; exact hfg.le
   have hmod : ω g ≤ ω f + C0 * ‖f - g‖ₑ := by
     have h1 := hadd f (g - f)
     rw [add_sub_cancel] at h1
     refine h1.trans (add_le_add le_rfl ((hle _).trans ?_))
-    rw [← enorm_neg, neg_sub]
+    rw [← eNorm_neg, neg_sub]
   calc A.approxError f n
       ≤ A.approxError g n + ‖f - g‖ₑ := approxError_le_approxError_add_enorm n f g
     _ ≤ C * (ω f + C0 * ‖f - g‖ₑ) + ‖f - g‖ₑ := add_le_add ((h g hgD).trans (by gcongr)) le_rfl
@@ -244,7 +244,7 @@ theorem enorm_sub_apply_le_of_apply_eq {E F : Type*} [SeminormedAddCommGroup E] 
     [AddMonoidHomClass F E E] {P : F} {C : ENNReal} (hP : ∀ x, ‖P x‖ₑ ≤ C * ‖x‖ₑ) {a : E}
     (ha : P a = a) (f : E) : ‖f - P f‖ₑ ≤ (1 + C) * ‖f - a‖ₑ := by
   calc ‖f - P f‖ₑ = ‖(f - a) - P (f - a)‖ₑ := by rw [map_sub, ha]; abel_nf
-    _ ≤ ‖f - a‖ₑ + ‖P (f - a)‖ₑ := enorm_sub_le
+    _ ≤ ‖f - a‖ₑ + ‖P (f - a)‖ₑ := eNorm_sub_le
     _ ≤ ‖f - a‖ₑ + C * ‖f - a‖ₑ := by gcongr; exact hP _
     _ = (1 + C) * ‖f - a‖ₑ := by rw [add_mul, one_mul]
 

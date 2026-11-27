@@ -93,7 +93,7 @@ theorem dyadicWeight_mul_enorm_conv_le_maximalFunction {G : ℕ → 𝓢(V, ℂ)
     dyadicWeight (s - σ) j * ‖conv K g volume x‖ₑ ≤
       decayMaximalConst V N * familyDecayConst A 0 N *
         maximalFunction (fun y => dyadicWeight s j * ‖g y‖ₑ) x := by
-  rw [hK, FunLike.coe_smul, smul_conv, Pi.smul_apply, smul_eq_mul, enorm_mul,
+  rw [hK, FunLike.coe_smul, smul_conv, Pi.smul_apply, smul_eq_mul, eNorm_mul,
     enorm_two_pow_rpow j σ,
     coe_schwartzDilate, ← mul_assoc, ← ENNReal.dyadicWeight_add, sub_add_cancel,
     ← dyadicWeight_mul_maximalFunction]
@@ -133,7 +133,7 @@ theorem triebelLizorkinNormDistr_fourierMultiplier_le (hp1 : 1 < p) (hp : p ≠ 
     fun j => distribBlock_fourierMultiplierCLM_eq_convLp hp hm (hg j)).trans ?_
   refine eLpNorm_le_of_le_lqNorm_maximalFunction hp1 hp hq1
     (aemeasurable_lqNorm_dyadicWeight_Lp _ q _)
-    (fun j => ((Lp.aestronglyMeasurable (g j)).enorm.const_mul _)) ?_
+    (fun j => ((Lp.aestronglyMeasurable (g j)).eNorm.const_mul _)) ?_
   filter_upwards [ae_all_iff.2 fun j => convLp_apply_ae hp (K j).integrable (g j)] with x hx
   simp_rw [hx, ← ENNReal.lqNorm_const_mul]
   exact ENNReal.lqNorm_mono fun j =>

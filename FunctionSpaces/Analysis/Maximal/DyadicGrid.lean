@@ -350,12 +350,12 @@ theorem enorm_tsum_rpow_le_of_overlap {ι : Type*} (g : ι → ℂ) {N : ℕ}
   have hzero : ∀ m ∉ T, g m = 0 := fun m hm => by_contra fun h => hm (hT m h)
   rw [tsum_eq_sum hzero]
   calc ‖∑ m ∈ T, g m‖ₑ ^ p ≤ (∑ m ∈ T, ‖g m‖ₑ) ^ p :=
-        ENNReal.rpow_le_rpow (enorm_sum_le _ _) (by linarith)
+        ENNReal.rpow_le_rpow (eNorm_sum_le _ _) (by linarith)
     _ ≤ (T.card : ℝ≥0∞) ^ (p - 1) * ∑ m ∈ T, ‖g m‖ₑ ^ p :=
         ENNReal.rpow_sum_le_const_mul_sum_rpow _ _ hp
     _ ≤ (N : ℝ≥0∞) ^ (p - 1) * ∑' m, ‖g m‖ₑ ^ p :=
         mul_le_mul' (ENNReal.rpow_le_rpow (by exact_mod_cast hTN) (by linarith))
-          (ENNReal.sum_le_tsum _)
+          (sum_le_tsum _)
 
 /-- **Bounded overlap in `L_p`**: if at every point at most `N` of the `g m` are nonzero and
 `F = ∑' m, g m` almost everywhere, then `‖F‖_p^p ≤ N^(p-1) ∑' m, ‖g m‖_p^p`. -/
@@ -377,7 +377,7 @@ theorem eLpNorm_rpow_le_of_overlap {α : Type*} [MeasurableSpace α] {μ : Measu
         exact enorm_tsum_rpow_le_of_overlap (fun m => g m x) (hN x) hpr
     _ = (N : ℝ≥0∞) ^ (p.toReal - 1) * ∑' m, ∫⁻ x, ‖g m x‖ₑ ^ p.toReal ∂μ := by
         rw [lintegral_const_mul' _ _ (ENNReal.rpow_ne_top_of_nonneg (by linarith)
-          (ENNReal.natCast_ne_top N)), lintegral_tsum fun m => ((hg m).enorm.pow_const _)]
+          (ENNReal.natCast_ne_top N)), lintegral_tsum fun m => ((hg m).eNorm.pow_const _)]
     _ = (N : ℝ≥0∞) ^ (p.toReal - 1) * ∑' m, eLpNorm (g m) p μ ^ p.toReal := by
         congr 2
         funext m

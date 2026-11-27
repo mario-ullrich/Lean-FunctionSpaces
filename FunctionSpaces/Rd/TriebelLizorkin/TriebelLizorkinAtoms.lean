@@ -50,7 +50,7 @@ theorem tsum_mul_le_of_le {ι : Type*} {c u : ι → ℝ≥0∞} {B : ℝ≥0∞
     [DecidablePred P] (h : ∀ m, u m ≤ B * if P m then 1 else 0) :
     ∑' m, c m * u m ≤ B * ∑' m, if P m then c m else 0 := by
   rw [← ENNReal.tsum_mul_left]
-  refine ENNReal.tsum_le_tsum fun m => (mul_le_mul_right (h m) _).trans_eq ?_
+  refine tsum_le_tsum fun m => (mul_le_mul_right (h m) _).trans_eq ?_
   split_ifs <;> ring
 
 end ENNReal
@@ -219,7 +219,7 @@ theorem dyadicWeight_mul_tsum_ite_le_maximalFunction {i j : ℕ} (hij : i ≤ j)
         ∑' m, (if ‖x - cellCenter j m‖ ≤ ρ / 2 ^ i then ‖coef j m‖ₑ else 0)
       ≤ ∑' m, ∫⁻ y in dyadicCell j m, (ball x r).indicator (cellCoefFun j coef) y := by
         rw [← ENNReal.tsum_mul_left]
-        exact ENNReal.tsum_le_tsum hterm
+        exact tsum_le_tsum hterm
     _ = ∫⁻ y in ball x r, cellCoefFun j coef y := by
         rw [← lintegral_eq_tsum_dyadicCell j, lintegral_indicator measurableSet_ball]
     _ ≤ volume (ball (0 : V) r) * maximalFunction (cellCoefFun j coef) x :=
@@ -250,7 +250,7 @@ theorem IsSmoothAtom.lintegral_enorm_le {K : ℕ} {d A : ℝ} (hd : 0 ≤ d) {j 
     {a : V → ℂ} (ha : IsSmoothAtom univ K d A j c a) :
     ∫⁻ y, ‖a y‖ₑ ≤ ENNReal.ofReal A * (ENNReal.ofReal (d ^ finrank ℝ V) *
       volume (ball (0 : V) 1) * dyadicWeight (-(finrank ℝ V : ℝ)) j) := by
-  rw [← eLpNorm_one_eq_lintegral_enorm ha.integrable.aestronglyMeasurable,
+  rw [← eLpNorm_one_eq_lintegral_eNorm ha.integrable.aestronglyMeasurable,
     ← volume_closedBall_div_two_pow hd j c]
   refine (eLpNorm_le_of_bound_of_support ha.integrable.aestronglyMeasurable
     (S := closedBall c (d / 2 ^ j)) (B := ENNReal.ofReal A)
@@ -304,8 +304,8 @@ theorem enorm_conv_le_tsum_atom {K : V → ℂ} (hKc : Continuous K) {ρ : ℝ} 
     (hf : ∀ᵐ x ∂volume, f x = ∑' m, coef m * a m x) (x : V) :
     ‖conv K f volume x‖ₑ ≤ ∑' m, ‖coef m‖ₑ * ‖conv K (a m) volume x‖ₑ := by
   rw [conv_congr_ae hf, conv_tsum_atom hKc hρ hKρ hd coef ha x]
-  refine enorm_tsum_le_tsum_enorm.trans_eq ?_
-  simp only [enorm_mul]
+  refine eNorm_tsum_le_tsum_eNorm.trans_eq ?_
+  simp only [eNorm_mul]
 
 /-! ### Coefficients with exponent one -/
 
@@ -363,7 +363,7 @@ theorem lintegral_enorm_meansKernel_mul_atom_le (L : ℕ) {i j : ℕ} (hij : i �
       _ = _ := by ring
   · have h0 : ∀ y, ‖b.meansKernel L i y‖ₑ * ‖a (x - y)‖ₑ = 0 := fun y => by
       by_cases hy : 2 * L * b.radius / 2 ^ i < ‖y‖
-      · rw [b.meansKernel_eq_zero_of_lt L i hy, enorm_zero, zero_mul]
+      · rw [b.meansKernel_eq_zero_of_lt L i hy, eNorm_zero, zero_mul]
       · push Not at hy hx
         have h1 : d / 2 ^ j ≤ d / 2 ^ i :=
           div_le_div_of_nonneg_left hd (by positivity) (pow_le_pow_right₀ one_le_two hij)
@@ -372,7 +372,7 @@ theorem lintegral_enorm_meansKernel_mul_atom_le (L : ℕ) {i j : ℕ} (hij : i �
             _ ≤ _ := norm_add_le _ _
         have h3 : (2 * L * b.radius + d) / 2 ^ i = 2 * L * b.radius / 2 ^ i + d / 2 ^ i :=
           add_div _ _ _
-        rw [ha.eq_zero (x - y) (by linarith), enorm_zero, mul_zero]
+        rw [ha.eq_zero (x - y) (by linarith), eNorm_zero, mul_zero]
     simp only [h0, lintegral_zero, mul_zero, le_refl]
 
 /-- The constant `C A_+ d^n |B_1| (2LR + d + n + 1)^n |B_1|` of the coarse local means of atoms
@@ -445,7 +445,7 @@ theorem enorm_mul_higherDiff_atom_le {L : ℕ} (hL : 1 ≤ L) {d A : ℝ} {j : �
         ENNReal.ofReal (b.radius ^ L) * dyadicWeight (-(L : ℝ)) (k - j) *
           (if ‖x - c‖ ≤ (d + L * b.radius) / 2 ^ j then 1 else 0)) := by
   by_cases hz : b.radius < ‖z‖
-  · rw [b.eq_zero z hz, enorm_zero, zero_mul, zero_mul]
+  · rw [b.eq_zero z hz, eNorm_zero, zero_mul, zero_mul]
   push Not at hz
   refine mul_le_mul_right ?_ _
   have hR := b.radius_nonneg
@@ -472,7 +472,7 @@ theorem enorm_mul_higherDiff_atom_le {L : ℕ} (hL : 1 ≤ L) {d A : ℝ} {j : �
       _ = ENNReal.ofReal (b.radius ^ L) * dyadicWeight (-(L : ℝ)) (k - j) := by
           rw [mul_pow, ENNReal.ofReal_mul (by positivity), ENNReal.ofReal_one_div_two_pow_pow]
   · push Not at hx
-    rw [ha.higherDiff_eq_zero_of_lt L (hh.trans hkj) (lt_of_eq_of_lt (by ring) hx), enorm_zero]
+    rw [ha.higherDiff_eq_zero_of_lt L (hh.trans hkj) (lt_of_eq_of_lt (by ring) hx), eNorm_zero]
     exact zero_le
 
 /-- **One scale of the moment identity for an atom**: for a smooth atom `a` on `V` of level `j`
@@ -491,7 +491,7 @@ theorem ae_enorm_atom_sub_conv_scaledMoment_le {L : ℕ} (hL : 1 ≤ L) {d A : �
     (by positivity)] with x hx
   refine hx.trans ((lintegral_mono fun z =>
     b.enorm_mul_higherDiff_atom_le hL ha hjk z x).trans ?_)
-  rw [lintegral_mul_const'' _ b.contDiff.continuous.aestronglyMeasurable.enorm]
+  rw [lintegral_mul_const'' _ b.contDiff.continuous.aestronglyMeasurable.eNorm]
 
 /-- The constant `2 ‖g‖_1 2^L L^(L+1) A (2R)^L` of the fine local means of a smooth atom of order
 `L` and constant `A`, for the bump `g` of radius `R`. -/
@@ -641,9 +641,9 @@ theorem enorm_conv_meansKernel_le_tsum_level (hp : p ≠ ∞) (L : ℕ)
         (fun j => b.localMean hp L i (f j)), hall] with x hx hj
       simp only [Function.comp_apply, map_sum]
       rw [hx]
-      refine (enorm_sum_le _ _).trans ?_
+      refine (eNorm_sum_le _ _).trans ?_
       simp only [hj]
-      exact ENNReal.sum_le_tsum _
+      exact sum_le_tsum _
   filter_upwards [h, b.localMean_ae_eq hp L i F] with x hx hb
   rwa [← hb]
 
@@ -670,7 +670,7 @@ theorem enorm_localMean_le_tsum_maximalFunction_cellCoefFun {L : ℕ} (hL : 1 �
   filter_upwards [h1, h2] with x hx1 hx2 i
   refine (hx1 i).trans ?_
   rw [← ENNReal.tsum_mul_left]
-  exact ENNReal.tsum_le_tsum fun j => hx2 i j
+  exact tsum_le_tsum fun j => hx2 i j
 
 /-- **Synthesis from atoms**: for smooth atoms `a_{j,m}` on `V` of level `j` and order `L ≥ 1`
 centred at the cells, with radius factor `d ≥ 0` and constant `A`, level sums

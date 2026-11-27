@@ -89,7 +89,7 @@ theorem extendsSobolev (E : SobolevExtensionOp p O U C) (hUO : U ⊆ O) :
     rw [h1 hxU]
     exact h2 (hUO hxU)
   · refine (E.bound u).trans_eq ?_
-    simp only [u, Lp.enorm_toLp]
+    simp only [u, Lp.eNorm_toLp]
 
 /-- The norm bound of an extension operator in the product norm of the jets:
 `‖E u‖ ≤ (n + 1) C ‖u‖` for finite `C` (`Rd.prod_pi_norm_le_norm_fst_add_sum`,
@@ -97,7 +97,7 @@ theorem extendsSobolev (E : SobolevExtensionOp p O U C) (hUO : U ⊆ O) :
 theorem norm_apply_le (E : SobolevExtensionOp p O U C) (hC : C ≠ ∞) (u : weakSobolevJet p O) :
     ‖E.toLinearMap u‖ ≤ (finrank ℝ V + 1) * C.toReal * ‖u‖ := by
   have h1 := ENNReal.toReal_mono (ENNReal.mul_ne_top hC (ENNReal.add_ne_top.2
-    ⟨enorm_ne_top, ENNReal.sum_ne_top.2 fun _ _ => enorm_ne_top⟩)) (E.bound u)
+    ⟨eNorm_ne_top, ENNReal.sum_ne_top.2 fun _ _ => eNorm_ne_top⟩)) (E.bound u)
   rw [ENNReal.toReal_mul, toReal_enorm_add_sum, toReal_enorm_add_sum] at h1
   have h2 := prod_pi_norm_fst_add_sum_le u.1
   rw [Fintype.card_fin] at h2
@@ -156,7 +156,7 @@ theorem tlLocalNormOn_indicatorExtendLp_le [Nontrivial V] (hp1 : 1 < p) (hp : p 
   refine (b.tlLocalNormOn_le_patchConst hp1 hp hW ((Lp.memLp u.1.1).mono_measure hμ)
     (fun i => (Lp.memLp (u.1.2 i)).mono_measure hμ) (fun i => (u.2 i).mono hTO) hsupp
     (indicatorExtendLp_apply_ae _ _ u.1.1)).trans ?_
-  gcongr with i <;> exact (eLpNorm_mono_measure _ hμ).trans_eq (Lp.enorm_def _).symm
+  gcongr with i <;> exact (eLpNorm_mono_measure _ hμ).trans_eq (Lp.eNorm_def _).symm
 
 /-- The local means quasi-norm of Triebel–Lizorkin type of a jet is finite
 (`Rd.LocalMeansBump.tlLocalNormOn_indicatorExtendLp_le`). -/
@@ -166,8 +166,8 @@ theorem tlLocalNormOn_indicatorExtendLp_lt_top [Nontrivial V] (hp1 : 1 < p) (hp 
     (u : weakSobolevJet p O) :
     b.tlLocalNormOn hp hW 2 1 2 (indicatorExtendLp T.isOpen.measurableSet hTO u.1.1) < ∞ :=
   (b.tlLocalNormOn_indicatorExtendLp_le hp1 hp hW hTO hsupp u).trans_lt (ENNReal.mul_lt_top
-    (b.patchConst_ne_top hp1 hp).lt_top (ENNReal.add_lt_top.2 ⟨enorm_lt_top,
-      ENNReal.sum_lt_top.2 fun _ _ => enorm_lt_top⟩))
+    (b.patchConst_ne_top hp1 hp).lt_top (ENNReal.add_lt_top.2 ⟨eNorm_lt_top,
+      ENNReal.sum_lt_top.2 fun _ _ => eNorm_lt_top⟩))
 
 /-- **The local extension of a jet converges absolutely**
 (`Rd.LocalMeansBump.summable_localExtTerm_of_tlLocalNormOn`). -/
@@ -351,8 +351,8 @@ noncomputable def paste (E : ∀ k, SobolevExtensionOp p O ((O : Set V) ∩ U k)
       sobolevJet.liftJet_apply_snd _ _ u _ (hasWeakLineDeriv_pasteValue E hψ hc ha hc' hd u _)]
     exact pasting_bound (x := fun k => ‖((E k).toLinearMap u).1.1‖ₑ)
       (y := fun k i => ‖((E k).toLinearMap u).1.2 i‖ₑ)
-      ((enorm_sum_le _ _).trans (Finset.sum_le_sum fun k _ => enorm_mulLp_le _ _ _))
-      (fun i => (enorm_sum_le _ _).trans (Finset.sum_le_sum fun k _ => (enorm_add_le _ _).trans
+      ((eNorm_sum_le _ _).trans (Finset.sum_le_sum fun k _ => enorm_mulLp_le _ _ _))
+      (fun i => (eNorm_sum_le _ _).trans (Finset.sum_le_sum fun k _ => (eNorm_add_le _ _).trans
         (add_le_add (enorm_mulLp_le _ _ _) (enorm_mulLp_le _ _ _)))) fun k => (E k).bound u
 
 end SobolevExtensionOp

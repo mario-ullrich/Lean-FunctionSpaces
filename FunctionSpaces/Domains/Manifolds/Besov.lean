@@ -240,7 +240,7 @@ theorem exists_enorm_le_atlasBesovNorm (r : ℕ) (s : ℝ) (q : ℝ≥0∞) :
   have hpiece : ∀ i, eLpNorm (A.piece i f) p volume ≤
       Rd.modNormOn hΩ r s q (A.pieceLp μ hp i f) := fun i => by
     have h : eLpNorm (A.piece i f) p volume = ‖Rd.indicatorLp hΩ (A.pieceLp μ hp i f)‖ₑ := by
-      rw [Lp.enorm_def]
+      rw [Lp.eNorm_def]
       refine eLpNorm_congr_ae ?_
       filter_upwards [Rd.indicatorLp_apply_ae hΩ (A.pieceLp μ hp i f), A.pieceLp_ae μ hp i f]
         with y h1 h2
@@ -252,7 +252,7 @@ theorem exists_enorm_le_atlasBesovNorm (r : ℕ) (s : ℝ) (q : ℝ≥0∞) :
     rw [h]
     exact le_add_right le_rfl
   calc ‖f‖ₑ = eLpNorm (∑ i, fun x => (A.psi i x : ℂ) * f x) p μ := by
-        rw [Lp.enorm_def, ← hsum]
+        rw [Lp.eNorm_def, ← hsum]
     _ ≤ ∑ i, eLpNorm (fun x => (A.psi i x : ℂ) * f x) p μ :=
         eLpNorm_sum_le hp1
     _ ≤ ∑ i, Cmax * Rd.modNormOn hΩ r s q (A.pieceLp μ hp i f) :=
@@ -328,12 +328,12 @@ theorem MemAtlasBesov.add {s : ℝ} {q : ℝ≥0∞} (hq : 1 ≤ q) {f g : Lp �
 theorem MemAtlasBesov.const_smul {s : ℝ} {q : ℝ≥0∞} (c : ℂ) {f : Lp ℂ p μ}
     (hf : A.MemAtlasBesov hp s q f) : A.MemAtlasBesov hp s q (c • f) := by
   rw [MemAtlasBesov, atlasBesovNorm_const_smul]
-  exact ENNReal.mul_lt_top enorm_lt_top hf
+  exact ENNReal.mul_lt_top eNorm_lt_top hf
 
 /-- `0 ∈ B^s_{p,q}`. -/
 theorem MemAtlasBesov.zero (s : ℝ) (q : ℝ≥0∞) : A.MemAtlasBesov hp s q (0 : Lp ℂ p μ) := by
   have h := A.atlasBesovNorm_const_smul hp (⌊s⌋₊ + 1) s q 0 (0 : Lp ℂ p μ)
-  rw [zero_smul, enorm_zero, zero_mul] at h
+  rw [zero_smul, eNorm_zero, zero_mul] at h
   rw [MemAtlasBesov, h]
   exact ENNReal.zero_lt_top
 

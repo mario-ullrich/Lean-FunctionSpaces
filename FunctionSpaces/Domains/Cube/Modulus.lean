@@ -240,7 +240,7 @@ theorem lpCubeModulus_add_le (hp : p ≠ ∞) (r : ℕ) (f g : Lp ℂ p (cubeVol
 /-- `ω_r(f, t)_p ≤ d 2^r ‖f‖_p` in `L_p(Q)`. -/
 theorem lpCubeModulus_le (hp : p ≠ ∞) (r : ℕ) (f : Lp ℂ p (cubeVol d)) (k : ℕ) :
     lpCubeModulus p r f k ≤ d * 2 ^ r * ‖f‖ₑ := by
-  rw [Lp.enorm_def]
+  rw [Lp.eNorm_def]
   exact cubeModulus_le (Lp.stronglyMeasurable f).measurable Fact.out hp r _
 
 omit [Fact (1 ≤ p)] in
@@ -264,7 +264,7 @@ theorem lpCubeModulus_le_of_coord (hp : p ≠ ∞) {r j k : ℕ} {θ : ℝ} {B :
   rcases lt_or_ge k j with hkj | hjk
   · rw [Nat.sub_eq_zero_of_le hkj.le, ENNReal.dyadicWeight_zero_right, mul_one]
     exact (lpCubeModulus_le hp r a k).trans (by gcongr)
-  rw [Lp.enorm_def, eLpNorm_congr_ae hae, lpCubeModulus,
+  rw [Lp.eNorm_def, eLpNorm_congr_ae hae, lpCubeModulus,
     cubeModulus_congr_ae (Lp.stronglyMeasurable a).measurable hg hae hp0 hp, cubeModulus]
   calc ∑ i, coordModulus r p i g (1 / 2 ^ k)
       ≤ ∑ _i : Fin d, B * ENNReal.dyadicWeight (-θ) (k - j) * eLpNorm g p (cubeVol d) :=

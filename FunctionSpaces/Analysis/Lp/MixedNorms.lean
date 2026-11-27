@@ -161,11 +161,11 @@ theorem dyadicWeight_mul_enorm_le_eLpNorm_lqNorm {E : Type*} [NormedAddCommGroup
     (hq : q ≠ 0) (s : ℝ) (h : ℕ → Lp E p μ) (j : ℕ) :
     dyadicWeight s j * ‖h j‖ₑ ≤
       eLpNorm (fun x => lqNorm q (fun i => dyadicWeight s i * ‖h i x‖ₑ)) p μ := by
-  rw [Lp.enorm_def, ← eLpNorm_enorm _ (Lp.aestronglyMeasurable (h j)),
-    ← eLpNorm_const_mul_ennreal (Lp.aestronglyMeasurable (h j)).enorm.aestronglyMeasurable]
-  refine eLpNorm_mono_enorm
-    (((Lp.aestronglyMeasurable (h j)).enorm.const_mul _).aestronglyMeasurable) fun x => ?_
-  simp only [enorm_eq_self]
+  rw [Lp.eNorm_def, ← eLpNorm_eNorm _ (Lp.aestronglyMeasurable (h j)),
+    ← eLpNorm_const_mul_ennreal (Lp.aestronglyMeasurable (h j)).eNorm.aestronglyMeasurable]
+  refine eLpNorm_mono_eNorm
+    (((Lp.aestronglyMeasurable (h j)).eNorm.const_mul _).aestronglyMeasurable) fun x => ?_
+  simp only [eNorm_eq_self]
   exact ENNReal.le_lqNorm hq (fun i => dyadicWeight s i * ‖h i x‖ₑ) j
 
 /-- **One term of a family is bounded by the mixed norm**: for `q ≠ 0`, a family `h_i ∈ L_p(μ)`
@@ -261,11 +261,11 @@ theorem lqNorm_lintegral_le {u : ℝ≥0∞} (hu : 1 ≤ u) {g : ι → α → �
   have hr : 1 < u.toReal := ENNReal.one_lt_toReal hu1 hu'
   have hr0 : 0 < u.toReal := zero_lt_one.trans hr
   simp only [ENNReal.lqNorm_eq_tsum hu0 hu']
-  rw [one_div, ENNReal.rpow_inv_le_iff hr0, ENNReal.tsum_eq_iSup_sum]
+  rw [one_div, ENNReal.rpow_inv_le_iff hr0, tsum_eq_iSup_sum]
   refine iSup_le fun S => ?_
   rw [← ENNReal.rpow_inv_le_iff hr0, ← one_div]
   refine (rpow_sum_rpow_lintegral_le hg hr S).trans (lintegral_mono fun x => ?_)
-  exact ENNReal.rpow_le_rpow (ENNReal.sum_le_tsum S) (by positivity)
+  exact ENNReal.rpow_le_rpow (sum_le_tsum S) (by positivity)
 
 /-- The pointwise `ℓ_q` norm `x ↦ ‖(g_i(x))_i‖_{ℓ_q}` of a countable family of measurable
 functions is measurable: it is a constant for `q = 0`, a countable supremum for `q = ∞` and a
@@ -305,8 +305,8 @@ theorem lqNorm_lintegral_le_eLpNorm [IsProbabilityMeasure μ] (hp1 : 1 ≤ p) (h
   calc lqNorm q (fun i => ∫⁻ x, g i x ∂μ)
       ≤ ∫⁻ x, lqNorm q (fun i => g i x) ∂μ := lqNorm_lintegral_le hq hg
     _ = eLpNorm (fun x => lqNorm q (fun i => g i x)) 1 μ := by
-        rw [eLpNorm_one_eq_lintegral_enorm (aemeasurable_lqNorm_comp hg q).aestronglyMeasurable]
-        simp only [enorm_eq_self]
+        rw [eLpNorm_one_eq_lintegral_eNorm (aemeasurable_lqNorm_comp hg q).aestronglyMeasurable]
+        simp only [eNorm_eq_self]
     _ ≤ _ := eLpNorm_le_eLpNorm_of_exponent_le hp1
 
 /-- **Minkowski's integral inequality for means**: for `1 ≤ u ≤ ∞` and almost everywhere
@@ -347,9 +347,9 @@ theorem lqNorm_eLpNorm_le_eLpNorm_lqNorm (hp0 : p ≠ 0) (hpq : p ≤ q)
     lqNorm q (fun i => eLpNorm (g i) p μ) ≤ eLpNorm (fun x => lqNorm q (fun i => g i x)) p μ := by
   rcases eq_or_ne q ∞ with rfl | hq
   · rw [ENNReal.lqNorm_top]
-    refine iSup_le fun i => eLpNorm_mono_enorm_ae (hg i).aestronglyMeasurable
+    refine iSup_le fun i => eLpNorm_mono_eNorm_ae (hg i).aestronglyMeasurable
       (Eventually.of_forall fun x => ?_)
-    simp only [enorm_eq_self]
+    simp only [eNorm_eq_self]
     exact ENNReal.le_lqNorm ENNReal.top_ne_zero (fun j => g j x) i
   have hp : p ≠ ∞ := ne_top_of_le_ne_top hq hpq
   have hr : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
@@ -420,9 +420,9 @@ theorem eLpNorm_lqNorm_le_lqNorm_min (hp1 : 1 ≤ p) (hp : p ≠ ∞) (hq : 1 �
       lqNorm (min p q) (fun i => eLpNorm (g i) p μ) := by
   rcases le_total p q with hpq | hqp
   · rw [min_eq_left hpq, ← eLpNorm_lqNorm_eq_lqNorm_eLpNorm (zero_lt_one.trans_le hp1).ne' hp hg]
-    refine eLpNorm_mono_enorm_ae (aemeasurable_lqNorm_comp hg q).aestronglyMeasurable
+    refine eLpNorm_mono_eNorm_ae (aemeasurable_lqNorm_comp hg q).aestronglyMeasurable
       (Eventually.of_forall fun x => ?_)
-    simp only [enorm_eq_self]
+    simp only [eNorm_eq_self]
     exact ENNReal.lqNorm_le_lqNorm_of_le (zero_lt_one.trans_le hp1).ne' hpq _
   · rw [min_eq_right hqp]
     exact eLpNorm_lqNorm_le_lqNorm_eLpNorm (zero_lt_one.trans_le hq).ne' hqp hp
@@ -439,9 +439,9 @@ theorem lqNorm_max_le_eLpNorm_lqNorm (hp1 : 1 ≤ p) (hp : p ≠ ∞) (hq : 1 �
   · rw [max_eq_right hpq]
     exact lqNorm_eLpNorm_le_eLpNorm_lqNorm (zero_lt_one.trans_le hp1).ne' hpq hg
   · rw [max_eq_left hqp, ← eLpNorm_lqNorm_eq_lqNorm_eLpNorm (zero_lt_one.trans_le hp1).ne' hp hg]
-    refine eLpNorm_mono_enorm_ae (aemeasurable_lqNorm_comp hg p).aestronglyMeasurable
+    refine eLpNorm_mono_eNorm_ae (aemeasurable_lqNorm_comp hg p).aestronglyMeasurable
       (Eventually.of_forall fun x => ?_)
-    simp only [enorm_eq_self]
+    simp only [eNorm_eq_self]
     exact ENNReal.lqNorm_le_lqNorm_of_le (zero_lt_one.trans_le hq).ne' hqp _
 
 end Countable
@@ -456,7 +456,7 @@ variable {E : Type*} [NormedAddCommGroup E]
 `c ∈ [0, ∞]`, every measurable `v : α → E` with values in a normed group and every `p`. -/
 theorem eLpNorm_const_mul_enorm (c : ℝ≥0∞) {v : α → E} (hv : AEStronglyMeasurable v μ)
     (p : ℝ≥0∞) : eLpNorm (fun x => c * ‖v x‖ₑ) p μ = c * eLpNorm v p μ := by
-  rw [eLpNorm_const_mul_ennreal hv.enorm.aestronglyMeasurable, eLpNorm_enorm _ hv]
+  rw [eLpNorm_const_mul_ennreal hv.eNorm.aestronglyMeasurable, eLpNorm_eNorm _ hv]
 
 section Countable
 
@@ -470,7 +470,7 @@ theorem eLpNorm_lqNorm_weighted_eq (w : ι → ℝ≥0∞) (hp0 : p ≠ 0) (hp :
     (hu : ∀ j, AEStronglyMeasurable (u j) μ) :
     eLpNorm (fun x => lqNorm p (fun j => w j * ‖u j x‖ₑ)) p μ =
       lqNorm p (fun j => w j * eLpNorm (u j) p μ) := by
-  rw [eLpNorm_lqNorm_eq_lqNorm_eLpNorm hp0 hp fun j => (hu j).enorm.const_mul _]
+  rw [eLpNorm_lqNorm_eq_lqNorm_eLpNorm hp0 hp fun j => (hu j).eNorm.const_mul _]
   congr 1
   funext j
   exact eLpNorm_const_mul_enorm (w j) (hu j) p
@@ -482,7 +482,7 @@ theorem eLpNorm_lqNorm_weighted_le_min (w : ι → ℝ≥0∞) (hp1 : 1 ≤ p) (
     (hu : ∀ j, AEStronglyMeasurable (u j) μ) :
     eLpNorm (fun x => lqNorm q (fun j => w j * ‖u j x‖ₑ)) p μ ≤
       lqNorm (min p q) (fun j => w j * eLpNorm (u j) p μ) := by
-  refine (eLpNorm_lqNorm_le_lqNorm_min hp1 hp hq fun j => (hu j).enorm.const_mul _).trans_eq ?_
+  refine (eLpNorm_lqNorm_le_lqNorm_min hp1 hp hq fun j => (hu j).eNorm.const_mul _).trans_eq ?_
   congr 1
   funext j
   exact eLpNorm_const_mul_enorm (w j) (hu j) p
@@ -495,7 +495,7 @@ theorem lqNorm_max_weighted_le (w : ι → ℝ≥0∞) (hp1 : 1 ≤ p) (hp : p �
     lqNorm (max p q) (fun j => w j * eLpNorm (u j) p μ) ≤
       eLpNorm (fun x => lqNorm q (fun j => w j * ‖u j x‖ₑ)) p μ := by
   refine le_of_eq_of_le ?_ (lqNorm_max_le_eLpNorm_lqNorm hp1 hp hq
-    fun j => (hu j).enorm.const_mul _)
+    fun j => (hu j).eNorm.const_mul _)
   congr 1
   funext j
   exact (eLpNorm_const_mul_enorm (w j) (hu j) p).symm
@@ -548,8 +548,8 @@ theorem ae_le_of_le_add_of_tendsto_eLpNorm {u v : α → ℝ≥0∞} {w : ℕ �
     (hw : Tendsto (fun J => eLpNorm (w J) p μ) atTop (𝓝 0)) : ∀ᵐ x ∂μ, u x ≤ v x := by
   have hd : AEStronglyMeasurable (fun x => u x - v x) μ := (hu.sub hv).aestronglyMeasurable
   have hle : ∀ J, eLpNorm (fun x => u x - v x) p μ ≤ eLpNorm (w J) p μ := fun J =>
-    eLpNorm_mono_enorm_ae hd ((h J).mono fun x hx => by
-      simp only [enorm_eq_self]
+    eLpNorm_mono_eNorm_ae hd ((h J).mono fun x hx => by
+      simp only [eNorm_eq_self]
       exact tsub_le_iff_left.2 hx)
   have h0 : eLpNorm (fun x => u x - v x) p μ = 0 := le_antisymm (ge_of_tendsto' hw hle) zero_le
   filter_upwards [(eLpNorm_eq_zero_iff hp0).1 h0] with x hx
@@ -564,7 +564,7 @@ theorem ae_enorm_le_of_tendsto_Lp {E : Type*} [NormedAddCommGroup E] [Fact (1 �
     (h : ∀ J, ∀ᵐ x ∂μ, ‖G J x‖ₑ ≤ v x) : ∀ᵐ x ∂μ, ‖F x‖ₑ ≤ v x := by
   obtain ⟨ns, -, hns⟩ := (tendstoInMeasure_of_tendsto_Lp hG).exists_seq_tendsto_ae
   filter_upwards [hns, ae_all_iff.2 fun k => h (ns k)] with x hx hk
-  exact le_of_tendsto' hx.enorm hk
+  exact le_of_tendsto' hx.eNorm hk
 
 /-! ### Families with terms set to zero -/
 
@@ -587,8 +587,8 @@ theorem eLpNorm_lqNorm_ite_le {P : ℕ → Prop} [DecidablePred P] {g : ℕ → 
     (hg : ∀ j, AEMeasurable (g j) μ) :
     eLpNorm (fun x => lqNorm q fun j => if P j then g j x else 0) p μ ≤
       eLpNorm (fun x => lqNorm q fun j => g j x) p μ :=
-  eLpNorm_mono_enorm (aemeasurable_lqNorm_ite hg q).aestronglyMeasurable fun x => by
-    simp only [enorm_eq_self]
+  eLpNorm_mono_eNorm (aemeasurable_lqNorm_ite hg q).aestronglyMeasurable fun x => by
+    simp only [eNorm_eq_self]
     exact ENNReal.lqNorm_mono fun j => by split_ifs <;> simp
 
 /-- **Setting more terms to zero decreases the mixed norm**: for measurable `g_j : α → [0, ∞]` and
@@ -599,8 +599,8 @@ theorem eLpNorm_lqNorm_ite_mono {P Q : ℕ → Prop} [DecidablePred P] [Decidabl
     {g : ℕ → α → ℝ≥0∞} (hg : ∀ j, AEMeasurable (g j) μ) (hPQ : ∀ j, P j → Q j) :
     eLpNorm (fun x => lqNorm q fun j => if P j then g j x else 0) p μ ≤
       eLpNorm (fun x => lqNorm q fun j => if Q j then g j x else 0) p μ :=
-  eLpNorm_mono_enorm (aemeasurable_lqNorm_ite hg q).aestronglyMeasurable fun x => by
-    simp only [enorm_eq_self]
+  eLpNorm_mono_eNorm (aemeasurable_lqNorm_ite hg q).aestronglyMeasurable fun x => by
+    simp only [eNorm_eq_self]
     refine ENNReal.lqNorm_mono fun j => ?_
     by_cases hP : P j
     · simp only [hP, hPQ j hP, ↓reduceIte, le_refl]
@@ -693,9 +693,9 @@ theorem eLpNorm_le_const_mul_sum_of_ae_le (hp1 : 1 ≤ p) {ι : Type*} (s : Fins
     (hF : ∀ i ∈ s, AEMeasurable (F i) μ) (c : ℝ≥0∞) (h : ∀ᵐ x ∂μ, B x ≤ c * ∑ i ∈ s, F i x) :
     eLpNorm B p μ ≤ c * ∑ i ∈ s, eLpNorm (F i) p μ := by
   calc eLpNorm B p μ ≤ eLpNorm (fun x => c * ∑ i ∈ s, F i x) p μ := by
-        refine eLpNorm_mono_enorm_ae hB.aestronglyMeasurable ?_
+        refine eLpNorm_mono_eNorm_ae hB.aestronglyMeasurable ?_
         filter_upwards [h] with x hx
-        simpa only [enorm_eq_self] using hx
+        simpa only [eNorm_eq_self] using hx
     _ = c * eLpNorm (∑ i ∈ s, F i) p μ := by
         rw [eLpNorm_const_mul_ennreal (Finset.aemeasurable_fun_sum _ hF).aestronglyMeasurable,
           Finset.sum_fn]
@@ -713,11 +713,11 @@ theorem eLpNorm_lqNorm_dyadicWeight_le_zero_add_succ (hp1 : 1 ≤ p) (hq : 1 ≤
     eLpNorm (fun x => lqNorm q fun j => dyadicWeight s j * b j x) p μ ≤
       eLpNorm (b 0) p μ +
         eLpNorm (fun x => lqNorm q fun n => dyadicWeight s (n + 1) * b (n + 1) x) p μ := by
-  refine (eLpNorm_mono_enorm (f := fun x => lqNorm q fun j => dyadicWeight s j * b j x)
+  refine (eLpNorm_mono_eNorm (f := fun x => lqNorm q fun j => dyadicWeight s j * b j x)
     (g := b 0 + fun x => lqNorm q fun n => dyadicWeight s (n + 1) * b (n + 1) x)
     (aemeasurable_lqNorm_comp (fun j => (hb j).const_mul _) q).aestronglyMeasurable
     fun x => ?_).trans (eLpNorm_add_le hp1)
-  simp only [enorm_eq_self, Pi.add_apply]
+  simp only [eNorm_eq_self, Pi.add_apply]
   refine (ENNReal.lqNorm_le_sum_range_add_shift hq _ 1).trans_eq ?_
   simp [ENNReal.dyadicWeight_zero_right]
 
@@ -736,11 +736,11 @@ theorem eLpNorm_lqNorm_le_add (hp1 : 1 ≤ p) (hq : 1 ≤ q) (hw : ∀ j, AEMeas
     eLpNorm (fun x => lqNorm q fun j => w j x) p μ ≤
       eLpNorm (fun x => lqNorm q fun j => u j x) p μ +
         eLpNorm (fun x => lqNorm q fun j => v j x) p μ := by
-  refine (eLpNorm_mono_enorm_ae (g := (fun x => lqNorm q fun j => u j x) +
+  refine (eLpNorm_mono_eNorm_ae (g := (fun x => lqNorm q fun j => u j x) +
     fun x => lqNorm q fun j => v j x)
     (aemeasurable_lqNorm_comp hw q).aestronglyMeasurable ?_).trans (eLpNorm_add_le hp1)
   filter_upwards [h] with x hx
-  simp only [enorm_eq_self, Pi.add_apply]
+  simp only [eNorm_eq_self, Pi.add_apply]
   exact (ENNReal.lqNorm_mono hx).trans (ENNReal.lqNorm_add_le hq _ _)
 
 /-- **Homogeneity of mixed norms**: for `c ∈ [0, ∞]` and families `u_j, w_j : α → [0, ∞]` with
@@ -770,8 +770,8 @@ theorem eLpNorm_lqNorm_mono_exponent {r : ℝ≥0∞} (hq0 : q ≠ 0) (hqr : q �
     (hu : ∀ j, AEMeasurable (u j) μ) :
     eLpNorm (fun x => lqNorm r fun j => u j x) p μ ≤
       eLpNorm (fun x => lqNorm q fun j => u j x) p μ :=
-  eLpNorm_mono_enorm (aemeasurable_lqNorm_comp hu r).aestronglyMeasurable fun x => by
-    simp only [enorm_eq_self]
+  eLpNorm_mono_eNorm (aemeasurable_lqNorm_comp hu r).aestronglyMeasurable fun x => by
+    simp only [eNorm_eq_self]
     exact ENNReal.lqNorm_le_lqNorm_of_le hq0 hqr _
 
 /-- **Monotonicity in `s` for dyadic families**: for `s ≤ t` and measurable `u_j : α → [0, ∞]`,
@@ -781,10 +781,10 @@ theorem eLpNorm_lqNorm_dyadicWeight_mono_smoothness {t : ℝ} (hst : s ≤ t)
     (hu : ∀ j, AEMeasurable (u j) μ) :
     eLpNorm (fun x => lqNorm q fun j => dyadicWeight s j * u j x) p μ ≤
       eLpNorm (fun x => lqNorm q fun j => dyadicWeight t j * u j x) p μ :=
-  eLpNorm_mono_enorm
+  eLpNorm_mono_eNorm
     (aemeasurable_lqNorm_comp (fun j => (hu j).const_mul _) q).aestronglyMeasurable
     fun x => by
-      simp only [enorm_eq_self]
+      simp only [eNorm_eq_self]
       exact ENNReal.lqNorm_mono fun j => by gcongr; exact ENNReal.dyadicWeight_le_of_le hst j
 
 end DyadicFamily

@@ -103,8 +103,8 @@ theorem exists_norm_le_restrictL2 [Nontrivial V] :
       ENNReal.ofReal (‖restrictL2 Ω.toOpens u‖ + ∑ i, ‖g i‖) := by
     rw [ENNReal.ofReal_add (norm_nonneg _) (Finset.sum_nonneg fun i _ => norm_nonneg _),
       ENNReal.ofReal_sum_of_nonneg fun i _ => norm_nonneg _, ofReal_norm, restrictL2_apply,
-      Lp.enorm_def, eLpNorm_congr_ae (LpToLpRestrictCLM_coeFn ℂ _ _)]
-    simp_rw [ofReal_norm, Lp.enorm_def]
+      Lp.eNorm_def, eLpNorm_congr_ae (LpToLpRestrictCLM_coeFn ℂ _ _)]
+    simp_rw [ofReal_norm, Lp.eNorm_def]
     rfl
   rw [hY] at hb
   have hFG : ‖F‖ + ∑ i, ‖G i‖ ≤ C.toReal * (‖restrictL2 Ω.toOpens u‖ + ∑ i, ‖g i‖) := by

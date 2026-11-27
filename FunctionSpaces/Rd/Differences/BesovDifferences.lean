@@ -137,13 +137,13 @@ theorem modNorm_one_tsum_le (L : ℕ) (σ : ℝ) {G : ℕ → Lp ℂ p (volume :
       (fun x => lpModulus_le L x k) htend
   calc ‖∑' i, G i‖ₑ + lqNorm 1 (fun k => dyadicWeight σ k * lpModulus p L (∑' i, G i) k)
       ≤ ∑' i, ‖G i‖ₑ + ∑' i, lqNorm 1 (fun k => dyadicWeight σ k * lpModulus p L (G i) k) := by
-        refine add_le_add enorm_tsum_le_tsum_enorm ?_
+        refine add_le_add eNorm_tsum_le_tsum_eNorm ?_
         rw [ENNReal.lqNorm_one]
         simp_rw [ENNReal.lqNorm_one]
-        rw [ENNReal.tsum_comm]
-        refine ENNReal.tsum_le_tsum fun k => ?_
+        rw [tsum_comm]
+        refine tsum_le_tsum fun k => ?_
         rw [ENNReal.tsum_mul_left]
         exact mul_le_mul' le_rfl (hmod k)
-    _ = _ := (ENNReal.tsum_add).symm
+    _ = _ := (tsum_add).symm
 
 end Rd

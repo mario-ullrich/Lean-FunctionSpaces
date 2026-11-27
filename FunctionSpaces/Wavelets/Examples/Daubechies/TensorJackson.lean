@@ -442,7 +442,7 @@ theorem approxError_tensorScheme_le (hN : 2 ≤ N) (hp : p ≠ ∞)
   have hgp : MemLp (g₀ : (Fin d → ℝ) → ℂ) p volume := MemLp.ae_eq hae (Lp.memLp g)
   refine ((tensorScheme m p d hN hp).approxError_le_of_mem ((mem_tensorScheme_two_pow m).2
     (toLp_foldSliceProj_mem_tensorScalingSpace m hN hp j g₀.continuous hgp)) g).trans ?_
-  rw [Lp.enorm_def, eLpNorm_congr_ae ((Lp.coeFn_sub _ _).trans
+  rw [Lp.eNorm_def, eLpNorm_congr_ae ((Lp.coeFn_sub _ _).trans
     (hae.sub (MemLp.coeFn_toLp _))), Rd.lpModulus, Rd.smoothnessModulus_congr_ae hae]
   exact eLpNorm_sub_foldSliceProj_le_smoothnessModulus m hN Fact.out hp j g₀.continuous
 

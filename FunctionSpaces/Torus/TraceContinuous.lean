@@ -118,7 +118,7 @@ theorem valleePoussinConst_ne_top : valleePoussinConst d ≠ ∞ :=
 theorem toReal_valleePoussinConst (j : ℕ) :
     (valleePoussinConst d).toReal =
       1 + ∫ y, ‖Rd.dilatedBandKernel (V := EuclideanSpace ℝ d) j y‖ := by
-  rw [integral_norm_eq_lintegral_enorm
+  rw [integral_norm_eq_lintegral_eNorm
     (Rd.integrable_dilatedBandKernel (V := EuclideanSpace ℝ d) j).aestronglyMeasurable,
     Rd.lintegral_enorm_dilatedBandKernel, valleePoussinConst,
     ENNReal.toReal_add ENNReal.one_ne_top Rd.eLpNorm_bandKernel_ne_top, ENNReal.toReal_one]
@@ -155,7 +155,7 @@ theorem tendsto_valleePoussinBCF (f : UnitAddTorus d →ᵇ ℂ) :
   rw [tendsto_iff_edist_tendsto_0]
   refine tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds hE (fun _ => bot_le)
     fun k => ?_
-  rw [edist_comm, edist_eq_enorm_sub]
+  rw [edist_comm, eDist_eq_eNorm_sub]
   refine ApproximationScheme.le_mul_approxError_of_forall_mem valleePoussinConst_ne_top
     fun a ha => ?_
   rw [← ofReal_norm, ← ofReal_norm, ← ENNReal.ofReal_toReal (valleePoussinConst_ne_top (d := d)),

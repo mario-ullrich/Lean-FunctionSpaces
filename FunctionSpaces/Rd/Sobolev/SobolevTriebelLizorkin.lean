@@ -122,8 +122,8 @@ theorem lqNorm_blockFun_succ_le_sum_ae (hp : p ≠ ∞) {m : ℕ} {f : Lp ℂ p 
         2 ^ m * ∑ i, lqNorm 2 (fun n => ‖conv (derivKernelFamily i n) (g i) volume x‖ₑ) := by
   filter_upwards [two_pow_mul_blockFun_succ_ae hp hg] with x hx
   refine ENNReal.lqNorm_dyadicWeight_succ_le_sum one_le_two Finset.univ fun n => ?_
-  rw [← enorm_two_pow_complex, ← enorm_mul, hx n]
-  exact enorm_sum_le _ _
+  rw [← enorm_two_pow_complex, ← eNorm_mul, hx n]
+  exact eNorm_sum_le _ _
 
 /-- **The higher blocks in `L_p(ℓ_2)`**: in dimension `n ≥ 1`, for `1 < p < ∞`, under the
 hypotheses of `Rd.two_pow_mul_blockFun_succ_ae`,
@@ -142,13 +142,13 @@ theorem eLpNorm_lqNorm_blockFun_succ_le [Nontrivial V] (hp1 : 1 < p) (hp : p ≠
       (fun x => lqNorm 2 (fun n => ‖conv (derivKernelFamily i n) (g i) volume x‖ₑ)) volume :=
     fun i => aemeasurable_lqNorm_comp (fun n => (aestronglyMeasurable_conv
       ((isCZFamily_derivKernelFamily i).integrable n).aestronglyMeasurable
-      (Lp.aestronglyMeasurable (g i))).enorm) 2
+      (Lp.aestronglyMeasurable (g i))).eNorm) 2
   refine (eLpNorm_le_const_mul_sum_of_ae_le (p := p) Fact.out Finset.univ
     (aemeasurable_lqNorm_comp (fun n =>
-      (aestronglyMeasurable_blockFun (n + 1) f).enorm.const_mul _) 2)
+      (aestronglyMeasurable_blockFun (n + 1) f).eNorm.const_mul _) 2)
     (fun i _ => hF i) _ (lqNorm_blockFun_succ_le_sum_ae hp hg)).trans ?_
   gcongr with i
-  rw [Lp.enorm_def]
+  rw [Lp.eNorm_def]
   exact (isCZFamily_derivKernelFamily i).eLpNorm_lqNorm_conv_le hp1 hp (Lp.memLp (g i))
 
 /-- **`W^m_p ⊆ F^m_{p,2}` with named constants**: in dimension `n ≥ 1`, for `1 < p < ∞` and
@@ -166,9 +166,9 @@ theorem triebelLizorkinNorm_le_of_hasWeakLineDeriv [Nontrivial V] (hp1 : 1 < p) 
       eLpNorm (lpKernel (V := V)) 1 volume * ‖f‖ₑ +
         2 ^ m * ∑ i, sobolevToTLConst V p i * ‖g i‖ₑ := by
   refine (eLpNorm_lqNorm_dyadicWeight_le_zero_add_succ (p := p) Fact.out one_le_two _
-    fun j => (aestronglyMeasurable_blockFun j f).enorm).trans ?_
+    fun j => (aestronglyMeasurable_blockFun j f).eNorm).trans ?_
   gcongr
-  · rw [eLpNorm_enorm _ (aestronglyMeasurable_blockFun 0 f)]
+  · rw [eLpNorm_eNorm _ (aestronglyMeasurable_blockFun 0 f)]
     exact eLpNorm_blockFun_zero_le hp f
   · exact eLpNorm_lqNorm_blockFun_succ_le hp1 hp hg
 
@@ -183,9 +183,9 @@ theorem memTriebelLizorkin_of_hasWeakLineDeriv [Nontrivial V] (hp1 : 1 < p) (hp 
     MemTriebelLizorkin (m : ℝ) 2 f :=
   (triebelLizorkinNorm_le_of_hasWeakLineDeriv hp1 hp hg).trans_lt
     (ENNReal.add_lt_top.2 ⟨ENNReal.mul_lt_top
-      eLpNorm_lpKernel_lt_top enorm_lt_top,
+      eLpNorm_lpKernel_lt_top eNorm_lt_top,
       ENNReal.mul_lt_top (ENNReal.pow_lt_top ENNReal.ofNat_lt_top) (ENNReal.sum_lt_top.2 fun i _ =>
-        ENNReal.mul_lt_top (sobolevToTLConst_ne_top hp1 hp i).lt_top enorm_lt_top)⟩)
+        ENNReal.mul_lt_top (sobolevToTLConst_ne_top hp1 hp i).lt_top eNorm_lt_top)⟩)
 
 /-- **`W^m_p ⊆ F^m_{p,2}`**: in dimension `n ≥ 1`, for `1 < p < ∞`, every `f ∈ W^m_p(V)` lies in
 `F^m_{p,2}(V)`; the weak derivatives of order `m` along the basis vectors suffice
@@ -240,8 +240,8 @@ theorem IsCZFamily.eLpNorm_sum_conv_smul_le [Nontrivial V] {θ : ℕ → V → �
     congr 1
     funext j
     by_cases h : j ∈ t
-    · simp only [a, h, ↓reduceIte, Pi.smul_apply, smul_eq_mul, enorm_mul, hc]
-    · simp only [a, h, ↓reduceIte, zero_smul, Pi.zero_apply, enorm_zero]
+    · simp only [a, h, ↓reduceIte, Pi.smul_apply, smul_eq_mul, eNorm_mul, hc]
+    · simp only [a, h, ↓reduceIte, zero_smul, Pi.zero_apply, eNorm_zero]
   rw [hsum, ← hnorm]
   exact hθ.eLpNorm_sum_conv_le hp1 hp t ha
 
@@ -317,7 +317,7 @@ theorem eLpNorm_sum_conv_blockFun_sub_le {σ : ℝ} {K : ℕ → 𝓢(V, ℂ)} {
   refine (hK _).trans ?_
   gcongr
   exact eLpNorm_lqNorm_ite_mono (P := (· ∈ Finset.Ico N N')) (Q := (N ≤ ·))
-    (fun j => (aestronglyMeasurable_blockFun j f).enorm.const_mul _)
+    (fun j => (aestronglyMeasurable_blockFun j f).eNorm.const_mul _)
     fun j hj => (Finset.mem_Ico.1 hj).1
 
 /-- **Cauchy synthesis sums**: let `1 ≤ p < ∞`, `σ` real, `f ∈ F^σ_{p,2}(V)` and `K_j` Schwartz
@@ -336,7 +336,7 @@ theorem cauchySeq_toLp_sum_conv_blockFun (hp : p ≠ ∞) {σ : ℝ} {K : ℕ �
   cauchySeq_of_edist_le_lqNorm_ite (p := p) (q := 2)
     (g := fun j x => dyadicWeight σ j * ‖blockFun j f x‖ₑ) hC
     (zero_lt_one.trans_le Fact.out).ne' hp two_ne_zero ENNReal.ofNat_ne_top
-    (fun j => (aestronglyMeasurable_blockFun j f).enorm.const_mul _) hf.ne fun N N' hNN' => by
+    (fun j => (aestronglyMeasurable_blockFun j f).eNorm.const_mul _) hf.ne fun N N' hNN' => by
       simp only [Lp.edist_toLp_toLp]
       exact eLpNorm_sum_conv_blockFun_sub_le hK hNN'
 
@@ -354,9 +354,9 @@ theorem exists_tendsto_sum_conv_blockFun (hp : p ≠ ∞) {σ : ℝ} {K : ℕ �
       ‖g‖ₑ ≤ C * triebelLizorkinNorm σ 2 f := by
   obtain ⟨g, hg⟩ := cauchySeq_tendsto_of_complete (cauchySeq_toLp_sum_conv_blockFun hp hC hf hK)
   refine ⟨g, ((Lp.tendsto_Lp_iff_tendsto_eLpNorm' _ g).1 hg).congr fun J =>
-    eLpNorm_congr_ae ((MemLp.coeFn_toLp _).sub EventuallyEq.rfl), le_of_tendsto' hg.enorm
+    eLpNorm_congr_ae ((MemLp.coeFn_toLp _).sub EventuallyEq.rfl), le_of_tendsto' hg.eNorm
     fun J => ?_⟩
-  rw [Lp.enorm_def, eLpNorm_congr_ae (MemLp.coeFn_toLp _)]
+  rw [Lp.eNorm_def, eLpNorm_congr_ae (MemLp.coeFn_toLp _)]
   refine (hK _).trans ?_
   gcongr
   exact eLpNorm_lqNorm_ite_blockFun_le _ _ f

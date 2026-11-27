@@ -88,9 +88,9 @@ theorem eLpNorm_Icc_split {G : ℝ → ℂ} (hG : Measurable G) {p : ℝ≥0∞}
       eLpNorm G p (volume.restrict (Icc a b)) + eLpNorm G p (volume.restrict (Icc b c)) := by
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one hp).ne'
   have hq1 : 1 ≤ p.toReal := ENNReal.one_le_toReal_of_one_le hp hp'
-  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp' hG.aestronglyMeasurable,
-    eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp' hG.aestronglyMeasurable,
-    eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp' hG.aestronglyMeasurable,
+  rw [eLpNorm_eq_lintegral_rpow_eNorm_toReal hp0 hp' hG.aestronglyMeasurable,
+    eLpNorm_eq_lintegral_rpow_eNorm_toReal hp0 hp' hG.aestronglyMeasurable,
+    eLpNorm_eq_lintegral_rpow_eNorm_toReal hp0 hp' hG.aestronglyMeasurable,
     ← Icc_union_Icc_eq_Icc hab hbc]
   refine le_trans (ENNReal.rpow_le_rpow (lintegral_union_le _ _ _) (by positivity)) ?_
   have := ENNReal.rpow_add_rpow_le_add
@@ -348,7 +348,7 @@ theorem eLpNorm_higherDiff_reflect {f : ℝ → ℂ} (hf : Measurable f) (r : �
   rw [hfun, show (fun x => (-1 : ℂ) ^ r * higherDiff r h f (a + b - r * h - x)) =
       ((-1 : ℂ) ^ r) • fun x => higherDiff r h f (a + b - r * h - x) from rfl, eLpNorm_const_smul,
     eLpNorm_comp_sub_Icc (measurable_higherDiff hf r h)]
-  simp only [enorm_pow, enorm_neg, enorm_one, one_pow, one_mul]
+  simp only [eNorm_pow, eNorm_neg, eNorm_one, one_pow, one_mul]
   congr 3 <;> ring
 
 /-- **Reflection**: `ω_r(f(a + b - ·), t, [a, b]) = ω_r(f, t, [a, b])`. -/

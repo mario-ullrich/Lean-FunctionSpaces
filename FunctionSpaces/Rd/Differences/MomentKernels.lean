@@ -100,7 +100,7 @@ theorem lintegral_enorm_ne_zero_of_integral_eq_one {α : Type*} [MeasurableSpace
     ∫⁻ z, ‖g z‖ₑ ∂ν ≠ 0 := by
   intro h0
   have hae : g =ᵐ[ν] 0 := by
-    have := (lintegral_eq_zero_iff' hg.aestronglyMeasurable.enorm).1 h0
+    have := (lintegral_eq_zero_iff' hg.aestronglyMeasurable.eNorm).1 h0
     filter_upwards [this] with z hz
     simpa using hz
   rw [integral_congr_ae hae] at h1
@@ -256,8 +256,8 @@ theorem ae_enorm_sub_conv_dilate_momentKernel_le {p : ℝ≥0∞} (hp1 : 1 ≤ p
       ∫⁻ z, ‖g z‖ₑ * ‖(fwdDiff (-c⁻¹ • z))^[L] f x‖ₑ ∂μ := by
   filter_upwards [ae_sub_conv_dilate_momentKernel_eq hp1 hp hg h1 hf L hc] with x hx
   rw [hx]
-  refine (enorm_integral_le_lintegral_enorm _).trans (le_of_eq (lintegral_congr fun z => ?_))
-  rw [enorm_mul, enorm_mul, enorm_pow, enorm_neg, enorm_one, one_pow, one_mul]
+  refine (eNorm_integral_le_lintegral_eNorm _).trans (le_of_eq (lintegral_congr fun z => ?_))
+  rw [eNorm_mul, eNorm_mul, eNorm_pow, eNorm_neg, eNorm_one, one_pow, one_mul]
 
 /-- **Moment kernels approximate with the modulus on a set**: let `g` have integral `1` and vanish
 outside the ball of radius `R`, and let `U` be a measurable set that the steps of the averaged
@@ -341,7 +341,7 @@ theorem enorm_sub_convLp_momentKernel_le {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp :
       (∫⁻ z, ‖g z‖ₑ ∂μ) * smoothnessModulus μ L p (f : V → ℂ) (R / c) := by
   have h := eLpNorm_indicator_sub_convLp_momentKernel_le hp hg h1 hgR L hc MeasurableSet.univ
     (T := Set.univ) (fun _ _ => by rw [diffStepSet_univ]) f
-  rwa [Set.indicator_univ, modulusOn_univ, ← Lp.enorm_def] at h
+  rwa [Set.indicator_univ, modulusOn_univ, ← Lp.eNorm_def] at h
 
 end Rd
 

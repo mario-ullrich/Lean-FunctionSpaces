@@ -110,9 +110,9 @@ theorem lintegral_fin_nat_prod_volume_eq_prod {f : Fin d → ℝ → ℝ≥0∞}
 theorem lintegral_enorm_tensorKernel {K : Fin d → ℝ → ℂ} (hK : ∀ i, Integrable (K i)) :
     ∫⁻ x, ‖tensorKernel K x‖ₑ = ∏ i, ∫⁻ t, ‖K i t‖ₑ := by
   have h : ∀ x : Fin d → ℝ, ‖tensorKernel K x‖ₑ = ∏ i, ‖K i (x i)‖ₑ := fun x => by
-    simp [tensorKernel_apply, enorm_eq_nnnorm, nnnorm_prod]
+    simp [tensorKernel_apply, eNorm_eq_nnNorm, nnNorm_prod]
   simp_rw [h]
-  exact lintegral_fin_nat_prod_volume_eq_prod fun i => (hK i).aestronglyMeasurable.enorm
+  exact lintegral_fin_nat_prod_volume_eq_prod fun i => (hK i).aestronglyMeasurable.eNorm
 
 /-- **The `L_p` norm of a tensor product**: `‖⊗K‖_p = ∏_i ‖K_i‖_p` for `0 < p < ∞` and almost
 everywhere strongly measurable kernels, since `‖⊗K‖_p^p = ∫ ∏_i |K_i(x_i)|^p dx = ∏_i ‖K_i‖_p^p`
@@ -120,16 +120,16 @@ everywhere strongly measurable kernels, since `‖⊗K‖_p^p = ∫ ∏_i |K_i(x
 theorem eLpNorm_tensorKernel {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞) {K : Fin d → ℝ → ℂ}
     (hK : ∀ i, AEStronglyMeasurable (K i)) :
     eLpNorm (tensorKernel K) p volume = ∏ i, eLpNorm (K i) p volume := by
-  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp (aestronglyMeasurable_tensorKernel hK),
-    Finset.prod_congr rfl fun i _ => eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp (hK i),
+  rw [eLpNorm_eq_lintegral_rpow_eNorm_toReal hp0 hp (aestronglyMeasurable_tensorKernel hK),
+    Finset.prod_congr rfl fun i _ => eLpNorm_eq_lintegral_rpow_eNorm_toReal hp0 hp (hK i),
     ENNReal.prod_rpow_of_nonneg (by positivity)]
   congr 1
   have h : ∀ x : Fin d → ℝ, ‖tensorKernel K x‖ₑ ^ p.toReal = ∏ i, ‖K i (x i)‖ₑ ^ p.toReal :=
     fun x => by
       rw [ENNReal.prod_rpow_of_nonneg ENNReal.toReal_nonneg, tensorKernel_apply]
-      simp [enorm_eq_nnnorm, nnnorm_prod]
+      simp [eNorm_eq_nnNorm, nnNorm_prod]
   simp_rw [h]
-  exact lintegral_fin_nat_prod_volume_eq_prod fun i => (hK i).enorm.pow_const _
+  exact lintegral_fin_nat_prod_volume_eq_prod fun i => (hK i).eNorm.pow_const _
 
 /-- `‖⊗K‖_1 = ∏_i ‖K_i‖_1` with `eLpNorm`, the case `p = 1` of `Rd.eLpNorm_tensorKernel`. -/
 theorem eLpNorm_tensorKernel_one {K : Fin d → ℝ → ℂ} (hK : ∀ i, Integrable (K i)) :

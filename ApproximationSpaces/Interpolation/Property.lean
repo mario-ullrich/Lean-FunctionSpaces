@@ -65,9 +65,11 @@ theorem indicator_preimage_mul_left_inv {c : ℝ} (hc : 0 < c) (s : Set ℝ) (t 
         indicator_of_mem (show c * t ∈ s ∩ Ioi 0 from ⟨hs, hct⟩), ENNReal.ofReal_mul hc.le,
         ENNReal.mul_inv (Or.inl hc0) (Or.inl ENNReal.ofReal_ne_top), ← mul_assoc,
         ENNReal.mul_inv_cancel hc0 ENNReal.ofReal_ne_top, one_mul]
-    · rw [indicator_of_notMem (fun h => hs h.1), indicator_of_notMem (fun h => hs h.1), mul_zero]
+    · rw [indicator_of_notMem (fun h : t ∈ (c * ·) ⁻¹' s ∩ Ioi 0 => hs h.1),
+        indicator_of_notMem (fun h : c * t ∈ s ∩ Ioi 0 => hs h.1), mul_zero]
   · have hct : ¬ 0 < c * t := fun h => ht (pos_of_mul_pos_right h hc.le)
-    rw [indicator_of_notMem (fun h => ht h.2), indicator_of_notMem (fun h => hct h.2), mul_zero]
+    rw [indicator_of_notMem (fun h : t ∈ (c * ·) ⁻¹' s ∩ Ioi 0 => ht h.2),
+      indicator_of_notMem (fun h : c * t ∈ s ∩ Ioi 0 => hct h.2), mul_zero]
 
 /-- **Dilations preserve `dt/t`**: for `c > 0`, `t ↦ c t` maps the measure `dt/t` on `(0, ∞)`
 to itself, since Lebesgue measure scales by `c⁻¹` and the density `t⁻¹` by `c`. -/
@@ -98,9 +100,9 @@ theorem ae_pos_kMethodMeasure : ∀ᵐ t ∂kMethodMeasure, 0 < t := by
 theorem phiFunctional_mono (hφ : Measurable φ) (h : ∀ t, t ≠ 0 → t ≠ ∞ → φ t ≤ ψ t) :
     phiFunctional θ q φ ≤ phiFunctional θ q ψ := by
   rw [phiFunctional_eq, phiFunctional_eq]
-  refine eLpNorm_mono_enorm_ae (measurable_phiIntegrand_of_measurable hφ).aestronglyMeasurable
+  refine eLpNorm_mono_eNorm_ae (measurable_phiIntegrand_of_measurable hφ).aestronglyMeasurable
     (ae_pos_kMethodMeasure.mono fun t ht => ?_)
-  simp only [enorm_eq_self, phiIntegrand]
+  simp only [eNorm_eq_self, phiIntegrand]
   gcongr
   exact h _ (ENNReal.ofReal_pos.2 ht).ne' ENNReal.ofReal_ne_top
 
@@ -454,10 +456,10 @@ theorem inclInterpNorm_map_le_of_comp_eq (T : X →L[ℝ] X') (S : Y →L[ℝ] Y
 theorem MemInclKMethod.map (T : X →L[ℝ] X') (S : Y →L[ℝ] Y') (hTS : T.comp ι = ι'.comp S) {f : X}
     (hf : MemInclKMethod ι θ q f) : MemInclKMethod ι' θ q (T f) :=
   InterpCouple.memKMethod_ofMap_iff.1 ((InterpCouple.memKMethod_ofMap_iff.2 hf).map
-    (T : X →+ X') enorm_ne_top (max_ne_top ENNReal.one_ne_top enorm_ne_top)
+    (T : X →+ X') eNorm_ne_top (max_ne_top ENNReal.one_ne_top eNorm_ne_top)
     (InterpCouple.norm0_ofMap_apply_le T)
     (InterpCouple.norm1_ofMap_apply_le hTS (zero_lt_one.trans_le (le_max_left _ _)).ne'
-      (max_ne_top ENNReal.one_ne_top enorm_ne_top) (le_max_right _ _)))
+      (max_ne_top ENNReal.one_ne_top eNorm_ne_top) (le_max_right _ _)))
 
 /-- **The spaces of the discrete K-method under compatible maps**: if `T : X → X'` and
 `S : Y → Y'` are bounded linear maps with `T ι = ι' S`, then for `θ > 0` and `ρ > 0` the map `T`

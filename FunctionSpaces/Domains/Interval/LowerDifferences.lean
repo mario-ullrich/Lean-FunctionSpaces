@@ -158,7 +158,7 @@ theorem lintegral_localBound_le (j : ℕ) (c : ℝ≥0∞) (M : ℕ → ℝ≥0�
 theorem sum_localMass_ppFun_le (hp : p ≠ ∞) (j : ℕ) (Q : ℕ → ℂ[X]) :
     ∑ n ∈ Finset.range (2 ^ j), localMass p j (ppFun j Q) n ≤
       eLpNorm (ppFun j Q) p unitVol ^ p.toReal :=
-  (ENNReal.sum_le_tsum _).trans (tsum_localMass_ppFun_le hp j Q)
+  (sum_le_tsum _).trans (tsum_localMass_ppFun_le hp j Q)
 
 /-! ### Pointwise bounds -/
 
@@ -403,7 +403,7 @@ theorem enorm_higherDiff_spline_le_of_lt {r j N m : ℕ} (hm : 1 ≤ m) (hmr : m
           S ^ (1 / p.toReal) := fun l hl =>
     enorm_jumpCoeff_mul_higherDiff_truncPow_le hm hmr hP hJ hu hK hp hh0 hmh hl
   rw [higherDiff_eq_add_sum_jumps hmr.le hJ hu hh0 hh hx hxm]
-  refine (enorm_add_le _ _).trans ((add_le_add hpiece ((enorm_sum_le _ _).trans
+  refine (eNorm_add_le _ _).trans ((add_le_add hpiece ((eNorm_sum_le _ _).trans
     (Finset.sum_le_sum hterm))).trans ?_)
   rw [Finset.sum_const, Nat.card_Ioc, show n₀ + r - n₀ = r by omega, nsmul_eq_mul]
   exact le_of_eq (by ring)

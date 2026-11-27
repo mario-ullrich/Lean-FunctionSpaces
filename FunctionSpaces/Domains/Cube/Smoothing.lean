@@ -189,7 +189,7 @@ theorem eLpNorm_sub_cubeSteklovSmooth_le_of_cubeDiff_le {f : (Fin d → ℝ) →
     funext x
     rw [sub_cubeSteklovSmooth_eq hf r hδ.ne' i x]
     rfl
-  rw [heq, eLpNorm_const_smul, enorm_pow, enorm_neg, enorm_one, one_pow, one_mul]
+  rw [heq, eLpNorm_const_smul, eNorm_pow, eNorm_neg, eNorm_one, one_pow, one_mul]
   refine (eLpNorm_avgStepIter_le (continuous_cubeDiff_uncurry hf r i) hδ hp hp' μ r 0).trans ?_
   refine iSup₂_le fun h hh => ?_
   rw [zero_add] at hh

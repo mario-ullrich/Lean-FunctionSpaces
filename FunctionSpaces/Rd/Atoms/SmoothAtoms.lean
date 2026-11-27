@@ -407,7 +407,7 @@ theorem norm_iteratedFDeriv_cellAtom_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) {K g : 
           ring
   have h := enorm_inv_cellCoef_mul_conv_le hp1 hg m hK' hρ hK'ρ x
   have h' := ENNReal.toReal_mono (ENNReal.mul_ne_top ENNReal.ofReal_ne_top hX) h
-  rw [toReal_enorm, ENNReal.toReal_mul, ENNReal.toReal_ofReal (by positivity)] at h'
+  rw [toReal_eNorm, ENNReal.toReal_mul, ENNReal.toReal_ofReal (by positivity)] at h'
   calc ‖(cellCoef p j g m)⁻¹ * conv K' ((dyadicCell j m).indicator g) volume x‖
       ≤ A * 2 ^ (j * l) * (∏ i, ‖v i‖) * X.toReal := h'
     _ = A * 2 ^ (j * l) * X.toReal * ∏ i, ‖v i‖ := by ring
@@ -485,8 +485,8 @@ noncomputable def LocalMeansBump.std : LocalMeansBump V := LocalMeansBump.center
 norm `1`. -/
 theorem LocalMeansBump.eLpNorm_std_one :
     eLpNorm (LocalMeansBump.std (V := V)).toFun 1 volume = 1 := by
-  rw [eLpNorm_one_eq_lintegral_enorm (LocalMeansBump.std (V := V)).integrable.aestronglyMeasurable,
-    ← ofReal_integral_norm_eq_lintegral_enorm (LocalMeansBump.std (V := V)).integrable]
+  rw [eLpNorm_one_eq_lintegral_eNorm (LocalMeansBump.std (V := V)).integrable.aestronglyMeasurable,
+    ← ofReal_integral_norm_eq_lintegral_eNorm (LocalMeansBump.std (V := V)).integrable]
   have hn : ∀ z, ‖(LocalMeansBump.std (V := V)).toFun z‖ =
       (stdBumpBase (V := V)).normed volume z := fun z => by
     change ‖(((stdBumpBase (V := V)).normed volume z : ℝ) : ℂ)‖ = _

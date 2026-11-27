@@ -236,7 +236,7 @@ theorem exists_enorm_bspline_le (r : ℕ) : ∃ M : ℝ≥0∞, M ≠ ∞ ∧ �
     convert h using 2
     push_cast
     ring_nf
-  · simp only [bspline, hy, ↓reduceIte, enorm_zero, zero_le]
+  · simp only [bspline, hy, ↓reduceIte, eNorm_zero, zero_le]
 
 variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 
@@ -251,7 +251,7 @@ theorem exists_enorm_bcoord_le {r : ℕ} (hr : 1 ≤ r) :
   let T : (Fin r → ℂ) →ₗ[ℂ] (Fin r → ℂ) :=
     (bsplineBasis hr).equivFun.toLinearMap ∘ₗ (degreeLTEquiv ℂ r).symm.toLinearMap
   let T' := LinearMap.toContinuousLinearMap T
-  refine ⟨‖T'‖ₑ * K, ENNReal.mul_ne_top enorm_ne_top ENNReal.coe_ne_top, fun R hR j => ?_⟩
+  refine ⟨‖T'‖ₑ * K, ENNReal.mul_ne_top eNorm_ne_top ENNReal.coe_ne_top, fun R hR j => ?_⟩
   by_cases hj : j < r
   · set c := degreeLTEquiv ℂ r ⟨R, hR⟩
     have hRc : (degreeLTEquiv ℂ r).symm c = ⟨R, hR⟩ := by simp [c]
@@ -275,7 +275,7 @@ theorem exists_enorm_bcoord_le {r : ℕ} (hr : 1 ≤ r) :
           ENNReal.ofReal_coe_nnreal]
         ring
   · have h : ¬ (R ∈ degreeLT ℂ r ∧ j < r) := fun h => hj h.2
-    simp only [bcoord, h, ↓reduceDIte, enorm_zero, zero_le]
+    simp only [bcoord, h, ↓reduceDIte, eNorm_zero, zero_le]
 
 /-- The quasi-interpolant coefficient as a coordinate on the unit interval of `J(n)`:
 `λ_n(g) = a_{max(n,0) - n}(Π g((· + max(n, 0)) 2^(-k)))`. -/
@@ -386,17 +386,17 @@ theorem eLpNorm_qiPieces_le {r : ℕ} (hr : 1 ≤ r) {Cb : ℝ≥0∞}
         ∑ n ∈ Finset.Ioc ((i : ℤ) - r) i, eLpNorm g p (volume.restrict (dyadicIco k n.toNat)) :=
     fun x hx => by
       rw [polyFun_qiPieces_eq_sum_Ioc hr hi g hx]
-      refine (enorm_sum_le _ _).trans ?_
+      refine (eNorm_sum_le _ _).trans ?_
       rw [Finset.mul_sum]
       refine Finset.sum_le_sum fun n hn => ?_
       have hn' := (Finset.mem_Ioc.1 hn).1
-      rw [enorm_mul]
+      rw [eNorm_mul]
       calc ‖qiCoeff hr k g n‖ₑ * ‖bspline r (2 ^ k * x - n)‖ₑ
           ≤ (Cb * ppProjConst r * ENNReal.ofReal (2 ^ k) ^ (1 / p.toReal) *
               eLpNorm g p (volume.restrict (dyadicIco k n.toNat))) * MN :=
             mul_le_mul' (enorm_qiCoeff_le hr hCb hp k (by omega) (hgI n hn)) (hMN _)
         _ = _ := by ring
-  refine (eLpNorm_le_of_ae_enorm_bound (measurable_polyFun _).aestronglyMeasurable
+  refine (eLpNorm_le_of_ae_eNorm_bound (measurable_polyFun _).aestronglyMeasurable
     ((ae_restrict_iff' (measurableSet_dyadicIco k i)).2 (Filter.Eventually.of_forall hpt))).trans_eq ?_
   rw [Measure.restrict_apply_univ, volume_dyadicIco, smul_eq_mul, ← hθ']
   have h1 : ENNReal.ofReal (2 ^ k) ^ (1 / p.toReal) * ENNReal.ofReal (1 / 2 ^ k) ^ (1 / p.toReal) =

@@ -94,12 +94,12 @@ theorem dyadicWeight_mul_enorm_conv_meansKernel_succ_le {L m : ℕ} (hmL : m ≤
   have hw : dyadicWeight (m : ℝ) (j + 1) * ‖((2 : ℂ) ^ (j * m))⁻¹‖ₑ = 2 ^ m := by
     have h2 : ‖(2 : ℂ)‖ₑ = 2 := by
       rw [← ofReal_norm, Complex.norm_two, ENNReal.ofReal_ofNat]
-    rw [ENNReal.dyadicWeight_natCast, enorm_inv (pow_ne_zero _ two_ne_zero), enorm_pow, h2,
+    rw [ENNReal.dyadicWeight_natCast, eNorm_inv (pow_ne_zero _ two_ne_zero), eNorm_pow, h2,
       add_mul, one_mul, pow_add, mul_comm, ← mul_assoc, ENNReal.inv_mul_cancel
         (pow_ne_zero _ two_ne_zero) (ENNReal.pow_ne_top ENNReal.ofNat_ne_top), one_mul]
-  rw [b.conv_meansKernel_succ_eq_sum_higherKernel hmL hf hfg j hx, enorm_mul, ← mul_assoc, hw]
+  rw [b.conv_meansKernel_succ_eq_sum_higherKernel hmL hf hfg j hx, eNorm_mul, ← mul_assoc, hw]
   gcongr
-  exact enorm_sum_le _ _
+  exact eNorm_sum_le _ _
 
 /-- **The local means of order `L` by the derivatives of order `m ≤ L`, pointwise**: let `m ≤ L`,
 `f ∈ L_p(T)` on an open set `T` with weak derivatives `g_i = ∂^{e_i} f` on `T` for the words `i`
@@ -179,7 +179,7 @@ theorem tlLocalNormOn_le_of_hasWeakLineDeriv_words [Nontrivial V] (hp1 : 1 < p) 
           eLpNorm (g i) p (volume.restrict T) := by
   have hT := T.isOpen.measurableSet
   have hFn : ‖F‖ₑ = eLpNorm f p (volume.restrict T) := by
-    rw [Lp.enorm_def, eLpNorm_congr_ae hF,
+    rw [Lp.eNorm_def, eLpNorm_congr_ae hF,
       eLpNorm_indicator_eq_eLpNorm_restrict hT.nullMeasurableSet]
   refine (b.dilationSmoothed.tlLocalNormOn_le_of_pointwise hp L m hW (b.higherKernel L m)
     (fun i => (T : Set V).indicator (g i))
@@ -308,7 +308,7 @@ theorem extendsSobolevOrder_of_eLpNorm_le [Fact (1 ≤ p)] {m : ℕ} {O : Opens 
     rw [h1, h2 hx]
   · refine le_trans (le_of_eq ?_) hb
     refine Finset.sum_congr rfl fun k hk => Finset.sum_congr rfl fun w _ => ?_
-    rw [hGL k (Nat.lt_succ_iff.1 (Finset.mem_range.1 hk)) w, Lp.enorm_toLp]
+    rw [hGL k (Nat.lt_succ_iff.1 (Finset.mem_range.1 hk)) w, Lp.eNorm_toLp]
 
 /-- **Order zero**: `W^0_p(O) = L_p(O)` extends from `O` by zero, with constant `1`: `F = 1_O f`,
 and `‖F‖_p = ‖f‖_{L_p(O)} = ‖g_{0,∅}‖_{L_p(O)}`. -/
@@ -496,7 +496,7 @@ theorem extendsSobolevOrder_of_cover [Fact (1 ≤ p)] {m : ℕ} {ι : Type*} [Fi
     obtain ⟨H, hH, hHb⟩ := exists_hasWeakLineDeriv_top_mul_le (p := p) (B := ⊤)
       (G := fun k w => (G i k w : V → ℂ)) (hG i) (hψ i) (hcs i) (Set.subset_univ _) hk w
     refine ⟨H, hH, hHb.trans (mul_le_mul_right ?_ _)⟩
-    simpa only [volume_restrict_top, ← Lp.enorm_def] using hb i
+    simpa only [volume_restrict_top, ← Lp.eNorm_def] using hb i
   refine ⟨fun x => ∑ i, (ψ i x : ℂ) * F i x, fun k w => ∑ i, H i k w, fun k hk w => ?_,
     ae_sum_mul_eq hψU (fun x hx => hψ1 x (subset_closure hx)) hFf, ?_⟩
   · refine (HasWeakLineDeriv.sum (s := Finset.univ) fun i _ => (hH i k hk w).1).congr_ae ?_ ?_ <;>

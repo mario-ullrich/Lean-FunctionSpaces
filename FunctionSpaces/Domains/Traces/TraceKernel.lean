@@ -484,8 +484,8 @@ theorem exists_mem_zeroBoundarySpace_enorm_sub_le (s : ℝ) (hs : 1 / 2 < s) (hs
       map_sub (restrictProj s Ω.toOpens) (sobolevInclusion hs1 (W' - W)), restrictProj_coe]
   rw [hyu]
   calc _ ≤ ‖sobolevInclusion hs1 W' - (u : H^{s}(V)) - sobolevInclusion hs1 W‖ₑ :=
-        enorm_le_iff_norm_le.2 (norm_restrictProj_apply_le _)
-    _ ≤ ‖sobolevInclusion hs1 W' - (u : H^{s}(V))‖ₑ + ‖sobolevInclusion hs1 W‖ₑ := enorm_sub_le
+        eNorm_le_iff_norm_le.2 (norm_restrictProj_apply_le _)
+    _ ≤ ‖sobolevInclusion hs1 W' - (u : H^{s}(V))‖ₑ + ‖sobolevInclusion hs1 W‖ₑ := eNorm_sub_le
     _ ≤ ‖sobolevInclusion hs1 W' - (u : H^{s}(V))‖ₑ +
         CE * (Ct * ‖sobolevInclusion hs1 W' - (u : H^{s}(V))‖ₑ) := add_le_add le_rfl hWs
     _ = (1 + CE * Ct) * ‖sobolevInclusion hs1 W' - (u : H^{s}(V))‖ₑ := by ring
@@ -509,8 +509,8 @@ theorem traceKer_le_zeroBoundarySpace_of_le_one (s : ℝ) (hs : 1 / 2 < s) (hs1 
   obtain ⟨y, hy, hyle⟩ := hle u hu W'
   refine ⟨y, hy, ?_⟩
   have h1 : ‖y - u‖ ≤ K.toReal * ‖sobolevInclusion hs1 W' - (u : H^{s}(V))‖ := by
-    have h := ENNReal.toReal_mono (ENNReal.mul_ne_top hK enorm_ne_top) hyle
-    rwa [ENNReal.toReal_mul, toReal_enorm, toReal_enorm] at h
+    have h := ENNReal.toReal_mono (ENNReal.mul_ne_top hK eNorm_ne_top) hyle
+    rwa [ENNReal.toReal_mul, toReal_eNorm, toReal_eNorm] at h
   have h2 : ‖sobolevInclusion hs1 W' - (u : H^{s}(V))‖ < ε / (K.toReal + 1) := by
     rw [← dist_eq_norm, dist_comm]
     exact hW'

@@ -93,7 +93,7 @@ theorem sobolevGridNorm_lt_top_of_memSobolevW {m : ℕ} {f : Lp ℂ p (volume : 
     (memSobolevW_iff_exists_hasWeakLineDeriv f).1 hf m le_rfl _
   choose g hg using hd
   exact (sobolevGridNorm_le hg).trans_lt
-    (ENNReal.add_lt_top.2 ⟨enorm_lt_top, ENNReal.sum_lt_top.2 fun _ _ => enorm_lt_top⟩)
+    (ENNReal.add_lt_top.2 ⟨eNorm_lt_top, ENNReal.sum_lt_top.2 fun _ _ => eNorm_lt_top⟩)
 
 /-- **The grid norm is finite exactly on `W^m_p(V)`**: in dimension `n ≥ 1`, for `1 < p < ∞`,
 `m ∈ ℕ` and `f ∈ L_p(V)`, the grid norm of `f` is finite iff `f ∈ W^m_p(V)`.  Weak derivatives

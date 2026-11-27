@@ -46,7 +46,7 @@ instance finiteDimensional_span_ofSpan (n : ℕ) :
 
 /-- The sets of `ofSpan e` are closed, being finite-dimensional subspaces. -/
 theorem isClosed_ofSpan (n : ℕ) : IsClosed (ofSpan e n) :=
-  Submodule.closed_of_finiteDimensional _
+  Submodule.isClosed_of_finiteDimensional _
 
 /-- The union of the sets of `ofSpan e` is the span of the whole sequence. -/
 theorem iUnion_ofSpan : (⋃ n, ofSpan e n) = (Submodule.span ℝ (Set.range e) : Set X) := by

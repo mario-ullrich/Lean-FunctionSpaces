@@ -341,7 +341,7 @@ theorem succ_mul_rpow_decreasingRearrangement_le (hr0 : ∀ i, 0 ≤ r i)
     _ ≤ ∑ k ∈ range (n + 1), ENNReal.ofReal (decreasingRearrangement r k) ^ p := by
         gcongr with k hk
         exact antitone_decreasingRearrangement (Nat.lt_succ_iff.1 (mem_range.1 hk))
-    _ ≤ _ := ENNReal.sum_le_tsum _
+    _ ≤ _ := sum_le_tsum _
 
 /-- `(r*_n)^p ≤ ∑_i r_i^p` for a nonnegative null family and `p > 0`. -/
 theorem rpow_decreasingRearrangement_le_tsum (hr0 : ∀ i, 0 ≤ r i)
@@ -379,7 +379,7 @@ theorem tsum_ite_rpow_le_tsum_min (hr0 : ∀ i, 0 ≤ r i) (hr : Tendsto r cofin
     by_cases hi : c < r i <;> simp [s, hi, ENNReal.zero_rpow_of_pos hp]
   simp_rw [hterm]
   rw [← tsum_ofReal_rpow_decreasingRearrangement hs0 (tendsto_of_le hs0 hsr hr) hp]
-  refine ENNReal.tsum_le_tsum fun k => le_min ?_ ?_
+  refine tsum_le_tsum fun k => le_min ?_ ?_
   · gcongr
     exact decreasingRearrangement_mono hsr hr.bddAbove_range_of_cofinite k
   · gcongr
@@ -403,7 +403,7 @@ theorem tsum_rpow_decreasingRearrangement_add_le [DecidableEq ι] (hr0 : ∀ i, 
     by_cases hi : i ∈ Λ <;> simp [s, hi, ENNReal.zero_rpow_of_pos hp]
   simp_rw [hterm]
   rw [← tsum_ofReal_rpow_decreasingRearrangement hs0 (tendsto_of_le hs0 hsr hr) hp]
-  refine ENNReal.tsum_le_tsum fun k => ?_
+  refine tsum_le_tsum fun k => ?_
   gcongr
   exact decreasingRearrangement_add_le_of_card_le hr.bddAbove_range_of_cofinite hΛ k
 

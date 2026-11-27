@@ -62,7 +62,7 @@ theorem exists_fourierMultiplier_eq_of_hasSymbolGrowth (hp1 : 1 < p) (hp : p ≠
     rw [mul_assoc]
     exact mul_le_mul_of_nonneg_left (triebelLizorkinNorm_zero_two_le hp1 hp f) (zero_le (a := C₁))
   obtain ⟨g, hg, hgn⟩ := hb _ (hf.trans_lt (ENNReal.mul_lt_top
-    (ENNReal.mul_lt_top hC₁.lt_top (squareFunctionConst_ne_top hp1 hp).lt_top) enorm_lt_top))
+    (ENNReal.mul_lt_top hC₁.lt_top (squareFunctionConst_ne_top hp1 hp).lt_top) eNorm_lt_top))
   rw [TemperedDistribution.besselPotential_zero, ContinuousLinearMap.id_apply] at hg
   refine ⟨g, hg, hgn.trans ?_⟩
   rw [mul_assoc C₂]
@@ -106,9 +106,9 @@ theorem toTemperedDistributionCLM_symbolLpFun (hp1 : 1 < p) (hp : p ≠ ∞)
 theorem norm_symbolLpFun_le (hp1 : 1 < p) (hp : p ≠ ∞) (hm : HasSymbolGrowth 0 m)
     (f : Lp ℂ p (volume : Measure V)) :
     ‖symbolLpFun hp1 hp hm f‖ ≤ (symbolLpConst hp1 hp hm).toReal * ‖f‖ := by
-  have h := ENNReal.toReal_mono (ENNReal.mul_ne_top (symbolLpConst_ne_top hp1 hp hm) enorm_ne_top)
+  have h := ENNReal.toReal_mono (ENNReal.mul_ne_top (symbolLpConst_ne_top hp1 hp hm) eNorm_ne_top)
     (exists_fourierMultiplier_eq_symbolLpConst hp1 hp hm f).choose_spec.2
-  rwa [ENNReal.toReal_mul, toReal_enorm, toReal_enorm] at h
+  rwa [ENNReal.toReal_mul, toReal_eNorm, toReal_eNorm] at h
 
 /-- The **Fourier multiplier `m(D)` on `L_p(V)`** for a symbol `m` of order `0`, `1 < p < ∞`,
 `n ≥ 1`: the `L_p` function of the tempered distribution `m(D) f` (`Rd.symbolLpFun`). It is

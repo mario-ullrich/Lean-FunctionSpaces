@@ -49,8 +49,8 @@ theorem eLpNorm_top_le_enorm {α E : Type*} [MeasurableSpace α] {μ : Measure �
     [TopologicalSpace α] [OpensMeasurableSpace α] [NormedAddCommGroup E]
     [SecondCountableTopologyEither α E] (a : α →ᵇ E) : eLpNorm a ∞ μ ≤ ‖a‖ₑ := by
   rw [eLpNorm_exponent_top a.continuous.aestronglyMeasurable]
-  exact eLpNormEssSup_le_of_ae_enorm_bound
-    (Filter.Eventually.of_forall fun x => enorm_le_iff_norm_le.2 (a.norm_coe_le_norm x))
+  exact eLpNormEssSup_le_of_ae_eNorm_bound
+    (Filter.Eventually.of_forall fun x => eNorm_le_iff_norm_le.2 (a.norm_coe_le_norm x))
 
 /-- **The real form of the sup-norm bound in `L_∞`**: `(‖a‖_{L_∞(μ)}).toReal ≤ sup |a|` for every
 measure `μ` (`BoundedContinuousFunction.eLpNorm_top_le_enorm`, with `‖a‖ₑ < ∞`). -/
@@ -58,13 +58,13 @@ theorem toReal_eLpNorm_top_le_norm {α E : Type*} [MeasurableSpace α] {μ : Mea
     [TopologicalSpace α] [OpensMeasurableSpace α] [NormedAddCommGroup E]
     [SecondCountableTopologyEither α E] (a : α →ᵇ E) :
     (eLpNorm a ∞ μ).toReal ≤ ‖a‖ := by
-  rw [← toReal_enorm]
-  exact ENNReal.toReal_mono enorm_ne_top (eLpNorm_top_le_enorm a)
+  rw [← toReal_eNorm]
+  exact ENNReal.toReal_mono eNorm_ne_top (eLpNorm_top_le_enorm a)
 
 /-- **The `L_p` quasi-norm of a bounded continuous function**: for a finite measure `μ` on `Ω`,
 every exponent `p` and every bounded continuous `b`, the class `ι_{∞,p}(b)` of `b` in `L_p(μ)`,
 taken through `L_∞(μ)`, satisfies `‖ι_{∞,p}(b)‖_p ≤ μ(Ω)^(1/p) ‖b‖_∞`, since `b` is bounded by
-its sup norm everywhere (`MeasureTheory.eLpNorm_le_of_ae_enorm_bound`). This is the `[0, ∞]`
+its sup norm everywhere (`MeasureTheory.eLpNorm_le_of_ae_eNorm_bound`). This is the `[0, ∞]`
 form, along `L_∞ ↪ L_p`, of Mathlib's `BoundedContinuousFunction.Lp_nnnorm_le`, which holds for
 every exponent. -/
 theorem eLpNorm_topInclusion_toLp_le {α E 𝕜 : Type*}
@@ -75,11 +75,11 @@ theorem eLpNorm_topInclusion_toLp_le {α E 𝕜 : Type*}
         (BoundedContinuousFunction.toLp (E := E) ∞ μ 𝕜 b)) p μ ≤
       μ Set.univ ^ p.toReal⁻¹ * ‖b‖ₑ := by
   rw [mul_comm, ← smul_eq_mul]
-  refine eLpNorm_le_of_ae_enorm_bound (Lp.aestronglyMeasurable _) ?_
+  refine eLpNorm_le_of_ae_eNorm_bound (Lp.aestronglyMeasurable _) ?_
   filter_upwards [Lp.coeFn_topInclusion (𝕜 := 𝕜) (p := p)
       (BoundedContinuousFunction.toLp (E := E) ∞ μ 𝕜 b),
     BoundedContinuousFunction.coeFn_toLp (E := E) (p := ∞) (μ := μ) (𝕜 := 𝕜) b] with x h1 h2
-  rw [h1, h2, enorm_le_iff_norm_le]
+  rw [h1, h2, eNorm_le_iff_norm_le]
   exact b.norm_coe_le_norm x
 
 variable {α E 𝕜 : Type*} {m0 : MeasurableSpace α} {μ : Measure α}
@@ -125,10 +125,10 @@ theorem norm_toLp_top [μ.IsOpenPosMeasure] (a : α →ᵇ E) : ‖toLp (E := E)
     have hae : ∀ᵐ x ∂μ, ‖a x‖ₑ ≤ ‖F‖ₑ := by
       filter_upwards [coeFn_toLp (E := E) ∞ μ 𝕜 a,
         ae_le_eLpNormEssSup (f := (F : α → E)) (μ := μ)] with x h1 h2
-      rw [← h1, Lp.enorm_def, eLpNorm_exponent_top (Lp.aestronglyMeasurable F)]
+      rw [← h1, Lp.eNorm_def, eLpNorm_exponent_top (Lp.aestronglyMeasurable F)]
       exact h2
     have hU : IsOpen {x | ‖F‖ₑ < ‖a x‖ₑ} :=
-      isOpen_lt continuous_const (continuous_enorm.comp a.continuous)
+      isOpen_lt continuous_const (continuous_eNorm.comp a.continuous)
     have hU0 : μ {x | ‖F‖ₑ < ‖a x‖ₑ} = 0 := by
       simpa [not_le] using ae_iff.1 hae
     rw [hU.measure_eq_zero_iff μ] at hU0
@@ -136,8 +136,8 @@ theorem norm_toLp_top [μ.IsOpenPosMeasure] (a : α →ᵇ E) : ‖toLp (E := E)
     have hx : ‖a x‖ₑ ≤ ‖F‖ₑ := by
       by_contra h
       exact (Set.eq_empty_iff_forall_notMem.1 hU0 x) (not_le.1 h)
-    rw [← toReal_enorm, ← toReal_enorm]
-    exact ENNReal.toReal_mono enorm_ne_top hx
+    rw [← toReal_eNorm, ← toReal_eNorm]
+    exact ENNReal.toReal_mono eNorm_ne_top hx
 
 /-- For a measure that charges every nonempty open set, `toLp ∞` is an isometry. -/
 theorem isometry_toLp_top [μ.IsOpenPosMeasure] :

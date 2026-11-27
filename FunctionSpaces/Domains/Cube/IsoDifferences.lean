@@ -115,7 +115,7 @@ theorem diffAct_list_prod (m : Fin d → ℕ) (h : Fin d → ℝ) (l : List (Fin
   induction l with
   | nil => simp [cubeMixedDiff_nil]
   | cons i l ih =>
-    rw [List.map_cons, List.prod_cons, map_mul, Module.End.mul_apply, ih,
+    rw [List.map_cons, List.prod_cons, map_mul, mul_apply_eq_comp, ih,
       diffAct_coordElem_pow, cubeMixedDiff_cons]
 
 /-! ### The expansion -/
@@ -129,7 +129,7 @@ theorem higherDiff_eq_sum (r : ℕ) (h : Fin d → ℝ) (f : (Fin d → ℝ) →
   rw [higherDiff_eq_diffAct, single_sub_one_pow_eq_sum, map_sum, LinearMap.sum_apply,
     Finset.sum_apply]
   refine Finset.sum_congr rfl fun α _ => ?_
-  rw [map_mul, Module.End.mul_apply, diffAct_single_one, transl_apply, Fin.prod_univ_def,
+  rw [map_mul, mul_apply_eq_comp, diffAct_single_one, transl_apply, Fin.prod_univ_def,
     diffAct_list_prod]
 
 /-! ### Slices of mixed differences -/

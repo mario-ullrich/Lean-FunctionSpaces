@@ -208,7 +208,7 @@ theorem enorm_sub_periodicJacksonApprox_le (hp : p ≠ ∞) (r k : ℕ)
     exact measurable_const.mul (Finset.measurable_sum _ fun l _ => measurable_const.mul
       (hfm.comp (measurable_fst.add ((hwl l).comp measurable_snd))))
   have hω : Rd.lpModulus p r f k ≠ ∞ :=
-    ne_top_of_le_ne_top (ENNReal.mul_ne_top (by simp) enorm_ne_top) (Rd.lpModulus_le r f k)
+    ne_top_of_le_ne_top (ENNReal.mul_ne_top (by simp) eNorm_ne_top) (Rd.lpModulus_le r f k)
   -- the differences at the step `π(-2^(-k) z)`
   have hbound : ∀ z, eLpNorm (fun t => G t z) p volume ≤
       ENNReal.ofReal (1 + ‖z‖) ^ r * Rd.lpModulus p r f k := fun z => by
@@ -230,7 +230,7 @@ theorem enorm_sub_periodicJacksonApprox_le (hp : p ≠ ∞) (r k : ℕ)
             (by positivity)
   have hlhs : ‖f - periodicJacksonApprox hp r k f‖ₑ =
       eLpNorm (fun t => ∫ z, Rd.lpKernel z * G t z) p volume := by
-    rw [Lp.enorm_def]
+    rw [Lp.eNorm_def]
     exact eLpNorm_congr_ae (ae_sub_periodicJacksonApprox_eq hp r k f)
   rw [hlhs]
   exact Rd.eLpNorm_integral_lpKernel_mul_le hp1 hp r hG hω hbound
@@ -317,8 +317,8 @@ theorem lpModulus_le_of_mem_trigPolyLp (hp : p ≠ ∞) (r : ℕ) {j k : ℕ}
     obtain ⟨x, rfl, hxn⟩ := exists_quotientProj_eq h
     have h1 : eLpNorm ((fwdDiff (quotientProj x))^[r] (periodicEconv Θ a)) p volume ≤
         eLpNorm ((fwdDiff x)^[r] Θ) 1 volume * ‖a‖ₑ := by
-      rw [eLpNorm_congr_ae (higherDiff_periodicEconv_ae hΘ ham hai r x), Lp.enorm_def,
-        eLpNorm_one_eq_lintegral_enorm (Rd.integrable_higherDiff hΘ r x).aestronglyMeasurable]
+      rw [eLpNorm_congr_ae (higherDiff_periodicEconv_ae hΘ ham hai r x), Lp.eNorm_def,
+        eLpNorm_one_eq_lintegral_eNorm (Rd.integrable_higherDiff hΘ r x).aestronglyMeasurable]
       exact eLpNorm_periodicEconv_le Fact.out hp (Rd.integrable_higherDiff hΘ r x) ham
     have h2 : ENNReal.ofReal (2 ^ J * ‖x‖) ^ r ≤
         ENNReal.ofReal c ^ r * dyadicWeight (-(r : ℝ)) (k - j) := by

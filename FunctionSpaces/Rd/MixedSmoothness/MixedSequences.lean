@@ -65,7 +65,7 @@ theorem lqNorm_schur_le {ι κ : Type*} [MeasurableSpace ι] [Countable ι]
   · rw [ENNReal.lqNorm_top, ENNReal.lqNorm_top]
     refine iSup_le fun m => ?_
     calc ∑' k, w m k * b k ≤ ∑' k, w m k * ⨆ k', b k' :=
-          ENNReal.tsum_le_tsum fun k => mul_le_mul' le_rfl (le_iSup b k)
+          tsum_le_tsum fun k => mul_le_mul' le_rfl (le_iSup b k)
       _ = (∑' k, w m k) * ⨆ k', b k' := ENNReal.tsum_mul_right
       _ ≤ A * ⨆ k', b k' := mul_le_mul' (hrow m) le_rfl
   have hq0 : q ≠ 0 := (zero_lt_one.trans_le hq).ne'
@@ -81,12 +81,12 @@ theorem lqNorm_schur_le {ι κ : Type*} [MeasurableSpace ι] [Countable ι]
     exact h.trans (mul_le_mul' (ENNReal.rpow_le_rpow (hrow m) (by linarith)) le_rfl)
   have hsum : ∑' m, (∑' k, w m k * b k) ^ r ≤ A ^ r * ∑' k, b k ^ r := by
     calc ∑' m, (∑' k, w m k * b k) ^ r ≤ ∑' m, A ^ (r - 1) * ∑' k, w m k * b k ^ r :=
-          ENNReal.tsum_le_tsum hjensen
+          tsum_le_tsum hjensen
       _ = A ^ (r - 1) * ∑' k, (∑' m, w m k) * b k ^ r := by
-          rw [ENNReal.tsum_mul_left, ENNReal.tsum_comm]
+          rw [ENNReal.tsum_mul_left, tsum_comm]
           simp_rw [ENNReal.tsum_mul_right]
       _ ≤ A ^ (r - 1) * ∑' k, A * b k ^ r :=
-          mul_le_mul' le_rfl (ENNReal.tsum_le_tsum fun k => mul_le_mul' (hcol k) le_rfl)
+          mul_le_mul' le_rfl (tsum_le_tsum fun k => mul_le_mul' (hcol k) le_rfl)
       _ = A ^ r * ∑' k, b k ^ r := by
           rw [ENNReal.tsum_mul_left, ← mul_assoc]
           congr 1
@@ -102,7 +102,7 @@ theorem lqNorm_schur_le {ι κ : Type*} [MeasurableSpace ι] [Countable ι]
 (Mathlib's `Finset.prod_univ_sum`). -/
 theorem tsum_prod_le_prod_tsum (f : Fin d → ℕ → ℝ≥0∞) :
     ∑' k : Fin d → ℕ, ∏ i, f i (k i) ≤ ∏ i, ∑' j, f i j := by
-  rw [ENNReal.tsum_eq_iSup_sum]
+  rw [tsum_eq_iSup_sum]
   refine iSup_le fun S => ?_
   set N := S.sup fun k => Finset.univ.sup k
   have hsub : S ⊆ Fintype.piFinset fun _ => Finset.range (N + 1) := fun k hk => by
@@ -115,7 +115,7 @@ theorem tsum_prod_le_prod_tsum (f : Fin d → ℕ → ℝ≥0∞) :
       ≤ ∑ k ∈ Fintype.piFinset (fun _ => Finset.range (N + 1)), ∏ i, f i (k i) :=
         Finset.sum_le_sum_of_subset hsub
     _ = ∏ i, ∑ j ∈ Finset.range (N + 1), f i j := (Finset.prod_univ_sum _ _).symm
-    _ ≤ ∏ i, ∑' j, f i j := Finset.prod_le_prod fun i _ => ENNReal.sum_le_tsum _
+    _ ≤ ∏ i, ∑' j, f i j := Finset.prod_le_prod fun i _ => sum_le_tsum _
 
 /-- **Sums of products of finitely supported factors**: let `F_i : κ → R`, `i ∈ ι` finite, vanish
 outside finite sets `T_i`. Then `∑_{k : ι → κ} ∏_i F_i(k_i) = ∏_i ∑_n F_i(n)`; both sides are
@@ -179,7 +179,8 @@ theorem dyadicWeight_mul_almostDiagCoeff_mul (s L : ℝ) (i j : ℕ) :
 theorem tsum_almostDiagProfile_le (s L : ℝ) (hs : 0 ≤ s) :
     ∑' l, almostDiagProfile s L l ≤
       (1 - (2 : ℝ≥0∞) ^ (-(L - s)))⁻¹ + (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ := by
-  rw [(ENNReal.summable.hasSum.of_nat_of_neg_add_one ENNReal.summable.hasSum).tsum_eq]
+  rw [(CompleteLattice.summable.hasSum.of_nat_of_neg_add_one
+    CompleteLattice.summable.hasSum).tsum_eq]
   refine add_le_add (le_of_eq ?_) ?_
   · rw [← ENNReal.tsum_dyadicWeight_neg]
     refine tsum_congr fun n => ?_
@@ -188,7 +189,7 @@ theorem tsum_almostDiagProfile_le (s L : ℝ) (hs : 0 ≤ s) :
     push_cast
     ring
   · rw [← ENNReal.tsum_dyadicWeight_neg]
-    refine ENNReal.tsum_le_tsum fun n => ?_
+    refine tsum_le_tsum fun n => ?_
     have hneg : ¬ (0 : ℤ) ≤ -((n : ℤ) + 1) := by omega
     simp only [almostDiagProfile, hneg, ↓reduceIte, ENNReal.dyadicWeight]
     refine ENNReal.rpow_le_rpow_of_exponent_le (by norm_num) ?_
@@ -216,13 +217,13 @@ theorem lqNorm_almostDiagonal_pi_le (hq : 1 ≤ q) {s L : ℝ} (hs : 0 ≤ s)
     refine (tsum_prod_le_prod_tsum fun i j => almostDiagProfile s L ((m i : ℤ) - j)).trans ?_
     calc ∏ i, ∑' j : ℕ, almostDiagProfile s L ((m i : ℤ) - j) ≤ ∏ _i : Fin d, C :=
           Finset.prod_le_prod fun i _ => le_trans
-            (ENNReal.tsum_comp_le_tsum_of_injective (fun j j' h => by simpa using h) _) hprof
+            (tsum_comp_le_tsum_of_injective (fun j j' h => by simpa using h) _) hprof
       _ = C ^ d := by rw [Finset.prod_const, Finset.card_univ, Fintype.card_fin]
   have hcol : ∀ k, ∑' m, w m k ≤ C ^ d := fun k => by
     refine (tsum_prod_le_prod_tsum fun i j => almostDiagProfile s L ((j : ℤ) - k i)).trans ?_
     calc ∏ i, ∑' j : ℕ, almostDiagProfile s L ((j : ℤ) - k i) ≤ ∏ _i : Fin d, C :=
           Finset.prod_le_prod fun i _ => le_trans
-            (ENNReal.tsum_comp_le_tsum_of_injective (fun j j' h => by simpa using h) _) hprof
+            (tsum_comp_le_tsum_of_injective (fun j j' h => by simpa using h) _) hprof
       _ = C ^ d := by rw [Finset.prod_const, Finset.card_univ, Fintype.card_fin]
   refine le_trans (le_of_eq ?_) (lqNorm_schur_le hq hrow hcol _)
   congr 1

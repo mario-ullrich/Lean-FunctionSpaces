@@ -258,11 +258,11 @@ theorem LipschitzGraph.convexOn_quadrant_phi : ConvexOn ℝ univ (LipschitzGraph
 end Positive
 
 /-- **The closed quadrant is the open quadrant up to a null set**: the open quadrant is the interior
-of the closed one (Mathlib's `interior_euclideanQuadrant`), and the frontier of a convex set is a
+of the closed one (Mathlib's `interior_quadrant`), and the frontier of a convex set is a
 null set (Mathlib's `Convex.addHaar_frontier`). -/
 theorem quadrant_ae_eq :
     {y : EuclideanSpace ℝ (Fin n) | ∀ i, 0 ≤ y i} =ᵐ[volume] {y | ∀ i, 0 < y i} := by
-  rw [← interior_euclideanQuadrant n 2 0]
+  rw [← interior_quadrant (n := n) 2 0]
   exact (interior_ae_eq_of_null_frontier (EuclideanQuadrant.convex.addHaar_frontier volume)).symm
 
 /-- **The quadrant model of manifolds with corners is a Besov domain**: the range

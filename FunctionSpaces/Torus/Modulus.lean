@@ -51,7 +51,7 @@ noncomputable def periodicModulus (f : Lp ℂ 2 (volume : Measure (UnitAddTorus 
 theorem enorm_periodicTranslate_sub_eq (h : UnitAddTorus d)
     (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
     ‖periodicTranslate h f - f‖ₑ = eLpNorm ((fwdDiff h)^[1] (f : UnitAddTorus d → ℂ)) 2 volume := by
-  rw [Lp.enorm_def, Function.iterate_one]
+  rw [Lp.eNorm_def, Function.iterate_one]
   refine eLpNorm_congr_ae ?_
   filter_upwards [Lp.coeFn_sub (periodicTranslate h f) f, coeFn_periodicTranslate h f] with x h1 h2
   rw [h1, Pi.sub_apply, h2]
@@ -113,7 +113,7 @@ theorem enorm_periodicTranslate_nsmul_sub_le (n : ℕ) (h : UnitAddTorus d)
   | succ n ih =>
     rw [succ_nsmul', periodicTranslate_add, ← sub_add_sub_cancel _ (periodicTranslate h f),
       ← map_sub, Nat.cast_succ, add_mul, one_mul]
-    exact (enorm_add_le _ _).trans (add_le_add_left ((enorm_periodicTranslate _ _).trans_le ih) _)
+    exact (eNorm_add_le _ _).trans (add_le_add_left ((enorm_periodicTranslate _ _).trans_le ih) _)
 
 /-- Every point of the circle has a representative `x ∈ ℝ` with `|x| = ‖u‖`. -/
 theorem exists_coe_eq_abs_eq_norm (u : UnitAddCircle) :
@@ -232,7 +232,7 @@ theorem approxError_sq_le_tsum (n : ℕ) (f : Lp ℂ 2 (volume : Measure (UnitAd
   rw [toLp_trigScheme_eq]
   have h1 := (fourierScheme d).spectralProjectionScheme.approxError_le_enorm_sub n f
   refine (pow_le_pow_left₀ bot_le h1 2).trans (le_of_eq ?_)
-  rw [SpectralScheme.spectralProjectionScheme_P, ← mFourierBasis.repr.enorm_map,
+  rw [SpectralScheme.spectralProjectionScheme_P, ← mFourierBasis.repr.eNorm_map,
     lp.enorm_sq_eq_tsum]
   congr 1; funext k
   change ‖(fourierScheme d).basis.repr (f - (fourierScheme d).levelTruncate n f) k‖ₑ ^ 2 = _
@@ -264,12 +264,12 @@ theorem approxError_sq_le_card_mul_periodicModulus_sq {n : ℕ} (hn : 1 ≤ n)
         (fun u : ℝ => ‖fourier (k i) (u : UnitAddCircle) - 1‖ₑ ^ 2 * c k)
         (volume.restrict (Ioc 0 t)) := fun k =>
       (Measurable.mul_const ((((fourier (k i)).continuous.comp continuous_quotient_mk').sub
-        continuous_const).measurable.enorm.pow_const 2) _).aemeasurable
+        continuous_const).measurable.eNorm.pow_const 2) _).aemeasurable
     calc ∑' k, c k * I i k
         = ∫⁻ u in Ioc 0 t, ∑' k, ‖fourier (k i) (u : UnitAddCircle) - 1‖ₑ ^ 2 * c k := by
           rw [lintegral_tsum hmeas]
           congr 1; funext k
-          rw [lintegral_mul_const' _ _ (ENNReal.pow_ne_top enorm_ne_top), mul_comm]
+          rw [lintegral_mul_const' _ _ (ENNReal.pow_ne_top eNorm_ne_top), mul_comm]
       _ = ∫⁻ u in Ioc 0 t, ‖periodicTranslate (Pi.single i (u : UnitAddCircle)) f - f‖ₑ ^ 2 := by
           congr 1; funext u
           rw [enorm_periodicTranslate_sub_sq]
@@ -311,10 +311,10 @@ theorem approxError_sq_le_card_mul_periodicModulus_sq {n : ℕ} (hn : 1 ≤ n)
     calc ENNReal.ofReal t * ∑' k, (if n ≤ trigDeg k then c k else 0)
         = ∑' k, (if n ≤ trigDeg k then ENNReal.ofReal t * c k else 0) := by
           rw [← ENNReal.tsum_mul_left]; congr 1; funext k; split_ifs <;> simp
-      _ ≤ ∑' k, c k * ∑ i, I i k := ENNReal.tsum_le_tsum hfreq
+      _ ≤ ∑' k, c k * ∑ i, I i k := tsum_le_tsum hfreq
       _ = ∑ i, ∑' k, c k * I i k := by
           simp_rw [Finset.mul_sum]
-          exact (Summable.tsum_finsetSum fun _ _ => ENNReal.summable)
+          exact (Summable.tsum_finsetSum fun _ _ => CompleteLattice.summable)
       _ ≤ ∑ _i : d, ω ^ 2 * ENNReal.ofReal t := Finset.sum_le_sum fun i _ => hdir i
       _ = ENNReal.ofReal t * ((Fintype.card d : ℝ≥0∞) * ω ^ 2) := by
           rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]; ring

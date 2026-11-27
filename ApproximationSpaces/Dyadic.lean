@@ -104,14 +104,14 @@ theorem approxSeqDyadic_smul (c : ℝ) (f : X) :
 theorem approxNormDyadic_smul (c : ℝ) (f : X) :
     A.approxNormDyadic s q (c • f) = ‖c‖ₑ * A.approxNormDyadic s q f := by
   rw [approxNormDyadic, approxNormDyadic, approxSeqDyadic_smul, ENNReal.lqNorm_const_mul,
-    enorm_smul, mul_add]
+    eNorm_smul, mul_add]
 
 /-- The dyadic quasi-norm is even: `‖-f‖_{A^s_q} = ‖f‖_{A^s_q}`. -/
 theorem approxNormDyadic_neg (f : X) : A.approxNormDyadic s q (-f) = A.approxNormDyadic s q f := by
   have h : A.approxSeqDyadic s (-f) = A.approxSeqDyadic s f := by
     funext k
     rw [approxSeqDyadic, approxSeqDyadic, approxError_neg]
-  rw [approxNormDyadic, approxNormDyadic, h, enorm_neg]
+  rw [approxNormDyadic, approxNormDyadic, h, eNorm_neg]
 
 /-- **Pietsch's quasi-norm is dominated by the dyadic one**, for every `q`: for `s ≥ 0`,
 `‖f‖_{A^s_q} ≤ C_q 2^s (‖f‖ + ‖(2^(ks) E_{2^k}(f))_k‖_q)` with Mathlib's constant
@@ -186,7 +186,7 @@ theorem memApprox_iff_approxNormDyadic_lt_top (hq : 1 ≤ q) (hs : 0 ≤ s) {f :
 theorem memApprox_iff_lqNorm_dyadic_lt_top' (hq0 : q ≠ 0) (hs : 0 ≤ s) {f : X} :
     A.MemApprox s q f ↔ lqNorm q (A.approxSeqDyadic s f) < ∞ := by
   rw [memApprox_iff_approxNormDyadic_lt_top' hq0 hs, approxNormDyadic, ENNReal.add_lt_top]
-  exact and_iff_right enorm_lt_top
+  exact and_iff_right eNorm_lt_top
 
 /-- For `s ≥ 0` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q` iff `(2^(ks) E_{2^k}(f))_k ∈ ℓ_q`. -/
 theorem memApprox_iff_lqNorm_dyadic_lt_top (hq : 1 ≤ q) (hs : 0 ≤ s) {f : X} :

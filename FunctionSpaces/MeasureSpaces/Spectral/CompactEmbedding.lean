@@ -450,9 +450,9 @@ theorem norm_sub_truncate_le {n : ℕ} (hn : 1 ≤ n) (u : V) :
 theorem jacksonBound :
     ApproximationScheme.JacksonBound (J.toCLM.restrictScalars ℝ) J.spectralScheme.toScheme 1 1 := by
   intro n hn u
-  refine (ENNReal.toReal_mono enorm_ne_top (ApproximationScheme.approxError_le_of_mem
+  refine (ENNReal.toReal_mono eNorm_ne_top (ApproximationScheme.approxError_le_of_mem
     (J.spectralScheme.levelTruncate_mem_levelSpan n (J.toCLM u)) _)).trans ?_
-  rw [toReal_enorm, one_mul, Real.rpow_neg_one]
+  rw [toReal_eNorm, one_mul, Real.rpow_neg_one]
   exact J.norm_sub_truncate_le hn u
 
 /-- **Bernstein's inequality** for `J(V)`: every `a ∈ A_n` is `J u` with `‖u‖ ≤ n ‖a‖`, since

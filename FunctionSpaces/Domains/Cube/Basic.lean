@@ -118,7 +118,8 @@ theorem lintegral_inter_eq_slice {G : (Fin d → ℝ) → ℝ≥0∞} (hG : Meas
     · rw [indicator_of_notMem ht, indicator_of_notMem fun h => ht (by simpa using h.2)]
   · rw [indicator_of_notMem hx]
     have h0 : ∀ t, (R ∩ {x | x i ∈ S}).indicator G (Function.update x i t) = 0 := fun t =>
-      indicator_of_notMem (fun h => hx ((hRi x t).1 h.1)) _
+      indicator_of_notMem
+        (fun h : Function.update x i t ∈ R ∩ {x | x i ∈ S} => hx ((hRi x t).1 h.1)) _
     simp only [h0, lintegral_zero]
 
 /-- **Integrating out one coordinate over a region** `{x ∈ Q : x_i ∈ S}`:
@@ -137,7 +138,7 @@ theorem eLpNorm_rpow_region_eq_slice {f : (Fin d → ℝ) → ℂ} (hf : Measura
     eLpNorm f p ((cubeVol d).restrict {x | x i ∈ S}) ^ p.toReal =
       ∫⁻ x, eLpNorm (slice f x i) p (unitVol.restrict S) ^ p.toReal ∂cubeVol d := by
   rw [eLpNorm_rpow_eq hf.aestronglyMeasurable hp0 hp,
-    lintegral_region_eq_slice (hf.enorm.pow_const _) i hS]
+    lintegral_region_eq_slice (hf.eNorm.pow_const _) i hS]
   refine lintegral_congr fun x => ?_
   rw [eLpNorm_rpow_eq (measurable_slice hf x i).aestronglyMeasurable hp0 hp]
   rfl
@@ -156,10 +157,10 @@ theorem measurable_eLpNorm_slice {f : (Fin d → ℝ) → ℂ} (hf : Measurable 
     (hp0 : p ≠ 0) (hp : p ≠ ∞) (i : Fin d) (μ : Measure ℝ) [SFinite μ] :
     Measurable fun x => eLpNorm (slice f x i) p μ := by
   have h : Measurable fun x => ∫⁻ t, ‖slice f x i t‖ₑ ^ p.toReal ∂μ :=
-    ((measurable_slice_uncurry hf i).enorm.pow_const p.toReal).lintegral_prod_right'
+    ((measurable_slice_uncurry hf i).eNorm.pow_const p.toReal).lintegral_prod_right'
   have heq : (fun x => eLpNorm (slice f x i) p μ) =
       fun x => (∫⁻ t, ‖slice f x i t‖ₑ ^ p.toReal ∂μ) ^ (1 / p.toReal) := funext fun x =>
-    eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp (measurable_slice hf x i).aestronglyMeasurable
+    eLpNorm_eq_lintegral_rpow_eNorm_toReal hp0 hp (measurable_slice hf x i).aestronglyMeasurable
   rw [heq]
   exact h.pow_const _
 
@@ -175,8 +176,8 @@ theorem eLpNorm_inter_eq_slice {f : (Fin d → ℝ) → ℂ} (hf : Measurable f)
         ((cubeVol d).restrict R) := by
   refine (ENNReal.rpow_left_injective (ENNReal.toReal_pos hp0 hp).ne').eq_iff.1 ?_
   simp only [eLpNorm_rpow_eq hf.aestronglyMeasurable hp0 hp, eLpNorm_rpow_eq
-    (measurable_eLpNorm_slice hf hp0 hp i _).aestronglyMeasurable hp0 hp, enorm_eq_self]
-  rw [lintegral_inter_eq_slice (hf.enorm.pow_const _) i hR hRi hS]
+    (measurable_eLpNorm_slice hf hp0 hp i _).aestronglyMeasurable hp0 hp, eNorm_eq_self]
+  rw [lintegral_inter_eq_slice (hf.eNorm.pow_const _) i hR hRi hS]
   refine setLIntegral_congr_fun hR fun x _ => ?_
   rw [eLpNorm_rpow_eq (measurable_slice hf x i).aestronglyMeasurable hp0 hp]
   rfl
@@ -196,8 +197,8 @@ theorem eLpNorm_inter_le_of_slice_le {F G : (Fin d → ℝ) → ℂ} (hF : Measu
   rw [eLpNorm_inter_eq_slice hF hp0 hp i hR hRi hS, eLpNorm_inter_eq_slice hG hp0 hp i hR hRi hS',
     ← eLpNorm_const_mul_ennreal (c := C)
       (measurable_eLpNorm_slice hG hp0 hp i _).aestronglyMeasurable]
-  exact eLpNorm_mono_enorm (measurable_eLpNorm_slice hF hp0 hp i _).aestronglyMeasurable
-    fun x => by simpa only [enorm_eq_self] using h x
+  exact eLpNorm_mono_eNorm (measurable_eLpNorm_slice hF hp0 hp i _).aestronglyMeasurable
+    fun x => by simpa only [eNorm_eq_self] using h x
 
 /-- **Bounds through slices on the whole cube**: for measurable `F, G`, `0 < p < ∞` and
 `C ∈ [0, ∞]`, if `‖slice F x i‖_{L_p[0,1]} ≤ C ‖slice G x i‖_{L_p[0,1]}` for every point `x`,

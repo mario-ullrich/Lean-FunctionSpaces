@@ -54,7 +54,7 @@ theorem ae_mem_Ico_unitVol : ∀ᵐ x ∂unitVol, x ∈ Ico (0 : ℝ) 1 := by
   exact ae_restrict_mem measurableSet_Ico
 
 /-- The dyadic interval `I_{k,n} = [n 2^(-k), (n + 1) 2^(-k))`. -/
-def dyadicIco (k n : ℕ) : Set ℝ := Ico ((n : ℝ) / 2 ^ k) ((n + 1) / 2 ^ k)
+noncomputable def dyadicIco (k n : ℕ) : Set ℝ := Ico ((n : ℝ) / 2 ^ k) ((n + 1) / 2 ^ k)
 
 /-- Dyadic intervals are measurable. -/
 theorem measurableSet_dyadicIco (k n : ℕ) : MeasurableSet (dyadicIco k n) := measurableSet_Ico

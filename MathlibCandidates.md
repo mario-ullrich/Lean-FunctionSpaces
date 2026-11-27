@@ -145,7 +145,7 @@ declarations.
 * **The Ditzian–Prymak bootstrap** (`FunctionSpaces/Analysis/Lp/QuasiNorm.lean`): every
   function satisfies `‖f x‖ ≤ ‖f‖_∞` for almost every `x`, measurable or not
   (`MeasureTheory.ae_enorm_le_eLpNorm_top`; Mathlib states this bound for `eLpNormEssSup` only,
-  `enorm_ae_le_eLpNormEssSup` and `ae_le_eLpNormEssSup`); an almost everywhere bound `N < ∞`
+  `eNorm_ae_le_eLpNormEssSup` and `ae_le_eLpNormEssSup`); an almost everywhere bound `N < ∞`
   of `‖f‖` with `N ≤ M ‖f‖_{p₀}` gives `N ≤ M^(p₀/p) ‖f‖_p` for every `0 < p ≤ p₀ < ∞`
   (`MeasureTheory.le_rpow_mul_eLpNorm_of_ae_enorm_le`), and
   `‖f‖_∞ ≤ M ‖f‖_p` gives `‖f‖_r ≤ M^(1 - p/r) ‖f‖_p` for every `p ≤ r ≤ ∞`
@@ -332,7 +332,7 @@ declarations.
   (`MeasureTheory.Lp.eq_zero_of_forall_integral_contDiff_smul_eq_zero`, from
   `IsOpen.ae_eq_zero_of_integral_contDiff_smul_eq_zero`); and dense range in `L_2(μ)` of a map
   whose range contains these functions (`MeasureTheory.L2.denseRange_of_forall_contDiff`).
-  Mathlib `v4.35.0` has adjoints and Riesz's representation but no pivot dual or Gelfand triple.
+  Mathlib `v4.36.0` has adjoints and Riesz's representation but no pivot dual or Gelfand triple.
 * **Fourier analysis on the torus** (`FunctionSpaces/Torus/Translation.lean`): the Fourier
   coefficients of a translate, `(τ_h f)^(k) = e_k(h) f̂(k)`
   (`Torus.mFourierCoeff_periodicTranslate`), and `|∏ aᵢ - 1| ≤ ∑ |aᵢ - 1|` for unimodular `aᵢ`
@@ -582,7 +582,7 @@ declarations.
 * **Norms of means of vector-valued functions**
   (`FunctionSpaces/Analysis/Maximal/CalderonZygmund.lean`): `‖⨍ f‖ₑ ≤ ⨍⁻ ‖f‖ₑ` for `f` with
   values in a real normed space (`MeasureTheory.enorm_average_le`), next to Mathlib's
-  `enorm_integral_le_lintegral_enorm`; on a set `s` of finite measure `μ s * ‖⨍_s f‖ₑ ≤ ∫⁻_s ‖f‖ₑ`
+  `eNorm_integral_le_lintegral_eNorm`; on a set `s` of finite measure `μ s * ‖⨍_s f‖ₑ ≤ ∫⁻_s ‖f‖ₑ`
   (`MeasureTheory.measure_mul_enorm_setAverage_le`) and `∫⁻_s ‖f - ⨍_s f‖ₑ ≤ 2 ∫⁻_s ‖f‖ₑ`
   (`MeasureTheory.setLIntegral_enorm_sub_setAverage_le`), the step behind the mass of the bad pieces
   of a Calderón–Zygmund decomposition.
@@ -594,7 +594,7 @@ declarations.
   `MeasureTheory.measure_half_lt_le_add_setLIntegral_compl`): the level-set bookkeeping of a
   Calderón–Zygmund argument; the first form is Chebyshev's inequality with a power in lintegral
   form, `μ {F > t} ≤ t^(-r) ∫⁻ F^r` (`MeasureTheory.measure_lt_le_inv_rpow_mul_lintegral`; Mathlib
-  has the `eLpNorm` form `meas_ge_le_mul_pow_eLpNorm_enorm`). The three lemmas assume
+  has the `eLpNorm` form `meas_ge_le_mul_pow_eLpNorm_eNorm`). The three lemmas assume
   `0 < t < ∞`; for Mathlib these hypotheses would be removed, since at `t = ∞` the level sets are
   empty and at `t = 0` the bounds are either `∞` or force the functions to vanish almost
   everywhere. Also `MemLp f 2 μ` from `∫⁻ ‖f‖ₑ ^ 2 ∂μ ≠ ∞`

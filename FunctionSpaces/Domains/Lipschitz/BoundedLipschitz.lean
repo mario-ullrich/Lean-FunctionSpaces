@@ -139,7 +139,7 @@ theorem modNorm_finsetSum_le {ι : Type*} (t : Finset ι)
     ‖∑ i ∈ t, G i‖ₑ +
         lqNorm q (fun k => dyadicWeight s k * lpModulus p r (∑ i ∈ t, G i) k) ≤
       ∑ i ∈ t, (‖G i‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r (G i) k)) := by
-  have h1 : ‖∑ i ∈ t, G i‖ₑ ≤ ∑ i ∈ t, ‖G i‖ₑ := enorm_sum_le _ _
+  have h1 : ‖∑ i ∈ t, G i‖ₑ ≤ ∑ i ∈ t, ‖G i‖ₑ := eNorm_sum_le _ _
   have h2 : lqNorm q (fun k => dyadicWeight s k * lpModulus p r (∑ i ∈ t, G i) k) ≤
       ∑ i ∈ t, lqNorm q (fun k => dyadicWeight s k * lpModulus p r (G i) k) :=
     (ENNReal.lqNorm_mono fun k => (mul_le_mul' le_rfl (lpModulus_finsetSum_le t G r k)).trans_eq
@@ -162,7 +162,7 @@ theorem modNorm_add_le (G H : Lp ℂ p (volume : Measure V)) (r : ℕ) (s : ℝ)
     (ENNReal.lqNorm_mono fun k => (mul_le_mul' le_rfl (lpModulus_add_le r G H k)).trans_eq
       (mul_add _ _ _)).trans (ENNReal.lqNorm_add_le hq _ _)
   rw [add_add_add_comm]
-  exact add_le_add (enorm_add_le G H) h2
+  exact add_le_add (eNorm_add_le G H) h2
 
 /-- **The Besov quasi-norm by differences is homogeneous**:
 `‖c G‖_p + ‖(2^(ks) ω_r(c G, 2^(-k))_p)_k‖_{ℓ_q} =
@@ -173,7 +173,7 @@ theorem modNorm_const_smul (c : ℂ) (G : Lp ℂ p (volume : Measure V)) (r : �
     ‖c • G‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r (c • G) k) =
       ‖c‖ₑ * (‖G‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r G k)) := by
   simp_rw [lpModulus_const_smul, mul_left_comm (dyadicWeight s _) ‖c‖ₑ]
-  rw [ENNReal.lqNorm_const_mul, enorm_smul, mul_add]
+  rw [ENNReal.lqNorm_const_mul, eNorm_smul, mul_add]
 
 /-- **Finite sums keep the Besov spaces by differences** (`Rd.modNorm_finsetSum_le`). -/
 theorem modNorm_finsetSum_lt_top {ι : Type*} (t : Finset ι)
@@ -758,13 +758,13 @@ noncomputable instance instZero : Zero (Ω.DomainBesov p r s q) :=
 noncomputable instance instSMul : SMul ℂ (Ω.DomainBesov p r s q) :=
   ⟨fun c a => ⟨c • a.toLp, by rw [map_smul, a.indicator_eq], by
     rw [modNormOn_const_smul]
-    exact ENNReal.mul_lt_top enorm_lt_top a.mem⟩⟩
+    exact ENNReal.mul_lt_top eNorm_lt_top a.mem⟩⟩
 
 /-- The negative of a function of `B^s_{p,q}(Ω)`, the multiple by `-1`. -/
 noncomputable instance instNeg : Neg (Ω.DomainBesov p r s q) :=
   ⟨fun a => ⟨-a.toLp, by rw [map_neg, a.indicator_eq], by
     rw [← neg_one_smul ℂ a.toLp, modNormOn_const_smul]
-    exact ENNReal.mul_lt_top enorm_lt_top a.mem⟩⟩
+    exact ENNReal.mul_lt_top eNorm_lt_top a.mem⟩⟩
 
 /-- The sum of two functions of `B^s_{p,q}(Ω)`, for `q ≥ 1` (`Rd.modNormOn_add_le`). -/
 noncomputable instance instAdd [Fact (1 ≤ q)] : Add (Ω.DomainBesov p r s q) :=
@@ -815,7 +815,7 @@ protected theorem norm_def (a : Ω.DomainBesov p r s q) :
 protected theorem norm_smul (c : ℂ) (a : Ω.DomainBesov p r s q) : ‖c • a‖ = ‖c‖ * ‖a‖ := by
   rw [DomainBesov.norm_def, DomainBesov.norm_def]
   change (modNormOn Ω.measurableSet r s q (c • a.toLp)).toReal = _
-  rw [modNormOn_const_smul, ENNReal.toReal_mul, toReal_enorm]
+  rw [modNormOn_const_smul, ENNReal.toReal_mul, toReal_eNorm]
 
 /-- The triangle inequality, for `q ≥ 1` (`Rd.modNormOn_add_le`). -/
 protected theorem norm_add_le [Fact (1 ≤ q)] (a b : Ω.DomainBesov p r s q) :
@@ -835,7 +835,7 @@ protected theorem norm_eq_zero_iff [Fact (1 ≤ q)] (a : Ω.DomainBesov p r s q)
     ext1
     change a.toLp = 0
     rw [← a.indicator_eq]
-    exact enorm_eq_zero.1 h0
+    exact eNorm_eq_zero.1 h0
   · rintro rfl
     rw [DomainBesov.norm_def]
     change (modNormOn Ω.measurableSet r s q (0 : Lp ℂ p (volume : Measure V))).toReal = 0
@@ -872,8 +872,8 @@ noncomputable def toLpL [Fact (1 ≤ q)] :
       map_smul' _ _ := rfl }
     1 fun a => by
       change ‖a.toLp‖ ≤ 1 * ‖a‖
-      rw [one_mul, ← toReal_enorm a.toLp, ← toReal_enorm a]
-      refine ENNReal.toReal_mono enorm_ne_top ?_
+      rw [one_mul, ← toReal_eNorm a.toLp, ← toReal_eNorm a]
+      refine ENNReal.toReal_mono eNorm_ne_top ?_
       calc ‖a.toLp‖ₑ = ‖indicatorLp Ω.measurableSet a.toLp‖ₑ := by rw [a.indicator_eq]
         _ ≤ modNormOn Ω.measurableSet r s q a.toLp := le_self_add
         _ = ‖a‖ₑ := a.enorm_eq.symm
@@ -903,7 +903,7 @@ instance completeSpace_domainBesov {r : ℕ} {s : ℝ} {q : ℝ≥0∞} [Fact (1
     obtain ⟨N, hN⟩ := EMetric.cauchySeq_iff.1 hu ε hε
     refine ⟨N, fun m hm n hn => ?_⟩
     have h := hN m hm n hn
-    rw [edist_eq_enorm_sub, DomainBesov.enorm_eq] at h
+    rw [eDist_eq_eNorm_sub, DomainBesov.enorm_eq] at h
     exact h.le
   have hlim := tendsto_modNormOn_sub_of_cauchy Ω.measurableSet r s q hG' hC
   obtain ⟨n, hn⟩ := (ENNReal.tendsto_nhds_zero.1 hlim 1 one_pos).exists
@@ -914,7 +914,7 @@ instance completeSpace_domainBesov {r : ℕ} {s : ℝ} {q : ℝ≥0∞} [Fact (1
       _ ≤ _ := modNormOn_add_le _ r s Fact.out _ _
       _ < ∞ := ENNReal.add_lt_top.2 ⟨hn.trans_lt ENNReal.one_lt_top, (u n).mem⟩
   refine ⟨⟨G, hGi, hmem⟩, tendsto_iff_edist_tendsto_0.2 (hlim.congr fun n => ?_)⟩
-  rw [edist_comm, edist_eq_enorm_sub, DomainBesov.enorm_eq]
+  rw [edist_comm, eDist_eq_eNorm_sub, DomainBesov.enorm_eq]
   rfl
 
 /-- **An extension of `f ∈ B^s_{p,q}(Ω)` to `V`**, `1 ≤ p < ∞`, `0 < s < r`, `1 ≤ q ≤ ∞`: some

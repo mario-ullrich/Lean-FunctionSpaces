@@ -255,7 +255,7 @@ theorem eLpNorm_higherDiff_mul_le {ψ F : V → ℂ} (hψ : ContDiff ℝ ((⊤ :
           funext x
           simp [g, smul_eq_mul]
         rw [this, eLpNorm_const_smul, eLpNorm_norm _ (hmeas l),
-          eLpNorm_comp_add_right (aestronglyMeasurable_higherDiff hF _ h), Real.enorm_eq_ofReal hc,
+          eLpNorm_comp_add_right (aestronglyMeasurable_higherDiff hF _ h), Real.eNorm_eq_ofReal hc,
           ENNReal.ofReal_mul (by positivity), ENNReal.ofReal_natCast]
 
 /-- **The modulus of a product**:
@@ -333,7 +333,7 @@ theorem mulLp_smul {ψ : V → ℂ} (hψ : Continuous ψ) {C : ℝ} (hψC : ∀ 
 /-- `‖ψ F‖_p ≤ C ‖F‖_p`. -/
 theorem enorm_mulLp_le {ψ : V → ℂ} (hψ : Continuous ψ) {C : ℝ} (hψC : ∀ x, ‖ψ x‖ ≤ C)
     (F : Lp ℂ p (volume : Measure V)) : ‖mulLp hψ hψC F‖ₑ ≤ ENNReal.ofReal C * ‖F‖ₑ := by
-  rw [Lp.enorm_def, Lp.enorm_def, eLpNorm_congr_ae (mulLp_apply_ae hψ hψC F)]
+  rw [Lp.eNorm_def, Lp.eNorm_def, eLpNorm_congr_ae (mulLp_apply_ae hψ hψC F)]
   exact eLpNorm_le_mul_eLpNorm_of_ae_le_mul
     (hψ.aestronglyMeasurable.mul (Lp.aestronglyMeasurable F))
     (Eventually.of_forall fun x => by
@@ -351,9 +351,9 @@ noncomputable def mulLpL {ψ : V → ℂ} (hψ : Continuous ψ) {C : ℝ} (hψC 
       map_add' := mulLp_add hψ hψC
       map_smul' := mulLp_smul hψ hψC }
     (ENNReal.ofReal C).toReal fun F => by
-      have h := ENNReal.toReal_mono (ENNReal.mul_ne_top ENNReal.ofReal_ne_top enorm_ne_top)
+      have h := ENNReal.toReal_mono (ENNReal.mul_ne_top ENNReal.ofReal_ne_top eNorm_ne_top)
         (enorm_mulLp_le hψ hψC F)
-      rwa [ENNReal.toReal_mul, toReal_enorm, toReal_enorm] at h
+      rwa [ENNReal.toReal_mul, toReal_eNorm, toReal_eNorm] at h
 
 /-- The operator `Rd.mulLpL` is `Rd.mulLp`. -/
 theorem mulLpL_apply {ψ : V → ℂ} (hψ : Continuous ψ) {C : ℝ} (hψC : ∀ x, ‖ψ x‖ ≤ C)

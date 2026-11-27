@@ -176,7 +176,7 @@ theorem eLpNorm_indicator_diffStepSet_neg [μ.IsAddRightInvariant] (U : Set V) (
   have hfun : (diffStepSet U r (-h)).indicator ((fwdDiff (-h))^[r] f) =
       ((-1 : ℂ) ^ r) • (G ∘ fun x => x - (r : ℝ) • h) :=
     funext fun x => indicator_diffStepSet_neg U r h f x
-  rw [hfun, eLpNorm_const_smul, enorm_pow, enorm_neg, enorm_one, one_pow, one_mul,
+  rw [hfun, eLpNorm_const_smul, eNorm_pow, eNorm_neg, eNorm_one, one_pow, one_mul,
     ← hemb.eLpNorm_map_measure, map_sub_right_eq_self]
 
 /-- **The modulus on `U` is at most the modulus on `V`**, `ω_r(f, t, U)_p ≤ ω_r(f, t)_p`. -/
@@ -293,7 +293,7 @@ theorem lpModulusOn_le [Fact (1 ≤ p)] {U : Set V} (hU : MeasurableSet U) (r : 
     (k : ℕ) : lpModulusOn p U r f k ≤ 2 ^ r * ‖f‖ₑ :=
   (modulusOn_le (Lp.aestronglyMeasurable f) hU Fact.out r _).trans
     (mul_le_mul' le_rfl
-      ((eLpNorm_indicator_le _ hU.nullMeasurableSet).trans_eq (Lp.enorm_def f).symm))
+      ((eLpNorm_indicator_le _ hU.nullMeasurableSet).trans_eq (Lp.eNorm_def f).symm))
 
 /-- **The modulus on `Ω` through a function on `V`**: for a measurable `Ω`, `p ≥ 1` and
 `f, G ∈ L_p`, `ω_r(f, 2^(-k), Ω)_p ≤ 2^r ‖1_Ω (f - G)‖_p + ω_r(G, 2^(-k))_p`. Split
@@ -343,14 +343,14 @@ theorem modNormOn_zero (r : ℕ) (s : ℝ) (q : ℝ≥0∞) :
     modNormOn hΩ r s q (0 : Lp ℂ p μ) = 0 := by
   have h : ∀ k, lpModulusOn p Ω r (0 : Lp ℂ p μ) k = 0 := fun k =>
     le_antisymm ((lpModulusOn_le_lpModulus hΩ r 0 k).trans_eq (lpModulus_zero r k)) zero_le
-  simp only [modNormOn, map_zero, enorm_zero, h, mul_zero, ENNReal.lqNorm_zero_right, add_zero]
+  simp only [modNormOn, map_zero, eNorm_zero, h, mul_zero, ENNReal.lqNorm_zero_right, add_zero]
 
 /-- **The intrinsic quasi-norm is subadditive** for `q ≥ 1`. -/
 theorem modNormOn_add_le (r : ℕ) (s : ℝ) {q : ℝ≥0∞} (hq : 1 ≤ q) (G G' : Lp ℂ p μ) :
     modNormOn hΩ r s q (G + G') ≤ modNormOn hΩ r s q G + modNormOn hΩ r s q G' := by
   have h1 : ‖indicatorLp hΩ (G + G')‖ₑ ≤ ‖indicatorLp hΩ G‖ₑ + ‖indicatorLp hΩ G'‖ₑ := by
     rw [map_add]
-    exact enorm_add_le _ _
+    exact eNorm_add_le _ _
   have h2 : lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω r (G + G') k) ≤
       lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω r G k) +
         lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω r G' k) :=
@@ -371,7 +371,7 @@ theorem modNormOn_const_smul (r : ℕ) (s : ℝ) (q : ℝ≥0∞) (c : ℂ) (G :
       fun k => ‖c‖ₑ * (dyadicWeight s k * lpModulusOn p Ω r G k) := funext fun k => by
     rw [lpModulusOn_const_smul]
     ring
-  simp only [modNormOn, map_smul, enorm_smul, h, ENNReal.lqNorm_const_mul, mul_add]
+  simp only [modNormOn, map_smul, eNorm_smul, h, ENNReal.lqNorm_const_mul, mul_add]
 
 /-- **The intrinsic quasi-norm of a finite sum** is at most the sum of the quasi-norms. -/
 theorem modNormOn_finsetSum_le (r : ℕ) (s : ℝ) {q : ℝ≥0∞} (hq : 1 ≤ q) {ι : Type*}
@@ -395,7 +395,7 @@ theorem modNormOn_mono_of_subset [Fact (1 ≤ p)] {T U : Set V} (hT : Measurable
   unfold modNormOn
   refine add_le_add ?_ (ENNReal.lqNorm_mono fun k =>
     mul_le_mul' le_rfl (lpModulusOn_mono_set hT hTU r f k))
-  rw [Lp.enorm_def, Lp.enorm_def, eLpNorm_congr_ae (indicatorLp_apply_ae hT f),
+  rw [Lp.eNorm_def, Lp.eNorm_def, eLpNorm_congr_ae (indicatorLp_apply_ae hT f),
     eLpNorm_congr_ae (indicatorLp_apply_ae hU f)]
   exact eLpNorm_mono ((Lp.aestronglyMeasurable f).indicator hT)
     fun x => norm_indicator_le_of_subset hTU _ x
@@ -422,7 +422,7 @@ theorem modNormOn_univ [Fact (1 ≤ p)] (r : ℕ) (s : ℝ) (q : ℝ≥0∞) (f 
     modNormOn MeasurableSet.univ r s q f =
       ‖f‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r f k) := by
   have h1 : ‖indicatorLp MeasurableSet.univ f‖ₑ = ‖f‖ₑ := by
-    rw [Lp.enorm_def, Lp.enorm_def, eLpNorm_congr_ae (indicatorLp_apply_ae _ f),
+    rw [Lp.eNorm_def, Lp.eNorm_def, eLpNorm_congr_ae (indicatorLp_apply_ae _ f),
       Set.indicator_univ]
   have h2 : ∀ k, lpModulusOn p (Set.univ : Set V) r f k = lpModulus p r f k := fun k => by
     rw [lpModulusOn, modulusOn_univ, lpModulus]
@@ -439,7 +439,7 @@ theorem tendsto_lpModulusOn [Fact (1 ≤ p)] {U : Set V} (hU : MeasurableSet U) 
     Tendsto (fun m => lpModulusOn p U r (F m) k) atTop (𝓝 (lpModulusOn p U r G k)) := by
   have h0 : Tendsto (fun m => (2 : ℝ≥0∞) ^ r * ‖F m - G‖ₑ) atTop (𝓝 0) := by
     have h := ENNReal.Tendsto.const_mul (a := (2 : ℝ≥0∞) ^ r)
-      (by simpa only [edist_eq_enorm_sub] using tendsto_iff_edist_tendsto_0.1 hFG)
+      (by simpa only [eDist_eq_eNorm_sub] using tendsto_iff_edist_tendsto_0.1 hFG)
       (Or.inr (by simp))
     rwa [mul_zero] at h
   have hup : ∀ m, lpModulusOn p U r (F m) k ≤
@@ -449,7 +449,7 @@ theorem tendsto_lpModulusOn [Fact (1 ≤ p)] {U : Set V} (hU : MeasurableSet U) 
       _ ≤ _ := (lpModulusOn_add_le U r _ _ k).trans (add_le_add le_rfl (lpModulusOn_le hU r _ k))
   have hlow : ∀ m, lpModulusOn p U r G k - 2 ^ r * ‖F m - G‖ₑ ≤
       lpModulusOn p U r (F m) k := fun m => by
-    rw [tsub_le_iff_right, enorm_sub_rev]
+    rw [tsub_le_iff_right, eNorm_sub_rev]
     calc lpModulusOn p U r G k = lpModulusOn p U r (F m + (G - F m)) k := by
           rw [add_sub_cancel]
       _ ≤ _ := (lpModulusOn_add_le U r _ _ k).trans (add_le_add le_rfl (lpModulusOn_le hU r _ k))
@@ -473,7 +473,7 @@ theorem modNormOn_le_of_tendsto [Fact (1 ≤ p)] {U : Set V} (hU : MeasurableSet
   rcases eq_or_ne C ∞ with rfl | hCt
   · exact le_top
   have hx : Tendsto (fun m => ‖indicatorLp hU (F m)‖ₑ) atTop (𝓝 ‖indicatorLp hU G‖ₑ) :=
-    (continuous_enorm.tendsto _).comp (((indicatorLp hU).continuous.tendsto G).comp hFG)
+    (continuous_eNorm.tendsto _).comp (((indicatorLp hU).continuous.tendsto G).comp hFG)
   have hxC : ‖indicatorLp hU G‖ₑ ≤ C :=
     le_of_tendsto hx (hC.mono fun m hm => le_self_add.trans hm)
   have hlq : lqNorm q (fun k => dyadicWeight s k * lpModulusOn p U r G k) ≤
@@ -481,7 +481,7 @@ theorem modNormOn_le_of_tendsto [Fact (1 ≤ p)] {U : Set V} (hU : MeasurableSet
     ENNReal.lqNorm_le_of_tendsto (fun k => ENNReal.Tendsto.const_mul
         (tendsto_lpModulusOn hU r hFG k) (Or.inr (ENNReal.dyadicWeight_ne_top s k)))
       (ENNReal.Tendsto.sub tendsto_const_nhds hx (Or.inl hCt))
-      (hC.mono fun m hm => ENNReal.le_sub_of_add_le_left enorm_ne_top hm)
+      (hC.mono fun m hm => ENNReal.le_sub_of_add_le_left eNorm_ne_top hm)
   calc modNormOn hU r s q G
       = ‖indicatorLp hU G‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulusOn p U r G k) := rfl
     _ ≤ ‖indicatorLp hU G‖ₑ + (C - ‖indicatorLp hU G‖ₑ) := add_le_add le_rfl hlq
@@ -518,9 +518,10 @@ theorem diffStepSet_ae_eq {U U' : Set V} (hUU' : U =ᵐ[volume] U') (r : ℕ) (h
     diffStepSet U r h =ᵐ[volume] diffStepSet U' r h := by
   have hl : ∀ l : ℕ, ∀ᵐ x ∂(volume : Measure V),
       (x + (l : ℝ) • h ∈ U) = (x + (l : ℝ) • h ∈ U') := fun l =>
-    (measurePreserving_add_right volume ((l : ℝ) • h)).quasiMeasurePreserving.ae_eq_comp hUU'
+    (measurePreserving_add_right volume ((l : ℝ) • h)).quasiMeasurePreserving.ae_eq_comp
+      (hUU'.mono fun _ hx => propext hx)
   filter_upwards [ae_all_iff.2 hl] with x hx
-  exact propext (forall₂_congr fun l _ => (hx l).to_iff)
+  exact forall₂_congr fun l _ => (hx l).to_iff
 
 /-- **The modulus on a set does not see null sets**: `ω_r(f, t, U)_p = ω_r(f, t, U')_p` if `U`
 and `U'` agree up to a null set. -/

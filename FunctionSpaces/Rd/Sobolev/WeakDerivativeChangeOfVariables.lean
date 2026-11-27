@@ -82,9 +82,9 @@ theorem eLpNorm_mul_le_of_forall_norm_le {α : Type*} [MeasurableSpace α] {μ :
     (p : ℝ≥0∞) : eLpNorm (fun x => c x * u x) p μ ≤ C * eLpNorm u p μ := by
   by_cases hu : AEStronglyMeasurable u μ
   · refine eLpNorm_le_mul_eLpNorm_of_ae_le_mul' (hc.mul hu) (ae_of_all _ fun x => ?_) p
-    rw [Pi.mul_apply, enorm_mul]
+    rw [Pi.mul_apply, eNorm_mul]
     gcongr
-    exact enorm_le_coe.2 (by rw [← NNReal.coe_le_coe, coe_nnnorm]; exact hC x)
+    exact eNorm_le_coe.2 (by rw [← NNReal.coe_le_coe, coe_nnNorm]; exact hC x)
   rcases eq_or_ne C 0 with rfl | hC0
   · have h0 : (fun x => c x * u x) = 0 := funext fun x => by
       have hx := hC x
@@ -722,7 +722,7 @@ theorem eLpNorm_sum_inner_fderiv_mul_comp_le {p : ℝ≥0∞} (hp : 1 ≤ p) {K 
       (Measurable.inner (measurable_fderiv_apply_const ℝ Φ v) measurable_const)
   have hb : ∀ x, ‖(inner ℝ (fderiv ℝ Φ x v) (gridBasis V i) : ℂ)‖ ≤ (K * ‖v‖₊ : ℝ≥0) := by
     intro x
-    rw [Complex.norm_real, NNReal.coe_mul, coe_nnnorm]
+    rw [Complex.norm_real, NNReal.coe_mul, coe_nnNorm]
     calc ‖inner ℝ (fderiv ℝ Φ x v) (gridBasis V i)‖
         ≤ ‖fderiv ℝ Φ x v‖ * ‖gridBasis V i‖ := norm_inner_le_norm _ _
       _ = ‖fderiv ℝ Φ x v‖ := by rw [(gridBasis V).orthonormal.1 i, mul_one]
@@ -733,7 +733,7 @@ theorem eLpNorm_sum_inner_fderiv_mul_comp_le {p : ℝ≥0∞} (hp : 1 ≤ p) {K 
     _ ≤ (K * ‖v‖₊ : ℝ≥0) * eLpNorm (h i) p (volume.restrict O) := by
         gcongr
         exact eLpNorm_comp_le_of_mapsTo hmp hO hUO p
-    _ = _ := by rw [ENNReal.coe_mul, enorm_eq_nnnorm]
+    _ = _ := by rw [ENNReal.coe_mul, eNorm_eq_nnNorm]
 
 /-- **Local-to-global for weak derivatives**: if every compact `K ⊆ U` lies in an open `U'` on
 which `G = ∂^v F` weakly, then `G = ∂^v F` weakly on `U`. A test function on `U` is a test
@@ -780,7 +780,7 @@ theorem HasWeakLineDeriv.comp_lipschitzWith_of_mapsTo_isCompact {O U : Opens V} 
     memLp_one_iff_integrable.2 (hf.integrableOn_compact_subset hLO hL)
   have hgL : ∀ i, MemLp (g i) 1 (volume.restrict L) := fun i =>
     memLp_one_iff_integrable.2 ((hfg i).2.integrableOn_compact_subset hLO hL)
-  have hKv : (K : ℝ≥0∞) * ‖v‖ₑ ≠ ∞ := ENNReal.mul_ne_top ENNReal.coe_ne_top enorm_ne_top
+  have hKv : (K : ℝ≥0∞) * ‖v‖ₑ ≠ ∞ := ENNReal.mul_ne_top ENNReal.coe_ne_top eNorm_ne_top
   refine HasWeakLineDeriv.of_tendsto le_rfl le_rfl (l := atTop)
     (fun k => hasWeakLineDeriv_comp_of_contDiff (hu k) (huc k) hΦ U v)
     ((eLpNorm_comp_le_of_mapsTo hmp hLm hUL 1).trans_lt hfL)

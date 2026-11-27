@@ -148,9 +148,9 @@ theorem eLpNorm_le_of_comp_quotientProj_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) {F G
   calc eLpNorm F p volume = eLpNorm (F ∘ quotientProj) p (volume.restrict (periodBox 0)) :=
         (eLpNorm_comp_quotientProj_periodBox 0 hF.aestronglyMeasurable p).symm
     _ ≤ eLpNorm (A + G ∘ quotientProj) p (volume.restrict (periodBox 0)) :=
-        eLpNorm_mono_enorm_ae (hF.aestronglyMeasurable.comp_measurePreserving
+        eLpNorm_mono_eNorm_ae (hF.aestronglyMeasurable.comp_measurePreserving
           (measurePreserving_quotientProj_periodBox 0)) (h.mono fun x hx => by
-            simpa only [enorm_eq_self, Pi.add_apply, Function.comp_apply] using hx)
+            simpa only [eNorm_eq_self, Pi.add_apply, Function.comp_apply] using hx)
     _ ≤ eLpNorm A p (volume.restrict (periodBox 0)) +
           eLpNorm (G ∘ quotientProj) p (volume.restrict (periodBox 0)) := eLpNorm_add_le hp1
     _ ≤ eLpNorm A p volume + eLpNorm G p volume :=
@@ -163,7 +163,7 @@ theorem eLpNorm_le_of_comp_quotientProj_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) {F G
 cover `ℝ^d`, and on each of them `π` preserves measure. -/
 theorem quasiMeasurePreserving_quotientProj :
     QuasiMeasurePreserving (quotientProj : EuclideanSpace ℝ d → UnitAddTorus d) volume volume := by
-  refine ⟨measurable_quotientProj, Measure.AbsolutelyContinuous.mk fun s hs h0 => ?_⟩
+  refine ⟨measurable_quotientProj.aemeasurable, Measure.AbsolutelyContinuous.mk fun s hs h0 => ?_⟩
   rw [Measure.map_apply measurable_quotientProj hs]
   have hcover : quotientProj ⁻¹' s ⊆
       ⋃ m : d → ℤ, quotientProj ⁻¹' s ∩ periodBox (fun i => (m i : ℝ)) := fun x hx =>
@@ -349,9 +349,9 @@ theorem eLpNorm_indicator_tripleBox_comp_quotientProj {ε : Type*} [TopologicalS
     eLpNorm (tripleBox.indicator (F ∘ quotientProj)) p volume =
       3 ^ ((Fintype.card d : ℝ) / p.toReal) * eLpNorm F p volume := by
   rw [eLpNorm_indicator_eq_eLpNorm_restrict measurableSet_tripleBox.nullMeasurableSet,
-    eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp
+    eLpNorm_eq_lintegral_rpow_eNorm_toReal hp0 hp
       (hF.comp_quasiMeasurePreserving quasiMeasurePreserving_quotientProj).restrict,
-    eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hF, Function.comp_def,
+    eLpNorm_eq_lintegral_rpow_eNorm_toReal hp0 hp hF, Function.comp_def,
     setLIntegral_tripleBox (fun t => ‖F t‖ₑ ^ p.toReal),
     ENNReal.mul_rpow_of_nonneg _ _ (by positivity), ← ENNReal.rpow_natCast, ← ENNReal.rpow_mul,
     mul_one_div]

@@ -135,7 +135,7 @@ theorem tsum_canonical_ne_top {A : ApproximationScheme X} {β : ℝ} (hβ : 0 �
   have h2 : ∀ k, dyadicWeight β k * dyadicWeight (-(β + 1)) k = dyadicWeight (-1) k :=
     fun k => by rw [← ENNReal.dyadicWeight_add]; congr 1; ring
   simp_rw [mul_add, h2]
-  rw [ENNReal.tsum_add, ENNReal.tsum_dyadicWeight_neg_one, ← ENNReal.lqNorm_one]
+  rw [tsum_add, ENNReal.tsum_dyadicWeight_neg_one, ← ENNReal.lqNorm_one]
   exact ENNReal.add_ne_top.2 ⟨hL.ne, by norm_num⟩
 
 namespace TraceBound
@@ -198,7 +198,7 @@ theorem edist_apply_succ_le {f : X} {t : ℕ → ℝ≥0∞} (D : A.DyadicApprox
     (k : ℕ) :
     edist (TB.T (D.a k)) (TB.T (D.a (k + 1))) ≤
       traceConst TB.C β * (dyadicWeight β k * (A.approxError f (2 ^ k) + t k)) := by
-  rw [edist_comm, edist_eq_enorm_sub]
+  rw [edist_comm, eDist_eq_eNorm_sub]
   exact TB.enorm_apply_sub_succ_le D ht k
 
 /-- The traces of near-best approximants form a Cauchy sequence when
@@ -227,13 +227,13 @@ theorem tendsto_edist_apply {f : X} {γ γ' : ℕ} {c c' : ℕ → X}
       _ = 2 ^ (k + M) := by rw [show k + M = k + (γ + γ') + 1 by omega, pow_succ]; ring
   have hle : ∀ k, edist (TB.T (c k)) (TB.T (c' k)) ≤ TB.C * dyadicWeight β M *
       (dyadicWeight β k * ‖f - c k‖ₑ + dyadicWeight β k * ‖f - c' k‖ₑ) := fun k => by
-    rw [edist_eq_enorm_sub, ← map_sub]
+    rw [eDist_eq_eNorm_sub, ← map_sub]
     calc ‖TB.T (c k - c' k)‖ₑ ≤ TB.C * dyadicWeight β (k + M) * ‖c k - c' k‖ₑ :=
           TB.enorm_apply_le (hmem k)
       _ ≤ TB.C * dyadicWeight β (k + M) * (‖f - c k‖ₑ + ‖f - c' k‖ₑ) := by
           gcongr
           calc ‖c k - c' k‖ₑ = ‖(f - c' k) - (f - c k)‖ₑ := by congr 1; abel
-            _ ≤ ‖f - c' k‖ₑ + ‖f - c k‖ₑ := _root_.enorm_sub_le
+            _ ≤ ‖f - c' k‖ₑ + ‖f - c k‖ₑ := eNorm_sub_le
             _ = ‖f - c k‖ₑ + ‖f - c' k‖ₑ := add_comm _ _
       _ = _ := by rw [ENNReal.dyadicWeight_add_nat]; ring
   have hlim : Tendsto (fun k => TB.C * dyadicWeight β M *
@@ -300,7 +300,7 @@ theorem limitTrace_add [CompleteSpace Y] (hβ : 0 ≤ β) {f g : X} (hf : A.MemA
     calc dyadicWeight β k * ‖(f + g) - (Df.a k + Dg.a k)‖ₑ
         = dyadicWeight β k * ‖(f - Df.a k) + (g - Dg.a k)‖ₑ := by congr 2; abel
       _ ≤ dyadicWeight β k * (‖f - Df.a k‖ₑ + ‖g - Dg.a k‖ₑ) := by
-          gcongr; exact enorm_add_le _ _
+          gcongr; exact eNorm_add_le _ _
       _ = _ := mul_add _ _ _
   have h1 := TB.tendsto_limitTrace hβ (MemApprox.add one_ne_zero hβ hf hg) hc hlim
   have h2 : Tendsto (fun k => TB.T (Df.a k + Dg.a k)) atTop
@@ -316,10 +316,10 @@ theorem limitTrace_smul [CompleteSpace Y] (hβ : 0 ≤ β) {f : X} (hf : A.MemAp
   have hcf := D.tendsto_dyadicWeight_mul_enorm_sub (tsum_canonical_ne_top hβ hf)
   have hc : ∀ k, r • D.a k ∈ A (2 ^ (k + 0)) := fun k => A.smul_mem r (D.mem k)
   have hlim : Tendsto (fun k => dyadicWeight β k * ‖r • f - r • D.a k‖ₑ) atTop (𝓝 0) := by
-    have := ENNReal.Tendsto.const_mul (a := ‖r‖ₑ) hcf (Or.inr enorm_ne_top)
+    have := ENNReal.Tendsto.const_mul (a := ‖r‖ₑ) hcf (Or.inr eNorm_ne_top)
     rw [mul_zero] at this
     refine this.congr fun k => ?_
-    rw [← smul_sub, enorm_smul]; ring
+    rw [← smul_sub, eNorm_smul]; ring
   have h1 := TB.tendsto_limitTrace hβ (hf.smul r) hc hlim
   have h2 : Tendsto (fun k => TB.T (r • D.a k)) atTop (𝓝 (r • TB.limitTrace f)) := by
     simp_rw [map_smul]
@@ -344,7 +344,7 @@ theorem edist_apply_limitTrace_le [CompleteSpace Y] (hβ : 0 ≤ β) {f : X} {t 
   have hf : A.MemApprox β 1 f := by
     refine (memApprox_iff_lqNorm_dyadic_lt_top le_rfl hβ).2 (lt_of_le_of_lt ?_ hsum.lt_top)
     rw [ENNReal.lqNorm_one]
-    exact ENNReal.tsum_le_tsum fun k => by rw [approxSeqDyadic]; gcongr; exact le_self_add
+    exact tsum_le_tsum fun k => by rw [approxSeqDyadic]; gcongr; exact le_self_add
   have hlim := TB.tendsto_limitTrace hβ hf (γ := 0) (fun k => by simpa using D.mem k)
     (D.tendsto_dyadicWeight_mul_enorm_sub hsum)
   calc edist (TB.T (D.a k)) (TB.limitTrace f) ≤ ∑' m, traceConst TB.C β *
@@ -366,10 +366,10 @@ theorem enorm_limitTrace_le_of_dyadicApprox [CompleteSpace Y] (hβ : 0 ≤ β) {
       _ ≤ TB.C * (2 * ‖f‖ₑ + t 0) := by
           rw [ENNReal.dyadicWeight_zero_right, mul_one]; gcongr; exact D.enorm_zero_le
   calc ‖TB.limitTrace f‖ₑ = ‖TB.T (D.a 0) + (TB.limitTrace f - TB.T (D.a 0))‖ₑ := by congr 1; abel
-    _ ≤ ‖TB.T (D.a 0)‖ₑ + ‖TB.limitTrace f - TB.T (D.a 0)‖ₑ := enorm_add_le _ _
+    _ ≤ ‖TB.T (D.a 0)‖ₑ + ‖TB.limitTrace f - TB.T (D.a 0)‖ₑ := eNorm_add_le _ _
     _ ≤ _ := by
         gcongr
-        rw [← edist_eq_enorm_sub, edist_comm]
+        rw [← eDist_eq_eNorm_sub, edist_comm]
         exact h0
 
 /-- **The trace is bounded on `A^β_1`**:
@@ -377,7 +377,7 @@ theorem enorm_limitTrace_le_of_dyadicApprox [CompleteSpace Y] (hβ : 0 ≤ β) {
 theorem enorm_limitTrace_le [CompleteSpace Y] (hβ : 0 ≤ β) {f : X} (hf : A.MemApprox β 1 f) :
     ‖TB.limitTrace f‖ₑ ≤ (3 * TB.C + 3 * traceConst TB.C β) * A.approxNormDyadic β 1 f := by
   rcases eq_or_ne f 0 with rfl | hf0
-  · rw [TB.limitTrace_zero hβ, enorm_zero]; exact bot_le
+  · rw [TB.limitTrace_zero hβ, eNorm_zero]; exact bot_le
   obtain ⟨D⟩ := exists_dyadicApprox A f (tolerance_ne_zero hf0 β)
   have h := TB.enorm_limitTrace_le_of_dyadicApprox hβ D (tolerance_anti f hβ)
     (tsum_dyadicWeight_mul_add_tolerance_ne_top le_rfl
@@ -401,7 +401,7 @@ theorem approxNormDyadic_limitTrace_le [CompleteSpace Y] (hβ : 0 ≤ β) {s : �
   rw [tolerance_zero] at hy
   refine approxNormDyadic_le_of_tail hβs.le hq f hy fun k => ?_
   refine (approxError_le_of_mem (TB.mapsTo _ _ (D.mem k)) _).trans ?_
-  rw [← edist_eq_enorm_sub, edist_comm]
+  rw [← eDist_eq_eNorm_sub, edist_comm]
   exact TB.edist_apply_limitTrace_le hβ D ht hsum k
 
 /-- **The trace transfer theorem**, membership form: `f ∈ A^s_q(X)` gives
@@ -441,7 +441,7 @@ theorem limitTrace_eq_of_hasSum_lift [CompleteSpace Y] (hβ : 0 ≤ β) {γ : �
     calc dyadicWeight β K * ‖f - ∑ i ∈ range (K + γ), shiftSeq γ a i‖ₑ
         ≤ dyadicWeight β K * ∑' m, ‖a (m + K)‖ₑ := mul_le_mul' le_rfl (htailG K)
       _ ≤ dyadicWeight β K * ∑' m, C' * dyadicWeight (-β) (m + K) * ‖b (m + K)‖ₑ :=
-          mul_le_mul' le_rfl (ENNReal.tsum_le_tsum fun m => hale (m + K))
+          mul_le_mul' le_rfl (tsum_le_tsum fun m => hale (m + K))
       _ = ∑' m, C' * dyadicWeight (-β) m * ‖b (m + K)‖ₑ := by
           rw [← ENNReal.tsum_mul_left]
           congr 1; funext m
@@ -451,7 +451,7 @@ theorem limitTrace_eq_of_hasSum_lift [CompleteSpace Y] (hβ : 0 ≤ β) {γ : �
               = C' * dyadicWeight (-β) m * ‖b (m + K)‖ₑ *
                   (dyadicWeight β K * dyadicWeight (-β) K) := by ring
             _ = _ := by rw [ENNReal.dyadicWeight_mul_neg_self, mul_one]
-      _ ≤ ∑' m, C' * ‖b (m + K)‖ₑ := ENNReal.tsum_le_tsum fun m => by
+      _ ≤ ∑' m, C' * ‖b (m + K)‖ₑ := tsum_le_tsum fun m => by
           calc C' * dyadicWeight (-β) m * ‖b (m + K)‖ₑ ≤ C' * 1 * ‖b (m + K)‖ₑ := by
                 gcongr; exact hw1 m
             _ = C' * ‖b (m + K)‖ₑ := by rw [mul_one]
@@ -498,8 +498,8 @@ theorem exists_limitTrace_eq [CompleteSpace X] [CompleteSpace Y] (hβ : 0 ≤ β
       _ ≤ C' * 1 * ‖b j‖ₑ := by gcongr; exact hw1 j
       _ = C' * ‖b j‖ₑ := by rw [mul_one]
   have ha_fin : ∑' j, ‖a j‖ₑ ≠ ∞ := ne_top_of_le_ne_top (ENNReal.mul_ne_top hC' hb_fin)
-    ((ENNReal.tsum_le_tsum hale').trans_eq ENNReal.tsum_mul_left)
-  have ha_summ : Summable a := Summable.of_enorm ha_fin
+    ((tsum_le_tsum hale').trans_eq ENNReal.tsum_mul_left)
+  have ha_summ : Summable a := Summable.of_eNorm ha_fin
   set f := ∑' j, a j
   have hfa : HasSum a f := ha_summ.hasSum
   -- the norm of `f`, through the lifted blocks placed at the levels `j + γ`

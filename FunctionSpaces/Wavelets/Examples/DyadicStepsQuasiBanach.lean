@@ -167,7 +167,7 @@ theorem lintegral_indicator_add_eq_eLpNorm (hp0 : p ≠ 0) (hp : p ≠ ∞) {F :
   by_cases hy : y ∈ Icc (0 : ℝ) 1 ∧ y + h ∈ Icc (0 : ℝ) 1
   · simp only [Set.indicator_of_mem hy.1, Set.indicator_of_mem hy.2,
       Set.indicator_of_mem ((hmem y).2 hy), Function.iterate_one, fwdDiff]
-  · rw [Set.indicator_of_notMem (fun h' => hy ((hmem y).1 h')), enorm_zero,
+  · rw [Set.indicator_of_notMem (fun h' => hy ((hmem y).1 h')), eNorm_zero,
       ENNReal.zero_rpow_of_pos hq]
     by_cases hy1 : y ∈ Icc (0 : ℝ) 1
     · simp only [Set.indicator_of_mem hy1, Set.indicator_of_notMem (fun h2 => hy ⟨hy1, h2⟩)]
@@ -198,7 +198,7 @@ theorem two_pow_mul_sum_lintegral_le_intervalModulus (hp0 : p ≠ 0) (hp : p ≠
       simp only [Function.uncurry, hΦdef, Set.indicator_apply]
     rw [hfun]
     exact Measurable.ite ((measurable_fst.add measurable_snd) measurableSet_Icc)
-      (((hF.comp (measurable_fst.add measurable_snd)).sub (hF.comp measurable_fst)).enorm.pow_const
+      (((hF.comp (measurable_fst.add measurable_snd)).sub (hF.comp measurable_fst)).eNorm.pow_const
         _) measurable_const
   have h1 : ∑ n ∈ Finset.range (2 ^ j),
       ∫⁻ y in dyadicIco j n, ∫⁻ x in dyadicIco j n, ‖F x - F y‖ₑ ^ p.toReal ≤
@@ -258,7 +258,7 @@ theorem enorm_higherDiff_one_rpow_le_stripBound (hp0 : p ≠ 0) (hp1 : p ≤ 1) 
     rw [hu _ _ hxh, one_mul]
     calc ‖v (⌊2 ^ j * x⌋₊ + 1) - v ⌊2 ^ j * x⌋₊‖ₑ ^ p.toReal
         ≤ (‖v (⌊2 ^ j * x⌋₊ + 1)‖ₑ + ‖v ⌊2 ^ j * x⌋₊‖ₑ) ^ p.toReal :=
-          ENNReal.rpow_le_rpow enorm_sub_le hq.le
+          ENNReal.rpow_le_rpow eNorm_sub_le hq.le
       _ ≤ ‖v (⌊2 ^ j * x⌋₊ + 1)‖ₑ ^ p.toReal + ‖v ⌊2 ^ j * x⌋₊‖ₑ ^ p.toReal :=
           ENNReal.rpow_add_le_add_rpow _ _ hq.le hq1
       _ = _ := add_comm _ _
@@ -266,7 +266,7 @@ theorem enorm_higherDiff_one_rpow_le_stripBound (hp0 : p ≠ 0) (hp1 : p ≤ 1) 
     have hxh : x + h ∈ dyadicIco j ⌊2 ^ j * x⌋₊ := by
       rw [mem_dyadicIco]
       constructor <;> linarith
-    rw [hu _ _ hxh, sub_self, enorm_zero, ENNReal.zero_rpow_of_pos hq]
+    rw [hu _ _ hxh, sub_self, eNorm_zero, ENNReal.zero_rpow_of_pos hq]
 
 /-- **The `L_p` quasi-norm of a step function**: if `u = v_n` on `I_{j,n}` for `n < 2^j`, then
 `∫_0^1 |u|^r = 2^(-j) ∑_{n<2^j} |v_n|^r` for every exponent `r`. -/
@@ -293,7 +293,7 @@ theorem eLpNorm_higherDiff_one_le_of_step (hp0 : p ≠ 0) (hp1 : p ≤ 1) {j : �
   have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
   set a : ℕ → ℝ≥0∞ := fun n => ‖v n‖ₑ ^ p.toReal with ha_def
   set T := ∑ n ∈ Finset.range (2 ^ j), a n with hT
-  have ha : a (2 ^ j) = 0 := by simp only [ha_def, hv, enorm_zero, ENNReal.zero_rpow_of_pos hq]
+  have ha : a (2 ^ j) = 0 := by simp only [ha_def, hv, eNorm_zero, ENNReal.zero_rpow_of_pos hq]
   have hB : ∑ n ∈ Finset.range (2 ^ j), (a n + a (n + 1)) ≤
       (((1 : ℕ) : ℝ≥0∞) + 1) * (T ^ (1 / p.toReal)) ^ p.toReal := by
     rw [← ENNReal.rpow_mul, one_div_mul_cancel hq.ne', ENNReal.rpow_one, Nat.cast_one,
@@ -309,7 +309,7 @@ theorem eLpNorm_higherDiff_one_le_of_step (hp0 : p ≠ 0) (hp1 : p ≤ 1) {j : �
     rw [ENNReal.one_rpow]
     exact enorm_higherDiff_one_rpow_le_stripBound hp0 hp1 hu hh0 hh hx.1
   have hpinv : (0 : ℝ) ≤ 1 / p.toReal := by positivity
-  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hum.aestronglyMeasurable,
+  rw [eLpNorm_eq_lintegral_rpow_eNorm_toReal hp0 hp hum.aestronglyMeasurable,
     lintegral_rpow_eq_of_step (fun n _ => hu n)]
   simp only [Nat.cast_one, one_mul]
   rw [← ENNReal.mul_rpow_of_nonneg _ _ hpinv, ← ENNReal.mul_rpow_of_nonneg _ _ hpinv]
@@ -452,7 +452,7 @@ theorem eFunctional_stepCouple_le (hp : p ≠ ∞) (f : Lp ℂ p vol) (j : ℕ) 
       stronglyMeasurable_stepFun _ j, (MemLp.coeFn_toLp hu).trans (ppFun_ae_eq_stepFun hQ j)⟩
   rw [eFunctional_stepCouple_two_pow]
   refine (iInf₂_le _ hb).trans ?_
-  rw [Lp.enorm_def, eLpNorm_congr_ae ((Lp.coeFn_sub f _).trans
+  rw [Lp.eNorm_def, eLpNorm_congr_ae ((Lp.coeFn_sub f _).trans
     (Filter.EventuallyEq.sub Filter.EventuallyEq.rfl (MemLp.coeFn_toLp hu)))]
   refine eLpNorm_le_of_lintegral_le (hF.sub (measurable_ppFun j _)).aestronglyMeasurable hp0 hp ?_
   calc ∫⁻ x, ‖((f : ℝ → ℂ) - ppFun j fun n => C (c n)) x‖ₑ ^ p.toReal ∂vol
@@ -487,7 +487,7 @@ theorem intervalLpModulus_le_of_mem_lpMeas (hp0 : p ≠ 0) (hp1 : p ≤ 1) {j k 
     rw [ppFun_eq_polyFun _ hx]
     split_ifs <;> simp [polyFun]
   have hnorm : ‖a‖ₑ = eLpNorm (ppFun j fun m => C (g ((m : ℝ) / 2 ^ j))) p vol := by
-    rw [Lp.enorm_def]
+    rw [Lp.eNorm_def]
     exact eLpNorm_congr_ae hae
   rw [intervalLpModulus, intervalModulus_congr_ae hae, hnorm, intervalModulus_eq_iSup_nonneg]
   refine iSup₂_le fun h hh => ?_
@@ -611,7 +611,7 @@ theorem le_eFunctional_stepCouple_idLp (hp0 : p ≠ 0) (hp : p ≠ ∞) (j : ℕ
     congr 1
     push_cast
     field_simp
-  rw [Lp.enorm_def, eLpNorm_congr_ae hae, ← ENNReal.rpow_le_rpow_iff hq,
+  rw [Lp.eNorm_def, eLpNorm_congr_ae hae, ← ENNReal.rpow_le_rpow_iff hq,
     eLpNorm_rpow_eq ((measurable_polyFun X).sub (measurable_ppFun j _)).aestronglyMeasurable hp0 hp,
     ENNReal.mul_rpow_of_nonneg _ _ hq.le, ← ENNReal.rpow_mul, one_div_mul_cancel hq.ne',
     ENNReal.rpow_one, ← hcount]

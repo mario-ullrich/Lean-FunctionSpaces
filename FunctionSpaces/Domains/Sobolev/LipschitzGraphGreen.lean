@@ -230,13 +230,13 @@ theorem exists_norm_fderiv_rayIntegral_le (hg : ContDiff ℝ 1 g) (hgc : HasComp
         ring_nf
 
 /-- **The ray integral is Lipschitz**, since its derivative is bounded
-(`Rd.exists_norm_fderiv_rayIntegral_le`, Mathlib's `lipschitzWith_of_nnnorm_fderiv_le`). -/
+(`Rd.exists_norm_fderiv_rayIntegral_le`, Mathlib's `lipschitzWith_of_nnNorm_fderiv_le`). -/
 theorem exists_lipschitzWith_rayIntegral (hg : ContDiff ℝ 1 g) (hgc : HasCompactSupport g)
     {w : V} (hw : ‖w‖ = 1) : ∃ K : ℝ≥0, LipschitzWith K (rayIntegral g w) := by
   obtain ⟨K, hK⟩ := exists_norm_fderiv_rayIntegral_le hg hgc hw
-  refine ⟨K.toNNReal, lipschitzWith_of_nnnorm_fderiv_le
+  refine ⟨K.toNNReal, lipschitzWith_of_nnNorm_fderiv_le
     (fun y => (hasFDerivAt_rayIntegral hg hgc hw y).differentiableAt) fun y => ?_⟩
-  rw [← NNReal.coe_le_coe, coe_nnnorm]
+  rw [← NNReal.coe_le_coe, coe_nnNorm]
   exact (hK y).trans (Real.le_coe_toNNReal K)
 
 end RayIntegral

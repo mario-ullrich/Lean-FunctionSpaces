@@ -50,13 +50,13 @@ open ENNReal (lqNorm dyadicWeight)
 namespace Rd
 
 /-- **A bound in `[0, ∞]` is a bound of norms**: `‖x‖ₑ ≤ C ‖y‖ₑ` with `C < ∞` gives
-`‖x‖ ≤ C.toReal ‖y‖` for elements of seminormed groups (Mathlib's `toReal_enorm`,
+`‖x‖ ≤ C.toReal ‖y‖` for elements of seminormed groups (Mathlib's `toReal_eNorm`,
 `ENNReal.toReal_mono`). -/
 theorem norm_le_toReal_mul_of_enorm_le {E F : Type*} [SeminormedAddGroup E]
     [SeminormedAddGroup F] {x : E} {y : F} {C : ℝ≥0∞} (hC : C ≠ ∞) (h : ‖x‖ₑ ≤ C * ‖y‖ₑ) :
     ‖x‖ ≤ C.toReal * ‖y‖ := by
-  rw [← toReal_enorm x, ← toReal_enorm y, ← ENNReal.toReal_mul]
-  exact ENNReal.toReal_mono (ENNReal.mul_ne_top hC enorm_ne_top) h
+  rw [← toReal_eNorm x, ← toReal_eNorm y, ← ENNReal.toReal_mul]
+  exact ENNReal.toReal_mono (ENNReal.mul_ne_top hC eNorm_ne_top) h
 
 namespace BoundedLipschitzDomain
 
@@ -71,7 +71,7 @@ variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDim
 theorem enorm_domainTrace_restrictProj_le (s : ℝ) (U : H^{s}(V)) (hs : 1 / 2 < s := by norm_num)
     (hs' : s < 3 / 2 := by norm_num) :
     ‖Ω.domainTrace s hs hs' (restrictProj s Ω.toOpens U)‖ₑ ≤ ‖U‖ₑ :=
-  enorm_le_iff_norm_le.2
+  eNorm_le_iff_norm_le.2
     ((Ω.norm_domainTrace_apply_le s _ hs hs').trans (norm_restrictProj_apply_le U))
 
 /-- **Functions with the boundary trace of `t` restrict to extensions of `t`**: for every

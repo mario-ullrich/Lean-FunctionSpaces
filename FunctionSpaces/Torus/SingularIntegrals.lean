@@ -69,12 +69,12 @@ theorem farMass_dilate_le {G : ℕ → 𝓢(EuclideanSpace ℝ d, ℂ)} {A : ℕ
       2 * Rd.familyTailConst (EuclideanSpace ℝ d) A 0 1 := by
   have hmeas : ∀ j, AEMeasurable (fun y => ‖Rd.dilate (2 ^ j) (G j : EuclideanSpace ℝ d → ℂ) y‖ₑ)
       (volume.restrict {y : EuclideanSpace ℝ d | 1 ≤ ‖y‖}) := fun j =>
-    (Rd.continuous_dilate (G j).continuous _).measurable.enorm.aemeasurable
+    (Rd.continuous_dilate (G j).continuous _).measurable.eNorm.aemeasurable
   rw [farMass, lintegral_tsum hmeas]
   calc ∑' j, ∫⁻ y in {y : EuclideanSpace ℝ d | 1 ≤ ‖y‖},
         ‖Rd.dilate (2 ^ j) (G j : EuclideanSpace ℝ d → ℂ) y‖ₑ
       ≤ ∑' j : ℕ, Rd.familyTailConst (EuclideanSpace ℝ d) A 0 1 * (2⁻¹ : ℝ≥0∞) ^ j :=
-        ENNReal.tsum_le_tsum fun j => (Rd.setLIntegral_enorm_dilate_schwartz_le (G j) 1 j 1).trans
+        tsum_le_tsum fun j => (Rd.setLIntegral_enorm_dilate_schwartz_le (G j) 1 j 1).trans
           (mul_le_mul' (Rd.tailConst_le_familyTailConst h j 0 1)
             (Rd.inv_one_add_ofReal_two_pow_le j))
     _ = 2 * Rd.familyTailConst (EuclideanSpace ℝ d) A 0 1 := by
@@ -131,7 +131,7 @@ measure `ν` below the Lebesgue measure, such as its restriction to `{‖y‖ �
 theorem aemeasurable_tsum_enorm {θ : ℕ → EuclideanSpace ℝ d → ℂ}
     (hθ : ∀ j, AEStronglyMeasurable (θ j) volume) (ν : Measure (EuclideanSpace ℝ d))
     (hν : ν ≤ volume) : AEMeasurable (fun y => ∑' j, ‖θ j y‖ₑ) ν :=
-  AEMeasurable.tsum fun j => ((hθ j).mono_measure hν).enorm
+  AEMeasurable.tsum fun j => ((hθ j).mono_measure hν).eNorm
 
 /-- **Young's inequality for kernels on `ℝ^d` acting on the torus**, for nonnegative functions:
 for `1 ≤ q`, an s-finite measure `ν` on `ℝ^d`, an almost everywhere measurable
@@ -173,7 +173,7 @@ theorem eLpNorm_farConv_le {θ : ℕ → EuclideanSpace ℝ d → ℂ}
   refine eLpNorm_le_of_lintegral_le (aemeasurable_farConv hθ hG).aestronglyMeasurable hp0 hp ?_
   rw [ENNReal.mul_rpow_of_nonneg _ _ (by linarith), eLpNorm_rpow_eq_lintegral hp0 hp
     hG.aemeasurable]
-  simp only [enorm_eq_self]
+  simp only [eNorm_eq_self]
   exact lintegral_rpow_lintegral_mul_comp_sub_quotientProj_le hq1
     (aemeasurable_tsum_enorm hθ _ Measure.restrict_le_self) hG
 
@@ -185,7 +185,7 @@ theorem tsum_setLIntegral_eq_farConv {θ : ℕ → EuclideanSpace ℝ d → ℂ}
     ∑' j, ∫⁻ y in {y : EuclideanSpace ℝ d | 1 ≤ ‖y‖}, ‖θ j y‖ₑ * G (t - quotientProj y) =
       farConv θ G t := by
   rw [farConv, ← lintegral_tsum (f := fun j y => ‖θ j y‖ₑ * G (t - quotientProj y)) fun j =>
-    (hθ j).restrict.enorm.mul (hG.comp (measurable_const.sub measurable_quotientProj)).aemeasurable]
+    (hθ j).restrict.eNorm.mul (hG.comp (measurable_const.sub measurable_quotientProj)).aemeasurable]
   exact lintegral_congr fun y => ENNReal.tsum_mul_right
 
 /-! ### Pointwise localisation -/
@@ -217,8 +217,8 @@ theorem enorm_periodicEconv_quotientProj_sub_conv_le {θ : EuclideanSpace ℝ d 
   have hsplit := integral_add_compl hS hint
   rw [hconv, show periodicEconv θ f (quotientProj x) =
       ∫ y, θ y * f (quotientProj x - quotientProj y) from rfl, ← hsplit, add_sub_cancel_left]
-  refine (enorm_integral_le_lintegral_enorm _).trans ?_
-  simp only [enorm_mul]
+  refine (eNorm_integral_le_lintegral_eNorm _).trans ?_
+  simp only [eNorm_mul]
   exact lintegral_mono_set fun y hy => one_le_norm_of_sub_notMem_tripleBox hx hy
 
 /-- **The convolution integrals of lifts converge absolutely**: for integrable kernels `θ_j` and
@@ -254,11 +254,11 @@ theorem lqNorm_periodicEconv_quotientProj_le {θ : ℕ → EuclideanSpace ℝ d 
             (periodicEconv (θ j) f (quotientProj x) -
               Rd.conv (θ j) (tripleBox.indicator (f ∘ quotientProj)) volume x)‖ₑ := by
           rw [add_sub_cancel]
-      _ ≤ _ := (enorm_add_le _ _).trans
+      _ ≤ _ := (eNorm_add_le _ _).trans
           (add_le_add le_rfl (enorm_periodicEconv_quotientProj_sub_conv_le hx (hint j)))
   refine (ENNReal.lqNorm_mono hj).trans ((ENNReal.lqNorm_add_le one_le_two _ _).trans ?_)
   refine add_le_add le_rfl ((ENNReal.lqNorm_le_lqNorm_one one_le_two _).trans_eq ?_)
-  exact tsum_setLIntegral_eq_farConv hθ hf.enorm (quotientProj x)
+  exact tsum_setLIntegral_eq_farConv hθ hf.eNorm (quotientProj x)
 
 /-- **Localisation of the synthesis operators**: at `x ∈ P_0` where all convolution integrals
 converge absolutely, for every finite set `s`,
@@ -273,20 +273,20 @@ theorem enorm_sum_periodicEconv_quotientProj_le {θ : ℕ → EuclideanSpace ℝ
         farConv θ (fun t => lqNorm 2 fun j => ‖g j t‖ₑ) (quotientProj x) := by
   set c : ℕ → ℂ := fun j => Rd.conv (θ j) (tripleBox.indicator (g j ∘ quotientProj)) volume x
   have hG : Measurable fun t => lqNorm 2 fun j => ‖g j t‖ₑ :=
-    measurable_lqNorm_comp (fun j => (hg j).enorm) 2
+    measurable_lqNorm_comp (fun j => (hg j).eNorm) 2
   have hfar : ∑ j ∈ s, ‖periodicEconv (θ j) (g j) (quotientProj x) - c j‖ₑ ≤
       farConv θ (fun t => lqNorm 2 fun j => ‖g j t‖ₑ) (quotientProj x) := by
     rw [← tsum_setLIntegral_eq_farConv hθ hG]
     refine (Finset.sum_le_sum fun j _ =>
       (enorm_periodicEconv_quotientProj_sub_conv_le hx (hint j)).trans
-      (lintegral_mono fun y => mul_le_mul_right ?_ _)).trans (ENNReal.sum_le_tsum s)
+      (lintegral_mono fun y => mul_le_mul_right ?_ _)).trans (sum_le_tsum s)
     exact ENNReal.le_lqNorm two_ne_zero (fun i => ‖g i (quotientProj x - quotientProj y)‖ₑ) j
   calc ‖∑ j ∈ s, periodicEconv (θ j) (g j) (quotientProj x)‖ₑ
       = ‖∑ j ∈ s, c j + ∑ j ∈ s, (periodicEconv (θ j) (g j) (quotientProj x) - c j)‖ₑ := by
         rw [← Finset.sum_add_distrib]
         simp only [add_sub_cancel]
     _ ≤ ‖∑ j ∈ s, c j‖ₑ + ∑ j ∈ s, ‖periodicEconv (θ j) (g j) (quotientProj x) - c j‖ₑ :=
-        (enorm_add_le _ _).trans (add_le_add le_rfl (enorm_sum_le _ _))
+        (eNorm_add_le _ _).trans (add_le_add le_rfl (eNorm_sum_le _ _))
     _ ≤ _ := add_le_add le_rfl hfar
 
 /-! ### The two bounds -/
@@ -321,8 +321,8 @@ theorem eLpNorm_lqNorm_periodicEconv_le [Nonempty d] {θ : ℕ → EuclideanSpac
   have hθ : ∀ j, AEStronglyMeasurable (θ j) volume := fun j => (h.integrable j).1
   have hfm : Measurable f := (Lp.stronglyMeasurable f).measurable
   have hF : AEMeasurable (fun t => lqNorm 2 fun j => ‖periodicEconv (θ j) f t‖ₑ) volume :=
-    aemeasurable_lqNorm_comp (fun j => (aestronglyMeasurable_periodicEconv (hθ j) hfm).enorm) 2
-  have hsplit := eLpNorm_le_of_comp_quotientProj_le hp1.le hF (aemeasurable_farConv hθ hfm.enorm)
+    aemeasurable_lqNorm_comp (fun j => (aestronglyMeasurable_periodicEconv (hθ j) hfm).eNorm) 2
+  have hsplit := eLpNorm_le_of_comp_quotientProj_le hp1.le hF (aemeasurable_farConv hθ hfm.eNorm)
     (A := fun x => lqNorm 2 fun j =>
       ‖Rd.conv (θ j) (tripleBox.indicator (f ∘ quotientProj)) volume x‖ₑ)
     (by
@@ -335,10 +335,10 @@ theorem eLpNorm_lqNorm_periodicEconv_le [Nonempty d] {θ : ℕ → EuclideanSpac
     (memLp_indicator_tripleBox_comp_quotientProj hp0 hp (Lp.memLp f))
   rw [eLpNorm_indicator_tripleBox_comp_quotientProj hp0 hp (Lp.aestronglyMeasurable f)] at hnear
   refine hsplit.trans ?_
-  rw [Lp.enorm_def, periodicCZConst, add_mul]
+  rw [Lp.eNorm_def, periodicCZConst, add_mul]
   refine add_le_add (hnear.trans_eq (by ring)) ?_
-  refine (eLpNorm_farConv_le hθ hp1.le hp hfm.enorm).trans ?_
-  rw [eLpNorm_enorm _ (Lp.aestronglyMeasurable f)]
+  refine (eLpNorm_farConv_le hθ hp1.le hp hfm.eNorm).trans ?_
+  rw [eLpNorm_eNorm _ (Lp.aestronglyMeasurable f)]
   gcongr
 
 /-- **The strong type of the synthesis operators on the torus**: for `d ≥ 1`, a
@@ -355,25 +355,25 @@ theorem eLpNorm_sum_periodicEconv_le [Nonempty d] {θ : ℕ → EuclideanSpace �
   have hp0 : p ≠ 0 := (zero_lt_one.trans hp1).ne'
   have hθ : ∀ j, AEStronglyMeasurable (θ j) volume := fun j => (h.integrable j).1
   have hG : Measurable fun t => lqNorm 2 fun j => ‖g j t‖ₑ :=
-    measurable_lqNorm_comp (fun j => (hgm j).enorm) 2
+    measurable_lqNorm_comp (fun j => (hgm j).eNorm) 2
   have hsum : AEStronglyMeasurable (fun t => ∑ j ∈ s, periodicEconv (θ j) (g j) t) volume :=
     Finset.aestronglyMeasurable_fun_sum s fun j _ =>
       aestronglyMeasurable_periodicEconv (hθ j) (hgm j)
-  have hsplit := eLpNorm_le_of_comp_quotientProj_le hp1.le hsum.enorm (aemeasurable_farConv hθ hG)
+  have hsplit := eLpNorm_le_of_comp_quotientProj_le hp1.le hsum.eNorm (aemeasurable_farConv hθ hG)
     (A := fun x => ‖∑ j ∈ s, Rd.conv (θ j) (tripleBox.indicator (g j ∘ quotientProj)) volume x‖ₑ)
     (by
       filter_upwards [ae_restrict_mem (measurableSet_periodBox 0), ae_restrict_of_ae
         (ae_integrable_econv_quotientProj h.integrable hgm fun j => (hg j).integrable hp1.le)]
         with x hx hint
       exact enorm_sum_periodicEconv_quotientProj_le hθ hgm s hx hint)
-  rw [eLpNorm_enorm _ hsum, eLpNorm_enorm _ (Finset.aestronglyMeasurable_fun_sum s fun j _ =>
+  rw [eLpNorm_eNorm _ hsum, eLpNorm_eNorm _ (Finset.aestronglyMeasurable_fun_sum s fun j _ =>
     Rd.aestronglyMeasurable_conv (hθ j)
       (memLp_indicator_tripleBox_comp_quotientProj hp0 hp (hg j)).aestronglyMeasurable)] at hsplit
   have hnear := h.eLpNorm_sum_conv_le hp1 hp s fun j =>
     memLp_indicator_tripleBox_comp_quotientProj hp0 hp (hg j)
   have hfun : (fun x => lqNorm 2 fun j => ‖tripleBox.indicator (g j ∘ quotientProj) x‖ₑ) =
       tripleBox.indicator fun y => lqNorm 2 fun j => ‖g j (quotientProj y)‖ₑ := funext fun x => by
-    simp only [enorm_indicator_eq_indicator_enorm]
+    simp only [eNorm_indicator_eq_indicator_eNorm]
     exact ENNReal.lqNorm_indicator 2 _ (fun j y => ‖(g j ∘ quotientProj) y‖ₑ) x
   rw [hfun, eLpNorm_indicator_tripleBox hp0 hp hG.aemeasurable] at hnear
   refine hsplit.trans ?_

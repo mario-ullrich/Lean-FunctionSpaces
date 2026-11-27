@@ -85,7 +85,7 @@ the strong type of the analysis operator of the Calderón–Zygmund family `(ψ_
 theorem triebelLizorkinNorm_zero_two_le [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞)
     (f : Lp ℂ p (volume : Measure V)) :
     triebelLizorkinNorm 0 2 f ≤ squareFunctionConst V p * ‖f‖ₑ := by
-  rw [triebelLizorkinNorm_zero_left, Lp.enorm_def]
+  rw [triebelLizorkinNorm_zero_left, Lp.eNorm_def]
   exact isCZFamily_lpBlockKernel.eLpNorm_lqNorm_conv_le hp1 hp (Lp.memLp f)
 
 /-- **`L_p ⊆ F^0_{p,2}`**: in dimension `n ≥ 1`, for `1 < p < ∞`, every `f ∈ L_p(V)` has a
@@ -93,7 +93,7 @@ finite Triebel–Lizorkin norm `‖f‖_{F^0_{p,2}}`. -/
 theorem memTriebelLizorkin_zero_two [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞)
     (f : Lp ℂ p (volume : Measure V)) : MemTriebelLizorkin 0 2 f :=
   (triebelLizorkinNorm_zero_two_le hp1 hp f).trans_lt
-    (ENNReal.mul_lt_top (squareFunctionConst_ne_top hp1 hp).lt_top enorm_lt_top)
+    (ENNReal.mul_lt_top (squareFunctionConst_ne_top hp1 hp).lt_top eNorm_lt_top)
 
 /-! ### The reproducing formula -/
 
@@ -144,9 +144,9 @@ theorem enorm_le_triebelLizorkinNorm_zero_two [Nontrivial V] (hp1 : 1 < p) (hp :
     (f : Lp ℂ p (volume : Measure V)) :
     ‖f‖ₑ ≤ squareSynthesisConst V p * triebelLizorkinNorm 0 2 f := by
   have h : Tendsto (fun J => ‖∑ j ∈ Finset.range J, lpBlock hp j f‖ₑ) atTop (𝓝 ‖f‖ₑ) :=
-    (tendsto_sum_lpBlock hp f).enorm
+    (tendsto_sum_lpBlock hp f).eNorm
   refine le_of_tendsto' h fun J => ?_
-  rw [Lp.enorm_def, ← eLpNorm_congr_ae (sum_conv_dualLpBlockKernel_blockFun_ae hp _ f),
+  rw [Lp.eNorm_def, ← eLpNorm_congr_ae (sum_conv_dualLpBlockKernel_blockFun_ae hp _ f),
     triebelLizorkinNorm_zero_left]
   exact isCZFamily_dualLpBlockKernel.eLpNorm_sum_conv_le hp1 hp _ fun j => memLp_blockFun hp j f
 

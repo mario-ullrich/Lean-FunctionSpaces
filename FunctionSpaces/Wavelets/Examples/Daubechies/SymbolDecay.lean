@@ -90,7 +90,7 @@ theorem TransferGrowth.setIntegral_prod_daubFun_le {N : ℕ} {lam C : ℝ}
       ≤ ∫ ξ in Set.Icc (-(2 ^ n / 2)) (2 ^ n / 2),
           ∏ j ∈ Finset.range n, daubFun N (ξ / 2 ^ (j + 1)) :=
         setIntegral_mono_set (continuous_prod_daubFun N n).integrableOn_Icc
-          (Eventually.of_forall fun ξ => prod_daubFun_nonneg N n ξ) hs.eventuallyLE
+          (Eventually.of_forall fun ξ => prod_daubFun_nonneg N n ξ) (EventuallySubset.of_subset hs)
     _ = ∫ ξ in -(2 ^ n / 2 : ℝ)..2 ^ n / 2,
           ∏ j ∈ Finset.range n, daubFun N (ξ / 2 ^ (j + 1)) := by
         rw [intervalIntegral.integral_of_le hle, integral_Icc_eq_integral_Ioc]

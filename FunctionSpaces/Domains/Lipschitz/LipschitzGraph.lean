@@ -445,7 +445,7 @@ theorem graphCutoff_apply_ae (f : Lp ℂ p (volume : Measure V)) :
 /-- `‖1_Ω f‖_p = ‖f‖_{L_p(Ω)}`. -/
 theorem enorm_graphCutoff (f : Lp ℂ p (volume : Measure V)) :
     ‖Ω.graphCutoff f‖ₑ = eLpNorm (Ω.domain.indicator f) p volume := by
-  rw [Lp.enorm_def, eLpNorm_congr_ae (Ω.graphCutoff_apply_ae f)]
+  rw [Lp.eNorm_def, eLpNorm_congr_ae (Ω.graphCutoff_apply_ae f)]
 
 /-- `‖1_Ω f‖_p ≤ ‖f‖_p`. -/
 theorem enorm_graphCutoff_le (f : Lp ℂ p (volume : Measure V)) : ‖Ω.graphCutoff f‖ₑ ≤ ‖f‖ₑ :=

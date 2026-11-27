@@ -108,7 +108,7 @@ theorem eLpNorm_avg_le [TopologicalSpace α] [MeasurableSpace α] [OpensMeasurab
       ⨆ t ∈ Icc 0 δ, eLpNorm (K t) p μ := by
   set Φ : ℝ → ℂ := (Ioc 0 δ).indicator fun _ => ((δ : ℂ))⁻¹
   have hΦ : ∫⁻ t, ‖Φ t‖ₑ = 1 := by
-    simp only [Φ, enorm_indicator_eq_indicator_enorm]
+    simp only [Φ, eNorm_indicator_eq_indicator_eNorm]
     rw [lintegral_indicator measurableSet_Ioc, setLIntegral_const, Real.volume_Ioc, sub_zero,
       ← ofReal_norm, norm_inv, Complex.norm_real, Real.norm_eq_abs, abs_of_pos hδ,
       ENNReal.ofReal_inv_of_pos hδ,
@@ -329,7 +329,7 @@ theorem eLpNorm_sub_steklovSmooth_le {f : ℝ → ℂ} (hf : Continuous f) (r : 
     funext x
     rw [sub_steklovSmooth_eq hf r hδ.ne' x]
     rfl
-  rw [heq, eLpNorm_const_smul, enorm_pow, enorm_neg, enorm_one, one_pow, one_mul]
+  rw [heq, eLpNorm_const_smul, eNorm_pow, eNorm_neg, eNorm_one, one_pow, one_mul]
   refine (eLpNorm_avgStepIter_le (continuous_higherDiff_uncurry hf r) hδ hp hp' _ r 0).trans ?_
   refine iSup₂_le fun h hh => ?_
   rw [zero_add] at hh
@@ -369,11 +369,11 @@ theorem eLpNorm_smoothCoeff_smul_le [MeasurableSpace α] {μ : Measure α} {r k 
       (((k + 1 : ℕ) * δ : ℝ) : ℂ)⁻¹ ^ r) • g) p μ ≤
       (r.choose (k + 1) : ℝ≥0∞) * ((ENNReal.ofReal δ)⁻¹ ^ r * B) := by
   have hk1 : (1 : ℝ) ≤ ((k + 1 : ℕ) : ℝ) := by exact_mod_cast Nat.succ_le_succ (Nat.zero_le k)
-  rw [eLpNorm_const_smul, enorm_mul, enorm_mul, enorm_pow, enorm_neg, enorm_one, one_pow,
+  rw [eLpNorm_const_smul, eNorm_mul, eNorm_mul, eNorm_pow, eNorm_neg, eNorm_one, one_pow,
     one_mul, mul_assoc]
   refine mul_le_mul' ?_ (mul_le_mul' ?_ hg)
   · rw [← ofReal_norm, Complex.norm_natCast, ENNReal.ofReal_natCast]
-  · rw [enorm_pow, ← ofReal_norm, norm_inv, Complex.norm_real, Real.norm_eq_abs,
+  · rw [eNorm_pow, ← ofReal_norm, norm_inv, Complex.norm_real, Real.norm_eq_abs,
       abs_of_pos (by positivity), ENNReal.ofReal_inv_of_pos (by positivity)]
     gcongr
     exact le_mul_of_one_le_left hδ.le hk1

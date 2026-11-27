@@ -64,7 +64,7 @@ variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDim
 /-- The **open model set** `O_I = interior (range I)`, as an open set of `E`: the open half-space
 for manifolds with boundary, the open quadrant for manifolds with corners, `E` for manifolds without
 boundary. -/
-abbrev modelInterior : Opens E :=
+noncomputable abbrev modelInterior : Opens E :=
   Opens.interior (range I)
 
 omit [FiniteDimensional ℝ E] in
@@ -111,11 +111,11 @@ noncomputable def pieceCLM (i : Fin A.n) : Lp ℂ p μ →L[ℂ] Lp ℂ p (volum
       (zero_lt_one.trans_le (Fact.out : 1 ≤ p)).ne' hp
     refine ⟨C.toReal, fun f => ?_⟩
     have h : ‖A.pieceLp μ hp i f‖ₑ ≤ C * ‖f‖ₑ := by
-      rw [Lp.enorm_def, Lp.enorm_def, eLpNorm_congr_ae (A.pieceLp_ae μ hp i f)]
+      rw [Lp.eNorm_def, Lp.eNorm_def, eLpNorm_congr_ae (A.pieceLp_ae μ hp i f)]
       exact hle f (Lp.stronglyMeasurable f)
     change ‖A.pieceLp μ hp i f‖ ≤ _
-    rw [← toReal_enorm, ← toReal_enorm f, ← ENNReal.toReal_mul]
-    exact ENNReal.toReal_mono (ENNReal.mul_ne_top hC enorm_ne_top) h)
+    rw [← toReal_eNorm, ← toReal_eNorm f, ← ENNReal.toReal_mul]
+    exact ENNReal.toReal_mono (ENNReal.mul_ne_top hC eNorm_ne_top) h)
 
 /-- `pieceCLM i f` is the piece `(ψ_i f) ∘ κ_i⁻¹`. -/
 theorem pieceCLM_apply (i : Fin A.n) (f : Lp ℂ p μ) : A.pieceCLM μ hp i f = A.pieceLp μ hp i f :=
@@ -134,11 +134,11 @@ noncomputable def chartLiftCLM (k : Fin A.n) : Lp ℂ p (volume : Measure E) →
       (zero_lt_one.trans_le (Fact.out : 1 ≤ p)).ne' hp
     refine ⟨C.toReal, fun F => ?_⟩
     have h : ‖A.chartLiftLp μ hp k F‖ₑ ≤ C * ‖F‖ₑ := by
-      rw [Lp.enorm_def, Lp.enorm_def, eLpNorm_congr_ae (A.chartLiftLp_ae hp k F)]
+      rw [Lp.eNorm_def, Lp.eNorm_def, eLpNorm_congr_ae (A.chartLiftLp_ae hp k F)]
       exact hle F (Lp.stronglyMeasurable F)
     change ‖A.chartLiftLp μ hp k F‖ ≤ _
-    rw [← toReal_enorm, ← toReal_enorm F, ← ENNReal.toReal_mul]
-    exact ENNReal.toReal_mono (ENNReal.mul_ne_top hC enorm_ne_top) h)
+    rw [← toReal_eNorm, ← toReal_eNorm F, ← ENNReal.toReal_mul]
+    exact ENNReal.toReal_mono (ENNReal.mul_ne_top hC eNorm_ne_top) h)
 
 /-- `chartLiftCLM k F` is the lift `θ_k · F ∘ κ_k`. -/
 theorem chartLiftCLM_apply (k : Fin A.n) (F : Lp ℂ p (volume : Measure E)) :
@@ -191,7 +191,7 @@ theorem sum_chartLiftCLM_comp_pieceCLM :
 
 /-- **The carrier of the `k`-th lift**: the compact set `κ_k(tsupport θ_k) ⊆ range I`, the only
 part of `E` that the lift `θ_k · F ∘ κ_k` sees. -/
-def liftCarrier (k : Fin A.n) : Set E :=
+noncomputable def liftCarrier (k : Fin A.n) : Set E :=
   A.extChart k '' tsupport (A.theta k)
 
 omit [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E] [MeasurableSpace M]

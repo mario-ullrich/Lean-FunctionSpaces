@@ -120,7 +120,7 @@ theorem exists_inclusion_eq_of_memEMethod {τ : ℝ} (hτ0 : 0 < τ) (hτ1 : τ 
   have ha : ∑' n, ‖haarSystemCoeff g n‖ₑ ^ τ ≠ ∞ := by
     rw [ENNReal.tsum_eq_add_tsum_two_pow_add, haarSystemCoeff_zero]
     simp only [hsys]
-    exact ENNReal.add_ne_top.2 ⟨ENNReal.rpow_ne_top_of_nonneg hτ0.le enorm_ne_top, hcoef⟩
+    exact ENNReal.add_ne_top.2 ⟨ENNReal.rpow_ne_top_of_nonneg hτ0.le eNorm_ne_top, hcoef⟩
   set F : Lp ℂ 2 vol := haarBasis.repr.symm
     ⟨haarSystemCoeff g, mem_l2_of_tsum_enorm_rpow_ne_top hτ0 (by linarith) ha⟩
   have hF : ∀ n, haarSystemCoeff F n = haarSystemCoeff g n := fun n => by
@@ -165,7 +165,7 @@ theorem memApprox_nTerm_iff_intervalModulus_of_lt_two {τ : ℝ} (hτ0 : 0 < τ)
     have hg := Lp.coeFn_inclusionOfExponentLeLinear (𝕜 := ℝ)
       (ofReal_le_two (τ := τ) (by linarith)) f
     rw [memApprox_nTerm_iff_memEMethod hτ0 hτ1 f, memEMethod_stepCouple_iff_modulus hp0
-      (ENNReal.ofReal_le_one.2 hτ1) hp0 hθ0 hθp, Lp.enorm_def, eLpNorm_congr_ae hg]
+      (ENNReal.ofReal_le_one.2 hτ1) hp0 hθ0 hθp, Lp.eNorm_def, eLpNorm_congr_ae hg]
     simp only [Interval.intervalLpModulus, intervalModulus_congr_ae hg]
   · have : Fact (1 ≤ ENNReal.ofReal τ) := ⟨ENNReal.one_le_ofReal.2 hτ1.le⟩
     have hp2 : ENNReal.ofReal τ < 2 := by
@@ -174,7 +174,7 @@ theorem memApprox_nTerm_iff_intervalModulus_of_lt_two {τ : ℝ} (hτ0 : 0 < τ)
     have hg := Lp.coeFn_inclusionOfExponentLe (𝕜 := ℝ) hp2.le f
     have h := memApprox_nTerm_iff_modulus hp2 f
     rw [hpτ] at h
-    rw [h, Lp.enorm_def, eLpNorm_congr_ae hg]
+    rw [h, Lp.eNorm_def, eLpNorm_congr_ae hg]
     simp only [Interval.intervalLpModulus, intervalModulus_congr_ae hg]
 
 end Haar

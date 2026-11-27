@@ -77,7 +77,7 @@ theorem eLpNorm_sub_steklovSmooth_le_smoothnessModulus {f : ℝ → ℂ} (hf : C
     funext x
     rw [Interval.sub_steklovSmooth_eq hf r hδ.ne' x]
     rfl
-  rw [heq, eLpNorm_const_smul, enorm_pow, enorm_neg, enorm_one, one_pow, one_mul]
+  rw [heq, eLpNorm_const_smul, eNorm_pow, eNorm_neg, eNorm_one, one_pow, one_mul]
   refine (Interval.eLpNorm_avgStepIter_le (Interval.continuous_higherDiff_uncurry hf r) hδ hp
     hp' volume r 0).trans (iSup₂_le fun h hh => ?_)
   rw [zero_add] at hh

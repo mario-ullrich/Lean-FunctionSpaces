@@ -782,7 +782,7 @@ theorem enorm_tensorProj_succ_sub_tensorProj (hN : 2 ≤ N) (hp : p ≠ ∞) (j 
     (f : Lp ℂ p (volume : Measure (Fin d → ℝ))) :
     ‖tensorProj m p d hN hp (j + 1) f - tensorProj m p d hN hp j f‖ₑ =
       eLpNorm (tensorDetailFun m j f) p volume := by
-  rw [tensorProj_succ_sub_tensorProj, Lp.enorm_def, eLpNorm_congr_ae (MemLp.coeFn_toLp _)]
+  rw [tensorProj_succ_sub_tensorProj, Lp.eNorm_def, eLpNorm_congr_ae (MemLp.coeFn_toLp _)]
 
 /-- **The norms of the blocks through the wavelet coefficients**: for `N ≥ 2` and `1 ≤ p < ∞`
 there are constants `K, M < ∞` such that for every `f ∈ L_p(ℝ^d)` and every level `j`,
@@ -832,7 +832,7 @@ theorem enorm_tensorProj_zero_equiv (hN : 2 ≤ N) (hp : p ≠ ∞) :
     tensorCoeffConst_ne_top _ _ fun _ => memLp_tensorGen m hN ∅ _,
     tensorExpandConst_ne_top _ _ Fact.out fun _ => memLp_tensorGen m hN ∅ p, fun f => ?_⟩
   have he : ‖tensorProj m p d hN hp 0 f‖ₑ = eLpNorm (tensorProjFun m 0 f) p volume := by
-    rw [Lp.enorm_def, eLpNorm_congr_ae (tensorProj_apply_ae m hN hp 0 f)]
+    rw [Lp.eNorm_def, eLpNorm_congr_ae (tensorProj_apply_ae m hN hp 0 f)]
   rw [he]
   refine ⟨?_, eLpNorm_tensorProjFun_zero_le m hN Fact.out hp f⟩
   have hl : lqNorm p (fun k : Fin d → ℤ => ‖tensorCoeff (tensorScalingFamily m d) 0 f ((), k)‖ₑ) =
@@ -883,7 +883,7 @@ theorem lpModulus_le_of_mem_tensorScalingSpace (hN : 2 ≤ N) (hp : p ≠ ∞) {
     _ ≤ tensorBernsteinConst (tensorScalingFamily m d) (1 - N) (2 * N - 1) p N *
           (⨆ (ν : Unit) (H : Fin d → ℝ) (_ : ‖H‖ ≤ 2 ^ j * (1 / 2 ^ k)),
             eLpNorm ((fwdDiff H)^[N] (tensorScalingFamily m d ν)) p volume) * ‖a‖ₑ := by
-        rw [Lp.enorm_def]
+        rw [Lp.eNorm_def]
         exact smoothnessModulus_tensorExpand_le
           (fun _ => (continuous_tensorGen m hN ∅).aestronglyMeasurable)
           (fun _ _ hx => tensorGen_eq_zero m hN ∅ hx) Fact.out hp N (Lp.aestronglyMeasurable a)

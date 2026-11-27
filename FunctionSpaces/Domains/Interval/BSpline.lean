@@ -137,8 +137,8 @@ theorem linearIndependent_X_add_C_pow (r : ℕ) :
   have hcoeff : ∀ d : ℕ,
       ∑ m : Fin r, g m * (((m : ℕ) : ℂ) ^ (r - 1 - d) * ((r - 1).choose d : ℂ)) = 0 := fun d => by
     have h := congrArg (fun P => P.coeff d) hg
-    simpa only [finsetSum_coeff, coeff_smul, coeff_X_add_C_pow, smul_eq_mul, coeff_zero]
-      using h
+    simpa only [finsetSum_coeff, AddMonoidAlgebra.coeff_smul_apply, coeff_X_add_C_pow,
+      smul_eq_mul, coeff_zero] using h
   have hv : Matrix.vecMul g (Matrix.vandermonde (fun m : Fin r => ((m : ℕ) : ℂ))) = 0 := by
     funext e
     have h := hcoeff (r - 1 - e)

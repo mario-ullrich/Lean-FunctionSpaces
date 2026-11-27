@@ -247,7 +247,7 @@ theorem dyadicWeight_mul_enorm_sum_conv_le {N : ℕ} (hN : finrank ℝ V < N) (c
       ≤ ∑ k ∈ Finset.Icc (j - c) (j + c),
           dyadicWeight s j * (D * maximalFunction (fun y => ‖g k y‖ₑ) x) := by
         rw [← Finset.mul_sum]
-        refine mul_le_mul_of_nonneg_left ((enorm_sum_le _ _).trans
+        refine mul_le_mul_of_nonneg_left ((eNorm_sum_le _ _).trans
           (Finset.sum_le_sum fun k _ => ?_)) (zero_le (a := dyadicWeight s j))
         rw [K.coe_kernelLpBlockS]
         exact K.isUniformSchwartz_kernelBase.enorm_conv_dilate_le_maximalFunction hN j _ x
@@ -295,7 +295,7 @@ theorem kernelTriebelLizorkinNormDistr_le_of_blocks (hp1 : 1 < p) (hp : p ≠ �
     (K.kernelDistribBlock_eq_sum_convLp K' hp hb hb' hg)).trans ?_
   refine eLpNorm_le_of_le_lqNorm_maximalFunction hp1 hp hq1
     (aemeasurable_lqNorm_dyadicWeight_Lp _ q _)
-    (fun k => ((Lp.aestronglyMeasurable (g k)).enorm.const_mul _)) ?_
+    (fun k => ((Lp.aestronglyMeasurable (g k)).eNorm.const_mul _)) ?_
   filter_upwards [ae_all_iff.2 hae] with x hx
   simp_rw [hx]
   calc lqNorm q (fun j => dyadicWeight s j *

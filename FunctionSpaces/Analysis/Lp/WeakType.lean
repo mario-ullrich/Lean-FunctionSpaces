@@ -127,7 +127,7 @@ lemma distribution_le_inv_rpow_mul_eLpNorm_rpow (hp0 : p ≠ 0) (hp : p ≠ ∞)
     exact zero_le
   calc distribution f t μ ≤ μ {x | t ≤ ‖f x‖ₑ} :=
       measure_mono fun x (hx : t < ‖f x‖ₑ) => show t ≤ ‖f x‖ₑ from hx.le
-    _ ≤ _ := meas_ge_le_mul_pow_eLpNorm_enorm μ hp0 hp ht fun h => absurd h htop
+    _ ≤ _ := meas_ge_le_mul_pow_eLpNorm_eNorm μ hp0 hp ht fun h => absurd h htop
 
 /-- The weak `L_p` norm is at most the `L_p` norm, for a real exponent `p > 0`: Chebyshev's
 inequality `t^p μ{‖f‖ > t} ≤ ∫ ‖f‖^p` at every level `t`. -/
@@ -141,7 +141,7 @@ lemma wnorm'_le_eLpNorm' (hf : AEStronglyMeasurable f μ) {p : ℝ} (p0 : 0 < p)
   have : (t : ℝ≥0∞) = ((t : ℝ≥0∞) ^ p) ^ (1 / p) := by simp [p0.ne']
   nth_rewrite 1 [inv_eq_one_div p, this, ← ENNReal.mul_rpow_of_nonneg _ _ p0', set_eq]
   refine ENNReal.rpow_le_rpow ?_ p0'
-  refine le_trans ?_ <| mul_meas_ge_le_lintegral₀ (hf.enorm.pow_const p) ((t : ℝ≥0∞) ^ p)
+  refine le_trans ?_ <| mul_meas_ge_le_lintegral₀ (hf.eNorm.pow_const p) ((t : ℝ≥0∞) ^ p)
   gcongr
   exact fun x ↦ le_of_lt x
 

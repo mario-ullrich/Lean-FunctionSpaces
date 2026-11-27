@@ -86,9 +86,9 @@ theorem enorm_cellCoef_one_le (j : ℕ) {g : V → ℂ} (hg : AEStronglyMeasurab
   rw [cellCoef, ← ofReal_norm, Complex.norm_real, Real.norm_eq_abs,
     abs_of_nonneg ENNReal.toReal_nonneg]
   refine ENNReal.ofReal_toReal_le.trans_eq ?_
-  rw [ENNReal.toReal_one, div_one, eLpNorm_one_eq_lintegral_enorm
+  rw [ENNReal.toReal_one, div_one, eLpNorm_one_eq_lintegral_eNorm
     (hg.indicator (measurableSet_dyadicCell j m))]
-  simp_rw [enorm_indicator_eq_indicator_enorm]
+  simp_rw [eNorm_indicator_eq_indicator_eNorm]
   rw [lintegral_indicator (measurableSet_dyadicCell j m)]
 
 /-- `λ_{j,m} a_{j,m} = K ⋆ (1_{P_{j,m}} g)`. -/
@@ -98,7 +98,7 @@ theorem cellCoef_mul_cellAtom {p : ℝ≥0∞} (hp0 : p ≠ 0) {g : V → ℂ} (
   by_cases h0 : cellCoef p j g m = 0
   · have hn : eLpNorm ((dyadicCell j m).indicator g) p volume = 0 := by
       have h1 := enorm_cellCoef hg j m
-      rw [h0, enorm_zero, eq_comm, mul_eq_zero] at h1
+      rw [h0, eNorm_zero, eq_comm, mul_eq_zero] at h1
       exact h1.resolve_left (ENNReal.dyadicWeight_ne_zero _ _)
     have hae : (dyadicCell j m).indicator g =ᵐ[volume] 0 :=
       (eLpNorm_eq_zero_iff hp0).1 hn
@@ -264,7 +264,7 @@ theorem enorm_inv_cellCoef_mul_conv_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) {g : V �
     ‖(cellCoef p j g m)⁻¹ * conv K' ((dyadicCell j m).indicator g) volume x‖ₑ ≤
       A * (ENNReal.ofReal (ρ ^ finrank ℝ V) * volume (ball (0 : V) 1)) ^ (1 - 1 / p.toReal) := by
   by_cases h0 : cellCoef p j g m = 0
-  · rw [h0, inv_zero, zero_mul, enorm_zero]
+  · rw [h0, inv_zero, zero_mul, eNorm_zero]
     exact zero_le
   have ht : 0 ≤ 1 - 1 / p.toReal := one_sub_one_div_toReal_nonneg hp1
   set e := eLpNorm ((dyadicCell j m).indicator g) p volume
@@ -280,7 +280,7 @@ theorem enorm_inv_cellCoef_mul_conv_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) {g : V �
     rw [← ENNReal.dyadicWeight_neg, ← ENNReal.dyadicWeight_add, ← ENNReal.dyadicWeight_add]
     convert ENNReal.dyadicWeight_zero_left j using 2
     ring
-  rw [enorm_mul, enorm_inv h0, enorm_cellCoef hg j m]
+  rw [eNorm_mul, eNorm_inv h0, enorm_cellCoef hg j m]
   calc (W * e)⁻¹ * ‖conv K' ((dyadicCell j m).indicator g) volume x‖ₑ
       ≤ (W * e)⁻¹ * (A * dyadicWeight (finrank ℝ V) j *
           (X ^ (1 - 1 / p.toReal) * dyadicWeight (-(finrank ℝ V * (1 - 1 / p.toReal))) j) * e) :=
@@ -465,7 +465,7 @@ theorem exists_higherDiff_dualKernel_bound (L r : ℕ) : ∃ A : ℝ≥0∞, A �
       ENNReal.ofReal (2 ^ r * C) * dyadicWeight (finrank ℝ V) j *
         min 1 (ENNReal.ofReal (2 ^ j * ‖h‖) ^ (l : ℝ)) := by
     intro l hl i j hij h y
-    rw [scaledMoment, higherDiff_dilate, dilate, enorm_mul]
+    rw [scaledMoment, higherDiff_dilate, dilate, eNorm_mul]
     have h1 := enorm_higherDiff_le_of_iteratedFDeriv (b.contDiff_momentKernel L) (r := l) (j := 0)
       hC0 (fun l' hl' x => by simpa using hC l' (hl'.trans hl) x) ((2 : ℝ) ^ i • h)
       ((2 : ℝ) ^ i • y)
@@ -498,7 +498,7 @@ theorem exists_higherDiff_dualKernel_bound (L r : ℕ) : ∃ A : ℝ≥0∞, A �
   | succ j =>
     rw [show b.dualKernel L (j + 1) = b.scaledMoment L (j + 1) + b.scaledMoment L j from rfl,
       fwdDiff_iter_add, Pi.add_apply]
-    refine (enorm_add_le _ _).trans ?_
+    refine (eNorm_add_le _ _).trans ?_
     calc ‖(fwdDiff h)^[l] (b.scaledMoment L (j + 1)) y‖ₑ + ‖(fwdDiff h)^[l] (b.scaledMoment L j) y‖ₑ
         ≤ ENNReal.ofReal (2 ^ r * C) * dyadicWeight (finrank ℝ V) (j + 1) *
             min 1 (ENNReal.ofReal (2 ^ (j + 1) * ‖h‖) ^ (l : ℝ)) +
@@ -566,7 +566,7 @@ theorem atomic_decomposition (hp : p ≠ ∞) (L r : ℕ) : ∃ C : ℝ≥0∞, 
     exact conv_eq_tsum_cellAtom hp1 (b.continuous_dualKernel L j) (by positivity)
       (fun y hy => b.dualKernel_eq_zero_of_lt L j hy) (Lp.memLp _) j x
   · rw [coeffNorm_cellCoef hp0 hp (fun j => Lp.memLp _), localMeansNorm]
-    simp_rw [Lp.enorm_def]
+    simp_rw [Lp.eNorm_def]
 
 include b in
 /-- **Atomic characterisation of Besov spaces** (Schneider–Vybíral, Corollary 2.8, for `p ≥ 1`):

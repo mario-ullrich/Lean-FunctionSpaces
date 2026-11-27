@@ -51,7 +51,7 @@ theorem exists_eLpNorm_le_middle (r : ℕ) :
         K * eLpNorm (polyFun P) p (volume.restrict (Icc (1 / 3) (2 / 3))) := by
   obtain ⟨K, hK, hKb⟩ := exists_enorm_le_eLpNorm (p := p) r (by norm_num : (1 / 3 : ℝ) < 2 / 3)
   refine ⟨K, hK, fun P hP => ?_⟩
-  refine (eLpNorm_le_of_ae_enorm_bound (measurable_polyFun P).aestronglyMeasurable
+  refine (eLpNorm_le_of_ae_eNorm_bound (measurable_polyFun P).aestronglyMeasurable
     ((ae_restrict_iff' measurableSet_Icc).2
       (Filter.Eventually.of_forall fun x hx => hKb P hP x hx))).trans_eq ?_
   rw [Measure.restrict_apply_univ, Real.volume_Icc, sub_zero, ENNReal.ofReal_one, ENNReal.one_rpow,

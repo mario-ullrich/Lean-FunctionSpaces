@@ -210,7 +210,7 @@ theorem enorm_sub_jacksonApprox_le (hp : p ≠ ∞) (r k : ℕ) (f : Lp ℂ p (v
     exact measurable_const.mul (Finset.measurable_sum _ fun l _ => measurable_const.mul
       (hfm.comp (measurable_fst.add ((measurable_snd.const_smul _).const_smul _))))
   have hω : lpModulus p r f k ≠ ∞ :=
-    ne_top_of_le_ne_top (ENNReal.mul_ne_top (by simp) enorm_ne_top) (lpModulus_le r f k)
+    ne_top_of_le_ne_top (ENNReal.mul_ne_top (by simp) eNorm_ne_top) (lpModulus_le r f k)
   -- the differences at the step `-2^(-k) z`
   have hbound : ∀ z, eLpNorm (fun x => G x z) p volume ≤
       ENNReal.ofReal (1 + ‖z‖) ^ r * lpModulus p r f k := fun z => by
@@ -230,7 +230,7 @@ theorem enorm_sub_jacksonApprox_le (hp : p ≠ ∞) (r k : ℕ) (f : Lp ℂ p (v
           smoothnessModulus_mul_le (Lp.aestronglyMeasurable f) hp1 r (norm_nonneg z) (by positivity)
   have hlhs : ‖f - jacksonApprox hp r k f‖ₑ =
       eLpNorm (fun x => ∫ z, lpKernel z * G x z) p volume := by
-    rw [Lp.enorm_def]
+    rw [Lp.eNorm_def]
     exact eLpNorm_congr_ae (ae_sub_jacksonApprox_eq hp r k f)
   rw [hlhs]
   exact eLpNorm_integral_lpKernel_mul_le hp1 hp r hG hω hbound

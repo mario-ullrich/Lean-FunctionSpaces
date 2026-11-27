@@ -47,7 +47,7 @@ theorem HasSum.of_tendsto_of_lqNorm_dyadicWeight_lt_top {E : Type*} [NormedAddCo
     [CompleteSpace E] {s : ℝ} {q : ℝ≥0∞} (hs : 0 < s) (hq : 1 ≤ q) {b : ℕ → E} {f : E}
     (hb : Tendsto (fun n => ∑ j ∈ range n, b j) atTop (𝓝 f))
     (hL : ENNReal.lqNorm q (fun j => ENNReal.dyadicWeight s j * ‖b j‖ₑ) < ∞) : HasSum b f :=
-  (Summable.of_enorm (ne_top_of_le_ne_top
+  (Summable.of_eNorm (ne_top_of_le_ne_top
     (ENNReal.mul_ne_top (ENNReal.one_sub_two_rpow_neg_inv_ne_top hs) hL.ne)
     (ENNReal.tsum_le_lqNorm_dyadicWeight hq s _))).hasSum_iff_tendsto_nat.2 hb
 
@@ -155,16 +155,17 @@ theorem DyadicApprox.tsum_enorm_blockSeq_ne_top (hs : 0 < s) (hq : 1 ≤ q) {f :
   have htail : ∑' k, ‖D.blockSeq (k + 2)‖ₑ ≠ ∞ := by
     have hfin : 2 * (lqNorm 1 (A.approxSeqDyadic 0 f) + 2 * ‖f‖ₑ) ≠ ∞ :=
       ENNReal.mul_ne_top (by norm_num) (ENNReal.add_ne_top.2
-        ⟨hE1.ne, ENNReal.mul_ne_top (by norm_num) enorm_ne_top⟩)
+        ⟨hE1.ne, ENNReal.mul_ne_top (by norm_num) eNorm_ne_top⟩)
     refine ne_top_of_le_ne_top hfin ?_
     calc ∑' k, ‖D.blockSeq (k + 2)‖ₑ ≤ ∑' k, 2 * (A.approxError f (2 ^ k) + t k) :=
-          ENNReal.tsum_le_tsum hg
+          tsum_le_tsum hg
       _ = 2 * (∑' k, A.approxSeqDyadic 0 f k + ∑' k, t k) := by
-          rw [ENNReal.tsum_mul_left, ENNReal.tsum_add]; simp [approxSeqDyadic]
+          rw [ENNReal.tsum_mul_left, tsum_add]; simp [approxSeqDyadic]
       _ ≤ 2 * (lqNorm 1 (A.approxSeqDyadic 0 f) + 2 * ‖f‖ₑ) := by
           rw [ENNReal.lqNorm_one]; gcongr
-  rw [← Summable.sum_add_tsum_nat_add' (f := fun k => ‖D.blockSeq k‖ₑ) (k := 2) ENNReal.summable]
-  exact ENNReal.add_ne_top.2 ⟨ENNReal.sum_ne_top.2 fun j _ => enorm_ne_top, htail⟩
+  rw [← Summable.sum_add_tsum_nat_add' (f := fun k => ‖D.blockSeq k‖ₑ) (k := 2)
+    CompleteLattice.summable]
+  exact ENNReal.add_ne_top.2 ⟨ENNReal.sum_ne_top.2 fun j _ => eNorm_ne_top, htail⟩
 
 /-- **The blocks of near-best approximants add up to `f`**: in a Banach space, for
 `f ∈ A^s_q` with `s > 0` and tolerances that decrease, tend to `0` and satisfy
@@ -174,7 +175,7 @@ theorem DyadicApprox.hasSum_blockSeq [CompleteSpace X] (hs : 0 < s) (hq : 1 ≤ 
     (htend : Tendsto t atTop (𝓝 0)) (htsum : ∑' k, t k ≤ 2 * ‖f‖ₑ) :
     HasSum D.blockSeq f := by
   have hsum : Summable D.blockSeq :=
-    Summable.of_enorm (D.tsum_enorm_blockSeq_ne_top hs hq hf ht htsum)
+    Summable.of_eNorm (D.tsum_enorm_blockSeq_ne_top hs hq hf ht htsum)
   have he := tendsto_approxError_pow_zero_of_memApprox (zero_lt_one.trans_le hq).ne' hs hf
   have h2 : Tendsto (fun K => ∑ j ∈ range (K + 2), D.blockSeq j) atTop (𝓝 (∑' k, D.blockSeq k)) :=
     hsum.hasSum.tendsto_sum_nat.comp (tendsto_add_atTop_nat 2)

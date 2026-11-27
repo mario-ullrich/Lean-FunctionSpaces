@@ -613,14 +613,14 @@ theorem enorm_daubechiesProj_succ_sub_daubechiesProj (hN : 2 ≤ N) (hp : p ≠ 
     (f : Lp ℂ p (volume : Measure ℝ)) :
     ‖daubechiesProj m p hN hp (j + 1) f - daubechiesProj m p hN hp j f‖ₑ =
       eLpNorm (daubechiesDetailFun m j f) p volume := by
-  rw [daubechiesProj_succ_sub_daubechiesProj, Lp.enorm_def, eLpNorm_congr_ae (MemLp.coeFn_toLp _)]
+  rw [daubechiesProj_succ_sub_daubechiesProj, Lp.eNorm_def, eLpNorm_congr_ae (MemLp.coeFn_toLp _)]
 
 /-- **The norm of a projection**: `‖P_j f‖_p = ‖∑_k ⟨f, φ_{j,k}⟩ φ_{j,k}‖_p` for every
 `f ∈ L_p` and every level `j` (`Daubechies.daubechiesProj_apply_ae`). -/
 theorem enorm_daubechiesProj_eq (hN : 2 ≤ N) (hp : p ≠ ∞) (j : ℕ)
     (f : Lp ℂ p (volume : Measure ℝ)) :
     ‖daubechiesProj m p hN hp j f‖ₑ = eLpNorm (projFun m j f) p volume := by
-  rw [Lp.enorm_def, eLpNorm_congr_ae (daubechiesProj_apply_ae m hN hp j f)]
+  rw [Lp.eNorm_def, eLpNorm_congr_ae (daubechiesProj_apply_ae m hN hp j f)]
 
 /-- **The norms of the blocks through the wavelet coefficients**: for `N ≥ 2` and `1 ≤ p < ∞`
 there are constants `K, M < ∞` such that for every `f ∈ L_p` and every level `j`

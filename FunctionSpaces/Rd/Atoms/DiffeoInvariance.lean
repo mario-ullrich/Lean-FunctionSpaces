@@ -169,10 +169,10 @@ theorem lintegral_apply_eq (g : V → ℂ) {e : ℝ} (he : 0 < e) :
       T.isCompact_K0.measurableSet hderiv hinj]
     refine setLIntegral_congr_fun T.isCompact_K0.measurableSet fun y hy => ?_
     rw [apply, Set.indicator_of_mem (T.mapsTo_Psi (T.K0_subset hy)), T.right_inv y (T.K0_subset hy),
-      enorm_mul, ENNReal.mul_rpow_of_nonneg _ _ he.le]
+      eNorm_mul, ENNReal.mul_rpow_of_nonneg _ _ he.le]
   · by_contra hxc
     exact hx (show ‖T.apply g x‖ₑ ^ e = 0 by
-      rw [T.apply_eq_zero_of_notMem g hxc, enorm_zero, ENNReal.zero_rpow_of_pos he])
+      rw [T.apply_eq_zero_of_notMem g hxc, eNorm_zero, ENNReal.zero_rpow_of_pos he])
 
 omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- The Jacobian of `Ψ` is bounded on `K₀`. -/
@@ -326,7 +326,7 @@ theorem exists_transported_atoms {r : ℕ} (hr : 1 ≤ r) {d A : ℝ} (hd : 0 �
   · dsimp only
     by_cases h : near j m
     · rw [ite_eq_left h]
-    · rw [ite_eq_right h, enorm_zero]
+    · rw [ite_eq_right h, eNorm_zero]
       exact zero_le
   · by_cases h : near j m
     · exact Or.inl (ite_eq_left h)
@@ -371,7 +371,7 @@ theorem modNormOn_applyLp_le {r : ℕ} (hr : 1 ≤ r) {s : ℝ} (hs : 0 < s) (hs
       (b.tendsto_sum_dual_localMean hp hr F)
     simpa only [Function.comp_def, map_sum] using h
   have hsyn := modNormOn_le_coeffNorm hp hΩm c' _ coef' hN ha' hf hF hs hsr hq
-  rw [modNormOn, Lp.enorm_def, eLpNorm_congr_ae (indicatorLp_apply_ae hΩm _)]
+  rw [modNormOn, Lp.eNorm_def, eLpNorm_congr_ae (indicatorLp_apply_ae hΩm _)]
   refine hsyn.trans ?_
   rw [mul_assoc]
   refine mul_le_mul' le_rfl ?_

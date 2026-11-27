@@ -106,7 +106,7 @@ theorem higherDiff_reflect (r : ℕ) (h : ℝ) (f : ℝ → ℂ) (c x : ℝ) :
 /-- **The coefficients of a difference**: `‖(-1)^(r-k) C(r, k)‖ = C(r, k)`. -/
 theorem enorm_higherDiff_coeff (r k : ℕ) :
     ‖(-1 : ℂ) ^ (r - k) * (r.choose k : ℂ)‖ₑ = (r.choose k : ℝ≥0∞) := by
-  rw [enorm_mul, enorm_pow, enorm_neg, enorm_one, one_pow, one_mul, ← ofReal_norm,
+  rw [eNorm_mul, eNorm_pow, eNorm_neg, eNorm_one, one_pow, one_mul, ← ofReal_norm,
     Complex.norm_natCast, ENNReal.ofReal_natCast]
 
 /-- **Pointwise bound for differences**: if `|f(x + k h)| ≤ B` for `k ≤ r`, then
@@ -114,11 +114,11 @@ theorem enorm_higherDiff_coeff (r k : ℕ) :
 theorem enorm_higherDiff_le_of_forall {r : ℕ} {h x : ℝ} {f : ℝ → ℂ} {B : ℝ≥0∞}
     (hB : ∀ k ∈ range (r + 1), ‖f (x + k * h)‖ₑ ≤ B) : ‖higherDiff r h f x‖ₑ ≤ 2 ^ r * B := by
   rw [interval_higherDiff_apply]
-  refine (enorm_sum_le _ _).trans ?_
+  refine (eNorm_sum_le _ _).trans ?_
   calc ∑ k ∈ range (r + 1), ‖(-1 : ℂ) ^ (r - k) * (r.choose k : ℂ) * f (x + k * h)‖ₑ
       ≤ ∑ k ∈ range (r + 1), (r.choose k : ℝ≥0∞) * B :=
         sum_le_sum fun k hk => by
-          rw [enorm_mul, enorm_higherDiff_coeff]
+          rw [eNorm_mul, enorm_higherDiff_coeff]
           exact mul_le_mul_right (hB k hk) _
     _ = 2 ^ r * B := by
         rw [← sum_mul, ← Nat.cast_sum, Nat.sum_range_choose]

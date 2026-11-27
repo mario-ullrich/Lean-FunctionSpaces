@@ -194,7 +194,7 @@ theorem enorm_sq_eq_lintegral {α : Type*} [MeasurableSpace α] {μ : Measure α
     (F : Lp ℂ 2 μ) : ‖F‖ₑ ^ 2 = ∫⁻ x, ‖F x‖ₑ ^ 2 ∂μ := by
   have h := eLpNorm_rpow_eq (Lp.aestronglyMeasurable F) two_ne_zero two_ne_top
   simp only [ENNReal.toReal_ofNat, ENNReal.rpow_two] at h
-  rw [Lp.enorm_def, h]
+  rw [Lp.eNorm_def, h]
 
 /-- **The `L_2` norm of a function through its class**: for a function `f` with
 `∫ |f|² < ∞` (`MemLp f 2 μ`), `∫ |f|² = ‖[f]‖_2²` for the class `[f] = hf.toLp f` of `f` in
@@ -213,7 +213,7 @@ theorem enorm_convLp_sq {K : V → ℂ} (hK : Integrable K) (f : Lp ℂ 2 (volum
   rw [← enorm_fourier_Lp_two, enorm_sq_eq_lintegral]
   refine lintegral_congr_ae ?_
   filter_upwards [fourier_convLp hK f] with ξ hξ
-  rw [hξ, enorm_mul, mul_pow]
+  rw [hξ, eNorm_mul, mul_pow]
 
 /-- **Plancherel for a block**: for `f ∈ L_2(V)`,
 `‖Δ_j f‖_2² = ∫ |𝓕ψ_j(ξ)|² |𝓕f(ξ)|² dξ`, the case `K = ψ_j` of `Rd.enorm_convLp_sq`. -/
@@ -474,7 +474,7 @@ theorem ofReal_besselWeight_sq_le_tsum {s : ℝ} (hs : 0 ≤ s) (ξ : V) :
         ring
     _ ≤ _ := by
         gcongr
-        exact ENNReal.sum_le_tsum _
+        exact sum_le_tsum _
 
 /-! ### Temperate weights and Bessel potentials of `L_2` functions -/
 
@@ -538,7 +538,7 @@ theorem enorm_sq_eq_lintegral_of_besselPotential_eq {s : ℝ}
   rw [← enorm_fourier_Lp_two, enorm_sq_eq_lintegral]
   refine lintegral_congr_ae ?_
   filter_upwards [fourier_ae_eq_of_besselPotential_eq hfh] with ξ hξ
-  rw [← hξ, enorm_mul, mul_pow, enorm_besselWeight]
+  rw [← hξ, eNorm_mul, mul_pow, enorm_besselWeight]
 
 /-- If `∫ ⟨ξ⟩^{2s} |𝓕f(ξ)|² dξ < ∞` for `f ∈ L_2(V)`, then `⟨ξ⟩^s 𝓕f ∈ L_2(V)`. -/
 theorem memLp_besselWeight_mul_fourier (s : ℝ) (f : Lp ℂ 2 (volume : Measure V))
@@ -551,8 +551,8 @@ theorem memLp_besselWeight_mul_fourier (s : ℝ) (f : Lp ℂ 2 (volume : Measure
     (hasTemperateGrowth_besselWeight s).1.continuous.aestronglyMeasurable.mul
       (Lp.aestronglyMeasurable _)
   refine memLp_iff.2 ?_
-  rw [eLpNorm_lt_top_iff_lintegral_rpow_enorm_lt_top two_ne_zero two_ne_top hm]
-  simpa [enorm_mul, mul_pow, enorm_besselWeight, ENNReal.rpow_two] using hf
+  rw [eLpNorm_lt_top_iff_lintegral_rpow_eNorm_lt_top two_ne_zero two_ne_top hm]
+  simpa [eNorm_mul, mul_pow, enorm_besselWeight, ENNReal.rpow_two] using hf
 
 /-- **A sufficient condition for `H^s`**: if `f ∈ L_2(V)` has
 `∫ ⟨ξ⟩^{2s} |𝓕f(ξ)|² dξ < ∞`, then `f ∈ H^s(V)`. -/
@@ -588,8 +588,8 @@ theorem triebelLizorkinNorm_two_sq (s : ℝ) (f : Lp ℂ 2 (volume : Measure V))
   have hm : ∀ j, AEMeasurable (fun ξ =>
       dyadicWeight s j ^ 2 * ‖𝓕 (lpBlockKernel (V := V) j) ξ‖ₑ ^ 2 *
         ‖(𝓕 f : Lp ℂ 2 (volume : Measure V)) ξ‖ₑ ^ 2) volume := fun j =>
-    ((((continuous_fourier_of_integrable (integrable_lpBlockKernel j)).measurable.enorm.pow_const
-      2).aemeasurable.const_mul _).mul ((Lp.aestronglyMeasurable _).enorm.pow_const 2))
+    ((((continuous_fourier_of_integrable (integrable_lpBlockKernel j)).measurable.eNorm.pow_const
+      2).aemeasurable.const_mul _).mul ((Lp.aestronglyMeasurable _).eNorm.pow_const 2))
   rw [triebelLizorkinNorm_eq_littlewoodPaleyNorm two_ne_top, littlewoodPaleyNorm, hl]
   calc ∑' j, (dyadicWeight s j * ‖lpBlock two_ne_top j f‖ₑ) ^ 2
       = ∑' j, ∫⁻ ξ, dyadicWeight s j ^ 2 * ‖𝓕 (lpBlockKernel (V := V) j) ξ‖ₑ ^ 2 *
@@ -663,7 +663,7 @@ theorem memSobolev_two_iff_memTriebelLizorkin {s : ℝ} (hs : 0 ≤ s) (u : 𝓢
   · rintro ⟨h, hh⟩
     obtain ⟨f, rfl⟩ := exists_toTemperedDistribution_eq_of_besselPotential_eq hs hh
     refine ⟨f, rfl, (triebelLizorkinNorm_le_of_besselPotential_eq hs hh).trans_lt ?_⟩
-    exact ENNReal.mul_lt_top (by finiteness) enorm_lt_top
+    exact ENNReal.mul_lt_top (by finiteness) eNorm_lt_top
   · rintro ⟨f, rfl, hf⟩
     refine memSobolev_two_of_lintegral_lt_top f ((lintegral_besselWeight_sq_le hs f).trans_lt ?_)
     exact ENNReal.mul_lt_top (by finiteness) (ENNReal.pow_lt_top hf)
@@ -697,7 +697,7 @@ theorem exists_eq_toDistr_two {s : ℝ} (hs : 0 ≤ s) (F : H^{s}(V)) :
   have hb := triebelLizorkinNorm_le_of_besselPotential_eq hs (f := f)
     (hf ▸ F.bessel_toDistr_eq_toLp)
   rw [BesselPotentialSpace.enorm_toLp_eq] at hb
-  exact ⟨f, hf, hb.trans_lt (ENNReal.mul_lt_top (by finiteness) enorm_lt_top), hb⟩
+  exact ⟨f, hf, hb.trans_lt (ENNReal.mul_lt_top (by finiteness) eNorm_lt_top), hb⟩
 
 /-! ### `W^1_2 = H^1` -/
 
@@ -736,11 +736,11 @@ theorem enorm_le_of_hasWeakLineDeriv {v : V} {f g h : Lp ℂ 2 (volume : Measure
     ‖g‖ₑ ≤ ENNReal.ofReal (2 * π) * ‖v‖ₑ * ‖h‖ₑ := by
   have h1 := fourier_ae_eq_of_lineDerivOp_eq (hasWeakLineDeriv_top_iff.1 hfg)
   have h2 := fourier_ae_eq_of_besselPotential_eq hfh
-  rw [← enorm_fourier_Lp_two g, ← enorm_fourier_Lp_two h, Lp.enorm_def, Lp.enorm_def]
+  rw [← enorm_fourier_Lp_two g, ← enorm_fourier_Lp_two h, Lp.eNorm_def, Lp.eNorm_def]
   refine eLpNorm_le_mul_eLpNorm_of_ae_le_mul'' _ (Lp.aestronglyMeasurable _) ?_
   filter_upwards [h1, h2] with ξ e1 e2
-  rw [← e1, ← e2, enorm_mul (2 * π * Complex.I * (inner ℝ ξ v : ℂ)),
-    enorm_mul (besselWeight 1 ξ : ℂ), ← mul_assoc]
+  rw [← e1, ← e2, eNorm_mul (2 * π * Complex.I * (inner ℝ ξ v : ℂ)),
+    eNorm_mul (besselWeight 1 ξ : ℂ), ← mul_assoc]
   gcongr
   rw [← ofReal_norm, ← ofReal_norm, enorm_besselWeight, ← ENNReal.ofReal_mul (by positivity),
     ← ENNReal.ofReal_mul (by positivity)]
@@ -756,7 +756,7 @@ theorem lintegral_inner_sq_eq {v : V} {f g : Lp ℂ 2 (volume : Measure V)}
     ← lintegral_const_mul' _ _ (by finiteness)]
   refine lintegral_congr_ae ?_
   filter_upwards [fourier_ae_eq_of_lineDerivOp_eq h] with ξ hξ
-  rw [← hξ, enorm_mul, enorm_mul, mul_pow, mul_pow, ← mul_assoc]
+  rw [← hξ, eNorm_mul, eNorm_mul, mul_pow, mul_pow, ← mul_assoc]
   congr 2
   rw [← ofReal_norm]
   congr 1
@@ -785,13 +785,13 @@ theorem lintegral_besselWeight_one_sq_eq {ι : Type*} [Fintype ι] (b : Orthonor
       ‖(𝓕 f : Lp ℂ 2 (volume : Measure V)) ξ‖ₑ ^ 2 =
       ENNReal.ofReal (2 * π) ^ 2 * ‖f‖ₑ ^ 2 + ∑ i, ‖g i‖ₑ ^ 2 := by
   have hF : AEMeasurable (fun ξ => ‖(𝓕 f : Lp ℂ 2 (volume : Measure V)) ξ‖ₑ ^ 2) volume :=
-    (Lp.aestronglyMeasurable _).enorm.pow_const 2
+    (Lp.aestronglyMeasurable _).eNorm.pow_const 2
   simp_rw [ofReal_besselWeight_one_sq b, add_mul, one_mul, Finset.sum_mul]
   rw [lintegral_add_left' hF, lintegral_finsetSum' _ fun i _ => ?_, mul_add, Finset.mul_sum,
     ← enorm_sq_eq_lintegral, enorm_fourier_Lp_two]
   · congr 1
     exact Finset.sum_congr rfl fun i _ => lintegral_inner_sq_eq (hg i)
-  · exact ((Complex.continuous_ofReal.comp (continuous_id.inner continuous_const)).measurable.enorm
+  · exact ((Complex.continuous_ofReal.comp (continuous_id.inner continuous_const)).measurable.eNorm
       |>.pow_const 2).aemeasurable.mul hF
 
 /-- **A gradient in `L_2` gives `H^1`**: let `(e_i)` be an orthonormal basis of `V`. If
@@ -806,8 +806,8 @@ theorem memSobolev_one_two_of_lineDerivOp_eq {ι : Type*} [Fintype ι]
     (ENNReal.pow_ne_zero (by simp [Real.pi_pos]) 2 : ENNReal.ofReal (2 * π) ^ 2 ≠ 0))
   rw [lintegral_besselWeight_one_sq_eq b hg]
   exact ENNReal.add_ne_top.2 ⟨ENNReal.mul_ne_top (by finiteness)
-    (ENNReal.pow_ne_top enorm_ne_top), ENNReal.sum_ne_top.2 fun i _ =>
-      ENNReal.pow_ne_top enorm_ne_top⟩
+    (ENNReal.pow_ne_top eNorm_ne_top), ENNReal.sum_ne_top.2 fun i _ =>
+      ENNReal.pow_ne_top eNorm_ne_top⟩
 
 /-- **`W^1_2 = H^1`**: a function `f ∈ L_2(V)` lies in the Sobolev space `W^1_2(V)` of weak
 derivatives (`Rd.MemSobolevW 1 f`) iff it lies in Mathlib's Sobolev space `H^1(V)`

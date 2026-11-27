@@ -80,8 +80,8 @@ theorem eLpNorm_le_of_le_lqNorm_maximalFunction (hp1 : 1 < p) (hp : p ≠ ∞) {
       C * feffermanSteinConst V p q * eLpNorm (fun x => lqNorm q (fun i => g i x)) p volume :=
   calc eLpNorm F p volume
       ≤ eLpNorm (fun x => C * lqNorm q (fun i => maximalFunction (g i) x)) p volume :=
-        eLpNorm_mono_enorm_ae hF.aestronglyMeasurable (h.mono fun x hx => by
-          simpa only [enorm_eq_self] using hx)
+        eLpNorm_mono_eNorm_ae hF.aestronglyMeasurable (h.mono fun x hx => by
+          simpa only [eNorm_eq_self] using hx)
     _ = C * eLpNorm (fun x => lqNorm q (fun i => maximalFunction (g i) x)) p volume :=
         eLpNorm_const_mul_ennreal (c := C) (aemeasurable_lqNorm_comp
           (fun i => (measurable_maximalFunction (g i)).aemeasurable) q).aestronglyMeasurable
@@ -121,7 +121,7 @@ theorem continuous_conv_meansKernel (L j : ℕ) (f : Lp ℂ p (volume : Measure 
 theorem measurable_dyadicWeight_mul_conv_meansKernel (L : ℕ) (s : ℝ) (j : ℕ)
     (f : Lp ℂ p (volume : Measure V)) :
     Measurable fun y => dyadicWeight s j * ‖conv (b.meansKernel L j) f volume y‖ₑ :=
-  (b.continuous_conv_meansKernel L j f).measurable.enorm.const_mul _
+  (b.continuous_conv_meansKernel L j f).measurable.eNorm.const_mul _
 
 /-- The pointwise `ℓ_q` norm of the weighted local means is measurable. -/
 theorem aemeasurable_lqNorm_conv_meansKernel (L : ℕ) (s : ℝ) (q : ℝ≥0∞)
@@ -193,11 +193,11 @@ theorem ae_enorm_lpBlock_sum_dualKernel_le_tsum_maximalFunction (hp : p ≠ ∞)
         else 1) * maximalFunction (fun y => ‖h i y‖ₑ) x := by
   filter_upwards [b.lpBlock_sum_dualKernel_ae hp L J j h] with x hx
   rw [hx]
-  refine (enorm_sum_le _ _).trans ((Finset.sum_le_sum fun i _ =>
+  refine (eNorm_sum_le _ _).trans ((Finset.sum_le_sum fun i _ =>
     b.enorm_conv_conv_lpBlockKernel_dualKernel_le L hL' i j _ x).trans ?_)
   rw [← Finset.mul_sum]
   gcongr
-  exact ENNReal.sum_le_tsum _
+  exact sum_le_tsum _
 
 /-- **The blocks of a synthesis sum, pointwise**: if `F = ∑_i η_i ⋆ h_i` in `L_p` (as the limit
 of the partial sums), then for `L' ≥ 1`, almost everywhere and for all levels `j`,
@@ -341,11 +341,11 @@ theorem ae_enorm_localMean_sum_lpBlock_le (hp : p ≠ ∞) (L J j : ℕ)
         else 1) * maximalFunction (fun y => ‖blockFun i f y‖ₑ) x := by
   filter_upwards [b.localMean_sum_lpBlock_ae hp L J j f] with x hx
   rw [hx]
-  refine (enorm_sum_le _ _).trans ((Finset.sum_le_sum fun i _ =>
+  refine (eNorm_sum_le _ _).trans ((Finset.sum_le_sum fun i _ =>
     b.enorm_conv_conv_meansKernel_dilatedBandKernel_le L i j _ x).trans ?_)
   rw [← Finset.mul_sum]
   gcongr
-  exact ENNReal.sum_le_tsum _
+  exact sum_le_tsum _
 
 /-- **The local means by blocks, pointwise**: for every order `L`, `1 ≤ p < ∞` and `f ∈ L_p`,
 almost everywhere and for all levels `j`, `|k_j ⋆ f(x)| ≤ C ∑_i c_{ji} M(ψ_i ⋆ f)(x)` with
@@ -449,7 +449,7 @@ theorem tlLocalMeansNorm_le_triebelLizorkinNorm (L : ℕ) (hp1 : 1 < p) (hp : p 
     b.tlLocalMeansNorm L s q f ≤ b.tlLowerConst L p q s * triebelLizorkinNorm s q f :=
   eLpNorm_le_of_le_lqNorm_maximalFunction hp1 hp hq1
     (b.aemeasurable_lqNorm_conv_meansKernel L s q f)
-    (fun i => ((aestronglyMeasurable_blockFun i f).enorm.const_mul _))
+    (fun i => ((aestronglyMeasurable_blockFun i f).eNorm.const_mul _))
     (b.lqNorm_localMean_le_lqNorm_maximalFunction L hp hq1.le s f)
 
 /-- **The local means characterisation of Triebel–Lizorkin spaces**: for a bump `b`, an order
@@ -506,7 +506,7 @@ theorem triebelLizorkinNorm_le_of_tendsto_sum_dual (L : ℕ) (hp1 : 1 < p) (hp :
     triebelLizorkinNorm s q F ≤ b.tlUpperConst L p q s *
       eLpNorm (fun x => lqNorm q (fun i => dyadicWeight s i * ‖h i x‖ₑ)) p volume := by
   refine eLpNorm_le_of_le_lqNorm_maximalFunction hp1 hp hq1 (aemeasurable_lqNorm_blockFun s q F)
-    (fun i => ((Lp.aestronglyMeasurable (h i)).enorm.const_mul _)) ?_
+    (fun i => ((Lp.aestronglyMeasurable (h i)).eNorm.const_mul _)) ?_
   filter_upwards [b.enorm_blockFun_le_tsum_maximalFunction_of_tendsto hp L (Nat.le_add_left 1 ⌈s⌉₊)
     hrep] with x hx
   refine (ENNReal.lqNorm_le_almostDiagonalConst_mul_of_le hq1.le s _ hx).trans_eq ?_
