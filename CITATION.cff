@@ -8,7 +8,7 @@ authors:
 repository-code: "https://github.com/mario-ullrich/Lean-FunctionSpaces"
 url: "https://mario-ullrich.github.io/Lean-FunctionSpaces/"
 license: Apache-2.0
-date-released: 2026-11-10
+date-released: 2026-11-27
 keywords:
   - Lean 4
   - Mathlib
