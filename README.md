@@ -16,8 +16,6 @@ files and contains no `sorry`.
 * **Blueprint as PDF**: <https://mario-ullrich.github.io/Lean-FunctionSpaces/blueprint.pdf>
 * **Dependency graph**:
   <https://mario-ullrich.github.io/Lean-FunctionSpaces/dep_graph_document.html>
-* **PDF and dependency graph as images**, built from the latest commit on `main`: branch
-  [`blueprint-build`](https://github.com/mario-ullrich/Lean-FunctionSpaces/tree/blueprint-build)
 
 ## The setting
 
