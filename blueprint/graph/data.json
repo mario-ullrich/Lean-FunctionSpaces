@@ -26377,7 +26377,7 @@
    "example_of": "has-nikolskii"}],
  "meta":
  {"tool_commit": "0d87ea5ff0e37940ff80e3aafc48c8aea011fd34",
-  "title": "Characterizations of Function Spaces: main results",
+  "title": "Characterizations of Function Spaces",
   "source":
   {"repo": "https://github.com/mario-ullrich/Lean-FunctionSpaces",
    "name": "FunctionSpaces",
@@ -26390,10 +26390,10 @@
    "docstrings": true},
   "public_source_links": true,
   "profiles":
-  [{"title": "Main results", "nest_examples": true, "id": "main"},
-   {"title": "Characterizations",
+  [{"title": "Characterizations",
     "nest_examples": false,
-    "id": "characterizations"}],
+    "id": "characterizations"},
+   {"title": "Main results", "nest_examples": true, "id": "main"}],
   "mathlib_commit": "fc4f59e577feb1a4956671bc04ac18aaaf8cd842",
   "lean_version": "4.36.0",
   "lean_toolchain": "leanprover/lean4:v4.36.0",
