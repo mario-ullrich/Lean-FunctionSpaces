@@ -669,7 +669,8 @@ $\sum_{\deg k < n} |e_k(x)|^2 \leq 2^d n^d$. The Nikolskii property is \Cref{thm
   Torus.sobolev_exists_inclusion_eq, Torus.sobolev_exists_continuous, Torus.toLp_toContinuousMap}
 \leanok
 \uses{def:besov, def:trig-poly, def:torus-sobolev, lem:inclusion-linear}
-Let $0 < p \leq r \leq \infty$ and $0 < q \leq \infty$.
+Let $0 < p \leq r \leq \infty$ and $0 < q \leq \infty$, and for $0 < u \leq v \leq \infty$ let
+$\iota_{v,u} \colon L_v(\T^d) \to L_u(\T^d)$ be the inclusion (\Cref{lem:inclusion-linear}).
 \begin{enumerate}
   \item If $s > d(1/p - 1/r)$, then every $f \in \Besov{s}{p}{q}(\T^d)$ is $\iota_{r,p} g$ for
     some $g \in \Besov{s - d(1/p - 1/r)}{r}{q}(\T^d)$.
@@ -933,8 +934,10 @@ $\|f - V_k f\|_p \leq C_V \|f - a_k\|_p$.
   Torus.ae_trace_eq_restrictFace, Torus.exists_trace_eq_restrictFace}
 \leanok
 \uses{thm:trace-torus, lem:trace-ext}
-Let $1 \leq p < \infty$ and let $\operatorname{Tr}$ be the trace of \Cref{lem:trace-ext} for the
-restriction to the face, as in \Cref{thm:trace-torus}.
+Let $1 \leq p < \infty$ and let $\operatorname{Tr}$ be the trace on the face of
+\Cref{thm:trace-torus}: for $f \in \Besov{1/p}{p}{1}(\T^{n+1})$, $\operatorname{Tr} f$ is the limit
+in $L_p(\T^n)$ of $c_k(0, \cdot)$ for every $\gamma \in \N$ and all trigonometric polynomials
+$c_k \in \mathcal{T}_{2^{k+\gamma}}$ with $2^{k/p} \|f - c_k\|_p \to 0$ (\Cref{lem:trace-ext}).
 \begin{enumerate}
   \item For every bounded continuous $f$ on $\T^{n+1}$ with
     $f \in \Besov{1/p}{p}{1}(\T^{n+1})$, $\operatorname{Tr} f = f(0, \cdot)$. In particular,
@@ -1365,13 +1368,20 @@ $(l+1) \, \pi(-c^{-1} z) = -\pi((c/(l+1))^{-1} z)$.
   Torus.lpModulus_le_two_pow_mul_succ}
 \leanok
 \uses{lem:torus-lp-jackson-approx, lem:modulus-linear, lem:jackson-weighted-average}
-For $f \in L_p(\T^d)$ and $k \in \N$, with the constant $C_J$ of
-\Cref{lem:jackson-weighted-average} on $\R^d$,
+For $f \in L_p(\T^d)$ and $k \in \N$ let
+$J_k f = \sum_{l < r} (-1)^l \binom{r}{l+1} \Phi_{2^k/(l+1)} * f \in \mathcal{T}_{2^{k+1}}$, with
+the kernel $\Phi$ of \Cref{def:lp-kernels} and $\Phi_c(x) = c^d \Phi(c x)$
+(\Cref{lem:torus-lp-jackson-approx}). There is a constant $C_J < \infty$, depending only on $d$,
+$p$ and $r$, such that for every $f \in L_p(\T^d)$ and every $k \in \N$,
 \[
   E_{2^{k+1}}(f)_p \leq \|f - J_k f\|_p \leq C_J \, \omega_r(f, 2^{-k})_p
   \leq 2^r C_J \, \omega_r(f, 2^{-(k+1)})_p .
 \]
 \end{theorem}
+
+The constant $C_J$ comes from \Cref{lem:jackson-weighted-average} on $\R^d$,
+$C_J^p = \|\Phi\|_1^{p-1} \int_{\R^d} |\Phi(z)| (1 + |z|)^{rp} \, dz$: it averages the bound
+$(1 + |z|)^r \omega_r(f, 2^{-k})_p$ of the differences of step $2^{-k} z$ with the weight $|\Phi|$.
 
 \begin{proof}
 \leanok
@@ -2543,12 +2553,17 @@ vanishes. In every case, for $k \leq r$,
 \[
   |\Delta_h^k a(x)| \leq 2^k K 2^{j/p} \Bigl( \sum_{l=0}^r m_{n+l} \Bigr)^{1/p}
 \]
-with the constant $K$ of \Cref{lem:interval-nikolskii}. If $a$ vanishes outside $[0, 1)$, then
-$\sum_{n < 2^j} \sum_{l = 0}^r m_{n+l} \leq (r+1) \|a\|_p^p$. Finally, let $S \subseteq [0, 1]$ be
-measurable. If $|\Delta_h^r a(x)| \leq G (\sum_{l=0}^r m_{n+l})^{1/p}$ for almost every $x \in S$
-with $(n+1) 2^{-j} \leq x + rh$, and $\sum_{n < 2^j} \sum_{l = 0}^r m_{n+l} \leq (r+1) B^p$, then
+with a constant $K < \infty$ that depends only on $r$ and $p$. If $a$ vanishes outside $[0, 1)$,
+then $\sum_{n < 2^j} \sum_{l = 0}^r m_{n+l} \leq (r+1) \|a\|_p^p$. Finally, let $S \subseteq [0, 1]$
+be measurable and $G, B \in [0, \infty]$. If $|\Delta_h^r a(x)| \leq G (\sum_{l=0}^r m_{n+l})^{1/p}$
+for almost every $x \in S$ with $(n+1) 2^{-j} \leq x + rh$, and
+$\sum_{n < 2^j} \sum_{l = 0}^r m_{n+l} \leq (r+1) B^p$, then
 $\|\Delta_h^r a\|_{L_p(S)} \leq G (rh (r + 1))^{1/p} B$.
 \end{lemma}
+
+The constant $K$ is the constant of the Nikolskii inequality for polynomials of degree $< r$
+(\Cref{lem:interval-nikolskii}), $|P(x)| \leq K L^{-1/p} \|P\|_{L_p[u, u + L]}$ for
+$x \in [u, u + 2L]$, applied to the pieces of $a$.
 
 \begin{proof}
 \leanok
@@ -3319,22 +3334,28 @@ $H_k(f - b_{k+n}) \leq 2^k \|f - b_{k+n}\|_1 \to 0$ as $n \to \infty$.
   Haar.pos_of_one_div_sub_one_lt, Haar.eLpNorm_one_le_eNormDyadic,
   Haar.integrable_of_eNormDyadic_lt_top}
 \leanok
-\uses{lem:near-best-steps, lem:weighted-tails, thm:couple-modulus-coincidence,
+\uses{lem:near-best-steps, lem:weighted-tails, lem:e-near-best,
   lem:e-method-dyadic, lem:dyadic-interpolation}
-Let $s > 1/p - 1$ and $q \in (0, \infty]$, and let $\delta = s - (1/p - 1)$. Every
-$f \in L_p[0, 1]$ satisfies
+Let $0 < p \leq 1$, $s > 1/p - 1$ and $q \in (0, \infty]$. There is a constant $C < \infty$,
+depending only on $p$, $s$ and $q$, such that every $f \in L_p[0, 1]$ satisfies
 \[
-  \|f\|_1 \leq C \Bigl( \|f\|_p + \bigl\| \bigl( 2^{ks} E(2^k, f) \bigr)_k \bigr\|_{\ell_q} \Bigr)
+  \|f\|_1 \leq C \Bigl( \|f\|_p + \bigl\| \bigl( 2^{ks} E(2^k, f) \bigr)_k \bigr\|_{\ell_q} \Bigr) .
 \]
-with $C = 2^{1/p} \bigl(1 + 2^{1/p - 1} (1 - 2^{-\delta})^{-1}\bigr) \, C_q (1 + \gamma_{1,q})$,
-$C_q$ and $\gamma_{1,q}$ as in \Cref{thm:couple-modulus-coincidence}. In particular every element
-of $E_{s,q}$ of the step couple is integrable.
+In particular every element of $E_{s,q}$ of the step couple is integrable.
 \end{theorem}
+
+The constant is
+$C = 2^{1/p} \bigl(1 + 2^{1/p - 1} (1 - 2^{-\delta})^{-1}\bigr) \, C_q (1 + \gamma_{1,q})$ with
+$\delta = s - (1/p - 1) > 0$. The last two factors bound the weighted errors of near-best steps
+by the dyadic norm (\Cref{lem:e-near-best} (4)), with the quasi-triangle constant $C_q$ of
+\Cref{lem:lq-quasi-triangle} and $\gamma_{1,q} = \|(2^{-k})_k\|_{\ell_q}$ of
+\Cref{lem:lq-reindex}; the first sums the differences of these steps in $L_1$, a geometric series
+of ratio $2^{-\delta}$.
 
 \begin{proof}
 \leanok
 Since $p \leq 1$, $s > 0$. Take the near-best steps of \Cref{lem:near-best-steps}. By
-\Cref{thm:couple-modulus-coincidence},
+\Cref{lem:e-near-best} (4),
 $L = \|(2^{ks} e_k)_k\|_{\ell_q} \leq C_q (1 + \gamma_{1,q})$ times the dyadic norm, and by
 \Cref{lem:weighted-tails} $e_j \leq 2^{-js} L$, so $e_j \to 0$ and
 $\sum_i 2^{(i+1)(1/p-1)} 2^{1/p} e_i \leq 2^{1/p} 2^{1/p-1} (1 - 2^{-\delta})^{-1} L$. With
@@ -3383,8 +3404,8 @@ couples, and $\alpha(1, p, r) = 1/p - 1/r$, so the two bounds are
 \Cref{thm:besov-embedding}(1).
 \end{proof}
 
-For $r = 1$ and $p \leq 1$ the second bound holds with an explicit $K'$, proved directly
-(\Cref{thm:besov-into-l1}); the agreement of the two proofs is a check of
+For $r = 1$ and $p \leq 1$ the second bound is proved directly in \Cref{thm:besov-into-l1}, with
+the explicit constant given after that theorem; the agreement of the two proofs is a check of
 \Cref{thm:besov-embedding}(1) for $p < 1$. With \Cref{thm:steps-besov-below-one} and
 \Cref{cor:steps-besov-space}, for $0 < p \leq 1$, $p \leq r < \infty$ and $1/p - 1/r < s < 1/p$
 the second bound of \Cref{cor:steps-embedding} is the embedding
@@ -3461,7 +3482,13 @@ Let $1/p - 1 < s < 1/p$ and $q \in (0, \infty]$. For $f \in L_p[0, 1]$,
 \[
   \|f\|_p + \bigl\| \bigl( 2^{ks} \omega_1(f, 2^{-k}, [0,1])_p \bigr)_k \bigr\|_{\ell_q} < \infty
 \]
-if and only if $f \in L_1[0, 1]$ and the Haar condition of \Cref{thm:haar-below-one} holds.
+if and only if $f \in L_1[0, 1]$ and its Haar coefficients satisfy the condition of
+\Cref{thm:haar-below-one},
+\[
+  \Bigl| \int_0^1 f \Bigr| + \Bigl\| \Bigl(2^{k(s + 1/2 - 1/p)}
+  \bigl\| (\langle f, h_{k,m} \rangle)_{0 \leq m < 2^k} \bigr\|_{\ell_p} \Bigr)_k
+  \Bigr\|_{\ell_q} < \infty .
+\]
 \end{corollary}
 
 \begin{proof}
@@ -3683,10 +3710,14 @@ $\langle d_i, b_l \rangle = \delta_{il}$, and $Q$ is a combination of the $b_l(2
 \leanok
 \uses{lem:loc-proj, lem:pp-bookkeeping, def:projection-scheme}
 Let $1 \leq p < \infty$ and $r \in \N$. For $j \in \N$ let $P_j f = \Pi_{j,m} f$ on every
-$I_{j,m}$, $m < 2^j$. Then $P_j$ is a bounded projection of $L_p[0,1]$ onto $V_j$, and
-$\|P_j\| \leq r M^2$ for all $j$. As functions, $P_j a = a$ for every piecewise polynomial $a$ of
-level $j$ and degree $< r$.
+$I_{j,m}$, $m < 2^j$. Then $P_j$ is a bounded projection of $L_p[0,1]$ onto $V_j$, and there is a
+constant $C_r < \infty$, depending only on $r$, with $\|P_j\| \leq C_r$ for all $j$. As
+functions, $P_j a = a$ for every piecewise polynomial $a$ of level $j$ and degree $< r$.
 \end{theorem}
+
+The constant is $C_r = r M^2$, where $M$ bounds the monomials $b_i$ and their dual basis $d_i$ of
+\Cref{lem:poly-dual-basis} on $[0, 1]$: it is the bound of each local projection
+(\Cref{lem:loc-proj}).
 
 \begin{proof}
 \leanok
@@ -3706,9 +3737,11 @@ Let $1 \leq p < \infty$, $r \geq 1$, $s > 0$ and $1 \leq q \leq \infty$. A funct
 $f \in L_p[0,1]$ lies in the approximation space $A^s_q$ of the scheme of dyadic piecewise
 polynomials of degree $< r$ if and only if
 \[
-  \|P_0 f\|_p + \bigl\| \bigl( 2^{ks} \|P_{k+1} f - P_k f\|_p \bigr)_k \bigr\|_{\ell_q} < \infty .
+  \|P_0 f\|_p + \bigl\| \bigl( 2^{ks} \|P_{k+1} f - P_k f\|_p \bigr)_k \bigr\|_{\ell_q} < \infty ,
 \]
-For $0 < s < 1/p$ this condition is equivalent to $f \in \Besov{s}{p}{q}[0,1]$ and to
+with the projections $P_k f = \Pi_{k,m} f$ on every $I_{k,m}$ onto the piecewise polynomials of
+level $k$ and degree $< r$ (\Cref{thm:pp-proj}). For $0 < s < 1/p$ this condition is equivalent to
+$f \in \Besov{s}{p}{q}[0,1]$ and to
 $f \in \Besov{s}{p}{q}(\T)$, defined by $\omega_r$ and $\omega_r^{\mathrm{per}}$.
 \end{theorem}
 
@@ -3843,7 +3876,8 @@ over $m < 2^k$.
 \uses{thm:pp-multiscale, lem:multiwavelet-norms, thm:pp-besov, thm:pp-besov-per}
 Let $1 \leq p < \infty$, $r \geq 1$, $s > 0$ and $1 \leq q \leq \infty$. A function
 $f \in L_p[0,1]$ lies in the approximation space $A^s_q$ of the scheme of dyadic piecewise
-polynomials of degree $< r$ if and only if
+polynomials of degree $< r$ if and only if, with the projection $P_0 f$ onto the polynomials of
+degree $< r$ (\Cref{thm:pp-proj}),
 \[
   \|P_0 f\|_p + \Bigl\| \Bigl( 2^{k(s + 1/2 - 1/p)} \bigl\| (\langle f, \psi_{k,m,i} \rangle)_{m < 2^k,
   i \leq r} \bigr\|_{\ell_p} \Bigr)_k \Bigr\|_{\ell_q} < \infty .
@@ -4073,12 +4107,17 @@ $n_0 = \lfloor 2^j x \rfloor$,
 \[
   \Delta_h^r u(x) = \sum_{n_0 < m \leq n_0 + r} c_m \, \Delta_h^r (\cdot - \xi_m)_+^{r-1}(x),
 \]
-and $|c_m| 2^{-j(r-1)} \leq K 2^{j/p} (m_m^{1/p} + m_{m-1}^{1/p})$ for $0 < m < N$. For a spline in
+and $|c_m| 2^{-j(r-1)} \leq K 2^{j/p} (m_m^{1/p} + m_{m-1}^{1/p})$ for $0 < m < N$, with a
+constant $K < \infty$ that depends only on $r$ and $p$. For a spline in
 $S_j$, $N = 2^j$. For differences of order $k \leq r$ with $x + kh < N 2^{-j}$ the same holds
 with the piece added, $\Delta_h^k u(x) = \Delta_h^k P_{n_0}(x) +
 \sum_{n_0 < m \leq n_0 + r} c_m \, \Delta_h^k (\cdot - \xi_m)_+^{r-1}(x)$, and every jump term is
 at most $2 \cdot 2^k k^{r-1} K (2^j h)^{r-1} 2^{j/p} (\sum_{l \leq r} m_{n_0+l})^{1/p}$.
 \end{lemma}
+
+The constant $K$ is the constant of the Nikolskii inequality for polynomials of degree $< r$
+(\Cref{lem:interval-nikolskii}), applied to the pieces on $I_{j,m}$ and on the doubled interval
+of $I_{j,m-1}$.
 
 \begin{proof}
 \leanok
@@ -4907,7 +4946,8 @@ level $k$ and degree $< r$,
 \[
   \|u - P_k u\|_{L_p[0,1]} \leq (1 + C_r) \|u - S\|_{L_p[0,1]} ,
 \]
-with the bound $C_r = r M^2$ of \Cref{thm:pp-proj}.
+where $C_r < \infty$, depending only on $r$, is the bound $\|P_j\| \leq C_r$ of the projections
+in \Cref{thm:pp-proj}.
 \end{lemma}
 
 \begin{proof}
@@ -4995,8 +5035,9 @@ $\|f - T^{(i)} f\|_{L_p(Q)} \leq 2 c J \, \omega_r^{(i)}(f, L)_p$ for every coor
 Let $T$ be a kernel operator with $\|T u\|_{L_p[0,1]} \leq C \|u\|_{L_p[0,1]}$ for measurable
 $u$. If $\|f - T^{(i)} f\|_{L_p(Q)} \leq B \, \omega_r^{(i)}(f, t)_p$ for every coordinate $i$
 and a bounded measurable $f$, then
-$\|f - T^{(1)} \cdots T^{(d)} f\|_{L_p(Q)} \leq (1 + C)^d B \, \omega_r(f, t)_p$; for $T = P_k$
-this is $\|f - P^d_k f\|_{L_p(Q)} \leq (1 + C_r)^d B \, \omega_r(f, t)_p$.
+$\|f - T^{(1)} \cdots T^{(d)} f\|_{L_p(Q)} \leq (1 + C)^d B \, \omega_r(f, t)_p$; for $T = P_k$,
+with the bound $\|P_k\| \leq C_r$ of \Cref{thm:pp-proj}, this is
+$\|f - P^d_k f\|_{L_p(Q)} \leq (1 + C_r)^d B \, \omega_r(f, t)_p$.
 \end{lemma}
 
 \begin{proof}
@@ -5021,14 +5062,21 @@ The third statement is \Cref{lem:kernel-telescoping}.
 \leanok
 \uses{def:cube-pp, lem:pp-kernel, lem:pp-taylor, lem:poly-glue, lem:cube-two-sided-smoothing,
   lem:slices-to-cube, lem:cube-modulus, lem:error-dense}
-Let $1 \leq p < \infty$ and $r \geq 1$. For every $f \in L_p(Q)$ and $k \geq 1$,
+Let $1 \leq p < \infty$ and $r \geq 1$, and let $E$ be the error of best approximation by the
+scheme of \Cref{def:cube-pp}. There is a constant $C < \infty$, depending only on $d$ and $r$,
+such that for every $f \in L_p(Q)$ and every $k \geq 1$,
 \[
-  E_{2^k}(f)_p \leq (1 + C_r)^{d+1} \, 2 (1 + 2^r r^{2r}) \, \omega_r(f, 2^{-k})_p ,
+  E_{2^k}(f)_p \leq C \, \omega_r(f, 2^{-k})_p ,
 \]
-where $E$ is the error of best approximation by the scheme of \Cref{def:cube-pp}, and there is
-$C_J < \infty$ with $E_{2^k}(f)_p \leq C_J \, \omega_r(f, 2^{-k})_p$ for every $f \in L_p(Q)$ and
-every $k \geq 0$.
+and there is $C_J < \infty$ with $E_{2^k}(f)_p \leq C_J \, \omega_r(f, 2^{-k})_p$ for every
+$f \in L_p(Q)$ and every $k \geq 0$.
 \end{theorem}
+
+The first constant is $C = (1 + C_r)^{d+1} \, 2 (1 + 2^r r^{2r})$, with the bound $C_r$ of the
+projections onto piecewise polynomials (\Cref{thm:pp-proj}). One factor $1 + C_r$ bounds the error
+of the projection in one coordinate (\Cref{lem:pp-kernel}), the power $(1 + C_r)^d$ passes from one
+coordinate to all of them (\Cref{lem:slices-to-cube}), and $2 (1 + 2^r r^{2r})$ comes from the
+smoothings near the two ends of a coordinate (\Cref{lem:cube-two-sided-smoothing}).
 
 \begin{proof}
 \leanok
@@ -5358,12 +5406,13 @@ $Q$ the region $Q_{r s e_i}$ is $\{x_i \leq 1 - rs\}$.
   Cube.eLpNorm_higherDiff_le_of_exponents, Cube.lpIsoModulus_le_of_exponents}
 \leanok
 \uses{lem:iso-expansion, lem:iso-modulus, lem:cube-slices, lem:step-regions}
-Let $1 \leq p < \infty$, $r, j \in \N$, and let $V$ be a subspace of functions of one variable with
+Let $1 \leq p < \infty$, $r, j \in \N$ and $C \in [0, \infty]$, and let $V$ be a subspace of
+functions of one variable with
 \[
   \|\Delta_t^m u\|_{L_p(J(m,t))} \leq C (2^j |t|)^{\theta_m} \|u\|_p
   \qquad (u \in V, \ m \leq r, \ |t| \leq 2^{-j})
 \]
-for exponents $\theta_m \geq 0$, with $J(m, t)$ as in \Cref{lem:step-regions}. Let
+for exponents $\theta_m \geq 0$, with $J(m, t) = \{x \in [0, 1] : x + mt \in [0, 1]\}$. Let
 $\Theta \leq \sum_i \theta_{m_i}$ for all $m \in \N^d$ with $\sum_i m_i = r$. Then for every
 measurable $f$ whose slices all lie in $V$ and every $h$ with $\|h\|_\infty \leq 2^{-j}$,
 \[
@@ -5566,7 +5615,9 @@ $2^r \|R F\|_p$ (\Cref{lem:iso-modulus}), and a shift by $d$ levels costs the fa
   Cube.exists_approxNormDyadic_restrictEuclidean_le}
 \leanok
 \uses{thm:iso-besov, prop:euclidean-cube-norms, thm:modulus-coincidence}
-Let $1 \leq p < \infty$, $1 \leq q \leq \infty$, $r \geq 1$ and $F \in L_p(\R^d)$.
+Let $1 \leq p < \infty$, $1 \leq q \leq \infty$, $r \geq 1$ and $F \in L_p(\R^d)$, and for
+$s \geq 0$ let
+$N_{Q_E}(F) = \|F\|_{L_p(Q_E)} + \|(2^{ks} \omega_r(F, 2^{-k}, Q_E)_p)_k\|_{\ell_q}$.
 \begin{enumerate}
   \item For $0 \leq s < r - 1 + 1/p$, $R F$ lies in the approximation space $A^s_q$ of the
     tensor splines of order $r$ if and only if $N_{Q_E}(F) < \infty$.
@@ -5983,8 +6034,10 @@ The step sets are intersections of translates, and translations preserve the Leb
   PiLp.norm_continuousLinearEquiv_symm_le}
 \leanok
 \uses{def:rd-modulus-on, lem:modulus-linear-equiv}
-Let $V$, $W$, $\mu$, $\nu$ and $e$ be as in \Cref{lem:modulus-linear-equiv}, and let
-$U \subseteq W$ be measurable. Then $(e^{-1}U)_{rh} = e^{-1}(U_{r\,eh})$ for every $h \in V$ and
+Let $V$ and $W$ be finite-dimensional real normed spaces with additive Haar measures $\mu$ and
+$\nu$, let $e : V \to W$ be linear and continuous with $\nu(B) = \mu(e^{-1}(B))$ for every Borel
+set $B$, as in \Cref{lem:modulus-linear-equiv}, and let $U \subseteq W$ be measurable. Then
+$(e^{-1}U)_{rh} = e^{-1}(U_{r\,eh})$ for every $h \in V$ and
 $r \in \N$, and for every measurable $f : W \to \C$, every $0 < p \leq \infty$ and every $t$,
 \[
   \omega_r(f \circ e, t, e^{-1}U)_{L_p(\mu)} \leq \omega_r(f, \|e\| t, U)_{L_p(\nu)} .
@@ -6027,7 +6080,9 @@ $\Delta_h^r (f \circ A) = (\Delta_{Lh}^r f) \circ A$; for measurable $U$ and $f$
 \]
 For measurable $U$, $r \in \N$, $s \geq 0$ and $1 \leq q \leq \infty$ there is $C < \infty$ with
 $N_{A^{-1}U}(G \circ A) \leq C \, N_U(G)$ for every $G \in L_p(\mu)$, with the intrinsic
-quasi-norms of \Cref{lem:modnorm-on}.
+quasi-norms
+$N_U(G) = \|G\|_{L_p(U)} + \|(2^{ks} \omega_r(G, 2^{-k}, U)_p)_k\|_{\ell_q}$ of
+\Cref{lem:modnorm-on}.
 \end{lemma}
 
 \begin{proof}
@@ -6229,7 +6284,9 @@ Let $1 \leq p < \infty$ and $r \in \N$. There is $C < \infty$ with
 \[
   \inf_{g \in E_k} \|f - g\|_p \leq \|f - J_k f\|_p \leq C \, \omega_r(f, 2^{-k})_p
 \]
-for all $f \in L_p$ and $k \in \N$; one can take
+for all $f \in L_p$ and $k \in \N$, with
+$J_k f = \sum_{l=1}^r (-1)^{l+1} \binom{r}{l} \, \Phi_{2^k/l} * f \in E_k$
+(\Cref{lem:jackson-approx}); one can take
 $C^p = \|\Phi\|_1^{p-1} \int_V |\Phi(z)| (1 + |z|)^{rp} \, dz$.
 \end{theorem}
 
@@ -7131,20 +7188,29 @@ $j > k$, $\omega_r(f, t)_p \leq 2^r \|f\|_p$.
   Rd.eLpNorm_indicator_le_tsum, Rd.lpModulusOn_le_tsum, Rd.modNormOn_le_coeffNorm}
 \leanok
 \uses{lem:level-sums, lem:almost-diagonal, lem:rd-modulus-on, lem:local-means-synthesis}
-Let $1 \leq p < \infty$, $1 \leq q \leq \infty$ and $0 < s < \sigma$. Let $a_{j,m}$ be regular atoms
-of level $j$ such that the centres of the atoms with $\lambda_{j,m} \neq 0$ satisfy the overlap
-condition of \Cref{lem:level-sums} at every level, and let $F = \sum_j f_j$ in $L_p$ with
-$f_j = \sum_m \lambda_{j,m} a_{j,m}$ almost everywhere. Then
+Let $1 \leq p < \infty$, $1 \leq q \leq \infty$, $r, N \in \N$, $d, C \geq 0$ and
+$0 < s < \sigma$. There is a constant $K < \infty$, depending only on $p$, $s$, $\sigma$, $r$, $C$
+and $N$, with the following property. Let $a_{j,m}$ be regular atoms of level $j$, exponent
+$\sigma$ and order $r$ with centres $c_{j,m}$ and the constants $d$ and $C$ of
+\Cref{def:regular-atoms}, and $\lambda_{j,m}$ coefficients such that at every level $j$ at most
+$N$ of the centres $c_{j,m}$ with $\lambda_{j,m} \neq 0$ lie in a closed ball of radius
+$(d + r) 2^{-j}$. Let $F = \sum_j f_j$ in $L_p$ with $f_j = \sum_m \lambda_{j,m} a_{j,m}$ almost
+everywhere. Then
 \[
-  \|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q} \leq K \|\lambda\|_{b^s_{p,q}},
+  \|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q} \leq K \|\lambda\|_{b^s_{p,q}} .
 \]
-with $K = N^{1-1/p} C \bigl((1 - 2^{-s})^{-1} + 2^r ((1 - 2^{-(\sigma - s)})^{-1} +
-(1 - 2^{-s})^{-1})\bigr)$. For regular atoms on a measurable set $\Omega$,
+For regular atoms on a measurable set $\Omega$,
 \[
   \|F\|_{L_p(\Omega)} + \|(2^{ks} \omega_r(F, 2^{-k}, \Omega)_p)_k\|_{\ell_q} \leq
   K \|\lambda\|_{b^s_{p,q}} .
 \]
 \end{theorem}
+
+The constant is
+$K = N^{1-1/p} C \bigl((1 - 2^{-s})^{-1} + 2^r ((1 - 2^{-(\sigma - s)})^{-1} +
+(1 - 2^{-s})^{-1})\bigr)$. The factor $N^{1-1/p} C$ bounds the norm and, up to $2^r$, the modulus of
+one level of atoms (\Cref{lem:level-sums}); the two geometric series sum the levels with the
+weights $2^{ks}$ and are finite exactly for $0 < s < \sigma$ (\Cref{lem:almost-diagonal}).
 
 \begin{proof}
 \leanok
@@ -7161,11 +7227,19 @@ with exponent $\sigma$ sums the levels, since $2^{js} b_j = 2^{j(s - n/p)}
 \lean{Rd.isRegularAtomOn_zero, Rd.modNorm_level_le}
 \leanok
 \uses{thm:rd-atomic-synthesis, lem:lq-basic}
-For regular atoms of level $j$ with the overlap of \Cref{lem:level-sums}, $F = \sum_m \lambda_m a_m$
-in $L_p$ and $0 < s < \sigma$,
-$\|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q} \leq K 2^{j(s - n/p)} \|\lambda\|_{\ell_p}$,
-with the constant $K$ of \Cref{thm:rd-atomic-synthesis}.
+Let $1 \leq p < \infty$, $1 \leq q \leq \infty$, $r, N \in \N$, $d, C \geq 0$ and
+$0 < s < \sigma$. There is a constant $K < \infty$, depending only on $p$, $s$, $\sigma$, $r$, $C$
+and $N$, such that for every $j \in \N$, all regular atoms $a_m$ of level $j$, exponent $\sigma$
+and order $r$ with centres $c_m$ and the constants $d$ and $C$, all coefficients $\lambda_m$ such
+that at most $N$ of the centres $c_m$ with $\lambda_m \neq 0$ lie in a closed ball of radius
+$(d + r) 2^{-j}$, and $F = \sum_m \lambda_m a_m$ in $L_p$,
+\[
+  \|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q}
+  \leq K 2^{j(s - n/p)} \|\lambda\|_{\ell_p} .
+\]
 \end{lemma}
+
+The constant is $K$ of \Cref{thm:rd-atomic-synthesis}.
 
 \begin{proof}
 \leanok
@@ -7394,10 +7468,12 @@ $\|\lambda\|_{b^s_{p,q}} = \|(2^{js} \|k_j * F\|_p)_j\|_{\ell_q}$ for all $s$ an
 \leanok
 \uses{thm:atomic-decomposition, thm:rd-atomic-synthesis, thm:local-means, lem:cells-partition}
 Let $1 \leq p < \infty$, $L \geq 1$, $0 < s < L$, $1 \leq q \leq \infty$ and $F \in L_p$. Then
-$\|F\|_p + \|(2^{ks} \omega_L(F, 2^{-k})_p)_k\|_{\ell_q} < \infty$ if and only if
-$F = \sum_j f_j$ in $L_p$ with $f_j = \sum_m \lambda_{j,m} a_{j,m}$ almost everywhere, for regular
-atoms of order and exponent $L$ whose centres satisfy the overlap condition of
-\Cref{lem:level-sums}, and $\|\lambda\|_{b^s_{p,q}} < \infty$.
+$\|F\|_p + \|(2^{ks} \omega_L(F, 2^{-k})_p)_k\|_{\ell_q} < \infty$ if and only if there are
+constants $d, C \geq 0$ and $N \in \N$, regular atoms $a_{j,m}$ of level $j$, order and exponent
+$L$ with centres $c_{j,m}$ and the constants $d$ and $C$ (\Cref{def:regular-atoms}), and
+coefficients $\lambda_{j,m}$ such that at every level $j$ at most $N$ of the centres $c_{j,m}$ with
+$\lambda_{j,m} \neq 0$ lie in a closed ball of radius $(d + L) 2^{-j}$, $F = \sum_j f_j$ in $L_p$
+with $f_j = \sum_m \lambda_{j,m} a_{j,m}$ almost everywhere, and $\|\lambda\|_{b^s_{p,q}} < \infty$.
 \end{theorem}
 
 \begin{proof}
@@ -7530,18 +7606,20 @@ $\eta_j$ is a sum of two dilations.
   Rd.LocalMeansBump.exists_isSmoothAtom_cellAtom}
 \leanok
 \uses{lem:conv-derivatives, lem:dual-kernel-derivatives, lem:cell-atoms-regular}
-Let $K$ be smooth with $K = 0$ outside $\overline{B}(0, \rho 2^{-j})$ and
-$\|D^l K\| \leq A 2^{j(n+l)}$. Then the cell atoms of $K * g$, $g \in L_p$, have
-$\|D^l a_{j,m}\| \leq A 2^{jl} (\rho^n |B_1|)^{1-1/p}$. For a bump of radius $R$, every order
-$K$, every level $j$ and every $g \in L_p$, every cell atom of $\eta_j * g$ is a smooth atom on
-$V$ of order $K$ with radius factor $2LR + n$ and constant
-$A_{L,K} ((2LR)^n |B_1|)^{1-1/p}$, with $A_{L,K}$ of \Cref{lem:dual-kernel-derivatives}.
+Let $\kappa$ be smooth with $\kappa = 0$ outside $\overline{B}(0, \rho 2^{-j})$ and
+$\|D^l \kappa\| \leq A 2^{j(n+l)}$. Then the cell atoms of $\kappa * g$, $g \in L_p$, have
+$\|D^l a_{j,m}\| \leq A 2^{jl} (\rho^n |B_1|)^{1-1/p}$. For a bump of radius $R$ with the moment
+kernel $m$ and the dual kernels $\eta_j$ of order $L$, every order $K$, every level $j$ and every
+$g \in L_p$, every cell atom of $\eta_j * g$ is a smooth atom on $V$ of order $K$ with radius
+factor $2LR + n$ and constant $A_{L,K} ((2LR)^n |B_1|)^{1-1/p}$, where
+$A_{L,K} = 2 \sum_{l=0}^K \sup_y \|D^l m(y)\|$ bounds the derivatives of the dual kernels
+(\Cref{lem:dual-kernel-derivatives}).
 \end{lemma}
 
 \begin{proof}
 \leanok
 \Cref{lem:conv-derivatives} moves the derivatives onto the kernel, and the bound of
-\Cref{lem:conv-pointwise} for the kernel $(D^l K)(\cdot)(v_1, \dots, v_l)$ cancels the factor
+\Cref{lem:conv-pointwise} for the kernel $(D^l \kappa)(\cdot)(v_1, \dots, v_l)$ cancels the factor
 $2^{jn}$ against the coefficient as in \Cref{lem:cell-atoms-regular}.
 \end{proof}
 
@@ -8046,9 +8124,10 @@ gives at most $A^q \sum_k b_k^q$. The product bound holds on the finite boxes.
   Rd.lqNorm_le_of_le_almostDiagonal_pi}
 \leanok
 \uses{lem:schur-test, lem:almost-diagonal}
-Let $c(i, j) = 2^{-(i - j)L}$ for $j \leq i$ and $c(i, j) = 1$ for $j > i$, let $s \geq 0$ and
-$1 \leq q \leq \infty$, and let $A_{s,L}$ be the constant of \Cref{lem:almost-diagonal}. Then
-for every $a \geq 0$
+Let $L \in \R$, $c(i, j) = 2^{-(i - j)L}$ for $j \leq i$ and $c(i, j) = 1$ for $j > i$, let
+$s \geq 0$ and $1 \leq q \leq \infty$, and let
+$A_{s,L} = (1 - 2^{-(L-s)})^{-1} + (1 - 2^{-s})^{-1} \in [0, \infty]$ as in
+\Cref{lem:almost-diagonal}. Then for every $a \geq 0$
 \[
   \bigl\|\bigl(2^{s|m|_1} \textstyle\sum_k \prod_i c(m_i, k_i) \, a_k\bigr)_m\bigr\|_{\ell_q}
   \leq A_{s,L}^d \, \|(2^{s|k|_1} a_k)_k\|_{\ell_q} .
@@ -8159,9 +8238,10 @@ The binomial theorem.
 \lean{Rd.diffAct_prod_sum_pow_apply, Rd.conv_tensorKernel_sum_dilate_ae}
 \leanok
 \uses{lem:diagonal-substitution, lem:tensor-kernel-fubini, lem:acts-bounded}
-Let $\kappa_i = \sum_{t \in T} q_i(t) \, g_{c_i/\nu(t)}$ with integers $\nu(t) \geq 1$, scales
-$c_i > 0$ and an integrable $g$ on $\R$, and let $Y_i = \delta_{-z_i e_i / c_i}$. For $f \in L_p$
-and almost every $x$,
+Let $1 \leq p < \infty$, let $T$ be a finite set with integers $\nu(t) \geq 1$ and coefficients
+$q_i(t) \in \C$ for $t \in T$ and every coordinate $i$, and let
+$\kappa_i = \sum_{t \in T} q_i(t) \, g_{c_i/\nu(t)}$ with scales $c_i > 0$ and an integrable $g$
+on $\R$, and $Y_i = \delta_{-z_i e_i / c_i}$. For $f \in L_p(\R^d)$ and almost every $x$,
 \[
   ((\otimes\kappa) * f)(x) = \int (\otimes g)(z)
     \Bigl(\prod_i \textstyle\sum_t q_i(t) Y_i^{\nu(t)}\Bigr) f(x) \, dz .
@@ -8216,9 +8296,12 @@ $Y^2 - 1 = (Y - 1)(Y + 1)$ and \Cref{lem:moment-polynomial}.
 \leanok
 \uses{def:mixed-local-means, lem:kernel-dilation-sum, thm:tensor-averaged-differences,
   lem:acts-bounded, lem:weighted-jensen, def:mixed-moduli}
-If the bump vanishes outside $[-1, 1]$, then
-$\|k_k * f\|_p \leq (\|g\|_1 (2^L + 1))^d \, \Omega^{e(k)}_L(f, 2^{-k})_p$. Hence the mixed local
-means quasi-norm is at most $(\|g\|_1 (2^L + 1))^d$ times the quasi-norm by differences.
+Let $1 \leq p < \infty$ and $L \in \N$, and let the bump $g$ vanish outside $[-1, 1]$. For every
+$f \in L_p(\R^d)$ and every $k \in \N^d$,
+$\|k_k * f\|_p \leq (\|g\|_1 (2^L + 1))^d \, \Omega^{e(k)}_L(f, 2^{-k})_p$. Hence for all
+$s \in \R$ and $0 < q \leq \infty$ the mixed local means quasi-norm
+$\|(2^{s|k|_1} \|k_k * f\|_p)_k\|_{\ell_q}$ is at most $(\|g\|_1 (2^L + 1))^d$ times the
+quasi-norm $\|(2^{s|k|_1} \Omega^{e(k)}_L(f, 2^{-k})_p)_k\|_{\ell_q}$ by differences.
 \end{theorem}
 
 \begin{proof}
@@ -8278,8 +8361,9 @@ product whose factors have $L_1$ norms at most $C_\eta c(m_i, k_i)$
 \leanok
 \uses{thm:mixed-local-means-upper, lem:mixed-reproducing, lem:mixed-dual-moduli,
   lem:mixed-almost-diagonal}
-Let $1 \leq p < \infty$, $0 < s < L$, $1 \leq q \leq \infty$, and let the bump vanish outside
-$[-1, 1]$. Then $\|(2^{s|k|_1} \Omega^{e(k)}_L(f, 2^{-k})_p)_k\|_{\ell_q} < \infty$ if and only if
+Let $1 \leq p < \infty$, $L \in \N$, $0 < s < L$, $1 \leq q \leq \infty$ and
+$f \in L_p(\R^d)$, and let the bump vanish outside $[-1, 1]$. Then
+$\|(2^{s|k|_1} \Omega^{e(k)}_L(f, 2^{-k})_p)_k\|_{\ell_q} < \infty$ if and only if
 $\|(2^{s|k|_1} \|k_k * f\|_p)_k\|_{\ell_q} < \infty$, with equivalent quasi-norms.
 \end{theorem}
 
@@ -8342,7 +8426,8 @@ inequality suffices.
 \leanok
 \uses{def:mixed-lp, lem:mixed-lp-kernels, lem:mixed-reproducing, thm:mixed-local-means,
   lem:mixed-almost-diagonal, lem:bumps-every-radius, lem:bump-of-smooth-bump}
-Let $1 \leq p < \infty$, $0 < s < L$ and $1 \leq q \leq \infty$. Then
+Let $1 \leq p < \infty$, $L \in \N$, $0 < s < L$, $1 \leq q \leq \infty$ and
+$f \in L_p(\R^d)$. Then
 $\|(2^{s|k|_1} \Omega^{e(k)}_L(f, 2^{-k})_p)_k\|_{\ell_q} < \infty$ if and only if
 $\|(2^{s|k|_1} \|\delta_k * f\|_p)_k\|_{\ell_q} < \infty$.
 \end{theorem}

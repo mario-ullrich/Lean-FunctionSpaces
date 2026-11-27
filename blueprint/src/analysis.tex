@@ -1704,9 +1704,10 @@ $q$-th power.
 \lean{Rd.lintegral_maximalFunction_rpow_le, Rd.lintegral_lqNorm_maximalFunction_rpow_le}
 \leanok
 \uses{thm:maximal-strong-type, lem:lp-norm-nonnegative, lem:maximal-function-measurable}
-For every $p > 1$ and every almost everywhere measurable $g : V \to [0, \infty]$,
-$\int (M g)^p \leq C_{n,p} \int g^p$. For every $1 < q < \infty$ and every family of almost
-everywhere measurable $g_j : V \to [0, \infty]$, $j \in \N$,
+For $r > 1$ let $C_{n,r} = r \, 2^r \, 5^n / (r - 1)$. For every $p > 1$ and every almost
+everywhere measurable $g : V \to [0, \infty]$, $\int (M g)^p \leq C_{n,p} \int g^p$. For every
+$1 < q < \infty$ and every family of almost everywhere measurable $g_j : V \to [0, \infty]$,
+$j \in \N$,
 \[
   \int \|(M g_j(x))_j\|_{\ell_q}^q \, dx \leq C_{n,q} \int \|(g_j(x))_j\|_{\ell_q}^q \, dx .
 \]
@@ -1726,14 +1727,22 @@ $\sum_j \int (\cdot)^q$ by Tonelli's theorem, and the first bound applies to eac
 \uses{lem:calderon-zygmund-good-parts, lem:calderon-zygmund-averages,
   lem:fefferman-stein-diagonal, def:calderon-zygmund-good-part, lem:maximal-function-measurable,
   lem:lq-norm-means}
-Let $n \geq 1$, $1 < q < \infty$ and
-$C^{\mathrm w}_{n,q} = (2n)^n |B(0,1)| + (1 + 3^n)^q \, 2^{n(q-1)} \, C_{n,q}$. For every family
-of almost everywhere measurable $g_j : V \to [0, \infty]$ with $\int G < \infty$ and every
-$0 < t < \infty$,
+Let $n \geq 1$ and $1 < q < \infty$. There is a constant $C^{\mathrm w}_{n,q} < \infty$,
+depending only on $n$ and $q$, such that for every family of almost everywhere measurable
+$g_j : V \to [0, \infty]$ with $\int G < \infty$ and every $0 < t < \infty$,
 \[
   \bigl|\{x : \|(M g_j(x))_j\|_{\ell_q} > t\}\bigr| \leq \frac{C^{\mathrm w}_{n,q}}{t} \int G .
 \]
 \end{theorem}
+
+The constant is
+\[
+  C^{\mathrm w}_{n,q} = (2n)^n |B(0,1)| + (1 + 3^n)^q \, 2^{n(q-1)} \, C_{n,q} ,
+\]
+one term for each part of the proof: the first bounds the measure of the enlarged exceptional
+set of the Calder\'on--Zygmund decomposition (\Cref{lem:calderon-zygmund-averages}), and the
+second contains the constant $C_{n,q} = q \, 2^q \, 5^n / (q - 1)$ of the maximal theorem
+(\Cref{thm:maximal-strong-type}), applied to the good parts.
 
 \begin{proof}
 \leanok
@@ -1758,21 +1767,27 @@ and \Cref{lem:calderon-zygmund-averages} bounds $|\Omega^*|$.
 \uses{thm:vector-weak-type, lem:fefferman-stein-diagonal, lem:maximal-function-basic,
   lem:maximal-function-measurable, lem:lq-norm-means, lem:parts-above-below-level,
   lem:marcinkiewicz-level}
-Let $n \geq 1$ and $1 < q < \infty$. For every family of almost everywhere measurable
+Let $n \geq 1$ and $1 < q < \infty$. There are constants $W, D < \infty$, depending only on $n$
+and $q$, such that the following holds. For every family of almost everywhere measurable
 $g_j : V \to [0, \infty]$, $j \in \N$, every measurable $S \subseteq V$ with
 $\int_S G < \infty$ and every $0 < s < \infty$,
 \[
   \bigl|\{\overline M g > s\}\bigr|
-  \leq \frac{2 C^{\mathrm w}_{n,q}}{s} \int_S G + \frac{2^q C_{n,q}}{s^q} \int_{V \setminus S} G^q .
+  \leq \frac{W}{s} \int_S G + \frac{D}{s^q} \int_{V \setminus S} G^q .
 \]
 For every $p > 1$, every family of measurable
 $g_j : V \to [0, \infty]$, $j \in \N$, with $\int G^p < \infty$ and every $\tau > 0$,
 \[
   \bigl|\{\overline M g > \tau\}\bigr| \, \tau^{p-1}
-  \leq 2 C^{\mathrm w}_{n,q} \, \tau^{p-2} \int_{\{G > \tau\}} G
-    + 2^q C_{n,q} \, \tau^{p-1-q} \int_{\{G \leq \tau\}} G^q .
+  \leq W \, \tau^{p-2} \int_{\{G > \tau\}} G
+    + D \, \tau^{p-1-q} \int_{\{G \leq \tau\}} G^q .
 \]
 \end{lemma}
+
+The constants are $W = 2 C^{\mathrm w}_{n,q}$, with the constant $C^{\mathrm w}_{n,q}$ of the
+vector-valued weak type $(1,1)$ (\Cref{thm:vector-weak-type}), and $D = 2^q C_{n,q}$, with the
+constant $C_{n,q} = q \, 2^q \, 5^n / (q - 1)$ of the maximal theorem
+(\Cref{thm:maximal-strong-type}).
 
 \begin{proof}
 \leanok
@@ -1798,16 +1813,23 @@ $(\tau/2)^{-1} \tau^{p-1} = 2 \tau^{p-2}$ and $(\tau/2)^{-q} \tau^{p-1} = 2^q \t
 \leanok
 \uses{lem:fefferman-stein-split, lem:tonelli-steps-measure-space, lem:layer-cake,
   lem:maximal-function-basic, lem:maximal-function-measurable, lem:lq-norm-means}
-Let $n \geq 1$, $1 < p < q < \infty$ and
-\[
-  C^{\mathrm i}_{n,p,q} = p \Bigl( \frac{2 C^{\mathrm w}_{n,q}}{p - 1}
-    + \frac{2^q C_{n,q}}{q - p} \Bigr) .
-\]
-For every family of almost everywhere measurable $g_j : V \to [0, \infty]$,
+Let $n \geq 1$ and $1 < p < q < \infty$. There is a constant $C^{\mathrm i}_{n,p,q} < \infty$,
+depending only on $n$, $p$ and $q$, such that for every family of almost everywhere measurable
+$g_j : V \to [0, \infty]$,
 \[
   \int \|(M g_j(x))_j\|_{\ell_q}^p \, dx \leq C^{\mathrm i}_{n,p,q} \int G^p .
 \]
 \end{theorem}
+
+The constant is
+\[
+  C^{\mathrm i}_{n,p,q} = p \Bigl( \frac{2 C^{\mathrm w}_{n,q}}{p - 1}
+    + \frac{2^q C_{n,q}}{q - p} \Bigr) :
+\]
+the layer cake formula integrates the two terms of the splitting at each level
+(\Cref{lem:fefferman-stein-split}), with the constant $C^{\mathrm w}_{n,q}$ of the vector-valued
+weak type $(1,1)$ (\Cref{thm:vector-weak-type}) and the constant
+$C_{n,q} = q \, 2^q \, 5^n / (q - 1)$ of the maximal theorem (\Cref{thm:maximal-strong-type}).
 
 \begin{proof}
 \leanok
@@ -1826,9 +1848,9 @@ $r = q$ evaluates the two resulting integrals.
 \leanok
 \uses{thm:maximal-strong-type, lem:fefferman-stein-diagonal, lem:cancel-conjugate-power,
   lem:maximal-function-measurable}
-Let $1 < q < p < \infty$, $u = p/q$, $u' = p/(p - q)$ and
-$C^{\mathrm d}_{n,p,q} = \bigl( C_{n,q} \, C_{n,u'}^{1/u'} \bigr)^{u}$. For every finite set
-$S \subseteq \N$ and every family of almost everywhere measurable $g_j : V \to [0, \infty]$,
+Let $1 < q < p < \infty$. There is a constant $C^{\mathrm d}_{n,p,q} < \infty$, depending only
+on $n$, $p$ and $q$, such that for every finite set $S \subseteq \N$ and every family of almost
+everywhere measurable $g_j : V \to [0, \infty]$,
 \[
   \int \Bigl( \sum_{j \in S} (M g_j)^q \Bigr)^{p/q}
   \leq C^{\mathrm d}_{n,p,q} \int \Bigl( \sum_{j \in S} g_j^q \Bigr)^{p/q}
@@ -1838,6 +1860,12 @@ and
   \int \|(M g_j(x))_j\|_{\ell_q}^p \, dx \leq C^{\mathrm d}_{n,p,q} \int G^p .
 \]
 \end{theorem}
+
+The constant is
+$C^{\mathrm d}_{n,p,q} = \bigl( C_{n,q} \, C_{n,u'}^{1/u'} \bigr)^{u}$ with the conjugate
+exponents $u = p/q$ and $u' = p/(p - q)$ and the constants $C_{n,r} = r \, 2^r \, 5^n / (r - 1)$
+of the maximal theorem (\Cref{thm:maximal-strong-type}): the proof uses the weighted strong type
+at the exponent $q$ and the maximal theorem in $L_{u'}$.
 
 \begin{proof}
 \leanok
@@ -1869,15 +1897,20 @@ that bound is used at the exponent $q$ for functions known only to lie in $L_p$.
   lem:fefferman-stein-diagonal, thm:maximal-strong-type, lem:maximal-function-basic,
   lem:maximal-function-measurable, lem:lq-norm-means, lem:lp-norm-nonnegative,
   lem:lp-norm-from-power-integrals}
-Let $1 < p < \infty$ and $1 < q \leq \infty$, and let $C_{n,p,q}$ be $1$ for $n = 0$, and
-otherwise $C_{n,p}^{1/p}$ for $q \in \{p, \infty\}$, $(C^{\mathrm d}_{n,p,q})^{1/p}$ for $q < p$
-and $(C^{\mathrm i}_{n,p,q})^{1/p}$ for $p < q < \infty$. Then $C_{n,p,q} < \infty$, and for
-every family of almost everywhere measurable $g_j : V \to [0, \infty]$, $j \in \N$,
+Let $1 < p < \infty$ and $1 < q \leq \infty$. There is a constant $C_{n,p,q} < \infty$, depending
+only on $n$, $p$ and $q$, such that for every family of almost everywhere measurable
+$g_j : V \to [0, \infty]$, $j \in \N$,
 \[
   \Bigl\| x \mapsto \|(M g_j(x))_j\|_{\ell_q} \Bigr\|_p
   \leq C_{n,p,q} \Bigl\| x \mapsto \|(g_j(x))_j\|_{\ell_q} \Bigr\|_p .
 \]
 \end{theorem}
+
+The constant is $C_{n,p,q} = 1$ for $n = 0$, and otherwise the $p$-th root of the constant of
+the case at hand: $C_{n,p}^{1/p}$ for $q \in \{p, \infty\}$, with
+$C_{n,p} = p \, 2^p \, 5^n / (p - 1)$ of the maximal theorem (\Cref{thm:maximal-strong-type}),
+$(C^{\mathrm d}_{n,p,q})^{1/p}$ for $q < p$ (\Cref{thm:fefferman-stein-duality}) and
+$(C^{\mathrm i}_{n,p,q})^{1/p}$ for $p < q < \infty$ (\Cref{thm:fefferman-stein-interpolation}).
 
 \begin{proof}
 \leanok

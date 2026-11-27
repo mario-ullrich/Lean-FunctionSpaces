@@ -323,8 +323,9 @@ partial sums are those of \Cref{lem:reproducing-formula}, which converge to $f$.
 Let $1 \leq p < \infty$, $0 < s < L$, $1 \leq q \leq \infty$ and $f \in L_p$. There is
 $F \in L_p$ with $F = f$ almost everywhere on $\Omega$ and
 $\|F\|_p + \|(2^{ks} \omega_L(F, 2^{-k})_p)_k\|_{\ell_q} < \infty$ if and only if
-$\|(2^{js} \|k_j * f\|_{L_p(\Omega)})_j\|_{\ell_q} < \infty$, and then
-$F = \operatorname{Ext} f$ is such a function.
+$\|(2^{js} \|k_j * f\|_{L_p(\Omega)})_j\|_{\ell_q} < \infty$, and then the extension
+$F = \operatorname{Ext} f = \sum_j \eta_j * (1_\Omega (k_j * f))$ of \Cref{thm:graph-extension}
+is such a function.
 \end{theorem}
 
 \begin{proof}
@@ -408,7 +409,8 @@ equivalent:
     $F = f$ almost everywhere on $\Omega$.
 \end{enumerate}
 For every $F$ as in (2), the quantity in (1) is at most
-$\|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q}$. Under (1), $F = \operatorname{Ext} f$
+$\|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q}$. Under (1), the extension
+$F = \operatorname{Ext} f = \sum_j \eta_j * (1_\Omega (k_j * f))$ of \Cref{thm:graph-extension}
 with $L = r$ satisfies (2), and there is $C < \infty$, independent of $f$, with
 \begin{multline*}
   \|\operatorname{Ext} f\|_p + \|(2^{ks} \omega_r(\operatorname{Ext} f, 2^{-k})_p)_k\|_{\ell_q} \\
@@ -538,22 +540,29 @@ As in \Cref{lem:intrinsic-upper}, with \Cref{thm:moment-approx} for the two sets
 \leanok
 \uses{lem:support-principle-two, lem:local-means-on-sets, lem:reproducing-formula,
   lem:local-means-synthesis}
-Let $g$ be a bump of radius $R \leq 1/2$, $L \geq 1$, $1 \leq p < \infty$, $0 < s < L$ and
-$1 \leq q \leq \infty$. Let $U \subseteq W$ and $U \subseteq T$ be measurable with $x - y \in W$
-for $x \in U$ and $\eta_j(y) \neq 0$, and with $W \subseteq T_{Lh}$ for the steps
-$h = -c^{-1} z$, $c \geq 1$, $g(z) \neq 0$. If
-$\|f\|_{L_p(T)} + \|(2^{ks} \omega_L(f, 2^{-k}, T)_p)_k\|_{\ell_q} < \infty$, then there is
+Let $g$ be a bump of radius $R \leq 1/2$ with the moment kernel $m$, the local means kernels $k_j$
+and the dual kernels $\eta_j$ of order $L \geq 1$ (\Cref{def:local-means}), $1 \leq p < \infty$,
+$0 < s < L$ and $1 \leq q \leq \infty$. Let $U \subseteq W$ and $U \subseteq T$ be measurable with
+$x - y \in W$ for $x \in U$ and $\eta_j(y) \neq 0$, and with $W \subseteq T_{Lh}$ for the steps
+$h = -c^{-1} z$, $c \geq 1$, $g(z) \neq 0$. There is a constant $C < \infty$, depending only on
+$g$, $L$ and $s$, such that for every $f \in L_p$ with
+$\|f\|_{L_p(T)} + \|(2^{ks} \omega_L(f, 2^{-k}, T)_p)_k\|_{\ell_q} < \infty$ there is
 $F \in L_p$ with $F = f$ almost everywhere on $U$ and
 \begin{multline*}
   \|F\|_p + \|(2^{ks} \omega_L(F, 2^{-k})_p)_k\|_{\ell_q} \\
-  \leq C (\|m\|_1 + 2 \|g\|_1) \bigl( \|f\|_{L_p(T)}
-    + \|(2^{ks} \omega_L(f, 2^{-k}, T)_p)_k\|_{\ell_q} \bigr) < \infty ,
+  \leq C \bigl( \|f\|_{L_p(T)}
+    + \|(2^{ks} \omega_L(f, 2^{-k}, T)_p)_k\|_{\ell_q} \bigr) < \infty .
 \end{multline*}
-with the constant $C$ of \Cref{lem:local-means-synthesis}. For every measurable $W$, every
+For every measurable $W$, every
 $s > 0$ and every $f \in L_p$ with
 $2^{js} \|\mathbf 1_W (k_j * f)\|_p \leq X < \infty$ for every $j$,
 $\sum_j \|\eta_j * \mathbf 1_W (k_j * f)\|_p \leq 2 \|m\|_1 (1 - 2^{-s})^{-1} X$.
 \end{theorem}
+
+The constant is $C = C' (\|m\|_1 + 2 \|g\|_1)$. The factor $C'$ is the constant of the synthesis
+estimate (\Cref{lem:local-means-synthesis}), which bounds a series of dual kernels by its
+coefficients; the factor $\|m\|_1 + 2 \|g\|_1$, with the moment kernel $m$ of $g$, bounds the
+local means on $W$ by the intrinsic quasi-norm on $T$ (\Cref{lem:local-means-on-sets}).
 
 \begin{proof}
 \leanok
@@ -1634,7 +1643,7 @@ resolution of unity $\psi$ and every $U \in H^s(V)$.
 \begin{proof}
 \leanok
 \Cref{thm:boundary-trace-lp} applies with smoothness $s - 1/2$, $p = q = 2$, $L = 2$
-(\Cref{lem:besov-half-one-general}). With the constants $C_j$ of
+(\Cref{lem:besov-half-one-general}). With the constants $C_j$ of the trace bound of
 \Cref{lem:graph-trace-sobolev} for the graph domains $\Omega_j$,
 \[
   \int_\Gamma |\operatorname{Tr}_\Gamma \iota_s U|^2 \, d\sigma
@@ -3023,8 +3032,10 @@ $L_p(H)$ (\Cref{thm:trace-series}), and a subsequence converges almost everywher
 \lean{Rd.LipschitzGraph.sum_traceFun_eq, Rd.LipschitzGraph.graphTrace_ae_eq_comp_graphMap}
 \leanok
 \uses{lem:trace-mollified, lem:approx-identity-points}
-Let $L \geq 1$, $s > 0$, and let $f \in L_p$ have a finite norm as in \Cref{thm:trace-graph} and a
-continuous representative $G$. Then $\operatorname{Tr} f = G \circ \gamma$ almost everywhere on $H$.
+Let $L \geq 1$, $s > 0$, $1 \leq q \leq \infty$, and let $f \in L_p$ have a continuous
+representative $G$ and
+$\|f\|_{L_p(\Omega)} + \|(2^{k(s + 1/p)} \omega_L(f, 2^{-k}, \Omega)_p)_k\|_{\ell_q} < \infty$.
+Then $\operatorname{Tr} f = G \circ \gamma$ almost everywhere on $H$.
 \end{theorem}
 
 \begin{proof}
@@ -3590,7 +3601,7 @@ Lebesgue measure, and a $K$-Lipschitz map $f$ has $\mu_H^k(f(N)) \leq K^k \mu_H^
   Rd.LipschitzGraph.graphTrace_ae_eq_graphTrace_comp}
 \leanok
 \uses{lem:trace-partial-sums, thm:trace-continuous, lem:lipschitz-null}
-Let $s > 0$, $s + 1/p < L$ and
+Let $s > 0$, $L \in \N$ with $s + 1/p < L$, $1 \leq q \leq \infty$ and $F \in L_p$ with
 $\|F\|_p + \|(2^{k(s + 1/p)} \omega_L(F, 2^{-k})_p)_k\|_{\ell_q} < \infty$. For almost every
 $x' \in H_1$ such that $\gamma_1(x')$ lies on the graph of $\Omega_2$, that is
 $\gamma_2(P_2 \gamma_1(x')) = \gamma_1(x')$,
@@ -3778,7 +3789,7 @@ $\operatorname{Tr}_\Gamma F(y) = \sum_k \psi_k(y) \operatorname{Tr}_k F(P_k y)$.
 \leanok
 \uses{def:boundary-trace, thm:change-of-chart, lem:boundary-charts, def:ae-boundary,
   thm:trace-continuous}
-Let $s > 0$, $s + 1/p < L$ and
+Let $s > 0$, $L \in \N$ with $s + 1/p < L$, $1 \leq q \leq \infty$ and $F \in L_p$ with
 $\|F\|_p + \|(2^{k(s + 1/p)} \omega_L(F, 2^{-k})_p)_k\|_{\ell_q} < \infty$. Then
 $\operatorname{Tr}_\Gamma F(\gamma_j(x')) = \operatorname{Tr}_j F(x')$ for almost every $x' \in H_j$
 with $\gamma_j(x') \in B_j$. Hence $\operatorname{Tr}_\Gamma F$ does not depend on the resolution of
@@ -3868,7 +3879,8 @@ for all smooth $\zeta_j$ with bounded derivatives up to order $L$, $\zeta_j \neq
 and $\zeta_j = 1$ where $\psi_j \neq 0$, and all $G_j \in L_p(H_j)$ with
 $G_j = (\psi_j g) \circ \gamma_j$ almost everywhere on $H_j$ and
 $\|G_j\|_p + \|(2^{ks} \omega_1(G_j, 2^{-k})_p)_k\|_{\ell_q} < \infty$, the function
-$F = \sum_j \zeta_j E_j G_j$ has these properties.
+$F = \sum_j \zeta_j E_j G_j$, with the extension $E_j$ from the boundary of the graph domain
+$\Omega_j$ with $L_H = 1$ (\Cref{thm:graph-trace-extension}), has these properties.
 \end{theorem}
 
 \begin{proof}
@@ -5707,7 +5719,7 @@ trace kernel $N^s_\Gamma \subseteq H^s(\Omega)$ of the elements with vanishing t
 $\Omega$ (\Cref{def:sobolev-vanishing}), with $H^s(\Omega) = N^s(\Omega)^\perp$.
 
 The chart traces are bounded by the norm of $B^{1/2}_{2,1}(V)$ (\Cref{lem:trace-linear}). The
-following three results bound this norm on $H^1(V)$, with explicit constants; on $H^s(V)$,
+following three results bound this norm on $H^1(V)$; on $H^s(V)$,
 $1/2 < s < 2$, \Cref{lem:graph-trace-sobolev} bounds it with \Cref{lem:besov-half-one-general}
 and \Cref{thm:sobolev-besov-constants}.
 
@@ -5748,7 +5760,7 @@ $2^{k/2} \omega_k = 2^{-k/2} (2^k \omega_k)$, and \Cref{lem:lq-cauchy-schwarz} g
 $\sum_k 2^{k/2} \omega_k \leq \sqrt 2 \, \|(2^k \omega_k)_k\|_{\ell_2}$; and $1 \leq \sqrt 2$.
 \end{proof}
 
-\begin{theorem}[$H^1(V)$ in Besov spaces, with explicit constants]
+\begin{theorem}[$H^1(V)$ in Besov spaces]
 \label{thm:sobolev-one-besov-constant}
 \lean{Rd.sobolevOneBesovConst, Rd.sobolevOneBesovConst_ne_top, Rd.modNorm_two_le_norm,
   Rd.modNorm_half_one_le_norm, Rd.modNorm_toL2_lt_top}
@@ -5756,11 +5768,7 @@ $\sum_k 2^{k/2} \omega_k \leq \sqrt 2 \, \|(2^k \omega_k)_k\|_{\ell_2}$; and $1 
 \uses{thm:modulus-coincidence, thm:rd-besov, thm:tl-besov-sandwich,
   thm:sobolev-two-triebel-lizorkin, lem:sobolev-one-to-l2, lem:besov-half-one,
   lem:bessel-space-enorm}
-Let $K$ be the constant of the inverse direction of
-\Cref{thm:modulus-coincidence} for the band-limited scheme with the moduli of order $2$
-(\Cref{thm:rd-besov}) at smoothness $1$, and
-$C_1 = K \cdot 2 (1 - 2^{-1})^{-1} \cdot (2 \cdot 4)^{1/2}$. Then $C_1 < \infty$, and for every
-$U \in H^1(V)$,
+There is a constant $C_1 < \infty$, depending only on $n$, such that for every $U \in H^1(V)$,
 \[
   \|\iota U\|_2 + \|(2^k \omega_2(\iota U, 2^{-k})_2)_k\|_{\ell_2} \leq C_1 \|U\|
 \]
@@ -5772,6 +5780,14 @@ In particular
 $\|\iota U\|_2 + \|(2^{k(1/2 + 1/2)} \omega_2(\iota U, 2^{-k})_2)_k\|_{\ell_2} < \infty$ for every
 $U \in H^1(V)$.
 \end{theorem}
+
+The constant is $C_1 = K \cdot 2 (1 - 2^{-1})^{-1} \cdot (2 \cdot 4)^{1/2}$, one factor for each
+step of the proof. The factor $K$ is the constant of the inverse direction of
+\Cref{thm:modulus-coincidence} for the band-limited scheme with the moduli of order $2$
+(\Cref{thm:rd-besov}) at smoothness $1$: it bounds the moduli by the norm of $A^1_2$. The factor
+$2 (1 - 2^{-1})^{-1}$ bounds that norm by the norm of $F^1_{2,2}$
+(\Cref{thm:tl-besov-sandwich}), and $(2 \cdot 4)^{1/2}$ bounds the norm of $F^1_{2,2}$ by the norm
+of $H^1(V)$ (\Cref{thm:sobolev-two-triebel-lizorkin}).
 
 \begin{proof}
 \leanok
@@ -5787,21 +5803,25 @@ The second bound follows with \Cref{lem:besov-half-one}.
 The finiteness in \Cref{thm:sobolev-one-besov-constant} is the hypothesis of the boundary trace
 theorems with $s = 1/2$ and $p = q = 2$.
 
-\begin{theorem}[The norm of $H^1(V)$ by the $B^1_{2,2}(V)$ quantity, with an explicit constant]
+\begin{theorem}[The norm of $H^1(V)$ by the $B^1_{2,2}(V)$ quantity]
 \label{thm:besov-sobolev-one-constant}
 \lean{Rd.sobolevOneInvConst, Rd.sobolevOneInvConst_ne_top, Rd.enorm_le_modNorm_two}
 \leanok
 \uses{thm:modulus-coincidence, thm:rd-besov, thm:tl-besov-sandwich,
   thm:sobolev-two-triebel-lizorkin, lem:sobolev-one-to-l2, lem:bessel-space-enorm}
-Let $D$ be the constant of the direct direction of \Cref{thm:modulus-coincidence} for the
-band-limited scheme with the moduli of order $2$ (\Cref{thm:rd-besov}) at smoothness $1$, $\Phi$
-the kernel of \Cref{thm:tl-besov-sandwich}, and
-$C_2 = (2 \cdot 5)^{1/2} \cdot 8 \cdot 8 \, \|\Phi\|_1 D$.
-Then $C_2 < \infty$, and for every $U \in H^1(V)$,
+There is a constant $C_2 < \infty$, depending only on $n$, such that for every $U \in H^1(V)$,
 \[
   \|U\| \leq C_2 \bigl(\|\iota U\|_2 + \|(2^k \omega_2(\iota U, 2^{-k})_2)_k\|_{\ell_2}\bigr).
 \]
 \end{theorem}
+
+The constant is $C_2 = (2 \cdot 5)^{1/2} \cdot 8 \cdot 8 \, \|\Phi\|_1 D$, one factor for each
+step of the proof. The factor $(2 \cdot 5)^{1/2}$ bounds the norm of $H^1(V)$ by the norm of
+$F^1_{2,2}$ (\Cref{thm:sobolev-two-triebel-lizorkin}); the factor $8 \cdot 8 \, \|\Phi\|_1$, with
+the kernel $\Phi$ of \Cref{thm:tl-besov-sandwich}, bounds that norm by the norm of $A^1_2$ of the
+band-limited scheme; and $D$ is the constant of the direct direction of
+\Cref{thm:modulus-coincidence} for this scheme with the moduli of order $2$
+(\Cref{thm:rd-besov}) at smoothness $1$, which bounds the norm of $A^1_2$ by the moduli.
 
 \begin{proof}
 \leanok
@@ -5839,15 +5859,20 @@ $\iota U$ (\Cref{lem:trace-linear}), which is at most $\sqrt 2 \, C_1 \|U\|$
 \lean{Rd.modNorm_half_one_le_norm_of_lt, Rd.LipschitzGraph.exists_enorm_graphTrace_sobolevToL2_le}
 \leanok
 \uses{lem:trace-linear, lem:besov-half-one-general, thm:sobolev-besov-constants}
-Let $1/2 < s < 2$, let $c_s$ be the constant of \Cref{lem:besov-half-one-general} and $C_{s,2}$
-that of \Cref{thm:sobolev-besov-constants}. For every $U \in H^s(V)$,
+Let $1/2 < s < 2$. There is a constant $C_s < \infty$, depending only on $n$ and $s$, such that
+for every $U \in H^s(V)$,
 \[
-  \|\iota_s U\|_2 + \sum_k 2^{k/2} \omega_2(\iota_s U, 2^{-k})_2 \leq c_s C_{s,2} \|U\| .
+  \|\iota_s U\|_2 + \sum_k 2^{k/2} \omega_2(\iota_s U, 2^{-k})_2 \leq C_s \|U\| .
 \]
 For every Lipschitz graph domain with hyperplane $H$ and trace $\operatorname{Tr}$
 (\Cref{thm:trace-graph}), taken with $L = 2$ and $p = 2$, there is $C < \infty$ with
 $\|\operatorname{Tr} \iota_s U\|_{L_2(H)} \leq C \|U\|$ for every $U \in H^s(V)$.
 \end{lemma}
+
+The constant is $C_s = c_s C_{s,2}$. The factor $c_s = (1 - 2^{-2(s - 1/2)})^{-1/2}$ trades the
+weights $2^{k/2}$ of the sum for the weights $2^{ks}$ of an $\ell_2$ norm
+(\Cref{lem:besov-half-one-general}), and $C_{s,2}$ bounds that $\ell_2$ quantity by the norm of
+$H^s(V)$ (\Cref{thm:sobolev-besov-constants}, differences of order $2 > s$).
 
 \begin{proof}
 \leanok
@@ -5952,7 +5977,7 @@ The functions $\psi_j \iota_s U$ have finite intrinsic norms (\Cref{thm:multipli
 $\|\operatorname{Tr}_j(\psi_j \iota_s U)\|_2$ is at most $K$ times the $B^{1/2}_{2,1}$ quantity
 of $\psi_j \iota_s U$ (\Cref{lem:trace-linear}), which is at most $M$ times that of
 $\iota_s U$, with the multiplier constant $M$ of $\psi_j$ (\Cref{thm:multipliers}), which is at
-most $c_s C_{s,2} \|U\|$ (\Cref{lem:graph-trace-sobolev}); so $C = K M c_s C_{s,2}$. The trace
+most $C_s \|U\|$ (\Cref{lem:graph-trace-sobolev}); so $C = K M C_s$. The trace
 is additive on the functions of finite intrinsic norm and commutes with complex scalars
 (\Cref{lem:trace-linear}), and so does the multiplication by $\psi^0_j$
 (\Cref{lem:product-modulus}). The chart identity is \Cref{thm:boundary-trace-bounded}.
@@ -6366,12 +6391,17 @@ The next theorem gives the right inverse of the trace in McLean's trace theorem
   Rd.BoundedLipschitzDomain.norm_traceRightInverse_le}
 \leanok
 \uses{thm:trace-space-iso, thm:trace-space-operators, def:trace-l2}
-Let $C$ be the constant of \Cref{thm:trace-space-norm-equiv} for $\psi^0$ chosen in
-\Cref{thm:trace-space-iso}. The operator
+The operator
 $R_s = E_s \circ \tau_s^{-1} : B^{s-1/2}_{2,2}(\Gamma) \to H^s(\Omega)$ is bounded and linear,
-and for every $g \in B^{s-1/2}_{2,2}(\Gamma)$, $\gamma_s R_s g = \tau_s^{-1} g$,
-$\gamma^s_{L_2} R_s g = g$ in $L_2(\Gamma)$ and $\|R_s g\| \leq C \|g\|_{B^{s-1/2}_{2,2}(\Gamma)}$.
+and for every $g \in B^{s-1/2}_{2,2}(\Gamma)$, $\gamma_s R_s g = \tau_s^{-1} g$ and
+$\gamma^s_{L_2} R_s g = g$ in $L_2(\Gamma)$. There is a constant $C < \infty$, depending only on
+$s$, $\Omega$ and the resolution of unity $\psi^0$, such that
+$\|R_s g\| \leq C \|g\|_{B^{s-1/2}_{2,2}(\Gamma)}$ for every $g \in B^{s-1/2}_{2,2}(\Gamma)$.
 \end{theorem}
+
+The constant $C$ is the constant of \Cref{thm:trace-space-norm-equiv} for the resolution of unity
+$\psi^0$ fixed in \Cref{def:trace-space-setting}, the one used in \Cref{thm:trace-space-iso}:
+$E_s$ is an isometry, so $R_s$ has the bound of $\tau_s^{-1}$.
 
 \begin{proof}
 \leanok
@@ -6646,14 +6676,18 @@ $u(z) \leq S$ for every $z$, and all $p > 0$ and $a$ with $a - p < m < a$,
 \[
   \int_E \frac{u(z)^p}{|z|^a} \, dz \leq L^p c_1 + S^p c_2 ,
 \]
-where $c_1$ is the constant of part (2) of \Cref{lem:radial-power-integrals} for the exponent
-$a - p$ and $c_2$ the constant of its part (1) for $a$. For every $u \colon E \to [0, \infty]$
-and all $\eta > 0$ and $a > m$,
+where $c_1 = (1 + 2^{a - p}) |B(0, 1)| (1 - 2^{-(m - a + p)})^{-1}$ and
+$c_2 = 2^m |B(0, 1)| (1 - 2^{-(a - m)})^{-1}$, with the unit ball $B(0, 1)$ of $E$. For every
+$u \colon E \to [0, \infty]$ and all $\eta > 0$ and $a > m$, with this $c_2$,
 \[
   \int_E \int_E u(x) \, \mathbf 1_{|y - x| \geq \eta} |y - x|^{-a} \, dy \, dx
   \leq c_2 \, \eta^{m - a} \int_E u .
 \]
 \end{lemma}
+
+The constants are those of \Cref{lem:radial-power-integrals} with $R = 1$: $c_1$ bounds the
+integral of $|z|^{-(a - p)}$ over the unit ball (part (2) for the exponent $a - p$), and $c_2$
+the integral of $|z|^{-a}$ outside it (part (1) for $a$). Both are finite under the hypotheses.
 
 \begin{proof}
 \leanok
@@ -6739,8 +6773,8 @@ Let $1 \leq p < \infty$, $0 < s < 1$, $b = n - 1 + sp$, and keep the notation of
   \item $\int_{H_j} \int_{H_j} \mathbf 1_{B_j^2}(\gamma_j x', \gamma_j y')
     |g(\gamma_j y') - g(\gamma_j x')|^p / |\gamma_j y' - \gamma_j x'|^b \, dy' \, dx'
     \leq \mathcal{E}^\Gamma_{s,p}(g)$;
-  \item with $K_j = (D_j (1 + M_j))^p c_1 + (2 D_j)^p c_2$ for the constants $c_1$, $c_2$ of
-    \Cref{lem:radial-lipschitz-integral} on $H_j$ with $a = b$, $K_j < \infty$ and
+  \item there is a constant $K_j < \infty$, depending only on $n$, $p$, $s$, $D_j$ and $M_j$,
+    with
     $\int_{H_j} \int_{H_j} \mathbf 1_{B_j}(\gamma_j x') |g(\gamma_j x')|^p
     |\psi_j(\gamma_j y') - \psi_j(\gamma_j x')|^p / |y' - x'|^b \, dy' \, dx'
     \leq K_j \int_\Gamma |g|^p \, d\sigma$;
@@ -6749,6 +6783,11 @@ Let $1 \leq p < \infty$, $0 < s < 1$, $b = n - 1 + sp$, and keep the notation of
     plus $2 \int_{H_j} \int_{H_j} |G(x')|^p k(y' - x') \, dy' \, dx'$.
 \end{enumerate}
 \end{lemma}
+
+The constant in (3) is $K_j = (D_j (1 + M_j))^p c_1 + (2 D_j)^p c_2$, with the constants $c_1$,
+$c_2$ of \Cref{lem:radial-lipschitz-integral} on $H_j$, of dimension $n - 1$, with $a = b$: for
+a step $z$ along the chart, the difference of $\psi_j$ is at most
+$\min(D_j (1 + M_j) |z|, 2 D_j)$.
 
 \begin{proof}
 \leanok
@@ -6920,8 +6959,15 @@ the squares of the norms of the components.
 \leanok
 \uses{lem:gagliardo-embedding, lem:boundary-besov-lp, lem:boundary-chart-pieces-lp,
   thm:slobodeckij-form-by-modulus, thm:modulus-by-slobodeckij-form}
-For every $t > 0$ there is $C < \infty$ with $\|g\|_{B^t_{2,2}(\Gamma)} \leq C \|\Phi g\|$ and
-$\|\Phi g\| \leq C \|g\|_{B^t_{2,2}(\Gamma)}$ for every $g \in B^t_{2,2}(\Gamma)$.
+Let $t > 0$, and for $g \in B^t_{2,2}(\Gamma)$ let $\Phi g$ be the Gagliardo embedding of
+\Cref{lem:gagliardo-embedding}, with the norm
+\[
+  \|\Phi g\|^2 = \|g\|_{L_2(\Gamma)}^2 + \sum_j \int_{H_j} \int_{H_j}
+    \frac{|G_j(y') - G_j(x')|^2}{|y' - x'|^{n - 1 + 2t}} \, dy' \, dx'
+\]
+with the chart pieces $G_j = (\psi^0_j g) \circ \gamma_j$. There is $C < \infty$ with
+$\|g\|_{B^t_{2,2}(\Gamma)} \leq C \|\Phi g\|$ and $\|\Phi g\| \leq C \|g\|_{B^t_{2,2}(\Gamma)}$
+for every $g \in B^t_{2,2}(\Gamma)$.
 \end{theorem}
 
 \begin{proof}
@@ -7075,14 +7121,22 @@ right inverse, and the trace space is isomorphic to $H^{s-1/2}(\Gamma)$.
 \leanok
 \uses{thm:trace-space-boundary-sobolev, thm:besov-trace-operator, def:domain-besov-space,
   lem:restriction-moduli, thm:sobolev-besov-constants, thm:trace-l2}
-Let $0 < s < 2$. For every $U \in H^s(V)$,
-$N_\Omega(\mathbf 1_\Omega \iota_s U) \leq C_{s,2} \|U\|$ with the constant of
-\Cref{thm:sobolev-besov-constants}, and $u \mapsto \mathbf 1_\Omega \iota_s u$ is a bounded
-linear operator $H^s(\Omega) \to B^s_{2,2}(\Omega)$, the space of \Cref{def:domain-besov-space}
-with differences of order $2$. For $1/2 < s < 3/2$ and every $u \in H^s(\Omega)$,
-$\gamma^H_s u = \operatorname{Tr}(\mathbf 1_\Omega \iota_s u)$ in $L_2(\Gamma)$, with the trace
-operator of \Cref{thm:besov-trace-operator} for $p = q = 2$.
+Let $0 < s < 2$, and let
+$N_\Omega(F) = \|F\|_{L_2(\Omega)} + \|(2^{ks} \omega_2(F, 2^{-k}, \Omega)_2)_k\|_{\ell_2}$ be the
+norm of $B^s_{2,2}(\Omega)$, the space of \Cref{def:domain-besov-space} with differences of order
+$2$. There is a constant $C < \infty$, depending only on $n$ and $s$, such that
+$N_\Omega(\mathbf 1_\Omega \iota_s U) \leq C \|U\|$ for every $U \in H^s(V)$, and
+$u \mapsto \mathbf 1_\Omega \iota_s u$ is a bounded linear operator
+$H^s(\Omega) \to B^s_{2,2}(\Omega)$. For $1/2 < s < 3/2$ and every $u \in H^s(\Omega)$, the trace
+$\gamma^H_s u \in H^{s-1/2}(\Gamma)$ of \Cref{thm:trace-space-boundary-sobolev} is
+$\operatorname{Tr}(\mathbf 1_\Omega \iota_s u)$ in $L_2(\Gamma)$, with the trace operator of
+\Cref{thm:besov-trace-operator} for $p = q = 2$.
 \end{theorem}
+
+The constant is $C = C_{s,2}$ of \Cref{thm:sobolev-besov-constants}, with differences of order
+$2 > s$: $N_\Omega(\mathbf 1_\Omega F)$ is at most the corresponding quantity of $F$ on $V$
+(\Cref{lem:restriction-moduli}), which $C_{s,2}$ bounds by the norm of $H^s(V)$ for
+$F = \iota_s U$.
 
 \begin{proof}
 \leanok
@@ -7204,9 +7258,13 @@ two and the divergence kernels $K_i$. For every $j \in \N$ and every $y \in V$,
   k_{j+1}(y) = 2^{-j} \sum_{i \in I} \partial_{e_i} (K_i)_{2^j}(y) .
 \]
 For every $w \in V$, $\int_V \langle w, x \rangle \, m(x) \, dx = 0$, and for every $i$,
-$((K_i)_{2^j})_{j \in \N}$ is a Calder\'on--Zygmund family with the constants $B_i$, $H_i$ of
-\Cref{thm:mean-zero-cz-family}.
+$((K_i)_{2^j})_{j \in \N}$ is a Calder\'on--Zygmund family with a finite overlap $B_i$ and a
+finite H\"ormander constant $H_i$, both depending only on $g$ and $i$.
 \end{lemma}
+
+The constants are those of \Cref{thm:mean-zero-cz-family} for the kernel $K_i$, which has mean
+zero: $B_i = 4 C^2$ with the constant $C$ of \Cref{lem:mean-zero-fourier} for $K_i$, and
+$H_i = 4 H_A$ with the Schwartz seminorms $A$ of $K_i$ (\Cref{def:hormander-const}).
 
 \begin{proof}
 \leanok
@@ -7285,9 +7343,14 @@ $q \neq 0$ and $f \in L_p(V)$ with $X = \|f\|^{W,L}_{s,q} < \infty$. Then
 $2^{js} \|\mathbf 1_W (k_j * f)\|_p \leq X$ for every $j$, the terms of the local extension
 satisfy $\|\eta_j * \mathbf 1_W (k_j * f)\|_p \leq 2 \|m\|_1 2^{-js} X$, the local extension
 $F = \sum_j \eta_j * \mathbf 1_W (k_j * f)$ converges in $L_p$ with
-$\|F\|_p \leq 2 \|m\|_1 (1 - 2^{-s})^{-1} X$, and for $1 < p < \infty$ and $1 < q \leq \infty$,
-$\|F\|_{F^s_{p,q}} \leq C X$ with the constant $C$ of \Cref{thm:tl-local-means}.
+$\|F\|_p \leq 2 \|m\|_1 (1 - 2^{-s})^{-1} X$, and for $1 < p < \infty$ and $1 < q \leq \infty$
+there is a constant $C < \infty$, depending only on $n$, $p$, $q$, $s$, $L$ and $g$, with
+$\|F\|_{F^s_{p,q}} \leq C X$.
 \end{lemma}
+
+The constant $C$ is the upper constant of \Cref{thm:tl-local-means} (2), the constant of the
+synthesis bound of \Cref{thm:tl-synthesis-dual}, here with the coefficients
+$h_j = \mathbf 1_W (k_j * f)$.
 
 \begin{proof}
 \leanok
@@ -7345,19 +7408,23 @@ gives the second bound.
 Let $n \geq 1$, $1 < p < \infty$, $g$ a bump with the moment kernel $m$ of order two and the
 divergence kernels $K_i$, $W \subseteq V$ measurable, $T \subseteq V$ open, $f \in L_p(T)$ with
 weak derivatives $g_i = \partial_{e_i} f \in L_p(T)$ on $T$, and assume $x - y \in T$ for every
-$x \in W$, every $j \in \N$, every $i$ and every $y$ in the support of $(K_i)_{2^j}$. Then
+$x \in W$, every $j \in \N$, every $i$ and every $y$ in the support of $(K_i)_{2^j}$. There are
+constants $S_i < \infty$, $i \in I$, depending only on $n$, $p$ and $g$, such that
 $F = \mathbf 1_T f \in L_p(V)$ satisfies
 \[
-  \|F\|^{W,2}_{1,2} \leq \|m\|_1 \|f\|_{L_p(T)} + 2 \sum_{i \in I} S_{V,p}(B_i, H_i)
-  \|g_i\|_{L_p(T)} ,
+  \|F\|^{W,2}_{1,2} \leq \|m\|_1 \|f\|_{L_p(T)} + 2 \sum_{i \in I} S_i \|g_i\|_{L_p(T)} ,
 \]
 hence
 \[
   \|F\|^{W,2}_{1,2} \leq C_g \Bigl(\|f\|_{L_p(T)} + \sum_{i \in I} \|g_i\|_{L_p(T)}\Bigr) ,
 \]
-with the constant $C_g = \|m\|_1 + 2 \sum_i S_{V,p}(B_i, H_i)$, where $S_{V,p}$ is the strong
-type constant of \Cref{def:cz-const}.
+with the constant $C_g = \|m\|_1 + 2 \sum_i S_i < \infty$.
 \end{theorem}
+
+The constant $S_i = S_{V,p}(B_i, H_i)$ is the strong type constant (\Cref{def:cz-const}) of the
+Calder\'on--Zygmund family of the divergence kernel $K_i$, with its overlap $B_i$ and
+H\"ormander constant $H_i$ (\Cref{lem:bump-divergence-identity}); it bounds the analysis operator
+of this family on $L_p$ (\Cref{thm:vector-valued-strong-type}).
 
 \begin{proof}
 \leanok
@@ -7453,11 +7520,18 @@ Let $n \geq 1$, $1 < p < \infty$, $g$ a bump with the dual kernels $\eta_j$ of o
 divergence kernels $K_i$, let $U, W \subseteq V$ be measurable and $T \subseteq V$ open with
 $U \subseteq T$, $x - y \in W$ for every $x \in U$, every $j$ and every $y$ with
 $\eta_j(y) \neq 0$, and $x - y \in T$ for every $x \in W$, every $j$, every $i$ and every $y$ in
-the support of $(K_i)_{2^j}$. Then Sobolev functions on $T$ extend from $U$ with the constant
-$\bigl(2 \|m\|_1 (1 - 2^{-1})^{-1} + (\sum_i D_{p, e_i}) A\bigr) C_g$, where $A$ is the constant
-$C$ of \Cref{thm:tl-local-means} for $L = 2$, $q = 2$, $s = 1$, $D_{p,e_i}$ the constants of
-\Cref{thm:triebel-lizorkin-to-sobolev}, and $C_g$ that of \Cref{thm:tl-local-means-gradient}.
+the support of $(K_i)_{2^j}$. There is a constant $C < \infty$, depending only on $n$, $p$ and
+$g$, such that Sobolev functions on $T$ extend from $U$ with the constant $C$.
 \end{theorem}
+
+The constant is $C = \bigl(2 \|m\|_1 (1 - 2^{-1})^{-1} + (\sum_i D_{p, e_i}) A\bigr) C_g$, with
+the moment kernel $m$ of order two of $g$. The factor $C_g$ of
+\Cref{thm:tl-local-means-gradient} bounds the local means of Triebel--Lizorkin type on $W$ by the
+Sobolev norm on $T$. In the first factor, $2 \|m\|_1 (1 - 2^{-1})^{-1}$ bounds the $L_p$ norm of
+the local extension (\Cref{lem:tl-local-extension}), $A$ is the upper constant of
+\Cref{thm:tl-local-means} (2) for $g$, $L = 2$, $q = 2$ and $s = 1$, which bounds its norm in
+$\TL{1}{p}{2}$, and $D_{p,e_i} = C_{V,p,(e_i)}$ (\Cref{def:tl-to-sobolev-const}) bounds its weak
+derivative $\partial_{e_i}$ by that norm (\Cref{thm:triebel-lizorkin-to-sobolev}).
 
 \begin{proof}
 \leanok
@@ -7759,8 +7833,11 @@ $\eta_j(y) \neq 0$, and $x - y \in T$ for every $x \in W$, every $j$, every $i$ 
 the support of $(K_i)_{2^j}$. Then the map
 $(f, (g_i)_i) \mapsto F = \sum_j \eta_j * \mathbf 1_W (k_j * \mathbf 1_T f)$, with the weak
 derivatives $\partial_{e_i} F$, is an extension operator from $U$ for the jets of
-$\Sob{1}{p}(O)$, with the constant of \Cref{thm:one-patch-extension}.
+$\Sob{1}{p}(O)$ with a constant $C < \infty$ that depends only on $n$, $p$ and $g$.
 \end{lemma}
+
+The constant is the constant $C$ of \Cref{thm:one-patch-extension}: the operator is the
+extension built in its proof, read as a linear map on the jets.
 
 \begin{proof}
 \leanok
@@ -9064,13 +9141,18 @@ $\Psi$ (\Cref{lem:derivative-dilate}).
 For every bump $g$ of radius $R$, every $L \geq 1$, every $m \in \N$ and every $i \in I^m$:
 \begin{enumerate}
   \item if $m < L$, then $\int_V K^L_i = 0$ and $((K^L_i)_{2^j})_{j \in \N}$ is a
-    Calder\'on--Zygmund family with the constants of \Cref{thm:mean-zero-cz-family};
+    Calder\'on--Zygmund family with a finite overlap $B_i$ and a finite H\"ormander constant
+    $H_i$, both depending only on $g$, $L$ and $i$;
   \item $K^L_i$ vanishes outside $\bar B(0, L R)$, in particular $K^L_i$ has compact support, and
     every dilate $(K^L_i)_{2^j}$ is supported in $\bar B(0, L R)$;
   \item if $g$ is supported in $-K$ for the cone $K$ of a Lipschitz graph domain, then every
     dilate $(K^L_i)_{2^j}$ is supported in $\{y : -y \in \bar K, \ \|y\| \leq L R\}$.
 \end{enumerate}
 \end{theorem}
+
+The constants in (1) are those of \Cref{thm:mean-zero-cz-family} for the kernel $K^L_i$, which
+has mean zero: $B_i = 4 C^2$ with the constant $C$ of \Cref{lem:mean-zero-fourier} for $K^L_i$,
+and $H_i = 4 H_A$ with the Schwartz seminorms $A$ of $K^L_i$ (\Cref{def:hormander-const}).
 
 \begin{proof}
 \leanok
@@ -9148,22 +9230,27 @@ the first claim, and the bound follows from $2^{(j+1)m} 2^{-jm} = 2^m$.
   thm:vector-valued-strong-type, def:cz-const, lem:tl-local-means-pointwise,
   thm:tl-local-means-gradient}
 Let $n \geq 1$, $1 < p < \infty$, $g$ a bump with the smoothed bump $g'$, $m < L$, $\mu'$ the
-moment kernel of order $L$ of $g'$, $K^L_i$ the higher divergence kernels of $g$ with the
-constants $B_i$, $H_i$ of \Cref{thm:bump-higher-kernels-cz}, $W \subseteq V$ measurable,
+moment kernel of order $L$ of $g'$, $K^L_i$ the higher divergence kernels of $g$,
+$W \subseteq V$ measurable,
 $T \subseteq V$ open, $f \in L_p(T)$ with weak derivatives $g_i = \partial^{e_i} f \in L_p(T)$ on
 $T$ for every $i \in I^m$, and assume $x - y \in T$ for every $x \in W$, every $j \in \N$, every
-$i \in I^m$ and every $y$ in the support of $(K^L_i)_{2^j}$. Then $F = \mathbf 1_T f \in L_p(V)$
+$i \in I^m$ and every $y$ in the support of $(K^L_i)_{2^j}$. There are constants $S_i < \infty$,
+$i \in I^m$, depending only on $n$, $p$, $g$, $L$ and $m$, such that $F = \mathbf 1_T f \in L_p(V)$
 satisfies, with the quasi-norm $\|\cdot\|'^{W,L}_{m,2}$ of \Cref{def:tl-local-norm-on} for $g'$,
 \[
-  \|F\|'^{W,L}_{m,2} \leq \|\mu'\|_1 \|f\|_{L_p(T)} + 2^m \sum_{i \in I^m} S_{V,p}(B_i, H_i)
-  \|g_i\|_{L_p(T)} ,
+  \|F\|'^{W,L}_{m,2} \leq \|\mu'\|_1 \|f\|_{L_p(T)} + 2^m \sum_{i \in I^m} S_i \|g_i\|_{L_p(T)} ,
 \]
 hence
 \[
   \|F\|'^{W,L}_{m,2} \leq C'_g \Bigl(\|f\|_{L_p(T)} + \sum_{i \in I^m} \|g_i\|_{L_p(T)}\Bigr) ,
 \]
-with the constant $C'_g = \|\mu'\|_1 + 2^m \sum_i S_{V,p}(B_i, H_i) < \infty$.
+with the constant $C'_g = \|\mu'\|_1 + 2^m \sum_i S_i < \infty$.
 \end{theorem}
+
+The constant $S_i = S_{V,p}(B_i, H_i)$ is the strong type constant (\Cref{def:cz-const}) of the
+Calder\'on--Zygmund family of the higher divergence kernel $K^L_i$, with its overlap $B_i$ and
+H\"ormander constant $H_i$ (\Cref{thm:bump-higher-kernels-cz} (1)); it bounds the analysis
+operator of this family on $L_p$ (\Cref{thm:vector-valued-strong-type}).
 
 \begin{proof}
 \leanok
@@ -9259,12 +9346,17 @@ kernels $\eta'_j$ of order $m + 1$ of $g'$ and the higher divergence kernels $K^
 let $U, W \subseteq V$ be measurable and $T \subseteq V$ open with $U \subseteq T$, $x - y \in W$
 for every $x \in U$, every $j$ and every $y$ with $\eta'_j(y) \neq 0$, and $x - y \in T$ for
 every $x \in W$, every $j$, every $i \in I^m$ and every $y$ in the support of
-$(K^{m+1}_i)_{2^j}$. Then Sobolev functions of order $m$ on $T$ extend from $U$ with the constant
-$\bigl(\sum_{k \leq m} \sum_{w \in I^k} D_{p, e_w}\bigr) A C'_g$, where $A$ is the
-constant $C$ of \Cref{thm:tl-local-means} for $g'$, $L = m + 1$, $q = 2$, $s = m$, $D_{p,e_w}$ the
-constants of \Cref{thm:triebel-lizorkin-to-sobolev}, and $C'_g$ that of
-\Cref{thm:tl-local-means-higher} for $L = m + 1$.
+$(K^{m+1}_i)_{2^j}$. There is a constant $C < \infty$, depending only on $n$, $p$, $m$ and $g$,
+such that Sobolev functions of order $m$ on $T$ extend from $U$ with the constant $C$.
 \end{theorem}
+
+The constant is $C = \bigl(\sum_{k \leq m} \sum_{w \in I^k} D_{p, e_w}\bigr) A C'_g$. The factor
+$C'_g$ of \Cref{thm:tl-local-means-higher} for $L = m + 1$ bounds the local means of
+Triebel--Lizorkin type on $W$ by the Sobolev norm of order $m$ on $T$; $A$ is the upper constant
+of \Cref{thm:tl-local-means} (2) for $g'$, $L = m + 1$, $q = 2$ and $s = m$, which bounds the
+norm of the local extension in $\TL{m}{p}{2}$ (\Cref{lem:tl-local-extension}); and
+$D_{p,e_w} = C_{V,p,e_w}$ (\Cref{def:tl-to-sobolev-const}) bounds its weak derivative
+$\partial^{e_w}$ by that norm (\Cref{thm:triebel-lizorkin-to-sobolev}).
 
 \begin{proof}
 \leanok
@@ -10990,8 +11082,9 @@ and all $u, w \in H^1_0(\Omega)$,
   \langle u, w \rangle = \langle J_\Omega u, J_\Omega w \rangle_{L_2(\Omega)}
     + (2\pi)^{-2} \sum_k \langle \partial_{b_k} \iota u, \partial_{b_k} \iota w \rangle_{L_2(V)},
 \]
-and for every $i \in I$ and every $w \in H^1_0(\Omega)$, with $\lambda_i$ and $\varphi_i$ as in
-\Cref{thm:dirichlet-eigenbasis},
+Let $\sigma_i$ and $(v_i)_{i \in I}$ be the singular values and the singular basis of $J_\Omega$,
+and let $\lambda_i = 4\pi^2 (\sigma_i^{-2} - 1)$ and $\varphi_i = \sigma_i^{-1} v_i$
+(\Cref{thm:dirichlet-eigenbasis}). For every $i \in I$ and every $w \in H^1_0(\Omega)$,
 \[
   \sum_k \langle \partial_{b_k} \iota \varphi_i, \partial_{b_k} \iota w \rangle_{L_2(V)}
     = \lambda_i \langle \iota \varphi_i, \iota w \rangle_{L_2(V)} .
@@ -11019,14 +11112,21 @@ $\iota w$ vanish outside $\Omega$, so the boundary needs no hypothesis.
 \leanok
 \uses{thm:dirichlet-eigenbasis, cor:compact-embedding-interpolation, lem:sobolev-range,
   thm:spectral-coefficients}
-Let $\Omega \subseteq V$ be a bounded open set, with $(e_i)$ and $\sigma_i$ as in
-\Cref{thm:dirichlet-eigenbasis} and the approximation spaces $A^\theta_q$ of the Dirichlet scheme.
+Let $\Omega \subseteq V$ be a bounded open set, with the eigenvector basis $(e_i)$ of
+$L_2(\Omega)$ and the singular values $\sigma_i$ of $J_\Omega$ (\Cref{thm:dirichlet-eigenbasis}),
+and the approximation spaces $A^\theta_q$ of its spectral scheme, the Dirichlet scheme, with the
+levels $\lfloor \sigma_i^{-1} \rfloor$.
 For every $f \in L_2(\Omega)$, $f = J_\Omega w$ for some $w \in H^1_0(\Omega)$ if and only if
 $\sum_i (1 + \lfloor \sigma_i^{-1} \rfloor)^2 |\langle e_i, f \rangle|^2 < \infty$. For every
 $0 < \theta < 1$, every $q \in [1, \infty]$ and every $f \in L_2(\Omega)$, the following are
 equivalent:
-$f \in (L_2(\Omega), J_\Omega(H^1_0(\Omega)))_{\theta, q}$; $f \in A^\theta_q$; the block norm of
-\Cref{thm:spectral-coefficients} with $s = \theta$ is finite.
+$f \in (L_2(\Omega), J_\Omega(H^1_0(\Omega)))_{\theta, q}$; $f \in A^\theta_q$; the block norm
+\[
+  \Bigl(\sum_{\lfloor \sigma_i^{-1} \rfloor = 0} |\langle e_i, f \rangle|^2\Bigr)^{1/2}
+  + \Bigl\| \Bigl(2^{k\theta} \Bigl(\sum_{2^k \leq \lfloor \sigma_i^{-1} \rfloor < 2^{k+1}}
+    |\langle e_i, f \rangle|^2\Bigr)^{1/2}\Bigr)_k \Bigr\|_{\ell_q}
+\]
+of \Cref{thm:spectral-coefficients} is finite.
 \end{corollary}
 
 \begin{proof}
@@ -11227,9 +11327,12 @@ $1$ under the square root; the Dirichlet scheme has the same form up to the fact
 \lean{Rd.BoundedLipschitzDomain.neumannEigenfunction_weak}
 \leanok
 \uses{thm:neumann-eigenbasis, def:neumann-space, lem:singular-coefficients}
-For every bounded Lipschitz domain $\Omega$ in dimension $n \geq 1$, every $i \in I$ and every
-$(f, g) \in N(\Omega)$, with $\lambda_i$ and $\varphi_i = (\varphi_i, \nabla \varphi_i)$ as in
-\Cref{thm:neumann-eigenbasis},
+Let $\Omega$ be a bounded Lipschitz domain in dimension $n \geq 1$, let $\sigma_i$ and
+$(v_i)_{i \in I}$ be the singular values and the singular basis of the Neumann embedding
+$J^N_\Omega$, and let $\lambda_i = \sigma_i^{-2} - 1$ (\Cref{thm:neumann-eigenbasis}). The pair
+$\sigma_i^{-1} v_i \in N(\Omega)$ is $(\varphi_i, (\partial_{b_k} \varphi_i)_{k \in K})$ for a
+function $\varphi_i \in L_2(\Omega)$ with weak derivatives $\partial_{b_k} \varphi_i$
+(\Cref{def:neumann-space}). For every $i \in I$ and every $(f, g) \in N(\Omega)$,
 \[
   \sum_{k \in K} \langle \partial_{b_k} \varphi_i, g_k \rangle_{L_2(\Omega)}
     = \lambda_i \langle \varphi_i, f \rangle_{L_2(\Omega)} .
@@ -11283,13 +11386,21 @@ since the nonempty open set $\Omega$ has positive measure.
 \leanok
 \uses{thm:neumann-eigenbasis, cor:compact-embedding-interpolation, lem:sobolev-range,
   thm:spectral-coefficients}
-Let $\Omega$ be a bounded Lipschitz domain in dimension $n \geq 1$, with $(e_i)$ and $\sigma_i$ as
-in \Cref{thm:neumann-eigenbasis} and the approximation spaces $A^\theta_q$ of the Neumann scheme.
+Let $\Omega$ be a bounded Lipschitz domain in dimension $n \geq 1$, with the eigenvector basis
+$(e_i)$ of $L_2(\Omega)$ and the singular values $\sigma_i$ of $J^N_\Omega$
+(\Cref{thm:neumann-eigenbasis}), and the approximation spaces $A^\theta_q$ of its spectral scheme,
+the Neumann scheme, with the levels $\lfloor \sigma_i^{-1} \rfloor$.
 For every $f \in L_2(\Omega)$, $f = J^N_\Omega w$ for some $w \in N(\Omega)$ if and only if
 $\sum_i (1 + \lfloor \sigma_i^{-1} \rfloor)^2 |\langle e_i, f \rangle|^2 < \infty$. For every
 $0 < \theta < 1$, every $q \in [1, \infty]$ and every $f \in L_2(\Omega)$, the following are
 equivalent: $f \in (L_2(\Omega), J^N_\Omega(N(\Omega)))_{\theta, q}$; $f \in A^\theta_q$; the
-block norm of \Cref{thm:spectral-coefficients} with $s = \theta$ is finite.
+block norm
+\[
+  \Bigl(\sum_{\lfloor \sigma_i^{-1} \rfloor = 0} |\langle e_i, f \rangle|^2\Bigr)^{1/2}
+  + \Bigl\| \Bigl(2^{k\theta} \Bigl(\sum_{2^k \leq \lfloor \sigma_i^{-1} \rfloor < 2^{k+1}}
+    |\langle e_i, f \rangle|^2\Bigr)^{1/2}\Bigr)_k \Bigr\|_{\ell_q}
+\]
+of \Cref{thm:spectral-coefficients} is finite.
 \end{corollary}
 
 \begin{proof}
@@ -11388,7 +11499,8 @@ with constants $1$ and $2\pi$, and \Cref{thm:interpolation-property} applies.
   prop:couple-natural-grid, prop:map-couple-k-method, thm:bounded-lipschitz-besov,
   thm:bessel-potential-interpolate, lem:indicator-lp-eq-iff}
 Let $\Omega$ be a bounded Lipschitz domain in dimension $n \geq 1$ and $A^\theta_q$ the
-approximation spaces of the Neumann scheme (\Cref{thm:neumann-eigenbasis}). For every
+approximation spaces of the Neumann scheme, the spectral scheme of the Neumann embedding
+$J^N_\Omega$ (\Cref{thm:neumann-eigenbasis}). For every
 $0 < \theta < 1$, every $q \in [1, \infty]$, every order $r \geq 1$ and every $f \in L_2(V)$,
 \[
   f|_\Omega \in A^\theta_q \iff
@@ -11419,10 +11531,19 @@ is the approximation space of the Neumann eigenbasis, with the order $r$ of the 
 \lean{Rd.BoundedLipschitzDomain.modNormOn_lt_top_iff_blockNorm_lt_top}
 \leanok
 \uses{thm:spectral-besov-neumann, thm:spectral-coefficients}
-Let $\Omega$ be a bounded Lipschitz domain in dimension $n \geq 1$. For every $0 < \theta < 1$,
-every $q \in [1, \infty]$, every order $r \geq 1$ and every $f \in L_2(V)$, the right side of
-\Cref{thm:spectral-besov-neumann} is finite if and only if the block norm of
-\Cref{thm:spectral-coefficients} of $f|_\Omega$ for the Neumann scheme with $s = \theta$ is finite.
+Let $\Omega$ be a bounded Lipschitz domain in dimension $n \geq 1$, with the eigenvector basis
+$(e_i)$ of $L_2(\Omega)$ and the singular values $\sigma_i$ of the Neumann embedding $J^N_\Omega$
+(\Cref{thm:neumann-eigenbasis}). For every $0 < \theta < 1$, every $q \in [1, \infty]$, every
+order $r \geq 1$ and every $f \in L_2(V)$,
+$\|f\|_{L_2(\Omega)} + \|(2^{k\theta} \omega_r(f, 2^{-k}, \Omega)_2)_k\|_{\ell_q} < \infty$ if and
+only if
+\[
+  \Bigl(\sum_{\lfloor \sigma_i^{-1} \rfloor = 0} |\langle e_i, f|_\Omega \rangle|^2\Bigr)^{1/2}
+  + \Bigl\| \Bigl(2^{k\theta} \Bigl(\sum_{2^k \leq \lfloor \sigma_i^{-1} \rfloor < 2^{k+1}}
+    |\langle e_i, f|_\Omega \rangle|^2\Bigr)^{1/2}\Bigr)_k \Bigr\|_{\ell_q} < \infty ,
+\]
+that is, if and only if the block norm of $f|_\Omega$ for the Neumann scheme
+(\Cref{thm:spectral-coefficients} with $s = \theta$) is finite.
 \end{corollary}
 
 \begin{proof}
@@ -11435,9 +11556,10 @@ every $q \in [1, \infty]$, every order $r \geq 1$ and every $f \in L_2(V)$, the 
 \lean{Rd.BoundedLipschitzDomain.modNormOn_two_lt_top_iff}
 \leanok
 \uses{thm:spectral-besov-neumann, cor:compact-embedding-interpolation, thm:neumann-eigenbasis}
-Let $\Omega$ be a bounded Lipschitz domain in dimension $n \geq 1$, with $(e_i)$ and $\lambda_i$ as
-in \Cref{thm:neumann-eigenbasis}. For every $0 < \theta < 1$, every order $r \geq 1$ and every
-$f \in L_2(V)$,
+Let $\Omega$ be a bounded Lipschitz domain in dimension $n \geq 1$, with the eigenvector basis
+$(e_i)$ of $L_2(\Omega)$ and the singular values $\sigma_i$ of the Neumann embedding $J^N_\Omega$,
+and $\lambda_i = \sigma_i^{-2} - 1$ (\Cref{thm:neumann-eigenbasis}). For every $0 < \theta < 1$,
+every order $r \geq 1$ and every $f \in L_2(V)$,
 \[
   \|f\|_{L_2(\Omega)} + \bigl\| \bigl(2^{k\theta} \omega_r(f, 2^{-k}, \Omega)_2\bigr)_k
     \bigr\|_{\ell_2} < \infty
@@ -11898,8 +12020,8 @@ $\|f\|_{L_p(\mu)} \leq C \|f\|_{A, r, s, q}$.
 \lean{Manifold.BesovAtlas.atlasBesovNorm_le_atlasBesovNorm}
 \leanok
 \uses{def:manifold-besov-norm, thm:pieces-two-atlases, thm:besov-domain-invariance}
-For two Besov atlases $A, A'$, $0 < s < r$ and $1 \leq q \leq \infty$ there is $C < \infty$ with
-$\|f\|_{A, r, s, q} \leq C \|f\|_{A', r, s, q}$ for all $f \in L_p(\mu)$.
+For two Besov atlases $A, A'$, $1 \leq p < \infty$, $0 < s < r$ and $1 \leq q \leq \infty$ there
+is $C < \infty$ with $\|f\|_{A, r, s, q} \leq C \|f\|_{A', r, s, q}$ for all $f \in L_p(\mu)$.
 \end{theorem}
 
 \begin{proof}
@@ -12283,7 +12405,8 @@ change only by null sets when $\Omega_0$ is replaced by its closure
 \uses{def:boundary-chart-change, lem:trace-continuous-half-space, lem:partial-sums-approx,
   lem:trace-linear, thm:diffeo-invariance, lem:closed-open-half-space, def:besov-domain}
 Let $T$ be a change of charts with a cut-off and $T^\partial$ its restriction to $H_0$
-(\Cref{def:boundary-chart-change}), $s > 0$, $L > s + 1/p$, and let $G \in L_p(\R^n)$ satisfy
+(\Cref{def:boundary-chart-change}), $s > 0$, $L \in \N$ with $L > s + 1/p$,
+$1 \leq q \leq \infty$, and let $G \in L_p(\R^n)$ satisfy
 $\|G\|_{L_p(\Omega)} + \|(2^{k(s+1/p)} \omega_L(G, 2^{-k}, \Omega)_p)_k\|_{\ell_q} < \infty$ on the
 closed half-space $\Omega$. Then $\operatorname{Tr}(T G) = T^\partial(\operatorname{Tr} G)$.
 \end{theorem}
@@ -12321,7 +12444,8 @@ is the cut-off of $T_{ki}$.
 \leanok
 \uses{def:manifold-boundary-trace, thm:trace-chart-change, thm:pieces-two-atlases, lem:trace-sums,
   thm:boundary-atlas-independence}
-Let $s > 0$, $L > s + 1/p$ and $f \in \Besov{s+1/p}{p}{q}(M)$. For two Besov atlases $A, A'$,
+Let $s > 0$, $L \in \N$ with $L > s + 1/p$, $1 \leq q \leq \infty$ and
+$f \in \Besov{s+1/p}{p}{q}(M)$. For two Besov atlases $A, A'$,
 $\operatorname{Tr}(\text{piece}_i f) = \sum_j T^\partial_{ij}
 \bigl(\operatorname{Tr}(\text{piece}'_j f)\bigr)$, and the $i$-th boundary piece for $A$ of
 $\operatorname{Tr}_{A'} f$ is $\operatorname{Tr}(\text{piece}_i f)$ almost everywhere on $H_0$. In
@@ -12928,9 +13052,14 @@ The spectral scheme of \Cref{thm:chart-eigenbasis} is the \emph{chart scheme} of
   Manifold.BesovAtlas.chartForm_eigenfunction_integral}
 \leanok
 \uses{thm:chart-eigenbasis, def:chart-sobolev, lem:singular-coefficients}
-Let $\dim E \geq 1$, let $A$ be a Besov atlas, and let $e_i$, $\lambda_i$ and
-$\varphi_i = (e_i, g)$ be as in \Cref{thm:chart-eigenbasis}. For every $i \in \mathcal{I}$ and
-every $w = (f', g') \in H^1_A(M)$,
+Let $\dim E \geq 1$ and let $A$ be a Besov atlas. Let $(e_i)_{i \in \mathcal{I}}$ be the
+eigenvector basis of $L_2(\mu)$, $\sigma_i$ the singular values and $(v_i)_{i \in \mathcal{I}}$
+the singular basis of $H^1_A(M)$ of the chart Sobolev embedding $J_A$, let
+$\lambda_i = \sigma_i^{-2} - 1$ and $\varphi_i = \sigma_i^{-1} v_i$ (\Cref{thm:chart-eigenbasis}).
+As an element of $H^1_A(M)$ (\Cref{def:chart-sobolev}), $\varphi_i$ is a pair $(e_i, g)$: its
+first component is $J_A \varphi_i = e_i$, and $g_{kj}$ is the weak derivative
+$\partial_{b_j} P_k e_i$ on $O_I$. For every $i \in \mathcal{I}$ and every
+$w = (f', g') \in H^1_A(M)$, with the chart form $a_A$ of \Cref{def:chart-sobolev},
 \[
   a_A(\varphi_i, w) = \lambda_i \langle e_i, J_A w \rangle_{L_2(\mu)} ,
 \]
@@ -12969,8 +13098,10 @@ $a_A$ depends on the atlas.
   Manifold.BesovAtlas.memManifoldBesov_one_two_iff_spectral}
 \leanok
 \uses{thm:chart-eigenbasis, cor:compact-embedding-interpolation, thm:chart-sobolev-besov}
-Let $\dim E \geq 1$, let $A$ be a Besov atlas, and let $(e_i)$ and $\lambda_i$ be as in
-\Cref{thm:chart-eigenbasis}. For every $f \in L_2(\mu)$ the following are equivalent:
+Let $\dim E \geq 1$, let $A$ be a Besov atlas, let $(e_i)$ be the eigenvector basis of
+$L_2(\mu)$ and $\sigma_i$ the singular values of the chart Sobolev embedding $J_A$, and let
+$\lambda_i = \sigma_i^{-2} - 1$ (\Cref{thm:chart-eigenbasis}). For every $f \in L_2(\mu)$ the
+following are equivalent:
 \begin{enumerate}
   \item $f = J_A u$ for some $u \in H^1_A(M)$;
   \item $f \in \Besov{1}{2}{2}(M)$;
@@ -13092,7 +13223,8 @@ subspace (\Cref{prop:couple-k-method-space}).
 \uses{lem:chart-couple-retract, cor:compact-embedding-interpolation, thm:chart-eigenbasis,
   lem:manifold-besov-pieces, def:manifold-besov}
 Let $\dim E \geq 1$, let $A$ be a Besov atlas and $A^\theta_q$ the approximation spaces of the
-chart scheme (\Cref{thm:chart-eigenbasis}). For every $0 < \theta < 1$, every $q \in [1, \infty]$
+chart scheme, the spectral scheme of the chart Sobolev embedding $J_A$
+(\Cref{thm:chart-eigenbasis}). For every $0 < \theta < 1$, every $q \in [1, \infty]$
 and every $f \in L_2(\mu)$,
 \[
   f \in A^\theta_q \iff f \in \Besov{\theta}{2}{q}(M) .
@@ -13125,8 +13257,12 @@ of its expansion in the eigenbasis of the chart form (\Cref{prop:spectral-projec
 \leanok
 \uses{thm:spectral-besov-manifold, thm:spectral-coefficients, prop:spectral-projections,
   thm:chart-eigenbasis}
-Let $\dim E \geq 1$ and let $A$ be a Besov atlas. For every $0 < \theta < 1$, every
-$q \in [1, \infty]$ and every $f \in L_2(\mu)$,
+Let $\dim E \geq 1$ and let $A$ be a Besov atlas, with the eigenvector basis $(e_i)$ of
+$L_2(\mu)$ and the singular values $\sigma_i$ of the chart Sobolev embedding $J_A$
+(\Cref{thm:chart-eigenbasis}), the truncations
+$P_n f = \sum_{\lfloor \sigma_i^{-1} \rfloor < n} \langle e_i, f \rangle e_i$ of the chart scheme
+and its dyadic blocks $\Delta_k f = P_{2^{k+1}} f - P_{2^k} f$. For every $0 < \theta < 1$,
+every $q \in [1, \infty]$ and every $f \in L_2(\mu)$,
 \[
   f \in \Besov{\theta}{2}{q}(M) \iff
   \|P_1 f\|_2 + \bigl\| \bigl(2^{k\theta} \|\Delta_k f\|_2\bigr)_k \bigr\|_{\ell_q} < \infty .
@@ -13143,8 +13279,10 @@ $q \in [1, \infty]$ and every $f \in L_2(\mu)$,
 \lean{Manifold.BesovAtlas.memManifoldBesov_two_iff_chartEigenvalue}
 \leanok
 \uses{thm:spectral-besov-manifold, cor:compact-embedding-interpolation, thm:chart-eigenbasis}
-Let $\dim E \geq 1$, let $A$ be a Besov atlas, and let $(e_i)$ and $\lambda_i$ be as in
-\Cref{thm:chart-eigenbasis}. For every $0 < \theta < 1$ and every $f \in L_2(\mu)$,
+Let $\dim E \geq 1$, let $A$ be a Besov atlas, let $(e_i)$ be the eigenvector basis of
+$L_2(\mu)$ and $\sigma_i$ the singular values of the chart Sobolev embedding $J_A$, and let
+$\lambda_i = \sigma_i^{-2} - 1$ (\Cref{thm:chart-eigenbasis}). For every $0 < \theta < 1$ and
+every $f \in L_2(\mu)$,
 \[
   f \in \Besov{\theta}{2}{2}(M) \iff
   \sum_{i \in \mathcal{I}} (1 + \lambda_i)^\theta |\langle e_i, f \rangle|^2 < \infty .

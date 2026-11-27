@@ -2033,31 +2033,41 @@ $\|\eta_c * U - U\|_{H^s} = \|\eta_c * J_s U - J_s U\|_2$
 At $s = 1$ and for a Schwartz function $\eta$ this is \Cref{thm:sobolev-one-mollification},
 proved there through the weak derivatives.
 
-\begin{theorem}[$H^s(V)$ and $\Besov{s}{2}{2}$ by differences, with explicit constants]
+\begin{theorem}[$H^s(V)$ and $\Besov{s}{2}{2}$ by differences]
 \label{thm:sobolev-besov-constants}
 \lean{Rd.sobolevBesovConst, Rd.sobolevBesovConst_ne_top, Rd.modNorm_sobolevToL2_le,
   Rd.sobolevBesovInvConst, Rd.sobolevBesovInvConst_ne_top, Rd.enorm_le_modNorm_sobolevToL2}
 \leanok
 \uses{thm:modulus-coincidence, thm:rd-besov, thm:tl-besov-sandwich, lem:tl-sandwich-constants,
   thm:sobolev-two-triebel-lizorkin, lem:sobolev-to-l2, lem:bessel-space-enorm}
-Let $s > 0$ and let $r$ be an integer with $s < r$. Let $K_{s,r}$ be the constant of the inverse
-direction of \Cref{thm:modulus-coincidence} for the band-limited scheme with the moduli of order
-$r$ (\Cref{thm:rd-besov}) at smoothness $s$, and
-$C_{s,r} = K_{s,r} \cdot 2 (1 - 2^{-s})^{-1} \cdot (2 \cdot 4^s)^{1/2}$. Then
-$C_{s,r} < \infty$, and for every $U \in H^s(V)$,
-\[
-  \|\iota_s U\|_2 + \|(2^{ks} \omega_r(\iota_s U, 2^{-k})_2)_k\|_{\ell_2} \leq C_{s,r} \|U\| .
-\]
-Let $s \geq 0$ and $r \in \N$, let $D_{s,r}$ be the constant of the direct direction of
-\Cref{thm:modulus-coincidence} for the band-limited scheme with the moduli of order $r$ at
-smoothness $s$, $\Phi$ the kernel of \Cref{thm:tl-besov-sandwich}, and
-$C'_{s,r} = (2 \cdot 5^s)^{1/2} \cdot 8 \cdot 8^s \, \|\Phi\|_1 D_{s,r}$. Then
-$C'_{s,r} < \infty$, and for every $U \in H^s(V)$,
-\[
-  \|U\| \leq C'_{s,r} \bigl(\|\iota_s U\|_2 +
-  \|(2^{ks} \omega_r(\iota_s U, 2^{-k})_2)_k\|_{\ell_2}\bigr) .
-\]
+Let $s \geq 0$ and $r \in \N$.
+\begin{enumerate}
+  \item If $0 < s < r$, there is a constant $C_{s,r} < \infty$, depending only on $n$, $s$ and
+    $r$, such that for every $U \in H^s(V)$,
+    \[
+      \|\iota_s U\|_2 + \|(2^{ks} \omega_r(\iota_s U, 2^{-k})_2)_k\|_{\ell_2} \leq C_{s,r} \|U\| .
+    \]
+  \item There is a constant $C'_{s,r} < \infty$, depending only on $n$, $s$ and $r$, such that
+    for every $U \in H^s(V)$,
+    \[
+      \|U\| \leq C'_{s,r} \bigl(\|\iota_s U\|_2 +
+      \|(2^{ks} \omega_r(\iota_s U, 2^{-k})_2)_k\|_{\ell_2}\bigr) .
+    \]
+\end{enumerate}
 \end{theorem}
+
+The constants have one factor for each step of the proof:
+\[
+  C_{s,r} = K_{s,r} \cdot 2 (1 - 2^{-s})^{-1} \cdot (2 \cdot 4^s)^{1/2}, \qquad
+  C'_{s,r} = (2 \cdot 5^s)^{1/2} \cdot 8 \cdot 8^s \, \|\Phi\|_1 \, D_{s,r} .
+\]
+$K_{s,r}$ and $D_{s,r}$ are the constants of the inverse and the direct direction of
+\Cref{thm:modulus-coincidence} for the band-limited scheme with the moduli of order $r$
+(\Cref{thm:rd-besov}) at smoothness $s$; they compare the moduli with the approximation norm of
+$A^s_2$. The factors $2 (1 - 2^{-s})^{-1}$ and $8 \cdot 8^s \|\Phi\|_1$, with the kernel $\Phi$
+of \Cref{thm:tl-besov-sandwich}, compare that norm with $\|\cdot\|_{F^s_{2,2}}$, and
+$(2 \cdot 4^s)^{1/2}$ and $(2 \cdot 5^s)^{1/2}$ compare $\|\cdot\|_{F^s_{2,2}}$ with the norm of
+$H^s(V)$ (\Cref{thm:sobolev-two-triebel-lizorkin}).
 
 \begin{proof}
 \leanok
@@ -2549,7 +2559,10 @@ $\mathcal F^{-1}$ on Schwartz functions.
 \leanok
 \uses{lem:fourier-iterated-derivative, lem:derivative-symbol, lem:derivative-kernel,
   lem:psi-one, lem:lp-kernels-frequency}
-For every $m \in \N$,
+For every $m \in \N$, the derivative kernels
+$\eta_\alpha = \mathcal F^{-1}(\sigma_\alpha \widehat{\psi_1})$ of the multi-indices $\alpha$ of
+length $m$ (\Cref{lem:derivative-kernel}), with the derivative symbols $\sigma_\alpha$ of
+\Cref{def:derivative-symbol}, satisfy
 \[
   \psi_1 = \sum_\alpha \partial^{e_\alpha} \eta_\alpha .
 \]
@@ -2570,7 +2583,10 @@ Schwartz functions.
 \lean{Rd.two_pow_smul_lpBlockKernel_succ_eq_sum}
 \leanok
 \uses{thm:psi-one-derivatives, lem:derivative-dilate, lem:psi-one}
-For all $m, j \in \N$,
+For all $m, j \in \N$, with the derivative kernels
+$\eta_\alpha = \mathcal F^{-1}(\sigma_\alpha \widehat{\psi_1})$ of \Cref{lem:derivative-kernel}
+for the multi-indices $\alpha$ of length $m$ and the derivative symbols $\sigma_\alpha$ of
+\Cref{def:derivative-symbol},
 \[
   2^{jm} \psi_{j+1} = \sum_\alpha \partial^{e_\alpha} \bigl( (\eta_\alpha)_{2^j} \bigr) .
 \]
@@ -3005,12 +3021,12 @@ $\int K^m_w = \int_0^{\log 2} \int_V \langle w, x \rangle m_{e^s}(x) \, dx \, ds
 \uses{lem:fourier-character-lipschitz, lem:fourier-integrable, def:gradient-mass,
   lem:gradient-mass}
 For every Schwartz function $G$ and every $\xi \in V$,
-$2 \pi \|\xi\| \, |\widehat G(\xi)| \leq C_G$ with the gradient mass $C_G$ of
+$2 \pi \|\xi\| \, |\widehat G(\xi)| \leq M_G$ with the gradient mass $M_G$ of
 \Cref{def:gradient-mass}. If moreover $\int G = 0$, then
 $|\widehat G(\xi)| \leq 2 \pi \|\xi\| \int_V \|x\| \, |G(x)| \, dx$ and
 \[
   |\widehat G(\xi)| \leq C \min\bigl(\|\xi\|, \|\xi\|^{-1}\bigr), \qquad
-  C = 2 \pi \int_V \|x\| \, |G(x)| \, dx + \frac{C_G}{2 \pi} .
+  C = 2 \pi \int_V \|x\| \, |G(x)| \, dx + \frac{M_G}{2 \pi} .
 \]
 \end{lemma}
 
@@ -3018,7 +3034,7 @@ $|\widehat G(\xi)| \leq 2 \pi \|\xi\| \int_V \|x\| \, |G(x)| \, dx$ and
 \leanok
 $\widehat{\partial_\xi G}(\xi) = 2 \pi i \|\xi\|^2 \widehat G(\xi)$ (Mathlib's
 \texttt{SchwartzMap.\allowbreak fourier\_\allowbreak lineDerivOp\_\allowbreak eq}), and
-$|\widehat{\partial_\xi G}(\xi)| \leq \|\partial_\xi G\|_1 \leq \|\xi\| C_G$
+$|\widehat{\partial_\xi G}(\xi)| \leq \|\partial_\xi G\|_1 \leq \|\xi\| M_G$
 (\Cref{lem:fourier-integrable}, \Cref{lem:gradient-mass}). If $\int G = 0$,
 $\widehat G(\xi) = \int (e^{-2 \pi i \langle x, \xi \rangle} - 1) \, G(x) \, dx$, and
 $|e^{-2 \pi i a} - 1| \leq 2 \pi |a|$ (\Cref{lem:fourier-character-lipschitz}) with
@@ -3033,17 +3049,26 @@ $|\langle x, \xi \rangle| \leq \|x\| \|\xi\|$.
 \uses{lem:mean-zero-fourier, lem:dyadic-min-sum, lem:fourier-dilate, thm:cz-family-dilation,
   lem:uniform-schwartz-constants, def:cz-family, def:hormander-const,
   lem:divergence-kernel-mean, def:divergence-schwartz}
-For every Schwartz function $G$ with $\int G = 0$ and every $\xi \in V$,
+For every Schwartz function $G$ with $\int G = 0$ there is a constant $B < \infty$, depending only
+on $G$, such that for every $\xi \in V$,
 \[
-  \sum_{j \in \N} \bigl|\widehat{G_{2^j}}(\xi)\bigr|^2 \leq 4 C^2
+  \sum_{j \in \N} \bigl|\widehat{G_{2^j}}(\xi)\bigr|^2 \leq B ,
 \]
-with the constant $C$ of \Cref{lem:mean-zero-fourier}, and the dilates $(G_{2^j})_{j \in \N}$
-form a Calder\'on--Zygmund family with Fourier overlap $4 C^2$ and H\"ormander constant $4 H_A$
-for the seminorms $A_{k,l}$ of $G$ (\Cref{def:hormander-const}). In particular, for every smooth
-$m$ that vanishes outside a ball and every $w \in V$ with
+and the dilates $(G_{2^j})_{j \in \N}$ form a Calder\'on--Zygmund family with Fourier overlap $B$
+and H\"ormander constant $4 H_A$ for the seminorms $A_{k,l}$ of $G$ (\Cref{def:hormander-const}).
+In particular, for every smooth $m$ that vanishes outside a ball and every $w \in V$ with
 $\int_V \langle w, x \rangle \, m(x) \, dx = 0$, the dilates
 $\bigl((K^m_w)_{2^j}\bigr)_{j \in \N}$ form a Calder\'on--Zygmund family.
 \end{theorem}
+
+The overlap is $B = 4 C^2$ with
+\[
+  C = 2 \pi \int_V \|x\| \, |G(x)| \, dx + \frac{M_G}{2 \pi} ,
+\]
+the constant of the decay $|\widehat G(\xi)| \leq C \min(\|\xi\|, \|\xi\|^{-1})$ of a mean-zero
+kernel (\Cref{lem:mean-zero-fourier}), where $M_G$ is the gradient mass of
+\Cref{def:gradient-mass}. The factor $4$ bounds the dyadic sums
+$\sum_j \min(2^j a, (2^j a)^{-1})$ (\Cref{lem:dyadic-min-sum}).
 
 \begin{proof}
 \leanok
@@ -3353,8 +3378,11 @@ and for every $m \geq 1$,
 \[
   \Sob{m}{p}(V) \subseteq \Besov{m}{p}{\max(p,2)} .
 \]
-For every $m \geq 1$ and every $f \in L_p(V)$ with weak derivatives
-$g_\alpha = \partial^{e_\alpha} f \in L_p(V)$ for every multi-index $\alpha$ of length $m$,
+Let $A$ be the band-limited scheme, $\Phi$ the kernel of \Cref{def:lp-kernels}, and
+$K_{V,p,\alpha}$ and $C_{V,p,w}$ the finite constants of \Cref{def:sobolev-to-tl-const} and
+\Cref{def:tl-to-sobolev-const}. For every $m \geq 1$ and every $f \in L_p(V)$ with weak
+derivatives $g_\alpha = \partial^{e_\alpha} f \in L_p(V)$ for every multi-index $\alpha$ of length
+$m$,
 \[
   \|f\|^{\mathrm{dy}}_{A^m_{\max(p,2)}} \leq 2 (1 - 2^{-m})^{-1}
   \Bigl( \|\Phi\|_1 \, \|f\|_p + 2^m \sum_\alpha K_{V,p,\alpha} \, \|g_\alpha\|_p \Bigr) .
@@ -5609,7 +5637,9 @@ $\zeta = 2^{-j} \xi$,
 \]
 Let $a > 0$ and $b$ be real, and let $\widehat\omega$ vanish outside the annulus
 $\{a \leq \|\zeta\| \leq b\}$. Then for every $j \in \N$ and every $\xi \in V$,
-$|\widehat{(K_j)_{2^j}}(\xi)| \leq M_{a,b,\sigma} \|\widehat\omega\|_{0,0}$, and if
+$|\widehat{(K_j)_{2^j}}(\xi)| \leq M_{a,b,\sigma} \|\widehat\omega\|_{0,0}$ with
+$M_{a,b,\sigma} = \max((a^2)^{\sigma/2}, (1 + b^2)^{\sigma/2})$
+(\Cref{lem:shifted-bessel-symbol-bounds}), and if
 $\widehat{(K_j)_{2^j}}(\xi) \neq 0$, then $a \leq 2^{-j} \|\xi\| \leq b$. If moreover
 $b = 2^N a$ with $N \in \N$, and $i_0 \in \N$ is the least index with
 $\|\xi\| \leq 2^{i_0} 2^N a$, then $\widehat{(K_j)_{2^j}}(\xi) \neq 0$ implies
@@ -6715,12 +6745,16 @@ $G_j = K^m_j[\tilde G]$ and apply (1) and \Cref{thm:symbol-dilate}.
 Let $(G_j)$ be uniformly Schwartz with bounds $A$ and let $N > n$. For every $j \in \N$, every
 function $g \colon V \to \C$ and every $x \in V$,
 \[
-  |((G_j)_{2^j} \ast g)(x)| \leq C_{n,N} \, C_{A,0,N} \, M|g|(x)
+  |((G_j)_{2^j} \ast g)(x)| \leq C_{n,N} \, C_{A,0,N} \, M|g|(x) ,
 \]
-with the constants $C_{n,N}$ of \Cref{lem:maximal-function-kernels} and $C_{A,0,N}$ of
-\Cref{def:uniform-schwartz}, independent of $j$; the product $C_{n,N} \, C_{A,0,N}$ is
-finite.
+with $C_{n,N} = |B(0, 1)| \, 2^n (1 - 2^{-(N - n)})^{-1}$ and $C_{A,0,N}$ of
+\Cref{def:uniform-schwartz}; the product $C_{n,N} \, C_{A,0,N}$ is finite.
 \end{theorem}
+
+The factor $C_{A,0,N}$ bounds every dilate,
+$|(G_j)_{2^j}(y)| \leq C_{A,0,N} \, 2^{jn} (1 + 2^j \|y\|)^{-N}$ (\Cref{lem:schwartz-decay}), and
+$C_{n,N}$ bounds the convolution with such a kernel by the maximal function
+(\Cref{lem:maximal-function-kernels}).
 
 \begin{proof}
 \leanok
@@ -6775,8 +6809,10 @@ The second claim follows with \Cref{lem:conv-fourier-multiplier}.
 Let $(G_j)$ be uniformly Schwartz with bounds $A$, $N > n$, $\sigma$ real, $j \in \N$ and
 $K = 2^{j\sigma} (G_j)_{2^j}$. For every real $s$, every $g \colon V \to \C$ and every $x \in V$,
 \[
-  2^{j(s - \sigma)} |(K * g)(x)| \leq C_{n,N} \, C_{A,0,N} \, M\bigl(2^{js} |g|\bigr)(x) .
+  2^{j(s - \sigma)} |(K * g)(x)| \leq C_{n,N} \, C_{A,0,N} \, M\bigl(2^{js} |g|\bigr)(x) ,
 \]
+with $C_{n,N} = |B(0, 1)| \, 2^n (1 - 2^{-(N - n)})^{-1}$ and $C_{A,0,N}$ of
+\Cref{def:uniform-schwartz}.
 \end{lemma}
 
 \begin{proof}
@@ -6802,17 +6838,24 @@ on $V$,
 \[
   \|m(D) u\|_{F^{s-\sigma}_{p,q}} \leq C \, \|u\|_{F^s_{p,q}} .
 \]
-In particular $m(D)$ maps $\TL{s}{p}{q}$ into $\TL{s-\sigma}{p}{q}$. More precisely, for every
-$m \colon V \to \C$ that is smooth with polynomially bounded derivatives, every uniformly
-Schwartz family $(G_j)$ with bounds $A$ and $m(D) \tilde\psi_j = 2^{j\sigma} (G_j)_{2^j}$ for
-every $j$, every $N > n$, every tempered distribution $u$ and every family $(g_j)$ in $L_p(V)$
-with $\Delta_j u = g_j$ for every $j$,
+In particular $m(D)$ maps $\TL{s}{p}{q}$ into $\TL{s-\sigma}{p}{q}$.
+
+More precisely, let $m \colon V \to \C$ be smooth with polynomially bounded derivatives, let
+$(G_j)$ be uniformly Schwartz with bounds $A$ and $m(D) \tilde\psi_j = 2^{j\sigma} (G_j)_{2^j}$
+for every $j$, and let $N > n$. There is a constant $C' < \infty$, depending only on $n$, $N$,
+$p$, $q$ and $A$, such that for every real $s$, every tempered distribution $u$ and every family
+$(g_j)$ in $L_p(V)$ with $\Delta_j u = g_j$ for every $j$,
 \[
-  \|m(D) u\|_{F^{s-\sigma}_{p,q}} \leq C_{n,N} \, C_{A,0,N} \, C^{\mathrm{FS}}_{p,q}
-  \Bigl\| x \mapsto \bigl\| (2^{js} |g_j(x)|)_j \bigr\|_{\ell_q} \Bigr\|_{L_p}
+  \|m(D) u\|_{F^{s-\sigma}_{p,q}} \leq C'
+  \Bigl\| x \mapsto \bigl\| (2^{js} |g_j(x)|)_j \bigr\|_{\ell_q} \Bigr\|_{L_p} .
 \]
-with the Fefferman--Stein constant $C^{\mathrm{FS}}_{p,q}$ of \Cref{thm:fefferman-stein}.
 \end{theorem}
+
+The constant of the second bound is $C' = C_{n,N} \, C_{A,0,N} \, C^{\mathrm{FS}}_{p,q}$. The
+product $C_{n,N} \, C_{A,0,N}$ of \Cref{lem:symbol-kernel-maximal} bounds each weighted block of
+$m(D) u$ by the maximal function of the weighted block of $u$, and the Fefferman--Stein constant
+$C^{\mathrm{FS}}_{p,q}$, the constant $C_{n,p,q}$ of \Cref{thm:fefferman-stein}, removes the
+maximal function.
 
 \begin{proof}
 \leanok
@@ -6822,7 +6865,7 @@ $2^{j(s - \sigma)} |h_j(x)| \leq C_{n,N} C_{A,0,N} \, M(2^{js} |g_j|)(x)$ for ev
 \Cref{lem:tl-distr-eq} and \Cref{lem:maximal-bounds-mixed-norm} give the second bound, which
 uses only that $m$ has polynomially bounded derivatives. For a symbol of order $\sigma$ the
 family $(G_j)$ exists by \Cref{cor:symbol-psi-dual}; with $N = n + 1$ and
-$C = \max(1, C_{n,N} C_{A,0,N} C^{\mathrm{FS}}_{p,q})$, \Cref{lem:tl-distr-eq} gives the first
+$C = \max(1, C')$, \Cref{lem:tl-distr-eq} gives the first
 bound, also when the blocks of $u$ are no $L_p$ functions.
 \end{proof}
 

@@ -1724,13 +1724,16 @@ componentwise convention.
 \leanok
 \uses{def:pi-lp-maps, lem:pi-lp-map-properties, thm:besov-trace-operator,
   thm:besov-trace-right-inverse}
-Let $1 \leq p < \infty$, $1 \leq q \leq \infty$ and $m \in \N$, and let $B^s_{p,q}(\Omega)$ and
-$B^t_{p,q}(\Gamma)$ be the Banach spaces of \Cref{thm:besov-trace-operator}. For
-$1/p < s < 1 + 1/p$ the componentwise Besov trace
-$B^s_{p,q}(\Omega)^m \to B^{s-1/p}_{p,q}(\Gamma)^m$ is a bounded linear operator onto
+Let $1 \leq p < \infty$, $1 \leq q \leq \infty$ and $m \in \N$, let $B^s_{p,q}(\Omega)$ be the
+space of \Cref{def:domain-besov-space} with differences of order $2$, and let $B^t_{p,q}(\Gamma)$
+be the space of \Cref{def:boundary-besov-space}. For $1/p < s < 1 + 1/p$ the componentwise Besov
+trace $\operatorname{Tr}$ of \Cref{thm:besov-trace-operator},
+$B^s_{p,q}(\Omega)^m \to B^{s-1/p}_{p,q}(\Gamma)^m$, is a bounded linear operator onto
 $B^{s-1/p}_{p,q}(\Gamma)^m$. For $0 < t < 1$ the componentwise extension
-$B^t_{p,q}(\Gamma)^m \to B^{t+1/p}_{p,q}(\Omega)^m$ of \Cref{thm:besov-trace-right-inverse} is a
-bounded linear operator, and the componentwise trace of the extension of $g$ is $g$.
+$\operatorname{Ext} g = \mathbf 1_\Omega E_\Gamma g$ of \Cref{thm:besov-trace-right-inverse},
+$B^t_{p,q}(\Gamma)^m \to B^{t+1/p}_{p,q}(\Omega)^m$, with $E_\Gamma$ of
+\Cref{def:boundary-extension-operator}, is a bounded linear operator, and the componentwise trace
+of the extension of $g$ is $g$.
 \end{theorem}
 
 \begin{proof}

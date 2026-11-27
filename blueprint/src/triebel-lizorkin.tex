@@ -906,20 +906,25 @@ and $2^{-(k-j)L} \leq 2^L \, 2^{-(i-j)L}$ for $k \in \{i - 1, i\}$
 \uses{lem:local-means-kernel-bounds, lem:local-means-one-scale, lem:conv-second-argument,
   lem:schwartz-decay, lem:schwartz-tails, lem:peetre-weights, lem:dyadic-weights-integer,
   lem:lp-kernels-basic, lem:conv-assoc, lem:weighted-jensen}
-Let $L, N \in \N$, let
-\[
-  C^{\mathrm m}_{L,N} = 2 \|g\|_1 (2R)^L (1 + 2LR)^N C_{\Theta,L,N},
-\]
-\[
-  C^{\mathrm s}_{L,N} = A_L \bigl( \|\Theta\|_1 (1 + 4LR)^N + 2^N T_{\Theta,0,N} \bigr),
-\]
-and $C^\Theta_{L,N} = C^{\mathrm m}_{L,N} + C^{\mathrm s}_{L,N} < \infty$.
-For all $i, j \in \N$, with $\nu = \min(i, j)$, $c_{ji} = 2^{-(j-i)L}$ for $i \leq j$ and
-$c_{ji} = 1$ for $i > j$, and for almost every $y \in V$,
+Let $L, N \in \N$. There is a constant $C^\Theta_{L,N} < \infty$, depending only on $n$, $L$,
+$N$ and the bump $g$, such that for all $i, j \in \N$, with $\nu = \min(i, j)$,
+$c_{ji} = 2^{-(j-i)L}$ for $i \leq j$ and $c_{ji} = 1$ for $i > j$, and for almost every
+$y \in V$,
 \[
   |(k_j * \Theta_i)(y)| \leq C^\Theta_{L,N} \, c_{ji} \, 2^{\nu n} (1 + 2^\nu \|y\|)^{-N} .
 \]
 \end{theorem}
+
+The constant is $C^\Theta_{L,N} = C^{\mathrm m}_{L,N} + C^{\mathrm s}_{L,N}$, one term for each
+case of the proof:
+\[
+  C^{\mathrm m}_{L,N} = 2 \|g\|_1 (2R)^L (1 + 2LR)^N C_{\Theta,L,N}, \qquad
+  C^{\mathrm s}_{L,N} = A_L \bigl( \|\Theta\|_1 (1 + 4LR)^N + 2^N T_{\Theta,0,N} \bigr) .
+\]
+The moment term contains the decay constant $C_{\Theta,L,N}$ of the differences of order $L$ of
+$\Theta$ (\Cref{lem:schwartz-decay}). The support term contains the bound $A_L = 2 \sup_V |m|$
+of the local means kernels (\Cref{lem:local-means-kernel-bounds}) and the tail constant
+$T_{\Theta,0,N}$ of $\Theta$ (\Cref{lem:schwartz-tails}).
 
 \begin{proof}
 \leanok
@@ -1020,17 +1025,22 @@ $(1 + 2^k \|y - w\|)^{-N} \leq (1 + \rho)^N (1 + 2^k \|y\|)^{-N}$.
 \uses{lem:dual-kernel-derivatives, lem:dual-kernel-bounds, lem:smooth-differences,
   lem:conv-second-argument, lem:schwartz-tails, lem:peetre-weights, lem:dyadic-weights-integer,
   lem:lp-moment-kernels, lem:lp-kernels-basic}
-Let $L, N \in \N$, $L' \geq 1$, let $\mu$ be the moment kernel of order $L'$ of $\Phi$, let
-$A_{L,L'}$ be the constant of \Cref{lem:dual-kernel-derivatives} for the order $K = L'$, and
-\[
-  D_{L,L',N} = A_{L,L'} \, 4^{L'} (8 L')^N (1 + 4LR)^N \, T_{\Phi,L',N} < \infty .
-\]
-For all $i, j' \in \N$ with $i \leq j' + 2$ and almost every $w \in V$,
+Let $L, N \in \N$ and $L' \geq 1$, and let $\mu$ be the moment kernel of order $L'$ of $\Phi$.
+There is a constant $D_{L,L',N} < \infty$, depending only on $n$, $L$, $L'$, $N$ and the bump
+$g$, such that for all $i, j' \in \N$ with $i \leq j' + 2$ and almost every $w \in V$,
 \[
   |\eta_i(w) - (\mu_{2^{j'}} * \eta_i)(w)| \leq D_{L,L',N} \, 2^{-(j'+2-i)L'} \, 2^{in}
   (1 + 2^i \|w\|)^{-N} .
 \]
 \end{lemma}
+
+The constant is
+\[
+  D_{L,L',N} = A_{L,L'} \, 4^{L'} (8 L')^N (1 + 4LR)^N \, T_{\Phi,L',N} ,
+\]
+with the bound $A_{L,L'}$ of the derivatives of order at most $L'$ of the dual kernels
+(\Cref{lem:dual-kernel-derivatives} with $K = L'$) and the tail constant $T_{\Phi,L',N}$ of
+$\Phi$ (\Cref{lem:schwartz-tails}).
 
 \begin{proof}
 \leanok
@@ -1061,20 +1071,24 @@ $2^{iL'} 2^{-j'L'} = 4^{L'} 2^{-(j'+2-i)L'}$ (\Cref{lem:dyadic-weights-integer})
 \uses{lem:lp-blocks-decay, lem:small-support-decay, lem:dual-averaged-differences,
   lem:lp-moment-kernels, lem:two-decay-bumps, lem:dual-kernel-bounds, lem:dual-kernel-moduli,
   lem:dyadic-weights-integer, lem:conv-assoc, lem:conv-second-argument, lem:weighted-jensen}
-Let $L, N \in \N$ and $L' \geq 1$, and let
-\[
-  S_{L,N} = 2 P_N (1 + 2LR)^N \|m\|_1,
-\]
-\[
-  C_{L,L',N} = (1 + 2^{n + L'}) S_{L,N} + D_{L,L',N} \, P_{2N} \, I_N ,
-\]
-with $C_{L,L',N} < \infty$ for $N > n$. For all $i, j \in \N$, with $\nu = \min(i, j)$,
-$c_{ji} = 2^{-(j-i)L'}$ for $i \leq j$ and $c_{ji} = 1$ for $i > j$, and for almost every
-$y \in V$,
+Let $L \in \N$, $L' \geq 1$ and let $N > n$ be an integer. There is a constant
+$C_{L,L',N} < \infty$, depending only on $n$, $L$, $L'$, $N$ and the bump $g$, such that for all
+$i, j \in \N$, with $\nu = \min(i, j)$, $c_{ji} = 2^{-(j-i)L'}$ for $i \leq j$ and $c_{ji} = 1$
+for $i > j$, and for almost every $y \in V$,
 \[
   |(\psi_j * \eta_i)(y)| \leq C_{L,L',N} \, c_{ji} \, 2^{\nu n} (1 + 2^\nu \|y\|)^{-N} .
 \]
 \end{theorem}
+
+The constant collects the bounds of the three cases of the proof:
+\[
+  C_{L,L',N} = (1 + 2^{n + L'}) S_{L,N} + D_{L,L',N} \, P_{2N} \, I_N , \qquad
+  S_{L,N} = 2 P_N (1 + 2LR)^N \|m\|_1 .
+\]
+Here $P_N$ is the decay constant of the blocks $\psi_j$ (\Cref{lem:lp-blocks-decay}),
+$D_{L,L',N}$ the constant of the averaged differences of the dual kernels
+(\Cref{lem:dual-averaged-differences}), and $I_N = \int_V (1 + \|u\|)^{-N} \, du$ the Peetre
+integral of \Cref{lem:schwartz-tails}, finite for $N > n$.
 
 \begin{proof}
 \leanok
@@ -1104,14 +1118,18 @@ for every $L'$, independently of the order $L$ of the local means.
 \lean{Rd.enorm_conv_le_maximalFunction_of_decay}
 \leanok
 \uses{lem:maximal-function-kernels, def:conv, lem:weighted-jensen}
-Let $N > n$ and $\nu \geq 0$ be integers, $C \in [0, \infty)$, and let $K : V \to \C$
-satisfy $|K(y)| \leq C 2^{\nu n} (1 + 2^\nu \|y\|)^{-N}$ for almost every $y$. For every
-$h : V \to \C$ and every $x \in V$,
+Let $N > n$ be an integer. There is a constant $C_{n,N} < \infty$, depending only on $n$ and
+$N$, such that the following holds. Let $\nu \geq 0$ be an integer, $C \in [0, \infty)$, and let
+$K : V \to \C$ satisfy $|K(y)| \leq C 2^{\nu n} (1 + 2^\nu \|y\|)^{-N}$ for almost every $y$.
+For every $h : V \to \C$ and every $x \in V$,
 \[
-  |(K * h)(x)| \leq C_{n,N} \, C \, M|h|(x),
+  |(K * h)(x)| \leq C_{n,N} \, C \, M|h|(x) .
 \]
-with the constant $C_{n,N}$ of \Cref{lem:maximal-function-kernels}.
 \end{theorem}
+
+The constant is $C_{n,N} = |B(0, 1)| \, 2^n (1 - 2^{-(N - n)})^{-1}$ of
+\Cref{lem:maximal-function-kernels}: the Peetre majorant is split into dyadic shells, and the
+geometric series over the shells converges for $N > n$.
 
 \begin{proof}
 \leanok
@@ -1183,15 +1201,17 @@ The weights are powers of $2$ or $1$. The second claim is part (3) of
 \leanok
 \uses{thm:fefferman-stein, lem:lp-norm-nonnegative, lem:lp-norm-homogeneity,
   lem:maximal-function-measurable}
-Let $1 < p < \infty$, $1 < q \leq \infty$ and $C \in [0, \infty]$. For every almost everywhere
-measurable $F : V \to [0, \infty]$ and every family of almost everywhere measurable
+Let $1 < p < \infty$ and $1 < q \leq \infty$. There is a constant $C_{n,p,q} < \infty$,
+depending only on $n$, $p$ and $q$, such that for every $C \in [0, \infty]$, every almost
+everywhere measurable $F : V \to [0, \infty]$ and every family of almost everywhere measurable
 $h_i : V \to [0, \infty]$, $i \in \N$, with $F(x) \leq C \|(M h_i(x))_i\|_{\ell_q}$ for almost
 every $x$,
 \[
-  \|F\|_p \leq C \, C_{n,p,q} \Bigl\| x \mapsto \|(h_i(x))_i\|_{\ell_q} \Bigr\|_p ,
+  \|F\|_p \leq C \, C_{n,p,q} \Bigl\| x \mapsto \|(h_i(x))_i\|_{\ell_q} \Bigr\|_p .
 \]
-with the constant $C_{n,p,q}$ of \Cref{thm:fefferman-stein}.
 \end{lemma}
+
+The constant is that of the Fefferman--Stein inequality (\Cref{thm:fefferman-stein}).
 
 \begin{proof}
 \leanok
@@ -1209,19 +1229,23 @@ Monotonicity and homogeneity of the $L_p$ norm, then \Cref{thm:fefferman-stein}.
 \uses{thm:cross-kernel-dual, thm:decay-kernels-maximal, lem:maximal-function-kernels,
   lem:reproducing-formula, lem:lp-limits-pointwise, lem:conv-op, lem:almost-diagonal-pointwise,
   def:triebel-lizorkin, def:tl-local-means}
-Let $L \in \N$ and $L' \geq 1$, and let
-$B_{L,L'} = C_{L,L',n+1} \, C_{n,n+1} < \infty$ with the constants of
-\Cref{thm:cross-kernel-dual} and \Cref{lem:maximal-function-kernels}. For every
-$h : V \to \C$, all $i, j \in \N$ and every $x \in V$,
+Let $L \in \N$ and $L' \geq 1$. There is a constant $B_{L,L'} < \infty$, depending only on $n$,
+$L$, $L'$ and the bump $g$, such that for every $h : V \to \C$, all $i, j \in \N$ and every
+$x \in V$,
 \[
-  |((\psi_j * \eta_i) * h)(x)| \leq B_{L,L'} \, c^{L'}_{ji} \, M|h|(x) .
+  |((\psi_j * \eta_i) * h)(x)| \leq B_{L,L'} \, c^{L'}_{ji} \, M|h|(x) ,
 \]
-If $L \geq 1$ and $1 \leq p < \infty$, then for every $f \in L_p$, almost every $x \in V$ and
+and, if $L \geq 1$ and $1 \leq p < \infty$, for every $f \in L_p$, almost every $x \in V$ and
 every $j \in \N$,
 \[
   |(\psi_j * f)(x)| \leq B_{L,L'} \sum_{i \in \N} c^{L'}_{ji} \, M|k_i * f|(x) .
 \]
 \end{theorem}
+
+The constant is $B_{L,L'} = C_{L,L',n+1} \, C_{n,n+1}$: the bound $C_{L,L',n+1}$ of the cross
+kernel $\psi_j * \eta_i$ with the decay $N = n + 1$ (\Cref{thm:cross-kernel-dual}), times the
+constant $C_{n,n+1}$ that turns this Peetre majorant into the maximal function
+(\Cref{thm:decay-kernels-maximal}).
 
 \begin{proof}
 \leanok
@@ -1247,18 +1271,22 @@ bound to $f$.
 \uses{thm:cross-kernel-theta, thm:decay-kernels-maximal, lem:maximal-function-kernels,
   lem:lp-blocks, thm:kernel-identities, lem:lp-limits-pointwise, lem:conv-op,
   lem:almost-diagonal-pointwise, def:triebel-lizorkin, def:tl-local-means}
-Let $L \in \N$ and $1 \leq p < \infty$, and let
-$B^\Theta_L = C^\Theta_{L,n+1} \, C_{n,n+1} < \infty$ with the constants of
-\Cref{thm:cross-kernel-theta} and \Cref{lem:maximal-function-kernels}. For every
-$h : V \to \C$, all $i, j \in \N$ and every $x \in V$,
+Let $L \in \N$ and $1 \leq p < \infty$. There is a constant $B^\Theta_L < \infty$, depending only
+on $n$, $L$ and the bump $g$, such that for every $h : V \to \C$, all $i, j \in \N$ and every
+$x \in V$,
 \[
-  |((k_j * \Theta_i) * h)(x)| \leq B^\Theta_L \, c^L_{ji} \, M|h|(x) .
+  |((k_j * \Theta_i) * h)(x)| \leq B^\Theta_L \, c^L_{ji} \, M|h|(x) ,
 \]
-For every $f \in L_p$, almost every $x \in V$ and every $j \in \N$,
+and for every $f \in L_p$, almost every $x \in V$ and every $j \in \N$,
 \[
   |(k_j * f)(x)| \leq B^\Theta_L \sum_{i \in \N} c^L_{ji} \, M|\psi_i * f|(x) .
 \]
 \end{theorem}
+
+The constant is $B^\Theta_L = C^\Theta_{L,n+1} \, C_{n,n+1}$: the bound $C^\Theta_{L,n+1}$ of the
+cross kernel $k_j * \Theta_i$ with the decay $N = n + 1$ (\Cref{thm:cross-kernel-theta}), times
+the constant $C_{n,n+1}$ that turns this Peetre majorant into the maximal function
+(\Cref{thm:decay-kernels-maximal}).
 
 \begin{proof}
 \leanok
@@ -1281,18 +1309,27 @@ $\int g = 1$.
   Rd.LocalMeansBump.lqNorm_localMean_le_lqNorm_maximalFunction}
 \leanok
 \uses{thm:blocks-by-local-means, thm:local-means-by-blocks, lem:almost-diagonal-pointwise}
-Let $1 \leq p < \infty$, $1 \leq q \leq \infty$, $s \in \R$ and $L, L' \in \N$. For every
-$f \in L_p$ and almost every $x \in V$,
-\[
-  \bigl\| (2^{js} |(k_j * f)(x)|)_j \bigr\|_{\ell_q} \leq B^\Theta_L A_{s,L}
-  \bigl\| (M(2^{is} |\psi_i * f|)(x))_i \bigr\|_{\ell_q},
-\]
-and if $L \geq 1$ and $L' \geq 1$, then
-\[
-  \bigl\| (2^{js} |(\psi_j * f)(x)|)_j \bigr\|_{\ell_q} \leq B_{L,L'} A_{s,L'}
-  \bigl\| (M(2^{is} |k_i * f|)(x))_i \bigr\|_{\ell_q} .
-\]
+Let $1 \leq p < \infty$, $1 \leq q \leq \infty$, $s \in \R$ and $L, L' \in \N$.
+\begin{enumerate}
+  \item If $0 < s < L$, there is a constant $C < \infty$, depending only on $n$, $s$, $L$ and the
+    bump $g$, such that for every $f \in L_p$ and almost every $x \in V$,
+    \[
+      \bigl\| (2^{js} |(k_j * f)(x)|)_j \bigr\|_{\ell_q} \leq C
+      \bigl\| (M(2^{is} |\psi_i * f|)(x))_i \bigr\|_{\ell_q} .
+    \]
+  \item If $L \geq 1$ and $0 < s < L'$, there is a constant $C < \infty$, depending only on $n$,
+    $s$, $L$, $L'$ and $g$, such that for every $f \in L_p$ and almost every $x \in V$,
+    \[
+      \bigl\| (2^{js} |(\psi_j * f)(x)|)_j \bigr\|_{\ell_q} \leq C
+      \bigl\| (M(2^{is} |k_i * f|)(x))_i \bigr\|_{\ell_q} .
+    \]
+\end{enumerate}
 \end{lemma}
+
+The constants are $B^\Theta_L A_{s,L}$ in (1) and $B_{L,L'} A_{s,L'}$ in (2): the pointwise
+bounds of \Cref{thm:local-means-by-blocks} and \Cref{thm:blocks-by-local-means}, summed over the
+scales with the constant $A_{s,L} = (1 - 2^{-(L-s)})^{-1} + (1 - 2^{-s})^{-1}$ of the almost
+diagonal estimate (\Cref{lem:almost-diagonal}), finite for $0 < s < L$.
 
 \begin{proof}
 \leanok
@@ -1311,30 +1348,42 @@ and if $L \geq 1$ and $L' \geq 1$, then
 \uses{lem:tl-local-means-lq, lem:maximal-bounds-mixed-norm, lem:almost-diagonal-pointwise,
   thm:blocks-by-local-means, thm:local-means-by-blocks, thm:fefferman-stein,
   def:triebel-lizorkin, def:tl-local-means}
-Let $1 < p < \infty$, $1 < q \leq \infty$, $s \in \R$ and $L \in \N$, let
-$L_s = \lceil s \rceil_+ + 1$, where $\lceil s \rceil_+ = \max(\lceil s \rceil, 0)$ is the least
-natural number at least $s$, and let
-\[
-  U_{L,p,q,s} = B_{L,L_s} A_{s,L_s} C_{n,p,q}, \qquad
-  D_{L,p,q,s} = B^\Theta_L A_{s,L} C_{n,p,q} .
-\]
-Then $U_{L,p,q,s} < \infty$ for $s > 0$, and $D_{L,p,q,s} < \infty$ for $0 < s < L$. For every
-$f \in L_p$,
-\[
-  \|f\|^{g,L}_{F^s_{p,q}} \leq D_{L,p,q,s} \, \|f\|_{F^s_{p,q}},
-\]
-and if $L \geq 1$, then $\|f\|_{F^s_{p,q}} \leq U_{L,p,q,s} \, \|f\|^{g,L}_{F^s_{p,q}}$. In
-particular, for $0 < s < L$, $f \in \TL{s}{p}{q}$ if and only if
+Let $1 < p < \infty$, $1 < q \leq \infty$, $s \in \R$ and $L \in \N$.
+\begin{enumerate}
+  \item If $0 < s < L$, there is a constant $D < \infty$, depending only on $n$, $p$, $q$, $s$,
+    $L$ and the bump $g$, such that $\|f\|^{g,L}_{F^s_{p,q}} \leq D \, \|f\|_{F^s_{p,q}}$ for
+    every $f \in L_p$.
+  \item If $s > 0$ and $L \geq 1$, there is a constant $U < \infty$, depending only on $n$, $p$,
+    $q$, $s$, $L$ and $g$, such that $\|f\|_{F^s_{p,q}} \leq U \, \|f\|^{g,L}_{F^s_{p,q}}$ for
+    every $f \in L_p$.
+\end{enumerate}
+In particular, for $0 < s < L$, $f \in \TL{s}{p}{q}$ if and only if
 $\|f\|^{g,L}_{F^s_{p,q}} < \infty$.
 \end{theorem}
+
+Each constant is a product of three factors, one for each step of the proof:
+\[
+  D = B^\Theta_L \, A_{s,L} \, C_{n,p,q}, \qquad U = B_{L,L_s} \, A_{s,L_s} \, C_{n,p,q},
+\]
+with $L_s = \lceil s \rceil_+ + 1$, where $\lceil s \rceil_+ = \max(\lceil s \rceil, 0)$. The
+first factor bounds one local mean by the Littlewood--Paley blocks, or one block by the local
+means, pointwise through the maximal function (\Cref{thm:local-means-by-blocks},
+\Cref{thm:blocks-by-local-means}), with weights $c^L_{ji}$, equal to $2^{-(j-i)L}$ for $i \leq j$
+and to $1$ for $i > j$. The second, $A_{s,L} = (1 - 2^{-(L-s)})^{-1} + (1 - 2^{-s})^{-1}$, sums
+these bounds over the scales with the weights $2^{js}$: two geometric series, one for $i \leq j$
+and one for $i > j$, finite exactly for $0 < s < L$ (\Cref{lem:almost-diagonal}). The third is
+the constant of the Fefferman--Stein inequality, which removes the maximal function
+(\Cref{thm:fefferman-stein}). The decay of the block bound has a free order $L'$
+(\Cref{thm:cross-kernel-dual}); summing over the scales needs $L' > s$, hence $L' = L_s$ in $U$.
+The formula for $U$ makes sense for every $L \in \N$, and $U$ is finite for $s > 0$.
 
 \begin{proof}
 \leanok
 Both bounds are \Cref{lem:tl-local-means-lq}, with $L' = L_s$ for the second, followed by
 \Cref{lem:maximal-bounds-mixed-norm} for the families $2^{is} |\psi_i * f|$ and
-$2^{is} |k_i * f|$. The constants $B_{L,L_s}$, $B^\Theta_L$ and $C_{n,p,q}$ are finite, and
-since $L_s > s$, \Cref{lem:almost-diagonal} gives $A_{s,L_s} < \infty$ for $s > 0$
-and $A_{s,L} < \infty$ for $0 < s < L$. For $0 < s < L$ the order satisfies $L \geq 1$.
+$2^{is} |k_i * f|$, with the constants $D$ and $U$ above. The factors $B_{L,L_s}$, $B^\Theta_L$
+and $C_{n,p,q}$ are finite, and since $L_s > s$, \Cref{lem:almost-diagonal} gives
+$A_{s,L_s} < \infty$ for $s > 0$ and $A_{s,L} < \infty$ for $0 < s < L$.
 \end{proof}
 
 \begin{theorem}[Synthesis in Triebel--Lizorkin spaces]
@@ -1347,13 +1396,16 @@ and $A_{s,L} < \infty$ for $0 < s < L$. For $0 < s < L$ the order satisfies $L \
 \uses{thm:blocks-by-local-means, thm:tl-local-means, lem:lp-limits-pointwise, lem:conv-op,
   lem:almost-diagonal-pointwise, lem:maximal-bounds-mixed-norm}
 Let $g$ be a bump with the dual kernels $\eta_i$ of order $L$, let $1 < p < \infty$,
-$1 < q \leq \infty$ and $s \in \R$. For every family $h_i \in L_p$ and every $F \in L_p$ with
+$1 < q \leq \infty$ and $s > 0$. There is a constant $C < \infty$, depending only on $n$, $p$, $q$,
+$s$, $L$ and $g$, such that for every family $h_i \in L_p$ and every $F \in L_p$ with
 $\sum_{i \leq J} \eta_i * h_i \to F$ in $L_p$,
 \[
-  \|F\|_{F^s_{p,q}} \leq C \, \bigl\| x \mapsto \|(2^{is} |h_i(x)|)_i\|_{\ell_q} \bigr\|_p
+  \|F\|_{F^s_{p,q}} \leq C \, \bigl\| x \mapsto \|(2^{is} |h_i(x)|)_i\|_{\ell_q} \bigr\|_p .
 \]
-with the constant $C$ of \Cref{thm:tl-local-means}, finite for $s > 0$.
 \end{theorem}
+
+The constant is $U$ of \Cref{thm:tl-local-means}: the theorem is its upper bound with arbitrary
+coefficients $h_i$ in place of the local means $k_i * f$.
 
 \begin{proof}
 \leanok
@@ -1370,15 +1422,18 @@ and the Fefferman--Stein inequality (\Cref{lem:maximal-bounds-mixed-norm}) finis
   Rd.LocalMeansBump.tlLocalMeansNorm_lt_top_iff}
 \leanok
 \uses{thm:tl-local-means}
-Let $1 < p < \infty$, $1 < q \leq \infty$ and $s \in \R$, and let $g, g'$ be two bumps with
-orders $L, L' \in \N$. If $L \geq 1$, then for every $f \in L_p$,
+Let $1 < p < \infty$, $1 < q \leq \infty$, let $g, g'$ be two bumps with orders
+$L, L' \in \N$, $L \geq 1$, and let $0 < s < L'$. There is a constant $C < \infty$, depending only
+on $n$, $p$, $q$, $s$, $L$, $L'$, $g$ and $g'$, such that for every $f \in L_p$,
 \[
-  \|f\|^{g',L'}_{F^s_{p,q}} \leq D'_{L',p,q,s} \, U_{L,p,q,s} \, \|f\|^{g,L}_{F^s_{p,q}},
+  \|f\|^{g',L'}_{F^s_{p,q}} \leq C \, \|f\|^{g,L}_{F^s_{p,q}} .
 \]
-with $D'$ the constant of \Cref{thm:tl-local-means} for $g'$. If
-$0 < s < \min(L, L')$, then $\|f\|^{g,L}_{F^s_{p,q}} < \infty$ if and only if
+If $0 < s < \min(L, L')$, then $\|f\|^{g,L}_{F^s_{p,q}} < \infty$ if and only if
 $\|f\|^{g',L'}_{F^s_{p,q}} < \infty$.
 \end{corollary}
+
+The constant is $C = D' U$, with $U$ of \Cref{thm:tl-local-means} for $g$ and $L$ and $D'$ for
+$g'$ and $L'$.
 
 \begin{proof}
 \leanok
@@ -1490,8 +1545,11 @@ The last claim follows with \Cref{lem:conv-fourier-multiplier}.
 \leanok
 \uses{lem:lp-kernel-blocks, thm:uniform-family-maximal, lem:window-sums,
   lem:almost-diagonal-pointwise}
-Let $K$ be an admissible kernel, $N > n$, $c, j \in \N$ and $s$ real. For every family
-$g_k \colon V \to \C$ and every $x \in V$,
+Let $K$ be an admissible kernel, $N > n$, $c, j \in \N$ and $s$ real, let
+$C_{n,N} = |B(0, 1)| \, 2^n (1 - 2^{-(N - n)})^{-1}$, and let
+$C_{A^K,0,N} = 2^N (A^K_{0,0} + A^K_{N,0})$ be the decay constant (\Cref{def:uniform-schwartz})
+of the seminorm bounds $A^K$ of the bases of the blocks of $K$ (\Cref{def:lp-kernel-base-bound},
+\Cref{lem:lp-kernel-blocks}). For every family $g_k \colon V \to \C$ and every $x \in V$,
 \[
   2^{js} \Bigl| \sum_{k = j - c}^{j + c} (\psi_j * g_k)(x) \Bigr|
   \leq 2^{c|s|} \, C_{n,N} \, C_{A^K,0,N} \sum_{k = j - c}^{j + c} M\bigl(2^{ks} |g_k|\bigr)(x) .
@@ -1519,22 +1577,27 @@ $2^{js} \leq 2^{c|s|} 2^{ks}$ (\Cref{lem:window-sums}), and $2^{ks} M|g_k| = M(2
 \uses{lem:lp-kernel-finite-identity, lem:tl-distr-eq, lem:lp-kernel-pointwise,
   lem:window-sums, lem:maximal-bounds-mixed-norm, thm:fefferman-stein, lem:conv-fourier-multiplier}
 Let $K$, $K'$ be admissible kernels with $a, b$ and $a', b'$, $1 < p < \infty$,
-$1 < q \leq \infty$, $s$ real, $N > n$ and $c \in \N$ with $b \leq 2^c a'$ and $b' \leq 2^c a$, and
-let $C^{\mathrm{FS}}_{p,q}$ be the Fefferman--Stein constant of \Cref{thm:fefferman-stein}.
+$1 < q \leq \infty$, $s$ real, $N > n$ and $c \in \N$ with $b \leq 2^c a'$ and $b' \leq 2^c a$.
+There is a constant $C < \infty$, depending only on $n$, $p$, $q$, $s$, $N$, $c$ and $K$, such
+that:
 \begin{enumerate}
-  \item For every tempered distribution $u$ and every family $(g_k)$ in $L_p(V)$ with
+  \item for every tempered distribution $u$ and every family $(g_k)$ in $L_p(V)$ with
     $\Delta'_k u = g_k$ for every $k$,
     \[
-      \|u\|_{F^s_{p,q}, K} \leq C_{K,N,c,s} \, C^{\mathrm{FS}}_{p,q}
-      \Bigl\| x \mapsto \bigl\| (2^{ks} |g_k(x)|)_k \bigr\|_{\ell_q} \Bigr\|_{L_p} .
+      \|u\|_{F^s_{p,q}, K} \leq C
+      \Bigl\| x \mapsto \bigl\| (2^{ks} |g_k(x)|)_k \bigr\|_{\ell_q} \Bigr\|_{L_p} ;
     \]
-  \item For every tempered distribution $u$,
+  \item for every tempered distribution $u$,
     \[
-      \|u\|_{F^s_{p,q}, K} \leq \max\bigl(1, C_{K,N,c,s} \, C^{\mathrm{FS}}_{p,q}\bigr) \,
-      \|u\|_{F^s_{p,q}, K'} .
+      \|u\|_{F^s_{p,q}, K} \leq \max(1, C) \, \|u\|_{F^s_{p,q}, K'} .
     \]
 \end{enumerate}
 \end{lemma}
+
+The constant is $C = C_{K,N,c,s} \, C^{\mathrm{FS}}_{p,q}$: the comparison constant
+$C_{K,N,c,s}$ of \Cref{lem:lp-kernel-pointwise} times the constant
+$C^{\mathrm{FS}}_{p,q} = C_{n,p,q}$ of the Fefferman--Stein inequality
+(\Cref{thm:fefferman-stein}).
 
 \begin{proof}
 \leanok
@@ -1567,10 +1630,9 @@ $C < \infty$ such that for every tempered distribution $u$ on $V$ and every $f \
 
 \begin{proof}
 \leanok
-Take a window $c$ from \Cref{lem:lp-kernel-finite-identity}, $N = n + 1$ and
-$C = \max(1, C_{K,N,c,s} C^{\mathrm{FS}}_{p,q})$, which is finite (\Cref{lem:lp-kernel-pointwise},
-\Cref{thm:fefferman-stein}). Part (2) of \Cref{lem:lp-kernel-comparison-blocks} gives the first
-bound, and for $f \in L_p(V)$ the two quasi-norms of $f$ agree
+Take a window $c$ from \Cref{lem:lp-kernel-finite-identity}, $N = n + 1$, and
+$C = \max(1, C')$ with the constant $C' < \infty$ of \Cref{lem:lp-kernel-comparison-blocks}. Part
+(2) of that lemma gives the first bound, and for $f \in L_p(V)$ the two quasi-norms of $f$ agree
 (\Cref{lem:lp-kernel-tl-norm-basic}).
 \end{proof}
 
@@ -1757,15 +1819,22 @@ everywhere (\Cref{lem:period-box-measure}), and the maximal function does not se
 \uses{thm:fefferman-stein, lem:torus-maximal-localisation, lem:triple-box-norm,
   lem:period-box-measure, lem:minkowski-integral-lq, lem:maximal-function-measurable,
   lem:lp-norm-nonnegative, lem:fefferman-stein-split}
-Let $1 < p < \infty$ and $1 < q \leq \infty$, and let
-$C^{\T}_{p,q} = 3^{\#d/p} C_{\#d,p,q} + 4^{\#d} |B(0,1)|^{-1}$ with the constant $C_{\#d,p,q}$
-of \Cref{thm:fefferman-stein} on $\R^d$. Then $C^{\T}_{p,q} < \infty$, and for every family of
-almost everywhere measurable $u_j : \T^d \to [0, \infty]$, $j \in \N$,
+Let $1 < p < \infty$ and $1 < q \leq \infty$. There is a constant $C^{\T}_{p,q} < \infty$,
+depending only on $\#d$, $p$ and $q$, such that for every family of almost everywhere measurable
+$u_j : \T^d \to [0, \infty]$, $j \in \N$,
 \[
   \Bigl\| x \mapsto \|(M(u_j \circ \pi)(x))_j\|_{\ell_q} \Bigr\|_{L_p(P_0)}
   \leq C^{\T}_{p,q} \Bigl\| t \mapsto \|(u_j(t))_j\|_{\ell_q} \Bigr\|_{L_p(\T^d)} .
 \]
 \end{theorem}
+
+The constant is $C^{\T}_{p,q} = 3^{\#d/p} C_{\#d,p,q} + 4^{\#d} |B(0,1)|^{-1}$, one term for
+each of the two parts of the maximal function in \Cref{lem:torus-maximal-localisation}. The
+balls of radius at most $1$ contribute the Fefferman--Stein constant $C_{\#d,p,q}$ on $\R^d$
+(\Cref{thm:fefferman-stein}) times $3^{\#d/p}$, since the lift restricted to the box $T$ of three
+periods in each direction has $3^{\#d/p}$ times the norm in $L_p(\T^d)$
+(\Cref{lem:triple-box-norm}); the larger balls contribute the bound $4^{\#d} |B(0,1)|^{-1}$ of
+their means.
 
 \begin{proof}
 \leanok
@@ -1784,8 +1853,9 @@ gives $\|(\int u_j)_j\|_{\ell_q} \leq \|G\|_{L_p(\T^d)}$.
 \leanok
 \uses{thm:fefferman-stein-periodic, lem:period-box-measure, lem:lp-norm-homogeneity,
   lem:maximal-function-measurable}
-Let $1 < p < \infty$, $1 < q \leq \infty$ and $C \in [0, \infty]$. For every almost everywhere
-measurable $F : \T^d \to [0, \infty]$ and every family of almost everywhere measurable
+Let $1 < p < \infty$ and $1 < q \leq \infty$. There is a constant $C^{\T}_{p,q} < \infty$,
+depending only on $\#d$, $p$ and $q$, such that for every $C \in [0, \infty]$, every almost
+everywhere measurable $F : \T^d \to [0, \infty]$ and every family of almost everywhere measurable
 $h_i : \T^d \to [0, \infty]$, $i \in \N$, with
 $F(\pi x) \leq C \|(M(h_i \circ \pi)(x))_i\|_{\ell_q}$ for almost every $x \in P_0$,
 \[
@@ -1793,6 +1863,9 @@ $F(\pi x) \leq C \|(M(h_i \circ \pi)(x))_i\|_{\ell_q}$ for almost every $x \in P
   \Bigr\|_{L_p(\T^d)} .
 \]
 \end{lemma}
+
+The constant is that of the Fefferman--Stein inequality for periodic lifts
+(\Cref{thm:fefferman-stein-periodic}).
 
 \begin{proof}
 \leanok
@@ -1855,14 +1928,16 @@ last identity is $\Theta_i * \psi_i = \psi_i$ (\Cref{thm:kernel-identities}) and
   lem:period-box-measure, lem:torus-econv-identities, lem:lp-limits-pointwise,
   lem:torus-maximal-localisation, def:torus-triebel-lizorkin, def:torus-tl-local-means,
   lem:torus-econv-young}
-Let $L, L' \in \N$ with $L, L' \geq 1$ and $1 \leq p < \infty$, and let $B_{L,L'}$ be the
-constant of \Cref{thm:blocks-by-local-means} on $\R^d$. For every $f \in L_p(\T^d)$, almost every
-$x \in P_0$ and every $j \in \N$,
+Let $L, L' \in \N$ with $L, L' \geq 1$ and $1 \leq p < \infty$. There is a constant
+$B_{L,L'} < \infty$, depending only on $\#d$, $L$, $L'$ and the bump $g$, such that for every
+$f \in L_p(\T^d)$, almost every $x \in P_0$ and every $j \in \N$,
 \[
   |(\psi_j * f)(\pi x)| \leq B_{L,L'} \sum_{i \in \N} c^{L'}_{ji} \,
   M\bigl(|k_i * f| \circ \pi\bigr)(x) .
 \]
 \end{theorem}
+
+The constant is $B_{L,L'}$ of \Cref{thm:blocks-by-local-means} on $\R^d$.
 
 \begin{proof}
 \leanok
@@ -1889,14 +1964,16 @@ bound to $f$.
   lem:period-box-measure, lem:torus-lp-blocks, lem:lp-limits-pointwise,
   lem:torus-maximal-localisation, def:torus-triebel-lizorkin, def:torus-tl-local-means,
   lem:torus-econv-young, thm:torus-blocks-by-local-means}
-Let $L \in \N$ and $1 \leq p < \infty$, and let $B^\Theta_L$ be the constant of
-\Cref{thm:local-means-by-blocks} on $\R^d$. For every $f \in L_p(\T^d)$, almost every
-$x \in P_0$ and every $j \in \N$,
+Let $L \in \N$ and $1 \leq p < \infty$. There is a constant $B^\Theta_L < \infty$, depending only
+on $\#d$, $L$ and the bump $g$, such that for every $f \in L_p(\T^d)$, almost every $x \in P_0$
+and every $j \in \N$,
 \[
   |(k_j * f)(\pi x)| \leq B^\Theta_L \sum_{i \in \N} c^L_{ji} \,
   M\bigl(|\psi_i * f| \circ \pi\bigr)(x) .
 \]
 \end{theorem}
+
+The constant is $B^\Theta_L$ of \Cref{thm:local-means-by-blocks} on $\R^d$.
 
 \begin{proof}
 \leanok
@@ -1915,18 +1992,26 @@ $f$.
 \leanok
 \uses{thm:torus-blocks-by-local-means, thm:torus-local-means-by-blocks,
   lem:almost-diagonal-pointwise}
-Let $1 \leq p < \infty$, $1 \leq q \leq \infty$, $s \in \R$ and $L, L' \in \N$. For every
-$f \in L_p(\T^d)$ and almost every $x \in P_0$,
-\[
-  \bigl\| (2^{js} |(k_j * f)(\pi x)|)_j \bigr\|_{\ell_q} \leq B^\Theta_L A_{s,L}
-  \bigl\| (M(2^{is} |\psi_i * f| \circ \pi)(x))_i \bigr\|_{\ell_q},
-\]
-and if $L \geq 1$ and $L' \geq 1$, then
-\[
-  \bigl\| (2^{js} |(\psi_j * f)(\pi x)|)_j \bigr\|_{\ell_q} \leq B_{L,L'} A_{s,L'}
-  \bigl\| (M(2^{is} |k_i * f| \circ \pi)(x))_i \bigr\|_{\ell_q} .
-\]
+Let $1 \leq p < \infty$, $1 \leq q \leq \infty$, $s \in \R$ and $L, L' \in \N$.
+\begin{enumerate}
+  \item If $0 < s < L$, there is a constant $C < \infty$, depending only on $\#d$, $s$, $L$ and
+    the bump $g$, such that for every $f \in L_p(\T^d)$ and almost every $x \in P_0$,
+    \[
+      \bigl\| (2^{js} |(k_j * f)(\pi x)|)_j \bigr\|_{\ell_q} \leq C
+      \bigl\| (M(2^{is} |\psi_i * f| \circ \pi)(x))_i \bigr\|_{\ell_q} .
+    \]
+  \item If $L \geq 1$ and $0 < s < L'$, there is a constant $C < \infty$, depending only on
+    $\#d$, $s$, $L$, $L'$ and $g$, such that for every $f \in L_p(\T^d)$ and almost every
+    $x \in P_0$,
+    \[
+      \bigl\| (2^{js} |(\psi_j * f)(\pi x)|)_j \bigr\|_{\ell_q} \leq C
+      \bigl\| (M(2^{is} |k_i * f| \circ \pi)(x))_i \bigr\|_{\ell_q} .
+    \]
+\end{enumerate}
 \end{lemma}
+
+The constants are $B^\Theta_L A_{s,L}$ in (1) and $B_{L,L'} A_{s,L'}$ in (2), as on $\R^d$
+(\Cref{lem:tl-local-means-lq}).
 
 \begin{proof}
 \leanok
@@ -1944,22 +2029,30 @@ with \Cref{lem:almost-diagonal-pointwise}.
 \uses{lem:torus-tl-local-means-lq, lem:torus-maximal-bounds-mixed-norm,
   lem:almost-diagonal-pointwise, thm:fefferman-stein-periodic, def:torus-triebel-lizorkin,
   def:torus-tl-local-means, thm:tl-local-means}
-Let $1 < p < \infty$, $1 < q \leq \infty$, $s \in \R$ and $L \in \N$, let
-$L_s = \lceil s \rceil_+ + 1$, and let
-\[
-  U^{\T}_{L,p,q,s} = B_{L,L_s} A_{s,L_s} C^{\T}_{p,q}, \qquad
-  D^{\T}_{L,p,q,s} = B^\Theta_L A_{s,L} C^{\T}_{p,q} .
-\]
-Then $U^{\T}_{L,p,q,s} < \infty$ for $s > 0$, and $D^{\T}_{L,p,q,s} < \infty$ for $0 < s < L$.
-For every $f \in L_p(\T^d)$,
-\[
-  \|f\|^{g,L}_{F^s_{p,q}(\T^d)} \leq D^{\T}_{L,p,q,s} \, \|f\|_{F^s_{p,q}(\T^d)},
-\]
-and if $L \geq 1$, then
-$\|f\|_{F^s_{p,q}(\T^d)} \leq U^{\T}_{L,p,q,s} \, \|f\|^{g,L}_{F^s_{p,q}(\T^d)}$. In particular,
-for $0 < s < L$, $f \in \TL{s}{p}{q}(\T^d)$ if and only if
+Let $1 < p < \infty$, $1 < q \leq \infty$, $s \in \R$ and $L \in \N$.
+\begin{enumerate}
+  \item If $0 < s < L$, there is a constant $D < \infty$, depending only on $\#d$, $p$, $q$, $s$,
+    $L$ and the bump $g$, such that
+    $\|f\|^{g,L}_{F^s_{p,q}(\T^d)} \leq D \, \|f\|_{F^s_{p,q}(\T^d)}$ for every
+    $f \in L_p(\T^d)$.
+  \item If $s > 0$ and $L \geq 1$, there is a constant $U < \infty$, depending only on $\#d$, $p$,
+    $q$, $s$, $L$ and $g$, such that
+    $\|f\|_{F^s_{p,q}(\T^d)} \leq U \, \|f\|^{g,L}_{F^s_{p,q}(\T^d)}$ for every
+    $f \in L_p(\T^d)$.
+\end{enumerate}
+In particular, for $0 < s < L$, $f \in \TL{s}{p}{q}(\T^d)$ if and only if
 $\|f\|^{g,L}_{F^s_{p,q}(\T^d)} < \infty$.
 \end{theorem}
+
+The constants are those of \Cref{thm:tl-local-means} with the Fefferman--Stein constant for
+periodic lifts in place of $C_{n,p,q}$:
+\[
+  D = B^\Theta_L \, A_{s,L} \, C^{\T}_{p,q}, \qquad U = B_{L,L_s} \, A_{s,L_s} \, C^{\T}_{p,q},
+\]
+with $L_s = \lceil s \rceil_+ + 1$, where $\lceil s \rceil_+ = \max(\lceil s \rceil, 0)$, with
+$B^\Theta_L$ of \Cref{thm:torus-local-means-by-blocks}, $B_{L,L_s}$ of
+\Cref{thm:torus-blocks-by-local-means}, $A_{s,L}$ of \Cref{lem:almost-diagonal} and
+$C^{\T}_{p,q}$ of \Cref{thm:fefferman-stein-periodic}.
 
 \begin{proof}
 \leanok
@@ -2190,12 +2283,16 @@ costs the factor $2^{(i-j)n}$; the average over the steps $h \in B_j$ removes it
 \uses{thm:ball-means-dual, lem:reproducing-formula, lem:reproducing-pointwise,
   lem:ball-means-basic, lem:ball-means-lp, lem:limits-of-pointwise-bounds,
   lem:maximal-function-basic, lem:maximal-function-measurable, def:tl-local-means, lem:conv-op}
-Let $L \in \N$ with $L \geq 1$ and $1 \leq p < \infty$. For every $f \in L_p$, almost every
+Let $L \in \N$ with $L \geq 1$ and $1 \leq p < \infty$. There is a constant $E_L < \infty$,
+depending only on $n$, $L$ and the bump $g$, such that for every $f \in L_p$, almost every
 $x \in V$ and every $j \in \N$,
 \[
   d_j f(x) \leq E_L \sum_{i \in \N} c^L_{ji} \, M|k_i * f|(x) .
 \]
 \end{theorem}
+
+The constant is $E_L$ of \Cref{thm:ball-means-dual}, the bound of the ball means of the dual
+kernels.
 
 \begin{proof}
 \leanok
@@ -2222,26 +2319,34 @@ everywhere.
   lem:dual-kernel-moduli, lem:conv-op, cor:mixed-norm-sandwich, lem:lq-basic,
   lem:local-means-synthesis, def:tl-local-means, def:ball-means-differences,
   lem:lp-norm-homogeneity}
-Let $s \in \R$, $L \in \N$, $1 \leq p < \infty$ and $1 \leq q \leq \infty$, and let
-\[
-  D^\Delta_{L,s} = 2 \|m\|_1 \sum_{j \leq r} 2^{js} + 2^{(r+1)s} C^\Delta .
-\]
-Then $D^\Delta_{L,s} < \infty$, and for every $f \in L_p$,
-\[
-  \|f\|^{g,L}_{F^s_{p,q}} \leq D^\Delta_{L,s} \, \|f\|^{L}_{F^s_{p,q}, \Delta} .
-\]
-If $L \geq 1$, then $\|f\|_p \leq 2 \|m\|_1 (1 - 2^{-s})^{-1} \|f\|^{g,L}_{F^s_{p,q}}$ for every
-$f \in L_p$. If $L \geq 1$, $1 < p$ and $1 < q$, let
-\[
-  U^\Delta_{L,p,q,s} = 2 \|m\|_1 (1 - 2^{-s})^{-1} + E_L A_{s,L} C_{n,p,q},
-\]
-with the constants $A_{s,L}$ of \Cref{lem:almost-diagonal} and $C_{n,p,q}$ of
-\Cref{thm:fefferman-stein}; then $U^\Delta_{L,p,q,s} < \infty$ for $0 < s < L$, and for every
-$f \in L_p$,
-\[
-  \|f\|^{L}_{F^s_{p,q}, \Delta} \leq U^\Delta_{L,p,q,s} \, \|f\|^{g,L}_{F^s_{p,q}} .
-\]
+Let $s \in \R$, $L \in \N$, $1 \leq p < \infty$ and $1 \leq q \leq \infty$.
+\begin{enumerate}
+  \item There is a constant $D^\Delta_{L,s} < \infty$, depending only on $n$, $s$, $L$ and the
+    bump $g$, such that
+    $\|f\|^{g,L}_{F^s_{p,q}} \leq D^\Delta_{L,s} \, \|f\|^{L}_{F^s_{p,q}, \Delta}$ for every
+    $f \in L_p$.
+  \item If $L \geq 1$ and $s > 0$, then
+    $\|f\|_p \leq 2 \|m\|_1 (1 - 2^{-s})^{-1} \|f\|^{g,L}_{F^s_{p,q}}$ for every $f \in L_p$.
+  \item If $1 < p$, $1 < q$ and $0 < s < L$, there is a constant
+    $U^\Delta_{L,p,q,s} < \infty$, depending only on $n$, $p$, $q$, $s$, $L$ and $g$, such that
+    $\|f\|^{L}_{F^s_{p,q}, \Delta} \leq U^\Delta_{L,p,q,s} \, \|f\|^{g,L}_{F^s_{p,q}}$ for every
+    $f \in L_p$.
+\end{enumerate}
 \end{theorem}
+
+The constants are
+\[
+  D^\Delta_{L,s} = 2 \|m\|_1 \sum_{j \leq r} 2^{js} + 2^{(r+1)s} C^\Delta , \qquad
+  U^\Delta_{L,p,q,s} = 2 \|m\|_1 (1 - 2^{-s})^{-1} + E_L A_{s,L} C_{n,p,q} .
+\]
+Here $r = \lceil R \rceil_+$ is the least natural number at least the bump radius $R$. In
+$D^\Delta_{L,s}$ the first term bounds the local means of the levels $j \leq r$ by Young's
+inequality, and the second the higher levels by the ball means, with the constant $C^\Delta$ of
+\Cref{thm:local-means-by-ball-means}. In $U^\Delta_{L,p,q,s}$ the first term is the bound (2) of
+$\|f\|_p$, and the second is the product of the bound $E_L$ of the ball means by the local means
+(\Cref{thm:ball-means-by-local-means}), the constant $A_{s,L}$ of the almost diagonal estimate
+(\Cref{lem:almost-diagonal}), finite for $0 < s < L$, and the Fefferman--Stein constant
+$C_{n,p,q}$ (\Cref{thm:fefferman-stein}).
 
 \begin{proof}
 \leanok
@@ -2509,24 +2614,33 @@ the smoothness of the atoms give the decay $2^{-(i-j)L}$.
 \uses{lem:coarse-local-means-atoms, lem:fine-local-means-atoms, lem:lp-limits-pointwise,
   def:tl-local-means, lem:conv-op, lem:almost-diagonal-pointwise, lem:maximal-bounds-mixed-norm,
   def:tl-sequence-space}
-Let $L \in \N$ with $L \geq 1$, $d \geq 0$, $A \in \R$, and
-$C^{\mathrm a}_{L,d,A} = \max(C^{\mathrm c}_{L,d,A}, C^{\mathrm f}_{L,d,A}) < \infty$. Let
-$1 < p < \infty$, $1 < q \leq \infty$ and $s \in \R$. For all coefficients $\lambda$, all smooth
-atoms $a_{j,m}$ on $V$ of level $j$ and order $L$ with centres $c_{j,m}$, radius factor $d$ and
-constant $A$, all $f_j \in L_p$ with $f_j = \sum_m \lambda_{j,m} a_{j,m}$ almost everywhere, and
-every $F \in L_p$ with $\sum_{j \leq J} f_j \to F$ in $L_p$, almost everywhere and for all
-$i \in \N$
-\[
-  |(k_i * F)(x)| \leq C^{\mathrm a}_{L,d,A} \sum_{j \in \N} c^L_{ij} \, M \lambda_j(x) ,
-\]
-and
-\[
-  \|F\|^{g,L}_{F^s_{p,q}} \leq C^{\mathrm a}_{L,d,A} \, A_{s,L} \, C_{n,p,q} \,
-  \|\lambda\|_{f^s_{p,q}} ,
-\]
-with the constants $A_{s,L}$ of \Cref{lem:almost-diagonal-pointwise}, finite for $0 < s < L$,
-and $C_{n,p,q}$ of \Cref{thm:fefferman-stein}.
+Let $L \in \N$ with $L \geq 1$, $d \geq 0$, $A \in \R$, $1 < p < \infty$, $1 < q \leq \infty$
+and $s \in \R$. In both parts, let $\lambda$ be coefficients, $a_{j,m}$ smooth atoms on $V$ of
+level $j$ and order $L$ with centres $c_{j,m}$, radius factor $d$ and constant $A$, $f_j \in L_p$
+with $f_j = \sum_m \lambda_{j,m} a_{j,m}$ almost everywhere, and $F \in L_p$ with
+$\sum_{j \leq J} f_j \to F$ in $L_p$.
+\begin{enumerate}
+  \item There is a constant $C^{\mathrm a}_{L,d,A} < \infty$, depending only on $n$, $L$, $d$,
+    $A$ and the bump $g$, such that for all such $\lambda$, $a_{j,m}$, $f_j$ and $F$, almost
+    everywhere and for all $i \in \N$,
+    \[
+      |(k_i * F)(x)| \leq C^{\mathrm a}_{L,d,A} \sum_{j \in \N} c^L_{ij} \, M \lambda_j(x) .
+    \]
+  \item If $0 < s < L$, there is a constant $C < \infty$, depending only on $n$, $p$, $q$, $s$,
+    $L$, $d$, $A$ and $g$, such that for all such $\lambda$, $a_{j,m}$, $f_j$ and $F$,
+    \[
+      \|F\|^{g,L}_{F^s_{p,q}} \leq C \, \|\lambda\|_{f^s_{p,q}} .
+    \]
+\end{enumerate}
 \end{theorem}
+
+The pointwise constant is
+$C^{\mathrm a}_{L,d,A} = \max(C^{\mathrm c}_{L,d,A}, C^{\mathrm f}_{L,d,A})$, the larger of the
+constants of the coarse levels $j \geq i$ (\Cref{lem:coarse-local-means-atoms}) and of the fine
+levels $j < i$ (\Cref{lem:fine-local-means-atoms}). The constant of the norm bound is
+$C = C^{\mathrm a}_{L,d,A} \, A_{s,L} \, C_{n,p,q}$, with the constant $A_{s,L}$ of the almost
+diagonal estimate (\Cref{lem:almost-diagonal}), finite for $0 < s < L$, and the Fefferman--Stein
+constant $C_{n,p,q}$ (\Cref{thm:fefferman-stein}).
 
 \begin{proof}
 \leanok
@@ -2581,16 +2695,22 @@ with $a_{j,m} = 0$ if $\lambda_{j,m} = 0$: the coefficients and cell atoms with 
 of \Cref{def:cell-atoms} for the kernel $\eta_j$ and $g = u_j$. Then:
 \begin{enumerate}
   \item every $a_{j,m}$ is a smooth atom on $V$ of level $j$ and order $K$ with centre $c_{j,m}$,
-    radius factor $2LR + n$ and constant $A_{L,K}$ of \Cref{lem:dual-kernel-derivatives};
+    radius factor $2LR + n$ and constant $A_{L,K} = 2 \sum_{l=0}^K \sup_y \|D^l m^g(y)\|$, the
+    bound of the derivatives of the dual kernels (\Cref{lem:dual-kernel-derivatives});
   \item $(\eta_j * u_j)(x) = \sum_m \lambda_{j,m} a_{j,m}(x)$ for every $j \in \N$ and every
     $x \in V$;
   \item $\sum_{j \leq J} \eta_j * u_j \to F$ in $L_p$;
-  \item if $p > 1$, then for every $1 < q \leq \infty$ and every $s \in \R$,
+  \item if $p > 1$, then for every $1 < q \leq \infty$ there is a constant $C < \infty$,
+    depending only on $n$, $p$ and $q$, such that for every $s \in \R$,
     \[
-      \|\lambda\|_{f^s_{p,q}} \leq (2n + 1)^n |B_1| \, C_{n,p,q} \, \|F\|^{g,L}_{F^s_{p,q}} .
+      \|\lambda\|_{f^s_{p,q}} \leq C \, \|F\|^{g,L}_{F^s_{p,q}} .
     \]
 \end{enumerate}
 \end{theorem}
+
+The constant of (4) is $C = (2n + 1)^n |B_1| \, C_{n,p,q}$: the bound of the coefficients by the
+maximal function (\Cref{lem:cell-coefficients-exponent-one}) times the Fefferman--Stein constant
+(\Cref{thm:fefferman-stein}).
 
 \begin{proof}
 \leanok
@@ -2624,8 +2744,7 @@ $\|\lambda\|_{f^s_{p,q}} < \infty$.
 $L \geq 1$ since $0 < s < L$, and $F \in \TL{s}{p}{q}$ iff the local means quasi-norm of a bump is
 finite (\Cref{thm:tl-local-means}, with the bump of \Cref{thm:smooth-atomic-decomposition}).
 Forward: \Cref{thm:tl-atomic-decomposition} with $K = L$, $\rho = 2LR + n$, $A = A_{L,L}$ and
-$f_j = \eta_j * (k_j * F)$. Backward: \Cref{thm:tl-atomic-synthesis}, since
-$A_{s,L} < \infty$.
+$f_j = \eta_j * (k_j * F)$. Backward: \Cref{thm:tl-atomic-synthesis} (2), since $0 < s < L$.
 \end{proof}
 
 The Besov analogue is \Cref{thm:atomic-characterisation}. Here the atoms are indexed by the cells

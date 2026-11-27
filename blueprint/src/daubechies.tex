@@ -924,12 +924,12 @@ The \emph{symbol product} of a Daubechies mask is the function
   Daubechies.multipliable_symbolProduct}
 \leanok
 \uses{def:daub-symbol-product, lem:daub-symbol-lipschitz}
-For every Daubechies mask, every $\xi \in \R$ and every $j \in \N$,
+For every Daubechies mask of order $N$, every $\xi \in \R$ and every $j \in \N$,
 \[
   \Bigl|m_0\Bigl(\frac{\xi}{2^{j+1}}\Bigr) - 1\Bigr| \leq \frac{C_0 |\xi|}{2^{j+1}}
 \]
-with the constant $C_0$ of \Cref{lem:daub-symbol-lipschitz}. Moreover
-$\sum_{j \geq 0} |m_0(\xi/2^{j+1}) - 1| < \infty$, and the product $\Phi(\xi)$ converges.
+with the constant $C_0 = \pi \sum_{k=0}^{2N-1} k |c_k|$ of \Cref{lem:daub-symbol-lipschitz}.
+Moreover $\sum_{j \geq 0} |m_0(\xi/2^{j+1}) - 1| < \infty$, and the product $\Phi(\xi)$ converges.
 \end{lemma}
 
 \begin{proof}
@@ -3718,10 +3718,15 @@ Let $1 \leq p < \infty$, and let $\gamma : \R \to \C$ be continuous, vanish outs
 have orthonormal integer translates. For every $j \in \N$ and every $\lambda : \Z \to \C$,
 \[
   2^{j(1/2 - 1/p)} \|\lambda\|_{\ell_p}
-  \leq C'_\gamma \Bigl\|\sum_{k \in \Z} \lambda_k \gamma_{j,k}\Bigr\|_p
+  \leq C'_\gamma \Bigl\|\sum_{k \in \Z} \lambda_k \gamma_{j,k}\Bigr\|_p , \qquad
+  C'_\gamma = M^{1/p} \|\gamma\|_{p'} ,
 \]
-with the constant $C'_\gamma$ of \Cref{prop:daub-coeff-estimate}.
+with $M = \lceil b - a \rceil + 1$.
 \end{theorem}
+
+The constant $C'_\gamma$ is that of the coefficient estimate (\Cref{prop:daub-coeff-estimate}),
+and it is finite, since a continuous $\gamma$ that vanishes outside $[a, b]$ lies in $L_{p'}(\R)$
+(\Cref{lem:daub-generator-norms}).
 
 \begin{proof}
 \leanok
@@ -3739,10 +3744,12 @@ Let $1 \leq p < \infty$, and let $\gamma : \R \to \C$ be measurable and vanish o
 $[a, b]$. For every measurable $f : \R \to \C$ and every $j \in \N$,
 \[
   \Bigl\|\sum_{k \in \Z} \langle f, \gamma_{j,k} \rangle \gamma_{j,k}\Bigr\|_p
-  \leq C_\gamma C'_\gamma \|f\|_p
+  \leq C_\gamma C'_\gamma \|f\|_p , \qquad
+  C_\gamma = M^{1 - 1/p} \|\gamma\|_p , \quad C'_\gamma = M^{1/p} \|\gamma\|_{p'} ,
 \]
-with the constants of \Cref{thm:daub-upper-stability} and \Cref{prop:daub-coeff-estimate}. If
-$\gamma$ is continuous and $f \in L_p(\R)$, this expansion lies in $L_p(\R)$.
+with $M = \lceil b - a \rceil + 1$; $C_\gamma$ and $C'_\gamma$ are the constants of
+\Cref{thm:daub-upper-stability} and \Cref{prop:daub-coeff-estimate}. If $\gamma$ is continuous
+and $f \in L_p(\R)$, this expansion lies in $L_p(\R)$.
 \end{lemma}
 
 \begin{proof}
@@ -4802,8 +4809,10 @@ length $4N - 3$ is $4N - 2$ (\Cref{lem:daub-window-overlap}), and the window ine
 \leanok
 \uses{def:daub-proj-fun}
 Let $N \geq 2$ and $1 \leq p < \infty$, and let
-$C_S = (4N - 2)^{1/p} (1 + C_I) (4N - 3)^N$. Then $C_S < \infty$, and for every
-$S \in C^N(\R)$ and every $j \in \N$
+$C_S = (4N - 2)^{1/p} (1 + C_I) (4N - 3)^N$ with the bound
+$C_I = (2N - 1) \|\varphi\|_p \|\varphi\|_{p'}$ of the projection on a cell
+(\Cref{prop:daub-proj-cell-bound}). Then $C_S < \infty$, and for every $S \in C^N(\R)$ and every
+$j \in \N$
 \[
   \|S - P_j S\|_p \leq C_S \, 2^{-jN} \|S^{(N)}\|_p .
 \]
@@ -4841,14 +4850,20 @@ constant $C_I$ is finite (\Cref{prop:daub-proj-cell-bound}).
   Daubechies.enorm_sub_daubechiesProj_le_of_continuous}
 \leanok
 \uses{def:daub-proj-fun, def:daub-proj, def:rd-modulus}
-Let $N \geq 2$ and $1 \leq p < \infty$, and let $C_J = 1 + C_P + 2^N N^N C_S$. Then
-$C_J < \infty$, and for every continuous $f : \R \to \C$ and every $j \in \N$
+Let $N \geq 2$ and $1 \leq p < \infty$. There is a constant $C_J < \infty$, depending only on $p$
+and the mask, such that for every continuous $f : \R \to \C$ and every $j \in \N$
 \[
   \|f - P_j f\|_p \leq C_J \, \omega_N(f, 2^{-j})_p .
 \]
 The same holds for the projection $P_j$ on $L_p(\R)$ and every $f \in L_p(\R)$ with a continuous
 representative.
 \end{proposition}
+
+The constant is $C_J = 1 + C_P + 2^N N^N C_S$, with the bound
+$C_P = 2N \|\varphi\|_p \|\varphi\|_{p'}$ of the projections (\Cref{thm:daub-proj-bound}) and the
+constant $C_S$ of Jackson's inequality for smooth functions (\Cref{prop:daub-jackson-smooth}):
+the proof compares $f$ with a smoothing $S$ of $f$, whose $N$-th derivative is bounded by
+$2^N N^N 2^{jN} \omega_N(f, 2^{-j})_p$.
 
 \begin{proof}
 \leanok
@@ -4879,17 +4894,21 @@ Both sides depend only on the class of $f$ (\Cref{lem:daub-proj-fun-basic} and
   Daubechies.approxError_daubechiesScheme_le, Daubechies.enorm_sub_daubechiesProj_le}
 \leanok
 \uses{def:daub-scheme, def:rd-modulus, def:error}
-Let $N \geq 2$ and $1 \leq p < \infty$. For every $f \in L_p(\R)$ and every $j \in \N$ the error
-of best approximation $E_{2^j}(f)$ from $V_j$, the set of approximants of complexity $2^j$ of the
+Let $N \geq 2$ and $1 \leq p < \infty$. There are constants $C_J, C < \infty$, depending only on
+$p$ and the mask, such that for every $f \in L_p(\R)$ and every $j \in \N$ the error of best
+approximation $E_{2^j}(f)$ from $V_j$, the set of approximants of complexity $2^j$ of the
 Daubechies scheme, satisfies
 \[
   E_{2^j}(f) \leq C_J \, \omega_N(f, 2^{-j})_p
   \quad\text{and}\quad
-  \|f - P_j f\|_p \leq (1 + C_P) \, C_J \, \omega_N(f, 2^{-j})_p
+  \|f - P_j f\|_p \leq C \, \omega_N(f, 2^{-j})_p .
 \]
-with the constants $C_P$ and $C_J < \infty$ of
-\Cref{thm:daub-proj-bound} and \Cref{prop:daub-jackson-continuous}.
 \end{theorem}
+
+Here $C_J$ is the constant of Jackson's inequality for continuous functions
+(\Cref{prop:daub-jackson-continuous}), and $C = (1 + C_P) C_J$ with the bound
+$C_P = 2N \|\varphi\|_p \|\varphi\|_{p'}$ of the projections (\Cref{thm:daub-proj-bound}): the
+error of $P_j f$ is at most $1 + C_P$ times the error of best approximation.
 
 \begin{proof}
 \leanok
@@ -5032,13 +5051,14 @@ The rules for powers.
 \lean{Daubechies.lpModulus_le_of_mem_scalingSpace, Daubechies.inverse_daubechiesScheme}
 \leanok
 \uses{def:daub-scheme, def:daub-bernstein-bound, def:modulus-data}
-Let $N \geq 2$, $1 \leq p < \infty$, $r \in \N$ and $\theta \in \R$, and let $K \in [0, \infty]$
-with $\omega_r(\varphi, t)_p \leq K t^\theta$ for every $t \in (0, 1]$. For all $j \leq k$ in
-$\N$ and every $v \in V_j$,
+Let $N \geq 2$, $1 \leq p < \infty$, $r \in \N$ and $\theta \in \R$. There is a constant
+$C_B < \infty$, depending only on $p$, $r$ and the mask, such that for every $K \in [0, \infty]$
+with $\omega_r(\varphi, t)_p \leq K t^\theta$ for every $t \in (0, 1]$, all $j \leq k$ in $\N$
+and every $v \in V_j$,
 \[
-  \omega_r(v, 2^{-k})_p \leq C_B K \, 2^{-(k-j)\theta} \|v\|_p
+  \omega_r(v, 2^{-k})_p \leq C_B K \, 2^{-(k-j)\theta} \|v\|_p .
 \]
-with the constant $C_B$ of \Cref{thm:daub-bernstein}. If $\varphi$ has a Bernstein bound of order
+If $\varphi$ has a Bernstein bound of order
 $\theta$ in $L_p$ with differences of order $r$, then there is a constant $C < \infty$ such that
 for all $j, k \in \N$ and every approximant $v$ of complexity $2^j$ of the Daubechies scheme
 \[
@@ -5047,6 +5067,9 @@ for all $j, k \in \N$ and every approximant $v$ of complexity $2^j$ of the Daube
 the inverse inequality of \Cref{def:modulus-data} for the modulus
 $\omega(f, k) = \omega_r(f, 2^{-k})_p$.
 \end{corollary}
+
+The constant $C_B = (2N + 2r)^{1 - 1/p} (2N)^{1/p} \|\varphi\|_{p'}$ is that of Bernstein's
+inequality (\Cref{thm:daub-bernstein}), which bounds the moduli of $v$ by those of $\varphi$.
 
 \begin{proof}
 \leanok
@@ -6547,10 +6570,15 @@ outside $[a, b]^d$ and have orthonormal integer translates. For every $j \in \N$
 $c : I \times \Z^d \to \C$,
 \[
   2^{jd(1/2 - 1/p)} \|c\|_{\ell_p}
-  \leq C' \Bigl\|\sum_{(\nu, k)} c_{\nu,k} G_{\nu,j,k}\Bigr\|_p
+  \leq C' \Bigl\|\sum_{(\nu, k)} c_{\nu,k} G_{\nu,j,k}\Bigr\|_p , \qquad
+  C' = L^{1/p} \max_\nu \|G_\nu\|_{p'} ,
 \]
-with the constant $C'$ of \Cref{prop:daub-rd-coeff-estimate}.
+with $L = |I| M^d$ and $M = \lceil b - a \rceil + 1$.
 \end{theorem}
+
+The constant $C'$ is that of the coefficient estimate (\Cref{prop:daub-rd-coeff-estimate}), and it
+is finite, since continuous generators that vanish outside $[a, b]^d$ lie in $L_{p'}(\R^d)$
+(\Cref{lem:daub-rd-expand-coeff}).
 
 \begin{proof}
 \leanok
@@ -6574,13 +6602,15 @@ the generators $G_\nu$, $\nu \in I$, be measurable and vanish outside $[a, b]^d$
 measurable $f : \R^d \to \C$ and every $j \in \N$,
 \[
   \Bigl\|\sum_{(\nu, k)} \langle f, G_{\nu,j,k} \rangle G_{\nu,j,k}\Bigr\|_p
-  \leq C C' \|f\|_p
+  \leq C C' \|f\|_p , \qquad
+  C = L^{1 - 1/p} \max_\nu \|G_\nu\|_p , \quad C' = L^{1/p} \max_\nu \|G_\nu\|_{p'} ,
 \]
-with the constants of \Cref{thm:daub-rd-upper-stability} and \Cref{prop:daub-rd-coeff-estimate}.
-If every $G_\nu$ is continuous and $f \in L_p(\R^d)$, this expansion lies in $L_p(\R^d)$. The
-coefficients depend only on the class of $f$ modulo null sets, and they are linear in $f$ on
-$L_p(\R^d)$: for a continuous $g$ that vanishes outside $[a, b]^d$ and $f \in L_p(\R^d)$, the
-function $f \overline{g_{j,k}}$ is integrable.
+with $L = |I| M^d$ and $M = \lceil b - a \rceil + 1$; $C$ and $C'$ are the constants of
+\Cref{thm:daub-rd-upper-stability} and \Cref{prop:daub-rd-coeff-estimate}. If every $G_\nu$ is
+continuous and $f \in L_p(\R^d)$, this expansion lies in $L_p(\R^d)$. The coefficients depend
+only on the class of $f$ modulo null sets, and they are linear in $f$ on $L_p(\R^d)$: for a
+continuous $g$ that vanishes outside $[a, b]^d$ and $f \in L_p(\R^d)$, the function
+$f \overline{g_{j,k}}$ is integrable.
 \end{lemma}
 
 \begin{proof}
@@ -6631,9 +6661,10 @@ $\Delta_{2^j h}^i G_\nu$ vanishes outside a cube, so the differences may be take
 \leanok
 \uses{def:daub-rd-expansions, def:rd-modulus}
 Let $1 \leq p < \infty$ and $r \in \N$, and let the generators $G_\nu$, $\nu \in I$, be
-measurable and vanish outside $[a, b]^d$. Let $C_B = L_r^{1 - 1/p} C'$ with
-$L_r = |I| (\lceil b - a + 2r \rceil + 1)^d$ and the constant $C'$ of
-\Cref{prop:daub-rd-coeff-estimate}; $C_B < \infty$ if every $G_\nu$ lies in $L_{p'}(\R^d)$.
+measurable and vanish outside $[a, b]^d$. Let $L = |I| (\lceil b - a \rceil + 1)^d$,
+$C' = L^{1/p} \max_\nu \|G_\nu\|_{p'}$ (the constant of \Cref{prop:daub-rd-coeff-estimate}),
+$L_r = |I| (\lceil b - a + 2r \rceil + 1)^d$ and $C_B = L_r^{1 - 1/p} C'$; $C_B < \infty$ if every
+$G_\nu$ lies in $L_{p'}(\R^d)$.
 Let $j \in \N$, let $f : \R^d \to \C$ be measurable with
 $f = \sum_{(\nu, k)} \langle f, G_{\nu,j,k} \rangle G_{\nu,j,k}$ almost everywhere, and let
 $t \in \R$ with $2^j t \leq 1$. Then
@@ -7021,9 +7052,8 @@ complexity $2^j$ is $P_j$.
   Daubechies.enorm_tensorBlock_equiv, Daubechies.enorm_tensorProj_zero_equiv}
 \leanok
 \uses{def:daub-rd-proj, def:daub-rd-lp-proj, def:lq-norm, thm:daub-rd-upper-stability}
-Let $1 \leq p < \infty$, and let $C_0$ and $C$ be the constants of the upper estimate
-(\Cref{thm:daub-rd-upper-stability}) of the scaling family and of the wavelet family. For every
-$f : \R^d \to \C$ and every $j \in \N$
+Let $1 \leq p < \infty$. There are constants $C_0, C < \infty$, depending only on $d$, $p$ and
+the mask, such that for every $f : \R^d \to \C$ and every $j \in \N$
 \[
   \|Q_j f\|_p \leq C \, 2^{jd(1/2 - 1/p)}
     \bigl\|(\langle f, \Psi^e_{j,k} \rangle)_{e \neq \emptyset, k \in \Z^d}\bigr\|_{\ell_p}
@@ -7046,6 +7076,11 @@ $\|P_0 f\|_p \leq M_4 \|(\langle f, \Phi(\cdot - k) \rangle)_{k \in \Z^d}\|_{\el
 $f \in L_p(\R^d)$.
 \end{proposition}
 
+The constants $C_0$ and $C$ are those of upper stability, $L^{1 - 1/p} \max_\nu \|G_\nu\|_p$
+(\Cref{thm:daub-rd-upper-stability}), for the scaling family and for the wavelet family on the
+cube $[1 - N, 2N - 1]^d$. They are finite, since every $\Psi^e$ lies in $L_p(\R^d)$
+(\Cref{lem:daub-rd-generator-support}).
+
 \begin{proof}
 \leanok
 \uses{thm:daub-rd-block-identity, thm:daub-rd-lower-stability,
@@ -7066,15 +7101,19 @@ gives $M_1$ and $M_3$.
 \lean{Daubechies.lpModulus_le_of_mem_tensorScalingSpace}
 \leanok
 \uses{def:daub-rd-scaling-spaces, def:rd-modulus, thm:daub-rd-expansion-moduli}
-Let $1 \leq p < \infty$, and let $C_B < \infty$ be the constant of
-\Cref{thm:daub-rd-expansion-moduli} for the scaling family, $[a, b] = [1 - N, 2N - 1]$ and
-$r = N$. Let $\theta \geq 0$ and $K \in [0, \infty]$ with
-$\|\Delta_h^N \Phi\|_p \leq K \|h\|^\theta$ for every $h \in \R^d$ with $\|h\| \leq 1$. Then for
-all $j \leq k$ in $\N$ and every $v \in V_j$
+Let $1 \leq p < \infty$. There is a constant $C_B < \infty$, depending only on $d$, $p$ and the
+mask, such that for every $\theta \geq 0$, every $K \in [0, \infty]$ with
+$\|\Delta_h^N \Phi\|_p \leq K \|h\|^\theta$ for every $h \in \R^d$ with $\|h\| \leq 1$, all
+$j \leq k$ in $\N$ and every $v \in V_j$
 \[
   \omega_N(v, 2^{-k})_p \leq C_B K \, 2^{-(k-j)\theta} \|v\|_p .
 \]
 \end{theorem}
+
+The constant $C_B$ is that of Bernstein's inequality for expansions
+(\Cref{thm:daub-rd-expansion-moduli}) for the scaling family, $[a, b] = [1 - N, 2N - 1]$ and
+$r = N$, that is $C_B = (5N - 1)^{d(1 - 1/p)} (3N - 1)^{d/p} \|\Phi\|_{p'}$; it is finite, since
+$\Phi$ lies in $L_{p'}(\R^d)$ (\Cref{lem:daub-rd-generator-support}).
 
 \begin{proof}
 \leanok
@@ -7275,18 +7314,22 @@ locally integrable and $P_j$ is additive on these (\Cref{lem:daub-proj-fun-basic
   Daubechies.eLpNorm_sub_sliceProj_le}
 \leanok
 \uses{def:daub-rd-slice-proj, def:rd-modulus}
-Let $1 \leq p < \infty$, $j \in \N$ and $i$ a coordinate. For every measurable
-$f : \R^d \to \C$,
+Let $1 \leq p < \infty$, and let $C_P = 2N \|\varphi\|_p \|\varphi\|_{p'}$ be the bound of the
+projections of \Cref{thm:daub-proj-bound}. For every $j \in \N$, every coordinate $i$ and every
+measurable $f : \R^d \to \C$,
 \[
-  \|P^{(i)}_j f\|_p \leq C_P \|f\|_p
+  \|P^{(i)}_j f\|_p \leq C_P \|f\|_p .
 \]
-with the constant $C_P$ of \Cref{thm:daub-proj-bound}, and for every continuous $f : \R^d \to \C$,
+There is a constant $C_J < \infty$, depending only on $p$ and the mask, such that for every
+$j \in \N$, every coordinate $i$ and every continuous $f : \R^d \to \C$, with the isotropic
+modulus of smoothness of $\R^d$,
 \[
-  \|f - P^{(i)}_j f\|_p \leq C_J \, \omega_N(f, 2^{-j})_p
+  \|f - P^{(i)}_j f\|_p \leq C_J \, \omega_N(f, 2^{-j})_p .
 \]
-with the constant $C_J$ of \Cref{prop:daub-jackson-continuous} and the isotropic modulus of
-smoothness of $\R^d$.
 \end{proposition}
+
+The constants are those of one variable, applied on every slice: $C_J$ is the constant of
+Jackson's inequality for continuous functions (\Cref{prop:daub-jackson-continuous}).
 
 \begin{proof}
 \leanok
@@ -7342,7 +7385,8 @@ $(1, \dots, d)$ of all coordinates write $R_j f$.
 \leanok
 \uses{def:daub-rd-fold-proj, thm:daub-proj-bound}
 Let $1 \leq p < \infty$, $j \in \N$, let $l$ be a list of coordinates of length $|l|$, and let
-$C_P$ be the constant of \Cref{thm:daub-proj-bound}. For every continuous $f : \R^d \to \C$,
+$C_P = 2N \|\varphi\|_p \|\varphi\|_{p'}$ be the bound of the projections of
+\Cref{thm:daub-proj-bound}. For every continuous $f : \R^d \to \C$,
 $\|R_{j,l} f\|_p \leq C_P^{|l|} \|f\|_p$, so $R_{j,l} f \in L_p(\R^d)$ if $f \in L_p(\R^d)$, and
 \[
   \|f - R_{j,l} f\|_p \leq (1 + C_P)^{|l|} \sum_{i \in l} \|f - P^{(i)}_j f\|_p .
@@ -7369,13 +7413,19 @@ and both $1$ and $C_P$ are at most $1 + C_P$.
   Daubechies.eLpNorm_sub_foldSliceProj_le_smoothnessModulus}
 \leanok
 \uses{def:daub-rd-fold-proj, def:rd-modulus, thm:daub-proj-bound, prop:daub-jackson-continuous}
-Let $1 \leq p < \infty$ and $C_{J,d} = (1 + C_P)^d \, d \, C_J$ with the constants $C_P$ of
-\Cref{thm:daub-proj-bound} and $C_J$ of \Cref{prop:daub-jackson-continuous}. For every continuous
-$f : \R^d \to \C$ and every $j \in \N$,
+Let $1 \leq p < \infty$. There is a constant $C_{J,d} < \infty$, depending only on $d$, $p$ and the
+mask, such that for every continuous $f : \R^d \to \C$ and every $j \in \N$,
 \[
   \|f - R_j f\|_p \leq C_{J,d} \, \omega_N(f, 2^{-j})_p .
 \]
 \end{proposition}
+
+The constant is $C_{J,d} = (1 + C_P)^d \, d \, C_J$, with the bound
+$C_P = 2N \|\varphi\|_p \|\varphi\|_{p'}$ of the projections of one variable
+(\Cref{thm:daub-proj-bound}) and the constant $C_J$ of Jackson's inequality of one variable
+(\Cref{prop:daub-jackson-continuous}): the error of $R_j$ telescopes into $d$ errors in one
+coordinate (\Cref{lem:daub-rd-telescoping}), each bounded by
+\Cref{prop:daub-rd-coordinate-direct}.
 
 \begin{proof}
 \leanok
@@ -7483,14 +7533,19 @@ $L_p(\R^d)$ (\Cref{lem:daub-rd-telescoping}), and $P_j$ reproduces expansions in
 \lean{Daubechies.approxError_tensorScheme_le, Daubechies.enorm_sub_tensorProj_le}
 \leanok
 \uses{def:daub-rd-scheme, def:rd-modulus, prop:daub-rd-fold-direct, thm:daub-rd-proj-bound}
-Let $1 \leq p < \infty$ and let $C_{J,d}$ be the constant of \Cref{prop:daub-rd-fold-direct}. For
-every $f \in L_p(\R^d)$ and every $j \in \N$ the error of best approximation from $V_j$ satisfies
+Let $1 \leq p < \infty$. There are constants $C_{J,d}, C < \infty$, depending only on $d$, $p$
+and the mask, such that for every $f \in L_p(\R^d)$ and every $j \in \N$ the error of best
+approximation from $V_j$ satisfies
 \[
   E_{2^j}(f)_p \leq C_{J,d} \, \omega_N(f, 2^{-j})_p ,
 \]
-and $\|f - P_j f\|_p \leq (1 + C_{P,d}) \, C_{J,d} \, \omega_N(f, 2^{-j})_p$ with the constant
-$C_{P,d}$ of \Cref{thm:daub-rd-proj-bound}.
+and $\|f - P_j f\|_p \leq C \, \omega_N(f, 2^{-j})_p$.
 \end{theorem}
+
+Here $C_{J,d}$ is the constant of Jackson's inequality in all coordinates
+(\Cref{prop:daub-rd-fold-direct}), and $C = (1 + C_{P,d}) C_{J,d}$ with the bound $C_{P,d}$ of
+the projections on $\R^d$ (\Cref{thm:daub-rd-proj-bound}): the error of $P_j f$ is at most
+$1 + C_{P,d}$ times the error of best approximation.
 
 \begin{proof}
 \leanok
@@ -7646,8 +7701,12 @@ polynomial in $L_p(\R)$, $p < \infty$, is $0$, while $\|\varphi\|_2 = 1$.
 \leanok
 \uses{thm:daub-rd-besov, def:daub-transfer-growth}
 Let $1 \leq p < \infty$ and $1 \leq q \leq \infty$, let $\lambda, C$ be a growth bound for the
-transfer operator of order $N$, and let $f \in L_p(\R^d)$. The equivalence of
-\Cref{thm:daub-rd-besov} holds
+transfer operator of order $N$, and let $f \in L_p(\R^d)$. The equivalence
+\[
+  \|f\|_p + \bigl\|\bigl(2^{ks} \omega_N(f, 2^{-k})_p\bigr)_{k \in \N}\bigr\|_{\ell_q} < \infty
+  \quad\text{if and only if}\quad \|f\|^{\mathrm{coef},d}_{s,q} < \infty
+\]
+of \Cref{thm:daub-rd-besov} holds
 \begin{enumerate}
   \item for $p \leq 2$ and $0 < s < N - \log_4 \lambda$;
   \item for $p \geq 2$, $0 \leq s' < N - \log_4 \lambda$, $0 \leq a < N - \log_4 \lambda - 1/2$
@@ -7711,8 +7770,10 @@ Besov quasi-norms of $F$ and of $F \circ \iota$ by differences of order $N$ are 
   Daubechies.memSobolev_two_iff_tensorCoeff_order_three}
 \leanok
 \uses{thm:daub-rd-besov-grid}
-Let $V$ and $\iota$ be as in \Cref{thm:daub-rd-besov-grid}, let $\varphi$ have a Bernstein bound
-of order $\theta$ in $L_2$ with differences of order $N$, and let $0 < s < \theta$ with $s < N$.
+Let $V$ be a finite-dimensional real inner product space of dimension $n$, and let
+$\iota : \R^n \to V$ be the inverse of the coordinates of the dyadic grid
+(\Cref{lem:grid-coordinates}). Let $\varphi$ have a Bernstein bound of order $\theta$ in $L_2$
+with differences of order $N$, and let $0 < s < \theta$ with $s < N$.
 A tempered distribution $u$ lies in $H^s(V)$ if and only if $u$ is a function $f \in L_2(V)$ with
 \[
   \sum_{k \in \Z^n} |\langle f \circ \iota, \Phi(\cdot - k) \rangle|^2
@@ -7899,9 +7960,9 @@ measure, and \Cref{lem:daub-rd-coeff-sums} with $p = 2$ and the coefficients of
   Daubechies.memLp_of_tensorCoeffNorm_lt_top}
 \leanok
 \uses{def:daub-rd-coeff-norm, def:daub-rd-proj, thm:daub-rd-upper-stability}
-Let $1 \leq p < \infty$, $0 < q \leq \infty$ and $s \in \R$, and let $C_0$ and $C$ be the
-constants of the upper estimate (\Cref{thm:daub-rd-upper-stability}) of the scaling family and
-of the wavelet family. For every $f : \R^d \to \C$ and every $j \in \N$,
+Let $1 \leq p < \infty$, $0 < q \leq \infty$ and $s \in \R$. There are constants
+$C_0, C < \infty$, depending only on $d$, $p$ and the mask, such that for every
+$f : \R^d \to \C$ and every $j \in \N$,
 \[
   \|Q_j f\|_p \leq C \, 2^{-js} \, \|f\|^{\mathrm{coef},d}_{s,q} ,
 \]
@@ -7911,6 +7972,9 @@ $(1 - 2^{-s})^{-1} = \infty$ for $s \leq 0$ and $0 \cdot \infty = 0$. For $s > 0
 $C_0 + C (1 - 2^{-s})^{-1}$ is finite. If $s > 0$, $1 \leq r < \infty$, $f \in L_r(\R^d)$ and
 $\|f\|^{\mathrm{coef},d}_{s,q} < \infty$, then $f \in L_p(\R^d)$.
 \end{proposition}
+
+The constants $C_0$ and $C$ are those of \Cref{prop:daub-rd-block-norms}: the constants of upper
+stability (\Cref{thm:daub-rd-upper-stability}) for the scaling family and for the wavelet family.
 
 \begin{proof}
 \leanok

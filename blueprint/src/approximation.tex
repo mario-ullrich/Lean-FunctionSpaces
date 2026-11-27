@@ -982,7 +982,8 @@ $\alpha > 0$. For all sequences $a, b$ in $[0, \infty]$,
   &\leq \gamma_{\alpha, q} \, \|(2^{-k\alpha} b_k)_k\|_{\ell_q} ,
 \end{align*}
 and, with $c_{ij} = 2^{-(i-j)L}$ for $j \leq i$, $c_{ij} = 1$ for $j > i$ and the constant
-$A_{s,L}$ of \Cref{lem:almost-diagonal},
+$A_{sq, Lq} = (1 - 2^{-(L-s)q})^{-1} + (1 - 2^{-sq})^{-1} \in [0, \infty]$ of
+\Cref{lem:almost-diagonal} for the exponents $sq$ and $Lq$,
 \[
   \Bigl\| \Bigl( 2^{is} \sum_j c_{ij} \, a_j \Bigr)_i \Bigr\|_{\ell_q}
   \leq A_{sq, Lq}^{1/q} \, \|(2^{js} a_j)_j\|_{\ell_q} ,
@@ -1010,9 +1011,10 @@ sequence $(a_j^q)_j$ applies.
 \leanok
 \uses{lem:hardy, lem:hardy-below-one}
 For $\alpha \in \R$ and $q \in (0, \infty]$ let $H_{\alpha, q} = (1 - 2^{-\alpha})^{-1}$ for
-$q \geq 1$ and $H_{\alpha, q} = \gamma_{\alpha, q}$ for $q < 1$, with $\gamma_{\alpha, q}$ as in
-\Cref{lem:hardy-below-one}. Then $H_{\alpha, q} \geq 1$, and for $\alpha > 0$ the constant
-$H_{\alpha, q}$ and its powers $H_{\alpha, q}^t$, $t \geq 0$, are finite. For every sequence $b$
+$q \geq 1$ and $H_{\alpha, q} = (1 - 2^{-\alpha q})^{-1/q}$ for $q < 1$ (the constant
+$\gamma_{\alpha, q}$ of \Cref{lem:hardy-below-one}), in $[0, \infty]$. Then $H_{\alpha, q} \geq 1$,
+and for $\alpha > 0$ the constant $H_{\alpha, q}$ and its powers $H_{\alpha, q}^t$, $t \geq 0$,
+are finite. For every sequence $b$
 in $[0, \infty]$,
 \begin{align*}
   \Bigl\| \Bigl(2^{k\alpha} \sum_{i=0}^\infty b_{k+i}\Bigr)_k \Bigr\|_{\ell_q}
@@ -1075,7 +1077,10 @@ constant accumulates. \Cref{sec:moduli-quasi} uses this with Hardy's inequality 
   ENNReal.tsum_rpow_le_lqNorm_dyadicWeight, ENNReal.tsum_rpow_ne_top_of_lqNorm_dyadicWeight_ne_top}
 \leanok
 \uses{def:lq-norm, lem:hardy-every-exponent}
-Let $q \in (0, \infty]$, $s \in \R$ and let $e$, $x$, $y$ be sequences in $[0, \infty]$.
+Let $q \in (0, \infty]$, $s \in \R$ and let $e$, $x$, $y$ be sequences in $[0, \infty]$. For
+$\alpha \in \R$ and $r \in (0, \infty]$ let $H_{\alpha, r} = (1 - 2^{-\alpha})^{-1}$ for $r \geq 1$
+and $H_{\alpha, r} = (1 - 2^{-\alpha r})^{-1/r}$ for $r < 1$, in $[0, \infty]$, the constant of
+Hardy's inequality (\Cref{lem:hardy-every-exponent}).
 \begin{enumerate}
   \item $e_j \leq 2^{-js} \|(2^{ks} e_k)_k\|_{\ell_q}$ for every $j$; if $s > 0$ and the norm is
     finite, then $e_j \to 0$.
@@ -1085,7 +1090,7 @@ Let $q \in (0, \infty]$, $s \in \R$ and let $e$, $x$, $y$ be sequences in $[0, \
       \|(2^{ks} x_k)_k\|_{\ell_q}^\rho \leq c \, H_{s\rho - \beta, q/\rho} \,
       \|(2^{ks} y_k)_k\|_{\ell_q}^\rho ,
     \]
-    with $H$ as in \Cref{lem:hardy-every-exponent}, hence
+    hence
     \[
       \|(2^{ks} x_k)_k\|_{\ell_q} \leq (c \, H_{s\rho - \beta, q/\rho})^{1/\rho} \,
       \|(2^{ks} y_k)_k\|_{\ell_q} .
@@ -1182,8 +1187,9 @@ $\ell_q$ norms, by Cauchy condensation (\Cref{lem:condensation}).
   ENNReal.lqNorm_dyadic_succ_le_lqNorm_pow_mul, ENNReal.dyadic_le_lqNorm_pow_mul}
 \leanok
 \uses{def:lq-norm, lem:lq-quasi-triangle}
-Let $q \in (0, \infty]$, let $C_q$ be the constant of \Cref{lem:lq-quasi-triangle}, and
-$1/\infty = 0$. Let $s \in \R$, let $(e_n)_{n \in \N}$ be a sequence in $[0, \infty]$ and put
+Let $q \in (0, \infty]$, $1/\infty = 0$, and let $C_q = \max(1, 2^{1/q - 1})$ be the constant of
+the quasi-triangle inequality in $\ell_q$ (\Cref{lem:lq-quasi-triangle}). Let $s \in \R$, let
+$(e_n)_{n \in \N}$ be a sequence in $[0, \infty]$ and put
 $P = \|((n+1)^{s - 1/q} e_n)_n\|_{\ell_q}$. If $q < \infty$, then
 $P^q = \sum_n (n+1)^{sq - 1} e_n^q$. If $s \geq 0$ and $(e_n)_n$ decreases, then with
 $D = \|(2^{ks} e_{2^k})_k\|_{\ell_q}$,
@@ -1223,8 +1229,9 @@ $q \geq 1$.
   ApproximationScheme.memApprox_iff_lqNorm_dyadic_lt_top'}
 \leanok
 \uses{def:approx-space, def:dyadic-norm, lem:lq-quasi-triangle}
-Let $s \geq 0$, $q \in (0, \infty]$ and let $C_q$ be the constant of
-\Cref{lem:lq-quasi-triangle}. For every $f \in X$,
+Let $s \geq 0$, $q \in (0, \infty]$ and let $C_q = \max(1, 2^{1/q - 1})$, with $1/\infty = 0$, be
+the constant of the quasi-triangle inequality in $\ell_q$ (\Cref{lem:lq-quasi-triangle}). For
+every $f \in X$,
 $\|(2^{ks} E_{2^{k+1}}(f))_k\|_{\ell_q} \leq 2 C_q \|f\|_{A^s_q}$, and
 \[
   \|f\|_{A^s_q} \leq C_q 2^s \, \|f\|^{\mathrm{dy}}_{A^s_q}
@@ -1284,8 +1291,9 @@ This is the case $C_q = 1$ of \Cref{lem:dyadic-norm-below-one}, since $C_q = 1$ 
   ApproximationScheme.iUnion_subset_approxSpace}
 \leanok
 \uses{def:approx-space, def:dyadic-norm, lem:lq-quasi-triangle}
-Let $s \geq 0$, $0 < q \leq \infty$ and let $C_q$ be the constant of
-\Cref{lem:lq-quasi-triangle}. For all $f, g \in X$, $c \in \R$ and $m \in \N$:
+Let $s \geq 0$, $0 < q \leq \infty$ and let $C_q = \max(1, 2^{1/q - 1})$, with $1/\infty = 0$, be
+the constant of the quasi-triangle inequality in $\ell_q$ (\Cref{lem:lq-quasi-triangle}). For all
+$f, g \in X$, $c \in \R$ and $m \in \N$:
 \begin{enumerate}
   \item $\|c f\|_{A^s_q} = |c| \, \|f\|_{A^s_q}$;
   \item $\|f\| \leq \|f\|_{A^s_q}$, and $\|f\|_{A^s_q} = 0$ only for $f = 0$;
@@ -1971,8 +1979,9 @@ and, if $\rho\theta \geq 0$,
   \|f\|^{\Z}_{\theta, \rho, q} \leq C_q \, \gamma_{\rho\theta, q} \, \|f\|_{\theta, q} ,
 \]
 where $C_q = 1$ for $q \geq 1$ and $C_q = 2^{1/q - 1}$ for $q < 1$ is the constant of the
-quasi-triangle inequality in $\ell_q$ and $\gamma_{\rho\theta, q}$ is the constant of
-\Cref{lem:lq-reindex}. For every $\varphi : [0, \infty] \to [0, \infty]$,
+quasi-triangle inequality in $\ell_q$ and $\gamma_{\rho\theta, q} =
+\|(2^{-k\rho\theta})_{k \in \N}\|_{\ell_q}$ is the norm of the geometric sequence
+(\Cref{lem:lq-reindex}). For every $\varphi : [0, \infty] \to [0, \infty]$,
 \[
   \bigl\| \bigl(2^{k\rho\theta} \varphi(2^{-k\rho})\bigr)_{k \in \N} \bigr\|_{\ell_q}
   \leq \|\varphi^{\Z}_{\theta, \rho}\|_{\ell_q} ,
@@ -2016,24 +2025,32 @@ $n \leq 0$ form a part of the sequence on $\Z$.
   ApproximationScheme.memInterp_iff_memInterp_of_pos}
 \leanok
 \uses{lem:continuous-k-method-integer-grid, lem:integer-grid-natural-grid}
-Let $\theta \geq 0$, $\rho > 0$ and $q \in (0, \infty]$, and let $\|f\|_{\theta, q}$ be the
-expression of \Cref{def:interpolation} on the grid $t = 2^{-k\rho}$. For every $f \in X$,
+Let $\theta \geq 0$, $\rho > 0$ and $q \in (0, \infty]$, with $1/\infty = 0$, and let
+$\|f\|_{\theta, q}$ be the expression of \Cref{def:interpolation} on the grid $t = 2^{-k\rho}$.
+Let $C_q = \max(1, 2^{1/q - 1})$ be the constant of the quasi-triangle inequality in $\ell_q$
+(\Cref{lem:lq-quasi-triangle}), $\gamma_{\rho\theta, q} =
+\|(2^{-k\rho\theta})_{k \in \N}\|_{\ell_q} \in [1, \infty]$ (\Cref{lem:lq-reindex}), and
+\[
+  M_1 = (\rho \log 2)^{1/q} \, 2^{\rho\theta} \, C_q \, \gamma_{\rho\theta, q} , \qquad
+  M_2 = \bigl(1 + \max(1, \|\iota\|)\bigr) \, 2^{\rho\theta} (\rho \log 2)^{-1/q} .
+\]
+For every $f \in X$,
 \[
   \|f\|_{K, \theta, q} \leq M_1 \, \|f\|_{\theta, q}
   \qquad \text{and} \qquad
-  \|f\|_{\theta, q} \leq M_2 \, \|f\|_{K, \theta, q} ,
+  \|f\|_{\theta, q} \leq M_2 \, \|f\|_{K, \theta, q} .
 \]
-where $M_1 = (\rho \log 2)^{1/q} \, 2^{\rho\theta} \, C_q \, \gamma_{\rho\theta, q}$ and
-\[
-  M_2 = \bigl(1 + \max(1, \|\iota\|)\bigr) \, 2^{\rho\theta} (\rho \log 2)^{-1/q} ,
-\]
-with $C_q$ and $\gamma_{\rho\theta, q}$ as in \Cref{lem:integer-grid-natural-grid}. The
-constant $M_2$ is finite, and $M_1$ is finite for $\theta > 0$. In particular, for every
+The constant $M_2$ is finite, and $M_1$ is finite for $\theta > 0$. In particular, for every
 $\theta > 0$, every $q \in (0, \infty]$, all $\rho, \rho' > 0$ and every $f \in X$, $f$ lies in
 the space of the discrete $K$-method on the grid $t = 2^{-k\rho}$ if and only if
 $f \in (X, Y)^K_{\theta, q}$, if and only if $f$ lies in the space of the discrete $K$-method on
 the grid $t = 2^{-k\rho'}$.
 \end{theorem}
+
+The factors $(\rho \log 2)^{\pm 1/q} \, 2^{\rho\theta}$ compare the integral over $t$ with the
+sum over the grid on $\Z$ (\Cref{lem:continuous-k-method-integer-grid}); the factors $C_q$,
+$\gamma_{\rho\theta, q}$ and $1 + \max(1, \|\iota\|)$ pass between the grids on $\Z$ and on $\N$
+(\Cref{lem:integer-grid-natural-grid}).
 
 \begin{proof}
 \leanok
@@ -2055,8 +2072,10 @@ spaces are all of $X$.
   ApproximationScheme.SmoothnessSpace.memApprox_iff_memInclKMethod}
 \leanok
 \uses{thm:representation, thm:discrete-continuous-k-method, def:smoothness}
-Let $A$, $r$, $C_1, C_2 \geq 0$ and $\iota$ be as in \Cref{thm:representation}, and let
-$0 < s < r$ and $1 \leq q \leq \infty$. For every $f \in X$, $f \in A^s_q$ if and only if
+Let $A$ be an approximation scheme in $X$, let $r \in \R$ and $C_1, C_2 \geq 0$, and let
+$\iota$ satisfy Jackson's inequality of order $r$ and constant $C_1$ and the lifting bound of
+exponent $r$ and constant $C_2$. Let $0 < s < r$ and $1 \leq q \leq \infty$. For every
+$f \in X$, $f \in A^s_q$ if and only if
 $\|f\|_{K, s/r, q} < \infty$. In particular, for every smoothness space $W$ of order $r$,
 $A^s_q = (X, W)^K_{s/r, q}$.
 \end{corollary}
@@ -2315,7 +2334,8 @@ Let $A$ be a couple on $U$, let $\theta \in \R$ and $q \in (0, \infty]$.
       \|u + v\|_{K, \theta, q}
       \leq C_q \, C \bigl(\|u\|_{K, \theta, q} + \|v\|_{K, \theta, q}\bigr) ,
     \]
-    with the constant $C_q$ of \Cref{lem:integer-grid-natural-grid}.
+    with $C_q = \max(1, 2^{1/q - 1})$, $1/\infty = 0$, the constant of the quasi-triangle
+    inequality in $\ell_q$ (\Cref{lem:lq-quasi-triangle}).
   \item If $U$ is a real vector space and $A$ is homogeneous, then
     $\|r u\|_{K, \theta, q} \leq |r| \, \|u\|_{K, \theta, q}$ for every $r \in \R$ and every
     $u \in U$; if $A$ is moreover quasi-normed, $(X_0, X_1)_{\theta, q}$ is a linear subspace
@@ -2375,11 +2395,14 @@ for $u \in U$ let
   \|u\|_{\theta, \rho, q}
   = N_0(u) + \bigl\| \bigl(2^{k\rho\theta} K(2^{-k\rho}, u)\bigr)_{k \in \N} \bigr\|_{\ell_q} .
 \]
-If $N_0(0) = N_1(0) = 0$, then $\|0\|_{\theta, \rho, q} = 0$.
+Let $C_q = \max(1, 2^{1/q - 1})$, $1/\infty = 0$, be the constant of the quasi-triangle inequality
+in $\ell_q$ (\Cref{lem:lq-quasi-triangle}) and, for $\rho\theta \geq 0$,
+$\gamma_{\rho\theta, q} = \|(2^{-k\rho\theta})_{k \in \N}\|_{\ell_q}$ (\Cref{lem:lq-reindex}). If
+$N_0(0) = N_1(0) = 0$, then $\|0\|_{\theta, \rho, q} = 0$.
 \begin{enumerate}
   \item If $N_1(0) = 0$ and $\rho\theta \geq 0$, then
     $\|u\|^{\Z}_{\theta, \rho, q} \leq C_q \, \gamma_{\rho\theta, q} \, \|u\|_{\theta, \rho, q}$
-    for every $u \in U$, with the constants of \Cref{lem:integer-grid-natural-grid}.
+    for every $u \in U$.
   \item If $A$ is quasi-normed with constant $C$ and $N_0(a) \leq c \, N_1(a)$ for every
     $a \in U$ and some $c \in [0, \infty)$, then
     $\|u\|_{\theta, \rho, q} \leq \bigl(1 + C \max(1, c)\bigr) \|u\|^{\Z}_{\theta, \rho, q}$
@@ -2387,8 +2410,9 @@ If $N_0(0) = N_1(0) = 0$, then $\|0\|_{\theta, \rho, q} = 0$.
   \item Under the hypotheses of (2), for $\theta > 0$ and $\rho > 0$, every $u \in U$ satisfies
     $u \in (X_0, X_1)_{\theta, q}$ if and only if $\|u\|_{\theta, \rho, q} < \infty$.
   \item If $N_1(0) = 0$, $\theta \geq 0$ and $\rho > 0$, then
-    $\|u\|_{K, \theta, q} \leq M_1 \, \|u\|_{\theta, \rho, q}$ for every $u \in U$, with the
-    constant $M_1$ of \Cref{thm:discrete-continuous-k-method}. Under the hypotheses of (2), for
+    $\|u\|_{K, \theta, q} \leq M_1 \, \|u\|_{\theta, \rho, q}$ for every $u \in U$, with
+    $M_1 = (\rho \log 2)^{1/q} \, 2^{\rho\theta} \, C_q \, \gamma_{\rho\theta, q}$, the constant
+    of \Cref{thm:discrete-continuous-k-method}. Under the hypotheses of (2), for
     $\theta \geq 0$ and $\rho > 0$,
     $\|u\|_{\theta, \rho, q} \leq \bigl(1 + C \max(1, c)\bigr) \, 2^{\rho\theta}
     (\rho \log 2)^{-1/q} \, \|u\|_{K, \theta, q}$ for every $u \in U$.
@@ -2577,16 +2601,19 @@ two pieces of finite norm.
 \leanok
 \uses{lem:k-functional-map, lem:phi-functional-dilation, lem:couple-k-functional,
   def:couple-k-method}
-Let $A$, $B$, $T$, $M_0$, $M_1$ and $u$ be as in \Cref{lem:k-functional-map}, with
-$M_1 \in (0, \infty)$, and assume the hypothesis of (1) or of (2) there. For every
-$\theta \in \R$ and every $q \in (0, \infty]$,
+Let $A = (N_0, N_1)$ be a couple on $U$ and $B = (N_0', N_1')$ a couple on $V$, let
+$T : U \to V$ be a map, and let $M_0, M_1 \in (0, \infty)$ with $N_0'(Ta) \leq M_0 N_0(a)$ and
+$N_1'(Ta) \leq M_1 N_1(a)$ for every $a \in U$. Let $u \in U$, and let $T$ be additive or satisfy
+$Tu = T(u - b) + Tb$ for every $b \in U$ with $N_0(u - b) < \infty$ and $N_1(b) < \infty$. For
+every $\theta \in \R$ and every $q \in (0, \infty]$,
 \[
   \|Tu\|_{K, \theta, q} \leq M_0^{1-\theta} M_1^{\theta} \, \|u\|_{K, \theta, q} .
 \]
 In particular, for every additive $T : U \to V$ and all $M_0, M_1 \in [0, \infty)$ with
 $N_0'(Ta) \leq M_0 N_0(a)$ and $N_1'(Ta) \leq M_1 N_1(a)$ for every $a \in U$, every
-$\theta \in \R$ and every $q \in (0, \infty]$, the map $T$ sends $(X_0, X_1)_{\theta, q}$ into
-$(X_0', X_1')_{\theta, q}$.
+$\theta \in \R$ and every $q \in (0, \infty]$, the map $T$ sends the space
+$(X_0, X_1)_{\theta, q}$ of the $u \in U$ with $\|u\|_{K, \theta, q} < \infty$ for $A$ into the
+corresponding space $(X_0', X_1')_{\theta, q}$ for $B$ (\Cref{def:couple-k-method}).
 \end{theorem}
 
 \begin{proof}
@@ -2712,9 +2739,11 @@ $T \iota = \iota' S$. Let $\theta \in \R$, $q \in (0, \infty]$ and $f \in X$.
     $\|Tf\|_{K, \theta, q} \leq L_0^{1-\theta} L_1^{\theta} \, \|f\|_{K, \theta, q}$; and, for
     $\theta \geq 0$ and $\rho > 0$, the norms of \Cref{def:interpolation} on the grid
     $t = 2^{-k\rho}$ satisfy
-    $\|Tf\|_{\theta, q} \leq c' \, L_0^{1-\theta} L_1^{\theta} \, c \, \|f\|_{\theta, q}$,
-    where $c$ is the constant $M_1$ of \Cref{thm:discrete-continuous-k-method} and $c'$ is its
-    constant $M_2$ for $\iota'$.
+    $\|Tf\|_{\theta, q} \leq c' \, L_0^{1-\theta} L_1^{\theta} \, c \, \|f\|_{\theta, q}$ with
+    the constants $c = (\rho \log 2)^{1/q} \, 2^{\rho\theta} \, C_q \, \gamma_{\rho\theta, q}$
+    and $c' = \bigl(1 + \max(1, \|\iota'\|)\bigr) \, 2^{\rho\theta} (\rho \log 2)^{-1/q}$ of
+    \Cref{thm:discrete-continuous-k-method}, where $C_q = \max(1, 2^{1/q - 1})$, $1/\infty = 0$,
+    and $\gamma_{\rho\theta, q} = \|(2^{-k\rho\theta})_{k \in \N}\|_{\ell_q}$.
   \item The map $T$ sends $(X, Y)^K_{\theta, q}$ into $(X', Y')^K_{\theta, q}$, and, for
     $\theta > 0$ and $\rho > 0$, the space of the discrete $K$-method on the grid
     $t = 2^{-k\rho}$ for $\iota$ into the space for $\iota'$.
@@ -2940,8 +2969,9 @@ The constant is finite since $\alpha > 0$ and $1 - \alpha > 0$.
   lem:couple-k-functional, lem:k-space-couples, lem:couple-k-functional-swap,
   lem:couple-k-method-swap}
 Let $A$ be a couple on $U$ quasi-normed with constant $C$, let $q_0, q_1 \in [1, \infty]$ and
-$\theta_0, \theta_1 \in (0, 1)$, and let $c_C$ be as in \Cref{lem:holmstedt-halves}. For every
-$m \in \Z$ and every $u \in U$:
+$\theta_0, \theta_1 \in (0, 1)$, and let
+$c_C(\alpha) = (1 - 2^{-\alpha})^{-1} + C (1 - 2^{-(1-\alpha)})^{-1}$ be the constant of
+\Cref{lem:holmstedt-halves}. For every $m \in \Z$ and every $u \in U$:
 \begin{enumerate}
   \item with $s = 2^{m(\theta_1 - \theta_0)}$ and $\bar K$ the $K$-functional of the couple of
     $K$-spaces,
@@ -3270,12 +3300,14 @@ bound combines these with (1).
 \uses{lem:approximants-top-norm, lem:near-best, thm:lift, lem:hardy, lem:lq-basic,
   prop:couple-natural-grid, def:approximation-space-couples, lem:approximation-space-couples,
   lem:couple-k-functional, def:lq-norm, thm:representation}
-Let $0 \leq s < r$ and $q \in [1, \infty]$. For every $f \in X$,
+Let $0 \leq s < r$ and $q \in [1, \infty]$, let $K$ be the $K$-functional of the couple
+$(X, A^r_\infty)$, and let
+$\|f\|_{s/r, r, q} = \|f\| + \|(2^{ks} K(2^{-kr}, f))_{k \in \N}\|_{\ell_q}$, its norm on the grid
+$t = 2^{-kr}$ (\Cref{prop:couple-natural-grid}). For every $f \in X$,
 \[
   \|f\|_{s/r, r, q} \leq \bigl(3 + 7 (1 - 2^{-(r-s)})^{-1}\bigr) \,
-  \|f\|^{\mathrm{dy}}_{A^s_q} ,
+  \|f\|^{\mathrm{dy}}_{A^s_q} .
 \]
-with the norm $\|\cdot\|_{s/r, r, q}$ of \Cref{prop:couple-natural-grid} of $(X, A^r_\infty)$.
 \end{theorem}
 
 \begin{proof}
@@ -3350,8 +3382,8 @@ $t = 2^n$ of the couple $(X, A^r_\infty)$. For every $f \in X$:
   \item if $0 < s < r$, then $\|f\|_{K, s/r, q} \leq M \, \|f\|^{\mathrm{dy}}_{A^s_q}$ and
     $\|f\|^{\Z}_{s/r, 1, q} \leq \bigl((\log 2)^{1/q} 2^{-s/r}\bigr)^{-1} M \,
     \|f\|^{\mathrm{dy}}_{A^s_q}$, with $M = M_1 \bigl(3 + 7 (1 - 2^{-(r-s)})^{-1}\bigr)$ and
-    the constant $M_1$ of \Cref{thm:discrete-continuous-k-method} for $\theta = s/r$ and
-    $\rho = r$.
+    $M_1 = (r \log 2)^{1/q} \, 2^s \, \|(2^{-ks})_{k \in \N}\|_{\ell_q}$, the constant of
+    \Cref{thm:discrete-continuous-k-method} for $\theta = s/r$, $\rho = r$ and $q \geq 1$.
 \end{enumerate}
 All these constants are finite.
 \end{lemma}
@@ -3591,9 +3623,10 @@ This is~\cite[Definition~7.1.5]{BerghLofstrom}.
 \leanok
 \uses{def:continuous-k-method, lem:bounded-on-pieces, lem:dyadic-pieces, lem:lq-quasi-triangle,
   lem:lq-reindex}
-Let $\alpha \geq 0$, $q \in (0, \infty]$ and $\varphi : [0, \infty] \to [0, \infty]$, let
-$C_q$ be the constant of \Cref{lem:lq-quasi-triangle}, $\gamma_{\alpha, q}$ that of
-\Cref{lem:lq-reindex}, and $1/\infty = 0$.
+Let $\alpha \geq 0$, $q \in (0, \infty]$ and $\varphi : [0, \infty] \to [0, \infty]$. Let
+$C_q = \max(1, 2^{1/q - 1})$, with $1/\infty = 0$, be the constant of the quasi-triangle
+inequality in $\ell_q$ (\Cref{lem:lq-quasi-triangle}), and let
+$\gamma_{\alpha, q} = \|(2^{-k\alpha})_{k \in \N}\|_{\ell_q}$ (\Cref{lem:lq-reindex}).
 \begin{enumerate}
   \item If $\varphi$ is decreasing and $\varphi \leq M$, then
     \[
@@ -3634,7 +3667,9 @@ alone, where $t^\alpha \varphi(t) \geq 2^{-\alpha} M$.
 \uses{def:e-method, lem:e-functional, lem:antitone-phi-functional, lem:lq-basic,
   lem:lq-quasi-triangle}
 Let $A = (N_0, N_1)$ be a couple on $U$, let $\alpha \geq 0$, $q \in (0, \infty]$ and
-$u, v \in U$, with the constants of \Cref{lem:antitone-phi-functional}.
+$u, v \in U$. Let $C_q = \max(1, 2^{1/q - 1})$, with $1/\infty = 0$, and
+$\gamma_{\alpha, q} = \|(2^{-k\alpha})_{k \in \N}\|_{\ell_q}$ be the constants of
+\Cref{lem:antitone-phi-functional}.
 \begin{enumerate}
   \item If $N_1(0) = 0$, then $\|u\|_{\alpha, q; E} \leq (\log 2)^{1/q} \, C_q \,
     (2^\alpha + \gamma_{\alpha, q}) \, \|u\|^{\mathrm{dy}}_{E, \alpha, q}$.
@@ -3690,7 +3725,7 @@ Let $A = (N_0, N_1)$ be a couple on $U$ and let $u \in U$.
   \item For all $s \in \R$ and $0 < q \leq r \leq \infty$,
     $\|u\|^{\mathrm{dy}}_{E, s, r} \leq \|u\|^{\mathrm{dy}}_{E, s, q}$.
   \item For all real $t < s$ and all $q, r \in (0, \infty]$, with the constant
-    $\gamma_{s - t, r} < \infty$ of \Cref{lem:lq-reindex},
+    $\gamma_{s - t, r} = \|(2^{-k(s-t)})_{k \in \N}\|_{\ell_r} < \infty$ (\Cref{lem:lq-reindex}),
     \[
       \|u\|^{\mathrm{dy}}_{E, t, r} \leq \gamma_{s - t, r} \, \|u\|^{\mathrm{dy}}_{E, s, q} .
     \]
@@ -3740,8 +3775,10 @@ $e_k = E(2^k, u) + N_0(u) \, 2^{-k(s+1)}$ for $k \in \N$.
     then $N_1(a - b) \leq N_1(a) + N_1(b)$ for all $a, b \in U$, and $N_1(b' - b) \leq 2^{j+2}$
     for all $b, b' \in U$ and $j \in \N$ with $N_1(b) \leq 2^j$ and $N_1(b') \leq 2^{j+1}$.
   \item $\|(2^{ks} e_k)_k\|_{\ell_q} \leq C_q (1 + \gamma_{1, q}) \,
-    \|u\|^{\mathrm{dy}}_{E, s, q}$ for every $q \in (0, \infty]$, with the constants $C_q$ of
-    \Cref{lem:lq-quasi-triangle} and $\gamma_{1, q}$ of \Cref{lem:lq-reindex}. Consequently, if
+    \|u\|^{\mathrm{dy}}_{E, s, q}$ for every $q \in (0, \infty]$, with the constant
+    $C_q = \max(1, 2^{1/q - 1})$, $1/\infty = 0$, of the quasi-triangle inequality in $\ell_q$
+    (\Cref{lem:lq-quasi-triangle}) and $\gamma_{1, q} = \|(2^{-k})_{k \in \N}\|_{\ell_q}$
+    (\Cref{lem:lq-reindex}). Consequently, if
     $N_1(0) = 0$ and $s \geq -1$, there are $b_k \in U$ with $N_1(b_k) \leq 2^k$ and a
     decreasing sequence $(e_k')_k$ in $[0, \infty]$ with $N_0(u - b_k) \leq e_k'$ for every $k$,
     $N_0(u) \leq e_0'$ and
@@ -3793,8 +3830,9 @@ $1/\infty = 0$. \emph{Pietsch's form} of the norm of $E_{s, q}$ is
   InterpCouple.eNormPietsch_map_le}
 \leanok
 \uses{def:e-pietsch-norm, def:e-method, lem:lq-quasi-triangle, lem:e-method-calculus}
-Let $q \in (0, \infty]$, let $C_q$ be the constant of \Cref{lem:lq-quasi-triangle}, and
-$1/\infty = 0$. Let $A = (N_0, N_1)$ be a couple on $U$, let $s \in \R$ and $u \in U$.
+Let $q \in (0, \infty]$, $1/\infty = 0$, and let $C_q = \max(1, 2^{1/q - 1})$ be the constant of
+the quasi-triangle inequality in $\ell_q$ (\Cref{lem:lq-quasi-triangle}). Let $A = (N_0, N_1)$ be
+a couple on $U$, let $s \in \R$ and $u \in U$.
 \begin{enumerate}
   \item If $N_0(0) = N_1(0) = 0$, then $\|0\|^{\mathrm{P}}_{E, s, q} = 0$.
   \item Let $s \geq 0$. If $N_1(0) = 0$, then
@@ -3948,8 +3986,9 @@ $\|\cdot\|^{\mathrm{dy}}_{E, s_1, q_1}$.
   InterpCouple.isHomogeneousCouple_eCouple}
 \leanok
 \uses{def:e-couples, def:couple, lem:lq-quasi-triangle}
-Let $s, r, s_0, s_1 \in \R$ and $q, q_0, q_1 \in (0, \infty]$, let $C_q$ be the constant of
-\Cref{lem:lq-quasi-triangle}, and let $u \in U$.
+Let $s, r, s_0, s_1 \in \R$ and $q, q_0, q_1 \in (0, \infty]$, let
+$C_q = \max(1, 2^{1/q - 1})$, $1/\infty = 0$, be the constant of the quasi-triangle inequality in
+$\ell_q$ (\Cref{lem:lq-quasi-triangle}), and let $u \in U$.
 \begin{enumerate}
   \item If $N_0$ and $N_1$ are even, then
     $\|{-u}\|^{\mathrm{dy}}_{E, s, q} = \|u\|^{\mathrm{dy}}_{E, s, q}$.
@@ -3995,8 +4034,10 @@ Let $r \in \R$.
       E(2^{k+1}, u) \leq C \max(1, C_J) \, K(2^{-kr}, u) .
     \]
     If $r \neq 0$, then for every $s \in \R$, every $q \in (0, \infty]$ and every $u \in U$,
-    with the norm $\|\cdot\|_{s/r, r, q}$ of \Cref{prop:couple-natural-grid} of $(N_0, N)$ and
-    the constant $C_q$ of \Cref{lem:lq-quasi-triangle},
+    with the norm $\|u\|_{s/r, r, q} = N_0(u) + \|(2^{ks} K(2^{-kr}, u))_{k \in \N}\|_{\ell_q}$
+    of $(N_0, N)$ on the grid $t = 2^{-kr}$ (\Cref{prop:couple-natural-grid}) and the constant
+    $C_q = \max(1, 2^{1/q - 1})$, $1/\infty = 0$, of the quasi-triangle inequality in $\ell_q$
+    (\Cref{lem:lq-quasi-triangle}),
     \[
       \|u\|^{\mathrm{dy}}_{E, s, q} \leq \bigl(1 + C_q (1 + 2^s C \max(1, C_J))\bigr)
       \|u\|_{s/r, r, q} .
@@ -4045,9 +4086,13 @@ $E$-functionals vanish from level $k$ on, so their dyadic norms are bounded by f
 \leanok
 \uses{def:e-couples, def:couple-k-functional, def:lq-norm, prop:couple-natural-grid,
   lem:lq-quasi-triangle, lem:lq-reindex, lem:hardy-every-exponent}
-Let $q, q_1 \in (0, \infty]$ and $\rho_1 = \min(1, q_1)$, and let $C_q$, $\gamma_{\alpha, q}$ and
-$H_{\alpha, q}$ be the constants of \Cref{lem:lq-quasi-triangle}, \Cref{lem:lq-reindex} and
-\Cref{lem:hardy-every-exponent}.
+Let $q, q_1 \in (0, \infty]$ and $\rho_1 = \min(1, q_1)$, with $1/\infty = 0$. Let
+$C_q = \max(1, 2^{1/q - 1})$ be the constant of the quasi-triangle inequality in $\ell_q$
+(\Cref{lem:lq-quasi-triangle}), for $\alpha \geq 0$ let
+$\gamma_{\alpha, q} = \|(2^{-k\alpha})_{k \in \N}\|_{\ell_q}$ (\Cref{lem:lq-reindex}), and for
+$\alpha \in \R$ and $p \in (0, \infty]$ let $H_{\alpha, p} = (1 - 2^{-\alpha})^{-1}$ for
+$p \geq 1$ and $H_{\alpha, p} = (1 - 2^{-\alpha p})^{-1/p}$ for $p < 1$, in $[0, \infty]$, the
+constant of Hardy's inequality (\Cref{lem:hardy-every-exponent}).
 \begin{enumerate}
   \item Let $B$ be a couple on $U$ with the $K$-functional $K_B$, let $r, s \in \R$ with
     $s \leq r$, let $u \in U$, $a, b \in [0, \infty]$, and let $(e_k)_k$, $(x_k)_k$ be sequences
@@ -4075,17 +4120,28 @@ $H_{\alpha, q}$ be the constants of \Cref{lem:lq-quasi-triangle}, \Cref{lem:lq-r
       \|(2^{ks} K(2^{-kr}, u))_k\|_{\ell_q}
       \leq C_q \bigl( C_q ( (1 + C) L + C N_0(u) \, \gamma_{r-s, q} ) + T L \bigr) .
     \]
-  \item Let $A$ be quasi-normed with constant $C$ and let $0 \leq s < r$. Then for every
-    $u \in U$, with the norm $\|\cdot\|_{s/r, r, q}$ of \Cref{prop:couple-natural-grid} of the
-    couple $(N_0, E_{r, q_1})$,
+  \item Let $A$ be quasi-normed with constant $C$, let $0 \leq s < r$, let $K$ be the
+    $K$-functional of the couple $(N_0, E_{r, q_1})$, and let
+    $\|u\|_{s/r, r, q} = N_0(u) + \|(2^{ks} K(2^{-kr}, u))_{k \in \N}\|_{\ell_q}$ be its norm on
+    the grid $t = 2^{-kr}$ (\Cref{prop:couple-natural-grid}). There is a constant $c < \infty$,
+    depending only on $C$, $r$, $s$, $q$ and $q_1$, such that for every $u \in U$
     \[
-      \|u\|_{s/r, r, q} \leq c \, \|u\|^{\mathrm{dy}}_{E, s, q} ,
+      \|u\|_{s/r, r, q} \leq c \, \|u\|^{\mathrm{dy}}_{E, s, q} .
     \]
-    where $M = C_q (1 + \gamma_{1, q})$ and
-    $c = 1 + C_q \bigl( C_q ((1 + C) M + C \gamma_{r-s, q}) + ((2C)^{\rho_1}
-    H_{(r-s)\rho_1, q/\rho_1})^{1/\rho_1} M \bigr)$ is finite.
 \end{enumerate}
 \end{theorem}
+
+The constant of (4) is
+\[
+  c = 1 + C_q \Bigl( C_q \bigl((1 + C) M + C \gamma_{r-s, q}\bigr)
+    + \bigl((2C)^{\rho_1} H_{(r-s)\rho_1, q/\rho_1}\bigr)^{1/\rho_1} M \Bigr) ,
+  \qquad M = C_q (1 + \gamma_{1, q}) .
+\]
+The factor $M$ bounds near-best errors $e_k$ by the dyadic norm (\Cref{lem:e-near-best}), the
+bracket is the bound of (3) with $L \leq M \|u\|^{\mathrm{dy}}_{E, s, q}$ and
+$N_0(u) \leq \|u\|^{\mathrm{dy}}_{E, s, q}$, and the summand $1$ adds $N_0(u)$. The constant is
+finite since $r - s > 0$ makes $\gamma_{r-s, q}$ and $H_{(r-s)\rho_1, q/\rho_1}$ finite
+(\Cref{lem:lq-reindex}, \Cref{lem:hardy-every-exponent}).
 
 \begin{proof}
 \leanok
@@ -4165,28 +4221,31 @@ For a scheme in a normed space and $q \geq 1$ this is
 \uses{def:e-couples, def:couple-k-method, lem:lq-quasi-triangle}
 Let $A$ be quasi-normed with constant $C$, let $r > 0$ and $q \in (0, \infty]$, and write
 $\|\cdot\|^{\Z}_{\theta, 1, q}$ for the discrete $K$-norm on the grid $t = 2^n$ of the couple
-$(N_0, E_{r, \infty})$. For every $u \in U$:
+$(N_0, E_{r, \infty})$.
 \begin{enumerate}
-  \item if $N_1$ is subadditive and $s \geq 0$, then
-    $\|u\|^{\mathrm{dy}}_{E, s, q} \leq c \, \|u\|^{\Z}_{s/r, 1, q}$ with
-    \[
-      c = \bigl(1 + C_q (1 + 2^s C)\bigr) (1 + K_{r, \infty}) \, 2^s (r \log 2)^{-1/q}
-      (\log 2)^{1/q} \, 2^{s/r} ,
-    \]
-    where $C_q$ is the constant of \Cref{lem:lq-quasi-triangle} and $K_{r, \infty}$ the
-    constant of (3) of \Cref{lem:e-couples};
-  \item if $0 < s < r$, then
-    \[
-      \|u\|^{\Z}_{s/r, 1, q} \leq c' \, \|u\|^{\mathrm{dy}}_{E, s, q}
-      \qquad \text{with} \qquad
-      c' = \bigl((\log 2)^{1/q} 2^{-s/r}\bigr)^{-1} M_1 c_B ,
-    \]
-    where $M_1$ is the constant of \Cref{thm:discrete-continuous-k-method} for $\theta = s/r$
-    and $\rho = r$, and $c_B$ the constant of (4) of \Cref{thm:e-couple-bernstein} for
-    $q_1 = \infty$.
+  \item If $N_1$ is subadditive and $s \geq 0$, there is a constant $c < \infty$, depending only
+    on $C$, $r$, $s$ and $q$, such that
+    $\|u\|^{\mathrm{dy}}_{E, s, q} \leq c \, \|u\|^{\Z}_{s/r, 1, q}$ for every $u \in U$.
+  \item If $0 < s < r$, there is a constant $c' < \infty$, depending only on $C$, $r$, $s$ and
+    $q$, such that $\|u\|^{\Z}_{s/r, 1, q} \leq c' \, \|u\|^{\mathrm{dy}}_{E, s, q}$ for every
+    $u \in U$.
 \end{enumerate}
-Both constants are finite.
 \end{lemma}
+
+The constants are
+\[
+  c = \bigl(1 + C_q (1 + 2^s C)\bigr) (1 + K_{r, \infty}) \, 2^s (r \log 2)^{-1/q}
+  (\log 2)^{1/q} \, 2^{s/r} , \qquad
+  c' = \bigl((\log 2)^{1/q} 2^{-s/r}\bigr)^{-1} M_1 c_4 .
+\]
+In $c$, the first factor is the Jackson bound of \Cref{lem:e-couple-jackson}, with
+$C_q = \max(1, 2^{1/q - 1})$ the constant of the quasi-triangle inequality in $\ell_q$
+(\Cref{lem:lq-quasi-triangle}); $K_{r, \infty} = C (2 + 2^r)$ is the quasi-triangle constant of
+the couple $(N_0, E_{r, \infty})$ (\Cref{lem:e-couples}); the remaining factors pass from the
+grid on $\N$ to the continuous and then to the discrete $K$-norm
+(\Cref{prop:couple-natural-grid}, \Cref{thm:couple-discrete-continuous}). In $c'$, $M_1$ is the
+constant of \Cref{thm:discrete-continuous-k-method} for $\theta = s/r$ and $\rho = r$, and $c_4$
+is the constant $c$ of (4) of \Cref{thm:e-couple-bernstein} for $q_1 = \infty$.
 
 \begin{proof}
 \leanok
@@ -4276,7 +4335,8 @@ $N_0 + Y$.
 \leanok
 \uses{def:jackson-bernstein-data, def:couple, lem:lq-quasi-triangle}
 Let $Y$ satisfy Jackson's and Bernstein's inequalities of order $r$ with exponent $\rho$ and
-constants $C_J$, $C_B$, and let $C_\rho$ be the constant of \Cref{lem:lq-quasi-triangle}.
+constants $C_J$, $C_B$, and let $C_\rho = \max(1, 2^{1/\rho - 1})$ be the constant of the
+quasi-triangle inequality in $\ell_\rho$ (\Cref{lem:lq-quasi-triangle}).
 \begin{enumerate}
   \item Let $A$ be quasi-normed with constant $C$, let $u, a, a' \in U$ and
     $x \in [0, \infty]$. If $N_0(u - a) \leq x$, then $N_0(a) \leq C (x + N_0(u))$; if
@@ -4341,24 +4401,21 @@ approximation from sets $X_n$.
   prop:couple-natural-grid, lem:lq-quasi-triangle, lem:lq-reindex, lem:hardy-every-exponent}
 Let $A$ be quasi-normed with constant $C$, let $N_1$ be subadditive, and let $Y$ satisfy
 Jackson's and Bernstein's inequalities of order $r$ with exponent $\rho$ and constants $C_J$,
-$C_B$. Let $C_q$, $\gamma_{\alpha, q}$ and $H_{\alpha, q}$ be the constants of
-\Cref{lem:lq-quasi-triangle}, \Cref{lem:lq-reindex} and \Cref{lem:hardy-every-exponent}, let $K$
-be the $K$-functional of the couple $(N_0, N_0 + Y)$, and write $\|\cdot\|_{s/r, r, q}$ for its
-norm of \Cref{prop:couple-natural-grid}.
+$C_B$. Let $K$ be the $K$-functional of the couple $(N_0, N_0 + Y)$, and for $s \in \R$ and
+$q \in (0, \infty]$ let
+$\|u\|_{s/r, r, q} = N_0(u) + \|(2^{ks} K(2^{-kr}, u))_{k \in \N}\|_{\ell_q}$ be its norm on the
+grid $t = 2^{-kr}$ for $r \neq 0$ (\Cref{prop:couple-natural-grid}) and
+$C_q = \max(1, 2^{1/q - 1})$, $1/\infty = 0$, the constant of the quasi-triangle inequality in
+$\ell_q$ (\Cref{lem:lq-quasi-triangle}).
 \begin{enumerate}
   \item Let $r \geq 0$ and $u \in U$, and let $b_k \in U$ and $e_k \in [0, \infty]$ satisfy
     $N_0(u - b_k) \leq e_k$ for every $k \in \N$. Then for every $k \in \N$,
     \[
       K(2^{-kr}, u) \leq (1 + C) e_k + C N_0(u) \, 2^{-kr} + 2^{-kr} Y(b_k) .
     \]
-  \item Let $0 \leq s < r$ and $q \in (0, \infty]$. Then for every $u \in U$,
-    $\|u\|_{s/r, r, q} \leq c \, \|u\|^{\mathrm{dy}}_{E, s, q}$, where
-    $M = C_q (1 + \gamma_{1, q})$ and
-    \[
-      c = 1 + C_q \Bigl( C_q \bigl((1 + C) M + C \gamma_{r-s, q}\bigr)
-        + \bigl(2 (2 C C_B)^\rho \, 4^{r\rho} H_{(r-s)\rho, q/\rho}\bigr)^{1/\rho} M \Bigr)
-    \]
-    is finite.
+  \item Let $0 \leq s < r$ and $q \in (0, \infty]$. There is a constant $c < \infty$, depending
+    only on $C$, $C_B$, $\rho$, $r$, $s$ and $q$, such that
+    $\|u\|_{s/r, r, q} \leq c \, \|u\|^{\mathrm{dy}}_{E, s, q}$ for every $u \in U$.
   \item Let $r \neq 0$, $s \in \R$ and $q \in (0, \infty]$. Then for every $u \in U$,
     $\|u\|^{\mathrm{dy}}_{E, s, q} \leq \bigl(1 + C_q (1 + 2^s C \max(1, C_J))\bigr)
     \|u\|_{s/r, r, q}$.
@@ -4367,6 +4424,19 @@ norm of \Cref{prop:couple-natural-grid}.
     $(N_0, N_0 + Y)$, if and only if $\|u\|^{\mathrm{dy}}_{E, s, q} < \infty$.
 \end{enumerate}
 \end{theorem}
+
+The constant of (2) is
+\[
+  c = 1 + C_q \Bigl( C_q \bigl((1 + C) M + C \gamma_{r-s, q}\bigr)
+    + \bigl(2 (2 C C_B)^\rho \, 4^{r\rho} H_{(r-s)\rho, q/\rho}\bigr)^{1/\rho} M \Bigr) ,
+  \qquad M = C_q (1 + \gamma_{1, q}) ,
+\]
+with $\gamma_{\alpha, q} = \|(2^{-k\alpha})_{k \in \N}\|_{\ell_q}$ (\Cref{lem:lq-reindex}) and the
+constant $H_{\alpha, p}$ of Hardy's inequality in $\ell_p$ (\Cref{lem:hardy-every-exponent}). It
+is the constant of (4) of \Cref{thm:e-couple-bernstein} with $\rho$ in place of $\rho_1$ and the
+Bernstein bound $2 (2 C C_B)^\rho 4^{r\rho}$ of the near-best elements
+(\Cref{lem:jackson-bernstein-couple}) in place of $(2C)^{\rho_1}$, and it is finite since
+$r - s > 0$.
 
 \begin{proof}
 \leanok
@@ -4839,9 +4909,13 @@ is the order of the splines.
   lem:hardy-every-exponent, def:couple}
 Let $A$ be quasi-normed (\Cref{def:couple}), let $\rho > 0$ with
 $N_0(a + b)^\rho \leq N_0(a)^\rho + N_0(b)^\rho$ for all $a, b \in U$, let $s \in \R$ and
-$q \in (0, \infty]$, with $q/\rho = \infty$ for $q = \infty$. Let $C_q$ be the constant of
-\Cref{lem:lq-quasi-triangle}, $\gamma_{1,q}$ that of \Cref{lem:lq-reindex} and $H_{\alpha, r}$
-that of \Cref{lem:hardy-every-exponent}.
+$q \in (0, \infty]$, with $q/\rho = \infty$ for $q = \infty$. Let $C_q = \max(1, 2^{1/q - 1})$,
+$1/\infty = 0$, be the constant of the quasi-triangle inequality in $\ell_q$
+(\Cref{lem:lq-quasi-triangle}), $\gamma_{1,q} = \|(2^{-k})_{k \in \N}\|_{\ell_q}$
+(\Cref{lem:lq-reindex}), and for $\alpha \in \R$ and $r \in (0, \infty]$ let
+$H_{\alpha, r} = (1 - 2^{-\alpha})^{-1}$ for $r \geq 1$ and
+$H_{\alpha, r} = (1 - 2^{-\alpha r})^{-1/r}$ for $r < 1$, in $[0, \infty]$, the constant of
+Hardy's inequality (\Cref{lem:hardy-every-exponent}).
 \begin{enumerate}
   \item Let $u \in U$, and let $b_k \in U$ and a decreasing sequence $(e_k)_k$ in $[0, \infty]$
     satisfy $N_0(u - b_k) \leq e_k$ for every $k$ and $N_0(u) \leq e_0$. Then the blocks
@@ -5262,8 +5336,11 @@ $N_0(f) \leq e_0$. Then for every $k \in \N$
   \sum_{j \leq k} 2^{-(k - j)\theta\rho} e_j^\rho ,
 \]
 and for every $s \in \R$ and $r \in (0, \infty]$, with $\alpha = (\theta - s)\rho$, the
-constant $C_r$ of \Cref{lem:lq-quasi-triangle} and $H_{\alpha, r}$ of
-\Cref{lem:hardy-every-exponent},
+constant $C_r = \max(1, 2^{1/r - 1})$, $1/\infty = 0$, of the quasi-triangle inequality in
+$\ell_r$ (\Cref{lem:lq-quasi-triangle}) and the constant of Hardy's inequality
+$H_{\alpha, r} = (1 - 2^{-\alpha})^{-1}$ for $r \geq 1$ and
+$H_{\alpha, r} = (1 - 2^{-\alpha r})^{-1/r}$ for $r < 1$, in $[0, \infty]$
+(\Cref{lem:hardy-every-exponent}),
 \[
   \bigl\| \bigl( (2^{ks} \omega(f, k))^\rho \bigr)_k \bigr\|_{\ell_r} \leq
   C_r \bigl(C_0^\rho + 4 \, C_B^\rho \, 4^{\theta\rho} H_{\alpha, r}\bigr)
@@ -5303,21 +5380,31 @@ terms.
 \leanok
 \uses{def:couple-modulus-data, lem:couple-modulus-telescoping, lem:e-method-dyadic,
   lem:lp-rho-triangle, lem:lq-quasi-triangle, lem:lq-reindex, thm:modulus-coincidence}
-Let $\omega$ be a modulus compatible with $A$ of exponent $\rho$ and inverse order $\theta$, let
-$q \in (0, \infty]$ and $f \in U$, and let $r = q/\rho$. For every $s \in \R$,
-$\|f\|^{\mathrm{dy}}_{E, s, q} \leq \max(1, C_J) \, \|f\|^{\omega}_{s,q}$, and for
-$0 \leq s < \theta$
+Let $\omega$ be a modulus compatible with $A$ of exponent $\rho$ and inverse order $\theta$, and
+let $q \in (0, \infty]$. For every $s \in \R$ and every $f \in U$,
+$\|f\|^{\mathrm{dy}}_{E, s, q} \leq \max(1, C_J) \, \|f\|^{\omega}_{s,q}$. For every
+$0 \leq s < \theta$ there is a constant $c < \infty$, depending only on $C_0$, $C_B$, $\rho$,
+$\theta$, $s$ and $q$, such that for every $f \in U$
 \[
-  \|f\|^{\omega}_{s,q} \leq \Bigl(1 + \bigl(C_r (C_0^\rho + 4 \, C_B^\rho \, 4^{\theta\rho}
-  H_{(\theta - s)\rho, r})\bigr)^{1/\rho} C_q (1 + \gamma_{1, q})\Bigr)
-  \|f\|^{\mathrm{dy}}_{E, s, q} ,
+  \|f\|^{\omega}_{s,q} \leq c \, \|f\|^{\mathrm{dy}}_{E, s, q} .
 \]
-with the constants of \Cref{lem:couple-modulus-telescoping} and $\gamma_{1, q}$ of
-\Cref{lem:lq-reindex}; the constant is finite. Hence for $0 \leq s < \theta$,
-$\|f\|^{\mathrm{dy}}_{E, s, q} < \infty$ if and only if $\|f\|^{\omega}_{s,q} < \infty$. If
-every $b$ with $N_1(b) < 1$ is $0$, then for $0 < s < \theta$, $f \in E_{s, q}$ if and only if
-$\|f\|^{\omega}_{s,q} < \infty$.
+Hence for $0 \leq s < \theta$ and $f \in U$, $\|f\|^{\mathrm{dy}}_{E, s, q} < \infty$ if and
+only if $\|f\|^{\omega}_{s,q} < \infty$. If every $b$ with $N_1(b) < 1$ is $0$, then for
+$0 < s < \theta$ and $f \in U$, $f \in E_{s, q}$ if and only if $\|f\|^{\omega}_{s,q} < \infty$.
 \end{theorem}
+
+With $r = q/\rho$, the constant is
+\[
+  c = 1 + \bigl(C_r (C_0^\rho + 4 \, C_B^\rho \, 4^{\theta\rho} H_{(\theta - s)\rho, r})
+  \bigr)^{1/\rho} \, C_q (1 + \gamma_{1, q}) .
+\]
+The factor $C_q (1 + \gamma_{1, q})$ bounds a decreasing sequence of near-best errors by the
+dyadic norm (\Cref{lem:e-near-best}), with $C_q = \max(1, 2^{1/q - 1})$ the constant of the
+quasi-triangle inequality in $\ell_q$ (\Cref{lem:lq-quasi-triangle}) and
+$\gamma_{1, q} = \|(2^{-k})_{k \in \N}\|_{\ell_q}$ (\Cref{lem:lq-reindex}). The bracket bounds
+the modulus by these errors (\Cref{lem:couple-modulus-telescoping}); it contains the Hardy
+constant $H_{(\theta - s)\rho, r}$ (\Cref{lem:hardy-every-exponent}), finite for $s < \theta$.
+The summand $1$ accounts for $N_0(f)$.
 
 \begin{proof}
 \leanok
@@ -5354,7 +5441,8 @@ corollary pair $N_0$ with a classical space of the modulus.
 \uses{def:couple-modulus-data, def:couple-k-method, def:jackson-bernstein-data,
   lem:lq-quasi-triangle}
 Let $\omega$ be a modulus compatible with $A$ of exponent $\rho$ and inverse order $\theta$, let
-$C_\rho$ be the constant of \Cref{lem:lq-quasi-triangle}, and for $s_1 \in \R$ and
+$C_\rho = \max(1, 2^{1/\rho - 1})$ be the constant of the quasi-triangle inequality in
+$\ell_\rho$ (\Cref{lem:lq-quasi-triangle}), and for $s_1 \in \R$ and
 $q_1 \in (0, \infty]$ let $(N_0, \|\cdot\|^{\omega}_{s_1, q_1})$ be the couple on $U$ with the
 norms $N_0$ and $\|\cdot\|^{\omega}_{s_1, q_1}$.
 \begin{enumerate}
@@ -5771,10 +5859,17 @@ inequality for tails turns it into a bound in weighted $\ell_q$.
 \lean{MeasureTheory.lqNorm_eLpNorm_sub_le_of_nearBest}
 \leanok
 \uses{lem:near-best-transfer, lem:hardy-every-exponent}
-Let $\mu$, $p$, $r$, $\rho_p$, $\rho_r$, $f$, $b_k$, $e_k$, $C$ and $\beta$ satisfy the
-hypotheses of \Cref{lem:near-best-transfer}(3), let $s \in \R$ and $q \in (0, \infty]$, and let
-$H = H_{(s - \beta)\rho_r, q/\rho_r}$ be the constant of \Cref{lem:hardy-every-exponent}, finite
-for $s > \beta$. Then
+Let $\mu$ be a measure on $\Omega$, let $0 < p, r \leq \infty$, $\rho_p = \min(1, p)$ and
+$\rho_r = \min(1, r)$, and let $f$ be a function on $\Omega$ with values in a normed group $E$.
+Let $b_0, b_1, \dots$ be almost everywhere strongly measurable functions on $\Omega$ with values
+in $E$, and let $e_0 \geq e_1 \geq \dots$ be numbers in $[0, \infty]$ with $e_k \to 0$ and
+$\|f - b_k\|_p \leq e_k$ for every $k \in \N$. Let $C \in [0, \infty]$ and $\beta \in \R$ with
+$\|b_{k+1} - b_k\|_r \leq C \, 2^{k\beta} \, \|b_{k+1} - b_k\|_p$ for every $k \in \N$ (the
+hypotheses of \Cref{lem:near-best-transfer}(3)). Let $s \in \R$ and $q \in (0, \infty]$, and let
+$H = H_{(s - \beta)\rho_r, q/\rho_r}$, where $H_{\alpha, t} = (1 - 2^{-\alpha})^{-1}$ for
+$t \geq 1$ and $H_{\alpha, t} = (1 - 2^{-\alpha t})^{-1/t}$ for $t < 1$, in $[0, \infty]$, is the
+constant of Hardy's inequality (\Cref{lem:hardy-every-exponent}); $H$ is finite for $s > \beta$.
+Then
 \[
   \bigl\| \bigl(2^{k(s-\beta)} \|f - b_k\|_r\bigr)_k \bigr\|_{\ell_q}
   \leq C \, 2^{1/\rho_p} H^{1/\rho_r} \, \bigl\| (2^{ks} e_k)_k \bigr\|_{\ell_q} .
@@ -5884,9 +5979,10 @@ the complexity couple of the quasi-norm $\|\cdot\|_p$ and the sets $S^{(p)}_n$
 \leanok
 \uses{def:scheme-lp-couple, def:couple, def:e-functional, def:e-method, lem:lq-quasi-triangle,
   lem:inclusion-linear}
-Let $S$ be a scheme of functions, let $0 < p \leq \infty$ and $\rho = \min(1, p)$, let $C_p$ be
-the constant of \Cref{lem:lq-quasi-triangle}, and let $(N_0, N_1)$ be the couple of $S$ in
-$L_p$, with $E$-functional $E$.
+Let $S$ be a scheme of functions, let $0 < p \leq \infty$ and $\rho = \min(1, p)$, let
+$C_p = \max(1, 2^{1/p - 1})$, $1/\infty = 0$, be the constant of the quasi-triangle inequality in
+$\ell_p$ and in $L_p$ (\Cref{lem:lq-quasi-triangle}, \Cref{lem:lp-quasi-triangle}), and let
+$(N_0, N_1)$ be the couple of $S$ in $L_p$, with $E$-functional $E$.
 \begin{enumerate}
   \item The sets $S^{(p)}_n$ increase, $S^{(p)}_0 = \{0\}$, $c \, S^{(p)}_n \subseteq S^{(p)}_n$
     for every $c \in \R$ and $n \in \N$, and $S^{(p)}_m + S^{(p)}_n \subseteq S^{(p)}_{m+n}$ for
@@ -5906,8 +6002,8 @@ $L_p$, with $E$-functional $E$.
   \item Let $p \leq r \leq \infty$, and let $N_1^{(p)}$ and $N_1^{(r)}$ be the complexities of the
     couples of $S$ in $L_p$ and in $L_r$. Then $N_1^{(p)}(\iota_{r,p} f) \leq N_1^{(r)}(f)$ for
     every $f \in L_r$.
-  \item Let $p \leq r \leq \infty$, $0 < q \leq \infty$ and $t \in \R$, let $C_r$ be the constant
-    of \Cref{lem:lq-quasi-triangle}, let $b_k \in S_{2^k}$ for $k \in \N$, and let $f \in L_p$
+  \item Let $p \leq r \leq \infty$, $0 < q \leq \infty$ and $t \in \R$, let
+    $C_r = \max(1, 2^{1/r - 1})$, let $b_k \in S_{2^k}$ for $k \in \N$, and let $f \in L_p$
     with $X = \|(2^{kt} \|f - b_k\|_r)_k\|_{\ell_q} < \infty$. Then $f = \iota_{r,p} g$ for some
     $g \in L_r$ whose dyadic norm $\|g\|^{\mathrm{dy}}_{E', t, q}$ (\Cref{def:e-method}) in the
     couple of $S$ in $L_r$, with $E$-functional $E'$, satisfies
@@ -6357,9 +6453,13 @@ is~\cite[Theorem~5.1 and Corollary~5.3]{DeVorePopovTAMS}, with series that conve
 \uses{def:besov, def:function-scheme, def:scheme-lp-couple, def:e-method, lem:lq-quasi-triangle,
   lem:lq-reindex, lem:hardy-every-exponent}
 Let $S$ be a scheme of functions, $0 < p \leq \infty$, $\rho = \min(1, p)$, $s > 0$ and
-$q \in (0, \infty]$, with $q/\rho = \infty$ for $q = \infty$. Let $C_q$ be the constant of
-\Cref{lem:lq-quasi-triangle}, $\gamma_{1,q}$ that of \Cref{lem:lq-reindex} and $H_{\alpha, r}$
-that of \Cref{lem:hardy-every-exponent}, let
+$q \in (0, \infty]$, with $q/\rho = \infty$ for $q = \infty$. Let $C_q = \max(1, 2^{1/q - 1})$,
+$1/\infty = 0$, be the constant of the quasi-triangle inequality in $\ell_q$
+(\Cref{lem:lq-quasi-triangle}), $\gamma_{1,q} = \|(2^{-k})_{k \in \N}\|_{\ell_q}$
+(\Cref{lem:lq-reindex}), and for $\alpha \in \R$ and $r \in (0, \infty]$ let
+$H_{\alpha, r} = (1 - 2^{-\alpha})^{-1}$ for $r \geq 1$ and
+$H_{\alpha, r} = (1 - 2^{-\alpha r})^{-1/r}$ for $r < 1$, in $[0, \infty]$, the constant of
+Hardy's inequality (\Cref{lem:hardy-every-exponent}). Let
 $K = C_q^3 \, 2^{1/\rho} \, 2^s (1 + 2^s) (1 + \gamma_{1,q})$, and for $f \in L_p$ let
 $\|f\|^{\mathrm{dy}}_{s,q} = \|f\|_p + \|(2^{ks} E_{2^k}(f)_p)_k\|_{\ell_q}$ be the dyadic norm
 (\Cref{def:e-method}) of the couple of $S$ in $L_p$ (\Cref{def:scheme-lp-couple}).
@@ -7306,8 +7406,13 @@ Let $s > 0$ and $1 \leq q \leq \infty$. For $f \in L_2(\mu)$:
 \begin{enumerate}
   \item $f \in \Besov{s}{2}{2}(M)$ if and only if
     $\sum_i (1 + \lambda(i))^{2s} |\langle e_i, f \rangle|^2 < \infty$;
-  \item $f \in \Besov{s}{2}{q}(M)$ if and only if the block norm of \Cref{thm:spectral-coefficients}
-    is finite;
+  \item $f \in \Besov{s}{2}{q}(M)$ if and only if its block norm
+    (\Cref{thm:spectral-coefficients}) is finite, that is,
+    \[
+      \Bigl(\sum_{\lambda(i) = 0} |\langle e_i, f \rangle|^2\Bigr)^{1/2} + \Bigl\| \Bigl(2^{ks}
+        \Bigl(\sum_{2^k \leq \lambda(i) < 2^{k+1}} |\langle e_i, f \rangle|^2\Bigr)^{1/2}\Bigr)_k
+        \Bigr\|_{\ell_q} < \infty ;
+    \]
   \item the space $H^s(M)$ of the $f$ with
     $\sum_i (1 + \lambda(i))^{2s} |\langle e_i, f \rangle|^2 < \infty$ is a Sobolev space of order
     $s$ for the scheme in $L_2$, with constants $1$; $H^s(M) \subseteq \Besov{s}{2}{\infty}(M)$, and
