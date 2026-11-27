@@ -14,7 +14,9 @@ files and contains no `sorry`.
 * **Blueprint** (a webpage explaining the mathematics):
   <https://mario-ullrich.github.io/Lean-FunctionSpaces/>
 * **Blueprint as PDF**: <https://mario-ullrich.github.io/Lean-FunctionSpaces/blueprint.pdf>
-* **Dependency graph**:
+* **Dependency graph** of the main results, read off the Lean proofs (views Flow and Rings):
+  <https://mario-ullrich.github.io/Lean-FunctionSpaces/graph/flow.html>
+* **Dependency graph of the blueprint** (leanblueprint):
   <https://mario-ullrich.github.io/Lean-FunctionSpaces/dep_graph_document.html>
 
 ## The setting
@@ -465,7 +467,9 @@ Requires [`elan`](https://github.com/leanprover/elan); Lean and Mathlib are pinn
 run `lake update`, which re-resolves the dependencies. The blueprint follows
 [leanblueprint](https://github.com/PatrickMassot/leanblueprint) (`leanblueprint pdf`,
 `leanblueprint web`). GitHub Actions builds the project and the blueprint on every push, checks
-that every `\lean{...}` of the blueprint resolves, and publishes both.
+that every `\lean{...}` of the blueprint resolves, and publishes both. The dependency graph read
+off the Lean proofs comes from a separate extractor run on the compiled project: its pages and
+data are committed in `blueprint/graph/` and copied into the site.
 
 ## AI assistance
 

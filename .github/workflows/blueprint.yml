@@ -150,6 +150,23 @@ jobs:
             --repo "$GITHUB_REPOSITORY" \
             --rev "$GITHUB_SHA"
 
+      # The dependency graph drawn from the compiled Lean code: its arrows are
+      # read off the proofs. The pages in blueprint/graph/ (the views Flow and
+      # Rings, with the data in data.json) go to graph/ on the site, and the menu
+      # entry "Dependency graph" of every page leads there. The graphs
+      # leanblueprint draws from the `\uses` of the blueprint stay on the site
+      # under their names, and the title page links both kinds below the author.
+      # dep_graph_overview.html holds the main results in their blocks as
+      # Graphviz source, for the picture on the Lean page of the homepage. The
+      # check fails the build if the menu entry was not found.
+      - name: Publish the dependency graph from the Lean code, keep the leanblueprint graphs
+        run: |
+          cp -r blueprint/graph blueprint/web/graph
+          sed -i 's#^<li ><a href="dep_graph_document.html">Dependency graph</a></li>$#<li ><a href="graph/flow.html">Dependency graph</a></li>#' blueprint/web/*.html
+          sed -i 's#<span class="author">Mario Ullrich</span>#&</p>\n<p class="repo-link">GitHub: <a href="https://github.com/mario-ullrich/Lean-FunctionSpaces">Lean-FunctionSpaces</a></p>\n<p class="repo-link"><a href="graph/flow.html">Dependency graph</a>, <a href="dep_graph_document.html">leanblueprint version</a>#' blueprint/web/index.html
+          python blueprint/scripts/graph_overview_page.py
+          grep -q 'href="graph/flow.html">Dependency graph</a></li>' blueprint/web/index.html
+
       # Fatal on purpose: a blueprint that cites a declaration the project no
       # longer has is wrong, and a step that only reports can itself break
       # unnoticed. The script performs the check of `leanblueprint checkdecls`

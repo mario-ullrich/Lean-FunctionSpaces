@@ -84,6 +84,20 @@ div.titlepage + p {
 	text-align: center;
 }
 
+/* The two link lines on the title page, added below the author by the workflow:
+   close to the author and to each other, with room before the page goes on. */
+div.titlepage p.authors {
+	margin-bottom: 0.15rem;
+}
+
+div.titlepage p.repo-link {
+	margin: 0.15rem 0;
+}
+
+div.titlepage p.repo-link:last-of-type {
+	margin-bottom: 2rem;
+}
+
 /* The statement that opens on a click in the dependency graph fits the window:
    dep_graph.css gives it a fixed width but no height limit, so a long statement
    ran below the window edge and could only be read after zooming out. Now it

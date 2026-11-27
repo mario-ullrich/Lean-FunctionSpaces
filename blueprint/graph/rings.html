@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Knowledge graph</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=JetBrains+Mono:wght@500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <link rel="stylesheet" href="advanced.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/elkjs@0.9.3/lib/elk.bundled.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <script defer src="common.js"></script>
+  <script defer src="advanced.js"></script>
+  <script defer src="rings.js"></script>
+</head>
+<body>
+<div class="app" id="app">
+  <header class="band">
+    <div class="band-in">
+      <div class="hd">
+        <div class="hd-title">
+          <h1 id="title">Knowledge graph</h1>
+          <p class="meta" id="provenance"></p>
+        </div>
+        <div class="controls">
+          <nav class="views" aria-label="Views">
+            <a href="flow.html" data-view="flow.html">Flow</a>
+            <a href="rings.html" data-view="rings.html" aria-current="page">Rings</a>
+          </nav>
+          <div class="seg" role="group" aria-label="Drawing or list">
+            <button id="v-graph" type="button" aria-pressed="true">Graph</button>
+            <button id="v-list" type="button" aria-pressed="false">List</button>
+          </div>
+          <div class="seg" role="group" aria-label="Nodes">
+            <span class="seg-l">Nodes</span>
+            <button id="n-main" type="button" aria-pressed="true">Main</button>
+            <button id="n-all" type="button" aria-pressed="false">All</button>
+          </div>
+          <div class="seg" role="group" aria-label="Arrows">
+            <span class="seg-l">Arrows</span>
+            <button id="a-reduced" type="button" aria-pressed="true">Reduced</button>
+            <button id="a-all" type="button" aria-pressed="false">All</button>
+          </div>
+          <input type="checkbox" id="details" hidden>
+          <span id="profile-switch" class="profile-switch"></span>
+          <div class="search">
+            <label class="visually-hidden" for="search">Find a node</label>
+            <input id="search" type="search" placeholder="Find a node" autocomplete="off"
+                   role="combobox" aria-expanded="false" aria-controls="search-results">
+            <ul id="search-results" role="listbox" hidden></ul>
+          </div>
+        </div>
+      </div>
+      <div class="state">
+        <div class="state-h" id="state-h"></div>
+        <div class="bar" id="bar" role="group" aria-label="Where the nodes stand in Lean"></div>
+        <div class="keys" id="keys"></div>
+      </div>
+    </div>
+  </header>
+  <main class="main">
+    <div class="left">
+      <section class="stage" id="stage" aria-label="Dependency graph">
+        <svg id="drawing" class="gv" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet"></svg>
+        <div class="status" id="status" role="status">Loading…</div>
+        <p class="ctl" id="hint" hidden></p>
+        <div class="ctl zoom">
+          <button class="tool" id="z-in" type="button" aria-label="Zoom in">+</button>
+          <button class="tool" id="z-out" type="button" aria-label="Zoom out">−</button>
+          <button class="tool" id="z-fit" type="button">Fit</button>
+        </div>
+        <div class="ctl axis" aria-hidden="true">
+          <span>Foundations in the middle</span><i></i><span>Results outside</span>
+          <div class="mousekey" id="mousekey">
+            <span class="mk-l"><svg class="mi" viewBox="0 0 12 16" width="12" height="16" aria-hidden="true"><rect x=".75" y=".75" width="10.5" height="14.5" rx="5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M6 1A5 5 0 0 0 1 6V7H6Z" fill="currentColor"/><path d="M6 1V7" stroke="currentColor"/></svg><b>Left-click:</b> all connections</span>
+            <span class="mk-r"><svg class="mi" viewBox="0 0 12 16" width="12" height="16" aria-hidden="true"><rect x=".75" y=".75" width="10.5" height="14.5" rx="5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M6 1A5 5 0 0 1 11 6V7H6Z" fill="currentColor"/><path d="M6 1V7" stroke="currentColor"/></svg><b>Right-click:</b> read another node</span>
+          </div>
+        </div>
+      </section>
+      <section class="list" id="list" aria-label="List of nodes" hidden></section>
+    </div>
+    <aside class="panel" id="panel" aria-live="polite" aria-label="Details">
+      <div id="panel-body"></div>
+    </aside>
+  </main>
+</div>
+</body>
+</html>
